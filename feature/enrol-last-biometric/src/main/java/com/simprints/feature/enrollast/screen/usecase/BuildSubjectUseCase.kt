@@ -1,8 +1,8 @@
 package com.simprints.feature.enrollast.screen.usecase
 
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.Sample
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
@@ -44,28 +44,34 @@ internal class BuildSubjectUseCase @Inject constructor(
     private fun fingerprintSample(
         referenceId: String,
         result: FingerTemplateCaptureResult,
-    ) = FingerprintSample(
-        fromDomainToModuleApi(result.finger),
-        result.template,
-        result.format,
-        referenceId,
+    ) = Sample(
+        identifier = fromDomainToModuleApi(result.finger),
+        template = result.template,
+        format = result.format,
+        referenceId = referenceId,
+        modality = Modality.FINGERPRINT,
     )
 
     private fun fromDomainToModuleApi(finger: Finger) = when (finger) {
-        Finger.RIGHT_5TH_FINGER -> IFingerIdentifier.RIGHT_5TH_FINGER
-        Finger.RIGHT_4TH_FINGER -> IFingerIdentifier.RIGHT_4TH_FINGER
-        Finger.RIGHT_3RD_FINGER -> IFingerIdentifier.RIGHT_3RD_FINGER
-        Finger.RIGHT_INDEX_FINGER -> IFingerIdentifier.RIGHT_INDEX_FINGER
-        Finger.RIGHT_THUMB -> IFingerIdentifier.RIGHT_THUMB
-        Finger.LEFT_THUMB -> IFingerIdentifier.LEFT_THUMB
-        Finger.LEFT_INDEX_FINGER -> IFingerIdentifier.LEFT_INDEX_FINGER
-        Finger.LEFT_3RD_FINGER -> IFingerIdentifier.LEFT_3RD_FINGER
-        Finger.LEFT_4TH_FINGER -> IFingerIdentifier.LEFT_4TH_FINGER
-        Finger.LEFT_5TH_FINGER -> IFingerIdentifier.LEFT_5TH_FINGER
+        Finger.RIGHT_5TH_FINGER -> SampleIdentifier.RIGHT_5TH_FINGER
+        Finger.RIGHT_4TH_FINGER -> SampleIdentifier.RIGHT_4TH_FINGER
+        Finger.RIGHT_3RD_FINGER -> SampleIdentifier.RIGHT_3RD_FINGER
+        Finger.RIGHT_INDEX_FINGER -> SampleIdentifier.RIGHT_INDEX_FINGER
+        Finger.RIGHT_THUMB -> SampleIdentifier.RIGHT_THUMB
+        Finger.LEFT_THUMB -> SampleIdentifier.LEFT_THUMB
+        Finger.LEFT_INDEX_FINGER -> SampleIdentifier.LEFT_INDEX_FINGER
+        Finger.LEFT_3RD_FINGER -> SampleIdentifier.LEFT_3RD_FINGER
+        Finger.LEFT_4TH_FINGER -> SampleIdentifier.LEFT_4TH_FINGER
+        Finger.LEFT_5TH_FINGER -> SampleIdentifier.LEFT_5TH_FINGER
     }
 
     private fun faceSample(
         referenceId: String,
         result: FaceTemplateCaptureResult,
-    ) = FaceSample(result.template, result.format, referenceId)
+    ) = Sample(
+        template = result.template,
+        format = result.format,
+        referenceId = referenceId,
+        modality = Modality.FACE,
+    )
 }

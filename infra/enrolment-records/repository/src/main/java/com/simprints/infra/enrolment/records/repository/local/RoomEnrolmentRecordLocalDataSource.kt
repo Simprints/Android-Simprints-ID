@@ -2,9 +2,9 @@ package com.simprints.infra.enrolment.records.repository.local
 
 import androidx.room.withTransaction
 import com.simprints.core.DispatcherIO
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.Sample
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
@@ -96,11 +96,12 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             FaceIdentity(
                 subjectId = subjectId,
                 faces = templates.map { sample ->
-                    FaceSample(
+                    Sample(
                         template = sample.templateData,
                         id = sample.uuid,
                         format = sample.format,
                         referenceId = sample.referenceId,
+                        modality = Modality.FACE,
                     )
                 },
             )
@@ -127,12 +128,13 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             FingerprintIdentity(
                 subjectId = subjectId,
                 fingerprints = templates.map { sample ->
-                    FingerprintSample(
-                        fingerIdentifier = IFingerIdentifier.entries[sample.identifier!!],
+                    Sample(
+                        identifier = SampleIdentifier.entries[sample.identifier!!],
                         template = sample.templateData,
                         id = sample.uuid,
                         format = sample.format,
                         referenceId = sample.referenceId,
+                        modality = Modality.FINGERPRINT,
                     )
                 },
             )

@@ -1,7 +1,8 @@
 package com.simprints.infra.eventsync.sync.down.tasks
 
-import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.face.FaceSample
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
@@ -11,7 +12,9 @@ import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.*
+import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Creation
+import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Deletion
+import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Update
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScope
@@ -37,9 +40,7 @@ import com.simprints.infra.eventsync.sync.common.SubjectFactory
 import com.simprints.infra.eventsync.sync.down.tasks.BaseEventDownSyncTask.Companion.EVENTS_BATCH_SIZE
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
@@ -518,7 +519,12 @@ class SimprintsEventDownSyncTaskTest {
                 attendantId = "moduleId".asTokenizableRaw(),
                 moduleId = "attendantId".asTokenizableRaw(),
                 faceSamples = listOf(
-                    FaceSample(byteArrayOf(), "format", "referenceId"),
+                    Sample(
+                        template = byteArrayOf(),
+                        format = "format",
+                        referenceId = "referenceId",
+                        modality = Modality.FACE,
+                    ),
                 ),
             ),
         )

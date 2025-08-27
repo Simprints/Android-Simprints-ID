@@ -1,11 +1,14 @@
-package com.simprints.core.domain.fingerprint
+package com.simprints.core.domain.sample
 
 import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 
 @Keep
 @ExcludedFromGeneratedTestCoverageReports("Enum")
-enum class IFingerIdentifier {
+enum class SampleIdentifier {
+    NONE,
+
+    // Fingerprint identifiers
     RIGHT_5TH_FINGER,
     RIGHT_4TH_FINGER,
     RIGHT_3RD_FINGER,

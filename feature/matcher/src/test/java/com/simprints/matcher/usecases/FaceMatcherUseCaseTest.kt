@@ -3,7 +3,8 @@ package com.simprints.matcher.usecases
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.Sample
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.models.FaceConfiguration
@@ -121,7 +122,14 @@ internal class FaceMatcherUseCaseTest {
         val faceIdentities = listOf(
             FaceIdentity(
                 "subjectId",
-                listOf(FaceSample(byteArrayOf(1, 2, 3), "format", "faceTemplate")),
+                listOf(
+                    Sample(
+                        template = byteArrayOf(1, 2, 3),
+                        format = "format",
+                        referenceId = "faceTemplate",
+                        modality = Modality.FACE,
+                    ),
+                ),
             ),
         )
         coEvery { enrolmentRecordRepository.count(any(), any()) } returns 1

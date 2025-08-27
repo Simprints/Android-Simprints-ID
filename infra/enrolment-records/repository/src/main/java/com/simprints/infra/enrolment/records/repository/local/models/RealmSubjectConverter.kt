@@ -1,7 +1,6 @@
 package com.simprints.infra.enrolment.records.repository.local.models
 
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.domain.tokenization.isTokenized
@@ -40,8 +39,8 @@ internal fun Subject.toRealmDb(): RealmSubject = RealmSubject().also { subject -
     subject.createdAt = createdAt?.toRealmInstant()
     subject.updatedAt = updatedAt?.toRealmInstant()
     subject.fingerprintSamples =
-        fingerprintSamples.map(FingerprintSample::toRealmDb).toRealmList()
-    subject.faceSamples = faceSamples.map(FaceSample::toRealmDb).toRealmList()
+        fingerprintSamples.map(Sample::toRealmFingerprintDb).toRealmList()
+    subject.faceSamples = faceSamples.map(Sample::toRealmFaceDb).toRealmList()
     subject.isModuleIdTokenized = moduleId.isTokenized()
     subject.isAttendantIdTokenized = attendantId.isTokenized()
 }

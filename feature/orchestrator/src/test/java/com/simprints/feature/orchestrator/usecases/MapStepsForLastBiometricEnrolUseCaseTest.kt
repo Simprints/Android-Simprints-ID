@@ -1,7 +1,7 @@
 package com.simprints.feature.orchestrator.usecases
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
@@ -103,12 +103,12 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
                 FingerprintCaptureResult(
                     "referenceId",
                     results = listOf(
-                        FingerprintCaptureResult.Item(null, IFingerIdentifier.LEFT_THUMB, null),
+                        FingerprintCaptureResult.Item(null, SampleIdentifier.LEFT_THUMB, null),
                         FingerprintCaptureResult.Item(
-                            identifier = IFingerIdentifier.RIGHT_THUMB,
+                            identifier = SampleIdentifier.RIGHT_THUMB,
                             captureEventId = GUID1,
                             sample = FingerprintCaptureResult.Sample(
-                                fingerIdentifier = IFingerIdentifier.RIGHT_THUMB,
+                                fingerIdentifier = SampleIdentifier.RIGHT_THUMB,
                                 template = byteArrayOf(),
                                 templateQualityScore = 0,
                                 imageRef = null,

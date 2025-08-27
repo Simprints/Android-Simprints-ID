@@ -5,9 +5,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.face.capture.FaceCaptureResult
@@ -300,22 +300,22 @@ internal class OrchestratorViewModelTest {
         coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
         val format = "SimMatcher"
         val sample1 = FingerprintCaptureResult.Sample(
-            IFingerIdentifier.LEFT_INDEX_FINGER,
+            SampleIdentifier.LEFT_INDEX_FINGER,
             ByteArray(0),
             0,
             null,
             format,
         )
         val sample2 = FingerprintCaptureResult.Sample(
-            IFingerIdentifier.LEFT_THUMB,
+            SampleIdentifier.LEFT_THUMB,
             ByteArray(0),
             0,
             null,
             format,
         )
         val captureResults: List<FingerprintCaptureResult.Item> = listOf(
-            FingerprintCaptureResult.Item(null, IFingerIdentifier.LEFT_INDEX_FINGER, sample1),
-            FingerprintCaptureResult.Item(null, IFingerIdentifier.LEFT_THUMB, sample2),
+            FingerprintCaptureResult.Item(null, SampleIdentifier.LEFT_INDEX_FINGER, sample1),
+            FingerprintCaptureResult.Item(null, SampleIdentifier.LEFT_THUMB, sample2),
         )
 
         viewModel.handleAction(mockk())

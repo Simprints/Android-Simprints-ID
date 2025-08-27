@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.capture.usecase
 
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.fingerprint.capture.extensions.deduceFileExtension
 import com.simprints.fingerprint.capture.extensions.toInt
 import com.simprints.fingerprint.capture.state.CaptureState
@@ -21,7 +21,7 @@ internal class SaveFingerprintSampleUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         vero2Configuration: Vero2Configuration,
-        finger: IFingerIdentifier,
+        finger: SampleIdentifier,
         captureEventId: String?,
         collectedFinger: CaptureState.ScanProcess.Collected,
     ) = if (collectedFinger.scanResult.image != null && captureEventId != null) {
@@ -45,7 +45,7 @@ internal class SaveFingerprintSampleUseCase @Inject constructor(
         imageBytes: ByteArray,
         captureEventId: String,
         fileExtension: String,
-        finger: IFingerIdentifier,
+        finger: SampleIdentifier,
         dpi: Int,
         scannerId: String?,
         un20SerialNumber: String?,

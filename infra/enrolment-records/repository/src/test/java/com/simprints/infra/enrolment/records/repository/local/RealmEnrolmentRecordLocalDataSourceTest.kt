@@ -1,9 +1,9 @@
 package com.simprints.infra.enrolment.records.repository.local
 
 import com.google.common.truth.Truth.*
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.Sample
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.config.store.models.Project
@@ -329,9 +329,9 @@ class RealmEnrolmentRecordLocalDataSourceTest {
                 match<DbSubject> {
                     // one old + one new
                     it.faceSamples.size == 2 &&
-                    it.fingerprintSamples.size == 2 &&
-                    it.faceSamples.none { sample -> sample.referenceId == faceReferenceId } &&
-                    it.fingerprintSamples.none { sample -> sample.referenceId == fingerReferenceId }
+                        it.fingerprintSamples.size == 2 &&
+                        it.faceSamples.none { sample -> sample.referenceId == faceReferenceId } &&
+                        it.fingerprintSamples.none { sample -> sample.referenceId == fingerReferenceId }
                 },
                 any(),
             )
@@ -425,11 +425,11 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         projectId: String = UUID.randomUUID().toString(),
         userId: String = UUID.randomUUID().toString(),
         moduleId: String = UUID.randomUUID().toString(),
-        faceSamples: List<FaceSample> = listOf(
+        faceSamples: List<Sample> = listOf(
             getRandomFaceSample(),
             getRandomFaceSample(),
         ),
-        fingerprintSamples: List<FingerprintSample> = listOf(),
+        fingerprintSamples: List<Sample> = listOf(),
     ): Subject = Subject(
         subjectId = patientId,
         projectId = projectId,
@@ -442,10 +442,23 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     private fun getRandomFaceSample(
         id: String = UUID.randomUUID().toString(),
         referenceId: String = "referenceId",
-    ) = FaceSample(Random.nextBytes(64), "faceTemplateFormat", referenceId, id)
+    ) = Sample(
+        template = Random.nextBytes(64),
+        format = "faceTemplateFormat",
+        referenceId = referenceId,
+        id = id,
+        modality = Modality.FACE,
+    )
 
     private fun getRandomFingerprintSample(
         id: String = UUID.randomUUID().toString(),
         referenceId: String = "referenceId",
-    ) = FingerprintSample(IFingerIdentifier.LEFT_3RD_FINGER, Random.nextBytes(64), "fingerprintTemplateFormat", referenceId, id)
+    ) = Sample(
+        identifier = SampleIdentifier.LEFT_3RD_FINGER,
+        template = Random.nextBytes(64),
+        format = "fingerprintTemplateFormat",
+        referenceId = referenceId,
+        id = id,
+        modality = Modality.FINGERPRINT,
+    )
 }

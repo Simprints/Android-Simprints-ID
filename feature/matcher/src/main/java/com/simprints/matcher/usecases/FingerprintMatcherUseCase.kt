@@ -2,7 +2,7 @@ package com.simprints.matcher.usecases
 
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
@@ -134,17 +134,18 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         ?.getSdkConfiguration(bioSdk)
         ?.comparisonStrategyForVerification == CROSS_FINGER_USING_MEAN_OF_MAX
 
-    private fun IFingerIdentifier.toMatcherDomain() = when (this) {
-        IFingerIdentifier.RIGHT_5TH_FINGER -> FingerIdentifier.RIGHT_5TH_FINGER
-        IFingerIdentifier.RIGHT_4TH_FINGER -> FingerIdentifier.RIGHT_4TH_FINGER
-        IFingerIdentifier.RIGHT_3RD_FINGER -> FingerIdentifier.RIGHT_3RD_FINGER
-        IFingerIdentifier.RIGHT_INDEX_FINGER -> FingerIdentifier.RIGHT_INDEX_FINGER
-        IFingerIdentifier.RIGHT_THUMB -> FingerIdentifier.RIGHT_THUMB
-        IFingerIdentifier.LEFT_THUMB -> FingerIdentifier.LEFT_THUMB
-        IFingerIdentifier.LEFT_INDEX_FINGER -> FingerIdentifier.LEFT_INDEX_FINGER
-        IFingerIdentifier.LEFT_3RD_FINGER -> FingerIdentifier.LEFT_3RD_FINGER
-        IFingerIdentifier.LEFT_4TH_FINGER -> FingerIdentifier.LEFT_4TH_FINGER
-        IFingerIdentifier.LEFT_5TH_FINGER -> FingerIdentifier.LEFT_5TH_FINGER
+    private fun SampleIdentifier.toMatcherDomain() = when (this) {
+        SampleIdentifier.RIGHT_5TH_FINGER -> FingerIdentifier.RIGHT_5TH_FINGER
+        SampleIdentifier.RIGHT_4TH_FINGER -> FingerIdentifier.RIGHT_4TH_FINGER
+        SampleIdentifier.RIGHT_3RD_FINGER -> FingerIdentifier.RIGHT_3RD_FINGER
+        SampleIdentifier.RIGHT_INDEX_FINGER -> FingerIdentifier.RIGHT_INDEX_FINGER
+        SampleIdentifier.RIGHT_THUMB -> FingerIdentifier.RIGHT_THUMB
+        SampleIdentifier.LEFT_THUMB -> FingerIdentifier.LEFT_THUMB
+        SampleIdentifier.LEFT_INDEX_FINGER -> FingerIdentifier.LEFT_INDEX_FINGER
+        SampleIdentifier.LEFT_3RD_FINGER -> FingerIdentifier.LEFT_3RD_FINGER
+        SampleIdentifier.LEFT_4TH_FINGER -> FingerIdentifier.LEFT_4TH_FINGER
+        SampleIdentifier.LEFT_5TH_FINGER -> FingerIdentifier.LEFT_5TH_FINGER
+        SampleIdentifier.NONE -> throw IllegalArgumentException("Not a finger sample")
     }
 
     private fun List<DomainFingerprintIdentity>.mapToFingerprintIdentity() = map {
@@ -152,7 +153,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
             it.subjectId,
             it.fingerprints.map { finger ->
                 Fingerprint(
-                    finger.fingerIdentifier.toMatcherDomain(),
+                    finger.identifier.toMatcherDomain(),
                     finger.template,
                     finger.format,
                 )

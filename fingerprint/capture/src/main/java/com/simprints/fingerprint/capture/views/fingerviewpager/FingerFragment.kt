@@ -8,7 +8,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.fingerprint.capture.R
 import com.simprints.fingerprint.capture.databinding.FragmentFingerBinding
 import com.simprints.fingerprint.capture.resources.directionTextColour
@@ -30,7 +30,7 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
     private val binding by viewBinding(FragmentFingerBinding::bind)
     private val vm: FingerprintCaptureViewModel by viewModels(ownerProducer = { requireParentFragment() })
 
-    private lateinit var fingerId: IFingerIdentifier
+    private lateinit var fingerId: SampleIdentifier
 
     private lateinit var timeoutBars: List<ScanCountdownBar>
 
@@ -40,7 +40,7 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        fingerId = IFingerIdentifier.entries.toTypedArray()[
+        fingerId = SampleIdentifier.entries.toTypedArray()[
             arguments?.getInt(FINGER_ID_BUNDLE_KEY)
                 ?: throw IllegalArgumentException(),
         ]
@@ -151,7 +151,7 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
 
         private const val PROGRESS_BAR_MARGIN = 4
 
-        fun newInstance(fingerId: IFingerIdentifier) = FingerFragment().also {
+        fun newInstance(fingerId: SampleIdentifier) = FingerFragment().also {
             it.arguments = Bundle().apply { putInt(FINGER_ID_BUNDLE_KEY, fingerId.ordinal) }
         }
     }

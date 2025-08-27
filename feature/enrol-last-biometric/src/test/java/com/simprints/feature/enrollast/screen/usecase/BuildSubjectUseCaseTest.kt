@@ -1,7 +1,7 @@
 package com.simprints.feature.enrollast.screen.usecase
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
@@ -81,7 +81,7 @@ class BuildSubjectUseCaseTest {
         )
 
         assertThat(result.fingerprintSamples).isNotEmpty()
-        assertThat(result.fingerprintSamples.first().fingerIdentifier).isEqualTo(IFingerIdentifier.RIGHT_THUMB)
+        assertThat(result.fingerprintSamples.first().fingerIdentifier).isEqualTo(SampleIdentifier.RIGHT_THUMB)
     }
 
     @Test
