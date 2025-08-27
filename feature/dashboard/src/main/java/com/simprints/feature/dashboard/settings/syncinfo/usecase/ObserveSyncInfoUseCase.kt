@@ -20,7 +20,7 @@ import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.models.canCoSyncData
+import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
@@ -171,11 +171,14 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             else -> OnStandby
         }
 
-        val isUpSyncStillAllowedWhenCommCareSyncBlockedByDeniedPermission = // quite a specific case hence the name
-            isCommCareSyncBlockedByDeniedPermission && projectConfig.canCoSyncData()
+        val isEventUpSyncPossible =
+            projectConfig.canSyncDataToSimprints() && isOnline
+        val isDownSyncPossible =
+            (projectConfig.isSimprintsEventDownSyncAllowed() && isOnline && !isReLoginRequired) ||
+                (projectConfig.isCommCareEventDownSyncAllowed() && !eventSyncState.isSyncFailedBecauseCommCarePermissionIsMissing())
         val isSyncButtonEnabled =
-            ((eventSyncVisibleState == OnStandby) || isUpSyncStillAllowedWhenCommCareSyncBlockedByDeniedPermission)
-                    && !isReLoginRequired
+            (eventSyncVisibleState == OnStandby) &&
+                ((!isPreLogoutUpSync && isDownSyncPossible) || isEventUpSyncPossible)
 
         val projectId = authStore.signedInProjectId
 

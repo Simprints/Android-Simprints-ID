@@ -20,7 +20,7 @@ import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
-import com.simprints.infra.config.store.models.canCoSyncData
+import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
@@ -77,22 +77,26 @@ class ObserveSyncInfoUseCaseTest {
         const val TEST_USER_ID = "test_user_id"
         const val TEST_MODULE_NAME = "test_module"
         val TEST_TIMESTAMP = Timestamp(1000L)
+
+        fun createMockSynchronizationConfiguration(): SynchronizationConfiguration {
+            return mockk<SynchronizationConfiguration>(relaxed = true) {
+                every { down } returns mockk<DownSynchronizationConfiguration>(relaxed = true) {
+                    every { commCare } returns null
+                }
+                every { up } returns mockk<UpSynchronizationConfiguration>(relaxed = true) {
+                    every { coSync } returns mockk<UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration>(relaxed = true) {
+                        every { kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+                    }
+                }
+            }
+        }
     }
 
     private val mockProjectConfiguration = mockk<ProjectConfiguration>(relaxed = true) {
         every { general } returns mockk<GeneralConfiguration>(relaxed = true) {
             every { modalities } returns emptyList()
         }
-        every { synchronization } returns mockk<SynchronizationConfiguration>(relaxed = true) {
-            every { down } returns mockk<DownSynchronizationConfiguration>(relaxed = true) {
-                every { commCare } returns null
-            }
-            every { up } returns mockk<UpSynchronizationConfiguration>(relaxed = true) {
-                every { coSync } returns mockk<UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration>(relaxed = true) {
-                    every { kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
-                }
-            }
-        }
+        every { synchronization } returns createMockSynchronizationConfiguration()
     }
     private val mockDeviceConfiguration = mockk<DeviceConfiguration>(relaxed = true) {
         every { selectedModules } returns emptyList()
@@ -372,6 +376,7 @@ class ObserveSyncInfoUseCaseTest {
             every { general } returns mockk<GeneralConfiguration> {
                 every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
             }
+            every { synchronization } returns createMockSynchronizationConfiguration()
         }
         val mockDeviceConfigWithModules = mockk<DeviceConfiguration> {
             every { selectedModules } returns listOf(TokenizableString.Raw(TEST_MODULE_NAME))
@@ -601,6 +606,7 @@ class ObserveSyncInfoUseCaseTest {
             every { general } returns mockk<GeneralConfiguration> {
                 every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
             }
+            every { synchronization } returns createMockSynchronizationConfiguration()
         }
         val mockDeviceConfigWithModules = mockk<DeviceConfiguration> {
             every { selectedModules } returns listOf(TokenizableString.Raw("module_1"), TokenizableString.Raw("module_2"))
@@ -636,6 +642,7 @@ class ObserveSyncInfoUseCaseTest {
             every { general } returns mockk<GeneralConfiguration> {
                 every { modalities } returns emptyList()
             }
+            every { synchronization } returns createMockSynchronizationConfiguration()
         }
         val mockDeviceConfigWithoutModules = mockk<DeviceConfiguration> {
             every { selectedModules } returns emptyList()
@@ -659,6 +666,7 @@ class ObserveSyncInfoUseCaseTest {
             every { general } returns mockk<GeneralConfiguration> {
                 every { modalities } returns emptyList()
             }
+            every { synchronization } returns createMockSynchronizationConfiguration()
         }
         val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncInProgress() } returns false
@@ -698,6 +706,7 @@ class ObserveSyncInfoUseCaseTest {
             every { general } returns mockk<GeneralConfiguration> {
                 every { modalities } returns emptyList()
             }
+            every { synchronization } returns createMockSynchronizationConfiguration()
         }
         val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncInProgress() } returns false
@@ -722,6 +731,7 @@ class ObserveSyncInfoUseCaseTest {
             every { general } returns mockk<GeneralConfiguration> {
                 every { modalities } returns emptyList()
             }
+            every { synchronization } returns createMockSynchronizationConfiguration()
         }
         val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncInProgress() } returns false
@@ -902,6 +912,7 @@ class ObserveSyncInfoUseCaseTest {
             every { general } returns mockk<GeneralConfiguration> {
                 every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
             }
+            every { synchronization } returns createMockSynchronizationConfiguration()
         }
         every { mockConfigWithModules.isModuleSelectionAvailable() } returns true
         projectConfigFlow.value = mockConfigWithModules // now with modules
@@ -917,6 +928,13 @@ class ObserveSyncInfoUseCaseTest {
             mockk<ProjectConfiguration> {
                 every { general } returns mockk<GeneralConfiguration> {
                     every { modalities } returns emptyList()
+                }
+                every { synchronization } returns mockk<SynchronizationConfiguration>(relaxed = true) {
+                    every { up } returns mockk<UpSynchronizationConfiguration>(relaxed = true) {
+                        every { coSync } returns mockk<UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration>(relaxed = true) {
+                            every { kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+                        }
+                    }
                 }
             },
         )
@@ -1010,15 +1028,53 @@ class ObserveSyncInfoUseCaseTest {
     }
 
     @Test
-    fun `should enable sync button when CommCare permission is missing but co-sync up-sync possible`() = runTest {
-        val mockFailedEventSyncState = mockk<EventSyncState>(relaxed = true) {
-            every { isSyncFailedBecauseCommCarePermissionIsMissing() } returns true
-            every { isSyncRunning() } returns false
+    fun `sync button should be disabled when not on standby`() = runTest {
+        val mockSyncingEventSyncState = mockk<EventSyncState>(relaxed = true) {
+            every { isSyncInProgress() } returns true
         }
-        every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockFailedEventSyncState)
+        every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockSyncingEventSyncState)
+        createUseCase()
+
+        val result = useCase().first()
+
+        assertThat(result.syncInfoSectionRecords.isSyncButtonEnabled).isFalse()
+    }
+
+    @Test
+    fun `sync button should be disabled when this is logout screen and offline`() = runTest {
+        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(false)
+        createUseCase()
+
+        val result = useCase(isPreLogoutUpSync = true).first()
+
+        assertThat(result.syncInfoSectionRecords.isSyncButtonEnabled).isFalse()
+    }
+
+    @Test
+    fun `sync button should be disabled when this is logout screen and no sync to Simprints`() = runTest {
+        every { any<ProjectConfiguration>().canSyncDataToSimprints() } returns false
+        createUseCase()
+
+        val result = useCase(isPreLogoutUpSync = true).first()
+
+        assertThat(result.syncInfoSectionRecords.isSyncButtonEnabled).isFalse()
+    }
+
+    @Test
+    fun `sync button should be enabled when online and there is sync to Simprints`() = runTest {
         every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(true)
-        every { mockProjectConfiguration.isCommCareEventDownSyncAllowed() } returns true
-        every { mockProjectConfiguration.canCoSyncData() } returns true
+        every { any<ProjectConfiguration>().canSyncDataToSimprints() } returns true
+        createUseCase()
+
+        val result = useCase().first() // here and on for the sync button state: assuming not the logout screen
+
+        assertThat(result.syncInfoSectionRecords.isSyncButtonEnabled).isTrue()
+    }
+
+    @Test
+    fun `sync button should be enabled when offline but CommCare down-sync allowed`() = runTest {
+        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(false)
+        every { any<ProjectConfiguration>().isCommCareEventDownSyncAllowed() } returns true
         createUseCase()
 
         val result = useCase().first()
@@ -1027,15 +1083,70 @@ class ObserveSyncInfoUseCaseTest {
     }
 
     @Test
-    fun `should disable sync button when CommCare permission is missing and co-sync up-sync impossible`() = runTest {
-        val mockFailedEventSyncState = mockk<EventSyncState>(relaxed = true) {
-            every { isSyncFailedBecauseCommCarePermissionIsMissing() } returns true
-            every { isSyncRunning() } returns false
+    fun `sync button should be enabled when Simprints down-sync allowed and re-login not required`() = runTest {
+        val mockNormalEventSyncState = mockk<EventSyncState>(relaxed = true) {
+            every { isSyncFailedBecauseReloginRequired() } returns false
         }
-        every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockFailedEventSyncState)
-        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(true)
-        every { mockProjectConfiguration.isCommCareEventDownSyncAllowed() } returns true
-        every { mockProjectConfiguration.canCoSyncData() } returns false
+        every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockNormalEventSyncState)
+        every { any<ProjectConfiguration>().isSimprintsEventDownSyncAllowed() } returns true
+        createUseCase()
+
+        val result = useCase().first()
+
+        assertThat(result.syncInfoSectionRecords.isSyncButtonEnabled).isTrue()
+    }
+
+    @Test
+    fun `sync button should be enabled when CommCare down-sync allowed and no CommCare permission error`() = runTest {
+        val mockNormalEventSyncState = mockk<EventSyncState>(relaxed = true) {
+            every { isSyncFailedBecauseCommCarePermissionIsMissing() } returns false
+        }
+        every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockNormalEventSyncState)
+        every { any<ProjectConfiguration>().isCommCareEventDownSyncAllowed() } returns true
+        createUseCase()
+
+        val result = useCase().first()
+
+        assertThat(result.syncInfoSectionRecords.isSyncButtonEnabled).isTrue()
+    }
+
+    @Test
+    fun `sync button should be disabled when there is neither Simprints nor ComCare down-sync`() = runTest {
+        every { any<ProjectConfiguration>().isSimprintsEventDownSyncAllowed() } returns false
+        every { any<ProjectConfiguration>().isCommCareEventDownSyncAllowed() } returns false
+        every { any<ProjectConfiguration>().canSyncDataToSimprints() } returns false
+        createUseCase()
+
+        val result = useCase().first()
+
+        assertThat(result.syncInfoSectionRecords.isSyncButtonEnabled).isFalse()
+    }
+
+    @Test
+    fun `sync button should be disabled when only Simprints down-sync allowed but re-login required`() = runTest {
+        val mockReLoginRequiredEventSyncState = mockk<EventSyncState>(relaxed = true) {
+            every { isSyncFailedBecauseReloginRequired() } returns true
+        }
+        every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockReLoginRequiredEventSyncState)
+        every { any<ProjectConfiguration>().isSimprintsEventDownSyncAllowed() } returns true
+        every { any<ProjectConfiguration>().isCommCareEventDownSyncAllowed() } returns false
+        every { any<ProjectConfiguration>().canSyncDataToSimprints() } returns false
+        createUseCase()
+
+        val result = useCase().first()
+
+        assertThat(result.syncInfoSectionRecords.isSyncButtonEnabled).isFalse()
+    }
+
+    @Test
+    fun `sync button should be disabled when only CommCare down-sync allowed but there is CoSync permission error`() = runTest {
+        val mockCommCarePermissionErrorEventSyncState = mockk<EventSyncState>(relaxed = true) {
+            every { isSyncFailedBecauseCommCarePermissionIsMissing() } returns true
+        }
+        every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockCommCarePermissionErrorEventSyncState)
+        every { any<ProjectConfiguration>().isCommCareEventDownSyncAllowed() } returns true
+        every { any<ProjectConfiguration>().isSimprintsEventDownSyncAllowed() } returns false
+        every { any<ProjectConfiguration>().canSyncDataToSimprints() } returns false
         createUseCase()
 
         val result = useCase().first()
@@ -1150,6 +1261,7 @@ class ObserveSyncInfoUseCaseTest {
             every { general } returns mockk<GeneralConfiguration> {
                 every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
             }
+            every { synchronization } returns createMockSynchronizationConfiguration()
         }
         val mockEmptyDeviceConfig = mockk<DeviceConfiguration> {
             every { selectedModules } returns emptyList()
@@ -1257,6 +1369,7 @@ class ObserveSyncInfoUseCaseTest {
             every { general } returns mockk<GeneralConfiguration> {
                 every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
             }
+            every { synchronization } returns createMockSynchronizationConfiguration()
         }
         val mockDeviceConfigWithTokenizedModules = mockk<DeviceConfiguration> {
             every { selectedModules } returns listOf(tokenizedModule)
@@ -1287,6 +1400,7 @@ class ObserveSyncInfoUseCaseTest {
             every { general } returns mockk<GeneralConfiguration> {
                 every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
             }
+            every { synchronization } returns createMockSynchronizationConfiguration()
         }
         val mockDeviceConfigWithRawModules = mockk<DeviceConfiguration> {
             every { selectedModules } returns listOf(rawModule)
