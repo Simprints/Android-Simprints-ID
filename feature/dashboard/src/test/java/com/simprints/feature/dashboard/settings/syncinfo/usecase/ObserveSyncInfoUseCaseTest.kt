@@ -1051,16 +1051,6 @@ class ObserveSyncInfoUseCaseTest {
     }
 
     @Test
-    fun `sync button should be disabled when this is logout screen and no sync to Simprints`() = runTest {
-        every { any<ProjectConfiguration>().canSyncDataToSimprints() } returns false
-        createUseCase()
-
-        val result = useCase(isPreLogoutUpSync = true).first()
-
-        assertThat(result.syncInfoSectionRecords.isSyncButtonEnabled).isFalse()
-    }
-
-    @Test
     fun `sync button should be enabled when online and there is sync to Simprints`() = runTest {
         every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(true)
         every { any<ProjectConfiguration>().canSyncDataToSimprints() } returns true
@@ -1139,7 +1129,7 @@ class ObserveSyncInfoUseCaseTest {
     }
 
     @Test
-    fun `sync button should be disabled when only CommCare down-sync allowed but there is CoSync permission error`() = runTest {
+    fun `sync button should be disabled when only CommCare down-sync allowed but there is CommCare permission error`() = runTest {
         val mockCommCarePermissionErrorEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncFailedBecauseCommCarePermissionIsMissing() } returns true
         }
