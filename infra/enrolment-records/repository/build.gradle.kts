@@ -1,10 +1,14 @@
 plugins {
     id("simprints.infra")
     id("kotlin-parcelize")
+    id("simprints.testing.android")
 }
 
 android {
     namespace = "com.simprints.infra.enrolment.records.repository"
+    defaultConfig {
+        testInstrumentationRunner = "com.simprints.infra.enrolment.records.repository.local.CustomTestRunner"
+    }
 }
 
 dependencies {
