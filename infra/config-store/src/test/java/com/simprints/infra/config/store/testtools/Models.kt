@@ -1,5 +1,6 @@
 package com.simprints.infra.config.store.testtools
 
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.local.models.ProtoAllowedAgeRange
 import com.simprints.infra.config.store.local.models.ProtoConsentConfiguration
@@ -298,8 +299,8 @@ internal val protoFingerprintConfiguration = ProtoFingerprintConfiguration
     ).build()
 
 internal val apiGeneralConfiguration = ApiGeneralConfiguration(
-    listOf(ApiGeneralConfiguration.Modality.FACE),
-    listOf(ApiGeneralConfiguration.Modality.FACE),
+    listOf(ApiGeneralConfiguration.ApiModality.FACE),
+    listOf(ApiGeneralConfiguration.ApiModality.FACE),
     listOf("en"),
     "en",
     collectLocation = true,
@@ -308,8 +309,8 @@ internal val apiGeneralConfiguration = ApiGeneralConfiguration(
 )
 
 internal val generalConfiguration = GeneralConfiguration(
-    listOf(GeneralConfiguration.Modality.FACE),
-    listOf(GeneralConfiguration.Modality.FACE),
+    listOf(Modality.FACE),
+    listOf(Modality.FACE),
     listOf("en"),
     "en",
     collectLocation = true,

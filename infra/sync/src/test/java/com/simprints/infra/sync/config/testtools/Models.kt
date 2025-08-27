@@ -1,5 +1,6 @@
 package com.simprints.infra.sync.config.testtools
 
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.ConsentConfiguration
@@ -24,8 +25,8 @@ import com.simprints.infra.config.store.models.Vero1Configuration
 import com.simprints.infra.config.store.models.Vero2Configuration
 
 internal val generalConfiguration = GeneralConfiguration(
-    listOf(GeneralConfiguration.Modality.FACE),
-    listOf(GeneralConfiguration.Modality.FACE),
+    listOf(Modality.FACE),
+    listOf(Modality.FACE),
     listOf("en"),
     "en",
     collectLocation = true,

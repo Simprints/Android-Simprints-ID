@@ -1,6 +1,6 @@
 package com.simprints.infra.images
 
-import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.core.domain.modality.Modality
 import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.metadata.ImageMetadataStore
 import com.simprints.infra.images.model.SecuredImageRef
@@ -20,13 +20,13 @@ internal class ImageRepositoryImpl @Inject internal constructor(
     override suspend fun storeSample(
         projectId: String,
         sessionId: String,
-        modality: GeneralConfiguration.Modality,
+        modality: Modality,
         sampleId: String,
         fileExtension: String,
         sampleBytes: ByteArray,
         optionalMetadata: Map<String, String>,
     ): SecuredImageRef? {
-        val logTag = if (modality == GeneralConfiguration.Modality.FACE) FACE_CAPTURE else FINGER_CAPTURE
+        val logTag = if (modality == Modality.FACE) FACE_CAPTURE else FINGER_CAPTURE
         val relativePath = samplePathConverter.create(sessionId, modality, sampleId, fileExtension)
 
         Simber.d("Saving $modality sample to ${relativePath.compose()}", tag = logTag)

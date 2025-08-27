@@ -1,7 +1,7 @@
 package com.simprints.infra.images.usecase
 
 import com.google.common.truth.Truth.*
-import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.core.domain.modality.Modality
 import com.simprints.infra.images.model.Path
 import org.junit.Before
 import org.junit.Test
@@ -19,7 +19,7 @@ class SamplePathConvertorTest {
         val expectedPath = "sessions/sessionId/faces/captureEventId.jpg"
         val result = pathUtil.create(
             sessionId = "sessionId",
-            modality = GeneralConfiguration.Modality.FACE,
+            modality = Modality.FACE,
             sampleId = "captureEventId",
             fileExtension = "jpg",
         )
@@ -33,7 +33,7 @@ class SamplePathConvertorTest {
 
         val result = pathUtil.create(
             sessionId = "sessionId",
-            modality = GeneralConfiguration.Modality.FINGERPRINT,
+            modality = Modality.FINGERPRINT,
             sampleId = "captureEventId",
             fileExtension = "swq",
         )
@@ -48,7 +48,7 @@ class SamplePathConvertorTest {
         assertThat(result).isNotNull()
         assertThat(result?.sessionId).isEqualTo("sessionId")
         assertThat(result?.sampleId).isEqualTo("captureEventId")
-        assertThat(result?.modality).isEqualTo(GeneralConfiguration.Modality.FINGERPRINT)
+        assertThat(result?.modality).isEqualTo(Modality.FINGERPRINT)
     }
 
     @Test
@@ -58,7 +58,7 @@ class SamplePathConvertorTest {
         assertThat(result).isNotNull()
         assertThat(result?.sessionId).isEqualTo("sessionId")
         assertThat(result?.sampleId).isEqualTo("captureEventId")
-        assertThat(result?.modality).isEqualTo(GeneralConfiguration.Modality.FACE)
+        assertThat(result?.modality).isEqualTo(Modality.FACE)
     }
 
     @Test
@@ -68,7 +68,7 @@ class SamplePathConvertorTest {
         assertThat(result).isNotNull()
         assertThat(result?.sessionId).isEqualTo("sessionId")
         assertThat(result?.sampleId).isEqualTo("captureEventId")
-        assertThat(result?.modality).isEqualTo(GeneralConfiguration.Modality.FINGERPRINT)
+        assertThat(result?.modality).isEqualTo(Modality.FINGERPRINT)
     }
 
     @Test

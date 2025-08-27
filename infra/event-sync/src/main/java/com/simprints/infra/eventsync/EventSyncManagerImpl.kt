@@ -107,7 +107,7 @@ internal class EventSyncManagerImpl @Inject constructor(
     ): Unit = withContext(dispatcher) {
         val projectConfiguration = configRepository.getProjectConfiguration()
 
-        //TODO(MS-1091): Handle CommCare down sync
+        // TODO(MS-1091): Handle CommCare down sync
         if (projectConfiguration.synchronization.down.simprints == null) {
             return@withContext
         }
@@ -124,7 +124,7 @@ internal class EventSyncManagerImpl @Inject constructor(
         eventRepository.closeEventScope(eventScope, EventScopeEndCause.WORKFLOW_ENDED)
     }
 
-    private fun getProjectModes(projectConfiguration: ProjectConfiguration) = projectConfiguration.general.modalities.map { it.toMode() }
+    private fun getProjectModes(projectConfiguration: ProjectConfiguration) = projectConfiguration.general.modalities
 
     override suspend fun deleteModules(unselectedModules: List<String>) {
         downSyncScopeRepository.deleteOperations(

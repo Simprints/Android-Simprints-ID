@@ -1,6 +1,6 @@
 package com.simprints.infra.events.sampledata
 
-import com.simprints.core.domain.modality.Modes
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.event.domain.models.callout.BiometricDataSource
@@ -27,5 +27,5 @@ object SampleDefaults {
 
     val TIME1 = System.currentTimeMillis()
 
-    val DEFAULT_MODES = listOf(Modes.FINGERPRINT)
+    val DEFAULT_MODES = listOf(Modality.FINGERPRINT)
 }

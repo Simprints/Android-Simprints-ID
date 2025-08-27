@@ -4,12 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.feature.troubleshooting.AutoResettingClickCounter
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.sync.ConfigManager
@@ -32,9 +32,9 @@ internal class AboutViewModel @Inject constructor(
         get() = _syncAndSearchConfig
     private val _syncAndSearchConfig = MutableLiveData<SyncAndSearchConfig>()
 
-    val modalities: LiveData<List<GeneralConfiguration.Modality>>
+    val modalities: LiveData<List<Modality>>
         get() = _modalities
-    private val _modalities = MutableLiveData<List<GeneralConfiguration.Modality>>()
+    private val _modalities = MutableLiveData<List<Modality>>()
 
     val recentUserActivity: LiveData<RecentUserActivity>
         get() = _recentUserActivity
@@ -85,7 +85,9 @@ internal class AboutViewModel @Inject constructor(
     private fun load() = viewModelScope.launch {
         val configuration = configManager.getProjectConfiguration()
         val syncAndSearchConfig = SyncAndSearchConfig(
-            configuration.synchronization.down.simprints?.partitionType?.name ?: "CommCare",
+            configuration.synchronization.down.simprints
+                ?.partitionType
+                ?.name ?: "CommCare",
             configuration.identification.poolType.name,
         )
         _syncAndSearchConfig.postValue(syncAndSearchConfig)

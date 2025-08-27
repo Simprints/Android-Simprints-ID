@@ -3,6 +3,7 @@ package com.simprints.feature.dashboard.settings
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
+import com.simprints.core.domain.modality.Modality
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
@@ -28,8 +29,8 @@ class SettingsViewModelTest {
     val testCoroutineRule = TestCoroutineRule()
 
     private val generalConfiguration = GeneralConfiguration(
-        modalities = listOf(GeneralConfiguration.Modality.FINGERPRINT),
-        matchingModalities = listOf(GeneralConfiguration.Modality.FINGERPRINT),
+        modalities = listOf(Modality.FINGERPRINT),
+        matchingModalities = listOf(Modality.FINGERPRINT),
         languageOptions = listOf("en", "fr"),
         defaultLanguage = "fr",
         collectLocation = true,
@@ -83,7 +84,7 @@ class SettingsViewModelTest {
                 listOf(
                     ExperimentalProjectConfiguration(experimentalConfig1),
                     ExperimentalProjectConfiguration(experimentalConfig2),
-                )
+                ),
             )
     }
 

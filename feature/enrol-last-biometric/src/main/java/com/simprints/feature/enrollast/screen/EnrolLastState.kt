@@ -1,6 +1,6 @@
 package com.simprints.feature.enrollast.screen
 
-import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.core.domain.modality.Modality
 
 internal sealed class EnrolLastState {
     data class Success(
@@ -9,7 +9,7 @@ internal sealed class EnrolLastState {
 
     data class Failed(
         val errorType: ErrorType,
-        val modalities: List<GeneralConfiguration.Modality>,
+        val modalities: List<Modality>,
     ) : EnrolLastState()
 
     enum class ErrorType {

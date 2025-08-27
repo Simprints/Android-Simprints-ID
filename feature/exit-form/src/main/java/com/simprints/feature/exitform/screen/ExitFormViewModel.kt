@@ -5,13 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.SessionCoroutineScope
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.exitform.ExitFormOption
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.event.domain.models.RefusalEvent
 import com.simprints.infra.events.session.SessionEventRepository
@@ -75,7 +75,7 @@ internal class ExitFormViewModel @Inject constructor(
     fun start() {
         viewModelScope.launch {
             val projectConfig = configManager.getProjectConfiguration()
-            if (projectConfig.general.modalities.contains(GeneralConfiguration.Modality.FINGERPRINT)) {
+            if (projectConfig.general.modalities.contains(Modality.FINGERPRINT)) {
                 val options = DEFAULT_OPTIONS.toMutableSet()
                 options.remove(ExitFormOption.AppNotWorking)
                 options.add(ExitFormOption.ScannerNotWorking)

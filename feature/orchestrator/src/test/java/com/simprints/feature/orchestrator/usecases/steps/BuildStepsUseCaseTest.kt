@@ -1,5 +1,6 @@
 package com.simprints.feature.orchestrator.usecases.steps
 
+import com.simprints.core.domain.modality.Modality
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
 import com.simprints.feature.orchestrator.steps.Step
@@ -11,7 +12,6 @@ import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.NEC
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
-import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.orchestration.data.ActionRequest

@@ -1,20 +1,20 @@
 package com.simprints.infra.images.usecase
 
-import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.core.domain.modality.Modality
 import com.simprints.infra.images.model.Path
 import javax.inject.Inject
 
 internal class SamplePathConverter @Inject constructor() {
     fun create(
         sessionId: String,
-        modality: GeneralConfiguration.Modality,
+        modality: Modality,
         sampleId: String,
         fileExtension: String,
     ) = Path(
         arrayOf(
             SESSIONS_PATH,
             sessionId,
-            if (modality == GeneralConfiguration.Modality.FACE) FACES_PATH else FINGERPRINTS_PATH,
+            if (modality == Modality.FACE) FACES_PATH else FINGERPRINTS_PATH,
             "$sampleId.$fileExtension",
         ),
     )
@@ -26,8 +26,8 @@ internal class SamplePathConverter @Inject constructor() {
         val sessionId = parts[sessionsPathIndex + 1]
         val modality = parts[sessionsPathIndex + 2].let {
             when (it) {
-                FACES_PATH -> GeneralConfiguration.Modality.FACE
-                else -> GeneralConfiguration.Modality.FINGERPRINT
+                FACES_PATH -> Modality.FACE
+                else -> Modality.FINGERPRINT
             }
         }
         val sampleId = parts[sessionsPathIndex + 3].substringBefore(".")
@@ -37,7 +37,7 @@ internal class SamplePathConverter @Inject constructor() {
 
     data class PathData(
         val sessionId: String,
-        val modality: GeneralConfiguration.Modality,
+        val modality: Modality,
         val sampleId: String,
     )
 

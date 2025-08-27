@@ -1,6 +1,7 @@
 package com.simprints.infra.config.store.local
 
 import androidx.datastore.core.DataStore
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.config.store.AbsolutePath
@@ -171,8 +172,8 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                 projectId = "",
                 updatedAt = "",
                 general = GeneralConfiguration(
-                    modalities = listOf(GeneralConfiguration.Modality.FINGERPRINT),
-                    matchingModalities = listOf(GeneralConfiguration.Modality.FINGERPRINT),
+                    modalities = listOf(Modality.FINGERPRINT),
+                    matchingModalities = listOf(Modality.FINGERPRINT),
                     languageOptions = listOf(),
                     defaultLanguage = "en",
                     collectLocation = true,

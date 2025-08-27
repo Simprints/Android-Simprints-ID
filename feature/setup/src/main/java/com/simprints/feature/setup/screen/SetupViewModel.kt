@@ -6,11 +6,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DeviceID
+import com.simprints.core.domain.modality.Modality
 import com.simprints.feature.setup.LocationStore
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.config.sync.ConfigManager
@@ -154,11 +154,11 @@ internal class SetupViewModel @Inject constructor(
 private val ProjectConfiguration.requiredLicenses: List<Pair<Vendor, LicenseVersion>>
     get() = general.modalities.mapNotNull {
         when {
-            it == GeneralConfiguration.Modality.FACE && shouldIncludeRankOne() -> {
+            it == Modality.FACE && shouldIncludeRankOne() -> {
                 Vendor.RankOne to LicenseVersion(face?.rankOne?.version.orEmpty())
             }
 
-            it == GeneralConfiguration.Modality.FINGERPRINT && shouldIncludeNec() -> {
+            it == Modality.FINGERPRINT && shouldIncludeNec() -> {
                 Vendor.Nec to LicenseVersion(fingerprint?.nec?.version.orEmpty())
             }
 
