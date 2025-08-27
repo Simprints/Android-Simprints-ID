@@ -107,6 +107,7 @@ androidX-Room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx
 androidX-lifecycle = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx_lifecycle_version" }
 androidX-lifecycle-scope = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx_lifecycle_version" }
 androidX-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidx_lifecycle_version" }
+androidX-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "androidx_lifecycle_version" }
 
 #UI
 androidX-ui-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx_constraint_version" }

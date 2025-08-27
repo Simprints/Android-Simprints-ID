@@ -1,351 +1,747 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:fillViewport="true"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/simprints_off_white"
+    android:orientation="vertical">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:context=".settings.syncinfo.SyncInfoFragment">
+        android:layout_height="wrap_content">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appBarLayout"
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/syncInfoToolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_height="?android:attr/actionBarSize"
+            app:navigationContentDescription="back"
+            app:navigationIcon="?android:attr/homeAsUpIndicator"
+            app:title="@string/sync_info_title" />
 
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/syncInfoToolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?android:attr/actionBarSize"
-                app:menu="@menu/sync_info_menu"
-                app:navigationContentDescription="back"
-                app:navigationIcon="?android:attr/homeAsUpIndicator"
-                app:title="@string/dashboard_sync_info_title" />
+    </com.google.android.material.appbar.AppBarLayout>
 
-        </com.google.android.material.appbar.AppBarLayout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/recordsInLocalCardView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="8dp">
-
-                <TextView
-                    android:id="@+id/totalRecordsOnDeviceText"
-                    style="@style/Text.Body1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:layout_weight="0.8"
-                    android:padding="4dp"
-                    android:text="@string/dashboard_sync_info_total_records_on_device" />
-
-                <TextView
-                    android:id="@+id/totalRecordsCount"
-                    style="@style/Text.Body1.Secondary"
-                    android:layout_width="0dp"
-                    android:layout_height="36dp"
-                    android:layout_gravity="center"
-                    android:layout_weight="0.2"
-                    android:gravity="center"
-                    tools:text="137" />
-
-                <ProgressBar
-                    android:id="@+id/totalRecordsProgress"
-                    android:layout_width="0dp"
-                    android:layout_height="36dp"
-                    android:layout_gravity="center"
-                    android:layout_weight="0.2"
-                    android:gravity="center"
-                    android:indeterminate="true"
-                    android:indeterminateTintMode="src_atop" />
-
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/recordsToUploadCardView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            app:layout_constraintEnd_toStartOf="@+id/imagesToUploadCardView"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/recordsInLocalCardView">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:padding="8dp">
+                app:layout_constraintWidth_max="500dp"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" >
 
-                <TextView
-                    android:id="@+id/recordsToUploadText"
-                    style="@style/Text.Body1"
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:layout_weight="0.8"
-                    android:gravity="center"
-                    android:padding="4dp"
-                    android:text="@string/dashboard_sync_info_records_to_upload" />
+                    android:background="@color/simprints_white">
 
-                <TextView
-                    android:id="@+id/recordsToUploadCount"
-                    style="@style/Text.Body1.Secondary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    tools:text="0" />
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/progressConfigRefresh"
+                        style="@style/Widget.Simprints.LinearProgressIndicator.Blue"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:indeterminate="true"
+                        android:visibility="visible" />
 
-                <ProgressBar
-                    android:id="@+id/recordsToUploadProgress"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:layout_gravity="center"
-                    android:layout_weight="0.2"
-                    android:gravity="center"
-                    android:indeterminate="true"
-                    android:indeterminateTintMode="src_atop" />
+                </FrameLayout>
 
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/imagesToUploadCardView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            app:layout_constraintBottom_toBottomOf="@+id/recordsToUploadCardView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/recordsToUploadCardView"
-            app:layout_constraintTop_toTopOf="@id/recordsToUploadCardView">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:padding="8dp">
-
-                <TextView
-                    android:id="@+id/imagesToUploadText"
-                    style="@style/Text.Body1"
+                <FrameLayout
+                    android:id="@+id/syncStatusHeader"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:layout_weight="0.8"
-                    android:gravity="center"
-                    android:padding="4dp"
-                    android:text="@string/dashboard_sync_info_images_to_upload" />
+                    android:paddingHorizontal="3dp"
+                    android:layout_marginBottom="-8dp"
+                    android:background="@color/simprints_white">
 
-                <TextView
-                    android:id="@+id/imagesToUploadCount"
-                    style="@style/Text.Body1.Secondary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    tools:text="0" />
+                    <TextView
+                        android:id="@+id/sync_card_title"
+                        style="@style/Text.Subtitle1.Bold"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sync_info_header_title"
+                        android:padding="10dp"
+                        tools:ignore="HardcodedText" />
 
-                <ProgressBar
-                    android:id="@+id/imagesToUploadProgress"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:layout_gravity="center"
-                    android:layout_weight="0.2"
-                    android:gravity="center"
-                    android:indeterminate="true"
-                    android:indeterminateTintMode="src_atop" />
+                    <TextView
+                        android:id="@+id/syncSettingsButton"
+                        style="@style/Text.Subtitle1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sync_info_header_settings_button"
+                        android:gravity="end"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="10dp"
+                        tools:ignore="HardcodedText" />
 
-            </LinearLayout>
+                </FrameLayout>
 
-        </com.google.android.material.card.MaterialCardView>
+                <!-- Relogin -->
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/recordsToDownloadCardView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toTopOf="@id/syncActionSection"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/recordsToUploadCardView">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:padding="8dp">
-
-                <TextView
-                    android:id="@+id/recordsToDownloadText"
-                    style="@style/Text.Body1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:layout_weight="0.8"
-                    android:padding="4dp"
-                    android:text="@string/dashboard_sync_info_records_to_download" />
-
-                <TextView
-                    android:id="@+id/recordsToDownloadCount"
-                    style="@style/Text.Body1.Secondary"
-                    android:layout_width="0dp"
-                    android:layout_height="36dp"
-                    android:layout_gravity="center"
-                    android:layout_weight="0.2"
-                    android:gravity="center"
-                    android:textSize="16sp"
-                    tools:text="137" />
-
-                <ProgressBar
-                    android:id="@+id/recordsToDownloadProgress"
-                    android:layout_width="0dp"
-                    android:layout_height="36dp"
-                    android:layout_gravity="center"
-                    android:layout_weight="0.2"
-                    android:gravity="center"
-                    android:indeterminate="true"
-                    android:indeterminateTintMode="src_atop" />
-
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <LinearLayout
-            android:id="@+id/syncActionSection"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toTopOf="@+id/modulesTabHost"
-            app:layout_constraintEnd_toEndOf="@+id/modulesTabHost"
-            app:layout_constraintStart_toStartOf="@+id/modulesTabHost"
-            app:layout_constraintTop_toBottomOf="@+id/recordsToDownloadCardView">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/syncButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/dashboard_sync_info_sync_now_button"
-                android:visibility="visible" />
-
-            <LinearLayout
-                android:id="@+id/syncReloginRequiredSection"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:visibility="gone">
-
-                <TextView
-                    android:id="@+id/syncReloginRequiredMessage"
-                    style="@style/Text.Body1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="@string/dashboard_sync_card_relogin_required" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/sync_relogin_required_login_button"
+                <LinearLayout
+                    android:id="@+id/sync_re_login_required_section"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/login_log_in_button" />
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="8dp"
+                    android:background="@color/simprints_white"
+                    android:layout_marginBottom="5dp"
+                    tools:visibility="visible"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/syncReloginRequiredMessage"
+                        style="@style/Text.Body1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginHorizontal="4dp"
+                        android:text="@string/sync_info_re_login_required" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/sync_relogin_required_login_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="@string/login_log_in_button" />
+
+                </LinearLayout>
+
+                <!-- Record sync -->
+
+                <LinearLayout
+                    android:id="@+id/layoutRecordsSync"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="8dp"
+                    android:background="@color/simprints_white">
+
+                    <TextView
+                        android:id="@+id/headerRecordSync"
+                        style="@style/Text.Body1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:padding="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:text="@string/sync_info_section_record_sync"
+                        android:textAllCaps="true"
+                        android:textColor="@color/simprints_text_orange" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="8dp">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:contentDescription="@string/sync_info_records_on_device"
+                            android:padding="4dp"
+                            android:src="@drawable/ic_records"
+                            app:tint="@color/simprints_text_grey" />
+
+                        <TextView
+                            style="@style/Text.Body1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:layout_weight="0.85"
+                            android:padding="4dp"
+                            android:text="@string/sync_info_records_on_device" />
+
+                        <TextView
+                            android:id="@+id/totalRecordsCount"
+                            style="@style/Text.Body1.Secondary"
+                            android:layout_width="0dp"
+                            android:layout_height="32dp"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="7dp"
+                            android:layout_weight="0.15"
+                            android:gravity="end|center_vertical"
+                            tools:text="137"
+                            android:textSize="16sp" />
+
+                        <ProgressBar
+                            android:id="@+id/totalRecordsProgress"
+                            style="@style/Text.Body1.Secondary"
+                            android:indeterminate="true"
+                            android:indeterminateTint="@color/simprints_grey_light"
+                            android:layout_width="0dp"
+                            android:layout_height="32dp"
+                            android:layout_gravity="center"
+                            android:layout_weight="0.15"
+                            android:visibility="gone"
+                            android:gravity="end|center_vertical" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layoutRecordsToUpload"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="8dp">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:contentDescription="@string/sync_info_records_to_up_sync"
+                            android:padding="4dp"
+                            android:src="@drawable/ic_up_sync"
+                            app:tint="@color/simprints_text_grey" />
+
+                        <TextView
+                            style="@style/Text.Body1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:layout_weight="0.85"
+                            android:padding="4dp"
+                            android:text="@string/sync_info_records_to_up_sync" />
+
+                        <TextView
+                            android:id="@+id/recordsToUploadCount"
+                            style="@style/Text.Body1.Secondary"
+                            android:layout_width="0dp"
+                            android:layout_height="32dp"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="7dp"
+                            android:layout_weight="0.15"
+                            android:gravity="end|center_vertical"
+                            tools:text="41"
+                            android:textSize="16sp" />
+
+                        <ProgressBar
+                            android:id="@+id/recordsToUploadProgress"
+                            style="@style/Text.Body1.Secondary"
+                            android:indeterminate="true"
+                            android:indeterminateTint="@color/simprints_grey_light"
+                            android:layout_width="0dp"
+                            android:layout_height="32dp"
+                            android:layout_gravity="center"
+                            android:layout_weight="0.15"
+                            android:visibility="gone"
+                            android:gravity="end|center_vertical" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layoutRecordsToDownload"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="8dp">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:contentDescription="@string/sync_info_records_to_down_sync"
+                            android:padding="4dp"
+                            android:src="@drawable/ic_down_sync"
+                            app:tint="@color/simprints_text_grey" />
+
+                        <TextView
+                            style="@style/Text.Body1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:layout_weight="0.85"
+                            android:padding="4dp"
+                            android:text="@string/sync_info_records_to_down_sync" />
+
+                        <TextView
+                            android:id="@+id/recordsToDownloadCount"
+                            style="@style/Text.Body1.Secondary"
+                            android:layout_width="0dp"
+                            android:layout_height="32dp"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="7dp"
+                            android:layout_weight="0.15"
+                            android:gravity="end|center_vertical"
+                            tools:text="16"
+                            android:textSize="16sp" />
+
+                        <ProgressBar
+                            android:id="@+id/recordsToDownloadProgress"
+                            style="@style/Text.Body1.Secondary"
+                            android:indeterminate="true"
+                            android:indeterminateTint="@color/simprints_grey_light"
+                            android:layout_width="0dp"
+                            android:layout_height="32dp"
+                            android:layout_gravity="center"
+                            android:layout_weight="0.15"
+                            android:visibility="gone"
+                            android:gravity="end|center_vertical" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layoutComboImageCounter"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:visibility="gone"
+                        android:paddingVertical="8dp">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:contentDescription="@string/sync_info_images_to_up_sync"
+                            android:padding="4dp"
+                            android:src="@drawable/ic_images"
+                            app:tint="@color/simprints_text_grey" />
+
+                        <TextView
+                            style="@style/Text.Body1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:layout_weight="0.85"
+                            android:padding="4dp"
+                            android:text="@string/sync_info_images_to_up_sync" />
+
+                        <TextView
+                            android:id="@+id/comboImagesToUploadCount"
+                            style="@style/Text.Body1.Secondary"
+                            android:layout_width="0dp"
+                            android:layout_height="32dp"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="7dp"
+                            android:layout_weight="0.15"
+                            android:gravity="end|center_vertical"
+                            tools:text="30"
+                            android:textSize="16sp" />
+
+                        <ProgressBar
+                            android:id="@+id/comboImagesToUploadProgress"
+                            style="@style/Text.Body1.Secondary"
+                            android:indeterminate="true"
+                            android:indeterminateTint="@color/simprints_grey_light"
+                            android:layout_width="0dp"
+                            android:layout_height="32dp"
+                            android:layout_gravity="center"
+                            android:layout_weight="0.15"
+                            android:visibility="gone"
+                            android:gravity="end|center_vertical" />
+                    </LinearLayout>
+
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="110dp"
+                        android:orientation="vertical"
+                        android:gravity="bottom">
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:id="@+id/text_event_sync_instructions_default"
+                                style="@style/Text.Body2.Secondary"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom"
+                                android:layout_marginHorizontal="8dp"
+                                android:paddingBottom="8dp"
+                                android:text="@string/sync_info_instruction_records"
+                                android:textColorLink="?attr/colorAccent"
+                                android:visibility="visible" />
+
+                            <TextView
+                                android:id="@+id/text_event_sync_instructions_comm_care_permission"
+                                style="@style/Text.Body2.Secondary"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom"
+                                android:layout_marginHorizontal="8dp"
+                                android:paddingBottom="8dp"
+                                android:text="@string/sync_info_instruction_comm_care_permission"
+                                android:textColorLink="?attr/colorAccent"
+                                android:visibility="invisible" />
+
+                            <TextView
+                                android:id="@+id/text_event_sync_instructions_offline"
+                                style="@style/Text.Body2.Secondary"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom"
+                                android:layout_marginHorizontal="8dp"
+                                android:paddingBottom="8dp"
+                                android:text="@string/sync_info_instruction_error_offline"
+                                android:textColorLink="?attr/colorAccent"
+                                android:visibility="invisible" />
+
+                            <TextView
+                                android:id="@+id/text_event_sync_instructions_no_modules"
+                                style="@style/Text.Body2.Secondary"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom"
+                                android:layout_marginHorizontal="8dp"
+                                android:paddingBottom="8dp"
+                                android:text="@string/sync_info_instruction_error_no_modules"
+                                android:textColorLink="?attr/colorAccent"
+                                android:visibility="invisible" />
+
+                            <TextView
+                                android:id="@+id/text_event_sync_instructions_error"
+                                style="@style/Text.Body2"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom"
+                                android:layout_marginHorizontal="8dp"
+                                android:paddingBottom="8dp"
+                                android:text="@string/sync_info_instruction_error"
+                                android:textColorLink="?attr/colorAccent"
+                                android:visibility="invisible" />
+
+                            <LinearLayout
+                                android:id="@+id/layoutEventSyncProgress"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom"
+                                android:layout_marginHorizontal="2dp"
+                                android:gravity="bottom"
+                                android:orientation="vertical"
+                                android:visibility="invisible">
+
+                                <TextView
+                                    android:id="@+id/textEventSyncProgress"
+                                    style="@style/Text.Body2.Secondary"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginHorizontal="6dp"
+                                    tools:text="Syncing, 21 items of 30..." />
+
+                                <com.google.android.material.progressindicator.LinearProgressIndicator
+                                    android:id="@+id/eventSyncProgressBar"
+                                    style="@style/Widget.Simprints.LinearProgressIndicator.Blue.Large"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginHorizontal="8dp"
+                                    android:layout_marginVertical="8dp"
+                                    tools:progress="63"
+                                    android:visibility="visible" />
+
+                            </LinearLayout>
+
+                        </FrameLayout>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/buttonSyncRecordsNow"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="3dp"
+                            android:enabled="true"
+                            android:text="@string/sync_info_button_sync_records"
+                            android:visibility="visible" />
+
+                    </LinearLayout>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="20dp">
+
+                        <TextView
+                            android:id="@+id/textFooterRecordLastSyncedWhen"
+                            style="@style/Text.Body2.Secondary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:layout_marginHorizontal="8dp"
+                            tools:text="Last synced 2 minutes ago"
+                            android:visibility="visible" />
+
+                        <TextView
+                            android:id="@+id/textFooterRecordSyncInProgress"
+                            style="@style/Text.Body2.Secondary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:layout_marginHorizontal="8dp"
+                            android:text="@string/sync_info_footer_sync_in_progress"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/textFooterRecordSyncIncomplete"
+                            style="@style/Text.Body2.Secondary"
+                            android:textColor="@color/simprints_red_dark"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:layout_marginHorizontal="8dp"
+                            android:text="@string/sync_info_footer_sync_incomplete"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/textFooterRecordLoggingOut"
+                            style="@style/Text.Body2.Secondary"
+                            android:textColor="@color/simprints_green_dark"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:layout_marginHorizontal="8dp"
+                            android:text="@string/sync_info_footer_sync_complete_logging_out"
+                            android:visibility="gone" />
+
+                    </FrameLayout>
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/sectionDivider1"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"/>
+
+                <!-- Image sync -->
+
+                <LinearLayout
+                    android:id="@+id/layoutImagesSync"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="8dp"
+                    android:background="@color/simprints_white">
+
+                    <TextView
+                        android:id="@+id/headerImageSync"
+                        style="@style/Text.Body1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:padding="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:text="@string/sync_info_section_image_sync"
+                        android:textAllCaps="true"
+                        android:textColor="@color/simprints_text_orange" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="8dp">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:contentDescription="@string/sync_info_images_to_up_sync"
+                            android:padding="4dp"
+                            android:src="@drawable/ic_images"
+                            app:tint="@color/simprints_text_grey" />
+
+                        <TextView
+                            style="@style/Text.Body1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:layout_weight="0.85"
+                            android:padding="4dp"
+                            android:text="@string/sync_info_images_to_up_sync" />
+
+                        <TextView
+                            android:id="@+id/imagesToUploadCount"
+                            style="@style/Text.Body1.Secondary"
+                            android:layout_width="0dp"
+                            android:layout_height="32dp"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="7dp"
+                            android:layout_weight="0.15"
+                            android:gravity="end|center_vertical"
+                            tools:text="30"
+                            android:textSize="16sp" />
+
+                        <ProgressBar
+                            android:id="@+id/imagesToUploadProgress"
+                            style="@style/Text.Body1.Secondary"
+                            android:indeterminate="true"
+                            android:indeterminateTint="@color/simprints_grey_light"
+                            android:layout_width="0dp"
+                            android:layout_height="32dp"
+                            android:layout_gravity="center"
+                            android:layout_weight="0.15"
+                            android:visibility="gone"
+                            android:gravity="end|center_vertical" />
+                    </LinearLayout>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/textImageSyncInstructionsDefault"
+                            style="@style/Text.Body2.Secondary"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            android:layout_marginHorizontal="8dp"
+                            android:paddingBottom="8dp"
+                            android:text="@string/sync_info_instruction_images"
+                            android:visibility="visible" />
+
+                        <TextView
+                            android:id="@+id/textImageSyncInstructionsOffline"
+                            style="@style/Text.Body2.Secondary"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            android:layout_marginHorizontal="8dp"
+                            android:paddingBottom="8dp"
+                            android:text="@string/sync_info_instruction_error_offline"
+                            android:textColorLink="?attr/colorAccent"
+                            android:visibility="invisible" />
+
+                        <LinearLayout
+                            android:id="@+id/layoutImageSyncProgress"
+                            android:layout_width="match_parent"
+                            android:layout_height="55dp"
+                            android:layout_gravity="bottom"
+                            android:layout_marginHorizontal="2dp"
+                            android:gravity="bottom"
+                            android:orientation="vertical"
+                            android:visibility="invisible">
+
+                            <TextView
+                                android:id="@+id/textImageSyncProgress"
+                                style="@style/Text.Body2.Secondary"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="6dp"
+                                tools:text="Syncing, 21 items of 30..." />
+
+                            <com.google.android.material.progressindicator.LinearProgressIndicator
+                                android:id="@+id/imageSyncProgressBar"
+                                style="@style/Widget.Simprints.LinearProgressIndicator.Blue.Large"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="8dp"
+                                android:layout_marginVertical="8dp"
+                                tools:progress="63"
+                                android:visibility="visible" />
+
+                        </LinearLayout>
+
+                    </FrameLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonSyncImagesNow"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="3dp"
+                        android:enabled="true"
+                        android:text="@string/sync_info_button_sync_images"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/textFooterImageLastSyncedWhen"
+                        style="@style/Text.Body2.Secondary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:layout_marginHorizontal="8dp"
+                        tools:text="Last synced 1 minute ago"
+                        android:visibility="visible" />
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/sectionDivider2"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"/>
+
+
+                <!-- Module sync -->
+
+                <LinearLayout
+                    android:id="@+id/layoutModuleSelection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:background="@color/simprints_white"
+                    android:orientation="vertical">
+
+
+                    <TextView
+                        android:id="@+id/headerModuleSelection"
+                        style="@style/Text.Body1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:padding="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:text="@string/sync_info_section_module_selection"
+                        android:textAllCaps="true"
+                        android:textColor="@color/simprints_text_orange" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/selectedModulesView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fadeScrollbars="false"
+                        android:orientation="vertical"
+                        android:scrollbars="vertical"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:itemCount="100"
+                        tools:listitem="@layout/item_module_count" />
+
+                    <TextView
+                        android:id="@+id/textModuleSyncInstructions"
+                        style="@style/Text.Body2.Secondary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="8dp"
+                        android:paddingTop="8dp"
+                        android:text="@string/sync_info_instruction_modules"
+                        android:visibility="visible" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonSelectModules"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="3dp"
+                        android:layout_marginTop="6dp"
+                        android:enabled="true"
+                        android:text="@string/sync_info_button_select_modules"
+                        android:visibility="visible" />
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/sectionFooter"
+                    android:layout_width="match_parent"
+                    android:background="@color/simprints_white"
+                    android:layout_height="3dp"/>
+
             </LinearLayout>
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <LinearLayout
-            android:id="@+id/modulesTabHost"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="16dp"
-            android:background="@color/cardview_light_background"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toTopOf="@+id/moduleSelectionButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/recordsCardsBarrier"
-            tools:ignore="SpeakableTextPresentCheck"
-            tools:visibility="visible">
 
-            <TextView
-                style="@style/Text.Body1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="4dp"
-                android:text="@string/dashboard_sync_info_selected_modules"
-                android:textAlignment="center" />
+    </ScrollView>
 
-            <View
-                android:id="@+id/divider"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/simprints_orange" />
+</LinearLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/selectedModulesView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:fadeScrollbars="false"
-                android:orientation="vertical"
-                android:padding="8dp"
-                android:scrollbars="vertical"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:itemCount="100"
-                tools:listitem="@layout/item_module_count" />
 
-        </LinearLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/moduleSelectionButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="16dp"
-            android:text="@string/dashboard_sync_info_select_modules_button"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/modulesTabHost"
-            app:layout_constraintStart_toStartOf="@+id/modulesTabHost"
-            tools:visibility="visible" />
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/recordsCardsBarrier"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:barrierDirection="bottom"
-            app:constraint_referenced_ids="recordsToUploadCardView,recordsToDownloadCardView,recordsToDownloadCardView,syncActionSection" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>

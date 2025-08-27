@@ -220,6 +220,23 @@ internal class SignedUrlSampleUploaderTest {
         }
     }
 
+    @Test
+    fun `progress callback receives correct index counter values during upload`() = runTest {
+        val progressValues = mutableListOf<Pair<Int, Int>>()
+        val progressCallback: suspend (Int, Int) -> Unit = { current, total ->
+            progressValues.add(current to total)
+        }
+        mockBatchSize(1)
+        coEvery { localDataSource.listImages(any()) } returns List(3) { mockImageRef("${SAMPLE_ID}_$it") }
+
+        signedUrlSampleUploader.uploadAllSamples(PROJECT_ID, progressCallback)
+
+        assertThat(progressValues).hasSize(3)
+        assertThat(progressValues[0]).isEqualTo(0 to 3)
+        assertThat(progressValues[1]).isEqualTo(1 to 3)
+        assertThat(progressValues[2]).isEqualTo(2 to 3)
+    }
+
     private fun mockBatchSize(batchSize: Int) {
         coEvery {
             configRepository

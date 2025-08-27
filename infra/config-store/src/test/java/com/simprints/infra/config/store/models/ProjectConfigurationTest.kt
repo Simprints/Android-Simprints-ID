@@ -503,4 +503,117 @@ class ProjectConfigurationTest {
 
         assertThat(result).isEqualTo(expected)
     }
+
+    @Test
+    fun `isProjectWithModuleSync should return true when partition type is MODULE`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                down = synchronizationConfiguration.down.copy(
+                    simprints = simprintsDownSyncConfigurationConfiguration.copy(
+                        partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                    ),
+                ),
+            ),
+        )
+        assertThat(config.isProjectWithModuleSync()).isTrue()
+    }
+
+    @Test
+    fun `isProjectWithModuleSync should return false when partition type is not MODULE`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                down = synchronizationConfiguration.down.copy(
+                    simprints = simprintsDownSyncConfigurationConfiguration.copy(
+                        partitionType = DownSynchronizationConfiguration.PartitionType.PROJECT,
+                    ),
+                ),
+            ),
+        )
+        assertThat(config.isProjectWithModuleSync()).isFalse()
+    }
+
+    @Test
+    fun `isProjectWithPeriodicallyUpSync should return true when frequency is ONLY_PERIODICALLY_UP_SYNC`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                up = synchronizationConfiguration.up.copy(
+                    simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                        frequency = Frequency.ONLY_PERIODICALLY_UP_SYNC,
+                    ),
+                ),
+            ),
+        )
+        assertThat(config.isProjectWithPeriodicallyUpSync()).isTrue()
+    }
+
+    @Test
+    fun `isProjectWithPeriodicallyUpSync should return false when frequency is not ONLY_PERIODICALLY_UP_SYNC`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                up = synchronizationConfiguration.up.copy(
+                    simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                        frequency = Frequency.PERIODICALLY,
+                    ),
+                ),
+            ),
+        )
+        assertThat(config.isProjectWithPeriodicallyUpSync()).isFalse()
+    }
+
+    @Test
+    fun `isModuleSelectionAvailable should return true when project has MODULE and not ONLY_PERIODICALLY_UP_SYNC`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                down = synchronizationConfiguration.down.copy(
+                    simprints = simprintsDownSyncConfigurationConfiguration.copy(
+                        partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                    ),
+                ),
+                up = synchronizationConfiguration.up.copy(
+                    simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                        frequency = Frequency.PERIODICALLY,
+                    ),
+                ),
+            ),
+        )
+        assertThat(config.isModuleSelectionAvailable()).isTrue()
+    }
+
+    @Test
+    fun `isModuleSelectionAvailable should return false when partition type is not MODULE`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                down = synchronizationConfiguration.down.copy(
+                    simprints = simprintsDownSyncConfigurationConfiguration.copy(
+                        partitionType = DownSynchronizationConfiguration.PartitionType.PROJECT,
+                    ),
+                ),
+                up = synchronizationConfiguration.up.copy(
+                    simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                        frequency = Frequency.ONLY_PERIODICALLY_UP_SYNC,
+                    ),
+                ),
+            ),
+        )
+        assertThat(config.isModuleSelectionAvailable()).isFalse()
+    }
+
+    @Test
+    fun `isModuleSelectionAvailable should return false when frequency is ONLY_PERIODICALLY_UP_SYNC`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                down = synchronizationConfiguration.down.copy(
+                    simprints = simprintsDownSyncConfigurationConfiguration.copy(
+                        partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                    ),
+                ),
+                up = synchronizationConfiguration.up.copy(
+                    simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                        frequency = Frequency.ONLY_PERIODICALLY_UP_SYNC,
+                    ),
+                ),
+            ),
+        )
+        assertThat(config.isModuleSelectionAvailable()).isFalse()
+    }
 }

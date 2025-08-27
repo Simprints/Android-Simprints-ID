@@ -151,6 +151,7 @@ internal class EventSyncMasterWorkerTest {
                 appContext = ctx,
                 params = mockk(relaxed = true) {
                     every { tags } returns setOf(MASTER_SYNC_SCHEDULER_PERIODIC_TIME)
+                    every { inputData.getBoolean(EventSyncMasterWorker.IS_DOWN_SYNC_ALLOWED, true) } returns true
                 },
                 simprintsDownSyncWorkerBuilder = simprintsDownSyncWorkerBuilder,
                 commCareDownSyncWorkerBuilder = commCareDownSyncWorkerBuilder,

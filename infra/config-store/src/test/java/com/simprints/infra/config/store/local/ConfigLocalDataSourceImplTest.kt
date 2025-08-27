@@ -25,6 +25,7 @@ import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.mockk
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -304,7 +305,7 @@ class ConfigLocalDataSourceImplTest {
     }
 
     @Test
-    fun `watchProjectConfiguration should emit updated values when configuration changes`() = runTest {
+    fun `observeProjectConfiguration should emit updated values when configuration changes`() = runTest {
         val config1 = projectConfiguration.copy(projectId = "project1")
         val config2 = projectConfiguration.copy(projectId = "project2")
         val config3 = projectConfiguration.copy(projectId = "project3")
@@ -315,7 +316,7 @@ class ConfigLocalDataSourceImplTest {
         configLocalDataSourceImpl.saveProjectConfiguration(config2) // will replay when collection starts below
 
         val job = launch {
-            configLocalDataSourceImpl.watchProjectConfiguration().collect { emittedConfigs.add(it) }
+            configLocalDataSourceImpl.observeProjectConfiguration().collect { emittedConfigs.add(it) }
         }
 
         configLocalDataSourceImpl.saveProjectConfiguration(config3)
@@ -326,5 +327,32 @@ class ConfigLocalDataSourceImplTest {
         assertThat(emittedConfigs[1]).isEqualTo(config3)
         assertThat(emittedConfigs[2]).isEqualTo(config4)
         job.cancel()
+    }
+
+    @Test
+    fun `observeDeviceConfiguration should emit updated values when configuration changes`() = runTest {
+        configLocalDataSourceImpl.saveProject(project)
+
+        val config1 = DeviceConfiguration("en", listOf(), "instruction1")
+        val config2 = DeviceConfiguration("fr", listOf("module1".asTokenizableEncrypted()), "instruction2")
+
+        configLocalDataSourceImpl.updateDeviceConfiguration { config1 }
+
+        val result1 = configLocalDataSourceImpl.observeDeviceConfiguration().first()
+
+        assertThat(result1).isEqualTo(config1)
+
+        configLocalDataSourceImpl.updateDeviceConfiguration { config2 }
+
+        val result2 = configLocalDataSourceImpl.observeDeviceConfiguration().first()
+
+        assertThat(result2).isEqualTo(config2)
+    }
+
+    @Test
+    fun `observeDeviceConfiguration should emit default configuration initially`() = runTest {
+        val result = configLocalDataSourceImpl.observeDeviceConfiguration().first()
+
+        assertThat(result).isEqualTo(ConfigLocalDataSourceImpl.defaultDeviceConfiguration.toDomain())
     }
 }
