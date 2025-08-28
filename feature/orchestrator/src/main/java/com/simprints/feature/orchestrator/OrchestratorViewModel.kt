@@ -215,7 +215,7 @@ internal class OrchestratorViewModel @Inject constructor(
                 if (step.id != StepId.FACE_MATCHER) {
                     false
                 } else {
-                    val stepSdk = step.params?.let { it as? MatchStepStubPayload }?.faceSDK
+                    val stepSdk = step.params?.let { it as? MatchStepStubPayload }?.sdkType
                     stepSdk == captureParams?.faceSDK
                 }
             }
@@ -225,7 +225,7 @@ internal class OrchestratorViewModel @Inject constructor(
 
                 val newPayload = matchingStep.params
                     ?.let { it as? MatchStepStubPayload }
-                    ?.toFaceStepArgs(result.referenceId, faceSamples)
+                    ?.toStepArgs(result.referenceId, faceSamples)
 
                 if (newPayload != null) {
                     matchingStep.params = newPayload
@@ -239,7 +239,7 @@ internal class OrchestratorViewModel @Inject constructor(
                 if (step.id != StepId.FINGERPRINT_MATCHER) {
                     false
                 } else {
-                    val stepSdk = step.params?.let { it as? MatchStepStubPayload }?.fingerprintSDK
+                    val stepSdk = step.params?.let { it as? MatchStepStubPayload }?.sdkType
                     stepSdk == captureParams?.fingerprintSDK
                 }
             }
@@ -248,7 +248,7 @@ internal class OrchestratorViewModel @Inject constructor(
                 val fingerprintSamples = result.results.mapNotNull { it.sample }
                 val newPayload = matchingStep.params
                     ?.let { it as? MatchStepStubPayload }
-                    ?.toFingerprintStepArgs(result.referenceId, fingerprintSamples)
+                    ?.toStepArgs(result.referenceId, fingerprintSamples)
 
                 if (newPayload != null) {
                     matchingStep.params = newPayload

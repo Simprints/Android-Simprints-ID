@@ -1,11 +1,11 @@
 package com.simprints.feature.orchestrator.usecases.response
 
+import com.simprints.infra.config.store.models.ModalitySdkConfigurationMapping
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
+import com.simprints.infra.config.store.models.getModalityConfigs
+import com.simprints.matcher.MatchResult
 import java.io.Serializable
 import javax.inject.Inject
-import kotlin.text.compareTo
 
 internal class IsNewEnrolmentUseCase @Inject constructor() {
     /**
@@ -21,38 +21,23 @@ internal class IsNewEnrolmentUseCase @Inject constructor() {
             return true
         }
 
-        val faceResult = results.lastOrNull { it is FaceMatchResult } as? FaceMatchResult
-        val fingerprintResult = results.lastOrNull { it is FingerprintMatchResult } as? FingerprintMatchResult
-
-        val isNewFaceEnrolment = isNewEnrolmentFaceResult(projectConfiguration, faceResult)
-        val isNewFingerprintEnrolment = isValidEnrolmentFingerprintResult(projectConfiguration, fingerprintResult)
-
-        return isNewFaceEnrolment && isNewFingerprintEnrolment
+        val configs = projectConfiguration.getModalityConfigs()
+        val matchResults = results.mapNotNull { it as? MatchResult }
+        return matchResults
+            .map { result -> isValidEnrolmentResult(configs, result) }
+            .all { it }
     }
 
     // Missing results and configuration are ignored as "valid" to allow creating new records.
-    private fun isValidEnrolmentFingerprintResult(
-        projectConfiguration: ProjectConfiguration,
-        fingerprintResult: FingerprintMatchResult?,
-    ): Boolean = fingerprintResult?.let {
-        projectConfiguration.fingerprint
-            ?.getSdkConfiguration(fingerprintResult.sdk)
+    private fun isValidEnrolmentResult(
+        configs: ModalitySdkConfigurationMapping,
+        result: MatchResult?,
+    ): Boolean = result?.let {
+        configs[result.modality]
+            ?.get(result.bioSdk)
             ?.decisionPolicy
             ?.medium
             ?.toFloat()
-            ?.let { threshold -> fingerprintResult.results.all { it.confidence < threshold } }
-    } != false
-
-    // Missing results and configuration are ignored as "valid" to allow creating new records.
-    private fun isNewEnrolmentFaceResult(
-        projectConfiguration: ProjectConfiguration,
-        faceResult: FaceMatchResult?,
-    ): Boolean = faceResult?.let {
-        projectConfiguration.face
-            ?.getSdkConfiguration(faceResult.sdk)
-            ?.decisionPolicy
-            ?.medium
-            ?.toFloat()
-            ?.let { threshold -> faceResult.results.all { it.confidence < threshold } }
+            ?.let { threshold -> result.results.all { it.confidence < threshold } }
     } != false
 }

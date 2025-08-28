@@ -1,18 +1,16 @@
 package com.simprints.feature.orchestrator.usecases.response
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.modality.Modality
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
+import com.simprints.matcher.MatchResult
+import com.simprints.matcher.MatchResultItem
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -36,9 +34,9 @@ class CreateIdentifyResponseUseCaseTest {
     @Test
     fun `Returns no identifications if no decision policy`() = runTest {
         val result = useCase(
-            mockk {
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns null
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
+            mockk(relaxed = true) {
+                every { face?.rankOne?.decisionPolicy } returns null
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns null
             },
             results = listOf(createFaceMatchResult(10f, 20f, 30f)),
         )
@@ -49,10 +47,10 @@ class CreateIdentifyResponseUseCaseTest {
     @Test
     fun `Returns only face identifications over the low confidence`() = runTest {
         val result = useCase(
-            mockk {
+            mockk(relaxed = true) {
                 every { identification.maxNbOfReturnedCandidates } returns 2
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns null
             },
             results = listOf(createFaceMatchResult(10f, 20f, 30f)),
         )
@@ -64,10 +62,10 @@ class CreateIdentifyResponseUseCaseTest {
     @Test
     fun `Returns exactly N best face identifications over the low confidence`() = runTest {
         val result = useCase(
-            mockk {
+            mockk(relaxed = true) {
                 every { identification.maxNbOfReturnedCandidates } returns 2
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns null
             },
             results = listOf(createFaceMatchResult(20f, 25f, 30f, 40f)),
         )
@@ -79,10 +77,10 @@ class CreateIdentifyResponseUseCaseTest {
     @Test
     fun `Returns only high confidence face identifications if there are any`() = runTest {
         val result = useCase(
-            mockk {
+            mockk(relaxed = true) {
                 every { identification.maxNbOfReturnedCandidates } returns 2
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns null
             },
             results = listOf(createFaceMatchResult(15f, 30f, 100f)),
         )
@@ -94,10 +92,10 @@ class CreateIdentifyResponseUseCaseTest {
     @Test
     fun `Returns only fingerprint identifications over the low confidence`() = runTest {
         val result = useCase(
-            mockk {
+            mockk(relaxed = true) {
                 every { identification.maxNbOfReturnedCandidates } returns 2
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns null
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
+                every { face?.rankOne?.decisionPolicy } returns null
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns DecisionPolicy(
                     20,
                     50,
                     100,
@@ -113,10 +111,10 @@ class CreateIdentifyResponseUseCaseTest {
     @Test
     fun `Returns exactly N best fingerprint identifications over the low confidence`() = runTest {
         val result = useCase(
-            mockk {
+            mockk(relaxed = true) {
                 every { identification.maxNbOfReturnedCandidates } returns 2
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns null
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
+                every { face?.rankOne?.decisionPolicy } returns null
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns DecisionPolicy(
                     20,
                     50,
                     100,
@@ -132,10 +130,10 @@ class CreateIdentifyResponseUseCaseTest {
     @Test
     fun `Returns only high confidence fingerprint identifications if there are any`() = runTest {
         val result = useCase(
-            mockk {
+            mockk(relaxed = true) {
                 every { identification.maxNbOfReturnedCandidates } returns 2
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns null
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
+                every { face?.rankOne?.decisionPolicy } returns null
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns DecisionPolicy(
                     20,
                     50,
                     100,
@@ -151,10 +149,10 @@ class CreateIdentifyResponseUseCaseTest {
     @Test
     fun `Returns fingerprint matches if both modalities available and fingerprint has higher confidence`() = runTest {
         val result = useCase(
-            mockk {
+            mockk(relaxed = true) {
                 every { identification.maxNbOfReturnedCandidates } returns 2
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns DecisionPolicy(
                     20,
                     50,
                     100,
@@ -173,10 +171,10 @@ class CreateIdentifyResponseUseCaseTest {
     @Test
     fun `Returns face matches if both modalities available and face has higher confidence`() = runTest {
         val result = useCase(
-            mockk {
+            mockk(relaxed = true) {
                 every { identification.maxNbOfReturnedCandidates } returns 2
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns DecisionPolicy(
                     20,
                     50,
                     100,
@@ -192,13 +190,15 @@ class CreateIdentifyResponseUseCaseTest {
         assertThat(result.identifications.map { it.confidenceScore }).isEqualTo(listOf(105))
     }
 
-    private fun createFaceMatchResult(vararg confidences: Float): Serializable = FaceMatchResult(
-        confidences.map { FaceMatchResult.Item(subjectId = "1", confidence = it) },
+    private fun createFaceMatchResult(vararg confidences: Float): Serializable = MatchResult(
+        confidences.map { MatchResultItem(subjectId = "1", confidence = it) },
+        Modality.FACE,
         FaceConfiguration.BioSdk.RANK_ONE,
     )
 
-    private fun createFingerprintMatchResult(vararg confidences: Float): Serializable = FingerprintMatchResult(
-        confidences.map { FingerprintMatchResult.Item(subjectId = "1", confidence = it) },
+    private fun createFingerprintMatchResult(vararg confidences: Float): Serializable = MatchResult(
+        confidences.map { MatchResultItem(subjectId = "1", confidence = it) },
+        Modality.FINGERPRINT,
         FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
     )
 }

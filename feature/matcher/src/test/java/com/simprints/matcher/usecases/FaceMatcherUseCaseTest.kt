@@ -14,8 +14,8 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
+import com.simprints.matcher.MatchResultItem
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -71,6 +71,7 @@ internal class FaceMatcherUseCaseTest {
                     probeReferenceId = "referenceId",
                     flowType = FlowType.VERIFY,
                     queryForCandidates = SubjectQuery(),
+                    sdkType = FaceConfiguration.BioSdk.RANK_ONE,
                     modality = Modality.FACE,
                     biometricDataSource = BiometricDataSource.Simprints,
                 ),
@@ -105,7 +106,7 @@ internal class FaceMatcherUseCaseTest {
                             modality = Modality.FACE,
                         ),
                     ),
-                    faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
+                    sdkType = FaceConfiguration.BioSdk.RANK_ONE,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = SubjectQuery(),
                     modality = Modality.FACE,
@@ -171,7 +172,7 @@ internal class FaceMatcherUseCaseTest {
                             modality = Modality.FACE,
                         ),
                     ),
-                    faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
+                    sdkType = FaceConfiguration.BioSdk.RANK_ONE,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = SubjectQuery(),
                     modality = Modality.FACE,
@@ -186,7 +187,7 @@ internal class FaceMatcherUseCaseTest {
             MatcherUseCase.MatcherState.LoadingStarted(totalCandidates),
             MatcherUseCase.MatcherState.CandidateLoaded,
             MatcherUseCase.MatcherState.Success(
-                matchResultItems = listOf(FaceMatchResult.Item("subjectId", 42f)),
+                matchResultItems = listOf(MatchResultItem("subjectId", 42f)),
                 totalCandidates = totalCandidates,
                 matcherName = "",
             ),

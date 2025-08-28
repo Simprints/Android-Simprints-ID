@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
@@ -14,9 +15,9 @@ import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
+import com.simprints.matcher.MatchResult
+import com.simprints.matcher.MatchResultItem
 import com.simprints.matcher.usecases.FaceMatcherUseCase
 import com.simprints.matcher.usecases.FingerprintMatcherUseCase
 import com.simprints.matcher.usecases.MatcherUseCase
@@ -83,7 +84,7 @@ internal class MatchViewModelTest {
     @Test
     fun `when setup is called, then view model becomes initialized`() = runTest {
         val responseItems = listOf(
-            FaceMatchResult.Item("1", 90f),
+            MatchResultItem("1", 90f),
         )
 
         coEvery { faceMatcherUseCase.invoke(any(), any()) } returns flow {
@@ -105,8 +106,9 @@ internal class MatchViewModelTest {
         viewModel.setupMatch(
             MatchParams(
                 probeReferenceId = "referenceId",
-                probeFaceSamples = listOf(getFaceSample()),
-                faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
+                probeSamples = listOf(getFaceSample()),
+                sdkType = FaceConfiguration.BioSdk.RANK_ONE,
+                modality = Modality.FACE,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -129,18 +131,18 @@ internal class MatchViewModelTest {
             configManager
                 .getProjectConfiguration()
                 .face
-                ?.getSdkConfiguration(any())
+                ?.rankOne
                 ?.decisionPolicy
         } returns DecisionPolicy(20, 35, 50)
 
         val responseItems = listOf(
-            FaceMatchResult.Item("1", 90f),
-            FaceMatchResult.Item("1", 80f),
-            FaceMatchResult.Item("1", 55f),
-            FaceMatchResult.Item("1", 40f),
-            FaceMatchResult.Item("1", 36f),
-            FaceMatchResult.Item("1", 20f),
-            FaceMatchResult.Item("1", 10f),
+            MatchResultItem("1", 90f),
+            MatchResultItem("1", 80f),
+            MatchResultItem("1", 55f),
+            MatchResultItem("1", 40f),
+            MatchResultItem("1", 36f),
+            MatchResultItem("1", 20f),
+            MatchResultItem("1", 10f),
         )
         coEvery { faceMatcherUseCase.invoke(any(), any()) } returns flow {
             emit(MatcherUseCase.MatcherState.LoadingStarted(responseItems.size))
@@ -159,8 +161,9 @@ internal class MatchViewModelTest {
         viewModel.setupMatch(
             MatchParams(
                 probeReferenceId = "referenceId",
-                probeFaceSamples = listOf(getFaceSample()),
-                faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
+                probeSamples = listOf(getFaceSample()),
+                modality = Modality.FACE,
+                sdkType = FaceConfiguration.BioSdk.RANK_ONE,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -178,7 +181,7 @@ internal class MatchViewModelTest {
             ),
         )
         assertThat(viewModel.matchResponse.getOrAwaitValue().peekContent()).isEqualTo(
-            FaceMatchResult(responseItems, FaceConfiguration.BioSdk.RANK_ONE),
+            MatchResult(responseItems, Modality.FACE, FaceConfiguration.BioSdk.RANK_ONE),
         )
 
         verify { saveMatchEvent.invoke(any(), any(), any(), eq(7), eq(MATCHER_NAME), any()) }
@@ -190,18 +193,18 @@ internal class MatchViewModelTest {
             configManager
                 .getProjectConfiguration()
                 .fingerprint
-                ?.getSdkConfiguration(any())
+                ?.secugenSimMatcher
                 ?.decisionPolicy
         } returns DecisionPolicy(200, 350, 500)
 
         val responseItems = listOf(
-            FingerprintMatchResult.Item("1", 900f),
-            FingerprintMatchResult.Item("1", 800f),
-            FingerprintMatchResult.Item("1", 550f),
-            FingerprintMatchResult.Item("1", 400f),
-            FingerprintMatchResult.Item("1", 360f),
-            FingerprintMatchResult.Item("1", 200f),
-            FingerprintMatchResult.Item("1", 100f),
+            MatchResultItem("1", 900f),
+            MatchResultItem("1", 800f),
+            MatchResultItem("1", 550f),
+            MatchResultItem("1", 400f),
+            MatchResultItem("1", 360f),
+            MatchResultItem("1", 200f),
+            MatchResultItem("1", 100f),
         )
 
         coEvery { fingerprintMatcherUseCase.invoke(any(), any()) } returns flow {
@@ -223,8 +226,9 @@ internal class MatchViewModelTest {
         viewModel.setupMatch(
             MatchParams(
                 probeReferenceId = "referenceId",
-                probeFingerprintSamples = listOf(getFingerprintSample()),
-                fingerprintSDK = SECUGEN_SIM_MATCHER,
+                probeSamples = listOf(getFingerprintSample()),
+                modality = Modality.FINGERPRINT,
+                sdkType = SECUGEN_SIM_MATCHER,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -242,7 +246,7 @@ internal class MatchViewModelTest {
             ),
         )
         assertThat(viewModel.matchResponse.getOrAwaitValue().peekContent()).isEqualTo(
-            FingerprintMatchResult(responseItems, SECUGEN_SIM_MATCHER),
+            MatchResult(responseItems, Modality.FINGERPRINT, SECUGEN_SIM_MATCHER),
         )
 
         verify { saveMatchEvent.invoke(any(), any(), any(), eq(7), eq(MATCHER_NAME), any()) }
@@ -254,13 +258,13 @@ internal class MatchViewModelTest {
             configManager
                 .getProjectConfiguration()
                 .face
-                ?.getSdkConfiguration(any())
+                ?.rankOne
                 ?.decisionPolicy
         } returns null
 
         val responseItems = listOf(
-            FaceMatchResult.Item("1", 90f),
-            FaceMatchResult.Item("1", 10f),
+            MatchResultItem("1", 90f),
+            MatchResultItem("1", 10f),
         )
         coEvery { faceMatcherUseCase.invoke(any(), any()) } returns flow {
             emit(MatcherUseCase.MatcherState.LoadingStarted(responseItems.size))
@@ -277,8 +281,9 @@ internal class MatchViewModelTest {
         viewModel.setupMatch(
             MatchParams(
                 probeReferenceId = "referenceId",
-                probeFaceSamples = listOf(getFaceSample()),
-                faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
+                probeSamples = listOf(getFaceSample()),
+                modality = Modality.FACE,
+                sdkType = FaceConfiguration.BioSdk.RANK_ONE,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -296,17 +301,21 @@ internal class MatchViewModelTest {
         )
     }
 
-    private fun getFaceSample(): MatchParams.Sample = MatchParams.Sample(
+    private fun getFaceSample() = CaptureSample(
         format = "format",
         template = Random.nextBytes(20),
+        templateQualityScore = 1,
         modality = Modality.FACE,
+        imageRef = null,
     )
 
-    private fun getFingerprintSample(): MatchParams.Sample = MatchParams.Sample(
+    private fun getFingerprintSample() = CaptureSample(
         identifier = SampleIdentifier.LEFT_3RD_FINGER,
         format = "format",
         template = Random.nextBytes(20),
+        templateQualityScore = 1,
         modality = Modality.FINGERPRINT,
+        imageRef = null,
     )
 
     companion object {

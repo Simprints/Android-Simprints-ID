@@ -1,15 +1,11 @@
 package com.simprints.feature.orchestrator.usecases
 
+import com.simprints.core.domain.modality.Modality
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
-import com.simprints.feature.enrollast.FaceTemplateCaptureResult
-import com.simprints.feature.enrollast.FingerTemplateCaptureResult
-import com.simprints.feature.enrollast.MatchResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
-import com.simprints.infra.config.store.models.fromModuleApiToDomain
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
+import com.simprints.matcher.MatchResult
 import java.io.Serializable
 import javax.inject.Inject
 
@@ -21,31 +17,22 @@ internal class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
                 result.newSubjectId,
             )
 
-            is FingerprintCaptureResult -> EnrolLastBiometricStepResult.FingerprintCaptureResult(
+            is FingerprintCaptureResult -> EnrolLastBiometricStepResult.CaptureResult(
                 result.referenceId,
-                result.results.mapNotNull { it.sample }.map {
-                    FingerTemplateCaptureResult(
-                        it.identifier.fromModuleApiToDomain(),
-                        it.template,
-                        it.templateQualityScore,
-                        it.format,
-                    )
-                },
+                Modality.FINGERPRINT,
+                result.results.mapNotNull { it.sample },
             )
 
-            is FingerprintMatchResult -> EnrolLastBiometricStepResult.FingerprintMatchResult(
-                result.results.map { MatchResult(it.subjectId, it.confidence) },
-                result.sdk,
-            )
-
-            is FaceCaptureResult -> EnrolLastBiometricStepResult.FaceCaptureResult(
+            is FaceCaptureResult -> EnrolLastBiometricStepResult.CaptureResult(
                 result.referenceId,
-                result.results.mapNotNull { it.sample }.map { FaceTemplateCaptureResult(it.template, it.format) },
+                Modality.FACE,
+                result.results.mapNotNull { it.sample },
             )
 
-            is FaceMatchResult -> EnrolLastBiometricStepResult.FaceMatchResult(
-                result.results.map { MatchResult(it.subjectId, it.confidence) },
-                result.sdk,
+            is MatchResult -> EnrolLastBiometricStepResult.MatchResult(
+                result.results.map { EnrolLastBiometricStepResult.MatchResult.Item(it.subjectId, it.confidence) },
+                result.modality,
+                result.bioSdk,
             )
 
             else -> null

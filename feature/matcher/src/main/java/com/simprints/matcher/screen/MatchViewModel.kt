@@ -10,10 +10,10 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.DecisionPolicy
+import com.simprints.infra.config.store.models.getModalityConfigs
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
+import com.simprints.matcher.MatchResult
 import com.simprints.matcher.MatchResultItem
 import com.simprints.matcher.usecases.FaceMatcherUseCase
 import com.simprints.matcher.usecases.FingerprintMatcherUseCase
@@ -91,25 +91,23 @@ internal class MatchViewModel @Inject constructor(
                     delay(MATCHING_END_WAIT_TIME_MS)
 
                     _matchResponse.send(
-                        when (params.modality) {
-                            Modality.FACE -> FaceMatchResult(matcherState.matchResultItems, params.faceSDK!!)
-                            Modality.FINGERPRINT -> FingerprintMatchResult(matcherState.matchResultItems, params.fingerprintSDK!!)
-                        },
+                        MatchResult(
+                            matcherState.matchResultItems,
+                            params.modality,
+                            params.sdkType,
+                        ),
                     )
                 }
             }
         }
     }
 
-    private suspend fun getDecisionPolicy(params: MatchParams): DecisionPolicy {
-        val config = configManager.getProjectConfiguration()
-        val policy = when {
-            params.faceSDK != null -> config.face?.getSdkConfiguration(params.faceSDK)?.decisionPolicy
-            params.fingerprintSDK != null -> config.fingerprint?.getSdkConfiguration(params.fingerprintSDK)?.decisionPolicy
-            else -> null
-        }
-        return policy ?: fallbackDecisionPolicy()
-    }
+    private suspend fun getDecisionPolicy(params: MatchParams): DecisionPolicy = configManager
+        .getProjectConfiguration()
+        .getModalityConfigs()[params.modality]
+        ?.get(params.sdkType)
+        ?.decisionPolicy
+        ?: fallbackDecisionPolicy()
 
     private fun setMatchState(
         candidatesMatched: Int,

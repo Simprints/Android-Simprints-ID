@@ -1,19 +1,17 @@
 package com.simprints.feature.orchestrator.usecases
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
-import com.simprints.feature.enrollast.FaceTemplateCaptureResult
-import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
+import com.simprints.matcher.MatchResult
 import org.junit.Before
 import org.junit.Test
 
@@ -40,11 +38,17 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
     fun `maps FaceMatchResult correctly`() {
         val result = useCase(
             listOf(
-                FaceMatchResult(emptyList(), FaceConfiguration.BioSdk.RANK_ONE),
+                MatchResult(emptyList(), Modality.FACE, FaceConfiguration.BioSdk.RANK_ONE),
             ),
         )
 
-        assertThat(result.first()).isEqualTo(EnrolLastBiometricStepResult.FaceMatchResult(emptyList(), FaceConfiguration.BioSdk.RANK_ONE))
+        assertThat(result.first()).isEqualTo(
+            EnrolLastBiometricStepResult.MatchResult(
+                emptyList(),
+                Modality.FACE,
+                FaceConfiguration.BioSdk.RANK_ONE,
+            ),
+        )
     }
 
     @Test
@@ -58,11 +62,12 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
                         FaceCaptureResult.Item(
                             captureEventId = GUID1,
                             index = 0,
-                            sample = FaceCaptureResult.Sample(
-                                faceId = "faceId",
-                                template = byteArrayOf(),
-                                imageRef = null,
+                            sample = CaptureSample(
                                 format = "format",
+                                template = byteArrayOf(),
+                                templateQualityScore = 1,
+                                imageRef = null,
+                                modality = Modality.FACE,
                             ),
                         ),
                     ),
@@ -71,12 +76,16 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
         )
 
         assertThat(result.first()).isEqualTo(
-            EnrolLastBiometricStepResult.FaceCaptureResult(
+            EnrolLastBiometricStepResult.CaptureResult(
                 referenceId = "referenceId",
+                modality = Modality.FACE,
                 results = listOf(
-                    element = FaceTemplateCaptureResult(
-                        template = byteArrayOf(),
+                    element = CaptureSample(
                         format = "format",
+                        template = byteArrayOf(),
+                        templateQualityScore = 1,
+                        imageRef = null,
+                        modality = Modality.FACE,
                     ),
                 ),
             ),
@@ -87,13 +96,13 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
     fun `maps FingerprintMatchResult correctly`() {
         val result = useCase(
             listOf(
-                FingerprintMatchResult(emptyList(), FingerprintConfiguration.BioSdk.NEC),
+                MatchResult(emptyList(), Modality.FINGERPRINT, FingerprintConfiguration.BioSdk.NEC),
             ),
         )
 
         assertThat(
             result.first(),
-        ).isEqualTo(EnrolLastBiometricStepResult.FingerprintMatchResult(emptyList(), FingerprintConfiguration.BioSdk.NEC))
+        ).isEqualTo(EnrolLastBiometricStepResult.MatchResult(emptyList(), Modality.FINGERPRINT, FingerprintConfiguration.BioSdk.NEC))
     }
 
     @Test
@@ -107,12 +116,13 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
                         FingerprintCaptureResult.Item(
                             identifier = SampleIdentifier.RIGHT_THUMB,
                             captureEventId = GUID1,
-                            sample = FingerprintCaptureResult.Sample(
-                                fingerIdentifier = SampleIdentifier.RIGHT_THUMB,
+                            sample = CaptureSample(
+                                identifier = SampleIdentifier.RIGHT_THUMB,
+                                format = "format",
                                 template = byteArrayOf(),
                                 templateQualityScore = 0,
                                 imageRef = null,
-                                format = "format",
+                                modality = Modality.FINGERPRINT,
                             ),
                         ),
                     ),
@@ -121,14 +131,17 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
         )
 
         assertThat(result.first()).isEqualTo(
-            EnrolLastBiometricStepResult.FingerprintCaptureResult(
+            EnrolLastBiometricStepResult.CaptureResult(
                 referenceId = "referenceId",
+                Modality.FINGERPRINT,
                 results = listOf(
-                    FingerTemplateCaptureResult(
+                    CaptureSample(
                         template = byteArrayOf(),
                         templateQualityScore = 0,
                         format = "format",
-                        finger = Finger.RIGHT_THUMB,
+                        imageRef = null,
+                        identifier = SampleIdentifier.RIGHT_THUMB,
+                        modality = Modality.FINGERPRINT,
                     ),
                 ),
             ),

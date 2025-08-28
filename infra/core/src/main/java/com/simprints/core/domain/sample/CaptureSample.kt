@@ -24,7 +24,7 @@ data class CaptureSample(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Sample
+        other as CaptureSample
 
         if (identifier != other.identifier) return false
         if (!template.contentEquals(other.template)) return false

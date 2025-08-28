@@ -41,7 +41,13 @@ internal class SaveMatchEventUseCase @Inject constructor(
                     matcherName,
                     matchParams.queryForCandidates,
                     matchEntries.firstOrNull(),
-                    if (matchParams.modality == Modality.FACE) null else getFingerprintComparisonStrategy(matchParams.fingerprintSDK!!),
+                    if (matchParams.modality == Modality.FACE ||
+                        matchParams.sdkType !is FingerprintConfiguration.BioSdk
+                    ) {
+                        null
+                    } else {
+                        getFingerprintComparisonStrategy(matchParams.sdkType)
+                    },
                     matchParams.probeReferenceId,
                 )
             } else {

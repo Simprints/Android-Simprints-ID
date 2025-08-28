@@ -5,8 +5,7 @@ import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.step.StepParams
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 
@@ -14,8 +13,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQue
 data class MatchParams(
     val probeReferenceId: String,
     val probeSamples: List<CaptureSample> = emptyList(),
-    val faceSDK: FaceConfiguration.BioSdk? = null,
-    val fingerprintSDK: FingerprintConfiguration.BioSdk? = null,
+    val sdkType: ModalitySdkType,
     val modality: Modality,
     val flowType: FlowType,
     val queryForCandidates: SubjectQuery,

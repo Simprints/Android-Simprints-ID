@@ -3,16 +3,16 @@ package com.simprints.matcher.usecases
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.Sample
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.biosdkresolver.FaceBioSDK
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
-import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
+import com.simprints.matcher.MatchResultItem
 import com.simprints.matcher.usecases.MatcherUseCase.MatcherState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -35,12 +35,12 @@ internal class FaceMatcherUseCase @Inject constructor(
         project: Project,
     ): Flow<MatcherState> = channelFlow {
         Simber.i("Initialising matcher", tag = crashReportTag)
-        if (matchParams.faceSDK == null) {
+        if (matchParams.sdkType !is FaceConfiguration.BioSdk) {
             Simber.w("Face SDK was not provided", tag = crashReportTag)
             send(MatcherState.Success(emptyList(), 0, ""))
             return@channelFlow
         }
-        val bioSdk = resolveFaceBioSdk(matchParams.faceSDK)
+        val bioSdk = resolveFaceBioSdk(matchParams.sdkType)
 
         if (matchParams.probeSamples.isEmpty()) {
             send(MatcherState.Success(emptyList(), 0, bioSdk.matcherName()))
@@ -67,7 +67,7 @@ internal class FaceMatcherUseCase @Inject constructor(
         // as it's count function does not take into account filtering criteria
         val loadedCandidates = AtomicInteger(0)
         val ranges = createRanges(expectedCandidates)
-        val resultSet = MatchResultSet<FaceMatchResult.Item>()
+        val resultSet = MatchResultSet<MatchResultItem>()
         val candidatesChannel = enrolmentRecordRepository
             .loadFaceIdentities(
                 query = queryWithSupportedFormat,
@@ -87,7 +87,7 @@ internal class FaceMatcherUseCase @Inject constructor(
     suspend fun consumeAndMatch(
         candidatesChannel: ReceiveChannel<List<Identity>>,
         samples: List<CaptureSample>,
-        resultSet: MatchResultSet<FaceMatchResult.Item>,
+        resultSet: MatchResultSet<MatchResultItem>,
         bioSdk: FaceBioSDK,
     ) {
         for (batch in candidatesChannel) {
@@ -101,9 +101,9 @@ internal class FaceMatcherUseCase @Inject constructor(
     private suspend fun match(
         matcher: FaceMatcher,
         batchCandidates: List<Identity>,
-    ) = batchCandidates.fold(MatchResultSet<FaceMatchResult.Item>()) { acc, candidate ->
+    ) = batchCandidates.fold(MatchResultSet<MatchResultItem>()) { acc, candidate ->
         acc.add(
-            FaceMatchResult.Item(
+            MatchResultItem(
                 candidate.subjectId,
                 matcher.getHighestComparisonScoreForCandidate(candidate),
             ),

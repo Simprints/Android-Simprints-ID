@@ -7,6 +7,7 @@ import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -32,6 +33,8 @@ import com.simprints.feature.setup.SetupResult
 import com.simprints.fingerprint.capture.FingerprintCaptureContract
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.AgeGroup
+import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.NEC
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.sync.ConfigManager
@@ -199,6 +202,8 @@ internal class OrchestratorViewModelTest {
                     FlowType.VERIFY,
                     SubjectQuery(),
                     BiometricDataSource.Simprints,
+                    Modality.FACE,
+                    FaceConfiguration.BioSdk.RANK_ONE,
                 ),
             ),
         )
@@ -223,6 +228,8 @@ internal class OrchestratorViewModelTest {
                     FlowType.VERIFY,
                     SubjectQuery(),
                     BiometricDataSource.Simprints,
+                    Modality.FACE,
+                    FaceConfiguration.BioSdk.RANK_ONE,
                 ),
             ),
         )
@@ -246,6 +253,8 @@ internal class OrchestratorViewModelTest {
                     FlowType.VERIFY,
                     SubjectQuery(),
                     BiometricDataSource.Simprints,
+                    Modality.FINGERPRINT,
+                    FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                 ),
             ),
         )
@@ -276,7 +285,8 @@ internal class OrchestratorViewModelTest {
                     flowType = FlowType.VERIFY,
                     subjectQuery = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
-                    fingerprintSDK = SECUGEN_SIM_MATCHER,
+                    modality = Modality.FINGERPRINT,
+                    sdkType = SECUGEN_SIM_MATCHER,
                 ),
             ),
             createMockStep(
@@ -293,25 +303,28 @@ internal class OrchestratorViewModelTest {
                     flowType = FlowType.VERIFY,
                     subjectQuery = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
-                    fingerprintSDK = NEC,
+                    modality = Modality.FINGERPRINT,
+                    sdkType = NEC,
                 ),
             ),
         )
         coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
         val format = "SimMatcher"
-        val sample1 = FingerprintCaptureResult.Sample(
+        val sample1 = CaptureSample(
+            format,
+            ByteArray(0),
+            0,
+            null,
+            Modality.FINGERPRINT,
             SampleIdentifier.LEFT_INDEX_FINGER,
-            ByteArray(0),
-            0,
-            null,
-            format,
         )
-        val sample2 = FingerprintCaptureResult.Sample(
-            SampleIdentifier.LEFT_THUMB,
+        val sample2 = CaptureSample(
+            format,
             ByteArray(0),
             0,
             null,
-            format,
+            Modality.FINGERPRINT,
+            SampleIdentifier.LEFT_THUMB,
         )
         val captureResults: List<FingerprintCaptureResult.Item> = listOf(
             FingerprintCaptureResult.Item(null, SampleIdentifier.LEFT_INDEX_FINGER, sample1),
@@ -325,10 +338,10 @@ internal class OrchestratorViewModelTest {
             assertThat(step.id).isEqualTo(StepId.FINGERPRINT_MATCHER)
             val params = step.params?.let { it as? MatchParams }
             assertThat(params).isNotNull()
-            assertThat(params?.fingerprintSDK).isEqualTo(SECUGEN_SIM_MATCHER)
-            assertThat(params?.probeFingerprintSamples?.size).isEqualTo(2)
-            assertThat(params?.probeFingerprintSamples?.get(0)?.format).isEqualTo(format)
-            assertThat(params?.probeFingerprintSamples?.get(1)?.format).isEqualTo(format)
+            assertThat(params?.sdkType).isEqualTo(SECUGEN_SIM_MATCHER)
+            assertThat(params?.probeSamples?.size).isEqualTo(2)
+            assertThat(params?.probeSamples?.get(0)?.format).isEqualTo(format)
+            assertThat(params?.probeSamples?.get(1)?.format).isEqualTo(format)
         }
     }
 

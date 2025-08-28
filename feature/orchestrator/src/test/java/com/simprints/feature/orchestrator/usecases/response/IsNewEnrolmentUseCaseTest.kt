@@ -1,15 +1,15 @@
 package com.simprints.feature.orchestrator.usecases.response
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.modality.Modality
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import com.simprints.matcher.MatchResult
+import com.simprints.matcher.MatchResultItem
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 
@@ -21,10 +21,10 @@ internal class IsNewEnrolmentUseCaseTest {
 
     @Before
     fun setUp() {
-        MockKAnnotations.init(this, relaxUnitFun = true)
+        MockKAnnotations.init(this, relaxed = true, relaxUnitFun = true)
 
-        every { projectConfiguration.face?.getSdkConfiguration((any()))?.decisionPolicy } returns faceConfidenceDecisionPolicy
-        every { projectConfiguration.fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns fingerprintConfidenceDecisionPolicy
+        every { projectConfiguration.face?.rankOne?.decisionPolicy } returns faceConfidenceDecisionPolicy
+        every { projectConfiguration.fingerprint?.secugenSimMatcher?.decisionPolicy } returns fingerprintConfidenceDecisionPolicy
 
         useCase = IsNewEnrolmentUseCase()
     }
@@ -50,7 +50,13 @@ internal class IsNewEnrolmentUseCaseTest {
         assertThat(
             useCase(
                 projectConfiguration,
-                listOf(FingerprintMatchResult(listOf(FingerprintMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)), mockk())),
+                listOf(
+                    MatchResult(
+                        listOf(MatchResultItem("", LOWER_THAN_MEDIUM_SCORE)),
+                        Modality.FINGERPRINT,
+                        FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
+                    ),
+                ),
             ),
         ).isTrue()
     }
@@ -62,7 +68,13 @@ internal class IsNewEnrolmentUseCaseTest {
         assertThat(
             useCase(
                 projectConfiguration,
-                listOf(FingerprintMatchResult(listOf(FingerprintMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE)), mockk())),
+                listOf(
+                    MatchResult(
+                        listOf(MatchResultItem("", HIGHER_THAN_MEDIUM_SCORE)),
+                        Modality.FINGERPRINT,
+                        FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
+                    ),
+                ),
             ),
         ).isFalse()
     }
@@ -74,7 +86,13 @@ internal class IsNewEnrolmentUseCaseTest {
         assertThat(
             useCase(
                 projectConfiguration,
-                listOf(FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE)),
+                listOf(
+                    MatchResult(
+                        listOf(MatchResultItem("", LOWER_THAN_MEDIUM_SCORE)),
+                        Modality.FACE,
+                        FaceConfiguration.BioSdk.RANK_ONE,
+                    ),
+                ),
             ),
         ).isTrue()
     }
@@ -86,7 +104,13 @@ internal class IsNewEnrolmentUseCaseTest {
         assertThat(
             useCase(
                 projectConfiguration,
-                listOf(FaceMatchResult(listOf(FaceMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE)),
+                listOf(
+                    MatchResult(
+                        listOf(MatchResultItem("", HIGHER_THAN_MEDIUM_SCORE)),
+                        Modality.FACE,
+                        FaceConfiguration.BioSdk.RANK_ONE,
+                    ),
+                ),
             ),
         ).isFalse()
     }
@@ -99,11 +123,16 @@ internal class IsNewEnrolmentUseCaseTest {
             useCase(
                 projectConfiguration,
                 listOf(
-                    FingerprintMatchResult(
-                        listOf(FingerprintMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)),
-                        mockk(),
+                    MatchResult(
+                        listOf(MatchResultItem("", LOWER_THAN_MEDIUM_SCORE)),
+                        Modality.FINGERPRINT,
+                        FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                     ),
-                    FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE),
+                    MatchResult(
+                        listOf(MatchResultItem("", LOWER_THAN_MEDIUM_SCORE)),
+                        Modality.FACE,
+                        FaceConfiguration.BioSdk.RANK_ONE,
+                    ),
                 ),
             ),
         ).isTrue()
@@ -117,11 +146,16 @@ internal class IsNewEnrolmentUseCaseTest {
             useCase(
                 projectConfiguration,
                 listOf(
-                    FingerprintMatchResult(
-                        listOf(FingerprintMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)),
-                        mockk(),
+                    MatchResult(
+                        listOf(MatchResultItem("", LOWER_THAN_MEDIUM_SCORE)),
+                        Modality.FINGERPRINT,
+                        FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                     ),
-                    FaceMatchResult(listOf(FaceMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE),
+                    MatchResult(
+                        listOf(MatchResultItem("", HIGHER_THAN_MEDIUM_SCORE)),
+                        Modality.FACE,
+                        FaceConfiguration.BioSdk.RANK_ONE,
+                    ),
                 ),
             ),
         ).isFalse()
@@ -135,11 +169,16 @@ internal class IsNewEnrolmentUseCaseTest {
             useCase(
                 projectConfiguration,
                 listOf(
-                    FingerprintMatchResult(
-                        listOf(FingerprintMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE)),
-                        mockk(),
+                    MatchResult(
+                        listOf(MatchResultItem("", HIGHER_THAN_MEDIUM_SCORE)),
+                        Modality.FINGERPRINT,
+                        FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                     ),
-                    FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE),
+                    MatchResult(
+                        listOf(MatchResultItem("", LOWER_THAN_MEDIUM_SCORE)),
+                        Modality.FACE,
+                        FaceConfiguration.BioSdk.RANK_ONE,
+                    ),
                 ),
             ),
         ).isFalse()

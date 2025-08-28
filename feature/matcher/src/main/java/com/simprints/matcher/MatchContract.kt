@@ -3,8 +3,7 @@ package com.simprints.matcher
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.sample.CaptureSample
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 
@@ -15,8 +14,7 @@ object MatchContract {
         referenceId: String = "",
         probeSamples: List<CaptureSample> = emptyList(),
         modality: Modality,
-        fingerprintSDK: FingerprintConfiguration.BioSdk? = null,
-        faceSDK: FaceConfiguration.BioSdk? = null,
+        sdkType: ModalitySdkType,
         flowType: FlowType,
         subjectQuery: SubjectQuery,
         biometricDataSource: BiometricDataSource,
@@ -24,8 +22,7 @@ object MatchContract {
         probeReferenceId = referenceId,
         probeSamples = probeSamples,
         modality = modality,
-        faceSDK = faceSDK,
-        fingerprintSDK = fingerprintSDK,
+        sdkType = sdkType,
         flowType = flowType,
         queryForCandidates = subjectQuery,
         biometricDataSource = biometricDataSource,

@@ -1,15 +1,14 @@
 package com.simprints.feature.enrollast.screen.usecase
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
-import com.simprints.feature.enrollast.FaceTemplateCaptureResult
-import com.simprints.feature.enrollast.FingerTemplateCaptureResult
-import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.eventsync.sync.common.SubjectFactory
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
@@ -52,8 +51,8 @@ class BuildSubjectUseCaseTest {
             createParams(
                 listOf(
                     EnrolLastBiometricStepResult.EnrolLastBiometricsResult(null),
-                    EnrolLastBiometricStepResult.FingerprintMatchResult(emptyList(), mockk()),
-                    EnrolLastBiometricStepResult.FaceMatchResult(emptyList(), mockk()),
+                    EnrolLastBiometricStepResult.MatchResult(emptyList(), Modality.FINGERPRINT, mockk()),
+                    EnrolLastBiometricStepResult.MatchResult(emptyList(), Modality.FACE, mockk()),
                 ),
             ),
         )
@@ -67,21 +66,23 @@ class BuildSubjectUseCaseTest {
         val result = useCase(
             createParams(
                 listOf(
-                    EnrolLastBiometricStepResult.FingerprintMatchResult(emptyList(), mockk()),
-                    EnrolLastBiometricStepResult.FingerprintCaptureResult(
+                    EnrolLastBiometricStepResult.MatchResult(emptyList(), Modality.FINGERPRINT, mockk()),
+                    EnrolLastBiometricStepResult.CaptureResult(
                         REFERENCE_ID,
-                        listOf(mockFingerprintResults(Finger.RIGHT_THUMB)),
+                        Modality.FINGERPRINT,
+                        listOf(mockFingerprintResults(SampleIdentifier.RIGHT_THUMB)),
                     ),
-                    EnrolLastBiometricStepResult.FingerprintCaptureResult(
+                    EnrolLastBiometricStepResult.CaptureResult(
                         REFERENCE_ID,
-                        listOf(mockFingerprintResults(Finger.LEFT_THUMB)),
+                        Modality.FINGERPRINT,
+                        listOf(mockFingerprintResults(SampleIdentifier.LEFT_THUMB)),
                     ),
                 ),
             ),
         )
 
         assertThat(result.fingerprintSamples).isNotEmpty()
-        assertThat(result.fingerprintSamples.first().fingerIdentifier).isEqualTo(SampleIdentifier.RIGHT_THUMB)
+        assertThat(result.fingerprintSamples.first().identifier).isEqualTo(SampleIdentifier.RIGHT_THUMB)
     }
 
     @Test
@@ -89,19 +90,20 @@ class BuildSubjectUseCaseTest {
         val result = useCase(
             createParams(
                 listOf(
-                    EnrolLastBiometricStepResult.FingerprintCaptureResult(
+                    EnrolLastBiometricStepResult.CaptureResult(
                         REFERENCE_ID,
+                        Modality.FINGERPRINT,
                         listOf(
-                            mockFingerprintResults(Finger.RIGHT_5TH_FINGER),
-                            mockFingerprintResults(Finger.RIGHT_4TH_FINGER),
-                            mockFingerprintResults(Finger.RIGHT_3RD_FINGER),
-                            mockFingerprintResults(Finger.RIGHT_INDEX_FINGER),
-                            mockFingerprintResults(Finger.RIGHT_THUMB),
-                            mockFingerprintResults(Finger.LEFT_THUMB),
-                            mockFingerprintResults(Finger.LEFT_INDEX_FINGER),
-                            mockFingerprintResults(Finger.LEFT_3RD_FINGER),
-                            mockFingerprintResults(Finger.LEFT_4TH_FINGER),
-                            mockFingerprintResults(Finger.LEFT_5TH_FINGER),
+                            mockFingerprintResults(SampleIdentifier.RIGHT_5TH_FINGER),
+                            mockFingerprintResults(SampleIdentifier.RIGHT_4TH_FINGER),
+                            mockFingerprintResults(SampleIdentifier.RIGHT_3RD_FINGER),
+                            mockFingerprintResults(SampleIdentifier.RIGHT_INDEX_FINGER),
+                            mockFingerprintResults(SampleIdentifier.RIGHT_THUMB),
+                            mockFingerprintResults(SampleIdentifier.LEFT_THUMB),
+                            mockFingerprintResults(SampleIdentifier.LEFT_INDEX_FINGER),
+                            mockFingerprintResults(SampleIdentifier.LEFT_3RD_FINGER),
+                            mockFingerprintResults(SampleIdentifier.LEFT_4TH_FINGER),
+                            mockFingerprintResults(SampleIdentifier.LEFT_5TH_FINGER),
                         ),
                     ),
                 ),
@@ -117,9 +119,17 @@ class BuildSubjectUseCaseTest {
         val result = useCase(
             createParams(
                 listOf(
-                    EnrolLastBiometricStepResult.FaceMatchResult(emptyList(), mockk()),
-                    EnrolLastBiometricStepResult.FaceCaptureResult(REFERENCE_ID, mockFaceResultsList("first")),
-                    EnrolLastBiometricStepResult.FaceCaptureResult(REFERENCE_ID, mockFaceResultsList("second")),
+                    EnrolLastBiometricStepResult.MatchResult(emptyList(), Modality.FACE, mockk()),
+                    EnrolLastBiometricStepResult.CaptureResult(
+                        REFERENCE_ID,
+                        Modality.FACE,
+                        listOf(mockFaceResults("first")),
+                    ),
+                    EnrolLastBiometricStepResult.CaptureResult(
+                        REFERENCE_ID,
+                        Modality.FACE,
+                        listOf(mockFaceResults("second")),
+                    ),
                 ),
             ),
         )
@@ -135,9 +145,22 @@ class BuildSubjectUseCaseTest {
         steps = steps,
     )
 
-    private fun mockFingerprintResults(finger: Finger) = FingerTemplateCaptureResult(finger, byteArrayOf(), 1, "ISO_19794_2")
+    private fun mockFingerprintResults(finger: SampleIdentifier) = CaptureSample(
+        "ISO_19794_2",
+        byteArrayOf(),
+        templateQualityScore = 1,
+        imageRef = null,
+        modality = Modality.FINGERPRINT,
+        identifier = finger,
+    )
 
-    private fun mockFaceResultsList(format: String) = listOf(FaceTemplateCaptureResult(byteArrayOf(), format))
+    private fun mockFaceResults(format: String) = CaptureSample(
+        format = format,
+        template = byteArrayOf(),
+        templateQualityScore = 1,
+        imageRef = null,
+        modality = Modality.FACE,
+    )
 
     companion object {
         private const val REFERENCE_ID = "referenceId"
