@@ -8,6 +8,8 @@ import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MAX
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MIN
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FALLBACK_TO_COMMCARE_THRESHOLD_DAYS
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FALLBACK_TO_COMMCARE_THRESHOLD_DAYS_DEFAULT
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_DEFAULT_MAX_RETRIES
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES
@@ -142,6 +144,23 @@ internal class ExperimentalProjectConfigurationTest {
             mapOf(CAMERA_FLASH_CONTROLS_ENABLED to true) to true,
         ).forEach { (config, result) ->
             assertThat(ExperimentalProjectConfiguration(config).displayCameraFlashToggle).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `check fallback to CommCare threshold days correctly`() {
+        mapOf(
+            // Value not present
+            emptyMap<String, Any>() to FALLBACK_TO_COMMCARE_THRESHOLD_DAYS_DEFAULT,
+            // Value not int
+            mapOf(FALLBACK_TO_COMMCARE_THRESHOLD_DAYS to true) to FALLBACK_TO_COMMCARE_THRESHOLD_DAYS_DEFAULT,
+            mapOf(FALLBACK_TO_COMMCARE_THRESHOLD_DAYS to 0) to 0L,
+            mapOf(FALLBACK_TO_COMMCARE_THRESHOLD_DAYS to 1) to 1L,
+            mapOf(FALLBACK_TO_COMMCARE_THRESHOLD_DAYS to 5) to 5L,
+            // Value present and exactly at default
+            mapOf(FALLBACK_TO_COMMCARE_THRESHOLD_DAYS to 3) to 3L,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).fallbackToCommCareThresholdDays).isEqualTo(result)
         }
     }
 }
