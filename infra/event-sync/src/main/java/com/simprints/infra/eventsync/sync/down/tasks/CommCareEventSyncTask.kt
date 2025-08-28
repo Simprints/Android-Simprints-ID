@@ -1,13 +1,10 @@
 package com.simprints.infra.eventsync.sync.down.tasks
 
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Creation
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Deletion
 import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
 import com.simprints.infra.eventsync.event.commcare.CommCareEventDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
@@ -33,8 +30,6 @@ internal class CommCareEventSyncTask @Inject constructor(
     timeHelper,
     eventRepository,
 ) {
-    private var subjectIdsPresentInCommCare = mutableSetOf<String>()
-
     override suspend fun fetchEvents(
         operation: EventDownSyncOperation,
         scope: CoroutineScope,
@@ -54,31 +49,7 @@ internal class CommCareEventSyncTask @Inject constructor(
         return throwable is SecurityException || throwable is IllegalStateException
     }
 
-    // Override to track subject IDs present in CommCare
-    override suspend fun onActionsProcessed(actions: List<SubjectAction>) {
-        actions.forEach { action ->
-            if (action is Creation) {
-                subjectIdsPresentInCommCare.add(action.subject.subjectId)
-            }
-        }
-    }
-
-    override suspend fun performPostSyncCleanup(project: Project, count: Int) {
-        //Don't trigger if count is 0 because it might be due to CommCare logout
-        if (count > 0) {
-            deleteSubjectsNotInCommCare(project)
-        }
-
-        Simber.i("CommCareEventSyncTask finished", tag = COMMCARE_SYNC)
-    }
-
-    private suspend fun deleteSubjectsNotInCommCare(project: Project) {
-        val deleteActions = enrolmentRecordRepository.getAllSubjectIds()
-            .filterNot { subjectIdsPresentInCommCare.contains(it) }
-            .map { Deletion(it) }
-        if (deleteActions.isNotEmpty()) {
-            enrolmentRecordRepository.performActions(deleteActions, project)
-            Simber.i("Deleted ${deleteActions.size} subjects not present in CommCare", tag = COMMCARE_SYNC)
-        }
-    }
+    // Override to track subject IDs present in CommCare and update CommCareSyncCache
+    override suspend fun onEventsProcessed(events: List<EnrolmentRecordEvent>) =
+        commCareEventDataSource.onEventsProcessed(events)
 }

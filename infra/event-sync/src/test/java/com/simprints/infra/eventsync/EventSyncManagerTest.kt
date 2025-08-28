@@ -15,6 +15,7 @@ import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.infra.eventsync.event.commcare.cache.CommCareSyncCache
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
@@ -60,6 +61,9 @@ internal class EventSyncManagerTest {
     lateinit var eventSyncCache: EventSyncCache
 
     @MockK
+    lateinit var commCareSyncCache: CommCareSyncCache
+
+    @MockK
     lateinit var eventRepository: EventRepository
 
     @MockK
@@ -98,6 +102,7 @@ internal class EventSyncManagerTest {
             eventRepository = eventRepository,
             upSyncScopeRepo = eventUpSyncScopeRepository,
             eventSyncCache = eventSyncCache,
+            commCareSyncCache = commCareSyncCache,
             simprintsDownSyncTask = downSyncTask,
             eventRemoteDataSource = eventRemoteDataSource,
             configRepository = configRepository,
@@ -195,12 +200,14 @@ internal class EventSyncManagerTest {
         coVerify(exactly = 1) { eventDownSyncScopeRepository.deleteAll() }
         coVerify(exactly = 1) { eventSyncCache.clearProgresses() }
         coVerify(exactly = 1) { eventSyncCache.storeLastSuccessfulSyncTime(null) }
+        coVerify(exactly = 1) { commCareSyncCache.clearAllSyncedCases() }
     }
 
     @Test
     fun `resetDownSyncInfo should call sync scope repo`() = runTest {
         eventSyncManagerImpl.resetDownSyncInfo()
 
-        coVerify { eventDownSyncScopeRepository.deleteAll() }
+        coVerify(exactly = 1) { eventDownSyncScopeRepository.deleteAll() }
+        coVerify(exactly = 1) { commCareSyncCache.clearAllSyncedCases() }
     }
 }
