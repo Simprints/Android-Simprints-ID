@@ -7,7 +7,7 @@ plugins {
 android {
     namespace = "com.simprints.infra.enrolment.records.repository"
     defaultConfig {
-        testInstrumentationRunner = "com.simprints.infra.enrolment.records.repository.local.CustomTestRunner"
+        testInstrumentationRunner = "com.simprints.infra.enrolment.records.repository.local.HiltTestRunner"
     }
 }
 
