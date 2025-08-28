@@ -1,5 +1,6 @@
 package com.simprints.infra.eventsync
 
+import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.Partitioning
@@ -17,10 +18,11 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
+import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
-import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask
+import com.simprints.infra.eventsync.sync.down.tasks.SimprintsEventDownSyncTask
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -61,7 +63,7 @@ internal class EventSyncManagerTest {
     lateinit var eventRepository: EventRepository
 
     @MockK
-    lateinit var downSyncTask: EventDownSyncTask
+    lateinit var downSyncTask: SimprintsEventDownSyncTask
 
     @MockK
     lateinit var eventRemoteDataSource: EventRemoteDataSource
@@ -85,8 +87,7 @@ internal class EventSyncManagerTest {
         coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general.modalities } returns listOf()
             every {
-                synchronization.down.simprints.partitionType
-                    .toDomain()
+                synchronization.down.simprints?.partitionType?.toDomain()
             } returns Partitioning.MODULE
         }
 
@@ -97,7 +98,7 @@ internal class EventSyncManagerTest {
             eventRepository = eventRepository,
             upSyncScopeRepo = eventUpSyncScopeRepository,
             eventSyncCache = eventSyncCache,
-            downSyncTask = downSyncTask,
+            simprintsDownSyncTask = downSyncTask,
             eventRemoteDataSource = eventRemoteDataSource,
             configRepository = configRepository,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,
@@ -117,6 +118,25 @@ internal class EventSyncManagerTest {
     }
 
     @Test
+    fun `getLastSyncState with useDefaultValue true should return an immediate default value`() = runTest {
+        every { eventSyncStateProcessor.getLastSyncState() } returns MutableLiveData(null)
+        val defaultValue = EventSyncState(syncId = "", null, null, emptyList(), emptyList(), emptyList())
+
+        val result = eventSyncManagerImpl.getLastSyncState(true).value
+
+        assertThat(result).isEqualTo(defaultValue)
+    }
+
+    @Test
+    fun `getLastSyncState with useDefaultValue false and no data emission should return null value`() = runTest {
+        every { eventSyncStateProcessor.getLastSyncState() } returns MutableLiveData(null)
+
+        val result = eventSyncManagerImpl.getLastSyncState(false).value
+
+        assertThat(result).isEqualTo(null)
+    }
+
+    @Test
     fun `countEventsToUpload without types should call event repo`() = runTest {
         eventSyncManagerImpl.countEventsToUpload().toList()
 
@@ -131,7 +151,7 @@ internal class EventSyncManagerTest {
     }
 
     @Test
-    fun `getDownSyncCounts correctly counts sync events`() = runTest {
+    fun `countEventsToDownload correctly counts sync events`() = runTest {
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any())
         } returns SampleSyncScopes.modulesDownSyncScope

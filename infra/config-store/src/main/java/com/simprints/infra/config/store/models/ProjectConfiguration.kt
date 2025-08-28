@@ -37,7 +37,11 @@ fun ProjectConfiguration.canSyncBiometricDataToSimprints(): Boolean =
 fun ProjectConfiguration.canSyncAnalyticsDataToSimprints(): Boolean =
     synchronization.up.simprints.kind == UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
 
-fun ProjectConfiguration.isEventDownSyncAllowed(): Boolean = synchronization.down.simprints.frequency != Frequency.ONLY_PERIODICALLY_UP_SYNC
+fun ProjectConfiguration.isSimprintsEventDownSyncAllowed(): Boolean =
+    synchronization.down.simprints != null &&
+    synchronization.down.simprints.frequency != Frequency.ONLY_PERIODICALLY_UP_SYNC
+
+fun ProjectConfiguration.isCommCareEventDownSyncAllowed(): Boolean = synchronization.down.commCare != null
 
 fun ProjectConfiguration.imagesUploadRequiresUnmeteredConnection(): Boolean = synchronization.up.simprints.imagesRequireUnmeteredConnection
 
@@ -73,3 +77,13 @@ fun ProjectConfiguration.sortedUniqueAgeGroups(): List<AgeGroup> {
 fun ProjectConfiguration.isAgeRestricted() = allowedAgeRanges().any { !it.isEmpty() }
 
 fun ProjectConfiguration.experimental(): ExperimentalProjectConfiguration = ExperimentalProjectConfiguration(custom)
+
+// module sync
+
+fun ProjectConfiguration.isProjectWithModuleSync(): Boolean =
+    synchronization.down.simprints?.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
+
+fun ProjectConfiguration.isProjectWithPeriodicallyUpSync(): Boolean =
+    synchronization.up.simprints.frequency == Frequency.ONLY_PERIODICALLY_UP_SYNC
+
+fun ProjectConfiguration.isModuleSelectionAvailable(): Boolean = isProjectWithModuleSync() && !isProjectWithPeriodicallyUpSync()

@@ -75,26 +75,35 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
 
     override suspend fun getProjectConfiguration(): ProjectConfiguration = configDataStore.data.first().toDomain()
 
-    override fun watchProjectConfiguration(): Flow<ProjectConfiguration> = configDataStore.data.map(ProtoProjectConfiguration::toDomain)
+    override fun observeProjectConfiguration(): Flow<ProjectConfiguration> =
+        configDataStore.data.map(ProtoProjectConfiguration::toDomain)
 
     override suspend fun clearProjectConfiguration() {
         configDataStore.updateData { it.toBuilder().clear().build() }
     }
 
-    override suspend fun getDeviceConfiguration(): DeviceConfiguration {
-        val config = deviceConfigDataStore.data.first().toDomain()
-        val tokenizedModules = config.selectedModules.map { moduleId ->
-            when (moduleId) {
-                is TokenizableString.Raw -> tokenizationProcessor.encrypt(
-                    decrypted = moduleId,
-                    tokenKeyType = TokenKeyType.ModuleId,
-                    project = getProject(),
-                )
-                is TokenizableString.Tokenized -> moduleId
+    override suspend fun getDeviceConfiguration(): DeviceConfiguration =
+        deviceConfigDataStore.data.first().toDomain().apply {
+            selectedModules = selectedModules.mapToTokenizedModuleIds()
+        }
+
+    override fun observeDeviceConfiguration(): Flow<DeviceConfiguration> =
+        deviceConfigDataStore.data.map(ProtoDeviceConfiguration::toDomain).map { config ->
+            config.apply {
+                selectedModules = selectedModules.mapToTokenizedModuleIds()
             }
         }
-        config.selectedModules = tokenizedModules
-        return config
+
+    private suspend fun List<TokenizableString>.mapToTokenizedModuleIds() = map { moduleId ->
+        when (moduleId) {
+            is TokenizableString.Raw -> tokenizationProcessor.encrypt(
+                decrypted = moduleId,
+                tokenKeyType = TokenKeyType.ModuleId,
+                project = getProject(),
+            )
+
+            is TokenizableString.Tokenized -> moduleId
+        }
     }
 
     override suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) {
@@ -232,6 +241,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                             maxAge = DEFAULT_DOWN_SYNC_MAX_AGE,
                             frequency = Frequency.PERIODICALLY,
                         ),
+                        commCare = null,
                     ),
                     samples = SampleSynchronizationConfiguration(
                         signedUrlBatchSize = 1,

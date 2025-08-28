@@ -3,11 +3,11 @@ kotlin_version = "2.2.0"
 kotlin_coroutine_version = "1.10.2"
 ksp_version = "2.2.0-2.0.2"
 
-android_gradlePlugin_version = "8.12.0"
+android_gradlePlugin_version = "8.12.1"
 androidx_version = "1.7.0"
-androidx_core_version = "1.16.0"
+androidx_core_version = "1.17.0"
 androidx_app_compat_version = "1.7.1"
-androidx_fragment_version = "1.8.8"
+androidx_fragment_version = "1.8.9"
 androidx_navigation_version = "2.9.3"
 androidx_lifecycle_version = "2.9.2"
 androidx_work_version = "2.10.3"
@@ -107,6 +107,7 @@ androidX-Room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx
 androidX-lifecycle = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx_lifecycle_version" }
 androidX-lifecycle-scope = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx_lifecycle_version" }
 androidX-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidx_lifecycle_version" }
+androidX-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "androidx_lifecycle_version" }
 
 #UI
 androidX-ui-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx_constraint_version" }

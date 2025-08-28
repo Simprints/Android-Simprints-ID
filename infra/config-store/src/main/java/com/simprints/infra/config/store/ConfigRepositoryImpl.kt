@@ -58,7 +58,7 @@ internal class ConfigRepositoryImpl @Inject constructor(
         return tokenizeModules(config)
     }
 
-    override fun watchProjectConfiguration(): Flow<ProjectConfiguration> = localDataSource.watchProjectConfiguration().map { config ->
+    override fun observeProjectConfiguration(): Flow<ProjectConfiguration> = localDataSource.observeProjectConfiguration().map { config ->
         tokenizeModules(config)
     }
 
@@ -70,6 +70,8 @@ internal class ConfigRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getDeviceConfiguration(): DeviceConfiguration = localDataSource.getDeviceConfiguration()
+
+    override fun observeDeviceConfiguration(): Flow<DeviceConfiguration> = localDataSource.observeDeviceConfiguration()
 
     override suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) =
         localDataSource.updateDeviceConfiguration(update)
@@ -99,7 +101,7 @@ internal class ConfigRepositoryImpl @Inject constructor(
         return config.copy(
             synchronization = config.synchronization.copy(
                 down = config.synchronization.down.copy(
-                    simprints = config.synchronization.down.simprints.copy(
+                    simprints = config.synchronization.down.simprints?.copy(
                         moduleOptions = config.synchronization.down.simprints.moduleOptions.map { moduleId ->
                             when (moduleId) {
                                 is TokenizableString.Raw -> tokenizationProcessor.encrypt(

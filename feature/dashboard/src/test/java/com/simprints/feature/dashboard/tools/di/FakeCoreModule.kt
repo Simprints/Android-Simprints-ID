@@ -14,6 +14,7 @@ import com.simprints.core.PackageVersionName
 import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Ticker
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.StringTokenizer
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
@@ -42,7 +43,11 @@ object FakeCoreModule {
 
     @Provides
     @Singleton
-    fun provideTimeHelper(): TimeHelper = mockk()
+    fun provideTimeHelper(): TimeHelper = mockk(relaxed = true)
+
+    @Provides
+    @Singleton
+    fun provideTicker(): Ticker = mockk(relaxed = true)
 
     @Provides
     @Singleton
@@ -95,5 +100,5 @@ object FakeCoreModule {
     @Provides
     fun provideWorkManager(
         @ApplicationContext context: Context,
-    ): WorkManager = WorkManager.getInstance(context)
+    ): WorkManager = mockk(relaxed = true)
 }

@@ -16,7 +16,7 @@ interface EventSyncManager {
 
     suspend fun getLastSyncTime(): Timestamp?
 
-    fun getLastSyncState(): LiveData<EventSyncState>
+    fun getLastSyncState(useDefaultValue: Boolean = false): LiveData<EventSyncState>
 
     suspend fun countEventsToUpload(): Flow<Int>
 

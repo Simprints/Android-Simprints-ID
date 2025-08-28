@@ -28,6 +28,8 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
+        app:layout_constraintWidth_max="500dp"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintBottom_toTopOf="@+id/logoutWithoutSyncButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,30 +49,42 @@
                 android:text="@string/dashboard_logout_confirmation_sync_info"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="invisible"
+                tools:visibility="visible"/>
 
-            <com.simprints.feature.dashboard.views.SyncCardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/logoutSyncCard"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/margin_large"
+                android:layout_marginHorizontal="12dp"
                 android:layout_marginVertical="@dimen/margin_default"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/logout_sync_info" />
+                app:layout_constraintTop_toBottomOf="@+id/logout_sync_info">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/logoutButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/margin_large"
-                android:layout_marginVertical="@dimen/margin_large"
-                android:text="@string/dashboard_logout_confirmation_log_out_button"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/logoutSyncCard"
-                tools:visibility="visible" />
+                <com.simprints.feature.dashboard.view.ConfigurableSyncInfoFragmentContainer
+                    app:isSyncInfoToolbarVisible="false"
+                    app:isSyncInfoStatusHeaderVisible="true"
+                    app:isSyncInfoStatusHeaderSettingsButtonVisible="false"
+                    app:areSyncInfoSectionHeadersVisible="false"
+                    app:isSyncInfoImageSyncVisible="false"
+                    app:isSyncInfoRecordsImagesCombined="true"
+                    app:isSyncInfoLogoutOnComplete="true"
+                    app:isSyncInfoModuleListVisible="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.fragment.app.FragmentContainerView
+                        android:id="@+id/dashboard_sync"
+                        android:name="com.simprints.feature.dashboard.settings.syncinfo.SyncInfoFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                </com.simprints.feature.dashboard.view.ConfigurableSyncInfoFragmentContainer>
+
+            </com.google.android.material.card.MaterialCardView>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 

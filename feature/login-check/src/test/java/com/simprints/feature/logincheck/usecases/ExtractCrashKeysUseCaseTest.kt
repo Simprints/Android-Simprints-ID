@@ -37,7 +37,7 @@ class ExtractCrashKeysUseCaseTest {
     @Test
     fun `Sets values to Simber`() = runTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
-            every { synchronization.down.simprints.frequency } returns Frequency.PERIODICALLY
+            every { synchronization.down.simprints?.frequency } returns Frequency.PERIODICALLY
         }
         coEvery { configManager.getDeviceConfiguration() } returns mockk {
             every { selectedModules } returns listOf(

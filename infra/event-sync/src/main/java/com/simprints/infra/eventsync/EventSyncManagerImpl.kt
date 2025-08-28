@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.time.TimeHelper
@@ -25,7 +26,7 @@ import com.simprints.infra.eventsync.sync.common.MASTER_SYNC_SCHEDULER_ONE_TIME
 import com.simprints.infra.eventsync.sync.common.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
 import com.simprints.infra.eventsync.sync.common.TAG_SCHEDULED_AT
 import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
-import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask
+import com.simprints.infra.eventsync.sync.down.tasks.SimprintsEventDownSyncTask
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -40,14 +41,21 @@ internal class EventSyncManagerImpl @Inject constructor(
     private val eventRepository: EventRepository,
     private val upSyncScopeRepo: EventUpSyncScopeRepository,
     private val eventSyncCache: EventSyncCache,
-    private val downSyncTask: EventDownSyncTask,
+    private val simprintsDownSyncTask: SimprintsEventDownSyncTask,
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val configRepository: ConfigRepository,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : EventSyncManager {
     override suspend fun getLastSyncTime(): Timestamp? = eventSyncCache.readLastSuccessfulSyncTime()
 
-    override fun getLastSyncState(): LiveData<EventSyncState> = eventSyncStateProcessor.getLastSyncState()
+    override fun getLastSyncState(useDefaultValue: Boolean): LiveData<EventSyncState> = MediatorLiveData<EventSyncState>().apply {
+        if (useDefaultValue) {
+            value = EventSyncState(syncId = "", null, null, emptyList(), emptyList(), emptyList())
+        }
+        addSource(eventSyncStateProcessor.getLastSyncState()) { lastSyncState ->
+            value = lastSyncState
+        }
+    }
 
     override fun getPeriodicWorkTags(): List<String> = listOf(
         MASTER_SYNC_SCHEDULERS,
@@ -71,13 +79,17 @@ internal class EventSyncManagerImpl @Inject constructor(
 
     override suspend fun countEventsToDownload(): DownSyncCounts {
         val projectConfig = configRepository.getProjectConfiguration()
+        val simprintsDownConfig = projectConfig.synchronization.down.simprints
+        // For CommCare there's no easy way to count the number of events to download
+        if (simprintsDownConfig == null) {
+            return DownSyncCounts(count = 0, isLowerBound = false)
+        }
         val deviceConfig = configRepository.getDeviceConfiguration()
 
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
             modes = getProjectModes(projectConfig),
             selectedModuleIDs = deviceConfig.selectedModules.values(),
-            syncPartitioning = projectConfig.synchronization.down.simprints.partitionType
-                .toDomain(),
+            syncPartitioning = simprintsDownConfig.partitionType.toDomain(),
         )
 
         val counts = downSyncScope.operations
@@ -93,15 +105,22 @@ internal class EventSyncManagerImpl @Inject constructor(
         projectId: String,
         subjectId: String,
     ): Unit = withContext(dispatcher) {
+        val projectConfiguration = configRepository.getProjectConfiguration()
+
+        //TODO(MS-1091): Handle CommCare down sync
+        if (projectConfiguration.synchronization.down.simprints == null) {
+            return@withContext
+        }
+
         val eventScope = eventRepository.createEventScope(EventScopeType.DOWN_SYNC)
         val op = EventDownSyncOperation(
             RemoteEventQuery(
                 projectId = projectId,
                 subjectId = subjectId,
-                modes = getProjectModes(configRepository.getProjectConfiguration()),
+                modes = getProjectModes(projectConfiguration),
             ),
         )
-        downSyncTask.downSync(this, op, eventScope, configRepository.getProject()).toList()
+        simprintsDownSyncTask.downSync(this, op, eventScope, configRepository.getProject()).toList()
         eventRepository.closeEventScope(eventScope, EventScopeEndCause.WORKFLOW_ENDED)
     }
 

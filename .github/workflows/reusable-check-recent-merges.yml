@@ -23,7 +23,7 @@ jobs:
 
         steps:
             -   name: Checkout code (optional, only if you need repo files for other reasons)
-                uses: actions/checkout@v4
+                uses: actions/checkout@v5
                 with:
                     fetch-depth: 50 # Adjust as needed, 0 for full history
 

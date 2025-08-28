@@ -1,242 +1,159 @@
 package com.simprints.feature.dashboard.settings.syncinfo
 
-import android.os.Bundle
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.livedata.LiveDataEventWithContent
-import com.simprints.core.livedata.send
-import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
-import com.simprints.feature.login.LoginContract
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
+import com.simprints.feature.dashboard.settings.syncinfo.usecase.ObserveSyncInfoUseCase
+import com.simprints.feature.login.LoginParams
 import com.simprints.feature.login.LoginResult
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
-import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.store.models.SynchronizationConfiguration
-import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.models.isEventDownSyncAllowed
-import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.config.store.models.ProjectState
+import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.EventSyncManager
-import com.simprints.infra.eventsync.status.models.DownSyncCounts
-import com.simprints.infra.eventsync.status.models.EventSyncState
-import com.simprints.infra.images.ImageRepository
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
-import com.simprints.infra.logging.Simber
-import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.sync.SyncOrchestrator
-import com.simprints.infra.uibase.navigation.toBundle
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 internal class SyncInfoViewModel @Inject constructor(
     private val configManager: ConfigManager,
-    connectivityTracker: ConnectivityTracker,
-    private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val authStore: AuthStore,
-    private val imageRepository: ImageRepository,
     private val eventSyncManager: EventSyncManager,
     private val syncOrchestrator: SyncOrchestrator,
-    private val tokenizationProcessor: TokenizationProcessor,
     private val recentUserActivityManager: RecentUserActivityManager,
+    private val timeHelper: TimeHelper,
+    observeSyncInfo: ObserveSyncInfoUseCase,
+    private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
-    val recordsInLocal: LiveData<Int?>
-        get() = _recordsInLocal
-    private val _recordsInLocal = MutableLiveData<Int?>(null)
+    var isPreLogoutUpSync = false
 
-    val recordsToUpSync: LiveData<Int?>
-        get() = _recordsToUpSync
-    private val _recordsToUpSync = MutableLiveData<Int?>(null)
+    val loginNavigationEventLiveData: LiveData<LoginParams>
+        get() = _loginNavigationEventLiveData
+    private val _loginNavigationEventLiveData = MutableLiveData<LoginParams>()
 
-    val imagesToUpload: LiveData<Int?>
-        get() = _imagesToUpload
-    private val _imagesToUpload = MutableLiveData<Int?>(null)
+    private val eventSyncStateFlow =
+        eventSyncManager.getLastSyncState(useDefaultValue = true /* otherwise value not guaranteed */).asFlow()
+    private val imageSyncStatusFlow =
+        syncOrchestrator.observeImageSyncStatus()
 
-    val recordsToDownSync: LiveData<DownSyncCounts?>
-        get() = _recordsToDownSync
-    private val _recordsToDownSync = MutableLiveData<DownSyncCounts?>(null)
+    val logoutEventLiveData: LiveData<LiveDataEventWithContent<Unit>> = combine(
+        eventSyncStateFlow,
+        imageSyncStatusFlow,
+    ) { eventSyncState, imageSyncStatus ->
+        val isReadyToLogOut =
+            isPreLogoutUpSync && eventSyncState.isSyncCompleted() && !imageSyncStatus.isSyncing
+        return@combine isReadyToLogOut
+    }.debounce(LOGOUT_DELAY_MILLIS)
+        .filter { isReadyToLogOut ->
+            isReadyToLogOut // only when ready
+        }.map {
+            LiveDataEventWithContent(Unit)
+        }.asLiveData()
 
-    val moduleCounts: LiveData<List<ModuleCount>>
-        get() = _moduleCounts
-    private val _moduleCounts = MutableLiveData<List<ModuleCount>>()
+    val syncInfoLiveData: LiveData<SyncInfo> = observeSyncInfo(isPreLogoutUpSync)
+        .onStart {
+            startInitialSyncIfRequired()
+            syncImagesAfterEventsWhenRequired()
+        }.asLiveData()
 
-    val configuration: LiveData<ProjectConfiguration>
-        get() = _configuration
-    private val _configuration = MutableLiveData<ProjectConfiguration>()
-
-    private val isConnected: LiveData<Boolean> = connectivityTracker.observeIsConnected()
-
-    val lastSyncState = eventSyncManager.getLastSyncState()
-    private var lastKnownEventSyncState: EventSyncState? = null
-
-    val isSyncAvailable: LiveData<Boolean>
-        get() = _isSyncAvailable
-    private val _isSyncAvailable = MediatorLiveData<Boolean>()
-
-    val isReloginRequired: LiveData<Boolean>
-        get() = _isReloginRequired
-    private val _isReloginRequired = MediatorLiveData<Boolean>()
-
-    val loginRequestedEventLiveData: LiveData<LiveDataEventWithContent<Bundle>>
-        get() = _loginRequestedEventLiveData
-    private val _loginRequestedEventLiveData = MutableLiveData<LiveDataEventWithContent<Bundle>>()
-
-    init {
-        _isSyncAvailable.addSource(lastSyncState) { lastSyncStateValue ->
-            _isSyncAvailable.postValue(
-                emitSyncAvailable(
-                    isSyncRunning = lastSyncStateValue?.isSyncRunning(),
-                    isConnected = isConnected.value,
-                    syncConfiguration = configuration.value?.synchronization,
-                ),
-            )
-        }
-        _isSyncAvailable.addSource(isConnected) { isConnectedValue ->
-            _isSyncAvailable.postValue(
-                emitSyncAvailable(
-                    isSyncRunning = lastSyncState.value?.isSyncRunning(),
-                    isConnected = isConnectedValue,
-                    syncConfiguration = configuration.value?.synchronization,
-                ),
-            )
-        }
-        _isSyncAvailable.addSource(_configuration) { config ->
-            _isSyncAvailable.postValue(
-                emitSyncAvailable(
-                    isSyncRunning = lastSyncState.value?.isSyncRunning(),
-                    isConnected = isConnected.value,
-                    syncConfiguration = config.synchronization,
-                ),
-            )
-        }
-        _isReloginRequired.addSource(lastSyncState) { lastSyncStateValue ->
-            _isReloginRequired.postValue(lastSyncStateValue.isSyncFailedBecauseReloginRequired())
-        }
-        viewModelScope.launch { getRecordsToUpSync() }
-    }
-
-    fun refreshInformation() {
-        _recordsInLocal.postValue(null)
-        _recordsToDownSync.postValue(null)
-        _imagesToUpload.postValue(null)
-        _moduleCounts.postValue(listOf())
-        load()
-    }
-
-    fun forceSync() {
-        syncOrchestrator.startEventSync()
-        // There is a delay between starting sync and lastSyncState
-        // reporting it so this prevents starting multiple syncs by accident
-        _isSyncAvailable.postValue(false)
-    }
-
-    /**
-     * Calls fetchSyncInformation() when all workers are done.
-     * To determine this EventSyncState is checked to have all workers in Succeeded state.
-     * Also, to avoid consecutive calls with the same EventSyncState the last one is saved
-     * and compared with new one before evaluating it.
-     */
-    fun fetchSyncInformationIfNeeded(eventSyncState: EventSyncState) {
-        if (eventSyncState != lastKnownEventSyncState) {
-            if (eventSyncState.isSyncCompleted() && eventSyncState.isSyncReporterCompleted()) {
-                load()
-            }
-
-            lastKnownEventSyncState = eventSyncState
-        }
-    }
-
-    fun login() {
+    fun forceEventSync() {
         viewModelScope.launch {
-            val loginArgs = LoginContract.getParams(
-                authStore.signedInProjectId,
-                authStore.signedInUserId ?: recentUserActivityManager.getRecentUserActivity().lastUserUsed,
+            syncOrchestrator.stopEventSync()
+            val isDownSyncAllowed =
+                !isPreLogoutUpSync && configManager.getProject(authStore.signedInProjectId).state != ProjectState.PROJECT_ENDING
+            syncOrchestrator.startEventSync(isDownSyncAllowed)
+        }
+    }
+
+    fun toggleImageSync() {
+        viewModelScope.launch {
+            val isImageSyncing = imageSyncStatusFlow.firstOrNull()?.isSyncing == true
+            if (isImageSyncing) {
+                syncOrchestrator.stopImageSync()
+            } else {
+                syncOrchestrator.startImageSync()
+            }
+        }
+    }
+
+    fun performLogout() {
+        logoutUseCase()
+    }
+
+    fun requestNavigationToLogin() {
+        viewModelScope.launch {
+            _loginNavigationEventLiveData.postValue(
+                LoginParams(
+                    projectId = authStore.signedInProjectId,
+                    userId = authStore.signedInUserId ?: recentUserActivityManager.getRecentUserActivity().lastUserUsed,
+                ),
             )
-            _loginRequestedEventLiveData.send(loginArgs.toBundle())
         }
     }
 
     fun handleLoginResult(result: LoginResult) {
         if (result.isSuccess) {
-            forceSync()
+            forceEventSync()
         }
     }
 
-    private fun load() = viewModelScope.launch {
-        val projectId = authStore.signedInProjectId
+    // initial actions
 
-        awaitAll(
-            async { _configuration.postValue(configManager.getProjectConfiguration()) },
-            async { _recordsInLocal.postValue(getRecordsInLocal(projectId)) },
-            async { _recordsToDownSync.postValue(fetchRecordsToCreateAndDeleteCount()) },
-            async { _imagesToUpload.postValue(imageRepository.getNumberOfImagesToUpload(projectId)) },
-            async { _moduleCounts.postValue(getModuleCounts(projectId)) },
-        )
-    }
+    private fun startInitialSyncIfRequired() {
+        viewModelScope.launch {
+            val isRunning = eventSyncManager.getLastSyncState().value?.isSyncRunning() ?: false
+            val lastUpdate = eventSyncManager.getLastSyncTime()
 
-    private fun emitSyncAvailable(
-        isSyncRunning: Boolean?,
-        isConnected: Boolean?,
-        syncConfiguration: SynchronizationConfiguration? = configuration.value?.synchronization,
-    ) = isConnected == true &&
-        isSyncRunning == false &&
-        syncConfiguration?.let {
-            !isModuleSync(it.down) ||
-                isModuleSyncAndModuleIdOptionsNotEmpty(
-                    it,
-                )
-        } == true
-
-    private fun isModuleSync(syncConfiguration: DownSynchronizationConfiguration) =
-        syncConfiguration.simprints.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
-
-    fun isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration: SynchronizationConfiguration) =
-        synchronizationConfiguration.down.let { it.simprints.moduleOptions.isNotEmpty() && isModuleSync(it) }
-
-    private suspend fun getRecordsInLocal(projectId: String): Int = enrolmentRecordRepository.count(SubjectQuery(projectId = projectId))
-
-    private suspend fun getRecordsToUpSync() = eventSyncManager
-        .countEventsToUpload(listOf(EventType.ENROLMENT_V2, EventType.ENROLMENT_V4))
-        .collect { _recordsToUpSync.postValue(it) }
-
-    private suspend fun fetchRecordsToCreateAndDeleteCount(): DownSyncCounts =
-        if (configManager.getProjectConfiguration().isEventDownSyncAllowed()) {
-            fetchAndUpdateRecordsToDownSyncAndDeleteCount()
-        } else {
-            DownSyncCounts(0, isLowerBound = false)
-        }
-
-    private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): DownSyncCounts = try {
-        eventSyncManager.countEventsToDownload()
-    } catch (t: Throwable) {
-        Simber.i("Could not count events for download", t, tag = SYNC)
-        DownSyncCounts(0, isLowerBound = false)
-    }
-
-    private suspend fun getModuleCounts(projectId: String): List<ModuleCount> =
-        configManager.getDeviceConfiguration().selectedModules.map { moduleName ->
-            val count = enrolmentRecordRepository.count(
-                SubjectQuery(projectId = projectId, moduleId = moduleName),
-            )
-            val decryptedName = when (moduleName) {
-                is TokenizableString.Raw -> moduleName
-                is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
-                    encrypted = moduleName,
-                    tokenKeyType = TokenKeyType.ModuleId,
-                    project = configManager.getProject(projectId),
-                )
+            val isForceEventSync = when {
+                isPreLogoutUpSync -> true
+                configManager.isModuleSelectionRequired() -> false
+                isRunning -> false
+                lastUpdate == null -> true
+                timeHelper.msBetweenNowAndTime(lastUpdate) > RE_SYNC_TIMEOUT_MILLIS -> true
+                else -> false
             }
-            return@map ModuleCount(name = decryptedName.value, count = count)
+            if (isForceEventSync) {
+                forceEventSync()
+            }
         }
+    }
+
+    private fun syncImagesAfterEventsWhenRequired() {
+        viewModelScope.launch {
+            if (isPreLogoutUpSync) {
+                eventSyncStateFlow
+                    .map { it.isSyncCompleted() }
+                    .distinctUntilChanged()
+                    .collect { isEventSyncCompleted ->
+                        if (isEventSyncCompleted) {
+                            syncOrchestrator.startImageSync()
+                        }
+                    }
+            }
+        }
+    }
+
+    private suspend fun ConfigManager.isModuleSelectionRequired() =
+        getProjectConfiguration().isModuleSelectionAvailable() && getDeviceConfiguration().selectedModules.isEmpty()
+
+    private companion object {
+        private const val RE_SYNC_TIMEOUT_MILLIS = 5 * 60 * 1000L
+        private const val LOGOUT_DELAY_MILLIS = 3000L
+    }
 }
