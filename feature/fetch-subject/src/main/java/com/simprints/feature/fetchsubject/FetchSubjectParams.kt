@@ -7,5 +7,4 @@ import com.simprints.core.domain.step.StepParams
 data class FetchSubjectParams(
     val projectId: String,
     val subjectId: String,
-    val metadata: String,
 ) : StepParams

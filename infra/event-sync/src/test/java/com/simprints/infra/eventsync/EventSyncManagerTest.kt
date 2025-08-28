@@ -5,7 +5,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.Partitioning
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.core.tools.utils.ExtractCommCareCaseIdUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.events.EventRepository
@@ -22,7 +21,6 @@ import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
-import com.simprints.infra.eventsync.sync.down.tasks.CommCareEventSyncTask
 import com.simprints.infra.eventsync.sync.down.tasks.SimprintsEventDownSyncTask
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
@@ -67,10 +65,7 @@ internal class EventSyncManagerTest {
     lateinit var eventRepository: EventRepository
 
     @MockK
-    lateinit var simprintsDownSyncTask: SimprintsEventDownSyncTask
-
-    @MockK
-    lateinit var commCareDownSyncTask: CommCareEventSyncTask
+    lateinit var downSyncTask: SimprintsEventDownSyncTask
 
     @MockK
     lateinit var eventRemoteDataSource: EventRemoteDataSource
@@ -84,9 +79,6 @@ internal class EventSyncManagerTest {
     @MockK
     lateinit var project: Project
 
-    @MockK
-    lateinit var extractCommCareCaseIdUseCase: ExtractCommCareCaseIdUseCase
-
     private lateinit var eventSyncManagerImpl: EventSyncManagerImpl
 
     @Before
@@ -97,9 +89,7 @@ internal class EventSyncManagerTest {
         coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general.modalities } returns listOf()
             every {
-                synchronization.down.simprints
-                    ?.partitionType
-                    ?.toDomain()
+                synchronization.down.simprints?.partitionType?.toDomain()
             } returns Partitioning.MODULE
         }
 
@@ -111,11 +101,9 @@ internal class EventSyncManagerTest {
             upSyncScopeRepo = eventUpSyncScopeRepository,
             eventSyncCache = eventSyncCache,
             commCareSyncCache = commCareSyncCache,
-            simprintsDownSyncTask = simprintsDownSyncTask,
-            commCareSyncTask = commCareDownSyncTask,
+            simprintsDownSyncTask = downSyncTask,
             eventRemoteDataSource = eventRemoteDataSource,
             configRepository = configRepository,
-            extractCommCareCaseId = extractCommCareCaseIdUseCase,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
     }
@@ -166,98 +154,14 @@ internal class EventSyncManagerTest {
     }
 
     @Test
-    fun `downSyncSubject should call CommCare sync when CommCare config is present`() = runTest {
-        val metadata = """{"caseId": "case123"}"""
-        val expectedCaseId = "case123"
-
-        // Mock CommCare configuration
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
-            every { general.modalities } returns listOf()
-            every { synchronization.down.simprints } returns null
-            every { synchronization.down.commCare } returns mockk()
-        }
-        every { extractCommCareCaseIdUseCase.invoke(metadata) } returns expectedCaseId
+    fun `downSync should call down sync helper`() = runTest {
         coEvery { eventRepository.createEventScope(any()) } returns eventScope
-        coEvery { commCareDownSyncTask.downSync(any(), any(), eventScope, any()) } returns emptyFlow()
+        coEvery { downSyncTask.downSync(any(), any(), eventScope, any()) } returns emptyFlow()
 
-        eventSyncManagerImpl.downSyncSubject(DEFAULT_PROJECT_ID, "subjectId", metadata)
+        eventSyncManagerImpl.downSyncSubject(DEFAULT_PROJECT_ID, "subjectId")
 
-        coVerify { extractCommCareCaseIdUseCase.invoke(metadata) }
-        coVerify {
-            commCareDownSyncTask.downSync(
-                any(),
-                match { operation ->
-                    operation.queryEvent.externalIds == listOf(expectedCaseId)
-                },
-                eventScope,
-                any(),
-            )
-        }
+        coVerify { downSyncTask.downSync(any(), any(), eventScope, any()) }
         coVerify { eventRepository.closeEventScope(eventScope, any()) }
-        coVerify(exactly = 0) { simprintsDownSyncTask.downSync(any(), any(), any(), any()) }
-    }
-
-    @Test
-    fun `downSyncSubject should call CommCare sync with null externalIds when caseId is null`() = runTest {
-        val metadata = """{"otherField": "value"}"""
-
-        // Mock CommCare configuration
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
-            every { general.modalities } returns listOf()
-            every { synchronization.down.simprints } returns null
-            every { synchronization.down.commCare } returns mockk()
-        }
-        every { extractCommCareCaseIdUseCase.invoke(metadata) } returns null
-        coEvery { eventRepository.createEventScope(any()) } returns eventScope
-        coEvery { commCareDownSyncTask.downSync(any(), any(), eventScope, any()) } returns emptyFlow()
-
-        eventSyncManagerImpl.downSyncSubject(DEFAULT_PROJECT_ID, "subjectId", metadata)
-
-        coVerify { extractCommCareCaseIdUseCase.invoke(metadata) }
-        coVerify {
-            commCareDownSyncTask.downSync(
-                any(),
-                match { operation ->
-                    operation.queryEvent.externalIds == null
-                },
-                eventScope,
-                any(),
-            )
-        }
-        coVerify { eventRepository.closeEventScope(eventScope, any()) }
-        coVerify(exactly = 0) { simprintsDownSyncTask.downSync(any(), any(), any(), any()) }
-    }
-
-    @Test
-    fun `downSyncSubject should call Simprints sync when Simprints config is present`() = runTest {
-        // Mock Simprints configuration (restore original config from setup)
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
-            every { general.modalities } returns listOf()
-            every { synchronization.down.simprints } returns mockk {
-                every { partitionType.toDomain() } returns Partitioning.MODULE
-            }
-            every { synchronization.down.commCare } returns null
-        }
-        coEvery { eventRepository.createEventScope(any()) } returns eventScope
-        coEvery { simprintsDownSyncTask.downSync(any(), any(), eventScope, any()) } returns emptyFlow()
-
-        eventSyncManagerImpl.downSyncSubject(DEFAULT_PROJECT_ID, "subjectId", "metadata")
-
-        coVerify {
-            simprintsDownSyncTask.downSync(
-                any(),
-                match { operation ->
-                    operation.queryEvent.subjectId == "subjectId" &&
-                        operation.queryEvent.projectId == DEFAULT_PROJECT_ID &&
-                        operation.queryEvent.externalIds == null
-                },
-                eventScope,
-                any(),
-            )
-        }
-        coVerify { eventRepository.closeEventScope(eventScope, any()) }
-        coVerify(exactly = 0) { commCareDownSyncTask.downSync(any(), any(), any(), any()) }
-        coVerify(exactly = 0) { extractCommCareCaseIdUseCase.invoke(any()) }
     }
 
     @Test

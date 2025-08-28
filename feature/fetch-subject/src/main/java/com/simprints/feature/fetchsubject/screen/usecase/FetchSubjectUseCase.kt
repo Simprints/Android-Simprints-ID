@@ -16,7 +16,6 @@ internal class FetchSubjectUseCase @Inject constructor(
     suspend operator fun invoke(
         projectId: String,
         subjectId: String,
-        metadata: String,
     ): FetchSubjectState {
         Simber.d("Fetching $subjectId", tag = TAG)
         try {
@@ -26,7 +25,7 @@ internal class FetchSubjectUseCase @Inject constructor(
                 return FetchSubjectState.FoundLocal
             }
 
-            eventSyncManager.downSyncSubject(projectId, subjectId, metadata)
+            eventSyncManager.downSyncSubject(projectId, subjectId)
             Simber.d("Network request done", tag = TAG)
 
             val remoteSubject = loadFromDatabase(projectId, subjectId)

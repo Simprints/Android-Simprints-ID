@@ -79,7 +79,6 @@ internal class BuildStepsUseCase @Inject constructor(
                 subjectId = action.verifyGuid,
                 biometricDataSource = action.biometricDataSource,
                 callerPackageName = action.actionIdentifier.callerPackageName,
-                metadata = action.metadata,
             ),
             buildConsentStepIfNeeded(ConsentType.VERIFY, projectConfiguration),
             buildCaptureAndMatchStepsForVerify(action, projectConfiguration),
@@ -239,7 +238,6 @@ internal class BuildStepsUseCase @Inject constructor(
         subjectId: String,
         biometricDataSource: String,
         callerPackageName: String,
-        metadata: String,
     ) = when (
         BiometricDataSource.fromString(
             value = biometricDataSource,
@@ -251,7 +249,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 id = StepId.FETCH_GUID,
                 navigationActionId = R.id.action_orchestratorFragment_to_fetchSubject,
                 destinationId = FetchSubjectContract.DESTINATION,
-                params = FetchSubjectContract.getParams(projectId, subjectId, metadata),
+                params = FetchSubjectContract.getParams(projectId, subjectId),
             ),
         )
 

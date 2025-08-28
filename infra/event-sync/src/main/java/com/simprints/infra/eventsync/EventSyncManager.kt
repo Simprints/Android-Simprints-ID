@@ -27,7 +27,6 @@ interface EventSyncManager {
     suspend fun downSyncSubject(
         projectId: String,
         subjectId: String,
-        metadata: String,
     )
 
     suspend fun deleteModules(unselectedModules: List<String>)

@@ -52,41 +52,41 @@ internal class FetchSubjectViewModelTest {
 
     @Test
     fun `tries fetching subject`() = runTest {
-        coEvery { fetchSubjectUseCase.invoke(any(), any(), METADATA) } returns FetchSubjectState.NotFound
+        coEvery { fetchSubjectUseCase.invoke(any(), any()) } returns FetchSubjectState.NotFound
 
-        viewModel.fetchSubject(PROJECT_ID, SUBJECT_ID, METADATA)
+        viewModel.fetchSubject(PROJECT_ID, SUBJECT_ID)
         val result = viewModel.subjectState.test()
 
         assertThat(result.value().getContentIfNotHandled()).isNotNull()
-        coVerify { fetchSubjectUseCase.invoke(any(), any(), METADATA) }
+        coVerify { fetchSubjectUseCase.invoke(any(), any()) }
     }
 
     @Test
     fun `onViewCreated tries fetching subject when it wasn't attempted yet`() = runTest {
-        coEvery { fetchSubjectUseCase.invoke(any(), any(), METADATA) } returns FetchSubjectState.NotFound
+        coEvery { fetchSubjectUseCase.invoke(any(), any()) } returns FetchSubjectState.NotFound
 
-        viewModel.onViewCreated(PROJECT_ID, SUBJECT_ID, METADATA)
+        viewModel.onViewCreated(PROJECT_ID, SUBJECT_ID)
         val result = viewModel.subjectState.test()
 
         assertThat(result.value().getContentIfNotHandled()).isNotNull()
-        coVerify { fetchSubjectUseCase.invoke(any(), any(), METADATA) }
+        coVerify { fetchSubjectUseCase.invoke(any(), any()) }
     }
 
     @Test
     fun `onViewCreated doesn't try fetching subject when it was already attempted`() = runTest {
-        coEvery { fetchSubjectUseCase.invoke(any(), any(), METADATA) } returns FetchSubjectState.NotFound
+        coEvery { fetchSubjectUseCase.invoke(any(), any()) } returns FetchSubjectState.NotFound
 
-        viewModel.onViewCreated(PROJECT_ID, SUBJECT_ID, METADATA)
-        viewModel.onViewCreated(PROJECT_ID, SUBJECT_ID, METADATA)
+        viewModel.onViewCreated(PROJECT_ID, SUBJECT_ID)
+        viewModel.onViewCreated(PROJECT_ID, SUBJECT_ID)
 
-        coVerify(exactly = 1) { fetchSubjectUseCase.invoke(any(), any(), METADATA) }
+        coVerify(exactly = 1) { fetchSubjectUseCase.invoke(any(), any()) }
     }
 
     @Test
     fun `saves event after fetching subject`() = runTest {
-        coEvery { fetchSubjectUseCase.invoke(any(), any(), METADATA) } returns FetchSubjectState.NotFound
+        coEvery { fetchSubjectUseCase.invoke(any(), any()) } returns FetchSubjectState.NotFound
 
-        viewModel.fetchSubject(PROJECT_ID, SUBJECT_ID, METADATA)
+        viewModel.fetchSubject(PROJECT_ID, SUBJECT_ID)
 
         coVerify { saveSubjectFetchEventUseCase.invoke(any(), any(), any(), any()) }
     }
@@ -103,7 +103,5 @@ internal class FetchSubjectViewModelTest {
         private val TIMESTAMP = Timestamp(1L)
         private const val PROJECT_ID = "projectId"
         private const val SUBJECT_ID = "subjectId"
-
-        private const val METADATA = "metadata"
     }
 }

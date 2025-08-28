@@ -6,6 +6,5 @@ object FetchSubjectContract {
     fun getParams(
         projectId: String,
         subjectId: String,
-        metadata: String,
-    ) = FetchSubjectParams(projectId, subjectId, metadata)
+    ) = FetchSubjectParams(projectId, subjectId)
 }

@@ -27,22 +27,20 @@ internal class FetchSubjectViewModel @Inject constructor(
     fun onViewCreated(
         projectId: String,
         subjectId: String,
-        metadata: String,
     ) {
         if (!fetchWasAttempted) {
-            fetchSubject(projectId, subjectId, metadata)
+            fetchSubject(projectId, subjectId)
         }
     }
 
     fun fetchSubject(
         projectId: String,
         subjectId: String,
-        metadata: String,
     ) {
         viewModelScope.launch {
             fetchWasAttempted = true
             val subjectFetchStartTime = timeHelper.now()
-            val subjectState = fetchSubjectUseCase(projectId, subjectId, metadata)
+            val subjectState = fetchSubjectUseCase(projectId, subjectId)
 
             _subjectState.send(subjectState)
 

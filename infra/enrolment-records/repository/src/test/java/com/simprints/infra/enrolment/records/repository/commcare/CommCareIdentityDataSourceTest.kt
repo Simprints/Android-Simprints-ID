@@ -11,7 +11,6 @@ import com.simprints.core.domain.fingerprint.IFingerIdentifier.LEFT_THUMB
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.core.tools.utils.ExtractCommCareCaseIdUseCase
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.commcare.CommCareIdentityDataSource.Companion.COLUMN_DATUM_ID
 import com.simprints.infra.enrolment.records.repository.commcare.CommCareIdentityDataSource.Companion.COLUMN_VALUE
@@ -154,9 +153,6 @@ class CommCareIdentityDataSourceTest {
     @MockK
     private lateinit var useCase: CompareImplicitTokenizedStringsUseCase
 
-    @MockK
-    private lateinit var extractCommCareCaseIdUseCase: ExtractCommCareCaseIdUseCase
-
     private lateinit var mockMetadataCursor: Cursor
 
     private lateinit var mockDataCursor: Cursor
@@ -206,13 +202,11 @@ class CommCareIdentityDataSourceTest {
 
         every { encoder.base64ToBytes(any()) } returns byteArrayOf()
         every { useCase.invoke(any(), any(), any(), any()) } returns true
-        every { extractCommCareCaseIdUseCase.invoke(any()) } returns null
 
         dataSource = CommCareIdentityDataSource(
             encoder,
             JsonHelper,
             useCase,
-            extractCommCareCaseIdUseCase,
             4,
             context,
             testCoroutineRule.testCoroutineDispatcher,

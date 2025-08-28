@@ -15,7 +15,6 @@ import com.simprints.core.domain.tokenization.serialization.TokenizationClassNam
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.core.tools.utils.ExtractCommCareCaseIdUseCase
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.enrolment.records.repository.IdentityDataSource
@@ -42,13 +41,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
+import org.json.JSONException
 import javax.inject.Inject
 
 internal class CommCareIdentityDataSource @Inject constructor(
     private val encoder: EncodingUtils,
     private val jsonHelper: JsonHelper,
     private val compareImplicitTokenizedStringsUseCase: CompareImplicitTokenizedStringsUseCase,
-    private val extractCommCareCaseId: ExtractCommCareCaseIdUseCase,
     @AvailableProcessors private val availableProcessors: Int,
     @ApplicationContext private val context: Context,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
@@ -92,7 +91,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
     ): List<EnrolmentRecordCreationEvent> {
         val enrolmentRecordCreationEvents: MutableList<EnrolmentRecordCreationEvent> = mutableListOf()
         try {
-            val caseId = extractCommCareCaseId(query.metadata)
+            val caseId = attemptExtractingCaseId(query.metadata)
             if (caseId != null) {
                 return loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query, project)
             }
@@ -121,6 +120,14 @@ internal class CommCareIdentityDataSource @Inject constructor(
         }
 
         return enrolmentRecordCreationEvents
+    }
+
+    private fun attemptExtractingCaseId(metadata: String?) = metadata?.takeUnless { it.isEmpty() }?.let {
+        try {
+            JsonHelper.fromJson<Map<String, Any>>(it)[ARG_CASE_ID] as? String
+        } catch (_: JSONException) {
+            null
+        }
     }
 
     private suspend fun loadFaceIdentities(
@@ -325,5 +332,6 @@ internal class CommCareIdentityDataSource @Inject constructor(
         const val COLUMN_CASE_ID = "case_id"
         const val COLUMN_DATUM_ID = "datum_id"
         const val COLUMN_VALUE = "value"
+        const val ARG_CASE_ID = "caseId"
     }
 }

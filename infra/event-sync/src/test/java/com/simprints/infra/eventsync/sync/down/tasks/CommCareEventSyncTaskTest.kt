@@ -206,7 +206,7 @@ class CommCareEventSyncTaskTest {
 
     @Test
     fun downSync_shouldEmitAFailureIfDownloadFails() = runTest {
-        coEvery { commCareEventDataSource.getEvents(any()) } throws Throwable("CommCare Exception")
+        coEvery { commCareEventDataSource.getEvents() } throws Throwable("CommCare Exception")
 
         val progress = commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
@@ -216,21 +216,21 @@ class CommCareEventSyncTaskTest {
 
     @Test(expected = SecurityException::class)
     fun downSync_shouldThrowUpIfSecurityExceptionOccurs() = runTest {
-        coEvery { commCareEventDataSource.getEvents(any()) } throws SecurityException("Security Exception")
+        coEvery { commCareEventDataSource.getEvents() } throws SecurityException("Security Exception")
 
         commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
     }
 
     @Test(expected = IllegalStateException::class)
     fun downSync_shouldThrowUpIfIllegalStateExceptionOccurs() = runTest {
-        coEvery { commCareEventDataSource.getEvents(any()) } throws IllegalStateException("Illegal State Exception")
+        coEvery { commCareEventDataSource.getEvents() } throws IllegalStateException("Illegal State Exception")
 
         commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
     }
 
     @Test
     fun downSync_shouldAddEventWithErrorIfDownloadFails() = runTest {
-        coEvery { commCareEventDataSource.getEvents(any()) } throws Throwable("CommCare Exception")
+        coEvery { commCareEventDataSource.getEvents() } throws Throwable("CommCare Exception")
         commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
         coVerify(exactly = 1) {
@@ -277,7 +277,7 @@ class CommCareEventSyncTaskTest {
     @Test
     fun downSync_shouldAddEventWithExceptionClassSimpleNameIfDownloadFails() = runTest {
         val expectedException = Exception("Test")
-        coEvery { commCareEventDataSource.getEvents(any()) } throws expectedException
+        coEvery { commCareEventDataSource.getEvents() } throws expectedException
 
         commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
@@ -394,7 +394,7 @@ class CommCareEventSyncTaskTest {
     }
 
     private fun mockCommCareDataSource(events: List<EnrolmentRecordEvent>) {
-        coEvery { commCareEventDataSource.getEvents(any()) } returns CommCareEventSyncResult(
+        coEvery { commCareEventDataSource.getEvents() } returns CommCareEventSyncResult(
             totalCount = events.size,
             eventFlow = flowOf(*events.toTypedArray()),
         )
