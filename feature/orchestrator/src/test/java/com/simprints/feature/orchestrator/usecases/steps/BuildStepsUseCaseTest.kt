@@ -16,9 +16,12 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.orchestration.data.ActionRequest
 import io.mockk.MockKAnnotations
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Before
@@ -35,6 +38,9 @@ class BuildStepsUseCaseTest {
     private lateinit var mapStepsForLastBiometrics: MapStepsForLastBiometricEnrolUseCase
 
     @RelaxedMockK
+    private lateinit var fallbackToCommCareDataSourceIfNeeded: FallbackToCommCareDataSourceIfNeededUseCase
+
+    @RelaxedMockK
     private lateinit var secugenSimMatcher: FingerprintConfiguration.FingerprintSdkConfiguration
 
     @RelaxedMockK
@@ -45,7 +51,11 @@ class BuildStepsUseCaseTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this)
-        useCase = BuildStepsUseCase(buildMatcherSubjectQuery, cache, mapStepsForLastBiometrics)
+        useCase = BuildStepsUseCase(buildMatcherSubjectQuery, cache, mapStepsForLastBiometrics, fallbackToCommCareDataSourceIfNeeded)
+        
+        // Setup fallback use case to return the input actions unchanged by default
+        coEvery { fallbackToCommCareDataSourceIfNeeded(any<ActionRequest.EnrolActionRequest>(), any()) } answers { firstArg() }
+        coEvery { fallbackToCommCareDataSourceIfNeeded(any<ActionRequest.IdentifyActionRequest>(), any()) } answers { firstArg() }
     }
 
     private fun mockCommonProjectConfiguration(): ProjectConfiguration {
@@ -93,7 +103,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - enrol action - no age restriction - returns expected steps`() {
+    fun `build - enrol action - no age restriction - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns false
 
@@ -113,7 +123,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - enrol action - no consent - returns expected steps`() {
+    fun `build - enrol action - no consent - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         every { projectConfiguration.consent.collectConsent } returns false
 
@@ -132,7 +142,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - enrol action - no age restriction - duplicate check - returns expected steps`() {
+    fun `build - enrol action - no age restriction - duplicate check - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
 
@@ -155,7 +165,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - enrol action - no age restriction - duplicate check - matching modalities - returns expected steps`() {
+    fun `build - enrol action - no age restriction - duplicate check - matching modalities - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         every { projectConfiguration.general.matchingModalities } returns listOf(Modality.FACE)
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
@@ -177,7 +187,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - identify action - no age restriction - returns expected steps`() {
+    fun `build - identify action - no age restriction - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
 
         val action = mockk<ActionRequest.IdentifyActionRequest>(relaxed = true)
@@ -199,7 +209,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - identify action - no age restriction - matching modalities - returns expected steps`() {
+    fun `build - identify action - no age restriction - matching modalities - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         every { projectConfiguration.general.matchingModalities } returns listOf(Modality.FACE)
 
@@ -218,7 +228,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - identify action - no age restriction - id pool validation - returns expected steps`() {
+    fun `build - identify action - no age restriction - id pool validation - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
 
         val action = mockk<ActionRequest.IdentifyActionRequest>(relaxed = true)
@@ -242,7 +252,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - verify action - no age restriction - returns expected steps`() {
+    fun `build - verify action - no age restriction - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
 
         val action = mockk<ActionRequest.VerifyActionRequest>(relaxed = true)
@@ -265,7 +275,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - verify action - no age restriction - matching modalities - returns expected steps`() {
+    fun `build - verify action - no age restriction - matching modalities - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         every { projectConfiguration.general.matchingModalities } returns listOf(Modality.FACE)
 
@@ -285,7 +295,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - confirm identity action - returns expected steps`() {
+    fun `build - confirm identity action - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
 
         val action = mockk<ActionRequest.ConfirmIdentityActionRequest>(relaxed = true)
@@ -300,7 +310,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - enrol last biometric action - returns expected steps`() {
+    fun `build - enrol last biometric action - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
 
         val action = mockk<ActionRequest.EnrolLastBiometricActionRequest>(relaxed = true)
@@ -319,7 +329,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - enrol last biometric action - missing modality capture - returns expected steps`() {
+    fun `build - enrol last biometric action - missing modality capture - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         every { projectConfiguration.general.matchingModalities } returns listOf(Modality.FACE)
 
@@ -340,7 +350,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - enrol action - age restriction - missing subject age - returns expected steps`() {
+    fun `build - enrol action - age restriction - missing subject age - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         val ageGroup = AgeGroup(18, 60)
         every { secugenSimMatcher.allowedAgeRange } returns ageGroup
@@ -361,7 +371,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - identify action - age restriction - missing subject age - returns expected steps`() {
+    fun `build - identify action - age restriction - missing subject age - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         val ageGroup = AgeGroup(18, 60)
         every { secugenSimMatcher.allowedAgeRange } returns ageGroup
@@ -382,7 +392,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - verify action - age restriction - missing subject age - returns expected steps`() {
+    fun `build - verify action - age restriction - missing subject age - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         val ageGroup = AgeGroup(18, 60)
         every { secugenSimMatcher.allowedAgeRange } returns ageGroup
@@ -404,7 +414,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - enrol action - age restriction - subject age within range - returns expected steps`() {
+    fun `build - enrol action - age restriction - subject age within range - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         val ageGroup = AgeGroup(18, 60)
         every { secugenSimMatcher.allowedAgeRange } returns ageGroup
@@ -427,7 +437,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - enrol action - age restriction - subject age within range - duplicate check - returns expected steps`() {
+    fun `build - enrol action - age restriction - subject age within range - duplicate check - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
         val ageGroup = AgeGroup(18, 60)
@@ -454,7 +464,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - identify action - age restriction - subject age within range - returns expected steps`() {
+    fun `build - identify action - age restriction - subject age within range - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         val ageGroup = AgeGroup(18, 60)
         every { secugenSimMatcher.allowedAgeRange } returns ageGroup
@@ -480,7 +490,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - identify action - CoSync data source - returns steps without validate ID pool`() {
+    fun `build - identify action - CoSync data source - returns steps without validate ID pool`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         val ageGroup = AgeGroup(18, 60)
         every { secugenSimMatcher.allowedAgeRange } returns ageGroup
@@ -507,7 +517,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - verify action - age restriction - subject age within range - returns expected steps`() {
+    fun `build - verify action - age restriction - subject age within range - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         val ageGroup = AgeGroup(18, 60)
         every { secugenSimMatcher.allowedAgeRange } returns ageGroup
@@ -534,7 +544,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - verify action - co-sync data source - returns steps without fetch GUID`() {
+    fun `build - verify action - co-sync data source - returns steps without fetch GUID`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         val ageGroup = AgeGroup(18, 60)
         every { secugenSimMatcher.allowedAgeRange } returns ageGroup
@@ -561,7 +571,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - enrol action - age restriction - subject age not supported - throws SubjectAgeNotSupportedException`() {
+    fun `build - enrol action - age restriction - subject age not supported - throws SubjectAgeNotSupportedException`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         val ageGroup = AgeGroup(30, 40)
         every { secugenSimMatcher.allowedAgeRange } returns ageGroup
@@ -572,12 +582,12 @@ class BuildStepsUseCaseTest {
         every { action.getSubjectAgeIfAvailable() } returns 20 // Subject age not supported by any SDK
 
         assertThrows(SubjectAgeNotSupportedException::class.java) {
-            useCase.build(action, projectConfiguration)
+            runBlocking { useCase.build(action, projectConfiguration) }
         }
     }
 
     @Test
-    fun `build - identify action - age restriction - subject age not supported - throws SubjectAgeNotSupportedException`() {
+    fun `build - identify action - age restriction - subject age not supported - throws SubjectAgeNotSupportedException`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         val ageGroup = AgeGroup(30, 40)
         every { secugenSimMatcher.allowedAgeRange } returns ageGroup
@@ -588,12 +598,12 @@ class BuildStepsUseCaseTest {
         every { action.getSubjectAgeIfAvailable() } returns 20 // Subject age not supported by any SDK
 
         assertThrows(SubjectAgeNotSupportedException::class.java) {
-            useCase.build(action, projectConfiguration)
+            runBlocking { useCase.build(action, projectConfiguration) }
         }
     }
 
     @Test
-    fun `build - verify action - age restriction - subject age not supported - throws SubjectAgeNotSupportedException`() {
+    fun `build - verify action - age restriction - subject age not supported - throws SubjectAgeNotSupportedException`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         val ageGroup = AgeGroup(30, 40)
         every { secugenSimMatcher.allowedAgeRange } returns ageGroup
@@ -604,12 +614,12 @@ class BuildStepsUseCaseTest {
         every { action.getSubjectAgeIfAvailable() } returns 20 // Subject age not supported by any SDK
 
         assertThrows(SubjectAgeNotSupportedException::class.java) {
-            useCase.build(action, projectConfiguration)
+            runBlocking { useCase.build(action, projectConfiguration) }
         }
     }
 
     @Test
-    fun `build capture and match steps - enrol action - returns expected steps`() {
+    fun `build capture and match steps - enrol action - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         val ageGroup = AgeGroup(18, 60)
         every { secugenSimMatcher.allowedAgeRange } returns ageGroup
@@ -629,7 +639,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build capture and match steps - enrol action - duplicate check - returns expected steps`() {
+    fun `build capture and match steps - enrol action - duplicate check - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
         val ageGroup = AgeGroup(18, 60)
@@ -653,7 +663,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build capture and match steps - identify action - returns expected steps`() {
+    fun `build capture and match steps - identify action - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         val ageGroup = AgeGroup(18, 60)
         every { secugenSimMatcher.allowedAgeRange } returns ageGroup
@@ -676,7 +686,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build capture and match steps - verify action - returns expected steps`() {
+    fun `build capture and match steps - verify action - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         val ageGroup = AgeGroup(18, 60)
         every { secugenSimMatcher.allowedAgeRange } returns ageGroup
@@ -699,7 +709,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build capture and match steps with all SDKs - verify action - returns expected steps`() {
+    fun `build capture and match steps with all SDKs - verify action - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         val ageGroup = AgeGroup(18, 60)
         every { secugenSimMatcher.allowedAgeRange } returns ageGroup
@@ -725,7 +735,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build capture and match steps - confirm identity action - returns expected steps`() {
+    fun `build capture and match steps - confirm identity action - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
 
         val action = mockk<ActionRequest.ConfirmIdentityActionRequest>(relaxed = true)
@@ -736,7 +746,7 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build capture and match steps - enrol last action - returns expected steps`() {
+    fun `build capture and match steps - enrol last action - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
 
         val action = mockk<ActionRequest.EnrolLastBiometricActionRequest>(relaxed = true)

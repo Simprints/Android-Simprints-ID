@@ -15,7 +15,7 @@ import javax.inject.Singleton
 
 @SuppressLint("ApplySharedPref")
 @Singleton
-internal class EventSyncCache @Inject constructor(
+class EventSyncCache @Inject constructor(
     securityManager: SecurityManager,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {

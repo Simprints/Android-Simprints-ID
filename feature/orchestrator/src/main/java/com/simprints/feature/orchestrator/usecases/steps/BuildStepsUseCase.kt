@@ -38,8 +38,9 @@ internal class BuildStepsUseCase @Inject constructor(
     private val buildMatcherSubjectQuery: BuildMatcherSubjectQueryUseCase,
     private val cache: OrchestratorCache,
     private val mapStepsForLastBiometrics: MapStepsForLastBiometricEnrolUseCase,
+    private val fallbackToCommCareDataSourceIfNeeded: FallbackToCommCareDataSourceIfNeededUseCase,
 ) {
-    fun build(
+    suspend fun build(
         action: ActionRequest,
         projectConfiguration: ProjectConfiguration,
     ) = when (action) {
@@ -94,7 +95,7 @@ internal class BuildStepsUseCase @Inject constructor(
         )
     }.flatten()
 
-    fun buildCaptureAndMatchStepsForAgeGroup(
+    suspend fun buildCaptureAndMatchStepsForAgeGroup(
         action: ActionRequest,
         projectConfiguration: ProjectConfiguration,
         ageGroup: AgeGroup,
@@ -121,11 +122,12 @@ internal class BuildStepsUseCase @Inject constructor(
         else -> emptyList()
     }
 
-    private fun buildCaptureAndMatchStepsForEnrol(
+    private suspend fun buildCaptureAndMatchStepsForEnrol(
         action: ActionRequest.EnrolActionRequest,
         projectConfiguration: ProjectConfiguration,
         ageGroup: AgeGroup? = null,
     ): List<Step> {
+        val action = fallbackToCommCareDataSourceIfNeeded(action, projectConfiguration)
         val resolvedAgeGroup = ageGroup ?: ageGroupFromSubjectAge(action, projectConfiguration)
 
         return listOf(
@@ -151,12 +153,13 @@ internal class BuildStepsUseCase @Inject constructor(
         ).flatten()
     }
 
-    private fun buildCaptureAndMatchStepsForIdentify(
+    private suspend fun buildCaptureAndMatchStepsForIdentify(
         action: ActionRequest.IdentifyActionRequest,
         projectConfiguration: ProjectConfiguration,
         ageGroup: AgeGroup? = null,
         subjectQuery: SubjectQuery,
     ): List<Step> {
+        val action = fallbackToCommCareDataSourceIfNeeded(action, projectConfiguration)
         val resolvedAgeGroup = ageGroup ?: ageGroupFromSubjectAge(action, projectConfiguration)
 
         return listOf(
