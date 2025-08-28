@@ -42,7 +42,7 @@ internal class FetchSubjectUseCaseTest {
     fun `fetch should check local DB first`() = runTest {
         coEvery { enrolmentRecordRepository.load(any()) } returns listOf(subject)
 
-        val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)
+        val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID, "")
 
         coVerify { enrolmentRecordRepository.load(SubjectQuery(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)) }
         assertThat(result).isInstanceOf(FetchSubjectState.FoundLocal::class.java)
@@ -52,9 +52,10 @@ internal class FetchSubjectUseCaseTest {
     fun `fetch should not check remote if present in local DB`() = runTest {
         coEvery { enrolmentRecordRepository.load(any()) } returns listOf(subject)
 
-        val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)
+        val metadata = "ABC"
+        val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID, metadata)
 
-        coVerify(exactly = 0) { eventSyncManager.downSyncSubject(any(), any()) }
+        coVerify(exactly = 0) { eventSyncManager.downSyncSubject(any(), any(), metadata) }
         assertThat(result).isInstanceOf(FetchSubjectState.FoundLocal::class.java)
     }
 
@@ -62,16 +63,17 @@ internal class FetchSubjectUseCaseTest {
     fun `fetch should try down syncing if not present in local DB`() = runTest {
         coEvery { enrolmentRecordRepository.load(any()) } returns emptyList()
 
-        useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)
+        val metadata = "ABC"
+        useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID, metadata)
 
-        coVerify { eventSyncManager.downSyncSubject(any(), any()) }
+        coVerify { eventSyncManager.downSyncSubject(any(), any(), metadata) }
     }
 
     @Test
     fun `fetch should return from local DB if present after downsync`() = runTest {
         coEvery { enrolmentRecordRepository.load(any()) } returnsMany listOf(emptyList(), listOf(subject))
 
-        val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)
+        val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID, "")
 
         coVerify(exactly = 2) { enrolmentRecordRepository.load(SubjectQuery(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)) }
         assertThat(result).isInstanceOf(FetchSubjectState.FoundRemote::class.java)
@@ -82,7 +84,7 @@ internal class FetchSubjectUseCaseTest {
         coEvery { enrolmentRecordRepository.load(any()) } returns emptyList()
         every { connectivityTracker.isConnected() } returns true
 
-        val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)
+        val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID, "")
 
         assertThat(result).isInstanceOf(FetchSubjectState.NotFound::class.java)
     }
@@ -92,7 +94,7 @@ internal class FetchSubjectUseCaseTest {
         coEvery { enrolmentRecordRepository.load(any()) } returns emptyList()
         every { connectivityTracker.isConnected() } returns false
 
-        val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)
+        val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID, "")
 
         assertThat(result).isInstanceOf(FetchSubjectState.ConnectionError::class.java)
     }
@@ -102,7 +104,7 @@ internal class FetchSubjectUseCaseTest {
         coEvery { enrolmentRecordRepository.load(any()) } throws Exception("test")
         every { connectivityTracker.isConnected() } returns true
 
-        val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)
+        val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID, "")
 
         assertThat(result).isInstanceOf(FetchSubjectState.NotFound::class.java)
     }
@@ -112,7 +114,7 @@ internal class FetchSubjectUseCaseTest {
         coEvery { enrolmentRecordRepository.load(any()) } throws Exception("test")
         every { connectivityTracker.isConnected() } returns false
 
-        val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)
+        val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID, "")
 
         assertThat(result).isInstanceOf(FetchSubjectState.ConnectionError::class.java)
     }

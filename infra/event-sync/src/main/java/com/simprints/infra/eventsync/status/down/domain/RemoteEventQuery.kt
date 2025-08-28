@@ -11,6 +11,7 @@ internal data class RemoteEventQuery(
     val moduleId: String? = null,
     val subjectId: String? = null,
     val lastEventId: String? = null,
+    val externalIds: List<String>? = null,
     val modes: List<Modes>,
 ) {
     internal fun fromDomainToApi() = ApiRemoteEventQuery(

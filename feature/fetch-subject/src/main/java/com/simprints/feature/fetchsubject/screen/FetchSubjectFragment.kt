@@ -44,7 +44,7 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
             state?.getContentIfNotHandled()?.let(::handleFetchState)
         }
 
-        viewModel.onViewCreated(params.projectId, params.subjectId)
+        viewModel.onViewCreated(params.projectId, params.subjectId, params.metadata)
     }
 
     private fun handleAlertResult(alertResult: AlertResult) {
@@ -59,7 +59,7 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
     }
 
     private fun tryFetchSubject() {
-        viewModel.fetchSubject(params.projectId, params.subjectId)
+        viewModel.fetchSubject(params.projectId, params.subjectId, params.metadata)
     }
 
     private fun handleFetchState(state: FetchSubjectState) = when (state) {
