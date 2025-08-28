@@ -1,7 +1,5 @@
 package com.simprints.fingerprint.testtools
 
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.Random
@@ -35,35 +33,17 @@ object FingerprintGenerator {
     private const val QUALITY_SHIFT = 5 // SHORT
 
     private val RANDOM_GENERATOR = Random()
-    private val FINGER_IDENTIFIERS = FingerIdentifier.values()
 
     /**
-     * @return A random valid [Fingerprint] with a random [FingerIdentifier]
+     * @return A random valid fingerprint template
      */
-    fun generateRandomFingerprint(): Fingerprint {
-        val fingerNo = RANDOM_GENERATOR.nextInt(FINGER_IDENTIFIERS.size)
-        val fingerId = FINGER_IDENTIFIERS[fingerNo]
-        return generateRandomFingerprint(fingerId)
-    }
+    fun generateRandomFingerprintTemplate(): ByteArray = generateRandomFingerprintTemplate(101)
 
     /**
-     * @param fingerId Finger identifier of the fingerprint
-     * @return A random valid [Fingerprint] with specified [FingerIdentifier]
-     */
-    private fun generateRandomFingerprint(fingerId: FingerIdentifier): Fingerprint {
-        val qualityScore = RANDOM_GENERATOR.nextInt(101).toByte()
-        return generateRandomFingerprint(fingerId, qualityScore)
-    }
-
-    /**
-     * @param fingerId     Finger identifier of the fingerprint
      * @param qualityScore Quality score of the fingerprint
-     * @return A random valid [Fingerprint] with specified [FingerIdentifier]
+     * @return A random valid fingerprint template
      */
-    private fun generateRandomFingerprint(
-        fingerId: FingerIdentifier,
-        qualityScore: Byte,
-    ): Fingerprint {
+    private fun generateRandomFingerprintTemplate(qualityScore: Byte): ByteArray {
         val nbMinutiae = RANDOM_GENERATOR.nextInt(128).toByte()
         val length = HEADER_SIZE + nbMinutiae * MINUTIAE_SIZE
 
@@ -97,6 +77,7 @@ object FingerprintGenerator {
         bb.position(0)
         val templateBytes = ByteArray(bb.remaining())
         bb.get(templateBytes)
-        return Fingerprint(fingerId, templateBytes, format = "ISO_19794_2")
+
+        return templateBytes
     }
 }

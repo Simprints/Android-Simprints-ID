@@ -1,9 +1,10 @@
 package com.simprints.fingerprint.infra.biosdk
 
+import com.simprints.core.domain.sample.CaptureIdentity
+import com.simprints.core.domain.sample.Identity
 import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateResponse
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.toDomain
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.template.FingerprintTemplateAcquisitionSettings
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.template.FingerprintTemplateMetadata
@@ -34,8 +35,8 @@ class NECBioSdkWrapper @Inject constructor(
     override suspend fun initialize() = bioSdk.initialize()
 
     override suspend fun match(
-        probe: FingerprintIdentity,
-        candidates: List<FingerprintIdentity>,
+        probe: CaptureIdentity,
+        candidates: List<Identity>,
         isCrossFingerMatchingEnabled: Boolean,
     ): List<MatchResult> = bioSdk.match(probe, candidates, NecMatchingSettings(isCrossFingerMatchingEnabled))
 

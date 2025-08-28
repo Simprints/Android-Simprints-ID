@@ -1,10 +1,11 @@
 package com.simprints.fingerprint.infra.biosdk
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.sample.CaptureIdentity
+import com.simprints.core.domain.sample.Identity
 import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.ImageResponse
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateResponse
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.biosdkimpl.acquisition.template.FingerprintTemplateAcquisitionSettings
 import com.simprints.fingerprint.infra.biosdkimpl.acquisition.template.FingerprintTemplateMetadata
 import com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcherSettings
@@ -66,8 +67,8 @@ class SimprintsBioSdkWrapperTest {
     @Test
     fun `Calls match on bio sdk`() = runTest {
         // Given
-        val probe = mockk<FingerprintIdentity>()
-        val candidates = listOf(mockk<FingerprintIdentity>())
+        val probe = mockk<CaptureIdentity>()
+        val candidates = listOf(mockk<Identity>())
         val isCrossFingerMatchingEnabled = true
         val settings = SimAfisMatcherSettings(isCrossFingerMatchingEnabled)
         // When

@@ -4,6 +4,8 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
@@ -11,7 +13,6 @@ import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
@@ -70,6 +71,7 @@ internal class FaceMatcherUseCaseTest {
                     probeReferenceId = "referenceId",
                     flowType = FlowType.VERIFY,
                     queryForCandidates = SubjectQuery(),
+                    modality = Modality.FACE,
                     biometricDataSource = BiometricDataSource.Simprints,
                 ),
                 project,
@@ -94,12 +96,19 @@ internal class FaceMatcherUseCaseTest {
             .invoke(
                 MatchParams(
                     probeReferenceId = "referenceId",
-                    probeFaceSamples = listOf(
-                        MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3)),
+                    probeSamples = listOf(
+                        CaptureSample(
+                            format = "faceId",
+                            template = byteArrayOf(1, 2, 3),
+                            templateQualityScore = 1,
+                            imageRef = null,
+                            modality = Modality.FACE,
+                        ),
                     ),
                     faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = SubjectQuery(),
+                    modality = Modality.FACE,
                     biometricDataSource = BiometricDataSource.Simprints,
                 ),
                 project,
@@ -120,8 +129,9 @@ internal class FaceMatcherUseCaseTest {
     fun `Correctly calls SDK matcher`() = runTest {
         val totalCandidates = 1
         val faceIdentities = listOf(
-            FaceIdentity(
+            Identity(
                 "subjectId",
+                Modality.FACE,
                 listOf(
                     Sample(
                         template = byteArrayOf(1, 2, 3),
@@ -152,12 +162,19 @@ internal class FaceMatcherUseCaseTest {
             .invoke(
                 matchParams = MatchParams(
                     probeReferenceId = "referenceId",
-                    probeFaceSamples = listOf(
-                        MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3)),
+                    probeSamples = listOf(
+                        CaptureSample(
+                            format = "faceId",
+                            template = byteArrayOf(1, 2, 3),
+                            templateQualityScore = 1,
+                            imageRef = null,
+                            modality = Modality.FACE,
+                        ),
                     ),
                     faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = SubjectQuery(),
+                    modality = Modality.FACE,
                     biometricDataSource = BiometricDataSource.Simprints,
                 ),
                 project,

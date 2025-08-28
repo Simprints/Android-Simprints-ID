@@ -2,6 +2,7 @@ package com.simprints.matcher.usecases
 
 import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
@@ -40,7 +41,7 @@ internal class SaveMatchEventUseCase @Inject constructor(
                     matcherName,
                     matchParams.queryForCandidates,
                     matchEntries.firstOrNull(),
-                    if (matchParams.isFaceMatch()) null else getFingerprintComparisonStrategy(matchParams.fingerprintSDK!!),
+                    if (matchParams.modality == Modality.FACE) null else getFingerprintComparisonStrategy(matchParams.fingerprintSDK!!),
                     matchParams.probeReferenceId,
                 )
             } else {

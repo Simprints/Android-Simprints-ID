@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
@@ -30,7 +31,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.UUID
 import kotlin.random.Random
 
 internal class MatchViewModelTest {
@@ -296,12 +296,17 @@ internal class MatchViewModelTest {
         )
     }
 
-    private fun getFaceSample(): MatchParams.FaceSample = MatchParams.FaceSample(UUID.randomUUID().toString(), Random.nextBytes(20))
+    private fun getFaceSample(): MatchParams.Sample = MatchParams.Sample(
+        format = "format",
+        template = Random.nextBytes(20),
+        modality = Modality.FACE,
+    )
 
-    private fun getFingerprintSample(): MatchParams.FingerprintSample = MatchParams.FingerprintSample(
-        SampleIdentifier.LEFT_3RD_FINGER,
-        "format",
-        Random.nextBytes(20),
+    private fun getFingerprintSample(): MatchParams.Sample = MatchParams.Sample(
+        identifier = SampleIdentifier.LEFT_3RD_FINGER,
+        format = "format",
+        template = Random.nextBytes(20),
+        modality = Modality.FINGERPRINT,
     )
 
     companion object {

@@ -283,7 +283,6 @@ class SubjectFactoryTest {
                         sample = FaceCaptureResult.Sample(
                             template = BASE_64_BYTES,
                             format = REFERENCE_FORMAT,
-                            faceId = REFERENCE_ID,
                             imageRef = null,
                         ),
                     ),

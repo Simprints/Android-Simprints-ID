@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
 import com.simprints.core.domain.image.Path
 import com.simprints.core.domain.image.SecuredImageRef
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
@@ -663,12 +665,13 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             FingerprintCaptureResult.Item(
                 identifier = captureId.finger,
                 captureEventId = captureEventIds[captureId],
-                sample = FingerprintCaptureResult.Sample(
-                    fingerIdentifier = captureId.finger,
+                sample = CaptureSample(
+                    identifier = captureId.finger,
                     template = collectedFinger.scanResult.template,
                     templateQualityScore = collectedFinger.scanResult.qualityScore,
                     imageRef = imageRefs[captureId]?.let { SecuredImageRef(Path(it.relativePath.parts)) },
                     format = collectedFinger.scanResult.templateFormat,
+                    modality = Modality.FINGERPRINT,
                 ),
             )
         }

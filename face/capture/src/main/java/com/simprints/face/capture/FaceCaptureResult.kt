@@ -2,6 +2,7 @@ package com.simprints.face.capture
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.image.SecuredImageRef
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.step.StepResult
 
 @Keep
@@ -13,14 +14,6 @@ data class FaceCaptureResult(
     data class Item(
         val captureEventId: String?,
         val index: Int,
-        val sample: Sample?,
-    ) : StepResult
-
-    @Keep
-    data class Sample(
-        val faceId: String,
-        val template: ByteArray,
-        val imageRef: SecuredImageRef?,
-        val format: String,
+        val sample: CaptureSample?,
     ) : StepResult
 }

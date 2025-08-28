@@ -1,13 +1,15 @@
 package com.simprints.feature.orchestrator.steps
 
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.step.StepParams
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.matcher.MatchContract
-import com.simprints.matcher.MatchParams
 
 /**
  * Actual matching step payload is based on capture step results, so until the it is done we are storing
@@ -24,10 +26,11 @@ internal data class MatchStepStubPayload(
 ) : StepParams {
     fun toFaceStepArgs(
         referenceId: String,
-        samples: List<MatchParams.FaceSample>,
+        samples: List<CaptureSample>,
     ) = MatchContract.getParams(
         referenceId = referenceId,
-        faceSamples = samples,
+        probeSamples = samples,
+        modality = Modality.FACE,
         faceSDK = faceSDK,
         flowType = flowType,
         subjectQuery = subjectQuery,
@@ -36,10 +39,11 @@ internal data class MatchStepStubPayload(
 
     fun toFingerprintStepArgs(
         referenceId: String,
-        samples: List<MatchParams.FingerprintSample>,
+        samples: List<CaptureSample>,
     ) = MatchContract.getParams(
         referenceId = referenceId,
-        fingerprintSamples = samples,
+        probeSamples = samples,
+        modality = Modality.FINGERPRINT,
         fingerprintSDK = fingerprintSDK,
         flowType = flowType,
         subjectQuery = subjectQuery,

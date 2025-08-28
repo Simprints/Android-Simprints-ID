@@ -1,9 +1,10 @@
 package com.simprints.matcher.usecases
 
 import com.simprints.core.DispatcherBG
-import com.simprints.face.infra.basebiosdk.matching.FaceIdentity
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.Identity
+import com.simprints.core.domain.sample.Sample
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
-import com.simprints.face.infra.basebiosdk.matching.FaceSample
 import com.simprints.face.infra.biosdkresolver.FaceBioSDK
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.models.Project
@@ -20,7 +21,6 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
-import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity as DomainFaceIdentity
 
 internal class FaceMatcherUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
@@ -42,11 +42,11 @@ internal class FaceMatcherUseCase @Inject constructor(
         }
         val bioSdk = resolveFaceBioSdk(matchParams.faceSDK)
 
-        if (matchParams.probeFaceSamples.isEmpty()) {
+        if (matchParams.probeSamples.isEmpty()) {
             send(MatcherState.Success(emptyList(), 0, bioSdk.matcherName()))
             return@channelFlow
         }
-        val samples = mapSamples(matchParams.probeFaceSamples)
+
         val queryWithSupportedFormat = matchParams.queryForCandidates.copy(
             faceSampleFormat = bioSdk.templateFormat(),
         )
@@ -80,47 +80,33 @@ internal class FaceMatcherUseCase @Inject constructor(
                 this@channelFlow.send(MatcherState.CandidateLoaded)
             }
 
-        consumeAndMatch(candidatesChannel, samples, resultSet, bioSdk)
+        consumeAndMatch(candidatesChannel, matchParams.probeSamples, resultSet, bioSdk)
         send(MatcherState.Success(resultSet.toList(), loadedCandidates.get(), bioSdk.matcherName()))
     }.flowOn(dispatcherBG)
 
     suspend fun consumeAndMatch(
-        candidatesChannel: ReceiveChannel<List<DomainFaceIdentity>>,
-        samples: List<FaceSample>,
+        candidatesChannel: ReceiveChannel<List<Identity>>,
+        samples: List<CaptureSample>,
         resultSet: MatchResultSet<FaceMatchResult.Item>,
         bioSdk: FaceBioSDK,
     ) {
         for (batch in candidatesChannel) {
             val results = bioSdk.createMatcher(samples).use { matcher ->
-                match(matcher, batch.mapToFaceIdentities())
+                match(matcher, batch)
             }
             resultSet.addAll(results)
         }
     }
 
-    private fun mapSamples(probes: List<MatchParams.FaceSample>) = probes.map { FaceSample(it.faceId, it.template) }
-
     private suspend fun match(
         matcher: FaceMatcher,
-        batchCandidates: List<FaceIdentity>,
+        batchCandidates: List<Identity>,
     ) = batchCandidates.fold(MatchResultSet<FaceMatchResult.Item>()) { acc, candidate ->
         acc.add(
             FaceMatchResult.Item(
                 candidate.subjectId,
                 matcher.getHighestComparisonScoreForCandidate(candidate),
             ),
-        )
-    }
-
-    private fun List<DomainFaceIdentity>.mapToFaceIdentities(): List<FaceIdentity> = map {
-        FaceIdentity(
-            it.subjectId,
-            it.faces.map {
-                FaceSample(
-                    it.referenceId,
-                    it.template,
-                )
-            },
         )
     }
 }

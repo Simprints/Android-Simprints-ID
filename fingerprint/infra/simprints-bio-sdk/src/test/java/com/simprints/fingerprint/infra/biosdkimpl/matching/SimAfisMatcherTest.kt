@@ -1,9 +1,12 @@
 package com.simprints.fingerprint.infra.biosdkimpl.matching
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.CaptureIdentity
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.Identity
+import com.simprints.core.domain.sample.Sample
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.fingerprint.infra.simafiswrapper.JNILibAfisInterface
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -32,18 +35,35 @@ class SimAfisMatcherTest {
     @Test
     fun `test same finger match`() = runTest {
         every { jniLibAfis.identify(any(), any(), 1) } returns floatArrayOf(1F)
-        val candidate = FingerprintIdentity(
-            "candidate",
-            listOf(
-                Fingerprint(
-                    FingerIdentifier.RIGHT_THUMB,
-                    IsoFingerprintTemplateGenerator.generate(1),
-                    SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
+        val probe = CaptureIdentity(
+            modality = Modality.FINGERPRINT,
+            samples = listOf(
+                CaptureSample(
+                    identifier = SampleIdentifier.RIGHT_THUMB,
+                    template = IsoFingerprintTemplateGenerator.generate(1),
+                    templateQualityScore = 1,
+                    modality = Modality.FINGERPRINT,
+                    format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
+                    imageRef = null,
                 ),
             ),
         )
+        val candidate = Identity(
+            subjectId = "candidate",
+            modality = Modality.FINGERPRINT,
+            samples = listOf(
+                Sample(
+                    referenceId = "referenceId",
+                    identifier = SampleIdentifier.RIGHT_THUMB,
+                    template = probe.samples[0].template,
+                    modality = Modality.FINGERPRINT,
+                    format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
+                ),
+            ),
+        )
+
         // When
-        val result = simAfisMatcher.match(candidate, listOf(candidate), false).last()
+        val result = simAfisMatcher.match(probe, listOf(candidate), false).last()
         // Then
         verify { jniLibAfis.identify(any(), any(), any()) }
         assertThat(result.score).isEqualTo(1)
@@ -52,18 +72,35 @@ class SimAfisMatcherTest {
     @Test
     fun `test matching probe with other template format ignore candidate`() = runTest {
         every { jniLibAfis.identify(any(), any(), 1) } returns floatArrayOf(1F)
-        val candidate = FingerprintIdentity(
-            "candidate",
-            listOf(
-                Fingerprint(
-                    FingerIdentifier.RIGHT_3RD_FINGER,
-                    IsoFingerprintTemplateGenerator.generate(1),
-                    "NEC_1",
+        val probe = CaptureIdentity(
+            modality = Modality.FINGERPRINT,
+            samples = listOf(
+                CaptureSample(
+                    identifier = SampleIdentifier.RIGHT_THUMB,
+                    template = IsoFingerprintTemplateGenerator.generate(1),
+                    templateQualityScore = 1,
+                    modality = Modality.FINGERPRINT,
+                    format = "NEC_1",
+                    imageRef = null,
                 ),
             ),
         )
+        val candidate = Identity(
+            subjectId = "candidate",
+            modality = Modality.FINGERPRINT,
+            samples = listOf(
+                Sample(
+                    referenceId = "referenceId",
+                    identifier = SampleIdentifier.RIGHT_THUMB,
+                    template = probe.samples[0].template,
+                    modality = Modality.FINGERPRINT,
+                    format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
+                ),
+            ),
+        )
+
         // When
-        val result = simAfisMatcher.match(candidate, listOf(candidate), false)
+        val result = simAfisMatcher.match(probe, listOf(candidate), false)
         // Then
         assertThat(result).isEmpty()
     }
@@ -75,18 +112,16 @@ class SimAfisMatcherTest {
         val template2 = mockk<ByteBuffer>()
         val template3 = mockk<ByteBuffer>()
 
-        val probe = mockk<FingerprintIdentity> {
+        val probe = mockk<CaptureIdentity> {
             every { templateFormatNotSupportedBySimAfisMatcher() } returns false
             every { fingerprintsTemplates } returns listOf(template1, template2)
         }
-        val candidate1 = mockk<FingerprintIdentity> {
+        val candidate1 = mockk<Identity> {
             every { subjectId } returns "candidate1"
-            every { templateFormatNotSupportedBySimAfisMatcher() } returns false
             every { fingerprintsTemplates } returns listOf(template2, template1)
         }
-        val candidate2 = mockk<FingerprintIdentity> {
+        val candidate2 = mockk<Identity> {
             every { subjectId } returns "candidate2"
-            every { templateFormatNotSupportedBySimAfisMatcher() } returns false
             every { fingerprintsTemplates } returns listOf(template3, template1)
         }
 
@@ -111,19 +146,24 @@ class SimAfisMatcherTest {
     fun `test crossFingerMatching zero fingers success`() {
         // Given
         every { jniLibAfis.verify(any(), any()) } returns 1F
-        val probe = FingerprintIdentity("probe", listOf())
-        val candidate = FingerprintIdentity(
+        val probe = CaptureIdentity(modality = Modality.FINGERPRINT, listOf())
+        val candidate = Identity(
             "candidate",
+            Modality.FINGERPRINT,
             listOf(
-                Fingerprint(
-                    FingerIdentifier.LEFT_THUMB,
-                    IsoFingerprintTemplateGenerator.generate(1),
-                    SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
+                Sample(
+                    referenceId = "referenceId",
+                    identifier = SampleIdentifier.LEFT_THUMB,
+                    template = IsoFingerprintTemplateGenerator.generate(1),
+                    format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
+                    modality = Modality.FINGERPRINT,
                 ),
-                Fingerprint(
-                    FingerIdentifier.LEFT_3RD_FINGER,
-                    IsoFingerprintTemplateGenerator.generate(1),
-                    SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
+                Sample(
+                    referenceId = "referenceId",
+                    identifier = SampleIdentifier.LEFT_3RD_FINGER,
+                    template = IsoFingerprintTemplateGenerator.generate(1),
+                    format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
+                    modality = Modality.FINGERPRINT,
                 ),
             ),
         )

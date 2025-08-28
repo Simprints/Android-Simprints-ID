@@ -25,7 +25,7 @@ internal class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
                 result.referenceId,
                 result.results.mapNotNull { it.sample }.map {
                     FingerTemplateCaptureResult(
-                        it.fingerIdentifier.fromModuleApiToDomain(),
+                        it.identifier.fromModuleApiToDomain(),
                         it.template,
                         it.templateQualityScore,
                         it.format,

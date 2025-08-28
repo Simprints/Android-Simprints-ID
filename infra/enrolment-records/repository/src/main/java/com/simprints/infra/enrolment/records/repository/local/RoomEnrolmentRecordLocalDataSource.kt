@@ -3,14 +3,13 @@ package com.simprints.infra.enrolment.records.repository.local
 import androidx.room.withTransaction
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
-import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.local.models.toDomain
@@ -88,14 +87,15 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<List<FaceIdentity>> = loadBiometricIdentitiesPaged(
+    ): ReceiveChannel<List<Identity>> = loadBiometricIdentitiesPaged(
         query = query,
         ranges = ranges,
         format = requireNotNull(query.faceSampleFormat) { "faceSampleFormat required" },
         createIdentity = { subjectId, templates ->
-            FaceIdentity(
+            Identity(
                 subjectId = subjectId,
-                faces = templates.map { sample ->
+                modality = Modality.FINGERPRINT,
+                samples = templates.map { sample ->
                     Sample(
                         template = sample.templateData,
                         id = sample.uuid,
@@ -120,14 +120,15 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<List<FingerprintIdentity>> = loadBiometricIdentitiesPaged(
+    ): ReceiveChannel<List<Identity>> = loadBiometricIdentitiesPaged(
         query = query,
         ranges = ranges,
         format = requireNotNull(query.fingerprintSampleFormat) { "fingerprintSampleFormat required" },
         createIdentity = { subjectId, templates ->
-            FingerprintIdentity(
+            Identity(
                 subjectId = subjectId,
-                fingerprints = templates.map { sample ->
+                modality = Modality.FINGERPRINT,
+                samples = templates.map { sample ->
                     Sample(
                         identifier = SampleIdentifier.entries[sample.identifier!!],
                         template = sample.templateData,
@@ -143,17 +144,17 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         scope = scope,
     )
 
-    private fun <T> loadBiometricIdentitiesPaged(
+    private fun loadBiometricIdentitiesPaged(
         query: SubjectQuery,
         ranges: List<IntRange>,
         format: String,
-        createIdentity: (String, List<DbBiometricTemplate>) -> T,
+        createIdentity: (String, List<DbBiometricTemplate>) -> Identity,
         onCandidateLoaded: suspend () -> Unit,
         scope: CoroutineScope,
-    ): ReceiveChannel<List<T>> {
+    ): ReceiveChannel<List<Identity>> {
         var afterSubjectId: String? = null
         var lastOffset = 0
-        val channel = Channel<List<T>>(CHANNEL_CAPACITY)
+        val channel = Channel<List<Identity>>(CHANNEL_CAPACITY)
         scope.launch(dispatcherIO) {
             ranges
                 .forEach { range ->
@@ -168,9 +169,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                         createIdentity = createIdentity,
                         onCandidateLoaded = onCandidateLoaded,
                     )
-                    afterSubjectId = identities.lastOrNull()?.let {
-                        (it as? FaceIdentity)?.subjectId ?: (it as? FingerprintIdentity)?.subjectId
-                    }
+                    afterSubjectId = identities.lastOrNull()?.subjectId
                     lastOffset = range.last + 1
                     channel.send(identities)
                 }

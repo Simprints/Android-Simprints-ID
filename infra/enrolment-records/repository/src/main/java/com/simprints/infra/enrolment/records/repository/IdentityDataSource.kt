@@ -1,9 +1,8 @@
 package com.simprints.infra.enrolment.records.repository
 
+import com.simprints.core.domain.sample.Identity
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
-import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -21,7 +20,7 @@ interface IdentityDataSource {
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<List<FingerprintIdentity>>
+    ): ReceiveChannel<List<Identity>>
 
     suspend fun loadFaceIdentities(
         query: SubjectQuery,
@@ -30,7 +29,7 @@ interface IdentityDataSource {
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<List<FaceIdentity>>
+    ): ReceiveChannel<List<Identity>>
 
     /**
      * Loads identities concurrently using the provided dispatcher and parallelism level.

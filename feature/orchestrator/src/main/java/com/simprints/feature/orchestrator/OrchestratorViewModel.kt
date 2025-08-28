@@ -42,7 +42,6 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppResponse
-import com.simprints.matcher.MatchParams
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.io.Serializable
@@ -222,9 +221,8 @@ internal class OrchestratorViewModel @Inject constructor(
             }
 
             if (matchingStep != null) {
-                val faceSamples = result.results
-                    .mapNotNull { it.sample }
-                    .map { MatchParams.FaceSample(it.faceId, it.template) }
+                val faceSamples = result.results.mapNotNull { it.sample }
+
                 val newPayload = matchingStep.params
                     ?.let { it as? MatchStepStubPayload }
                     ?.toFaceStepArgs(result.referenceId, faceSamples)
@@ -247,15 +245,7 @@ internal class OrchestratorViewModel @Inject constructor(
             }
 
             if (matchingStep != null) {
-                val fingerprintSamples = result.results
-                    .mapNotNull { it.sample }
-                    .map {
-                        MatchParams.FingerprintSample(
-                            fingerId = it.fingerIdentifier,
-                            format = it.format,
-                            template = it.template,
-                        )
-                    }
+                val fingerprintSamples = result.results.mapNotNull { it.sample }
                 val newPayload = matchingStep.params
                     ?.let { it as? MatchStepStubPayload }
                     ?.toFingerprintStepArgs(result.referenceId, fingerprintSamples)

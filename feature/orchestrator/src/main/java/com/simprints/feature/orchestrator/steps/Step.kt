@@ -4,6 +4,8 @@ import androidx.annotation.IdRes
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.core.domain.image.SecuredImageRef
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.step.StepResult
 import com.simprints.face.capture.FaceCaptureParams
@@ -50,10 +52,6 @@ import java.io.Serializable
         value = FingerprintCaptureResult.Item::class,
         name = "FingerprintCaptureResult.Item",
     ),
-    JsonSubTypes.Type(
-        value = FingerprintCaptureResult.Sample::class,
-        name = "FingerprintCaptureResult.Sample",
-    ),
     JsonSubTypes.Type(value = FingerprintMatchResult::class, name = "FingerprintMatchResult"),
     JsonSubTypes.Type(
         value = FingerprintMatchResult.Item::class,
@@ -61,7 +59,6 @@ import java.io.Serializable
     ),
     JsonSubTypes.Type(value = FaceCaptureResult::class, name = "FaceCaptureResult"),
     JsonSubTypes.Type(value = FaceCaptureResult.Item::class, name = "FaceCaptureResult.Item"),
-    JsonSubTypes.Type(value = FaceCaptureResult.Sample::class, name = "FaceCaptureResult.Sample"),
     JsonSubTypes.Type(value = FaceMatchResult::class, name = "FaceMatchResult"),
     JsonSubTypes.Type(value = FaceMatchResult.Item::class, name = "FaceMatchResult.Item"),
     JsonSubTypes.Type(value = EnrolLastBiometricResult::class, name = "EnrolLastBiometricResult"),
@@ -71,6 +68,9 @@ import java.io.Serializable
     JsonSubTypes.Type(value = ExitFormResult::class, name = "ExitFormResult"),
     JsonSubTypes.Type(value = ValidateSubjectPoolResult::class, name = "ValidateSubjectPoolResult"),
     JsonSubTypes.Type(value = SelectSubjectAgeGroupResult::class, name = "SelectSubjectAgeGroupResult"),
+    // Common data classes used in multiple step results
+    JsonSubTypes.Type(value = CaptureSample::class, name = "CaptureSample"),
+    JsonSubTypes.Type(value = SecuredImageRef::class, name = "SecuredImageRef"),
 )
 abstract class StepResultMixin : StepResult
 
@@ -87,8 +87,6 @@ abstract class StepResultMixin : StepResult
     // Match params are updated after capture steps
     JsonSubTypes.Type(value = MatchStepStubPayload::class, name = "MatchStepStubPayload"),
     JsonSubTypes.Type(value = MatchParams::class, name = "MatchParams"),
-    JsonSubTypes.Type(value = MatchParams.FaceSample::class, name = "MatchParams.FaceSample"),
-    JsonSubTypes.Type(value = MatchParams.FingerprintSample::class, name = "MatchParams.FingerprintSample"),
     // Below are subclasses of enrol-last step that takes results of other steps as parameters
     JsonSubTypes.Type(value = EnrolLastBiometricParams::class, name = "EnrolLastBiometricParams"),
     JsonSubTypes.Type(value = EnrolLastBiometricStepResult::class, name = "EnrolLastBiometricStepResult"),
@@ -116,6 +114,7 @@ abstract class StepResultMixin : StepResult
     JsonSubTypes.Type(value = FingerTemplateCaptureResult::class, name = "FingerTemplateCaptureResult"),
     JsonSubTypes.Type(value = FaceTemplateCaptureResult::class, name = "FaceTemplateCaptureResult"),
     // Additional types that are used in top-level params
+    JsonSubTypes.Type(value = CaptureSample::class, name = "CaptureSample"),
     JsonSubTypes.Type(value = BiometricDataSource::class, name = "BiometricDataSource"),
     JsonSubTypes.Type(value = SubjectQuery::class, name = "SubjectQuery"),
 )

@@ -2,7 +2,6 @@ package com.simprints.face.infra.rocv1
 
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.basebiosdk.initialization.FaceBioSdkInitializer
-import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.rocv1.detection.RocV1Detector
 import com.simprints.face.infra.rocv1.initialization.RocV1Initializer
 import dagger.Binds

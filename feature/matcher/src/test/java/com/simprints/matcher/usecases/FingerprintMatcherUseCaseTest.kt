@@ -4,6 +4,8 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
@@ -13,7 +15,6 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.matcher.MatchParams
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -77,10 +78,11 @@ internal class FingerprintMatcherUseCaseTest {
             .invoke(
                 MatchParams(
                     probeReferenceId = "referenceId",
-                    probeFingerprintSamples = emptyList(),
+                    probeSamples = emptyList(),
                     fingerprintSDK = SECUGEN_SIM_MATCHER,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = SubjectQuery(),
+                    modality = Modality.FINGERPRINT,
                     biometricDataSource = BiometricDataSource.Simprints,
                 ),
                 project,
@@ -108,13 +110,17 @@ internal class FingerprintMatcherUseCaseTest {
             .invoke(
                 MatchParams(
                     probeReferenceId = "referenceId",
-                    probeFingerprintSamples = listOf(
-                        MatchParams.FingerprintSample(
-                            SampleIdentifier.LEFT_3RD_FINGER,
-                            "format",
-                            byteArrayOf(1, 2, 3),
+                    probeSamples = listOf(
+                        CaptureSample(
+                            identifier = SampleIdentifier.LEFT_3RD_FINGER,
+                            format = "format",
+                            template = byteArrayOf(1, 2, 3),
+                            templateQualityScore = 1,
+                            modality = Modality.FINGERPRINT,
+                            imageRef = null,
                         ),
                     ),
+                    modality = Modality.FINGERPRINT,
                     fingerprintSDK = SECUGEN_SIM_MATCHER,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = SubjectQuery(),
@@ -150,8 +156,9 @@ internal class FingerprintMatcherUseCaseTest {
         } returns
             createTestChannel(
                 listOf(
-                    FingerprintIdentity(
+                    Identity(
                         "personId",
+                        Modality.FINGERPRINT,
                         listOf(
                             fingerprintSample(SampleIdentifier.RIGHT_5TH_FINGER),
                             fingerprintSample(SampleIdentifier.RIGHT_4TH_FINGER),
@@ -173,13 +180,17 @@ internal class FingerprintMatcherUseCaseTest {
             .invoke(
                 matchParams = MatchParams(
                     probeReferenceId = "referenceId",
-                    probeFingerprintSamples = listOf(
-                        MatchParams.FingerprintSample(
-                            SampleIdentifier.LEFT_3RD_FINGER,
-                            "format",
-                            byteArrayOf(1, 2, 3),
+                    probeSamples = listOf(
+                        CaptureSample(
+                            identifier = SampleIdentifier.LEFT_3RD_FINGER,
+                            format = "format",
+                            template = byteArrayOf(1, 2, 3),
+                            templateQualityScore = 1,
+                            modality = Modality.FINGERPRINT,
+                            imageRef = null,
                         ),
                     ),
+                    modality = Modality.FINGERPRINT,
                     fingerprintSDK = SECUGEN_SIM_MATCHER,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = SubjectQuery(),
@@ -192,9 +203,9 @@ internal class FingerprintMatcherUseCaseTest {
 
     private fun fingerprintSample(finger: SampleIdentifier) = Sample(
         identifier = finger,
-        template = byteArrayOf(1),
-        format = "format",
         referenceId = "referenceId",
+        format = "format",
+        template = byteArrayOf(1),
         modality = Modality.FINGERPRINT,
     )
 }

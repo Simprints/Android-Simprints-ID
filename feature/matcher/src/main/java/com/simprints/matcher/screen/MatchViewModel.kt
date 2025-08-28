@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
@@ -51,10 +52,9 @@ internal class MatchViewModel @Inject constructor(
         isInitialized = true
         val startTime = timeHelper.now()
 
-        val isFaceMatch = params.isFaceMatch()
-        val matcherUseCase = when {
-            isFaceMatch -> faceMatcher
-            else -> fingerprintMatcher
+        val matcherUseCase = when (params.modality) {
+            Modality.FACE -> faceMatcher
+            Modality.FINGERPRINT -> fingerprintMatcher
         }
         val project = configManager.getProject(authStore.signedInProjectId)
         val decisionPolicy = getDecisionPolicy(params)
@@ -91,9 +91,9 @@ internal class MatchViewModel @Inject constructor(
                     delay(MATCHING_END_WAIT_TIME_MS)
 
                     _matchResponse.send(
-                        when {
-                            isFaceMatch -> FaceMatchResult(matcherState.matchResultItems, params.faceSDK!!)
-                            else -> FingerprintMatchResult(matcherState.matchResultItems, params.fingerprintSDK!!)
+                        when (params.modality) {
+                            Modality.FACE -> FaceMatchResult(matcherState.matchResultItems, params.faceSDK!!)
+                            Modality.FINGERPRINT -> FingerprintMatchResult(matcherState.matchResultItems, params.fingerprintSDK!!)
                         },
                     )
                 }

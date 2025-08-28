@@ -1,19 +1,9 @@
 package com.simprints.fingerprint.infra.biosdkimpl.matching
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.LEFT_3RD_FINGER
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.LEFT_4TH_FINGER
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.LEFT_5TH_FINGER
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.LEFT_INDEX_FINGER
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.LEFT_THUMB
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.RIGHT_3RD_FINGER
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.RIGHT_4TH_FINGER
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.RIGHT_5TH_FINGER
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.RIGHT_INDEX_FINGER
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.RIGHT_THUMB
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
+import com.simprints.core.domain.sample.CaptureIdentity
+import com.simprints.core.domain.sample.Identity
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult
 import com.simprints.fingerprint.infra.simafiswrapper.JNILibAfisInterface
 import com.simprints.fingerprint.infra.simafiswrapper.models.SimAfisFingerIdentifier
@@ -35,8 +25,8 @@ internal class SimAfisMatcher @Inject constructor(
     private val jniLibAfis: JNILibAfisInterface,
 ) {
     fun match(
-        probe: FingerprintIdentity,
-        candidates: List<FingerprintIdentity>,
+        probe: CaptureIdentity,
+        candidates: List<Identity>,
         crossFingerComparison: Boolean,
     ): List<MatchResult> {
         // if probe template format is not supported by SimAfisMatcher, return empty list
@@ -51,8 +41,8 @@ internal class SimAfisMatcher @Inject constructor(
     }
 
     private fun match(
-        probe: FingerprintIdentity,
-        candidates: List<FingerprintIdentity>,
+        probe: CaptureIdentity,
+        candidates: List<Identity>,
     ): List<MatchResult> {
         val simAfisCandidates = candidates.map { it.toSimAfisPerson() }
 
@@ -69,28 +59,34 @@ internal class SimAfisMatcher @Inject constructor(
         }
     }
 
-    private fun FingerprintIdentity.toSimAfisPerson(): SimAfisPerson =
-        SimAfisPerson(subjectId, fingerprints.map { it.toSimAfisFingerprint() })
+    private fun CaptureIdentity.toSimAfisPerson(): SimAfisPerson = SimAfisPerson(
+        "",
+        samples.map { SimAfisFingerprint(it.identifier.toSimAfisFingerIdentifier(), it.template) },
+    )
 
-    private fun Fingerprint.toSimAfisFingerprint(): SimAfisFingerprint = SimAfisFingerprint(fingerId.toSimAfisFingerIdentifier(), template)
+    private fun Identity.toSimAfisPerson(): SimAfisPerson = SimAfisPerson(
+        subjectId,
+        samples.map { SimAfisFingerprint(it.identifier.toSimAfisFingerIdentifier(), it.template) },
+    )
 
     @ExcludedFromGeneratedTestCoverageReports(reason = "This is just a mapping function")
-    private fun FingerIdentifier.toSimAfisFingerIdentifier(): SimAfisFingerIdentifier = when (this) {
-        RIGHT_5TH_FINGER -> SimAfisFingerIdentifier.RIGHT_5TH_FINGER
-        RIGHT_4TH_FINGER -> SimAfisFingerIdentifier.RIGHT_4TH_FINGER
-        RIGHT_3RD_FINGER -> SimAfisFingerIdentifier.RIGHT_3RD_FINGER
-        RIGHT_INDEX_FINGER -> SimAfisFingerIdentifier.RIGHT_INDEX_FINGER
-        RIGHT_THUMB -> SimAfisFingerIdentifier.RIGHT_THUMB
-        LEFT_THUMB -> SimAfisFingerIdentifier.LEFT_THUMB
-        LEFT_INDEX_FINGER -> SimAfisFingerIdentifier.LEFT_INDEX_FINGER
-        LEFT_3RD_FINGER -> SimAfisFingerIdentifier.LEFT_3RD_FINGER
-        LEFT_4TH_FINGER -> SimAfisFingerIdentifier.LEFT_4TH_FINGER
-        LEFT_5TH_FINGER -> SimAfisFingerIdentifier.LEFT_5TH_FINGER
+    private fun SampleIdentifier.toSimAfisFingerIdentifier(): SimAfisFingerIdentifier = when (this) {
+        SampleIdentifier.RIGHT_5TH_FINGER -> SimAfisFingerIdentifier.RIGHT_5TH_FINGER
+        SampleIdentifier.RIGHT_4TH_FINGER -> SimAfisFingerIdentifier.RIGHT_4TH_FINGER
+        SampleIdentifier.RIGHT_3RD_FINGER -> SimAfisFingerIdentifier.RIGHT_3RD_FINGER
+        SampleIdentifier.RIGHT_INDEX_FINGER -> SimAfisFingerIdentifier.RIGHT_INDEX_FINGER
+        SampleIdentifier.RIGHT_THUMB -> SimAfisFingerIdentifier.RIGHT_THUMB
+        SampleIdentifier.LEFT_THUMB -> SimAfisFingerIdentifier.LEFT_THUMB
+        SampleIdentifier.LEFT_INDEX_FINGER -> SimAfisFingerIdentifier.LEFT_INDEX_FINGER
+        SampleIdentifier.LEFT_3RD_FINGER -> SimAfisFingerIdentifier.LEFT_3RD_FINGER
+        SampleIdentifier.LEFT_4TH_FINGER -> SimAfisFingerIdentifier.LEFT_4TH_FINGER
+        SampleIdentifier.LEFT_5TH_FINGER -> SimAfisFingerIdentifier.LEFT_5TH_FINGER
+        else -> throw IllegalArgumentException("Unknown finger identifier: $this")
     }
 
     private fun crossFingerMatch(
-        probe: FingerprintIdentity,
-        candidates: List<FingerprintIdentity>,
+        probe: CaptureIdentity,
+        candidates: List<Identity>,
     ) = candidates.map { crossFingerMatching(probe, it, jniLibAfis) }
 
     /**
@@ -102,8 +98,8 @@ internal class SimAfisMatcher @Inject constructor(
      * @return MatchResult
      */
     private fun crossFingerMatching(
-        probe: FingerprintIdentity,
-        candidate: FingerprintIdentity,
+        probe: CaptureIdentity,
+        candidate: Identity,
         jniLibAfis: JNILibAfisInterface,
     ): MatchResult {
         // Number of fingers used in matching
@@ -137,10 +133,13 @@ internal class SimAfisMatcher @Inject constructor(
     }
 }
 
-val FingerprintIdentity.fingerprintsTemplates
-    get() = fingerprints.map { it.template.toByteBuffer() }
+internal val CaptureIdentity.fingerprintsTemplates
+    get() = samples.map { it.template.toByteBuffer() }
+
+internal val Identity.fingerprintsTemplates
+    get() = samples.map { it.template.toByteBuffer() }
 
 private fun ByteArray.toByteBuffer(): ByteBuffer = ByteBuffer.allocateDirect(size).put(this)
 
-fun FingerprintIdentity.templateFormatNotSupportedBySimAfisMatcher(): Boolean =
-    fingerprints.any { it.format != SimAfisMatcher.SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT }
+internal fun CaptureIdentity.templateFormatNotSupportedBySimAfisMatcher(): Boolean =
+    samples.any { it.format != SimAfisMatcher.SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT }

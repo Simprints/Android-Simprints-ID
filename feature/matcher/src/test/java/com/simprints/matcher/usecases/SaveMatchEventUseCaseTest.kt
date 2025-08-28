@@ -2,7 +2,8 @@ package com.simprints.matcher.usecases
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
@@ -72,7 +73,16 @@ class SaveMatchEventUseCaseTest {
                 probeReferenceId = "referenceId",
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(subjectId = "subjectId"),
-                probeFaceSamples = listOf(MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3))),
+                probeSamples = listOf(
+                    CaptureSample(
+                        format = "faceId",
+                        template = byteArrayOf(1, 2, 3),
+                        templateQualityScore = 1,
+                        imageRef = null,
+                        modality = Modality.FACE,
+                    ),
+                ),
+                modality = Modality.FACE,
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
             2,
@@ -109,13 +119,16 @@ class SaveMatchEventUseCaseTest {
                 probeReferenceId = "referenceId",
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(subjectId = "subjectId"),
-                probeFingerprintSamples = listOf(
-                    MatchParams.FingerprintSample(
-                        SampleIdentifier.RIGHT_5TH_FINGER,
-                        "format",
-                        byteArrayOf(1, 2, 3),
+                probeSamples = listOf(
+                    CaptureSample(
+                        format = "finger",
+                        template = byteArrayOf(1, 2, 3),
+                        templateQualityScore = 1,
+                        imageRef = null,
+                        modality = Modality.FINGERPRINT,
                     ),
                 ),
+                modality = Modality.FINGERPRINT,
                 fingerprintSDK = SECUGEN_SIM_MATCHER,
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
@@ -151,8 +164,8 @@ class SaveMatchEventUseCaseTest {
             endTime = Timestamp(2L),
             matchParams = MatchParams(
                 probeReferenceId = "referenceId",
-                probeFaceSamples = emptyList(),
-                probeFingerprintSamples = emptyList(),
+                probeSamples = emptyList(),
+                modality = Modality.FACE,
                 fingerprintSDK = null,
                 flowType = FlowType.IDENTIFY,
                 queryForCandidates = SubjectQuery(),
@@ -198,6 +211,7 @@ class SaveMatchEventUseCaseTest {
             MatchParams(
                 probeReferenceId = "referenceId",
                 flowType = FlowType.IDENTIFY,
+                modality = Modality.FACE,
                 queryForCandidates = SubjectQuery(attendantId = "userId".asTokenizableEncrypted()),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
@@ -224,6 +238,7 @@ class SaveMatchEventUseCaseTest {
             MatchParams(
                 probeReferenceId = "referenceId",
                 flowType = FlowType.IDENTIFY,
+                modality = Modality.FACE,
                 queryForCandidates = SubjectQuery(moduleId = "moduleId".asTokenizableEncrypted()),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
@@ -251,6 +266,7 @@ class SaveMatchEventUseCaseTest {
                 probeReferenceId = "referenceId",
                 emptyList(),
                 flowType = FlowType.IDENTIFY,
+                modality = Modality.FACE,
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),

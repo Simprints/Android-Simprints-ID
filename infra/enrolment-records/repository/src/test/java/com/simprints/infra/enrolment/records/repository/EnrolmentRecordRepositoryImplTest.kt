@@ -1,14 +1,13 @@
 package com.simprints.infra.enrolment.records.repository
 
 import android.content.SharedPreferences
+import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
-import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
@@ -285,7 +284,7 @@ class EnrolmentRecordRepositoryImplTest {
     fun `should forward the call to the local data source when loading fingerprint identities and dataSource is Simprints`() = runTest {
         val expectedSubjectQuery = SubjectQuery()
         val expectedRange = listOf(0..10)
-        val expectedFingerprintIdentities = listOf<FingerprintIdentity>()
+        val expectedFingerprintIdentities = listOf<Identity>()
         coEvery {
             localDataSource.loadFingerprintIdentities(
                 expectedSubjectQuery,
@@ -297,7 +296,7 @@ class EnrolmentRecordRepositoryImplTest {
             )
         } returns createTestChannel(expectedFingerprintIdentities)
 
-        val fingerprintIdentities = mutableListOf<FingerprintIdentity>()
+        val fingerprintIdentities = mutableListOf<Identity>()
         repository
             .loadFingerprintIdentities(
                 query = expectedSubjectQuery,
@@ -327,7 +326,7 @@ class EnrolmentRecordRepositoryImplTest {
     fun `should forward the call to the commcare data source when loading fingerprint identities and dataSource is CommCare`() = runTest {
         val expectedSubjectQuery = SubjectQuery()
         val expectedRange = listOf(0..10)
-        val expectedFingerprintIdentities = listOf<FingerprintIdentity>()
+        val expectedFingerprintIdentities = listOf<Identity>()
         coEvery {
             commCareDataSource.loadFingerprintIdentities(
                 expectedSubjectQuery,
@@ -338,7 +337,7 @@ class EnrolmentRecordRepositoryImplTest {
                 onCandidateLoaded,
             )
         } returns createTestChannel(expectedFingerprintIdentities)
-        val fingerprintIdentities = mutableListOf<FingerprintIdentity>()
+        val fingerprintIdentities = mutableListOf<Identity>()
         repository
             .loadFingerprintIdentities(
                 query = expectedSubjectQuery,
@@ -368,7 +367,7 @@ class EnrolmentRecordRepositoryImplTest {
     fun `should forward the call to the local data source when loading face identities and dataSource is Simprints`() = runTest {
         val expectedSubjectQuery = SubjectQuery()
         val expectedRange = listOf(0..10)
-        val expectedFaceIdentities = listOf<FaceIdentity>()
+        val expectedFaceIdentities = listOf<Identity>()
         coEvery {
             localDataSource.loadFaceIdentities(
                 expectedSubjectQuery,
@@ -380,7 +379,7 @@ class EnrolmentRecordRepositoryImplTest {
             )
         } returns createTestChannel(expectedFaceIdentities)
 
-        val faceIdentities = mutableListOf<FaceIdentity>()
+        val faceIdentities = mutableListOf<Identity>()
         repository
             .loadFaceIdentities(
                 query = expectedSubjectQuery,
@@ -410,7 +409,7 @@ class EnrolmentRecordRepositoryImplTest {
     fun `should forward the call to the commcare data source when loading face identities and dataSource is CommCare`() = runTest {
         val expectedSubjectQuery = SubjectQuery()
         val expectedRange = listOf(0..10)
-        val expectedFaceIdentities = listOf<FaceIdentity>()
+        val expectedFaceIdentities = listOf<Identity>()
         coEvery {
             commCareDataSource.loadFaceIdentities(
                 expectedSubjectQuery,
@@ -422,7 +421,7 @@ class EnrolmentRecordRepositoryImplTest {
             )
         } returns createTestChannel(expectedFaceIdentities)
 
-        val faceIdentities = mutableListOf<FaceIdentity>()
+        val faceIdentities = mutableListOf<Identity>()
 
         repository
             .loadFaceIdentities(
