@@ -14,10 +14,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.feature.dashboard.R
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
@@ -84,7 +84,7 @@ class AboutFragmentTest {
 
     @Test
     fun `should hide the fingerprint preference if the modalities doesn't contain Fingerprint`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockModalities(listOf(Modality.FACE))
 
         launchFragmentInHiltContainer<AboutFragment>()
 
@@ -94,7 +94,7 @@ class AboutFragmentTest {
 
     @Test
     fun `should display the fingerprint preference if the modalities contains Fingerprint`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FINGERPRINT))
+        mockModalities(listOf(Modality.FINGERPRINT))
 
         launchFragmentInHiltContainer<AboutFragment>()
 
@@ -104,7 +104,7 @@ class AboutFragmentTest {
 
     @Test
     fun `should display the toolbar`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FINGERPRINT))
+        mockModalities(listOf(Modality.FINGERPRINT))
 
         launchFragmentInHiltContainer<AboutFragment>()
 
@@ -113,7 +113,7 @@ class AboutFragmentTest {
 
     @Test
     fun `should init the preferences correctly`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockModalities(listOf(Modality.FACE))
 
         launchFragmentInHiltContainer<AboutFragment>()
 
@@ -125,7 +125,7 @@ class AboutFragmentTest {
     @Test
     fun `should process logout when no password and clicking on logout`() {
         mockSettingsPassword(SettingsPasswordConfig.NotSet)
-        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockModalities(listOf(Modality.FACE))
         val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
 
         launchFragmentInHiltContainer<AboutFragment>(navController = navController)
@@ -159,7 +159,7 @@ class AboutFragmentTest {
         @IdRes targetDestinationId: Int,
     ) {
         mockSettingsPassword(SettingsPasswordConfig.NotSet)
-        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockModalities(listOf(Modality.FACE))
         mockLogoutDestination(destination)
         val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
 
@@ -170,7 +170,7 @@ class AboutFragmentTest {
     @Test
     fun `should not logout when no password and refusing on the alert dialog`() {
         mockSettingsPassword(SettingsPasswordConfig.NotSet)
-        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockModalities(listOf(Modality.FACE))
         val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
 
         launchFragmentInHiltContainer<AboutFragment>(navController = navController)
@@ -187,7 +187,7 @@ class AboutFragmentTest {
     @Test
     fun `should prompt password input when has password and clicking on logout`() {
         mockSettingsPassword(SettingsPasswordConfig.Locked("1234"))
-        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockModalities(listOf(Modality.FACE))
         val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
 
         launchFragmentInHiltContainer<AboutFragment>(navController = navController)
@@ -203,7 +203,7 @@ class AboutFragmentTest {
     @Test
     fun `should not log out when prompted password and it was incorrect`() {
         mockSettingsPassword(SettingsPasswordConfig.Locked("1234"))
-        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockModalities(listOf(Modality.FACE))
         val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
 
         launchFragmentInHiltContainer<AboutFragment>(navController = navController)
@@ -217,10 +217,10 @@ class AboutFragmentTest {
         verify(exactly = 0) { viewModel.processLogoutRequest() }
     }
 
-    private fun mockModalities(modalities: List<GeneralConfiguration.Modality>) {
+    private fun mockModalities(modalities: List<Modality>) {
         every { viewModel.modalities } returns mockk {
             every { observe(any(), any()) } answers {
-                secondArg<Observer<List<GeneralConfiguration.Modality>>>().onChanged(modalities)
+                secondArg<Observer<List<Modality>>>().onChanged(modalities)
             }
         }
     }

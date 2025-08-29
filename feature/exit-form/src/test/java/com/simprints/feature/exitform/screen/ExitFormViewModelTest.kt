@@ -3,10 +3,10 @@ package com.simprints.feature.exitform.screen
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.exitform.ExitFormOption
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -57,7 +57,7 @@ internal class ExitFormViewModelTest {
     @Test
     fun `show default options when configuration doesn't contain fingerprint`() = runTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
-            every { general.modalities } returns listOf(GeneralConfiguration.Modality.FACE)
+            every { general.modalities } returns listOf(Modality.FACE)
         }
 
         exitFormViewModel.start()
@@ -68,7 +68,7 @@ internal class ExitFormViewModelTest {
     @Test
     fun `show scanner options when configuration contains fingerprint`() = runTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
-            every { general.modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+            every { general.modalities } returns listOf(Modality.FINGERPRINT)
         }
 
         exitFormViewModel.start()

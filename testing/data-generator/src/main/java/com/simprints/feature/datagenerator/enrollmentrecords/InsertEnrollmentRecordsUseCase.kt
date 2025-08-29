@@ -2,9 +2,9 @@ package com.simprints.feature.datagenerator.enrollmentrecords
 
 import android.os.Bundle
 import com.simprints.core.DispatcherIO
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.Sample
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.ConfigRepository
@@ -77,8 +77,8 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
         emit("Inserted $numRecords biometric records")
     }.flowOn(dispatcher)
 
-    private fun generateFaceSamples(templatesPerFormat: Bundle): List<FaceSample> {
-        val faceSamples = mutableListOf<FaceSample>()
+    private fun generateFaceSamples(templatesPerFormat: Bundle): List<Sample> {
+        val faceSamples = mutableListOf<Sample>()
         for (key in templatesPerFormat.keySet()) {
             if (FINGERPRINT_FORMATES.contains(key)) {
                 // Skip non-face formats
@@ -87,11 +87,12 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
             val numSamples = templatesPerFormat.getInt(key, 0)
             repeat(numSamples) {
                 faceSamples.add(
-                    FaceSample(
+                    Sample(
                         template = getTemplateForFormat(key),
                         format = key,
                         referenceId = UUID.randomUUID().toString(),
                         id = UUID.randomUUID().toString(),
+                        modality = Modality.FACE,
                     ),
                 )
             }
@@ -102,8 +103,8 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
     private fun generateFingerprintTemplates(
         templatesPerFormat: Bundle,
         fingerOrder: Bundle?,
-    ): List<FingerprintSample> {
-        val fingerprintSamples = mutableListOf<FingerprintSample>()
+    ): List<Sample> {
+        val fingerprintSamples = mutableListOf<Sample>()
 
         for (key in templatesPerFormat.keySet()) {
             if (FACE_FORMATES.contains(key)) {
@@ -115,16 +116,17 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
             val numSamples = templatesPerFormat.getInt(key, 0)
             for (i in 0 until numSamples) {
                 fingerprintSamples.add(
-                    FingerprintSample(
+                    Sample(
                         template = getTemplateForFormat(key),
                         format = key,
                         referenceId = UUID.randomUUID().toString(),
                         id = UUID.randomUUID().toString(),
-                        fingerIdentifier = if (fingerIdentifiers.isNullOrEmpty()) {
-                            IFingerIdentifier.LEFT_THUMB
+                        identifier = if (fingerIdentifiers.isNullOrEmpty()) {
+                            SampleIdentifier.LEFT_THUMB
                         } else {
                             fingerIdentifiers[i % fingerIdentifiers.size].toFingerIdentifier()
                         },
+                        modality = Modality.FINGERPRINT,
                     ),
                 )
             }
@@ -133,18 +135,18 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
     }
 
     private fun String.toFingerIdentifier() = when (this.uppercase()) {
-        "LEFT_THUMB" -> IFingerIdentifier.LEFT_THUMB
-        "LEFT_INDEX_FINGER" -> IFingerIdentifier.LEFT_INDEX_FINGER
-        "LEFT_3RD_FINGER" -> IFingerIdentifier.LEFT_3RD_FINGER
-        "LEFT_4TH_FINGER" -> IFingerIdentifier.LEFT_4TH_FINGER
-        "LEFT_5TH_FINGER" -> IFingerIdentifier.LEFT_5TH_FINGER
-        "RIGHT_THUMB" -> IFingerIdentifier.RIGHT_THUMB
-        "RIGHT_INDEX_FINGER" -> IFingerIdentifier.RIGHT_INDEX_FINGER
-        "RIGHT_3RD_FINGER" -> IFingerIdentifier.RIGHT_3RD_FINGER
-        "RIGHT_4TH_FINGER" -> IFingerIdentifier.RIGHT_4TH_FINGER
-        "RIGHT_5TH_FINGER" -> IFingerIdentifier.RIGHT_5TH_FINGER
+        "LEFT_THUMB" -> SampleIdentifier.LEFT_THUMB
+        "LEFT_INDEX_FINGER" -> SampleIdentifier.LEFT_INDEX_FINGER
+        "LEFT_3RD_FINGER" -> SampleIdentifier.LEFT_3RD_FINGER
+        "LEFT_4TH_FINGER" -> SampleIdentifier.LEFT_4TH_FINGER
+        "LEFT_5TH_FINGER" -> SampleIdentifier.LEFT_5TH_FINGER
+        "RIGHT_THUMB" -> SampleIdentifier.RIGHT_THUMB
+        "RIGHT_INDEX_FINGER" -> SampleIdentifier.RIGHT_INDEX_FINGER
+        "RIGHT_3RD_FINGER" -> SampleIdentifier.RIGHT_3RD_FINGER
+        "RIGHT_4TH_FINGER" -> SampleIdentifier.RIGHT_4TH_FINGER
+        "RIGHT_5TH_FINGER" -> SampleIdentifier.RIGHT_5TH_FINGER
         else -> {
-            IFingerIdentifier.LEFT_THUMB
+            SampleIdentifier.LEFT_THUMB
         }
     }
 

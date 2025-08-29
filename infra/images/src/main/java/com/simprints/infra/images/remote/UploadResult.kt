@@ -1,6 +1,6 @@
 package com.simprints.infra.images.remote
 
-import com.simprints.infra.images.model.SecuredImageRef
+import com.simprints.core.domain.image.SecuredImageRef
 
 /**
  * An upload result

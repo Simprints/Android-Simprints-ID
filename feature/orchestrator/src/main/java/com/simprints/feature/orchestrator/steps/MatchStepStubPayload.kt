@@ -1,13 +1,13 @@
 package com.simprints.feature.orchestrator.steps
 
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.step.StepParams
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.matcher.MatchContract
-import com.simprints.matcher.MatchParams
 
 /**
  * Actual matching step payload is based on capture step results, so until the it is done we are storing
@@ -19,28 +19,17 @@ internal data class MatchStepStubPayload(
     val flowType: FlowType,
     val subjectQuery: SubjectQuery,
     val biometricDataSource: BiometricDataSource,
-    val fingerprintSDK: FingerprintConfiguration.BioSdk?,
-    val faceSDK: FaceConfiguration.BioSdk?,
+    val modality: Modality,
+    val sdkType: ModalitySdkType,
 ) : StepParams {
-    fun toFaceStepArgs(
+    fun toStepArgs(
         referenceId: String,
-        samples: List<MatchParams.FaceSample>,
+        samples: List<CaptureSample>,
     ) = MatchContract.getParams(
         referenceId = referenceId,
-        faceSamples = samples,
-        faceSDK = faceSDK,
-        flowType = flowType,
-        subjectQuery = subjectQuery,
-        biometricDataSource = biometricDataSource,
-    )
-
-    fun toFingerprintStepArgs(
-        referenceId: String,
-        samples: List<MatchParams.FingerprintSample>,
-    ) = MatchContract.getParams(
-        referenceId = referenceId,
-        fingerprintSamples = samples,
-        fingerprintSDK = fingerprintSDK,
+        probeSamples = samples,
+        modality = modality,
+        sdkType = sdkType,
         flowType = flowType,
         subjectQuery = subjectQuery,
         biometricDataSource = biometricDataSource,
@@ -53,8 +42,8 @@ internal data class MatchStepStubPayload(
             flowType: FlowType,
             subjectQuery: SubjectQuery,
             biometricDataSource: BiometricDataSource,
-            fingerprintSDK: FingerprintConfiguration.BioSdk? = null,
-            faceSDK: FaceConfiguration.BioSdk? = null,
-        ) = MatchStepStubPayload(flowType, subjectQuery, biometricDataSource, fingerprintSDK, faceSDK)
+            modality: Modality,
+            sdkType: ModalitySdkType,
+        ) = MatchStepStubPayload(flowType, subjectQuery, biometricDataSource, modality, sdkType)
     }
 }

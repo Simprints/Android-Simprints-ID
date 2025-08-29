@@ -2,9 +2,11 @@ package com.simprints.matcher.usecases
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy
 import com.simprints.infra.config.sync.ConfigManager
@@ -15,8 +17,8 @@ import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToM
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent.OneToOneMatchPayload.OneToOneMatchPayloadV4
 import com.simprints.infra.events.session.SessionEventRepository
-import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
+import com.simprints.matcher.MatchResultItem
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
@@ -72,14 +74,24 @@ class SaveMatchEventUseCaseTest {
                 probeReferenceId = "referenceId",
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(subjectId = "subjectId"),
-                probeFaceSamples = listOf(MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3))),
+                probeSamples = listOf(
+                    CaptureSample(
+                        format = "faceId",
+                        template = byteArrayOf(1, 2, 3),
+                        templateQualityScore = 1,
+                        imageRef = null,
+                        modality = Modality.FACE,
+                    ),
+                ),
+                modality = Modality.FACE,
+                sdkType = FaceConfiguration.BioSdk.RANK_ONE,
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
             2,
             "faceMatcherName",
             listOf(
-                FaceMatchResult.Item("guid1", 0.5f),
-                FaceMatchResult.Item("guid2", 0.1f),
+                MatchResultItem("guid1", 0.5f),
+                MatchResultItem("guid2", 0.1f),
             ),
         )
 
@@ -109,21 +121,24 @@ class SaveMatchEventUseCaseTest {
                 probeReferenceId = "referenceId",
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(subjectId = "subjectId"),
-                probeFingerprintSamples = listOf(
-                    MatchParams.FingerprintSample(
-                        IFingerIdentifier.RIGHT_5TH_FINGER,
-                        "format",
-                        byteArrayOf(1, 2, 3),
+                probeSamples = listOf(
+                    CaptureSample(
+                        format = "finger",
+                        template = byteArrayOf(1, 2, 3),
+                        templateQualityScore = 1,
+                        imageRef = null,
+                        modality = Modality.FINGERPRINT,
                     ),
                 ),
-                fingerprintSDK = SECUGEN_SIM_MATCHER,
+                modality = Modality.FINGERPRINT,
+                sdkType = SECUGEN_SIM_MATCHER,
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
             2,
             "faceMatcherName",
             listOf(
-                FaceMatchResult.Item("guid1", 0.5f),
-                FaceMatchResult.Item("guid2", 0.1f),
+                MatchResultItem("guid1", 0.5f),
+                MatchResultItem("guid2", 0.1f),
             ),
         )
 
@@ -151,9 +166,9 @@ class SaveMatchEventUseCaseTest {
             endTime = Timestamp(2L),
             matchParams = MatchParams(
                 probeReferenceId = "referenceId",
-                probeFaceSamples = emptyList(),
-                probeFingerprintSamples = emptyList(),
-                fingerprintSDK = null,
+                probeSamples = emptyList(),
+                modality = Modality.FACE,
+                sdkType = FaceConfiguration.BioSdk.RANK_ONE,
                 flowType = FlowType.IDENTIFY,
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -161,8 +176,8 @@ class SaveMatchEventUseCaseTest {
             candidatesCount = 2,
             matcherName = "faceMatcherName",
             results = listOf(
-                FaceMatchResult.Item("guid1", 0.5f),
-                FaceMatchResult.Item("guid2", 0.1f),
+                MatchResultItem("guid1", 0.5f),
+                MatchResultItem("guid2", 0.1f),
             ),
         )
 
@@ -198,12 +213,14 @@ class SaveMatchEventUseCaseTest {
             MatchParams(
                 probeReferenceId = "referenceId",
                 flowType = FlowType.IDENTIFY,
+                modality = Modality.FACE,
+                sdkType = FaceConfiguration.BioSdk.RANK_ONE,
                 queryForCandidates = SubjectQuery(attendantId = "userId".asTokenizableEncrypted()),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
             0,
             "faceMatcherName",
-            listOf(FaceMatchResult.Item("guid1", 0.5f)),
+            listOf(MatchResultItem("guid1", 0.5f)),
         )
 
         // Then
@@ -224,6 +241,8 @@ class SaveMatchEventUseCaseTest {
             MatchParams(
                 probeReferenceId = "referenceId",
                 flowType = FlowType.IDENTIFY,
+                modality = Modality.FACE,
+                sdkType = FaceConfiguration.BioSdk.RANK_ONE,
                 queryForCandidates = SubjectQuery(moduleId = "moduleId".asTokenizableEncrypted()),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
@@ -251,6 +270,8 @@ class SaveMatchEventUseCaseTest {
                 probeReferenceId = "referenceId",
                 emptyList(),
                 flowType = FlowType.IDENTIFY,
+                modality = Modality.FACE,
+                sdkType = FaceConfiguration.BioSdk.RANK_ONE,
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),

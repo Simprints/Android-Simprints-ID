@@ -1,9 +1,9 @@
 package com.simprints.infra.images.metadata
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.image.Path
 import com.simprints.infra.images.metadata.database.DbImageMetadata
 import com.simprints.infra.images.metadata.database.ImageMetadataDao
-import com.simprints.infra.images.model.Path
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coJustRun

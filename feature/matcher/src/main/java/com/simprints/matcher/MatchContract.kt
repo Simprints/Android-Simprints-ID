@@ -1,8 +1,9 @@
 package com.simprints.matcher
 
 import com.simprints.core.domain.common.FlowType
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 
@@ -11,21 +12,19 @@ object MatchContract {
 
     fun getParams(
         referenceId: String = "",
-        fingerprintSamples: List<MatchParams.FingerprintSample> = emptyList(),
-        faceSamples: List<MatchParams.FaceSample> = emptyList(),
-        fingerprintSDK: FingerprintConfiguration.BioSdk? = null,
-        faceSDK: FaceConfiguration.BioSdk? = null,
+        probeSamples: List<CaptureSample> = emptyList(),
+        modality: Modality,
+        sdkType: ModalitySdkType,
         flowType: FlowType,
         subjectQuery: SubjectQuery,
         biometricDataSource: BiometricDataSource,
     ) = MatchParams(
-        referenceId,
-        faceSamples,
-        faceSDK,
-        fingerprintSamples,
-        fingerprintSDK,
-        flowType,
-        subjectQuery,
-        biometricDataSource,
+        probeReferenceId = referenceId,
+        probeSamples = probeSamples,
+        modality = modality,
+        sdkType = sdkType,
+        flowType = flowType,
+        queryForCandidates = subjectQuery,
+        biometricDataSource = biometricDataSource,
     )
 }

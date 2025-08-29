@@ -32,7 +32,7 @@ data class DbBiometricTemplate(
     val templateData: ByteArray = byteArrayOf(),
     val format: String = "",
     val referenceId: String = "",
-    val modality: Int = Modality.FINGERPRINT.id,
+    val modality: Int = 0, // Defaults to fingerprint
 ) {
     companion object {
         const val TEMPLATE_TABLE_NAME = "DbBiometricTemplate"

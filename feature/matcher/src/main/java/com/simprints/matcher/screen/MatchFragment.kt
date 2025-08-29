@@ -54,7 +54,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
     ) {
         super.onViewCreated(view, savedInstanceState)
         applySystemBarInsets(view)
-        Simber.i("MatchFragment started (isFace=${params.isFaceMatch()})", tag = ORCHESTRATION)
+        Simber.i("MatchFragment started (${params.modality})", tag = ORCHESTRATION)
 
         observeViewModel()
     }

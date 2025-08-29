@@ -13,15 +13,15 @@ import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsAboutBinding
 import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
-import com.simprints.infra.config.store.models.GeneralConfiguration.Modality.FINGERPRINT
-import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.system.Clipboard
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
@@ -86,7 +86,7 @@ internal class AboutFragment : PreferenceFragmentCompat() {
                 "${it.sync.lowerCaseCapitalized()} Sync - ${it.search.lowerCaseCapitalized()} Search"
         }
         viewModel.modalities.observe(viewLifecycleOwner) {
-            getScannerVersionPreference()?.isVisible = it.contains(FINGERPRINT)
+            getScannerVersionPreference()?.isVisible = it.contains(Modality.FINGERPRINT)
         }
         viewModel.recentUserActivity.observe(viewLifecycleOwner) {
             getScannerVersionPreference()?.summary = it.lastScannerVersion

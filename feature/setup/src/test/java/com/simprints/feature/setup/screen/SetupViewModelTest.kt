@@ -2,11 +2,11 @@ package com.simprints.feature.setup.screen
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.jraska.livedata.test
+import com.simprints.core.domain.modality.Modality
 import com.simprints.feature.setup.LocationStore
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
@@ -81,7 +81,11 @@ class SetupViewModelTest {
     fun `should not request location permission if collectLocation is disabled`() = runTest {
         // Given
         coEvery { configManager.getProjectConfiguration().general.collectLocation } returns false
-        coEvery { configManager.getProjectConfiguration().synchronization.down.commCare } returns mockk()
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .synchronization.down.commCare
+        } returns mockk()
 
         // when
         viewModel.start()
@@ -95,7 +99,11 @@ class SetupViewModelTest {
         // Given
         justRun { locationStore.collectLocationInBackground() }
         coEvery { configManager.getProjectConfiguration() } returns mockk<ProjectConfiguration>()
-        coEvery { configManager.getProjectConfiguration().synchronization.down.commCare } returns mockk()
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .synchronization.down.commCare
+        } returns mockk()
 
         // when
         viewModel.locationPermissionCheckDone(granted = true)
@@ -109,7 +117,11 @@ class SetupViewModelTest {
         // Given
         justRun { locationStore.collectLocationInBackground() }
         coEvery { configManager.getProjectConfiguration() } returns mockk<ProjectConfiguration>()
-        coEvery { configManager.getProjectConfiguration().synchronization.down.commCare } returns mockk()
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .synchronization.down.commCare
+        } returns mockk()
 
         // when
         viewModel.locationPermissionCheckDone(granted = false)
@@ -122,7 +134,11 @@ class SetupViewModelTest {
     fun `should request CommCare permission if needed when location permission is granted`() = runTest {
         // Given
         justRun { locationStore.collectLocationInBackground() }
-        coEvery { configManager.getProjectConfiguration().synchronization.down.commCare } returns mockk()
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .synchronization.down.commCare
+        } returns mockk()
 
         // When
         viewModel.locationPermissionCheckDone(true)
@@ -135,7 +151,11 @@ class SetupViewModelTest {
     fun `should request CommCare permission if needed when location permission is not granted`() = runTest {
         // Given
         justRun { locationStore.collectLocationInBackground() }
-        coEvery { configManager.getProjectConfiguration().synchronization.down.commCare } returns mockk()
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .synchronization.down.commCare
+        } returns mockk()
 
         // When
         viewModel.locationPermissionCheckDone(false)
@@ -149,10 +169,7 @@ class SetupViewModelTest {
         // Given
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
-                every { modalities } returns listOf(
-                    GeneralConfiguration.Modality.FINGERPRINT,
-                    GeneralConfiguration.Modality.FACE,
-                )
+                every { modalities } returns listOf(Modality.FINGERPRINT, Modality.FACE)
             }
             every { fingerprint } returns mockk {
                 every { allowedSDKs } returns listOf(FingerprintConfiguration.BioSdk.NEC)
@@ -180,10 +197,7 @@ class SetupViewModelTest {
         // Given
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
-                every { modalities } returns listOf(
-                    GeneralConfiguration.Modality.FINGERPRINT,
-                    GeneralConfiguration.Modality.FACE,
-                )
+                every { modalities } returns listOf(Modality.FINGERPRINT, Modality.FACE)
                 every { fingerprint } returns mockk {
                     every { allowedSDKs } returns listOf(FingerprintConfiguration.BioSdk.NEC)
                     every { nec?.version } returns null
@@ -211,10 +225,7 @@ class SetupViewModelTest {
         // Given
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
-                every { modalities } returns listOf(
-                    GeneralConfiguration.Modality.FINGERPRINT,
-                    GeneralConfiguration.Modality.FACE,
-                )
+                every { modalities } returns listOf(Modality.FINGERPRINT, Modality.FACE)
                 every { fingerprint } returns mockk {
                     every { allowedSDKs } returns listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
                 }
@@ -236,10 +247,7 @@ class SetupViewModelTest {
         // Given
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
-                every { modalities } returns listOf(
-                    GeneralConfiguration.Modality.FINGERPRINT,
-                    GeneralConfiguration.Modality.FACE,
-                )
+                every { modalities } returns listOf(Modality.FINGERPRINT, Modality.FACE)
             }
             every { fingerprint } returns mockk {
                 every { allowedSDKs } returns listOf(FingerprintConfiguration.BioSdk.NEC)

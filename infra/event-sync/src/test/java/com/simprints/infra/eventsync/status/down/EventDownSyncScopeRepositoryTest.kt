@@ -2,7 +2,7 @@ package com.simprints.infra.eventsync.status.down
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.Partitioning
-import com.simprints.core.domain.modality.Modes
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.authstore.AuthStore
@@ -92,7 +92,7 @@ internal class EventDownSyncScopeRepositoryTest {
     @Test
     fun buildProjectDownSyncScope() = runTest(UnconfinedTestDispatcher()) {
         val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
-            listOf(Modes.FINGERPRINT),
+            listOf(Modality.FINGERPRINT),
             DEFAULT_MODULES.toList(),
             Partitioning.GLOBAL,
         )
@@ -106,7 +106,7 @@ internal class EventDownSyncScopeRepositoryTest {
         every { tokenizationProcessor.encrypt(any(), any(), any()) } returns TokenizableString.Tokenized(DEFAULT_USER_ID.value)
 
         val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
-            listOf(Modes.FINGERPRINT),
+            listOf(Modality.FINGERPRINT),
             DEFAULT_MODULES.toList(),
             Partitioning.USER,
         )
@@ -120,7 +120,7 @@ internal class EventDownSyncScopeRepositoryTest {
         every { tokenizationProcessor.encrypt(any(), any(), any()) } returns TokenizableString.Tokenized(DEFAULT_USER_ID.value)
 
         val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
-            listOf(Modes.FINGERPRINT),
+            listOf(Modality.FINGERPRINT),
             DEFAULT_MODULES.toList(),
             Partitioning.USER,
         )
@@ -133,7 +133,7 @@ internal class EventDownSyncScopeRepositoryTest {
         every { authStore.signedInUserId } returns TokenizableString.Tokenized(DEFAULT_USER_ID.value)
 
         val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
-            listOf(Modes.FINGERPRINT),
+            listOf(Modality.FINGERPRINT),
             DEFAULT_MODULES.toList(),
             Partitioning.USER,
         )
@@ -144,7 +144,7 @@ internal class EventDownSyncScopeRepositoryTest {
     @Test
     fun buildModuleDownSyncScope() = runTest(UnconfinedTestDispatcher()) {
         val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
-            listOf(Modes.FINGERPRINT),
+            listOf(Modality.FINGERPRINT),
             DEFAULT_MODULES.toList(),
             Partitioning.MODULE,
         )
@@ -158,7 +158,7 @@ internal class EventDownSyncScopeRepositoryTest {
 
         assertThrows<MissingArgumentForDownSyncScopeException> {
             eventDownSyncScopeRepository.getDownSyncScope(
-                listOf(Modes.FINGERPRINT),
+                listOf(Modality.FINGERPRINT),
                 DEFAULT_MODULES.toList(),
                 Partitioning.GLOBAL,
             )
@@ -174,7 +174,7 @@ internal class EventDownSyncScopeRepositoryTest {
 
         assertThrows<MissingArgumentForDownSyncScopeException> {
             eventDownSyncScopeRepository.getDownSyncScope(
-                listOf(Modes.FINGERPRINT),
+                listOf(Modality.FINGERPRINT),
                 DEFAULT_MODULES.toList(),
                 Partitioning.USER,
             )
@@ -201,14 +201,14 @@ internal class EventDownSyncScopeRepositoryTest {
     fun deleteOperations_shouldDeleteOpsFromDb() = runTest {
         eventDownSyncScopeRepository.deleteOperations(
             DEFAULT_MODULES.toList(),
-            listOf(Modes.FINGERPRINT),
+            listOf(Modality.FINGERPRINT),
         )
 
         DEFAULT_MODULES.forEach { moduleId ->
             val scope = SubjectModuleScope(
                 DEFAULT_PROJECT_ID,
                 listOf(moduleId),
-                listOf(Modes.FINGERPRINT),
+                listOf(Modality.FINGERPRINT),
             )
             coVerify(exactly = 1) {
                 downSyncOperationOperationDao.delete(
@@ -254,7 +254,7 @@ internal class EventDownSyncScopeRepositoryTest {
         assertThat(syncScope).isInstanceOf(SubjectProjectScope::class.java)
         with((syncScope as SubjectProjectScope)) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
-            assertThat(modes).isEqualTo(listOf(Modes.FINGERPRINT))
+            assertThat(modes).isEqualTo(listOf(Modality.FINGERPRINT))
         }
     }
 
@@ -263,7 +263,7 @@ internal class EventDownSyncScopeRepositoryTest {
         with((syncScope as SubjectUserScope)) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
             assertThat(attendantId).isEqualTo(DEFAULT_USER_ID.value)
-            assertThat(modes).isEqualTo(listOf(Modes.FINGERPRINT))
+            assertThat(modes).isEqualTo(listOf(Modality.FINGERPRINT))
         }
     }
 
@@ -275,7 +275,7 @@ internal class EventDownSyncScopeRepositoryTest {
                 DEFAULT_MODULE_ID.value,
                 DEFAULT_MODULE_ID_2.value,
             )
-            assertThat(modes).isEqualTo(listOf(Modes.FINGERPRINT))
+            assertThat(modes).isEqualTo(listOf(Modality.FINGERPRINT))
         }
     }
 

@@ -1,11 +1,11 @@
 package com.simprints.infra.enrolment.records.repository.local
 
 import android.content.Context
-import androidx.test.core.app.ApplicationProvider
-import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import androidx.test.core.app.*
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.Sample
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.models.Project
@@ -16,9 +16,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQue
 import com.simprints.infra.enrolment.records.room.store.SubjectsDatabaseFactory
 import com.simprints.infra.security.keyprovider.LocalDbKey
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -66,44 +64,50 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     private val date = Date() // Use a fixed date for consistent timestamps in tests
 
     // Samples defined first
-    private val faceSample1 = FaceSample(
+    private val faceSample1 = Sample(
         template = byteArrayOf(1, 2, 3),
         format = ROC_1_FORMAT,
         referenceId = "ref-face-1",
         id = "face-uuid-1",
+        modality = Modality.FACE,
     )
-    private val faceSample2 = FaceSample(
+    private val faceSample2 = Sample(
         template = byteArrayOf(4, 5, 6),
         format = ROC_3_FORMAT,
         referenceId = "ref-face-2",
         id = "face-uuid-2",
+        modality = Modality.FACE,
     )
-    private val faceSample3 = FaceSample(
+    private val faceSample3 = Sample(
         template = byteArrayOf(7, 8, 9),
         format = ROC_1_FORMAT,
         referenceId = "ref-face-3-p2",
         id = "face-uuid-3-p2",
+        modality = Modality.FACE,
     )
-    private val fingerprintSample1 = FingerprintSample(
-        fingerIdentifier = IFingerIdentifier.LEFT_THUMB,
+    private val fingerprintSample1 = Sample(
+        identifier = SampleIdentifier.LEFT_THUMB,
         template = byteArrayOf(10, 11),
         format = NEC_FORMAT,
         referenceId = "ref-fp-1",
         id = "fp-uuid-1",
+        modality = Modality.FINGERPRINT,
     )
-    private val fingerprintSample2 = FingerprintSample(
-        fingerIdentifier = IFingerIdentifier.RIGHT_THUMB,
+    private val fingerprintSample2 = Sample(
+        identifier = SampleIdentifier.RIGHT_THUMB,
         template = byteArrayOf(12, 13),
         format = ISO_FORMAT,
         referenceId = "ref-fp-2",
         id = "fp-uuid-2",
+        modality = Modality.FINGERPRINT,
     )
-    private val fingerprintSample3 = FingerprintSample(
-        fingerIdentifier = IFingerIdentifier.LEFT_INDEX_FINGER,
+    private val fingerprintSample3 = Sample(
+        identifier = SampleIdentifier.LEFT_INDEX_FINGER,
         template = byteArrayOf(14, 15),
         format = NEC_FORMAT,
         referenceId = "ref-fp-3-p2",
         id = "fp-uuid-3-p2",
+        modality = Modality.FINGERPRINT,
     )
 
     // Subjects defined using the samples

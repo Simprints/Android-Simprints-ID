@@ -3,9 +3,9 @@ package com.simprints.infra.images
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.image.Path
+import com.simprints.core.domain.image.SecuredImageRef
 import com.simprints.infra.images.local.ImageLocalDataSourceImpl
-import com.simprints.infra.images.model.Path
-import com.simprints.infra.images.model.SecuredImageRef
 import io.mockk.mockk
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest

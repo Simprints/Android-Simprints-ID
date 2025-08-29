@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.sync.common
 
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
@@ -90,8 +90,8 @@ class SubjectFactory @Inject constructor(
         moduleId: TokenizableString,
         createdAt: Date? = null,
         updatedAt: Date? = null,
-        fingerprintSamples: List<FingerprintSample> = emptyList(),
-        faceSamples: List<FaceSample> = emptyList(),
+        fingerprintSamples: List<Sample> = emptyList(),
+        faceSamples: List<Sample> = emptyList(),
     ) = Subject(
         subjectId = subjectId,
         projectId = projectId,
@@ -106,18 +106,26 @@ class SubjectFactory @Inject constructor(
     private fun extractFingerprintSamples(fingerprintResponse: FingerprintCaptureResult) =
         fingerprintResponse.results.mapNotNull { captureResult ->
             captureResult.sample?.let { sample ->
-                FingerprintSample(
-                    captureResult.identifier,
-                    sample.template,
-                    sample.format,
-                    fingerprintResponse.referenceId,
+                Sample(
+                    identifier = captureResult.identifier,
+                    template = sample.template,
+                    format = sample.format,
+                    referenceId = fingerprintResponse.referenceId,
+                    modality = Modality.FINGERPRINT,
                 )
             }
         }
 
     private fun extractFaceSamples(faceResponse: FaceCaptureResult) = faceResponse.results
         .mapNotNull { it.sample }
-        .map { FaceSample(it.template, it.format, faceResponse.referenceId) }
+        .map {
+            Sample(
+                template = it.template,
+                format = it.format,
+                referenceId = faceResponse.referenceId,
+                modality = Modality.FACE,
+            )
+        }
 
     fun extractFingerprintSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) = biometricReferences
         ?.filterIsInstance<FingerprintReference>()
@@ -129,11 +137,12 @@ class SubjectFactory @Inject constructor(
         template: FingerprintTemplate,
         format: String,
         referenceId: String,
-    ): FingerprintSample = FingerprintSample(
-        fingerIdentifier = template.finger,
+    ): Sample = Sample(
+        identifier = template.finger,
         template = encodingUtils.base64ToBytes(template.template),
         format = format,
         referenceId = referenceId,
+        modality = Modality.FINGERPRINT,
     )
 
     fun extractFaceSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) = biometricReferences
@@ -146,9 +155,10 @@ class SubjectFactory @Inject constructor(
         template: FaceTemplate,
         format: String,
         referenceId: String,
-    ) = FaceSample(
+    ) = Sample(
         template = encodingUtils.base64ToBytes(template.template),
         format = format,
         referenceId = referenceId,
+        modality = Modality.FACE,
     )
 }

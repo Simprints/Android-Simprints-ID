@@ -1,7 +1,7 @@
 package com.simprints.infra.config.store.local.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.core.domain.modality.Modality
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.testtools.generalConfiguration
 import com.simprints.infra.config.store.testtools.protoGeneralConfiguration
@@ -18,8 +18,8 @@ class GeneralConfigurationTest {
     @Test
     fun `should map correctly the Modality enums`() {
         val mapping = mapOf(
-            ProtoGeneralConfiguration.Modality.FACE to GeneralConfiguration.Modality.FACE,
-            ProtoGeneralConfiguration.Modality.FINGERPRINT to GeneralConfiguration.Modality.FINGERPRINT,
+            ProtoGeneralConfiguration.Modality.FACE to Modality.FACE,
+            ProtoGeneralConfiguration.Modality.FINGERPRINT to Modality.FINGERPRINT,
         )
 
         mapping.forEach {

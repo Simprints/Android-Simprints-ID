@@ -11,6 +11,7 @@ import androidx.test.espresso.matcher.PreferenceMatchers.*
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.modality.Modality
 import com.simprints.feature.dashboard.R
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
@@ -60,7 +61,7 @@ class SettingsFragmentTest {
 
     @Test
     fun `should display the toolbar`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FINGERPRINT))
+        mockModalities(listOf(Modality.FINGERPRINT))
 
         launchFragmentInHiltContainer<SettingsFragment>()
 
@@ -69,7 +70,7 @@ class SettingsFragmentTest {
 
     @Test
     fun `should hide the fingerprint preference if the modalities doesn't contain Fingerprint`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockModalities(listOf(Modality.FACE))
 
         launchFragmentInHiltContainer<SettingsFragment>()
 
@@ -78,7 +79,7 @@ class SettingsFragmentTest {
 
     @Test
     fun `should display the fingerprint preference if the modalities contains Fingerprint`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FINGERPRINT))
+        mockModalities(listOf(Modality.FINGERPRINT))
 
         launchFragmentInHiltContainer<SettingsFragment>()
 
@@ -87,7 +88,7 @@ class SettingsFragmentTest {
 
     @Test
     fun `should redirect to the sync info fragment when clicking on the sync info preference`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FINGERPRINT))
+        mockModalities(listOf(Modality.FINGERPRINT))
 
         val navController = testNavController(R.navigation.graph_dashboard, R.id.settingsFragment)
 
@@ -99,7 +100,7 @@ class SettingsFragmentTest {
 
     @Test
     fun `should redirect to the finger selection fragment when clicking on the finger selection preference`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FINGERPRINT))
+        mockModalities(listOf(Modality.FINGERPRINT))
 
         val navController = testNavController(R.navigation.graph_dashboard, R.id.settingsFragment)
 
@@ -111,7 +112,7 @@ class SettingsFragmentTest {
 
     @Test
     fun `should redirect to the about fragment when clicking on the about preference`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockModalities(listOf(Modality.FACE))
 
         val navController = testNavController(R.navigation.graph_dashboard, R.id.settingsFragment)
 
@@ -128,14 +129,14 @@ class SettingsFragmentTest {
 
     @Test
     fun `should add the selected language as the summary of the language preference`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockModalities(listOf(Modality.FACE))
 
         launchFragmentInHiltContainer<SettingsFragment>()
 
         onView(withText("English")).check(matches(isDisplayed()))
     }
 
-    private fun mockModalities(modalities: List<GeneralConfiguration.Modality>) {
+    private fun mockModalities(modalities: List<Modality>) {
         every { configuration.modalities } returns modalities
     }
 }

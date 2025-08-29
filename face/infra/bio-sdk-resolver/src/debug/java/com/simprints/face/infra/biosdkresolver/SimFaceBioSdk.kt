@@ -1,8 +1,9 @@
 package com.simprints.face.infra.biosdkresolver
 
 import com.simprints.biometrics.simface.SimFace
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.Sample
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
-import com.simprints.face.infra.basebiosdk.matching.FaceSample
 import com.simprints.face.infra.simface.detection.SimFaceDetector
 import com.simprints.face.infra.simface.initialization.SimFaceInitializer
 import com.simprints.face.infra.simface.matching.SimFaceMatcher
@@ -21,5 +22,5 @@ class SimFaceBioSdk @Inject constructor(
 
     override fun matcherName(): String = "SIM_FACE"
 
-    override fun createMatcher(probeSamples: List<FaceSample>): FaceMatcher = SimFaceMatcher(simFace, probeSamples)
+    override fun createMatcher(probeSamples: List<CaptureSample>): FaceMatcher = SimFaceMatcher(simFace, probeSamples)
 }

@@ -3,12 +3,12 @@ package com.simprints.infra.images.remote.firestore
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
 import com.google.firebase.storage.FirebaseStorage
+import com.simprints.core.domain.image.Path
+import com.simprints.core.domain.image.SecuredImageRef
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.metadata.ImageMetadataStore
-import com.simprints.infra.images.model.Path
-import com.simprints.infra.images.model.SecuredImageRef
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.tasks.await

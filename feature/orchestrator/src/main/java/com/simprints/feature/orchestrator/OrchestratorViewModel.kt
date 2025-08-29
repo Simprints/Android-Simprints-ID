@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.step.StepResult
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -35,14 +36,12 @@ import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.setup.LocationStore
 import com.simprints.fingerprint.capture.FingerprintCaptureParams
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppResponse
-import com.simprints.matcher.MatchParams
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.io.Serializable
@@ -61,7 +60,7 @@ internal class OrchestratorViewModel @Inject constructor(
     private val mapStepsForLastBiometrics: MapStepsForLastBiometricEnrolUseCase,
 ) : ViewModel() {
     var isRequestProcessed = false
-    private var modalities = emptySet<GeneralConfiguration.Modality>()
+    private var modalities = emptySet<Modality>()
     private var steps = emptyList<Step>()
     private var actionRequest: ActionRequest? = null
 
@@ -216,18 +215,17 @@ internal class OrchestratorViewModel @Inject constructor(
                 if (step.id != StepId.FACE_MATCHER) {
                     false
                 } else {
-                    val stepSdk = step.params?.let { it as? MatchStepStubPayload }?.faceSDK
+                    val stepSdk = step.params?.let { it as? MatchStepStubPayload }?.sdkType
                     stepSdk == captureParams?.faceSDK
                 }
             }
 
             if (matchingStep != null) {
-                val faceSamples = result.results
-                    .mapNotNull { it.sample }
-                    .map { MatchParams.FaceSample(it.faceId, it.template) }
+                val faceSamples = result.results.mapNotNull { it.sample }
+
                 val newPayload = matchingStep.params
                     ?.let { it as? MatchStepStubPayload }
-                    ?.toFaceStepArgs(result.referenceId, faceSamples)
+                    ?.toStepArgs(result.referenceId, faceSamples)
 
                 if (newPayload != null) {
                     matchingStep.params = newPayload
@@ -241,24 +239,16 @@ internal class OrchestratorViewModel @Inject constructor(
                 if (step.id != StepId.FINGERPRINT_MATCHER) {
                     false
                 } else {
-                    val stepSdk = step.params?.let { it as? MatchStepStubPayload }?.fingerprintSDK
+                    val stepSdk = step.params?.let { it as? MatchStepStubPayload }?.sdkType
                     stepSdk == captureParams?.fingerprintSDK
                 }
             }
 
             if (matchingStep != null) {
-                val fingerprintSamples = result.results
-                    .mapNotNull { it.sample }
-                    .map {
-                        MatchParams.FingerprintSample(
-                            fingerId = it.fingerIdentifier,
-                            format = it.format,
-                            template = it.template,
-                        )
-                    }
+                val fingerprintSamples = result.results.mapNotNull { it.sample }
                 val newPayload = matchingStep.params
                     ?.let { it as? MatchStepStubPayload }
-                    ?.toFingerprintStepArgs(result.referenceId, fingerprintSamples)
+                    ?.toStepArgs(result.referenceId, fingerprintSamples)
 
                 if (newPayload != null) {
                     matchingStep.params = newPayload

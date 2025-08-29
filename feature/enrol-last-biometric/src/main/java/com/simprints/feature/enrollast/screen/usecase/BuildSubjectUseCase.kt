@@ -1,14 +1,11 @@
 package com.simprints.feature.enrollast.screen.usecase
 
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.Sample
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
-import com.simprints.feature.enrollast.FaceTemplateCaptureResult
-import com.simprints.feature.enrollast.FingerTemplateCaptureResult
-import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.eventsync.sync.common.SubjectFactory
 import java.util.Date
@@ -25,47 +22,29 @@ internal class BuildSubjectUseCase @Inject constructor(
         params.userId,
         params.moduleId,
         createdAt = Date(timeHelper.now().ms),
-        fingerprintSamples = getFingerprintCaptureResult(params.steps)
-            ?.let { result -> result.results.map { fingerprintSample(result.referenceId, it) } }
+        fingerprintSamples = getCaptureResult(params.steps, Modality.FINGERPRINT)
+            ?.let { result -> result.results.map { getSample(result.referenceId, it) } }
             .orEmpty(),
-        faceSamples = getFaceCaptureResult(params.steps)
-            ?.let { result -> result.results.map { faceSample(result.referenceId, it) } }
+        faceSamples = getCaptureResult(params.steps, Modality.FACE)
+            ?.let { result -> result.results.map { getSample(result.referenceId, it) } }
             .orEmpty(),
     )
 
-    private fun getFingerprintCaptureResult(steps: List<EnrolLastBiometricStepResult>) = steps
-        .filterIsInstance<EnrolLastBiometricStepResult.FingerprintCaptureResult>()
-        .firstOrNull()
+    private fun getCaptureResult(
+        steps: List<EnrolLastBiometricStepResult>,
+        modality: Modality,
+    ) = steps
+        .filterIsInstance<EnrolLastBiometricStepResult.CaptureResult>()
+        .firstOrNull { it.modality == modality }
 
-    private fun getFaceCaptureResult(steps: List<EnrolLastBiometricStepResult>) = steps
-        .filterIsInstance<EnrolLastBiometricStepResult.FaceCaptureResult>()
-        .firstOrNull()
-
-    private fun fingerprintSample(
+    private fun getSample(
         referenceId: String,
-        result: FingerTemplateCaptureResult,
-    ) = FingerprintSample(
-        fromDomainToModuleApi(result.finger),
-        result.template,
-        result.format,
-        referenceId,
+        result: CaptureSample,
+    ) = Sample(
+        identifier = result.identifier,
+        template = result.template,
+        format = result.format,
+        referenceId = referenceId,
+        modality = result.modality,
     )
-
-    private fun fromDomainToModuleApi(finger: Finger) = when (finger) {
-        Finger.RIGHT_5TH_FINGER -> IFingerIdentifier.RIGHT_5TH_FINGER
-        Finger.RIGHT_4TH_FINGER -> IFingerIdentifier.RIGHT_4TH_FINGER
-        Finger.RIGHT_3RD_FINGER -> IFingerIdentifier.RIGHT_3RD_FINGER
-        Finger.RIGHT_INDEX_FINGER -> IFingerIdentifier.RIGHT_INDEX_FINGER
-        Finger.RIGHT_THUMB -> IFingerIdentifier.RIGHT_THUMB
-        Finger.LEFT_THUMB -> IFingerIdentifier.LEFT_THUMB
-        Finger.LEFT_INDEX_FINGER -> IFingerIdentifier.LEFT_INDEX_FINGER
-        Finger.LEFT_3RD_FINGER -> IFingerIdentifier.LEFT_3RD_FINGER
-        Finger.LEFT_4TH_FINGER -> IFingerIdentifier.LEFT_4TH_FINGER
-        Finger.LEFT_5TH_FINGER -> IFingerIdentifier.LEFT_5TH_FINGER
-    }
-
-    private fun faceSample(
-        referenceId: String,
-        result: FaceTemplateCaptureResult,
-    ) = FaceSample(result.template, result.format, referenceId)
 }

@@ -13,16 +13,15 @@ import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.dashboard.DashboardActivity
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsBinding
 import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
-import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.config.store.models.GeneralConfiguration.Modality.FINGERPRINT
-import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
@@ -92,8 +91,8 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         bindClickListeners()
     }
 
-    private fun enableFingerprintSettings(modalities: List<GeneralConfiguration.Modality>) {
-        getFingerSelectionPreference()?.isVisible = modalities.contains(FINGERPRINT)
+    private fun enableFingerprintSettings(modalities: List<Modality>) {
+        getFingerSelectionPreference()?.isVisible = modalities.contains(Modality.FINGERPRINT)
     }
 
     private fun bindClickListeners() {

@@ -2,7 +2,8 @@ package com.simprints.fingerprint.capture.screen
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.image.Path
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModelTest.MockAcquireImageResult.OK
 import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModelTest.MockCaptureFingerprintResponse.BAD_SCAN
@@ -41,7 +42,6 @@ import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStr
 import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.BASIC
 import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.LIVE_QUALITY_FEEDBACK
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.images.model.Path
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.assertEventNotReceived
 import com.simprints.testtools.common.livedata.assertEventReceived
@@ -854,9 +854,9 @@ class FingerprintCaptureViewModelTest {
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(3)
             assertThat(actualFingerprints?.results?.map { it.identifier }).containsExactly(
-                IFingerIdentifier.LEFT_THUMB,
-                IFingerIdentifier.RIGHT_THUMB,
-                IFingerIdentifier.RIGHT_INDEX_FINGER,
+                SampleIdentifier.LEFT_THUMB,
+                SampleIdentifier.RIGHT_THUMB,
+                SampleIdentifier.RIGHT_INDEX_FINGER,
             )
             actualFingerprints?.results?.forEach {
                 assertThat(it.sample?.template).isEqualTo(TEMPLATE)
@@ -967,9 +967,9 @@ class FingerprintCaptureViewModelTest {
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(3)
             assertThat(actualFingerprints?.results?.map { it.identifier }).containsExactly(
-                IFingerIdentifier.LEFT_THUMB,
-                IFingerIdentifier.RIGHT_THUMB,
-                IFingerIdentifier.RIGHT_INDEX_FINGER,
+                SampleIdentifier.LEFT_THUMB,
+                SampleIdentifier.RIGHT_THUMB,
+                SampleIdentifier.RIGHT_INDEX_FINGER,
             )
             actualFingerprints?.results?.forEach {
                 assertThat(it.sample?.template).isEqualTo(TEMPLATE)
@@ -1062,9 +1062,9 @@ class FingerprintCaptureViewModelTest {
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(3)
             assertThat(actualFingerprints?.results?.map { it.identifier }).containsExactly(
-                IFingerIdentifier.LEFT_THUMB,
-                IFingerIdentifier.LEFT_INDEX_FINGER,
-                IFingerIdentifier.RIGHT_THUMB,
+                SampleIdentifier.LEFT_THUMB,
+                SampleIdentifier.LEFT_INDEX_FINGER,
+                SampleIdentifier.RIGHT_THUMB,
             )
             actualFingerprints?.results?.forEach {
                 assertThat(it.sample?.template).isEqualTo(TEMPLATE)
@@ -1563,14 +1563,14 @@ class FingerprintCaptureViewModelTest {
 
     companion object {
         val TWO_FINGERS_IDS = listOf(
-            IFingerIdentifier.LEFT_THUMB,
-            IFingerIdentifier.LEFT_INDEX_FINGER,
+            SampleIdentifier.LEFT_THUMB,
+            SampleIdentifier.LEFT_INDEX_FINGER,
         )
         val FOUR_FINGERS_IDS = listOf(
-            IFingerIdentifier.LEFT_THUMB,
-            IFingerIdentifier.LEFT_INDEX_FINGER,
-            IFingerIdentifier.RIGHT_THUMB,
-            IFingerIdentifier.RIGHT_INDEX_FINGER,
+            SampleIdentifier.LEFT_THUMB,
+            SampleIdentifier.LEFT_INDEX_FINGER,
+            SampleIdentifier.RIGHT_THUMB,
+            SampleIdentifier.RIGHT_INDEX_FINGER,
         )
 
         const val GOOD_QUALITY = 80
@@ -1578,8 +1578,8 @@ class FingerprintCaptureViewModelTest {
         const val DIFFERENT_GOOD_QUALITY = 80
         const val BAD_QUALITY = 20
 
-        val TEMPLATE = FingerprintGenerator.generateRandomFingerprint().template
-        val DIFFERENT_TEMPLATE = FingerprintGenerator.generateRandomFingerprint().template
+        val TEMPLATE = FingerprintGenerator.generateRandomFingerprintTemplate()
+        val DIFFERENT_TEMPLATE = FingerprintGenerator.generateRandomFingerprintTemplate()
 
         val IMAGE = byteArrayOf(0x05, 0x06, 0x07, 0x08)
 

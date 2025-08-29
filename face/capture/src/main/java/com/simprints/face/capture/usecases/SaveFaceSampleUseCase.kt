@@ -1,9 +1,9 @@
 package com.simprints.face.capture.usecases
 
-import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.core.domain.image.SecuredImageRef
+import com.simprints.core.domain.modality.Modality
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.images.ImageRepository
-import com.simprints.infra.images.model.SecuredImageRef
 import javax.inject.Inject
 
 internal class SaveFaceSampleUseCase @Inject constructor(
@@ -23,7 +23,7 @@ internal class SaveFaceSampleUseCase @Inject constructor(
         return coreImageRepository.storeSample(
             projectId = sessionScope.projectId,
             sessionId = sessionScope.id,
-            modality = GeneralConfiguration.Modality.FACE,
+            modality = Modality.FACE,
             sampleId = captureEventId,
             fileExtension = "jpg",
             sampleBytes = imageBytes,

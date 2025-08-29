@@ -2,12 +2,12 @@ package com.simprints.feature.consent.screens.consent
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.exitform.ExitFormResult
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.event.domain.models.ConsentEvent
@@ -46,7 +46,7 @@ class ConsentViewModelTest {
     @MockK
     private lateinit var eventRepository: SessionEventRepository
 
-    private val defaultModalityList = listOf(GeneralConfiguration.Modality.FACE)
+    private val defaultModalityList = listOf(Modality.FACE)
 
     private lateinit var vm: ConsentViewModel
 

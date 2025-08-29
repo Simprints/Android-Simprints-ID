@@ -1,9 +1,9 @@
 package com.simprints.feature.consent.screens.consent.helpers
 
 import android.content.Context
+import com.simprints.core.domain.modality.Modality
 import com.simprints.feature.consent.ConsentType
 import com.simprints.infra.config.store.models.ConsentConfiguration
-import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.resources.R
 
 internal data class ParentalConsentTextHelper(
@@ -113,7 +113,6 @@ internal data class ParentalConsentTextHelper(
     ) = when (modalities.first()) {
         Modality.FACE -> context.getString(R.string.consent_biometrics_parental_face)
         Modality.FINGERPRINT -> context.getString(R.string.consent_biometrics_parental_fingerprint)
-        else -> ""
     }
 
     private fun getModalitySpecificAccessText(
@@ -134,6 +133,5 @@ internal data class ParentalConsentTextHelper(
     ) = when (modalities.first()) {
         Modality.FACE -> context.getString(R.string.consent_biometrics_access_face)
         Modality.FINGERPRINT -> context.getString(R.string.consent_biometrics_access_fingerprint)
-        else -> ""
     }
 }

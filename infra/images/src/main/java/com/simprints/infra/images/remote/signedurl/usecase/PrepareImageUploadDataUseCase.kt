@@ -1,8 +1,8 @@
 package com.simprints.infra.images.remote.signedurl.usecase
 
+import com.simprints.core.domain.image.SecuredImageRef
 import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.metadata.ImageMetadataStore
-import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.remote.signedurl.SampleUploadData
 import com.simprints.infra.images.usecase.CalculateFileMd5AndSizeUseCase
 import com.simprints.infra.images.usecase.SamplePathConverter

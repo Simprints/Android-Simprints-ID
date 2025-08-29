@@ -1,6 +1,6 @@
-package com.simprints.infra.images.model
+package com.simprints.core.domain.image
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth
 import org.junit.Test
 import java.io.File
 
@@ -9,7 +9,7 @@ class PathTest {
     fun shouldComposePathOutOfString() {
         val path = Path("dir${File.separator}file.txt")
 
-        assertThat(path.compose()).isEqualTo("dir${File.separator}file.txt")
+        Truth.assertThat(path.compose()).isEqualTo("dir${File.separator}file.txt")
     }
 
     @Test
@@ -17,7 +17,7 @@ class PathTest {
         val dirs = arrayOf("dir1", "dir2", "file.txt")
         val path = Path(dirs)
 
-        assertThat(path.compose()).isEqualTo("dir1${File.separator}dir2${File.separator}file.txt")
+        Truth.assertThat(path.compose()).isEqualTo("dir1${File.separator}dir2${File.separator}file.txt")
     }
 
     @Test
@@ -33,9 +33,10 @@ class PathTest {
 
         val result = Path.combine(first, subDirs)
 
-        assertThat(
-            result.compose(),
-        ).isEqualTo("${File.separator}home${File.separator}test${File.separator}dir1${File.separator}dir2${File.separator}file.txt")
+        Truth
+            .assertThat(
+                result.compose(),
+            ).isEqualTo("${File.separator}home${File.separator}test${File.separator}dir1${File.separator}dir2${File.separator}file.txt")
     }
 
     @Test
@@ -45,7 +46,7 @@ class PathTest {
 
         val actual = Path.parse(pathString).compose()
 
-        assertThat(actual).isEqualTo("my${File.separator}test${File.separator}directory")
+        Truth.assertThat(actual).isEqualTo("my${File.separator}test${File.separator}directory")
     }
 
     @Test
@@ -62,7 +63,7 @@ class PathTest {
         val subset = arrayOf("dir1", "dir2")
         val actual = originalPath.remove(subset).compose()
 
-        assertThat(actual).isEqualTo("dir3${File.separator}file.txt")
+        Truth.assertThat(actual).isEqualTo("dir3${File.separator}file.txt")
     }
 
     @Test
@@ -78,7 +79,7 @@ class PathTest {
 
         val actual = originalPath.remove("dir700").compose()
 
-        assertThat(actual).isEqualTo("dir1${File.separator}dir2${File.separator}dir3${File.separator}file.txt")
+        Truth.assertThat(actual).isEqualTo("dir1${File.separator}dir2${File.separator}dir3${File.separator}file.txt")
     }
 
     @Test
@@ -96,7 +97,7 @@ class PathTest {
             Path(arrayOf("dir1", "dir2"))
         val actual = originalPath.remove(subPath).compose()
 
-        assertThat(actual).isEqualTo("dir3${File.separator}file.txt")
+        Truth.assertThat(actual).isEqualTo("dir3${File.separator}file.txt")
     }
 
     @Test
@@ -113,6 +114,6 @@ class PathTest {
         val subPath = Path("dir700")
         val actual = originalPath.remove(subPath).compose()
 
-        assertThat(actual).isEqualTo("dir1${File.separator}dir2${File.separator}dir3${File.separator}file.txt")
+        Truth.assertThat(actual).isEqualTo("dir1${File.separator}dir2${File.separator}dir3${File.separator}file.txt")
     }
 }

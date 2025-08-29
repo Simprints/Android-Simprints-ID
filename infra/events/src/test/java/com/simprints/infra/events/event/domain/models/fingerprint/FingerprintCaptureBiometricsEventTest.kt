@@ -1,7 +1,7 @@
 package com.simprints.infra.events.event.domain.models.fingerprint
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.sampledata.SampleDefaults
 import org.junit.Test
@@ -11,7 +11,7 @@ class FingerprintCaptureBiometricsEventTest {
     fun create_FingerprintCaptureBiometricsEvent() {
         val fingerArg =
             FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
-                IFingerIdentifier.LEFT_3RD_FINGER,
+                SampleIdentifier.LEFT_3RD_FINGER,
                 "template",
                 1,
                 "ISO_19794_2",

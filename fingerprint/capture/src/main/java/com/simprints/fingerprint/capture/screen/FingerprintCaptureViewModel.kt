@@ -6,7 +6,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.image.Path
+import com.simprints.core.domain.image.SecuredImageRef
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
@@ -50,8 +54,6 @@ import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStr
 import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
 import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.LIVE_QUALITY_FEEDBACK
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.images.model.Path
-import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -140,7 +142,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private val _finishWithFingerprints =
         MutableLiveData<LiveDataEventWithContent<FingerprintCaptureResult>>()
 
-    private lateinit var originalFingerprintsToCapture: List<IFingerIdentifier>
+    private lateinit var originalFingerprintsToCapture: List<SampleIdentifier>
     private val captureEventIds: MutableMap<CaptureId, String> = mutableMapOf()
     private val imageRefs: MutableMap<CaptureId, SecuredImageRef?> = mutableMapOf()
     private var lastCaptureStartedAt: Timestamp = Timestamp(0L)
@@ -167,7 +169,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     private fun start(
-        fingerprintsToCapture: List<IFingerIdentifier>,
+        fingerprintsToCapture: List<SampleIdentifier>,
         fingerprintSdk: FingerprintConfiguration.BioSdk,
     ) {
         if (!hasStarted) {
@@ -274,7 +276,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         }
     }
 
-    private fun setStartingState(fingerprintsToCapture: List<IFingerIdentifier>) {
+    private fun setStartingState(fingerprintsToCapture: List<SampleIdentifier>) {
         val initialState = CollectFingerprintsState.EMPTY.copy(
             fingerStates = getStartState(fingerprintsToCapture),
         )
@@ -663,12 +665,13 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             FingerprintCaptureResult.Item(
                 identifier = captureId.finger,
                 captureEventId = captureEventIds[captureId],
-                sample = FingerprintCaptureResult.Sample(
-                    fingerIdentifier = captureId.finger,
+                sample = CaptureSample(
+                    identifier = captureId.finger,
                     template = collectedFinger.scanResult.template,
                     templateQualityScore = collectedFinger.scanResult.qualityScore,
                     imageRef = imageRefs[captureId]?.let { SecuredImageRef(Path(it.relativePath.parts)) },
                     format = collectedFinger.scanResult.templateFormat,
+                    modality = Modality.FINGERPRINT,
                 ),
             )
         }
@@ -699,7 +702,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     fun handleOnViewCreated(
-        fingerprintsToCapture: List<IFingerIdentifier>,
+        fingerprintsToCapture: List<SampleIdentifier>,
         fingerprintSdk: FingerprintConfiguration.BioSdk,
     ) {
         updateState {

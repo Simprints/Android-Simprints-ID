@@ -1,12 +1,11 @@
 package com.simprints.infra.enrolment.records.repository.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.sample.Sample
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.enrolment.records.repository.remote.models.face.toApi
-import com.simprints.infra.enrolment.records.repository.remote.models.fingerprint.toApi
+import com.simprints.infra.enrolment.records.repository.remote.models.face.toFaceApi
+import com.simprints.infra.enrolment.records.repository.remote.models.fingerprint.toFingerprintApi
 
 @Keep
 internal data class ApiEnrolmentRecord(
@@ -24,19 +23,12 @@ internal fun Subject.toEnrolmentRecord(encoder: EncodingUtils): ApiEnrolmentReco
 )
 
 internal fun buildBiometricReferences(
-    fingerprintSamples: List<FingerprintSample>,
-    faceSamples: List<FaceSample>,
+    fingerprintSamples: List<Sample>,
+    faceSamples: List<Sample>,
     encoder: EncodingUtils,
 ): List<ApiBiometricReference> {
     val biometricReferences = mutableListOf<ApiBiometricReference>()
-
-    fingerprintSamples.toApi(encoder)?.let {
-        biometricReferences.add(it)
-    }
-
-    faceSamples.toApi(encoder)?.let {
-        biometricReferences.add(it)
-    }
-
+    fingerprintSamples.toFingerprintApi(encoder)?.let { biometricReferences.add(it) }
+    faceSamples.toFaceApi(encoder)?.let { biometricReferences.add(it) }
     return biometricReferences
 }

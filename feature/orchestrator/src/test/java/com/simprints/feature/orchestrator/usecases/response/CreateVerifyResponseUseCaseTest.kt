@@ -1,11 +1,14 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.modality.Modality
 import com.simprints.infra.config.store.models.DecisionPolicy
+import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
+import com.simprints.matcher.MatchResult
+import com.simprints.matcher.MatchResultItem
 import io.mockk.*
 import org.junit.Before
 import org.junit.Test
@@ -22,9 +25,10 @@ class CreateVerifyResponseUseCaseTest {
     @Test
     fun `Returns error if no decision policy`() {
         val result = useCase(
-            mockk {
+            mockk(relaxed = true) {
                 every { face } returns null
-                every { fingerprint?.getSdkConfiguration((any())) } returns null
+                every { fingerprint?.nec } returns null
+                every { fingerprint?.secugenSimMatcher } returns null
             },
             results = listOf(createFaceMatchResult(10f, 20f, 30f)),
         )
@@ -35,11 +39,11 @@ class CreateVerifyResponseUseCaseTest {
     @Test
     fun `Returns face matches with highest score`() {
         val result = useCase(
-            mockk {
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(10, 20, 30)
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
-                every { face?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns null
-                every { fingerprint?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns null
+            mockk(relaxed = true) {
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(10, 20, 30)
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns null
+                every { face?.rankOne?.verificationMatchThreshold } returns null
+                every { fingerprint?.secugenSimMatcher?.verificationMatchThreshold } returns null
             },
             results = listOf(createFaceMatchResult(10f, 50f, 100f)),
         )
@@ -50,14 +54,14 @@ class CreateVerifyResponseUseCaseTest {
     @Test
     fun `Returns fingerprint matches with highest score`() {
         val result = useCase(
-            mockk {
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns null
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
+            mockk(relaxed = true) {
+                every { face?.rankOne?.decisionPolicy } returns null
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns DecisionPolicy(
                     10,
                     20,
                     30,
                 )
-                every { fingerprint?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns 50f
+                every { fingerprint?.secugenSimMatcher?.verificationMatchThreshold } returns 50f
             },
             results = listOf(createFingerprintMatchResult(10f, 50f, 100f)),
         )
@@ -68,15 +72,15 @@ class CreateVerifyResponseUseCaseTest {
     @Test
     fun `Returns matches with highest face match score`() {
         val result = useCase(
-            mockk {
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(10, 20, 30)
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
+            mockk(relaxed = true) {
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(10, 20, 30)
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns DecisionPolicy(
                     10,
                     20,
                     30,
                 )
-                every { face?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns 50f
-                every { fingerprint?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns 50f
+                every { face?.rankOne?.verificationMatchThreshold } returns 50f
+                every { fingerprint?.secugenSimMatcher?.verificationMatchThreshold } returns 50f
             },
             results = listOf(
                 createFaceMatchResult(10f, 50f, 105f),
@@ -90,15 +94,15 @@ class CreateVerifyResponseUseCaseTest {
     @Test
     fun `Returns matches with highest fingerprint match score`() {
         val result = useCase(
-            mockk {
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(10, 20, 30)
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
+            mockk(relaxed = true) {
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(10, 20, 30)
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns DecisionPolicy(
                     10,
                     20,
                     30,
                 )
-                every { face?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns 50f
-                every { fingerprint?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns 50f
+                every { face?.rankOne?.verificationMatchThreshold } returns 50f
+                every { fingerprint?.secugenSimMatcher?.verificationMatchThreshold } returns 50f
             },
             results = listOf(
                 createFaceMatchResult(10f, 50f, 100f),
@@ -112,9 +116,9 @@ class CreateVerifyResponseUseCaseTest {
     @Test
     fun `When face verificationMatchThreshold is null - verificationSuccess is null`() {
         val result = useCase(
-            mockk {
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(10, 20, 30)
-                every { face?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns null
+            mockk(relaxed = true) {
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(10, 20, 30)
+                every { face?.rankOne?.verificationMatchThreshold } returns null
             },
             results = listOf(
                 createFaceMatchResult(10f, 50f, 100f),
@@ -127,13 +131,13 @@ class CreateVerifyResponseUseCaseTest {
     @Test
     fun `When fingerprint verificationMatchThreshold is null - verificationSuccess is null`() {
         val result = useCase(
-            mockk {
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
+            mockk(relaxed = true) {
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns DecisionPolicy(
                     10,
                     20,
                     30,
                 )
-                every { fingerprint?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns null
+                every { fingerprint?.secugenSimMatcher?.verificationMatchThreshold } returns null
             },
             results = listOf(
                 createFingerprintMatchResult(10f, 50f, 100f),
@@ -146,9 +150,9 @@ class CreateVerifyResponseUseCaseTest {
     @Test
     fun `When face match score is above verificationMatchThreshold - verificationSuccess is true`() {
         val result = useCase(
-            mockk {
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(10, 20, 30)
-                every { face?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns 50f
+            mockk(relaxed = true) {
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(10, 20, 30)
+                every { face?.rankOne?.verificationMatchThreshold } returns 50f
             },
             results = listOf(
                 createFaceMatchResult(51f),
@@ -161,13 +165,14 @@ class CreateVerifyResponseUseCaseTest {
     @Test
     fun `When fingerprint match score is above verificationMatchThreshold - verificationSuccess is true`() {
         val result = useCase(
-            mockk {
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
+            mockk(relaxed = true) {
+                every { fingerprint?.nec?.decisionPolicy } returns null
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns DecisionPolicy(
                     10,
                     20,
                     30,
                 )
-                every { fingerprint?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns 50f
+                every { fingerprint?.secugenSimMatcher?.verificationMatchThreshold } returns 50f
             },
             results = listOf(
                 createFingerprintMatchResult(51f),
@@ -180,9 +185,9 @@ class CreateVerifyResponseUseCaseTest {
     @Test
     fun `When face match score is equal to verificationMatchThreshold - verificationSuccess is true`() {
         val result = useCase(
-            mockk {
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(10, 20, 30)
-                every { face?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns 50f
+            mockk(relaxed = true) {
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(10, 20, 30)
+                every { face?.rankOne?.verificationMatchThreshold } returns 50f
             },
             results = listOf(
                 createFaceMatchResult(50f),
@@ -195,13 +200,13 @@ class CreateVerifyResponseUseCaseTest {
     @Test
     fun `When fingerprint match score is equal to verificationMatchThreshold - verificationSuccess is true`() {
         val result = useCase(
-            mockk {
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
+            mockk(relaxed = true) {
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns DecisionPolicy(
                     10,
                     20,
                     30,
                 )
-                every { fingerprint?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns 50f
+                every { fingerprint?.secugenSimMatcher?.verificationMatchThreshold } returns 50f
             },
             results = listOf(
                 createFingerprintMatchResult(50f),
@@ -214,9 +219,9 @@ class CreateVerifyResponseUseCaseTest {
     @Test
     fun `When face match score is below verificationMatchThreshold - verificationSuccess is false`() {
         val result = useCase(
-            mockk {
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(10, 20, 30)
-                every { face?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns 50f
+            mockk(relaxed = true) {
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(10, 20, 30)
+                every { face?.rankOne?.verificationMatchThreshold } returns 50f
             },
             results = listOf(
                 createFaceMatchResult(49f),
@@ -229,13 +234,13 @@ class CreateVerifyResponseUseCaseTest {
     @Test
     fun `When fingerprint match score is below verificationMatchThreshold - verificationSuccess is false`() {
         val result = useCase(
-            mockk {
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
+            mockk(relaxed = true) {
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns DecisionPolicy(
                     10,
                     20,
                     30,
                 )
-                every { fingerprint?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns 50f
+                every { fingerprint?.secugenSimMatcher?.verificationMatchThreshold } returns 50f
             },
             results = listOf(
                 createFingerprintMatchResult(49f),
@@ -245,13 +250,15 @@ class CreateVerifyResponseUseCaseTest {
         assertThat((result as AppVerifyResponse).matchResult.verificationSuccess).isEqualTo(false)
     }
 
-    private fun createFingerprintMatchResult(vararg confidences: Float): Serializable = FingerprintMatchResult(
-        confidences.map { FingerprintMatchResult.Item(subjectId = "1", confidence = it) },
-        mockk(),
+    private fun createFingerprintMatchResult(vararg confidences: Float): Serializable = MatchResult(
+        confidences.map { MatchResultItem(subjectId = "1", confidence = it) },
+        Modality.FINGERPRINT,
+        FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
     )
 
-    private fun createFaceMatchResult(vararg confidences: Float): Serializable = FaceMatchResult(
-        confidences.map { FaceMatchResult.Item(subjectId = "1", confidence = it) },
-        mockk(),
+    private fun createFaceMatchResult(vararg confidences: Float): Serializable = MatchResult(
+        confidences.map { MatchResultItem(subjectId = "1", confidence = it) },
+        Modality.FACE,
+        FaceConfiguration.BioSdk.RANK_ONE,
     )
 }

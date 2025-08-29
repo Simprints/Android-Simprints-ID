@@ -1,5 +1,6 @@
 package com.simprints.infra.config.store.local.models
 
+import com.simprints.core.domain.modality.Modality
 import com.simprints.infra.config.store.exceptions.InvalidProtobufEnumException
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
@@ -15,9 +16,9 @@ internal fun GeneralConfiguration.toProto(): ProtoGeneralConfiguration = ProtoGe
     .setSettingsPassword(settingsPassword.toProto())
     .build()
 
-internal fun GeneralConfiguration.Modality.toProto(): ProtoGeneralConfiguration.Modality = when (this) {
-    GeneralConfiguration.Modality.FACE -> ProtoGeneralConfiguration.Modality.FACE
-    GeneralConfiguration.Modality.FINGERPRINT -> ProtoGeneralConfiguration.Modality.FINGERPRINT
+internal fun Modality.toProto(): ProtoGeneralConfiguration.Modality = when (this) {
+    Modality.FACE -> ProtoGeneralConfiguration.Modality.FACE
+    Modality.FINGERPRINT -> ProtoGeneralConfiguration.Modality.FINGERPRINT
 }
 
 internal fun ProtoGeneralConfiguration.toDomain(): GeneralConfiguration = GeneralConfiguration(
@@ -30,9 +31,9 @@ internal fun ProtoGeneralConfiguration.toDomain(): GeneralConfiguration = Genera
     SettingsPasswordConfig.toDomain(settingsPassword),
 )
 
-internal fun ProtoGeneralConfiguration.Modality.toDomain(): GeneralConfiguration.Modality = when (this) {
-    ProtoGeneralConfiguration.Modality.FACE -> GeneralConfiguration.Modality.FACE
-    ProtoGeneralConfiguration.Modality.FINGERPRINT -> GeneralConfiguration.Modality.FINGERPRINT
+internal fun ProtoGeneralConfiguration.Modality.toDomain(): Modality = when (this) {
+    ProtoGeneralConfiguration.Modality.FACE -> Modality.FACE
+    ProtoGeneralConfiguration.Modality.FINGERPRINT -> Modality.FINGERPRINT
     ProtoGeneralConfiguration.Modality.UNRECOGNIZED -> throw InvalidProtobufEnumException("invalid modality $name")
 }
 

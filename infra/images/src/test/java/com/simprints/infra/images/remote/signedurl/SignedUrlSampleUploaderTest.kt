@@ -1,14 +1,14 @@
 package com.simprints.infra.images.remote.signedurl
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.image.Path
+import com.simprints.core.domain.image.SecuredImageRef
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
 import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.metadata.ImageMetadataStore
-import com.simprints.infra.images.model.Path
-import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.remote.signedurl.usecase.FetchUploadUrlsPerSampleUseCase
 import com.simprints.infra.images.remote.signedurl.usecase.PrepareImageUploadDataUseCase
 import com.simprints.infra.images.remote.signedurl.usecase.UploadSampleWithTrackingUseCase
