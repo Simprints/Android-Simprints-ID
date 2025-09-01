@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.core.domain.step.ModalityCaptureStepResult
 import com.simprints.core.domain.step.StepResult
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
@@ -16,7 +17,6 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.face.capture.FaceCaptureParams
-import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
@@ -35,7 +35,7 @@ import com.simprints.feature.orchestrator.usecases.steps.BuildStepsUseCase
 import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.setup.LocationStore
 import com.simprints.fingerprint.capture.FingerprintCaptureParams
-import com.simprints.fingerprint.capture.FingerprintCaptureResult
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
@@ -209,46 +209,25 @@ internal class OrchestratorViewModel @Inject constructor(
         currentStep: Step,
         result: Serializable,
     ) {
-        if (currentStep.id == StepId.FACE_CAPTURE && result is FaceCaptureResult) {
-            val captureParams = currentStep.params?.let { it as? FaceCaptureParams }
-            val matchingStep = steps.firstOrNull { step ->
-                if (step.id != StepId.FACE_MATCHER) {
-                    false
-                } else {
-                    val stepSdk = step.params?.let { it as? MatchStepStubPayload }?.sdkType
-                    stepSdk == captureParams?.faceSDK
+        if (currentStep.id == StepId.MODALITY_CAPTURE && result is ModalityCaptureStepResult) {
+            val captureStepSdkType: ModalitySdkType? = currentStep.params?.let {
+                when (it) {
+                    is FaceCaptureParams -> it.faceSDK
+                    is FingerprintCaptureParams -> it.fingerprintSDK
+                    else -> null
                 }
             }
-
-            if (matchingStep != null) {
-                val faceSamples = result.results.mapNotNull { it.sample }
-
-                val newPayload = matchingStep.params
-                    ?.let { it as? MatchStepStubPayload }
-                    ?.toStepArgs(result.referenceId, faceSamples)
-
-                if (newPayload != null) {
-                    matchingStep.params = newPayload
-                }
-            }
-        }
-        if (currentStep.id == StepId.FINGERPRINT_CAPTURE && result is FingerprintCaptureResult) {
-            val captureParams = currentStep.params?.let { it as? FingerprintCaptureParams }
             // Find the matching step for the same fingerprint SDK as there may be multiple match steps
             val matchingStep = steps.firstOrNull { step ->
-                if (step.id != StepId.FINGERPRINT_MATCHER) {
-                    false
-                } else {
-                    val stepSdk = step.params?.let { it as? MatchStepStubPayload }?.sdkType
-                    stepSdk == captureParams?.fingerprintSDK
-                }
+                step.id == StepId.MODALITY_MATCHER &&
+                    step.params?.let { it as? MatchStepStubPayload }?.sdkType == captureStepSdkType
             }
 
             if (matchingStep != null) {
-                val fingerprintSamples = result.results.mapNotNull { it.sample }
+                val capturedSamples = result.results.mapNotNull { it.sample }
                 val newPayload = matchingStep.params
                     ?.let { it as? MatchStepStubPayload }
-                    ?.toStepArgs(result.referenceId, fingerprintSamples)
+                    ?.toStepArgs(result.referenceId, capturedSamples)
 
                 if (newPayload != null) {
                     matchingStep.params = newPayload

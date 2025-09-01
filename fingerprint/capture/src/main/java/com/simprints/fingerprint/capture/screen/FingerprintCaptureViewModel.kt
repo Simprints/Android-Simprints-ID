@@ -168,10 +168,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         }
     }
 
-    private fun start(
-        fingerprintsToCapture: List<SampleIdentifier>,
-        fingerprintSdk: FingerprintConfiguration.BioSdk,
-    ) {
+    private fun start(fingerprintSdk: FingerprintConfiguration.BioSdk) {
         if (!hasStarted) {
             hasStarted = true
 
@@ -179,11 +176,15 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 // Configuration must be initialised when start returns for UI to be initialised correctly,
                 // and since fetching happens on IO thread execution must be suspended until it is available
                 configuration = configManager.getProjectConfiguration().fingerprint!!
+                originalFingerprintsToCapture = configuration
+                    .getSdkConfiguration(fingerprintSdk)
+                    ?.fingersToCapture
+                    .orEmpty()
+
                 initBioSdk(fingerprintSdk)
             }
 
-            originalFingerprintsToCapture = fingerprintsToCapture
-            setStartingState(fingerprintsToCapture)
+            setStartingState(originalFingerprintsToCapture)
             startObserverForLiveFeedback()
             tracker.resetToIdle()
         }
@@ -701,14 +702,11 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         tracker.resetToIdle()
     }
 
-    fun handleOnViewCreated(
-        fingerprintsToCapture: List<SampleIdentifier>,
-        fingerprintSdk: FingerprintConfiguration.BioSdk,
-    ) {
+    fun handleOnViewCreated(fingerprintSdk: FingerprintConfiguration.BioSdk) {
         updateState {
             it.copy(isShowingConnectionScreen = false)
         }
-        start(fingerprintsToCapture, fingerprintSdk)
+        start(fingerprintSdk)
     }
 
     fun handleOnResume() {

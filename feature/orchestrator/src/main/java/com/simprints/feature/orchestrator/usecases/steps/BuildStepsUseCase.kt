@@ -22,10 +22,11 @@ import com.simprints.fingerprint.capture.FingerprintCaptureContract
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.allowedAgeRanges
 import com.simprints.infra.config.store.models.experimental
-import com.simprints.infra.config.store.models.fromDomainToModuleApi
+import com.simprints.infra.config.store.models.getModalityConfigs
 import com.simprints.infra.config.store.models.isAgeRestricted
 import com.simprints.infra.config.store.models.sortedUniqueAgeGroups
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
@@ -340,40 +341,23 @@ internal class BuildStepsUseCase @Inject constructor(
         projectConfiguration: ProjectConfiguration,
         ageGroup: AgeGroup?,
         flowType: FlowType,
-    ): List<Step> = when (modality) {
-        Modality.FINGERPRINT -> {
-            determineFingerprintSDKs(projectConfiguration, ageGroup).map { bioSDK ->
+    ): List<Step> = determineSDKs(modality, projectConfiguration, ageGroup).mapNotNull { bioSdk ->
+        when (bioSdk) {
+            is FingerprintConfiguration.BioSdk -> Step(
+                id = StepId.MODALITY_CAPTURE,
+                navigationActionId = R.id.action_orchestratorFragment_to_fingerprintCapture,
+                destinationId = FingerprintCaptureContract.DESTINATION,
+                params = FingerprintCaptureContract.getParams(flowType, bioSdk),
+            )
 
-                val sdkConfiguration = projectConfiguration.fingerprint?.getSdkConfiguration(bioSDK)
+            is FaceConfiguration.BioSdk -> Step(
+                id = StepId.MODALITY_CAPTURE,
+                navigationActionId = R.id.action_orchestratorFragment_to_faceCapture,
+                destinationId = FaceCaptureContract.DESTINATION,
+                params = FaceCaptureContract.getParams(bioSdk),
+            )
 
-                // TODO: fingersToCollect can be read directly from FingerprintCapture
-                val fingersToCollect = sdkConfiguration
-                    ?.fingersToCapture
-                    .orEmpty()
-                    .map { finger -> finger.fromDomainToModuleApi() }
-
-                Step(
-                    id = StepId.FINGERPRINT_CAPTURE,
-                    navigationActionId = R.id.action_orchestratorFragment_to_fingerprintCapture,
-                    destinationId = FingerprintCaptureContract.DESTINATION,
-                    params = FingerprintCaptureContract.getParams(flowType, fingersToCollect, bioSDK),
-                )
-            }
-        }
-
-        Modality.FACE -> {
-            determineFaceSDKs(projectConfiguration, ageGroup).map { bioSDK ->
-                val sdkConfiguration = projectConfiguration.face?.getSdkConfiguration(bioSDK)
-
-                // TODO: samplesToCapture can be read directly from FaceCapture
-                val samplesToCapture = sdkConfiguration?.nbOfImagesToCapture ?: 0
-                Step(
-                    id = StepId.FACE_CAPTURE,
-                    navigationActionId = R.id.action_orchestratorFragment_to_faceCapture,
-                    destinationId = FaceCaptureContract.DESTINATION,
-                    params = FaceCaptureContract.getParams(samplesToCapture, bioSDK),
-                )
-            }
+            else -> null
         }
     }
 
@@ -403,41 +387,19 @@ internal class BuildStepsUseCase @Inject constructor(
         flowType: FlowType,
         subjectQuery: SubjectQuery,
         biometricDataSource: BiometricDataSource,
-    ): List<Step> = when (modality) {
-        Modality.FINGERPRINT -> {
-            determineFingerprintSDKs(projectConfiguration, ageGroup).map { bioSDK ->
-                Step(
-                    id = StepId.FINGERPRINT_MATCHER,
-                    navigationActionId = R.id.action_orchestratorFragment_to_matcher,
-                    destinationId = MatchContract.DESTINATION,
-                    params = MatchStepStubPayload.getMatchStubParams(
-                        flowType = flowType,
-                        subjectQuery = subjectQuery,
-                        biometricDataSource = biometricDataSource,
-                        modality = modality,
-                        sdkType = bioSDK,
-                    ),
-                )
-            }
-        }
-
-        Modality.FACE -> {
-            determineFaceSDKs(projectConfiguration, ageGroup).map { bioSDK ->
-                // Face bio SDK is currently ignored until we add a second one
-                Step(
-                    id = StepId.FACE_MATCHER,
-                    navigationActionId = R.id.action_orchestratorFragment_to_matcher,
-                    destinationId = MatchContract.DESTINATION,
-                    params = MatchStepStubPayload.getMatchStubParams(
-                        flowType = flowType,
-                        subjectQuery = subjectQuery,
-                        biometricDataSource = biometricDataSource,
-                        modality = modality,
-                        sdkType = bioSDK,
-                    ),
-                )
-            }
-        }
+    ): List<Step> = determineSDKs(modality, projectConfiguration, ageGroup).map { bioSdk ->
+        Step(
+            id = StepId.MODALITY_MATCHER,
+            navigationActionId = R.id.action_orchestratorFragment_to_matcher,
+            destinationId = MatchContract.DESTINATION,
+            params = MatchStepStubPayload.getMatchStubParams(
+                flowType = flowType,
+                subjectQuery = subjectQuery,
+                biometricDataSource = biometricDataSource,
+                modality = modality,
+                sdkType = bioSdk,
+            ),
+        )
     }
 
     private fun buildEnrolLastBiometricStep(
@@ -485,64 +447,26 @@ internal class BuildStepsUseCase @Inject constructor(
         ),
     )
 
-    private fun determineFingerprintSDKs(
+    private fun determineSDKs(
+        modality: Modality,
         projectConfiguration: ProjectConfiguration,
         ageGroup: AgeGroup?,
-    ): List<FingerprintConfiguration.BioSdk> {
-        val sdks = mutableListOf<FingerprintConfiguration.BioSdk>()
+    ): List<ModalitySdkType> = when {
+        !projectConfiguration.isAgeRestricted() ->
+            projectConfiguration
+                .getModalityConfigs()[modality]
+                ?.keys
+                ?.toList()
+                .orEmpty()
 
-        if (!projectConfiguration.isAgeRestricted()) {
-            projectConfiguration.fingerprint?.allowedSDKs?.let { sdks.addAll(it) }
-        } else {
-            ageGroup?.let {
-                if (projectConfiguration.fingerprint
-                        ?.secugenSimMatcher
-                        ?.allowedAgeRange
-                        ?.contains(ageGroup) == true
-                ) {
-                    sdks.add(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
-                }
-                if (projectConfiguration.fingerprint
-                        ?.nec
-                        ?.allowedAgeRange
-                        ?.contains(ageGroup) == true
-                ) {
-                    sdks.add(FingerprintConfiguration.BioSdk.NEC)
-                }
-            }
-        }
-
-        return sdks
-    }
-
-    private fun determineFaceSDKs(
-        projectConfiguration: ProjectConfiguration,
-        ageGroup: AgeGroup?,
-    ): List<FaceConfiguration.BioSdk> {
-        val sdks = mutableListOf<FaceConfiguration.BioSdk>()
-
-        if (!projectConfiguration.isAgeRestricted()) {
-            projectConfiguration.face?.allowedSDKs?.let { sdks.addAll(it) }
-        } else {
-            ageGroup?.let {
-                if (projectConfiguration.face
-                        ?.rankOne
-                        ?.allowedAgeRange
-                        ?.contains(ageGroup) == true
-                ) {
-                    sdks.add(FaceConfiguration.BioSdk.RANK_ONE)
-                }
-                if (projectConfiguration.face
-                        ?.simFace
-                        ?.allowedAgeRange
-                        ?.contains(ageGroup) == true
-                ) {
-                    sdks.add(FaceConfiguration.BioSdk.SIM_FACE)
-                }
-            }
-        }
-
-        return sdks
+        ageGroup == null -> emptyList()
+        else ->
+            projectConfiguration
+                .getModalityConfigs()[modality]
+                ?.filterValues { config -> config.allowedAgeRange.contains(ageGroup) }
+                ?.keys
+                ?.toList()
+                .orEmpty()
     }
 
     private fun ageGroupFromSubjectAge(

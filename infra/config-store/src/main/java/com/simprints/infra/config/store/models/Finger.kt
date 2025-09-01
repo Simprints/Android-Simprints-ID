@@ -15,7 +15,7 @@ enum class Finger {
     RIGHT_5TH_FINGER,
 }
 
-fun Finger.fromDomainToModuleApi() = when (this) {
+fun Finger.toDomain() = when (this) {
     Finger.RIGHT_5TH_FINGER -> SampleIdentifier.RIGHT_5TH_FINGER
     Finger.RIGHT_4TH_FINGER -> SampleIdentifier.RIGHT_4TH_FINGER
     Finger.RIGHT_3RD_FINGER -> SampleIdentifier.RIGHT_3RD_FINGER
@@ -26,18 +26,4 @@ fun Finger.fromDomainToModuleApi() = when (this) {
     Finger.LEFT_3RD_FINGER -> SampleIdentifier.LEFT_3RD_FINGER
     Finger.LEFT_4TH_FINGER -> SampleIdentifier.LEFT_4TH_FINGER
     Finger.LEFT_5TH_FINGER -> SampleIdentifier.LEFT_5TH_FINGER
-}
-
-fun SampleIdentifier.fromModuleApiToDomain(): Finger = when (this) {
-    SampleIdentifier.RIGHT_5TH_FINGER -> Finger.RIGHT_5TH_FINGER
-    SampleIdentifier.RIGHT_4TH_FINGER -> Finger.RIGHT_4TH_FINGER
-    SampleIdentifier.RIGHT_3RD_FINGER -> Finger.RIGHT_3RD_FINGER
-    SampleIdentifier.RIGHT_INDEX_FINGER -> Finger.RIGHT_INDEX_FINGER
-    SampleIdentifier.RIGHT_THUMB -> Finger.RIGHT_THUMB
-    SampleIdentifier.LEFT_THUMB -> Finger.LEFT_THUMB
-    SampleIdentifier.LEFT_INDEX_FINGER -> Finger.LEFT_INDEX_FINGER
-    SampleIdentifier.LEFT_3RD_FINGER -> Finger.LEFT_3RD_FINGER
-    SampleIdentifier.LEFT_4TH_FINGER -> Finger.LEFT_4TH_FINGER
-    SampleIdentifier.LEFT_5TH_FINGER -> Finger.LEFT_5TH_FINGER
-    else -> throw IllegalArgumentException("Not a finger sample")
 }

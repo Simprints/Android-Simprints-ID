@@ -22,7 +22,7 @@ class FingerExtTest {
 
         mapping.forEach {
             assertThat(it.key.fromModuleApiToDomain()).isEqualTo(it.value)
-            assertThat(it.value.fromDomainToModuleApi()).isEqualTo(it.key)
+            assertThat(it.value.toDomain()).isEqualTo(it.key)
         }
     }
 }

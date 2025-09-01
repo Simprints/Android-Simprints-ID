@@ -124,10 +124,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
 
         vm.launchReconnect.observe(viewLifecycleOwner, LiveDataEventObserver { launchConnection() })
 
-        vm.handleOnViewCreated(
-            params.fingerprintsToCapture,
-            params.fingerprintSDK,
-        )
+        vm.handleOnViewCreated(params.fingerprintSDK)
         initUI()
     }
 

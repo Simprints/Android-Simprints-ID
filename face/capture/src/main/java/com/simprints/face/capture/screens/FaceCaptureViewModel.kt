@@ -87,10 +87,6 @@ internal class FaceCaptureViewModel @Inject constructor(
         get() = _invalidLicense
     private val _invalidLicense = MutableLiveData<LiveDataEvent>()
 
-    fun setupCapture(samplesToCapture: Int) {
-        this.samplesToCapture = samplesToCapture
-    }
-
     fun initFaceBioSdk(
         activity: Activity,
         sdk: FaceConfiguration.BioSdk,
@@ -100,6 +96,12 @@ internal class FaceCaptureViewModel @Inject constructor(
             return@launch
         }
         this@FaceCaptureViewModel.bioSDK = sdk
+
+        samplesToCapture = configManager
+            .getProjectConfiguration()
+            .face
+            ?.getSdkConfiguration(sdk)
+            ?.nbOfImagesToCapture ?: 0
 
         Simber.i("Starting face capture flow", tag = FACE_CAPTURE)
         if (sdk == FaceConfiguration.BioSdk.RANK_ONE) {

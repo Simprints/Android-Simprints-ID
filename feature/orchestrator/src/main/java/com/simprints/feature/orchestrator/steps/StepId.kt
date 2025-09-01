@@ -18,6 +18,11 @@ internal object StepId {
     const val SELECT_SUBJECT_AGE = STEP_BASE_CORE + 7
 
     // Face step ids
+    private const val STEP_BASE_MODALITY = 200
+    const val MODALITY_CAPTURE = STEP_BASE_MODALITY + 2
+    const val MODALITY_MATCHER = STEP_BASE_MODALITY + 3
+
+    // Face step ids
     private const val STEP_BASE_FINGERPRINT = 300
     const val FINGERPRINT_CAPTURE = STEP_BASE_FINGERPRINT + 2
     const val FINGERPRINT_MATCHER = STEP_BASE_FINGERPRINT + 3

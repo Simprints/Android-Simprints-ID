@@ -6,6 +6,5 @@ import com.simprints.infra.config.store.models.FaceConfiguration
 
 @Keep
 data class FaceCaptureParams(
-    val samplesToCapture: Int,
     val faceSDK: FaceConfiguration.BioSdk,
 ) : StepParams
