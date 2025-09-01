@@ -55,33 +55,6 @@ internal class CommCareIdentityDataSource @Inject constructor(
 
     private fun getCaseDataUri(packageName: String): Uri = "content://$packageName.case/casedb/data".toUri()
 
-    private suspend fun loadFingerprintIdentities(
-        query: SubjectQuery,
-        range: IntRange,
-        dataSource: BiometricDataSource,
-        project: Project,
-        onCandidateLoaded: suspend () -> Unit,
-    ): List<Identity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
-        .filter { erce ->
-            erce.payload.biometricReferences.any { it is FingerprintReference && it.format == query.fingerprintSampleFormat }
-        }.map {
-            Identity(
-                subjectId = it.payload.subjectId,
-                modality = Modality.FINGERPRINT,
-                samples = it.payload.biometricReferences.filterIsInstance<FingerprintReference>().flatMap { fingerprintReference ->
-                    fingerprintReference.templates.map { fingerprintTemplate ->
-                        Sample(
-                            identifier = fingerprintTemplate.finger,
-                            template = encoder.base64ToBytes(fingerprintTemplate.template),
-                            format = fingerprintReference.format,
-                            referenceId = fingerprintReference.id,
-                            modality = Modality.FINGERPRINT,
-                        )
-                    }
-                },
-            )
-        }
-
     private suspend fun loadEnrolmentRecordCreationEvents(
         range: IntRange,
         callerPackageName: String,
@@ -130,7 +103,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
         }
     }
 
-    private suspend fun loadFaceIdentities(
+    private suspend fun loadIdentities(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
@@ -138,19 +111,34 @@ internal class CommCareIdentityDataSource @Inject constructor(
         onCandidateLoaded: suspend () -> Unit,
     ): List<Identity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
         .filter { erce ->
-            erce.payload.biometricReferences.any { it is FaceReference && it.format == query.faceSampleFormat }
-        }.map {
+            erce.payload.biometricReferences.any {
+                //
+                (it is FaceReference && it.format == query.sampleFormat) ||
+                    (it is FingerprintReference && it.format == query.sampleFormat)
+            }
+        }.map { event ->
             Identity(
-                subjectId = it.payload.subjectId,
-                modality = Modality.FACE,
-                samples = it.payload.biometricReferences.filterIsInstance<FaceReference>().flatMap { faceReference ->
-                    faceReference.templates.map { faceTemplate ->
-                        Sample(
-                            template = encoder.base64ToBytes(faceTemplate.template),
-                            format = faceReference.format,
-                            referenceId = faceReference.id,
-                            modality = Modality.FACE,
-                        )
+                subjectId = event.payload.subjectId,
+                samples = event.payload.biometricReferences.flatMap { reference ->
+                    when (reference) {
+                        is FaceReference -> reference.templates.map { faceTemplate ->
+                            Sample(
+                                template = encoder.base64ToBytes(faceTemplate.template),
+                                format = reference.format,
+                                referenceId = reference.id,
+                                modality = Modality.FACE,
+                            )
+                        }
+
+                        is FingerprintReference -> reference.templates.map { fingerprintTemplate ->
+                            Sample(
+                                identifier = fingerprintTemplate.finger,
+                                template = encoder.base64ToBytes(fingerprintTemplate.template),
+                                format = reference.format,
+                                referenceId = reference.id,
+                                modality = Modality.FINGERPRINT,
+                            )
+                        }
                     }
                 },
             )
@@ -269,7 +257,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
         count
     }
 
-    override suspend fun loadFaceIdentities(
+    override suspend fun loadIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
@@ -280,27 +268,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
         ranges = ranges,
         scope = scope,
     ) { range ->
-        loadFaceIdentities(
-            query = query,
-            range = range,
-            project = project,
-            dataSource = dataSource,
-            onCandidateLoaded = onCandidateLoaded,
-        )
-    }
-
-    override suspend fun loadFingerprintIdentities(
-        query: SubjectQuery,
-        ranges: List<IntRange>,
-        dataSource: BiometricDataSource,
-        project: Project,
-        scope: CoroutineScope,
-        onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<List<Identity>> = loadIdentitiesConcurrently(
-        ranges = ranges,
-        scope = scope,
-    ) { range ->
-        loadFingerprintIdentities(
+        loadIdentities(
             query = query,
             range = range,
             project = project,

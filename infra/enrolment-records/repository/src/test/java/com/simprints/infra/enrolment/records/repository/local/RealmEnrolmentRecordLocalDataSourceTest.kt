@@ -138,7 +138,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
 
         val people = mutableListOf<Identity>()
         enrolmentRecordLocalDataSource
-            .loadFingerprintIdentities(
+            .loadIdentities(
                 SubjectQuery(),
                 listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
@@ -157,8 +157,8 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val format = "SupportedFormat"
 
         enrolmentRecordLocalDataSource
-            .loadFingerprintIdentities(
-                SubjectQuery(fingerprintSampleFormat = format),
+            .loadIdentities(
+                SubjectQuery(sampleFormat = format),
                 listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
                 project,
@@ -179,8 +179,8 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val format = "SupportedFormat"
 
         enrolmentRecordLocalDataSource
-            .loadFingerprintIdentities(
-                SubjectQuery(faceSampleFormat = format),
+            .loadIdentities(
+                SubjectQuery(sampleFormat = format),
                 listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
                 project,
@@ -202,7 +202,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
 
         val people = mutableListOf<Identity>()
         enrolmentRecordLocalDataSource
-            .loadFaceIdentities(
+            .loadIdentities(
                 SubjectQuery(),
                 listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,

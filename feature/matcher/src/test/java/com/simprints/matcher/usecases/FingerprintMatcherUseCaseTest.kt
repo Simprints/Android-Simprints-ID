@@ -102,7 +102,7 @@ internal class FingerprintMatcherUseCaseTest {
     @Test
     fun `Skips matching if there are no candidates`() = runTest {
         coEvery { enrolmentRecordRepository.count(any()) } returns 0
-        coEvery { enrolmentRecordRepository.loadFingerprintIdentities(any(), any(), any(), project, any(), any()) } returns
+        coEvery { enrolmentRecordRepository.loadIdentities(any(), any(), any(), project, any(), any()) } returns
             createTestChannel(emptyList())
         coEvery { bioSdkWrapper.match(any(), any(), any()) } returns listOf()
 
@@ -145,7 +145,7 @@ internal class FingerprintMatcherUseCaseTest {
         coEvery { enrolmentRecordRepository.count(any(), any()) } returns 100
         coEvery { createRangesUseCase(any()) } returns listOf(0..99)
         coEvery {
-            enrolmentRecordRepository.loadFingerprintIdentities(
+            enrolmentRecordRepository.loadIdentities(
                 any(),
                 any(),
                 any(),
@@ -158,7 +158,6 @@ internal class FingerprintMatcherUseCaseTest {
                 listOf(
                     Identity(
                         "personId",
-                        Modality.FINGERPRINT,
                         listOf(
                             fingerprintSample(SampleIdentifier.RIGHT_5TH_FINGER),
                             fingerprintSample(SampleIdentifier.RIGHT_4TH_FINGER),

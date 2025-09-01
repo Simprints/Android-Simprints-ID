@@ -37,5 +37,6 @@ data class DbBiometricTemplate(
     companion object {
         const val TEMPLATE_TABLE_NAME = "DbBiometricTemplate"
         const val FORMAT_COLUMN = "format"
+        const val MODALITY_COLUMN = "modality"
     }
 }

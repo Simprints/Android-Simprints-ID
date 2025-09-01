@@ -13,16 +13,7 @@ interface IdentityDataSource {
         dataSource: BiometricDataSource = BiometricDataSource.Simprints,
     ): Int
 
-    suspend fun loadFingerprintIdentities(
-        query: SubjectQuery,
-        ranges: List<IntRange>,
-        dataSource: BiometricDataSource,
-        project: Project,
-        scope: CoroutineScope,
-        onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<List<Identity>>
-
-    suspend fun loadFaceIdentities(
+    suspend fun loadIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,

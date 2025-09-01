@@ -106,30 +106,14 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
 
     override suspend fun getLocalDBInfo(): String = selectEnrolmentRecordLocalDataSource().getLocalDBInfo()
 
-    override suspend fun loadFingerprintIdentities(
+    override suspend fun loadIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ) = fromIdentityDataSource(dataSource).loadFingerprintIdentities(
-        query = query,
-        ranges = ranges,
-        dataSource = dataSource,
-        project = project,
-        scope = scope,
-        onCandidateLoaded = onCandidateLoaded,
-    )
-
-    override suspend fun loadFaceIdentities(
-        query: SubjectQuery,
-        ranges: List<IntRange>,
-        dataSource: BiometricDataSource,
-        project: Project,
-        scope: CoroutineScope,
-        onCandidateLoaded: suspend () -> Unit,
-    ) = fromIdentityDataSource(dataSource).loadFaceIdentities(
+    ) = fromIdentityDataSource(dataSource).loadIdentities(
         query = query,
         ranges = ranges,
         dataSource = dataSource,

@@ -65,7 +65,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
             .map { dbSubject -> dbSubject.toDomain() }
     }
 
-    override suspend fun loadFaceIdentities(
+    override suspend fun loadIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
@@ -82,42 +82,8 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                     mapper = { dbSubject ->
                         Identity(
                             subjectId = dbSubject.subjectId.toString(),
-                            modality = Modality.FACE,
-                            samples = dbSubject.faceSamples
-                                .filter { it.format == query.faceSampleFormat }
-                                .map { it.toDomain() },
-                        )
-                    },
-                    onCandidateLoaded = onCandidateLoaded,
-                )
-                channel.send(identities)
-            }
-            channel.close()
-        }
-        return channel
-    }
-
-    override suspend fun loadFingerprintIdentities(
-        query: SubjectQuery,
-        ranges: List<IntRange>,
-        dataSource: BiometricDataSource,
-        project: Project,
-        scope: CoroutineScope,
-        onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<List<Identity>> {
-        val channel = Channel<List<Identity>>(CHANNEL_CAPACITY)
-        scope.launch(dispatcherIO) {
-            ranges.forEach { range ->
-                val identities = loadIdentitiesRange(
-                    query = query,
-                    range = range,
-                    mapper = { dbSubject ->
-                        Identity(
-                            subjectId = dbSubject.subjectId.toString(),
-                            modality = Modality.FINGERPRINT,
-                            samples = dbSubject.fingerprintSamples
-                                .filter { it.format == query.fingerprintSampleFormat }
-                                .map { it.toDomain() },
+                            samples = dbSubject.faceSamples.filter { it.format == query.sampleFormat }.map { it.toDomain() } +
+                                dbSubject.fingerprintSamples.filter { it.format == query.sampleFormat }.map { it.toDomain() },
                         )
                     },
                     onCandidateLoaded = onCandidateLoaded,
@@ -302,16 +268,16 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         if (query.moduleId != null) {
             realmQuery = realmQuery.query("$MODULE_ID_FIELD == $0", query.moduleId.value)
         }
-        if (query.fingerprintSampleFormat != null) {
+        if (query.modality == Modality.FINGERPRINT && query.sampleFormat != null) {
             realmQuery = realmQuery.query(
                 "ANY $FINGERPRINT_SAMPLES_FIELD.$FORMAT_FIELD == $0",
-                query.fingerprintSampleFormat,
+                query.sampleFormat,
             )
         }
-        if (query.faceSampleFormat != null) {
+        if (query.modality == Modality.FACE && query.sampleFormat != null) {
             realmQuery = realmQuery.query(
                 "ANY $FACE_SAMPLES_FIELD.$FORMAT_FIELD == $0",
-                query.faceSampleFormat,
+                query.sampleFormat,
             )
         }
         if (query.afterSubjectId != null) {

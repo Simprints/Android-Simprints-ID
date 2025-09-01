@@ -10,6 +10,5 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 class Identity(
     val subjectId: String,
-    val modality: Modality,
     val samples: List<Sample>,
 ) : Parcelable

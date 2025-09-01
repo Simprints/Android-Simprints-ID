@@ -2,16 +2,15 @@ package com.simprints.infra.enrolment.records.repository.local
 
 import androidx.room.withTransaction
 import com.simprints.core.DispatcherIO
-import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
-import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.local.models.DbModality
 import com.simprints.infra.enrolment.records.repository.local.models.toDomain
 import com.simprints.infra.enrolment.records.repository.local.models.toRoomDb
 import com.simprints.infra.enrolment.records.room.store.BuildConfig.DB_ENCRYPTION
@@ -80,7 +79,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     /**
      * Loads face identities in paged ranges.
      */
-    override suspend fun loadFaceIdentities(
+    override suspend fun loadIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
@@ -90,52 +89,17 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     ): ReceiveChannel<List<Identity>> = loadBiometricIdentitiesPaged(
         query = query,
         ranges = ranges,
-        format = requireNotNull(query.faceSampleFormat) { "faceSampleFormat required" },
+        format = requireNotNull(query.sampleFormat) { "faceSampleFormat required" },
         createIdentity = { subjectId, templates ->
             Identity(
                 subjectId = subjectId,
-                modality = Modality.FACE,
                 samples = templates.map { sample ->
                     Sample(
                         template = sample.templateData,
                         id = sample.uuid,
                         format = sample.format,
                         referenceId = sample.referenceId,
-                        modality = Modality.FACE,
-                    )
-                },
-            )
-        },
-        onCandidateLoaded = onCandidateLoaded,
-        scope = scope,
-    )
-
-    /**
-     * Loads fingerprint identities in paged ranges.
-     */
-    override suspend fun loadFingerprintIdentities(
-        query: SubjectQuery,
-        ranges: List<IntRange>,
-        dataSource: BiometricDataSource,
-        project: Project,
-        scope: CoroutineScope,
-        onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<List<Identity>> = loadBiometricIdentitiesPaged(
-        query = query,
-        ranges = ranges,
-        format = requireNotNull(query.fingerprintSampleFormat) { "fingerprintSampleFormat required" },
-        createIdentity = { subjectId, templates ->
-            Identity(
-                subjectId = subjectId,
-                modality = Modality.FINGERPRINT,
-                samples = templates.map { sample ->
-                    Sample(
-                        identifier = SampleIdentifier.entries[sample.identifier!!],
-                        template = sample.templateData,
-                        id = sample.uuid,
-                        format = sample.format,
-                        referenceId = sample.referenceId,
-                        modality = Modality.FINGERPRINT,
+                        modality = DbModality.fromId(sample.modality).toDomain(),
                     )
                 },
             )
@@ -181,7 +145,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     private suspend fun <T> loadBiometricIdentities(
         query: SubjectQuery,
         pageSize: Int,
-        format: String?,
+        format: String,
         createIdentity: (subjectId: String, samples: List<DbBiometricTemplate>) -> T,
         onCandidateLoaded: suspend () -> Unit,
     ): List<T> = withContext(dispatcherIO) {

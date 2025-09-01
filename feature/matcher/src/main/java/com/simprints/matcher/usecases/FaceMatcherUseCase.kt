@@ -1,6 +1,7 @@
 package com.simprints.matcher.usecases
 
 import com.simprints.core.DispatcherBG
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Identity
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
@@ -47,11 +48,12 @@ internal class FaceMatcherUseCase @Inject constructor(
             return@channelFlow
         }
 
-        val queryWithSupportedFormat = matchParams.queryForCandidates.copy(
-            faceSampleFormat = bioSdk.templateFormat(),
+        val queryWithFormatAndModality = matchParams.queryForCandidates.copy(
+            sampleFormat = bioSdk.templateFormat(),
+            modality = Modality.FACE,
         )
         val expectedCandidates = enrolmentRecordRepository.count(
-            queryWithSupportedFormat,
+            queryWithFormatAndModality,
             dataSource = matchParams.biometricDataSource,
         )
         if (expectedCandidates == 0) {
@@ -69,8 +71,8 @@ internal class FaceMatcherUseCase @Inject constructor(
         val ranges = createRanges(expectedCandidates)
         val resultSet = MatchResultSet<MatchResultItem>()
         val candidatesChannel = enrolmentRecordRepository
-            .loadFaceIdentities(
-                query = queryWithSupportedFormat,
+            .loadIdentities(
+                query = queryWithFormatAndModality,
                 ranges = ranges,
                 dataSource = matchParams.biometricDataSource,
                 project = project,
