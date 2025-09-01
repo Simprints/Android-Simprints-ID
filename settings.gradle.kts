@@ -3,7 +3,6 @@ pluginManagement {
 
     repositories {
         maven(url = "https://repo1.maven.org/maven2/")
-
         google()
         mavenCentral()
         gradlePluginPortal()
