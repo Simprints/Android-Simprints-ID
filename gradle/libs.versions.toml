@@ -38,7 +38,7 @@ play_barcode_version = "18.3.1"
 
 firebase_auth_version = "24.0.1"
 firebase_storage_version = "22.0.0"
-firebase_crashlytics_version = "20.0.0"
+firebase_crashlytics_version = "20.0.1"
 firebase_analytics_version = "23.0.0"
 firebase_perf_version = "22.0.0"
 firebase_crashlyticsPlugin_version = "3.0.6"
