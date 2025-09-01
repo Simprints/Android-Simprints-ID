@@ -23,20 +23,20 @@ internal class CommCareEventSyncTask @Inject constructor(
     eventRepository: EventRepository,
     private val commCareEventDataSource: CommCareEventDataSource,
 ) : BaseEventDownSyncTask(
-    enrolmentRecordRepository,
-    eventDownSyncScopeRepository,
-    subjectFactory,
-    configManager,
-    timeHelper,
-    eventRepository,
-) {
+        enrolmentRecordRepository,
+        eventDownSyncScopeRepository,
+        subjectFactory,
+        configManager,
+        timeHelper,
+        eventRepository,
+    ) {
     override suspend fun fetchEvents(
         operation: EventDownSyncOperation,
         scope: CoroutineScope,
         requestId: String,
     ): EventFetchResult {
         Simber.i("CommCareEventSyncTask started", tag = COMMCARE_SYNC)
-        val result = commCareEventDataSource.getEvents()
+        val result = commCareEventDataSource.getEvents(operation.queryEvent)
 
         return EventFetchResult(
             eventFlow = result.eventFlow,
@@ -50,6 +50,5 @@ internal class CommCareEventSyncTask @Inject constructor(
     }
 
     // Override to track subject IDs present in CommCare and update CommCareSyncCache
-    override suspend fun onEventsProcessed(events: List<EnrolmentRecordEvent>) =
-        commCareEventDataSource.onEventsProcessed(events)
+    override suspend fun onEventsProcessed(events: List<EnrolmentRecordEvent>) = commCareEventDataSource.onEventsProcessed(events)
 }
