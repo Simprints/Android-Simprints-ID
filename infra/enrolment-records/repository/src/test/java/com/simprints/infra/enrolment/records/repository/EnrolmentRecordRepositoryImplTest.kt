@@ -196,8 +196,7 @@ class EnrolmentRecordRepositoryImplTest {
                 moduleId = moduleIdRaw,
                 createdAt = Date(),
                 updatedAt = null,
-                fingerprintSamples = emptyList(),
-                faceSamples = emptyList(),
+                samples = emptyList(),
             )
             every { project.id } returns projectId
             coEvery { localDataSource.load(any()) } returns listOf(subject)
@@ -238,8 +237,7 @@ class EnrolmentRecordRepositoryImplTest {
             moduleId = moduleIdRaw,
             createdAt = Date(),
             updatedAt = null,
-            fingerprintSamples = emptyList(),
-            faceSamples = emptyList(),
+            samples = emptyList(),
         )
         every { project.id } returns projectId
         coEvery { localDataSource.load(any()) } returns listOf(subject)

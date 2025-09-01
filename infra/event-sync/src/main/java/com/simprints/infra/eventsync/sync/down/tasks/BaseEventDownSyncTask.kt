@@ -42,7 +42,6 @@ internal abstract class BaseEventDownSyncTask(
     protected val timeHelper: TimeHelper,
     protected val eventRepository: EventRepository,
 ) {
-
     abstract suspend fun fetchEvents(
         operation: EventDownSyncOperation,
         scope: CoroutineScope,
@@ -51,7 +50,10 @@ internal abstract class BaseEventDownSyncTask(
 
     abstract fun shouldRethrowError(throwable: Throwable): Boolean
 
-    abstract suspend fun performPostSyncCleanup(project: Project, count: Int)
+    abstract suspend fun performPostSyncCleanup(
+        project: Project,
+        count: Int,
+    )
 
     data class EventFetchResult(
         val eventFlow: Flow<EnrolmentRecordEvent>,
@@ -205,7 +207,7 @@ internal abstract class BaseEventDownSyncTask(
 
     private fun handleSubjectCreationEvent(event: EnrolmentRecordCreationEvent): List<SubjectAction> {
         val subject = subjectFactory.buildSubjectFromCreationPayload(event.payload)
-        return if (subject.fingerprintSamples.isNotEmpty() || subject.faceSamples.isNotEmpty()) {
+        return if (subject.samples.isNotEmpty()) {
             listOf(Creation(subject))
         } else {
             emptyList()
@@ -262,7 +264,7 @@ internal abstract class BaseEventDownSyncTask(
     private fun createASubjectActionFromRecordCreation(enrolmentRecordCreation: EnrolmentRecordCreationInMove?): Creation? =
         enrolmentRecordCreation?.let {
             val subject = subjectFactory.buildSubjectFromMovePayload(it)
-            if (subject.fingerprintSamples.isNotEmpty() || subject.faceSamples.isNotEmpty()) {
+            if (subject.samples.isNotEmpty()) {
                 Creation(subject)
             } else {
                 null
@@ -276,8 +278,7 @@ internal abstract class BaseEventDownSyncTask(
         listOf(
             SubjectAction.Update(
                 subjectId = subjectId,
-                faceSamplesToAdd = subjectFactory.extractFaceSamplesFromBiometricReferences(biometricReferencesAdded),
-                fingerprintSamplesToAdd = subjectFactory.extractFingerprintSamplesFromBiometricReferences(biometricReferencesAdded),
+                samplesToAdd = subjectFactory.extractSamplesFromBiometricReferences(biometricReferencesAdded),
                 referenceIdsToRemove = biometricReferencesRemoved,
             ),
         )

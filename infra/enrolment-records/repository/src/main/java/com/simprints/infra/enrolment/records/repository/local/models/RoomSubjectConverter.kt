@@ -12,8 +12,7 @@ internal fun SubjectBiometrics.toDomain() = Subject(
     moduleId = subject.moduleId.asTokenizableEncrypted(),
     createdAt = subject.createdAt?.toDate(),
     updatedAt = subject.updatedAt?.toDate(),
-    fingerprintSamples = biometricTemplates.filter { it.modality == DbModality.FINGERPRINT.id }.map { it.toSample() },
-    faceSamples = biometricTemplates.filter { it.modality == DbModality.FACE.id }.map { it.toSample() },
+    samples = biometricTemplates.map { it.toSample() },
 )
 
 fun Long.toDate() = Date(this)

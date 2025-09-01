@@ -11,8 +11,7 @@ sealed class SubjectAction {
 
     data class Update(
         val subjectId: String,
-        val faceSamplesToAdd: List<Sample>,
-        val fingerprintSamplesToAdd: List<Sample>,
+        val samplesToAdd: List<Sample>,
         val referenceIdsToRemove: List<String>,
     ) : SubjectAction()
 

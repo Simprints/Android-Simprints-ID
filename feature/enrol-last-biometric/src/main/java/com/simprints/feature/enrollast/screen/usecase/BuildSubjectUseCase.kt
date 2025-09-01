@@ -22,9 +22,10 @@ internal class BuildSubjectUseCase @Inject constructor(
         params.userId,
         params.moduleId,
         createdAt = Date(timeHelper.now().ms),
-        fingerprintSamples = getCaptureResult(params.steps, Modality.FINGERPRINT)
-            ?.let { result -> result.results.map { getSample(result.referenceId, it) } }
-            .orEmpty(),
+        samples =
+            fingerprintSamples = getCaptureResult(params.steps, Modality.FINGERPRINT)
+                ?.let { result -> result.results.map { getSample(result.referenceId, it) } }
+                .orEmpty(),
         faceSamples = getCaptureResult(params.steps, Modality.FACE)
             ?.let { result -> result.results.map { getSample(result.referenceId, it) } }
             .orEmpty(),

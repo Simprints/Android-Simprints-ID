@@ -39,7 +39,10 @@ internal class GetEnrolmentCreationEventForSubjectUseCase @Inject constructor(
             ?.fromSubjectToEnrolmentCreationEvent()
 
         if (recordCreationEvent == null) {
-            Simber.e("Couldn't find enrolment for subjectActions", IllegalStateException("No enrolment record found for subjectId: $subjectId"))
+            Simber.e(
+                "Couldn't find enrolment for subjectActions",
+                IllegalStateException("No enrolment record found for subjectId: $subjectId"),
+            )
             return null
         }
 
@@ -51,7 +54,7 @@ internal class GetEnrolmentCreationEventForSubjectUseCase @Inject constructor(
         projectId,
         moduleId,
         attendantId,
-        EnrolmentRecordCreationEvent.buildBiometricReferences(fingerprintSamples, faceSamples, encoder),
+        EnrolmentRecordCreationEvent.buildBiometricReferences(samples, encoder),
     )
 
     companion object {

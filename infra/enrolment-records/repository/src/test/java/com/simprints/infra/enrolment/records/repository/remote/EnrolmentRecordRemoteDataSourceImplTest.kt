@@ -68,7 +68,7 @@ class EnrolmentRecordRemoteDataSourceImplTest {
             projectId = PROJECT_ID,
             moduleId = MODULE_ID,
             attendantId = ATTENDANT_ID,
-            fingerprintSamples = listOf(
+            samples = listOf(
                 Sample(
                     identifier = SampleIdentifier.LEFT_3RD_FINGER,
                     template = FINGERPRINT_TEMPLATE,
@@ -76,8 +76,6 @@ class EnrolmentRecordRemoteDataSourceImplTest {
                     referenceId = "5289df73-7df5-3326-bcdd-22597afb1fac",
                     modality = Modality.FINGERPRINT,
                 ),
-            ),
-            faceSamples = listOf(
                 Sample(
                     template = FACE_TEMPLATE,
                     format = "faceTemplateFormat",

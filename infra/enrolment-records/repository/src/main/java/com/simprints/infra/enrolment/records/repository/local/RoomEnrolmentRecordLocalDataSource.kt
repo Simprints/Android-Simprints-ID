@@ -94,7 +94,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         createIdentity = { subjectId, templates ->
             Identity(
                 subjectId = subjectId,
-                modality = Modality.FINGERPRINT,
+                modality = Modality.FACE,
                 samples = templates.map { sample ->
                     Sample(
                         template = sample.templateData,
@@ -255,7 +255,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         subject: DomainSubject,
         project: Project,
     ) {
-        require(subject.faceSamples.isNotEmpty() || subject.fingerprintSamples.isNotEmpty()) {
+        require(subject.samples.isNotEmpty()) {
             val errorMsg = "Subject should include at least one of the face or fingerprint samples"
             Simber.i(
                 "[createSubject] $errorMsg for subjectId: ${subject.subjectId}",
@@ -282,13 +282,9 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             updatedAt = subject.updatedAt?.time,
         )
         subjectDao.insertSubject(dbSubject)
-        subject.fingerprintSamples.takeIf { it.isNotEmpty() }?.let { samples ->
-            val dbFingerprints = samples.map { it.toRoomDb(subject.subjectId) }
-            subjectDao.insertBiometricSamples(dbFingerprints)
-        }
-        subject.faceSamples.takeIf { it.isNotEmpty() }?.let { samples ->
-            val dbFaces = samples.map { it.toRoomDb(subject.subjectId) }
-            subjectDao.insertBiometricSamples(dbFaces)
+        subject.samples.takeIf { it.isNotEmpty() }?.let { samples ->
+            val dbSamples = samples.map { it.toRoomDb(subject.subjectId) }
+            subjectDao.insertBiometricSamples(dbSamples)
         }
     }
 
@@ -297,9 +293,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         if (dbSubject != null) {
             val referencesToDelete = action.referenceIdsToRemove.toSet()
             require(
-                referencesToDelete.size != dbSubject.biometricTemplates.size ||
-                    action.faceSamplesToAdd.isNotEmpty() ||
-                    action.fingerprintSamplesToAdd.isNotEmpty(),
+                referencesToDelete.size != dbSubject.biometricTemplates.size || action.samplesToAdd.isNotEmpty(),
             ) {
                 val errorMsg =
                     "Cannot delete all samples for subject ${action.subjectId} without adding new ones"
@@ -309,9 +303,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             dbSubject.biometricTemplates.filter { it.referenceId in referencesToDelete }.forEach {
                 subjectDao.deleteBiometricSample(it.uuid)
             }
-            val templatesToAdd =
-                action.faceSamplesToAdd.map { it.toRoomDb(action.subjectId) } +
-                    action.fingerprintSamplesToAdd.map { it.toRoomDb(action.subjectId) }
+            val templatesToAdd = action.samplesToAdd.map { it.toRoomDb(action.subjectId) }
             if (templatesToAdd.isNotEmpty()) {
                 subjectDao.insertBiometricSamples(templatesToAdd)
             }

@@ -270,10 +270,8 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val fingerReferenceId = "fingerToDelete"
         every { realmSingleQuery.find() } returns getRandomSubject()
             .copy(
-                faceSamples = listOf(
+                samples = listOf(
                     getRandomFaceSample(referenceId = faceReferenceId),
-                ),
-                fingerprintSamples = listOf(
                     getRandomFingerprintSample(referenceId = fingerReferenceId),
                 ),
             ).toRealmDb()
@@ -298,11 +296,9 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val faceReferenceId = "faceToDelete"
         val fingerReferenceId = "fingerToDelete"
         every { realmSingleQuery.find() } returns getRandomSubject(
-            faceSamples = listOf(
+            samples = listOf(
                 getRandomFaceSample(referenceId = faceReferenceId),
                 getRandomFaceSample(),
-            ),
-            fingerprintSamples = listOf(
                 getRandomFingerprintSample(referenceId = fingerReferenceId),
                 getRandomFingerprintSample(),
             ),
@@ -312,8 +308,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
             listOf(
                 SubjectAction.Update(
                     subject.subjectId.toString(),
-                    faceSamplesToAdd = listOf(getRandomFaceSample()),
-                    fingerprintSamplesToAdd = listOf(getRandomFingerprintSample()),
+                    samplesToAdd = listOf(getRandomFaceSample(), getRandomFingerprintSample()),
                     referenceIdsToRemove = listOf(faceReferenceId, fingerReferenceId),
                 ),
             ),
@@ -424,18 +419,16 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         projectId: String = UUID.randomUUID().toString(),
         userId: String = UUID.randomUUID().toString(),
         moduleId: String = UUID.randomUUID().toString(),
-        faceSamples: List<Sample> = listOf(
+        samples: List<Sample> = listOf(
             getRandomFaceSample(),
             getRandomFaceSample(),
         ),
-        fingerprintSamples: List<Sample> = listOf(),
     ): Subject = Subject(
         subjectId = patientId,
         projectId = projectId,
         attendantId = userId.asTokenizableRaw(),
         moduleId = moduleId.asTokenizableRaw(),
-        faceSamples = faceSamples,
-        fingerprintSamples = fingerprintSamples,
+        samples = samples,
     )
 
     private fun getRandomFaceSample(

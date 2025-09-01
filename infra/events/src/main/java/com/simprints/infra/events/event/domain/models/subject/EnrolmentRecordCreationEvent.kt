@@ -1,6 +1,7 @@
 package com.simprints.infra.events.event.domain.models.subject
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.utils.EncodingUtils
@@ -39,13 +40,13 @@ data class EnrolmentRecordCreationEvent(
 
     companion object {
         fun buildBiometricReferences(
-            fingerprintSamples: List<Sample>,
-            faceSamples: List<Sample>,
+            samples: List<Sample>,
             encoder: EncodingUtils,
         ): List<BiometricReference> {
             val biometricReferences = mutableListOf<BiometricReference>()
-            buildFingerprintReference(fingerprintSamples, encoder)?.let { biometricReferences.add(it) }
-            buildFaceReference(faceSamples, encoder)?.let { biometricReferences.add(it) }
+
+            buildFingerprintReference(samples.filter { it.modality == Modality.FINGERPRINT }, encoder)?.let { biometricReferences.add(it) }
+            buildFaceReference(samples.filter { it.modality == Modality.FACE }, encoder)?.let { biometricReferences.add(it) }
 
             return biometricReferences
         }

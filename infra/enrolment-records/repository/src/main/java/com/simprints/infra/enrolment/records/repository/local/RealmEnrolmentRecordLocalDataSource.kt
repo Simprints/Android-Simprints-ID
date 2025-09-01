@@ -229,10 +229,14 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
 
                             // Append new samples to the list of samples that remain after removing
                             dbSubject.faceSamples = (
-                                faceSamplesMap[false].orEmpty() + action.faceSamplesToAdd.map { it.toRealmFaceDb() }
+                                faceSamplesMap[false].orEmpty() + action.samplesToAdd
+                                    .filter { it.modality == Modality.FACE }
+                                    .map { it.toRealmFaceDb() }
                             ).toRealmList()
                             dbSubject.fingerprintSamples = (
-                                fingerprintSamplesMap[false].orEmpty() + action.fingerprintSamplesToAdd.map { it.toRealmFingerprintDb() }
+                                fingerprintSamplesMap[false].orEmpty() + action.samplesToAdd
+                                    .filter { it.modality == Modality.FINGERPRINT }
+                                    .map { it.toRealmFingerprintDb() }
                             ).toRealmList()
 
                             faceSamplesMap[true]?.forEach { realm.delete(it) }
