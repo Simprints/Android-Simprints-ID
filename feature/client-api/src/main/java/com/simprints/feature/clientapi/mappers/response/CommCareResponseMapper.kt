@@ -2,6 +2,8 @@ package com.simprints.feature.clientapi.mappers.response
 
 import android.os.Bundle
 import androidx.core.os.bundleOf
+import com.simprints.core.DeviceID
+import com.simprints.core.PackageVersionName
 import com.simprints.feature.clientapi.models.CommCareConstants
 import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.libsimprints.Constants
@@ -9,9 +11,14 @@ import javax.inject.Inject
 import com.simprints.libsimprints.Identification as LegacyIdentification
 import com.simprints.libsimprints.Tier as LegacyTier
 
-internal class CommCareResponseMapper @Inject constructor() {
+internal class CommCareResponseMapper @Inject constructor(
+    @DeviceID private val deviceId: String,
+    @PackageVersionName private val appVersionName: String,
+) {
     operator fun invoke(response: ActionResponse): Bundle = when (response) {
         is ActionResponse.EnrolActionResponse -> bundleOf(
+            CommCareConstants.COMMCARE_DEVICE_ID to deviceId,
+            CommCareConstants.COMMCARE_SID_VERSION to appVersionName,
             CommCareConstants.SIMPRINTS_SESSION_ID to response.sessionId,
             CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY to "true",
             CommCareConstants.REGISTRATION_GUID_KEY to response.enrolledGuid,
@@ -23,6 +30,8 @@ internal class CommCareResponseMapper @Inject constructor() {
          * from others (not inside [CommCareConstants.COMMCARE_BUNDLE_KEY]).
          */
         is ActionResponse.IdentifyActionResponse -> bundleOf(
+            CommCareConstants.COMMCARE_DEVICE_ID to deviceId,
+            CommCareConstants.COMMCARE_SID_VERSION to appVersionName,
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
             Constants.SIMPRINTS_IDENTIFICATIONS to ArrayList<LegacyIdentification>(
                 response.identifications.map {
@@ -32,11 +41,15 @@ internal class CommCareResponseMapper @Inject constructor() {
         )
 
         is ActionResponse.ConfirmActionResponse -> bundleOf(
+            CommCareConstants.COMMCARE_DEVICE_ID to deviceId,
+            CommCareConstants.COMMCARE_SID_VERSION to appVersionName,
             CommCareConstants.SIMPRINTS_SESSION_ID to response.sessionId,
             CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY to "true",
         ).toCommCareBundle()
 
         is ActionResponse.VerifyActionResponse -> bundleOf(
+            CommCareConstants.COMMCARE_DEVICE_ID to deviceId,
+            CommCareConstants.COMMCARE_SID_VERSION to appVersionName,
             CommCareConstants.SIMPRINTS_SESSION_ID to response.sessionId,
             CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY to "true",
             CommCareConstants.VERIFICATION_GUID_KEY to response.matchResult.guid,
@@ -49,6 +62,8 @@ internal class CommCareResponseMapper @Inject constructor() {
         }.toCommCareBundle()
 
         is ActionResponse.ExitFormActionResponse -> bundleOf(
+            CommCareConstants.COMMCARE_DEVICE_ID to deviceId,
+            CommCareConstants.COMMCARE_SID_VERSION to appVersionName,
             CommCareConstants.SIMPRINTS_SESSION_ID to response.sessionId,
             CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY to "true",
             CommCareConstants.EXIT_REASON to response.reason,
@@ -56,6 +71,8 @@ internal class CommCareResponseMapper @Inject constructor() {
         ).toCommCareBundle()
 
         is ActionResponse.ErrorActionResponse -> bundleOf(
+            CommCareConstants.COMMCARE_DEVICE_ID to deviceId,
+            CommCareConstants.COMMCARE_SID_VERSION to appVersionName,
             CommCareConstants.SIMPRINTS_SESSION_ID to response.sessionId,
             CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY to response.flowCompleted.toString(),
         ).toCommCareBundle()

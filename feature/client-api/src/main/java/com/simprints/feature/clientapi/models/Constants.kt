@@ -64,6 +64,9 @@ internal object CommCareConstants {
 
     const val COMMCARE_BUNDLE_KEY = "odk_intent_bundle"
     const val COMMCARE_DATA_KEY = "odk_intent_data"
+
+    const val COMMCARE_DEVICE_ID = "deviceId"
+    const val COMMCARE_SID_VERSION = "appVersionName"
 }
 
 internal object LibSimprintsConstants {
