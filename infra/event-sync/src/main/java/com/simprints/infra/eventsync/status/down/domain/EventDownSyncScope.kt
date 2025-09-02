@@ -3,7 +3,7 @@ package com.simprints.infra.eventsync.status.down.domain
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.simprints.core.domain.modality.Modes
+import com.simprints.core.domain.common.Modality
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope.SubjectModuleScope
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope.SubjectUserScope
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope.ProjectScope
@@ -26,7 +26,7 @@ internal sealed class EventDownSyncScope(
     @Keep
     data class SubjectProjectScope(
         val projectId: String,
-        val modes: List<Modes>,
+        val modes: List<Modality>,
     ) : EventDownSyncScope() {
         override var operations =
             listOf(
@@ -43,7 +43,7 @@ internal sealed class EventDownSyncScope(
     data class SubjectUserScope(
         val projectId: String,
         val attendantId: String,
-        val modes: List<Modes>,
+        val modes: List<Modality>,
     ) : EventDownSyncScope() {
         override var operations =
             listOf(
@@ -61,7 +61,7 @@ internal sealed class EventDownSyncScope(
     data class SubjectModuleScope(
         val projectId: String,
         val moduleIds: List<String>,
-        val modes: List<Modes>,
+        val modes: List<Modality>,
     ) : EventDownSyncScope() {
         override var operations =
             moduleIds.map {

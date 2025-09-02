@@ -1,13 +1,14 @@
 package com.simprints.infra.config.store.remote.models
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.common.Modality
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 
 @Keep
 internal data class ApiGeneralConfiguration(
-    val modalities: List<Modality>,
-    val matchingModalities: List<Modality>,
+    val modalities: List<ApiModality>,
+    val matchingModalities: List<ApiModality>,
     val languageOptions: List<String>,
     val defaultLanguage: String,
     val collectLocation: Boolean,
@@ -27,14 +28,14 @@ internal data class ApiGeneralConfiguration(
     )
 
     @Keep
-    enum class Modality {
+    enum class ApiModality {
         FACE,
         FINGERPRINT,
         ;
 
-        fun toDomain(): GeneralConfiguration.Modality = when (this) {
-            FACE -> GeneralConfiguration.Modality.FACE
-            FINGERPRINT -> GeneralConfiguration.Modality.FINGERPRINT
+        fun toDomain(): Modality = when (this) {
+            FACE -> Modality.FACE
+            FINGERPRINT -> Modality.FINGERPRINT
         }
     }
 }

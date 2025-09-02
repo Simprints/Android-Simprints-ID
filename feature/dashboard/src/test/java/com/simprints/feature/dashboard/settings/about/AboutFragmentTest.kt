@@ -2,22 +2,19 @@ package com.simprints.feature.dashboard.settings.about
 
 import androidx.annotation.IdRes
 import androidx.lifecycle.Observer
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.replaceText
-import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.PreferenceMatchers.*
-import androidx.test.espresso.matcher.RootMatchers.isDialog
+import androidx.test.espresso.Espresso.*
+import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.assertion.ViewAssertions.*
+import androidx.test.espresso.matcher.RootMatchers.*
 import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth
+import androidx.test.ext.junit.runners.*
+import com.google.common.truth.*
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.feature.dashboard.R
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
@@ -26,9 +23,7 @@ import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -84,7 +79,7 @@ class AboutFragmentTest {
 
     @Test
     fun `should hide the fingerprint preference if the modalities doesn't contain Fingerprint`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockModalities(listOf(Modality.FACE))
 
         launchFragmentInHiltContainer<AboutFragment>()
 
@@ -94,7 +89,7 @@ class AboutFragmentTest {
 
     @Test
     fun `should display the fingerprint preference if the modalities contains Fingerprint`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FINGERPRINT))
+        mockModalities(listOf(Modality.FINGERPRINT))
 
         launchFragmentInHiltContainer<AboutFragment>()
 
@@ -104,7 +99,7 @@ class AboutFragmentTest {
 
     @Test
     fun `should display the toolbar`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FINGERPRINT))
+        mockModalities(listOf(Modality.FINGERPRINT))
 
         launchFragmentInHiltContainer<AboutFragment>()
 
@@ -113,7 +108,7 @@ class AboutFragmentTest {
 
     @Test
     fun `should init the preferences correctly`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockModalities(listOf(Modality.FACE))
 
         launchFragmentInHiltContainer<AboutFragment>()
 
@@ -125,7 +120,7 @@ class AboutFragmentTest {
     @Test
     fun `should process logout when no password and clicking on logout`() {
         mockSettingsPassword(SettingsPasswordConfig.NotSet)
-        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockModalities(listOf(Modality.FACE))
         val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
 
         launchFragmentInHiltContainer<AboutFragment>(navController = navController)
@@ -159,7 +154,7 @@ class AboutFragmentTest {
         @IdRes targetDestinationId: Int,
     ) {
         mockSettingsPassword(SettingsPasswordConfig.NotSet)
-        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockModalities(listOf(Modality.FACE))
         mockLogoutDestination(destination)
         val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
 
@@ -170,7 +165,7 @@ class AboutFragmentTest {
     @Test
     fun `should not logout when no password and refusing on the alert dialog`() {
         mockSettingsPassword(SettingsPasswordConfig.NotSet)
-        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockModalities(listOf(Modality.FACE))
         val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
 
         launchFragmentInHiltContainer<AboutFragment>(navController = navController)
@@ -187,7 +182,7 @@ class AboutFragmentTest {
     @Test
     fun `should prompt password input when has password and clicking on logout`() {
         mockSettingsPassword(SettingsPasswordConfig.Locked("1234"))
-        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockModalities(listOf(Modality.FACE))
         val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
 
         launchFragmentInHiltContainer<AboutFragment>(navController = navController)
@@ -203,7 +198,7 @@ class AboutFragmentTest {
     @Test
     fun `should not log out when prompted password and it was incorrect`() {
         mockSettingsPassword(SettingsPasswordConfig.Locked("1234"))
-        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockModalities(listOf(Modality.FACE))
         val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
 
         launchFragmentInHiltContainer<AboutFragment>(navController = navController)
@@ -217,10 +212,10 @@ class AboutFragmentTest {
         verify(exactly = 0) { viewModel.processLogoutRequest() }
     }
 
-    private fun mockModalities(modalities: List<GeneralConfiguration.Modality>) {
+    private fun mockModalities(modalities: List<Modality>) {
         every { viewModel.modalities } returns mockk {
             every { observe(any(), any()) } answers {
-                secondArg<Observer<List<GeneralConfiguration.Modality>>>().onChanged(modalities)
+                secondArg<Observer<List<Modality>>>().onChanged(modalities)
             }
         }
     }

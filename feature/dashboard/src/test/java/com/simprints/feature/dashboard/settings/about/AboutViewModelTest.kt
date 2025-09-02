@@ -3,6 +3,7 @@ package com.simprints.feature.dashboard.settings.about
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
@@ -30,7 +31,7 @@ import org.junit.Test
 
 class AboutViewModelTest {
     companion object {
-        private val MODALITIES = listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        private val MODALITIES = listOf(Modality.FINGERPRINT)
         private val POOL_TYPE = IdentificationConfiguration.PoolType.MODULE
         private val PARTITION_TYPE = DownSynchronizationConfiguration.PartitionType.PROJECT
     }

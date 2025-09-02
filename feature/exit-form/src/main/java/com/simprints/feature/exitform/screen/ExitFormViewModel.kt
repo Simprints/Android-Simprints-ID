@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.SessionCoroutineScope
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
@@ -75,7 +76,7 @@ internal class ExitFormViewModel @Inject constructor(
     fun start() {
         viewModelScope.launch {
             val projectConfig = configManager.getProjectConfiguration()
-            if (projectConfig.general.modalities.contains(GeneralConfiguration.Modality.FINGERPRINT)) {
+            if (projectConfig.general.modalities.contains(Modality.FINGERPRINT)) {
                 val options = DEFAULT_OPTIONS.toMutableSet()
                 options.remove(ExitFormOption.AppNotWorking)
                 options.add(ExitFormOption.ScannerNotWorking)

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.step.StepResult
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -38,7 +39,6 @@ import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.setup.LocationStore
 import com.simprints.fingerprint.capture.FingerprintCaptureParams
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
@@ -68,7 +68,7 @@ internal class OrchestratorViewModel @Inject constructor(
 
     // [MS-1127] MF-ID: during enrolment, the same 'subjectId' needs to be used during the entire workflow
     private val enrolmentSubjectId = UUID.randomUUID().toString()
-    private var modalities = emptySet<GeneralConfiguration.Modality>()
+    private var modalities = emptySet<Modality>()
     private var steps = emptyList<Step>()
     private var actionRequest: ActionRequest? = null
 
@@ -142,7 +142,7 @@ internal class OrchestratorViewModel @Inject constructor(
                 action = actionRequest!!,
                 projectConfiguration = projectConfiguration,
                 ageGroup = result.ageGroup,
-                enrolmentSubjectId = enrolmentSubjectId
+                enrolmentSubjectId = enrolmentSubjectId,
             )
             steps = steps + captureAndMatchSteps
         }
@@ -207,11 +207,11 @@ internal class OrchestratorViewModel @Inject constructor(
     private fun removeMatcherStepIfRequired(result: ExternalCredentialSearchResult) {
         if (result.flowType == FlowType.IDENTIFY) {
             val confirmedVerifications = result.goodMatches.size
-            if(confirmedVerifications > 0) {
+            if (confirmedVerifications > 0) {
                 steps = steps.filterNot { it.id in listOf(StepId.FACE_MATCHER, StepId.FINGERPRINT_MATCHER) }
                 Simber.i(
                     "Matcher steps removed because External Credential search verified [$confirmedVerifications] candidate(s). Flow type = [${result.flowType}]",
-                    tag = ORCHESTRATION
+                    tag = ORCHESTRATION,
                 )
             }
         }
@@ -316,7 +316,10 @@ internal class OrchestratorViewModel @Inject constructor(
     /**
      * Passes face or fingerprint samples to the External Credential search step
      */
-    private fun updateExternalCredentialStepPayload(currentStep: Step, result: StepResult) {
+    private fun updateExternalCredentialStepPayload(
+        currentStep: Step,
+        result: StepResult,
+    ) {
         if (currentStep.id !in listOf(StepId.FACE_CAPTURE, StepId.FINGERPRINT_CAPTURE)) return
         val step = steps.firstOrNull { it.id == StepId.EXTERNAL_CREDENTIAL } ?: return
         val params = step.params as? ExternalCredentialParams ?: return

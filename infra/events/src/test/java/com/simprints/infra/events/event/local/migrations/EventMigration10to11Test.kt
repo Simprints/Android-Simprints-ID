@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.fasterxml.jackson.core.type.TypeReference
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.tools.extentions.getLongWithColumnName
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.json.JsonHelper
@@ -233,8 +234,8 @@ class EventMigration10to11Test {
         assertThat(scopePayload.sidVersion).isEqualTo("1.0.0")
         assertThat(scopePayload.modalities).isEqualTo(
             listOf(
-                GeneralConfiguration.Modality.FINGERPRINT,
-                GeneralConfiguration.Modality.FACE,
+                Modality.FINGERPRINT,
+                Modality.FACE,
             ),
         )
         assertThat(scopePayload.device).isEqualTo(Device("29", "Pixel 3", DEVICE_ID))

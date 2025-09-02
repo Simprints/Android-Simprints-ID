@@ -2,7 +2,8 @@ package com.simprints.infra.eventsync.sync.up
 
 import androidx.work.WorkRequest
 import androidx.work.workDataOf
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
@@ -17,9 +18,7 @@ import com.simprints.infra.eventsync.sync.common.TAG_UP_MASTER_SYNC_ID
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_EVENT_UP_SYNC_SCOPE_ID
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_UP_SYNC
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -46,7 +45,7 @@ class EventUpSyncWorkersBuilderTest {
 
     @Test
     fun builder_forProjectUpSync_shouldReturnTheRightWorkers() = runTest {
-        every { generalConfiguration.modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        every { generalConfiguration.modalities } returns listOf(Modality.FINGERPRINT)
         every { downSyncConfiguration.simprints?.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
         coEvery {
             eventUpSyncScopeRepository.getUpSyncScope()
@@ -61,7 +60,7 @@ class EventUpSyncWorkersBuilderTest {
 
     @Test
     fun builder_periodicUpSyncWorkers_shouldHaveTheRightTags() = runTest {
-        every { generalConfiguration.modalities } returns listOf(GeneralConfiguration.Modality.FACE)
+        every { generalConfiguration.modalities } returns listOf(Modality.FACE)
         every { downSyncConfiguration.simprints?.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
         coEvery {
             eventUpSyncScopeRepository.getUpSyncScope()
@@ -77,7 +76,7 @@ class EventUpSyncWorkersBuilderTest {
 
     @Test
     fun builder_oneTimeDownSyncWorkers_shouldHaveTheRightTags() = runTest {
-        every { generalConfiguration.modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        every { generalConfiguration.modalities } returns listOf(Modality.FINGERPRINT)
         every { downSyncConfiguration.simprints?.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
         coEvery {
             eventUpSyncScopeRepository.getUpSyncScope()

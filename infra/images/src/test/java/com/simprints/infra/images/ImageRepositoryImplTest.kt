@@ -1,7 +1,7 @@
 package com.simprints.infra.images
 
 import com.google.common.truth.Truth.*
-import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.core.domain.common.Modality
 import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.metadata.ImageMetadataStore
 import com.simprints.infra.images.model.Path
@@ -60,7 +60,7 @@ internal class ImageRepositoryImplTest {
         val imageRef = repository.storeSample(
             projectId = PROJECT_ID,
             sessionId = "sessionId",
-            modality = GeneralConfiguration.Modality.FACE,
+            modality = Modality.FACE,
             sampleId = "sampleId",
             fileExtension = "jpg",
             sampleBytes = ByteArray(10),
@@ -79,7 +79,7 @@ internal class ImageRepositoryImplTest {
         val imageRef = repository.storeSample(
             projectId = PROJECT_ID,
             sessionId = "sessionId",
-            modality = GeneralConfiguration.Modality.FACE,
+            modality = Modality.FACE,
             sampleId = "sampleId",
             fileExtension = "jpg",
             sampleBytes = ByteArray(10),
@@ -99,7 +99,7 @@ internal class ImageRepositoryImplTest {
         val imageRef = repository.storeSample(
             projectId = PROJECT_ID,
             sessionId = "sessionId",
-            modality = GeneralConfiguration.Modality.FACE,
+            modality = Modality.FACE,
             sampleId = "sampleId",
             fileExtension = "jpg",
             sampleBytes = ByteArray(10),

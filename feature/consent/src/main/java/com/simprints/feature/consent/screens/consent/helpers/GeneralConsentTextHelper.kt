@@ -1,9 +1,9 @@
 package com.simprints.feature.consent.screens.consent.helpers
 
 import android.content.Context
+import com.simprints.core.domain.common.Modality
 import com.simprints.feature.consent.ConsentType
 import com.simprints.infra.config.store.models.ConsentConfiguration
-import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.resources.R
 
 internal data class GeneralConsentTextHelper(

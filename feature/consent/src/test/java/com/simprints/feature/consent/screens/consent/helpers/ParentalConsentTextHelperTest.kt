@@ -1,12 +1,12 @@
 package com.simprints.feature.consent.screens.consent.helpers
 
 import android.content.Context
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import androidx.test.core.app.*
+import androidx.test.ext.junit.runners.*
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.Modality
 import com.simprints.feature.consent.ConsentType
 import com.simprints.infra.config.store.models.ConsentConfiguration
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.resources.R
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,7 +38,7 @@ class ParentalConsentTextHelperTest {
                     confirmation = false,
                 ),
             ),
-            listOf(GeneralConfiguration.Modality.FINGERPRINT),
+            listOf(Modality.FINGERPRINT),
             ConsentType.ENROL,
         ).assembleText(context)
 
@@ -61,7 +61,7 @@ class ParentalConsentTextHelperTest {
                     confirmation = false,
                 ),
             ),
-            listOf(GeneralConfiguration.Modality.FINGERPRINT, GeneralConfiguration.Modality.FACE),
+            listOf(Modality.FINGERPRINT, Modality.FACE),
             ConsentType.ENROL,
         ).assembleText(context)
 
@@ -84,7 +84,7 @@ class ParentalConsentTextHelperTest {
                     confirmation = false,
                 ),
             ),
-            listOf(GeneralConfiguration.Modality.FACE),
+            listOf(Modality.FACE),
             ConsentType.ENROL,
         ).assembleText(context)
 
@@ -107,7 +107,7 @@ class ParentalConsentTextHelperTest {
                     confirmation = false,
                 ),
             ),
-            listOf(GeneralConfiguration.Modality.FINGERPRINT, GeneralConfiguration.Modality.FACE),
+            listOf(Modality.FINGERPRINT, Modality.FACE),
             ConsentType.ENROL,
         ).assembleText(context)
 
@@ -130,7 +130,7 @@ class ParentalConsentTextHelperTest {
                     confirmation = false,
                 ),
             ),
-            listOf(GeneralConfiguration.Modality.FINGERPRINT),
+            listOf(Modality.FINGERPRINT),
             ConsentType.VERIFY,
         ).assembleText(context)
 
@@ -153,7 +153,7 @@ class ParentalConsentTextHelperTest {
                     confirmation = false,
                 ),
             ),
-            listOf(GeneralConfiguration.Modality.FINGERPRINT),
+            listOf(Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
 
@@ -176,7 +176,7 @@ class ParentalConsentTextHelperTest {
                     confirmation = false,
                 ),
             ),
-            listOf(GeneralConfiguration.Modality.FINGERPRINT, GeneralConfiguration.Modality.FACE),
+            listOf(Modality.FINGERPRINT, Modality.FACE),
             ConsentType.IDENTIFY,
         ).assembleText(context)
 
@@ -199,7 +199,7 @@ class ParentalConsentTextHelperTest {
                     confirmation = false,
                 ),
             ),
-            listOf(GeneralConfiguration.Modality.FINGERPRINT),
+            listOf(Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
 
@@ -223,7 +223,7 @@ class ParentalConsentTextHelperTest {
                     confirmation = false,
                 ),
             ),
-            listOf(GeneralConfiguration.Modality.FACE),
+            listOf(Modality.FACE),
             ConsentType.IDENTIFY,
         ).assembleText(context)
 
@@ -247,7 +247,7 @@ class ParentalConsentTextHelperTest {
                     confirmation = false,
                 ),
             ),
-            listOf(GeneralConfiguration.Modality.FINGERPRINT, GeneralConfiguration.Modality.FACE),
+            listOf(Modality.FINGERPRINT, Modality.FACE),
             ConsentType.IDENTIFY,
         ).assembleText(context)
 
@@ -271,7 +271,7 @@ class ParentalConsentTextHelperTest {
                     confirmation = false,
                 ),
             ),
-            listOf(GeneralConfiguration.Modality.FINGERPRINT),
+            listOf(Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
 
@@ -294,7 +294,7 @@ class ParentalConsentTextHelperTest {
                     confirmation = false,
                 ),
             ),
-            listOf(GeneralConfiguration.Modality.FINGERPRINT),
+            listOf(Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
 
@@ -316,7 +316,7 @@ class ParentalConsentTextHelperTest {
                     confirmation = false,
                 ),
             ),
-            listOf(GeneralConfiguration.Modality.FINGERPRINT),
+            listOf(Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
 
@@ -338,7 +338,7 @@ class ParentalConsentTextHelperTest {
                     confirmation = false,
                 ),
             ),
-            listOf(GeneralConfiguration.Modality.FINGERPRINT),
+            listOf(Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
 
@@ -360,7 +360,7 @@ class ParentalConsentTextHelperTest {
                     confirmation = false,
                 ),
             ),
-            listOf(GeneralConfiguration.Modality.FINGERPRINT),
+            listOf(Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
 
@@ -382,7 +382,7 @@ class ParentalConsentTextHelperTest {
                     confirmation = true,
                 ),
             ),
-            listOf(GeneralConfiguration.Modality.FINGERPRINT),
+            listOf(Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
 
@@ -405,7 +405,7 @@ class ParentalConsentTextHelperTest {
                     confirmation = false,
                 ),
             ),
-            listOf(GeneralConfiguration.Modality.FINGERPRINT),
+            listOf(Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
 
@@ -427,7 +427,7 @@ class ParentalConsentTextHelperTest {
                     confirmation = true,
                 ),
             ),
-            listOf(GeneralConfiguration.Modality.FINGERPRINT),
+            listOf(Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
 
@@ -446,7 +446,7 @@ class ParentalConsentTextHelperTest {
                     confirmation = true,
                 ),
             ),
-            listOf(GeneralConfiguration.Modality.FINGERPRINT),
+            listOf(Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
 
@@ -465,7 +465,7 @@ class ParentalConsentTextHelperTest {
                     confirmation = true,
                 ),
             ),
-            listOf(GeneralConfiguration.Modality.FINGERPRINT),
+            listOf(Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
 

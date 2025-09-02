@@ -1,5 +1,6 @@
 package com.simprints.infra.sync.config.testtools
 
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.models.AgeGroup
@@ -26,8 +27,8 @@ import com.simprints.infra.config.store.models.Vero1Configuration
 import com.simprints.infra.config.store.models.Vero2Configuration
 
 internal val generalConfiguration = GeneralConfiguration(
-    listOf(GeneralConfiguration.Modality.FACE),
-    listOf(GeneralConfiguration.Modality.FACE),
+    listOf(Modality.FACE),
+    listOf(Modality.FACE),
     listOf("en"),
     "en",
     collectLocation = true,
@@ -119,7 +120,7 @@ internal val simprintsDownSyncConfigurationConfiguration = DownSynchronizationCo
 internal val allowedExternalCredential = ExternalCredentialType.NHISCard
 
 internal val multiFactorIdConfiguration = MultiFactorIdConfiguration(
-    allowedExternalCredentials = listOf(allowedExternalCredential)
+    allowedExternalCredentials = listOf(allowedExternalCredential),
 )
 
 internal val synchronizationConfiguration = SynchronizationConfiguration(
@@ -150,7 +151,7 @@ internal val projectConfiguration = ProjectConfiguration(
     identification = identificationConfiguration,
     synchronization = synchronizationConfiguration,
     multifactorId = multiFactorIdConfiguration,
-    custom = null
+    custom = null,
 )
 
 internal const val TOKENIZATION_JSON =

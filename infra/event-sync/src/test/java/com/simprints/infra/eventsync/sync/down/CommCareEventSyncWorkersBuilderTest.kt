@@ -3,8 +3,8 @@ package com.simprints.infra.eventsync.sync.down
 import androidx.work.WorkRequest
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.common.Partitioning
-import com.simprints.core.domain.modality.Modes
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.sync.ConfigManager
@@ -30,7 +30,6 @@ import org.junit.Before
 import org.junit.Test
 
 class CommCareEventSyncWorkersBuilderTest {
-
     @MockK
     private lateinit var generalConfiguration: GeneralConfiguration
 
@@ -59,10 +58,10 @@ class CommCareEventSyncWorkersBuilderTest {
 
     @Test
     fun builder_forCommCareDownSyncWithFingerprintModality_shouldReturnTheRightWorkers() = runTest {
-        every { generalConfiguration.modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        every { generalConfiguration.modalities } returns listOf(Modality.FINGERPRINT)
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(
-                modes = listOf(Modes.FINGERPRINT),
+                modes = listOf(Modality.FINGERPRINT),
                 selectedModuleIDs = emptyList(),
                 syncPartitioning = Partitioning.GLOBAL,
             )
@@ -77,10 +76,10 @@ class CommCareEventSyncWorkersBuilderTest {
 
     @Test
     fun builder_forCommCareDownSyncWithFaceModality_shouldReturnTheRightWorkers() = runTest {
-        every { generalConfiguration.modalities } returns listOf(GeneralConfiguration.Modality.FACE)
+        every { generalConfiguration.modalities } returns listOf(Modality.FACE)
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(
-                modes = listOf(Modes.FACE),
+                modes = listOf(Modality.FACE),
                 selectedModuleIDs = emptyList(),
                 syncPartitioning = Partitioning.GLOBAL,
             )
@@ -95,10 +94,10 @@ class CommCareEventSyncWorkersBuilderTest {
 
     @Test
     fun builder_periodicDownSyncWorkers_shouldHaveTheRightTags() = runTest {
-        every { generalConfiguration.modalities } returns listOf(GeneralConfiguration.Modality.FACE)
+        every { generalConfiguration.modalities } returns listOf(Modality.FACE)
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(
-                modes = listOf(Modes.FACE),
+                modes = listOf(Modality.FACE),
                 selectedModuleIDs = emptyList(),
                 syncPartitioning = Partitioning.GLOBAL,
             )
@@ -113,10 +112,10 @@ class CommCareEventSyncWorkersBuilderTest {
 
     @Test
     fun builder_oneTimeDownSyncWorkers_shouldHaveTheRightTags() = runTest {
-        every { generalConfiguration.modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        every { generalConfiguration.modalities } returns listOf(Modality.FINGERPRINT)
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(
-                modes = listOf(Modes.FINGERPRINT),
+                modes = listOf(Modality.FINGERPRINT),
                 selectedModuleIDs = emptyList(),
                 syncPartitioning = Partitioning.GLOBAL,
             )
