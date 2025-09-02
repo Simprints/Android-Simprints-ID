@@ -1,10 +1,10 @@
 package com.simprints.feature.enrollast
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 
 @Keep
@@ -54,7 +54,7 @@ data class MatchResult(
 
 @Keep
 data class FingerTemplateCaptureResult(
-    val finger: Finger,
+    val finger: SampleIdentifier,
     val template: ByteArray,
     val templateQualityScore: Int,
     val format: String,

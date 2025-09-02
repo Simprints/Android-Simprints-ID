@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.testtools
 
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -35,10 +35,10 @@ object FingerprintGenerator {
     private const val QUALITY_SHIFT = 5 // SHORT
 
     private val RANDOM_GENERATOR = Random()
-    private val FINGER_IDENTIFIERS = FingerIdentifier.values()
+    private val FINGER_IDENTIFIERS = SampleIdentifier.values()
 
     /**
-     * @return A random valid [Fingerprint] with a random [FingerIdentifier]
+     * @return A random valid [Fingerprint] with a random [SampleIdentifier]
      */
     fun generateRandomFingerprint(): Fingerprint {
         val fingerNo = RANDOM_GENERATOR.nextInt(FINGER_IDENTIFIERS.size)
@@ -48,9 +48,9 @@ object FingerprintGenerator {
 
     /**
      * @param fingerId Finger identifier of the fingerprint
-     * @return A random valid [Fingerprint] with specified [FingerIdentifier]
+     * @return A random valid [Fingerprint] with specified [SampleIdentifier]
      */
-    private fun generateRandomFingerprint(fingerId: FingerIdentifier): Fingerprint {
+    private fun generateRandomFingerprint(fingerId: SampleIdentifier): Fingerprint {
         val qualityScore = RANDOM_GENERATOR.nextInt(101).toByte()
         return generateRandomFingerprint(fingerId, qualityScore)
     }
@@ -58,10 +58,10 @@ object FingerprintGenerator {
     /**
      * @param fingerId     Finger identifier of the fingerprint
      * @param qualityScore Quality score of the fingerprint
-     * @return A random valid [Fingerprint] with specified [FingerIdentifier]
+     * @return A random valid [Fingerprint] with specified [SampleIdentifier]
      */
     private fun generateRandomFingerprint(
-        fingerId: FingerIdentifier,
+        fingerId: SampleIdentifier,
         qualityScore: Byte,
     ): Fingerprint {
         val nbMinutiae = RANDOM_GENERATOR.nextInt(128).toByte()

@@ -1,9 +1,9 @@
 package com.simprints.fingerprint.capture.state
 
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 
 internal data class FingerState(
-    val id: IFingerIdentifier,
+    val id: SampleIdentifier,
     val captures: List<CaptureState>,
     val currentCaptureIndex: Int = 0,
 ) {

@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.capture.usecase
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import org.junit.Test
 
 class GetNextFingerToAddUseCaseTest {
@@ -9,7 +9,7 @@ class GetNextFingerToAddUseCaseTest {
 
     @Test
     fun `Returns left thumb as first in priority`() {
-        assertThat(useCase(listOf())).isEqualTo(IFingerIdentifier.LEFT_THUMB)
+        assertThat(useCase(listOf())).isEqualTo(SampleIdentifier.LEFT_THUMB)
     }
 
     @Test
@@ -17,10 +17,10 @@ class GetNextFingerToAddUseCaseTest {
         assertThat(
             useCase(
                 listOf(
-                    IFingerIdentifier.LEFT_THUMB,
-                    IFingerIdentifier.LEFT_INDEX_FINGER,
+                    SampleIdentifier.LEFT_THUMB,
+                    SampleIdentifier.LEFT_INDEX_FINGER,
                 ),
             ),
-        ).isEqualTo(IFingerIdentifier.RIGHT_THUMB)
+        ).isEqualTo(SampleIdentifier.RIGHT_THUMB)
     }
 }

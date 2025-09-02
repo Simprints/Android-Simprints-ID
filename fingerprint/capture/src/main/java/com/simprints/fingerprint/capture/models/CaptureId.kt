@@ -1,8 +1,8 @@
 package com.simprints.fingerprint.capture.models
 
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 
 internal data class CaptureId(
-    val finger: IFingerIdentifier,
+    val finger: SampleIdentifier,
     val captureIndex: Int,
 )

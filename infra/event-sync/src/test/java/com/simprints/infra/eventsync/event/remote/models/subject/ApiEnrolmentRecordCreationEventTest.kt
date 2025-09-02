@@ -1,9 +1,9 @@
 package com.simprints.infra.eventsync.event.remote.models.subject
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
@@ -24,7 +24,7 @@ class ApiEnrolmentRecordCreationEventTest {
                 ApiFingerprintReference(
                     "fpRefId",
                     listOf(
-                        ApiFingerprintTemplate("template", IFingerIdentifier.LEFT_THUMB),
+                        ApiFingerprintTemplate("template", SampleIdentifier.LEFT_THUMB),
                     ),
                     "NEC_1",
                 ),
@@ -32,7 +32,7 @@ class ApiEnrolmentRecordCreationEventTest {
             externalCredential = ApiExternalCredential(
                 id = "id",
                 type = ExternalCredentialType.NHISCard.toString(),
-                value = "value"
+                value = "value",
             ),
         )
         val expectedPayload = EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload(
@@ -44,7 +44,7 @@ class ApiEnrolmentRecordCreationEventTest {
                 FingerprintReference(
                     "fpRefId",
                     listOf(
-                        FingerprintTemplate("template", IFingerIdentifier.LEFT_THUMB),
+                        FingerprintTemplate("template", SampleIdentifier.LEFT_THUMB),
                     ),
                     "NEC_1",
                 ),
@@ -54,8 +54,8 @@ class ApiEnrolmentRecordCreationEventTest {
                     id = "id",
                     value = "value".asTokenizableEncrypted(),
                     subjectId = "subjectId",
-                    type = ExternalCredentialType.NHISCard
-                )
+                    type = ExternalCredentialType.NHISCard,
+                ),
             ),
         )
 

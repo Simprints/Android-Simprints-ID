@@ -1,23 +1,12 @@
 package com.simprints.feature.dashboard.settings.fingerselection
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.store.models.Finger.LEFT_3RD_FINGER
-import com.simprints.infra.config.store.models.Finger.LEFT_4TH_FINGER
-import com.simprints.infra.config.store.models.Finger.LEFT_5TH_FINGER
-import com.simprints.infra.config.store.models.Finger.LEFT_INDEX_FINGER
-import com.simprints.infra.config.store.models.Finger.LEFT_THUMB
-import com.simprints.infra.config.store.models.Finger.RIGHT_3RD_FINGER
-import com.simprints.infra.config.store.models.Finger.RIGHT_4TH_FINGER
-import com.simprints.infra.config.store.models.Finger.RIGHT_5TH_FINGER
-import com.simprints.infra.config.store.models.Finger.RIGHT_INDEX_FINGER
-import com.simprints.infra.config.store.models.Finger.RIGHT_THUMB
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
 import org.junit.Rule
 import org.junit.Test
 
@@ -37,10 +26,10 @@ class FingerSelectionViewModelTest {
     @Test
     fun start_loadsSingleSdkFingerStatesCorrectly() {
         every { fingerprintConfiguration.secugenSimMatcher?.fingersToCapture } returns listOf(
-            LEFT_THUMB,
-            LEFT_THUMB,
-            RIGHT_THUMB,
-            RIGHT_THUMB,
+            SampleIdentifier.LEFT_THUMB,
+            SampleIdentifier.LEFT_THUMB,
+            SampleIdentifier.RIGHT_THUMB,
+            SampleIdentifier.RIGHT_THUMB,
         )
         every { fingerprintConfiguration.nec } returns null
 
@@ -53,8 +42,8 @@ class FingerSelectionViewModelTest {
         assertThat(fingerSelections?.first()?.items)
             .containsExactlyElementsIn(
                 listOf(
-                    FingerSelectionItem(LEFT_THUMB, 2),
-                    FingerSelectionItem(RIGHT_THUMB, 2),
+                    FingerSelectionItem(SampleIdentifier.LEFT_THUMB, 2),
+                    FingerSelectionItem(SampleIdentifier.RIGHT_THUMB, 2),
                 ),
             ).inOrder()
     }
@@ -62,18 +51,18 @@ class FingerSelectionViewModelTest {
     @Test
     fun start_loadsTwoSdksFingerStatesCorrectly() {
         every { fingerprintConfiguration.secugenSimMatcher?.fingersToCapture } returns listOf(
-            LEFT_THUMB,
-            RIGHT_THUMB,
-            RIGHT_THUMB,
+            SampleIdentifier.LEFT_THUMB,
+            SampleIdentifier.RIGHT_THUMB,
+            SampleIdentifier.RIGHT_THUMB,
         )
         every { fingerprintConfiguration.nec?.fingersToCapture } returns listOf(
-            LEFT_INDEX_FINGER,
-            LEFT_INDEX_FINGER,
-            LEFT_INDEX_FINGER,
-            RIGHT_INDEX_FINGER,
-            RIGHT_INDEX_FINGER,
-            RIGHT_INDEX_FINGER,
-            RIGHT_INDEX_FINGER,
+            SampleIdentifier.LEFT_INDEX_FINGER,
+            SampleIdentifier.LEFT_INDEX_FINGER,
+            SampleIdentifier.LEFT_INDEX_FINGER,
+            SampleIdentifier.RIGHT_INDEX_FINGER,
+            SampleIdentifier.RIGHT_INDEX_FINGER,
+            SampleIdentifier.RIGHT_INDEX_FINGER,
+            SampleIdentifier.RIGHT_INDEX_FINGER,
         )
 
         viewModel.start()
@@ -85,8 +74,8 @@ class FingerSelectionViewModelTest {
         assertThat(fingerSelections?.first()?.items)
             .containsExactlyElementsIn(
                 listOf(
-                    FingerSelectionItem(LEFT_THUMB, 1),
-                    FingerSelectionItem(RIGHT_THUMB, 2),
+                    FingerSelectionItem(SampleIdentifier.LEFT_THUMB, 1),
+                    FingerSelectionItem(SampleIdentifier.RIGHT_THUMB, 2),
                 ),
             ).inOrder()
         assertThat(fingerSelections?.get(1)?.sdkName).isEqualTo("NEC")
@@ -94,8 +83,8 @@ class FingerSelectionViewModelTest {
         assertThat(fingerSelections?.get(1)?.items)
             .containsExactlyElementsIn(
                 listOf(
-                    FingerSelectionItem(LEFT_INDEX_FINGER, 3),
-                    FingerSelectionItem(RIGHT_INDEX_FINGER, 4),
+                    FingerSelectionItem(SampleIdentifier.LEFT_INDEX_FINGER, 3),
+                    FingerSelectionItem(SampleIdentifier.RIGHT_INDEX_FINGER, 4),
                 ),
             ).inOrder()
     }
@@ -103,36 +92,36 @@ class FingerSelectionViewModelTest {
     @Test
     fun scatteredFingers_areAggregated() {
         every { fingerprintConfiguration.secugenSimMatcher?.fingersToCapture } returns listOf(
-            LEFT_THUMB,
-            RIGHT_THUMB,
-            RIGHT_INDEX_FINGER,
-            LEFT_3RD_FINGER,
-            LEFT_3RD_FINGER,
-            LEFT_4TH_FINGER,
-            LEFT_INDEX_FINGER,
-            RIGHT_5TH_FINGER,
-            LEFT_5TH_FINGER,
-            LEFT_3RD_FINGER,
-            LEFT_4TH_FINGER,
-            RIGHT_5TH_FINGER,
-            RIGHT_5TH_FINGER,
-            LEFT_5TH_FINGER,
-            RIGHT_4TH_FINGER,
-            LEFT_4TH_FINGER,
-            RIGHT_3RD_FINGER,
-            RIGHT_4TH_FINGER,
-            RIGHT_5TH_FINGER,
-            LEFT_5TH_FINGER,
-            RIGHT_INDEX_FINGER,
-            RIGHT_4TH_FINGER,
-            LEFT_4TH_FINGER,
-            LEFT_5TH_FINGER,
-            RIGHT_3RD_FINGER,
-            LEFT_5TH_FINGER,
-            RIGHT_4TH_FINGER,
-            RIGHT_5TH_FINGER,
-            LEFT_INDEX_FINGER,
-            RIGHT_3RD_FINGER,
+            SampleIdentifier.LEFT_THUMB,
+            SampleIdentifier.RIGHT_THUMB,
+            SampleIdentifier.RIGHT_INDEX_FINGER,
+            SampleIdentifier.LEFT_3RD_FINGER,
+            SampleIdentifier.LEFT_3RD_FINGER,
+            SampleIdentifier.LEFT_4TH_FINGER,
+            SampleIdentifier.LEFT_INDEX_FINGER,
+            SampleIdentifier.RIGHT_5TH_FINGER,
+            SampleIdentifier.LEFT_5TH_FINGER,
+            SampleIdentifier.LEFT_3RD_FINGER,
+            SampleIdentifier.LEFT_4TH_FINGER,
+            SampleIdentifier.RIGHT_5TH_FINGER,
+            SampleIdentifier.RIGHT_5TH_FINGER,
+            SampleIdentifier.LEFT_5TH_FINGER,
+            SampleIdentifier.RIGHT_4TH_FINGER,
+            SampleIdentifier.LEFT_4TH_FINGER,
+            SampleIdentifier.RIGHT_3RD_FINGER,
+            SampleIdentifier.RIGHT_4TH_FINGER,
+            SampleIdentifier.RIGHT_5TH_FINGER,
+            SampleIdentifier.LEFT_5TH_FINGER,
+            SampleIdentifier.RIGHT_INDEX_FINGER,
+            SampleIdentifier.RIGHT_4TH_FINGER,
+            SampleIdentifier.LEFT_4TH_FINGER,
+            SampleIdentifier.LEFT_5TH_FINGER,
+            SampleIdentifier.RIGHT_3RD_FINGER,
+            SampleIdentifier.LEFT_5TH_FINGER,
+            SampleIdentifier.RIGHT_4TH_FINGER,
+            SampleIdentifier.RIGHT_5TH_FINGER,
+            SampleIdentifier.LEFT_INDEX_FINGER,
+            SampleIdentifier.RIGHT_3RD_FINGER,
         )
         every { fingerprintConfiguration.nec } returns null
 
@@ -145,16 +134,16 @@ class FingerSelectionViewModelTest {
         assertThat(fingerSelections?.first()?.items)
             .containsExactlyElementsIn(
                 listOf(
-                    FingerSelectionItem(LEFT_THUMB, 1),
-                    FingerSelectionItem(RIGHT_THUMB, 1),
-                    FingerSelectionItem(RIGHT_INDEX_FINGER, 2),
-                    FingerSelectionItem(LEFT_3RD_FINGER, 3),
-                    FingerSelectionItem(LEFT_4TH_FINGER, 4),
-                    FingerSelectionItem(LEFT_INDEX_FINGER, 2),
-                    FingerSelectionItem(RIGHT_5TH_FINGER, 5),
-                    FingerSelectionItem(LEFT_5TH_FINGER, 5),
-                    FingerSelectionItem(RIGHT_4TH_FINGER, 4),
-                    FingerSelectionItem(RIGHT_3RD_FINGER, 3),
+                    FingerSelectionItem(SampleIdentifier.LEFT_THUMB, 1),
+                    FingerSelectionItem(SampleIdentifier.RIGHT_THUMB, 1),
+                    FingerSelectionItem(SampleIdentifier.RIGHT_INDEX_FINGER, 2),
+                    FingerSelectionItem(SampleIdentifier.LEFT_3RD_FINGER, 3),
+                    FingerSelectionItem(SampleIdentifier.LEFT_4TH_FINGER, 4),
+                    FingerSelectionItem(SampleIdentifier.LEFT_INDEX_FINGER, 2),
+                    FingerSelectionItem(SampleIdentifier.RIGHT_5TH_FINGER, 5),
+                    FingerSelectionItem(SampleIdentifier.LEFT_5TH_FINGER, 5),
+                    FingerSelectionItem(SampleIdentifier.RIGHT_4TH_FINGER, 4),
+                    FingerSelectionItem(SampleIdentifier.RIGHT_3RD_FINGER, 3),
                 ),
             ).inOrder()
     }

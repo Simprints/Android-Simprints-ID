@@ -7,14 +7,14 @@ import android.widget.LinearLayout
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.fingerprint.capture.resources.indicatorDrawableId
 import com.simprints.fingerprint.capture.state.FingerState
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 internal class FingerViewPagerManager(
-    private val activeFingers: MutableList<IFingerIdentifier>,
+    private val activeFingers: MutableList<SampleIdentifier>,
     private val parentFragment: Fragment,
     private val viewPager: ViewPager2,
     private val indicatorLayout: LinearLayout,

@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
@@ -140,7 +140,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private val _finishWithFingerprints =
         MutableLiveData<LiveDataEventWithContent<FingerprintCaptureResult>>()
 
-    private lateinit var originalFingerprintsToCapture: List<IFingerIdentifier>
+    private lateinit var originalFingerprintsToCapture: List<SampleIdentifier>
     private val captureEventIds: MutableMap<CaptureId, String> = mutableMapOf()
     private val imageRefs: MutableMap<CaptureId, SecuredImageRef?> = mutableMapOf()
     private var lastCaptureStartedAt: Timestamp = Timestamp(0L)
@@ -167,7 +167,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     private fun start(
-        fingerprintsToCapture: List<IFingerIdentifier>,
+        fingerprintsToCapture: List<SampleIdentifier>,
         fingerprintSdk: FingerprintConfiguration.BioSdk,
     ) {
         if (!hasStarted) {
@@ -274,7 +274,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         }
     }
 
-    private fun setStartingState(fingerprintsToCapture: List<IFingerIdentifier>) {
+    private fun setStartingState(fingerprintsToCapture: List<SampleIdentifier>) {
         val initialState = CollectFingerprintsState.EMPTY.copy(
             fingerStates = getStartState(fingerprintsToCapture),
         )
@@ -699,7 +699,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     fun handleOnViewCreated(
-        fingerprintsToCapture: List<IFingerIdentifier>,
+        fingerprintsToCapture: List<SampleIdentifier>,
         fingerprintSdk: FingerprintConfiguration.BioSdk,
     ) {
         updateState {

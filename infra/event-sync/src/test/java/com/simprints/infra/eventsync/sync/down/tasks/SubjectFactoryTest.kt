@@ -1,11 +1,11 @@
 package com.simprints.infra.eventsync.sync.down.tasks
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
@@ -22,11 +22,8 @@ import com.simprints.infra.events.event.domain.models.subject.FingerprintReferen
 import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.eventsync.sync.common.SubjectFactory
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockkStatic
-import io.mockk.unmockkStatic
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -65,7 +62,7 @@ class SubjectFactoryTest {
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
             biometricReferences = listOf(FINGERPRINT_REFERENCE, faceReference),
-            externalCredentials = emptyList()
+            externalCredentials = emptyList(),
         )
         val result = factory.buildSubjectFromCreationPayload(payload)
         val expected = Subject(
@@ -100,7 +97,7 @@ class SubjectFactoryTest {
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
             biometricReferences = listOf(FINGERPRINT_REFERENCE, faceReference),
-            externalCredential = null
+            externalCredential = null,
         )
         val result = factory.buildSubjectFromMovePayload(payload)
 
@@ -173,7 +170,7 @@ class SubjectFactoryTest {
                     templates = listOf(
                         FingerprintTemplate(
                             template = BASE_64_BYTES.toString(),
-                            finger = IFingerIdentifier.LEFT_THUMB,
+                            finger = SampleIdentifier.LEFT_THUMB,
                         ),
                     ),
                 ),
@@ -183,7 +180,7 @@ class SubjectFactoryTest {
                     templates = listOf(FaceTemplate(template = BASE_64_BYTES.toString())),
                 ),
             ),
-            externalCredentialAdded = EXTERNAL_CREDENTIAL
+            externalCredentialAdded = EXTERNAL_CREDENTIAL,
         )
         val result = factory.buildSubjectFromUpdatePayload(subject, payload)
 
@@ -247,7 +244,7 @@ class SubjectFactoryTest {
                     referenceId = REFERENCE_ID,
                 ),
             ),
-            externalCredentials = listOf(EXTERNAL_CREDENTIAL)
+            externalCredentials = listOf(EXTERNAL_CREDENTIAL),
         )
 
         val result = factory.buildSubjectFromCaptureResults(
@@ -286,7 +283,7 @@ class SubjectFactoryTest {
                     ),
                 ),
             ),
-            externalCredential = EXTERNAL_CREDENTIAL
+            externalCredential = EXTERNAL_CREDENTIAL,
         )
         assertThat(result).isEqualTo(expected)
     }
@@ -313,7 +310,7 @@ class SubjectFactoryTest {
                     referenceId = REFERENCE_ID,
                 ),
             ),
-            externalCredentials = listOf(EXTERNAL_CREDENTIAL)
+            externalCredentials = listOf(EXTERNAL_CREDENTIAL),
         )
 
         val result = factory.buildSubject(
@@ -323,7 +320,7 @@ class SubjectFactoryTest {
             moduleId = expected.moduleId,
             fingerprintSamples = expected.fingerprintSamples,
             faceSamples = expected.faceSamples,
-            externalCredentials = expected.externalCredentials
+            externalCredentials = expected.externalCredentials,
         )
         assertThat(result).isEqualTo(expected)
     }
@@ -341,7 +338,7 @@ class SubjectFactoryTest {
         private const val TEMPLATE_NAME = "template"
         private val EXTERNAL_CREDENTIAL_VALUE = "value".asTokenizableEncrypted()
         private val EXTERNAL_CREDENTIAL_TYPE = ExternalCredentialType.NHISCard
-        private val IDENTIFIER = IFingerIdentifier.LEFT_THUMB
+        private val IDENTIFIER = SampleIdentifier.LEFT_THUMB
         private const val QUALITY = 10
         private val FINGERPRINT_REFERENCE = FingerprintReference(
             id = REFERENCE_ID,
@@ -362,7 +359,7 @@ class SubjectFactoryTest {
             id = EXTERNAL_CREDENTIAL_ID,
             value = EXTERNAL_CREDENTIAL_VALUE,
             subjectId = SUBJECT_ID,
-            type = EXTERNAL_CREDENTIAL_TYPE
+            type = EXTERNAL_CREDENTIAL_TYPE,
         )
     }
 }

@@ -5,7 +5,7 @@ import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
@@ -338,9 +338,9 @@ class RealmEnrolmentRecordLocalDataSourceTest {
                 match<DbSubject> {
                     // one old + one new
                     it.faceSamples.size == 2 &&
-                    it.fingerprintSamples.size == 2 &&
-                    it.faceSamples.none { sample -> sample.referenceId == faceReferenceId } &&
-                    it.fingerprintSamples.none { sample -> sample.referenceId == fingerReferenceId }
+                        it.fingerprintSamples.size == 2 &&
+                        it.faceSamples.none { sample -> sample.referenceId == faceReferenceId } &&
+                        it.fingerprintSamples.none { sample -> sample.referenceId == fingerReferenceId }
                 },
                 any(),
             )
@@ -414,15 +414,17 @@ class RealmEnrolmentRecordLocalDataSourceTest {
             id = "id",
             value = credentialValue.asTokenizableEncrypted(),
             subjectId = "subjectId",
-            type = ExternalCredentialType.NHISCard
+            type = ExternalCredentialType.NHISCard,
         )
 
-        saveFakePeople(listOf(
-            getRandomSubject(externalCredentials = listOf(externalCredential))
-        ))
+        saveFakePeople(
+            listOf(
+                getRandomSubject(externalCredentials = listOf(externalCredential)),
+            ),
+        )
 
         enrolmentRecordLocalDataSource.load(
-            SubjectQuery(externalCredential = credentialValue.asTokenizableEncrypted())
+            SubjectQuery(externalCredential = credentialValue.asTokenizableEncrypted()),
         )
 
         verify {
@@ -466,7 +468,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         ),
         fingerprintSamples: List<FingerprintSample> = listOf(),
         externalCredentials: List<ExternalCredential> = listOf(
-            getRandomExternalCredential()
+            getRandomExternalCredential(),
         ),
     ): Subject = Subject(
         subjectId = patientId,
@@ -475,7 +477,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         moduleId = moduleId.asTokenizableRaw(),
         faceSamples = faceSamples,
         fingerprintSamples = fingerprintSamples,
-        externalCredentials = externalCredentials
+        externalCredentials = externalCredentials,
     )
 
     private fun getRandomFaceSample(
@@ -486,12 +488,12 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     private fun getRandomFingerprintSample(
         id: String = UUID.randomUUID().toString(),
         referenceId: String = "referenceId",
-    ) = FingerprintSample(IFingerIdentifier.LEFT_3RD_FINGER, Random.nextBytes(64), "fingerprintTemplateFormat", referenceId, id)
+    ) = FingerprintSample(SampleIdentifier.LEFT_3RD_FINGER, Random.nextBytes(64), "fingerprintTemplateFormat", referenceId, id)
 
     private fun getRandomExternalCredential() = ExternalCredential(
         id = "id",
         value = "value".asTokenizableEncrypted(),
         subjectId = "subjectId",
-        type = ExternalCredentialType.NHISCard
+        type = ExternalCredentialType.NHISCard,
     )
 }

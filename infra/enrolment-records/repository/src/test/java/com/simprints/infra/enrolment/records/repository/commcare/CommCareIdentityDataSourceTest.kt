@@ -6,8 +6,8 @@ import android.database.Cursor
 import android.net.Uri
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.IFingerIdentifier.LEFT_INDEX_FINGER
-import com.simprints.core.domain.fingerprint.IFingerIdentifier.LEFT_THUMB
+import com.simprints.core.domain.sample.SampleIdentifier.LEFT_INDEX_FINGER
+import com.simprints.core.domain.sample.SampleIdentifier.LEFT_THUMB
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper

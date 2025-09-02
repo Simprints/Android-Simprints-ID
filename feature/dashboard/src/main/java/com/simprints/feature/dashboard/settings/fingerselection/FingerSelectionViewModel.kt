@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.infra.config.store.models.Finger
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.infra.config.sync.ConfigManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -31,7 +31,7 @@ internal class FingerSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun List<Finger>.toFingerSelectionItems(): List<FingerSelectionItem> {
+    private fun List<SampleIdentifier>.toFingerSelectionItems(): List<FingerSelectionItem> {
         val result = mutableListOf<FingerSelectionItem>()
         this.forEach { finger ->
             val alreadyExistingFingerSelection = result.firstOrNull { fingerSelectionItem ->
@@ -54,6 +54,6 @@ data class FingerSelectionSection(
 )
 
 data class FingerSelectionItem(
-    var finger: Finger,
+    var finger: SampleIdentifier,
     var quantity: Int,
 )

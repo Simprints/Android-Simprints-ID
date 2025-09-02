@@ -1,14 +1,13 @@
 package com.simprints.fingerprint.infra.necsdkimpl.matching
 
-import com.google.common.truth.Truth
+import com.google.common.truth.*
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.template.NEC_TEMPLATE_FORMAT
 import com.simprints.necwrapper.nec.NEC
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -31,12 +30,12 @@ class FingerprintMatcherImplTest {
         // Given
         every { nec.match(any(), any(), any()) } returns 3
         val probe =
-            generatePersonIdentity(FingerIdentifier.LEFT_THUMB, FingerIdentifier.RIGHT_THUMB)
+            generatePersonIdentity(SampleIdentifier.LEFT_THUMB, SampleIdentifier.RIGHT_THUMB)
         val candidates =
             listOf(
-                generatePersonIdentity(FingerIdentifier.LEFT_THUMB, FingerIdentifier.RIGHT_THUMB),
-                generatePersonIdentity(FingerIdentifier.LEFT_THUMB, FingerIdentifier.RIGHT_THUMB),
-                generatePersonIdentity(FingerIdentifier.LEFT_THUMB, FingerIdentifier.RIGHT_THUMB),
+                generatePersonIdentity(SampleIdentifier.LEFT_THUMB, SampleIdentifier.RIGHT_THUMB),
+                generatePersonIdentity(SampleIdentifier.LEFT_THUMB, SampleIdentifier.RIGHT_THUMB),
+                generatePersonIdentity(SampleIdentifier.LEFT_THUMB, SampleIdentifier.RIGHT_THUMB),
             )
         // When
         val result = matcher.match(probe, candidates, NecMatchingSettings(false))
@@ -51,11 +50,11 @@ class FingerprintMatcherImplTest {
         every { nec.match(any(), any(), any()) } returns 3
         val probe =
             generatePersonIdentity(
-                FingerIdentifier.LEFT_INDEX_FINGER,
-                FingerIdentifier.RIGHT_INDEX_FINGER,
+                SampleIdentifier.LEFT_INDEX_FINGER,
+                SampleIdentifier.RIGHT_INDEX_FINGER,
             )
         val candidate =
-            generatePersonIdentity(FingerIdentifier.LEFT_THUMB, FingerIdentifier.RIGHT_THUMB)
+            generatePersonIdentity(SampleIdentifier.LEFT_THUMB, SampleIdentifier.RIGHT_THUMB)
         // When
         val result = matcher.match(probe, listOf(candidate), NecMatchingSettings(false))
         // Then
@@ -69,11 +68,11 @@ class FingerprintMatcherImplTest {
         every { nec.match(any(), any(), any()) } returns 3
         val probe =
             generatePersonIdentity(
-                FingerIdentifier.LEFT_INDEX_FINGER,
-                FingerIdentifier.RIGHT_INDEX_FINGER,
+                SampleIdentifier.LEFT_INDEX_FINGER,
+                SampleIdentifier.RIGHT_INDEX_FINGER,
             )
         val candidate =
-            generatePersonIdentity(FingerIdentifier.LEFT_THUMB, FingerIdentifier.RIGHT_THUMB)
+            generatePersonIdentity(SampleIdentifier.LEFT_THUMB, SampleIdentifier.RIGHT_THUMB)
         // When
         val result = matcher.match(probe, listOf(candidate), NecMatchingSettings(true))
         // Then
@@ -87,11 +86,11 @@ class FingerprintMatcherImplTest {
         every { nec.match(any(), any(), any()) } returns 3
         val probe =
             generatePersonIdentity(
-                FingerIdentifier.LEFT_INDEX_FINGER,
-                FingerIdentifier.RIGHT_INDEX_FINGER,
+                SampleIdentifier.LEFT_INDEX_FINGER,
+                SampleIdentifier.RIGHT_INDEX_FINGER,
             )
         val candidate =
-            generatePersonIdentity(FingerIdentifier.LEFT_INDEX_FINGER, FingerIdentifier.RIGHT_THUMB)
+            generatePersonIdentity(SampleIdentifier.LEFT_INDEX_FINGER, SampleIdentifier.RIGHT_THUMB)
         // When
         val result = matcher.match(probe, listOf(candidate), NecMatchingSettings(false))
         // Then
@@ -107,11 +106,11 @@ class FingerprintMatcherImplTest {
         } throws NEC.AttemptedToRunBeforeInitializedException()
         val probe =
             generatePersonIdentity(
-                FingerIdentifier.LEFT_INDEX_FINGER,
-                FingerIdentifier.RIGHT_INDEX_FINGER,
+                SampleIdentifier.LEFT_INDEX_FINGER,
+                SampleIdentifier.RIGHT_INDEX_FINGER,
             )
         val candidate =
-            generatePersonIdentity(FingerIdentifier.LEFT_INDEX_FINGER, FingerIdentifier.RIGHT_THUMB)
+            generatePersonIdentity(SampleIdentifier.LEFT_INDEX_FINGER, SampleIdentifier.RIGHT_THUMB)
         // When
         matcher.match(probe, listOf(candidate), NecMatchingSettings(false))
     }
@@ -121,12 +120,12 @@ class FingerprintMatcherImplTest {
         // Given
         val probe =
             generatePersonIdentity(
-                FingerIdentifier.LEFT_INDEX_FINGER,
-                FingerIdentifier.RIGHT_INDEX_FINGER,
+                SampleIdentifier.LEFT_INDEX_FINGER,
+                SampleIdentifier.RIGHT_INDEX_FINGER,
                 format = "Unsupported",
             )
         val candidate =
-            generatePersonIdentity(FingerIdentifier.LEFT_THUMB, FingerIdentifier.RIGHT_THUMB)
+            generatePersonIdentity(SampleIdentifier.LEFT_THUMB, SampleIdentifier.RIGHT_THUMB)
         // When
         val result = matcher.match(probe, listOf(candidate), NecMatchingSettings(false))
         // Then
@@ -134,7 +133,7 @@ class FingerprintMatcherImplTest {
     }
 
     private fun generatePersonIdentity(
-        vararg fingers: FingerIdentifier,
+        vararg fingers: SampleIdentifier,
         format: String = NEC_TEMPLATE_FORMAT,
     ) = FingerprintIdentity(
         "ID",

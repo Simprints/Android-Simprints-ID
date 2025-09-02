@@ -1,7 +1,7 @@
 package com.simprints.infra.enrolment.records.repository.remote.models.fingerprint
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 
 @Keep
 internal enum class ApiFinger {
@@ -17,15 +17,16 @@ internal enum class ApiFinger {
     LEFT_5TH_FINGER,
 }
 
-internal fun IFingerIdentifier.toApi(): ApiFinger = when (this) {
-    IFingerIdentifier.RIGHT_5TH_FINGER -> ApiFinger.RIGHT_5TH_FINGER
-    IFingerIdentifier.RIGHT_4TH_FINGER -> ApiFinger.RIGHT_4TH_FINGER
-    IFingerIdentifier.RIGHT_3RD_FINGER -> ApiFinger.RIGHT_3RD_FINGER
-    IFingerIdentifier.RIGHT_INDEX_FINGER -> ApiFinger.RIGHT_INDEX_FINGER
-    IFingerIdentifier.RIGHT_THUMB -> ApiFinger.RIGHT_THUMB
-    IFingerIdentifier.LEFT_THUMB -> ApiFinger.LEFT_THUMB
-    IFingerIdentifier.LEFT_INDEX_FINGER -> ApiFinger.LEFT_INDEX_FINGER
-    IFingerIdentifier.LEFT_3RD_FINGER -> ApiFinger.LEFT_3RD_FINGER
-    IFingerIdentifier.LEFT_4TH_FINGER -> ApiFinger.LEFT_4TH_FINGER
-    IFingerIdentifier.LEFT_5TH_FINGER -> ApiFinger.LEFT_5TH_FINGER
+internal fun SampleIdentifier.toApi(): ApiFinger = when (this) {
+    SampleIdentifier.RIGHT_5TH_FINGER -> ApiFinger.RIGHT_5TH_FINGER
+    SampleIdentifier.RIGHT_4TH_FINGER -> ApiFinger.RIGHT_4TH_FINGER
+    SampleIdentifier.RIGHT_3RD_FINGER -> ApiFinger.RIGHT_3RD_FINGER
+    SampleIdentifier.RIGHT_INDEX_FINGER -> ApiFinger.RIGHT_INDEX_FINGER
+    SampleIdentifier.RIGHT_THUMB -> ApiFinger.RIGHT_THUMB
+    SampleIdentifier.LEFT_THUMB -> ApiFinger.LEFT_THUMB
+    SampleIdentifier.LEFT_INDEX_FINGER -> ApiFinger.LEFT_INDEX_FINGER
+    SampleIdentifier.LEFT_3RD_FINGER -> ApiFinger.LEFT_3RD_FINGER
+    SampleIdentifier.LEFT_4TH_FINGER -> ApiFinger.LEFT_4TH_FINGER
+    SampleIdentifier.LEFT_5TH_FINGER -> ApiFinger.LEFT_5TH_FINGER
+    SampleIdentifier.NONE -> throw IllegalArgumentException("Must be a finger sample identifier")
 }

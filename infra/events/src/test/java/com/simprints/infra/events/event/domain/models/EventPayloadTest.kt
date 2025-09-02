@@ -1,8 +1,8 @@
 package com.simprints.infra.events.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.response.AppMatchConfidence
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.BLUETOOTH_NOT_ENABLED
@@ -159,7 +159,7 @@ class EventPayloadTest {
         FingerprintCaptureBiometricsEvent(
             createdAt = CREATED_AT,
             fingerprint = FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
-                finger = IFingerIdentifier.LEFT_3RD_FINGER,
+                finger = SampleIdentifier.LEFT_3RD_FINGER,
                 template = "template",
                 quality = 1,
                 format = "ISO_19794_2",
@@ -169,11 +169,11 @@ class EventPayloadTest {
         FingerprintCaptureEvent(
             createdAt = CREATED_AT,
             endTime = ENDED_AT,
-            finger = IFingerIdentifier.LEFT_THUMB,
+            finger = SampleIdentifier.LEFT_THUMB,
             qualityThreshold = 10,
             result = FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY,
             fingerprint = FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(
-                finger = IFingerIdentifier.LEFT_THUMB,
+                finger = SampleIdentifier.LEFT_THUMB,
                 quality = 8,
                 format = "ISO_19794_2",
             ),

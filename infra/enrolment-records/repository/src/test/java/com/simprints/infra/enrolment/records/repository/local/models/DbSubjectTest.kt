@@ -3,7 +3,7 @@ package com.simprints.infra.enrolment.records.repository.local.models
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.enrolment.records.realm.store.models.DbFaceSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbFingerprintSample
@@ -28,7 +28,7 @@ class DbSubjectTest {
     @Test
     fun fromDomainToDbModel() {
         val fingerprintSample = FingerprintSample(
-            IFingerIdentifier.RIGHT_3RD_FINGER,
+            SampleIdentifier.RIGHT_3RD_FINGER,
             Random.nextBytes(64),
             "NEC_1",
             REFERENCE_ID,
@@ -65,7 +65,7 @@ class DbSubjectTest {
     @Test
     fun fromDbModelToDomain() {
         val fingerprintSample = DbFingerprintSample().apply {
-            fingerIdentifier = IFingerIdentifier.RIGHT_3RD_FINGER.ordinal
+            fingerIdentifier = SampleIdentifier.RIGHT_3RD_FINGER.ordinal
             template = Random.nextBytes(64)
             format = "NEC_1"
             referenceId = REFERENCE_ID
