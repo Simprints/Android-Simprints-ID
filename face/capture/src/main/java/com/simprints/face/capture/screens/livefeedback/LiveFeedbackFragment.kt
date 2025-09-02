@@ -66,8 +66,10 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private var cameraControl: CameraControl? = null
 
-    private val validCaptureProgressColor = ContextCompat.getColor(requireContext(), IDR.color.simprints_green_light)
-    private val defaultCaptureProgressColor = ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey_light)
+    private val validCaptureProgressColor: Int
+        get() = ContextCompat.getColor(requireContext(), IDR.color.simprints_green_light)
+    private val defaultCaptureProgressColor: Int
+        get() = ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey_light)
 
     private val launchPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
