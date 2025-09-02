@@ -1,5 +1,6 @@
 package com.simprints.infra.config.store.testtools
 
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.local.models.ProtoAllowedAgeRange
@@ -306,8 +307,8 @@ internal val protoFingerprintConfiguration = ProtoFingerprintConfiguration
     ).build()
 
 internal val apiGeneralConfiguration = ApiGeneralConfiguration(
-    listOf(ApiGeneralConfiguration.Modality.FACE),
-    listOf(ApiGeneralConfiguration.Modality.FACE),
+    listOf(ApiGeneralConfiguration.ApiModality.FACE),
+    listOf(ApiGeneralConfiguration.ApiModality.FACE),
     listOf("en"),
     "en",
     collectLocation = true,
@@ -316,8 +317,8 @@ internal val apiGeneralConfiguration = ApiGeneralConfiguration(
 )
 
 internal val generalConfiguration = GeneralConfiguration(
-    listOf(GeneralConfiguration.Modality.FACE),
-    listOf(GeneralConfiguration.Modality.FACE),
+    listOf(Modality.FACE),
+    listOf(Modality.FACE),
     listOf("en"),
     "en",
     collectLocation = true,
@@ -418,7 +419,7 @@ internal val synchronizationConfiguration = SynchronizationConfiguration(
 internal val allowedExternalCredential = ExternalCredentialType.NHISCard
 
 internal val multiFactorIdConfiguration = MultiFactorIdConfiguration(
-    allowedExternalCredentials = listOf(allowedExternalCredential)
+    allowedExternalCredentials = listOf(allowedExternalCredential),
 )
 
 internal val protoMultiFactorIdConfiguration = ProtoMultiFactorIdConfiguration
@@ -474,7 +475,7 @@ internal val protoSynchronizationConfiguration = ProtoSynchronizationConfigurati
 internal val apiAllowedExternalCredential = ApiExternalCredentialType.NHIS_CARD
 
 internal val apiMultiFactorIdConfiguration = ApiMultiFactorIdConfiguration(
-    allowedExternalCredentials = listOf(apiAllowedExternalCredential)
+    allowedExternalCredentials = listOf(apiAllowedExternalCredential),
 )
 
 internal val customKeyMap: Map<String, Any>? = mapOf(
@@ -510,7 +511,7 @@ internal val projectConfiguration = ProjectConfiguration(
     identification = identificationConfiguration,
     synchronization = synchronizationConfiguration,
     multifactorId = multiFactorIdConfiguration,
-    custom = customKeyMap
+    custom = customKeyMap,
 )
 
 internal val protoProjectConfiguration = ProtoProjectConfiguration

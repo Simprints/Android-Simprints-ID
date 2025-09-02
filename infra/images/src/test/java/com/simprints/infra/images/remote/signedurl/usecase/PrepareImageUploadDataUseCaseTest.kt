@@ -1,7 +1,7 @@
 package com.simprints.infra.images.remote.signedurl.usecase
 
 import com.google.common.truth.Truth.*
-import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.core.domain.common.Modality
 import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.metadata.ImageMetadataStore
 import com.simprints.infra.images.model.SecuredImageRef
@@ -53,7 +53,7 @@ internal class PrepareImageUploadDataUseCaseTest {
         coEvery { calculateFileMd5AndSize(any()) } returns
             CalculateFileMd5AndSizeUseCase.CalculationResult("base64-md5", 10L)
         every { samplePathUtil.extract(any()) } returns
-            SamplePathConverter.PathData("sessionId", GeneralConfiguration.Modality.FINGERPRINT, "sampleId")
+            SamplePathConverter.PathData("sessionId", Modality.FINGERPRINT, "sampleId")
         coEvery { metadataStore.getMetadata(any()) } returns mapOf("k" to "v")
 
         val result = useCase(imageRef)

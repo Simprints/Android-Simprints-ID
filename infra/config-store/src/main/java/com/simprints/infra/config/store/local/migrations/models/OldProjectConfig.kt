@@ -2,6 +2,7 @@ package com.simprints.infra.config.store.local.migrations.models
 
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.models.ConsentConfiguration
@@ -83,11 +84,7 @@ internal data class OldProjectConfig(
         val modalities = modality
             .split(",")
             .map { if (it == "FINGER") "FINGERPRINT" else it }
-            .map {
-                GeneralConfiguration.Modality.valueOf(
-                    it,
-                )
-            }
+            .map { Modality.valueOf(it) }
         return GeneralConfiguration(
             modalities = modalities,
             matchingModalities = modalities,

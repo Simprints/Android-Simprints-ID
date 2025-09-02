@@ -1,8 +1,8 @@
 package com.simprints.feature.enrollast.screen
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
-import com.simprints.infra.config.store.models.GeneralConfiguration
 
 @ExcludedFromGeneratedTestCoverageReports("Data class")
 internal sealed class EnrolLastState {
@@ -15,7 +15,7 @@ internal sealed class EnrolLastState {
     @ExcludedFromGeneratedTestCoverageReports("Data class")
     data class Failed(
         val errorType: ErrorType,
-        val modalities: List<GeneralConfiguration.Modality>,
+        val modalities: List<Modality>,
     ) : EnrolLastState()
 
     @ExcludedFromGeneratedTestCoverageReports("Data class")

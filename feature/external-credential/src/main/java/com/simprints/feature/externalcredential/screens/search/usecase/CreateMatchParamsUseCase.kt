@@ -1,8 +1,8 @@
 package com.simprints.feature.externalcredential.screens.search.usecase
 
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.common.Modality
 import com.simprints.infra.config.store.models.AgeGroup
-import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.determineFaceSDKs
 import com.simprints.infra.config.store.models.determineFingerprintSDKs

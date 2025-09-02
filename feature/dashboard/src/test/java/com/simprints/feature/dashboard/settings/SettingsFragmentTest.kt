@@ -2,15 +2,14 @@ package com.simprints.feature.dashboard.settings
 
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.matcher.PreferenceMatchers.*
+import androidx.test.espresso.Espresso.*
+import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.assertion.ViewAssertions.*
+import androidx.test.espresso.contrib.*
 import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import androidx.test.ext.junit.runners.*
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.Modality
 import com.simprints.feature.dashboard.R
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
@@ -19,8 +18,7 @@ import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -60,7 +58,7 @@ class SettingsFragmentTest {
 
     @Test
     fun `should display the toolbar`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FINGERPRINT))
+        mockModalities(listOf(Modality.FINGERPRINT))
 
         launchFragmentInHiltContainer<SettingsFragment>()
 
@@ -69,7 +67,7 @@ class SettingsFragmentTest {
 
     @Test
     fun `should hide the fingerprint preference if the modalities doesn't contain Fingerprint`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockModalities(listOf(Modality.FACE))
 
         launchFragmentInHiltContainer<SettingsFragment>()
 
@@ -78,7 +76,7 @@ class SettingsFragmentTest {
 
     @Test
     fun `should display the fingerprint preference if the modalities contains Fingerprint`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FINGERPRINT))
+        mockModalities(listOf(Modality.FINGERPRINT))
 
         launchFragmentInHiltContainer<SettingsFragment>()
 
@@ -87,7 +85,7 @@ class SettingsFragmentTest {
 
     @Test
     fun `should redirect to the sync info fragment when clicking on the sync info preference`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FINGERPRINT))
+        mockModalities(listOf(Modality.FINGERPRINT))
 
         val navController = testNavController(R.navigation.graph_dashboard, R.id.settingsFragment)
 
@@ -99,7 +97,7 @@ class SettingsFragmentTest {
 
     @Test
     fun `should redirect to the finger selection fragment when clicking on the finger selection preference`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FINGERPRINT))
+        mockModalities(listOf(Modality.FINGERPRINT))
 
         val navController = testNavController(R.navigation.graph_dashboard, R.id.settingsFragment)
 
@@ -111,7 +109,7 @@ class SettingsFragmentTest {
 
     @Test
     fun `should redirect to the about fragment when clicking on the about preference`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockModalities(listOf(Modality.FACE))
 
         val navController = testNavController(R.navigation.graph_dashboard, R.id.settingsFragment)
 
@@ -128,14 +126,14 @@ class SettingsFragmentTest {
 
     @Test
     fun `should add the selected language as the summary of the language preference`() {
-        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockModalities(listOf(Modality.FACE))
 
         launchFragmentInHiltContainer<SettingsFragment>()
 
         onView(withText("English")).check(matches(isDisplayed()))
     }
 
-    private fun mockModalities(modalities: List<GeneralConfiguration.Modality>) {
+    private fun mockModalities(modalities: List<Modality>) {
         every { configuration.modalities } returns modalities
     }
 }

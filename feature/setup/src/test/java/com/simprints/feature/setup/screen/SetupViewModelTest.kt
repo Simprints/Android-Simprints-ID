@@ -2,11 +2,11 @@ package com.simprints.feature.setup.screen
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.jraska.livedata.test
+import com.simprints.core.domain.common.Modality
 import com.simprints.feature.setup.LocationStore
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
@@ -170,8 +170,8 @@ class SetupViewModelTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { modalities } returns listOf(
-                    GeneralConfiguration.Modality.FINGERPRINT,
-                    GeneralConfiguration.Modality.FACE,
+                    Modality.FINGERPRINT,
+                    Modality.FACE,
                 )
             }
             every { fingerprint } returns mockk {
@@ -201,8 +201,8 @@ class SetupViewModelTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { modalities } returns listOf(
-                    GeneralConfiguration.Modality.FINGERPRINT,
-                    GeneralConfiguration.Modality.FACE,
+                    Modality.FINGERPRINT,
+                    Modality.FACE,
                 )
                 every { fingerprint } returns mockk {
                     every { allowedSDKs } returns listOf(FingerprintConfiguration.BioSdk.NEC)
@@ -232,8 +232,8 @@ class SetupViewModelTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { modalities } returns listOf(
-                    GeneralConfiguration.Modality.FINGERPRINT,
-                    GeneralConfiguration.Modality.FACE,
+                    Modality.FINGERPRINT,
+                    Modality.FACE,
                 )
                 every { fingerprint } returns mockk {
                     every { allowedSDKs } returns listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
@@ -257,8 +257,8 @@ class SetupViewModelTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { modalities } returns listOf(
-                    GeneralConfiguration.Modality.FINGERPRINT,
-                    GeneralConfiguration.Modality.FACE,
+                    Modality.FINGERPRINT,
+                    Modality.FACE,
                 )
             }
             every { fingerprint } returns mockk {

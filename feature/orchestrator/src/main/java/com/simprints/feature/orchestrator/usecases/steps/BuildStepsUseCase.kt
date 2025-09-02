@@ -1,6 +1,7 @@
 package com.simprints.feature.orchestrator.usecases.steps
 
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.common.Modality
 import com.simprints.face.capture.FaceCaptureContract
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentType
@@ -21,7 +22,6 @@ import com.simprints.feature.setup.SetupContract
 import com.simprints.feature.validatepool.ValidateSubjectPoolContract
 import com.simprints.fingerprint.capture.FingerprintCaptureContract
 import com.simprints.infra.config.store.models.AgeGroup
-import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.allowedAgeRanges
 import com.simprints.infra.config.store.models.determineFaceSDKs

@@ -93,7 +93,7 @@ internal class EventSyncManagerImpl @Inject constructor(
         val deviceConfig = configRepository.getDeviceConfiguration()
 
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
-            modes = getProjectModes(projectConfig),
+            modes = getProjectModalities(projectConfig),
             selectedModuleIDs = deviceConfig.selectedModules.values(),
             syncPartitioning = simprintsDownConfig.partitionType.toDomain(),
         )
@@ -120,7 +120,7 @@ internal class EventSyncManagerImpl @Inject constructor(
                 RemoteEventQuery(
                     projectId = projectId,
                     subjectId = subjectId,
-                    modes = getProjectModes(projectConfiguration),
+                    modes = getProjectModalities(projectConfiguration),
                 ),
             )
             simprintsDownSyncTask.downSync(this, op, eventScope, configRepository.getProject()).toList()
@@ -131,7 +131,7 @@ internal class EventSyncManagerImpl @Inject constructor(
                     projectId = projectId,
                     subjectId = subjectId,
                     externalIds = caseId?.let { listOf(it) },
-                    modes = getProjectModes(projectConfiguration),
+                    modes = getProjectModalities(projectConfiguration),
                 ),
             )
             commCareSyncTask.downSync(this, op, eventScope, configRepository.getProject()).toList()
@@ -139,12 +139,12 @@ internal class EventSyncManagerImpl @Inject constructor(
         eventRepository.closeEventScope(eventScope, EventScopeEndCause.WORKFLOW_ENDED)
     }
 
-    private fun getProjectModes(projectConfiguration: ProjectConfiguration) = projectConfiguration.general.modalities.map { it.toMode() }
+    private fun getProjectModalities(projectConfiguration: ProjectConfiguration) = projectConfiguration.general.modalities
 
     override suspend fun deleteModules(unselectedModules: List<String>) {
         downSyncScopeRepository.deleteOperations(
             unselectedModules,
-            modes = getProjectModes(configRepository.getProjectConfiguration()),
+            modes = getProjectModalities(configRepository.getProjectConfiguration()),
         )
     }
 
