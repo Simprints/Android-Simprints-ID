@@ -3,7 +3,7 @@ package com.simprints.infra.enrolment.records.repository.local.models
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate
-import com.simprints.infra.enrolment.records.room.store.models.Modality
+import com.simprints.infra.enrolment.records.room.store.models.DbModality
 
 internal fun DbBiometricTemplate.toFingerprintSample(): FingerprintSample = FingerprintSample(
     id = uuid,
@@ -26,7 +26,7 @@ internal fun FaceSample.toRoomDb(subjectId: String): DbBiometricTemplate = DbBio
     format = format,
     subjectId = subjectId,
     referenceId = referenceId,
-    modality = Modality.FACE.id,
+    modality = DbModality.FACE.id,
 )
 
 internal fun FingerprintSample.toRoomDb(subjectId: String) = DbBiometricTemplate(
@@ -36,5 +36,5 @@ internal fun FingerprintSample.toRoomDb(subjectId: String) = DbBiometricTemplate
     format = format,
     subjectId = subjectId,
     referenceId = referenceId,
-    modality = Modality.FINGERPRINT.id,
+    modality = DbModality.FINGERPRINT.id,
 )

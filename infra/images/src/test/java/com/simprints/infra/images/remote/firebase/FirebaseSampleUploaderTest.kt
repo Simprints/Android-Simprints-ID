@@ -3,6 +3,7 @@ package com.simprints.infra.images.remote.firebase
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
 import com.google.firebase.storage.FirebaseStorage
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
@@ -73,7 +74,7 @@ class FirebaseSampleUploaderTest {
 
         every { timeHelper.now() } returns Timestamp(0L)
         every { samplePathUtil.extract(any()) } returns
-            SamplePathConverter.PathData("sessionID", GeneralConfiguration.Modality.FACE, "sampleId")
+            SamplePathConverter.PathData("sessionID", Modality.FACE, "sampleId")
         coEvery { eventRepository.createEventScope(any(), any()) } returns mockk<EventScope>()
         coJustRun { eventRepository.closeEventScope(any<EventScope>(), any()) }
 

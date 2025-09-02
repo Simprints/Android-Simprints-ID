@@ -1,10 +1,12 @@
 package com.simprints.feature.orchestrator
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import androidx.test.ext.junit.runners.*
+import com.google.android.gms.common.util.CollectionUtils.listOf
+import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.step.StepParams
@@ -36,23 +38,14 @@ import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.NEC
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.matching.MatchParams
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.clearMocks
-import io.mockk.coEvery
-import io.mockk.coJustRun
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.justRun
-import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -370,7 +363,7 @@ internal class OrchestratorViewModelTest {
 
     @Test
     fun `Restores modalities if empty`() = runTest {
-        val projectModalities = listOf<GeneralConfiguration.Modality>(
+        val projectModalities = listOf<Modality>(
             mockk(),
             mockk(),
         )
@@ -389,7 +382,7 @@ internal class OrchestratorViewModelTest {
 
     @Test
     fun `Does not restore modalities if not empty`() = runTest {
-        val projectModalities = listOf<GeneralConfiguration.Modality>(
+        val projectModalities = listOf<Modality>(
             mockk(),
             mockk(),
         )

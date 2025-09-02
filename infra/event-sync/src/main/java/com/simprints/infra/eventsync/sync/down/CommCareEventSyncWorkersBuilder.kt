@@ -6,8 +6,8 @@ import com.simprints.core.domain.common.Partitioning
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
-import com.simprints.infra.eventsync.sync.down.workers.CommCareEventSyncDownloaderWorker
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker
+import com.simprints.infra.eventsync.sync.down.workers.CommCareEventSyncDownloaderWorker
 import javax.inject.Inject
 
 internal class CommCareEventSyncWorkersBuilder @Inject constructor(
@@ -15,12 +15,11 @@ internal class CommCareEventSyncWorkersBuilder @Inject constructor(
     jsonHelper: JsonHelper,
     configManager: ConfigManager,
 ) : BaseEventDownSyncWorkersBuilder(
-    downSyncScopeRepository,
-    jsonHelper,
-    configManager,
-) {
-    override fun getWorkerClass(): Class<out BaseEventDownSyncDownloaderWorker> =
-        CommCareEventSyncDownloaderWorker::class.java
+        downSyncScopeRepository,
+        jsonHelper,
+        configManager,
+    ) {
+    override fun getWorkerClass(): Class<out BaseEventDownSyncDownloaderWorker> = CommCareEventSyncDownloaderWorker::class.java
 
     override fun getDownSyncWorkerConstraints() = Constraints
         .Builder()
@@ -33,7 +32,7 @@ internal class CommCareEventSyncWorkersBuilder @Inject constructor(
         val projectConfiguration = configManager.getProjectConfiguration()
 
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
-            modes = projectConfiguration.general.modalities.map { it.toMode() },
+            modes = projectConfiguration.general.modalities,
             selectedModuleIDs = emptyList(),
             syncPartitioning = Partitioning.GLOBAL,
         )

@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
@@ -746,7 +747,7 @@ class SyncInfoViewModelTest {
     fun `should trigger initial sync when in pre-logout mode and module selection required`() = runTest {
         val mockProjectConfigRequiringModules = mockk<ProjectConfiguration> {
             every { general } returns mockk<GeneralConfiguration> {
-                every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+                every { modalities } returns listOf(Modality.FINGERPRINT)
             }
         }
         val mockEmptyDeviceConfig = mockk<DeviceConfiguration> {
@@ -768,7 +769,7 @@ class SyncInfoViewModelTest {
     fun `should not trigger initial sync when not in pre-logout mode and module selection required`() = runTest {
         val mockProjectConfigRequiringModules = mockk<ProjectConfiguration> {
             every { general } returns mockk<GeneralConfiguration> {
-                every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+                every { modalities } returns listOf(Modality.FINGERPRINT)
             }
         }
         val mockEmptyDeviceConfig = mockk<DeviceConfiguration> {

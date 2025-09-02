@@ -2,6 +2,7 @@ package com.simprints.feature.externalcredential.screens.search.usecase
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.common.Modality
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
@@ -50,7 +51,7 @@ internal class CreateMatchParamsUseCaseTest {
             FaceConfiguration.BioSdk.SIM_FACE,
         )
         every { projectConfiguration.determineFingerprintSDKs(ageGroup) } returns emptyList()
-        every { generalConfiguration.matchingModalities } returns listOf(GeneralConfiguration.Modality.FACE)
+        every { generalConfiguration.matchingModalities } returns listOf(Modality.FACE)
 
         val result = useCase(
             candidateSubjectId = subjectId,
@@ -82,7 +83,7 @@ internal class CreateMatchParamsUseCaseTest {
             FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
             FingerprintConfiguration.BioSdk.NEC,
         )
-        every { generalConfiguration.matchingModalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        every { generalConfiguration.matchingModalities } returns listOf(Modality.FINGERPRINT)
 
         val result = useCase(
             candidateSubjectId = subjectId,
@@ -109,10 +110,7 @@ internal class CreateMatchParamsUseCaseTest {
 
     @Test
     fun ` creates correct  MatchParams for multiple`() {
-        every { generalConfiguration.matchingModalities } returns listOf(
-            GeneralConfiguration.Modality.FACE,
-            GeneralConfiguration.Modality.FINGERPRINT,
-        )
+        every { generalConfiguration.matchingModalities } returns listOf(Modality.FACE, Modality.FINGERPRINT)
         every { projectConfiguration.determineFaceSDKs(ageGroup) } returns listOf(
             FaceConfiguration.BioSdk.RANK_ONE,
         )
@@ -149,7 +147,7 @@ internal class CreateMatchParamsUseCaseTest {
             FaceConfiguration.BioSdk.RANK_ONE,
         )
         every { projectConfiguration.determineFingerprintSDKs(null) } returns emptyList()
-        every { generalConfiguration.matchingModalities } returns listOf(GeneralConfiguration.Modality.FACE)
+        every { generalConfiguration.matchingModalities } returns listOf(Modality.FACE)
 
         val result = useCase(
             candidateSubjectId = subjectId,
@@ -189,7 +187,7 @@ internal class CreateMatchParamsUseCaseTest {
             FaceConfiguration.BioSdk.SIM_FACE,
         )
         every { projectConfiguration.determineFingerprintSDKs(ageGroup) } returns emptyList()
-        every { generalConfiguration.matchingModalities } returns listOf(GeneralConfiguration.Modality.FACE)
+        every { generalConfiguration.matchingModalities } returns listOf(Modality.FACE)
 
         val faceSamples = listOf(faceSample, mockk(relaxed = true))
 

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.step.StepResult
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -38,7 +39,6 @@ import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.setup.LocationStore
 import com.simprints.fingerprint.capture.FingerprintCaptureParams
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
@@ -68,7 +68,7 @@ internal class OrchestratorViewModel @Inject constructor(
 
     // [MS-1127] MF-ID: during enrolment, the same 'subjectId' needs to be used during the entire workflow
     private val enrolmentSubjectId = UUID.randomUUID().toString()
-    private var modalities = emptySet<GeneralConfiguration.Modality>()
+    private var modalities = emptySet<Modality>()
     private var steps = emptyList<Step>()
     private var actionRequest: ActionRequest? = null
 

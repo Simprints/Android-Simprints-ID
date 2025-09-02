@@ -1,6 +1,7 @@
 package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.config.store.models.DeviceConfiguration
@@ -42,7 +43,7 @@ class ModuleRepositoryImplTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        every { projectConfiguration.general.modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        every { projectConfiguration.general.modalities } returns listOf(Modality.FINGERPRINT)
         every { projectConfiguration.synchronization.down } returns downSynchronizationConfiguration
         coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
 
