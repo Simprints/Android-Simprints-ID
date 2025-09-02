@@ -2,7 +2,7 @@ package com.simprints.fingerprint.capture.screen
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModelTest.MockAcquireImageResult.OK
 import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModelTest.MockCaptureFingerprintResponse.BAD_SCAN
@@ -854,9 +854,9 @@ class FingerprintCaptureViewModelTest {
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(3)
             assertThat(actualFingerprints?.results?.map { it.identifier }).containsExactly(
-                IFingerIdentifier.LEFT_THUMB,
-                IFingerIdentifier.RIGHT_THUMB,
-                IFingerIdentifier.RIGHT_INDEX_FINGER,
+                SampleIdentifier.LEFT_THUMB,
+                SampleIdentifier.RIGHT_THUMB,
+                SampleIdentifier.RIGHT_INDEX_FINGER,
             )
             actualFingerprints?.results?.forEach {
                 assertThat(it.sample?.template).isEqualTo(TEMPLATE)
@@ -967,9 +967,9 @@ class FingerprintCaptureViewModelTest {
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(3)
             assertThat(actualFingerprints?.results?.map { it.identifier }).containsExactly(
-                IFingerIdentifier.LEFT_THUMB,
-                IFingerIdentifier.RIGHT_THUMB,
-                IFingerIdentifier.RIGHT_INDEX_FINGER,
+                SampleIdentifier.LEFT_THUMB,
+                SampleIdentifier.RIGHT_THUMB,
+                SampleIdentifier.RIGHT_INDEX_FINGER,
             )
             actualFingerprints?.results?.forEach {
                 assertThat(it.sample?.template).isEqualTo(TEMPLATE)
@@ -1062,9 +1062,9 @@ class FingerprintCaptureViewModelTest {
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(3)
             assertThat(actualFingerprints?.results?.map { it.identifier }).containsExactly(
-                IFingerIdentifier.LEFT_THUMB,
-                IFingerIdentifier.LEFT_INDEX_FINGER,
-                IFingerIdentifier.RIGHT_THUMB,
+                SampleIdentifier.LEFT_THUMB,
+                SampleIdentifier.LEFT_INDEX_FINGER,
+                SampleIdentifier.RIGHT_THUMB,
             )
             actualFingerprints?.results?.forEach {
                 assertThat(it.sample?.template).isEqualTo(TEMPLATE)
@@ -1563,14 +1563,14 @@ class FingerprintCaptureViewModelTest {
 
     companion object {
         val TWO_FINGERS_IDS = listOf(
-            IFingerIdentifier.LEFT_THUMB,
-            IFingerIdentifier.LEFT_INDEX_FINGER,
+            SampleIdentifier.LEFT_THUMB,
+            SampleIdentifier.LEFT_INDEX_FINGER,
         )
         val FOUR_FINGERS_IDS = listOf(
-            IFingerIdentifier.LEFT_THUMB,
-            IFingerIdentifier.LEFT_INDEX_FINGER,
-            IFingerIdentifier.RIGHT_THUMB,
-            IFingerIdentifier.RIGHT_INDEX_FINGER,
+            SampleIdentifier.LEFT_THUMB,
+            SampleIdentifier.LEFT_INDEX_FINGER,
+            SampleIdentifier.RIGHT_THUMB,
+            SampleIdentifier.RIGHT_INDEX_FINGER,
         )
 
         const val GOOD_QUALITY = 80

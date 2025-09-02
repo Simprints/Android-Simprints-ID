@@ -1,16 +1,12 @@
 package com.simprints.fingerprint.infra.biosdkimpl.matching
 
-import com.google.common.truth.Truth.assertThat
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.simafiswrapper.JNILibAfisInterface
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -36,7 +32,7 @@ class SimAfisMatcherTest {
             "candidate",
             listOf(
                 Fingerprint(
-                    FingerIdentifier.RIGHT_THUMB,
+                    SampleIdentifier.RIGHT_THUMB,
                     IsoFingerprintTemplateGenerator.generate(1),
                     SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
                 ),
@@ -56,7 +52,7 @@ class SimAfisMatcherTest {
             "candidate",
             listOf(
                 Fingerprint(
-                    FingerIdentifier.RIGHT_3RD_FINGER,
+                    SampleIdentifier.RIGHT_3RD_FINGER,
                     IsoFingerprintTemplateGenerator.generate(1),
                     "NEC_1",
                 ),
@@ -116,12 +112,12 @@ class SimAfisMatcherTest {
             "candidate",
             listOf(
                 Fingerprint(
-                    FingerIdentifier.LEFT_THUMB,
+                    SampleIdentifier.LEFT_THUMB,
                     IsoFingerprintTemplateGenerator.generate(1),
                     SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
                 ),
                 Fingerprint(
-                    FingerIdentifier.LEFT_3RD_FINGER,
+                    SampleIdentifier.LEFT_3RD_FINGER,
                     IsoFingerprintTemplateGenerator.generate(1),
                     SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
                 ),

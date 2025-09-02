@@ -1,17 +1,7 @@
 package com.simprints.fingerprint.infra.biosdkimpl.matching
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.LEFT_3RD_FINGER
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.LEFT_4TH_FINGER
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.LEFT_5TH_FINGER
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.LEFT_INDEX_FINGER
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.LEFT_THUMB
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.RIGHT_3RD_FINGER
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.RIGHT_4TH_FINGER
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.RIGHT_5TH_FINGER
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.RIGHT_INDEX_FINGER
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.RIGHT_THUMB
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult
@@ -75,17 +65,18 @@ internal class SimAfisMatcher @Inject constructor(
     private fun Fingerprint.toSimAfisFingerprint(): SimAfisFingerprint = SimAfisFingerprint(fingerId.toSimAfisFingerIdentifier(), template)
 
     @ExcludedFromGeneratedTestCoverageReports(reason = "This is just a mapping function")
-    private fun FingerIdentifier.toSimAfisFingerIdentifier(): SimAfisFingerIdentifier = when (this) {
-        RIGHT_5TH_FINGER -> SimAfisFingerIdentifier.RIGHT_5TH_FINGER
-        RIGHT_4TH_FINGER -> SimAfisFingerIdentifier.RIGHT_4TH_FINGER
-        RIGHT_3RD_FINGER -> SimAfisFingerIdentifier.RIGHT_3RD_FINGER
-        RIGHT_INDEX_FINGER -> SimAfisFingerIdentifier.RIGHT_INDEX_FINGER
-        RIGHT_THUMB -> SimAfisFingerIdentifier.RIGHT_THUMB
-        LEFT_THUMB -> SimAfisFingerIdentifier.LEFT_THUMB
-        LEFT_INDEX_FINGER -> SimAfisFingerIdentifier.LEFT_INDEX_FINGER
-        LEFT_3RD_FINGER -> SimAfisFingerIdentifier.LEFT_3RD_FINGER
-        LEFT_4TH_FINGER -> SimAfisFingerIdentifier.LEFT_4TH_FINGER
-        LEFT_5TH_FINGER -> SimAfisFingerIdentifier.LEFT_5TH_FINGER
+    private fun SampleIdentifier.toSimAfisFingerIdentifier(): SimAfisFingerIdentifier = when (this) {
+        SampleIdentifier.RIGHT_5TH_FINGER -> SimAfisFingerIdentifier.RIGHT_5TH_FINGER
+        SampleIdentifier.RIGHT_4TH_FINGER -> SimAfisFingerIdentifier.RIGHT_4TH_FINGER
+        SampleIdentifier.RIGHT_3RD_FINGER -> SimAfisFingerIdentifier.RIGHT_3RD_FINGER
+        SampleIdentifier.RIGHT_INDEX_FINGER -> SimAfisFingerIdentifier.RIGHT_INDEX_FINGER
+        SampleIdentifier.RIGHT_THUMB -> SimAfisFingerIdentifier.RIGHT_THUMB
+        SampleIdentifier.LEFT_THUMB -> SimAfisFingerIdentifier.LEFT_THUMB
+        SampleIdentifier.LEFT_INDEX_FINGER -> SimAfisFingerIdentifier.LEFT_INDEX_FINGER
+        SampleIdentifier.LEFT_3RD_FINGER -> SimAfisFingerIdentifier.LEFT_3RD_FINGER
+        SampleIdentifier.LEFT_4TH_FINGER -> SimAfisFingerIdentifier.LEFT_4TH_FINGER
+        SampleIdentifier.LEFT_5TH_FINGER -> SimAfisFingerIdentifier.LEFT_5TH_FINGER
+        SampleIdentifier.NONE -> throw IllegalArgumentException("Must be a finger sample identifier")
     }
 
     private fun crossFingerMatch(

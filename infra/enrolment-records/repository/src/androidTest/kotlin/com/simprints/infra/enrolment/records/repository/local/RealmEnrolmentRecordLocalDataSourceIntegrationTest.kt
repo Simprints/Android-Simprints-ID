@@ -4,7 +4,7 @@ import androidx.test.core.app.*
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
@@ -256,7 +256,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
                     template = byteArrayOf(4, 5, 6),
                     format = "ISO",
                     referenceId = "ref3",
-                    fingerIdentifier = IFingerIdentifier.LEFT_THUMB,
+                    fingerIdentifier = SampleIdentifier.LEFT_THUMB,
                 ),
             ),
             referenceIdsToRemove = listOf("ref1"),
@@ -333,7 +333,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
                             template = byteArrayOf(i.toByte()),
                             format = "ISO",
                             referenceId = "ref$i",
-                            fingerIdentifier = IFingerIdentifier.LEFT_THUMB,
+                            fingerIdentifier = SampleIdentifier.LEFT_THUMB,
                         ),
                     )
                 }

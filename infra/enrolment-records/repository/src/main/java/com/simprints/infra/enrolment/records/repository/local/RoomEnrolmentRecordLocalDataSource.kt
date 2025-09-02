@@ -4,7 +4,7 @@ import androidx.room.withTransaction
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -15,6 +15,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.Fingerprin
 import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.local.models.DbSampleIdentifier
 import com.simprints.infra.enrolment.records.repository.local.models.toDomain
 import com.simprints.infra.enrolment.records.repository.local.models.toRoomDb
 import com.simprints.infra.enrolment.records.room.store.BuildConfig.DB_ENCRYPTION
@@ -131,7 +132,9 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                 subjectId = subjectId,
                 fingerprints = templates.map { sample ->
                     FingerprintSample(
-                        fingerIdentifier = IFingerIdentifier.entries[sample.identifier!!],
+                        fingerIdentifier = sample.identifier
+                            ?.let { DbSampleIdentifier.fromId(it)?.toDomain() }
+                            ?: SampleIdentifier.NONE,
                         template = sample.templateData,
                         id = sample.uuid,
                         format = sample.format,

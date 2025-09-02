@@ -1,5 +1,7 @@
 package com.simprints.infra.config.store.models
 
+import com.simprints.core.domain.sample.SampleIdentifier
+
 data class FingerprintConfiguration(
     val allowedScanners: List<VeroGeneration>,
     val allowedSDKs: List<BioSdk>,
@@ -8,7 +10,7 @@ data class FingerprintConfiguration(
     val nec: FingerprintSdkConfiguration?,
 ) {
     data class FingerprintSdkConfiguration(
-        val fingersToCapture: List<Finger>,
+        val fingersToCapture: List<SampleIdentifier>,
         val decisionPolicy: DecisionPolicy,
         val comparisonStrategyForVerification: FingerComparisonStrategy,
         val vero1: Vero1Configuration? = null,

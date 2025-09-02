@@ -3,7 +3,7 @@ package com.simprints.infra.enrolment.records.repository.local
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
@@ -334,9 +334,9 @@ class RealmEnrolmentRecordLocalDataSourceTest {
                 match<DbSubject> {
                     // one old + one new
                     it.faceSamples.size == 2 &&
-                    it.fingerprintSamples.size == 2 &&
-                    it.faceSamples.none { sample -> sample.referenceId == faceReferenceId } &&
-                    it.fingerprintSamples.none { sample -> sample.referenceId == fingerReferenceId }
+                        it.fingerprintSamples.size == 2 &&
+                        it.faceSamples.none { sample -> sample.referenceId == faceReferenceId } &&
+                        it.fingerprintSamples.none { sample -> sample.referenceId == fingerReferenceId }
                 },
                 any(),
             )
@@ -452,5 +452,5 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     private fun getRandomFingerprintSample(
         id: String = UUID.randomUUID().toString(),
         referenceId: String = "referenceId",
-    ) = FingerprintSample(IFingerIdentifier.LEFT_3RD_FINGER, Random.nextBytes(64), "fingerprintTemplateFormat", referenceId, id)
+    ) = FingerprintSample(SampleIdentifier.LEFT_3RD_FINGER, Random.nextBytes(64), "fingerprintTemplateFormat", referenceId, id)
 }

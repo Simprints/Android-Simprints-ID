@@ -1,6 +1,7 @@
 package com.simprints.infra.config.store.testtools
 
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.local.models.ProtoAllowedAgeRange
 import com.simprints.infra.config.store.local.models.ProtoConsentConfiguration
@@ -30,7 +31,6 @@ import com.simprints.infra.config.store.models.DeviceState
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FaceConfiguration.FaceSdkConfiguration
-import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.GeneralConfiguration
@@ -250,7 +250,7 @@ internal val apiFingerprintConfiguration = ApiFingerprintConfiguration(
     allowedSDKs = listOf(ApiFingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
     displayHandIcons = true,
     secugenSimMatcher = ApiFingerprintConfiguration.ApiFingerprintSdkConfiguration(
-        fingersToCapture = listOf(ApiFingerprintConfiguration.Finger.LEFT_3RD_FINGER),
+        fingersToCapture = listOf(ApiFingerprintConfiguration.ApiFinger.LEFT_3RD_FINGER),
         decisionPolicy = apiDecisionPolicy,
         comparisonStrategyForVerification = ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
         vero1 = ApiVero1Configuration(10),
@@ -267,7 +267,7 @@ internal val fingerprintConfiguration = FingerprintConfiguration(
     allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
     displayHandIcons = true,
     secugenSimMatcher = FingerprintConfiguration.FingerprintSdkConfiguration(
-        fingersToCapture = listOf(Finger.LEFT_3RD_FINGER),
+        fingersToCapture = listOf(SampleIdentifier.LEFT_3RD_FINGER),
         decisionPolicy = decisionPolicy,
         comparisonStrategyForVerification = FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
         vero1 = Vero1Configuration(qualityThreshold = 10),

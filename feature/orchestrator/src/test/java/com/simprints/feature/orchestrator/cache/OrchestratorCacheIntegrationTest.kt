@@ -3,7 +3,7 @@ package com.simprints.feature.orchestrator.cache
 import android.content.SharedPreferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.face.capture.FaceCaptureParams
 import com.simprints.feature.orchestrator.steps.Step
@@ -64,7 +64,7 @@ class OrchestratorCacheIntegrationTest {
                     results = listOf(
                         FingerprintCaptureResult.Item(
                             captureEventId = GUID1,
-                            identifier = IFingerIdentifier.LEFT_THUMB,
+                            identifier = SampleIdentifier.LEFT_THUMB,
                             sample = null,
                         ),
                     ),

@@ -2,8 +2,8 @@ package com.simprints.infra.events.sampledata
 
 import android.os.Build
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.fingerprint.IFingerIdentifier.LEFT_THUMB
 import com.simprints.core.domain.response.AppMatchConfidence.MEDIUM
+import com.simprints.core.domain.sample.SampleIdentifier.LEFT_THUMB
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection

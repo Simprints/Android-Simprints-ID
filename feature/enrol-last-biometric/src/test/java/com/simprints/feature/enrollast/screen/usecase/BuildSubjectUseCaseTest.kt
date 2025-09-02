@@ -1,7 +1,7 @@
 package com.simprints.feature.enrollast.screen.usecase
 
-import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
@@ -9,13 +9,10 @@ import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
-import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.eventsync.sync.common.SubjectFactory
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 
@@ -70,18 +67,18 @@ class BuildSubjectUseCaseTest {
                     EnrolLastBiometricStepResult.FingerprintMatchResult(emptyList(), mockk()),
                     EnrolLastBiometricStepResult.FingerprintCaptureResult(
                         REFERENCE_ID,
-                        listOf(mockFingerprintResults(Finger.RIGHT_THUMB)),
+                        listOf(mockFingerprintResults(SampleIdentifier.RIGHT_THUMB)),
                     ),
                     EnrolLastBiometricStepResult.FingerprintCaptureResult(
                         REFERENCE_ID,
-                        listOf(mockFingerprintResults(Finger.LEFT_THUMB)),
+                        listOf(mockFingerprintResults(SampleIdentifier.LEFT_THUMB)),
                     ),
                 ),
             ),
         )
 
         assertThat(result.fingerprintSamples).isNotEmpty()
-        assertThat(result.fingerprintSamples.first().fingerIdentifier).isEqualTo(IFingerIdentifier.RIGHT_THUMB)
+        assertThat(result.fingerprintSamples.first().fingerIdentifier).isEqualTo(SampleIdentifier.RIGHT_THUMB)
     }
 
     @Test
@@ -92,16 +89,16 @@ class BuildSubjectUseCaseTest {
                     EnrolLastBiometricStepResult.FingerprintCaptureResult(
                         REFERENCE_ID,
                         listOf(
-                            mockFingerprintResults(Finger.RIGHT_5TH_FINGER),
-                            mockFingerprintResults(Finger.RIGHT_4TH_FINGER),
-                            mockFingerprintResults(Finger.RIGHT_3RD_FINGER),
-                            mockFingerprintResults(Finger.RIGHT_INDEX_FINGER),
-                            mockFingerprintResults(Finger.RIGHT_THUMB),
-                            mockFingerprintResults(Finger.LEFT_THUMB),
-                            mockFingerprintResults(Finger.LEFT_INDEX_FINGER),
-                            mockFingerprintResults(Finger.LEFT_3RD_FINGER),
-                            mockFingerprintResults(Finger.LEFT_4TH_FINGER),
-                            mockFingerprintResults(Finger.LEFT_5TH_FINGER),
+                            mockFingerprintResults(SampleIdentifier.RIGHT_5TH_FINGER),
+                            mockFingerprintResults(SampleIdentifier.RIGHT_4TH_FINGER),
+                            mockFingerprintResults(SampleIdentifier.RIGHT_3RD_FINGER),
+                            mockFingerprintResults(SampleIdentifier.RIGHT_INDEX_FINGER),
+                            mockFingerprintResults(SampleIdentifier.RIGHT_THUMB),
+                            mockFingerprintResults(SampleIdentifier.LEFT_THUMB),
+                            mockFingerprintResults(SampleIdentifier.LEFT_INDEX_FINGER),
+                            mockFingerprintResults(SampleIdentifier.LEFT_3RD_FINGER),
+                            mockFingerprintResults(SampleIdentifier.LEFT_4TH_FINGER),
+                            mockFingerprintResults(SampleIdentifier.LEFT_5TH_FINGER),
                         ),
                     ),
                 ),
@@ -135,7 +132,7 @@ class BuildSubjectUseCaseTest {
         steps = steps,
     )
 
-    private fun mockFingerprintResults(finger: Finger) = FingerTemplateCaptureResult(finger, byteArrayOf(), 1, "ISO_19794_2")
+    private fun mockFingerprintResults(finger: SampleIdentifier) = FingerTemplateCaptureResult(finger, byteArrayOf(), 1, "ISO_19794_2")
 
     private fun mockFaceResultsList(format: String) = listOf(FaceTemplateCaptureResult(byteArrayOf(), format))
 
