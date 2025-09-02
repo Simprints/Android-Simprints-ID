@@ -5,8 +5,8 @@ import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
@@ -48,7 +48,6 @@ import com.simprints.fingerprint.capture.FingerprintCaptureParams
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
@@ -134,7 +133,7 @@ class OrchestratorCacheIntegrationTest {
                             "referenceId",
                             listOf(
                                 FingerTemplateCaptureResult(
-                                    Finger.LEFT_4TH_FINGER,
+                                    SampleIdentifier.LEFT_4TH_FINGER,
                                     byteArrayOf(1, 2, 3),
                                     10,
                                     "NEC",
@@ -203,7 +202,7 @@ class OrchestratorCacheIntegrationTest {
                     ),
                     fingerprintSamples = listOf(
                         MatchParams.FingerprintSample(
-                            fingerId = IFingerIdentifier.LEFT_4TH_FINGER,
+                            fingerId = SampleIdentifier.LEFT_4TH_FINGER,
                             format = "NEC",
                             template = byteArrayOf(1, 2, 3),
                         ),
@@ -254,7 +253,7 @@ class OrchestratorCacheIntegrationTest {
                 destinationId = 4,
                 params = FingerprintCaptureParams(
                     flowType = FlowType.ENROL,
-                    fingerprintsToCapture = listOf(IFingerIdentifier.LEFT_4TH_FINGER),
+                    fingerprintsToCapture = listOf(SampleIdentifier.LEFT_4TH_FINGER),
                     fingerprintSDK = FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                 ),
                 status = StepStatus.COMPLETED,
@@ -263,9 +262,9 @@ class OrchestratorCacheIntegrationTest {
                     results = listOf(
                         FingerprintCaptureResult.Item(
                             captureEventId = GUID1,
-                            identifier = IFingerIdentifier.LEFT_THUMB,
+                            identifier = SampleIdentifier.LEFT_THUMB,
                             sample = FingerprintCaptureResult.Sample(
-                                fingerIdentifier = IFingerIdentifier.LEFT_4TH_FINGER,
+                                fingerIdentifier = SampleIdentifier.LEFT_4TH_FINGER,
                                 template = byteArrayOf(1, 2, 3),
                                 templateQualityScore = 10,
                                 imageRef = SecuredImageRef(Path("file/path")),
@@ -286,7 +285,7 @@ class OrchestratorCacheIntegrationTest {
                     biometricDataSource = BiometricDataSource.CommCare("name"),
                     probeFingerprintSamples = listOf(
                         MatchParams.FingerprintSample(
-                            fingerId = IFingerIdentifier.LEFT_4TH_FINGER,
+                            fingerId = SampleIdentifier.LEFT_4TH_FINGER,
                             format = "NEC",
                             template = byteArrayOf(1, 2, 3),
                         ),

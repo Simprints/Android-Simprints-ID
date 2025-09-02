@@ -4,7 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
@@ -395,7 +395,7 @@ internal class MatchViewModelTest {
     private fun getFaceSample(): MatchParams.FaceSample = MatchParams.FaceSample(UUID.randomUUID().toString(), Random.nextBytes(20))
 
     private fun getFingerprintSample(): MatchParams.FingerprintSample = MatchParams.FingerprintSample(
-        IFingerIdentifier.LEFT_3RD_FINGER,
+        SampleIdentifier.LEFT_3RD_FINGER,
         "format",
         Random.nextBytes(20),
     )

@@ -2,9 +2,7 @@ package com.simprints.infra.matching.usecase
 
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
@@ -107,10 +105,15 @@ class FingerprintMatcherUseCase @Inject constructor(
         for (batch in channel) {
             val comparingStartTime = timeHelper.now()
             val matchResults =
-                match(samples, batch.identities.mapToFingerprintIdentity(), matchParams.flowType, bioSdkWrapper, bioSdk = matchParams.fingerprintSDK!!)
-                    .fold(MatchResultSet<FingerprintMatchResult.Item>()) { acc, item ->
-                        acc.add(FingerprintMatchResult.Item(item.id, item.score))
-                    }
+                match(
+                    samples,
+                    batch.identities.mapToFingerprintIdentity(),
+                    matchParams.flowType,
+                    bioSdkWrapper,
+                    bioSdk = matchParams.fingerprintSDK!!,
+                ).fold(MatchResultSet<FingerprintMatchResult.Item>()) { acc, item ->
+                    acc.add(FingerprintMatchResult.Item(item.id, item.score))
+                }
             resultSet.addAll(matchResults)
             val comparingEndTime = timeHelper.now()
             matchBatches.add(
@@ -127,7 +130,7 @@ class FingerprintMatcherUseCase @Inject constructor(
     }
 
     private fun mapSamples(probes: List<MatchParams.FingerprintSample>) = probes
-        .map { Fingerprint(it.fingerId.toMatcherDomain(), it.template, it.format) }
+        .map { Fingerprint(it.fingerId, it.template, it.format) }
 
     private suspend fun match(
         probes: List<Fingerprint>,
@@ -151,25 +154,12 @@ class FingerprintMatcherUseCase @Inject constructor(
         ?.getSdkConfiguration(bioSdk)
         ?.comparisonStrategyForVerification == CROSS_FINGER_USING_MEAN_OF_MAX
 
-    private fun IFingerIdentifier.toMatcherDomain() = when (this) {
-        IFingerIdentifier.RIGHT_5TH_FINGER -> FingerIdentifier.RIGHT_5TH_FINGER
-        IFingerIdentifier.RIGHT_4TH_FINGER -> FingerIdentifier.RIGHT_4TH_FINGER
-        IFingerIdentifier.RIGHT_3RD_FINGER -> FingerIdentifier.RIGHT_3RD_FINGER
-        IFingerIdentifier.RIGHT_INDEX_FINGER -> FingerIdentifier.RIGHT_INDEX_FINGER
-        IFingerIdentifier.RIGHT_THUMB -> FingerIdentifier.RIGHT_THUMB
-        IFingerIdentifier.LEFT_THUMB -> FingerIdentifier.LEFT_THUMB
-        IFingerIdentifier.LEFT_INDEX_FINGER -> FingerIdentifier.LEFT_INDEX_FINGER
-        IFingerIdentifier.LEFT_3RD_FINGER -> FingerIdentifier.LEFT_3RD_FINGER
-        IFingerIdentifier.LEFT_4TH_FINGER -> FingerIdentifier.LEFT_4TH_FINGER
-        IFingerIdentifier.LEFT_5TH_FINGER -> FingerIdentifier.LEFT_5TH_FINGER
-    }
-
     private fun List<DomainFingerprintIdentity>.mapToFingerprintIdentity() = map {
         FingerprintIdentity(
             it.subjectId,
             it.fingerprints.map { finger ->
                 Fingerprint(
-                    finger.fingerIdentifier.toMatcherDomain(),
+                    finger.fingerIdentifier,
                     finger.template,
                     finger.format,
                 )

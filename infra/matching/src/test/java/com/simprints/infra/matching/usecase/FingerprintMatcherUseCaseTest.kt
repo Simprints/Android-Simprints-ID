@@ -4,7 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
@@ -117,7 +117,7 @@ internal class FingerprintMatcherUseCaseTest {
                     probeReferenceId = "referenceId",
                     probeFingerprintSamples = listOf(
                         MatchParams.FingerprintSample(
-                            IFingerIdentifier.LEFT_3RD_FINGER,
+                            SampleIdentifier.LEFT_3RD_FINGER,
                             "format",
                             byteArrayOf(1, 2, 3),
                         ),
@@ -161,16 +161,16 @@ internal class FingerprintMatcherUseCaseTest {
                     FingerprintIdentity(
                         "personId",
                         listOf(
-                            fingerprintSample(IFingerIdentifier.RIGHT_5TH_FINGER),
-                            fingerprintSample(IFingerIdentifier.RIGHT_4TH_FINGER),
-                            fingerprintSample(IFingerIdentifier.RIGHT_3RD_FINGER),
-                            fingerprintSample(IFingerIdentifier.RIGHT_INDEX_FINGER),
-                            fingerprintSample(IFingerIdentifier.RIGHT_THUMB),
-                            fingerprintSample(IFingerIdentifier.LEFT_THUMB),
-                            fingerprintSample(IFingerIdentifier.LEFT_INDEX_FINGER),
-                            fingerprintSample(IFingerIdentifier.LEFT_3RD_FINGER),
-                            fingerprintSample(IFingerIdentifier.LEFT_4TH_FINGER),
-                            fingerprintSample(IFingerIdentifier.LEFT_5TH_FINGER),
+                            fingerprintSample(SampleIdentifier.RIGHT_5TH_FINGER),
+                            fingerprintSample(SampleIdentifier.RIGHT_4TH_FINGER),
+                            fingerprintSample(SampleIdentifier.RIGHT_3RD_FINGER),
+                            fingerprintSample(SampleIdentifier.RIGHT_INDEX_FINGER),
+                            fingerprintSample(SampleIdentifier.RIGHT_THUMB),
+                            fingerprintSample(SampleIdentifier.LEFT_THUMB),
+                            fingerprintSample(SampleIdentifier.LEFT_INDEX_FINGER),
+                            fingerprintSample(SampleIdentifier.LEFT_3RD_FINGER),
+                            fingerprintSample(SampleIdentifier.LEFT_4TH_FINGER),
+                            fingerprintSample(SampleIdentifier.LEFT_5TH_FINGER),
                         ),
                     ),
                 ),
@@ -183,7 +183,7 @@ internal class FingerprintMatcherUseCaseTest {
                     probeReferenceId = "referenceId",
                     probeFingerprintSamples = listOf(
                         MatchParams.FingerprintSample(
-                            IFingerIdentifier.LEFT_3RD_FINGER,
+                            SampleIdentifier.LEFT_3RD_FINGER,
                             "format",
                             byteArrayOf(1, 2, 3),
                         ),
@@ -198,7 +198,7 @@ internal class FingerprintMatcherUseCaseTest {
         coVerify { bioSdkWrapper.match(any(), any(), any()) }
     }
 
-    private fun fingerprintSample(finger: IFingerIdentifier) = FingerprintSample(finger, byteArrayOf(1), "format", "referenceId")
+    private fun fingerprintSample(finger: SampleIdentifier) = FingerprintSample(finger, byteArrayOf(1), "format", "referenceId")
 }
 
 fun <T> createTestChannel(vararg lists: List<T>): ReceiveChannel<IdentityBatch<T>> {
@@ -211,7 +211,7 @@ fun <T> createTestChannel(vararg lists: List<T>): ReceiveChannel<IdentityBatch<T
                     identities = list,
                     loadingStartTime = Timestamp(time++),
                     loadingEndTime = Timestamp(time++),
-                )
+                ),
             )
         }
         channel.close()

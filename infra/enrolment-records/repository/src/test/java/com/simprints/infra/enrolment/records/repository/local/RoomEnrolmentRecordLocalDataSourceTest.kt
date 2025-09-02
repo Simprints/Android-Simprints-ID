@@ -6,7 +6,7 @@ import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
@@ -91,21 +91,21 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         id = "face-uuid-3-p2",
     )
     private val fingerprintSample1 = FingerprintSample(
-        fingerIdentifier = IFingerIdentifier.LEFT_THUMB,
+        fingerIdentifier = SampleIdentifier.LEFT_THUMB,
         template = byteArrayOf(10, 11),
         format = NEC_FORMAT,
         referenceId = "ref-fp-1",
         id = "fp-uuid-1",
     )
     private val fingerprintSample2 = FingerprintSample(
-        fingerIdentifier = IFingerIdentifier.RIGHT_THUMB,
+        fingerIdentifier = SampleIdentifier.RIGHT_THUMB,
         template = byteArrayOf(12, 13),
         format = ISO_FORMAT,
         referenceId = "ref-fp-2",
         id = "fp-uuid-2",
     )
     private val fingerprintSample3 = FingerprintSample(
-        fingerIdentifier = IFingerIdentifier.LEFT_INDEX_FINGER,
+        fingerIdentifier = SampleIdentifier.LEFT_INDEX_FINGER,
         template = byteArrayOf(14, 15),
         format = NEC_FORMAT,
         referenceId = "ref-fp-3-p2",
