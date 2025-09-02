@@ -1,7 +1,7 @@
 package com.simprints.infra.events.event.domain.models.fingerprint
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
@@ -22,7 +22,7 @@ data class FingerprintCaptureEvent(
     constructor(
         createdAt: Timestamp,
         endTime: Timestamp,
-        finger: IFingerIdentifier,
+        finger: SampleIdentifier,
         qualityThreshold: Int,
         result: FingerprintCapturePayload.Result,
         fingerprint: FingerprintCapturePayload.Fingerprint?,
@@ -52,7 +52,7 @@ data class FingerprintCaptureEvent(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
         override var endedAt: Timestamp?,
-        val finger: IFingerIdentifier,
+        val finger: SampleIdentifier,
         val qualityThreshold: Int,
         val result: Result,
         val fingerprint: Fingerprint?,
@@ -64,7 +64,7 @@ data class FingerprintCaptureEvent(
 
         @Keep
         data class Fingerprint(
-            val finger: IFingerIdentifier,
+            val finger: SampleIdentifier,
             val quality: Int,
             val format: String,
         )

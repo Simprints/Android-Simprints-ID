@@ -7,7 +7,7 @@ import com.simprints.infra.enrolment.records.room.store.models.DbModality
 
 internal fun DbBiometricTemplate.toFingerprintSample(): FingerprintSample = FingerprintSample(
     id = uuid,
-    fingerIdentifier = IFingerIdentifier.fromId(identifier!!).toDomain(),
+    fingerIdentifier = DbSampleIdentifier.fromId(identifier!!).toDomain(),
     template = templateData,
     format = format,
     referenceId = referenceId,
@@ -31,7 +31,7 @@ internal fun FaceSample.toRoomDb(subjectId: String): DbBiometricTemplate = DbBio
 
 internal fun FingerprintSample.toRoomDb(subjectId: String) = DbBiometricTemplate(
     uuid = id,
-    identifier = fingerIdentifier.fromDomain().id,
+    identifier = fingerIdentifier.fromDomain()?.id,
     templateData = template,
     format = format,
     subjectId = subjectId,

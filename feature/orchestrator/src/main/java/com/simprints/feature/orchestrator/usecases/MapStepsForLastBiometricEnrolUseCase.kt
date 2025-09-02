@@ -7,7 +7,6 @@ import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.feature.enrollast.MatchResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
-import com.simprints.infra.config.store.models.fromModuleApiToDomain
 import com.simprints.infra.matching.FaceMatchResult
 import com.simprints.infra.matching.FingerprintMatchResult
 import java.io.Serializable
@@ -25,7 +24,7 @@ internal class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
                 result.referenceId,
                 result.results.mapNotNull { it.sample }.map {
                     FingerTemplateCaptureResult(
-                        it.fingerIdentifier.fromModuleApiToDomain(),
+                        it.fingerIdentifier,
                         it.template,
                         it.templateQualityScore,
                         it.format,

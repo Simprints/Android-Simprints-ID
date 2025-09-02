@@ -4,7 +4,7 @@ import android.os.Bundle
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.ConfigRepository
@@ -121,7 +121,7 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
                         referenceId = UUID.randomUUID().toString(),
                         id = UUID.randomUUID().toString(),
                         fingerIdentifier = if (fingerIdentifiers.isNullOrEmpty()) {
-                            IFingerIdentifier.LEFT_THUMB
+                            SampleIdentifier.LEFT_THUMB
                         } else {
                             fingerIdentifiers[i % fingerIdentifiers.size].toFingerIdentifier()
                         },
@@ -133,18 +133,18 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
     }
 
     private fun String.toFingerIdentifier() = when (this.uppercase()) {
-        "LEFT_THUMB" -> IFingerIdentifier.LEFT_THUMB
-        "LEFT_INDEX_FINGER" -> IFingerIdentifier.LEFT_INDEX_FINGER
-        "LEFT_3RD_FINGER" -> IFingerIdentifier.LEFT_3RD_FINGER
-        "LEFT_4TH_FINGER" -> IFingerIdentifier.LEFT_4TH_FINGER
-        "LEFT_5TH_FINGER" -> IFingerIdentifier.LEFT_5TH_FINGER
-        "RIGHT_THUMB" -> IFingerIdentifier.RIGHT_THUMB
-        "RIGHT_INDEX_FINGER" -> IFingerIdentifier.RIGHT_INDEX_FINGER
-        "RIGHT_3RD_FINGER" -> IFingerIdentifier.RIGHT_3RD_FINGER
-        "RIGHT_4TH_FINGER" -> IFingerIdentifier.RIGHT_4TH_FINGER
-        "RIGHT_5TH_FINGER" -> IFingerIdentifier.RIGHT_5TH_FINGER
+        "LEFT_THUMB" -> SampleIdentifier.LEFT_THUMB
+        "LEFT_INDEX_FINGER" -> SampleIdentifier.LEFT_INDEX_FINGER
+        "LEFT_3RD_FINGER" -> SampleIdentifier.LEFT_3RD_FINGER
+        "LEFT_4TH_FINGER" -> SampleIdentifier.LEFT_4TH_FINGER
+        "LEFT_5TH_FINGER" -> SampleIdentifier.LEFT_5TH_FINGER
+        "RIGHT_THUMB" -> SampleIdentifier.RIGHT_THUMB
+        "RIGHT_INDEX_FINGER" -> SampleIdentifier.RIGHT_INDEX_FINGER
+        "RIGHT_3RD_FINGER" -> SampleIdentifier.RIGHT_3RD_FINGER
+        "RIGHT_4TH_FINGER" -> SampleIdentifier.RIGHT_4TH_FINGER
+        "RIGHT_5TH_FINGER" -> SampleIdentifier.RIGHT_5TH_FINGER
         else -> {
-            IFingerIdentifier.LEFT_THUMB
+            SampleIdentifier.LEFT_THUMB
         }
     }
 

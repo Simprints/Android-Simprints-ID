@@ -2,6 +2,7 @@ package com.simprints.infra.config.store.local
 
 import androidx.datastore.core.DataStore
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.config.store.AbsolutePath
@@ -15,7 +16,6 @@ import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration.Companion.DEFAULT_DOWN_SYNC_MAX_AGE
-import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.GeneralConfiguration
@@ -185,8 +185,8 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                     allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
                     secugenSimMatcher = FingerprintConfiguration.FingerprintSdkConfiguration(
                         fingersToCapture = listOf(
-                            Finger.LEFT_THUMB,
-                            Finger.LEFT_INDEX_FINGER,
+                            SampleIdentifier.LEFT_THUMB,
+                            SampleIdentifier.LEFT_INDEX_FINGER,
                         ),
                         decisionPolicy = DecisionPolicy(
                             0,

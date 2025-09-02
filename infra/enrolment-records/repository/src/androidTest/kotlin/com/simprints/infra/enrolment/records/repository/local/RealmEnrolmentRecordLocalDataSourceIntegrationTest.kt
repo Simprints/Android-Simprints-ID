@@ -6,7 +6,7 @@ import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
@@ -267,7 +267,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
                     template = byteArrayOf(4, 5, 6),
                     format = "ISO",
                     referenceId = "ref3",
-                    fingerIdentifier = IFingerIdentifier.LEFT_THUMB,
+                    fingerIdentifier = SampleIdentifier.LEFT_THUMB,
                 ),
             ),
             referenceIdsToRemove = listOf("ref1"),
@@ -359,7 +359,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
                             template = byteArrayOf(i.toByte()),
                             format = "ISO",
                             referenceId = "ref$i",
-                            fingerIdentifier = IFingerIdentifier.LEFT_THUMB,
+                            fingerIdentifier = SampleIdentifier.LEFT_THUMB,
                         ),
                     )
                 }

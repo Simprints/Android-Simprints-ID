@@ -27,7 +27,6 @@ import com.simprints.infra.config.store.models.allowedAgeRanges
 import com.simprints.infra.config.store.models.determineFaceSDKs
 import com.simprints.infra.config.store.models.determineFingerprintSDKs
 import com.simprints.infra.config.store.models.experimental
-import com.simprints.infra.config.store.models.fromDomainToModuleApi
 import com.simprints.infra.config.store.models.isAgeRestricted
 import com.simprints.infra.config.store.models.sortedUniqueAgeGroups
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
@@ -410,7 +409,6 @@ internal class BuildStepsUseCase @Inject constructor(
                 val fingersToCollect = sdkConfiguration
                     ?.fingersToCapture
                     .orEmpty()
-                    .map { finger -> finger.fromDomainToModuleApi() }
 
                 Step(
                     id = StepId.FINGERPRINT_CAPTURE,

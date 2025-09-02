@@ -2,7 +2,7 @@ package com.simprints.infra.matching
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.step.StepParams
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
@@ -53,7 +53,7 @@ data class MatchParams(
     @Keep
     @ExcludedFromGeneratedTestCoverageReports("Generated code")
     data class FingerprintSample(
-        val fingerId: IFingerIdentifier,
+        val fingerId: SampleIdentifier,
         val format: String,
         val template: ByteArray,
     ) : StepParams {

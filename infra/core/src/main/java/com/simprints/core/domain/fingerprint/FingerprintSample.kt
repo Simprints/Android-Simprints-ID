@@ -2,13 +2,14 @@ package com.simprints.core.domain.fingerprint
 
 import android.os.Parcelable
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.domain.sample.SampleIdentifier
 import kotlinx.parcelize.Parcelize
 import java.util.UUID
 
 @Parcelize
 @ExcludedFromGeneratedTestCoverageReports("Data class with generated code")
 data class FingerprintSample(
-    val fingerIdentifier: IFingerIdentifier,
+    val fingerIdentifier: SampleIdentifier,
     val template: ByteArray,
     val format: String,
     val referenceId: String,

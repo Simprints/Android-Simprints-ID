@@ -2,7 +2,7 @@ package com.simprints.infra.matching.usecase
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
@@ -109,7 +109,7 @@ class SaveMatchEventUseCaseTest {
                 queryForCandidates = SubjectQuery(subjectId = "subjectId"),
                 probeFingerprintSamples = listOf(
                     MatchParams.FingerprintSample(
-                        IFingerIdentifier.RIGHT_5TH_FINGER,
+                        SampleIdentifier.RIGHT_5TH_FINGER,
                         "format",
                         byteArrayOf(1, 2, 3),
                     ),
