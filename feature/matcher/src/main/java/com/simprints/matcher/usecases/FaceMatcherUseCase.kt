@@ -1,6 +1,7 @@
 package com.simprints.matcher.usecases
 
 import com.simprints.core.DispatcherBG
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.infra.basebiosdk.matching.FaceIdentity
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.basebiosdk.matching.FaceSample
@@ -8,9 +9,11 @@ import com.simprints.face.infra.biosdkresolver.FaceBioSDK
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.matcher.FaceMatchResult
+import com.simprints.matcher.MatchBatchInfo
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.usecases.MatcherUseCase.MatcherState
 import kotlinx.coroutines.CoroutineDispatcher
@@ -23,6 +26,7 @@ import javax.inject.Inject
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity as DomainFaceIdentity
 
 internal class FaceMatcherUseCase @Inject constructor(
+    private val timeHelper: TimeHelper,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val resolveFaceBioSdk: ResolveFaceBioSdkUseCase,
     private val createRanges: CreateRangesUseCase,
@@ -37,13 +41,13 @@ internal class FaceMatcherUseCase @Inject constructor(
         Simber.i("Initialising matcher", tag = crashReportTag)
         if (matchParams.faceSDK == null) {
             Simber.w("Face SDK was not provided", tag = crashReportTag)
-            send(MatcherState.Success(emptyList(), 0, ""))
+            send(MatcherState.Success(emptyList(), emptyList(), 0, ""))
             return@channelFlow
         }
         val bioSdk = resolveFaceBioSdk(matchParams.faceSDK)
 
         if (matchParams.probeFaceSamples.isEmpty()) {
-            send(MatcherState.Success(emptyList(), 0, bioSdk.matcherName()))
+            send(MatcherState.Success(emptyList(), emptyList(), 0, bioSdk.matcherName()))
             return@channelFlow
         }
         val samples = mapSamples(matchParams.probeFaceSamples)
@@ -55,7 +59,7 @@ internal class FaceMatcherUseCase @Inject constructor(
             dataSource = matchParams.biometricDataSource,
         )
         if (expectedCandidates == 0) {
-            send(MatcherState.Success(emptyList(), 0, bioSdk.matcherName()))
+            send(MatcherState.Success(emptyList(), emptyList(), 0, bioSdk.matcherName()))
             return@channelFlow
         }
 
@@ -80,22 +84,35 @@ internal class FaceMatcherUseCase @Inject constructor(
                 this@channelFlow.send(MatcherState.CandidateLoaded)
             }
 
-        consumeAndMatch(candidatesChannel, samples, resultSet, bioSdk)
-        send(MatcherState.Success(resultSet.toList(), loadedCandidates.get(), bioSdk.matcherName()))
+        val batchInfo = consumeAndMatch(candidatesChannel, samples, resultSet, bioSdk)
+        send(MatcherState.Success(resultSet.toList(), batchInfo, loadedCandidates.get(), bioSdk.matcherName()))
     }.flowOn(dispatcherBG)
 
-    suspend fun consumeAndMatch(
-        candidatesChannel: ReceiveChannel<List<DomainFaceIdentity>>,
+    private suspend fun consumeAndMatch(
+        candidatesChannel: ReceiveChannel<IdentityBatch<DomainFaceIdentity>>,
         samples: List<FaceSample>,
         resultSet: MatchResultSet<FaceMatchResult.Item>,
         bioSdk: FaceBioSDK,
-    ) {
+    ): List<MatchBatchInfo> {
+        val matchBatches = mutableListOf<MatchBatchInfo>()
         for (batch in candidatesChannel) {
+            val comparingStartTime = timeHelper.now()
             val results = bioSdk.createMatcher(samples).use { matcher ->
-                match(matcher, batch.mapToFaceIdentities())
+                match(matcher, batch.identities.mapToFaceIdentities())
             }
             resultSet.addAll(results)
+            val comparingEndTime = timeHelper.now()
+            matchBatches.add(
+                MatchBatchInfo(
+                    batch.loadingStartTime,
+                    batch.loadingEndTime,
+                    comparingStartTime,
+                    comparingEndTime,
+                    batch.identities.size,
+                ),
+            )
         }
+        return matchBatches
     }
 
     private fun mapSamples(probes: List<MatchParams.FaceSample>) = probes.map { FaceSample(it.faceId, it.template) }
@@ -112,13 +129,13 @@ internal class FaceMatcherUseCase @Inject constructor(
         )
     }
 
-    private fun List<DomainFaceIdentity>.mapToFaceIdentities(): List<FaceIdentity> = map {
+    private fun List<DomainFaceIdentity>.mapToFaceIdentities(): List<FaceIdentity> = map { identity ->
         FaceIdentity(
-            it.subjectId,
-            it.faces.map {
+            identity.subjectId,
+            identity.faces.map { sample ->
                 FaceSample(
-                    it.referenceId,
-                    it.template,
+                    sample.referenceId,
+                    sample.template,
                 )
             },
         )

@@ -10,6 +10,7 @@ import com.simprints.core.domain.fingerprint.IFingerIdentifier.LEFT_INDEX_FINGER
 import com.simprints.core.domain.fingerprint.IFingerIdentifier.LEFT_THUMB
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.ExtractCommCareCaseIdUseCase
 import com.simprints.infra.config.store.models.Project
@@ -142,6 +143,9 @@ class CommCareIdentityDataSourceTest {
         }
     }
 
+    @MockK(relaxed = true)
+    private lateinit var timeHelper: TimeHelper
+
     @MockK
     private lateinit var encoder: EncodingUtils
 
@@ -209,6 +213,7 @@ class CommCareIdentityDataSourceTest {
         every { extractCommCareCaseIdUseCase.invoke(any()) } returns null
 
         dataSource = CommCareIdentityDataSource(
+            timeHelper,
             encoder,
             JsonHelper,
             useCase,
@@ -252,7 +257,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(1, actualIdentities.size)
@@ -313,7 +318,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(1, actualIdentities.size)
@@ -366,7 +371,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(1, actualIdentities.size)
@@ -424,7 +429,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(1, actualIdentities.size)
@@ -474,7 +479,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(1, actualIdentities.size)
@@ -528,7 +533,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(1, actualIdentities.size)
@@ -584,7 +589,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertTrue(actualIdentities.isEmpty())
@@ -616,7 +621,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertTrue(actualIdentities.isEmpty())
@@ -665,7 +670,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(1, actualIdentities.size)
@@ -708,7 +713,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(0, actualIdentities.size)
@@ -748,7 +753,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(0, actualIdentities.size)
@@ -792,7 +797,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(0, actualIdentities.size)
@@ -823,7 +828,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(0, actualIdentities.size)
@@ -859,7 +864,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(0, actualIdentities.size)
