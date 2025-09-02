@@ -16,12 +16,11 @@ internal class SimprintsEventDownSyncWorkersBuilder @Inject constructor(
     jsonHelper: JsonHelper,
     configManager: ConfigManager,
 ) : BaseEventDownSyncWorkersBuilder(
-    downSyncScopeRepository,
-    jsonHelper,
-    configManager,
-) {
-    override fun getWorkerClass(): Class<out BaseEventDownSyncDownloaderWorker> =
-        SimprintsEventDownSyncDownloaderWorker::class.java
+        downSyncScopeRepository,
+        jsonHelper,
+        configManager,
+    ) {
+    override fun getWorkerClass(): Class<out BaseEventDownSyncDownloaderWorker> = SimprintsEventDownSyncDownloaderWorker::class.java
 
     override fun getDownSyncWorkerConstraints() = Constraints
         .Builder()
@@ -36,9 +35,11 @@ internal class SimprintsEventDownSyncWorkersBuilder @Inject constructor(
         val deviceConfiguration = configManager.getDeviceConfiguration()
 
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
-            modes = projectConfiguration.general.modalities.map { it.toMode() },
+            modes = projectConfiguration.general.modalities,
             selectedModuleIDs = deviceConfiguration.selectedModules.values(),
-            syncPartitioning = projectConfiguration.synchronization.down.simprints!!.partitionType.toDomain(),
+            syncPartitioning = projectConfiguration.synchronization.down.simprints!!
+                .partitionType
+                .toDomain(),
         )
 
         return downSyncScope.operations.map { downSyncOperation ->

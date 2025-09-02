@@ -1,6 +1,6 @@
 package com.simprints.infra.enrolment.records.room.store.models
 
-enum class Modality(
+enum class DbModality(
     val id: Int,
 ) {
     FINGERPRINT(0),

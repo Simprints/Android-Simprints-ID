@@ -4,7 +4,8 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asFlow
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.tools.time.TimeHelper
@@ -29,14 +30,7 @@ import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.slot
-import io.mockk.verify
+import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -595,7 +589,7 @@ class SyncInfoViewModelTest {
     fun `should trigger initial sync when in pre-logout mode and module selection required`() = runTest {
         val mockProjectConfigRequiringModules = mockk<ProjectConfiguration> {
             every { general } returns mockk<GeneralConfiguration> {
-                every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+                every { modalities } returns listOf(Modality.FINGERPRINT)
             }
         }
         val mockEmptyDeviceConfig = mockk<DeviceConfiguration> {
@@ -617,7 +611,7 @@ class SyncInfoViewModelTest {
     fun `should not trigger initial sync when not in pre-logout mode and module selection required`() = runTest {
         val mockProjectConfigRequiringModules = mockk<ProjectConfiguration> {
             every { general } returns mockk<GeneralConfiguration> {
-                every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+                every { modalities } returns listOf(Modality.FINGERPRINT)
             }
         }
         val mockEmptyDeviceConfig = mockk<DeviceConfiguration> {
