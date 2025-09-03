@@ -6,6 +6,8 @@ import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
@@ -15,6 +17,7 @@ import com.simprints.infra.enrolment.records.realm.store.config.RealmConfig
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
+import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
@@ -43,6 +46,9 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
 
     private lateinit var dataSource: RealmEnrolmentRecordLocalDataSource
 
+    private val timeHelper: TimeHelper = mockk {
+        every { now() } returns Timestamp(1L)
+    }
     private val mockSecurityManager: SecurityManager = mockk {
         justRun { recreateLocalDatabaseKey(any()) }
         every { getLocalDbKeyOrThrow(any()) } returns LocalDbKey("test-project", ByteArray(64) { 1 })
@@ -70,9 +76,10 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         )
 
         dataSource = RealmEnrolmentRecordLocalDataSource(
-            realmWrapper,
-            mockTokenizationProcessor,
-            Dispatchers.Unconfined,
+            timeHelper = timeHelper,
+            realmWrapper = realmWrapper,
+            tokenizationProcessor = mockTokenizationProcessor,
+            dispatcherIO = Dispatchers.Unconfined,
         )
         // capture the realm instance used by the data source to verify results
         runBlocking {
@@ -302,16 +309,16 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
             onCandidateLoaded = { loadedCandidates.add(Unit) },
         )
 
-        val results = mutableListOf<List<FaceIdentity>>()
+        val results = mutableListOf<IdentityBatch<FaceIdentity>>()
         for (batch in channel) {
             results.add(batch)
         }
 
         // Then
         assertThat(results).hasSize(3)
-        assertThat(results[0]).hasSize(3)
-        assertThat(results[1]).hasSize(3)
-        assertThat(results[2]).hasSize(4)
+        assertThat(results[0].identities).hasSize(3)
+        assertThat(results[1].identities).hasSize(3)
+        assertThat(results[2].identities).hasSize(4)
         assertThat(loadedCandidates).hasSize(10)
     }
 
@@ -350,16 +357,16 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
                 onCandidateLoaded = { loadedCandidates.add(Unit) },
             )
 
-            val results = mutableListOf<List<FingerprintIdentity>>()
+            val results = mutableListOf<IdentityBatch<FingerprintIdentity>>()
             for (batch in channel) {
                 results.add(batch)
             }
 
             // Then
             assertThat(results).hasSize(3)
-            assertThat(results[0]).hasSize(3)
-            assertThat(results[1]).hasSize(3)
-            assertThat(results[2]).hasSize(4)
+            assertThat(results[0].identities).hasSize(3)
+            assertThat(results[1].identities).hasSize(3)
+            assertThat(results[2].identities).hasSize(4)
             assertThat(loadedCandidates).hasSize(10)
         }
 
