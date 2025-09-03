@@ -1,7 +1,7 @@
 package com.simprints.feature.clientapi.mappers.response
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import androidx.test.ext.junit.runners.*
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.feature.clientapi.mappers.request.requestFactories.ConfirmIdentityActionFactory
@@ -23,7 +23,7 @@ import com.simprints.libsimprints.Verification as LegacyVerification
 
 @RunWith(AndroidJUnit4::class)
 class LibSimprintsResponseMapperTest {
-    private val mapper = LibSimprintsResponseMapper()
+    private val mapper = LibSimprintsResponseMapper("deviceId", "appVersionName")
 
     @Test
     fun `correctly maps enrol response`() {
@@ -37,6 +37,8 @@ class LibSimprintsResponseMapperTest {
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(Constants.SIMPRINTS_APP_VERSION_NAME)).isEqualTo("appVersionName")
         assertThat(extras.getParcelable<LegacyEnrolment>(Constants.SIMPRINTS_REGISTRATION)).isEqualTo(
             LegacyEnrolment("guid"),
         )
@@ -57,6 +59,8 @@ class LibSimprintsResponseMapperTest {
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(Constants.SIMPRINTS_APP_VERSION_NAME)).isEqualTo("appVersionName")
         assertThat(extras.getString(Constants.SIMPRINTS_ENROLMENT)).isEqualTo("""{"guid":"guid"}""")
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
     }
@@ -83,6 +87,8 @@ class LibSimprintsResponseMapperTest {
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(Constants.SIMPRINTS_APP_VERSION_NAME)).isEqualTo("appVersionName")
         assertThat(extras.getParcelableArrayList<LegacyIdentification>(Constants.SIMPRINTS_IDENTIFICATIONS)).containsExactly(
             LegacyIdentification("guid-1", 100, LegacyTier.TIER_2),
             LegacyIdentification("guid-2", 75, LegacyTier.TIER_3),
@@ -108,6 +114,8 @@ class LibSimprintsResponseMapperTest {
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(Constants.SIMPRINTS_APP_VERSION_NAME)).isEqualTo("appVersionName")
         assertThat(extras.getString(Constants.SIMPRINTS_IDENTIFICATIONS)).isEqualTo(
             """
             [{"guid":"guid-1","confidenceBand":"MEDIUM","confidence":100}]
@@ -127,6 +135,8 @@ class LibSimprintsResponseMapperTest {
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(Constants.SIMPRINTS_APP_VERSION_NAME)).isEqualTo("appVersionName")
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
     }
 
@@ -149,6 +159,8 @@ class LibSimprintsResponseMapperTest {
         val extraVerification = extras.getParcelable<LegacyVerification>(Constants.SIMPRINTS_VERIFICATION)
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(Constants.SIMPRINTS_APP_VERSION_NAME)).isEqualTo("appVersionName")
         assertThat(extraVerification?.guid).isEqualTo("guid")
         assertThat(extraVerification?.tier).isEqualTo(LegacyTier.TIER_1)
         assertThat(extraVerification?.getConfidence()).isEqualTo(50)
@@ -175,6 +187,8 @@ class LibSimprintsResponseMapperTest {
         val extraVerification = extras.getParcelable<LegacyVerification>(Constants.SIMPRINTS_VERIFICATION)
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(Constants.SIMPRINTS_APP_VERSION_NAME)).isEqualTo("appVersionName")
         assertThat(extraVerification?.guid).isEqualTo("guid")
         assertThat(extraVerification?.tier).isEqualTo(LegacyTier.TIER_1)
         assertThat(extraVerification?.getConfidence()).isEqualTo(50)
@@ -202,6 +216,8 @@ class LibSimprintsResponseMapperTest {
         val extraVerification = extras.getParcelable<LegacyVerification>(Constants.SIMPRINTS_VERIFICATION)
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(Constants.SIMPRINTS_APP_VERSION_NAME)).isEqualTo("appVersionName")
         assertThat(extraVerification?.guid).isEqualTo("guid")
         assertThat(extraVerification?.tier).isEqualTo(LegacyTier.TIER_1)
         assertThat(extraVerification?.getConfidence()).isEqualTo(50)
@@ -227,6 +243,8 @@ class LibSimprintsResponseMapperTest {
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(Constants.SIMPRINTS_APP_VERSION_NAME)).isEqualTo("appVersionName")
         assertThat(extras.getString(Constants.SIMPRINTS_VERIFICATION)).isEqualTo(
             """
             {"guid":"guid","confidenceBand":"HIGH","confidence":50,"isSuccess":true}
@@ -253,6 +271,8 @@ class LibSimprintsResponseMapperTest {
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(Constants.SIMPRINTS_APP_VERSION_NAME)).isEqualTo("appVersionName")
         assertThat(extras.getString(Constants.SIMPRINTS_VERIFICATION)).isEqualTo(
             """
             {"guid":"guid","confidenceBand":"HIGH","confidence":50}
@@ -273,6 +293,8 @@ class LibSimprintsResponseMapperTest {
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(Constants.SIMPRINTS_APP_VERSION_NAME)).isEqualTo("appVersionName")
         assertThat(extras.getParcelable<LegacyRefusalForm>(Constants.SIMPRINTS_REFUSAL_FORM)).isEqualTo(
             LegacyRefusalForm("reason", "extra"),
         )
@@ -293,6 +315,8 @@ class LibSimprintsResponseMapperTest {
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(Constants.SIMPRINTS_APP_VERSION_NAME)).isEqualTo("appVersionName")
         assertThat(extras.getString(Constants.SIMPRINTS_REFUSAL_FORM)).isEqualTo(
             """
             {"reason":"reason","extra":"extra"}
@@ -313,6 +337,8 @@ class LibSimprintsResponseMapperTest {
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(Constants.SIMPRINTS_APP_VERSION_NAME)).isEqualTo("appVersionName")
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
         assertThat(extras.getInt(LibSimprintsResponseMapper.RESULT_CODE_OVERRIDE)).isEqualTo(
             Constants.SIMPRINTS_UNEXPECTED_ERROR,

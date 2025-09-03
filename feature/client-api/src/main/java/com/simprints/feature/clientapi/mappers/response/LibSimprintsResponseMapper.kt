@@ -2,7 +2,10 @@ package com.simprints.feature.clientapi.mappers.response
 
 import android.os.Bundle
 import androidx.core.os.bundleOf
+import com.simprints.core.DeviceID
+import com.simprints.core.PackageVersionName
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.infra.events.event.domain.models.scope.Device
 import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.contracts.VersionsList
@@ -19,10 +22,15 @@ import com.simprints.libsimprints.Registration as LegacyEnrolment
 import com.simprints.libsimprints.Tier as LegacyTier
 import com.simprints.libsimprints.Verification as LegacyVerification
 
-internal class LibSimprintsResponseMapper @Inject constructor() {
+internal class LibSimprintsResponseMapper @Inject constructor(
+    @DeviceID private val deviceId: String,
+    @PackageVersionName private val appVersionName: String,
+) {
     operator fun invoke(response: ActionResponse): Bundle = when (response) {
         is ActionResponse.EnrolActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
+            Constants.SIMPRINTS_DEVICE_ID to deviceId,
+            Constants.SIMPRINTS_APP_VERSION_NAME to appVersionName,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
         ).appendDataPerContractVersion(response) { version ->
             when {
@@ -30,12 +38,15 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
                     Constants.SIMPRINTS_REGISTRATION,
                     LegacyEnrolment(response.enrolledGuid),
                 )
+
                 else -> putString(Constants.SIMPRINTS_ENROLMENT, Enrolment(response.enrolledGuid).toJson())
             }
         }.appendCoSyncData(response.subjectActions)
 
         is ActionResponse.IdentifyActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
+            Constants.SIMPRINTS_DEVICE_ID to deviceId,
+            Constants.SIMPRINTS_APP_VERSION_NAME to appVersionName,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
         ).appendDataPerContractVersion(response) { version ->
             when {
@@ -57,11 +68,15 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
 
         is ActionResponse.ConfirmActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
+            Constants.SIMPRINTS_DEVICE_ID to deviceId,
+            Constants.SIMPRINTS_APP_VERSION_NAME to appVersionName,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
         )
 
         is ActionResponse.VerifyActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
+            Constants.SIMPRINTS_DEVICE_ID to deviceId,
+            Constants.SIMPRINTS_APP_VERSION_NAME to appVersionName,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
         ).appendDataPerContractVersion(response) { version ->
             when {
@@ -92,6 +107,8 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
 
         is ActionResponse.ExitFormActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
+            Constants.SIMPRINTS_DEVICE_ID to deviceId,
+            Constants.SIMPRINTS_APP_VERSION_NAME to appVersionName,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
         ).appendDataPerContractVersion(response) { version ->
             when {
@@ -109,6 +126,8 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
 
         is ActionResponse.ErrorActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
+            Constants.SIMPRINTS_DEVICE_ID to deviceId,
+            Constants.SIMPRINTS_APP_VERSION_NAME to appVersionName,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to response.flowCompleted,
             RESULT_CODE_OVERRIDE to response.reason.libSimprintsResultCode(),
         )
