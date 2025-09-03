@@ -290,6 +290,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 captureFeedbackBtn.setText(IDR.string.face_capture_prep_begin_button_capturing)
             } else {
                 captureFeedbackBtn.setText(IDR.string.face_capture_begin_button)
+                setManualCaptureButtonClickable(true)
             }
 
             captureFeedbackTxtExplanation.text = null
@@ -300,7 +301,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 true,
                 ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp),
             )
-            setManualCaptureButtonClickable(false)
         }
     }
 
