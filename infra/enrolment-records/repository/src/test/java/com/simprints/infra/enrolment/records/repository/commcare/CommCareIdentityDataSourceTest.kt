@@ -891,4 +891,57 @@ class CommCareIdentityDataSourceTest {
         assertEquals(0, actualCount)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
     }
+
+    @Test
+    fun `count with case ID in metadata returns 1 without database query`() = runTest {
+        val testCaseId = "test-case-id"
+        every { extractCommCareCaseIdUseCase.invoke(any()) } returns testCaseId
+
+        val query = SubjectQuery(metadata = "test-metadata")
+        val actualCount = dataSource.count(query, commCareBiometricDataSource)
+
+        assertEquals(1, actualCount)
+        // Verify that no ContentResolver query was made since we have a case ID
+        coVerify(exactly = 0) { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `count without case ID in metadata queries database`() = runTest {
+        val expectedCount = 3
+        every { extractCommCareCaseIdUseCase.invoke(any()) } returns null
+        every { mockMetadataCursor.count } returns expectedCount
+
+        val query = SubjectQuery(metadata = "test-metadata")
+        val actualCount = dataSource.count(query, commCareBiometricDataSource)
+
+        assertEquals(expectedCount, actualCount)
+        coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `loadFingerprintIdentities with case ID calls onCandidateLoaded`() = runTest {
+        val testCaseId = "test-case-id"
+        var onCandidateLoadedCalled = false
+        every { extractCommCareCaseIdUseCase.invoke(any()) } returns testCaseId
+        every { mockDataCursor.moveToNext() } returns true
+        every { mockDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID) } returns 0
+        every { mockDataCursor.getColumnIndexOrThrow(COLUMN_VALUE) } returns 1
+        every { mockDataCursor.getString(0) } returnsMany listOf("someOtherDatumId", "subjectActions")
+        every { mockDataCursor.getString(1) } returns SUBJECT_ACTIONS_FINGERPRINT_1
+
+        val query = SubjectQuery(metadata = "test-metadata")
+        dataSource.loadFingerprintIdentities(
+            query = query,
+            ranges = listOf(0..1),
+            project = project,
+            dataSource = commCareBiometricDataSource,
+            scope = this,
+            onCandidateLoaded = { onCandidateLoadedCalled = true }
+        ).consumeEach { }
+
+        assertTrue(onCandidateLoadedCalled)
+        coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
+        // Verify that metadata query was not made since we have a case ID
+        coVerify(exactly = 0) { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
+    }
 }

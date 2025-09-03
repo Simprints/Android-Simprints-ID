@@ -198,7 +198,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 projectConfiguration,
                 FlowType.VERIFY,
                 resolvedAgeGroup,
-                SubjectQuery(subjectId = action.verifyGuid),
+                SubjectQuery(subjectId = action.verifyGuid, metadata = action.metadata),
                 BiometricDataSource.fromString(
                     action.biometricDataSource,
                     action.actionIdentifier.callerPackageName,
