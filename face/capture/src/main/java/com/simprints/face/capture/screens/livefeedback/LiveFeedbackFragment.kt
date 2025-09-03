@@ -41,6 +41,7 @@ import com.simprints.infra.uibase.view.setCheckedWithLeftDrawable
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import com.simprints.infra.resources.R as IDR
@@ -96,6 +97,12 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         screenSize = with(resources.displayMetrics) { Size(widthPixels, widthPixels) }
         bindViewModel()
         binding.captureProgress.max = 1 // normalized progress
+
+        runBlocking {
+            // Value of the `isAutoCapture` affects major parts of the UI state management and MUST be updated
+            // before anything else is processed, therefore is has to block the rest of the initialisation.
+            vm.initAutoCapture()
+        }
 
         binding.captureFeedbackBtn.setOnClickListener {
             vm.startCapture()

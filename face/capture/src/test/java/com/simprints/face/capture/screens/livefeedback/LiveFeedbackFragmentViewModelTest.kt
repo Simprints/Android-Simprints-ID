@@ -91,6 +91,7 @@ internal class LiveFeedbackFragmentViewModelTest {
     fun `Process fallback image when valid face correctly but not started capture`() = runTest {
         coEvery { faceDetector.analyze(frame) } returns getFace()
 
+        viewModel.initAutoCapture()
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
         viewModel.process(frame)
 
@@ -104,6 +105,7 @@ internal class LiveFeedbackFragmentViewModelTest {
     fun `Process valid face correctly`() = runTest {
         coEvery { faceDetector.analyze(frame) } returns getFace()
 
+        viewModel.initAutoCapture()
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
         viewModel.process(frame)
         viewModel.startCapture()
@@ -134,6 +136,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         )
 
         val detections = viewModel.currentDetection.testObserver()
+        viewModel.initAutoCapture()
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 2, 0)
 
         viewModel.process(frame)
@@ -169,6 +172,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         )
 
         val detections = viewModel.currentDetection.testObserver()
+        viewModel.initAutoCapture()
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
         viewModel.process(frame)
         viewModel.process(frame)
@@ -189,6 +193,7 @@ internal class LiveFeedbackFragmentViewModelTest {
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
         val capturingStateObserver = viewModel.capturingState.testObserver()
+        viewModel.initAutoCapture()
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 2, 0)
         viewModel.process(frame)
         viewModel.startCapture()
