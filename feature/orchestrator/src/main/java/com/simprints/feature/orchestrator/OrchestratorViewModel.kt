@@ -42,7 +42,6 @@ import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.matching.MatchParams
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppResponse
@@ -270,11 +269,9 @@ internal class OrchestratorViewModel @Inject constructor(
             }
 
             if (matchingStep != null) {
-                val faceSamples = result.results
-                    .map { MatchParams.FaceSample(it.captureEventId, it.template) }
                 val newPayload = matchingStep.params
                     ?.let { it as? MatchStepStubPayload }
-                    ?.toFaceStepArgs(result.referenceId, faceSamples)
+                    ?.toFaceStepArgs(result.referenceId, result.results)
 
                 if (newPayload != null) {
                     matchingStep.params = newPayload
@@ -294,16 +291,9 @@ internal class OrchestratorViewModel @Inject constructor(
             }
 
             if (matchingStep != null) {
-                val fingerprintSamples = result.results.map {
-                    MatchParams.FingerprintSample(
-                        fingerId = it.identifier,
-                        format = it.format,
-                        template = it.template,
-                    )
-                }
                 val newPayload = matchingStep.params
                     ?.let { it as? MatchStepStubPayload }
-                    ?.toFingerprintStepArgs(result.referenceId, fingerprintSamples)
+                    ?.toFingerprintStepArgs(result.referenceId, result.results)
 
                 if (newPayload != null) {
                     matchingStep.params = newPayload
@@ -324,19 +314,16 @@ internal class OrchestratorViewModel @Inject constructor(
         val params = step.params as? ExternalCredentialParams ?: return
         val updatedParams = when {
             currentStep.id == StepId.FACE_CAPTURE && result is FaceCaptureResult -> {
-                val faceSamples = result.results.map { MatchParams.FaceSample(it.captureEventId, it.template) }
                 params.copy(
                     probeReferenceId = result.referenceId,
-                    faceSamples = faceSamples,
+                    faceSamples = result.results,
                 )
             }
 
             currentStep.id == StepId.FINGERPRINT_CAPTURE && result is FingerprintCaptureResult -> {
-                val fingerprintSamples = result.results
-                    .map { MatchParams.FingerprintSample(fingerId = it.identifier, format = it.format, template = it.template) }
                 params.copy(
                     probeReferenceId = result.referenceId,
-                    fingerprintSamples = fingerprintSamples,
+                    fingerprintSamples = result.results,
                 )
             }
 

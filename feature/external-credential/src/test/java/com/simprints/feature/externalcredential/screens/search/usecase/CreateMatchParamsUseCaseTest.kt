@@ -3,6 +3,7 @@ package com.simprints.feature.externalcredential.screens.search.usecase
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
@@ -11,7 +12,6 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.determineFaceSDKs
 import com.simprints.infra.config.store.models.determineFingerprintSDKs
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.matching.MatchParams
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import org.junit.Before
@@ -26,10 +26,10 @@ internal class CreateMatchParamsUseCaseTest {
     private val ageGroup = AgeGroup(25, 30)
 
     @MockK
-    private lateinit var faceSample: MatchParams.FaceSample
+    private lateinit var faceSample: CaptureSample
 
     @MockK
-    private lateinit var fingerprintSample: MatchParams.FingerprintSample
+    private lateinit var fingerprintSample: CaptureSample
 
     @MockK
     private lateinit var generalConfiguration: GeneralConfiguration
@@ -45,7 +45,7 @@ internal class CreateMatchParamsUseCaseTest {
     }
 
     @Test
-    fun ` creates correct MatchParams for face modality`() {
+    fun `creates correct MatchParams for face modality`() {
         every { projectConfiguration.determineFaceSDKs(ageGroup) } returns listOf(
             FaceConfiguration.BioSdk.RANK_ONE,
             FaceConfiguration.BioSdk.SIM_FACE,
@@ -77,7 +77,7 @@ internal class CreateMatchParamsUseCaseTest {
     }
 
     @Test
-    fun ` creates correct  MatchParams for fingerprint modality`() {
+    fun `creates correct  MatchParams for fingerprint modality`() {
         every { projectConfiguration.determineFaceSDKs(ageGroup) } returns emptyList()
         every { projectConfiguration.determineFingerprintSDKs(ageGroup) } returns listOf(
             FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
@@ -109,8 +109,11 @@ internal class CreateMatchParamsUseCaseTest {
     }
 
     @Test
-    fun ` creates correct  MatchParams for multiple`() {
-        every { generalConfiguration.matchingModalities } returns listOf(Modality.FACE, Modality.FINGERPRINT)
+    fun `creates correct  MatchParams for multiple`() {
+        every { generalConfiguration.matchingModalities } returns listOf(
+            Modality.FACE,
+            Modality.FINGERPRINT,
+        )
         every { projectConfiguration.determineFaceSDKs(ageGroup) } returns listOf(
             FaceConfiguration.BioSdk.RANK_ONE,
         )
@@ -142,7 +145,7 @@ internal class CreateMatchParamsUseCaseTest {
     }
 
     @Test
-    fun ` handles null ageGroup`() {
+    fun `handles null ageGroup`() {
         every { projectConfiguration.determineFaceSDKs(null) } returns listOf(
             FaceConfiguration.BioSdk.RANK_ONE,
         )
@@ -163,7 +166,7 @@ internal class CreateMatchParamsUseCaseTest {
     }
 
     @Test
-    fun ` returns empty list when no SDKs available`() {
+    fun `returns empty list when no SDKs available`() {
         every { projectConfiguration.determineFaceSDKs(ageGroup) } returns emptyList()
         every { projectConfiguration.determineFingerprintSDKs(ageGroup) } returns emptyList()
 
@@ -181,7 +184,7 @@ internal class CreateMatchParamsUseCaseTest {
     }
 
     @Test
-    fun ` creates multiple MatchParams for multiple face SDKs`() {
+    fun `creates multiple MatchParams for multiple face SDKs`() {
         every { projectConfiguration.determineFaceSDKs(ageGroup) } returns listOf(
             FaceConfiguration.BioSdk.RANK_ONE,
             FaceConfiguration.BioSdk.SIM_FACE,

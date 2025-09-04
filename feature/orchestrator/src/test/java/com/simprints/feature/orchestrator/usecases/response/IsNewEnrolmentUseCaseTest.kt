@@ -1,6 +1,7 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.infra.config.store.models.DecisionPolicy
@@ -50,7 +51,7 @@ internal class IsNewEnrolmentUseCaseTest {
         assertThat(
             useCase(
                 projectConfiguration,
-                listOf(FingerprintMatchResult(listOf(FingerprintMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)), mockk())),
+                listOf(FingerprintMatchResult(listOf(MatchConfidence("", LOWER_THAN_MEDIUM_SCORE)), mockk())),
             ),
         ).isTrue()
     }
@@ -62,7 +63,7 @@ internal class IsNewEnrolmentUseCaseTest {
         assertThat(
             useCase(
                 projectConfiguration,
-                listOf(FingerprintMatchResult(listOf(FingerprintMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE)), mockk())),
+                listOf(FingerprintMatchResult(listOf(MatchConfidence("", HIGHER_THAN_MEDIUM_SCORE)), mockk())),
             ),
         ).isFalse()
     }
@@ -74,7 +75,7 @@ internal class IsNewEnrolmentUseCaseTest {
         assertThat(
             useCase(
                 projectConfiguration,
-                listOf(FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE)),
+                listOf(FaceMatchResult(listOf(MatchConfidence("", LOWER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE)),
             ),
         ).isTrue()
     }
@@ -86,7 +87,7 @@ internal class IsNewEnrolmentUseCaseTest {
         assertThat(
             useCase(
                 projectConfiguration,
-                listOf(FaceMatchResult(listOf(FaceMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE)),
+                listOf(FaceMatchResult(listOf(MatchConfidence("", HIGHER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE)),
             ),
         ).isFalse()
     }
@@ -100,10 +101,10 @@ internal class IsNewEnrolmentUseCaseTest {
                 projectConfiguration,
                 listOf(
                     FingerprintMatchResult(
-                        listOf(FingerprintMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)),
+                        listOf(MatchConfidence("", LOWER_THAN_MEDIUM_SCORE)),
                         mockk(),
                     ),
-                    FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE),
+                    FaceMatchResult(listOf(MatchConfidence("", LOWER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE),
                 ),
             ),
         ).isTrue()
@@ -118,10 +119,10 @@ internal class IsNewEnrolmentUseCaseTest {
                 projectConfiguration,
                 listOf(
                     FingerprintMatchResult(
-                        listOf(FingerprintMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)),
+                        listOf(MatchConfidence("", LOWER_THAN_MEDIUM_SCORE)),
                         mockk(),
                     ),
-                    FaceMatchResult(listOf(FaceMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE),
+                    FaceMatchResult(listOf(MatchConfidence("", HIGHER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE),
                 ),
             ),
         ).isFalse()
@@ -136,10 +137,10 @@ internal class IsNewEnrolmentUseCaseTest {
                 projectConfiguration,
                 listOf(
                     FingerprintMatchResult(
-                        listOf(FingerprintMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE)),
+                        listOf(MatchConfidence("", HIGHER_THAN_MEDIUM_SCORE)),
                         mockk(),
                     ),
-                    FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE),
+                    FaceMatchResult(listOf(MatchConfidence("", LOWER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE),
                 ),
             ),
         ).isFalse()

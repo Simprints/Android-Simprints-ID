@@ -2,6 +2,8 @@ package com.simprints.feature.externalcredential.screens.search.usecase
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.infra.config.store.models.AgeGroup
@@ -11,7 +13,6 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.matching.MatchParams
-import com.simprints.infra.matching.MatchResultItem
 import com.simprints.infra.matching.usecase.FaceMatcherUseCase
 import com.simprints.infra.matching.usecase.FingerprintMatcherUseCase
 import com.simprints.infra.matching.usecase.MatcherUseCase.MatcherState
@@ -59,16 +60,16 @@ internal class MatchCandidatesUseCaseTest {
     private lateinit var fingerprintSdkConfig: FingerprintConfiguration.FingerprintSdkConfiguration
 
     @MockK
-    private lateinit var matchResultItem: MatchResultItem
+    private lateinit var matchResultItem: MatchConfidence
 
     @MockK
     private lateinit var matchParams: MatchParams
 
     @MockK
-    private lateinit var faceSample: MatchParams.FaceSample
+    private lateinit var faceSample: CaptureSample
 
     @MockK
-    private lateinit var fingerprintSample: MatchParams.FingerprintSample
+    private lateinit var fingerprintSample: CaptureSample
 
     @MockK
     private lateinit var ageGroup: AgeGroup
@@ -125,7 +126,7 @@ internal class MatchCandidatesUseCaseTest {
         val (faceSamples, fingerprintSamples) = if (isFace) {
             listOf(faceSample) to emptyList()
         } else {
-            emptyList<MatchParams.FaceSample>() to listOf(fingerprintSample)
+            emptyList<CaptureSample>() to listOf(fingerprintSample)
         }
         every { matchParams.probeFaceSamples } returns faceSamples
         every { matchParams.faceSDK } returns FaceConfiguration.BioSdk.RANK_ONE

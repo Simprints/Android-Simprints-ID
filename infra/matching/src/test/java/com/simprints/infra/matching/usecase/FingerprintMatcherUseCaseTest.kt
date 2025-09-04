@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.time.TimeHelper
@@ -117,10 +118,12 @@ internal class FingerprintMatcherUseCaseTest {
                 MatchParams(
                     probeReferenceId = "referenceId",
                     probeFingerprintSamples = listOf(
-                        MatchParams.FingerprintSample(
-                            SampleIdentifier.LEFT_3RD_FINGER,
-                            "format",
-                            byteArrayOf(1, 2, 3),
+                        CaptureSample(
+                            captureEventId = "fingerprintId",
+                            template = byteArrayOf(1, 2, 3),
+                            modality = Modality.FINGERPRINT,
+                            format = "format",
+                            identifier = SampleIdentifier.LEFT_3RD_FINGER,
                         ),
                     ),
                     fingerprintSDK = SECUGEN_SIM_MATCHER,
@@ -183,10 +186,12 @@ internal class FingerprintMatcherUseCaseTest {
                 matchParams = MatchParams(
                     probeReferenceId = "referenceId",
                     probeFingerprintSamples = listOf(
-                        MatchParams.FingerprintSample(
-                            SampleIdentifier.LEFT_3RD_FINGER,
-                            "format",
-                            byteArrayOf(1, 2, 3),
+                        CaptureSample(
+                            captureEventId = "fingerprintId",
+                            template = byteArrayOf(1, 2, 3),
+                            modality = Modality.FINGERPRINT,
+                            format = "format",
+                            identifier = SampleIdentifier.LEFT_3RD_FINGER,
                         ),
                     ),
                     fingerprintSDK = SECUGEN_SIM_MATCHER,

@@ -2,6 +2,8 @@ package com.simprints.infra.matching.usecase
 
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
@@ -15,7 +17,6 @@ import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepositor
 import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.matching.FingerprintMatchResult
 import com.simprints.infra.matching.MatchBatchInfo
 import com.simprints.infra.matching.MatchParams
 import com.simprints.infra.matching.usecase.MatcherUseCase.MatcherState
@@ -86,7 +87,7 @@ class FingerprintMatcherUseCase @Inject constructor(
             this@channelFlow.send(MatcherState.CandidateLoaded)
         }
 
-        val resultSet = MatchResultSet<FingerprintMatchResult.Item>()
+        val resultSet = MatchResultSet()
 
         val batchInfo = consumeAndMatch(channel, samples, resultSet, bioSdkWrapper, matchParams)
 
@@ -97,7 +98,7 @@ class FingerprintMatcherUseCase @Inject constructor(
     private suspend fun consumeAndMatch(
         channel: ReceiveChannel<IdentityBatch<DomainFingerprintIdentity>>,
         samples: List<Fingerprint>,
-        resultSet: MatchResultSet<FingerprintMatchResult.Item>,
+        resultSet: MatchResultSet,
         bioSdkWrapper: BioSdkWrapper,
         matchParams: MatchParams,
     ): List<MatchBatchInfo> {
@@ -111,8 +112,8 @@ class FingerprintMatcherUseCase @Inject constructor(
                     matchParams.flowType,
                     bioSdkWrapper,
                     bioSdk = matchParams.fingerprintSDK!!,
-                ).fold(MatchResultSet<FingerprintMatchResult.Item>()) { acc, item ->
-                    acc.add(FingerprintMatchResult.Item(item.id, item.score))
+                ).fold(MatchResultSet()) { acc, item ->
+                    acc.add(MatchConfidence(item.id, item.score))
                 }
             resultSet.addAll(matchResults)
             val comparingEndTime = timeHelper.now()
@@ -129,8 +130,8 @@ class FingerprintMatcherUseCase @Inject constructor(
         return matchBatches
     }
 
-    private fun mapSamples(probes: List<MatchParams.FingerprintSample>) = probes
-        .map { Fingerprint(it.fingerId, it.template, it.format) }
+    private fun mapSamples(probes: List<CaptureSample>) = probes
+        .map { Fingerprint(fingerId = it.identifier, template = it.template, format = it.format) }
 
     private suspend fun match(
         probes: List<Fingerprint>,

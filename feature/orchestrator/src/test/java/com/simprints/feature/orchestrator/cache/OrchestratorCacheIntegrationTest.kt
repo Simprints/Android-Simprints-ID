@@ -8,6 +8,7 @@ import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
@@ -24,7 +25,6 @@ import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
-import com.simprints.feature.enrollast.MatchResult
 import com.simprints.feature.exitform.ExitFormOption
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
@@ -140,7 +140,7 @@ class OrchestratorCacheIntegrationTest {
                             ),
                         ),
                         EnrolLastBiometricStepResult.FingerprintMatchResult(
-                            listOf(MatchResult("subjectId", 0.5f)),
+                            listOf(MatchConfidence("subjectId", 0.5f)),
                             FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                         ),
                         EnrolLastBiometricStepResult.FaceCaptureResult(
@@ -150,7 +150,7 @@ class OrchestratorCacheIntegrationTest {
                             ),
                         ),
                         EnrolLastBiometricStepResult.FaceMatchResult(
-                            listOf(MatchResult("subjectId", 0.5f)),
+                            listOf(MatchConfidence("subjectId", 0.5f)),
                             FaceConfiguration.BioSdk.RANK_ONE,
                         ),
                         EnrolLastBiometricStepResult.EnrolLastBiometricsResult("subjectId"),
@@ -194,16 +194,21 @@ class OrchestratorCacheIntegrationTest {
                     ageGroup = AgeGroup(1, 2),
                     probeReferenceId = "referenceId",
                     faceSamples = listOf(
-                        MatchParams.FaceSample(
-                            faceId = "faceId",
+                        CaptureSample(
+                            captureEventId = GUID1,
+                            identifier = SampleIdentifier.LEFT_THUMB,
                             template = byteArrayOf(1, 2, 3),
+                            modality = Modality.FACE,
+                            format = "format",
                         ),
                     ),
                     fingerprintSamples = listOf(
-                        MatchParams.FingerprintSample(
-                            fingerId = SampleIdentifier.LEFT_4TH_FINGER,
-                            format = "NEC",
+                        CaptureSample(
+                            captureEventId = GUID1,
+                            identifier = SampleIdentifier.LEFT_THUMB,
                             template = byteArrayOf(1, 2, 3),
+                            modality = Modality.FINGERPRINT,
+                            format = "format",
                         ),
                     ),
                 ),
@@ -224,7 +229,7 @@ class OrchestratorCacheIntegrationTest {
                     matchResults = listOf(
                         CredentialMatch(
                             credential = "credential".asTokenizableEncrypted(),
-                            matchResult = FaceMatchResult.Item("subjectId", 0.5f),
+                            matchResult = MatchConfidence("subjectId", 0.5f),
                             verificationThreshold = 55f,
                             faceBioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                             fingerprintBioSdk = FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
@@ -279,16 +284,18 @@ class OrchestratorCacheIntegrationTest {
                     queryForCandidates = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.CommCare("name"),
                     probeFingerprintSamples = listOf(
-                        MatchParams.FingerprintSample(
-                            fingerId = SampleIdentifier.LEFT_4TH_FINGER,
-                            format = "NEC",
+                        CaptureSample(
+                            captureEventId = GUID1,
+                            identifier = SampleIdentifier.LEFT_THUMB,
                             template = byteArrayOf(1, 2, 3),
+                            modality = Modality.FINGERPRINT,
+                            format = "format",
                         ),
                     ),
                 ),
                 status = StepStatus.COMPLETED,
                 result = FingerprintMatchResult(
-                    listOf(FingerprintMatchResult.Item("subjectId", 0.5f)),
+                    listOf(MatchConfidence("subjectId", 0.5f)),
                     FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                 ),
             ),
@@ -335,15 +342,18 @@ class OrchestratorCacheIntegrationTest {
                     queryForCandidates = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
                     probeFaceSamples = listOf(
-                        MatchParams.FaceSample(
-                            faceId = "faceId",
+                        CaptureSample(
+                            captureEventId = GUID1,
+                            identifier = SampleIdentifier.LEFT_THUMB,
                             template = byteArrayOf(1, 2, 3),
+                            modality = Modality.FACE,
+                            format = "format",
                         ),
                     ),
                 ),
                 status = StepStatus.COMPLETED,
                 result = FaceMatchResult(
-                    listOf(FaceMatchResult.Item("subjectId", 0.5f)),
+                    listOf(MatchConfidence("subjectId", 0.5f)),
                     FaceConfiguration.BioSdk.RANK_ONE,
                 ),
             ),
