@@ -1,22 +1,22 @@
 package com.simprints.infra.matching.usecase
 
-import com.simprints.infra.matching.MatchResultItem
+import com.simprints.core.domain.sample.MatchConfidence
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-class MatchResultSet<T : MatchResultItem>(
+internal class MatchResultSet(
     private val maxSize: Int = MAX_RESULTS,
 ) {
     private val lowestConfidence = AtomicReference(0f)
     private val lock = ReentrantLock()
 
     private val skipListSet = ConcurrentSkipListSet(
-        compareByDescending<T> { it.confidence }.thenByDescending { it.subjectId },
+        compareByDescending<MatchConfidence> { it.confidence }.thenByDescending { it.subjectId },
     )
 
-    fun add(element: T): MatchResultSet<T> {
+    fun add(element: MatchConfidence): MatchResultSet {
         // Use a lock to ensure thread safety during the entire add operation
         lock.withLock {
             // Only perform this optimization when we know the set is at max capacity
@@ -37,12 +37,12 @@ class MatchResultSet<T : MatchResultItem>(
         }
     }
 
-    fun addAll(elements: MatchResultSet<T>): MatchResultSet<T> {
+    fun addAll(elements: MatchResultSet): MatchResultSet {
         elements.skipListSet.forEach { add(it) }
         return this
     }
 
-    fun toList(): List<T> = skipListSet.toList()
+    fun toList(): List<MatchConfidence> = skipListSet.toList()
 
     companion object {
         /**

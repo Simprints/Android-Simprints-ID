@@ -1,6 +1,7 @@
 package com.simprints.feature.orchestrator.steps
 
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.step.StepParams
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
@@ -24,7 +25,7 @@ internal data class MatchStepStubPayload(
 ) : StepParams {
     fun toFaceStepArgs(
         referenceId: String,
-        samples: List<MatchParams.FaceSample>,
+        samples: List<CaptureSample>,
     ) = MatchContract.getParams(
         referenceId = referenceId,
         faceSamples = samples,
@@ -36,7 +37,7 @@ internal data class MatchStepStubPayload(
 
     fun toFingerprintStepArgs(
         referenceId: String,
-        samples: List<MatchParams.FingerprintSample>,
+        samples: List<CaptureSample>,
     ) = MatchContract.getParams(
         referenceId = referenceId,
         fingerprintSamples = samples,

@@ -65,8 +65,8 @@ internal class CheckForDuplicateEnrolmentsUseCase @Inject constructor() {
                 ?.toFloat()
         } ?: Float.MAX_VALUE
 
-        return fingerprintResponse?.results?.any { it.confidenceScore >= fingerprintThreshold } == true ||
-            faceResponse?.results?.any { it.confidenceScore >= faceThreshold } == true
+        return fingerprintResponse?.results?.any { it.confidence >= fingerprintThreshold } == true ||
+            faceResponse?.results?.any { it.confidence >= faceThreshold } == true
     }
 
     private class MissingMatchResultException : IllegalStateException("No match response in duplicate check.")

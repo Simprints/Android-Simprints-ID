@@ -1,6 +1,7 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
@@ -246,12 +247,12 @@ class CreateVerifyResponseUseCaseTest {
     }
 
     private fun createFingerprintMatchResult(vararg confidences: Float): Serializable = FingerprintMatchResult(
-        confidences.map { FingerprintMatchResult.Item(subjectId = "1", confidence = it) },
+        confidences.map { MatchConfidence(subjectId = "1", confidence = it) },
         mockk(),
     )
 
     private fun createFaceMatchResult(vararg confidences: Float): Serializable = FaceMatchResult(
-        confidences.map { FaceMatchResult.Item(subjectId = "1", confidence = it) },
+        confidences.map { MatchConfidence(subjectId = "1", confidence = it) },
         mockk(),
     )
 }

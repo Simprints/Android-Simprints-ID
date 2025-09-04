@@ -1,6 +1,8 @@
 package com.simprints.infra.matching.usecase
 
 import com.simprints.core.DispatcherBG
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.infra.basebiosdk.matching.FaceIdentity
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
@@ -71,7 +73,7 @@ class FaceMatcherUseCase @Inject constructor(
         // as it's count function does not take into account filtering criteria
         val loadedCandidates = AtomicInteger(0)
         val ranges = createRanges(expectedCandidates)
-        val resultSet = MatchResultSet<FaceMatchResult.Item>()
+        val resultSet = MatchResultSet()
         val candidatesChannel = enrolmentRecordRepository
             .loadFaceIdentities(
                 query = queryWithSupportedFormat,
@@ -91,7 +93,7 @@ class FaceMatcherUseCase @Inject constructor(
     private suspend fun consumeAndMatch(
         candidatesChannel: ReceiveChannel<IdentityBatch<DomainFaceIdentity>>,
         samples: List<FaceSample>,
-        resultSet: MatchResultSet<FaceMatchResult.Item>,
+        resultSet: MatchResultSet,
         bioSdk: FaceBioSDK,
     ): List<MatchBatchInfo> {
         val matchBatches = mutableListOf<MatchBatchInfo>()
@@ -115,14 +117,14 @@ class FaceMatcherUseCase @Inject constructor(
         return matchBatches
     }
 
-    private fun mapSamples(probes: List<MatchParams.FaceSample>) = probes.map { FaceSample(it.faceId, it.template) }
+    private fun mapSamples(probes: List<CaptureSample>) = probes.map { FaceSample(it.captureEventId, it.template) }
 
     private suspend fun match(
         matcher: FaceMatcher,
         batchCandidates: List<FaceIdentity>,
-    ) = batchCandidates.fold(MatchResultSet<FaceMatchResult.Item>()) { acc, candidate ->
+    ) = batchCandidates.fold(MatchResultSet()) { acc, candidate ->
         acc.add(
-            FaceMatchResult.Item(
+            MatchConfidence(
                 candidate.subjectId,
                 matcher.getHighestComparisonScoreForCandidate(candidate),
             ),
