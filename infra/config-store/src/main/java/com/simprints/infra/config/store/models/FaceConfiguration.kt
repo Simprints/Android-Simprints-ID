@@ -1,5 +1,7 @@
 package com.simprints.infra.config.store.models
 
+import com.simprints.core.domain.common.ModalitySdkType
+
 data class FaceConfiguration(
     val allowedSDKs: List<BioSdk>,
     val rankOne: FaceSdkConfiguration?,
@@ -15,12 +17,13 @@ data class FaceConfiguration(
         val verificationMatchThreshold: Float? = null,
     )
 
-    fun getSdkConfiguration(sdk: BioSdk): FaceSdkConfiguration? = when (sdk) {
+    fun getSdkConfiguration(sdk: ModalitySdkType): FaceSdkConfiguration? = when (sdk) {
         BioSdk.RANK_ONE -> rankOne
         BioSdk.SIM_FACE -> simFace
+        else -> null
     }
 
-    enum class BioSdk {
+    enum class BioSdk : ModalitySdkType {
         RANK_ONE,
         SIM_FACE,
     }

@@ -3,10 +3,11 @@ package com.simprints.feature.orchestrator.usecases.response
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.infra.config.store.models.DecisionPolicy
+import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.matching.MatchResult
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
-import com.simprints.infra.matching.FaceMatchResult
-import com.simprints.infra.matching.FingerprintMatchResult
 import io.mockk.*
 import org.junit.Before
 import org.junit.Test
@@ -246,13 +247,13 @@ class CreateVerifyResponseUseCaseTest {
         assertThat((result as AppVerifyResponse).matchResult.verificationSuccess).isEqualTo(false)
     }
 
-    private fun createFingerprintMatchResult(vararg confidences: Float): Serializable = FingerprintMatchResult(
+    private fun createFingerprintMatchResult(vararg confidences: Float): Serializable = MatchResult(
         confidences.map { MatchConfidence(subjectId = "1", confidence = it) },
-        mockk(),
+        FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
     )
 
-    private fun createFaceMatchResult(vararg confidences: Float): Serializable = FaceMatchResult(
+    private fun createFaceMatchResult(vararg confidences: Float): Serializable = MatchResult(
         confidences.map { MatchConfidence(subjectId = "1", confidence = it) },
-        mockk(),
+        FaceConfiguration.BioSdk.RANK_ONE,
     )
 }

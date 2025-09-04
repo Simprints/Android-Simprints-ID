@@ -1,11 +1,12 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_MATCHING
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.matching.FaceMatchResult
-import com.simprints.infra.matching.FingerprintMatchResult
+import com.simprints.infra.matching.MatchResult
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.orchestration.data.responses.AppResponse
@@ -31,8 +32,8 @@ internal class CreateVerifyResponseUseCase @Inject constructor() {
         projectConfiguration: ProjectConfiguration,
         results: List<Serializable>,
     ) = results
-        .filterIsInstance<FingerprintMatchResult>()
-        .lastOrNull()
+        .filterIsInstance<MatchResult>()
+        .lastOrNull { it.sdk is FingerprintConfiguration.BioSdk }
         ?.let { fingerprintMatchResult ->
             projectConfiguration.fingerprint
                 ?.getSdkConfiguration(fingerprintMatchResult.sdk)
@@ -55,8 +56,8 @@ internal class CreateVerifyResponseUseCase @Inject constructor() {
         projectConfiguration: ProjectConfiguration,
         results: List<Serializable>,
     ) = results
-        .filterIsInstance<FaceMatchResult>()
-        .lastOrNull()
+        .filterIsInstance<MatchResult>()
+        .lastOrNull { it.sdk is FaceConfiguration.BioSdk }
         ?.let { faceMatchResult ->
             projectConfiguration.face
                 ?.getSdkConfiguration(faceMatchResult.sdk)

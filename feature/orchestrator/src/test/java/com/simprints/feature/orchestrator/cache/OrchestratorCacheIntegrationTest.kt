@@ -52,9 +52,8 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.infra.matching.FaceMatchResult
-import com.simprints.infra.matching.FingerprintMatchResult
 import com.simprints.infra.matching.MatchParams
+import com.simprints.infra.matching.MatchResult
 import com.simprints.infra.security.SecurityManager
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -139,11 +138,11 @@ class OrchestratorCacheIntegrationTest {
                                 ),
                             ),
                         ),
-                        EnrolLastBiometricStepResult.FingerprintMatchResult(
+                        EnrolLastBiometricStepResult.MatchResult(
                             listOf(MatchConfidence("subjectId", 0.5f)),
                             FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                         ),
-                        EnrolLastBiometricStepResult.FaceMatchResult(
+                        EnrolLastBiometricStepResult.MatchResult(
                             listOf(MatchConfidence("subjectId", 0.5f)),
                             FaceConfiguration.BioSdk.RANK_ONE,
                         ),
@@ -277,6 +276,7 @@ class OrchestratorCacheIntegrationTest {
                     flowType = FlowType.IDENTIFY,
                     queryForCandidates = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.CommCare("name"),
+                    bioSdk = FingerprintConfiguration.BioSdk.NEC,
                     probeFingerprintSamples = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
@@ -288,7 +288,7 @@ class OrchestratorCacheIntegrationTest {
                     ),
                 ),
                 status = StepStatus.COMPLETED,
-                result = FingerprintMatchResult(
+                result = MatchResult(
                     listOf(MatchConfidence("subjectId", 0.5f)),
                     FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                 ),
@@ -335,6 +335,7 @@ class OrchestratorCacheIntegrationTest {
                     flowType = FlowType.IDENTIFY,
                     queryForCandidates = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
+                    bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                     probeFaceSamples = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
@@ -346,7 +347,7 @@ class OrchestratorCacheIntegrationTest {
                     ),
                 ),
                 status = StepStatus.COMPLETED,
-                result = FaceMatchResult(
+                result = MatchResult(
                     listOf(MatchConfidence("subjectId", 0.5f)),
                     FaceConfiguration.BioSdk.RANK_ONE,
                 ),

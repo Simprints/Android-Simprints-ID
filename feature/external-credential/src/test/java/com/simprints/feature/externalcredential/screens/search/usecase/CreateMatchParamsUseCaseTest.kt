@@ -70,10 +70,10 @@ internal class CreateMatchParamsUseCaseTest {
             assertThat(matchParams.queryForCandidates.subjectId).isEqualTo(subjectId)
             assertThat(matchParams.biometricDataSource).isEqualTo(BiometricDataSource.Simprints)
             assertThat(matchParams.probeFaceSamples).containsExactly(faceSample)
-            assertThat(matchParams.faceSDK).isNotNull()
+            assertThat(matchParams.bioSdk).isNotNull()
         }
-        assertThat(result[0].faceSDK).isEqualTo(FaceConfiguration.BioSdk.RANK_ONE)
-        assertThat(result[1].faceSDK).isEqualTo(FaceConfiguration.BioSdk.SIM_FACE)
+        assertThat(result[0].bioSdk).isEqualTo(FaceConfiguration.BioSdk.RANK_ONE)
+        assertThat(result[1].bioSdk).isEqualTo(FaceConfiguration.BioSdk.SIM_FACE)
     }
 
     @Test
@@ -102,10 +102,10 @@ internal class CreateMatchParamsUseCaseTest {
             assertThat(matchParams.queryForCandidates.subjectId).isEqualTo(subjectId)
             assertThat(matchParams.biometricDataSource).isEqualTo(BiometricDataSource.Simprints)
             assertThat(matchParams.probeFingerprintSamples).containsExactly(fingerprintSample)
-            assertThat(matchParams.fingerprintSDK).isNotNull()
+            assertThat(matchParams.bioSdk).isNotNull()
         }
-        assertThat(result[0].fingerprintSDK).isEqualTo(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
-        assertThat(result[1].fingerprintSDK).isEqualTo(FingerprintConfiguration.BioSdk.NEC)
+        assertThat(result[0].bioSdk).isEqualTo(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
+        assertThat(result[1].bioSdk).isEqualTo(FingerprintConfiguration.BioSdk.NEC)
     }
 
     @Test
@@ -133,14 +133,14 @@ internal class CreateMatchParamsUseCaseTest {
 
         assertThat(result).hasSize(2)
 
-        val faceMatch = result.find { it.faceSDK != null }
+        val faceMatch = result.find { it.bioSdk is FaceConfiguration.BioSdk }
         assertThat(faceMatch).isNotNull()
-        assertThat(faceMatch?.faceSDK).isEqualTo(FaceConfiguration.BioSdk.RANK_ONE)
+        assertThat(faceMatch?.bioSdk).isEqualTo(FaceConfiguration.BioSdk.RANK_ONE)
         assertThat(faceMatch?.probeFaceSamples).containsExactly(faceSample)
 
-        val fingerprintMatch = result.find { it.fingerprintSDK != null }
+        val fingerprintMatch = result.find { it.bioSdk is FingerprintConfiguration.BioSdk }
         assertThat(fingerprintMatch).isNotNull()
-        assertThat(fingerprintMatch?.fingerprintSDK).isEqualTo(FingerprintConfiguration.BioSdk.NEC)
+        assertThat(fingerprintMatch?.bioSdk).isEqualTo(FingerprintConfiguration.BioSdk.NEC)
         assertThat(fingerprintMatch?.probeFingerprintSamples).containsExactly(fingerprintSample)
     }
 

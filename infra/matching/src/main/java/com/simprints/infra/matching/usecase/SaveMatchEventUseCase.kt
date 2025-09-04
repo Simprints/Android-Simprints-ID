@@ -42,7 +42,9 @@ class SaveMatchEventUseCase @Inject constructor(
                     matcherName,
                     matchParams.queryForCandidates,
                     matchEntries.firstOrNull(),
-                    if (matchParams.isFaceMatch()) null else getFingerprintComparisonStrategy(matchParams.fingerprintSDK!!),
+                    matchParams.bioSdk
+                        .let { it as? FingerprintConfiguration.BioSdk }
+                        ?.let { getFingerprintComparisonStrategy(it) },
                     matchParams.probeReferenceId,
                 )
             } else {

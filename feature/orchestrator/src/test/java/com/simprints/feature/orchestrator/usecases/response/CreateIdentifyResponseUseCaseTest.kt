@@ -8,8 +8,7 @@ import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.events.session.SessionEventRepository
-import com.simprints.infra.matching.FaceMatchResult
-import com.simprints.infra.matching.FingerprintMatchResult
+import com.simprints.infra.matching.MatchResult
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -356,7 +355,7 @@ class CreateIdentifyResponseUseCaseTest {
                 mockk<ExternalCredentialSearchResult> {
                     every { matchResults } returns credentialFaceMatches
                 },
-                FaceMatchResult(
+                MatchResult(
                     listOf(MatchConfidence(subjectId = sharedGuid, confidence = faceConfidence)),
                     FaceConfiguration.BioSdk.RANK_ONE,
                 ),
@@ -405,7 +404,7 @@ class CreateIdentifyResponseUseCaseTest {
                 mockk<ExternalCredentialSearchResult> {
                     every { matchResults } returns credentialFingerprintMatches
                 },
-                FingerprintMatchResult(
+                MatchResult(
                     listOf(MatchConfidence(subjectId = sharedGuid, confidence = fingerprintConfidence)),
                     FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                 ),
@@ -417,12 +416,12 @@ class CreateIdentifyResponseUseCaseTest {
         assertThat(result.identifications.first().confidenceScore).isEqualTo(credentialConfidence.toInt())
     }
 
-    private fun createFaceMatchResult(vararg confidences: Float): Serializable = FaceMatchResult(
+    private fun createFaceMatchResult(vararg confidences: Float): Serializable = MatchResult(
         confidences.mapIndexed { i, confidence -> MatchConfidence(subjectId = "$i", confidence = confidence) },
         FaceConfiguration.BioSdk.RANK_ONE,
     )
 
-    private fun createFingerprintMatchResult(vararg confidences: Float): Serializable = FingerprintMatchResult(
+    private fun createFingerprintMatchResult(vararg confidences: Float): Serializable = MatchResult(
         confidences.mapIndexed { i, confidence -> MatchConfidence(subjectId = "$i", confidence = confidence) },
         FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
     )

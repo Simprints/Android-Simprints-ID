@@ -10,10 +10,11 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.DecisionPolicy
+import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.matching.FaceMatchResult
-import com.simprints.infra.matching.FingerprintMatchResult
 import com.simprints.infra.matching.MatchParams
+import com.simprints.infra.matching.MatchResult
 import com.simprints.infra.matching.usecase.FaceMatcherUseCase
 import com.simprints.infra.matching.usecase.FingerprintMatcherUseCase
 import com.simprints.infra.matching.usecase.MatcherUseCase
@@ -21,7 +22,6 @@ import com.simprints.infra.matching.usecase.SaveMatchEventUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.io.Serializable
 import javax.inject.Inject
 
 @HiltViewModel
@@ -45,9 +45,9 @@ internal class MatchViewModel @Inject constructor(
         get() = _matchState
     private val _matchState = MutableLiveData<MatchState>(MatchState.NotStarted)
 
-    val matchResponse: LiveData<LiveDataEventWithContent<Serializable>>
+    val matchResponse: LiveData<LiveDataEventWithContent<MatchResult>>
         get() = _matchResponse
-    private val _matchResponse = MutableLiveData<LiveDataEventWithContent<Serializable>>()
+    private val _matchResponse = MutableLiveData<LiveDataEventWithContent<MatchResult>>()
 
     fun setupMatch(params: MatchParams) = viewModelScope.launch {
         if (isMatcherRunning) return@launch
@@ -95,12 +95,7 @@ internal class MatchViewModel @Inject constructor(
                     // wait a bit for the user to see the results
                     delay(MATCHING_END_WAIT_TIME_MS)
 
-                    _matchResponse.send(
-                        when {
-                            isFaceMatch -> FaceMatchResult(matcherState.matchResultItems, params.faceSDK!!)
-                            else -> FingerprintMatchResult(matcherState.matchResultItems, params.fingerprintSDK!!)
-                        },
-                    )
+                    _matchResponse.send(MatchResult(matcherState.matchResultItems, params.bioSdk))
                 }
             }
         }
@@ -108,11 +103,9 @@ internal class MatchViewModel @Inject constructor(
 
     private suspend fun getDecisionPolicy(params: MatchParams): DecisionPolicy {
         val config = configManager.getProjectConfiguration()
-        val faceSDK = params.faceSDK
-        val fingerprintSDK = params.fingerprintSDK
-        val policy = when {
-            faceSDK != null -> config.face?.getSdkConfiguration(faceSDK)?.decisionPolicy
-            fingerprintSDK != null -> config.fingerprint?.getSdkConfiguration(fingerprintSDK)?.decisionPolicy
+        val policy = when (params.bioSdk) {
+            is FaceConfiguration.BioSdk -> config.face?.getSdkConfiguration(params.bioSdk)?.decisionPolicy
+            is FingerprintConfiguration.BioSdk -> config.fingerprint?.getSdkConfiguration(params.bioSdk)?.decisionPolicy
             else -> null
         }
         return policy ?: fallbackDecisionPolicy()

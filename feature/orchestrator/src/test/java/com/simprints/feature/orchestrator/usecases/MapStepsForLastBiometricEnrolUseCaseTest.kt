@@ -11,8 +11,7 @@ import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.infra.matching.FaceMatchResult
-import com.simprints.infra.matching.FingerprintMatchResult
+import com.simprints.infra.matching.MatchResult
 import org.junit.Before
 import org.junit.Test
 
@@ -39,11 +38,11 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
     fun `maps FaceMatchResult correctly`() {
         val result = useCase(
             listOf(
-                FaceMatchResult(emptyList(), FaceConfiguration.BioSdk.RANK_ONE),
+                MatchResult(emptyList(), FaceConfiguration.BioSdk.RANK_ONE),
             ),
         )
 
-        assertThat(result.first()).isEqualTo(EnrolLastBiometricStepResult.FaceMatchResult(emptyList(), FaceConfiguration.BioSdk.RANK_ONE))
+        assertThat(result.first()).isEqualTo(EnrolLastBiometricStepResult.MatchResult(emptyList(), FaceConfiguration.BioSdk.RANK_ONE))
     }
 
     @Test
@@ -83,13 +82,13 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
     fun `maps FingerprintMatchResult correctly`() {
         val result = useCase(
             listOf(
-                FingerprintMatchResult(emptyList(), FingerprintConfiguration.BioSdk.NEC),
+                MatchResult(emptyList(), FingerprintConfiguration.BioSdk.NEC),
             ),
         )
 
         assertThat(
             result.first(),
-        ).isEqualTo(EnrolLastBiometricStepResult.FingerprintMatchResult(emptyList(), FingerprintConfiguration.BioSdk.NEC))
+        ).isEqualTo(EnrolLastBiometricStepResult.MatchResult(emptyList(), FingerprintConfiguration.BioSdk.NEC))
     }
 
     @Test
