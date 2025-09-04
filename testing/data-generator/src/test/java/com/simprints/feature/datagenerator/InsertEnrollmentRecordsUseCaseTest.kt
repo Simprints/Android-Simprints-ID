@@ -248,8 +248,8 @@ internal class InsertEnrollmentRecordsUseCaseTest {
         // Then
         val subject = subjectActionsSlot.captured.first().subject
         assertThat(subject.fingerprintSamples).hasSize(2)
-        assertThat(subject.fingerprintSamples[0].fingerIdentifier).isEqualTo(SampleIdentifier.LEFT_THUMB)
-        assertThat(subject.fingerprintSamples[1].fingerIdentifier).isEqualTo(SampleIdentifier.LEFT_THUMB)
+        assertThat(subject.fingerprintSamples[0].identifier).isEqualTo(SampleIdentifier.LEFT_THUMB)
+        assertThat(subject.fingerprintSamples[1].identifier).isEqualTo(SampleIdentifier.LEFT_THUMB)
     }
 
     @Test
@@ -279,7 +279,7 @@ internal class InsertEnrollmentRecordsUseCaseTest {
 
         // Then
         val subject = subjectActionsSlot.captured.first().subject
-        val fingers = subject.fingerprintSamples.map { it.fingerIdentifier }
+        val fingers = subject.fingerprintSamples.map { it.identifier }
         assertThat(fingers).hasSize(4)
         assertThat(fingers)
             .containsExactly(

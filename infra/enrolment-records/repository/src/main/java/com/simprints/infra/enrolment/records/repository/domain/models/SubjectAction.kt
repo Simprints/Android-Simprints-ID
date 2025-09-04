@@ -2,8 +2,7 @@ package com.simprints.infra.enrolment.records.repository.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.externalcredential.ExternalCredential
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.sample.Sample
 
 @Keep
 sealed class SubjectAction {
@@ -13,8 +12,8 @@ sealed class SubjectAction {
 
     data class Update(
         val subjectId: String,
-        val faceSamplesToAdd: List<FaceSample>,
-        val fingerprintSamplesToAdd: List<FingerprintSample>,
+        val faceSamplesToAdd: List<Sample>,
+        val fingerprintSamplesToAdd: List<Sample>,
         val referenceIdsToRemove: List<String>,
         val externalCredentialsToAdd: List<ExternalCredential>,
         val externalCredentialIdsToRemove: List<String>,

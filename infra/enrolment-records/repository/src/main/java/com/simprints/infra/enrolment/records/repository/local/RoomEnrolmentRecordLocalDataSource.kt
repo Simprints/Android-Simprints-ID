@@ -2,8 +2,8 @@ package com.simprints.infra.enrolment.records.repository.local
 
 import androidx.room.withTransaction
 import com.simprints.core.DispatcherIO
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.models.Project
@@ -100,11 +100,12 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             FaceIdentity(
                 subjectId = subjectId,
                 faces = templates.map { sample ->
-                    FaceSample(
+                    Sample(
                         template = sample.templateData,
                         id = sample.uuid,
                         format = sample.format,
                         referenceId = sample.referenceId,
+                        modality = Modality.FACE,
                     )
                 },
             )
@@ -131,14 +132,15 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             FingerprintIdentity(
                 subjectId = subjectId,
                 fingerprints = templates.map { sample ->
-                    FingerprintSample(
-                        fingerIdentifier = sample.identifier
+                    Sample(
+                        identifier = sample.identifier
                             ?.let { DbSampleIdentifier.fromId(it)?.toDomain() }
                             ?: SampleIdentifier.NONE,
                         template = sample.templateData,
                         id = sample.uuid,
                         format = sample.format,
                         referenceId = sample.referenceId,
+                        modality = Modality.FINGERPRINT,
                     )
                 },
             )
