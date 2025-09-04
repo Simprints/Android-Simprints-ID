@@ -7,8 +7,6 @@ import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
-import com.simprints.feature.enrollast.FaceTemplateCaptureResult
-import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
@@ -67,12 +65,14 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
         )
 
         assertThat(result.first()).isEqualTo(
-            EnrolLastBiometricStepResult.FaceCaptureResult(
+            EnrolLastBiometricStepResult.CaptureResult(
                 referenceId = "referenceId",
                 results = listOf(
-                    element = FaceTemplateCaptureResult(
+                    CaptureSample(
+                        captureEventId = "captureId",
                         template = byteArrayOf(),
                         format = "format",
+                        modality = Modality.FACE,
                     ),
                 ),
             ),
@@ -112,13 +112,15 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
         )
 
         assertThat(result.first()).isEqualTo(
-            EnrolLastBiometricStepResult.FingerprintCaptureResult(
+            EnrolLastBiometricStepResult.CaptureResult(
                 referenceId = "referenceId",
                 results = listOf(
-                    FingerTemplateCaptureResult(
+                    CaptureSample(
+                        captureEventId = "captureId",
                         template = byteArrayOf(),
                         format = "format",
-                        finger = SampleIdentifier.RIGHT_THUMB,
+                        identifier = SampleIdentifier.RIGHT_THUMB,
+                        modality = Modality.FINGERPRINT,
                     ),
                 ),
             ),

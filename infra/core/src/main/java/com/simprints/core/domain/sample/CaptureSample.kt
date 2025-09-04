@@ -4,6 +4,7 @@ import android.os.Parcelable
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.step.StepResult
 import kotlinx.parcelize.Parcelize
 import java.util.UUID
@@ -17,6 +18,7 @@ data class CaptureSample(
     val template: ByteArray,
     val identifier: SampleIdentifier = SampleIdentifier.NONE,
 ) : StepResult,
+    StepParams,
     Parcelable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
