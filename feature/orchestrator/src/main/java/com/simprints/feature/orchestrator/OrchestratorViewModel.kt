@@ -271,8 +271,7 @@ internal class OrchestratorViewModel @Inject constructor(
 
             if (matchingStep != null) {
                 val faceSamples = result.results
-                    .mapNotNull { it.sample }
-                    .map { MatchParams.FaceSample(it.faceId, it.template) }
+                    .map { MatchParams.FaceSample(it.captureEventId, it.template) }
                 val newPayload = matchingStep.params
                     ?.let { it as? MatchStepStubPayload }
                     ?.toFaceStepArgs(result.referenceId, faceSamples)
@@ -295,15 +294,13 @@ internal class OrchestratorViewModel @Inject constructor(
             }
 
             if (matchingStep != null) {
-                val fingerprintSamples = result.results
-                    .mapNotNull { it.sample }
-                    .map {
-                        MatchParams.FingerprintSample(
-                            fingerId = it.fingerIdentifier,
-                            format = it.format,
-                            template = it.template,
-                        )
-                    }
+                val fingerprintSamples = result.results.map {
+                    MatchParams.FingerprintSample(
+                        fingerId = it.identifier,
+                        format = it.format,
+                        template = it.template,
+                    )
+                }
                 val newPayload = matchingStep.params
                     ?.let { it as? MatchStepStubPayload }
                     ?.toFingerprintStepArgs(result.referenceId, fingerprintSamples)
@@ -327,9 +324,7 @@ internal class OrchestratorViewModel @Inject constructor(
         val params = step.params as? ExternalCredentialParams ?: return
         val updatedParams = when {
             currentStep.id == StepId.FACE_CAPTURE && result is FaceCaptureResult -> {
-                val faceSamples = result.results
-                    .mapNotNull { it.sample }
-                    .map { MatchParams.FaceSample(it.faceId, it.template) }
+                val faceSamples = result.results.map { MatchParams.FaceSample(it.captureEventId, it.template) }
                 params.copy(
                     probeReferenceId = result.referenceId,
                     faceSamples = faceSamples,
@@ -338,14 +333,7 @@ internal class OrchestratorViewModel @Inject constructor(
 
             currentStep.id == StepId.FINGERPRINT_CAPTURE && result is FingerprintCaptureResult -> {
                 val fingerprintSamples = result.results
-                    .mapNotNull { it.sample }
-                    .map {
-                        MatchParams.FingerprintSample(
-                            fingerId = it.fingerIdentifier,
-                            format = it.format,
-                            template = it.template,
-                        )
-                    }
+                    .map { MatchParams.FingerprintSample(fingerId = it.identifier, format = it.format, template = it.template) }
                 params.copy(
                     probeReferenceId = result.referenceId,
                     fingerprintSamples = fingerprintSamples,

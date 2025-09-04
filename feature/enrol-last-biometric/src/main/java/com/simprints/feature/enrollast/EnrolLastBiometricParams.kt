@@ -60,7 +60,6 @@ data class MatchResult(
 data class FingerTemplateCaptureResult(
     val finger: SampleIdentifier,
     val template: ByteArray,
-    val templateQualityScore: Int,
     val format: String,
 ) : StepParams {
     override fun equals(other: Any?): Boolean {
@@ -71,7 +70,6 @@ data class FingerTemplateCaptureResult(
 
         if (finger != other.finger) return false
         if (!template.contentEquals(other.template)) return false
-        if (templateQualityScore != other.templateQualityScore) return false
         if (format != other.format) return false
 
         return true
@@ -80,7 +78,6 @@ data class FingerTemplateCaptureResult(
     override fun hashCode(): Int {
         var result = finger.hashCode()
         result = 31 * result + template.contentHashCode()
-        result = 31 * result + templateQualityScore
         result = 31 * result + format.hashCode()
         return result
     }

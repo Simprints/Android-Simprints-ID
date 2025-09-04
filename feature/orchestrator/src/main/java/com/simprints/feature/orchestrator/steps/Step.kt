@@ -4,6 +4,7 @@ import androidx.annotation.IdRes
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.step.StepResult
 import com.simprints.face.capture.FaceCaptureParams
@@ -48,22 +49,12 @@ import java.io.Serializable
     JsonSubTypes.Type(value = ConsentResult::class, name = "ConsentResult"),
     JsonSubTypes.Type(value = FingerprintConnectResult::class, name = "FingerprintConnectResult"),
     JsonSubTypes.Type(value = FingerprintCaptureResult::class, name = "FingerprintCaptureResult"),
-    JsonSubTypes.Type(
-        value = FingerprintCaptureResult.Item::class,
-        name = "FingerprintCaptureResult.Item",
-    ),
-    JsonSubTypes.Type(
-        value = FingerprintCaptureResult.Sample::class,
-        name = "FingerprintCaptureResult.Sample",
-    ),
+    JsonSubTypes.Type(value = FaceCaptureResult::class, name = "FaceCaptureResult"),
     JsonSubTypes.Type(value = FingerprintMatchResult::class, name = "FingerprintMatchResult"),
     JsonSubTypes.Type(
         value = FingerprintMatchResult.Item::class,
         name = "FingerprintMatchResult.Item",
     ),
-    JsonSubTypes.Type(value = FaceCaptureResult::class, name = "FaceCaptureResult"),
-    JsonSubTypes.Type(value = FaceCaptureResult.Item::class, name = "FaceCaptureResult.Item"),
-    JsonSubTypes.Type(value = FaceCaptureResult.Sample::class, name = "FaceCaptureResult.Sample"),
     JsonSubTypes.Type(value = FaceMatchResult::class, name = "FaceMatchResult"),
     JsonSubTypes.Type(value = FaceMatchResult.Item::class, name = "FaceMatchResult.Item"),
     JsonSubTypes.Type(value = EnrolLastBiometricResult::class, name = "EnrolLastBiometricResult"),
@@ -74,6 +65,8 @@ import java.io.Serializable
     JsonSubTypes.Type(value = ValidateSubjectPoolResult::class, name = "ValidateSubjectPoolResult"),
     JsonSubTypes.Type(value = SelectSubjectAgeGroupResult::class, name = "SelectSubjectAgeGroupResult"),
     JsonSubTypes.Type(value = ExternalCredentialSearchResult::class, name = "ExternalCredentialSearchResult"),
+    // Common data types
+    JsonSubTypes.Type(value = CaptureSample::class, name = "CaptureSample"),
 )
 abstract class StepResultMixin : StepResult
 

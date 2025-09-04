@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
@@ -271,31 +272,23 @@ class SubjectFactoryTest {
             fingerprintResponse = FingerprintCaptureResult(
                 GUID1,
                 listOf(
-                    FingerprintCaptureResult.Item(
+                    CaptureSample(
                         captureEventId = GUID1,
                         identifier = IDENTIFIER,
-                        sample = FingerprintCaptureResult.Sample(
-                            template = BASE_64_BYTES,
-                            templateQualityScore = QUALITY,
-                            format = REFERENCE_FORMAT,
-                            imageRef = null,
-                            fingerIdentifier = IDENTIFIER,
-                        ),
+                        template = BASE_64_BYTES,
+                        format = REFERENCE_FORMAT,
+                        modality = Modality.FINGERPRINT,
                     ),
                 ),
             ),
             faceResponse = FaceCaptureResult(
                 GUID1,
                 listOf(
-                    FaceCaptureResult.Item(
+                    CaptureSample(
                         captureEventId = GUID1,
-                        index = 0,
-                        sample = FaceCaptureResult.Sample(
-                            template = BASE_64_BYTES,
-                            format = REFERENCE_FORMAT,
-                            faceId = REFERENCE_ID,
-                            imageRef = null,
-                        ),
+                        template = BASE_64_BYTES,
+                        format = REFERENCE_FORMAT,
+                        modality = Modality.FACE,
                     ),
                 ),
             ),
@@ -357,7 +350,6 @@ class SubjectFactoryTest {
         private val EXTERNAL_CREDENTIAL_VALUE = "value".asTokenizableEncrypted()
         private val EXTERNAL_CREDENTIAL_TYPE = ExternalCredentialType.NHISCard
         private val IDENTIFIER = SampleIdentifier.LEFT_THUMB
-        private const val QUALITY = 10
         private val FINGERPRINT_REFERENCE = FingerprintReference(
             id = REFERENCE_ID,
             format = REFERENCE_FORMAT,
