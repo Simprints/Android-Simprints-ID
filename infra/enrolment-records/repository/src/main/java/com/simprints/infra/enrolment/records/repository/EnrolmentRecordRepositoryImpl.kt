@@ -158,4 +158,6 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
         insertRecordsInRoomDuringMigration(actions, project)
         selectEnrolmentRecordLocalDataSource().performActions(actions, project)
     }
+
+    override suspend fun closeOpenDbConnection() = selectEnrolmentRecordLocalDataSource().closeOpenDbConnection()
 }
