@@ -44,12 +44,12 @@ class FingerprintMatcherUseCase @Inject constructor(
         project: Project,
     ): Flow<MatcherState> = channelFlow {
         Simber.i("Initialising matcher", tag = crashReportTag)
-        if (matchParams.fingerprintSDK == null) {
+        if (matchParams.bioSdk !is FingerprintConfiguration.BioSdk) {
             Simber.w("Fingerprint SDK was not provided", tag = crashReportTag)
             send(MatcherState.Success(emptyList(), emptyList(), 0, ""))
             return@channelFlow
         }
-        val bioSdkWrapper = resolveBioSdkWrapper(matchParams.fingerprintSDK)
+        val bioSdkWrapper = resolveBioSdkWrapper(matchParams.bioSdk)
 
         if (matchParams.probeFingerprintSamples.isEmpty()) {
             send(MatcherState.Success(emptyList(), emptyList(), 0, bioSdkWrapper.matcherName))
@@ -89,7 +89,7 @@ class FingerprintMatcherUseCase @Inject constructor(
 
         val resultSet = MatchResultSet()
 
-        val batchInfo = consumeAndMatch(channel, samples, resultSet, bioSdkWrapper, matchParams)
+        val batchInfo = consumeAndMatch(channel, samples, resultSet, matchParams.bioSdk, bioSdkWrapper, matchParams.flowType)
 
         Simber.i("Matched $loadedCandidates candidates", tag = crashReportTag)
         send(MatcherState.Success(resultSet.toList(), batchInfo, loadedCandidates.get(), bioSdkWrapper.matcherName))
@@ -99,19 +99,20 @@ class FingerprintMatcherUseCase @Inject constructor(
         channel: ReceiveChannel<IdentityBatch<DomainFingerprintIdentity>>,
         samples: List<Fingerprint>,
         resultSet: MatchResultSet,
+        bioSdk: FingerprintConfiguration.BioSdk,
         bioSdkWrapper: BioSdkWrapper,
-        matchParams: MatchParams,
+        flowType: FlowType,
     ): List<MatchBatchInfo> {
         val matchBatches = mutableListOf<MatchBatchInfo>()
         for (batch in channel) {
             val comparingStartTime = timeHelper.now()
             val matchResults =
                 match(
-                    samples,
-                    batch.identities.mapToFingerprintIdentity(),
-                    matchParams.flowType,
-                    bioSdkWrapper,
-                    bioSdk = matchParams.fingerprintSDK!!,
+                    probes = samples,
+                    candidates = batch.identities.mapToFingerprintIdentity(),
+                    flowType = flowType,
+                    bioSdkWrapper = bioSdkWrapper,
+                    bioSdk = bioSdk,
                 ).fold(MatchResultSet()) { acc, item ->
                     acc.add(MatchConfidence(item.id, item.score))
                 }

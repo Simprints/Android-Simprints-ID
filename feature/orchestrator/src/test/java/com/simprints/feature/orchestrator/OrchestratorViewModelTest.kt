@@ -36,6 +36,7 @@ import com.simprints.feature.setup.SetupResult
 import com.simprints.fingerprint.capture.FingerprintCaptureContract
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.AgeGroup
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.NEC
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.sync.ConfigManager
@@ -197,6 +198,7 @@ internal class OrchestratorViewModelTest {
                     FlowType.VERIFY,
                     SubjectQuery(),
                     BiometricDataSource.Simprints,
+                    FaceConfiguration.BioSdk.RANK_ONE,
                 ),
             ),
         )
@@ -221,6 +223,7 @@ internal class OrchestratorViewModelTest {
                     FlowType.VERIFY,
                     SubjectQuery(),
                     BiometricDataSource.Simprints,
+                    FaceConfiguration.BioSdk.RANK_ONE,
                 ),
             ),
         )
@@ -244,6 +247,7 @@ internal class OrchestratorViewModelTest {
                     FlowType.VERIFY,
                     SubjectQuery(),
                     BiometricDataSource.Simprints,
+                    FaceConfiguration.BioSdk.RANK_ONE,
                 ),
             ),
         )
@@ -274,7 +278,7 @@ internal class OrchestratorViewModelTest {
                     flowType = FlowType.VERIFY,
                     subjectQuery = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
-                    fingerprintSDK = SECUGEN_SIM_MATCHER,
+                    bioSdk = SECUGEN_SIM_MATCHER,
                 ),
             ),
             createMockStep(
@@ -291,7 +295,7 @@ internal class OrchestratorViewModelTest {
                     flowType = FlowType.VERIFY,
                     subjectQuery = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
-                    fingerprintSDK = NEC,
+                    bioSdk = NEC,
                 ),
             ),
         )
@@ -319,7 +323,7 @@ internal class OrchestratorViewModelTest {
             assertThat(step.id).isEqualTo(StepId.FINGERPRINT_MATCHER)
             val params = step.params?.let { it as? MatchParams }
             assertThat(params).isNotNull()
-            assertThat(params?.fingerprintSDK).isEqualTo(SECUGEN_SIM_MATCHER)
+            assertThat(params?.bioSdk).isEqualTo(SECUGEN_SIM_MATCHER)
             assertThat(params?.probeFingerprintSamples?.size).isEqualTo(2)
             assertThat(params?.probeFingerprintSamples?.get(0)?.format).isEqualTo(format)
             assertThat(params?.probeFingerprintSamples?.get(1)?.format).isEqualTo(format)

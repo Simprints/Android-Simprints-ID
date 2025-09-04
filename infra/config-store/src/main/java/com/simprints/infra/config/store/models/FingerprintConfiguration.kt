@@ -1,5 +1,6 @@
 package com.simprints.infra.config.store.models
 
+import com.simprints.core.domain.common.ModalitySdkType
 import com.simprints.core.domain.sample.SampleIdentifier
 
 data class FingerprintConfiguration(
@@ -29,7 +30,7 @@ data class FingerprintConfiguration(
         VERO_2,
     }
 
-    enum class BioSdk {
+    enum class BioSdk : ModalitySdkType {
         SECUGEN_SIM_MATCHER,
         NEC,
     }
@@ -39,8 +40,9 @@ data class FingerprintConfiguration(
         CROSS_FINGER_USING_MEAN_OF_MAX,
     }
 
-    fun getSdkConfiguration(sdk: BioSdk): FingerprintSdkConfiguration? = when (sdk) {
+    fun getSdkConfiguration(sdk: ModalitySdkType): FingerprintSdkConfiguration? = when (sdk) {
         BioSdk.SECUGEN_SIM_MATCHER -> secugenSimMatcher
         BioSdk.NEC -> nec
+        else -> null
     }
 }

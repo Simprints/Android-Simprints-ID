@@ -98,8 +98,6 @@ internal class MatchCandidatesUseCaseTest {
         every { externalCredentialParams.fingerprintSamples } returns listOf(fingerprintSample)
         every { externalCredentialParams.ageGroup } returns ageGroup
 
-        every { matchParams.faceSDK } returns FaceConfiguration.BioSdk.RANK_ONE
-        every { matchParams.fingerprintSDK } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
         coEvery {
             createMatchParamsUseCase(
                 candidateSubjectId = any(),
@@ -123,15 +121,15 @@ internal class MatchCandidatesUseCaseTest {
     }
 
     private fun initMatchParams(isFace: Boolean) {
-        val (faceSamples, fingerprintSamples) = if (isFace) {
-            listOf(faceSample) to emptyList()
+        if (isFace) {
+            every { matchParams.probeFingerprintSamples } returns emptyList()
+            every { matchParams.probeFaceSamples } returns listOf(faceSample)
+            every { matchParams.bioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
         } else {
-            emptyList<CaptureSample>() to listOf(fingerprintSample)
+            every { matchParams.probeFingerprintSamples } returns listOf(fingerprintSample)
+            every { matchParams.probeFaceSamples } returns emptyList()
+            every { matchParams.bioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
         }
-        every { matchParams.probeFaceSamples } returns faceSamples
-        every { matchParams.faceSDK } returns FaceConfiguration.BioSdk.RANK_ONE
-        every { matchParams.probeFingerprintSamples } returns fingerprintSamples
-        every { matchParams.fingerprintSDK } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
     }
 
     @Test
@@ -176,38 +174,6 @@ internal class MatchCandidatesUseCaseTest {
     fun `returns empty list when no candidates provided`() = runTest {
         val result = useCase.invoke(
             candidates = emptyList(),
-            credential = credential,
-            externalCredentialParams = externalCredentialParams,
-            project = project,
-            projectConfig = projectConfig,
-        )
-
-        assertThat(result).isEmpty()
-    }
-
-    @Test
-    fun `returns empty list when face SDK is null`() = runTest {
-        initMatchParams(isFace = true)
-        every { matchParams.faceSDK } returns null
-
-        val result = useCase.invoke(
-            candidates = listOf(subject),
-            credential = credential,
-            externalCredentialParams = externalCredentialParams,
-            project = project,
-            projectConfig = projectConfig,
-        )
-
-        assertThat(result).isEmpty()
-    }
-
-    @Test
-    fun `returns empty list when fingerprint SDK is null`() = runTest {
-        initMatchParams(isFace = false)
-        every { matchParams.fingerprintSDK } returns null
-
-        val result = useCase.invoke(
-            candidates = listOf(subject),
             credential = credential,
             externalCredentialParams = externalCredentialParams,
             project = project,
