@@ -21,4 +21,6 @@ interface EnrolmentRecordLocalDataSource : IdentityDataSource {
     suspend fun getLocalDBInfo(): String
 
     suspend fun getAllSubjectIds(): List<String>
+
+    suspend fun closeOpenDbConnection()
 }
