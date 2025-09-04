@@ -64,14 +64,14 @@ internal class SyncInfoViewModel @Inject constructor(
             isReadyToLogOut // only when ready
         }.map {
             LiveDataEventWithContent(Unit)
-        }.asLiveData()
+        }.asLiveData(viewModelScope.coroutineContext)
 
     val syncInfoLiveData: LiveData<SyncInfo> by lazy {
         observeSyncInfo(isPreLogoutUpSync)
             .onStart {
                 startInitialSyncIfRequired()
                 syncImagesAfterEventsWhenRequired()
-            }.asLiveData()
+            }.asLiveData(viewModelScope.coroutineContext)
     }
 
     fun forceEventSync() {
