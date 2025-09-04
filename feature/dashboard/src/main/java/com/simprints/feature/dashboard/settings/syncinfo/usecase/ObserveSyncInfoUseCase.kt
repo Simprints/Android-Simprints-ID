@@ -5,8 +5,8 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.lifecycle.AppForegroundStateTracker
 import com.simprints.core.tools.extentions.combine9
 import com.simprints.core.tools.extentions.onChange
-import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Ticker
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.dashboard.settings.syncinfo.SyncInfo
 import com.simprints.feature.dashboard.settings.syncinfo.SyncInfoError
@@ -30,6 +30,7 @@ import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepositor
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.network.ConnectivityTracker
@@ -55,9 +56,13 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val ticker: Ticker,
     private val appForegroundStateTracker: AppForegroundStateTracker,
+    private val commCarePermissionChecker: CommCarePermissionChecker,
 ) {
     private val eventSyncStateFlow =
-        eventSyncManager.getLastSyncState(useDefaultValue = true /* otherwise value not guaranteed */).asFlow()
+        eventSyncManager
+            .getLastSyncState(
+                useDefaultValue = true, // otherwise value not guaranteed
+            ).asFlow()
     private val imageSyncStatusFlow =
         syncOrchestrator.observeImageSyncStatus()
 
@@ -157,9 +162,13 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             !isPreLogoutUpSync && projectConfig.isCommCareEventDownSyncAllowed()
 
         val isCommCareSyncBlockedByDeniedPermission =
-            isCommCareSyncExpected && eventSyncState.isSyncFailedBecauseCommCarePermissionIsMissing()
+            isCommCareSyncExpected &&
+                eventSyncState.isSyncFailedBecauseCommCarePermissionIsMissing() &&
+                !commCarePermissionChecker.hasCommCarePermissions()
         val isEventSyncConnectionBlocked =
             !isOnline && !isCommCareSyncExpected // CommCare would be able to sync even if device is offline
+        val isSyncFailedForNonCommCareReason =
+            eventSyncState.isSyncFailed() && !eventSyncState.isSyncFailedBecauseCommCarePermissionIsMissing()
 
         // an intermediate calculation of sync state shown in UI - not to be confused with the data layer-specific EventSyncState
         val eventSyncVisibleState = when {
@@ -167,7 +176,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             isCommCareSyncBlockedByDeniedPermission -> CommCareError
             isModuleSelectionRequired -> NoModulesError
             isEventSyncConnectionBlocked -> OfflineError
-            eventSyncState.isSyncFailed() -> Error
+            isSyncFailedForNonCommCareReason -> Error
             else -> OnStandby
         }
 
@@ -175,7 +184,13 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             projectConfig.canSyncDataToSimprints() && isOnline
         val isDownSyncPossible =
             (projectConfig.isSimprintsEventDownSyncAllowed() && isOnline && !isReLoginRequired) ||
-                (projectConfig.isCommCareEventDownSyncAllowed() && !eventSyncState.isSyncFailedBecauseCommCarePermissionIsMissing())
+                (
+                    projectConfig.isCommCareEventDownSyncAllowed() &&
+                        (
+                            !eventSyncState.isSyncFailedBecauseCommCarePermissionIsMissing() ||
+                                commCarePermissionChecker.hasCommCarePermissions()
+                        )
+                )
         val isSyncButtonEnabled =
             (eventSyncVisibleState == OnStandby) &&
                 ((!isPreLogoutUpSync && isDownSyncPossible) || isEventUpSyncPossible)
@@ -345,7 +360,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
  * A representation of a non-overlapping, exhaustive "sync state" as shown in UI.
  * To be used in a temporary UI state calculation: good to be used with exhaustive pattern matching.
  * Not to be confused with the data layer-specific EventSyncState.
-  */
+ */
 private sealed class EventSyncVisibleState
 
 private object OnStandby : EventSyncVisibleState()
