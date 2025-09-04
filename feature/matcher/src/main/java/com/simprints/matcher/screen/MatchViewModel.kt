@@ -10,8 +10,7 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.DecisionPolicy
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.getModalitySdkConfig
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.matching.MatchParams
 import com.simprints.infra.matching.MatchResult
@@ -101,15 +100,11 @@ internal class MatchViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getDecisionPolicy(params: MatchParams): DecisionPolicy {
-        val config = configManager.getProjectConfiguration()
-        val policy = when (params.bioSdk) {
-            is FaceConfiguration.BioSdk -> config.face?.getSdkConfiguration(params.bioSdk)?.decisionPolicy
-            is FingerprintConfiguration.BioSdk -> config.fingerprint?.getSdkConfiguration(params.bioSdk)?.decisionPolicy
-            else -> null
-        }
-        return policy ?: fallbackDecisionPolicy()
-    }
+    private suspend fun getDecisionPolicy(params: MatchParams): DecisionPolicy = configManager
+        .getProjectConfiguration()
+        .getModalitySdkConfig(params.bioSdk)
+        ?.decisionPolicy
+        ?: fallbackDecisionPolicy()
 
     private fun setMatchState(
         candidatesMatched: Int,

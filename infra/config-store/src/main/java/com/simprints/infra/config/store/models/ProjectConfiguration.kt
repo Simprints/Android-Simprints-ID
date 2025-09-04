@@ -1,5 +1,7 @@
 package com.simprints.infra.config.store.models
 
+import com.simprints.core.domain.common.ModalitySdkType
+
 data class ProjectConfiguration(
     val id: String,
     val projectId: String,
@@ -138,4 +140,12 @@ fun ProjectConfiguration.determineFingerprintSDKs(ageGroup: AgeGroup?): List<Fin
             }
         }
     }
+}
+
+fun ProjectConfiguration.getModalitySdkConfig(bioSdk: ModalitySdkType): ModalitySdkConfiguration? = when (bioSdk) {
+    FaceConfiguration.BioSdk.RANK_ONE -> face?.rankOne
+    FaceConfiguration.BioSdk.SIM_FACE -> face?.simFace
+    FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER -> fingerprint?.secugenSimMatcher
+    FingerprintConfiguration.BioSdk.NEC -> fingerprint?.nec
+    else -> null
 }
