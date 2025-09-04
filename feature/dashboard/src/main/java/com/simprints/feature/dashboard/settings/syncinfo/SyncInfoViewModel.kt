@@ -78,7 +78,7 @@ internal class SyncInfoViewModel @Inject constructor(
         viewModelScope.launch {
             syncOrchestrator.stopEventSync()
             val isDownSyncAllowed =
-                !isPreLogoutUpSync && configManager.getProject(authStore.signedInProjectId).state != ProjectState.PROJECT_ENDING
+                !isPreLogoutUpSync && configManager.getProject(authStore.signedInProjectId).state == ProjectState.RUNNING
             syncOrchestrator.startEventSync(isDownSyncAllowed)
         }
     }
