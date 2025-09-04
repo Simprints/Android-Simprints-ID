@@ -78,7 +78,7 @@ class BuildSubjectUseCaseTest {
         )
 
         assertThat(result.fingerprintSamples).isNotEmpty()
-        assertThat(result.fingerprintSamples.first().fingerIdentifier).isEqualTo(SampleIdentifier.RIGHT_THUMB)
+        assertThat(result.fingerprintSamples.first().identifier).isEqualTo(SampleIdentifier.RIGHT_THUMB)
     }
 
     @Test

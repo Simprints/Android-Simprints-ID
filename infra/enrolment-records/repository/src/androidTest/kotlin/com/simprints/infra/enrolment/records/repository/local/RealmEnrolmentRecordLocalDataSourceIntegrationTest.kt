@@ -2,10 +2,10 @@ package com.simprints.infra.enrolment.records.repository.local
 
 import androidx.test.core.app.*
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
@@ -237,10 +237,11 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         val subjectId = UUID.randomUUID().toString()
         val originalSubject = createTestSubject(subjectId)
         originalSubject.faceSamples = listOf(
-            FaceSample(
+            Sample(
                 template = byteArrayOf(),
                 format = "ISO",
                 referenceId = "ref1",
+                modality = Modality.FACE,
             ),
         )
         dataSource.performActions(listOf(SubjectAction.Creation(originalSubject)), mockk())
@@ -248,18 +249,20 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         val updateAction = SubjectAction.Update(
             subjectId,
             faceSamplesToAdd = listOf(
-                FaceSample(
+                Sample(
                     template = byteArrayOf(1, 2, 3),
                     format = "ISO",
                     referenceId = "ref2",
+                    modality = Modality.FACE,
                 ),
             ),
             fingerprintSamplesToAdd = listOf(
-                FingerprintSample(
+                Sample(
                     template = byteArrayOf(4, 5, 6),
                     format = "ISO",
                     referenceId = "ref3",
-                    fingerIdentifier = SampleIdentifier.LEFT_THUMB,
+                    identifier = SampleIdentifier.LEFT_THUMB,
+                    modality = Modality.FINGERPRINT,
                 ),
             ),
             referenceIdsToRemove = listOf("ref1"),
@@ -303,7 +306,12 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         val subjects = (1..10).map { i ->
             createTestSubject(subjectId = UUID.randomUUID().toString()).apply {
                 faceSamples = listOf(
-                    FaceSample(template = byteArrayOf(i.toByte()), format = "ISO", referenceId = "ref$i"),
+                    Sample(
+                        template = byteArrayOf(i.toByte()),
+                        format = "ISO",
+                        referenceId = "ref$i",
+                        modality = Modality.FACE,
+                    ),
                 )
             }
         }
@@ -346,11 +354,12 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
             val subjects = (1..10).map { i ->
                 createTestSubject(subjectId = UUID.randomUUID().toString()).apply {
                     fingerprintSamples = listOf(
-                        FingerprintSample(
+                        Sample(
                             template = byteArrayOf(i.toByte()),
                             format = "ISO",
                             referenceId = "ref$i",
-                            fingerIdentifier = SampleIdentifier.LEFT_THUMB,
+                            identifier = SampleIdentifier.LEFT_THUMB,
+                            modality = Modality.FINGERPRINT,
                         ),
                     )
                 }

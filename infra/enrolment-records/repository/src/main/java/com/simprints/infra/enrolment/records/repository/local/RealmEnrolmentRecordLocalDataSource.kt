@@ -16,6 +16,8 @@ import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAct
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.local.models.toDomain
 import com.simprints.infra.enrolment.records.repository.local.models.toRealmDb
+import com.simprints.infra.enrolment.records.repository.local.models.toRealmFaceDb
+import com.simprints.infra.enrolment.records.repository.local.models.toRealmFingerprintDb
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.REALM_DB
 import com.simprints.infra.logging.Simber
 import io.realm.kotlin.MutableRealm
@@ -236,15 +238,18 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                             val referencesToDelete = action.referenceIdsToRemove.toSet() // to make lookup O(1)
                             val faceSamplesMap = dbSubject.faceSamples.groupBy { it.referenceId in referencesToDelete }
                             val fingerprintSamplesMap = dbSubject.fingerprintSamples.groupBy { it.referenceId in referencesToDelete }
-                            val allExternalCredentials = (dbSubject.externalCredentials + action.externalCredentialsToAdd.map { it.toRealmDb() }).distinctBy { it.id }.toSet()
+                            val allExternalCredentials =
+                                (dbSubject.externalCredentials + action.externalCredentialsToAdd.map { it.toRealmDb() })
+                                    .distinctBy { it.id }
+                                    .toSet()
 
                             // Append new samples to the list of samples that remain after removing
                             dbSubject.faceSamples = (
-                                faceSamplesMap[false].orEmpty() + action.faceSamplesToAdd.map { it.toRealmDb() }
-                                ).toRealmList()
+                                faceSamplesMap[false].orEmpty() + action.faceSamplesToAdd.map { it.toRealmFaceDb() }
+                            ).toRealmList()
                             dbSubject.fingerprintSamples = (
-                                fingerprintSamplesMap[false].orEmpty() + action.fingerprintSamplesToAdd.map { it.toRealmDb() }
-                                ).toRealmList()
+                                fingerprintSamplesMap[false].orEmpty() + action.fingerprintSamplesToAdd.map { it.toRealmFingerprintDb() }
+                            ).toRealmList()
                             dbSubject.externalCredentials = allExternalCredentials.toRealmList()
 
                             faceSamplesMap[true]?.forEach { realm.delete(it) }

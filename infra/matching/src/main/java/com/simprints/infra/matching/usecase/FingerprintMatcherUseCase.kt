@@ -159,7 +159,7 @@ class FingerprintMatcherUseCase @Inject constructor(
             it.subjectId,
             it.fingerprints.map { finger ->
                 Fingerprint(
-                    finger.fingerIdentifier,
+                    finger.identifier,
                     finger.template,
                     finger.format,
                 )

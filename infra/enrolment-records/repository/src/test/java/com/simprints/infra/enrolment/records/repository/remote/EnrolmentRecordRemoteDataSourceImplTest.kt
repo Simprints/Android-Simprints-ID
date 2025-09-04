@@ -1,8 +1,8 @@
 package com.simprints.infra.enrolment.records.repository.remote
 
-import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.utils.EncodingUtils
@@ -20,10 +20,7 @@ import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.alias.InterfaceInvocation
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -72,14 +69,22 @@ class EnrolmentRecordRemoteDataSourceImplTest {
             moduleId = MODULE_ID,
             attendantId = ATTENDANT_ID,
             fingerprintSamples = listOf(
-                FingerprintSample(
-                    SampleIdentifier.LEFT_3RD_FINGER,
-                    FINGERPRINT_TEMPLATE,
-                    "ISO_19794_2",
-                    "5289df73-7df5-3326-bcdd-22597afb1fac",
+                Sample(
+                    identifier = SampleIdentifier.LEFT_3RD_FINGER,
+                    template = FINGERPRINT_TEMPLATE,
+                    format = "ISO_19794_2",
+                    referenceId = "5289df73-7df5-3326-bcdd-22597afb1fac",
+                    modality = Modality.FINGERPRINT,
                 ),
             ),
-            faceSamples = listOf(FaceSample(FACE_TEMPLATE, "faceTemplateFormat", "b4a3ba90-6413-32b4-a4ea-a841a5a400ec")),
+            faceSamples = listOf(
+                Sample(
+                    template = FACE_TEMPLATE,
+                    format = "faceTemplateFormat",
+                    referenceId = "b4a3ba90-6413-32b4-a4ea-a841a5a400ec",
+                    modality = Modality.FACE,
+                ),
+            ),
         )
         val expectedRecord = ApiEnrolmentRecord(
             subjectId = SUBJECT_ID,
