@@ -414,7 +414,7 @@ internal class BuildStepsUseCase @Inject constructor(
                         flowType = flowType,
                         subjectQuery = subjectQuery,
                         biometricDataSource = biometricDataSource,
-                        fingerprintSDK = bioSDK,
+                        bioSdk = bioSDK,
                     ),
                 )
             }
@@ -431,7 +431,7 @@ internal class BuildStepsUseCase @Inject constructor(
                         flowType = flowType,
                         subjectQuery = subjectQuery,
                         biometricDataSource = biometricDataSource,
-                        faceSDK = bioSDK,
+                        bioSdk = bioSDK,
                     ),
                 )
             }

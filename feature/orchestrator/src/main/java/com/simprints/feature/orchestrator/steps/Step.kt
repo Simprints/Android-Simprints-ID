@@ -33,9 +33,8 @@ import com.simprints.fingerprint.connect.FingerprintConnectParams
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
+import com.simprints.matcher.MatchResult
 import java.io.Serializable
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "resultType")
@@ -45,9 +44,8 @@ import java.io.Serializable
     JsonSubTypes.Type(value = ConsentResult::class, name = "ConsentResult"),
     JsonSubTypes.Type(value = FingerprintConnectResult::class, name = "FingerprintConnectResult"),
     JsonSubTypes.Type(value = FingerprintCaptureResult::class, name = "FingerprintCaptureResult"),
-    JsonSubTypes.Type(value = FingerprintMatchResult::class, name = "FingerprintMatchResult"),
     JsonSubTypes.Type(value = FaceCaptureResult::class, name = "FaceCaptureResult"),
-    JsonSubTypes.Type(value = FaceMatchResult::class, name = "FaceMatchResult"),
+    JsonSubTypes.Type(value = MatchResult::class, name = "MatchResult"),
     JsonSubTypes.Type(value = EnrolLastBiometricResult::class, name = "EnrolLastBiometricResult"),
     JsonSubTypes.Type(value = FetchSubjectResult::class, name = "FetchSubjectResult"),
     JsonSubTypes.Type(value = SelectSubjectResult::class, name = "SelectSubjectResult"),
@@ -82,12 +80,8 @@ abstract class StepResultMixin : StepResult
         name = "EnrolLastBiometricStepResult.EnrolLastBiometricsResult",
     ),
     JsonSubTypes.Type(
-        value = EnrolLastBiometricStepResult.FingerprintMatchResult::class,
-        name = "EnrolLastBiometricStepResult.FingerprintMatchResult",
-    ),
-    JsonSubTypes.Type(
-        value = EnrolLastBiometricStepResult.FaceMatchResult::class,
-        name = "EnrolLastBiometricStepResult.FaceMatchResult",
+        value = EnrolLastBiometricStepResult.MatchResult::class,
+        name = "EnrolLastBiometricStepResult.MatchResult",
     ),
     JsonSubTypes.Type(
         value = EnrolLastBiometricStepResult.CaptureResult::class,

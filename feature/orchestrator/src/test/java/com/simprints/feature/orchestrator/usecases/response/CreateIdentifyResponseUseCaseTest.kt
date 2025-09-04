@@ -7,8 +7,7 @@ import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
+import com.simprints.matcher.MatchResult
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
@@ -190,12 +189,12 @@ class CreateIdentifyResponseUseCaseTest {
         assertThat(result.identifications.map { it.confidenceScore }).isEqualTo(listOf(105))
     }
 
-    private fun createFaceMatchResult(vararg confidences: Float): Serializable = FaceMatchResult(
+    private fun createFaceMatchResult(vararg confidences: Float): Serializable = MatchResult(
         confidences.map { MatchConfidence(subjectId = "1", confidence = it) },
         FaceConfiguration.BioSdk.RANK_ONE,
     )
 
-    private fun createFingerprintMatchResult(vararg confidences: Float): Serializable = FingerprintMatchResult(
+    private fun createFingerprintMatchResult(vararg confidences: Float): Serializable = MatchResult(
         confidences.map { MatchConfidence(subjectId = "1", confidence = it) },
         FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
     )

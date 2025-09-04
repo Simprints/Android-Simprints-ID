@@ -16,10 +16,9 @@ import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchBatchInfo
 import com.simprints.matcher.MatchParams
+import com.simprints.matcher.MatchResult
 import com.simprints.matcher.usecases.FaceMatcherUseCase
 import com.simprints.matcher.usecases.FingerprintMatcherUseCase
 import com.simprints.matcher.usecases.MatcherUseCase
@@ -112,7 +111,7 @@ internal class MatchViewModelTest {
             MatchParams(
                 probeReferenceId = "referenceId",
                 probeFaceSamples = listOf(getFaceSample()),
-                faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
+                bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -184,7 +183,7 @@ internal class MatchViewModelTest {
             MatchParams(
                 probeReferenceId = "referenceId",
                 probeFaceSamples = listOf(getFaceSample()),
-                faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
+                bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -202,7 +201,7 @@ internal class MatchViewModelTest {
             ),
         )
         assertThat(viewModel.matchResponse.getOrAwaitValue().peekContent()).isEqualTo(
-            FaceMatchResult(responseItems, FaceConfiguration.BioSdk.RANK_ONE),
+            MatchResult(responseItems, FaceConfiguration.BioSdk.RANK_ONE),
         )
 
         verify {
@@ -275,7 +274,7 @@ internal class MatchViewModelTest {
             MatchParams(
                 probeReferenceId = "referenceId",
                 probeFingerprintSamples = listOf(getFingerprintSample()),
-                fingerprintSDK = SECUGEN_SIM_MATCHER,
+                bioSdk = SECUGEN_SIM_MATCHER,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -293,7 +292,7 @@ internal class MatchViewModelTest {
             ),
         )
         assertThat(viewModel.matchResponse.getOrAwaitValue().peekContent()).isEqualTo(
-            FingerprintMatchResult(responseItems, SECUGEN_SIM_MATCHER),
+            MatchResult(responseItems, SECUGEN_SIM_MATCHER),
         )
 
         verify {
@@ -340,7 +339,7 @@ internal class MatchViewModelTest {
             MatchParams(
                 probeReferenceId = "referenceId",
                 probeFaceSamples = listOf(getFaceSample()),
-                faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
+                bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
                 biometricDataSource = BiometricDataSource.Simprints,

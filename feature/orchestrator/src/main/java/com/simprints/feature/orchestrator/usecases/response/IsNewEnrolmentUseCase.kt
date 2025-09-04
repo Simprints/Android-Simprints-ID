@@ -1,11 +1,11 @@
 package com.simprints.feature.orchestrator.usecases.response
 
+import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
+import com.simprints.matcher.MatchResult
 import java.io.Serializable
 import javax.inject.Inject
-import kotlin.text.compareTo
 
 internal class IsNewEnrolmentUseCase @Inject constructor() {
     /**
@@ -21,8 +21,8 @@ internal class IsNewEnrolmentUseCase @Inject constructor() {
             return true
         }
 
-        val faceResult = results.lastOrNull { it is FaceMatchResult } as? FaceMatchResult
-        val fingerprintResult = results.lastOrNull { it is FingerprintMatchResult } as? FingerprintMatchResult
+        val faceResult = results.lastOrNull { it is MatchResult && it.sdk is FaceConfiguration.BioSdk } as? MatchResult
+        val fingerprintResult = results.lastOrNull { it is MatchResult && it.sdk is FingerprintConfiguration.BioSdk } as? MatchResult
 
         val isNewFaceEnrolment = isNewEnrolmentFaceResult(projectConfiguration, faceResult)
         val isNewFingerprintEnrolment = isValidEnrolmentFingerprintResult(projectConfiguration, fingerprintResult)
@@ -33,7 +33,7 @@ internal class IsNewEnrolmentUseCase @Inject constructor() {
     // Missing results and configuration are ignored as "valid" to allow creating new records.
     private fun isValidEnrolmentFingerprintResult(
         projectConfiguration: ProjectConfiguration,
-        fingerprintResult: FingerprintMatchResult?,
+        fingerprintResult: MatchResult?,
     ): Boolean = fingerprintResult?.let {
         projectConfiguration.fingerprint
             ?.getSdkConfiguration(fingerprintResult.sdk)
@@ -46,7 +46,7 @@ internal class IsNewEnrolmentUseCase @Inject constructor() {
     // Missing results and configuration are ignored as "valid" to allow creating new records.
     private fun isNewEnrolmentFaceResult(
         projectConfiguration: ProjectConfiguration,
-        faceResult: FaceMatchResult?,
+        faceResult: MatchResult?,
     ): Boolean = faceResult?.let {
         projectConfiguration.face
             ?.getSdkConfiguration(faceResult.sdk)

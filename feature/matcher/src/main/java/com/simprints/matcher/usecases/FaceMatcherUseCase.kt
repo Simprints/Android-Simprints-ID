@@ -9,12 +9,12 @@ import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.basebiosdk.matching.FaceSample
 import com.simprints.face.infra.biosdkresolver.FaceBioSDK
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
-import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchBatchInfo
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.usecases.MatcherUseCase.MatcherState
@@ -41,12 +41,12 @@ internal class FaceMatcherUseCase @Inject constructor(
         project: Project,
     ): Flow<MatcherState> = channelFlow {
         Simber.i("Initialising matcher", tag = crashReportTag)
-        if (matchParams.faceSDK == null) {
+        if (matchParams.bioSdk !is FaceConfiguration.BioSdk) {
             Simber.w("Face SDK was not provided", tag = crashReportTag)
             send(MatcherState.Success(emptyList(), emptyList(), 0, ""))
             return@channelFlow
         }
-        val bioSdk = resolveFaceBioSdk(matchParams.faceSDK)
+        val bioSdk = resolveFaceBioSdk(matchParams.bioSdk)
 
         if (matchParams.probeFaceSamples.isEmpty()) {
             send(MatcherState.Success(emptyList(), emptyList(), 0, bioSdk.matcherName()))

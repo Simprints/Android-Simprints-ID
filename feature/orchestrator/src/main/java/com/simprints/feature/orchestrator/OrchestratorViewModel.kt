@@ -215,7 +215,7 @@ internal class OrchestratorViewModel @Inject constructor(
                 if (step.id != StepId.FACE_MATCHER) {
                     false
                 } else {
-                    val stepSdk = step.params?.let { it as? MatchStepStubPayload }?.faceSDK
+                    val stepSdk = step.params?.let { it as? MatchStepStubPayload }?.bioSdk
                     stepSdk == captureParams?.faceSDK
                 }
             }
@@ -237,7 +237,7 @@ internal class OrchestratorViewModel @Inject constructor(
                 if (step.id != StepId.FINGERPRINT_MATCHER) {
                     false
                 } else {
-                    val stepSdk = step.params?.let { it as? MatchStepStubPayload }?.fingerprintSDK
+                    val stepSdk = step.params?.let { it as? MatchStepStubPayload }?.bioSdk
                     stepSdk == captureParams?.fingerprintSDK
                 }
             }
