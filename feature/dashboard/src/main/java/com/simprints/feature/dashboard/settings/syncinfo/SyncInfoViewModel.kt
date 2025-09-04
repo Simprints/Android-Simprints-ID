@@ -71,7 +71,8 @@ internal class SyncInfoViewModel @Inject constructor(
             .onStart {
                 startInitialSyncIfRequired()
                 syncImagesAfterEventsWhenRequired()
-            }.asLiveData(viewModelScope.coroutineContext)
+            }.debounce(ANTI_JITTER_DELAY_MILLIS)
+            .asLiveData(viewModelScope.coroutineContext)
     }
 
     fun forceEventSync() {
@@ -157,5 +158,6 @@ internal class SyncInfoViewModel @Inject constructor(
     private companion object {
         private const val RE_SYNC_TIMEOUT_MILLIS = 5 * 60 * 1000L
         private const val LOGOUT_DELAY_MILLIS = 3000L
+        private const val ANTI_JITTER_DELAY_MILLIS = 1000L
     }
 }
