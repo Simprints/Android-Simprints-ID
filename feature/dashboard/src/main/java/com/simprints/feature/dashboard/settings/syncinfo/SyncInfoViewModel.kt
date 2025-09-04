@@ -20,11 +20,14 @@ import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -52,6 +55,12 @@ internal class SyncInfoViewModel @Inject constructor(
     private val imageSyncStatusFlow =
         syncOrchestrator.observeImageSyncStatus()
 
+    private sealed class ForcedSyncCommand
+    private object ForcedEventSyncCommand : ForcedSyncCommand()
+    private object ForcedImageSyncCommand : ForcedSyncCommand()
+
+    private val forcedSyncCommandFlow = MutableSharedFlow<ForcedSyncCommand>(extraBufferCapacity = 1)
+
     val logoutEventLiveData: LiveData<LiveDataEventWithContent<Unit>> = combine(
         eventSyncStateFlow,
         imageSyncStatusFlow,
@@ -67,15 +76,76 @@ internal class SyncInfoViewModel @Inject constructor(
         }.asLiveData(viewModelScope.coroutineContext)
 
     val syncInfoLiveData: LiveData<SyncInfo> by lazy {
-        observeSyncInfo(isPreLogoutUpSync)
+        val dataLayerDrivenSyncInfoFlow = observeSyncInfo(isPreLogoutUpSync)
             .onStart {
                 startInitialSyncIfRequired()
                 syncImagesAfterEventsWhenRequired()
-            }.asLiveData(viewModelScope.coroutineContext)
+            }
+
+        /**
+         * The problem: data layer-driven progress visualization is simple programmatically, but can be slow in the UI.
+         * This is how.
+         *
+         * How it worked before these changes:
+         * The forceEventSync and toggleImageSync invoke sync purely on the data layer,
+         * so the UI may remain unaware of the forced sync command until data-driven evidence of sync starts appearing.
+         * This may take seconds on slow devices.
+         *
+         * How it works after the changes:
+         * Each forced sync, invoked by forceEventSync and toggleImageSync, immediately reshapes the flow of events:
+         * At first we immediately emit a sync state that is forcefully marked as in progress, for events or images separately.
+         * And we start ignoring sync states that happen before the true progress in data layer appears.
+         * Once the true progress in data layer starts, we keep showing that true progress.
+         * Additionally, an initial progress is emitted on start, before any forced sync invocations. To prevent getting stuck.
+         *
+         * This way, by introducing this performance optimization in one spot,
+         * we avoid going from reactive back to procedural calculation logic in this complex UI.
+         */
+        forcedSyncCommandFlow.flatMapLatest { forcedSyncCommand ->
+            dataLayerDrivenSyncInfoFlow.dropWhile {
+                when (forcedSyncCommand) {
+                    is ForcedEventSyncCommand -> !it.syncInfoSectionRecords.isProgressVisible
+                    is ForcedImageSyncCommand -> !it.syncInfoSectionImages.isProgressVisible
+                }
+            }.onStart {
+                val initialState = syncInfoLiveData.value ?: SyncInfo()
+                val initialStateWithSyncInProgress = when (forcedSyncCommand) {
+                    is ForcedEventSyncCommand -> initialState.copy(
+                        syncInfoSectionRecords = initialState.syncInfoSectionRecords.copy(
+                            counterTotalRecords = "",
+                            counterRecordsToUpload = "",
+                            counterRecordsToDownload = "",
+                            isInstructionDefaultVisible = false,
+                            isInstructionCommCarePermissionVisible = false,
+                            isInstructionNoModulesVisible = false,
+                            isInstructionOfflineVisible = false,
+                            isInstructionErrorVisible = false,
+                            isProgressVisible = true,
+                            isSyncButtonEnabled = false,
+                            footerLastSyncMinutesAgo = "",
+                        )
+                    )
+
+                    is ForcedImageSyncCommand -> initialState.copy(
+                        syncInfoSectionImages = initialState.syncInfoSectionImages.copy(
+                            counterImagesToUpload = "",
+                            isInstructionDefaultVisible = false,
+                            isInstructionOfflineVisible = false,
+                            isProgressVisible = true,
+                            footerLastSyncMinutesAgo = "",
+                        )
+                    )
+                }
+                emit(initialStateWithSyncInProgress)
+            }
+        }.onStart {
+            emit(dataLayerDrivenSyncInfoFlow.firstOrNull() ?: SyncInfo())
+        }.asLiveData(viewModelScope.coroutineContext)
     }
 
     fun forceEventSync() {
         viewModelScope.launch {
+            forcedSyncCommandFlow.tryEmit(ForcedEventSyncCommand)
             syncOrchestrator.stopEventSync()
             val isDownSyncAllowed =
                 !isPreLogoutUpSync && configManager.getProject(authStore.signedInProjectId).state == ProjectState.RUNNING
@@ -85,6 +155,7 @@ internal class SyncInfoViewModel @Inject constructor(
 
     fun toggleImageSync() {
         viewModelScope.launch {
+            forcedSyncCommandFlow.tryEmit(ForcedImageSyncCommand)
             val isImageSyncing = imageSyncStatusFlow.firstOrNull()?.isSyncing == true
             if (isImageSyncing) {
                 syncOrchestrator.stopImageSync()
