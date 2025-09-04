@@ -1,7 +1,7 @@
 package com.simprints.infra.matching.usecase
 
 import com.google.common.truth.Truth.*
-import com.simprints.infra.matching.FingerprintMatchResult
+import com.simprints.core.domain.sample.MatchConfidence
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
@@ -10,42 +10,42 @@ import java.util.concurrent.TimeUnit
 class MatchResultSetTest {
     @Test
     fun `Stores results sorted descending by confidence up to the limit`() {
-        val set = MatchResultSet<FingerprintMatchResult.Item>(3)
+        val set = MatchResultSet(3)
 
-        set.add(FingerprintMatchResult.Item("4", 0.4f))
-        set.add(FingerprintMatchResult.Item("1", 0.1f))
-        set.add(FingerprintMatchResult.Item("3", 0.3f))
-        set.add(FingerprintMatchResult.Item("3", 0.1f))
-        set.add(FingerprintMatchResult.Item("2", 0.2f))
+        set.add(MatchConfidence("4", 0.4f))
+        set.add(MatchConfidence("1", 0.1f))
+        set.add(MatchConfidence("3", 0.3f))
+        set.add(MatchConfidence("3", 0.1f))
+        set.add(MatchConfidence("2", 0.2f))
 
         assertThat(set.toList()).isEqualTo(
             listOf(
-                FingerprintMatchResult.Item("4", 0.4f),
-                FingerprintMatchResult.Item("3", 0.3f),
-                FingerprintMatchResult.Item("2", 0.2f),
+                MatchConfidence("4", 0.4f),
+                MatchConfidence("3", 0.3f),
+                MatchConfidence("2", 0.2f),
             ),
         )
     }
 
     @Test
     fun `Merges sets preserving the total limit`() {
-        val setOne = MatchResultSet<FingerprintMatchResult.Item>(2)
-        setOne.add(FingerprintMatchResult.Item("1", 0.1f))
-        setOne.add(FingerprintMatchResult.Item("3", 0.3f))
+        val setOne = MatchResultSet(2)
+        setOne.add(MatchConfidence("1", 0.1f))
+        setOne.add(MatchConfidence("3", 0.3f))
 
-        val setTwo = MatchResultSet<FingerprintMatchResult.Item>(2)
-        setTwo.add(FingerprintMatchResult.Item("2", 0.2f))
-        setTwo.add(FingerprintMatchResult.Item("4", 0.4f))
+        val setTwo = MatchResultSet(2)
+        setTwo.add(MatchConfidence("2", 0.2f))
+        setTwo.add(MatchConfidence("4", 0.4f))
 
-        val set = MatchResultSet<FingerprintMatchResult.Item>(3)
+        val set = MatchResultSet(3)
         set.addAll(setOne)
         set.addAll(setTwo)
 
         assertThat(set.toList()).isEqualTo(
             listOf(
-                FingerprintMatchResult.Item("4", 0.4f),
-                FingerprintMatchResult.Item("3", 0.3f),
-                FingerprintMatchResult.Item("2", 0.2f),
+                MatchConfidence("4", 0.4f),
+                MatchConfidence("3", 0.3f),
+                MatchConfidence("2", 0.2f),
             ),
         )
     }
@@ -53,25 +53,25 @@ class MatchResultSetTest {
     // On equal confidence scores sort by id
     @Test
     fun `Stores results sorted descending by confidence and id`() {
-        val set = MatchResultSet<FingerprintMatchResult.Item>(3)
+        val set = MatchResultSet(3)
 
-        set.add(FingerprintMatchResult.Item("4", 0.4f))
-        set.add(FingerprintMatchResult.Item("1", 0.4f))
-        set.add(FingerprintMatchResult.Item("3", 0.3f))
-        set.add(FingerprintMatchResult.Item("2", 0.3f))
+        set.add(MatchConfidence("4", 0.4f))
+        set.add(MatchConfidence("1", 0.4f))
+        set.add(MatchConfidence("3", 0.3f))
+        set.add(MatchConfidence("2", 0.3f))
 
         assertThat(set.toList()).isEqualTo(
             listOf(
-                FingerprintMatchResult.Item("4", 0.4f),
-                FingerprintMatchResult.Item("1", 0.4f),
-                FingerprintMatchResult.Item("3", 0.3f),
+                MatchConfidence("4", 0.4f),
+                MatchConfidence("1", 0.4f),
+                MatchConfidence("3", 0.3f),
             ),
         )
     }
 
     @Test
     fun `Concurrent add operations maintain thread safety`() {
-        val set = MatchResultSet<FingerprintMatchResult.Item>(5)
+        val set = MatchResultSet(5)
         val threadCount = 10
         val elementsPerThread = 20
         val latch = CountDownLatch(1)
@@ -88,7 +88,7 @@ class MatchResultSetTest {
                     // Each thread adds its own batch of elements
                     repeat(elementsPerThread) { i ->
                         val confidence = (threadIndex * elementsPerThread + i) / 100f
-                        set.add(FingerprintMatchResult.Item("T$threadIndex-$i", confidence))
+                        set.add(MatchConfidence("T$threadIndex-$i", confidence))
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -120,16 +120,16 @@ class MatchResultSetTest {
 
     @Test
     fun `Concurrent addAll operations maintain thread safety`() {
-        val targetSet = MatchResultSet<FingerprintMatchResult.Item>(5)
+        val targetSet = MatchResultSet(5)
         val threadCount = 5
         val latch = CountDownLatch(1)
 
         // Create source sets with different items
         val sourceSets = List(threadCount) { threadIndex ->
-            MatchResultSet<FingerprintMatchResult.Item>(3).apply {
+            MatchResultSet(3).apply {
                 repeat(5) { i ->
                     val confidence = 0.5f + (threadIndex * 5 + i) / 100f
-                    add(FingerprintMatchResult.Item("S$threadIndex-$i", confidence))
+                    add(MatchConfidence("S$threadIndex-$i", confidence))
                 }
             }
         }
@@ -172,21 +172,21 @@ class MatchResultSetTest {
 
     @Test
     fun `addAll correctly filters elements with lower confidence than current minimum`() {
-        val set = MatchResultSet<FingerprintMatchResult.Item>(3)
+        val set = MatchResultSet(3)
 
         // Add higher confidence items first to fill the set
-        set.add(FingerprintMatchResult.Item("A", 0.8f))
-        set.add(FingerprintMatchResult.Item("B", 0.7f))
-        set.add(FingerprintMatchResult.Item("C", 0.6f))
+        set.add(MatchConfidence("A", 0.8f))
+        set.add(MatchConfidence("B", 0.7f))
+        set.add(MatchConfidence("C", 0.6f))
 
         // Try to add a new set with lower confidence items
-        val lowerSet = MatchResultSet<FingerprintMatchResult.Item>(3)
-        lowerSet.add(FingerprintMatchResult.Item("D", 0.5f))
-        lowerSet.add(FingerprintMatchResult.Item("E", 0.4f))
-        lowerSet.add(FingerprintMatchResult.Item("F", 0.3f))
+        val lowerSet = MatchResultSet(3)
+        lowerSet.add(MatchConfidence("D", 0.5f))
+        lowerSet.add(MatchConfidence("E", 0.4f))
+        lowerSet.add(MatchConfidence("F", 0.3f))
 
         // Add one higher item to verify it still gets added
-        lowerSet.add(FingerprintMatchResult.Item("G", 0.9f))
+        lowerSet.add(MatchConfidence("G", 0.9f))
 
         set.addAll(lowerSet)
 

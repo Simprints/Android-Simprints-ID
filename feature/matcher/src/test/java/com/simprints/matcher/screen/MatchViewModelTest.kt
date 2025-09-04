@@ -4,6 +4,9 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
@@ -85,7 +88,7 @@ internal class MatchViewModelTest {
     @Test
     fun `when setup is called, then view model becomes initialized`() = runTest {
         val responseItems = listOf(
-            FaceMatchResult.Item("1", 90f),
+            MatchConfidence("1", 90f),
         )
 
         coEvery { faceMatcherUseCase.invoke(any(), any()) } returns flow {
@@ -137,13 +140,13 @@ internal class MatchViewModelTest {
         } returns DecisionPolicy(20, 35, 50)
 
         val responseItems = listOf(
-            FaceMatchResult.Item("1", 90f),
-            FaceMatchResult.Item("1", 80f),
-            FaceMatchResult.Item("1", 55f),
-            FaceMatchResult.Item("1", 40f),
-            FaceMatchResult.Item("1", 36f),
-            FaceMatchResult.Item("1", 20f),
-            FaceMatchResult.Item("1", 10f),
+            MatchConfidence("1", 90f),
+            MatchConfidence("1", 80f),
+            MatchConfidence("1", 55f),
+            MatchConfidence("1", 40f),
+            MatchConfidence("1", 36f),
+            MatchConfidence("1", 20f),
+            MatchConfidence("1", 10f),
         )
         val batches = listOf(
             MatchBatchInfo(
@@ -226,13 +229,13 @@ internal class MatchViewModelTest {
         } returns DecisionPolicy(200, 350, 500)
 
         val responseItems = listOf(
-            FingerprintMatchResult.Item("1", 900f),
-            FingerprintMatchResult.Item("1", 800f),
-            FingerprintMatchResult.Item("1", 550f),
-            FingerprintMatchResult.Item("1", 400f),
-            FingerprintMatchResult.Item("1", 360f),
-            FingerprintMatchResult.Item("1", 200f),
-            FingerprintMatchResult.Item("1", 100f),
+            MatchConfidence("1", 900f),
+            MatchConfidence("1", 800f),
+            MatchConfidence("1", 550f),
+            MatchConfidence("1", 400f),
+            MatchConfidence("1", 360f),
+            MatchConfidence("1", 200f),
+            MatchConfidence("1", 100f),
         )
         val batches = listOf(
             MatchBatchInfo(
@@ -317,8 +320,8 @@ internal class MatchViewModelTest {
         } returns null
 
         val responseItems = listOf(
-            FaceMatchResult.Item("1", 90f),
-            FaceMatchResult.Item("1", 10f),
+            MatchConfidence("1", 90f),
+            MatchConfidence("1", 10f),
         )
         coEvery { faceMatcherUseCase.invoke(any(), any()) } returns flow {
             emit(MatcherUseCase.MatcherState.LoadingStarted(responseItems.size))
@@ -363,7 +366,7 @@ internal class MatchViewModelTest {
             emit(MatcherUseCase.MatcherState.CandidateLoaded)
             emit(
                 MatcherUseCase.MatcherState.Success(
-                    matchResultItems = listOf(FaceMatchResult.Item("1", 90f)),
+                    matchResultItems = listOf(MatchConfidence("1", 90f)),
                     totalCandidates = 1,
                     matcherName = MATCHER_NAME,
                     matchBatches = emptyList(),
@@ -387,17 +390,26 @@ internal class MatchViewModelTest {
         viewModel.setupMatch(matchParams)
         advanceUntilIdle()
 
-        coVerify(exactly = 1) { faceMatcherUseCase.invoke(any(), any()) }
+        coVerify(exactly = 1) {
+            faceMatcherUseCase.invoke(any(), any())
+        }
         // Checking that no new states were emitted. History = (NotStarted, LoadingCandidates LoadingCandidates, Finished)
         assertThat(states.valueHistory()).hasSize(4)
     }
 
-    private fun getFaceSample(): MatchParams.FaceSample = MatchParams.FaceSample(UUID.randomUUID().toString(), Random.nextBytes(20))
+    private fun getFaceSample(): CaptureSample = CaptureSample(
+        captureEventId = UUID.randomUUID().toString(),
+        modality = Modality.FACE,
+        template = Random.nextBytes(20),
+        format = "format",
+    )
 
-    private fun getFingerprintSample(): MatchParams.FingerprintSample = MatchParams.FingerprintSample(
-        SampleIdentifier.LEFT_3RD_FINGER,
-        "format",
-        Random.nextBytes(20),
+    private fun getFingerprintSample(): CaptureSample = CaptureSample(
+        captureEventId = UUID.randomUUID().toString(),
+        modality = Modality.FINGERPRINT,
+        template = Random.nextBytes(20),
+        format = "format",
+        identifier = SampleIdentifier.LEFT_3RD_FINGER,
     )
 
     companion object {

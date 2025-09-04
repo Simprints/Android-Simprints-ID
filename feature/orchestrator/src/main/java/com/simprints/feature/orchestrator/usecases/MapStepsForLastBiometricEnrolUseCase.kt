@@ -1,11 +1,11 @@
 package com.simprints.feature.orchestrator.usecases
 
+import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
-import com.simprints.feature.enrollast.MatchResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.matching.FaceMatchResult
 import com.simprints.infra.matching.FingerprintMatchResult
@@ -32,7 +32,7 @@ internal class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
             )
 
             is FingerprintMatchResult -> EnrolLastBiometricStepResult.FingerprintMatchResult(
-                result.results.map { MatchResult(it.subjectId, it.confidence) },
+                result.results.map { MatchConfidence(it.subjectId, it.confidence) },
                 result.sdk,
             )
 
@@ -42,7 +42,7 @@ internal class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
             )
 
             is FaceMatchResult -> EnrolLastBiometricStepResult.FaceMatchResult(
-                result.results.map { MatchResult(it.subjectId, it.confidence) },
+                result.results.map { MatchConfidence(it.subjectId, it.confidence) },
                 result.sdk,
             )
 

@@ -1,8 +1,8 @@
 package com.simprints.feature.enrollast.screen.usecase
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
-import com.simprints.feature.enrollast.MatchResult
 import com.simprints.feature.enrollast.screen.EnrolLastState
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.ProjectConfiguration
@@ -140,7 +140,7 @@ class CheckDuplicateEnrolmentsErrorsUseCaseTest {
         every { face?.getSdkConfiguration(any())?.decisionPolicy } returns highConfidence?.let { DecisionPolicy(0, 0, it) }
     }
 
-    private fun matchResult(confidence: Float) = MatchResult("subjectId", confidence)
+    private fun matchResult(confidence: Float) = MatchConfidence("subjectId", confidence)
 
     companion object {
         private const val LOW_CONFIDENCE = 50f

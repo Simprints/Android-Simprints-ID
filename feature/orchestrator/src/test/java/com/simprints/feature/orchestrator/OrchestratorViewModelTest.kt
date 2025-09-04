@@ -470,8 +470,8 @@ internal class OrchestratorViewModelTest {
         )
 
         val expectedFingerprintSamples = listOf(
-            MatchParams.FingerprintSample(fingerId1, format1, template1),
-            MatchParams.FingerprintSample(fingerId2, format2, template2),
+            CaptureSample(GUID1, Modality.FINGERPRINT, format1, template1, fingerId1),
+            CaptureSample(GUID2, Modality.FINGERPRINT, format2, template2, fingerId2),
         )
 
         verify {

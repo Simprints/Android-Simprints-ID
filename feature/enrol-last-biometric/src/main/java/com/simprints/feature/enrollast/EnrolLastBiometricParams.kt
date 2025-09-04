@@ -3,6 +3,7 @@ package com.simprints.feature.enrollast
 import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
@@ -27,13 +28,13 @@ sealed class EnrolLastBiometricStepResult : StepParams {
 
     @Keep
     data class FingerprintMatchResult(
-        val results: List<MatchResult>,
+        val results: List<MatchConfidence>,
         val sdk: FingerprintConfiguration.BioSdk,
     ) : EnrolLastBiometricStepResult()
 
     @Keep
     data class FaceMatchResult(
-        val results: List<MatchResult>,
+        val results: List<MatchConfidence>,
         val sdk: FaceConfiguration.BioSdk,
     ) : EnrolLastBiometricStepResult()
 
@@ -49,12 +50,6 @@ sealed class EnrolLastBiometricStepResult : StepParams {
         val results: List<FaceTemplateCaptureResult>,
     ) : EnrolLastBiometricStepResult()
 }
-
-@Keep
-data class MatchResult(
-    val subjectId: String,
-    val confidenceScore: Float,
-) : StepParams
 
 @Keep
 data class FingerTemplateCaptureResult(
