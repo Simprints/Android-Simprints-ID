@@ -20,11 +20,13 @@ sealed class BiometricDataSource : StepParams {
     }
 
     companion object {
+        const val COMMCARE = "COMMCARE"
+
         fun fromString(
             value: String,
             callerPackageName: String,
         ) = when (value.uppercase()) {
-            "COMMCARE" -> CommCare(callerPackageName)
+            COMMCARE -> CommCare(callerPackageName)
             else -> Simprints
         }
     }
