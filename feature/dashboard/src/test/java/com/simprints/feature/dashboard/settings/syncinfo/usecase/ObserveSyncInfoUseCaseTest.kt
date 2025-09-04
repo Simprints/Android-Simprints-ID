@@ -6,8 +6,8 @@ import androidx.lifecycle.asFlow
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.lifecycle.AppForegroundStateTracker
-import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Ticker
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.dashboard.settings.syncinfo.SyncInfoModuleCount
 import com.simprints.infra.authstore.AuthStore
@@ -28,6 +28,7 @@ import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.images.ImageRepository
@@ -69,6 +70,7 @@ class ObserveSyncInfoUseCaseTest {
     private val timeHelper = mockk<TimeHelper>()
     private val ticker = mockk<Ticker>()
     private val appForegroundStateTracker = mockk<AppForegroundStateTracker>()
+    private val commCarePermissionChecker = mockk<CommCarePermissionChecker>()
 
     private lateinit var useCase: ObserveSyncInfoUseCase
 
@@ -78,15 +80,13 @@ class ObserveSyncInfoUseCaseTest {
         const val TEST_MODULE_NAME = "test_module"
         val TEST_TIMESTAMP = Timestamp(1000L)
 
-        fun createMockSynchronizationConfiguration(): SynchronizationConfiguration {
-            return mockk<SynchronizationConfiguration>(relaxed = true) {
-                every { down } returns mockk<DownSynchronizationConfiguration>(relaxed = true) {
-                    every { commCare } returns null
-                }
-                every { up } returns mockk<UpSynchronizationConfiguration>(relaxed = true) {
-                    every { coSync } returns mockk<UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration>(relaxed = true) {
-                        every { kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
-                    }
+        fun createMockSynchronizationConfiguration(): SynchronizationConfiguration = mockk<SynchronizationConfiguration>(relaxed = true) {
+            every { down } returns mockk<DownSynchronizationConfiguration>(relaxed = true) {
+                every { commCare } returns null
+            }
+            every { up } returns mockk<UpSynchronizationConfiguration>(relaxed = true) {
+                every { coSync } returns mockk<UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration>(relaxed = true) {
+                    every { kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
                 }
             }
         }
@@ -180,6 +180,8 @@ class ObserveSyncInfoUseCaseTest {
         every { any<ProjectConfiguration>().isModuleSelectionAvailable() } returns false
         every { any<ProjectConfiguration>().isSimprintsEventDownSyncAllowed() } returns true
         every { any<ProjectConfiguration>().isCommCareEventDownSyncAllowed() } returns false
+
+        every { commCarePermissionChecker.hasCommCarePermissions() } returns true
     }
 
     private fun createUseCase() {
@@ -195,6 +197,7 @@ class ObserveSyncInfoUseCaseTest {
             timeHelper = timeHelper,
             ticker = ticker,
             appForegroundStateTracker = appForegroundStateTracker,
+            commCarePermissionChecker = commCarePermissionChecker,
         )
     }
 
@@ -242,7 +245,9 @@ class ObserveSyncInfoUseCaseTest {
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockFailedEventSyncState)
         createUseCase()
 
-        val result = useCase(isPreLogoutUpSync = true /* This should hide the login prompt */).first()
+        val result = useCase(
+            isPreLogoutUpSync = true, // This should hide the login prompt
+        ).first()
 
         assertThat(result.isLoginPromptSectionVisible).isFalse()
     }
@@ -931,9 +936,10 @@ class ObserveSyncInfoUseCaseTest {
                 }
                 every { synchronization } returns mockk<SynchronizationConfiguration>(relaxed = true) {
                     every { up } returns mockk<UpSynchronizationConfiguration>(relaxed = true) {
-                        every { coSync } returns mockk<UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration>(relaxed = true) {
-                            every { kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
-                        }
+                        every { coSync } returns
+                            mockk<UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration>(relaxed = true) {
+                                every { kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+                            }
                     }
                 }
             },
@@ -998,6 +1004,7 @@ class ObserveSyncInfoUseCaseTest {
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockFailedEventSyncState)
         every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(true)
         every { mockProjectConfiguration.isCommCareEventDownSyncAllowed() } returns true
+        every { commCarePermissionChecker.hasCommCarePermissions() } returns false // Permission still denied
         createUseCase()
 
         val result = useCase().first()
@@ -1137,6 +1144,7 @@ class ObserveSyncInfoUseCaseTest {
         every { any<ProjectConfiguration>().isCommCareEventDownSyncAllowed() } returns true
         every { any<ProjectConfiguration>().isSimprintsEventDownSyncAllowed() } returns false
         every { any<ProjectConfiguration>().canSyncDataToSimprints() } returns false
+        every { commCarePermissionChecker.hasCommCarePermissions() } returns false // Permission still denied
         createUseCase()
 
         val result = useCase().first()
@@ -1418,6 +1426,7 @@ class ObserveSyncInfoUseCaseTest {
         }
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockNormalEventSyncState)
         every { mockProjectConfiguration.isCommCareEventDownSyncAllowed() } returns true
+        every { commCarePermissionChecker.hasCommCarePermissions() } returns false // Permission still denied
         createUseCase()
 
         val result = useCase().first()
