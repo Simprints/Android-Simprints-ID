@@ -5,6 +5,8 @@ import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.screen.EnrolLastState
 import com.simprints.infra.config.store.models.DecisionPolicy
+import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import io.mockk.*
 import org.junit.Before
@@ -33,9 +35,9 @@ class CheckDuplicateEnrolmentsErrorsUseCaseTest {
         val result = useCase(
             projectConfig = mockProjectConfig(),
             steps = listOf(
-                EnrolLastBiometricStepResult.FingerprintMatchResult(
+                EnrolLastBiometricStepResult.MatchResult(
                     listOf(matchResult(LOW_CONFIDENCE)),
-                    mockk(),
+                    FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                 ),
             ),
         )
@@ -48,9 +50,9 @@ class CheckDuplicateEnrolmentsErrorsUseCaseTest {
         val result = useCase(
             projectConfig = mockProjectConfig(),
             steps = listOf(
-                EnrolLastBiometricStepResult.FaceMatchResult(
+                EnrolLastBiometricStepResult.MatchResult(
                     listOf(matchResult(LOW_CONFIDENCE)),
-                    mockk(),
+                    FaceConfiguration.BioSdk.RANK_ONE,
                 ),
             ),
         )
@@ -63,9 +65,9 @@ class CheckDuplicateEnrolmentsErrorsUseCaseTest {
         val result = useCase(
             projectConfig = mockProjectConfig(highConfidence = null),
             steps = listOf(
-                EnrolLastBiometricStepResult.FingerprintMatchResult(
+                EnrolLastBiometricStepResult.MatchResult(
                     listOf(matchResult(HIGH_CONFIDENCE)),
-                    mockk(),
+                    FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                 ),
             ),
         )
@@ -78,9 +80,9 @@ class CheckDuplicateEnrolmentsErrorsUseCaseTest {
         val result = useCase(
             projectConfig = mockProjectConfig(highConfidence = null),
             steps = listOf(
-                EnrolLastBiometricStepResult.FaceMatchResult(
+                EnrolLastBiometricStepResult.MatchResult(
                     listOf(matchResult(HIGH_CONFIDENCE)),
-                    mockk(),
+                    FaceConfiguration.BioSdk.RANK_ONE,
                 ),
             ),
         )
@@ -103,9 +105,9 @@ class CheckDuplicateEnrolmentsErrorsUseCaseTest {
         val result = useCase(
             projectConfig = mockProjectConfig(),
             steps = listOf(
-                EnrolLastBiometricStepResult.FingerprintMatchResult(
+                EnrolLastBiometricStepResult.MatchResult(
                     listOf(matchResult(HIGH_CONFIDENCE)),
-                    mockk(),
+                    FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                 ),
             ),
         )
@@ -118,9 +120,9 @@ class CheckDuplicateEnrolmentsErrorsUseCaseTest {
         val result = useCase(
             projectConfig = mockProjectConfig(),
             steps = listOf(
-                EnrolLastBiometricStepResult.FaceMatchResult(
+                EnrolLastBiometricStepResult.MatchResult(
                     listOf(matchResult(HIGH_CONFIDENCE)),
-                    mockk(),
+                    FaceConfiguration.BioSdk.RANK_ONE,
                 ),
             ),
         )

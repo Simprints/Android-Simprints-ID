@@ -5,8 +5,7 @@ import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
-import com.simprints.infra.matching.FaceMatchResult
-import com.simprints.infra.matching.FingerprintMatchResult
+import com.simprints.infra.matching.MatchResult
 import java.io.Serializable
 import javax.inject.Inject
 
@@ -28,12 +27,7 @@ internal class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
                 result.results,
             )
 
-            is FingerprintMatchResult -> EnrolLastBiometricStepResult.FingerprintMatchResult(
-                result.results.map { MatchConfidence(it.subjectId, it.confidence) },
-                result.sdk,
-            )
-
-            is FaceMatchResult -> EnrolLastBiometricStepResult.FaceMatchResult(
+            is MatchResult -> EnrolLastBiometricStepResult.MatchResult(
                 result.results.map { MatchConfidence(it.subjectId, it.confidence) },
                 result.sdk,
             )

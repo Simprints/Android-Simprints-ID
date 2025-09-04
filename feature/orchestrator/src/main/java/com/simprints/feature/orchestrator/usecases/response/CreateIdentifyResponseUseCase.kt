@@ -3,10 +3,11 @@ package com.simprints.feature.orchestrator.usecases.response
 import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.infra.config.store.models.DecisionPolicy
+import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.session.SessionEventRepository
-import com.simprints.infra.matching.FaceMatchResult
-import com.simprints.infra.matching.FingerprintMatchResult
+import com.simprints.infra.matching.MatchResult
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.orchestration.data.responses.AppResponse
@@ -45,26 +46,50 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
     private fun getFingerprintResults(
         results: List<Serializable>,
         projectConfiguration: ProjectConfiguration,
-    ) = results.filterIsInstance<FingerprintMatchResult>().lastOrNull()?.let { fingerprintMatchResult ->
-        projectConfiguration.fingerprint
-            ?.getSdkConfiguration(fingerprintMatchResult.sdk)
-            ?.decisionPolicy
-            ?.let { fingerprintDecisionPolicy ->
-                fingerprintMatchResult.results.mapToMatchResults(fingerprintDecisionPolicy, projectConfiguration)
-            }
-    } ?: emptyList()
+    ) = results
+        .filterIsInstance<MatchResult>()
+        .lastOrNull { it.sdk is FingerprintConfiguration.BioSdk }
+        ?.let { fingerprintMatchResult ->
+            projectConfiguration.fingerprint
+                ?.getSdkConfiguration(fingerprintMatchResult.sdk)
+                ?.decisionPolicy
+                ?.let { fingerprintDecisionPolicy ->
+                    val matches = fingerprintMatchResult.results
+                    val goodResults = matches
+                        .filter { it.confidence >= fingerprintDecisionPolicy.low }
+                        .sortedByDescending { it.confidence }
+                    // Attempt to include only high confidence matches
+                    goodResults
+                        .filter { it.confidence >= fingerprintDecisionPolicy.high }
+                        .ifEmpty { goodResults }
+                        .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
+                        .map { AppMatchResult(it.subjectId, it.confidence, fingerprintDecisionPolicy) }
+                }
+        } ?: emptyList()
 
     private fun getFaceMatchResults(
         results: List<Serializable>,
         projectConfiguration: ProjectConfiguration,
-    ) = results.filterIsInstance<FaceMatchResult>().lastOrNull()?.let { faceMatchResult ->
-        projectConfiguration.face
-            ?.getSdkConfiguration(faceMatchResult.sdk)
-            ?.decisionPolicy
-            ?.let { faceDecisionPolicy ->
-                faceMatchResult.results.mapToMatchResults(faceDecisionPolicy, projectConfiguration)
-            }
-    } ?: emptyList()
+    ) = results
+        .filterIsInstance<MatchResult>()
+        .lastOrNull { it.sdk is FaceConfiguration.BioSdk }
+        ?.let { faceMatchResult ->
+            projectConfiguration.face
+                ?.getSdkConfiguration(faceMatchResult.sdk)
+                ?.decisionPolicy
+                ?.let { faceDecisionPolicy ->
+                    val matches = faceMatchResult.results
+                    val goodResults = matches
+                        .filter { it.confidence >= faceDecisionPolicy.low }
+                        .sortedByDescending { it.confidence }
+                    // Attempt to include only high confidence matches
+                    goodResults
+                        .filter { it.confidence >= faceDecisionPolicy.high }
+                        .ifEmpty { goodResults }
+                        .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
+                        .map { AppMatchResult(it.subjectId, it.confidence, faceDecisionPolicy) }
+                }
+        } ?: emptyList()
 
     private fun List<MatchConfidence>.mapToMatchResults(
         decisionPolicy: DecisionPolicy,
