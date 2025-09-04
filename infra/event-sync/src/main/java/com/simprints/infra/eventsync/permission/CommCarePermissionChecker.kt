@@ -2,6 +2,8 @@ package com.simprints.infra.eventsync.permission
 
 import android.content.Context
 import android.content.pm.PackageManager
+import com.simprints.core.domain.permission.CommCarePermissions
+import com.simprints.infra.config.store.LastCallingPackageStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -9,22 +11,17 @@ import javax.inject.Singleton
 @Singleton
 class CommCarePermissionChecker @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val lastCallingPackageStore: LastCallingPackageStore,
 ) {
-
     /**
-     * Checks if the required CommCare permissions are granted.
-     * These permissions are needed to access CommCare content provider data.
+     * Checks if the required CommCare permission is granted for the last calling package.
      *
-     * @return true if both CommCare permissions are granted, false otherwise
+     * @return true if the CommCare permission for the last calling package is granted, false otherwise
      */
     fun hasCommCarePermissions(): Boolean {
-        val permissions = listOf(
-            "org.commcare.dalvik.provider.cases.read",
-            "org.commcare.dalvik.debug.provider.cases.read"
+        val targetPermission = CommCarePermissions.buildPermissionForPackage(
+            lastCallingPackageStore.lastCallingPackageName ?: "",
         )
-        
-        return permissions.any { permission ->
-            context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
-        }
+        return context.checkSelfPermission(targetPermission) == PackageManager.PERMISSION_GRANTED
     }
 }
