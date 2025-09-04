@@ -1,8 +1,7 @@
 package com.simprints.infra.events.event.domain.models.subject
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.utils.EncodingUtils
 import java.util.UUID
@@ -40,8 +39,8 @@ data class EnrolmentRecordCreationEvent(
 
     companion object {
         fun buildBiometricReferences(
-            fingerprintSamples: List<FingerprintSample>,
-            faceSamples: List<FaceSample>,
+            fingerprintSamples: List<Sample>,
+            faceSamples: List<Sample>,
             encoder: EncodingUtils,
         ): List<BiometricReference> {
             val biometricReferences = mutableListOf<BiometricReference>()
@@ -58,7 +57,7 @@ data class EnrolmentRecordCreationEvent(
         }
 
         private fun buildFingerprintReference(
-            fingerprintSamples: List<FingerprintSample>,
+            fingerprintSamples: List<Sample>,
             encoder: EncodingUtils,
         ) = if (fingerprintSamples.isNotEmpty()) {
             FingerprintReference(
@@ -66,7 +65,7 @@ data class EnrolmentRecordCreationEvent(
                 fingerprintSamples.map {
                     FingerprintTemplate(
                         encoder.byteArrayToBase64(it.template),
-                        it.fingerIdentifier,
+                        it.identifier,
                     )
                 },
                 fingerprintSamples.first().format,
@@ -76,7 +75,7 @@ data class EnrolmentRecordCreationEvent(
         }
 
         private fun buildFaceReference(
-            faceSamples: List<FaceSample>,
+            faceSamples: List<Sample>,
             encoder: EncodingUtils,
         ) = if (faceSamples.isNotEmpty()) {
             FaceReference(

@@ -1,8 +1,8 @@
 package com.simprints.infra.enrolment.records.repository.local
 
 import com.google.common.truth.Truth.*
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
@@ -430,11 +430,11 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         projectId: String = UUID.randomUUID().toString(),
         userId: String = UUID.randomUUID().toString(),
         moduleId: String = UUID.randomUUID().toString(),
-        faceSamples: List<FaceSample> = listOf(
+        faceSamples: List<Sample> = listOf(
             getRandomFaceSample(),
             getRandomFaceSample(),
         ),
-        fingerprintSamples: List<FingerprintSample> = listOf(),
+        fingerprintSamples: List<Sample> = listOf(),
     ): Subject = Subject(
         subjectId = patientId,
         projectId = projectId,
@@ -447,10 +447,23 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     private fun getRandomFaceSample(
         id: String = UUID.randomUUID().toString(),
         referenceId: String = "referenceId",
-    ) = FaceSample(Random.nextBytes(64), "faceTemplateFormat", referenceId, id)
+    ) = Sample(
+        id = id,
+        referenceId = referenceId,
+        template = Random.nextBytes(64),
+        format = "faceTemplateFormat",
+        modality = Modality.FACE,
+    )
 
     private fun getRandomFingerprintSample(
         id: String = UUID.randomUUID().toString(),
         referenceId: String = "referenceId",
-    ) = FingerprintSample(SampleIdentifier.LEFT_3RD_FINGER, Random.nextBytes(64), "fingerprintTemplateFormat", referenceId, id)
+    ) = Sample(
+        id = id,
+        referenceId = referenceId,
+        identifier = SampleIdentifier.LEFT_3RD_FINGER,
+        template = Random.nextBytes(64),
+        format = "fingerprintTemplateFormat",
+        modality = Modality.FINGERPRINT,
+    )
 }
