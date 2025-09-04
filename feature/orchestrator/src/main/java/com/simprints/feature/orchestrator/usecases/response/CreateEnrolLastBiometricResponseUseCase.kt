@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 internal class CreateEnrolLastBiometricResponseUseCase @Inject constructor() {
     operator fun invoke(results: List<Serializable>) = results
-        .filterIsInstance(EnrolLastBiometricResult::class.java)
+        .filterIsInstance<EnrolLastBiometricResult>()
         .lastOrNull()
         ?.newSubjectId
         ?.let { AppEnrolResponse(it) }

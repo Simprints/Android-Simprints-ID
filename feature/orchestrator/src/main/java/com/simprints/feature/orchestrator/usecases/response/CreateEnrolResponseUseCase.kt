@@ -26,9 +26,9 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
         project: Project,
         enrolmentSubjectId: String,
     ): AppResponse {
-        val fingerprintCapture = results.filterIsInstance(FingerprintCaptureResult::class.java).lastOrNull()
-        val faceCapture = results.filterIsInstance(FaceCaptureResult::class.java).lastOrNull()
-        val credentialResult = results.filterIsInstance(ExternalCredentialSearchResult::class.java).lastOrNull()
+        val fingerprintCapture = results.filterIsInstance<FingerprintCaptureResult>().lastOrNull()
+        val faceCapture = results.filterIsInstance<FaceCaptureResult>().lastOrNull()
+        val credentialResult = results.filterIsInstance<ExternalCredentialSearchResult>().lastOrNull()
         val externalCredential = credentialResult?.scannedCredential?.toExternalCredential(enrolmentSubjectId)
 
         return try {
