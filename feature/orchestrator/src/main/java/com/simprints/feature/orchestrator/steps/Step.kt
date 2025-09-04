@@ -16,8 +16,6 @@ import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
-import com.simprints.feature.enrollast.FaceTemplateCaptureResult
-import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
@@ -95,18 +93,12 @@ abstract class StepResultMixin : StepResult
         name = "EnrolLastBiometricStepResult.FaceMatchResult",
     ),
     JsonSubTypes.Type(
-        value = EnrolLastBiometricStepResult.FingerprintCaptureResult::class,
-        name = "EnrolLastBiometricStepResult.FingerprintCaptureResult",
-    ),
-    JsonSubTypes.Type(
-        value = EnrolLastBiometricStepResult.FaceCaptureResult::class,
-        name = "EnrolLastBiometricStepResult.FaceCaptureResult",
+        value = EnrolLastBiometricStepResult.CaptureResult::class,
+        name = "EnrolLastBiometricStepResult.CaptureResult",
     ),
     JsonSubTypes.Type(value = ExternalCredentialParams::class, name = "ExternalCredentialParams"),
     JsonSubTypes.Type(value = ExternalCredentialSearchResult::class, name = "ExternalCredentialSearchResult"),
     JsonSubTypes.Type(value = MatchResult::class, name = "MatchResult"),
-    JsonSubTypes.Type(value = FingerTemplateCaptureResult::class, name = "FingerTemplateCaptureResult"),
-    JsonSubTypes.Type(value = FaceTemplateCaptureResult::class, name = "FaceTemplateCaptureResult"),
     // Additional types that are used in top-level params
     JsonSubTypes.Type(value = CaptureSample::class, name = "CaptureSample"),
     JsonSubTypes.Type(value = MatchConfidence::class, name = "MatchConfidence"),

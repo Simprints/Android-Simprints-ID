@@ -23,8 +23,6 @@ import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
-import com.simprints.feature.enrollast.FaceTemplateCaptureResult
-import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.feature.exitform.ExitFormOption
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
@@ -129,25 +127,21 @@ class OrchestratorCacheIntegrationTest {
                     userId = TokenizableString.Raw("value"),
                     moduleId = TokenizableString.Raw("value"),
                     steps = listOf(
-                        EnrolLastBiometricStepResult.FingerprintCaptureResult(
+                        EnrolLastBiometricStepResult.CaptureResult(
                             "referenceId",
                             listOf(
-                                FingerTemplateCaptureResult(
-                                    SampleIdentifier.LEFT_4TH_FINGER,
-                                    byteArrayOf(1, 2, 3),
-                                    "NEC",
+                                CaptureSample(
+                                    captureEventId = GUID1,
+                                    identifier = SampleIdentifier.LEFT_THUMB,
+                                    template = byteArrayOf(1, 2, 3),
+                                    modality = Modality.FINGERPRINT,
+                                    format = "format",
                                 ),
                             ),
                         ),
                         EnrolLastBiometricStepResult.FingerprintMatchResult(
                             listOf(MatchConfidence("subjectId", 0.5f)),
                             FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
-                        ),
-                        EnrolLastBiometricStepResult.FaceCaptureResult(
-                            "referenceId",
-                            listOf(
-                                FaceTemplateCaptureResult(byteArrayOf(1, 2, 3), "RankOne"),
-                            ),
                         ),
                         EnrolLastBiometricStepResult.FaceMatchResult(
                             listOf(MatchConfidence("subjectId", 0.5f)),
