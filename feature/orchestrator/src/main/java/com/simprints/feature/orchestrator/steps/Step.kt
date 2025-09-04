@@ -5,6 +5,7 @@ import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.step.StepResult
 import com.simprints.face.capture.FaceCaptureParams
@@ -17,7 +18,6 @@ import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
-import com.simprints.feature.enrollast.MatchResult
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.fetchsubject.FetchSubjectParams
 import com.simprints.feature.fetchsubject.FetchSubjectResult
@@ -47,14 +47,9 @@ import java.io.Serializable
     JsonSubTypes.Type(value = ConsentResult::class, name = "ConsentResult"),
     JsonSubTypes.Type(value = FingerprintConnectResult::class, name = "FingerprintConnectResult"),
     JsonSubTypes.Type(value = FingerprintCaptureResult::class, name = "FingerprintCaptureResult"),
-    JsonSubTypes.Type(value = FaceCaptureResult::class, name = "FaceCaptureResult"),
     JsonSubTypes.Type(value = FingerprintMatchResult::class, name = "FingerprintMatchResult"),
-    JsonSubTypes.Type(
-        value = FingerprintMatchResult.Item::class,
-        name = "FingerprintMatchResult.Item",
-    ),
+    JsonSubTypes.Type(value = FaceCaptureResult::class, name = "FaceCaptureResult"),
     JsonSubTypes.Type(value = FaceMatchResult::class, name = "FaceMatchResult"),
-    JsonSubTypes.Type(value = FaceMatchResult.Item::class, name = "FaceMatchResult.Item"),
     JsonSubTypes.Type(value = EnrolLastBiometricResult::class, name = "EnrolLastBiometricResult"),
     JsonSubTypes.Type(value = FetchSubjectResult::class, name = "FetchSubjectResult"),
     JsonSubTypes.Type(value = SelectSubjectResult::class, name = "SelectSubjectResult"),
@@ -64,6 +59,7 @@ import java.io.Serializable
     JsonSubTypes.Type(value = SelectSubjectAgeGroupResult::class, name = "SelectSubjectAgeGroupResult"),
     // Common data types
     JsonSubTypes.Type(value = CaptureSample::class, name = "CaptureSample"),
+    JsonSubTypes.Type(value = MatchConfidence::class, name = "MatchConfidence"),
 )
 abstract class StepResultMixin : StepResult
 
@@ -80,8 +76,6 @@ abstract class StepResultMixin : StepResult
     // Match params are updated after capture steps
     JsonSubTypes.Type(value = MatchStepStubPayload::class, name = "MatchStepStubPayload"),
     JsonSubTypes.Type(value = MatchParams::class, name = "MatchParams"),
-    JsonSubTypes.Type(value = MatchParams.FaceSample::class, name = "MatchParams.FaceSample"),
-    JsonSubTypes.Type(value = MatchParams.FingerprintSample::class, name = "MatchParams.FingerprintSample"),
     // Below are subclasses of enrol-last step that takes results of other steps as parameters
     JsonSubTypes.Type(value = EnrolLastBiometricParams::class, name = "EnrolLastBiometricParams"),
     JsonSubTypes.Type(value = EnrolLastBiometricStepResult::class, name = "EnrolLastBiometricStepResult"),
@@ -105,10 +99,11 @@ abstract class StepResultMixin : StepResult
         value = EnrolLastBiometricStepResult.FaceCaptureResult::class,
         name = "EnrolLastBiometricStepResult.FaceCaptureResult",
     ),
-    JsonSubTypes.Type(value = MatchResult::class, name = "MatchResult"),
     JsonSubTypes.Type(value = FingerTemplateCaptureResult::class, name = "FingerTemplateCaptureResult"),
     JsonSubTypes.Type(value = FaceTemplateCaptureResult::class, name = "FaceTemplateCaptureResult"),
     // Additional types that are used in top-level params
+    JsonSubTypes.Type(value = CaptureSample::class, name = "CaptureSample"),
+    JsonSubTypes.Type(value = MatchConfidence::class, name = "MatchConfidence"),
     JsonSubTypes.Type(value = BiometricDataSource::class, name = "BiometricDataSource"),
     JsonSubTypes.Type(value = SubjectQuery::class, name = "SubjectQuery"),
 )

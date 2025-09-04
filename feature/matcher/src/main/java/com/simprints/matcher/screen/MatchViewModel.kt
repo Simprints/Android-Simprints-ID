@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
@@ -13,7 +14,6 @@ import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
-import com.simprints.matcher.MatchResultItem
 import com.simprints.matcher.usecases.FaceMatcherUseCase
 import com.simprints.matcher.usecases.FingerprintMatcherUseCase
 import com.simprints.matcher.usecases.MatcherUseCase
@@ -114,7 +114,7 @@ internal class MatchViewModel @Inject constructor(
 
     private fun setMatchState(
         candidatesMatched: Int,
-        results: List<MatchResultItem>,
+        results: List<MatchConfidence>,
         decisionPolicy: DecisionPolicy,
     ) {
         val veryGoodMatches = results.count { decisionPolicy.high <= it.confidence }

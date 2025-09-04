@@ -2,6 +2,7 @@ package com.simprints.matcher.usecases
 
 import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
@@ -13,7 +14,6 @@ import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.matcher.MatchBatchInfo
 import com.simprints.matcher.MatchParams
-import com.simprints.matcher.MatchResultItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,7 +30,7 @@ internal class SaveMatchEventUseCase @Inject constructor(
         matchParams: MatchParams,
         candidatesCount: Int,
         matcherName: String,
-        results: List<MatchResultItem>,
+        results: List<MatchConfidence>,
         batches: List<MatchBatchInfo>,
     ) {
         sessionCoroutineScope.launch {

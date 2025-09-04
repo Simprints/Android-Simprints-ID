@@ -1,6 +1,7 @@
 package com.simprints.feature.orchestrator.usecases.response
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
@@ -8,11 +9,8 @@ import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -193,12 +191,12 @@ class CreateIdentifyResponseUseCaseTest {
     }
 
     private fun createFaceMatchResult(vararg confidences: Float): Serializable = FaceMatchResult(
-        confidences.map { FaceMatchResult.Item(subjectId = "1", confidence = it) },
+        confidences.map { MatchConfidence(subjectId = "1", confidence = it) },
         FaceConfiguration.BioSdk.RANK_ONE,
     )
 
     private fun createFingerprintMatchResult(vararg confidences: Float): Serializable = FingerprintMatchResult(
-        confidences.map { FingerprintMatchResult.Item(subjectId = "1", confidence = it) },
+        confidences.map { MatchConfidence(subjectId = "1", confidence = it) },
         FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
     )
 }

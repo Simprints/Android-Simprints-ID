@@ -1,7 +1,10 @@
 package com.simprints.matcher.usecases
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.Timestamp
@@ -15,16 +18,11 @@ import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToM
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent.OneToOneMatchPayload.OneToOneMatchPayloadV4
 import com.simprints.infra.events.session.SessionEventRepository
-import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchBatchInfo
 import com.simprints.matcher.MatchParams
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.Runs
-import io.mockk.coEvery
-import io.mockk.coVerify
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.just
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -73,14 +71,21 @@ class SaveMatchEventUseCaseTest {
                 probeReferenceId = "referenceId",
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(subjectId = "subjectId"),
-                probeFaceSamples = listOf(MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3))),
+                probeFaceSamples = listOf(
+                    CaptureSample(
+                        captureEventId = "faceId",
+                        template = byteArrayOf(1, 2, 3),
+                        modality = Modality.FACE,
+                        format = "format",
+                    ),
+                ),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
             2,
             "faceMatcherName",
             listOf(
-                FaceMatchResult.Item("guid1", 0.5f),
-                FaceMatchResult.Item("guid2", 0.1f),
+                MatchConfidence("guid1", 0.5f),
+                MatchConfidence("guid2", 0.1f),
             ),
             batches = emptyList(),
         )
@@ -112,10 +117,12 @@ class SaveMatchEventUseCaseTest {
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(subjectId = "subjectId"),
                 probeFingerprintSamples = listOf(
-                    MatchParams.FingerprintSample(
-                        SampleIdentifier.RIGHT_5TH_FINGER,
-                        "format",
-                        byteArrayOf(1, 2, 3),
+                    CaptureSample(
+                        captureEventId = "fingerprintId",
+                        template = byteArrayOf(1, 2, 3),
+                        modality = Modality.FINGERPRINT,
+                        format = "format",
+                        identifier = SampleIdentifier.RIGHT_5TH_FINGER,
                     ),
                 ),
                 fingerprintSDK = SECUGEN_SIM_MATCHER,
@@ -124,8 +131,8 @@ class SaveMatchEventUseCaseTest {
             2,
             "faceMatcherName",
             listOf(
-                FaceMatchResult.Item("guid1", 0.5f),
-                FaceMatchResult.Item("guid2", 0.1f),
+                MatchConfidence("guid1", 0.5f),
+                MatchConfidence("guid2", 0.1f),
             ),
             batches = emptyList(),
         )
@@ -168,8 +175,8 @@ class SaveMatchEventUseCaseTest {
             candidatesCount = 2,
             matcherName = "faceMatcherName",
             results = listOf(
-                FaceMatchResult.Item("guid1", 0.5f),
-                FaceMatchResult.Item("guid2", 0.1f),
+                MatchConfidence("guid1", 0.5f),
+                MatchConfidence("guid2", 0.1f),
             ),
             batches = batches,
         )
@@ -226,7 +233,7 @@ class SaveMatchEventUseCaseTest {
             ),
             0,
             "faceMatcherName",
-            listOf(FaceMatchResult.Item("guid1", 0.5f)),
+            listOf(MatchConfidence("guid1", 0.5f)),
             batches = batches,
         )
 
