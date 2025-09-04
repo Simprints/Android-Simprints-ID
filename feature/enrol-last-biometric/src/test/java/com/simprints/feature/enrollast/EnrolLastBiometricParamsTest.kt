@@ -12,7 +12,6 @@ class EnrolLastBiometricParamsTest {
         val result = FingerTemplateCaptureResult(
             finger = SampleIdentifier.LEFT_THUMB,
             template = byteArrayOf(3, 4),
-            templateQualityScore = 42,
             format = isoTemplateFormat,
         )
 
@@ -20,7 +19,6 @@ class EnrolLastBiometricParamsTest {
             FingerTemplateCaptureResult(
                 finger = SampleIdentifier.LEFT_THUMB,
                 template = byteArrayOf(3, 4),
-                templateQualityScore = 42,
                 format = isoTemplateFormat,
             ),
         )
@@ -28,7 +26,6 @@ class EnrolLastBiometricParamsTest {
             FingerTemplateCaptureResult(
                 finger = SampleIdentifier.RIGHT_3RD_FINGER,
                 template = byteArrayOf(3, 4),
-                templateQualityScore = 42,
                 format = isoTemplateFormat,
             ),
         )
@@ -36,7 +33,6 @@ class EnrolLastBiometricParamsTest {
             FingerTemplateCaptureResult(
                 finger = SampleIdentifier.RIGHT_3RD_FINGER,
                 template = byteArrayOf(3, 4, 5),
-                templateQualityScore = 42,
                 format = isoTemplateFormat,
             ),
         )
@@ -44,7 +40,6 @@ class EnrolLastBiometricParamsTest {
             FingerTemplateCaptureResult(
                 finger = SampleIdentifier.RIGHT_3RD_FINGER,
                 template = byteArrayOf(3, 4),
-                templateQualityScore = 41,
                 format = isoTemplateFormat,
             ),
         )
@@ -52,7 +47,6 @@ class EnrolLastBiometricParamsTest {
             FingerTemplateCaptureResult(
                 finger = SampleIdentifier.RIGHT_3RD_FINGER,
                 template = byteArrayOf(3, 4, 5, 6),
-                templateQualityScore = 42,
                 format = "NEC_1",
             ),
         )
@@ -64,14 +58,12 @@ class EnrolLastBiometricParamsTest {
             FingerTemplateCaptureResult(
                 finger = SampleIdentifier.LEFT_THUMB,
                 template = byteArrayOf(3, 4),
-                templateQualityScore = 42,
                 format = isoTemplateFormat,
             ).hashCode(),
         ).isEqualTo(
             FingerTemplateCaptureResult(
                 finger = SampleIdentifier.LEFT_THUMB,
                 template = byteArrayOf(3, 4),
-                templateQualityScore = 42,
                 format = isoTemplateFormat,
             ).hashCode(),
         )
@@ -79,14 +71,12 @@ class EnrolLastBiometricParamsTest {
             FingerTemplateCaptureResult(
                 finger = SampleIdentifier.LEFT_THUMB,
                 template = byteArrayOf(3, 4),
-                templateQualityScore = 42,
                 format = isoTemplateFormat,
             ).hashCode(),
         ).isNotEqualTo(
             FingerTemplateCaptureResult(
                 finger = SampleIdentifier.RIGHT_3RD_FINGER,
                 template = byteArrayOf(3, 4, 5, 6),
-                templateQualityScore = 42,
                 format = isoTemplateFormat,
             ).hashCode(),
         )

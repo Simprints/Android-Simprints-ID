@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.capture.screen
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModelTest.MockAcquireImageResult.OK
@@ -46,16 +46,9 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.assertEventNotReceived
 import com.simprints.testtools.common.livedata.assertEventReceived
 import com.simprints.testtools.common.livedata.assertEventReceivedWithContentAssertions
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coJustRun
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
+import io.mockk.impl.annotations.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.impl.annotations.RelaxedMockK
-import io.mockk.mockk
-import io.mockk.unmockkAll
-import io.mockk.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -527,8 +520,7 @@ class FingerprintCaptureViewModelTest {
                 FOUR_FINGERS_IDS,
             )
             actualFingerprints?.results?.forEach {
-                assertThat(it.sample?.template).isEqualTo(TEMPLATE)
-                assertThat(it.sample?.imageRef).isNotNull()
+                assertThat(it.template).isEqualTo(TEMPLATE)
             }
         }
     }
@@ -586,8 +578,7 @@ class FingerprintCaptureViewModelTest {
                 TWO_FINGERS_IDS,
             )
             actualFingerprints?.results?.forEach {
-                assertThat(it.sample?.template).isEqualTo(TEMPLATE)
-                assertThat(it.sample?.imageRef).isNotNull()
+                assertThat(it.template).isEqualTo(TEMPLATE)
             }
         }
     }
@@ -643,8 +634,7 @@ class FingerprintCaptureViewModelTest {
                 TWO_FINGERS_IDS,
             )
             actualFingerprints?.results?.forEach {
-                assertThat(it.sample?.template).isEqualTo(TEMPLATE)
-                assertThat(it.sample?.imageRef).isNull()
+                assertThat(it.template).isEqualTo(TEMPLATE)
             }
         }
     }
@@ -859,8 +849,7 @@ class FingerprintCaptureViewModelTest {
                 SampleIdentifier.RIGHT_INDEX_FINGER,
             )
             actualFingerprints?.results?.forEach {
-                assertThat(it.sample?.template).isEqualTo(TEMPLATE)
-                assertThat(it.sample?.imageRef).isNotNull()
+                assertThat(it.template).isEqualTo(TEMPLATE)
             }
         }
     }
@@ -972,8 +961,7 @@ class FingerprintCaptureViewModelTest {
                 SampleIdentifier.RIGHT_INDEX_FINGER,
             )
             actualFingerprints?.results?.forEach {
-                assertThat(it.sample?.template).isEqualTo(TEMPLATE)
-                assertThat(it.sample?.imageRef).isNotNull()
+                assertThat(it.template).isEqualTo(TEMPLATE)
             }
         }
     }
@@ -1067,8 +1055,7 @@ class FingerprintCaptureViewModelTest {
                 SampleIdentifier.RIGHT_THUMB,
             )
             actualFingerprints?.results?.forEach {
-                assertThat(it.sample?.template).isEqualTo(TEMPLATE)
-                assertThat(it.sample?.imageRef).isNotNull()
+                assertThat(it.template).isEqualTo(TEMPLATE)
             }
         }
     }

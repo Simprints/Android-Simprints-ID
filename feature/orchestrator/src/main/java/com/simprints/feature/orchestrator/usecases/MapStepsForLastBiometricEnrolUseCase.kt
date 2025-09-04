@@ -22,12 +22,11 @@ internal class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
 
             is FingerprintCaptureResult -> EnrolLastBiometricStepResult.FingerprintCaptureResult(
                 result.referenceId,
-                result.results.mapNotNull { it.sample }.map {
+                result.results.map {
                     FingerTemplateCaptureResult(
-                        it.fingerIdentifier,
-                        it.template,
-                        it.templateQualityScore,
-                        it.format,
+                        finger = it.identifier,
+                        template = it.template,
+                        format = it.format,
                     )
                 },
             )
@@ -39,7 +38,7 @@ internal class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
 
             is FaceCaptureResult -> EnrolLastBiometricStepResult.FaceCaptureResult(
                 result.referenceId,
-                result.results.mapNotNull { it.sample }.map { FaceTemplateCaptureResult(it.template, it.format) },
+                result.results.map { FaceTemplateCaptureResult(it.template, it.format) },
             )
 
             is FaceMatchResult -> EnrolLastBiometricStepResult.FaceMatchResult(

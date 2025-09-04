@@ -1,8 +1,10 @@
 package com.simprints.feature.orchestrator.cache
 
 import android.content.SharedPreferences
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import androidx.test.ext.junit.runners.*
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.face.capture.FaceCaptureParams
@@ -13,11 +15,8 @@ import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.security.SecurityManager
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.justRun
-import io.mockk.slot
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -62,10 +61,12 @@ class OrchestratorCacheIntegrationTest {
                 result = FingerprintCaptureResult(
                     "",
                     results = listOf(
-                        FingerprintCaptureResult.Item(
+                        CaptureSample(
                             captureEventId = GUID1,
                             identifier = SampleIdentifier.LEFT_THUMB,
-                            sample = null,
+                            template = byteArrayOf(1, 2, 3),
+                            modality = Modality.FINGERPRINT,
+                            format = "format",
                         ),
                     ),
                 ),

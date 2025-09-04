@@ -1,28 +1,11 @@
 package com.simprints.fingerprint.capture
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.step.StepResult
-import com.simprints.infra.images.model.SecuredImageRef
 
 @Keep
 data class FingerprintCaptureResult(
     val referenceId: String,
-    var results: List<Item>,
-) : StepResult {
-    @Keep
-    data class Item(
-        val captureEventId: String?,
-        val identifier: SampleIdentifier,
-        val sample: Sample?,
-    ) : StepResult
-
-    @Keep
-    data class Sample(
-        val fingerIdentifier: SampleIdentifier,
-        val template: ByteArray,
-        val templateQualityScore: Int,
-        val imageRef: SecuredImageRef?,
-        val format: String,
-    ) : StepResult
-}
+    var results: List<CaptureSample>,
+) : StepResult

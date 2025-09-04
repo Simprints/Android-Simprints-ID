@@ -2,6 +2,7 @@ package com.simprints.infra.eventsync.sync.down.tasks
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableRaw
@@ -261,31 +262,23 @@ class SubjectFactoryTest {
             fingerprintResponse = FingerprintCaptureResult(
                 GUID1,
                 listOf(
-                    FingerprintCaptureResult.Item(
+                    CaptureSample(
                         captureEventId = GUID1,
                         identifier = IDENTIFIER,
-                        sample = FingerprintCaptureResult.Sample(
-                            template = BASE_64_BYTES,
-                            templateQualityScore = QUALITY,
-                            format = REFERENCE_FORMAT,
-                            imageRef = null,
-                            fingerIdentifier = IDENTIFIER,
-                        ),
+                        template = BASE_64_BYTES,
+                        format = REFERENCE_FORMAT,
+                        modality = Modality.FINGERPRINT,
                     ),
                 ),
             ),
             faceResponse = FaceCaptureResult(
                 GUID1,
                 listOf(
-                    FaceCaptureResult.Item(
+                    CaptureSample(
                         captureEventId = GUID1,
-                        index = 0,
-                        sample = FaceCaptureResult.Sample(
-                            template = BASE_64_BYTES,
-                            format = REFERENCE_FORMAT,
-                            faceId = REFERENCE_ID,
-                            imageRef = null,
-                        ),
+                        template = BASE_64_BYTES,
+                        format = REFERENCE_FORMAT,
+                        modality = Modality.FACE,
                     ),
                 ),
             ),
