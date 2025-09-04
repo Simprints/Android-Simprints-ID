@@ -127,8 +127,8 @@ class BuildSubjectUseCaseTest {
             params = createParams(
                 listOf(
                     EnrolLastBiometricStepResult.FaceMatchResult(emptyList(), mockk()),
-                    EnrolLastBiometricStepResult.FaceCaptureResult(REFERENCE_ID, mockFaceResultsList("first")),
-                    EnrolLastBiometricStepResult.FaceCaptureResult(REFERENCE_ID, mockFaceResultsList("second")),
+                    EnrolLastBiometricStepResult.FaceCaptureResult(REFERENCE_ID, listOf(mockFaceResults("first"))),
+                    EnrolLastBiometricStepResult.FaceCaptureResult(REFERENCE_ID, listOf(mockFaceResults("second"))),
                 ),
                 scannedCredential = scannedCredential,
             ),
@@ -180,9 +180,16 @@ class BuildSubjectUseCaseTest {
         scannedCredential = scannedCredential,
     )
 
-    private fun mockFingerprintResults(finger: SampleIdentifier) = FingerTemplateCaptureResult(finger, byteArrayOf(), 1, "ISO_19794_2")
+    private fun mockFingerprintResults(finger: SampleIdentifier) = FingerTemplateCaptureResult(
+        finger = finger,
+        template = byteArrayOf(),
+        format = "ISO_19794_2",
+    )
 
-    private fun mockFaceResultsList(format: String) = listOf(FaceTemplateCaptureResult(byteArrayOf(), format))
+    private fun mockFaceResults(format: String) = FaceTemplateCaptureResult(
+        template = byteArrayOf(),
+        format = format,
+    )
 
     companion object {
         private const val REFERENCE_ID = "referenceId"

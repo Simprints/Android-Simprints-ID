@@ -4,8 +4,10 @@ import android.content.SharedPreferences
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
@@ -52,8 +54,6 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.infra.images.model.Path
-import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.matching.FaceMatchResult
 import com.simprints.infra.matching.FingerprintMatchResult
 import com.simprints.infra.matching.MatchParams
@@ -135,7 +135,6 @@ class OrchestratorCacheIntegrationTest {
                                 FingerTemplateCaptureResult(
                                     SampleIdentifier.LEFT_4TH_FINGER,
                                     byteArrayOf(1, 2, 3),
-                                    10,
                                     "NEC",
                                 ),
                             ),
@@ -260,16 +259,12 @@ class OrchestratorCacheIntegrationTest {
                 result = FingerprintCaptureResult(
                     "",
                     results = listOf(
-                        FingerprintCaptureResult.Item(
+                        CaptureSample(
                             captureEventId = GUID1,
                             identifier = SampleIdentifier.LEFT_THUMB,
-                            sample = FingerprintCaptureResult.Sample(
-                                fingerIdentifier = SampleIdentifier.LEFT_4TH_FINGER,
-                                template = byteArrayOf(1, 2, 3),
-                                templateQualityScore = 10,
-                                imageRef = SecuredImageRef(Path("file/path")),
-                                format = "NEC",
-                            ),
+                            template = byteArrayOf(1, 2, 3),
+                            modality = Modality.FINGERPRINT,
+                            format = "format",
                         ),
                     ),
                 ),
@@ -320,15 +315,12 @@ class OrchestratorCacheIntegrationTest {
                 result = FaceCaptureResult(
                     "",
                     results = listOf(
-                        FaceCaptureResult.Item(
-                            captureEventId = "event",
-                            index = 0,
-                            sample = FaceCaptureResult.Sample(
-                                faceId = "faceId",
-                                template = byteArrayOf(1, 2, 3),
-                                imageRef = SecuredImageRef(Path("file/path")),
-                                format = "ROC",
-                            ),
+                        CaptureSample(
+                            captureEventId = GUID1,
+                            identifier = SampleIdentifier.LEFT_THUMB,
+                            template = byteArrayOf(1, 2, 3),
+                            modality = Modality.FACE,
+                            format = "ROC",
                         ),
                     ),
                 ),
