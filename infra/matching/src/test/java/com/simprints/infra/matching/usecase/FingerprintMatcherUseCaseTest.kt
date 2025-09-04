@@ -3,7 +3,8 @@ package com.simprints.infra.matching.usecase
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
@@ -198,7 +199,13 @@ internal class FingerprintMatcherUseCaseTest {
         coVerify { bioSdkWrapper.match(any(), any(), any()) }
     }
 
-    private fun fingerprintSample(finger: SampleIdentifier) = FingerprintSample(finger, byteArrayOf(1), "format", "referenceId")
+    private fun fingerprintSample(finger: SampleIdentifier) = Sample(
+        identifier = finger,
+        template = byteArrayOf(1),
+        format = "format",
+        referenceId = "referenceId",
+        modality = Modality.FINGERPRINT,
+    )
 }
 
 fun <T> createTestChannel(vararg lists: List<T>): ReceiveChannel<IdentityBatch<T>> {

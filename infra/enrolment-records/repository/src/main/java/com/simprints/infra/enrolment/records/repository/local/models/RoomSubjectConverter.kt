@@ -13,8 +13,8 @@ internal fun SubjectBiometrics.toDomain() = Subject(
     moduleId = subject.moduleId.asTokenizableEncrypted(),
     createdAt = subject.createdAt?.toDate(),
     updatedAt = subject.updatedAt?.toDate(),
-    fingerprintSamples = biometricTemplates.filter { it.modality == DbModality.FINGERPRINT.id }.map { it.toFingerprintSample() },
-    faceSamples = biometricTemplates.filter { it.modality == DbModality.FACE.id }.map { it.toFaceSample() },
+    fingerprintSamples = biometricTemplates.filter { it.modality == DbModality.FINGERPRINT.id }.map { it.toSample() },
+    faceSamples = biometricTemplates.filter { it.modality == DbModality.FACE.id }.map { it.toSample() },
     externalCredentials = externalCredentials.map { it.toDomain() },
 )
 

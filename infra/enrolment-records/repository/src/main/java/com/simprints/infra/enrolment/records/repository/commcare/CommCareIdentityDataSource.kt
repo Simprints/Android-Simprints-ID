@@ -8,8 +8,8 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.AvailableProcessors
 import com.simprints.core.DispatcherBG
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
@@ -75,11 +75,12 @@ internal class CommCareIdentityDataSource @Inject constructor(
                     it.payload.subjectId,
                     it.payload.biometricReferences.filterIsInstance<FingerprintReference>().flatMap { fingerprintReference ->
                         fingerprintReference.templates.map { fingerprintTemplate ->
-                            FingerprintSample(
-                                fingerIdentifier = fingerprintTemplate.finger,
+                            Sample(
+                                identifier = fingerprintTemplate.finger,
                                 template = encoder.base64ToBytes(fingerprintTemplate.template),
                                 format = fingerprintReference.format,
                                 referenceId = fingerprintReference.id,
+                                modality = Modality.FINGERPRINT,
                             )
                         }
                     },
@@ -141,10 +142,11 @@ internal class CommCareIdentityDataSource @Inject constructor(
                 it.payload.subjectId,
                 it.payload.biometricReferences.filterIsInstance<FaceReference>().flatMap { faceReference ->
                     faceReference.templates.map { faceTemplate ->
-                        FaceSample(
+                        Sample(
                             template = encoder.base64ToBytes(faceTemplate.template),
                             format = faceReference.format,
                             referenceId = faceReference.id,
+                            modality = Modality.FACE,
                         )
                     }
                 },

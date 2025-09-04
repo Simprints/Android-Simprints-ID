@@ -1,7 +1,7 @@
 package com.simprints.feature.enrollast.screen.usecase
 
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.Sample
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
@@ -61,15 +61,21 @@ internal class BuildSubjectUseCase @Inject constructor(
     private fun fingerprintSample(
         referenceId: String,
         result: FingerTemplateCaptureResult,
-    ) = FingerprintSample(
-        result.finger,
-        result.template,
-        result.format,
-        referenceId,
+    ) = Sample(
+        identifier = result.finger,
+        template = result.template,
+        format = result.format,
+        referenceId = referenceId,
+        modality = Modality.FINGERPRINT,
     )
 
     private fun faceSample(
         referenceId: String,
         result: FaceTemplateCaptureResult,
-    ) = FaceSample(result.template, result.format, referenceId)
+    ) = Sample(
+        template = result.template,
+        format = result.format,
+        referenceId = referenceId,
+        modality = Modality.FACE,
+    )
 }

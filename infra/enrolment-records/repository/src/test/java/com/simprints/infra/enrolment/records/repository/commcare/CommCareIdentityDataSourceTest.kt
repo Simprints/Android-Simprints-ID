@@ -4,8 +4,8 @@ import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.sample.SampleIdentifier.LEFT_INDEX_FINGER
 import com.simprints.core.domain.sample.SampleIdentifier.LEFT_THUMB
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -54,34 +54,38 @@ class CommCareIdentityDataSourceTest {
             FingerprintIdentity(
                 subjectId = "b26c91bc-b307-4131-80c3-55090ba5dbf2",
                 fingerprints = listOf(
-                    FingerprintSample(
-                        fingerIdentifier = LEFT_THUMB,
+                    Sample(
+                        identifier = LEFT_THUMB,
                         template = byteArrayOf(),
                         format = "ISO_19794_2",
                         referenceId = "referenceId",
+                        modality = Modality.FINGERPRINT,
                     ),
-                    FingerprintSample(
-                        fingerIdentifier = LEFT_INDEX_FINGER,
+                    Sample(
+                        identifier = LEFT_INDEX_FINGER,
                         template = byteArrayOf(),
                         format = "ISO_19794_2",
                         referenceId = "referenceId",
+                        modality = Modality.FINGERPRINT,
                     ),
                 ),
             ),
             FingerprintIdentity(
                 subjectId = "a961fcb4-8573-4270-a1b2-088e88275b00",
                 fingerprints = listOf(
-                    FingerprintSample(
-                        fingerIdentifier = LEFT_THUMB,
+                    Sample(
+                        identifier = LEFT_THUMB,
                         template = byteArrayOf(),
                         format = "ISO_19794_2",
                         referenceId = "referenceId",
+                        modality = Modality.FINGERPRINT,
                     ),
-                    FingerprintSample(
-                        fingerIdentifier = LEFT_INDEX_FINGER,
+                    Sample(
+                        identifier = LEFT_INDEX_FINGER,
                         template = byteArrayOf(),
                         format = "ISO_19794_2",
                         referenceId = "referenceId",
+                        modality = Modality.FINGERPRINT,
                     ),
                 ),
             ),
@@ -90,20 +94,22 @@ class CommCareIdentityDataSourceTest {
             FaceIdentity(
                 subjectId = "b26c91bc-b307-4131-80c3-55090ba5dbf2",
                 faces = listOf(
-                    FaceSample(
+                    Sample(
                         template = byteArrayOf(),
                         format = "ROC_1_23",
                         referenceId = "referenceId",
+                        modality = Modality.FACE,
                     ),
                 ),
             ),
             FaceIdentity(
                 subjectId = "a961fcb4-8573-4270-a1b2-088e88275b00",
                 faces = listOf(
-                    FaceSample(
+                    Sample(
                         template = byteArrayOf(),
                         format = "ROC_3",
                         referenceId = "referenceId",
+                        modality = Modality.FACE,
                     ),
                 ),
             ),
@@ -268,7 +274,7 @@ class CommCareIdentityDataSourceTest {
                     expected.subjectId == actual.subjectId &&
                         expected.fingerprints
                             .zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
-                                expectedFingerprint.fingerIdentifier == actualFingerprint.fingerIdentifier &&
+                                expectedFingerprint.identifier == actualFingerprint.identifier &&
                                     expectedFingerprint.template.contentEquals(
                                         actualFingerprint.template,
                                     ) &&
@@ -382,7 +388,7 @@ class CommCareIdentityDataSourceTest {
                     expected.subjectId == actual.subjectId &&
                         expected.fingerprints
                             .zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
-                                expectedFingerprint.fingerIdentifier == actualFingerprint.fingerIdentifier &&
+                                expectedFingerprint.identifier == actualFingerprint.identifier &&
                                     expectedFingerprint.template.contentEquals(
                                         actualFingerprint.template,
                                     ) &&
@@ -490,7 +496,7 @@ class CommCareIdentityDataSourceTest {
                     expected.subjectId == actual.subjectId &&
                         expected.fingerprints
                             .zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
-                                expectedFingerprint.fingerIdentifier == actualFingerprint.fingerIdentifier &&
+                                expectedFingerprint.identifier == actualFingerprint.identifier &&
                                     expectedFingerprint.template.contentEquals(
                                         actualFingerprint.template,
                                     ) &&
@@ -681,7 +687,7 @@ class CommCareIdentityDataSourceTest {
                     expected.subjectId == actual.subjectId &&
                         expected.fingerprints
                             .zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
-                                expectedFingerprint.fingerIdentifier == actualFingerprint.fingerIdentifier &&
+                                expectedFingerprint.identifier == actualFingerprint.identifier &&
                                     expectedFingerprint.template.contentEquals(
                                         actualFingerprint.template,
                                     ) &&
