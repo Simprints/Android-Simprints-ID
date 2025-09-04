@@ -209,8 +209,8 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         }
 
         val project = configManager.getProject(projectId)
-        val isProjectEnding =
-            project.state == ProjectState.PROJECT_ENDING
+        val isProjectRunning =
+            project.state == ProjectState.RUNNING
         val moduleCounts = deviceConfig.selectedModules.map { moduleName ->
             ModuleCount(
                 name = when (moduleName) {
@@ -247,7 +247,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         val syncInfoSectionRecords = SyncInfoSectionRecords(
             counterTotalRecords = recordsTotal?.toString().orEmpty(),
             counterRecordsToUpload = recordsToUpload?.toString().orEmpty(),
-            isCounterRecordsToDownloadVisible = !isPreLogoutUpSync && !isProjectEnding,
+            isCounterRecordsToDownloadVisible = !isPreLogoutUpSync && isProjectRunning,
             counterRecordsToDownload = recordsToDownload?.let { "${it.count}${if (it.isLowerBound) "+" else ""}" }.orEmpty(),
             isCounterImagesToUploadVisible = isPreLogoutUpSync,
             counterImagesToUpload = imagesToUpload?.toString().orEmpty(),

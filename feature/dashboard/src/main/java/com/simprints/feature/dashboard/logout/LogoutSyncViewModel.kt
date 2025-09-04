@@ -36,14 +36,14 @@ internal class LogoutSyncViewModel @Inject constructor(
                 projectId.isEmpty()
             }.distinctUntilChanged()
             .map { /* Unit on every "true" */ }
-            .asLiveData()
+            .asLiveData(viewModelScope.coroutineContext)
 
     val isLogoutWithoutSyncVisibleLiveData: LiveData<Boolean> = combine(
         eventSyncManager.getLastSyncState(useDefaultValue = true).asFlow(),
         syncOrchestrator.observeImageSyncStatus(),
     ) { eventSyncState, imageSyncStatus ->
         !eventSyncState.isSyncCompleted() || imageSyncStatus.isSyncing
-    }.debounce(timeoutMillis = ANTI_JITTER_DELAY_MILLIS).asLiveData()
+    }.debounce(timeoutMillis = ANTI_JITTER_DELAY_MILLIS).asLiveData(viewModelScope.coroutineContext)
 
     val settingsLocked: LiveData<LiveDataEventWithContent<SettingsPasswordConfig>>
         get() = liveData(context = viewModelScope.coroutineContext) {

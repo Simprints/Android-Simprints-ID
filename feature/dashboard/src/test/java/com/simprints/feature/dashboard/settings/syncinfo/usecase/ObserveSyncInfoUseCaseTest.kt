@@ -248,7 +248,20 @@ class ObserveSyncInfoUseCaseTest {
     }
 
     @Test
-    fun `should handle project state correctly in sync info`() = runTest {
+    fun `should handle paused project state correctly in sync info`() = runTest {
+        val mockPausedProject = mockk<Project> {
+            every { state } returns ProjectState.PROJECT_PAUSED
+        }
+        coEvery { configManager.getProject(any()) } returns mockPausedProject
+        createUseCase()
+
+        val result = useCase().first()
+
+        assertThat(result.syncInfoSectionRecords.isCounterRecordsToDownloadVisible).isFalse()
+    }
+
+    @Test
+    fun `should handle ending project state correctly in sync info`() = runTest {
         val mockEndingProject = mockk<Project> {
             every { state } returns ProjectState.PROJECT_ENDING
         }
