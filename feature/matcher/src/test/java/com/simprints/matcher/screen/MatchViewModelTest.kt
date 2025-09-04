@@ -134,7 +134,7 @@ internal class MatchViewModelTest {
             configManager
                 .getProjectConfiguration()
                 .face
-                ?.getSdkConfiguration(any())
+                ?.rankOne
                 ?.decisionPolicy
         } returns DecisionPolicy(20, 35, 50)
 
@@ -223,7 +223,7 @@ internal class MatchViewModelTest {
             configManager
                 .getProjectConfiguration()
                 .fingerprint
-                ?.getSdkConfiguration(any())
+                ?.secugenSimMatcher
                 ?.decisionPolicy
         } returns DecisionPolicy(200, 350, 500)
 
@@ -314,7 +314,7 @@ internal class MatchViewModelTest {
             configManager
                 .getProjectConfiguration()
                 .face
-                ?.getSdkConfiguration(any())
+                ?.rankOne
                 ?.decisionPolicy
         } returns null
 

@@ -1,5 +1,7 @@
 package com.simprints.infra.config.store.models
 
+import com.simprints.core.domain.common.ModalitySdkType
+
 data class ProjectConfiguration(
     val id: String,
     val projectId: String,
@@ -37,8 +39,7 @@ fun ProjectConfiguration.canSyncBiometricDataToSimprints(): Boolean =
 fun ProjectConfiguration.canSyncAnalyticsDataToSimprints(): Boolean =
     synchronization.up.simprints.kind == UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
 
-fun ProjectConfiguration.isSimprintsEventDownSyncAllowed(): Boolean =
-    synchronization.down.simprints != null &&
+fun ProjectConfiguration.isSimprintsEventDownSyncAllowed(): Boolean = synchronization.down.simprints != null &&
     synchronization.down.simprints.frequency != Frequency.ONLY_PERIODICALLY_UP_SYNC
 
 fun ProjectConfiguration.isCommCareEventDownSyncAllowed(): Boolean = synchronization.down.commCare != null
@@ -87,3 +88,11 @@ fun ProjectConfiguration.isProjectWithPeriodicallyUpSync(): Boolean =
     synchronization.up.simprints.frequency == Frequency.ONLY_PERIODICALLY_UP_SYNC
 
 fun ProjectConfiguration.isModuleSelectionAvailable(): Boolean = isProjectWithModuleSync() && !isProjectWithPeriodicallyUpSync()
+
+fun ProjectConfiguration.getModalitySdkConfig(bioSdk: ModalitySdkType): ModalitySdkConfiguration? = when (bioSdk) {
+    FaceConfiguration.BioSdk.RANK_ONE -> face?.rankOne
+    FaceConfiguration.BioSdk.SIM_FACE -> face?.simFace
+    FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER -> fingerprint?.secugenSimMatcher
+    FingerprintConfiguration.BioSdk.NEC -> fingerprint?.nec
+    else -> null
+}

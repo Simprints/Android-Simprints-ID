@@ -11,11 +11,11 @@ data class FaceConfiguration(
         val nbOfImagesToCapture: Int,
         val qualityThreshold: Float,
         val imageSavingStrategy: ImageSavingStrategy,
-        val decisionPolicy: DecisionPolicy,
+        override val decisionPolicy: DecisionPolicy,
         val version: String,
-        val allowedAgeRange: AgeGroup = AgeGroup(0, null),
-        val verificationMatchThreshold: Float? = null,
-    )
+        override val allowedAgeRange: AgeGroup = AgeGroup(0, null),
+        override val verificationMatchThreshold: Float? = null,
+    ) : ModalitySdkConfiguration
 
     fun getSdkConfiguration(sdk: ModalitySdkType): FaceSdkConfiguration? = when (sdk) {
         BioSdk.RANK_ONE -> rankOne

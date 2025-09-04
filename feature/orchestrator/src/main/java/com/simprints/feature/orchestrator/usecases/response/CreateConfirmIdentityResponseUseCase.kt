@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 internal class CreateConfirmIdentityResponseUseCase @Inject constructor() {
     operator fun invoke(results: List<Serializable>): AppResponse = results
-        .filterIsInstance(SelectSubjectResult::class.java)
+        .filterIsInstance<SelectSubjectResult>()
         .lastOrNull()
         ?.let { AppConfirmationResponse(true) }
         ?: AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR)

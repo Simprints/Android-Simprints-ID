@@ -23,8 +23,8 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
         results: List<Serializable>,
         project: Project,
     ): AppResponse {
-        val fingerprintCapture = results.filterIsInstance(FingerprintCaptureResult::class.java).lastOrNull()
-        val faceCapture = results.filterIsInstance(FaceCaptureResult::class.java).lastOrNull()
+        val fingerprintCapture = results.filterIsInstance<FingerprintCaptureResult>().lastOrNull()
+        val faceCapture = results.filterIsInstance<FaceCaptureResult>().lastOrNull()
 
         return try {
             val subject = subjectFactory.buildSubjectFromCaptureResults(

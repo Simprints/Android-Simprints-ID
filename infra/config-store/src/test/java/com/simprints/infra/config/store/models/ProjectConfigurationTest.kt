@@ -1,6 +1,7 @@
 package com.simprints.infra.config.store.models
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.common.ModalitySdkType
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
@@ -10,6 +11,7 @@ import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.Up
 import com.simprints.infra.config.store.testtools.faceConfiguration
 import com.simprints.infra.config.store.testtools.faceSdkConfiguration
 import com.simprints.infra.config.store.testtools.fingerprintConfiguration
+import com.simprints.infra.config.store.testtools.fingerprintSdkConfiguration
 import com.simprints.infra.config.store.testtools.projectConfiguration
 import com.simprints.infra.config.store.testtools.simprintsDownSyncConfigurationConfiguration
 import com.simprints.infra.config.store.testtools.simprintsUpSyncConfigurationConfiguration
@@ -232,7 +234,7 @@ class ProjectConfigurationTest {
         val config = projectConfiguration.copy(
             synchronization = synchronizationConfiguration.copy(
                 down = synchronizationConfiguration.down.copy(
-                    simprints = null
+                    simprints = null,
                 ),
             ),
         )
@@ -245,7 +247,7 @@ class ProjectConfigurationTest {
         val config = projectConfiguration.copy(
             synchronization = synchronizationConfiguration.copy(
                 down = synchronizationConfiguration.down.copy(
-                    commCare = DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration
+                    commCare = DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration,
                 ),
             ),
         )
@@ -258,7 +260,7 @@ class ProjectConfigurationTest {
         val config = projectConfiguration.copy(
             synchronization = synchronizationConfiguration.copy(
                 down = synchronizationConfiguration.down.copy(
-                    commCare = null
+                    commCare = null,
                 ),
             ),
         )
@@ -615,5 +617,29 @@ class ProjectConfigurationTest {
             ),
         )
         assertThat(config.isModuleSelectionAvailable()).isFalse()
+    }
+
+    @Test
+    fun `getModalitySdkConfig returns correct SDK configuration`() {
+        // Marking sdks using the common interface field to use in equality checks
+        val config = projectConfiguration.copy(
+            face = faceConfiguration.copy(
+                rankOne = faceSdkConfiguration.copy(verificationMatchThreshold = 1f),
+                simFace = faceSdkConfiguration.copy(verificationMatchThreshold = 5f),
+            ),
+            fingerprint = fingerprintConfiguration.copy(
+                secugenSimMatcher = fingerprintSdkConfiguration.copy(verificationMatchThreshold = 20f),
+                nec = fingerprintSdkConfiguration.copy(verificationMatchThreshold = 30f),
+            ),
+        )
+
+        mapOf<ModalitySdkType, Float>(
+            FaceConfiguration.BioSdk.SIM_FACE to 5f,
+            FaceConfiguration.BioSdk.RANK_ONE to 1f,
+            FingerprintConfiguration.BioSdk.NEC to 30f,
+            FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER to 20f,
+        ).forEach { (type, expected) ->
+            assertThat(config.getModalitySdkConfig(type)?.verificationMatchThreshold).isEqualTo(expected)
+        }
     }
 }
