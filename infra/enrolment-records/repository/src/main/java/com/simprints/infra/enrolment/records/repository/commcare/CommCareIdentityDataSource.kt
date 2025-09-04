@@ -98,6 +98,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
             val caseId = extractCommCareCaseId(query.metadata)
             if (caseId != null) {
                 return loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query, project)
+                    .also { onCandidateLoaded() }
             }
 
             context.contentResolver
@@ -252,14 +253,19 @@ internal class CommCareIdentityDataSource @Inject constructor(
         dataSource: BiometricDataSource,
     ): Int = withContext(dispatcher) {
         var count = 0
-        context.contentResolver
-            .query(
-                getCaseMetadataUri(dataSource.callerPackageName()),
-                null,
-                null,
-                null,
-                null,
-            )?.use { caseMetadataCursor -> count = caseMetadataCursor.count }
+        val caseId = extractCommCareCaseId(query.metadata)
+        if (caseId != null) {
+            count = 1
+        } else {
+            context.contentResolver
+                .query(
+                    getCaseMetadataUri(dataSource.callerPackageName()),
+                    null,
+                    null,
+                    null,
+                    null,
+                )?.use { caseMetadataCursor -> count = caseMetadataCursor.count }
+        }
         count
     }
 
