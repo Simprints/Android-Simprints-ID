@@ -180,7 +180,6 @@ class ObserveSyncInfoUseCaseTest {
         every { any<ProjectConfiguration>().isModuleSelectionAvailable() } returns false
         every { any<ProjectConfiguration>().isSimprintsEventDownSyncAllowed() } returns true
         every { any<ProjectConfiguration>().isCommCareEventDownSyncAllowed() } returns false
-
         every { commCarePermissionChecker.hasCommCarePermissions() } returns true
     }
 
@@ -198,6 +197,8 @@ class ObserveSyncInfoUseCaseTest {
             ticker = ticker,
             appForegroundStateTracker = appForegroundStateTracker,
             commCarePermissionChecker = commCarePermissionChecker,
+            ioDispatcher = testCoroutineRule.testCoroutineDispatcher,
+            mainDispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
     }
 

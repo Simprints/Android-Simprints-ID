@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.DispatcherIO
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
@@ -20,11 +21,14 @@ import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -40,6 +44,7 @@ internal class SyncInfoViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     observeSyncInfo: ObserveSyncInfoUseCase,
     private val logoutUseCase: LogoutUseCase,
+    @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     var isPreLogoutUpSync = false
 
@@ -48,11 +53,14 @@ internal class SyncInfoViewModel @Inject constructor(
     private val _loginNavigationEventLiveData = MutableLiveData<LoginParams>()
 
     private val eventSyncStateFlow =
-        eventSyncManager.getLastSyncState(useDefaultValue = true /* otherwise value not guaranteed */).asFlow()
+        eventSyncManager
+            .getLastSyncState(
+                useDefaultValue = true, // otherwise value not guaranteed
+            ).asFlow()
     private val imageSyncStatusFlow =
         syncOrchestrator.observeImageSyncStatus()
 
-    val logoutEventLiveData: LiveData<LiveDataEventWithContent<Unit>> = combine(
+    val logoutEventFlow: Flow<LiveDataEventWithContent<Unit>> = combine(
         eventSyncStateFlow,
         imageSyncStatusFlow,
     ) { eventSyncState, imageSyncStatus ->
@@ -64,14 +72,15 @@ internal class SyncInfoViewModel @Inject constructor(
             isReadyToLogOut // only when ready
         }.map {
             LiveDataEventWithContent(Unit)
-        }.asLiveData(viewModelScope.coroutineContext)
+        }.flowOn(ioDispatcher)
 
     val syncInfoLiveData: LiveData<SyncInfo> by lazy {
         observeSyncInfo(isPreLogoutUpSync)
             .onStart {
                 startInitialSyncIfRequired()
                 syncImagesAfterEventsWhenRequired()
-            }.asLiveData(viewModelScope.coroutineContext)
+            }.flowOn(ioDispatcher)
+            .asLiveData(viewModelScope.coroutineContext)
     }
 
     fun forceEventSync() {
@@ -95,7 +104,9 @@ internal class SyncInfoViewModel @Inject constructor(
     }
 
     fun performLogout() {
-        logoutUseCase()
+        viewModelScope.launch {
+            logoutUseCase()
+        }
     }
 
     fun requestNavigationToLogin() {
