@@ -5,6 +5,7 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
@@ -15,6 +16,7 @@ import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogF
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
@@ -74,10 +76,12 @@ class LogoutSyncDeclineFragment : Fragment(R.layout.fragment_logout_sync_decline
     }
 
     private fun processLogoutConfirmation() {
-        viewModel.logout()
-        findNavController().navigateSafely(
-            this,
-            LogoutSyncDeclineFragmentDirections.actionLogoutSyncDeclineFragmentToRequestLoginFragment(),
-        )
+        lifecycleScope.launch {
+            viewModel.logout()
+            findNavController().navigateSafely(
+                this@LogoutSyncDeclineFragment,
+                LogoutSyncDeclineFragmentDirections.actionLogoutSyncDeclineFragmentToRequestLoginFragment(),
+            )
+        }
     }
 }

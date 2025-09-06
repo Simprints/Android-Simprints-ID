@@ -6,8 +6,8 @@ import androidx.lifecycle.asFlow
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.lifecycle.AppForegroundStateTracker
-import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Ticker
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.dashboard.settings.syncinfo.SyncInfoModuleCount
 import com.simprints.infra.authstore.AuthStore
@@ -78,15 +78,13 @@ class ObserveSyncInfoUseCaseTest {
         const val TEST_MODULE_NAME = "test_module"
         val TEST_TIMESTAMP = Timestamp(1000L)
 
-        fun createMockSynchronizationConfiguration(): SynchronizationConfiguration {
-            return mockk<SynchronizationConfiguration>(relaxed = true) {
-                every { down } returns mockk<DownSynchronizationConfiguration>(relaxed = true) {
-                    every { commCare } returns null
-                }
-                every { up } returns mockk<UpSynchronizationConfiguration>(relaxed = true) {
-                    every { coSync } returns mockk<UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration>(relaxed = true) {
-                        every { kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
-                    }
+        fun createMockSynchronizationConfiguration(): SynchronizationConfiguration = mockk<SynchronizationConfiguration>(relaxed = true) {
+            every { down } returns mockk<DownSynchronizationConfiguration>(relaxed = true) {
+                every { commCare } returns null
+            }
+            every { up } returns mockk<UpSynchronizationConfiguration>(relaxed = true) {
+                every { coSync } returns mockk<UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration>(relaxed = true) {
+                    every { kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
                 }
             }
         }
@@ -195,6 +193,8 @@ class ObserveSyncInfoUseCaseTest {
             timeHelper = timeHelper,
             ticker = ticker,
             appForegroundStateTracker = appForegroundStateTracker,
+            ioDispatcher = testCoroutineRule.testCoroutineDispatcher,
+            mainDispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
     }
 
@@ -944,9 +944,10 @@ class ObserveSyncInfoUseCaseTest {
                 }
                 every { synchronization } returns mockk<SynchronizationConfiguration>(relaxed = true) {
                     every { up } returns mockk<UpSynchronizationConfiguration>(relaxed = true) {
-                        every { coSync } returns mockk<UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration>(relaxed = true) {
-                            every { kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
-                        }
+                        every { coSync } returns
+                            mockk<UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration>(relaxed = true) {
+                                every { kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+                            }
                     }
                 }
             },

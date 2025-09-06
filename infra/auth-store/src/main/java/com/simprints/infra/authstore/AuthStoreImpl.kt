@@ -8,7 +8,7 @@ import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.authstore.network.SimApiClientFactory
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.SimRemoteInterface
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
@@ -29,7 +29,7 @@ internal class AuthStoreImpl @Inject constructor(
             loginInfoStore.signedInProjectId = value
         }
 
-    override fun observeSignedInProjectId(): StateFlow<String> = loginInfoStore.observeSignedInProjectId()
+    override fun observeSignedInProjectId(): Flow<String> = loginInfoStore.observeSignedInProjectId()
 
     override fun isProjectIdSignedIn(possibleProjectId: String): Boolean = loginInfoStore.isProjectIdSignedIn(possibleProjectId)
 

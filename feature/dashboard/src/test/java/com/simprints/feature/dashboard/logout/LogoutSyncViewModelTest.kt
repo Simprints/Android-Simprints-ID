@@ -17,13 +17,14 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.mockkStatic
-import io.mockk.verify
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -54,16 +55,16 @@ internal class LogoutSyncViewModelTest {
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
         // Setup default behavior for logoutUseCase
-        every { logoutUseCase() } returns Unit
+        coEvery { logoutUseCase() } returns Unit
     }
 
     @Test
-    fun `should logout correctly`() {
+    fun `should logout correctly`() = runTest {
         val viewModel = createViewModel()
 
         viewModel.logout()
 
-        verify(exactly = 1) { logoutUseCase() }
+        coVerify(exactly = 1) { logoutUseCase() }
     }
 
     @Test

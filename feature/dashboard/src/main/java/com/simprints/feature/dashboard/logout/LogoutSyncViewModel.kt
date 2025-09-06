@@ -50,7 +50,7 @@ internal class LogoutSyncViewModel @Inject constructor(
             emit(LiveDataEventWithContent(configManager.getProjectConfiguration().general.settingsPassword))
         }
 
-    fun logout() {
+    suspend fun logout() {
         logoutUseCase()
     }
 
