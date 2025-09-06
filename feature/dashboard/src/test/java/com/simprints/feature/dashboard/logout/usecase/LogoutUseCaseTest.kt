@@ -39,6 +39,7 @@ class LogoutUseCaseTest {
             syncOrchestrator = syncOrchestrator,
             authManager = authManager,
             flagsStore = flagsStore,
+            ioDispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
     }
 

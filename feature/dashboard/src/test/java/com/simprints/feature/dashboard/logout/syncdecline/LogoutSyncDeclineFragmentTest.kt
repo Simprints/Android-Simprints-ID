@@ -20,9 +20,9 @@ import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -51,7 +51,7 @@ internal class LogoutSyncDeclineFragmentTest {
             .inRoot(RootMatchers.isDialog())
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
             .perform(click())
-        verify(exactly = 1) { viewModel.logout() }
+        coVerify(exactly = 1) { viewModel.logout() }
     }
 
     @Test
@@ -66,7 +66,7 @@ internal class LogoutSyncDeclineFragmentTest {
             .inRoot(RootMatchers.isDialog())
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
             .perform(click())
-        verify(exactly = 0) { viewModel.logout() }
+        coVerify(exactly = 0) { viewModel.logout() }
     }
 
     @Test
@@ -82,7 +82,7 @@ internal class LogoutSyncDeclineFragmentTest {
             .inRoot(RootMatchers.isDialog())
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
             .perform(ViewActions.replaceText(password))
-        verify(exactly = 1) { viewModel.logout() }
+        coVerify(exactly = 1) { viewModel.logout() }
     }
 
     @Test
@@ -98,7 +98,7 @@ internal class LogoutSyncDeclineFragmentTest {
             .inRoot(RootMatchers.isDialog())
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
             .perform(click())
-        verify(exactly = 0) { viewModel.logout() }
+        coVerify(exactly = 0) { viewModel.logout() }
     }
 
     @Test

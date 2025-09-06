@@ -6,10 +6,8 @@ import androidx.core.content.edit
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.isTokenized
 import com.simprints.infra.security.SecurityManager
+import com.simprints.infra.security.keyprovider.keyFlow
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -41,6 +39,7 @@ internal class LoginInfoStore @Inject constructor(
      * Ensures that data has been migrated to secure prefs before accessing it.
      */
     private fun getSecurePrefs(): SharedPreferences {
+        @Suppress("DEPRECATION")
         if (prefs.contains(PROJECT_ID)) {
             securePrefs.edit(commit = true) {
                 putString(USER_ID_VALUE, prefs.getString(USER_ID_VALUE, ""))
@@ -78,19 +77,14 @@ internal class LoginInfoStore @Inject constructor(
             }
         }
 
-    private val signedInProjectIdFlow: MutableStateFlow<String> = MutableStateFlow(
-        getSecurePrefs().getString(PROJECT_ID, "").orEmpty(),
-    )
-
     var signedInProjectId: String = ""
         get() = getSecurePrefs().getString(PROJECT_ID, "").orEmpty()
         set(value) {
             field = value
             getSecurePrefs().edit { putString(PROJECT_ID, field) }
-            signedInProjectIdFlow.tryEmit(value)
         }
 
-    fun observeSignedInProjectId(): StateFlow<String> = signedInProjectIdFlow.asStateFlow()
+    fun observeSignedInProjectId() = getSecurePrefs().keyFlow(PROJECT_ID, "", true)
 
     // Core Firebase Project details. We store them to initialize the core Firebase project.
     var coreFirebaseProjectId: String = ""
@@ -128,7 +122,6 @@ internal class LoginInfoStore @Inject constructor(
     fun cleanCredentials() {
         securePrefs.clearValues()
         prefs.clearValues()
-        signedInProjectIdFlow.tryEmit("")
     }
 
     fun clearCachedTokenClaims() {
