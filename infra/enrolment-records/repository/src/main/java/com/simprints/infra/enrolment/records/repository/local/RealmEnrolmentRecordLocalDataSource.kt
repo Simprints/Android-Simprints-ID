@@ -365,4 +365,6 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
             .find()
             .map { it.subjectId.toString() }
     }
+
+    override suspend fun closeOpenDbConnection() = realmWrapper.close()
 }

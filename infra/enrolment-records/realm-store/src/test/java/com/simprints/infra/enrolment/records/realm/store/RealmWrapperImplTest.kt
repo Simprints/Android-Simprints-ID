@@ -117,4 +117,41 @@ class RealmWrapperImplTest {
         }
         verify(exactly = 2) { Realm.open(configuration) }
     }
+
+    // test close realm instance
+    @Test
+    fun `test close realm instance`(): Unit = runTest {
+        // Given
+        realmWrapper.writeRealm { }
+        // When
+        realmWrapper.close()
+        // Then
+        verify { realm.close() }
+    }
+
+    @Test
+    fun `test close realm instance when already closed`(): Unit = runTest {
+        // Given
+        realmWrapper.writeRealm { }
+        every { realm.isClosed() } returns true
+        // When
+        realmWrapper.close()
+        // Then
+        verify(exactly = 0) { realm.close() }
+    }
+
+    // test useing a closed realm instance recreates it
+    @Test
+    fun `test using closed realm instance recreates it`(): Unit = runTest {
+        // Given
+        realmWrapper.writeRealm { } // initializes the realm instance
+        every { realm.isClosed() } returns true
+
+        // When
+        realmWrapper.writeRealm { }
+
+        // Then
+        verify { realm.isClosed() }
+        verify(exactly = 2) { Realm.open(configuration) }
+    }
 }

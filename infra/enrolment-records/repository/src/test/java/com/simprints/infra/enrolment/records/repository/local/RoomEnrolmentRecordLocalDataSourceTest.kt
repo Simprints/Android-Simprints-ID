@@ -13,6 +13,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.BiometricD
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.room.store.SubjectsDatabase
 import com.simprints.infra.enrolment.records.room.store.SubjectsDatabaseFactory
 import com.simprints.infra.security.keyprovider.LocalDbKey
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -1582,5 +1583,28 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         val finalCount = dataSource.count()
         assertThat(finalCount).isEqualTo(0)
         assertThat(initialCount).isGreaterThan(0)
+    }
+
+    @Test
+    fun `closeOpenDbConnection should close the database `() = runTest {
+        // Given
+        val mockedDb = mockk<SubjectsDatabase>(relaxed = true)
+        val mockedDbFactory = mockk<SubjectsDatabaseFactory> {
+            every { get() } returns mockedDb
+        }
+
+        dataSource = RoomEnrolmentRecordLocalDataSource(
+            timeHelper,
+            mockedDbFactory,
+            mockk(),
+            queryBuilder = RoomEnrolmentRecordQueryBuilder(),
+            dispatcherIO = testCoroutineRule.testCoroutineDispatcher,
+        )
+
+        // When
+        dataSource.closeOpenDbConnection()
+
+        // Then
+        verify { mockedDb.close() }
     }
 }

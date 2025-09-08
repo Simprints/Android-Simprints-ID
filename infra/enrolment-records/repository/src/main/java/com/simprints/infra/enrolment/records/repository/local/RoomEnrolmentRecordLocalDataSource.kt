@@ -338,4 +338,8 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     override suspend fun getAllSubjectIds(): List<String> = withContext(dispatcherIO) {
         subjectDao.getAllSubjectIds()
     }
+
+    override suspend fun closeOpenDbConnection() = withContext(dispatcherIO) {
+        subjectsDatabaseFactory.get().close()
+    }
 }

@@ -39,7 +39,7 @@ class RealmWrapperImpl @Inject constructor(
     private val mutex = Mutex()
 
     private suspend fun getRealm(): Realm {
-        if (!this::realm.isInitialized) {
+        if (!this::realm.isInitialized || realm.isClosed()) {
             config = createAndSaveRealmConfig()
             realm = createRealm()
         }
@@ -98,8 +98,19 @@ class RealmWrapperImpl @Inject constructor(
         withContext(dispatcher) { getRealm().write(block) }
     }
 
+    /**
+     * close the Realm instance.
+     */
+    override suspend fun close() = withContext(dispatcher) {
+        if (this@RealmWrapperImpl::realm.isInitialized && !realm.isClosed()) {
+            Simber.d("[RealmWrapperImpl] closing realm instance", tag = REALM_DB)
+            realm.close()
+        }
+    }
+
     private fun createAndSaveRealmConfig(): RealmConfiguration {
         val localDbKey = getLocalDbKey()
+        Simber.d("[RealmWrapperImpl] creating new realm config ${localDbKey.projectId}", tag = REALM_DB)
         return configFactory.get(localDbKey.projectId, localDbKey.value)
     }
 
