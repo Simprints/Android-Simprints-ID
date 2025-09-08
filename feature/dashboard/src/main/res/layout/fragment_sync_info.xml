@@ -143,209 +143,265 @@
                         android:textAllCaps="true"
                         android:textColor="@color/simprints_text_orange" />
 
-                    <LinearLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
                         android:paddingVertical="8dp">
 
                         <ImageView
+                            android:id="@+id/iconRecordsOnDevice"
                             android:layout_width="32dp"
                             android:layout_height="32dp"
                             android:contentDescription="@string/sync_info_records_on_device"
                             android:padding="4dp"
                             android:src="@drawable/ic_records"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
                             app:tint="@color/simprints_text_grey" />
+
+                        <TextView
+                            android:id="@+id/totalRecordsCount"
+                            style="@style/Text.Body1.Secondary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:layout_marginEnd="7dp"
+                            android:gravity="end|center_vertical"
+                            android:textSize="16sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="137" />
+
+                        <ProgressBar
+                            android:id="@+id/totalRecordsProgress"
+                            style="@style/Text.Body1.Secondary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:indeterminate="true"
+                            android:indeterminateTint="@color/simprints_grey_light"
+                            android:visibility="gone"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.constraintlayout.widget.Barrier
+                            android:id="@+id/barrier_records_on_device_end"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:barrierDirection="start"
+                            app:constraint_referenced_ids="totalRecordsCount,totalRecordsProgress" />
 
                         <TextView
                             style="@style/Text.Body1"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:layout_weight="0.85"
+                            android:ellipsize="end"
+                            android:lines="1"
                             android:padding="4dp"
-                            android:text="@string/sync_info_records_on_device" />
+                            android:text="@string/sync_info_records_on_device"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/barrier_records_on_device_end"
+                            app:layout_constraintStart_toEndOf="@id/iconRecordsOnDevice"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                        <TextView
-                            android:id="@+id/totalRecordsCount"
-                            style="@style/Text.Body1.Secondary"
-                            android:layout_width="0dp"
-                            android:layout_height="32dp"
-                            android:layout_gravity="center"
-                            android:layout_marginEnd="7dp"
-                            android:layout_weight="0.15"
-                            android:gravity="end|center_vertical"
-                            tools:text="137"
-                            android:textSize="16sp" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        <ProgressBar
-                            android:id="@+id/totalRecordsProgress"
-                            style="@style/Text.Body1.Secondary"
-                            android:indeterminate="true"
-                            android:indeterminateTint="@color/simprints_grey_light"
-                            android:layout_width="0dp"
-                            android:layout_height="32dp"
-                            android:layout_gravity="center"
-                            android:layout_weight="0.15"
-                            android:visibility="gone"
-                            android:gravity="end|center_vertical" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/layoutRecordsToUpload"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
                         android:paddingVertical="8dp">
 
                         <ImageView
+                            android:id="@+id/iconRecordsToUpload"
                             android:layout_width="32dp"
                             android:layout_height="32dp"
                             android:contentDescription="@string/sync_info_records_to_up_sync"
                             android:padding="4dp"
                             android:src="@drawable/ic_up_sync"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
                             app:tint="@color/simprints_text_grey" />
+
+                        <TextView
+                            android:id="@+id/recordsToUploadCount"
+                            style="@style/Text.Body1.Secondary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:layout_marginEnd="7dp"
+                            android:gravity="end|center_vertical"
+                            android:textSize="16sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="41" />
+
+                        <ProgressBar
+                            android:id="@+id/recordsToUploadProgress"
+                            style="@style/Text.Body1.Secondary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:indeterminate="true"
+                            android:indeterminateTint="@color/simprints_grey_light"
+                            android:visibility="gone"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.constraintlayout.widget.Barrier
+                            android:id="@+id/barrier_records_upload_end"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:barrierDirection="start"
+                            app:constraint_referenced_ids="recordsToUploadCount,recordsToUploadProgress" />
 
                         <TextView
                             style="@style/Text.Body1"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:layout_weight="0.85"
+                            android:ellipsize="end"
+                            android:lines="1"
                             android:padding="4dp"
-                            android:text="@string/sync_info_records_to_up_sync" />
+                            android:text="@string/sync_info_records_to_up_sync"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/barrier_records_upload_end"
+                            app:layout_constraintStart_toEndOf="@id/iconRecordsToUpload"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                        <TextView
-                            android:id="@+id/recordsToUploadCount"
-                            style="@style/Text.Body1.Secondary"
-                            android:layout_width="0dp"
-                            android:layout_height="32dp"
-                            android:layout_gravity="center"
-                            android:layout_marginEnd="7dp"
-                            android:layout_weight="0.15"
-                            android:gravity="end|center_vertical"
-                            tools:text="41"
-                            android:textSize="16sp" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        <ProgressBar
-                            android:id="@+id/recordsToUploadProgress"
-                            style="@style/Text.Body1.Secondary"
-                            android:indeterminate="true"
-                            android:indeterminateTint="@color/simprints_grey_light"
-                            android:layout_width="0dp"
-                            android:layout_height="32dp"
-                            android:layout_gravity="center"
-                            android:layout_weight="0.15"
-                            android:visibility="gone"
-                            android:gravity="end|center_vertical" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/layoutRecordsToDownload"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
                         android:paddingVertical="8dp">
 
                         <ImageView
+                            android:id="@+id/iconRecordsToDownload"
                             android:layout_width="32dp"
                             android:layout_height="32dp"
                             android:contentDescription="@string/sync_info_records_to_down_sync"
                             android:padding="4dp"
                             android:src="@drawable/ic_down_sync"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
                             app:tint="@color/simprints_text_grey" />
+
+                        <TextView
+                            android:id="@+id/recordsToDownloadCount"
+                            style="@style/Text.Body1.Secondary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:layout_marginEnd="7dp"
+                            android:gravity="end|center_vertical"
+                            android:textSize="16sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="16" />
+
+                        <ProgressBar
+                            android:id="@+id/recordsToDownloadProgress"
+                            style="@style/Text.Body1.Secondary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:indeterminate="true"
+                            android:indeterminateTint="@color/simprints_grey_light"
+                            android:visibility="gone"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.constraintlayout.widget.Barrier
+                            android:id="@+id/barrier_records_download_end"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:barrierDirection="start"
+                            app:constraint_referenced_ids="recordsToDownloadCount,recordsToDownloadProgress" />
 
                         <TextView
                             style="@style/Text.Body1"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:layout_weight="0.85"
+                            android:ellipsize="end"
+                            android:lines="1"
                             android:padding="4dp"
-                            android:text="@string/sync_info_records_to_down_sync" />
+                            android:text="@string/sync_info_records_to_down_sync"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/barrier_records_download_end"
+                            app:layout_constraintStart_toEndOf="@id/iconRecordsToDownload"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                        <TextView
-                            android:id="@+id/recordsToDownloadCount"
-                            style="@style/Text.Body1.Secondary"
-                            android:layout_width="0dp"
-                            android:layout_height="32dp"
-                            android:layout_gravity="center"
-                            android:layout_marginEnd="7dp"
-                            android:layout_weight="0.15"
-                            android:gravity="end|center_vertical"
-                            tools:text="16"
-                            android:textSize="16sp" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        <ProgressBar
-                            android:id="@+id/recordsToDownloadProgress"
-                            style="@style/Text.Body1.Secondary"
-                            android:indeterminate="true"
-                            android:indeterminateTint="@color/simprints_grey_light"
-                            android:layout_width="0dp"
-                            android:layout_height="32dp"
-                            android:layout_gravity="center"
-                            android:layout_weight="0.15"
-                            android:visibility="gone"
-                            android:gravity="end|center_vertical" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/layoutComboImageCounter"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:visibility="gone"
-                        android:paddingVertical="8dp">
+                        android:paddingVertical="8dp"
+                        android:visibility="gone">
 
                         <ImageView
+                            android:id="@+id/iconComboImagesToUpload"
                             android:layout_width="32dp"
                             android:layout_height="32dp"
                             android:contentDescription="@string/sync_info_images_to_up_sync"
                             android:padding="4dp"
                             android:src="@drawable/ic_images"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
                             app:tint="@color/simprints_text_grey" />
+
+                        <TextView
+                            android:id="@+id/comboImagesToUploadCount"
+                            style="@style/Text.Body1.Secondary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:layout_marginEnd="7dp"
+                            android:gravity="end|center_vertical"
+                            android:textSize="16sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="30" />
+
+                        <ProgressBar
+                            android:id="@+id/comboImagesToUploadProgress"
+                            style="@style/Text.Body1.Secondary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:indeterminate="true"
+                            android:indeterminateTint="@color/simprints_grey_light"
+                            android:visibility="gone"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.constraintlayout.widget.Barrier
+                            android:id="@+id/barrier_combo_images_upload_end"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:barrierDirection="start"
+                            app:constraint_referenced_ids="comboImagesToUploadCount,comboImagesToUploadProgress" />
 
                         <TextView
                             style="@style/Text.Body1"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:layout_weight="0.85"
+                            android:ellipsize="end"
+                            android:lines="1"
                             android:padding="4dp"
-                            android:text="@string/sync_info_images_to_up_sync" />
+                            android:text="@string/sync_info_images_to_up_sync"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/barrier_combo_images_upload_end"
+                            app:layout_constraintStart_toEndOf="@id/iconComboImagesToUpload"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                        <TextView
-                            android:id="@+id/comboImagesToUploadCount"
-                            style="@style/Text.Body1.Secondary"
-                            android:layout_width="0dp"
-                            android:layout_height="32dp"
-                            android:layout_gravity="center"
-                            android:layout_marginEnd="7dp"
-                            android:layout_weight="0.15"
-                            android:gravity="end|center_vertical"
-                            tools:text="30"
-                            android:textSize="16sp" />
-
-                        <ProgressBar
-                            android:id="@+id/comboImagesToUploadProgress"
-                            style="@style/Text.Body1.Secondary"
-                            android:indeterminate="true"
-                            android:indeterminateTint="@color/simprints_grey_light"
-                            android:layout_width="0dp"
-                            android:layout_height="32dp"
-                            android:layout_gravity="center"
-                            android:layout_weight="0.15"
-                            android:visibility="gone"
-                            android:gravity="end|center_vertical" />
-                    </LinearLayout>
-
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
                     <LinearLayout
@@ -538,54 +594,69 @@
                         android:textAllCaps="true"
                         android:textColor="@color/simprints_text_orange" />
 
-                    <LinearLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
                         android:paddingVertical="8dp">
 
                         <ImageView
+                            android:id="@+id/iconImagesToUpload"
                             android:layout_width="32dp"
                             android:layout_height="32dp"
                             android:contentDescription="@string/sync_info_images_to_up_sync"
                             android:padding="4dp"
                             android:src="@drawable/ic_images"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
                             app:tint="@color/simprints_text_grey" />
+
+                        <TextView
+                            android:id="@+id/imagesToUploadCount"
+                            style="@style/Text.Body1.Secondary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:layout_marginEnd="7dp"
+                            android:gravity="end|center_vertical"
+                            android:textSize="16sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="30" />
+
+                        <ProgressBar
+                            android:id="@+id/imagesToUploadProgress"
+                            style="@style/Text.Body1.Secondary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:indeterminate="true"
+                            android:indeterminateTint="@color/simprints_grey_light"
+                            android:visibility="gone"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.constraintlayout.widget.Barrier
+                            android:id="@+id/barrier_images_upload_end"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:barrierDirection="start"
+                            app:constraint_referenced_ids="imagesToUploadCount,imagesToUploadProgress" />
 
                         <TextView
                             style="@style/Text.Body1"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:layout_weight="0.85"
+                            android:ellipsize="end"
+                            android:lines="1"
                             android:padding="4dp"
-                            android:text="@string/sync_info_images_to_up_sync" />
+                            android:text="@string/sync_info_images_to_up_sync"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/barrier_images_upload_end"
+                            app:layout_constraintStart_toEndOf="@id/iconImagesToUpload"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                        <TextView
-                            android:id="@+id/imagesToUploadCount"
-                            style="@style/Text.Body1.Secondary"
-                            android:layout_width="0dp"
-                            android:layout_height="32dp"
-                            android:layout_gravity="center"
-                            android:layout_marginEnd="7dp"
-                            android:layout_weight="0.15"
-                            android:gravity="end|center_vertical"
-                            tools:text="30"
-                            android:textSize="16sp" />
-
-                        <ProgressBar
-                            android:id="@+id/imagesToUploadProgress"
-                            style="@style/Text.Body1.Secondary"
-                            android:indeterminate="true"
-                            android:indeterminateTint="@color/simprints_grey_light"
-                            android:layout_width="0dp"
-                            android:layout_height="32dp"
-                            android:layout_gravity="center"
-                            android:layout_weight="0.15"
-                            android:visibility="gone"
-                            android:gravity="end|center_vertical" />
-                    </LinearLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <FrameLayout
                         android:layout_width="match_parent"
