@@ -27,6 +27,7 @@ import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
+import com.simprints.testtools.common.livedata.getOrAwaitValues
 import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
@@ -508,6 +509,126 @@ class SyncInfoViewModelTest {
         viewModel.handleLoginResult(failureResult)
 
         coVerify(exactly = 0) { syncOrchestrator.startEventSync(any()) }
+    }
+
+    // Sync button responsiveness optimization
+
+    @Test
+    fun `should immediately show event progress snapshot when forcing event sync`() = runTest {
+        createViewModel()
+
+        val values = viewModel.syncInfoLiveData.getOrAwaitValues(number = 2) {
+            viewModel.forceEventSync()
+        }
+
+        val initial = values[0]
+        val forced = values[1]
+        assertThat(initial.syncInfoSectionRecords.isProgressVisible).isFalse()
+        assertThat(forced.syncInfoSectionRecords.isProgressVisible).isTrue()
+    }
+
+    @Test
+    fun `should not emit forced event progress when events already syncing`() = runTest {
+        val mockInProgressEventSyncState = mockk<EventSyncState>(relaxed = true) {
+            every { isSyncInProgress() } returns true
+        }
+        every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockInProgressEventSyncState)
+        createViewModel()
+
+        val values = viewModel.syncInfoLiveData.getOrAwaitValues(number = 1) {
+            viewModel.forceEventSync()
+        }
+
+        val initial = values[0]
+        assertThat(initial.syncInfoSectionRecords.isProgressVisible).isFalse()
+    }
+
+    @Test
+    fun `should immediately show image progress snapshot when starting image sync`() = runTest {
+        val mockNotSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
+            every { isSyncing } returns false
+        }
+        every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockNotSyncingImageStatus)
+        createViewModel()
+
+        val values = viewModel.syncInfoLiveData.getOrAwaitValues(number = 2) {
+            viewModel.toggleImageSync()
+        }
+
+        val initial = values[0]
+        val forced = values[1]
+        assertThat(initial.syncInfoSectionImages.isProgressVisible).isFalse()
+        assertThat(forced.syncInfoSectionImages.isProgressVisible).isTrue()
+    }
+
+    @Test
+    fun `should not emit forced image progress when stopping image sync`() = runTest {
+        val mockSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
+            every { isSyncing } returns true
+        }
+        every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockSyncingImageStatus)
+        createViewModel()
+
+        val values = viewModel.syncInfoLiveData.getOrAwaitValues(number = 1) {
+            viewModel.toggleImageSync()
+        }
+
+        val initial = values[0]
+        assertThat(initial.syncInfoSectionImages.isProgressVisible).isFalse()
+    }
+
+    @Test
+    fun `should switch from forced to data-driven event sync progress once available`() = runTest {
+        val base = createDefaultSyncInfo()
+        val dataFlow = MutableStateFlow(base)
+        every { observeSyncInfo(any()) } returns dataFlow
+        createViewModel()
+
+        val values = viewModel.syncInfoLiveData.getOrAwaitValues(number = 3) {
+            viewModel.forceEventSync()
+            dataFlow.value = base.copy(
+                syncInfoSectionRecords = base.syncInfoSectionRecords.copy(
+                    isProgressVisible = true,
+                    counterTotalRecords = "123",
+                ),
+            )
+        }
+
+        val initial = values[0]
+        val forced = values[1]
+        val dataDriven = values[2]
+        assertThat(initial.syncInfoSectionRecords.isProgressVisible).isFalse()
+        assertThat(forced.syncInfoSectionRecords.isProgressVisible).isTrue()
+        assertThat(forced.syncInfoSectionRecords.counterTotalRecords).isEmpty()
+        assertThat(dataDriven.syncInfoSectionRecords.isProgressVisible).isTrue()
+        assertThat(dataDriven.syncInfoSectionRecords.counterTotalRecords).isEqualTo("123")
+    }
+
+    @Test
+    fun `should switch from forced to data-driven image sync progress once available`() = runTest {
+        val base = createDefaultSyncInfo()
+        val dataFlow = MutableStateFlow(base)
+        every { observeSyncInfo(any()) } returns dataFlow
+        createViewModel()
+
+        val values = viewModel.syncInfoLiveData.getOrAwaitValues(number = 3) {
+            viewModel.toggleImageSync()
+            dataFlow.value = base.copy(
+                syncInfoSectionImages = base.syncInfoSectionImages.copy(
+                    isProgressVisible = true,
+                    counterImagesToUpload = "123",
+                ),
+            )
+        }
+
+        val initial = values[0]
+        val forced = values[1]
+        val dataDriven = values[2]
+        assertThat(initial.syncInfoSectionImages.isProgressVisible).isFalse()
+        assertThat(forced.syncInfoSectionImages.isProgressVisible).isTrue()
+        assertThat(forced.syncInfoSectionImages.counterImagesToUpload).isEmpty()
+        assertThat(dataDriven.syncInfoSectionImages.isProgressVisible).isTrue()
+        assertThat(dataDriven.syncInfoSectionImages.counterImagesToUpload).isEqualTo("123")
     }
 
     // Other/combined UX case tests
