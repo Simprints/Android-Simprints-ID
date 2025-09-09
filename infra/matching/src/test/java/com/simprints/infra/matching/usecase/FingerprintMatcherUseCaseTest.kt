@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.time.TimeHelper
@@ -16,7 +17,6 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.matching.MatchParams
@@ -159,26 +159,25 @@ internal class FingerprintMatcherUseCaseTest {
                 any(),
                 any(),
             )
-        } returns
-            createTestChannel(
-                listOf(
-                    FingerprintIdentity(
-                        "personId",
-                        listOf(
-                            fingerprintSample(SampleIdentifier.RIGHT_5TH_FINGER),
-                            fingerprintSample(SampleIdentifier.RIGHT_4TH_FINGER),
-                            fingerprintSample(SampleIdentifier.RIGHT_3RD_FINGER),
-                            fingerprintSample(SampleIdentifier.RIGHT_INDEX_FINGER),
-                            fingerprintSample(SampleIdentifier.RIGHT_THUMB),
-                            fingerprintSample(SampleIdentifier.LEFT_THUMB),
-                            fingerprintSample(SampleIdentifier.LEFT_INDEX_FINGER),
-                            fingerprintSample(SampleIdentifier.LEFT_3RD_FINGER),
-                            fingerprintSample(SampleIdentifier.LEFT_4TH_FINGER),
-                            fingerprintSample(SampleIdentifier.LEFT_5TH_FINGER),
-                        ),
+        } returns createTestChannel(
+            listOf(
+                Identity(
+                    "personId",
+                    listOf(
+                        fingerprintSample(SampleIdentifier.RIGHT_5TH_FINGER),
+                        fingerprintSample(SampleIdentifier.RIGHT_4TH_FINGER),
+                        fingerprintSample(SampleIdentifier.RIGHT_3RD_FINGER),
+                        fingerprintSample(SampleIdentifier.RIGHT_INDEX_FINGER),
+                        fingerprintSample(SampleIdentifier.RIGHT_THUMB),
+                        fingerprintSample(SampleIdentifier.LEFT_THUMB),
+                        fingerprintSample(SampleIdentifier.LEFT_INDEX_FINGER),
+                        fingerprintSample(SampleIdentifier.LEFT_3RD_FINGER),
+                        fingerprintSample(SampleIdentifier.LEFT_4TH_FINGER),
+                        fingerprintSample(SampleIdentifier.LEFT_5TH_FINGER),
                     ),
                 ),
-            )
+            ),
+        )
         coEvery { bioSdkWrapper.match(any(), any(), any()) } returns listOf()
 
         useCase
@@ -213,8 +212,8 @@ internal class FingerprintMatcherUseCaseTest {
     )
 }
 
-fun <T> createTestChannel(vararg lists: List<T>): ReceiveChannel<IdentityBatch<T>> {
-    val channel = Channel<IdentityBatch<T>>(lists.size)
+fun createTestChannel(vararg lists: List<Identity>): ReceiveChannel<IdentityBatch<Identity>> {
+    val channel = Channel<IdentityBatch<Identity>>(lists.size)
     runBlocking {
         var time = 0L
         for (list in lists) {

@@ -877,22 +877,22 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         // Then - P1 NEC
         assertThat(loadedP1Nec).hasSize(1)
         assertThat(loadedP1Nec[0].subjectId).isEqualTo(subject2P1WithFinger.subjectId)
-        assertThat(loadedP1Nec[0].fingerprints).hasSize(1)
-        assertThat(loadedP1Nec[0].fingerprints[0].format).isEqualTo(NEC_FORMAT)
-        assertThat(loadedP1Nec[0].fingerprints).isEqualTo(subject2P1WithFinger.fingerprintSamples)
+        assertThat(loadedP1Nec[0].samples).hasSize(1)
+        assertThat(loadedP1Nec[0].samples[0].format).isEqualTo(NEC_FORMAT)
+        assertThat(loadedP1Nec[0].samples).isEqualTo(subject2P1WithFinger.fingerprintSamples)
 
         // Then - P1 ISO
         assertThat(loadedP1Iso).hasSize(1)
         assertThat(loadedP1Iso[0].subjectId).isEqualTo(subject3P1WithBoth.subjectId)
-        assertThat(loadedP1Iso[0].fingerprints).hasSize(1)
-        assertThat(loadedP1Iso[0].fingerprints[0].format).isEqualTo(ISO_FORMAT)
-        assertThat(loadedP1Iso[0].fingerprints).isEqualTo(subject3P1WithBoth.fingerprintSamples)
+        assertThat(loadedP1Iso[0].samples).hasSize(1)
+        assertThat(loadedP1Iso[0].samples[0].format).isEqualTo(ISO_FORMAT)
+        assertThat(loadedP1Iso[0].samples).isEqualTo(subject3P1WithBoth.fingerprintSamples)
 
         // Then - P2 NEC
         assertThat(loadedP2Nec).hasSize(2)
         assertThat(loadedP2Nec[0].subjectId).isEqualTo(subject4P2WithBoth.subjectId)
-        assertThat(loadedP2Nec[0].fingerprints).hasSize(1)
-        assertThat(loadedP2Nec[0].fingerprints[0].format).isEqualTo(NEC_FORMAT)
+        assertThat(loadedP2Nec[0].samples).hasSize(1)
+        assertThat(loadedP2Nec[0].samples[0].format).isEqualTo(NEC_FORMAT)
 
         verify(exactly = 4) { mockCallback() }
     }
@@ -1085,16 +1085,16 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         // Then - P1 ROC_1
         assertThat(loadedP1Roc1).hasSize(1)
         assertThat(loadedP1Roc1[0].subjectId).isEqualTo(subject1P1WithFace.subjectId)
-        assertThat(loadedP1Roc1[0].faces).hasSize(1)
-        assertThat(loadedP1Roc1[0].faces[0].format).isEqualTo(ROC_1_FORMAT)
-        assertThat(loadedP1Roc1[0].faces).isEqualTo(subject1P1WithFace.faceSamples)
+        assertThat(loadedP1Roc1[0].samples).hasSize(1)
+        assertThat(loadedP1Roc1[0].samples[0].format).isEqualTo(ROC_1_FORMAT)
+        assertThat(loadedP1Roc1[0].samples).isEqualTo(subject1P1WithFace.faceSamples)
 
         // Then - P1 ROC_3
         assertThat(loadedP1Roc3).hasSize(1)
         assertThat(loadedP1Roc3[0].subjectId).isEqualTo(subject3P1WithBoth.subjectId)
-        assertThat(loadedP1Roc3[0].faces).hasSize(1)
-        assertThat(loadedP1Roc3[0].faces[0].format).isEqualTo(ROC_3_FORMAT)
-        assertThat(loadedP1Roc3[0].faces).isEqualTo(subject3P1WithBoth.faceSamples)
+        assertThat(loadedP1Roc3[0].samples).hasSize(1)
+        assertThat(loadedP1Roc3[0].samples[0].format).isEqualTo(ROC_3_FORMAT)
+        assertThat(loadedP1Roc3[0].samples).isEqualTo(subject3P1WithBoth.faceSamples)
 
         // Then - P2 ROC_1
         assertThat(loadedP2Roc1).hasSize(2)
