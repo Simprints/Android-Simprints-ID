@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
@@ -18,8 +19,6 @@ import com.simprints.infra.enrolment.records.realm.store.RealmWrapper
 import com.simprints.infra.enrolment.records.realm.store.RealmWrapperImpl
 import com.simprints.infra.enrolment.records.realm.store.config.RealmConfig
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
-import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
-import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
@@ -343,7 +342,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
             onCandidateLoaded = { loadedCandidates.add(Unit) },
         )
 
-        val results = mutableListOf<IdentityBatch<FaceIdentity>>()
+        val results = mutableListOf<IdentityBatch<Identity>>()
         for (batch in channel) {
             results.add(batch)
         }
@@ -392,7 +391,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
                 onCandidateLoaded = { loadedCandidates.add(Unit) },
             )
 
-            val results = mutableListOf<IdentityBatch<FingerprintIdentity>>()
+            val results = mutableListOf<IdentityBatch<Identity>>()
             for (batch in channel) {
                 results.add(batch)
             }

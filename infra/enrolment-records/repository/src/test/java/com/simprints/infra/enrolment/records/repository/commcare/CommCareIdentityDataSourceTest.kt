@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.sample.SampleIdentifier.LEFT_INDEX_FINGER
 import com.simprints.core.domain.sample.SampleIdentifier.LEFT_THUMB
@@ -17,8 +18,6 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.commcare.CommCareIdentityDataSource.Companion.COLUMN_DATUM_ID
 import com.simprints.infra.enrolment.records.repository.commcare.CommCareIdentityDataSource.Companion.COLUMN_VALUE
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
-import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.usecases.CompareImplicitTokenizedStringsUseCase
 import com.simprints.infra.logging.Simber
@@ -51,9 +50,9 @@ class CommCareIdentityDataSourceTest {
             """{"events":[{"id":"0dafcd03-96c4-4ca5-b802-292da6d4f799","payload":{"subjectId":"a961fcb4-8573-4270-a1b2-088e88275b00","projectId":"nXcj9neYhXP9rFp56uWk","moduleId":{"value":"AWuA3H0WGtHI2uod+ePZ3yiWTt9etQ=="},"attendantId":{"value":"AdySMrjuy7uq0Dcxov3rUFIw66uXTFrKd0BnzSr9MYXl5maWEpyKQT8AUdcPuVHUWpOkO88="},"biometricReferences":[{"id":"2b9b4991-29d7-3eee-ac02-191afaa0c1a2","templates":[{"quality":77,"template":"123","finger":"LEFT_THUMB"},{"quality":66,"template":"123","finger":"LEFT_INDEX_FINGER"}],"format":"NEC_1_5","type":"FINGERPRINT_REFERENCE"},{"id":"2b9b4991-29d7-3eee-ac02-191afaa0c1a2","templates":[{"template":"123"}],"format":"ROC_3","type":"FACE_REFERENCE"}]},"type":"EnrolmentRecordCreation"}]}"""
 
         private val expectedFingerprintIdentities = listOf(
-            FingerprintIdentity(
+            Identity(
                 subjectId = "b26c91bc-b307-4131-80c3-55090ba5dbf2",
-                fingerprints = listOf(
+                samples = listOf(
                     Sample(
                         identifier = LEFT_THUMB,
                         template = byteArrayOf(),
@@ -70,9 +69,9 @@ class CommCareIdentityDataSourceTest {
                     ),
                 ),
             ),
-            FingerprintIdentity(
+            Identity(
                 subjectId = "a961fcb4-8573-4270-a1b2-088e88275b00",
-                fingerprints = listOf(
+                samples = listOf(
                     Sample(
                         identifier = LEFT_THUMB,
                         template = byteArrayOf(),
@@ -91,9 +90,9 @@ class CommCareIdentityDataSourceTest {
             ),
         )
         val expectedFaceIdentities = listOf(
-            FaceIdentity(
+            Identity(
                 subjectId = "b26c91bc-b307-4131-80c3-55090ba5dbf2",
-                faces = listOf(
+                samples = listOf(
                     Sample(
                         template = byteArrayOf(),
                         format = "ROC_1_23",
@@ -102,9 +101,9 @@ class CommCareIdentityDataSourceTest {
                     ),
                 ),
             ),
-            FaceIdentity(
+            Identity(
                 subjectId = "a961fcb4-8573-4270-a1b2-088e88275b00",
-                faces = listOf(
+                samples = listOf(
                     Sample(
                         template = byteArrayOf(),
                         format = "ROC_3",
@@ -252,7 +251,7 @@ class CommCareIdentityDataSourceTest {
         val templateFormat = "ISO_19794_2"
         val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
         val range = 0..expectedFingerprintIdentities.size
-        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        val actualIdentities = mutableListOf<Identity>()
 
         dataSource
             .loadFingerprintIdentities(
@@ -269,11 +268,11 @@ class CommCareIdentityDataSourceTest {
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
             expectedFingerprintIdentities
-                .filter { identity -> identity.fingerprints.any { it.format == templateFormat } }
+                .filter { identity -> identity.samples.any { it.format == templateFormat } }
                 .zip(actualIdentities) { expected, actual ->
                     expected.subjectId == actual.subjectId &&
-                        expected.fingerprints
-                            .zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
+                        expected.samples
+                            .zip(actual.samples) { expectedFingerprint, actualFingerprint ->
                                 expectedFingerprint.identifier == actualFingerprint.identifier &&
                                     expectedFingerprint.template.contentEquals(
                                         actualFingerprint.template,
@@ -314,7 +313,7 @@ class CommCareIdentityDataSourceTest {
             subjectId = "b26c91bc-b307-4131-80c3-55090ba5dbf2",
         )
         val range = 0..expectedFaceIdentities.size
-        val actualIdentities = mutableListOf<FaceIdentity>()
+        val actualIdentities = mutableListOf<Identity>()
         dataSource
             .loadFaceIdentities(
                 query = query,
@@ -330,11 +329,11 @@ class CommCareIdentityDataSourceTest {
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
             expectedFaceIdentities
-                .filter { identity -> identity.faces.any { it.format == templateFormat } }
+                .filter { identity -> identity.samples.any { it.format == templateFormat } }
                 .zip(actualIdentities) { expected, actual ->
                     expected.subjectId == actual.subjectId &&
-                        expected.faces
-                            .zip(actual.faces) { expectedFace, actualFace ->
+                        expected.samples
+                            .zip(actual.samples) { expectedFace, actualFace ->
                                 expectedFace.template.contentEquals(actualFace.template) && expectedFace.format == actualFace.format
                             }.all { it }
                 }.all { it }
@@ -367,7 +366,7 @@ class CommCareIdentityDataSourceTest {
         val templateFormat = "NEC_1_5"
         val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
         val range = 0..expectedFingerprintIdentities.size
-        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        val actualIdentities = mutableListOf<Identity>()
         dataSource
             .loadFingerprintIdentities(
                 query = query,
@@ -383,11 +382,11 @@ class CommCareIdentityDataSourceTest {
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
             expectedFingerprintIdentities
-                .filter { identity -> identity.fingerprints.any { it.format == templateFormat } }
+                .filter { identity -> identity.samples.any { it.format == templateFormat } }
                 .zip(actualIdentities) { expected, actual ->
                     expected.subjectId == actual.subjectId &&
-                        expected.fingerprints
-                            .zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
+                        expected.samples
+                            .zip(actual.samples) { expectedFingerprint, actualFingerprint ->
                                 expectedFingerprint.identifier == actualFingerprint.identifier &&
                                     expectedFingerprint.template.contentEquals(
                                         actualFingerprint.template,
@@ -425,7 +424,7 @@ class CommCareIdentityDataSourceTest {
         val templateFormat = "ROC_1_23"
         val query = SubjectQuery(faceSampleFormat = templateFormat)
         val range = 0..expectedFaceIdentities.size
-        val actualIdentities = mutableListOf<FaceIdentity>()
+        val actualIdentities = mutableListOf<Identity>()
         dataSource
             .loadFaceIdentities(
                 query = query,
@@ -441,11 +440,11 @@ class CommCareIdentityDataSourceTest {
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
             expectedFaceIdentities
-                .filter { identity -> identity.faces.any { it.format == templateFormat } }
+                .filter { identity -> identity.samples.any { it.format == templateFormat } }
                 .zip(actualIdentities) { expected, actual ->
                     expected.subjectId == actual.subjectId &&
-                        expected.faces
-                            .zip(actual.faces) { expectedFace, actualFace ->
+                        expected.samples
+                            .zip(actual.samples) { expectedFace, actualFace ->
                                 expectedFace.template.contentEquals(actualFace.template) && expectedFace.format == actualFace.format
                             }.all { it }
                 }.all { it }
@@ -475,7 +474,7 @@ class CommCareIdentityDataSourceTest {
         val templateFormat = "ISO_19794_2"
         val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
         val range = 0..expectedFingerprintIdentities.size
-        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        val actualIdentities = mutableListOf<Identity>()
         dataSource
             .loadFingerprintIdentities(
                 query = query,
@@ -491,11 +490,11 @@ class CommCareIdentityDataSourceTest {
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
             expectedFingerprintIdentities
-                .filter { identity -> identity.fingerprints.any { it.format == templateFormat } }
+                .filter { identity -> identity.samples.any { it.format == templateFormat } }
                 .zip(actualIdentities) { expected, actual ->
                     expected.subjectId == actual.subjectId &&
-                        expected.fingerprints
-                            .zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
+                        expected.samples
+                            .zip(actual.samples) { expectedFingerprint, actualFingerprint ->
                                 expectedFingerprint.identifier == actualFingerprint.identifier &&
                                     expectedFingerprint.template.contentEquals(
                                         actualFingerprint.template,
@@ -529,7 +528,7 @@ class CommCareIdentityDataSourceTest {
         val templateFormat = "ROC_1_23"
         val query = SubjectQuery(faceSampleFormat = templateFormat)
         val range = 0..expectedFaceIdentities.size
-        val actualIdentities = mutableListOf<FaceIdentity>()
+        val actualIdentities = mutableListOf<Identity>()
         dataSource
             .loadFaceIdentities(
                 query = query,
@@ -545,11 +544,11 @@ class CommCareIdentityDataSourceTest {
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
             expectedFaceIdentities
-                .filter { identity -> identity.faces.any { it.format == templateFormat } }
+                .filter { identity -> identity.samples.any { it.format == templateFormat } }
                 .zip(actualIdentities) { expected, actual ->
                     expected.subjectId == actual.subjectId &&
-                        expected.faces
-                            .zip(actual.faces) { expectedFace, actualFace ->
+                        expected.samples
+                            .zip(actual.samples) { expectedFace, actualFace ->
                                 expectedFace.template.contentEquals(actualFace.template) && expectedFace.format == actualFace.format
                             }.all { it }
                 }.all { it }
@@ -585,7 +584,7 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 0..0
-        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        val actualIdentities = mutableListOf<Identity>()
         dataSource
             .loadFingerprintIdentities(
                 query = query,
@@ -617,7 +616,7 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 2..3
-        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        val actualIdentities = mutableListOf<Identity>()
         dataSource
             .loadFingerprintIdentities(
                 query = query,
@@ -666,7 +665,7 @@ class CommCareIdentityDataSourceTest {
         val templateFormat = "ISO_19794_2"
         val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
         val range = expectedFingerprintIdentities.indices
-        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        val actualIdentities = mutableListOf<Identity>()
         dataSource
             .loadFingerprintIdentities(
                 query = query,
@@ -682,11 +681,11 @@ class CommCareIdentityDataSourceTest {
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
             expectedFingerprintIdentities
-                .filter { identity -> identity.fingerprints.any { it.format == templateFormat } }
+                .filter { identity -> identity.samples.any { it.format == templateFormat } }
                 .zip(actualIdentities) { expected, actual ->
                     expected.subjectId == actual.subjectId &&
-                        expected.fingerprints
-                            .zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
+                        expected.samples
+                            .zip(actual.samples) { expectedFingerprint, actualFingerprint ->
                                 expectedFingerprint.identifier == actualFingerprint.identifier &&
                                     expectedFingerprint.template.contentEquals(
                                         actualFingerprint.template,
@@ -709,7 +708,7 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 0..2
-        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        val actualIdentities = mutableListOf<Identity>()
         dataSource
             .loadFingerprintIdentities(
                 query = query,
@@ -749,7 +748,7 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 0..2
-        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        val actualIdentities = mutableListOf<Identity>()
         dataSource
             .loadFingerprintIdentities(
                 query = query,
@@ -793,7 +792,7 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 0..2
-        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        val actualIdentities = mutableListOf<Identity>()
         dataSource
             .loadFingerprintIdentities(
                 query = query,
@@ -824,7 +823,7 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 0..2
-        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        val actualIdentities = mutableListOf<Identity>()
         dataSource
             .loadFingerprintIdentities(
                 query = query,
@@ -860,7 +859,7 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 0..2
-        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        val actualIdentities = mutableListOf<Identity>()
         dataSource
             .loadFingerprintIdentities(
                 query = query,
@@ -936,14 +935,15 @@ class CommCareIdentityDataSourceTest {
         every { mockDataCursor.getString(1) } returns SUBJECT_ACTIONS_FINGERPRINT_1
 
         val query = SubjectQuery(metadata = "test-metadata")
-        dataSource.loadFingerprintIdentities(
-            query = query,
-            ranges = listOf(0..1),
-            project = project,
-            dataSource = commCareBiometricDataSource,
-            scope = this,
-            onCandidateLoaded = { onCandidateLoadedCalled = true }
-        ).consumeEach { }
+        dataSource
+            .loadFingerprintIdentities(
+                query = query,
+                ranges = listOf(0..1),
+                project = project,
+                dataSource = commCareBiometricDataSource,
+                scope = this,
+                onCandidateLoaded = { onCandidateLoadedCalled = true },
+            ).consumeEach { }
 
         assertTrue(onCandidateLoadedCalled)
         coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }

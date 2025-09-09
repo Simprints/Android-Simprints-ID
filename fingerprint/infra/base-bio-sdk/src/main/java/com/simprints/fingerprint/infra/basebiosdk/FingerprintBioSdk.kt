@@ -1,10 +1,11 @@
 package com.simprints.fingerprint.infra.basebiosdk
 
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.Identity
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.FingerprintImageProvider
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.FingerprintTemplateProvider
 import com.simprints.fingerprint.infra.basebiosdk.initialization.SdkInitializer
 import com.simprints.fingerprint.infra.basebiosdk.matching.FingerprintMatcher
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 
 class FingerprintBioSdk<SdkConfig, ImageRequestSettings, ImageResponseMetadata, TemplateRequestSettings, TemplateResponseMetadata, MatcherSettings>(
     private val sdkInitializer: SdkInitializer<SdkConfig>,
@@ -24,8 +25,8 @@ class FingerprintBioSdk<SdkConfig, ImageRequestSettings, ImageResponseMetadata, 
         fingerprintTemplateProvider.acquireFingerprintTemplate(settings)
 
     suspend fun match(
-        probe: FingerprintIdentity,
-        candidates: List<FingerprintIdentity>,
+        probe: List<CaptureSample>,
+        candidates: List<Identity>,
         matchingSettings: MatcherSettings?,
     ) = fingerprintMatcher.match(probe, candidates, matchingSettings)
 

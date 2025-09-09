@@ -1,19 +1,19 @@
 package com.simprints.face.infra.simface.matching
 
 import com.simprints.biometrics.simface.SimFace
-import com.simprints.face.infra.basebiosdk.matching.FaceIdentity
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.Identity
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
-import com.simprints.face.infra.basebiosdk.matching.FaceSample
 
 class SimFaceMatcher(
     private val simFace: SimFace,
-    override val probeSamples: List<FaceSample>,
+    override val probeSamples: List<CaptureSample>,
 ) : FaceMatcher(probeSamples) {
     private val probeTemplates = probeSamples.map { it.template }
 
-    override suspend fun getHighestComparisonScoreForCandidate(candidate: FaceIdentity): Float = probeTemplates
+    override suspend fun getHighestComparisonScoreForCandidate(candidate: Identity): Float = probeTemplates
         .flatMap { probeTemplate ->
-            candidate.faces.map { face ->
+            candidate.samples.map { face ->
                 val baseScore = simFace.verificationScore(probeTemplate, face.template)
                 // TODO: remove the adjustment after we find out why the returned range is biased towards [0.5;1]
                 (baseScore - 0.5).coerceAtLeast(0.0).toFloat() * 200f
