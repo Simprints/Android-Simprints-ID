@@ -1565,8 +1565,8 @@ class FingerprintCaptureViewModelTest {
         const val DIFFERENT_GOOD_QUALITY = 80
         const val BAD_QUALITY = 20
 
-        val TEMPLATE = FingerprintGenerator.generateRandomFingerprint().template
-        val DIFFERENT_TEMPLATE = FingerprintGenerator.generateRandomFingerprint().template
+        val TEMPLATE = FingerprintGenerator.generateRandomFingerprintTemplate()
+        val DIFFERENT_TEMPLATE = FingerprintGenerator.generateRandomFingerprintTemplate()
 
         val IMAGE = byteArrayOf(0x05, 0x06, 0x07, 0x08)
 

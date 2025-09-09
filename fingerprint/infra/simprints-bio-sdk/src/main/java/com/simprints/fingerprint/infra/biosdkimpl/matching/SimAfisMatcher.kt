@@ -1,10 +1,11 @@
 package com.simprints.fingerprint.infra.biosdkimpl.matching
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.Identity
+import com.simprints.core.domain.sample.MatchConfidence
+import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.sample.SampleIdentifier
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult
 import com.simprints.fingerprint.infra.simafiswrapper.JNILibAfisInterface
 import com.simprints.fingerprint.infra.simafiswrapper.models.SimAfisFingerIdentifier
 import com.simprints.fingerprint.infra.simafiswrapper.models.SimAfisFingerprint
@@ -25,10 +26,10 @@ internal class SimAfisMatcher @Inject constructor(
     private val jniLibAfis: JNILibAfisInterface,
 ) {
     fun match(
-        probe: FingerprintIdentity,
-        candidates: List<FingerprintIdentity>,
+        probe: List<CaptureSample>,
+        candidates: List<Identity>,
         crossFingerComparison: Boolean,
-    ): List<MatchResult> {
+    ): List<MatchConfidence> {
         // if probe template format is not supported by SimAfisMatcher, return empty list
         if (probe.templateFormatNotSupportedBySimAfisMatcher()) {
             return emptyList()
@@ -41,9 +42,9 @@ internal class SimAfisMatcher @Inject constructor(
     }
 
     private fun match(
-        probe: FingerprintIdentity,
-        candidates: List<FingerprintIdentity>,
-    ): List<MatchResult> {
+        probe: List<CaptureSample>,
+        candidates: List<Identity>,
+    ): List<MatchConfidence> {
         val simAfisCandidates = candidates.map { it.toSimAfisPerson() }
 
         println("Matching ${simAfisCandidates.size} candidates using all ${jniLibAfis.getNbCores()} cores")
@@ -55,14 +56,18 @@ internal class SimAfisMatcher @Inject constructor(
         )
 
         return results.zip(simAfisCandidates).map { (score, candidate) ->
-            MatchResult(candidate.guid, score)
+            MatchConfidence(candidate.guid, score)
         }
     }
 
-    private fun FingerprintIdentity.toSimAfisPerson(): SimAfisPerson =
-        SimAfisPerson(subjectId, fingerprints.map { it.toSimAfisFingerprint() })
+    private fun Identity.toSimAfisPerson(): SimAfisPerson = SimAfisPerson(subjectId, samples.map { it.toSimAfisFingerprint() })
 
-    private fun Fingerprint.toSimAfisFingerprint(): SimAfisFingerprint = SimAfisFingerprint(fingerId.toSimAfisFingerIdentifier(), template)
+    private fun Sample.toSimAfisFingerprint(): SimAfisFingerprint = SimAfisFingerprint(identifier.toSimAfisFingerIdentifier(), template)
+
+    private fun List<CaptureSample>.toSimAfisPerson(): SimAfisPerson = SimAfisPerson("", map { it.toSimAfisFingerprint() })
+
+    private fun CaptureSample.toSimAfisFingerprint(): SimAfisFingerprint =
+        SimAfisFingerprint(identifier.toSimAfisFingerIdentifier(), template)
 
     @ExcludedFromGeneratedTestCoverageReports(reason = "This is just a mapping function")
     private fun SampleIdentifier.toSimAfisFingerIdentifier(): SimAfisFingerIdentifier = when (this) {
@@ -80,8 +85,8 @@ internal class SimAfisMatcher @Inject constructor(
     }
 
     private fun crossFingerMatch(
-        probe: FingerprintIdentity,
-        candidates: List<FingerprintIdentity>,
+        probe: List<CaptureSample>,
+        candidates: List<Identity>,
     ) = candidates.map { crossFingerMatching(probe, it, jniLibAfis) }
 
     /**
@@ -93,10 +98,10 @@ internal class SimAfisMatcher @Inject constructor(
      * @return MatchResult
      */
     private fun crossFingerMatching(
-        probe: FingerprintIdentity,
-        candidate: FingerprintIdentity,
+        probe: List<CaptureSample>,
+        candidate: Identity,
         jniLibAfis: JNILibAfisInterface,
-    ): MatchResult {
+    ): MatchConfidence {
         // Number of fingers used in matching
         val fingers = probe.fingerprintsTemplates.size
         // Sum of maximum matching score for each finger
@@ -111,7 +116,7 @@ internal class SimAfisMatcher @Inject constructor(
                     }.toDouble()
             }
         // Matching score  = total/number of fingers
-        return MatchResult(candidate.subjectId, getOverallScore(total, fingers))
+        return MatchConfidence(candidate.subjectId, getOverallScore(total, fingers))
     }
 
     private fun getOverallScore(
@@ -128,10 +133,13 @@ internal class SimAfisMatcher @Inject constructor(
     }
 }
 
-val FingerprintIdentity.fingerprintsTemplates
-    get() = fingerprints.map { it.template.toByteBuffer() }
+val List<CaptureSample>.fingerprintsTemplates
+    get() = map { it.template.toByteBuffer() }
+
+val Identity.fingerprintsTemplates
+    get() = samples.map { it.template.toByteBuffer() }
 
 private fun ByteArray.toByteBuffer(): ByteBuffer = ByteBuffer.allocateDirect(size).put(this)
 
-fun FingerprintIdentity.templateFormatNotSupportedBySimAfisMatcher(): Boolean =
-    fingerprints.any { it.format != SimAfisMatcher.SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT }
+fun List<CaptureSample>.templateFormatNotSupportedBySimAfisMatcher(): Boolean =
+    any { it.format != SimAfisMatcher.SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT }

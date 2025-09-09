@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.tools.time.TimeHelper
@@ -134,7 +135,7 @@ internal class FaceMatcherUseCaseTest {
     fun `Correctly calls SDK matcher`() = runTest {
         val totalCandidates = 1
         val faceIdentities = listOf(
-            FaceIdentity(
+            Identity(
                 "subjectId",
                 listOf(
                     Sample(

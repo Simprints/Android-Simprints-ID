@@ -2,9 +2,9 @@ package com.simprints.infra.matching.usecase
 
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.face.infra.basebiosdk.matching.FaceIdentity
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.basebiosdk.matching.FaceSample
 import com.simprints.face.infra.biosdkresolver.FaceBioSDK
@@ -12,6 +12,7 @@ import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
@@ -25,7 +26,6 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
-import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity as DomainFaceIdentity
 
 class FaceMatcherUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
@@ -52,7 +52,6 @@ class FaceMatcherUseCase @Inject constructor(
             send(MatcherState.Success(emptyList(), emptyList(), 0, bioSdk.matcherName()))
             return@channelFlow
         }
-        val samples = mapSamples(matchParams.probeFaceSamples)
         val queryWithSupportedFormat = matchParams.queryForCandidates.copy(
             faceSampleFormat = bioSdk.templateFormat(),
         )
@@ -86,13 +85,13 @@ class FaceMatcherUseCase @Inject constructor(
                 this@channelFlow.send(MatcherState.CandidateLoaded)
             }
 
-        val batchInfo = consumeAndMatch(candidatesChannel, samples, resultSet, bioSdk)
+        val batchInfo = consumeAndMatch(candidatesChannel, matchParams.probeFaceSamples, resultSet, bioSdk)
         send(MatcherState.Success(resultSet.toList(), batchInfo, loadedCandidates.get(), bioSdk.matcherName()))
     }.flowOn(dispatcherBG)
 
     private suspend fun consumeAndMatch(
-        candidatesChannel: ReceiveChannel<IdentityBatch<DomainFaceIdentity>>,
-        samples: List<FaceSample>,
+        candidatesChannel: ReceiveChannel<IdentityBatch>,
+        samples: List<CaptureSample>,
         resultSet: MatchResultSet,
         bioSdk: FaceBioSDK,
     ): List<MatchBatchInfo> {
@@ -100,7 +99,7 @@ class FaceMatcherUseCase @Inject constructor(
         for (batch in candidatesChannel) {
             val comparingStartTime = timeHelper.now()
             val results = bioSdk.createMatcher(samples).use { matcher ->
-                match(matcher, batch.identities.mapToFaceIdentities())
+                match(matcher, batch.identities)
             }
             resultSet.addAll(results)
             val comparingEndTime = timeHelper.now()
@@ -117,29 +116,15 @@ class FaceMatcherUseCase @Inject constructor(
         return matchBatches
     }
 
-    private fun mapSamples(probes: List<CaptureSample>) = probes.map { FaceSample(it.captureEventId, it.template) }
-
     private suspend fun match(
         matcher: FaceMatcher,
-        batchCandidates: List<FaceIdentity>,
+        batchCandidates: List<Identity>,
     ) = batchCandidates.fold(MatchResultSet()) { acc, candidate ->
         acc.add(
             MatchConfidence(
                 candidate.subjectId,
                 matcher.getHighestComparisonScoreForCandidate(candidate),
             ),
-        )
-    }
-
-    private fun List<DomainFaceIdentity>.mapToFaceIdentities(): List<FaceIdentity> = map { identity ->
-        FaceIdentity(
-            identity.subjectId,
-            identity.faces.map { sample ->
-                FaceSample(
-                    sample.referenceId,
-                    sample.template,
-                )
-            },
         )
     }
 }

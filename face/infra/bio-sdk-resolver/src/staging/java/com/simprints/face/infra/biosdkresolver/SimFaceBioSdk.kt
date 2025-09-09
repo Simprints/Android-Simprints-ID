@@ -1,10 +1,10 @@
 package com.simprints.face.infra.biosdkresolver
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.basebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
-import com.simprints.face.infra.basebiosdk.matching.FaceSample
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -26,5 +26,5 @@ class SimFaceBioSdk @Inject constructor() : FaceBioSDK {
 
     override fun matcherName(): String = TODO()
 
-    override fun createMatcher(probeSamples: List<FaceSample>): FaceMatcher = TODO()
+    override fun createMatcher(probeSamples: List<CaptureSample>): FaceMatcher = TODO()
 }

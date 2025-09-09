@@ -1,10 +1,10 @@
-package com.simprints.face.infra.basebiosdk.matching
+package com.simprints.core.domain.sample
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class FaceIdentity(
+class Identity(
     val subjectId: String,
-    val faces: List<FaceSample>,
+    val samples: List<Sample>,
 ) : Parcelable
