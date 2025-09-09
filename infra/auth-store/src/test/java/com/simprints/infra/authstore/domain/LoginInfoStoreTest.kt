@@ -2,90 +2,89 @@ package com.simprints.infra.authstore.domain
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.google.common.truth.Truth.assertThat
+import androidx.test.core.app.*
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.infra.authstore.domain.LoginInfoStore.Companion.CORE_FIREBASE_API_KEY
+import com.simprints.infra.authstore.domain.LoginInfoStore.Companion.CORE_FIREBASE_APPLICATION_ID
+import com.simprints.infra.authstore.domain.LoginInfoStore.Companion.CORE_FIREBASE_PROJECT_ID
+import com.simprints.infra.authstore.domain.LoginInfoStore.Companion.LEGACY_PREF_FILE_NAME
+import com.simprints.infra.authstore.domain.LoginInfoStore.Companion.PROJECT_ID
+import com.simprints.infra.authstore.domain.LoginInfoStore.Companion.PROJECT_ID_CLAIM
+import com.simprints.infra.authstore.domain.LoginInfoStore.Companion.SECURE_PREF_FILE_NAME
+import com.simprints.infra.authstore.domain.LoginInfoStore.Companion.USER_ID_TOKENIZED
+import com.simprints.infra.authstore.domain.LoginInfoStore.Companion.USER_ID_VALUE
 import com.simprints.infra.security.SecurityManager
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import io.mockk.*
+import io.mockk.impl.annotations.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class LoginInfoStoreTest {
-    @MockK
+    @SpyK
     private lateinit var ctx: Context
 
     @MockK
     private lateinit var securityManager: SecurityManager
 
-    @MockK
     private lateinit var legacySharedPreferences: SharedPreferences
 
-    @MockK
     private lateinit var legacyEditor: SharedPreferences.Editor
 
-    @MockK
     private lateinit var secureSharedPreferences: SharedPreferences
 
-    @MockK
     private lateinit var secureEditor: SharedPreferences.Editor
 
     private lateinit var loginInfoStoreImpl: LoginInfoStore
 
     @Before
     fun setup() {
-        MockKAnnotations.init(this, relaxed = true)
+        ctx = ApplicationProvider.getApplicationContext()
+        secureSharedPreferences = ctx.getSharedPreferences(SECURE_PREF_FILE_NAME, Context.MODE_PRIVATE)
+        secureEditor = secureSharedPreferences.edit()
+        legacySharedPreferences = ctx.getSharedPreferences(LEGACY_PREF_FILE_NAME, Context.MODE_PRIVATE)
+        legacyEditor = legacySharedPreferences.edit()
+        MockKAnnotations.init(this)
 
-        every { ctx.getSharedPreferences(any(), any()) } returns legacySharedPreferences
-        every { legacySharedPreferences.edit() } returns legacyEditor
-
-        every { securityManager.buildEncryptedSharedPreferences(any()) } returns secureSharedPreferences
-        every { secureSharedPreferences.edit() } returns secureEditor
-
-        every { secureEditor.putString(any(), any()) } returns secureEditor
-        every { secureEditor.putBoolean(any(), any()) } returns secureEditor
+        every { ctx.getSharedPreferences(LEGACY_PREF_FILE_NAME, Context.MODE_PRIVATE) } returns legacySharedPreferences
+        every { securityManager.buildEncryptedSharedPreferences(SECURE_PREF_FILE_NAME) } returns secureSharedPreferences
 
         loginInfoStoreImpl = LoginInfoStore(ctx, securityManager)
     }
 
     @Test
     fun `should migrate data from legacy prefs to secure prefs`() {
-        every { legacySharedPreferences.contains(any()) } returns true
-        every { legacySharedPreferences.getString(any(), any()) } returns "old-value"
-        every { legacySharedPreferences.getBoolean(any(), any()) } returns true
-        every { secureSharedPreferences.getString(any(), any()) } returns "new-value"
+        val projectId = "project-id"
+        legacyEditor.putString(PROJECT_ID, projectId).apply()
 
         val result = loginInfoStoreImpl.signedInProjectId
 
-        verify {
-            // check any amount of save data
-            secureEditor.putString(any(), any())
-            secureEditor.putBoolean(any(), any())
-        }
-        // Check that legacy prefs cleared
-        verify(exactly = 7) { legacyEditor.remove(any()) }
-        verify(exactly = 1) {
-            legacyEditor.commit()
-            secureEditor.commit()
-        }
+        assertThat(result).isEqualTo(projectId)
+        assertThat(legacySharedPreferences.all).isEmpty()
     }
 
     @Test
     fun `getting the signed in encrypted user id should returns it`() {
-        every { secureSharedPreferences.getString(any(), any()) } returns "user"
-        every { secureSharedPreferences.getBoolean(any(), any()) } returns true
+        secureEditor.putString(USER_ID_VALUE, "user").apply()
+        secureEditor.putBoolean(USER_ID_TOKENIZED, true).apply()
 
         assertThat(loginInfoStoreImpl.signedInUserId).isEqualTo("user".asTokenizableEncrypted())
     }
 
     @Test
     fun `getting the signed in raw user id should return it`() {
-        every { secureSharedPreferences.getString(any(), any()) } returns "user"
-        every { secureSharedPreferences.getBoolean(any(), any()) } returns false
+        secureEditor.putString(USER_ID_VALUE, "user").apply()
+        secureEditor.putBoolean(USER_ID_TOKENIZED, false).apply()
 
         assertThat(loginInfoStoreImpl.signedInUserId).isEqualTo("user".asTokenizableRaw())
     }
@@ -93,34 +92,28 @@ class LoginInfoStoreTest {
     @Test
     fun `setting the raw signed in user id should set in the shared preferences`() {
         loginInfoStoreImpl.signedInUserId = "user".asTokenizableRaw()
-
-        verify(exactly = 1) {
-            secureEditor.putString("USER_ID", "user")
-            secureEditor.putBoolean("USER_ID_TOKENIZED", false)
-        }
+        assertThat(secureSharedPreferences.getString(USER_ID_VALUE, null)).isEqualTo("user")
+        assertThat(secureSharedPreferences.getBoolean(USER_ID_TOKENIZED, true)).isFalse()
     }
 
     @Test
     fun `setting the tokenized signed in user id should set in the shared preferences`() {
         loginInfoStoreImpl.signedInUserId = "user".asTokenizableEncrypted()
 
-        verify(exactly = 1) {
-            secureEditor.putString("USER_ID", "user")
-            secureEditor.putBoolean("USER_ID_TOKENIZED", true)
-        }
+        assertThat(secureSharedPreferences.getString(USER_ID_VALUE, null)).isEqualTo("user")
+        assertThat(secureSharedPreferences.getBoolean(USER_ID_TOKENIZED, false)).isTrue()
     }
 
     @Test
     fun `setting the null to user id should clear it from the shared preferences`() {
         loginInfoStoreImpl.signedInUserId = null
 
-        verify { secureEditor.remove(any()) }
+        assertThat(secureSharedPreferences.all).doesNotContainKey(USER_ID_VALUE)
     }
 
     @Test
     fun `getting the signed in project id should returns it`() {
-        every { secureSharedPreferences.getString(any(), any()) } returns "projectId"
-
+        secureEditor.putString(PROJECT_ID, "projectId").apply()
         assertThat(loginInfoStoreImpl.signedInProjectId).isEqualTo("projectId")
     }
 
@@ -128,22 +121,19 @@ class LoginInfoStoreTest {
     fun `setting the signed in project id should set in the shared preferences`() {
         loginInfoStoreImpl.signedInProjectId = "projectId"
 
-        verify(exactly = 1) {
-            secureEditor.putString("PROJECT_ID", "projectId")
-            secureEditor.apply()
-        }
+        assertThat(secureSharedPreferences.getString(PROJECT_ID, null)).isEqualTo("projectId")
     }
 
     @Test
     fun `getting the core firebase project id should returns it`() {
-        every { secureSharedPreferences.getString(any(), any()) } returns "firebase"
+        secureEditor.putString(CORE_FIREBASE_PROJECT_ID, "firebase").apply()
 
         assertThat(loginInfoStoreImpl.coreFirebaseProjectId).isEqualTo("firebase")
     }
 
     @Test
     fun `getting the core firebase project id should returns an empty string if null`() {
-        every { secureSharedPreferences.getString(any(), any()) } returns null
+        secureEditor.putString(CORE_FIREBASE_PROJECT_ID, null).apply()
 
         assertThat(loginInfoStoreImpl.coreFirebaseProjectId).isEqualTo("")
     }
@@ -151,23 +141,18 @@ class LoginInfoStoreTest {
     @Test
     fun `setting the core firebase project id should set in the shared preferences`() {
         loginInfoStoreImpl.coreFirebaseProjectId = "firebase"
-
-        verify(exactly = 1) {
-            secureEditor.putString("CORE_FIREBASE_PROJECT_ID", "firebase")
-            secureEditor.apply()
-        }
+        assertThat(secureSharedPreferences.getString(CORE_FIREBASE_PROJECT_ID, null)).isEqualTo("firebase")
     }
 
     @Test
     fun `getting the core firebase application id should returns it`() {
-        every { secureSharedPreferences.getString(any(), any()) } returns "firebase"
-
+        secureEditor.putString(CORE_FIREBASE_APPLICATION_ID, "firebase").apply()
         assertThat(loginInfoStoreImpl.coreFirebaseApplicationId).isEqualTo("firebase")
     }
 
     @Test
     fun `getting the core firebase application id should returns an empty string if null`() {
-        every { secureSharedPreferences.getString(any(), any()) } returns null
+        secureEditor.putString(CORE_FIREBASE_APPLICATION_ID, null).apply()
 
         assertThat(loginInfoStoreImpl.coreFirebaseApplicationId).isEqualTo("")
     }
@@ -176,22 +161,19 @@ class LoginInfoStoreTest {
     fun `setting the core firebase application id should set in the shared preferences`() {
         loginInfoStoreImpl.coreFirebaseApplicationId = "firebase"
 
-        verify(exactly = 1) {
-            secureEditor.putString("CORE_FIREBASE_APPLICATION_ID", "firebase")
-            secureEditor.apply()
-        }
+        assertThat(secureSharedPreferences.getString(CORE_FIREBASE_APPLICATION_ID, null)).isEqualTo("firebase")
     }
 
     @Test
     fun `getting the core firebase api key should returns it`() {
-        every { secureSharedPreferences.getString(any(), any()) } returns "firebase"
+        secureEditor.putString(CORE_FIREBASE_API_KEY, "firebase").apply()
 
         assertThat(loginInfoStoreImpl.coreFirebaseApiKey).isEqualTo("firebase")
     }
 
     @Test
     fun `getting the core firebase api key should returns an empty string if null`() {
-        every { secureSharedPreferences.getString(any(), any()) } returns null
+        secureEditor.putString(CORE_FIREBASE_API_KEY, null).apply()
 
         assertThat(loginInfoStoreImpl.coreFirebaseApiKey).isEqualTo("")
     }
@@ -200,77 +182,75 @@ class LoginInfoStoreTest {
     fun `setting the core firebase api key should set in the shared preferences`() {
         loginInfoStoreImpl.coreFirebaseApiKey = "firebase"
 
-        verify(exactly = 1) {
-            secureEditor.putString("CORE_FIREBASE_API_KEY", "firebase")
-            secureEditor.apply()
-        }
+        assertThat(secureSharedPreferences.getString(CORE_FIREBASE_API_KEY, null)).isEqualTo("firebase")
     }
 
     @Test
     fun `getSignedInProjectIdOrEmpty should return an empty string if null`() {
-        every { secureSharedPreferences.getString(any(), any()) } returns null
-
+        secureEditor.putString(PROJECT_ID, null).apply()
         assertThat(loginInfoStoreImpl.signedInProjectId).isEqualTo("")
     }
 
     @Test
     fun `getSignedInProjectIdOrEmpty should return the signed in project id`() {
-        every { secureSharedPreferences.getString(any(), any()) } returns "project"
+        secureEditor.putString(PROJECT_ID, "project").apply()
 
         assertThat(loginInfoStoreImpl.signedInProjectId).isEqualTo("project")
     }
 
     @Test
     fun `getting the project id claim should returns the string`() {
-        every { secureSharedPreferences.getString(any(), any()) } returns "project"
-
+        secureEditor.putString(PROJECT_ID_CLAIM, "project").apply()
         assertThat(loginInfoStoreImpl.projectIdTokenClaim).isEqualTo("project")
     }
 
     @Test
     fun `setting the project id claim should set in the shared preferences`() {
         loginInfoStoreImpl.projectIdTokenClaim = "project"
-
-        verify(exactly = 1) {
-            secureEditor.putString("PROJECT_ID_CLAIM", "project")
-            secureEditor.apply()
-        }
+        assertThat(secureSharedPreferences.getString(PROJECT_ID_CLAIM, null)).isEqualTo("project")
     }
 
     @Test
     fun `isProjectIdSignedIn should return false if the signed in project id is empty`() {
-        every { secureSharedPreferences.getString(any(), any()) } returns ""
-
+        secureEditor.putString(PROJECT_ID, "").apply()
         assertThat(loginInfoStoreImpl.isProjectIdSignedIn("project")).isFalse()
     }
 
     @Test
     fun `isProjectIdSignedIn should return false if the signed in project id is different`() {
-        every { secureSharedPreferences.getString(any(), any()) } returns "another project"
+        secureEditor.putString(PROJECT_ID, "another project").apply()
 
         assertThat(loginInfoStoreImpl.isProjectIdSignedIn("project")).isFalse()
     }
 
     @Test
     fun `isProjectIdSignedIn should return false if the signed in project id is the same`() {
-        every { secureSharedPreferences.getString(any(), any()) } returns "project"
+        secureEditor.putString(PROJECT_ID, "project").apply()
 
         assertThat(loginInfoStoreImpl.isProjectIdSignedIn("project")).isTrue()
     }
 
     @Test
     fun `cleanCredentials should reset all the credentials`() {
+        secureEditor.putString(PROJECT_ID_CLAIM, "project").apply()
+        secureEditor.putString(CORE_FIREBASE_PROJECT_ID, "project").apply()
+        secureEditor.putString(CORE_FIREBASE_APPLICATION_ID, "project").apply()
+
         loginInfoStoreImpl.cleanCredentials()
 
-        verify(exactly = 7) { secureEditor.remove(any()) }
-        verify(exactly = 1) { secureEditor.commit() }
+        assertThat(secureSharedPreferences.all).isEmpty()
     }
 
     @Test
     fun `clearCachedTokenClaims should reset firebase claims`() {
+        secureEditor.putString(PROJECT_ID_CLAIM, "project").apply()
+        secureEditor.putString(CORE_FIREBASE_PROJECT_ID, "project").apply()
+        secureEditor.putString(CORE_FIREBASE_APPLICATION_ID, "project").apply()
         loginInfoStoreImpl.clearCachedTokenClaims()
 
-        verify(exactly = 4) { secureEditor.remove(any()) }
+        assertThat(secureSharedPreferences.getString(CORE_FIREBASE_PROJECT_ID, null)).isNull()
+        assertThat(secureSharedPreferences.getString(CORE_FIREBASE_APPLICATION_ID, null)).isNull()
+        assertThat(secureSharedPreferences.getString(PROJECT_ID_CLAIM, null)).isNull()
     }
 
     @Test
@@ -293,18 +273,22 @@ class LoginInfoStoreTest {
         assertThat(initialValue).isEqualTo("")
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `observeSignedInProjectId should emit new values when signedInProjectId is updated`() = runTest {
         val flow = loginInfoStoreImpl.observeSignedInProjectId()
+        val emissionList = mutableListOf<String>()
+        val job = launch {
+            flow.collect {
+                emissionList.add(it)
+            }
+        }
         loginInfoStoreImpl.signedInProjectId = "initial-project-id"
-        val initialValue = flow.first()
-
-        assertThat(initialValue).isEqualTo("initial-project-id")
-
+        advanceUntilIdle()
         loginInfoStoreImpl.signedInProjectId = "updated-project-id"
-
-        val updatedValue = flow.first()
-        assertThat(updatedValue).isEqualTo("updated-project-id")
+        advanceUntilIdle()
+        assertThat(emissionList).containsExactly("initial-project-id", "updated-project-id").inOrder()
+        job.cancel()
     }
 
     @Test

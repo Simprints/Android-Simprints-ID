@@ -1,15 +1,14 @@
 package com.simprints.feature.dashboard.logout.syncdecline
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions
-import androidx.test.espresso.matcher.RootMatchers
-import androidx.test.espresso.matcher.ViewMatchers
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import androidx.test.espresso.Espresso.*
+import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.assertion.*
+import androidx.test.espresso.matcher.*
+import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.ext.junit.runners.*
+import com.google.common.truth.Truth.*
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.logout.LogoutSyncViewModel
@@ -20,9 +19,7 @@ import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,9 +46,9 @@ internal class LogoutSyncDeclineFragmentTest {
         onView(withId(R.id.logoutWithoutSyncConfirmButton)).perform(click())
         onView(withId(android.R.id.button1))
             .inRoot(RootMatchers.isDialog())
-            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+            .check(ViewAssertions.matches(isDisplayed()))
             .perform(click())
-        verify(exactly = 1) { viewModel.logout() }
+        coVerify(exactly = 1) { viewModel.logout() }
     }
 
     @Test
@@ -64,9 +61,9 @@ internal class LogoutSyncDeclineFragmentTest {
         onView(withId(R.id.logoutWithoutSyncConfirmButton)).perform(click())
         onView(withId(android.R.id.button2))
             .inRoot(RootMatchers.isDialog())
-            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+            .check(ViewAssertions.matches(isDisplayed()))
             .perform(click())
-        verify(exactly = 0) { viewModel.logout() }
+        coVerify(exactly = 0) { viewModel.logout() }
     }
 
     @Test
@@ -80,9 +77,9 @@ internal class LogoutSyncDeclineFragmentTest {
         onView(withId(R.id.logoutWithoutSyncConfirmButton)).perform(click())
         onView(withId(R.id.password_input_field))
             .inRoot(RootMatchers.isDialog())
-            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-            .perform(ViewActions.replaceText(password))
-        verify(exactly = 1) { viewModel.logout() }
+            .check(ViewAssertions.matches(isDisplayed()))
+            .perform(replaceText(password))
+        coVerify(exactly = 1) { viewModel.logout() }
     }
 
     @Test
@@ -96,13 +93,16 @@ internal class LogoutSyncDeclineFragmentTest {
         onView(withId(R.id.logoutWithoutSyncConfirmButton)).perform(click())
         onView(withId(android.R.id.button2))
             .inRoot(RootMatchers.isDialog())
-            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+            .check(ViewAssertions.matches(isDisplayed()))
             .perform(click())
-        verify(exactly = 0) { viewModel.logout() }
+        coVerify(exactly = 0) { viewModel.logout() }
     }
 
     @Test
     fun `should navigate to requestLoginFragment when logout confirmation button is pressed`() {
+        val logoutLiveData = MutableLiveData<Unit>()
+        every { viewModel.logoutEventLiveData } returns logoutLiveData
+
         mockSettingsPassword(SettingsPasswordConfig.NotSet)
         val navController =
             testNavController(R.navigation.graph_dashboard, R.id.logOutSyncDeclineFragment)
@@ -111,8 +111,10 @@ internal class LogoutSyncDeclineFragmentTest {
         onView(withId(R.id.logoutWithoutSyncConfirmButton)).perform(click())
         onView(withId(android.R.id.button1))
             .inRoot(RootMatchers.isDialog())
-            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+            .check(ViewAssertions.matches(isDisplayed()))
             .perform(click())
+        logoutLiveData.value = Unit
+
         assertThat(navController.currentDestination?.id)
             .isEqualTo(R.id.requestLoginFragment)
     }
@@ -120,6 +122,8 @@ internal class LogoutSyncDeclineFragmentTest {
     @Test
     fun `should navigate to requestLoginFragment when correct logout password is entered`() {
         val password = "password123"
+        val logoutLiveData = MutableLiveData<Unit>()
+        every { viewModel.logoutEventLiveData } returns logoutLiveData
         mockSettingsPassword(SettingsPasswordConfig.Locked(password = password))
         val navController =
             testNavController(R.navigation.graph_dashboard, R.id.logOutSyncDeclineFragment)
@@ -128,8 +132,9 @@ internal class LogoutSyncDeclineFragmentTest {
         onView(withId(R.id.logoutWithoutSyncConfirmButton)).perform(click())
         onView(withId(R.id.password_input_field))
             .inRoot(RootMatchers.isDialog())
-            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-            .perform(ViewActions.replaceText(password))
+            .check(ViewAssertions.matches(isDisplayed()))
+            .perform(replaceText(password))
+        logoutLiveData.value = Unit
         assertThat(navController.currentDestination?.id)
             .isEqualTo(R.id.requestLoginFragment)
     }

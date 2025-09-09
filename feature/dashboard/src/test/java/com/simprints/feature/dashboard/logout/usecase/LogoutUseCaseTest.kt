@@ -43,6 +43,7 @@ class LogoutUseCaseTest {
             authManager = authManager,
             flagsStore = flagsStore,
             enrolmentRecordRepository = enrolmentRecordRepository,
+            ioDispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
     }
 

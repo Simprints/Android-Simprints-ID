@@ -1,6 +1,8 @@
 package com.simprints.feature.dashboard.settings.syncinfo.usecase
 
 import androidx.lifecycle.asFlow
+import com.simprints.core.DispatcherIO
+import com.simprints.core.DispatcherMain
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.lifecycle.AppForegroundStateTracker
 import com.simprints.core.tools.extentions.combine9
@@ -35,10 +37,12 @@ import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.sync.SyncOrchestrator
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
@@ -57,6 +61,8 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     private val ticker: Ticker,
     private val appForegroundStateTracker: AppForegroundStateTracker,
     private val commCarePermissionChecker: CommCarePermissionChecker,
+    @DispatcherMain private val mainDispatcher: CoroutineDispatcher,
+    @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) {
     private val eventSyncStateFlow =
         eventSyncManager
@@ -74,7 +80,11 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         imageSyncStatusFlow,
         configManager.observeProjectConfiguration(),
         configManager.observeDeviceConfiguration(),
-        appForegroundStateTracker.observeAppInForeground().filter { it }, // only when going to foreground
+        appForegroundStateTracker
+            .observeAppInForeground()
+            .filter {
+                it // only when going to foreground
+            }.flowOn(mainDispatcher), // runs in main thread by design
         ticker.observeTickOncePerMinute(),
     ) { isOnline, isLoggedIn, isRefreshing, eventSyncState, imageSyncStatus, projectConfig, deviceConfig, _, _ ->
         val currentEvents = eventSyncState.progress?.coerceAtLeast(0) ?: 0
@@ -312,7 +322,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         delay(timeMillis = SYNC_COMPLETION_HOLD_MILLIS)
     }.onImageSyncComplete {
         delay(timeMillis = SYNC_COMPLETION_HOLD_MILLIS)
-    }
+    }.flowOn(ioDispatcher) // upstream flows mostly do IO work
 
     // sync info change detection helpers
 

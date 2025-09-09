@@ -19,7 +19,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.progressindicator.LinearProgressIndicator
-import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.utils.TimeUtils
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSyncInfoBinding
@@ -102,7 +101,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
             startActivity(
                 Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                     data = Uri.fromParts("package", requireContext().packageName, null)
-                }
+                },
             )
         }
         binding.textEventSyncInstructionsOffline.setOnClickListener {
@@ -139,12 +138,9 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.logoutEventLiveData.observe(
-                    viewLifecycleOwner,
-                    LiveDataEventWithContentObserver {
-                        viewModel.performLogout()
-                    },
-                )
+                viewModel.logoutEventFlow.collect {
+                    viewModel.performLogout()
+                }
             }
         }
 

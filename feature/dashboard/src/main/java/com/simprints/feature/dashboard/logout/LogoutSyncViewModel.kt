@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -51,7 +52,9 @@ internal class LogoutSyncViewModel @Inject constructor(
         }
 
     fun logout() {
-        logoutUseCase()
+        viewModelScope.launch {
+            logoutUseCase()
+        }
     }
 
     private companion object {
