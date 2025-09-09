@@ -19,12 +19,12 @@ class SimFaceBioSdk @Inject constructor() : FaceBioSDK {
         get() = TODO()
     override val detector: FaceDetector
         get() = TODO()
-    override val version: String
-        get() = TODO()
-    override val templateFormat: String
-        get() = TODO()
-    override val matcherName: String
-        get() = TODO()
+
+    override fun version(): String = TODO()
+
+    override fun templateFormat(): String = TODO()
+
+    override fun matcherName(): String = TODO()
 
     override fun createMatcher(probeSamples: List<FaceSample>): FaceMatcher = TODO()
 }
