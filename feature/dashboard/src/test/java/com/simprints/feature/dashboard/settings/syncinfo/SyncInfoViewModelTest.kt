@@ -150,14 +150,14 @@ class SyncInfoViewModelTest {
 
     private fun createViewModel() {
         viewModel = SyncInfoViewModel(
-            configManager = configManager,
-            authStore = authStore,
-            eventSyncManager = eventSyncManager,
-            syncOrchestrator = syncOrchestrator,
-            recentUserActivityManager = recentUserActivityManager,
-            timeHelper = timeHelper,
-            observeSyncInfo = observeSyncInfo,
-            logoutUseCase = logoutUseCase,
+            configManager = ::configManager,
+            authStore = ::authStore,
+            eventSyncManager = ::eventSyncManager,
+            syncOrchestrator = ::syncOrchestrator,
+            recentUserActivityManager = ::recentUserActivityManager,
+            timeHelper = ::timeHelper,
+            observeSyncInfo = ::observeSyncInfo,
+            logoutUseCase = ::logoutUseCase,
             ioDispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
     }

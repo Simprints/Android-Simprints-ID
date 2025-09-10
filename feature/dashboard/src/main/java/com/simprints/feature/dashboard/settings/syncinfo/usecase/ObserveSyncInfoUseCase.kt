@@ -40,6 +40,8 @@ import com.simprints.infra.sync.SyncOrchestrator
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
@@ -64,11 +66,13 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     @DispatcherMain private val mainDispatcher: CoroutineDispatcher,
     @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) {
-    private val eventSyncStateFlow =
-        eventSyncManager
-            .getLastSyncState(
-                useDefaultValue = true, // otherwise value not guaranteed
-            ).asFlow()
+    private val eventSyncStateFlow = flow {
+        emitAll(
+            eventSyncManager
+                .getLastSyncState(useDefaultValue = true) // otherwise value not guaranteed
+                .asFlow(),
+        )
+    }.flowOn(mainDispatcher) // main thread required by eventSyncManager.getLastSyncState()
     private val imageSyncStatusFlow =
         syncOrchestrator.observeImageSyncStatus()
 

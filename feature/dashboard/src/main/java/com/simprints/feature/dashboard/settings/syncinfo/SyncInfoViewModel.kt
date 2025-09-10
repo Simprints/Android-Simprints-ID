@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DispatcherIO
 import com.simprints.core.livedata.LiveDataEventWithContent
@@ -20,6 +21,7 @@ import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.sync.SyncOrchestrator
+import dagger.Lazy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -28,9 +30,11 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.dropWhile
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -40,14 +44,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class SyncInfoViewModel @Inject constructor(
-    private val configManager: ConfigManager,
-    private val authStore: AuthStore,
-    private val eventSyncManager: EventSyncManager,
-    private val syncOrchestrator: SyncOrchestrator,
-    private val recentUserActivityManager: RecentUserActivityManager,
-    private val timeHelper: TimeHelper,
-    observeSyncInfo: ObserveSyncInfoUseCase,
-    private val logoutUseCase: LogoutUseCase,
+    private val configManager: Lazy<ConfigManager>,
+    private val authStore: Lazy<AuthStore>,
+    private val eventSyncManager: Lazy<EventSyncManager>,
+    private val syncOrchestrator: Lazy<SyncOrchestrator>,
+    private val recentUserActivityManager: Lazy<RecentUserActivityManager>,
+    private val timeHelper: Lazy<TimeHelper>,
+    private val observeSyncInfo: Lazy<ObserveSyncInfoUseCase>,
+    private val logoutUseCase: Lazy<LogoutUseCase>,
     @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     var isPreLogoutUpSync = false
@@ -56,13 +60,12 @@ internal class SyncInfoViewModel @Inject constructor(
         get() = _loginNavigationEventLiveData
     private val _loginNavigationEventLiveData = MutableLiveData<LoginParams>()
 
-    private val eventSyncStateFlow =
-        eventSyncManager
-            .getLastSyncState(
-                useDefaultValue = true, // otherwise value not guaranteed
-            ).asFlow()
-    private val imageSyncStatusFlow =
-        syncOrchestrator.observeImageSyncStatus()
+    private val eventSyncStateFlow = liveData {
+        emitSource(eventSyncManager.get().getLastSyncState(useDefaultValue = true)) // otherwise value not guaranteed
+    }.asFlow()
+    private val imageSyncStatusFlow by lazy {
+        syncOrchestrator.get().observeImageSyncStatus()
+    }
 
     private val eventSyncButtonClickFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val imageSyncButtonClickFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
@@ -74,19 +77,18 @@ internal class SyncInfoViewModel @Inject constructor(
         val isReadyToLogOut =
             isPreLogoutUpSync && eventSyncState.isSyncCompleted() && !imageSyncStatus.isSyncing
         return@combine isReadyToLogOut
-    }.debounce(LOGOUT_DELAY_MILLIS)
-        .filter { isReadyToLogOut ->
-            isReadyToLogOut // only when ready
-        }.map {
-            LiveDataEventWithContent(Unit)
-        }.flowOn(ioDispatcher)
+    }.debounce(LOGOUT_DELAY_MILLIS).filter { isReadyToLogOut ->
+        isReadyToLogOut // only when ready
+    }.map {
+        LiveDataEventWithContent(Unit)
+    }.flowOn(ioDispatcher)
 
     val syncInfoLiveData: LiveData<SyncInfo> by lazy {
-        val dataLayerDrivenSyncInfoFlow = observeSyncInfo(isPreLogoutUpSync)
-            .onStart {
-                startInitialSyncIfRequired()
-                syncImagesAfterEventsWhenRequired()
-            }
+        val dataLayerDrivenSyncInfoFlow = flow {
+            emitAll(
+                observeSyncInfo.get().invoke(isPreLogoutUpSync)
+            )
+        }
 
         /**
          * Visual sync button responsiveness optimization
@@ -129,6 +131,8 @@ internal class SyncInfoViewModel @Inject constructor(
             imageSyncButtonResponsiveSyncInfo,
         ).onStart {
             emit(dataLayerDrivenSyncInfoFlow.firstOrNull() ?: SyncInfo())
+            startInitialSyncIfRequired()
+            syncImagesAfterEventsWhenRequired()
         }.distinctUntilChanged().flowOn(ioDispatcher)
             .asLiveData(viewModelScope.coroutineContext)
     }
@@ -139,10 +143,10 @@ internal class SyncInfoViewModel @Inject constructor(
             if (!isEventSyncing) {
                 eventSyncButtonClickFlow.emit(Unit)
             }
-            syncOrchestrator.stopEventSync()
+            syncOrchestrator.get().stopEventSync()
             val isDownSyncAllowed =
-                !isPreLogoutUpSync && configManager.getProject(authStore.signedInProjectId).state == ProjectState.RUNNING
-            syncOrchestrator.startEventSync(isDownSyncAllowed)
+                !isPreLogoutUpSync && configManager.get().getProject(authStore.get().signedInProjectId).state == ProjectState.RUNNING
+            syncOrchestrator.get().startEventSync(isDownSyncAllowed)
         }
     }
 
@@ -150,17 +154,17 @@ internal class SyncInfoViewModel @Inject constructor(
         viewModelScope.launch {
             val isImageSyncing = imageSyncStatusFlow.firstOrNull()?.isSyncing == true
             if (isImageSyncing) {
-                syncOrchestrator.stopImageSync()
+                syncOrchestrator.get().stopImageSync()
             } else {
                 imageSyncButtonClickFlow.emit(Unit)
-                syncOrchestrator.startImageSync()
+                syncOrchestrator.get().startImageSync()
             }
         }
     }
 
     fun performLogout() {
         viewModelScope.launch {
-            logoutUseCase()
+            logoutUseCase.get().invoke()
         }
     }
 
@@ -168,8 +172,8 @@ internal class SyncInfoViewModel @Inject constructor(
         viewModelScope.launch {
             _loginNavigationEventLiveData.postValue(
                 LoginParams(
-                    projectId = authStore.signedInProjectId,
-                    userId = authStore.signedInUserId ?: recentUserActivityManager.getRecentUserActivity().lastUserUsed,
+                    projectId = authStore.get().signedInProjectId,
+                    userId = authStore.get().signedInUserId ?: recentUserActivityManager.get().getRecentUserActivity().lastUserUsed,
                 ),
             )
         }
@@ -185,15 +189,15 @@ internal class SyncInfoViewModel @Inject constructor(
 
     private fun startInitialSyncIfRequired() {
         viewModelScope.launch {
-            val isRunning = eventSyncManager.getLastSyncState().value?.isSyncRunning() ?: false
-            val lastUpdate = eventSyncManager.getLastSyncTime()
+            val isRunning = eventSyncManager.get().getLastSyncState().value?.isSyncRunning() ?: false
+            val lastUpdate = eventSyncManager.get().getLastSyncTime()
 
             val isForceEventSync = when {
                 isPreLogoutUpSync -> true
-                configManager.isModuleSelectionRequired() -> false
+                configManager.get().isModuleSelectionRequired() -> false
                 isRunning -> false
                 lastUpdate == null -> true
-                timeHelper.msBetweenNowAndTime(lastUpdate) > RE_SYNC_TIMEOUT_MILLIS -> true
+                timeHelper.get().msBetweenNowAndTime(lastUpdate) > RE_SYNC_TIMEOUT_MILLIS -> true
                 else -> false
             }
             if (isForceEventSync) {
@@ -210,7 +214,7 @@ internal class SyncInfoViewModel @Inject constructor(
                     .distinctUntilChanged()
                     .collect { isEventSyncCompleted ->
                         if (isEventSyncCompleted) {
-                            syncOrchestrator.startImageSync()
+                            syncOrchestrator.get().startImageSync()
                         }
                     }
             }
