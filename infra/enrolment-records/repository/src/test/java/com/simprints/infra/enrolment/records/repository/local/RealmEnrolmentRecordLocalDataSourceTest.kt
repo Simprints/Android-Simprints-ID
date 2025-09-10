@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
@@ -16,8 +17,6 @@ import com.simprints.infra.enrolment.records.realm.store.models.DbFaceSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbFingerprintSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
-import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
@@ -145,9 +144,9 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
         val fakePerson = savedPersons[0].toRealmDb()
 
-        val people = mutableListOf<FingerprintIdentity>()
+        val people = mutableListOf<Identity>()
         enrolmentRecordLocalDataSource
-            .loadFingerprintIdentities(
+            .loadIdentities(
                 SubjectQuery(),
                 listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
@@ -162,43 +161,22 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     }
 
     @Test
-    fun `correctly query supported fingerprint format`() = runTest {
+    fun `correctly query supported format`() = runTest {
         val format = "SupportedFormat"
 
         enrolmentRecordLocalDataSource
-            .loadFingerprintIdentities(
-                SubjectQuery(fingerprintSampleFormat = format),
+            .loadIdentities(
+                SubjectQuery(format = format),
                 listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
                 project,
                 this,
                 onCandidateLoaded,
             ).consumeEach { }
-
         verify {
             realmQuery.query(
-                "ANY ${FINGERPRINT_SAMPLES_FIELD}.${FORMAT_FIELD} == $0",
+                "ANY ${FINGERPRINT_SAMPLES_FIELD}.${FORMAT_FIELD} == $0 OR ANY $FACE_SAMPLES_FIELD.$FORMAT_FIELD == $1",
                 format,
-            )
-        }
-    }
-
-    @Test
-    fun `correctly query supported face format`() = runTest {
-        val format = "SupportedFormat"
-
-        enrolmentRecordLocalDataSource
-            .loadFingerprintIdentities(
-                SubjectQuery(faceSampleFormat = format),
-                listOf(IntRange(0, 20)),
-                BiometricDataSource.Simprints,
-                project,
-                this,
-                onCandidateLoaded,
-            ).consumeEach { }
-        verify {
-            realmQuery.query(
-                "ANY ${FACE_SAMPLES_FIELD}.${FORMAT_FIELD} == $0",
                 format,
             )
         }
@@ -209,9 +187,9 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
         val fakePerson = savedPersons[0].toRealmDb()
 
-        val people = mutableListOf<FaceIdentity>()
+        val people = mutableListOf<Identity>()
         enrolmentRecordLocalDataSource
-            .loadFaceIdentities(
+            .loadIdentities(
                 SubjectQuery(),
                 listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,

@@ -1,6 +1,7 @@
 package com.simprints.infra.enrolment.records.repository
 
 import android.content.SharedPreferences
+import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.Timestamp
@@ -8,8 +9,6 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
-import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
@@ -287,9 +286,9 @@ class EnrolmentRecordRepositoryImplTest {
     fun `should forward the call to the local data source when loading fingerprint identities and dataSource is Simprints`() = runTest {
         val expectedSubjectQuery = SubjectQuery()
         val expectedRange = listOf(0..10)
-        val expectedFingerprintIdentities = listOf<FingerprintIdentity>()
+        val expectedFingerprintIdentities = listOf<Identity>()
         coEvery {
-            localDataSource.loadFingerprintIdentities(
+            localDataSource.loadIdentities(
                 expectedSubjectQuery,
                 expectedRange,
                 any(),
@@ -299,9 +298,9 @@ class EnrolmentRecordRepositoryImplTest {
             )
         } returns createTestChannel(expectedFingerprintIdentities)
 
-        val fingerprintIdentities = mutableListOf<FingerprintIdentity>()
+        val fingerprintIdentities = mutableListOf<Identity>()
         repository
-            .loadFingerprintIdentities(
+            .loadIdentities(
                 query = expectedSubjectQuery,
                 ranges = expectedRange,
                 dataSource = BiometricDataSource.Simprints,
@@ -314,7 +313,7 @@ class EnrolmentRecordRepositoryImplTest {
 
         assert(fingerprintIdentities == expectedFingerprintIdentities)
         coVerify(exactly = 1) {
-            localDataSource.loadFingerprintIdentities(
+            localDataSource.loadIdentities(
                 expectedSubjectQuery,
                 expectedRange,
                 any(),
@@ -329,9 +328,9 @@ class EnrolmentRecordRepositoryImplTest {
     fun `should forward the call to the commcare data source when loading fingerprint identities and dataSource is CommCare`() = runTest {
         val expectedSubjectQuery = SubjectQuery()
         val expectedRange = listOf(0..10)
-        val expectedFingerprintIdentities = listOf<FingerprintIdentity>()
+        val expectedFingerprintIdentities = listOf<Identity>()
         coEvery {
-            commCareDataSource.loadFingerprintIdentities(
+            commCareDataSource.loadIdentities(
                 expectedSubjectQuery,
                 expectedRange,
                 any(),
@@ -340,9 +339,9 @@ class EnrolmentRecordRepositoryImplTest {
                 onCandidateLoaded,
             )
         } returns createTestChannel(expectedFingerprintIdentities)
-        val fingerprintIdentities = mutableListOf<FingerprintIdentity>()
+        val fingerprintIdentities = mutableListOf<Identity>()
         repository
-            .loadFingerprintIdentities(
+            .loadIdentities(
                 query = expectedSubjectQuery,
                 ranges = expectedRange,
                 dataSource = BiometricDataSource.CommCare(""),
@@ -355,7 +354,7 @@ class EnrolmentRecordRepositoryImplTest {
 
         assert(fingerprintIdentities == expectedFingerprintIdentities)
         coVerify(exactly = 1) {
-            commCareDataSource.loadFingerprintIdentities(
+            commCareDataSource.loadIdentities(
                 expectedSubjectQuery,
                 expectedRange,
                 any(),
@@ -370,9 +369,9 @@ class EnrolmentRecordRepositoryImplTest {
     fun `should forward the call to the local data source when loading face identities and dataSource is Simprints`() = runTest {
         val expectedSubjectQuery = SubjectQuery()
         val expectedRange = listOf(0..10)
-        val expectedFaceIdentities = listOf<FaceIdentity>()
+        val expectedFaceIdentities = listOf<Identity>()
         coEvery {
-            localDataSource.loadFaceIdentities(
+            localDataSource.loadIdentities(
                 expectedSubjectQuery,
                 expectedRange,
                 any(),
@@ -382,9 +381,9 @@ class EnrolmentRecordRepositoryImplTest {
             )
         } returns createTestChannel(expectedFaceIdentities)
 
-        val faceIdentities = mutableListOf<FaceIdentity>()
+        val faceIdentities = mutableListOf<Identity>()
         repository
-            .loadFaceIdentities(
+            .loadIdentities(
                 query = expectedSubjectQuery,
                 ranges = expectedRange,
                 dataSource = BiometricDataSource.Simprints,
@@ -397,7 +396,7 @@ class EnrolmentRecordRepositoryImplTest {
 
         assert(faceIdentities == expectedFaceIdentities)
         coVerify(exactly = 1) {
-            localDataSource.loadFaceIdentities(
+            localDataSource.loadIdentities(
                 expectedSubjectQuery,
                 expectedRange,
                 any(),
@@ -412,9 +411,9 @@ class EnrolmentRecordRepositoryImplTest {
     fun `should forward the call to the commcare data source when loading face identities and dataSource is CommCare`() = runTest {
         val expectedSubjectQuery = SubjectQuery()
         val expectedRange = listOf(0..10)
-        val expectedFaceIdentities = listOf<FaceIdentity>()
+        val expectedFaceIdentities = listOf<Identity>()
         coEvery {
-            commCareDataSource.loadFaceIdentities(
+            commCareDataSource.loadIdentities(
                 expectedSubjectQuery,
                 expectedRange,
                 any(),
@@ -424,10 +423,10 @@ class EnrolmentRecordRepositoryImplTest {
             )
         } returns createTestChannel(expectedFaceIdentities)
 
-        val faceIdentities = mutableListOf<FaceIdentity>()
+        val faceIdentities = mutableListOf<Identity>()
 
         repository
-            .loadFaceIdentities(
+            .loadIdentities(
                 query = expectedSubjectQuery,
                 ranges = expectedRange,
                 dataSource = BiometricDataSource.CommCare(""),
@@ -440,7 +439,7 @@ class EnrolmentRecordRepositoryImplTest {
 
         assert(faceIdentities == expectedFaceIdentities)
         coVerify(exactly = 1) {
-            commCareDataSource.loadFaceIdentities(
+            commCareDataSource.loadIdentities(
                 expectedSubjectQuery,
                 expectedRange,
                 any(),
@@ -451,8 +450,8 @@ class EnrolmentRecordRepositoryImplTest {
         }
     }
 
-    private fun <T> createTestChannel(vararg lists: List<T>): ReceiveChannel<IdentityBatch<T>> {
-        val channel = Channel<IdentityBatch<T>>(lists.size)
+    private fun createTestChannel(vararg lists: List<Identity>): ReceiveChannel<IdentityBatch> {
+        val channel = Channel<IdentityBatch>(lists.size)
         runBlocking {
             var time = 0L
             for (list in lists) {
@@ -461,7 +460,7 @@ class EnrolmentRecordRepositoryImplTest {
                         identities = list,
                         loadingStartTime = Timestamp(time++),
                         loadingEndTime = Timestamp(time++),
-                    )
+                    ),
                 )
             }
             channel.close()

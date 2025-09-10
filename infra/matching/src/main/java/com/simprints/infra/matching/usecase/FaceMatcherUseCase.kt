@@ -6,13 +6,11 @@ import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
-import com.simprints.face.infra.basebiosdk.matching.FaceSample
 import com.simprints.face.infra.biosdkresolver.FaceBioSDK
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
@@ -53,7 +51,7 @@ class FaceMatcherUseCase @Inject constructor(
             return@channelFlow
         }
         val queryWithSupportedFormat = matchParams.queryForCandidates.copy(
-            faceSampleFormat = bioSdk.templateFormat(),
+            format = bioSdk.templateFormat(),
         )
         val expectedCandidates = enrolmentRecordRepository.count(
             queryWithSupportedFormat,
@@ -74,7 +72,7 @@ class FaceMatcherUseCase @Inject constructor(
         val ranges = createRanges(expectedCandidates)
         val resultSet = MatchResultSet()
         val candidatesChannel = enrolmentRecordRepository
-            .loadFaceIdentities(
+            .loadIdentities(
                 query = queryWithSupportedFormat,
                 ranges = ranges,
                 dataSource = matchParams.biometricDataSource,

@@ -1,6 +1,7 @@
 package com.simprints.infra.enrolment.records.repository.local
 
 import com.simprints.core.DispatcherIO
+import com.simprints.core.domain.sample.Identity
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -8,8 +9,6 @@ import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.realm.store.RealmWrapper
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
-import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
@@ -69,15 +68,15 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
             .map { dbSubject -> dbSubject.toDomain() }
     }
 
-    override suspend fun loadFaceIdentities(
+    override suspend fun loadIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<IdentityBatch<FaceIdentity>> {
-        val channel = Channel<IdentityBatch<FaceIdentity>>(CHANNEL_CAPACITY)
+    ): ReceiveChannel<IdentityBatch> {
+        val channel = Channel<IdentityBatch>(CHANNEL_CAPACITY)
         scope.launch(dispatcherIO) {
             ranges.forEach { range ->
                 val startTime = timeHelper.now()
@@ -85,11 +84,12 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                     query = query,
                     range = range,
                     mapper = { dbSubject ->
-                        FaceIdentity(
+                        Identity(
                             subjectId = dbSubject.subjectId.toString(),
-                            faces = dbSubject.faceSamples
-                                .filter { it.format == query.faceSampleFormat }
-                                .map { it.toDomain() },
+                            samples = (
+                                dbSubject.faceSamples.map { it.toDomain() } +
+                                    dbSubject.fingerprintSamples.map { it.toDomain() }
+                            ).filter { it.format == query.format },
                         )
                     },
                     onCandidateLoaded = onCandidateLoaded,
@@ -102,51 +102,19 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         return channel
     }
 
-    override suspend fun loadFingerprintIdentities(
-        query: SubjectQuery,
-        ranges: List<IntRange>,
-        dataSource: BiometricDataSource,
-        project: Project,
-        scope: CoroutineScope,
-        onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<IdentityBatch<FingerprintIdentity>> {
-        val channel = Channel<IdentityBatch<FingerprintIdentity>>(CHANNEL_CAPACITY)
-        scope.launch(dispatcherIO) {
-            ranges.forEach { range ->
-                val startTime = timeHelper.now()
-                val identities = loadIdentitiesRange(
-                    query = query,
-                    range = range,
-                    mapper = { dbSubject ->
-                        FingerprintIdentity(
-                            subjectId = dbSubject.subjectId.toString(),
-                            fingerprints = dbSubject.fingerprintSamples
-                                .filter { it.format == query.fingerprintSampleFormat }
-                                .map { it.toDomain() },
-                        )
-                    },
-                    onCandidateLoaded = onCandidateLoaded,
-                )
-                val endTime = timeHelper.now()
-                channel.send(IdentityBatch(identities, startTime, endTime))
-            }
-            channel.close()
-        }
-        return channel
-    }
-
-    private suspend fun <T> loadIdentitiesRange(
+    private suspend fun loadIdentitiesRange(
         query: SubjectQuery,
         range: IntRange,
-        mapper: (DbSubject) -> T,
+        mapper: (DbSubject) -> Identity,
         onCandidateLoaded: suspend () -> Unit,
-    ): List<T> = realmWrapper.readRealm { realm ->
+    ): List<Identity> = realmWrapper.readRealm { realm ->
         realm
             .query(DbSubject::class)
             .buildRealmQueryForSubject(query)
             // subList's second parameter is exclusive, so we need to add 1 to the last index
-            .find { it.subList(range.first, range.last + 1) }
-            .map { dbSubject ->
+            .find {
+                it.subList(range.first, range.last + 1)
+            }.map { dbSubject ->
                 onCandidateLoaded()
                 mapper(dbSubject)
             }
@@ -315,16 +283,11 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         if (query.moduleId != null) {
             realmQuery = realmQuery.query("$MODULE_ID_FIELD == $0", query.moduleId.value)
         }
-        if (query.fingerprintSampleFormat != null) {
+        if (query.format != null) {
             realmQuery = realmQuery.query(
-                "ANY $FINGERPRINT_SAMPLES_FIELD.$FORMAT_FIELD == $0",
-                query.fingerprintSampleFormat,
-            )
-        }
-        if (query.faceSampleFormat != null) {
-            realmQuery = realmQuery.query(
-                "ANY $FACE_SAMPLES_FIELD.$FORMAT_FIELD == $0",
-                query.faceSampleFormat,
+                "ANY $FINGERPRINT_SAMPLES_FIELD.$FORMAT_FIELD == $0 OR ANY $FACE_SAMPLES_FIELD.$FORMAT_FIELD == $1",
+                query.format,
+                query.format,
             )
         }
         if (query.afterSubjectId != null) {

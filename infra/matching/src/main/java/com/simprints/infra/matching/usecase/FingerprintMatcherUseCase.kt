@@ -55,7 +55,7 @@ class FingerprintMatcherUseCase @Inject constructor(
         // Only candidates with supported template format are considered
         val queryWithSupportedFormat =
             matchParams.queryForCandidates.copy(
-                fingerprintSampleFormat = bioSdkWrapper.supportedTemplateFormat,
+                format = bioSdkWrapper.supportedTemplateFormat,
             )
         val expectedCandidates = enrolmentRecordRepository.count(queryWithSupportedFormat, dataSource = matchParams.biometricDataSource)
         if (expectedCandidates == 0) {
@@ -72,7 +72,7 @@ class FingerprintMatcherUseCase @Inject constructor(
         val loadedCandidates = AtomicInteger(0)
         val ranges = createRanges(expectedCandidates)
         // if number of ranges less than the number of cores then use the number of ranges
-        val channel = enrolmentRecordRepository.loadFingerprintIdentities(
+        val channel = enrolmentRecordRepository.loadIdentities(
             query = queryWithSupportedFormat,
             ranges = ranges,
             dataSource = matchParams.biometricDataSource,

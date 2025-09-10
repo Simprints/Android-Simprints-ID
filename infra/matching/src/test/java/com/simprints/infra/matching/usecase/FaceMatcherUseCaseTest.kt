@@ -15,7 +15,6 @@ import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.matching.MatchParams
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -150,7 +149,7 @@ internal class FaceMatcherUseCaseTest {
         coEvery { enrolmentRecordRepository.count(any(), any()) } returns 1
         coEvery { createRangesUseCase(any()) } returns listOf(0..99)
         coEvery {
-            enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), any(), any(), any())
+            enrolmentRecordRepository.loadIdentities(any(), any(), any(), any(), any(), any())
         } answers {
             // Call the onCandidateLoaded callback (5th parameter)
             val onCandidateLoaded: suspend () -> Unit = arg(5)
