@@ -16,6 +16,7 @@ internal object StepId {
     const val CONFIRM_IDENTITY = STEP_BASE_CORE + 5
     const val VALIDATE_ID_POOL = STEP_BASE_CORE + 6
     const val SELECT_SUBJECT_AGE = STEP_BASE_CORE + 7
+    const val EXTERNAL_CREDENTIAL = STEP_BASE_CORE + 8
 
     // Face step ids
     private const val STEP_BASE_FINGERPRINT = 300

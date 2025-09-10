@@ -29,6 +29,8 @@ internal class CreateEnrolResponseUseCaseTest {
     @MockK
     lateinit var project: Project
 
+    private val enrolmentSubjectId = "enrolmentSubjectId"
+
     private val action = mockk<ActionRequest.EnrolActionRequest> {
         every { projectId } returns "projectId"
         every { userId } returns "userId".asTokenizableRaw()
@@ -50,24 +52,26 @@ internal class CreateEnrolResponseUseCaseTest {
     fun `Converts correct results to response`() = runTest {
         every {
             subjectFactory.buildSubjectFromCaptureResults(
+                subjectId = any(),
                 projectId = any(),
                 attendantId = any(),
                 moduleId = any(),
                 fingerprintResponse = any(),
                 faceResponse = any(),
-                externalCredential = any()
+                externalCredential = any(),
             )
         } returns mockk { every { subjectId } returns "guid" }
 
         assertThat(
             useCase(
-                action,
-                listOf(
+                request = action,
+                results = listOf(
                     FingerprintCaptureResult("", emptyList()),
                     FaceCaptureResult("", emptyList()),
                     mockk(),
                 ),
-                project
+                project = project,
+                enrolmentSubjectId = enrolmentSubjectId
             ),
         ).isInstanceOf(AppEnrolResponse::class.java)
     }
@@ -76,6 +80,7 @@ internal class CreateEnrolResponseUseCaseTest {
     fun `Returns error if no valid response`() = runTest {
         every {
             subjectFactory.buildSubjectFromCaptureResults(
+                subjectId = any(),
                 projectId = any(),
                 attendantId = any(),
                 moduleId = any(),
@@ -85,6 +90,6 @@ internal class CreateEnrolResponseUseCaseTest {
             )
         } throws MissingCaptureException()
 
-        assertThat(useCase(action, emptyList(), project)).isInstanceOf(AppErrorResponse::class.java)
+        assertThat(useCase(action, emptyList(), project, enrolmentSubjectId)).isInstanceOf(AppErrorResponse::class.java)
     }
 }

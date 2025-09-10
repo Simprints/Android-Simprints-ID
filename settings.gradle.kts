@@ -114,6 +114,7 @@ include(
     ":feature:fetch-subject",
     ":feature:select-subject",
     ":feature:enrol-last-biometric",
+    ":feature:external-credential",
     ":feature:dashboard",
     ":feature:troubleshooting",
     ":feature:alert",

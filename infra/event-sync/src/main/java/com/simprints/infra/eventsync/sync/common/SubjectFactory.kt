@@ -68,6 +68,7 @@ class SubjectFactory @Inject constructor(
     }
 
     fun buildSubjectFromCaptureResults(
+        subjectId: String,
         projectId: String,
         attendantId: TokenizableString,
         moduleId: TokenizableString,
@@ -75,7 +76,6 @@ class SubjectFactory @Inject constructor(
         faceResponse: FaceCaptureResult?,
         externalCredential: ExternalCredential?,
     ): Subject {
-        val subjectId = UUID.randomUUID().toString()
         return buildSubject(
             subjectId = subjectId,
             projectId = projectId,
