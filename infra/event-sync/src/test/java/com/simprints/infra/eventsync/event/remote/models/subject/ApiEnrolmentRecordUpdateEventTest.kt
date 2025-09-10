@@ -58,6 +58,7 @@ class ApiEnrolmentRecordUpdateEventTest {
             ),
             biometricReferencesRemoved = listOf("fpRefId2"),
             externalCredentialAdded = ExternalCredential(
+                id = "id",
                 value = "value".asTokenizableEncrypted(),
                 subjectId = "subjectId",
                 type = ExternalCredentialType.NHISCard

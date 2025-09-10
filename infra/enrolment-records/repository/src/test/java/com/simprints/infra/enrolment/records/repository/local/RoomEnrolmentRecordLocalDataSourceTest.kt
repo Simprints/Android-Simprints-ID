@@ -73,6 +73,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
     // External credentials
     private val externalCredential = ExternalCredential(
+        id = "id",
         value = "value".asTokenizableEncrypted(),
         subjectId = "subjectId",
         type = ExternalCredentialType.NHISCard
@@ -238,6 +239,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     )
 
     private fun getExternalCredential(subjectId: String) = ExternalCredential(
+        id = "id",
         value = "value".asTokenizableEncrypted(),
         subjectId = subjectId,
         type = ExternalCredentialType.NHISCard

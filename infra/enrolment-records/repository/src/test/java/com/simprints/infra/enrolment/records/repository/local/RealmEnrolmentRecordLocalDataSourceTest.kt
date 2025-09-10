@@ -462,6 +462,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     ) = FingerprintSample(IFingerIdentifier.LEFT_3RD_FINGER, Random.nextBytes(64), "fingerprintTemplateFormat", referenceId, id)
 
     private fun getRandomExternalCredential() = ExternalCredential(
+        id = "id",
         value = "value".asTokenizableEncrypted(),
         subjectId = "subjectId",
         type = ExternalCredentialType.NHISCard

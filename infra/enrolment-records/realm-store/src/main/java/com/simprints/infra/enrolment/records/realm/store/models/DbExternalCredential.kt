@@ -10,12 +10,7 @@ import io.realm.kotlin.types.annotations.PrimaryKey
 class DbExternalCredential : RealmObject {
     @PrimaryKey
     var id: String = ""
-        get() = "$value$SEPARATOR$subjectId"
     var value: String = ""
     var subjectId: String = ""
     var type: String = ""
-
-    companion object {
-        const val SEPARATOR = "|"
-    }
 }

@@ -20,6 +20,8 @@ import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Compani
     ]
 )
 data class DbExternalCredential(
+    // The ID is only used by BFSID for analytics. The primary key should be a composite of value+subjectId
+    val id: String,
     @ColumnInfo(name = EXTERNAL_CREDENTIAL_VALUE_COLUMN)
     val value: String,
     @ColumnInfo(name = SUBJECT_ID_COLUMN)

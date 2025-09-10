@@ -331,6 +331,7 @@ class SubjectFactoryTest {
         private lateinit var factory: SubjectFactory
         private const val PROJECT_ID = "projectId"
         private const val SUBJECT_ID = "subjectId"
+        private const val EXTERNAL_CREDENTIAL_ID = "credentialId"
         private val ATTENDANT_ID = "encryptedAttendantId".asTokenizableRaw()
         private val MODULE_ID = "encryptedModuleId".asTokenizableRaw()
         private val BASE_64_BYTES = byteArrayOf(1)
@@ -357,6 +358,7 @@ class SubjectFactoryTest {
             format = REFERENCE_FORMAT,
         )
         private val EXTERNAL_CREDENTIAL = ExternalCredential(
+            id = EXTERNAL_CREDENTIAL_ID,
             value = EXTERNAL_CREDENTIAL_VALUE,
             subjectId = SUBJECT_ID,
             type = EXTERNAL_CREDENTIAL_TYPE

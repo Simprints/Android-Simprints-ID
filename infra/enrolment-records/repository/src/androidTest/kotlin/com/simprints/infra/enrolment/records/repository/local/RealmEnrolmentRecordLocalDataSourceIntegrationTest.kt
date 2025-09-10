@@ -2,9 +2,12 @@ package com.simprints.infra.enrolment.records.repository.local
 
 import androidx.test.core.app.*
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
@@ -260,6 +263,14 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
                 ),
             ),
             referenceIdsToRemove = listOf("ref1"),
+            externalCredentialsToAdd = listOf(
+                ExternalCredential(
+                    id = "id",
+                    value = "value".asTokenizableEncrypted(),
+                    subjectId = "subjectId",
+                    type = ExternalCredentialType.NHISCard
+                )
+            )
         )
         val project = mockk<Project>()
         // When
@@ -278,6 +289,12 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         assertThat(savedSubject?.faceSamples?.first()?.referenceId).isEqualTo("ref2")
         assertThat(savedSubject?.fingerprintSamples).hasSize(1)
         assertThat(savedSubject?.fingerprintSamples?.first()?.referenceId).isEqualTo("ref3")
+        savedSubject?.externalCredentials?.first()?.let {
+            assertThat(it.id).isEqualTo("id")
+            assertThat(it.value).isEqualTo("value")
+            assertThat(it.subjectId).isEqualTo("subjectId")
+            assertThat(it.type).isEqualTo(ExternalCredentialType.NHISCard.toString())
+        }
     }
 
     @Test

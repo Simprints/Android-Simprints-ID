@@ -69,6 +69,7 @@ class SimprintsEventDownSyncTaskTest {
             biometricReferences = listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
             externalCredentials = listOf(
                 ExternalCredential(
+                    id = "id",
                     value = "value".asTokenizableEncrypted(),
                     subjectId = "subjectId",
                     type = ExternalCredentialType.NHISCard
@@ -83,6 +84,7 @@ class SimprintsEventDownSyncTaskTest {
                 "attendantId".asTokenizableRaw(),
                 listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
                 ExternalCredential(
+                    id = "id",
                     value = "value".asTokenizableEncrypted(),
                     subjectId = "subjectId",
                     type = ExternalCredentialType.NHISCard
@@ -103,6 +105,7 @@ class SimprintsEventDownSyncTaskTest {
                 DEFAULT_USER_ID,
                 listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
                 ExternalCredential(
+                    id = "id",
                     value = "value".asTokenizableEncrypted(),
                     subjectId = "subjectId",
                     type = ExternalCredentialType.NHISCard
@@ -123,6 +126,7 @@ class SimprintsEventDownSyncTaskTest {
                 DEFAULT_USER_ID_2,
                 listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
                 ExternalCredential(
+                    id = "id",
                     value = "value".asTokenizableEncrypted(),
                     subjectId = "subjectId",
                     type = ExternalCredentialType.NHISCard
@@ -140,6 +144,7 @@ class SimprintsEventDownSyncTaskTest {
             biometricReferencesAdded = listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
             biometricReferencesRemoved = listOf("referenceIdToDelete"),
             externalCredentialAdded = ExternalCredential(
+                id = "id",
                 value = "value".asTokenizableEncrypted(),
                 subjectId = "subjectId",
                 type = ExternalCredentialType.NHISCard
@@ -552,6 +557,7 @@ class SimprintsEventDownSyncTaskTest {
                 ),
                 externalCredentials = listOf(
                     ExternalCredential(
+                        id = "id",
                         value = "value".asTokenizableEncrypted(),
                         subjectId = "subjectId",
                         type = ExternalCredentialType.NHISCard

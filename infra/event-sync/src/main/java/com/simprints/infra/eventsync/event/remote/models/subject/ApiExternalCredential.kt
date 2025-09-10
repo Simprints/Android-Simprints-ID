@@ -12,6 +12,7 @@ data class ApiExternalCredential(
 
 
 internal fun ApiExternalCredential.fromApiToDomain(subjectId: String) = ExternalCredential(
+    id = id,
     value = value.asTokenizableEncrypted(),
     subjectId = subjectId,
     type = ExternalCredentialType.valueOf(type)

@@ -51,6 +51,7 @@ class ApiEnrolmentRecordCreationEventTest {
             ),
             externalCredentials = listOf(
                 ExternalCredential(
+                    id = "id",
                     value = "value".asTokenizableEncrypted(),
                     subjectId = "subjectId",
                     type = ExternalCredentialType.NHISCard

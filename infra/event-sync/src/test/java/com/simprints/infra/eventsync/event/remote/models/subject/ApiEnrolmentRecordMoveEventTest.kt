@@ -31,8 +31,8 @@ class ApiEnrolmentRecordMoveEventTest {
                     ),
                 ),
                 ApiExternalCredential(
+                    id = "id",
                     value = "value",
-                    id = "subjectId",
                     type = ExternalCredentialType.NHISCard.toString()
                 )
             ),
@@ -59,6 +59,7 @@ class ApiEnrolmentRecordMoveEventTest {
                     ),
                 ),
                 ExternalCredential(
+                    id = "id",
                     value = "value".asTokenizableEncrypted(),
                     subjectId = "subjectId",
                     type = ExternalCredentialType.NHISCard
