@@ -149,7 +149,7 @@ internal class FaceMatcherUseCaseTest {
         coEvery { enrolmentRecordRepository.count(any(), any()) } returns 1
         coEvery { createRangesUseCase(any()) } returns listOf(0..99)
         coEvery {
-            enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), any(), any(), any())
+            enrolmentRecordRepository.loadIdentities(any(), any(), any(), any(), any(), any())
         } answers {
             // Call the onCandidateLoaded callback (5th parameter)
             val onCandidateLoaded: suspend () -> Unit = arg(5)

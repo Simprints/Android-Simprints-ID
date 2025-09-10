@@ -51,7 +51,7 @@ class FaceMatcherUseCase @Inject constructor(
             return@channelFlow
         }
         val queryWithSupportedFormat = matchParams.queryForCandidates.copy(
-            faceSampleFormat = bioSdk.templateFormat(),
+            format = bioSdk.templateFormat(),
         )
         val expectedCandidates = enrolmentRecordRepository.count(
             queryWithSupportedFormat,
@@ -72,7 +72,7 @@ class FaceMatcherUseCase @Inject constructor(
         val ranges = createRanges(expectedCandidates)
         val resultSet = MatchResultSet()
         val candidatesChannel = enrolmentRecordRepository
-            .loadFaceIdentities(
+            .loadIdentities(
                 query = queryWithSupportedFormat,
                 ranges = ranges,
                 dataSource = matchParams.biometricDataSource,
@@ -88,7 +88,7 @@ class FaceMatcherUseCase @Inject constructor(
     }.flowOn(dispatcherBG)
 
     private suspend fun consumeAndMatch(
-        candidatesChannel: ReceiveChannel<IdentityBatch<Identity>>,
+        candidatesChannel: ReceiveChannel<IdentityBatch>,
         samples: List<CaptureSample>,
         resultSet: MatchResultSet,
         bioSdk: FaceBioSDK,
