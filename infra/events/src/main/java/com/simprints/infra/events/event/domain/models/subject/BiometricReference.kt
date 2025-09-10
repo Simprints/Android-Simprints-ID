@@ -16,6 +16,7 @@ import com.simprints.infra.events.event.domain.models.subject.BiometricReference
 @Keep
 sealed class BiometricReference(
     open val id: String,
+    open val format: String,
     val type: BiometricReferenceType,
 )
 
@@ -23,17 +24,17 @@ sealed class BiometricReference(
 data class FaceReference(
     override val id: String,
     val templates: List<FaceTemplate>,
-    val format: String,
+    override val format: String,
     val metadata: Map<String, String>? = null,
-) : BiometricReference(id, BiometricReferenceType.FACE_REFERENCE)
+) : BiometricReference(id, format, BiometricReferenceType.FACE_REFERENCE)
 
 @ExcludedFromGeneratedTestCoverageReports("Domain model")
 data class FingerprintReference(
     override val id: String,
     val templates: List<FingerprintTemplate>,
-    val format: String,
+    override val format: String,
     val metadata: Map<String, String>? = null,
-) : BiometricReference(id, BiometricReferenceType.FINGERPRINT_REFERENCE)
+) : BiometricReference(id, format, BiometricReferenceType.FINGERPRINT_REFERENCE)
 
 enum class BiometricReferenceType {
     // a constant key is required to serialise/deserialize

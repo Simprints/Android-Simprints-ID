@@ -25,7 +25,7 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
      */
     fun buildSubjectQuery(query: SubjectQuery): SimpleSQLiteQuery {
         // require format not to be set for subject query and guide to use the buildBiometricTemplatesQuery instead
-        require(query.fingerprintSampleFormat == null && query.faceSampleFormat == null) {
+        require(query.format == null) {
             "Cannot set format for subject query, use buildBiometricTemplatesQuery instead"
         }
         val (whereClause, args) = buildWhereClause(query)
@@ -43,9 +43,8 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
 
     fun buildCountQuery(query: SubjectQuery): SimpleSQLiteQuery {
         val (whereClause, args) = buildWhereClause(query)
-        val specificFormat = query.fingerprintSampleFormat ?: query.faceSampleFormat
 
-        val sql = if (specificFormat != null) {
+        val sql = if (query.format != null) {
             "SELECT COUNT(DISTINCT S.$SUBJECT_ID_COLUMN) FROM $SUBJECT_TABLE_NAME S  INNER JOIN  $TEMPLATE_TABLE_NAME T" +
                 " using(subjectId) $whereClause"
         } else {
@@ -59,8 +58,7 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
         pageSize: Int,
     ): SimpleSQLiteQuery {
         // require format to be set for biometric templates query
-        val format = query.fingerprintSampleFormat ?: query.faceSampleFormat
-        require(format != null) {
+        require(query.format != null) {
             "Must set format for biometric templates query, use buildSubjectQuery or buildCountQuery instead"
         }
         val updatedQuery = query.copy(sort = true)
@@ -77,14 +75,14 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
                 $whereClause
                 $orderByClause
                 LIMIT $pageSize
-            ) B USING(subjectId) where A.format ='$format'
+            ) B USING(subjectId) where A.format ='${query.format}'
             """.trimIndent()
         return SimpleSQLiteQuery(sql, args.toTypedArray())
     }
 
     fun buildDeleteQuery(query: SubjectQuery): SimpleSQLiteQuery {
-        require(query.faceSampleFormat == null && query.fingerprintSampleFormat == null) {
-            val errorMsg = "faceSampleFormat and fingerprintSampleFormat are not supported for deletion"
+        require(query.format == null) {
+            val errorMsg = "format is not supported for deletion"
             Simber.i("[delete] $errorMsg", tag = ROOM_RECORDS_DB)
             errorMsg
         }
@@ -106,9 +104,6 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
     ): Pair<String, List<Any?>> {
         val clauses = mutableListOf<String>()
         val args = mutableListOf<Any?>()
-        require(!(query.fingerprintSampleFormat != null && query.faceSampleFormat != null)) {
-            "Cannot set both fingerprintSampleFormat and faceSampleFormat"
-        }
         // to achieve the highest performance, we should not use OR in the where clause
         // subject id params are mutually exclusive, so only one of them will be set at a time
         when {
@@ -140,11 +135,7 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
             clauses.add("${subjectAlias}$MODULE_ID_COLUMN = ?")
             args.add(it.value)
         }
-        query.faceSampleFormat?.let {
-            clauses.add("${templateAlias}$FORMAT_COLUMN = ?")
-            args.add(it)
-        }
-        query.fingerprintSampleFormat?.let {
+        query.format?.let {
             clauses.add("${templateAlias}$FORMAT_COLUMN = ?")
             args.add(it)
         }
