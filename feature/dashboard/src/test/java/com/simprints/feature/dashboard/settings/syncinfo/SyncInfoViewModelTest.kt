@@ -11,6 +11,7 @@ import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.feature.dashboard.settings.syncinfo.usecase.ObserveSyncInfoUseCase
 import com.simprints.feature.login.LoginResult
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.Project
@@ -397,6 +398,21 @@ class SyncInfoViewModelTest {
     fun `should start event sync with down sync disabled when project ending`() = runTest {
         val mockEndingProject = mockk<Project> {
             every { state } returns ProjectState.PROJECT_ENDING
+        }
+        coEvery { configManager.getProject(any()) } returns mockEndingProject
+        createViewModel()
+        viewModel.isPreLogoutUpSync = false
+
+        viewModel.forceEventSync()
+
+        coVerify { syncOrchestrator.stopEventSync() }
+        coVerify { syncOrchestrator.startEventSync(isDownSyncAllowed = false) }
+    }
+
+    @Test
+    fun `should start event sync with down sync disabled event sync when logged out`() = runTest {
+        val mockEndingProject = mockk<Project> {
+            every { state } throws RemoteDbNotSignedInException("stub!")
         }
         coEvery { configManager.getProject(any()) } returns mockEndingProject
         createViewModel()

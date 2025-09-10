@@ -233,23 +233,31 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             else -> DownSyncCounts(0, isLowerBound = false)
         }
 
-        val project = configManager.getProject(projectId)
+        val project = try {
+            configManager.getProject(projectId)
+        } catch (e: Exception) {
+            null
+        }
         val isProjectRunning =
-            project.state == ProjectState.RUNNING
-        val moduleCounts = deviceConfig.selectedModules.map { moduleName ->
-            ModuleCount(
-                name = when (moduleName) {
-                    is TokenizableString.Raw -> moduleName
-                    is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
-                        encrypted = moduleName,
-                        tokenKeyType = TokenKeyType.ModuleId,
-                        project,
-                    )
-                }.value,
-                count = enrolmentRecordRepository.count(
-                    SubjectQuery(projectId = projectId, moduleId = moduleName),
-                ),
-            )
+            project?.state == ProjectState.RUNNING
+        val moduleCounts = if (project != null) {
+            deviceConfig.selectedModules.map { moduleName ->
+                ModuleCount(
+                    name = when (moduleName) {
+                        is TokenizableString.Raw -> moduleName
+                        is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
+                            encrypted = moduleName,
+                            tokenKeyType = TokenKeyType.ModuleId,
+                            project,
+                        )
+                    }.value,
+                    count = enrolmentRecordRepository.count(
+                        SubjectQuery(projectId = projectId, moduleId = moduleName),
+                    ),
+                )
+            }
+        } else {
+            emptyList()
         }
         val modulesCountTotal = SyncInfoModuleCount(
             isTotal = true,

@@ -140,8 +140,16 @@ internal class SyncInfoViewModel @Inject constructor(
                 eventSyncButtonClickFlow.emit(Unit)
             }
             syncOrchestrator.stopEventSync()
-            val isDownSyncAllowed =
-                !isPreLogoutUpSync && configManager.getProject(authStore.signedInProjectId).state == ProjectState.RUNNING
+            val projectState = try {
+                configManager.getProject(authStore.signedInProjectId).state
+            } catch (_: Exception) {
+                // When the device is compromised the project data will be deleted and
+                // attempting to access project state with result in exception.
+                // For user it is essentially the same as project ending.
+                ProjectState.PROJECT_ENDED
+            }
+
+            val isDownSyncAllowed = !isPreLogoutUpSync && projectState == ProjectState.RUNNING
             syncOrchestrator.startEventSync(isDownSyncAllowed)
         }
     }
