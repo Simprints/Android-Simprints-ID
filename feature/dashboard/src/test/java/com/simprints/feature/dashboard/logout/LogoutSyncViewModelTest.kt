@@ -161,10 +161,11 @@ internal class LogoutSyncViewModelTest {
     }
 
     private fun createViewModel() = LogoutSyncViewModel(
-        configManager = configManager,
-        eventSyncManager = eventSyncManager,
-        syncOrchestrator = syncOrchestrator,
-        authStore = authStore,
-        logoutUseCase = logoutUseCase,
+        configManager = ::configManager,
+        eventSyncManager = ::eventSyncManager,
+        syncOrchestrator = ::syncOrchestrator,
+        authStore = ::authStore,
+        logoutUseCase = ::logoutUseCase,
+        mainDispatcher = testCoroutineRule.testCoroutineDispatcher,
     )
 }
