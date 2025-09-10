@@ -17,6 +17,7 @@ import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent.OneToOn
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
+import com.simprints.matcher.MatchBatchInfo
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
@@ -81,6 +82,7 @@ class SaveMatchEventUseCaseTest {
                 FaceMatchResult.Item("guid1", 0.5f),
                 FaceMatchResult.Item("guid2", 0.1f),
             ),
+            batches = emptyList(),
         )
 
         // Then
@@ -125,6 +127,7 @@ class SaveMatchEventUseCaseTest {
                 FaceMatchResult.Item("guid1", 0.5f),
                 FaceMatchResult.Item("guid2", 0.1f),
             ),
+            batches = emptyList(),
         )
 
         // Then
@@ -146,6 +149,10 @@ class SaveMatchEventUseCaseTest {
 
     @Test
     fun `Correctly saves one to many match event`() = runTest {
+        val batches = listOf(
+            MatchBatchInfo(Timestamp(3L), Timestamp(4L), Timestamp(5L), Timestamp(6L), 10),
+            MatchBatchInfo(Timestamp(7L), Timestamp(8L), Timestamp(9L), Timestamp(10L), 5),
+        )
         useCase.invoke(
             startTime = Timestamp(1L),
             endTime = Timestamp(2L),
@@ -164,6 +171,7 @@ class SaveMatchEventUseCaseTest {
                 FaceMatchResult.Item("guid1", 0.5f),
                 FaceMatchResult.Item("guid2", 0.1f),
             ),
+            batches = batches,
         )
 
         // Then
@@ -184,7 +192,19 @@ class SaveMatchEventUseCaseTest {
                             ?.last()
                             ?.candidateId,
                     ).isEqualTo("guid2")
-                    assertThat((it.payload as OneToManyMatchPayloadV3).probeBiometricReferenceId).isEqualTo("referenceId")
+                    val payloadV3 = it.payload as OneToManyMatchPayloadV3
+                    assertThat(payloadV3.probeBiometricReferenceId).isEqualTo("referenceId")
+                    assertThat(payloadV3.batches!!).hasSize(2)
+                    assertThat(payloadV3.batches!![0].loadingStartTime).isEqualTo(Timestamp(3L))
+                    assertThat(payloadV3.batches!![0].loadingEndTime).isEqualTo(Timestamp(4L))
+                    assertThat(payloadV3.batches!![0].comparingStartTime).isEqualTo(Timestamp(5L))
+                    assertThat(payloadV3.batches!![0].comparingEndTime).isEqualTo(Timestamp(6L))
+                    assertThat(payloadV3.batches!![0].count).isEqualTo(10)
+                    assertThat(payloadV3.batches!![1].loadingStartTime).isEqualTo(Timestamp(7L))
+                    assertThat(payloadV3.batches!![1].loadingEndTime).isEqualTo(Timestamp(8L))
+                    assertThat(payloadV3.batches!![1].comparingStartTime).isEqualTo(Timestamp(9L))
+                    assertThat(payloadV3.batches!![1].comparingEndTime).isEqualTo(Timestamp(10L))
+                    assertThat(payloadV3.batches!![1].count).isEqualTo(5)
                 },
             )
         }
@@ -192,6 +212,9 @@ class SaveMatchEventUseCaseTest {
 
     @Test
     fun `Correctly saves one to many match event with USER pool`() = runTest {
+        val batches = listOf(
+            MatchBatchInfo(Timestamp(3L), Timestamp(4L), Timestamp(5L), Timestamp(6L), 10),
+        )
         useCase.invoke(
             Timestamp(1L),
             Timestamp(2L),
@@ -204,13 +227,21 @@ class SaveMatchEventUseCaseTest {
             0,
             "faceMatcherName",
             listOf(FaceMatchResult.Item("guid1", 0.5f)),
+            batches = batches,
         )
 
         // Then
         coVerify {
             eventRepository.addOrUpdateEvent(
                 withArg<OneToManyMatchEvent> {
-                    assertThat(it.payload.pool.type).isEqualTo(OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.USER)
+                    val payloadV3 = it.payload as OneToManyMatchPayloadV3
+                    assertThat(payloadV3.pool.type).isEqualTo(OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.USER)
+                    assertThat(payloadV3.batches!!).hasSize(1)
+                    assertThat(payloadV3.batches!![0].loadingStartTime).isEqualTo(Timestamp(3L))
+                    assertThat(payloadV3.batches!![0].loadingEndTime).isEqualTo(Timestamp(4L))
+                    assertThat(payloadV3.batches!![0].comparingStartTime).isEqualTo(Timestamp(5L))
+                    assertThat(payloadV3.batches!![0].comparingEndTime).isEqualTo(Timestamp(6L))
+                    assertThat(payloadV3.batches!![0].count).isEqualTo(10)
                 },
             )
         }
@@ -218,6 +249,9 @@ class SaveMatchEventUseCaseTest {
 
     @Test
     fun `Correctly saves one to many match event with MODULE pool`() = runTest {
+        val batches = listOf(
+            MatchBatchInfo(Timestamp(3L), Timestamp(4L), Timestamp(5L), Timestamp(6L), 10),
+        )
         useCase.invoke(
             Timestamp(1L),
             Timestamp(2L),
@@ -230,13 +264,21 @@ class SaveMatchEventUseCaseTest {
             0,
             "faceMatcherName",
             emptyList(),
+            batches = batches,
         )
 
         // Then
         coVerify {
             eventRepository.addOrUpdateEvent(
                 withArg<OneToManyMatchEvent> {
-                    assertThat(it.payload.pool.type).isEqualTo(OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.MODULE)
+                    val payloadV3 = it.payload as OneToManyMatchPayloadV3
+                    assertThat(payloadV3.pool.type).isEqualTo(OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.MODULE)
+                    assertThat(payloadV3.batches!!).hasSize(1)
+                    assertThat(payloadV3.batches!![0].loadingStartTime).isEqualTo(Timestamp(3L))
+                    assertThat(payloadV3.batches!![0].loadingEndTime).isEqualTo(Timestamp(4L))
+                    assertThat(payloadV3.batches!![0].comparingStartTime).isEqualTo(Timestamp(5L))
+                    assertThat(payloadV3.batches!![0].comparingEndTime).isEqualTo(Timestamp(6L))
+                    assertThat(payloadV3.batches!![0].count).isEqualTo(10)
                 },
             )
         }
@@ -244,6 +286,9 @@ class SaveMatchEventUseCaseTest {
 
     @Test
     fun `Correctly saves one to many match event with PROJECT pool`() = runTest {
+        val batches = listOf(
+            MatchBatchInfo(Timestamp(3L), Timestamp(4L), Timestamp(5L), Timestamp(6L), 10),
+        )
         useCase.invoke(
             Timestamp(1L),
             Timestamp(2L),
@@ -257,13 +302,21 @@ class SaveMatchEventUseCaseTest {
             0,
             "faceMatcherName",
             emptyList(),
+            batches = batches,
         )
 
         // Then
         coVerify {
             eventRepository.addOrUpdateEvent(
                 withArg<OneToManyMatchEvent> {
-                    assertThat(it.payload.pool.type).isEqualTo(OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.PROJECT)
+                    val payloadV3 = it.payload as OneToManyMatchPayloadV3
+                    assertThat(payloadV3.pool.type).isEqualTo(OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.PROJECT)
+                    assertThat(payloadV3.batches!!).hasSize(1)
+                    assertThat(payloadV3.batches!![0].loadingStartTime).isEqualTo(Timestamp(3L))
+                    assertThat(payloadV3.batches!![0].loadingEndTime).isEqualTo(Timestamp(4L))
+                    assertThat(payloadV3.batches!![0].comparingStartTime).isEqualTo(Timestamp(5L))
+                    assertThat(payloadV3.batches!![0].comparingEndTime).isEqualTo(Timestamp(6L))
+                    assertThat(payloadV3.batches!![0].count).isEqualTo(10)
                 },
             )
         }

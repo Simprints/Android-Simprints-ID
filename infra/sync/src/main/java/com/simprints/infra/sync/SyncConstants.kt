@@ -27,4 +27,7 @@ internal object SyncConstants {
     const val EVENT_SYNC_WORK_NAME = "event-sync-work"
     const val EVENT_SYNC_WORK_NAME_ONE_TIME = "event-sync-work-one-time"
     const val EVENT_SYNC_WORKER_INTERVAL = BuildConfig.EVENT_SYNC_WORKER_INTERVAL_MINUTES
+
+    const val PROGRESS_CURRENT = "progress_current"
+    const val PROGRESS_MAX = "progress_max"
 }

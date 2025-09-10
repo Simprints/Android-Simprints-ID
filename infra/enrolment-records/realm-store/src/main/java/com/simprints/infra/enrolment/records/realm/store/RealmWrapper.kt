@@ -14,4 +14,9 @@ interface RealmWrapper {
      * that modifications are handled in a transaction.
      */
     suspend fun <R> writeRealm(block: (MutableRealm) -> R)
+
+    /**
+     *  close the Realm instance.
+     */
+    suspend fun close()
 }

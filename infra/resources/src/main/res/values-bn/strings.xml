@@ -318,28 +318,28 @@
     <string name="dashboard_project_card_scanner_used">স্ক্যানার ব্যবহার করা হয়েছে: %1$s</string>
     <string name="dashboard_project_card_current_user">বর্তমান ব্যবহারকারী: %1$s</string>
 
-    <!-- Dashboard - Sync card -->
-    <string name="dashboard_sync_card_title">সিঙ্ক স্ট্যাটাস</string>
-    <string name="dashboard_sync_card_complete">সিঙ্ক হয়েছে</string>
-    <string name="dashboard_sync_card_incomplete">সিঙ্ক অসম্পূর্ণ</string>
-    <string name="dashboard_sync_card_connecting">সংযুক্ত হচ্ছে</string>
-    <string name="dashboard_sync_card_progress">সিঙ্ক করা হচ্ছে… %1$s</string>
-    <string name="dashboard_sync_card_sync_button">সিঙ্ক করুন</string>
-    <string name="dashboard_sync_card_failed_message">সিঙ্ক অসফল হয়েছে</string>
-    <string name="dashboard_sync_card_no_modules_message">সিঙ্ক করতে মডিউল নির্বাচন করুন</string>
-    <string name="dashboard_sync_card_no_modules_button">মডিউল সমূহ</string>
-    <string name="dashboard_sync_card_offline_message">সেটিংস্‌ থেকে ইন্টারনেট সংযোগ চালু করুন</string>
-    <string name="dashboard_sync_card_settings_button">স্ক্যানার যোগ করুন</string>
-    <string name="dashboard_sync_card_too_many_modules_message">অনেক বেশি মডিউল ডাউনলোড করা হয়েছে </string>
-    <string name="dashboard_sync_card_relogin_required">সিঙ্ক করতে পুনরায় লগইন করুন </string>
+    <!-- Sync Info -->
+    <string name="sync_info_header_title">সিঙ্ক স্ট্যাটাস</string>
+    <string name="sync_info_complete">সিঙ্ক হয়েছে</string>
+    <string name="sync_info_incomplete">সিঙ্ক অসম্পূর্ণ</string>
+    <string name="sync_info_connecting">সংযুক্ত হচ্ছে</string>
+    <string name="sync_info_progress">সিঙ্ক করা হচ্ছে… %1$s</string>
+    <string name="sync_info_sync_button">সিঙ্ক করুন</string>
+    <string name="sync_info_details_error">সিঙ্ক অসফল হয়েছে</string>
+    <string name="sync_info_no_modules_message">সিঙ্ক করতে মডিউল নির্বাচন করুন</string>
+    <string name="sync_info_no_modules_button">মডিউল সমূহ</string>
+    <string name="sync_info_offline_message">সেটিংস্‌ থেকে ইন্টারনেট সংযোগ চালু করুন</string>
+    <string name="sync_info_header_settings_button"><font fgcolor='#FF7C00'><u>স্ক্যানার যোগ করুন</u></font></string>
+    <string name="sync_info_details_too_many_modules">অনেক বেশি মডিউল ডাউনলোড করা হয়েছে </string>
+    <string name="sync_info_re_login_required">সিঙ্ক করতে পুনরায় লগইন করুন </string>
 
-    <string name="dashboard_sync_card_last_sync">সর্বশেষ সিঙ্ক: %1$s</string>
-    <string name="dashboard_sync_card_records_uploaded">সমস্ত রেকর্ড আপলোড হয়েছে</string>
-    <plurals name="dashboard_sync_card_records_to_upload">
+    <string name="sync_info_last_sync">সর্বশেষ সিঙ্ক: %1$s</string>
+    <string name="sync_info_records_uploaded">সমস্ত রেকর্ড আপলোড হয়েছে</string>
+    <plurals name="sync_info_records_to_upload">
         <item quantity="one"> %1$dটি রেকর্ড আপলোড হওয়া বাকি </item>
         <item quantity="other">%1$dটি রেকর্ড আপলোড হওয়া বাকি </item>
     </plurals>
-    <string name="dashboard_sync_card_try_again_button">আবার চেষ্টা করুন</string>
+    <string name="sync_info_button_try_again">আবার চেষ্টা করুন</string>
 
     <!-- Dashboard - Daily activity card -->
     <string name="dashboard_activity_card_activity">কার্যক্রম তথ্য: %1$s</string>
@@ -384,20 +384,17 @@
     <string name="dashboard_preference_enable_audio_on_scan_complete">অডিও সতর্কতা</string>
     <string name="dashboard_preference_enable_auto_capture">অটো-ক্যাপচার</string>
 
-    <!-- Dashboard - Sync info -->
-    <string name="dashboard_sync_info_title">তথ্য সিঙ্ক করুন</string>
-    <string name="dashboard_sync_info_select_modules_button">মডিউল নির্বাচন করুন</string>
-    <string name="dashboard_sync_info_records_to_upload">আপলোড এর জন্য প্রস্তুত রেকর্ড</string>
-    <string name="dashboard_sync_info_records_to_download">ডাউনলোড বা মুছে ফেলার রেকর্ড</string>
-    <string name="dashboard_sync_info_records_to_delete">মুছে ফেলার জন্য প্রস্তুত রেকর্ড</string>
-    <string name="dashboard_sync_info_total_records_on_device">ফোনে সংরক্ষিত সকল রেকর্ড</string>
-    <string name="dashboard_sync_info_selected_modules">নির্বাচিত মডিউল</string>
-    <string name="dashboard_sync_info_unselected_modules">অনির্বাচিত মডিউল</string>
-    <string name="dashboard_sync_info_total_records">সকল রেকর্ড</string>
-    <string name="dashboard_sync_info_images_to_upload">আপলোড বাকি</string>
-    <string name="dashboard_sync_info_sync_now_button">সিঙ্ক করুন</string>
-    <string name="dashboard_sync_info_sync_in_progress">সিঙ্ক হচ্ছে…</string>
-    <string name="dashboard_sync_info_re_fetch_button">সিঙ্ক তথ্য পুনরায় নিয়ে আসুন  </string>
+    <!-- Sync info -->
+    <string name="sync_info_total_records">সকল রেকর্ড</string>
+    <string name="sync_info_title">তথ্য সিঙ্ক করুন</string>
+    <string name="sync_info_button_select_modules">মডিউল নির্বাচন করুন</string>
+    <string name="sync_info_records_to_up_sync">আপলোড এর জন্য প্রস্তুত রেকর্ড</string>
+    <string name="sync_info_records_to_download_or_delete">ডাউনলোড বা মুছে ফেলার রেকর্ড</string>
+    <string name="sync_info_records_to_delete">মুছে ফেলার জন্য প্রস্তুত রেকর্ড</string>
+    <string name="sync_info_records_on_device">ফোনে সংরক্ষিত সকল রেকর্ড</string>
+    <string name="sync_info_section_module_selection">নির্বাচিত মডিউল</string>
+    <string name="sync_info_images_to_up_sync">আপলোড বাকি</string>
+    <string name="sync_info_button_records_syncing">সিঙ্ক হচ্ছে…</string>
 
     <!-- Dashboard - Module selection -->
     <string name="dashboard_select_modules_no_modules">অবৈধ নির্বাচন। অন্তত একটি মডিউল নির্বাচন করুন।</string>

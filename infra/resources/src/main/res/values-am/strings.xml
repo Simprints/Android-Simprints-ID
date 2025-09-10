@@ -321,28 +321,28 @@
     <string name="dashboard_project_card_scanner_used">እስካነር ይጠቀሙ: %1$s</string>
     <string name="dashboard_project_card_current_user">አሁን ያለ ተጠቃሚ: %1$s</string>
 
-    <!-- Dashboard - Sync card -->
-    <string name="dashboard_sync_card_title">መረጃውን መገናኘት</string>
-    <string name="dashboard_sync_card_complete">ሲንክ ማድረጉ ተጠናቋል</string>
-    <string name="dashboard_sync_card_incomplete">ሲንክ ማድረጉ አልተጠናቀቀም</string>
-    <string name="dashboard_sync_card_connecting">በመገኛኘት ላይ ነው</string>
-    <string name="dashboard_sync_card_progress">በግንኙነት ላይ...%1$s</string>
-    <string name="dashboard_sync_card_sync_button">አሁን ግንኙነት ፍጠር</string>
-    <string name="dashboard_sync_card_failed_message">ሲንክ ማድረግ አልተቻለም እባክዎ የበላይ አካል ያግኙ</string>
-    <string name="dashboard_sync_card_no_modules_message">ሲንክ ለማድረግ ሞጁል ይምረጡ</string>
-    <string name="dashboard_sync_card_no_modules_button">ሞጁሎች</string>
-    <string name="dashboard_sync_card_offline_message">የስልኩ ሴቲንግ በመግባት የሞባይል ዳታ ያብሩ</string>
-    <string name="dashboard_sync_card_settings_button">ማስተካከያ</string>
-    <string name="dashboard_sync_card_too_many_modules_message">ከተፈቀደው ሞጁል በላይ ወርዷል</string>
-    <string name="dashboard_sync_card_relogin_required">በቅድሚያ መግባት አለበት መረጃዉን ለመላክ</string>
+    <!-- Sync Info -->
+    <string name="sync_info_header_title">መረጃውን መገናኘት</string>
+    <string name="sync_info_complete">ሲንክ ማድረጉ ተጠናቋል</string>
+    <string name="sync_info_incomplete">ሲንክ ማድረጉ አልተጠናቀቀም</string>
+    <string name="sync_info_connecting">በመገኛኘት ላይ ነው</string>
+    <string name="sync_info_progress">በግንኙነት ላይ...%1$s</string>
+    <string name="sync_info_sync_button">አሁን ግንኙነት ፍጠር</string>
+    <string name="sync_info_details_error">ሲንክ ማድረግ አልተቻለም እባክዎ የበላይ አካል ያግኙ</string>
+    <string name="sync_info_no_modules_message">ሲንክ ለማድረግ ሞጁል ይምረጡ</string>
+    <string name="sync_info_no_modules_button">ሞጁሎች</string>
+    <string name="sync_info_offline_message">የስልኩ ሴቲንግ በመግባት የሞባይል ዳታ ያብሩ</string>
+    <string name="sync_info_header_settings_button"><font fgcolor='#FF7C00'><u>ማስተካከያ</u></font></string>
+    <string name="sync_info_details_too_many_modules">ከተፈቀደው ሞጁል በላይ ወርዷል</string>
+    <string name="sync_info_re_login_required">በቅድሚያ መግባት አለበት መረጃዉን ለመላክ</string>
 
-    <string name="dashboard_sync_card_last_sync">መጨረሻ ጊዜ ወደ ሰርቨር የተላከው : %1$s</string>
-    <string name="dashboard_sync_card_records_uploaded">ሁሉም መዝገቦች ተጭነዋል</string>
-    <plurals name="dashboard_sync_card_records_to_upload">
+    <string name="sync_info_last_sync">መጨረሻ ጊዜ ወደ ሰርቨር የተላከው : %1$s</string>
+    <string name="sync_info_records_uploaded">ሁሉም መዝገቦች ተጭነዋል</string>
+    <plurals name="sync_info_records_to_upload">
         <item quantity="one">%1$d ለመስቀል መዝገብ</item>
         <item quantity="other">%1$d ለመስቀል መዝገቦች</item>
     </plurals>
-    <string name="dashboard_sync_card_try_again_button">እንደገና ይሞክሩ</string>
+    <string name="sync_info_button_try_again">እንደገና ይሞክሩ</string>
 
     <!-- Dashboard - Daily activity card -->
     <string name="dashboard_activity_card_activity">የየዕለት ተግባር: %1$s</string>
@@ -387,20 +387,17 @@
     <string name="dashboard_preference_enable_audio_on_scan_complete">የድምጽ ማንቂያ</string>
     <string name="dashboard_preference_enable_auto_capture">ራስ-ሰር ቀረጻ</string>
 
-    <!-- Dashboard - Sync info -->
-    <string name="dashboard_sync_info_title">ሲንክ የተደረገ መረጃ</string>
-    <string name="dashboard_sync_info_select_modules_button">ሞጅውሎችን ይምረጡ</string>
-    <string name="dashboard_sync_info_records_to_upload">የተመዘገበውን ለመጫን</string>
-    <string name="dashboard_sync_info_records_to_download">ሪክርዶች ለማውረድ ወይም ለመሰረዝ</string>
-    <string name="dashboard_sync_info_records_to_delete">የተመዘገበውን ለመሰረዝ</string>
-    <string name="dashboard_sync_info_total_records_on_device">በስልኩ አጠቃላይ የተመዘገበ</string>
-    <string name="dashboard_sync_info_selected_modules">የተመረጡ ሞጁሎች</string>
-    <string name="dashboard_sync_info_unselected_modules">ያልተመረጡ ሞጁሎች</string>
-    <string name="dashboard_sync_info_total_records">አጠቃላይ የተመዘገበ</string>
-    <string name="dashboard_sync_info_images_to_upload">የሚጫኑ ምስሎች</string>
-    <string name="dashboard_sync_info_sync_now_button">አሁን ግንኙነት ፍጠር</string>
-    <string name="dashboard_sync_info_sync_in_progress">በግንኙነት ላይ</string>
-    <string name="dashboard_sync_info_re_fetch_button">የሲንክ መረጃውን በመውሰድ ላይ</string>
+    <!-- Sync info -->
+    <string name="sync_info_total_records">አጠቃላይ የተመዘገበ</string>
+    <string name="sync_info_title">ሲንክ የተደረገ መረጃ</string>
+    <string name="sync_info_button_select_modules">ሞጅውሎችን ይምረጡ</string>
+    <string name="sync_info_records_to_up_sync">የተመዘገበውን ለመጫን</string>
+    <string name="sync_info_records_to_download_or_delete">ሪክርዶች ለማውረድ ወይም ለመሰረዝ</string>
+    <string name="sync_info_records_to_delete">የተመዘገበውን ለመሰረዝ</string>
+    <string name="sync_info_records_on_device">በስልኩ አጠቃላይ የተመዘገበ</string>
+    <string name="sync_info_section_module_selection">የተመረጡ ሞጁሎች</string>
+    <string name="sync_info_images_to_up_sync">የሚጫኑ ምስሎች</string>
+    <string name="sync_info_button_records_syncing">በግንኙነት ላይ</string>
 
     <!-- Dashboard - Module selection -->
     <string name="dashboard_select_modules_no_modules">የተሳሳተ ምርጫ፡ እባክዎት ካለው የምዕራፍ አማራጭ ውስጥ ቢያንስ አንድ ይምረጡ</string>

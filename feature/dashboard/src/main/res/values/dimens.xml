@@ -3,4 +3,5 @@
     <dimen name="finger_selection_item_padding">16dp</dimen>
     <item name="finger_selection_finger_name_width_proportion" format="float" type="dimen">0.7</item>
     <item name="finger_selection_finger_quantity_width_proportion" format="float" type="dimen">0.3</item>
+    <dimen name="module_item_height">48dp</dimen>
 </resources>

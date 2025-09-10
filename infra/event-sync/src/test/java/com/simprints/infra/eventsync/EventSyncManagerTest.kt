@@ -1,10 +1,12 @@
 package com.simprints.infra.eventsync
 
+import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.Partitioning
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.core.tools.utils.ExtractCommCareCaseIdUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.events.EventRepository
@@ -14,12 +16,15 @@ import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.infra.eventsync.event.commcare.cache.CommCareSyncCache
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
+import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
+import com.simprints.infra.eventsync.sync.down.tasks.CommCareEventSyncTask
 import com.simprints.infra.eventsync.sync.down.tasks.SimprintsEventDownSyncTask
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
@@ -58,10 +63,16 @@ internal class EventSyncManagerTest {
     lateinit var eventSyncCache: EventSyncCache
 
     @MockK
+    lateinit var commCareSyncCache: CommCareSyncCache
+
+    @MockK
     lateinit var eventRepository: EventRepository
 
     @MockK
-    lateinit var downSyncTask: SimprintsEventDownSyncTask
+    lateinit var simprintsDownSyncTask: SimprintsEventDownSyncTask
+
+    @MockK
+    lateinit var commCareDownSyncTask: CommCareEventSyncTask
 
     @MockK
     lateinit var eventRemoteDataSource: EventRemoteDataSource
@@ -75,6 +86,9 @@ internal class EventSyncManagerTest {
     @MockK
     lateinit var project: Project
 
+    @MockK
+    lateinit var extractCommCareCaseIdUseCase: ExtractCommCareCaseIdUseCase
+
     private lateinit var eventSyncManagerImpl: EventSyncManagerImpl
 
     @Before
@@ -85,7 +99,9 @@ internal class EventSyncManagerTest {
         coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general.modalities } returns listOf()
             every {
-                synchronization.down.simprints?.partitionType?.toDomain()
+                synchronization.down.simprints
+                    ?.partitionType
+                    ?.toDomain()
             } returns Partitioning.MODULE
         }
 
@@ -96,9 +112,12 @@ internal class EventSyncManagerTest {
             eventRepository = eventRepository,
             upSyncScopeRepo = eventUpSyncScopeRepository,
             eventSyncCache = eventSyncCache,
-            simprintsDownSyncTask = downSyncTask,
+            commCareSyncCache = commCareSyncCache,
+            simprintsDownSyncTask = simprintsDownSyncTask,
+            commCareSyncTask = commCareDownSyncTask,
             eventRemoteDataSource = eventRemoteDataSource,
             configRepository = configRepository,
+            extractCommCareCaseId = extractCommCareCaseIdUseCase,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
     }
@@ -116,6 +135,25 @@ internal class EventSyncManagerTest {
     }
 
     @Test
+    fun `getLastSyncState with useDefaultValue true should return an immediate default value`() = runTest {
+        every { eventSyncStateProcessor.getLastSyncState() } returns MutableLiveData(null)
+        val defaultValue = EventSyncState(syncId = "", null, null, emptyList(), emptyList(), emptyList())
+
+        val result = eventSyncManagerImpl.getLastSyncState(true).value
+
+        assertThat(result).isEqualTo(defaultValue)
+    }
+
+    @Test
+    fun `getLastSyncState with useDefaultValue false and no data emission should return null value`() = runTest {
+        every { eventSyncStateProcessor.getLastSyncState() } returns MutableLiveData(null)
+
+        val result = eventSyncManagerImpl.getLastSyncState(false).value
+
+        assertThat(result).isEqualTo(null)
+    }
+
+    @Test
     fun `countEventsToUpload without types should call event repo`() = runTest {
         eventSyncManagerImpl.countEventsToUpload().toList()
 
@@ -130,7 +168,7 @@ internal class EventSyncManagerTest {
     }
 
     @Test
-    fun `getDownSyncCounts correctly counts sync events`() = runTest {
+    fun `countEventsToDownload correctly counts sync events`() = runTest {
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any())
         } returns SampleSyncScopes.modulesDownSyncScope
@@ -149,14 +187,98 @@ internal class EventSyncManagerTest {
     }
 
     @Test
-    fun `downSync should call down sync helper`() = runTest {
+    fun `downSyncSubject should call CommCare sync when CommCare config is present`() = runTest {
+        val metadata = """{"caseId": "case123"}"""
+        val expectedCaseId = "case123"
+
+        // Mock CommCare configuration
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+            every { general.modalities } returns listOf()
+            every { synchronization.down.simprints } returns null
+            every { synchronization.down.commCare } returns mockk()
+        }
+        every { extractCommCareCaseIdUseCase.invoke(metadata) } returns expectedCaseId
         coEvery { eventRepository.createEventScope(any()) } returns eventScope
-        coEvery { downSyncTask.downSync(any(), any(), eventScope, any()) } returns emptyFlow()
+        coEvery { commCareDownSyncTask.downSync(any(), any(), eventScope, any()) } returns emptyFlow()
 
-        eventSyncManagerImpl.downSyncSubject(DEFAULT_PROJECT_ID, "subjectId")
+        eventSyncManagerImpl.downSyncSubject(DEFAULT_PROJECT_ID, "subjectId", metadata)
 
-        coVerify { downSyncTask.downSync(any(), any(), eventScope, any()) }
+        coVerify { extractCommCareCaseIdUseCase.invoke(metadata) }
+        coVerify {
+            commCareDownSyncTask.downSync(
+                any(),
+                match { operation ->
+                    operation.queryEvent.externalIds == listOf(expectedCaseId)
+                },
+                eventScope,
+                any(),
+            )
+        }
         coVerify { eventRepository.closeEventScope(eventScope, any()) }
+        coVerify(exactly = 0) { simprintsDownSyncTask.downSync(any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `downSyncSubject should call CommCare sync with null externalIds when caseId is null`() = runTest {
+        val metadata = """{"otherField": "value"}"""
+
+        // Mock CommCare configuration
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+            every { general.modalities } returns listOf()
+            every { synchronization.down.simprints } returns null
+            every { synchronization.down.commCare } returns mockk()
+        }
+        every { extractCommCareCaseIdUseCase.invoke(metadata) } returns null
+        coEvery { eventRepository.createEventScope(any()) } returns eventScope
+        coEvery { commCareDownSyncTask.downSync(any(), any(), eventScope, any()) } returns emptyFlow()
+
+        eventSyncManagerImpl.downSyncSubject(DEFAULT_PROJECT_ID, "subjectId", metadata)
+
+        coVerify { extractCommCareCaseIdUseCase.invoke(metadata) }
+        coVerify {
+            commCareDownSyncTask.downSync(
+                any(),
+                match { operation ->
+                    operation.queryEvent.externalIds == null
+                },
+                eventScope,
+                any(),
+            )
+        }
+        coVerify { eventRepository.closeEventScope(eventScope, any()) }
+        coVerify(exactly = 0) { simprintsDownSyncTask.downSync(any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `downSyncSubject should call Simprints sync when Simprints config is present`() = runTest {
+        // Mock Simprints configuration (restore original config from setup)
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+            every { general.modalities } returns listOf()
+            every { synchronization.down.simprints } returns mockk {
+                every { partitionType.toDomain() } returns Partitioning.MODULE
+            }
+            every { synchronization.down.commCare } returns null
+        }
+        coEvery { eventRepository.createEventScope(any()) } returns eventScope
+        coEvery { simprintsDownSyncTask.downSync(any(), any(), eventScope, any()) } returns emptyFlow()
+
+        eventSyncManagerImpl.downSyncSubject(DEFAULT_PROJECT_ID, "subjectId", "metadata")
+
+        coVerify {
+            simprintsDownSyncTask.downSync(
+                any(),
+                match { operation ->
+                    operation.queryEvent.subjectId == "subjectId" &&
+                        operation.queryEvent.projectId == DEFAULT_PROJECT_ID &&
+                        operation.queryEvent.externalIds == null
+                },
+                eventScope,
+                any(),
+            )
+        }
+        coVerify { eventRepository.closeEventScope(eventScope, any()) }
+        coVerify(exactly = 0) { commCareDownSyncTask.downSync(any(), any(), any(), any()) }
+        coVerify(exactly = 0) { extractCommCareCaseIdUseCase.invoke(any()) }
     }
 
     @Test
@@ -174,12 +296,14 @@ internal class EventSyncManagerTest {
         coVerify(exactly = 1) { eventDownSyncScopeRepository.deleteAll() }
         coVerify(exactly = 1) { eventSyncCache.clearProgresses() }
         coVerify(exactly = 1) { eventSyncCache.storeLastSuccessfulSyncTime(null) }
+        coVerify(exactly = 1) { commCareSyncCache.clearAllSyncedCases() }
     }
 
     @Test
     fun `resetDownSyncInfo should call sync scope repo`() = runTest {
         eventSyncManagerImpl.resetDownSyncInfo()
 
-        coVerify { eventDownSyncScopeRepository.deleteAll() }
+        coVerify(exactly = 1) { eventDownSyncScopeRepository.deleteAll() }
+        coVerify(exactly = 1) { commCareSyncCache.clearAllSyncedCases() }
     }
 }

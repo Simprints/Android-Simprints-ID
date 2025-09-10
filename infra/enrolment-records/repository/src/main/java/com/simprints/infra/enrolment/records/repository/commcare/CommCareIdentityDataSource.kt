@@ -14,13 +14,16 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.core.tools.utils.ExtractCommCareCaseIdUseCase
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.enrolment.records.repository.IdentityDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
+import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.usecases.CompareImplicitTokenizedStringsUseCase
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordCreationEventDeserializer
@@ -41,13 +44,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
-import org.json.JSONException
 import javax.inject.Inject
 
 internal class CommCareIdentityDataSource @Inject constructor(
+    private val timeHelper: TimeHelper,
     private val encoder: EncodingUtils,
     private val jsonHelper: JsonHelper,
     private val compareImplicitTokenizedStringsUseCase: CompareImplicitTokenizedStringsUseCase,
+    private val extractCommCareCaseId: ExtractCommCareCaseIdUseCase,
     @AvailableProcessors private val availableProcessors: Int,
     @ApplicationContext private val context: Context,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
@@ -91,9 +95,10 @@ internal class CommCareIdentityDataSource @Inject constructor(
     ): List<EnrolmentRecordCreationEvent> {
         val enrolmentRecordCreationEvents: MutableList<EnrolmentRecordCreationEvent> = mutableListOf()
         try {
-            val caseId = attemptExtractingCaseId(query.metadata)
+            val caseId = extractCommCareCaseId(query.metadata)
             if (caseId != null) {
                 return loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query, project)
+                    .also { onCandidateLoaded() }
             }
 
             context.contentResolver
@@ -120,14 +125,6 @@ internal class CommCareIdentityDataSource @Inject constructor(
         }
 
         return enrolmentRecordCreationEvents
-    }
-
-    private fun attemptExtractingCaseId(metadata: String?) = metadata?.takeUnless { it.isEmpty() }?.let {
-        try {
-            JsonHelper.fromJson<Map<String, Any>>(it)[ARG_CASE_ID] as? String
-        } catch (_: JSONException) {
-            null
-        }
     }
 
     private suspend fun loadFaceIdentities(
@@ -256,14 +253,19 @@ internal class CommCareIdentityDataSource @Inject constructor(
         dataSource: BiometricDataSource,
     ): Int = withContext(dispatcher) {
         var count = 0
-        context.contentResolver
-            .query(
-                getCaseMetadataUri(dataSource.callerPackageName()),
-                null,
-                null,
-                null,
-                null,
-            )?.use { caseMetadataCursor -> count = caseMetadataCursor.count }
+        val caseId = extractCommCareCaseId(query.metadata)
+        if (caseId != null) {
+            count = 1
+        } else {
+            context.contentResolver
+                .query(
+                    getCaseMetadataUri(dataSource.callerPackageName()),
+                    null,
+                    null,
+                    null,
+                    null,
+                )?.use { caseMetadataCursor -> count = caseMetadataCursor.count }
+        }
         count
     }
 
@@ -274,17 +276,20 @@ internal class CommCareIdentityDataSource @Inject constructor(
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<List<FaceIdentity>> = loadIdentitiesConcurrently(
+    ): ReceiveChannel<IdentityBatch<FaceIdentity>> = loadIdentitiesConcurrently(
         ranges = ranges,
         scope = scope,
     ) { range ->
-        loadFaceIdentities(
+        val startTime = timeHelper.now()
+        val identities = loadFaceIdentities(
             query = query,
             range = range,
             project = project,
             dataSource = dataSource,
             onCandidateLoaded = onCandidateLoaded,
         )
+        val endTime = timeHelper.now()
+        IdentityBatch(identities, startTime, endTime)
     }
 
     override suspend fun loadFingerprintIdentities(
@@ -294,25 +299,28 @@ internal class CommCareIdentityDataSource @Inject constructor(
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<List<FingerprintIdentity>> = loadIdentitiesConcurrently(
+    ): ReceiveChannel<IdentityBatch<FingerprintIdentity>> = loadIdentitiesConcurrently(
         ranges = ranges,
         scope = scope,
     ) { range ->
-        loadFingerprintIdentities(
+        val startTime = timeHelper.now()
+        val identities = loadFingerprintIdentities(
             query = query,
             range = range,
             project = project,
             dataSource = dataSource,
             onCandidateLoaded = onCandidateLoaded,
         )
+        val endTime = timeHelper.now()
+        IdentityBatch(identities, startTime, endTime)
     }
 
-    fun <T> loadIdentitiesConcurrently(
+    private fun <T> loadIdentitiesConcurrently(
         ranges: List<IntRange>,
         scope: CoroutineScope,
-        load: suspend (IntRange) -> List<T>,
-    ): ReceiveChannel<List<T>> {
-        val channel = Channel<List<T>>(availableProcessors)
+        load: suspend (IntRange) -> IdentityBatch<T>,
+    ): ReceiveChannel<IdentityBatch<T>> {
+        val channel = Channel<IdentityBatch<T>>(availableProcessors)
         val semaphore = Semaphore(availableProcessors)
         scope.launch(dispatcher) {
             ranges
@@ -332,6 +340,5 @@ internal class CommCareIdentityDataSource @Inject constructor(
         const val COLUMN_CASE_ID = "case_id"
         const val COLUMN_DATUM_ID = "datum_id"
         const val COLUMN_VALUE = "value"
-        const val ARG_CASE_ID = "caseId"
     }
 }

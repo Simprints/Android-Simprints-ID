@@ -8,11 +8,13 @@ import com.simprints.core.CoreModule
 import com.simprints.core.DeviceID
 import com.simprints.core.DispatcherBG
 import com.simprints.core.DispatcherIO
+import com.simprints.core.DispatcherMain
 import com.simprints.core.ExternalScope
 import com.simprints.core.NonCancellableIO
 import com.simprints.core.PackageVersionName
 import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.time.Ticker
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.StringTokenizer
@@ -42,7 +44,11 @@ object FakeCoreModule {
 
     @Provides
     @Singleton
-    fun provideTimeHelper(): TimeHelper = mockk()
+    fun provideTimeHelper(): TimeHelper = mockk(relaxed = true)
+
+    @Provides
+    @Singleton
+    fun provideTicker(): Ticker = mockk(relaxed = true)
 
     @Provides
     @Singleton
@@ -67,6 +73,10 @@ object FakeCoreModule {
     @DispatcherBG
     @Provides
     fun provideCoroutineDispatcherBg(): CoroutineDispatcher = StandardTestDispatcher()
+
+    @DispatcherMain
+    @Provides
+    fun provideCoroutineDispatcherMain(): CoroutineDispatcher = StandardTestDispatcher()
 
     @NonCancellableIO
     @Provides
@@ -95,5 +105,5 @@ object FakeCoreModule {
     @Provides
     fun provideWorkManager(
         @ApplicationContext context: Context,
-    ): WorkManager = WorkManager.getInstance(context)
+    ): WorkManager = mockk(relaxed = true)
 }

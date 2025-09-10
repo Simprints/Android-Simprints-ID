@@ -206,7 +206,7 @@ class CommCareEventSyncTaskTest {
 
     @Test
     fun downSync_shouldEmitAFailureIfDownloadFails() = runTest {
-        coEvery { commCareEventDataSource.getEvents() } throws Throwable("CommCare Exception")
+        coEvery { commCareEventDataSource.getEvents(any()) } throws Throwable("CommCare Exception")
 
         val progress = commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
@@ -216,21 +216,21 @@ class CommCareEventSyncTaskTest {
 
     @Test(expected = SecurityException::class)
     fun downSync_shouldThrowUpIfSecurityExceptionOccurs() = runTest {
-        coEvery { commCareEventDataSource.getEvents() } throws SecurityException("Security Exception")
+        coEvery { commCareEventDataSource.getEvents(any()) } throws SecurityException("Security Exception")
 
         commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
     }
 
     @Test(expected = IllegalStateException::class)
     fun downSync_shouldThrowUpIfIllegalStateExceptionOccurs() = runTest {
-        coEvery { commCareEventDataSource.getEvents() } throws IllegalStateException("Illegal State Exception")
+        coEvery { commCareEventDataSource.getEvents(any()) } throws IllegalStateException("Illegal State Exception")
 
         commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
     }
 
     @Test
     fun downSync_shouldAddEventWithErrorIfDownloadFails() = runTest {
-        coEvery { commCareEventDataSource.getEvents() } throws Throwable("CommCare Exception")
+        coEvery { commCareEventDataSource.getEvents(any()) } throws Throwable("CommCare Exception")
         commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
         coVerify(exactly = 1) {
@@ -277,7 +277,7 @@ class CommCareEventSyncTaskTest {
     @Test
     fun downSync_shouldAddEventWithExceptionClassSimpleNameIfDownloadFails() = runTest {
         val expectedException = Exception("Test")
-        coEvery { commCareEventDataSource.getEvents() } throws expectedException
+        coEvery { commCareEventDataSource.getEvents(any()) } throws expectedException
 
         commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
@@ -322,42 +322,14 @@ class CommCareEventSyncTaskTest {
     }
 
     @Test
-    fun downSync_shouldTrackSubjectIdsAndDeleteSubjectsNotInCommCare() = runTest {
-        val creationEvent = ENROLMENT_RECORD_CREATION
-        mockCommCareDataSource(listOf(creationEvent))
-
-        // Mock existing subjects in the repository
-        coEvery { enrolmentRecordRepository.getAllSubjectIds() } returns listOf("subjectId", "subjectNotInCommCare")
+    fun downSync_shouldCallOnEventsProcessedOnDataSource() = runTest {
+        val eventsToDownload = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION)
+        mockCommCareDataSource(eventsToDownload)
 
         commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
-        // Verify that subjects not in CommCare are deleted
-        coVerify {
-            enrolmentRecordRepository.performActions(
-                match<List<SubjectAction>> { actions ->
-                    actions.any { it is Deletion && it.subjectId == "subjectNotInCommCare" }
-                },
-                project,
-            )
-        }
-    }
-
-    @Test
-    fun downSync_shouldNotDeleteSubjectsIfNoEventsProcessed() = runTest {
-        mockCommCareDataSource(emptyList())
-        coEvery { enrolmentRecordRepository.getAllSubjectIds() } returns listOf("existingSubject")
-
-        commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
-
-        // Verify that no deletion actions are performed when no events are processed
-        coVerify(exactly = 0) {
-            enrolmentRecordRepository.performActions(
-                match<List<SubjectAction>> { actions ->
-                    actions.any { it is Deletion }
-                },
-                project,
-            )
-        }
+        coVerify { commCareEventDataSource.onEventsProcessed(listOf(ENROLMENT_RECORD_CREATION)) }
+        coVerify { commCareEventDataSource.onEventsProcessed(listOf(ENROLMENT_RECORD_DELETION)) }
     }
 
     @Test
@@ -422,7 +394,7 @@ class CommCareEventSyncTaskTest {
     }
 
     private fun mockCommCareDataSource(events: List<EnrolmentRecordEvent>) {
-        coEvery { commCareEventDataSource.getEvents() } returns CommCareEventSyncResult(
+        coEvery { commCareEventDataSource.getEvents(any()) } returns CommCareEventSyncResult(
             totalCount = events.size,
             eventFlow = flowOf(*events.toTypedArray()),
         )

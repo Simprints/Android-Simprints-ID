@@ -316,29 +316,59 @@
     <string name="dashboard_project_card_scanner_used">Scanner used: %1$s</string>
     <string name="dashboard_project_card_current_user">Current user: %1$s</string>
 
-    <!-- Dashboard - Sync card -->
-    <string name="dashboard_sync_card_title">Sync status</string>
-    <string name="dashboard_sync_card_complete">Sync complete</string>
-    <string name="dashboard_sync_card_incomplete">Sync incomplete</string>
-    <string name="dashboard_sync_card_connecting">Connecting</string>
-    <string name="dashboard_sync_card_progress">Syncing… %1$s</string>
-    <string name="dashboard_sync_card_sync_button">Sync Now</string>
-    <string name="dashboard_sync_card_failed_message">Sync failed. Please contact your supervisor</string>
-    <string name="dashboard_sync_card_no_modules_message">Please select modules to sync</string>
-    <string name="dashboard_sync_card_no_modules_button">Modules</string>
-    <string name="dashboard_sync_card_offline_message">Please turn on internet connection in settings</string>
-    <string name="dashboard_sync_card_settings_button">Settings</string>
-    <string name="dashboard_sync_card_too_many_modules_message">Too many modules have been downloaded.</string>
-    <string name="dashboard_sync_card_relogin_required">You need to log in again in order to sync</string>
-    <string name="dashboard_sync_card_commcare_permission_message">You need to give permission to sync from CommCare</string>
+    <!-- Sync Info -->
+    <string name="sync_info_title">Sync Information</string>
 
-    <string name="dashboard_sync_card_last_sync">Last sync: %1$s</string>
-    <string name="dashboard_sync_card_records_uploaded">All records uploaded</string>
-    <plurals name="dashboard_sync_card_records_to_upload">
-        <item quantity="one">%1$d record to upload</item>
-        <item quantity="other">%1$d records to upload</item>
-    </plurals>
-    <string name="dashboard_sync_card_try_again_button">Try again</string>
+    <string name="sync_info_header_title">Sync status</string>
+    <string name="sync_info_header_settings_button"><font fgcolor='#FF7C00'><u>Settings</u></font></string>
+
+    <string name="sync_info_re_login_required">You need to log in again in order to sync</string>
+
+    <string name="sync_info_section_record_sync">Record Sync</string>
+    <string name="sync_info_section_image_sync">Image Sync</string>
+    <string name="sync_info_section_module_selection">Selected Modules</string>
+
+    <string name="sync_info_instruction_records">Manually synchronise records by pressing this button. <font fgcolor='#FF7C00'><u>More info</u></font></string>
+    <string name="sync_info_instruction_images">Manually send images to the cloud by pressing this button. <font fgcolor='#FF7C00'><u>More info</u></font></string>
+    <string name="sync_info_instruction_modules">Records from the selected modules will be synchronised. <font fgcolor='#FF7C00'><u>More info</u></font></string>
+    <string name="sync_info_instruction_comm_care_permission">Syncing from CommCare requires permission in <font fgcolor='#FF7C00'><u>System Settings</u></font></string>
+    <string name="sync_info_instruction_error_offline">Sync needs an internet connection. <font fgcolor='#FF7C00'><u>Connection settings</u></font></string>
+    <string name="sync_info_instruction_error_no_modules">Sync needs modules selected. <font fgcolor='#FF7C00'><u>Select modules</u></font></string>
+    <string name="sync_info_instruction_error">Sync failed. <font fgcolor='#FF7C00'><u>More info</u></font></string>
+
+    <string name="sync_info_details_event_sync_default">Manually synchronise records by pressing this button. Your device will also regularly attempt to synchronise records in the background.</string>
+    <string name="sync_info_details_image_sync_default">Manually send images to the cloud by pressing this button. Your device will also regularly attempt to send images in the background. Note that image syncing may require a strong internet connection.</string>
+    <string name="sync_info_details_module_selection">Records from the selected modules will be synchronised to your device. Click below/above to select modules to synchronise to your device.</string>
+    <string name="sync_info_details_error">Sync failed. Please contact your supervisor</string>
+    <string name="sync_info_details_too_many_modules">Too many modules have been downloaded.</string>
+    <string name="sync_info_details_ok">OK</string>
+
+    <string name="sync_info_records_on_device">Total records on device</string>
+    <string name="sync_info_records_to_up_sync">Records to upload</string>
+    <string name="sync_info_records_to_down_sync">Records to synchronise</string>
+    <string name="sync_info_images_to_up_sync">Images to upload</string>
+
+    <string name="sync_info_button_sync_records">Sync records now</string>
+    <string name="sync_info_button_records_syncing">Syncing</string>
+    <string name="sync_info_button_sync_images">Sync images now</string>
+    <string name="sync_info_button_images_sync_stop">Stop images syncing</string>
+    <string name="sync_info_button_try_again">Try again</string>
+    <string name="sync_info_button_select_modules">Select modules</string>
+
+    <string name="sync_info_progress_pending">%1$s sync pending…</string>
+    <string name="sync_info_progress_complete">%1$s sync complete</string>
+    <string name="sync_info_progress_ongoing_no_counters">%1$s sync in progress…</string>
+    <string name="sync_info_progress_ongoing">%1$s sync: %2$d of %3$d…</string>
+
+    <string name="sync_info_item_default">Item</string>
+    <string name="sync_info_item_record_or_event">Record &amp; Event</string>
+    <string name="sync_info_item_image">Image</string>
+
+    <string name="sync_info_total_records">Total records</string>
+
+    <string name="sync_info_footer_sync_in_progress">Sync in progress</string>
+    <string name="sync_info_footer_sync_incomplete">Sync incomplete</string>
+    <string name="sync_info_footer_sync_complete_logging_out">Sync complete, logging you out…</string>
 
     <!-- Dashboard - Daily activity card -->
     <string name="dashboard_activity_card_activity">Activity: %1$s</string>
@@ -382,21 +412,6 @@
     <string name="dashboard_preference_update_config_finished">Configuration updated</string>
     <string name="dashboard_preference_enable_audio_on_scan_complete">Audio Alert</string>
     <string name="dashboard_preference_enable_auto_capture">Auto-capture</string>
-
-    <!-- Dashboard - Sync info -->
-    <string name="dashboard_sync_info_title">Sync Information</string>
-    <string name="dashboard_sync_info_select_modules_button">Select modules</string>
-    <string name="dashboard_sync_info_records_to_upload">Records to upload</string>
-    <string name="dashboard_sync_info_records_to_download">Records to download or delete</string>
-    <string name="dashboard_sync_info_records_to_delete">Records to delete</string>
-    <string name="dashboard_sync_info_total_records_on_device">Total records on device</string>
-    <string name="dashboard_sync_info_selected_modules">Selected modules</string>
-    <string name="dashboard_sync_info_unselected_modules">Unselected modules</string>
-    <string name="dashboard_sync_info_total_records">Total records</string>
-    <string name="dashboard_sync_info_images_to_upload">Images to upload</string>
-    <string name="dashboard_sync_info_sync_now_button">Sync now</string>
-    <string name="dashboard_sync_info_sync_in_progress">Syncing…</string>
-    <string name="dashboard_sync_info_re_fetch_button">Re-fetch Sync Info</string>
 
     <!-- Dashboard - Module selection -->
     <string name="dashboard_select_modules_no_modules">Invalid Selection. Please select at least one module.</string>

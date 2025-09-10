@@ -2,6 +2,7 @@ package com.simprints.matcher.usecases
 
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.logging.LoggingConstants
+import com.simprints.matcher.MatchBatchInfo
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.MatchResultItem
 import kotlinx.coroutines.flow.Flow
@@ -20,6 +21,7 @@ internal interface MatcherUseCase {
         data object CandidateLoaded : MatcherState()
         data class Success(
             val matchResultItems: List<MatchResultItem>,
+            val matchBatches: List<MatchBatchInfo>,
             val totalCandidates: Int,
             val matcherName: String,
         ) : MatcherState()

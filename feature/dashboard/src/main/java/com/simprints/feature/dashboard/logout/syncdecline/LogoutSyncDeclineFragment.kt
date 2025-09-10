@@ -71,13 +71,15 @@ class LogoutSyncDeclineFragment : Fragment(R.layout.fragment_logout_sync_decline
                 },
             )
         }
+        viewModel.logoutEventLiveData.observe(viewLifecycleOwner) {
+            findNavController().navigateSafely(
+                this@LogoutSyncDeclineFragment,
+                LogoutSyncDeclineFragmentDirections.actionLogoutSyncDeclineFragmentToRequestLoginFragment(),
+            )
+        }
     }
 
     private fun processLogoutConfirmation() {
         viewModel.logout()
-        findNavController().navigateSafely(
-            this,
-            LogoutSyncDeclineFragmentDirections.actionLogoutSyncDeclineFragmentToRequestLoginFragment(),
-        )
     }
 }

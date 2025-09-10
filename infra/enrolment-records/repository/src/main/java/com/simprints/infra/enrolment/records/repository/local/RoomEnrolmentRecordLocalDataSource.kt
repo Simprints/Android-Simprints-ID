@@ -5,12 +5,14 @@ import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
+import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.local.models.toDomain
@@ -39,6 +41,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.Subject as
  */
 @Singleton
 internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
+    private val timeHelper: TimeHelper,
     private val subjectsDatabaseFactory: SubjectsDatabaseFactory,
     private val tokenizationProcessor: TokenizationProcessor,
     private val queryBuilder: RoomEnrolmentRecordQueryBuilder,
@@ -88,7 +91,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<List<FaceIdentity>> = loadBiometricIdentitiesPaged(
+    ): ReceiveChannel<IdentityBatch<FaceIdentity>> = loadBiometricIdentitiesPaged(
         query = query,
         ranges = ranges,
         format = requireNotNull(query.faceSampleFormat) { "faceSampleFormat required" },
@@ -119,7 +122,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<List<FingerprintIdentity>> = loadBiometricIdentitiesPaged(
+    ): ReceiveChannel<IdentityBatch<FingerprintIdentity>> = loadBiometricIdentitiesPaged(
         query = query,
         ranges = ranges,
         format = requireNotNull(query.fingerprintSampleFormat) { "fingerprintSampleFormat required" },
@@ -148,10 +151,10 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         createIdentity: (String, List<DbBiometricTemplate>) -> T,
         onCandidateLoaded: suspend () -> Unit,
         scope: CoroutineScope,
-    ): ReceiveChannel<List<T>> {
+    ): ReceiveChannel<IdentityBatch<T>> {
         var afterSubjectId: String? = null
         var lastOffset = 0
-        val channel = Channel<List<T>>(CHANNEL_CAPACITY)
+        val channel = Channel<IdentityBatch<T>>(CHANNEL_CAPACITY)
         scope.launch(dispatcherIO) {
             ranges
                 .forEach { range ->
@@ -159,6 +162,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                         "[loadBiometricIdentitiesPaged] The range start must match the last seen sample count. " +
                             "Expected: $lastOffset, Actual: ${range.first}"
                     }
+                    val startTime = timeHelper.now()
                     val identities = loadBiometricIdentities(
                         query = query.copy(afterSubjectId = afterSubjectId), // update query with the last seen subject ID
                         pageSize = range.last - range.first + 1,
@@ -170,7 +174,8 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                         (it as? FaceIdentity)?.subjectId ?: (it as? FingerprintIdentity)?.subjectId
                     }
                     lastOffset = range.last + 1
-                    channel.send(identities)
+                    val endTime = timeHelper.now()
+                    channel.send(IdentityBatch(identities, startTime, endTime))
                 }
             channel.close()
         }
@@ -339,5 +344,9 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
 
     override suspend fun getAllSubjectIds(): List<String> = withContext(dispatcherIO) {
         subjectDao.getAllSubjectIds()
+    }
+
+    override suspend fun closeOpenDbConnection() = withContext(dispatcherIO) {
+        subjectsDatabaseFactory.get().close()
     }
 }

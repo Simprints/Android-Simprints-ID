@@ -67,6 +67,11 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private var autoCaptureImagingDurationMillis: Long = FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
     private lateinit var faceDetector: FaceDetector
 
+    suspend fun initAutoCapture() {
+        val config = configManager.getProjectConfiguration()
+        isAutoCapture = isUsingAutoCaptureUseCase(config)
+    }
+
     fun initCapture(
         bioSdk: FaceConfiguration.BioSdk,
         samplesToCapture: Int,
@@ -79,8 +84,6 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             faceDetector = resolveFaceBioSdk(bioSdk).detector
 
             val config = configManager.getProjectConfiguration()
-            isAutoCapture = isUsingAutoCaptureUseCase(config)
-
             qualityThreshold = config.face?.getSdkConfiguration(bioSdk)?.qualityThreshold ?: 0f
             singleQualityFallbackCaptureRequired = config.experimental().singleQualityFallbackRequired
             autoCaptureImagingDurationMillis = config.experimental().faceAutoCaptureImagingDurationMillis

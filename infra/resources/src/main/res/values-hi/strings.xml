@@ -314,28 +314,28 @@
     <string name="dashboard_project_card_scanner_used">स्कैनर का उपयोग किया गया:%1$s</string>
     <string name="dashboard_project_card_current_user">वर्तमान उपयोगकर्ता: %1$s</string>
 
-    <!-- Dashboard - Sync card -->
-    <string name="dashboard_sync_card_title">सिंक की स्थिति</string>
-    <string name="dashboard_sync_card_complete">सिंक सफल हुआ</string>
-    <string name="dashboard_sync_card_incomplete">सिंक असफल</string>
-    <string name="dashboard_sync_card_connecting">कनेक्ट हो रहा है</string>
-    <string name="dashboard_sync_card_progress">सिंक हो रहा है......%1$s</string>
-    <string name="dashboard_sync_card_sync_button">अभी सिंक करें</string>
-    <string name="dashboard_sync_card_failed_message">सिंक असफल रहा। कृपया अपने सुपरवाईज़र से सम्पर्क करें</string>
-    <string name="dashboard_sync_card_no_modules_message">कृपया सिंक करने के लिए मॉड्यूल चुनें</string>
-    <string name="dashboard_sync_card_no_modules_button">मॉड्यूल्स</string>
-    <string name="dashboard_sync_card_offline_message">कृपया सेटिंग में जाकर इंटरनेट को चालू करें</string>
-    <string name="dashboard_sync_card_settings_button">सेटिंग</string>
-    <string name="dashboard_sync_card_too_many_modules_message">बहुत सारे मॉड्यूल डाउनलोड किए जा चुके हैं.</string>
-    <string name="dashboard_sync_card_relogin_required">सिंक करने के लिए आपको फिर से लॉग इन करना होगा</string>
+    <!-- Sync Info -->
+    <string name="sync_info_header_title">सिंक की स्थिति</string>
+    <string name="sync_info_complete">सिंक सफल हुआ</string>
+    <string name="sync_info_incomplete">सिंक असफल</string>
+    <string name="sync_info_connecting">कनेक्ट हो रहा है</string>
+    <string name="sync_info_progress">सिंक हो रहा है......%1$s</string>
+    <string name="sync_info_sync_button">अभी सिंक करें</string>
+    <string name="sync_info_details_error">सिंक असफल रहा। कृपया अपने सुपरवाईज़र से सम्पर्क करें</string>
+    <string name="sync_info_no_modules_message">कृपया सिंक करने के लिए मॉड्यूल चुनें</string>
+    <string name="sync_info_no_modules_button">मॉड्यूल्स</string>
+    <string name="sync_info_offline_message">कृपया सेटिंग में जाकर इंटरनेट को चालू करें</string>
+    <string name="sync_info_header_settings_button"><font fgcolor='#FF7C00'><u>सेटिंग</u></font></string>
+    <string name="sync_info_details_too_many_modules">बहुत सारे मॉड्यूल डाउनलोड किए जा चुके हैं.</string>
+    <string name="sync_info_re_login_required">सिंक करने के लिए आपको फिर से लॉग इन करना होगा</string>
 
-    <string name="dashboard_sync_card_last_sync">अंतिम बार सिंक: %1$s</string>
-    <string name="dashboard_sync_card_records_uploaded">सभी रिकॉर्ड अपलोड किए गए</string>
-    <plurals name="dashboard_sync_card_records_to_upload">
+    <string name="sync_info_last_sync">अंतिम बार सिंक: %1$s</string>
+    <string name="sync_info_records_uploaded">सभी रिकॉर्ड अपलोड किए गए</string>
+    <plurals name="sync_info_records_to_upload">
         <item quantity="one">%1$d अपलोड करने हेतु रिकार्ड</item>
         <item quantity="other">%1$dअपलोड करने हेतु रिकार्ड</item>
     </plurals>
-    <string name="dashboard_sync_card_try_again_button">पुनः प्रयास करें</string>
+    <string name="sync_info_button_try_again">पुनः प्रयास करें</string>
 
     <!-- Dashboard - Daily activity card -->
     <string name="dashboard_activity_card_activity">गतिविधि: %1$s</string>
@@ -380,20 +380,17 @@
     <string name="dashboard_preference_enable_audio_on_scan_complete">ऑडियो अलर्ट</string>
     <string name="dashboard_preference_enable_auto_capture">ऑटो-कैप्चर</string>
 
-    <!-- Dashboard - Sync info -->
-    <string name="dashboard_sync_info_title">सिंक सम्बंधित जानकारी</string>
-    <string name="dashboard_sync_info_select_modules_button">मॉड्यूल का चुनाव करें</string>
-    <string name="dashboard_sync_info_records_to_upload">रिकोर्ड्स अपलोड किए जाने हैं</string>
-    <string name="dashboard_sync_info_records_to_download">डाउनलोड करने या हटाने के लिए रिकॉर्ड</string>
-    <string name="dashboard_sync_info_records_to_delete">रिकोर्ड्स डिलीट किए जाने हैं</string>
-    <string name="dashboard_sync_info_total_records_on_device">डिवाइस में कुल रिकोर्ड्स</string>
-    <string name="dashboard_sync_info_selected_modules">चुने गए मॉड्यूल</string>
-    <string name="dashboard_sync_info_unselected_modules">अचयनित मॉड्यूल्स</string>
-    <string name="dashboard_sync_info_total_records">कुल रिकोर्ड्स</string>
-    <string name="dashboard_sync_info_images_to_upload">अपलोड करने के लिए चित्र</string>
-    <string name="dashboard_sync_info_sync_now_button">अभी सिंक करें</string>
-    <string name="dashboard_sync_info_sync_in_progress">सिंक हो रहा है …</string>
-    <string name="dashboard_sync_info_re_fetch_button">सिंक जानकारी पुनः प्राप्त करें</string>
+    <!-- Sync info -->
+    <string name="sync_info_total_records">कुल रिकोर्ड्स</string>
+    <string name="sync_info_title">सिंक सम्बंधित जानकारी</string>
+    <string name="sync_info_button_select_modules">मॉड्यूल का चुनाव करें</string>
+    <string name="sync_info_records_to_up_sync">रिकोर्ड्स अपलोड किए जाने हैं</string>
+    <string name="sync_info_records_to_download_or_delete">डाउनलोड करने या हटाने के लिए रिकॉर्ड</string>
+    <string name="sync_info_records_to_delete">रिकोर्ड्स डिलीट किए जाने हैं</string>
+    <string name="sync_info_records_on_device">डिवाइस में कुल रिकोर्ड्स</string>
+    <string name="sync_info_section_module_selection">चुने गए मॉड्यूल</string>
+    <string name="sync_info_images_to_up_sync">अपलोड करने के लिए चित्र</string>
+    <string name="sync_info_button_records_syncing">सिंक हो रहा है …</string>
 
     <!-- Dashboard - Module selection -->
     <string name="dashboard_select_modules_no_modules">अमान्य चुनाव। कृपया कम से कम एक मॉड्यूल चुनें</string>

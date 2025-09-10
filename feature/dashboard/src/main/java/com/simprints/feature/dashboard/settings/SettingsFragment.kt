@@ -21,8 +21,8 @@ import com.simprints.feature.dashboard.databinding.FragmentSettingsBinding
 import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality.FINGERPRINT
-import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
@@ -82,7 +82,7 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         )
         viewModel.sinceConfigLastUpdated.observe(
             viewLifecycleOwner,
-            LiveDataEventWithContentObserver<String> { lastUpdated ->
+            LiveDataEventWithContentObserver { lastUpdated ->
                 getUpdateConfig()?.summary = getString(
                     IDR.string.dashboard_preference_summary_update_config_last_updated,
                     lastUpdated,

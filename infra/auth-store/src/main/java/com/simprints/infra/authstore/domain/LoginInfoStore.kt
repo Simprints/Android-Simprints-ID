@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.isTokenized
+import com.simprints.core.tools.extentions.onUpdate
 import com.simprints.infra.security.SecurityManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -16,16 +17,16 @@ internal class LoginInfoStore @Inject constructor(
     securityManager: SecurityManager,
 ) {
     companion object {
-        private const val LEGACY_PREF_FILE_NAME = "b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a"
-        private const val SECURE_PREF_FILE_NAME = "99caf5cd-7b1c-4127-912d-77d4c35c51f3"
+        const val LEGACY_PREF_FILE_NAME = "b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a"
+        const val SECURE_PREF_FILE_NAME = "99caf5cd-7b1c-4127-912d-77d4c35c51f3"
 
-        private const val USER_ID_VALUE: String = "USER_ID"
-        private const val USER_ID_TOKENIZED: String = "USER_ID_TOKENIZED"
-        private const val PROJECT_ID: String = "PROJECT_ID"
-        private const val PROJECT_ID_CLAIM: String = "PROJECT_ID_CLAIM"
-        private const val CORE_FIREBASE_PROJECT_ID = "CORE_FIREBASE_PROJECT_ID"
-        private const val CORE_FIREBASE_APPLICATION_ID = "CORE_FIREBASE_APPLICATION_ID"
-        private const val CORE_FIREBASE_API_KEY = "CORE_FIREBASE_API_KEY"
+        const val USER_ID_VALUE: String = "USER_ID"
+        const val USER_ID_TOKENIZED: String = "USER_ID_TOKENIZED"
+        const val PROJECT_ID: String = "PROJECT_ID"
+        const val PROJECT_ID_CLAIM: String = "PROJECT_ID_CLAIM"
+        const val CORE_FIREBASE_PROJECT_ID = "CORE_FIREBASE_PROJECT_ID"
+        const val CORE_FIREBASE_APPLICATION_ID = "CORE_FIREBASE_APPLICATION_ID"
+        const val CORE_FIREBASE_API_KEY = "CORE_FIREBASE_API_KEY"
     }
 
     @Deprecated("Data has been migrated to secure prefs. Delete after there are no users below 2024.1.0")
@@ -38,6 +39,7 @@ internal class LoginInfoStore @Inject constructor(
      * Ensures that data has been migrated to secure prefs before accessing it.
      */
     private fun getSecurePrefs(): SharedPreferences {
+        @Suppress("DEPRECATION")
         if (prefs.contains(PROJECT_ID)) {
             securePrefs.edit(commit = true) {
                 putString(USER_ID_VALUE, prefs.getString(USER_ID_VALUE, ""))
@@ -81,6 +83,8 @@ internal class LoginInfoStore @Inject constructor(
             field = value
             getSecurePrefs().edit { putString(PROJECT_ID, field) }
         }
+
+    fun observeSignedInProjectId() = getSecurePrefs().onUpdate(PROJECT_ID, "")
 
     // Core Firebase Project details. We store them to initialize the core Firebase project.
     var coreFirebaseProjectId: String = ""

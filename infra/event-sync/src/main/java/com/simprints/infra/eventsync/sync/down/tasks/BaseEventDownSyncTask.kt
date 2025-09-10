@@ -51,8 +51,6 @@ internal abstract class BaseEventDownSyncTask(
 
     abstract fun shouldRethrowError(throwable: Throwable): Boolean
 
-    abstract suspend fun performPostSyncCleanup(project: Project, count: Int)
-
     data class EventFetchResult(
         val eventFlow: Flow<EnrolmentRecordEvent>,
         val totalCount: Int?,
@@ -97,8 +95,6 @@ internal abstract class BaseEventDownSyncTask(
 
             lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation, project)
             emitProgress(lastOperation, count, result.totalCount)
-
-            performPostSyncCleanup(project, count)
 
             lastOperation = lastOperation.copy(state = COMPLETE, lastSyncTime = timeHelper.now().ms)
             emitProgress(lastOperation, count, result.totalCount)
@@ -182,7 +178,9 @@ internal abstract class BaseEventDownSyncTask(
         enrolmentRecordRepository.performActions(actions, project)
 
         // Hook for subclasses to perform additional processing after actions are executed
-        onActionsProcessed(actions)
+        // Convert the mutable list to an immutable one to let subclasses safely use it
+        // while processing continues
+        onEventsProcessed(batchOfEventsToProcess.toList())
 
         return if (batchOfEventsToProcess.isNotEmpty()) {
             lastOperation.copy(
@@ -199,7 +197,7 @@ internal abstract class BaseEventDownSyncTask(
      * Hook method called after actions have been processed and executed.
      * Subclasses can override this to perform additional processing.
      */
-    protected open suspend fun onActionsProcessed(actions: List<SubjectAction>) {
+    protected open suspend fun onEventsProcessed(events: List<EnrolmentRecordEvent>) {
         // Default implementation does nothing
     }
 

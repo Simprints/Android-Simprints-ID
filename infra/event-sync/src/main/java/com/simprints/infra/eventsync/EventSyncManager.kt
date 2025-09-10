@@ -16,7 +16,7 @@ interface EventSyncManager {
 
     suspend fun getLastSyncTime(): Timestamp?
 
-    fun getLastSyncState(): LiveData<EventSyncState>
+    fun getLastSyncState(useDefaultValue: Boolean = false): LiveData<EventSyncState>
 
     suspend fun countEventsToUpload(): Flow<Int>
 
@@ -27,6 +27,7 @@ interface EventSyncManager {
     suspend fun downSyncSubject(
         projectId: String,
         subjectId: String,
+        metadata: String,
     )
 
     suspend fun deleteModules(unselectedModules: List<String>)

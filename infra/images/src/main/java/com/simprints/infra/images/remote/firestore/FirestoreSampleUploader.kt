@@ -22,7 +22,10 @@ internal class FirestoreSampleUploader @Inject constructor(
     private val localDataSource: ImageLocalDataSource,
     private val metadataStore: ImageMetadataStore,
 ) : SampleUploader {
-    override suspend fun uploadAllSamples(projectId: String): Boolean {
+    override suspend fun uploadAllSamples(
+        projectId: String,
+        progressCallback: (suspend (Int, Int) -> Unit)?,
+    ): Boolean {
         val firebaseApp = authStore.getLegacyAppFallback()
         if (firebaseApp.options.projectId.isNullOrBlank()) {
             Simber.i("Firebase projectId is null", tag = SAMPLE_UPLOAD)
@@ -36,8 +39,10 @@ internal class FirestoreSampleUploader @Inject constructor(
             .getInstance(firebaseApp, bucketUrl)
             .reference
 
-        localDataSource.listImages(projectId).forEach { imageRef ->
+        val sampleReferences = localDataSource.listImages(projectId)
+        sampleReferences.forEachIndexed { index, imageRef ->
             Simber.i("Reading sample file: ${imageRef.relativePath.parts.last()}", tag = SAMPLE_UPLOAD)
+            progressCallback?.invoke(index, sampleReferences.size)
             try {
                 localDataSource.decryptImage(imageRef)?.let { stream ->
                     val metadata = metadataStore.getMetadata(imageRef.relativePath)

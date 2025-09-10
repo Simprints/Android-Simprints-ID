@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/colorPrimary"
     android:theme="@style/Theme.Simprints">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -26,7 +27,8 @@
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="?attr/colorPrimary"
+        app:layout_constraintWidth_max="500dp"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -48,13 +50,35 @@
                 android:layout_height="match_parent"
                 tools:layout="@layout/fragment_dashboard_card_project_details" />
 
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/dashboard_sync"
-                android:name="com.simprints.feature.dashboard.main.sync.SyncFragment"
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/dashboard_sync_card"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="@dimen/vertical_spacing_dashboard_cards"
-                tools:layout="@layout/fragment_dashboard_card_sync" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vertical_spacing_dashboard_cards">
+
+                <com.simprints.feature.dashboard.view.ConfigurableSyncInfoFragmentContainer
+                    android:id="@+id/dashboard_sync_container"
+                    app:isSyncInfoToolbarVisible="false"
+                    app:isSyncInfoStatusHeaderVisible="true"
+                    app:isSyncInfoStatusHeaderSettingsButtonVisible="true"
+                    app:areSyncInfoSectionHeadersVisible="false"
+                    app:isSyncInfoImageSyncVisible="false"
+                    app:isSyncInfoRecordsImagesCombined="false"
+                    app:isSyncInfoLogoutOnComplete="false"
+                    app:isSyncInfoModuleListVisible="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.fragment.app.FragmentContainerView
+                        android:id="@+id/dashboard_sync"
+                        android:name="com.simprints.feature.dashboard.settings.syncinfo.SyncInfoFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                </com.simprints.feature.dashboard.view.ConfigurableSyncInfoFragmentContainer>
+
+            </com.google.android.material.card.MaterialCardView>
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/dashboard_daily_activity"
