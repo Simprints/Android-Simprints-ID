@@ -64,10 +64,10 @@ class AboutViewModelTest {
     @Test
     fun `should initialize the live data correctly`() {
         val viewModel = AboutViewModel(
-            configManager = configManager,
-            eventSyncManager = eventSyncManager,
-            recentUserActivityManager = recentUserActivityManager,
-            logoutUseCase = logoutUseCase,
+            configManager = ::configManager,
+            eventSyncManager = ::eventSyncManager,
+            recentUserActivityManager = ::recentUserActivityManager,
+            logoutUseCase = ::logoutUseCase,
         )
 
         assertThat(viewModel.modalities.value).isEqualTo(MODALITIES)
@@ -202,10 +202,10 @@ class AboutViewModelTest {
             upSyncKind,
         )
         return AboutViewModel(
-            configManager = configManager,
-            eventSyncManager = eventSyncManager,
-            recentUserActivityManager = recentUserActivityManager,
-            logoutUseCase = logoutUseCase,
+            configManager = ::configManager,
+            eventSyncManager = ::eventSyncManager,
+            recentUserActivityManager = ::recentUserActivityManager,
+            logoutUseCase = ::logoutUseCase,
         )
     }
 }

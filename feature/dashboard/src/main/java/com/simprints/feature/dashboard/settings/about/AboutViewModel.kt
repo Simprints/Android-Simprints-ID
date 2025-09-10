@@ -16,6 +16,7 @@ import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
+import dagger.Lazy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -23,10 +24,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class AboutViewModel @Inject constructor(
-    private val configManager: ConfigManager,
-    private val logoutUseCase: LogoutUseCase,
-    private val eventSyncManager: EventSyncManager,
-    private val recentUserActivityManager: RecentUserActivityManager,
+    private val configManager: Lazy<ConfigManager>,
+    private val logoutUseCase: Lazy<LogoutUseCase>,
+    private val eventSyncManager: Lazy<EventSyncManager>,
+    private val recentUserActivityManager: Lazy<RecentUserActivityManager>,
 ) : ViewModel() {
     val syncAndSearchConfig: LiveData<SyncAndSearchConfig>
         get() = _syncAndSearchConfig
@@ -70,7 +71,7 @@ internal class AboutViewModel @Inject constructor(
                 when (canSyncDataToSimprints() && hasEventsToUpload()) {
                     true -> LogoutDestination.LogoutDataSyncScreen
                     false -> {
-                        logoutUseCase()
+                        logoutUseCase.get().invoke()
                         LogoutDestination.LoginScreen
                     }
                 }
@@ -78,19 +79,19 @@ internal class AboutViewModel @Inject constructor(
         }
     }
 
-    private suspend fun hasEventsToUpload(): Boolean = eventSyncManager.countEventsToUpload().first() > 0
+    private suspend fun hasEventsToUpload(): Boolean = eventSyncManager.get().countEventsToUpload().first() > 0
 
-    private suspend fun canSyncDataToSimprints(): Boolean = configManager.getProjectConfiguration().canSyncDataToSimprints()
+    private suspend fun canSyncDataToSimprints(): Boolean = configManager.get().getProjectConfiguration().canSyncDataToSimprints()
 
     private fun load() = viewModelScope.launch {
-        val configuration = configManager.getProjectConfiguration()
+        val configuration = configManager.get().getProjectConfiguration()
         val syncAndSearchConfig = SyncAndSearchConfig(
             configuration.synchronization.down.simprints?.partitionType?.name ?: "CommCare",
             configuration.identification.poolType.name,
         )
         _syncAndSearchConfig.postValue(syncAndSearchConfig)
         _modalities.postValue(configuration.general.modalities)
-        _recentUserActivity.postValue(recentUserActivityManager.getRecentUserActivity())
+        _recentUserActivity.postValue(recentUserActivityManager.get().getRecentUserActivity())
         _settingsLocked.postValue(configuration.general.settingsPassword)
     }
 
