@@ -1,5 +1,6 @@
 package com.simprints.feature.orchestrator.usecases.steps
 
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
 import com.simprints.feature.orchestrator.steps.Step
@@ -755,5 +756,96 @@ class BuildStepsUseCaseTest {
         val steps = useCase.buildCaptureAndMatchStepsForAgeGroup(action, projectConfiguration, AgeGroup(18, 60), enrolmentSubjectId)
 
         assertEquals(0, steps.size)
+    }
+
+    @Test
+    fun `build external credential not enabled - no external credential step`() = runTest {
+        val projectConfiguration = mockCommonProjectConfiguration()
+        every { projectConfiguration.multifactorId?.allowedExternalCredentials } returns emptyList()
+
+        val action = mockk<ActionRequest.EnrolActionRequest>(relaxed = true)
+        every { action.getSubjectAgeIfAvailable() } returns null
+
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId)
+
+        // Should not contain EXTERNAL_CREDENTIAL step
+        assertStepOrder(
+            steps,
+            StepId.SETUP,
+            StepId.CONSENT,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FACE_CAPTURE,
+        )
+    }
+
+    @Test
+    fun `build enrol action - external credential enabled - returns external credential step`() = runTest {
+        val projectConfiguration = mockCommonProjectConfiguration()
+        every { projectConfiguration.multifactorId?.allowedExternalCredentials } returns ExternalCredentialType.entries
+
+        val action = mockk<ActionRequest.EnrolActionRequest>(relaxed = true)
+        every { action.getSubjectAgeIfAvailable() } returns null
+
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId)
+
+        assertStepOrder(
+            steps,
+            StepId.SETUP,
+            StepId.CONSENT,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FACE_CAPTURE,
+            StepId.EXTERNAL_CREDENTIAL,
+        )
+    }
+
+    @Test
+    fun `build identify action - external credential enabled - returns external credential step`() = runTest {
+        val projectConfiguration = mockCommonProjectConfiguration()
+        every { projectConfiguration.multifactorId?.allowedExternalCredentials } returns ExternalCredentialType.entries
+
+        val action = mockk<ActionRequest.IdentifyActionRequest>(relaxed = true)
+        every { action.getSubjectAgeIfAvailable() } returns null
+
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId)
+
+        assertStepOrder(
+            steps,
+            StepId.SETUP,
+            StepId.CONSENT,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FACE_CAPTURE,
+            StepId.EXTERNAL_CREDENTIAL,
+            StepId.FINGERPRINT_MATCHER,
+            StepId.FINGERPRINT_MATCHER,
+            StepId.FACE_MATCHER,
+        )
+    }
+
+    @Test
+    fun `build verify action - external credential enabled - no external credential step`() = runTest {
+        val projectConfiguration = mockCommonProjectConfiguration()
+        every { projectConfiguration.multifactorId?.allowedExternalCredentials } returns ExternalCredentialType.entries
+
+        val action = mockk<ActionRequest.VerifyActionRequest>(relaxed = true)
+        every { action.getSubjectAgeIfAvailable() } returns null
+
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId)
+
+        // Should not contain EXTERNAL_CREDENTIAL step for VERIFY flow
+        assertStepOrder(
+            steps,
+            StepId.SETUP,
+            StepId.FETCH_GUID,
+            StepId.CONSENT,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FACE_CAPTURE,
+            StepId.FINGERPRINT_MATCHER,
+            StepId.FINGERPRINT_MATCHER,
+            StepId.FACE_MATCHER,
+        )
     }
 }
