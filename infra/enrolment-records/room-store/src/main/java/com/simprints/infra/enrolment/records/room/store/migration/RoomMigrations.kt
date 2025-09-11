@@ -14,6 +14,7 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
         db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `DbExternalCredential` (
+                `id` TEXT NOT NULL,
                 `value` TEXT NOT NULL,
                 `subjectId` TEXT NOT NULL,
                 `type` TEXT NOT NULL,
