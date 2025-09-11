@@ -233,23 +233,34 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             else -> DownSyncCounts(0, isLowerBound = false)
         }
 
-        val project = configManager.getProject(projectId)
-        val isProjectRunning =
-            project.state == ProjectState.RUNNING
-        val moduleCounts = deviceConfig.selectedModules.map { moduleName ->
-            ModuleCount(
-                name = when (moduleName) {
-                    is TokenizableString.Raw -> moduleName
-                    is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
-                        encrypted = moduleName,
-                        tokenKeyType = TokenKeyType.ModuleId,
-                        project,
-                    )
-                }.value,
-                count = enrolmentRecordRepository.count(
-                    SubjectQuery(projectId = projectId, moduleId = moduleName),
-                ),
-            )
+        val project = try {
+            projectId.takeUnless { it.isBlank() }?.let { configManager.getProject(it) }
+        } catch (_: Exception) {
+            // When the device is compromised the project data will be deleted and
+            // attempting to access project state with result in exception.
+            // For user it is essentially the same as project ending.
+            null
+        }
+
+        val isProjectRunning = project?.state == ProjectState.RUNNING
+        val moduleCounts = if (project != null) {
+            deviceConfig.selectedModules.map { moduleName ->
+                ModuleCount(
+                    name = when (moduleName) {
+                        is TokenizableString.Raw -> moduleName
+                        is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
+                            encrypted = moduleName,
+                            tokenKeyType = TokenKeyType.ModuleId,
+                            project,
+                        )
+                    }.value,
+                    count = enrolmentRecordRepository.count(
+                        SubjectQuery(projectId = projectId, moduleId = moduleName),
+                    ),
+                )
+            }
+        } else {
+            emptyList()
         }
         val modulesCountTotal = SyncInfoModuleCount(
             isTotal = true,
