@@ -1,6 +1,7 @@
 package com.simprints.feature.dashboard.settings.syncinfo
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
@@ -8,6 +9,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DispatcherIO
 import com.simprints.core.livedata.LiveDataEventWithContent
+import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.feature.dashboard.settings.syncinfo.usecase.ObserveSyncInfoUseCase
@@ -56,6 +58,10 @@ internal class SyncInfoViewModel @Inject constructor(
         get() = _loginNavigationEventLiveData
     private val _loginNavigationEventLiveData = MutableLiveData<LoginParams>()
 
+    val signOutNavigationLiveData: LiveData<LiveDataEventWithContent<LogoutActionReason?>>
+        get() = _signOutNavigationLiveData
+    private val _signOutNavigationLiveData = MediatorLiveData<LiveDataEventWithContent<LogoutActionReason?>>()
+
     private val eventSyncStateFlow =
         eventSyncManager
             .getLastSyncState(
@@ -67,19 +73,19 @@ internal class SyncInfoViewModel @Inject constructor(
     private val eventSyncButtonClickFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val imageSyncButtonClickFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-    val logoutEventFlow: Flow<LiveDataEventWithContent<Unit>> = combine(
+    val logoutEventFlow: Flow<LogoutActionReason?> = combine(
+        authStore.observeSignedInProjectId(),
         eventSyncStateFlow,
         imageSyncStatusFlow,
-    ) { eventSyncState, imageSyncStatus ->
-        val isReadyToLogOut =
-            isPreLogoutUpSync && eventSyncState.isSyncCompleted() && !imageSyncStatus.isSyncing
-        return@combine isReadyToLogOut
+    ) { projectId, eventSyncState, imageSyncStatus ->
+        when {
+            projectId.isEmpty() -> LogoutActionReason.PROJECT_ENDING
+            isPreLogoutUpSync && eventSyncState.isSyncCompleted() && !imageSyncStatus.isSyncing -> LogoutActionReason.USER_ACTION
+            else -> null
+        }
     }.debounce(LOGOUT_DELAY_MILLIS)
-        .filter { isReadyToLogOut ->
-            isReadyToLogOut // only when ready
-        }.map {
-            LiveDataEventWithContent(Unit)
-        }.flowOn(ioDispatcher)
+        .filter { it != null }
+        .flowOn(ioDispatcher)
 
     val syncInfoLiveData: LiveData<SyncInfo> by lazy {
         val dataLayerDrivenSyncInfoFlow = observeSyncInfo(isPreLogoutUpSync)
@@ -88,7 +94,7 @@ internal class SyncInfoViewModel @Inject constructor(
                 syncImagesAfterEventsWhenRequired()
             }
 
-        /**
+        /*
          * Visual sync button responsiveness optimization
          *
          * The problem: data layer-driven progress visualization is simple programmatically, but can be slow in the UI.
@@ -107,21 +113,23 @@ internal class SyncInfoViewModel @Inject constructor(
          */
 
         val eventSyncButtonResponsiveSyncInfo = eventSyncButtonClickFlow.flatMapLatest {
-            dataLayerDrivenSyncInfoFlow.dropWhile { syncInfo ->
-                !syncInfo.syncInfoSectionRecords.isProgressVisible
-            }.onStart {
-                val initialState = syncInfoLiveData.value ?: SyncInfo()
-                emit(initialState.forceEventSyncProgress())
-            }
+            dataLayerDrivenSyncInfoFlow
+                .dropWhile { syncInfo ->
+                    !syncInfo.syncInfoSectionRecords.isProgressVisible
+                }.onStart {
+                    val initialState = syncInfoLiveData.value ?: SyncInfo()
+                    emit(initialState.forceEventSyncProgress())
+                }
         }
 
         val imageSyncButtonResponsiveSyncInfo = imageSyncButtonClickFlow.flatMapLatest {
-            dataLayerDrivenSyncInfoFlow.dropWhile { syncInfo ->
-                !syncInfo.syncInfoSectionImages.isProgressVisible
-            }.onStart {
-                val initialState = syncInfoLiveData.value ?: SyncInfo()
-                emit(initialState.forceImageSyncProgress())
-            }
+            dataLayerDrivenSyncInfoFlow
+                .dropWhile { syncInfo ->
+                    !syncInfo.syncInfoSectionImages.isProgressVisible
+                }.onStart {
+                    val initialState = syncInfoLiveData.value ?: SyncInfo()
+                    emit(initialState.forceImageSyncProgress())
+                }
         }
 
         merge(
@@ -129,7 +137,8 @@ internal class SyncInfoViewModel @Inject constructor(
             imageSyncButtonResponsiveSyncInfo,
         ).onStart {
             emit(dataLayerDrivenSyncInfoFlow.firstOrNull() ?: SyncInfo())
-        }.distinctUntilChanged().flowOn(ioDispatcher)
+        }.distinctUntilChanged()
+            .flowOn(ioDispatcher)
             .asLiveData(viewModelScope.coroutineContext)
     }
 
@@ -158,9 +167,10 @@ internal class SyncInfoViewModel @Inject constructor(
         }
     }
 
-    fun performLogout() {
+    fun performLogout(reason: LogoutActionReason?) {
         viewModelScope.launch {
             logoutUseCase()
+            _signOutNavigationLiveData.send(reason)
         }
     }
 
@@ -230,7 +240,7 @@ internal class SyncInfoViewModel @Inject constructor(
             isProgressVisible = true,
             isSyncButtonEnabled = false,
             footerLastSyncMinutesAgo = "",
-        )
+        ),
     )
 
     private fun SyncInfo.forceImageSyncProgress() = copy(
@@ -240,7 +250,7 @@ internal class SyncInfoViewModel @Inject constructor(
             isInstructionOfflineVisible = false,
             isProgressVisible = true,
             footerLastSyncMinutesAgo = "",
-        )
+        ),
     )
 
     private suspend fun ConfigManager.isModuleSelectionRequired() =
