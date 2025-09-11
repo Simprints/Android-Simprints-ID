@@ -5,6 +5,7 @@ import com.simprints.face.capture.FaceCaptureContract
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
+import com.simprints.feature.externalcredential.ExternalCredentialContract
 import com.simprints.feature.fetchsubject.FetchSubjectContract
 import com.simprints.feature.orchestrator.R
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
@@ -43,12 +44,13 @@ internal class BuildStepsUseCase @Inject constructor(
     suspend fun build(
         action: ActionRequest,
         projectConfiguration: ProjectConfiguration,
+        enrolmentSubjectId: String,
     ) = when (action) {
         is ActionRequest.EnrolActionRequest -> listOf(
             buildSetupStep(),
             buildAgeSelectionStepIfNeeded(action, projectConfiguration),
             buildConsentStepIfNeeded(ConsentType.ENROL, projectConfiguration),
-            buildCaptureAndMatchStepsForEnrol(action, projectConfiguration),
+            buildCaptureAndMatchStepsForEnrol(action, projectConfiguration, enrolmentSubjectId = enrolmentSubjectId),
         )
 
         is ActionRequest.IdentifyActionRequest -> {
@@ -65,9 +67,10 @@ internal class BuildStepsUseCase @Inject constructor(
                 buildAgeSelectionStepIfNeeded(action, projectConfiguration),
                 buildConsentStepIfNeeded(ConsentType.IDENTIFY, projectConfiguration),
                 buildCaptureAndMatchStepsForIdentify(
-                    action,
-                    projectConfiguration,
+                    action = action,
+                    projectConfiguration = projectConfiguration,
                     subjectQuery = subjectQuery,
+                    enrolmentSubjectId = enrolmentSubjectId
                 ),
             )
         }
@@ -99,18 +102,21 @@ internal class BuildStepsUseCase @Inject constructor(
         action: ActionRequest,
         projectConfiguration: ProjectConfiguration,
         ageGroup: AgeGroup,
+        enrolmentSubjectId: String,
     ): List<Step> = when (action) {
         is ActionRequest.EnrolActionRequest -> buildCaptureAndMatchStepsForEnrol(
             action,
             projectConfiguration,
             ageGroup,
+            enrolmentSubjectId
         )
 
         is ActionRequest.IdentifyActionRequest -> buildCaptureAndMatchStepsForIdentify(
-            action,
-            projectConfiguration,
-            ageGroup,
+            action = action,
+            projectConfiguration = projectConfiguration,
+            ageGroup = ageGroup,
             subjectQuery = buildMatcherSubjectQuery(projectConfiguration, action),
+            enrolmentSubjectId = enrolmentSubjectId
         )
 
         is ActionRequest.VerifyActionRequest -> buildCaptureAndMatchStepsForVerify(
@@ -122,35 +128,63 @@ internal class BuildStepsUseCase @Inject constructor(
         else -> emptyList()
     }
 
+    private fun buildExternalCredentialStepIfNeeded(
+        enrolmentSubjectId: String,
+        projectConfiguration: ProjectConfiguration,
+        flowType: FlowType
+    ): List<Step> {
+        val isExternalCredentialEnabled = projectConfiguration.multifactorId?.allowedExternalCredentials?.isNotEmpty() ?: false
+        if (!isExternalCredentialEnabled) return emptyList()
+
+        return when (flowType) {
+            FlowType.ENROL, FlowType.IDENTIFY -> {
+                listOf(
+                    Step(
+                        id = StepId.EXTERNAL_CREDENTIAL,
+                        navigationActionId = R.id.action_orchestratorFragment_to_externalCredential,
+                        destinationId = ExternalCredentialContract.DESTINATION,
+                        params = ExternalCredentialContract.getParams(subjectId = enrolmentSubjectId, flowType = flowType),
+                    )
+                )
+            }
+
+            FlowType.VERIFY -> emptyList()
+        }
+    }
+
     private suspend fun buildCaptureAndMatchStepsForEnrol(
         action: ActionRequest.EnrolActionRequest,
         projectConfiguration: ProjectConfiguration,
         ageGroup: AgeGroup? = null,
+        enrolmentSubjectId: String,
     ): List<Step> {
         val action = fallbackToCommCareDataSourceIfNeeded(action, projectConfiguration)
         val resolvedAgeGroup = ageGroup ?: ageGroupFromSubjectAge(action, projectConfiguration)
 
-        return listOf(
-            buildCaptureSteps(
+        val captureSteps = buildCaptureSteps(
+            projectConfiguration,
+            FlowType.ENROL,
+            resolvedAgeGroup,
+        )
+        val externalCredentialStep = when {
+            captureSteps.isEmpty() -> emptyList()
+            else -> buildExternalCredentialStepIfNeeded(enrolmentSubjectId, projectConfiguration, FlowType.ENROL)
+        }
+        val matcherSteps = if (projectConfiguration.general.duplicateBiometricEnrolmentCheck) {
+            buildMatcherSteps(
                 projectConfiguration,
                 FlowType.ENROL,
                 resolvedAgeGroup,
-            ),
-            if (projectConfiguration.general.duplicateBiometricEnrolmentCheck) {
-                buildMatcherSteps(
-                    projectConfiguration,
-                    FlowType.ENROL,
-                    resolvedAgeGroup,
-                    buildMatcherSubjectQuery(projectConfiguration, action),
-                    BiometricDataSource.fromString(
-                        action.biometricDataSource,
-                        action.actionIdentifier.callerPackageName,
-                    ),
-                )
-            } else {
-                emptyList()
-            },
-        ).flatten()
+                buildMatcherSubjectQuery(projectConfiguration, action),
+                BiometricDataSource.fromString(
+                    action.biometricDataSource,
+                    action.actionIdentifier.callerPackageName,
+                ),
+            )
+        } else {
+            emptyList()
+        }
+        return captureSteps + externalCredentialStep + matcherSteps
     }
 
     private suspend fun buildCaptureAndMatchStepsForIdentify(
@@ -158,27 +192,30 @@ internal class BuildStepsUseCase @Inject constructor(
         projectConfiguration: ProjectConfiguration,
         ageGroup: AgeGroup? = null,
         subjectQuery: SubjectQuery,
+        enrolmentSubjectId: String
     ): List<Step> {
         val action = fallbackToCommCareDataSourceIfNeeded(action, projectConfiguration)
         val resolvedAgeGroup = ageGroup ?: ageGroupFromSubjectAge(action, projectConfiguration)
-
-        return listOf(
-            buildCaptureSteps(
-                projectConfiguration,
-                FlowType.IDENTIFY,
-                resolvedAgeGroup,
+        val captureSteps = buildCaptureSteps(
+            projectConfiguration,
+            FlowType.IDENTIFY,
+            resolvedAgeGroup,
+        )
+        val externalCredentialStep = when {
+            captureSteps.isEmpty() -> emptyList()
+            else -> buildExternalCredentialStepIfNeeded(enrolmentSubjectId, projectConfiguration, FlowType.IDENTIFY)
+        }
+        val matcherSteps = buildMatcherSteps(
+            projectConfiguration,
+            FlowType.IDENTIFY,
+            resolvedAgeGroup,
+            subjectQuery,
+            BiometricDataSource.fromString(
+                action.biometricDataSource,
+                action.actionIdentifier.callerPackageName,
             ),
-            buildMatcherSteps(
-                projectConfiguration,
-                FlowType.IDENTIFY,
-                resolvedAgeGroup,
-                subjectQuery,
-                BiometricDataSource.fromString(
-                    action.biometricDataSource,
-                    action.actionIdentifier.callerPackageName,
-                ),
-            ),
-        ).flatten()
+        )
+        return captureSteps + externalCredentialStep + matcherSteps
     }
 
     private fun buildCaptureAndMatchStepsForVerify(

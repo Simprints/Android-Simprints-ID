@@ -469,7 +469,7 @@ internal val protoSynchronizationConfiguration = ProtoSynchronizationConfigurati
             .build(),
     ).build()
 
-internal val apiAllowedExternalCredential = ApiExternalCredentialType.NHISCard
+internal val apiAllowedExternalCredential = ApiExternalCredentialType.NHIS_CARD
 
 internal val apiMultiFactorIdConfiguration = ApiMultiFactorIdConfiguration(
     allowedExternalCredentials = listOf(apiAllowedExternalCredential)

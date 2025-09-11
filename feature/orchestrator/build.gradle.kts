@@ -22,6 +22,7 @@ dependencies {
     implementation(project(":feature:matcher"))
     implementation(project(":feature:validate-subject-pool"))
     implementation(project(":feature:select-subject-age-group"))
+    implementation(project(":feature:external-credential"))
 
     implementation(project(":face:capture"))
 

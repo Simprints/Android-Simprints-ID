@@ -46,6 +46,7 @@ import com.simprints.matcher.MatchParams
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.io.Serializable
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -61,6 +62,9 @@ internal class OrchestratorViewModel @Inject constructor(
     private val mapStepsForLastBiometrics: MapStepsForLastBiometricEnrolUseCase,
 ) : ViewModel() {
     var isRequestProcessed = false
+
+    // [MS-1127] MF-ID: during enrolment, the same 'subjectId' needs to be used during the entire workflow
+    private val enrolmentSubjectId = UUID.randomUUID().toString()
     private var modalities = emptySet<GeneralConfiguration.Modality>()
     private var steps = emptyList<Step>()
     private var actionRequest: ActionRequest? = null
@@ -83,7 +87,11 @@ internal class OrchestratorViewModel @Inject constructor(
             // In case of a follow-up action, we should restore completed steps from cache
             // and add new ones to the list. This way all session steps are available throughout
             // the app for reference (i.e. have we already captured face in this session?)
-            steps = cache.steps + stepsBuilder.build(action, projectConfiguration)
+            steps = cache.steps + stepsBuilder.build(
+                action = action,
+                projectConfiguration = projectConfiguration,
+                enrolmentSubjectId = enrolmentSubjectId
+            )
             Simber.i("Steps to execute: ${steps.joinToString { it.id.toString() }}", tag = ORCHESTRATION)
         } catch (_: SubjectAgeNotSupportedException) {
             handleErrorResponse(AppErrorResponse(AppErrorReason.AGE_GROUP_NOT_SUPPORTED))
@@ -115,9 +123,10 @@ internal class OrchestratorViewModel @Inject constructor(
 
         if (result is SelectSubjectAgeGroupResult) {
             val captureAndMatchSteps = stepsBuilder.buildCaptureAndMatchStepsForAgeGroup(
-                actionRequest!!,
-                projectConfiguration,
-                result.ageGroup,
+                action = actionRequest!!,
+                projectConfiguration = projectConfiguration,
+                ageGroup = result.ageGroup,
+                enrolmentSubjectId = enrolmentSubjectId
             )
             steps = steps + captureAndMatchSteps
         }
@@ -195,10 +204,11 @@ internal class OrchestratorViewModel @Inject constructor(
         val projectConfiguration = configManager.getProjectConfiguration()
         val project = configManager.getProject(projectConfiguration.projectId)
         val appResponse = appResponseBuilder(
-            projectConfiguration,
-            actionRequest,
-            steps.mapNotNull { it.result },
-            project,
+            projectConfiguration = projectConfiguration,
+            request = actionRequest,
+            results = steps.mapNotNull { it.result },
+            project = project,
+            enrolmentSubjectId = enrolmentSubjectId,
         )
 
         updateDailyActivity(appResponse)

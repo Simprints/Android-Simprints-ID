@@ -251,6 +251,7 @@ class SubjectFactoryTest {
         )
 
         val result = factory.buildSubjectFromCaptureResults(
+            subjectId = expected.subjectId,
             projectId = expected.projectId,
             attendantId = expected.attendantId,
             moduleId = expected.moduleId,

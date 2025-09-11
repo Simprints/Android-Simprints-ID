@@ -3,6 +3,7 @@ package com.simprints.infra.enrolment.records.room.store.models
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import com.simprints.infra.enrolment.records.room.store.models.DbExternalCredential.Companion.EXTERNAL_CREDENTIAL_TABLE_NAME
 import com.simprints.infra.enrolment.records.room.store.models.DbExternalCredential.Companion.EXTERNAL_CREDENTIAL_VALUE_COLUMN
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.SUBJECT_ID_COLUMN
@@ -17,7 +18,8 @@ import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Compani
             childColumns = [SUBJECT_ID_COLUMN],
             onDelete = ForeignKey.CASCADE,
         )
-    ]
+    ],
+    indices = [Index(SUBJECT_ID_COLUMN)]
 )
 data class DbExternalCredential(
     // The ID is only used by BFSID for analytics. The primary key should be a composite of value+subjectId
