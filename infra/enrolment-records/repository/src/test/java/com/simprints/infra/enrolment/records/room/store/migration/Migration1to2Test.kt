@@ -25,7 +25,7 @@ class Migration1to2Test {
             name = TEST_DB,
             version = 2,
             validateDroppedTables = true,
-            MIGRATION_1_2
+            SubjectMigration1to2()
         )
 
         // Verify external credentials table exists

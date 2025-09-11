@@ -2,6 +2,7 @@ package com.simprints.infra.enrolment.records.room.store.migration
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 
 /**
  * Schema version 1 -> 2
@@ -9,7 +10,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  * Changes:
  * - Adding [DbExternalCredential] entity
  * */
-val MIGRATION_1_2 = object : Migration(1, 2) {
+@ExcludedFromGeneratedTestCoverageReports("Covered indirectly in the migration tests")
+class SubjectMigration1to2 : Migration(1, 2) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL(
             """
