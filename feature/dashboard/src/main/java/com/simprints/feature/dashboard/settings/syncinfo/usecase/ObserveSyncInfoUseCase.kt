@@ -234,12 +234,15 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         }
 
         val project = try {
-            configManager.getProject(projectId)
-        } catch (e: Exception) {
+            projectId.takeUnless { it.isBlank() }?.let { configManager.getProject(it) }
+        } catch (_: Exception) {
+            // When the device is compromised the project data will be deleted and
+            // attempting to access project state with result in exception.
+            // For user it is essentially the same as project ending.
             null
         }
-        val isProjectRunning =
-            project?.state == ProjectState.RUNNING
+
+        val isProjectRunning = project?.state == ProjectState.RUNNING
         val moduleCounts = if (project != null) {
             deviceConfig.selectedModules.map { moduleName ->
                 ModuleCount(

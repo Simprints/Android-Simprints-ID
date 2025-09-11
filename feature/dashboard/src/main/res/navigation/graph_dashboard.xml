@@ -62,11 +62,6 @@
             android:id="@+id/action_mainFragment_to_moduleSelectionFragment"
             app:destination="@id/moduleSelectionFragment" />
         <action
-            android:id="@+id/action_mainFragment_to_requestLoginFragment"
-            app:destination="@id/requestLoginFragment"
-            app:popUpTo="@id/dashboard_navigation"
-            app:popUpToInclusive="true" />
-        <action
             android:id="@+id/action_mainFragment_to_privacyNoticesFragment"
             app:destination="@id/graph_privacy" />
         <action
@@ -170,5 +165,11 @@
                 app:popUpToInclusive="true" />
         </fragment>
     </navigation>
+
+    <action
+        android:id="@+id/action_to_requestLoginFragment"
+        app:destination="@id/requestLoginFragment"
+        app:popUpTo="@id/dashboard_navigation"
+        app:popUpToInclusive="true" />
 
 </navigation>
