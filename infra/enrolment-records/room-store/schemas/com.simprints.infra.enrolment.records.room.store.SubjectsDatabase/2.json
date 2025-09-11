@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "95e64b85f208336cee0a08fc5e94b2d6",
+    "identityHash": "8dad14b775cb4eea6cb7293fbcf84b30",
     "entities": [
       {
         "tableName": "DbSubject",
@@ -207,6 +207,17 @@
             "subjectId"
           ]
         },
+        "indices": [
+          {
+            "name": "index_DbExternalCredential_subjectId",
+            "unique": false,
+            "columnNames": [
+              "subjectId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DbExternalCredential_subjectId` ON `${TABLE_NAME}` (`subjectId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "DbSubject",
@@ -224,7 +235,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '95e64b85f208336cee0a08fc5e94b2d6')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8dad14b775cb4eea6cb7293fbcf84b30')"
     ]
   }
 }

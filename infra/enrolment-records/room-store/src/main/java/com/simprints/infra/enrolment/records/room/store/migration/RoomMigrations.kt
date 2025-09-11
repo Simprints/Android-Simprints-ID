@@ -23,6 +23,7 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
             )
             """.trimIndent()
         )
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_DbExternalCredential_subjectId` ON `DbExternalCredential` (`subjectId`)")
     }
 }
 

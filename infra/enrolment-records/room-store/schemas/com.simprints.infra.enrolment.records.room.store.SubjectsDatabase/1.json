@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "527fcc2c704906558681cb31beddb0c3",
+    "identityHash": "94bee827928a2618c6873579bc6bc63a",
     "entities": [
       {
         "tableName": "DbSubject",
@@ -170,55 +170,11 @@
             ]
           }
         ]
-      },
-      {
-        "tableName": "DbExternalCredential",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`value` TEXT NOT NULL, `subjectId` TEXT NOT NULL, `type` TEXT NOT NULL, PRIMARY KEY(`value`, `subjectId`), FOREIGN KEY(`subjectId`) REFERENCES `DbSubject`(`subjectId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
-        "fields": [
-          {
-            "fieldPath": "value",
-            "columnName": "value",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "subjectId",
-            "columnName": "subjectId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "type",
-            "columnName": "type",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "value",
-            "subjectId"
-          ]
-        },
-        "foreignKeys": [
-          {
-            "table": "DbSubject",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "subjectId"
-            ],
-            "referencedColumns": [
-              "subjectId"
-            ]
-          }
-        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '527fcc2c704906558681cb31beddb0c3')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '94bee827928a2618c6873579bc6bc63a')"
     ]
   }
 }
