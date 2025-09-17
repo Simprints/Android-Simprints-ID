@@ -42,6 +42,15 @@
         app:layout_constraintWidth_percent="@dimen/capture_target_size_percent"
         tools:visibility="visible" />
 
+    <com.simprints.face.capture.facelandmarks.FaceOverlayView
+        android:id="@+id/face_landmark_overlay"
+        android:layout_width="0dp"
+        app:layout_constraintLeft_toLeftOf="@id/capture_overlay"
+        app:layout_constraintRight_toRightOf="@id/capture_overlay"
+        app:layout_constraintTop_toTopOf="@id/capture_overlay"
+        app:layout_constraintBottom_toBottomOf="@id/capture_overlay"
+        android:layout_height="0dp" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/capture_feedback_btn"
         style="@style/Text.Headline6.Bold"

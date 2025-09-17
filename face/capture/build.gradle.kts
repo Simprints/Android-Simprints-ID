@@ -37,6 +37,7 @@ dependencies {
     implementation(libs.androidX.cameraX.view)
     implementation(libs.androidX.ui.preference)
     implementation(libs.workManager.work)
+    implementation(libs.mlkit.face.detection)
 
     implementation(libs.circleImageView)
 

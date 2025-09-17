@@ -20,5 +20,5 @@ dependencies {
     implementation(libs.androidX.cameraX.lifecycle)
     implementation(libs.androidX.cameraX.view)
     implementation(libs.jackson.core)
-    implementation(libs.playServices.barcode)
+    implementation(libs.mlkit.barcode)
 }

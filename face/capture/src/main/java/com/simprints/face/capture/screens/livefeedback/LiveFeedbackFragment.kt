@@ -12,6 +12,7 @@ import androidx.camera.core.CameraControl
 import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
+import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_YUV_420_888
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.lifecycle.awaitInstance
@@ -161,9 +162,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             .Builder()
             .setTargetResolution(targetResolution)
             .setOutputImageRotationEnabled(true)
-            .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
+            .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_YUV_420_888)
             .build()
-        val cropAnalyzer = CropToTargetOverlayAnalyzer(binding.captureOverlay, ::analyze)
+        val cropAnalyzer = CropToTargetOverlayAnalyzer(binding.captureOverlay, binding.faceLandmarkOverlay!!, ::analyze)
 
         imageAnalyzer.setAnalyzer(cameraExecutor, cropAnalyzer)
 
@@ -293,21 +294,23 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderValidFace() {
         binding.apply {
-            if (vm.isAutoCapture) {
-                captureFeedbackBtn.setText(IDR.string.face_capture_prep_begin_button_capturing)
-            } else {
-                captureFeedbackBtn.setText(IDR.string.face_capture_begin_button)
-                setManualCaptureButtonClickable(true)
+            if (faceLandmarkOverlay.isFaceInsideTheTarget) {
+                if (vm.isAutoCapture) {
+                    captureFeedbackBtn.setText(IDR.string.face_capture_prep_begin_button_capturing)
+                } else {
+                    captureFeedbackBtn.setText(IDR.string.face_capture_begin_button)
+                    setManualCaptureButtonClickable(true)
+                }
+
+                captureFeedbackTxtExplanation.text = null
+                captureFeedbackBtn.isVisible = true
+                captureFeedbackPermissionButton.isGone = true
+
+                captureFeedbackBtn.setCheckedWithLeftDrawable(
+                    true,
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp),
+                )
             }
-
-            captureFeedbackTxtExplanation.text = null
-            captureFeedbackBtn.isVisible = true
-            captureFeedbackPermissionButton.isGone = true
-
-            captureFeedbackBtn.setCheckedWithLeftDrawable(
-                true,
-                ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp),
-            )
         }
     }
 

@@ -34,7 +34,7 @@ play_location_services_version = "21.3.0"
 play_integrity_version = "1.5.0"
 gsm_plugin_version = "4.4.3"
 play_publisher_version = "3.12.1"
-play_barcode_version = "18.3.1"
+mlkit_barcode_version = "17.3.0"
 
 firebase_auth_version = "24.0.1"
 firebase_storage_version = "22.0.0"
@@ -88,6 +88,7 @@ protobuf_plugin_version = "0.9.5"
 deps_graph_version = "0.8.0"
 tink_version = "1.18.0"
 desugar_jdk_libsVersion = "2.1.5"
+mlkit_version = "16.1.7"
 [libraries]
 
 #Kotlin
@@ -124,6 +125,8 @@ androidX-cameraX-core = { module = "androidx.camera:camera-core", version.ref = 
 androidX-cameraX-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "androidx_camerax_version" }
 androidX-cameraX-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "androidx_camerax_version" }
 androidX-cameraX-view = { module = "androidx.camera:camera-view", version.ref = "androidx_camerax_version" }
+mlkit-face-detection = { module = "com.google.mlkit:face-detection", version.ref = "mlkit_version" }
+mlkit-barcode = { module = "com.google.mlkit:barcode-scanning", version.ref = "mlkit_barcode_version" }
 
 #Navigation
 androidX-navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidx_navigation_version" }
@@ -142,7 +145,6 @@ workManager-work = { module = "androidx.work:work-runtime-ktx", version.ref = "a
 playServices-base = { module = "com.google.android.gms:play-services-base", version.ref = "play_base_services_version" }
 playServices-location = { module = "com.google.android.gms:play-services-location", version.ref = "play_location_services_version" }
 playServices-integrity = { module = "com.google.android.play:integrity", version.ref = "play_integrity_version" }
-playServices-barcode = { module = "com.google.android.gms:play-services-mlkit-barcode-scanning", version.ref = "play_barcode_version" }
 desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libsVersion" }
 
 #Firebase
