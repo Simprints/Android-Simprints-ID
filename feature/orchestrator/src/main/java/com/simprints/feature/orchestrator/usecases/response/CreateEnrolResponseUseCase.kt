@@ -23,6 +23,7 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
         request: ActionRequest.EnrolActionRequest,
         results: List<Serializable>,
         project: Project,
+        enrolmentSubjectId: String,
     ): AppResponse {
         val fingerprintCapture = results.filterIsInstance(FingerprintCaptureResult::class.java).lastOrNull()
         val faceCapture = results.filterIsInstance(FaceCaptureResult::class.java).lastOrNull()
@@ -31,6 +32,7 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
 
         return try {
             val subject = subjectFactory.buildSubjectFromCaptureResults(
+                subjectId = enrolmentSubjectId,
                 projectId = request.projectId,
                 attendantId = request.userId,
                 moduleId = request.moduleId,

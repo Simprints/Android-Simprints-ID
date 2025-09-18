@@ -15,10 +15,10 @@ internal data class ApiMultiFactorIdConfiguration(
 
 @Keep
 enum class ApiExternalCredentialType {
-    NHISCard, GhanaIdCard, QRCode;
+    NHIS_CARD, GhanaIdCard, QRCode;
 
     fun toDomain(): ExternalCredentialType = when (this) {
-        NHISCard -> ExternalCredentialType.NHISCard
+        NHIS_CARD -> ExternalCredentialType.NHISCard
         GhanaIdCard -> ExternalCredentialType.GhanaIdCard
         QRCode -> ExternalCredentialType.QRCode
     }

@@ -33,12 +33,13 @@ internal class AppResponseBuilderUseCaseTest {
     lateinit var handleEnrolLastBiometric: CreateEnrolLastBiometricResponseUseCase
 
     private lateinit var useCase: AppResponseBuilderUseCase
+    private lateinit var enrolmentSubjectId: String
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
-        coEvery { handleEnrolment.invoke(any(), any(), any()) } returns mockk()
+        coEvery { handleEnrolment.invoke(any(), any(), any(), any()) } returns mockk()
         coEvery { handleIdentify.invoke(any(), any()) } returns mockk()
         every { handleVerify.invoke(any(), any()) } returns mockk()
         every { handleConfirmIdentity.invoke(any()) } returns mockk()
@@ -52,48 +53,49 @@ internal class AppResponseBuilderUseCaseTest {
             handleConfirmIdentity,
             handleEnrolLastBiometric,
         )
+        enrolmentSubjectId = "enrolmentSubjectId"
     }
 
     @Test
     fun `Handles as enrolment for new enrolment action`() = runTest {
         every { isNewEnrolment(any(), any()) } returns true
-        useCase(mockk(), mockk<ActionRequest.EnrolActionRequest>(), mockk(), mockk())
-        coVerify { handleEnrolment.invoke(any(), any(), any()) }
+        useCase(mockk(), mockk<ActionRequest.EnrolActionRequest>(), mockk(), mockk(), enrolmentSubjectId)
+        coVerify { handleEnrolment.invoke(any(), any(), any(), any()) }
     }
 
     @Test
     fun `Handles as identification for enrolment action with existing item`() = runTest {
         every { isNewEnrolment(any(), any()) } returns false
-        useCase(mockk(), mockk<ActionRequest.EnrolActionRequest>(), mockk(), mockk())
+        useCase(mockk(), mockk<ActionRequest.EnrolActionRequest>(), mockk(), mockk(), enrolmentSubjectId)
         coVerify { handleIdentify.invoke(any(), any()) }
     }
 
     @Test
     fun `Handles as identification for identification action`() = runTest {
-        useCase(mockk(), mockk<ActionRequest.IdentifyActionRequest>(), mockk(), mockk())
+        useCase(mockk(), mockk<ActionRequest.IdentifyActionRequest>(), mockk(), mockk(), enrolmentSubjectId)
         coVerify { handleIdentify.invoke(any(), any()) }
     }
 
     @Test
     fun `Handles as verification for verification action`() = runTest {
-        useCase(mockk(), mockk<ActionRequest.VerifyActionRequest>(), mockk(), mockk())
+        useCase(mockk(), mockk<ActionRequest.VerifyActionRequest>(), mockk(), mockk(), enrolmentSubjectId)
         coVerify { handleVerify.invoke(any(), any()) }
     }
 
     @Test
     fun `Handles as confirmIdentity for confirm action`() = runTest {
-        useCase(mockk(), mockk<ActionRequest.ConfirmIdentityActionRequest>(), mockk(), mockk())
+        useCase(mockk(), mockk<ActionRequest.ConfirmIdentityActionRequest>(), mockk(), mockk(), enrolmentSubjectId)
         coVerify { handleConfirmIdentity.invoke(any()) }
     }
 
     @Test
     fun `Handles as enrol last biometric for enrol last action`() = runTest {
-        useCase(mockk(), mockk<ActionRequest.EnrolLastBiometricActionRequest>(), mockk(), mockk())
+        useCase(mockk(), mockk<ActionRequest.EnrolLastBiometricActionRequest>(), mockk(), mockk(), enrolmentSubjectId)
         coVerify { handleEnrolLastBiometric.invoke(any()) }
     }
 
     @Test
     fun `Handles null request`() = runTest {
-        assertThat(useCase(mockk(), null, mockk(), mockk())).isInstanceOf(AppErrorResponse::class.java)
+        assertThat(useCase(mockk(), null, mockk(), mockk(), enrolmentSubjectId)).isInstanceOf(AppErrorResponse::class.java)
     }
 }
