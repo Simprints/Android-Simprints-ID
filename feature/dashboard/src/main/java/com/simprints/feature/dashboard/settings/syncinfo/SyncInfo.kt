@@ -84,3 +84,8 @@ data class SyncInfoModuleCount(
     val name: String,
     val count: String = "",
 )
+
+enum class LogoutActionReason {
+    USER_ACTION,
+    PROJECT_ENDING_OR_DEVICE_COMPROMISED,
+}

@@ -11,6 +11,7 @@ import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.feature.dashboard.settings.syncinfo.usecase.ObserveSyncInfoUseCase
 import com.simprints.feature.login.LoginResult
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.Project
@@ -34,12 +35,14 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import kotlin.test.fail
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class SyncInfoViewModelTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
@@ -221,7 +224,6 @@ class SyncInfoViewModelTest {
 
     // LiveData logoutEventLiveData tests
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `should trigger logout when pre-logout sync completes successfully`() = runTest {
         val mockCompletedEventSyncState = mockk<EventSyncState>(relaxed = true) {
@@ -248,7 +250,6 @@ class SyncInfoViewModelTest {
         flowCollector.cancel()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `should emit a logout event after the intended delay since ready to logout`() = runTest {
         val mockCompletedEventSyncState = mockk<EventSyncState>(relaxed = true) {
@@ -277,7 +278,25 @@ class SyncInfoViewModelTest {
         flowCollector.cancel()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `should emit a logout event when auth store is cleared`() = runTest {
+        val projectIdFlow = MutableStateFlow(TEST_PROJECT_ID)
+        every { authStore.observeSignedInProjectId() } returns projectIdFlow
+        createViewModel()
+
+        var numberOfEmissions = 0
+        val flowCollector = async {
+            viewModel.logoutEventFlow.collect {
+                numberOfEmissions++
+            }
+        }
+        projectIdFlow.value = ""
+        advanceUntilIdle()
+
+        assertThat(numberOfEmissions).isEqualTo(1)
+        flowCollector.cancel()
+    }
+
     @Test
     fun `should not trigger logout when not in pre-logout mode`() = runTest {
         val mockCompletedEventSyncState = mockk<EventSyncState>(relaxed = true) {
@@ -303,7 +322,6 @@ class SyncInfoViewModelTest {
         flowCollector.cancel()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `should not trigger logout when records still syncing`() = runTest {
         val mockInProgressEventSyncState = mockk<EventSyncState>(relaxed = true) {
@@ -330,7 +348,6 @@ class SyncInfoViewModelTest {
         flowCollector.cancel()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `should not trigger logout when images still syncing`() = runTest {
         val mockCompletedEventSyncState = mockk<EventSyncState>(relaxed = true) {
@@ -397,6 +414,21 @@ class SyncInfoViewModelTest {
     fun `should start event sync with down sync disabled when project ending`() = runTest {
         val mockEndingProject = mockk<Project> {
             every { state } returns ProjectState.PROJECT_ENDING
+        }
+        coEvery { configManager.getProject(any()) } returns mockEndingProject
+        createViewModel()
+        viewModel.isPreLogoutUpSync = false
+
+        viewModel.forceEventSync()
+
+        coVerify { syncOrchestrator.stopEventSync() }
+        coVerify { syncOrchestrator.startEventSync(isDownSyncAllowed = false) }
+    }
+
+    @Test
+    fun `should start event sync with down sync disabled event sync when logged out`() = runTest {
+        val mockEndingProject = mockk<Project> {
+            every { state } throws RemoteDbNotSignedInException("stub!")
         }
         coEvery { configManager.getProject(any()) } returns mockEndingProject
         createViewModel()
