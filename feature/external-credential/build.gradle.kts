@@ -8,5 +8,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":infra:config-store"))
+    implementation(project(":infra:config-sync"))
     implementation(project(":feature:exit-form"))
 }

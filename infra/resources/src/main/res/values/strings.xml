@@ -481,4 +481,17 @@
         <item quantity="other">%d years</item>
     </plurals>
 
+    <!-- MultiFactor Identification -->
+    <string name="mfid_scanner_selection_title_generic">Scan document</string>
+    <string name="mfid_scanner_selection_title_specific">Scan %1$s</string>
+    <string name="mfid_scanner_selection_skip">Skip document scan</string>
+    <string name="mfid_type_nhis_card">NHIS Card</string>
+    <string name="mfid_type_ghana_id_card">Ghana ID Card</string>
+    <string name="mfid_type_qr_code">QR Code</string>
+    <string name="mfid_action_scan_document">Scan</string>
+    <string name="mfid_dialog_skip_scan_title">Skip scanning?</string>
+    <string name="mfid_dialog_skip_scan_body_generic">Scanning a document is required by this project. Are you sure you want to skip this step?</string>
+    <string name="mfid_dialog_skip_scan_body_specific">Scanning %1$s is required by this project. Are you sure you want to skip this step?</string>
+    <string name="mfid_dialog_skip_scan_confirm">Skip</string>
+
 </resources>
