@@ -236,9 +236,8 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         val project = try {
             projectId.takeUnless { it.isBlank() }?.let { configManager.getProject(it) }
         } catch (_: Exception) {
-            // When the device is compromised the project data will be deleted and
-            // attempting to access project state with result in exception.
-            // For user it is essentially the same as project ending.
+            // If the device is compromised, project data is deleted. Access attempts will throw an exception,
+            // effectively appearing to the user as if the project has ended.
             null
         }
 
