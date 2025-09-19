@@ -18,7 +18,7 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
             field = value
             _stateLiveData.postValue(value)
         }
-    private val _stateLiveData = MutableLiveData<ExternalCredentialState>()
+    private val _stateLiveData = MutableLiveData(ExternalCredentialState.EMPTY)
     val stateLiveData: LiveData<ExternalCredentialState> = _stateLiveData
 
     fun setSelectedExternalCredentialType(selectedType: ExternalCredentialType?) {
