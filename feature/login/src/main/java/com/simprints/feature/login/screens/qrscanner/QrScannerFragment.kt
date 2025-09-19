@@ -10,12 +10,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.google.firebase.analytics.FirebaseAnalytics.Event.LOGIN
 import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.feature.login.R
 import com.simprints.feature.login.databinding.FragmentQrScannerBinding
-import com.simprints.feature.login.tools.camera.CameraHelper
-import com.simprints.feature.login.tools.camera.QrCodeAnalyzer
+import com.simprints.infra.logging.LoggingConstants
+import com.simprints.infra.uibase.camera.qrscan.CameraHelper
+import com.simprints.infra.uibase.camera.qrscan.QrCodeAnalyzer
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.finishWithResult
@@ -29,12 +29,18 @@ import javax.inject.Inject
 @AndroidEntryPoint
 internal class QrScannerFragment : Fragment(R.layout.fragment_qr_scanner) {
     private val binding by viewBinding(FragmentQrScannerBinding::bind)
-
+    private val crashReportTag = LoggingConstants.CrashReportTag.LOGIN
     @Inject
-    lateinit var cameraHelper: CameraHelper
-
+    lateinit var cameraHelperFactory: CameraHelper.Factory
     @Inject
-    lateinit var qrCodeAnalyzer: QrCodeAnalyzer
+    lateinit var qrCodeAnalyzerFactory: QrCodeAnalyzer.Factory
+
+    private val cameraHelper: CameraHelper by lazy {
+        cameraHelperFactory.create(crashReportTag)
+    }
+    private val qrCodeAnalyzer by lazy {
+        qrCodeAnalyzerFactory.create(cropConfig = null, crashReportTag = crashReportTag)
+    }
 
     private val launchPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -57,7 +63,7 @@ internal class QrScannerFragment : Fragment(R.layout.fragment_qr_scanner) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 qrCodeAnalyzer.scannedCode
                     .catch { e ->
-                        Simber.e("Camera not available for QR scanning", e, tag = LOGIN)
+                        Simber.e("Camera not available for QR scanning", e, tag = crashReportTag)
                         finishWithError(QrScannerResult.QrScannerError.CameraNotAvailable)
                     }.collectLatest { qrCode ->
                         if (qrCode.isNotEmpty()) {

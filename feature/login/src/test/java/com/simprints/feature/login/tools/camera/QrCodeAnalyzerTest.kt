@@ -2,6 +2,8 @@ package com.simprints.feature.login.tools.camera
 
 import androidx.camera.core.ImageProxy
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.uibase.camera.qrscan.QrCodeAnalyzer
+import com.simprints.infra.uibase.camera.qrscan.QrCodeDetector
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify

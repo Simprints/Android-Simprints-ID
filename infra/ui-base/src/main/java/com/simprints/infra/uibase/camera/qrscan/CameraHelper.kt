@@ -1,4 +1,4 @@
-package com.simprints.feature.login.tools.camera
+package com.simprints.infra.uibase.camera.qrscan
 
 import android.content.Context
 import androidx.camera.core.AspectRatio
@@ -10,8 +10,11 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
+import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -19,10 +22,18 @@ import javax.inject.Inject
 @ExcludedFromGeneratedTestCoverageReports(
     reason = "This is an injectable wrapper around cameraX and ML kit APIs. There is no business logic.",
 )
-internal class CameraHelper @Inject constructor(
+class CameraHelper @AssistedInject constructor(
     @ApplicationContext private val context: Context,
-    private val cameraFocusManager: CameraFocusManager,
+    @Assisted private val crashReportTag: LoggingConstants.CrashReportTag,
+    private val cameraFocusManagerFactory: CameraFocusManager.Factory,
 ) {
+    private val cameraFocusManager by lazy { cameraFocusManagerFactory.create(crashReportTag) }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(crashReportTag: LoggingConstants.CrashReportTag): CameraHelper
+    }
+
     fun startCamera(
         lifecycleOwner: LifecycleOwner,
         cameraPreview: PreviewView,
@@ -56,7 +67,7 @@ internal class CameraHelper @Inject constructor(
                             }
                         }
                 } catch (e: Exception) {
-                    Simber.i("Camera is already in use by another process", e, tag = LOGIN)
+                    Simber.i("Camera is already in use by another process", e, tag = crashReportTag)
                     initializationErrorListener.onCameraError()
                 }
             },

@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,7 +29,7 @@ import com.simprints.infra.resources.R as IDR
 @AndroidEntryPoint
 internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_external_credential_select) {
 
-    private val mainViewModel by viewModels<ExternalCredentialViewModel>()
+    private val mainViewModel: ExternalCredentialViewModel by activityViewModels()
     private val viewModel by viewModels<ExternalCredentialSelectViewModel>()
     private val binding by viewBinding(FragmentExternalCredentialSelectBinding::bind)
 
@@ -123,7 +124,7 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
         onConfirm: () -> Unit,
         onCancel: () -> Unit
     ) {
-        dialog?.dismiss()
+        dismissDialog()
         dialog = BottomSheetDialog(requireContext())
         val view = layoutInflater.inflate(R.layout.dialog_skip_scan_confirm, null)
         val bodyText = view.findViewById<TextView>(R.id.skipDialogBodyText)

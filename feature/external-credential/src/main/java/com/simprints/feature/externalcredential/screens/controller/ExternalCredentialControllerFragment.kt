@@ -7,20 +7,21 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.externalcredential.GraphExternalCredentialInternalDirections
 import com.simprints.feature.externalcredential.R
+import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.navigation.navigationParams
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.getValue
 
 @AndroidEntryPoint
 internal class ExternalCredentialControllerFragment : Fragment(R.layout.fragment_external_credential_controller) {
-    private val args: ExternalCredentialControllerFragmentArgs by navArgs()
+    private val params: ExternalCredentialParams by navigationParams()
     private val viewModel: ExternalCredentialViewModel by activityViewModels()
 
     private val hostFragment: Fragment?
@@ -34,6 +35,8 @@ internal class ExternalCredentialControllerFragment : Fragment(R.layout.fragment
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewModel.init(params)
 
         findNavController().handleResult<ExitFormResult>(
             this,
@@ -64,7 +67,7 @@ internal class ExternalCredentialControllerFragment : Fragment(R.layout.fragment
     private fun initListeners() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             when (internalNavController?.currentDestination?.id) {
-                R.id.externalCredentialSelectFragment -> {
+                R.id.externalCredentialSelectFragment, R.id.externalCredentialSearch -> {
                     // Exit form navigation
                     findNavController().navigateSafely(
                         this@ExternalCredentialControllerFragment,
