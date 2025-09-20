@@ -39,3 +39,8 @@ fun Activity.permissionFromResult(
         }
     }
 }
+
+@ExcludedFromGeneratedTestCoverageReports("UI code")
+fun Activity.getCurrentPermissionStatus(
+    permission: String,
+): PermissionStatus = permissionFromResult(permission = permission, grantResult = hasPermission(permission))

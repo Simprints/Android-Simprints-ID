@@ -1,11 +1,12 @@
 package com.simprints.feature.externalcredential.screens.scanqr
 
-import android.Manifest
 import android.Manifest.permission.CAMERA
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Rect
+import android.os.Bundle
 import android.provider.Settings
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -21,16 +22,19 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.simprints.core.domain.permission.PermissionStatus
+import com.simprints.core.tools.extentions.getCurrentPermissionStatus
+import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.core.tools.extentions.permissionFromResult
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialScanQrBinding
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
 import com.simprints.infra.logging.LoggingConstants
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.camera.qrscan.CameraHelper
 import com.simprints.infra.uibase.camera.qrscan.QrCodeAnalyzer
 import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.catch
@@ -49,7 +53,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
     private val viewModel by viewModels<ExternalCredentialScanQrViewModel>()
 
     private var dialog: Dialog? = null
-    private var shouldCheckCameraPermission = true
+    private var isCameraInitialized = false
 
     @Inject
     lateinit var cameraHelperFactory: CameraHelper.Factory
@@ -64,27 +68,27 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
     private val launchPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
-        val permissionStatus = requireActivity().permissionFromResult(CAMERA, granted)
-        shouldCheckCameraPermission = permissionStatus == PermissionStatus.DeniedNeverAskAgain
-        when (permissionStatus) {
-            PermissionStatus.Granted -> {
-                initObservers()
-                startCamera()
-                startAnalyzer()
-            }
+        val cameraPermissionStatus = requireActivity().permissionFromResult(CAMERA, granted)
+        viewModel.updateCameraPermissionStatus(cameraPermissionStatus)
+    }
 
-            PermissionStatus.Denied -> renderNoPermission(shouldOpenSettings = false)
-            PermissionStatus.DeniedNeverAskAgain -> renderNoPermission(shouldOpenSettings = true)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
+        Simber.i("ExternalCredentialScanQrFragment started", tag = MULTI_FACTOR_ID)
+
+
+        initObservers()
+
+        if (!requireActivity().hasPermission(CAMERA)) {
+            launchPermissionRequest.launch(CAMERA)
         }
     }
 
     override fun onResume() {
         super.onResume()
-        if (shouldCheckCameraPermission) {
-            // Check permission in onResume() so that if user left the app to go to Settings
-            // and give the permission, it's reflected when they come back to SID
-            launchPermissionRequest.launch(CAMERA)
-        }
+        val cameraPermissionStatus = requireActivity().getCurrentPermissionStatus(CAMERA)
+        viewModel.updateCameraPermissionStatus(cameraPermissionStatus)
     }
 
     override fun onDestroy() {
@@ -100,8 +104,13 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
     private fun initObservers() {
         viewModel.stateLiveData.observe(viewLifecycleOwner) { state ->
             when (state) {
-                ScanQrState.NothingScanned -> renderInitialState()
-                is ScanQrState.ScanComplete -> renderScanComplete(state)
+                ScanQrState.ReadyToScan -> {
+                    renderInitialState()
+                    initCamera()
+                }
+
+                is ScanQrState.QrCodeCaptured -> renderScanComplete(state)
+                is ScanQrState.NoCameraPermission -> renderNoPermission(state.shouldOpenPhoneSettings)
             }
         }
     }
@@ -115,7 +124,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
         buttonScan.setOnClickListener {}
     }
 
-    private fun renderScanComplete(state: ScanQrState.ScanComplete) = with(binding) {
+    private fun renderScanComplete(state: ScanQrState.QrCodeCaptured) = with(binding) {
         val qrCodeValue = state.qrCodeValue
         qrPreviewCard.isVisible = true
         qrPreviewText.text = state.qrCodeValue
@@ -131,8 +140,9 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
             } else {
                 showInvalidQrCodeFormatDialog(
                     qrCodeValue = qrCodeValue,
-                    onRescan = {
+                    onDismiss = {
                         dismissDialog()
+                        viewModel.updateCapturedValue(null)
                     }
                 )
             }
@@ -141,7 +151,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
 
     private fun showInvalidQrCodeFormatDialog(
         qrCodeValue: String,
-        onRescan: () -> Unit,
+        onDismiss: () -> Unit,
     ) {
         dismissDialog()
         dialog = BottomSheetDialog(requireContext())
@@ -151,8 +161,8 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
 
         qrValueTextView.text = qrCodeValue
 
-        buttonRescan.setOnClickListener { onRescan() }
-
+        buttonRescan.setOnClickListener { dismissDialog() }
+        dialog?.setOnDismissListener { onDismiss() }
         dialog?.setContentView(view)
         dialog?.setCancelable(true)
         dialog?.show()
@@ -162,16 +172,24 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
         }
     }
 
+    private fun initCamera() {
+        binding.qrScannerArea.post {
+            if (isCameraInitialized) return@post
+            isCameraInitialized = true
+            startCamera()
+            startAnalyzer()
+        }
+    }
+
     private fun startAnalyzer() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 qrCodeAnalyzer.scannedCode
                     .catch { e ->
                         Simber.e("Camera not available for QR scanning", e, tag = crashReportTag)
-                        // TODO [MS-1165] Handle camera permissions
                         Toast.makeText(requireActivity(), "No camera", Toast.LENGTH_LONG).show()
                     }.collectLatest { qrCode ->
-                        viewModel.setQrCodeValue(qrCode)
+                        viewModel.updateCapturedValue(qrCode)
                     }
             }
         }
@@ -186,22 +204,20 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
             binding.qrScannerPreview,
             qrCodeAnalyzer,
         ) {
-            // On error
-            // TODO [MS-1165] Handle lack of camera permissions
             Toast.makeText(requireActivity(), "No Camera available", Toast.LENGTH_LONG).show()
         }
     }
 
-    private fun getCropConfig(): QrCodeAnalyzer.CropConfig {
+    private fun getCropConfig(): QrCodeAnalyzer.CropConfig = with(binding) {
         val qrScannerArea = Rect(
-            binding.qrScannerAim.left,
-            binding.qrScannerAim.top,
-            binding.qrScannerAim.right,
-            binding.qrScannerAim.bottom
+            qrScannerArea.left,
+            qrScannerArea.top,
+            qrScannerArea.right,
+            qrScannerArea.bottom
         )
         val orientation = resources.configuration.orientation
-        val previewWidth = binding.qrScannerPreview.width
-        val previewHeight = binding.qrScannerPreview.height
+        val previewWidth = qrScannerPreview.width
+        val previewHeight = qrScannerPreview.height
         return QrCodeAnalyzer.CropConfig(
             rect = qrScannerArea,
             orientation = orientation,
@@ -210,34 +226,32 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
         )
     }
 
-    private fun renderNoPermission(shouldOpenSettings: Boolean) {
-        binding.apply {
-            buttonScan.isVisible = false
-            if (shouldOpenSettings) {
-                permissionRequestView.init(
-                    title = IDR.string.face_capture_permission_denied,
-                    body = IDR.string.login_qr_code_scanning_camera_permission_error,
-                    buttonText = IDR.string.fingerprint_connect_phone_settings_button,
-                    onClickListener = {
-                        requireActivity().startActivity(
-                            Intent(
-                                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                "package:${requireActivity().packageName}".toUri(),
-                            ),
-                        )
-                    }
-                )
-            } else {
-                permissionRequestView.init(
-                    title = IDR.string.face_capture_permission_denied,
-                    body = IDR.string.login_qr_code_scanning_camera_permission_error,
-                    buttonText = IDR.string.face_capture_permission_action,
-                    onClickListener = {
-                        launchPermissionRequest.launch(Manifest.permission.CAMERA)
-                    }
-                )
-            }
-            permissionRequestView.isVisible = true
+    private fun renderNoPermission(shouldOpenPhoneSettings: Boolean) = with(binding) {
+        buttonScan.isVisible = false
+        if (shouldOpenPhoneSettings) {
+            permissionRequestView.init(
+                title = IDR.string.face_capture_permission_denied,
+                body = IDR.string.login_qr_code_scanning_camera_permission_error,
+                buttonText = IDR.string.fingerprint_connect_phone_settings_button,
+                onClickListener = {
+                    requireActivity().startActivity(
+                        Intent(
+                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                            "package:${requireActivity().packageName}".toUri(),
+                        ),
+                    )
+                }
+            )
+        } else {
+            permissionRequestView.init(
+                title = IDR.string.face_capture_permission_denied,
+                body = IDR.string.login_qr_code_scanning_camera_permission_error,
+                buttonText = IDR.string.face_capture_permission_action,
+                onClickListener = {
+                    launchPermissionRequest.launch(CAMERA)
+                }
+            )
         }
+        permissionRequestView.isVisible = true
     }
 }

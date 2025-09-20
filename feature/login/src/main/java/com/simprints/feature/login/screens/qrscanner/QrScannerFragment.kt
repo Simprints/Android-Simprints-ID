@@ -81,7 +81,7 @@ internal class QrScannerFragment : Fragment(R.layout.fragment_qr_scanner) {
     }
 
     private fun startCamera() {
-        binding.qrScannerAim.isVisible = true
+        binding.qrScannerArea.isVisible = true
         cameraHelper.startCamera(
             viewLifecycleOwner,
             binding.qrScannerPreview,
