@@ -48,7 +48,7 @@ import com.simprints.infra.resources.R as IDR
 internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_external_credential_scan_qr) {
 
     private val binding by viewBinding(FragmentExternalCredentialScanQrBinding::bind)
-    private val crashReportTag = LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
+    private val crashReportTag = MULTI_FACTOR_ID
     private val mainViewModel: ExternalCredentialViewModel by activityViewModels()
     private val viewModel by viewModels<ExternalCredentialScanQrViewModel>()
 
