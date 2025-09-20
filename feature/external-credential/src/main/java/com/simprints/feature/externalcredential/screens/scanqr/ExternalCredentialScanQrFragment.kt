@@ -117,6 +117,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
 
     private fun renderInitialState() = with(binding) {
         permissionRequestView.isVisible = false
+        qrInstructionsText.isVisible = true
         qrPreviewCard.isVisible = false
         buttonScan.setText(IDR.string.mfid_qr_scan_no_qr_detected)
         buttonScan.isVisible = true
@@ -126,6 +127,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
 
     private fun renderScanComplete(state: ScanQrState.QrCodeCaptured) = with(binding) {
         val qrCodeValue = state.qrCodeValue
+        qrInstructionsText.isVisible = false
         qrPreviewCard.isVisible = true
         qrPreviewText.text = state.qrCodeValue
         buttonScan.setText(IDR.string.mfid_continue)
@@ -227,6 +229,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
     }
 
     private fun renderNoPermission(shouldOpenPhoneSettings: Boolean) = with(binding) {
+        qrInstructionsText.isVisible = false
         buttonScan.isVisible = false
         if (shouldOpenPhoneSettings) {
             permissionRequestView.init(

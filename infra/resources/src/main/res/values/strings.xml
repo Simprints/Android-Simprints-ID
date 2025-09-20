@@ -494,6 +494,7 @@
     <string name="mfid_dialog_skip_scan_body_specific">Scanning %1$s is required by this project. Are you sure you want to skip this step?</string>
     <string name="mfid_dialog_skip_scan_confirm">Skip</string>
     <string name="mfid_qr_scan_no_qr_detected">No QR code detected</string>
+    <string name="mfid_qr_scan_instructions">Place QR code in window</string>
     <string name="mfid_continue">Continue</string>
     <string name="mfid_dialog_wrong_qr_title">Invalid QR Code type</string>
     <string name="mfid_dialog_wrong_qr_body_top">Wrong QR code format is scanned</string>
