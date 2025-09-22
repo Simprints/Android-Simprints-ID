@@ -15,7 +15,7 @@ import org.junit.runner.RunWith
 internal class CropBitmapAreaForDetectionUseCaseTest {
 
     @MockK
-    lateinit var rotateIfNeeded: RotateIfNeededUseCase
+    lateinit var rotateIfNeeded: RotateToPortraitIfNeededUseCase
 
     @MockK
     lateinit var mapCropRectToImageSpace: MapCropRectToImageSpaceUseCase

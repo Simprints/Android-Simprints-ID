@@ -35,6 +35,16 @@ class QrCodeAnalyzer @AssistedInject constructor(
         fun create(cropConfig: CropConfig?, crashReportTag: LoggingConstants.CrashReportTag): QrCodeAnalyzer
     }
 
+    /**
+     * Specifies what rectangle to crop from the image. This configuration is used in the image analysis - instead of analyzing the entire
+     * image, we are limiting the detection area to [rect]. The coordinates in [rect] are relative to the full image size, whose dimensions
+     * are given by [rootViewWidth] and [rootViewHeight]. Orientation of the image should be provided from the configuration constants.
+     *
+     * @param rect area to crop and analyze relative to the full image
+     * @param orientation orientation of the parent image. Should be provided from the configuration constants
+     * @param rootViewWidth width of the parent image
+     * @param rootViewHeight height of the parent image
+     */
     data class CropConfig(
         val rect: Rect,
         val orientation: Int,
