@@ -65,6 +65,7 @@ jobs:
                 feature:alert
                 feature:exit-form
                 feature:select-subject-age-group
+                feature:external-credential
             reportsId: feature1
 
     feature-unit-tests2:
