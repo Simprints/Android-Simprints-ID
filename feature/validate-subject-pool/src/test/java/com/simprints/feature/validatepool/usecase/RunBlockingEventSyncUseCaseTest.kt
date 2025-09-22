@@ -9,9 +9,10 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
+import io.mockk.coJustRun
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.justRun
 import io.mockk.verify
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
@@ -38,7 +39,7 @@ class RunBlockingEventSyncUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this)
 
-        justRun { syncOrchestrator.startEventSync() }
+        coJustRun { syncOrchestrator.startEventSync() }
 
         usecase = RunBlockingEventSyncUseCase(
             syncManager,
@@ -58,7 +59,7 @@ class RunBlockingEventSyncUseCaseTest {
         liveData.postValue(createSyncState("sync", EventSyncWorkerState.Succeeded))
         testScheduler.advanceUntilIdle()
 
-        verify { syncOrchestrator.startEventSync() }
+        coVerify { syncOrchestrator.startEventSync() }
         verify { syncManager.getLastSyncState() }
     }
 
@@ -74,7 +75,7 @@ class RunBlockingEventSyncUseCaseTest {
         liveData.postValue(createSyncState("sync", EventSyncWorkerState.Failed()))
         testScheduler.advanceUntilIdle()
 
-        verify { syncOrchestrator.startEventSync() }
+        coVerify { syncOrchestrator.startEventSync() }
         verify { syncManager.getLastSyncState() }
     }
 
@@ -90,7 +91,7 @@ class RunBlockingEventSyncUseCaseTest {
         liveData.postValue(createSyncState("sync", EventSyncWorkerState.Cancelled))
         testScheduler.advanceUntilIdle()
 
-        verify { syncOrchestrator.startEventSync() }
+        coVerify { syncOrchestrator.startEventSync() }
         verify { syncManager.getLastSyncState() }
     }
 
