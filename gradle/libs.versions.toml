@@ -24,7 +24,7 @@ androidx_viewpager_version = "1.1.0"
 androidx_security_version = "1.1.0"
 androidx_annotation_version = "1.9.1"
 androidx_arch_core_version = "2.2.0"
-matertial_version = "1.13.0"
+material_version = "1.12.0"
 
 hilt_version = "2.56.2"
 hilt_androidx_version = "1.2.0"
@@ -133,7 +133,7 @@ androidX-navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", ver
 androidX-annotation-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx_annotation_version" }
 
 #Support
-support-material = { module = "com.google.android.material:material", version.ref = "matertial_version" }
+support-material = { module = "com.google.android.material:material", version.ref = "material_version" }
 
 #WorkManager
 workManager-work = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx_work_version" }
