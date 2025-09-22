@@ -8,7 +8,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.StringRes
 import com.simprints.infra.uibase.R
+import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 
+@ExcludedFromGeneratedTestCoverageReports("UI Code")
 class PermissionRequestView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
