@@ -1,15 +1,12 @@
 package com.simprints.feature.dashboard.settings.syncinfo
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DispatcherIO
-import com.simprints.core.livedata.LiveDataEventWithContent
-import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.feature.dashboard.settings.syncinfo.usecase.ObserveSyncInfoUseCase
@@ -138,12 +135,15 @@ internal class SyncInfoViewModel @Inject constructor(
             .asLiveData(viewModelScope.coroutineContext)
     }
 
-    fun forceEventSync() {
+    fun forceEventSync(canEmitSyncButtonClick: Boolean = true) {
         viewModelScope.launch {
-            val isEventSyncing = eventSyncStateFlow.firstOrNull()?.isSyncInProgress() == true
-            if (!isEventSyncing) {
-                eventSyncButtonClickFlow.emit(Unit)
+            if (canEmitSyncButtonClick) {
+                val isEventSyncing = eventSyncStateFlow.firstOrNull()?.isSyncInProgress() == true
+                if (!isEventSyncing) {
+                    eventSyncButtonClickFlow.emit(Unit)
+                }
             }
+
             syncOrchestrator.stopEventSync()
             val projectState = try {
                 configManager.getProject(authStore.signedInProjectId).state
@@ -207,7 +207,7 @@ internal class SyncInfoViewModel @Inject constructor(
                 else -> false
             }
             if (isForceEventSync) {
-                forceEventSync()
+                forceEventSync(canEmitSyncButtonClick = false)
             }
         }
     }
