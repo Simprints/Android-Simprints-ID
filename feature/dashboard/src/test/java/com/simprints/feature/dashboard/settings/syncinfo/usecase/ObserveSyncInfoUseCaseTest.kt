@@ -23,6 +23,7 @@ import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
+import com.simprints.infra.config.store.models.isSampleUploadEnabledInProject
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
@@ -180,6 +181,7 @@ class ObserveSyncInfoUseCaseTest {
         every { any<ProjectConfiguration>().isModuleSelectionAvailable() } returns false
         every { any<ProjectConfiguration>().isSimprintsEventDownSyncAllowed() } returns true
         every { any<ProjectConfiguration>().isCommCareEventDownSyncAllowed() } returns false
+        every { any<ProjectConfiguration>().isSampleUploadEnabledInProject() } returns true
         every { commCarePermissionChecker.hasCommCarePermissions() } returns true
     }
 

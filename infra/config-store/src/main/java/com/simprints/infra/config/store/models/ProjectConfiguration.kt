@@ -37,13 +37,29 @@ fun ProjectConfiguration.canSyncBiometricDataToSimprints(): Boolean =
 fun ProjectConfiguration.canSyncAnalyticsDataToSimprints(): Boolean =
     synchronization.up.simprints.kind == UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
 
-fun ProjectConfiguration.isSimprintsEventDownSyncAllowed(): Boolean =
-    synchronization.down.simprints != null &&
+fun ProjectConfiguration.isSimprintsEventDownSyncAllowed(): Boolean = synchronization.down.simprints != null &&
     synchronization.down.simprints.frequency != Frequency.ONLY_PERIODICALLY_UP_SYNC
 
 fun ProjectConfiguration.isCommCareEventDownSyncAllowed(): Boolean = synchronization.down.commCare != null
 
 fun ProjectConfiguration.imagesUploadRequiresUnmeteredConnection(): Boolean = synchronization.up.simprints.imagesRequireUnmeteredConnection
+
+fun ProjectConfiguration.isSampleUploadEnabledInProject(): Boolean = listOfNotNull(
+    face?.rankOne?.imageSavingStrategy?.let { it != FaceConfiguration.ImageSavingStrategy.NEVER },
+    face?.simFace?.imageSavingStrategy?.let { it != FaceConfiguration.ImageSavingStrategy.NEVER },
+    fingerprint
+        ?.nec
+        ?.vero2
+        ?.imageSavingStrategy
+        ?.let { it != Vero2Configuration.ImageSavingStrategy.NEVER },
+    fingerprint
+        ?.secugenSimMatcher
+        ?.vero2
+        ?.imageSavingStrategy
+        ?.let { it != Vero2Configuration.ImageSavingStrategy.NEVER },
+).let { explicitStrategies ->
+    explicitStrategies.isNotEmpty() && explicitStrategies.any { it }
+}
 
 fun ProjectConfiguration.allowedAgeRanges(): List<AgeGroup> = listOfNotNull(
     face?.rankOne?.allowedAgeRange,
