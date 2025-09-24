@@ -40,7 +40,7 @@
                 style="@style/Text.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:text="@string/mfid_dialog_skip_scan_body_generic" />
+                tools:text="Scanning a document is required by this project. Are you sure you want to skip this step?" />
 
 
         </LinearLayout>

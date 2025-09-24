@@ -33,8 +33,8 @@ internal class ExternalCredentialTypeAdapter(
                 ExternalCredentialType.NHISCard -> IDR.string.mfid_type_nhis_card
                 ExternalCredentialType.GhanaIdCard -> IDR.string.mfid_type_ghana_id_card
                 ExternalCredentialType.QRCode -> IDR.string.mfid_type_qr_code
-            }.apply(c::getString)
-            val text = c.getString(IDR.string.mfid_scanner_selection_title_specific).format(credentialTypeText)
+            }.run(c::getString)
+            val text = c.resources.getQuantityString(IDR.plurals.mfid_scan_action, 1, credentialTypeText)
             val image = when (credentialType) {
                 ExternalCredentialType.NHISCard -> R.drawable.ghana_nhis_card
                 ExternalCredentialType.GhanaIdCard -> R.drawable.ghana_id_card

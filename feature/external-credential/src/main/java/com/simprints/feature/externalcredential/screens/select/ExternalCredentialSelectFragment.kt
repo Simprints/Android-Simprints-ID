@@ -15,6 +15,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialSelectBinding
+import com.simprints.feature.externalcredential.ext.getQuantityCredentialString
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
 import com.simprints.feature.externalcredential.screens.select.view.ExternalCredentialTypeAdapter
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
@@ -23,7 +24,6 @@ import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.getValue
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
@@ -71,14 +71,12 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
     }
 
     private fun initViews(types: List<ExternalCredentialType>) {
-        binding.title.text = when (types.size) {
-            1 -> {
-                val documentType = getString(mainViewModel.mapTypeToStringResource(types.first()))
-                getString(IDR.string.mfid_scanner_selection_title_specific).format(documentType)
-            }
-
-            else -> getString(IDR.string.mfid_scanner_selection_title_generic)
-        }
+        binding.title.text = resources.getQuantityCredentialString(
+            id = IDR.plurals.mfid_scan_action,
+            specificCredentialRes = mainViewModel.mapTypeToStringResource(types.firstOrNull()),
+            multipleCredentialsRes = IDR.string.mfid_type_any_document,
+            credentialTypes = types,
+        )
     }
 
     private fun observeChanges() {
@@ -132,14 +130,13 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
                     val cancelButton = view.findViewById<Button>(R.id.buttonCancel)
                     val confirmButton = view.findViewById<Button>(R.id.buttonSkip)
 
-                    bodyText.text = when (credentialTypes.size) {
-                        1 -> {
-                            val documentType = getString(mainViewModel.mapTypeToStringResource(credentialTypes.first()))
-                            getString(IDR.string.mfid_dialog_skip_scan_body_specific).format(documentType)
-                        }
+                    bodyText.text = resources.getQuantityCredentialString(
+                        id = IDR.plurals.mfid_dialog_skip_scan_body,
+                        credentialTypes = credentialTypes,
+                        specificCredentialRes = mainViewModel.mapTypeToStringResource(credentialTypes.firstOrNull()),
+                        multipleCredentialsRes = IDR.string.mfid_type_any_document
+                    )
 
-                        else -> getString(IDR.string.mfid_dialog_skip_scan_body_generic)
-                    }
                     confirmButton.setOnClickListener { onConfirm() }
                     cancelButton.setOnClickListener { onCancel() }
                 }

@@ -41,9 +41,10 @@ internal class ExternalCredentialViewModel @Inject internal constructor() : View
     }
 
 
-    fun mapTypeToStringResource(type: ExternalCredentialType) = when (type) {
+    fun mapTypeToStringResource(type: ExternalCredentialType?) = when (type) {
         ExternalCredentialType.NHISCard -> IDR.string.mfid_type_nhis_card
         ExternalCredentialType.GhanaIdCard -> IDR.string.mfid_type_ghana_id_card
         ExternalCredentialType.QRCode -> IDR.string.mfid_type_qr_code
+        null -> IDR.string.mfid_type_any_document
     }
 }
