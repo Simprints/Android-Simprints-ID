@@ -29,11 +29,12 @@ internal class ExternalCredentialTypeAdapter(
     inner class ViewHolder(private val binding: ItemDocumentBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(credentialType: ExternalCredentialType) {
             val c = binding.root.context
-            val text = c.getString(IDR.string.mfid_action_scan_document) + " " + when (credentialType) {
-                ExternalCredentialType.NHISCard -> c.getString(IDR.string.mfid_type_nhis_card)
-                ExternalCredentialType.GhanaIdCard -> c.getString(IDR.string.mfid_type_ghana_id_card)
-                ExternalCredentialType.QRCode -> c.getString(IDR.string.mfid_type_qr_code)
-            }
+            val credentialTypeText = when (credentialType) {
+                ExternalCredentialType.NHISCard -> IDR.string.mfid_type_nhis_card
+                ExternalCredentialType.GhanaIdCard -> IDR.string.mfid_type_ghana_id_card
+                ExternalCredentialType.QRCode -> IDR.string.mfid_type_qr_code
+            }.apply(c::getString)
+            val text = c.getString(IDR.string.mfid_scanner_selection_title_specific).format(credentialTypeText)
             val image = when (credentialType) {
                 ExternalCredentialType.NHISCard -> R.drawable.ghana_nhis_card
                 ExternalCredentialType.GhanaIdCard -> R.drawable.ghana_id_card
