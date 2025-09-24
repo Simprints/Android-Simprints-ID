@@ -155,23 +155,21 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
         qrCodeValue: String,
         onDismiss: () -> Unit,
     ) {
-        dismissDialog()
-        dialog = BottomSheetDialog(requireContext())
-        val view = layoutInflater.inflate(R.layout.dialog_qr_wrong_value, null)
-        val qrValueTextView = view.findViewById<TextView>(R.id.qrValue)
-        val buttonRescan = view.findViewById<Button>(R.id.buttonRescan)
-
-        qrValueTextView.text = qrCodeValue
-
-        buttonRescan.setOnClickListener { dismissDialog() }
-        dialog?.setOnDismissListener { onDismiss() }
-        dialog?.setContentView(view)
-        dialog?.setCancelable(true)
-        dialog?.show()
-        (dialog as? BottomSheetDialog)?.apply {
-            behavior.state = BottomSheetBehavior.STATE_EXPANDED
-            behavior.isDraggable = false
+        dialog = BottomSheetDialog(requireContext()).also {
+            it.setContentView(
+                layoutInflater.inflate(R.layout.dialog_qr_wrong_value, null).also { view ->
+                    val qrValueTextView = view.findViewById<TextView>(R.id.qrValue)
+                    val buttonRescan = view.findViewById<Button>(R.id.buttonRescan)
+                    qrValueTextView.text = qrCodeValue
+                    buttonRescan.setOnClickListener { dismissDialog() }
+                }
+            )
+            it.setOnDismissListener { onDismiss() }
+            it.setCancelable(true)
+            it.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            it.behavior.isDraggable = false
         }
+        dialog?.show()
     }
 
     private fun initCamera() {
