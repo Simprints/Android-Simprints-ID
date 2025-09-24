@@ -1,4 +1,4 @@
-package com.simprints.feature.login.tools.camera
+package com.simprints.infra.uibase.camera.qrscan
 
 import android.annotation.SuppressLint
 import android.view.MotionEvent
@@ -14,15 +14,26 @@ import androidx.camera.core.MeteringPointFactory
 import androidx.camera.core.SurfaceOrientedMeteringPointFactory
 import androidx.camera.view.PreviewView
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
 import com.simprints.infra.logging.Simber
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ExcludedFromGeneratedTestCoverageReports(
     reason = "These are UI utilities for focus controls in the camera preview",
 )
-internal class CameraFocusManager @Inject constructor() {
+class CameraFocusManager @AssistedInject constructor(
+    @Assisted private val crashReportTag: LoggingConstants.CrashReportTag,
+) {
+    @AssistedFactory
+    interface Factory {
+        fun create(crashReportTag: LoggingConstants.CrashReportTag): CameraFocusManager
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     fun setUpFocusOnTap(
         cameraPreview: PreviewView,
@@ -52,7 +63,7 @@ internal class CameraFocusManager @Inject constructor() {
                 try {
                     cameraControl.startFocusAndMetering(focusAction)
                 } catch (e: CameraInfoUnavailableException) {
-                    Simber.e("Cannot access camera", e, tag = LOGIN)
+                    Simber.e("Cannot access camera", e, tag = crashReportTag)
                 }
                 true
             }
@@ -78,7 +89,7 @@ internal class CameraFocusManager @Inject constructor() {
             try {
                 camera.cameraControl.startFocusAndMetering(focusAction)
             } catch (e: CameraInfoUnavailableException) {
-                Simber.e("Cannot access camera", e, tag = LOGIN)
+                Simber.e("Cannot access camera", e, tag = crashReportTag)
             }
         }
     }

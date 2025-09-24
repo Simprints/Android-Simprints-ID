@@ -1,8 +1,8 @@
-package com.simprints.feature.login.tools.camera
+package com.simprints.infra.uibase.camera.qrscan
 
 import android.media.Image
 
-internal data class RawImage(
+data class RawImage(
     val image: Image,
     val rotationDegrees: Int,
 )

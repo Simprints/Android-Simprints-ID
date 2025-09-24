@@ -51,6 +51,7 @@ object LoggingConstants {
         SAMPLE_UPLOAD,
         APPLICATION,
         COMMCARE_SYNC,
+        MULTI_FACTOR_ID,
     }
 
     // Tags eligible for Firebase Analytics logging
