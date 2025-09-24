@@ -24,6 +24,7 @@ class EnrolmentRecordWorker @AssistedInject constructor(
     override val tag: String = "EnrolmentRecordWorker"
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
+        showProgressNotification()
         crashlyticsLog("Started")
         try {
             val instructionId =
