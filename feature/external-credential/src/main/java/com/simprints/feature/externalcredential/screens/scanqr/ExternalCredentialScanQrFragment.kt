@@ -155,15 +155,16 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
         qrCodeValue: String,
         onDismiss: () -> Unit,
     ) {
+        dismissDialog()
         dialog = BottomSheetDialog(requireContext()).also {
-            it.setContentView(
-                layoutInflater.inflate(R.layout.dialog_qr_wrong_value, null).also { view ->
+            val view = layoutInflater.inflate(R.layout.dialog_qr_wrong_value, null)
+                .also { view ->
                     val qrValueTextView = view.findViewById<TextView>(R.id.qrValue)
                     val buttonRescan = view.findViewById<Button>(R.id.buttonRescan)
                     qrValueTextView.text = qrCodeValue
                     buttonRescan.setOnClickListener { dismissDialog() }
                 }
-            )
+            it.setContentView(view)
             it.setOnDismissListener { onDismiss() }
             it.setCancelable(true)
             it.behavior.state = BottomSheetBehavior.STATE_EXPANDED

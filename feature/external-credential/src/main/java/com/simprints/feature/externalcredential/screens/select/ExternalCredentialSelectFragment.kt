@@ -125,32 +125,31 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
         onCancel: () -> Unit
     ) {
         dismissDialog()
-        dialog = BottomSheetDialog(requireContext())
-        val view = layoutInflater.inflate(R.layout.dialog_skip_scan_confirm, null)
-        val bodyText = view.findViewById<TextView>(R.id.skipDialogBodyText)
-        val cancelButton = view.findViewById<Button>(R.id.buttonCancel)
-        val confirmButton = view.findViewById<Button>(R.id.buttonSkip)
+        dialog = BottomSheetDialog(requireContext()).also {
+            val view = layoutInflater.inflate(R.layout.dialog_skip_scan_confirm, null)
+                .also { view ->
+                    val bodyText = view.findViewById<TextView>(R.id.skipDialogBodyText)
+                    val cancelButton = view.findViewById<Button>(R.id.buttonCancel)
+                    val confirmButton = view.findViewById<Button>(R.id.buttonSkip)
 
-        bodyText.text = when (credentialTypes.size) {
-            1 -> {
-                val documentType = getString(mainViewModel.mapTypeToStringResource(credentialTypes.first()))
-                getString(IDR.string.mfid_dialog_skip_scan_body_specific).format(documentType)
-            }
+                    bodyText.text = when (credentialTypes.size) {
+                        1 -> {
+                            val documentType = getString(mainViewModel.mapTypeToStringResource(credentialTypes.first()))
+                            getString(IDR.string.mfid_dialog_skip_scan_body_specific).format(documentType)
+                        }
 
-            else -> getString(IDR.string.mfid_dialog_skip_scan_body_generic)
+                        else -> getString(IDR.string.mfid_dialog_skip_scan_body_generic)
+                    }
+                    confirmButton.setOnClickListener { onConfirm() }
+                    cancelButton.setOnClickListener { onCancel() }
+                }
+            it.setContentView(view)
+            it.setCancelable(true)
+            it.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            it.behavior.isDraggable = false
         }
 
-        confirmButton.setOnClickListener { onConfirm() }
-        cancelButton.setOnClickListener { onCancel() }
-
-        dialog?.setContentView(view)
-        dialog?.setCancelable(true)
         dialog?.show()
-        (dialog as? BottomSheetDialog)?.apply {
-            behavior.state = BottomSheetBehavior.STATE_EXPANDED
-            behavior.isDraggable = false
-        }
-
     }
 
     private fun startOcr() {
