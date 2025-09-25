@@ -25,6 +25,7 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
+import com.simprints.infra.config.store.models.isSampleUploadEnabledInProject
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
@@ -320,12 +321,13 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         )
 
         val syncInfo = SyncInfo(
-            isLoggedIn,
+            isLoggedIn = isLoggedIn,
             isConfigurationLoadingProgressBarVisible = isRefreshing,
             isLoginPromptSectionVisible = isReLoginRequired && !isPreLogoutUpSync,
-            syncInfoSectionRecords,
-            syncInfoSectionImages,
-            syncInfoSectionModules,
+            isImageSyncSectionVisible = projectConfig.isSampleUploadEnabledInProject(),
+            syncInfoSectionRecords = syncInfoSectionRecords,
+            syncInfoSectionImages = syncInfoSectionImages,
+            syncInfoSectionModules = syncInfoSectionModules,
         )
         return@combine9 syncInfo
     }.onRecordSyncComplete {

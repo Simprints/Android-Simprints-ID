@@ -4,6 +4,7 @@ data class SyncInfo(
     val isLoggedIn: Boolean = true,
     val isConfigurationLoadingProgressBarVisible: Boolean = false,
     val isLoginPromptSectionVisible: Boolean = false,
+    val isImageSyncSectionVisible: Boolean = false,
     val syncInfoSectionRecords: SyncInfoSectionRecords = SyncInfoSectionRecords(),
     val syncInfoSectionImages: SyncInfoSectionImages = SyncInfoSectionImages(),
     val syncInfoSectionModules: SyncInfoSectionModules = SyncInfoSectionModules(),
