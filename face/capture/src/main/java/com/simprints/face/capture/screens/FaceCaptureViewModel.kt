@@ -7,12 +7,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DeviceID
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
 import com.simprints.face.capture.usecases.SaveFaceSampleUseCase
@@ -79,9 +79,9 @@ internal class FaceCaptureViewModel @Inject constructor(
         get() = _unexpectedErrorEvent
     private val _unexpectedErrorEvent = MutableLiveData<LiveDataEvent>()
 
-    val finishFlowEvent: LiveData<LiveDataEventWithContent<FaceCaptureResult>>
+    val finishFlowEvent: LiveData<LiveDataEventWithContent<CaptureIdentity>>
         get() = _finishFlowEvent
-    private val _finishFlowEvent = MutableLiveData<LiveDataEventWithContent<FaceCaptureResult>>()
+    private val _finishFlowEvent = MutableLiveData<LiveDataEventWithContent<CaptureIdentity>>()
 
     val invalidLicense: LiveData<LiveDataEvent>
         get() = _invalidLicense
@@ -190,7 +190,7 @@ internal class FaceCaptureViewModel @Inject constructor(
             val referenceId = UUID.randomUUID().toString()
             eventReporter.addBiometricReferenceCreationEvents(referenceId, items.map { it.captureEventId })
 
-            _finishFlowEvent.send(FaceCaptureResult(referenceId, items))
+            _finishFlowEvent.send(CaptureIdentity(referenceId, Modality.FACE, items))
         }
     }
 

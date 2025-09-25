@@ -1,11 +1,12 @@
-package com.simprints.fingerprint.capture
+package com.simprints.core.domain.sample
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.step.StepResult
 
 @Keep
-data class FingerprintCaptureResult(
+data class CaptureIdentity(
     val referenceId: String,
+    val modality: Modality,
     var results: List<CaptureSample>,
 ) : StepResult

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.livedata.LiveDataEvent
@@ -15,7 +16,6 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.extentions.updateOnIndex
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.fingerprint.capture.extensions.isEager
 import com.simprints.fingerprint.capture.extensions.isImageTransferRequired
 import com.simprints.fingerprint.capture.extensions.toInt
@@ -135,10 +135,10 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         get() = _invalidLicense
     private val _invalidLicense = MutableLiveData<LiveDataEvent>()
 
-    val finishWithFingerprints: LiveData<LiveDataEventWithContent<FingerprintCaptureResult>>
+    val finishWithFingerprints: LiveData<LiveDataEventWithContent<CaptureIdentity>>
         get() = _finishWithFingerprints
     private val _finishWithFingerprints =
-        MutableLiveData<LiveDataEventWithContent<FingerprintCaptureResult>>()
+        MutableLiveData<LiveDataEventWithContent<CaptureIdentity>>()
 
     private lateinit var originalFingerprintsToCapture: List<SampleIdentifier>
     private val captureEventIds: MutableMap<CaptureId, String> = mutableMapOf()
@@ -672,7 +672,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         val biometricReferenceId = UUID.randomUUID().toString()
         addBiometricReferenceCreationEvents(biometricReferenceId, resultItems.map { it.captureEventId })
 
-        _finishWithFingerprints.send(FingerprintCaptureResult(biometricReferenceId, resultItems))
+        _finishWithFingerprints.send(CaptureIdentity(biometricReferenceId, Modality.FINGERPRINT, resultItems))
     }
 
     private suspend fun saveImageIfExists(

@@ -2,12 +2,11 @@ package com.simprints.feature.orchestrator.usecases
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.SampleIdentifier
-import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
-import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
@@ -46,11 +45,12 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
     }
 
     @Test
-    fun `maps FaceCaptureResult correctly`() {
+    fun `maps face CaptureIdentity correctly`() {
         val result = useCase(
             listOf(
-                FaceCaptureResult(
+                CaptureIdentity(
                     "referenceId",
+                    modality = Modality.FACE,
                     results = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
@@ -92,11 +92,12 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
     }
 
     @Test
-    fun `maps FingerprintCaptureResult correctly`() {
+    fun `maps fingerprint CaptureIdentity correctly`() {
         val result = useCase(
             listOf(
-                FingerprintCaptureResult(
+                CaptureIdentity(
                     "referenceId",
+                    modality = Modality.FINGERPRINT,
                     results = listOf(
                         CaptureSample(
                             captureEventId = GUID1,

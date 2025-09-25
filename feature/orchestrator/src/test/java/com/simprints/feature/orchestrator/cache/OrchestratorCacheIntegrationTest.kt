@@ -7,6 +7,7 @@ import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.core.domain.sample.SampleIdentifier
@@ -16,7 +17,6 @@ import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.FaceCaptureParams
-import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.consent.ConsentParams
 import com.simprints.feature.consent.ConsentResult
@@ -45,7 +45,6 @@ import com.simprints.feature.setup.SetupResult
 import com.simprints.feature.validatepool.ValidateSubjectPoolFragmentParams
 import com.simprints.feature.validatepool.ValidateSubjectPoolResult
 import com.simprints.fingerprint.capture.FingerprintCaptureParams
-import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
@@ -254,8 +253,9 @@ class OrchestratorCacheIntegrationTest {
                     fingerprintSDK = FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                 ),
                 status = StepStatus.COMPLETED,
-                result = FingerprintCaptureResult(
+                result = CaptureIdentity(
                     "",
+                    modality = Modality.FINGERPRINT,
                     results = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
@@ -313,8 +313,9 @@ class OrchestratorCacheIntegrationTest {
                 destinationId = 6,
                 params = FaceCaptureParams(3, FaceConfiguration.BioSdk.RANK_ONE),
                 status = StepStatus.COMPLETED,
-                result = FaceCaptureResult(
+                result = CaptureIdentity(
                     "",
+                    modality = Modality.FACE,
                     results = listOf(
                         CaptureSample(
                             captureEventId = GUID1,

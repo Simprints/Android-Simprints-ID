@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.step.StepResult
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
@@ -17,7 +18,6 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.face.capture.FaceCaptureParams
-import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
@@ -38,7 +38,6 @@ import com.simprints.feature.orchestrator.usecases.steps.BuildStepsUseCase
 import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.setup.LocationStore
 import com.simprints.fingerprint.capture.FingerprintCaptureParams
-import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
@@ -257,7 +256,7 @@ internal class OrchestratorViewModel @Inject constructor(
         currentStep: Step,
         result: Serializable,
     ) {
-        if (currentStep.id == StepId.FACE_CAPTURE && result is FaceCaptureResult) {
+        if (currentStep.id == StepId.FACE_CAPTURE && result is CaptureIdentity) {
             val captureParams = currentStep.params?.let { it as? FaceCaptureParams }
             val matchingStep = steps.firstOrNull { step ->
                 if (step.id != StepId.FACE_MATCHER) {
@@ -278,7 +277,7 @@ internal class OrchestratorViewModel @Inject constructor(
                 }
             }
         }
-        if (currentStep.id == StepId.FINGERPRINT_CAPTURE && result is FingerprintCaptureResult) {
+        if (currentStep.id == StepId.FINGERPRINT_CAPTURE && result is CaptureIdentity) {
             val captureParams = currentStep.params?.let { it as? FingerprintCaptureParams }
             // Find the matching step for the same fingerprint SDK as there may be multiple match steps
             val matchingStep = steps.firstOrNull { step ->
@@ -313,14 +312,14 @@ internal class OrchestratorViewModel @Inject constructor(
         val step = steps.firstOrNull { it.id == StepId.EXTERNAL_CREDENTIAL } ?: return
         val params = step.params as? ExternalCredentialParams ?: return
         val updatedParams = when {
-            currentStep.id == StepId.FACE_CAPTURE && result is FaceCaptureResult -> {
+            currentStep.id == StepId.FACE_CAPTURE && result is CaptureIdentity -> {
                 params.copy(
                     probeReferenceId = result.referenceId,
                     faceSamples = result.results,
                 )
             }
 
-            currentStep.id == StepId.FINGERPRINT_CAPTURE && result is FingerprintCaptureResult -> {
+            currentStep.id == StepId.FINGERPRINT_CAPTURE && result is CaptureIdentity -> {
                 params.copy(
                     probeReferenceId = result.referenceId,
                     fingerprintSamples = result.results,
