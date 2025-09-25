@@ -2,12 +2,11 @@ package com.simprints.infra.eventsync.sync.common
 
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.face.capture.FaceCaptureResult
-import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.events.event.domain.models.subject.BiometricReference
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
@@ -71,8 +70,8 @@ class SubjectFactory @Inject constructor(
         projectId: String,
         attendantId: TokenizableString,
         moduleId: TokenizableString,
-        fingerprintResponse: FingerprintCaptureResult?,
-        faceResponse: FaceCaptureResult?,
+        fingerprintResponse: CaptureIdentity?,
+        faceResponse: CaptureIdentity?,
         externalCredential: ExternalCredential?,
     ): Subject = buildSubject(
         subjectId = subjectId,
@@ -107,22 +106,22 @@ class SubjectFactory @Inject constructor(
         externalCredentials = externalCredentials,
     )
 
-    private fun extractFingerprintSamples(fingerprintResponse: FingerprintCaptureResult) = fingerprintResponse.results.map { sample ->
+    private fun extractFingerprintSamples(fingerprintResponse: CaptureIdentity) = fingerprintResponse.results.map { sample ->
         Sample(
             identifier = sample.identifier,
             template = sample.template,
             format = sample.format,
             referenceId = fingerprintResponse.referenceId,
-            modality = Modality.FINGERPRINT,
+            modality = sample.modality,
         )
     }
 
-    private fun extractFaceSamples(faceResponse: FaceCaptureResult) = faceResponse.results.map {
+    private fun extractFaceSamples(faceResponse: CaptureIdentity) = faceResponse.results.map {
         Sample(
             template = it.template,
             format = it.format,
             referenceId = faceResponse.referenceId,
-            modality = Modality.FACE,
+            modality = it.modality,
         )
     }
 

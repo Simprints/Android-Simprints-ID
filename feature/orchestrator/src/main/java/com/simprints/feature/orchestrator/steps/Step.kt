@@ -4,12 +4,12 @@ import androidx.annotation.IdRes
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.MatchConfidence
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.step.StepResult
 import com.simprints.face.capture.FaceCaptureParams
-import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.consent.ConsentParams
 import com.simprints.feature.consent.ConsentResult
@@ -30,7 +30,6 @@ import com.simprints.feature.setup.SetupResult
 import com.simprints.feature.validatepool.ValidateSubjectPoolFragmentParams
 import com.simprints.feature.validatepool.ValidateSubjectPoolResult
 import com.simprints.fingerprint.capture.FingerprintCaptureParams
-import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.fingerprint.connect.FingerprintConnectParams
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
@@ -45,8 +44,6 @@ import java.io.Serializable
     JsonSubTypes.Type(value = SetupResult::class, name = "SetupResult"),
     JsonSubTypes.Type(value = ConsentResult::class, name = "ConsentResult"),
     JsonSubTypes.Type(value = FingerprintConnectResult::class, name = "FingerprintConnectResult"),
-    JsonSubTypes.Type(value = FingerprintCaptureResult::class, name = "FingerprintCaptureResult"),
-    JsonSubTypes.Type(value = FaceCaptureResult::class, name = "FaceCaptureResult"),
     JsonSubTypes.Type(value = MatchResult::class, name = "MatchResult"),
     JsonSubTypes.Type(value = EnrolLastBiometricResult::class, name = "EnrolLastBiometricResult"),
     JsonSubTypes.Type(value = FetchSubjectResult::class, name = "FetchSubjectResult"),
@@ -57,6 +54,7 @@ import java.io.Serializable
     JsonSubTypes.Type(value = SelectSubjectAgeGroupResult::class, name = "SelectSubjectAgeGroupResult"),
     JsonSubTypes.Type(value = ExternalCredentialSearchResult::class, name = "ExternalCredentialSearchResult"),
     // Common data types
+    JsonSubTypes.Type(value = CaptureIdentity::class, name = "CaptureIdentity"),
     JsonSubTypes.Type(value = CaptureSample::class, name = "CaptureSample"),
     JsonSubTypes.Type(value = MatchConfidence::class, name = "MatchConfidence"),
 )

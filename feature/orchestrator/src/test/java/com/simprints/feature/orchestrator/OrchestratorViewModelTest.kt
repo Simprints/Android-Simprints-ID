@@ -7,11 +7,11 @@ import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
@@ -34,7 +34,6 @@ import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.setup.LocationStore
 import com.simprints.feature.setup.SetupResult
 import com.simprints.fingerprint.capture.FingerprintCaptureContract
-import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.NEC
@@ -230,7 +229,7 @@ internal class OrchestratorViewModelTest {
         coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
 
         viewModel.handleAction(mockk())
-        viewModel.handleResult(FaceCaptureResult("", emptyList()))
+        viewModel.handleResult(CaptureIdentity("", Modality.FACE, emptyList()))
 
         viewModel.currentStep.test().value().peekContent()?.let { step ->
             assertThat(step.id).isEqualTo(StepId.FACE_MATCHER)
@@ -254,7 +253,7 @@ internal class OrchestratorViewModelTest {
         coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
 
         viewModel.handleAction(mockk())
-        viewModel.handleResult(FingerprintCaptureResult("", emptyList()))
+        viewModel.handleResult(CaptureIdentity("", Modality.FINGERPRINT, emptyList()))
 
         viewModel.currentStep.test().value().peekContent()?.let { step ->
             assertThat(step.id).isEqualTo(StepId.FINGERPRINT_MATCHER)
@@ -317,7 +316,7 @@ internal class OrchestratorViewModelTest {
         )
 
         viewModel.handleAction(mockk())
-        viewModel.handleResult(FingerprintCaptureResult("", listOf(sample1, sample2)))
+        viewModel.handleResult(CaptureIdentity("", Modality.FINGERPRINT, listOf(sample1, sample2)))
 
         viewModel.currentStep.test().value().peekContent()?.let { step ->
             assertThat(step.id).isEqualTo(StepId.FINGERPRINT_MATCHER)
@@ -422,7 +421,7 @@ internal class OrchestratorViewModelTest {
         )
 
         viewModel.handleAction(mockk())
-        viewModel.handleResult(FingerprintCaptureResult("", emptyList()))
+        viewModel.handleResult(CaptureIdentity("", Modality.FINGERPRINT, emptyList()))
 
         viewModel.currentStep.test().value().peekContent()?.let { step ->
             assertThat(step.params?.let { it as? EnrolLastBiometricParams }?.steps).containsExactly(mockEnrolLastStep)
@@ -466,10 +465,7 @@ internal class OrchestratorViewModelTest {
 
         viewModel.handleAction(mockk())
         viewModel.handleResult(
-            FingerprintCaptureResult(
-                fingerprintReferenceId,
-                listOf(fingerprintSample1, fingerprintSample2),
-            ),
+            CaptureIdentity(fingerprintReferenceId, Modality.FINGERPRINT, listOf(fingerprintSample1, fingerprintSample2)),
         )
 
         val expectedFingerprintSamples = listOf(

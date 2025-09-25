@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.sample.SampleIdentifier
@@ -11,8 +12,6 @@ import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.face.capture.FaceCaptureResult
-import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
@@ -267,8 +266,9 @@ class SubjectFactoryTest {
             projectId = expected.projectId,
             attendantId = expected.attendantId,
             moduleId = expected.moduleId,
-            fingerprintResponse = FingerprintCaptureResult(
+            fingerprintResponse = CaptureIdentity(
                 GUID1,
+                Modality.FINGERPRINT,
                 listOf(
                     CaptureSample(
                         captureEventId = GUID1,
@@ -279,8 +279,9 @@ class SubjectFactoryTest {
                     ),
                 ),
             ),
-            faceResponse = FaceCaptureResult(
+            faceResponse = CaptureIdentity(
                 GUID1,
+                Modality.FACE,
                 listOf(
                     CaptureSample(
                         captureEventId = GUID1,

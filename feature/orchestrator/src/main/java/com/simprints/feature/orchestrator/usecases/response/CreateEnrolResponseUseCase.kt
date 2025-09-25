@@ -1,10 +1,10 @@
 package com.simprints.feature.orchestrator.usecases.response
 
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.response.AppErrorReason
-import com.simprints.face.capture.FaceCaptureResult
+import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
-import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.eventsync.sync.common.SubjectFactory
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
@@ -26,8 +26,8 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
         project: Project,
         enrolmentSubjectId: String,
     ): AppResponse {
-        val fingerprintCapture = results.filterIsInstance<FingerprintCaptureResult>().lastOrNull()
-        val faceCapture = results.filterIsInstance<FaceCaptureResult>().lastOrNull()
+        val fingerprintCapture = results.filterIsInstance<CaptureIdentity>().lastOrNull { it.modality == Modality.FINGERPRINT }
+        val faceCapture = results.filterIsInstance<CaptureIdentity>().lastOrNull { it.modality == Modality.FACE }
         val credentialResult = results.filterIsInstance<ExternalCredentialSearchResult>().lastOrNull()
         val externalCredential = credentialResult?.scannedCredential?.toExternalCredential(enrolmentSubjectId)
 

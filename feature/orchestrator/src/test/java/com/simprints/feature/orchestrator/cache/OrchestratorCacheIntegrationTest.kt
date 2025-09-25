@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.json.JsonHelper
@@ -11,7 +12,6 @@ import com.simprints.face.capture.FaceCaptureParams
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.steps.StepStatus
-import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.security.SecurityManager
@@ -58,8 +58,9 @@ class OrchestratorCacheIntegrationTest {
                 navigationActionId = 3,
                 destinationId = 4,
                 status = StepStatus.COMPLETED,
-                result = FingerprintCaptureResult(
+                result = CaptureIdentity(
                     "",
+                    modality = Modality.FINGERPRINT,
                     results = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
