@@ -43,4 +43,11 @@ class PermissionRequestView @JvmOverloads constructor(
         this.actionButton.setText(buttonText)
         this.actionButton.setOnClickListener(onClickListener)
     }
+
+    fun init(@StringRes title: Int, body: String, @StringRes buttonText: Int, onClickListener: OnClickListener) {
+        this.title.setText(title)
+        this.body.setText(body)
+        this.actionButton.setText(buttonText)
+        this.actionButton.setOnClickListener(onClickListener)
+    }
 }

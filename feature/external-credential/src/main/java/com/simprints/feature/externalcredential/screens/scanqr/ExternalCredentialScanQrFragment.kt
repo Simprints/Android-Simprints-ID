@@ -118,6 +118,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
     private fun renderInitialState() = with(binding) {
         permissionRequestView.isVisible = false
         qrInstructionsText.isVisible = true
+        qrInstructionsText.text =  getString(IDR.string.mfid_scan_instructions, getString(IDR.string.mfid_type_qr_code))
         qrPreviewCard.isVisible = false
         buttonScan.setText(IDR.string.mfid_qr_scan_no_qr_detected)
         buttonScan.isVisible = true
@@ -230,10 +231,11 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
     private fun renderNoPermission(shouldOpenPhoneSettings: Boolean) = with(binding) {
         qrInstructionsText.isVisible = false
         buttonScan.isVisible = false
+        val bodyText = getString(IDR.string.mfid_scan_camera_permission_body, getString(IDR.string.mfid_type_qr_code))
         if (shouldOpenPhoneSettings) {
             permissionRequestView.init(
                 title = IDR.string.face_capture_permission_denied,
-                body = IDR.string.login_qr_code_scanning_camera_permission_error,
+                body = bodyText,
                 buttonText = IDR.string.fingerprint_connect_phone_settings_button,
                 onClickListener = {
                     requireActivity().startActivity(
@@ -247,7 +249,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
         } else {
             permissionRequestView.init(
                 title = IDR.string.face_capture_permission_denied,
-                body = IDR.string.login_qr_code_scanning_camera_permission_error,
+                body = bodyText,
                 buttonText = IDR.string.face_capture_permission_action,
                 onClickListener = {
                     launchPermissionRequest.launch(CAMERA)
