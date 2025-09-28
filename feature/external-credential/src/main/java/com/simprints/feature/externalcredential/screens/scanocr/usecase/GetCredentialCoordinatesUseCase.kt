@@ -5,6 +5,8 @@ import com.google.android.gms.tasks.Tasks
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.feature.externalcredential.ext.toBoundingBox
 import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
@@ -13,6 +15,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
+@ExcludedFromGeneratedTestCoverageReports("Unable to mock Google ML Kit")
 internal class GetCredentialCoordinatesUseCase @Inject constructor(
     private val ghanaNhisCardOcrSelectorUseCase: GhanaNhisCardOcrSelectorUseCase,
     private val ghanaIdCardOcrSelectorUseCase: GhanaIdCardOcrSelectorUseCase,
@@ -52,14 +55,14 @@ internal class GetCredentialCoordinatesUseCase @Inject constructor(
                         OcrDocumentType.GhanaIdCard -> ghanaIdCardOcrSelectorUseCase(lineReadout)
                     }
                     if (isValid) {
-                        val blockBoundingBox = textBlock.boundingBox ?: return@firstNotNullOfOrNull null
-                        val lineBoundingBox = textLine.boundingBox ?: return@firstNotNullOfOrNull null
-                        val savedImagePath = saveScannedImageUseCase(bitmap)
+                        val blockBoundingRect = textBlock.boundingBox ?: return@firstNotNullOfOrNull null
+                        val lineBoundingRect = textLine.boundingBox ?: return@firstNotNullOfOrNull null
+                        val savedImagePath = saveScannedImageUseCase(bitmap, documentType)
                         DetectedOcrBlock(
                             imagePath = savedImagePath,
                             documentType = documentType,
-                            blockBoundingBox = blockBoundingBox,
-                            lineBoundingBox = lineBoundingBox,
+                            blockBoundingBox = blockBoundingRect.toBoundingBox(),
+                            lineBoundingBox = lineBoundingRect.toBoundingBox(),
                             readoutValue = lineReadout,
                         )
                     } else null

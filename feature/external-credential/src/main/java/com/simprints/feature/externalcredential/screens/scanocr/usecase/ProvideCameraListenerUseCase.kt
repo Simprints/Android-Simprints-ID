@@ -10,9 +10,11 @@ import androidx.lifecycle.LifecycleOwner
 import com.google.common.util.concurrent.ListenableFuture
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 import javax.inject.Inject
 
 
+@ExcludedFromGeneratedTestCoverageReports("UI Code")
 internal class ProvideCameraListenerUseCase @Inject constructor() {
     operator fun invoke(
         cameraProviderFuture: ListenableFuture<ProcessCameraProvider>,

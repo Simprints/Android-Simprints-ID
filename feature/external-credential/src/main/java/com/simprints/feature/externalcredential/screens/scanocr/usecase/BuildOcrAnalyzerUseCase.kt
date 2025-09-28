@@ -6,18 +6,10 @@ import androidx.camera.core.ImageProxy
 import javax.inject.Inject
 
 internal class CaptureFrameUseCase @Inject constructor() {
-    private var frameCounter = 0
 
-    suspend operator fun invoke(imageProxy: ImageProxy, framesToSkip: Int): Pair<Bitmap, ImageInfo>? {
-        frameCounter++
-        if (frameCounter % framesToSkip != 0) {
-            imageProxy.close()
-            return null
-        }
-
+    suspend operator fun invoke(imageProxy: ImageProxy): Pair<Bitmap, ImageInfo>? {
         // Converting ImageProxy to Bitmap so that we don't forget to close the ImageProxy down the processing chain
         val bitmapWithImageInfo = imageProxy.toBitmap() to imageProxy.imageInfo
-        imageProxy.close()
         return bitmapWithImageInfo
     }
 }

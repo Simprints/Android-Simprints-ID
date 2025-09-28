@@ -23,7 +23,10 @@ internal class FindBestTextBlockForCredentialUseCase @Inject constructor(
             throw IllegalArgumentException("OCR: cannot find match for credential, provided detected block list is empty")
         }
 
-        detectedBlocks.forEach { block ->
+        // Searching from the end of detected blocks to maximize chances of getting the image closest to what the user have seen on the
+        // camera preview. This allows for natural look when transitioning to the next screen, as the best fitting text block will be as
+        // close to the last frame the user sees as possible.
+        detectedBlocks.reversed().forEach { block ->
             if (block.readoutValue == credential) {
                 return block
             }
