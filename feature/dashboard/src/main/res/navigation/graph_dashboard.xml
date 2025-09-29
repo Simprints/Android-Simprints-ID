@@ -34,11 +34,6 @@
         android:label="BaseFragment"
         tools:layout="@layout/fragment_base">
         <action
-            android:id="@+id/action_baseFragment_to_requestLoginFragment"
-            app:destination="@id/requestLoginFragment"
-            app:popUpTo="@id/dashboard_navigation"
-            app:popUpToInclusive="true" />
-        <action
             android:id="@+id/action_baseFragment_to_mainFragment"
             app:destination="@id/mainFragment"
             app:popUpTo="@id/dashboard_navigation"
@@ -98,11 +93,6 @@
             android:id="@+id/action_aboutFragment_to_logout_navigation"
             app:destination="@id/logout_navigation" />
         <action
-            android:id="@+id/action_aboutFragment_to_requestLoginFragment"
-            app:destination="@id/requestLoginFragment"
-            app:popUpTo="@id/dashboard_navigation"
-            app:popUpToInclusive="true" />
-        <action
             android:id="@+id/action_aboutFragment_to_troubleshooting"
             app:destination="@id/graph_troubleshooting" />
     </fragment>
@@ -142,11 +132,6 @@
                 android:id="@+id/action_logoutSyncFragment_to_logoutSyncDeclineFragment"
                 app:destination="@id/logOutSyncDeclineFragment" />
             <action
-                android:id="@+id/action_logoutSyncFragment_to_requestLoginFragment"
-                app:destination="@id/requestLoginFragment"
-                app:popUpTo="@id/dashboard_navigation"
-                app:popUpToInclusive="true" />
-            <action
                 android:id="@+id/action_logoutSyncFragment_to_moduleSelectionFragment"
                 app:destination="@id/moduleSelectionFragment" />
             <action
@@ -157,13 +142,7 @@
             android:id="@+id/logOutSyncDeclineFragment"
             android:name="com.simprints.feature.dashboard.logout.syncdecline.LogoutSyncDeclineFragment"
             android:label="LogoutSyncDeclineFragment"
-            tools:layout="@layout/fragment_logout_sync_decline">
-            <action
-                android:id="@+id/action_logoutSyncDeclineFragment_to_requestLoginFragment"
-                app:destination="@id/requestLoginFragment"
-                app:popUpTo="@id/dashboard_navigation"
-                app:popUpToInclusive="true" />
-        </fragment>
+            tools:layout="@layout/fragment_logout_sync_decline" />
     </navigation>
 
     <action
