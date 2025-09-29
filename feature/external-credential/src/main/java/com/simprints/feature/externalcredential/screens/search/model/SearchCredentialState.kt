@@ -25,7 +25,8 @@ internal sealed class SearchState {
     data object Searching : SearchState()
 
     data class SubjectFound(
-        val subjectId: String
+        val subjectId: String,
+        val isVerificationSuccessful: Boolean
     ) : SearchState()
 
     data object SubjectNotFound : SearchState()

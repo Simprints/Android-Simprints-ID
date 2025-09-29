@@ -51,4 +51,10 @@ internal class ExternalCredentialViewModel @Inject internal constructor() : View
         ExternalCredentialType.QRCode -> IDR.string.mfid_type_qr_code
         null -> IDR.string.mfid_type_any_document
     }
+
+    fun mapTypeToCredentialFieldResource(type: ExternalCredentialType) = when (type) {
+        ExternalCredentialType.NHISCard -> IDR.string.mfid_nhis_card_credential_field
+        ExternalCredentialType.GhanaIdCard -> IDR.string.mfid_ghana_id_credential_field
+        ExternalCredentialType.QRCode -> IDR.string.mfid_qr_credential_field
+    }
 }
