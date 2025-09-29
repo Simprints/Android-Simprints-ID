@@ -53,15 +53,17 @@ internal class ExternalCredentialScanOcrViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        viewModel = ExternalCredentialScanOcrViewModel(
-            ocrDocumentType = documentType,
-            normalizeBitmapToPreviewUseCase = normalizeBitmapToPreviewUseCase,
-            cropDocumentFromPreviewUseCase = cropDocumentFromPreviewUseCase,
-            getCredentialCoordinatesUseCase = getCredentialCoordinatesUseCase,
-            keepOnlyBestDetectedBlockUseCase = keepOnlyBestDetectedBlockUseCase,
-            ioDispatcher = testCoroutineRule.testCoroutineDispatcher
-        )
+        viewModel = initViewModel(documentType)
     }
+
+    private fun initViewModel(documentType: OcrDocumentType) = ExternalCredentialScanOcrViewModel(
+        ocrDocumentType = documentType,
+        normalizeBitmapToPreviewUseCase = normalizeBitmapToPreviewUseCase,
+        cropDocumentFromPreviewUseCase = cropDocumentFromPreviewUseCase,
+        getCredentialCoordinatesUseCase = getCredentialCoordinatesUseCase,
+        keepOnlyBestDetectedBlockUseCase = keepOnlyBestDetectedBlockUseCase,
+        ioDispatcher = testCoroutineRule.testCoroutineDispatcher
+    )
 
     @Test
     fun `ocrStarted updates state to ScanningInProgress`() {
@@ -108,13 +110,15 @@ internal class ExternalCredentialScanOcrViewModelTest {
 
     @Test
     fun `getDocumentTypeRes returns correct resource for NHIS card`() {
-        val result = viewModel.getDocumentTypeRes(OcrDocumentType.NhisCard)
+        viewModel = initViewModel(OcrDocumentType.NhisCard)
+        val result = viewModel.getDocumentTypeRes()
         assertThat(result).isEqualTo(R.string.mfid_type_nhis_card)
     }
 
     @Test
     fun `getDocumentTypeRes returns correct resource for Ghana ID card`() {
-        val result = viewModel.getDocumentTypeRes(OcrDocumentType.GhanaIdCard)
+        viewModel = initViewModel(OcrDocumentType.GhanaIdCard)
+        val result = viewModel.getDocumentTypeRes()
         assertThat(result).isEqualTo(R.string.mfid_type_ghana_id_card)
     }
 }

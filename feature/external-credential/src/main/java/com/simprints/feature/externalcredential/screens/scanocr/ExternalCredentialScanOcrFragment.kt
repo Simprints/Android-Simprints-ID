@@ -192,7 +192,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     }
 
     private fun renderInitialState() = with(binding) {
-        val documentTypeText = viewModel.getDocumentTypeRes(viewModel.ocrDocumentType).run(::getString)
+        val documentTypeText = viewModel.getDocumentTypeRes().run(::getString)
         permissionRequestView.isVisible = false
         instructionsText.isVisible = true
         instructionsText.text = getString(IDR.string.mfid_scan_instructions, documentTypeText)
@@ -211,7 +211,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             progressCard.isVisible = false
             documentScannerArea.isInvisible = true
             buttonScan.isVisible = false
-            val documentTypeText = viewModel.getDocumentTypeRes(viewModel.ocrDocumentType).run(::getString)
+            val documentTypeText = viewModel.getDocumentTypeRes().run(::getString)
             val bodyText = getString(IDR.string.mfid_scan_camera_permission_body, documentTypeText)
             if (shouldOpenPhoneSettings) {
                 permissionRequestView.init(
