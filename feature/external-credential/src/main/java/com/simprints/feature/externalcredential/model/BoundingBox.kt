@@ -1,5 +1,6 @@
 package com.simprints.feature.externalcredential.model
 
+import android.graphics.Rect
 import androidx.annotation.Keep
 import java.io.Serializable
 
@@ -14,3 +15,7 @@ data class BoundingBox(
     val right: Int,
     val bottom: Int,
 ) : Serializable
+
+internal fun Rect.toBoundingBox(): BoundingBox = BoundingBox(left, top, right, bottom)
+
+internal fun BoundingBox.toRect(): Rect = Rect(left, top, right, bottom)
