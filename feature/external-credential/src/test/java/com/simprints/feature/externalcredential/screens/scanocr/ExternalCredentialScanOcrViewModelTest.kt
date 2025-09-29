@@ -62,7 +62,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
         cropDocumentFromPreviewUseCase = cropDocumentFromPreviewUseCase,
         getCredentialCoordinatesUseCase = getCredentialCoordinatesUseCase,
         keepOnlyBestDetectedBlockUseCase = keepOnlyBestDetectedBlockUseCase,
-        ioDispatcher = testCoroutineRule.testCoroutineDispatcher
+        bgDispatcher = testCoroutineRule.testCoroutineDispatcher
     )
 
     @Test

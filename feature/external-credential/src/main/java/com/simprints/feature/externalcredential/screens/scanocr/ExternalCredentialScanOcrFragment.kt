@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.simprints.core.DispatcherIO
+import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
@@ -92,8 +92,8 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     lateinit var provideCameraListenerUseCase: ProvideCameraListenerUseCase
 
     @Inject
-    @DispatcherIO
-    lateinit var ioDispatcher: CoroutineDispatcher
+    @DispatcherBG
+    lateinit var bgDispatcher: CoroutineDispatcher
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -248,7 +248,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
                 return@setAnalyzer
             }
             viewModel.ocrOnFrameStarted()
-            lifecycleScope.launch(ioDispatcher) {
+            lifecycleScope.launch(bgDispatcher) {
                 try {
                     val (bitmap, imageInfo) = captureFrameUseCase(imageProxy) ?: return@launch
                     val cropConfig: OcrCropConfig = buildOcrCropConfigUseCase(
