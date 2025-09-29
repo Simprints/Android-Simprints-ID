@@ -1,6 +1,5 @@
 package com.simprints.feature.enrollast.screen.usecase
 
-import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Sample
@@ -21,7 +20,6 @@ internal class BuildSubjectUseCase @Inject constructor(
         val captureResult = params.steps
             .filterIsInstance<EnrolLastBiometricStepResult.CaptureResult>()
             .flatMap { result -> result.results.map { toSample(result.referenceId, it) } }
-            .groupBy { it.modality }
 
         return subjectFactory.buildSubject(
             UUID.randomUUID().toString(),
@@ -29,8 +27,7 @@ internal class BuildSubjectUseCase @Inject constructor(
             params.userId,
             params.moduleId,
             createdAt = Date(timeHelper.now().ms),
-            fingerprintSamples = captureResult[Modality.FINGERPRINT].orEmpty(),
-            faceSamples = captureResult[Modality.FACE].orEmpty(),
+            samples = captureResult,
             externalCredentials = getExternalCredentialResult(params.steps)?.let { listOf(it) } ?: emptyList(),
         )
     }

@@ -21,8 +21,7 @@ class AddExternalCredentialToSubjectUseCase @Inject() constructor(
             SubjectAction.Update(
                 subjectId = subjectId,
                 externalCredentialsToAdd = listOf(scannedCredential.toExternalCredential(subjectId)),
-                faceSamplesToAdd = emptyList(),
-                fingerprintSamplesToAdd = emptyList(),
+                samplesToAdd = emptyList(),
                 referenceIdsToRemove = emptyList(),
             ),
         )

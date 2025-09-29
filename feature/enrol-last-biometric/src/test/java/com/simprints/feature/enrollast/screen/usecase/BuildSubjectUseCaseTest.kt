@@ -39,8 +39,7 @@ class BuildSubjectUseCaseTest {
     fun `has no samples if no steps provided`() {
         val result = useCase(createParams(emptyList()))
 
-        assertThat(result.fingerprintSamples).isEmpty()
-        assertThat(result.faceSamples).isEmpty()
+        assertThat(result.samples).isEmpty()
     }
 
     @Test
@@ -55,8 +54,7 @@ class BuildSubjectUseCaseTest {
             ),
         )
 
-        assertThat(result.fingerprintSamples).isEmpty()
-        assertThat(result.faceSamples).isEmpty()
+        assertThat(result.samples).isEmpty()
     }
 
     @Test
@@ -77,8 +75,8 @@ class BuildSubjectUseCaseTest {
             ),
         )
 
-        assertThat(result.fingerprintSamples).isNotEmpty()
-        assertThat(result.fingerprintSamples.first().identifier).isEqualTo(SampleIdentifier.RIGHT_THUMB)
+        assertThat(result.samples).isNotEmpty()
+        assertThat(result.samples.first().identifier).isEqualTo(SampleIdentifier.RIGHT_THUMB)
     }
 
     @Test
@@ -105,8 +103,8 @@ class BuildSubjectUseCaseTest {
             ),
         )
 
-        assertThat(result.fingerprintSamples).isNotEmpty()
-        assertThat(result.fingerprintSamples.size).isEqualTo(10)
+        assertThat(result.samples).isNotEmpty()
+        assertThat(result.samples.size).isEqualTo(10)
     }
 
     @Test
@@ -121,8 +119,8 @@ class BuildSubjectUseCaseTest {
             ),
         )
 
-        assertThat(result.faceSamples).isNotEmpty()
-        assertThat(result.faceSamples.first().format).isEqualTo("first")
+        assertThat(result.samples).isNotEmpty()
+        assertThat(result.samples.first().format).isEqualTo("first")
     }
 
     private fun createParams(steps: List<EnrolLastBiometricStepResult>) = EnrolLastBiometricParams(

@@ -255,15 +255,15 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     fun performSubjectCreationAction_deletesOldSamples() = runTest {
         val faceReferenceId = "faceToDelete"
         val fingerReferenceId = "fingerToDelete"
-        every { realmSingleQuery.find() } returns getRandomSubject()
-            .copy(
-                faceSamples = listOf(
-                    getRandomFaceSample(referenceId = faceReferenceId),
-                ),
-                fingerprintSamples = listOf(
-                    getRandomFingerprintSample(referenceId = fingerReferenceId),
-                ),
-            ).toRealmDb()
+        every { realmSingleQuery.find() } returns getRandomSubject(
+            faceSamples = listOf(
+                getRandomFaceSample(referenceId = faceReferenceId),
+            ),
+            fingerprintSamples = listOf(
+                getRandomFingerprintSample(referenceId = fingerReferenceId),
+            ),
+        ).toRealmDb()
+
         val subject = getFakePerson()
 
         enrolmentRecordLocalDataSource.performActions(
@@ -299,8 +299,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
             listOf(
                 SubjectAction.Update(
                     subject.subjectId.toString(),
-                    faceSamplesToAdd = listOf(getRandomFaceSample()),
-                    fingerprintSamplesToAdd = listOf(getRandomFingerprintSample()),
+                    samplesToAdd = listOf(getRandomFaceSample(), getRandomFingerprintSample()),
                     referenceIdsToRemove = listOf(faceReferenceId, fingerReferenceId),
                     externalCredentialsToAdd = listOf(),
                 ),
@@ -309,9 +308,10 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         )
         val peopleCount = enrolmentRecordLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(1)
+
         verify {
-            mutableRealm.delete(match<DbFaceSample> { it.referenceId == faceReferenceId })
             mutableRealm.delete(match<DbFingerprintSample> { it.referenceId == fingerReferenceId })
+            mutableRealm.delete(match<DbFaceSample> { it.referenceId == faceReferenceId })
             mutableRealm.copyToRealm(
                 match<DbSubject> {
                     // one old + one new
@@ -453,8 +453,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         projectId = projectId,
         attendantId = userId.asTokenizableRaw(),
         moduleId = moduleId.asTokenizableRaw(),
-        faceSamples = faceSamples,
-        fingerprintSamples = fingerprintSamples,
+        samples = fingerprintSamples + faceSamples,
         externalCredentials = externalCredentials,
     )
 

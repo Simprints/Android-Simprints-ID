@@ -59,8 +59,7 @@ internal class CreateEnrolResponseUseCaseTest {
                 projectId = any(),
                 attendantId = any(),
                 moduleId = any(),
-                fingerprintResponse = any(),
-                faceResponse = any(),
+                captures = any(),
                 externalCredential = any(),
             )
         } returns mockk { every { subjectId } returns "guid" }
@@ -87,8 +86,7 @@ internal class CreateEnrolResponseUseCaseTest {
                 projectId = any(),
                 attendantId = any(),
                 moduleId = any(),
-                fingerprintResponse = null,
-                faceResponse = null,
+                captures = emptyList(),
                 externalCredential = null,
             )
         } throws MissingCaptureException()
@@ -113,8 +111,7 @@ internal class CreateEnrolResponseUseCaseTest {
                 projectId = any(),
                 attendantId = any(),
                 moduleId = any(),
-                fingerprintResponse = any(),
-                faceResponse = any(),
+                captures = any(),
                 externalCredential = any(),
             )
         } returns mockk { every { subjectId } returns enrolmentSubjectId }
@@ -135,8 +132,7 @@ internal class CreateEnrolResponseUseCaseTest {
                 projectId = projectId,
                 attendantId = any(),
                 moduleId = any(),
-                fingerprintResponse = any(),
-                faceResponse = null,
+                captures = any(),
                 externalCredential = match { it.value == credentialEncrypted && it.type == externalCredentialType },
             )
         }

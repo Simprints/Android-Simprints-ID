@@ -64,8 +64,7 @@ internal class AddExternalCredentialToSubjectUseCaseTest {
         val updateAction = actions.first() as SubjectAction.Update
         assertThat(updateAction.subjectId).isEqualTo(subjectId)
         assertThat(updateAction.externalCredentialsToAdd).hasSize(1)
-        assertThat(updateAction.faceSamplesToAdd).isEmpty()
-        assertThat(updateAction.fingerprintSamplesToAdd).isEmpty()
+        assertThat(updateAction.samplesToAdd).isEmpty()
         assertThat(updateAction.referenceIdsToRemove).isEmpty()
     }
 
