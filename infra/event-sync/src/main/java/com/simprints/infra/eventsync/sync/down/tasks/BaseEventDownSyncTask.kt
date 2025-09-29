@@ -202,7 +202,7 @@ internal abstract class BaseEventDownSyncTask(
 
     private fun handleSubjectCreationEvent(event: EnrolmentRecordCreationEvent): List<SubjectAction> {
         val subject = subjectFactory.buildSubjectFromCreationPayload(event.payload)
-        return if (subject.fingerprintSamples.isNotEmpty() || subject.faceSamples.isNotEmpty()) {
+        return if (subject.samples.isNotEmpty()) {
             listOf(Creation(subject))
         } else {
             emptyList()
@@ -259,7 +259,7 @@ internal abstract class BaseEventDownSyncTask(
     private fun createASubjectActionFromRecordCreation(enrolmentRecordCreation: EnrolmentRecordCreationInMove?): Creation? =
         enrolmentRecordCreation?.let {
             val subject = subjectFactory.buildSubjectFromMovePayload(it)
-            if (subject.fingerprintSamples.isNotEmpty() || subject.faceSamples.isNotEmpty()) {
+            if (subject.samples.isNotEmpty()) {
                 Creation(subject)
             } else {
                 null
@@ -273,8 +273,7 @@ internal abstract class BaseEventDownSyncTask(
         listOf(
             SubjectAction.Update(
                 subjectId = subjectId,
-                faceSamplesToAdd = subjectFactory.extractFaceSamplesFromBiometricReferences(biometricReferencesAdded),
-                fingerprintSamplesToAdd = subjectFactory.extractFingerprintSamplesFromBiometricReferences(biometricReferencesAdded),
+                samplesToAdd = subjectFactory.extractSamplesFromBiometricReferences(biometricReferencesAdded),
                 referenceIdsToRemove = biometricReferencesRemoved,
                 externalCredentialsToAdd = externalCredentialsAdded,
                 externalCredentialIdsToRemove = emptyList(), // Only used locally to ensure a single credential is linked per session

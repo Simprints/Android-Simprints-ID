@@ -234,7 +234,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         // Given
         val subjectId = UUID.randomUUID().toString()
         val originalSubject = createTestSubject(subjectId)
-        originalSubject.faceSamples = listOf(
+        originalSubject.samples = listOf(
             Sample(
                 template = byteArrayOf(),
                 format = "ISO",
@@ -254,15 +254,13 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
 
         val updateAction = SubjectAction.Update(
             subjectId,
-            faceSamplesToAdd = listOf(
+            samplesToAdd = listOf(
                 Sample(
                     template = byteArrayOf(1, 2, 3),
                     format = "ISO",
                     referenceId = "ref2",
                     modality = Modality.FACE,
                 ),
-            ),
-            fingerprintSamplesToAdd = listOf(
                 Sample(
                     template = byteArrayOf(4, 5, 6),
                     format = "ISO",
@@ -312,7 +310,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         // Given
         val subjects = (1..10).map { i ->
             createTestSubject(subjectId = UUID.randomUUID().toString()).apply {
-                faceSamples = listOf(
+                samples = listOf(
                     Sample(
                         template = byteArrayOf(i.toByte()),
                         format = "ISO",
@@ -359,7 +357,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         // Given
         val subjects = (1..10).map { i ->
             createTestSubject(subjectId = UUID.randomUUID().toString()).apply {
-                fingerprintSamples = listOf(
+                samples = listOf(
                     Sample(
                         template = byteArrayOf(i.toByte()),
                         format = "ISO",

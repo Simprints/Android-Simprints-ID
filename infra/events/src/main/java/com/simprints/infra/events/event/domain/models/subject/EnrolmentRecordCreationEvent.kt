@@ -2,6 +2,7 @@ package com.simprints.infra.events.event.domain.models.subject
 
 import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -45,56 +46,44 @@ data class EnrolmentRecordCreationEvent(
 
     companion object {
         fun buildBiometricReferences(
-            fingerprintSamples: List<Sample>,
-            faceSamples: List<Sample>,
+            samples: List<Sample>,
             encoder: EncodingUtils,
-        ): List<BiometricReference> {
-            val biometricReferences = mutableListOf<BiometricReference>()
-
-            buildFingerprintReference(fingerprintSamples, encoder)?.let {
-                biometricReferences.add(it)
+        ): List<BiometricReference> = samples.groupBy { it.modality }.mapNotNull { (modality, modalitySamples) ->
+            if (modalitySamples.isNotEmpty()) {
+                when (modality) {
+                    Modality.FACE -> buildFingerprintReference(modalitySamples, encoder)
+                    Modality.FINGERPRINT -> buildFaceReference(modalitySamples, encoder)
+                }
+            } else {
+                null
             }
-
-            buildFaceReference(faceSamples, encoder)?.let {
-                biometricReferences.add(it)
-            }
-
-            return biometricReferences
         }
 
         private fun buildFingerprintReference(
             fingerprintSamples: List<Sample>,
             encoder: EncodingUtils,
-        ) = if (fingerprintSamples.isNotEmpty()) {
-            FingerprintReference(
-                fingerprintSamples.first().referenceId,
-                fingerprintSamples.map {
-                    FingerprintTemplate(
-                        encoder.byteArrayToBase64(it.template),
-                        it.identifier,
-                    )
-                },
-                fingerprintSamples.first().format,
-            )
-        } else {
-            null
-        }
+        ) = FingerprintReference(
+            fingerprintSamples.first().referenceId,
+            fingerprintSamples.map {
+                FingerprintTemplate(
+                    encoder.byteArrayToBase64(it.template),
+                    it.identifier,
+                )
+            },
+            fingerprintSamples.first().format,
+        )
 
         private fun buildFaceReference(
             faceSamples: List<Sample>,
             encoder: EncodingUtils,
-        ) = if (faceSamples.isNotEmpty()) {
-            FaceReference(
-                faceSamples.first().referenceId,
-                faceSamples.map {
-                    FaceTemplate(
-                        encoder.byteArrayToBase64(it.template),
-                    )
-                },
-                faceSamples.first().format,
-            )
-        } else {
-            null
-        }
+        ) = FaceReference(
+            faceSamples.first().referenceId,
+            faceSamples.map {
+                FaceTemplate(
+                    encoder.byteArrayToBase64(it.template),
+                )
+            },
+            faceSamples.first().format,
+        )
     }
 }

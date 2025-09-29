@@ -15,7 +15,6 @@ data class Subject(
     val moduleId: TokenizableString,
     val createdAt: Date? = null,
     val updatedAt: Date? = null,
-    var fingerprintSamples: List<Sample> = emptyList(),
-    var faceSamples: List<Sample> = emptyList(),
+    var samples: List<Sample> = emptyList(),
     var externalCredentials: List<ExternalCredential> = emptyList(),
 ) : Parcelable
