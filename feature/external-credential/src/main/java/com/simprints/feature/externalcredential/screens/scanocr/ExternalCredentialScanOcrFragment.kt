@@ -33,7 +33,6 @@ import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOc
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.BuildOcrCropConfigUseCase
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.CaptureFrameUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ProvideCameraListenerUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
@@ -81,9 +80,6 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
 
     @Inject
     lateinit var viewModelFactory: ExternalCredentialScanOcrViewModel.Factory
-
-    @Inject
-    lateinit var captureFrameUseCase: CaptureFrameUseCase
 
     @Inject
     lateinit var buildOcrCropConfigUseCase: BuildOcrCropConfigUseCase
@@ -250,7 +246,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             viewModel.ocrOnFrameStarted()
             lifecycleScope.launch(bgDispatcher) {
                 try {
-                    val (bitmap, imageInfo) = captureFrameUseCase(imageProxy) ?: return@launch
+                    val (bitmap, imageInfo) = imageProxy.toBitmap() to imageProxy.imageInfo
                     val cropConfig: OcrCropConfig = buildOcrCropConfigUseCase(
                         rotationDegrees = imageInfo.rotationDegrees,
                         cameraPreview = binding.preview,
