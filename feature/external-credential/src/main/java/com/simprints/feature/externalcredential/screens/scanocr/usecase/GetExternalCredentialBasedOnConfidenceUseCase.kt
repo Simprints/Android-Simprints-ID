@@ -44,18 +44,13 @@ internal class GetExternalCredentialBasedOnConfidenceUseCase @Inject constructor
         }
         val truncatedValues = detectedValues.map { it.take(minLength) }
 
-        // For each character position, find the most frequent character: ["ABC", "ACD", "CCD"] -> "ACD"
+        // Grouping characters at each position across all strings and picking the most frequent one
         return (0 until minLength).map { position ->
             truncatedValues
-                // Get character at this position from all strings
                 .map { it[position] }
-                // Group identical characters
                 .groupingBy { it }
-                // Count occurrence frequency of each character
                 .eachCount()
-                // Find most frequent character
                 .maxBy { it.value }
-                // Extract winning character
                 .key
         }.joinToString(separator = "")
     }
