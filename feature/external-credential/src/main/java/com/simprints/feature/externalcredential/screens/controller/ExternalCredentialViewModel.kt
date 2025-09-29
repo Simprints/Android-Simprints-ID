@@ -3,6 +3,7 @@ package com.simprints.feature.externalcredential.screens.controller
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,6 +14,8 @@ import com.simprints.infra.resources.R as IDR
 internal class ExternalCredentialViewModel @Inject internal constructor() : ViewModel() {
 
     private var isInitialized = false
+    lateinit var flowType: FlowType
+        private set
     private var state: ExternalCredentialState = ExternalCredentialState.EMPTY
         set(value) {
             field = value
@@ -36,6 +39,7 @@ internal class ExternalCredentialViewModel @Inject internal constructor() : View
     fun init(params: ExternalCredentialParams) {
         if (!isInitialized) {
             isInitialized = true
+            flowType = params.flowType
             updateState { ExternalCredentialState.EMPTY.copy(subjectId = params.subjectId, flowType = params.flowType) }
         }
     }
