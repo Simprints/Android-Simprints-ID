@@ -24,8 +24,6 @@ internal class ExternalCredentialSelectViewModel @Inject internal constructor(
             val config = configManager.getProjectConfiguration()
             val allowedExternalCredentials = config.multifactorId?.allowedExternalCredentials.orEmpty()
             _externalCredentialTypes.postValue(allowedExternalCredentials)
-            // TODO remove
-            _externalCredentialTypes.postValue(ExternalCredentialType.entries)
         }
     }
 }
