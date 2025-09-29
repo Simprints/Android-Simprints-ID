@@ -332,7 +332,7 @@ class CommCareEventSyncTaskTest {
                 projectId = "projectId",
                 attendantId = "moduleId".asTokenizableRaw(),
                 moduleId = "attendantId".asTokenizableRaw(),
-                faceSamples = listOf(
+                samples = listOf(
                     Sample(
                         template = byteArrayOf(),
                         format = "format",
