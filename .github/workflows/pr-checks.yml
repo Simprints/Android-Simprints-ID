@@ -51,6 +51,7 @@ jobs:
                 infra:images
                 infra:auth-store
                 infra:auth-logic
+                infra:matching
             reportsId: infra2
 
     feature-unit-tests1:
