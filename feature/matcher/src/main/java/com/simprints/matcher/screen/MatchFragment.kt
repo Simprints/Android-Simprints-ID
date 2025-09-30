@@ -16,11 +16,11 @@ import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.core.tools.extentions.permissionFromResult
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.matching.MatchParams
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.navigationParams
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
-import com.simprints.matcher.MatchParams
 import com.simprints.matcher.R
 import com.simprints.matcher.databinding.FragmentMatcherBinding
 import com.simprints.matcher.screen.MatchViewModel.MatchState

@@ -1,6 +1,6 @@
-package com.simprints.matcher.usecases
+package com.simprints.infra.matching.usecase
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
@@ -15,16 +15,12 @@ import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToM
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent.OneToOneMatchPayload.OneToOneMatchPayloadV4
 import com.simprints.infra.events.session.SessionEventRepository
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.MatchParams
-import com.simprints.matcher.MatchBatchInfo
+import com.simprints.infra.matching.FaceMatchResult
+import com.simprints.infra.matching.MatchBatchInfo
+import com.simprints.infra.matching.MatchParams
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.Runs
-import io.mockk.coEvery
-import io.mockk.coVerify
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.just
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before

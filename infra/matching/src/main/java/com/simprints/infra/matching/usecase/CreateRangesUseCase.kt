@@ -1,10 +1,10 @@
-package com.simprints.matcher.usecases
+package com.simprints.infra.matching.usecase
 
 import com.simprints.core.AvailableProcessors
 import javax.inject.Inject
 import kotlin.math.ceil
 
-internal class CreateRangesUseCase @Inject constructor(
+class CreateRangesUseCase @Inject constructor(
     @AvailableProcessors private val availableProcessors: Int,
 ) {
     /**

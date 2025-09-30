@@ -1,8 +1,8 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
+import com.simprints.infra.matching.FaceMatchResult
+import com.simprints.infra.matching.FingerprintMatchResult
 import java.io.Serializable
 import javax.inject.Inject
 import kotlin.text.compareTo
