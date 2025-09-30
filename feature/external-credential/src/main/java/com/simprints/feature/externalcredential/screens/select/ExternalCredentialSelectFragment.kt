@@ -17,6 +17,7 @@ import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialSelectBinding
 import com.simprints.feature.externalcredential.ext.getQuantityCredentialString
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
+import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import com.simprints.feature.externalcredential.screens.select.view.ExternalCredentialTypeAdapter
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
@@ -104,8 +105,8 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
 
     private fun navigateToScanner(type: ExternalCredentialType) {
         when (type) {
-            ExternalCredentialType.NHISCard -> startOcr()
-            ExternalCredentialType.GhanaIdCard -> startOcr()
+            ExternalCredentialType.NHISCard -> startOcr(OcrDocumentType.NhisCard)
+            ExternalCredentialType.GhanaIdCard -> startOcr(OcrDocumentType.GhanaIdCard)
             ExternalCredentialType.QRCode -> startQrScan()
         }
     }
@@ -149,11 +150,10 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
         dialog?.show()
     }
 
-    private fun startOcr() {
-        // TODO [MS-1163] add OCR parameters to navigation once the OCR fragment is implemented
+    private fun startOcr(ocrDocumentType: OcrDocumentType) {
         findNavController().navigateSafely(
             this,
-            ExternalCredentialSelectFragmentDirections.actionExternalCredentialSelectFragmentToExternalCredentialScanOcr(),
+            ExternalCredentialSelectFragmentDirections.actionExternalCredentialSelectFragmentToExternalCredentialScanOcr(ocrDocumentType),
         )
     }
 

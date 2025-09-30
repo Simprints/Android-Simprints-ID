@@ -501,10 +501,13 @@
 
     <string name="mfid_dialog_skip_scan_confirm">Skip</string>
     <string name="mfid_qr_scan_no_qr_detected">No QR code detected</string>
-    <string name="mfid_qr_scan_instructions">Place QR code in window</string>
+    <string name="mfid_scan_instructions">Place %1$s in window</string>
     <string name="mfid_continue">Continue</string>
     <string name="mfid_dialog_wrong_qr_title">Invalid QR Code type</string>
     <string name="mfid_dialog_wrong_qr_body_top">Wrong QR code format is scanned</string>
     <string name="mfid_dialog_wrong_qr_body_bottom">This value cannot be used as a person document. Please make sure that correct QR code is scanned</string>
     <string name="mfid_dialog_wrong_qr_rescan">Re-scan</string>
+    <string name="mfid_ocr_progress_title">Scanning, keep card in frame…</string>
+    <string name="mfid_scan_camera_permission_body">Cannot scan the %1$s without permission to use the camera</string>
+
 </resources>

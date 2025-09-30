@@ -13,4 +13,5 @@ dependencies {
     implementation(project(":infra:ui-base"))
     implementation(project(":feature:exit-form"))
     implementation(libs.androidX.cameraX.view)
+    implementation(libs.mlkit.text.recognition)
 }
