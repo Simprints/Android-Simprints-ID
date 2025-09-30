@@ -171,7 +171,7 @@ internal class SyncInfoViewModel @Inject constructor(
     }
 
     fun performLogout() {
-        viewModelScope.launch { logoutUseCase() }
+        logoutUseCase()
     }
 
     fun requestNavigationToLogin() {

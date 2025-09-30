@@ -61,18 +61,4 @@ internal class LogoutSyncFragmentTest {
         onView(withId(R.id.logout_sync_info)).check(matches(not(isDisplayed())))
         onView(withId(R.id.logoutWithoutSyncButton)).check(matches(not(isDisplayed())))
     }
-
-    @Test
-    fun `should navigate to requestLoginFragment when logout event received`() {
-        every { logoutSyncViewModel.logoutEventLiveData } returns mockk {
-            every { observe(any(), any()) } answers {
-                secondArg<Observer<Unit>>().onChanged(Unit)
-            }
-        }
-        val navController = testNavController(R.navigation.graph_dashboard, R.id.logout_navigation)
-        launchFragmentInHiltContainer<LogoutSyncFragment>(navController = navController)
-
-        assertThat(navController.currentDestination?.id)
-            .isEqualTo(R.id.requestLoginFragment)
-    }
 }

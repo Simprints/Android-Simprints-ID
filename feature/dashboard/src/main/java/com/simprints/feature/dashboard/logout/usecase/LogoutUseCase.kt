@@ -6,7 +6,7 @@ import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepositor
 import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationFlagsStore
 import com.simprints.infra.sync.SyncOrchestrator
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 internal class LogoutUseCase @Inject constructor(
@@ -16,7 +16,8 @@ internal class LogoutUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) {
-    suspend operator fun invoke() = withContext(ioDispatcher) {
+    // To prevent a race between wiping data and navigation, this use case must block the executing thread
+    operator fun invoke() = runBlocking(ioDispatcher) {
         // Cancel all background sync
         syncOrchestrator.cancelBackgroundWork()
         syncOrchestrator.deleteEventSyncInfo()
