@@ -64,7 +64,7 @@ class FingerprintMatcherUseCase @Inject constructor(
             )
         val expectedCandidates = enrolmentRecordRepository.count(queryWithSupportedFormat, dataSource = matchParams.biometricDataSource)
         if (expectedCandidates == 0) {
-        send(MatcherState.Success(emptyList(), emptyList(), 0, bioSdkWrapper.matcherName))
+            send(MatcherState.Success(emptyList(), emptyList(), 0, bioSdkWrapper.matcherName))
             return@channelFlow
         }
 
