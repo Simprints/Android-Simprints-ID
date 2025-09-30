@@ -1,4 +1,4 @@
-package com.simprints.matcher.usecases
+package com.simprints.infra.matching.usecase
 
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.common.FlowType
@@ -17,10 +17,10 @@ import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepositor
 import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
-import com.simprints.matcher.FingerprintMatchResult
-import com.simprints.matcher.MatchBatchInfo
-import com.simprints.matcher.MatchParams
-import com.simprints.matcher.usecases.MatcherUseCase.MatcherState
+import com.simprints.infra.matching.FingerprintMatchResult
+import com.simprints.infra.matching.MatchBatchInfo
+import com.simprints.infra.matching.MatchParams
+import com.simprints.infra.matching.usecase.MatcherUseCase.MatcherState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity as DomainFingerprintIdentity
 
-internal class FingerprintMatcherUseCase @Inject constructor(
+class FingerprintMatcherUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val resolveBioSdkWrapper: ResolveBioSdkWrapperUseCase,

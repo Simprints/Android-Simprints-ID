@@ -37,6 +37,7 @@ dependencies {
     implementation(project(":infra:events"))
     implementation(project(":infra:event-sync"))
     implementation(project(":infra:images"))
+    implementation(project(":infra:matching"))
 
     implementation(libs.jackson.core)
     implementation(libs.androidX.ui.preference)
