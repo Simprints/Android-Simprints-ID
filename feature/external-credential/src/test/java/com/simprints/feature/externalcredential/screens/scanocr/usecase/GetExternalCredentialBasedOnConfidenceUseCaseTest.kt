@@ -2,7 +2,6 @@ package com.simprints.feature.externalcredential.screens.scanocr.usecase
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
-import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.mockk
@@ -13,49 +12,52 @@ internal class GetExternalCredentialBasedOnConfidenceUseCaseTest {
 
     private lateinit var useCase: GetExternalCredentialBasedOnConfidenceUseCase
 
+    private val credentialLength3 = 3
+    private val credentialLengthNhis = 8
+    private val credentialLengthGhanaID = 15
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         useCase = GetExternalCredentialBasedOnConfidenceUseCase()
     }
 
+    private fun createBlock(value: String) = mockk<DetectedOcrBlock> {
+        every { readoutValue } returns value
+    }
+
     @Test
     fun `returns most frequent character at each position`() {
         val blocks = listOf(
-            mockk<DetectedOcrBlock> { every { readoutValue } returns "ABC" },
-            mockk<DetectedOcrBlock> { every { readoutValue } returns "ACD" },
-            mockk<DetectedOcrBlock> { every { readoutValue } returns "CCD" }
+            createBlock("ABC"),
+            createBlock("ACD"),
+            createBlock("CCD")
         )
 
-        val result = useCase(blocks)
+        val result = useCase(blocks, credentialLength3)
 
         assertThat(result).isEqualTo("ACD")
     }
 
     @Test
     fun `returns single value when only one block provided`() {
-        val ghanaId = "GHA-123456789-0"
-        val blocks = listOf(
-            mockk<DetectedOcrBlock> { every { readoutValue } returns ghanaId }
-        )
+        val nhisMembership = "12345678"
+        val blocks = listOf(createBlock(nhisMembership))
 
-        val result = useCase(blocks)
+        val result = useCase(blocks, credentialLengthNhis)
 
-        assertThat(result).isEqualTo(ghanaId)
+        assertThat(result).isEqualTo(nhisMembership)
     }
 
     @Test
-    fun `truncates to shortest length when blocks have different lengths`() {
+    fun `filters out blocks with different lengths`() {
         val blocks = listOf(
-            mockk<DetectedOcrBlock> {
-                every { readoutValue } returns "ABCDE"
-                every { documentType } returns OcrDocumentType.GhanaIdCard
-            },
-            mockk<DetectedOcrBlock> { every { readoutValue } returns "ACD" },
-            mockk<DetectedOcrBlock> { every { readoutValue } returns "ACDGH" }
+            createBlock("ABCDE"),
+            createBlock("ACD"),
+            createBlock("ACDGH")
         )
 
-        val result = useCase(blocks)
+        val result = useCase(blocks, credentialLength3)
 
         assertThat(result).isEqualTo("ACD")
     }
@@ -64,12 +66,12 @@ internal class GetExternalCredentialBasedOnConfidenceUseCaseTest {
     fun `handles identical strings correctly`() {
         val nhisMembership = "12345678"
         val blocks = listOf(
-            mockk<DetectedOcrBlock> { every { readoutValue } returns nhisMembership },
-            mockk<DetectedOcrBlock> { every { readoutValue } returns nhisMembership },
-            mockk<DetectedOcrBlock> { every { readoutValue } returns nhisMembership }
+            createBlock(nhisMembership),
+            createBlock(nhisMembership),
+            createBlock(nhisMembership)
         )
 
-        val result = useCase(blocks)
+        val result = useCase(blocks, credentialLengthNhis)
 
         assertThat(result).isEqualTo(nhisMembership)
     }
@@ -78,19 +80,59 @@ internal class GetExternalCredentialBasedOnConfidenceUseCaseTest {
     fun `throws exception when block list is empty`() {
         val blocks = emptyList<DetectedOcrBlock>()
 
-        useCase(blocks)
+        useCase(blocks, credentialLength3)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `throws exception when all blocks filtered out by length`() {
+        val blocks = listOf(
+            createBlock("AB"),
+            createBlock("ABCD"),
+            createBlock("ABCDE")
+        )
+
+        useCase(blocks, credentialLength3)
     }
 
     @Test
     fun `handles single character strings`() {
         val blocks = listOf(
-            mockk<DetectedOcrBlock> { every { readoutValue } returns "A" },
-            mockk<DetectedOcrBlock> { every { readoutValue } returns "B" },
-            mockk<DetectedOcrBlock> { every { readoutValue } returns "A" }
+            createBlock("A"),
+            createBlock("B"),
+            createBlock("A")
         )
 
-        val result = useCase(blocks)
+        val result = useCase(blocks, 1)
 
         assertThat(result).isEqualTo("A")
+    }
+
+    @Test
+    fun `constructs credential from multiple varying positions`() {
+        val ghanaId = "GHA-123456789-0"
+        val blocks = listOf(
+            createBlock("GHA-123456789-0"),
+            createBlock("GHA-123456789-1"),
+            createBlock("GHA-123456789-0")
+        )
+
+        val result = useCase(blocks, credentialLengthGhanaID)
+
+        assertThat(result).isEqualTo(ghanaId)
+    }
+
+    @Test
+    fun `uses only blocks matching credential length`() {
+        val targetLength = 5
+        val blocks = listOf(
+            createBlock("ABCDE"),
+            createBlock("FGHIJ"),
+            createBlock("AB"),
+            createBlock("ABCDEFGH")
+        )
+
+        val result = useCase(blocks, targetLength)
+
+        assertThat(result.length).isEqualTo(targetLength)
     }
 }

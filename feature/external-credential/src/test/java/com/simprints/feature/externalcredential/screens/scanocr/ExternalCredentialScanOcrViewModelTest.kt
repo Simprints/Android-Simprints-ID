@@ -100,7 +100,8 @@ internal class ExternalCredentialScanOcrViewModelTest {
         val mockBestBlock = mockk<DetectedOcrBlock>()
         val finishObserver = viewModel.finishOcrEvent.test()
         val stateObserver = viewModel.stateLiveData.test()
-        coEvery { keepOnlyBestDetectedBlockUseCase(any()) } returns mockBestBlock
+        val ocrDocumentType = OcrDocumentType.NhisCard
+        coEvery { keepOnlyBestDetectedBlockUseCase(any(), ocrDocumentType) } returns mockBestBlock
         viewModel.processOcrResultsAndFinish()
 
         assertThat(finishObserver.value()?.peekContent()).isEqualTo(mockBestBlock)
