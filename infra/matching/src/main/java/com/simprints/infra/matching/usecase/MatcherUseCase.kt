@@ -1,13 +1,13 @@
-package com.simprints.matcher.usecases
+package com.simprints.infra.matching.usecase
 
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.logging.LoggingConstants
-import com.simprints.matcher.MatchBatchInfo
-import com.simprints.matcher.MatchParams
-import com.simprints.matcher.MatchResultItem
+import com.simprints.infra.matching.MatchBatchInfo
+import com.simprints.infra.matching.MatchParams
+import com.simprints.infra.matching.MatchResultItem
 import kotlinx.coroutines.flow.Flow
 
-internal interface MatcherUseCase {
+interface MatcherUseCase {
     val crashReportTag: LoggingConstants.CrashReportTag
 
     /**

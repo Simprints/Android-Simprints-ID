@@ -1,4 +1,4 @@
-package com.simprints.matcher
+package com.simprints.infra.matching
 
 import com.simprints.core.tools.time.Timestamp
 

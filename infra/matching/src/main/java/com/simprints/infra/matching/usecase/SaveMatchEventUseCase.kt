@@ -1,4 +1,4 @@
-package com.simprints.matcher.usecases
+package com.simprints.infra.matching.usecase
 
 import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.domain.common.FlowType
@@ -11,15 +11,15 @@ import com.simprints.infra.events.event.domain.models.MatchEntry
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
 import com.simprints.infra.events.session.SessionEventRepository
-import com.simprints.matcher.MatchBatchInfo
-import com.simprints.matcher.MatchParams
-import com.simprints.matcher.MatchResultItem
+import com.simprints.infra.matching.MatchBatchInfo
+import com.simprints.infra.matching.MatchParams
+import com.simprints.infra.matching.MatchResultItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy as ConfigFingerComparisonStrategy
 
-internal class SaveMatchEventUseCase @Inject constructor(
+class SaveMatchEventUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
     private val configManager: ConfigManager,
     @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,

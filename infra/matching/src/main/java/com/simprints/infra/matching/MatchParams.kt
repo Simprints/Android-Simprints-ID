@@ -1,4 +1,4 @@
-package com.simprints.matcher
+package com.simprints.infra.matching
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.common.FlowType

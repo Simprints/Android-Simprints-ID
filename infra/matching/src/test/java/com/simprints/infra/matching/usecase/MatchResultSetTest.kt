@@ -1,7 +1,7 @@
-package com.simprints.matcher.usecases
+package com.simprints.infra.matching.usecase
 
-import com.google.common.truth.Truth.assertThat
-import com.simprints.matcher.FingerprintMatchResult
+import com.google.common.truth.Truth.*
+import com.simprints.infra.matching.FingerprintMatchResult
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
