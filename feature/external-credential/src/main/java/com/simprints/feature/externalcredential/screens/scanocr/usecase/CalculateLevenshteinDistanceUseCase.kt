@@ -21,6 +21,9 @@ internal class CalculateLevenshteinDistanceUseCase @Inject constructor() {
      * @return minimum number of edits needed to transform s1 into s2
      */
     operator fun invoke(s1: String, s2: String): Int {
+        if (s1 == s2) return 0
+        if (s1.isEmpty()) return s2.length
+        if (s2.isEmpty()) return s1.length
         val dp = Array(s1.length + 1) { IntArray(s2.length + 1) }
         for (i in 0..s1.length) dp[i][0] = i
         for (j in 0..s2.length) dp[0][j] = j

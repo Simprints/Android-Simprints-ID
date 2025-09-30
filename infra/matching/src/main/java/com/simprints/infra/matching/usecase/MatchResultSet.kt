@@ -1,12 +1,12 @@
-package com.simprints.matcher.usecases
+package com.simprints.infra.matching.usecase
 
-import com.simprints.matcher.MatchResultItem
+import com.simprints.infra.matching.MatchResultItem
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-internal class MatchResultSet<T : MatchResultItem>(
+class MatchResultSet<T : MatchResultItem>(
     private val maxSize: Int = MAX_RESULTS,
 ) {
     private val lowestConfidence = AtomicReference(0f)

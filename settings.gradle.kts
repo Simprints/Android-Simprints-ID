@@ -140,6 +140,7 @@ include(
     ":infra:license",
     ":infra:logging",
     ":infra:logging-persistent",
+    ":infra:matching",
     ":infra:auth-store",
     ":infra:auth-logic",
     ":infra:network",

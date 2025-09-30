@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.DispatcherIO
+import com.simprints.core.DispatcherBG
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
@@ -29,7 +29,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     private val cropDocumentFromPreviewUseCase: CropDocumentFromPreviewUseCase,
     private val getCredentialCoordinatesUseCase: GetCredentialCoordinatesUseCase,
     private val keepOnlyBestDetectedBlockUseCase: KeepOnlyBestDetectedBlockUseCase,
-    @DispatcherIO private val ioDispatcher: CoroutineDispatcher
+    @DispatcherBG private val bgDispatcher: CoroutineDispatcher
 ) : ViewModel() {
     @AssistedFactory
     interface Factory {
@@ -56,7 +56,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
         this.state = state(this.state)
     }
 
-    fun getDocumentTypeRes(ocrDocumentType: OcrDocumentType): Int = when (ocrDocumentType) {
+    fun getDocumentTypeRes(): Int = when (ocrDocumentType) {
         OcrDocumentType.NhisCard -> R.string.mfid_type_nhis_card
         OcrDocumentType.GhanaIdCard -> R.string.mfid_type_ghana_id_card
     }
@@ -72,7 +72,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     }
 
     fun runOcrOnFrame(frame: Bitmap, cropConfig: OcrCropConfig) {
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch(bgDispatcher) {
             try {
                 Simber.d("started OCR")
                 val normalizedBitmap = normalizeBitmapToPreviewUseCase(frame, cropConfig)
@@ -95,7 +95,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
 
     fun processOcrResultsAndFinish() {
         viewModelScope.launch {
-            val detectedBlock = keepOnlyBestDetectedBlockUseCase(detectedBlocks)
+            val detectedBlock = keepOnlyBestDetectedBlockUseCase(detectedBlocks, ocrDocumentType)
             _finishOcrEvent.send(detectedBlock)
             detectedBlocks = emptyList()
             updateState { ScanOcrState.NotScanning }

@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.simprints.core.DispatcherIO
+import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
@@ -33,7 +33,6 @@ import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOc
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.BuildOcrCropConfigUseCase
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.CaptureFrameUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ProvideCameraListenerUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
@@ -83,17 +82,14 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     lateinit var viewModelFactory: ExternalCredentialScanOcrViewModel.Factory
 
     @Inject
-    lateinit var captureFrameUseCase: CaptureFrameUseCase
-
-    @Inject
     lateinit var buildOcrCropConfigUseCase: BuildOcrCropConfigUseCase
 
     @Inject
     lateinit var provideCameraListenerUseCase: ProvideCameraListenerUseCase
 
     @Inject
-    @DispatcherIO
-    lateinit var ioDispatcher: CoroutineDispatcher
+    @DispatcherBG
+    lateinit var bgDispatcher: CoroutineDispatcher
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -192,7 +188,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     }
 
     private fun renderInitialState() = with(binding) {
-        val documentTypeText = viewModel.getDocumentTypeRes(viewModel.ocrDocumentType).run(::getString)
+        val documentTypeText = viewModel.getDocumentTypeRes().run(::getString)
         permissionRequestView.isVisible = false
         instructionsText.isVisible = true
         instructionsText.text = getString(IDR.string.mfid_scan_instructions, documentTypeText)
@@ -211,7 +207,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             progressCard.isVisible = false
             documentScannerArea.isInvisible = true
             buttonScan.isVisible = false
-            val documentTypeText = viewModel.getDocumentTypeRes(viewModel.ocrDocumentType).run(::getString)
+            val documentTypeText = viewModel.getDocumentTypeRes().run(::getString)
             val bodyText = getString(IDR.string.mfid_scan_camera_permission_body, documentTypeText)
             if (shouldOpenPhoneSettings) {
                 permissionRequestView.init(
@@ -248,9 +244,9 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
                 return@setAnalyzer
             }
             viewModel.ocrOnFrameStarted()
-            lifecycleScope.launch(ioDispatcher) {
+            lifecycleScope.launch(bgDispatcher) {
                 try {
-                    val (bitmap, imageInfo) = captureFrameUseCase(imageProxy) ?: return@launch
+                    val (bitmap, imageInfo) = imageProxy.toBitmap() to imageProxy.imageInfo
                     val cropConfig: OcrCropConfig = buildOcrCropConfigUseCase(
                         rotationDegrees = imageInfo.rotationDegrees,
                         cameraPreview = binding.preview,

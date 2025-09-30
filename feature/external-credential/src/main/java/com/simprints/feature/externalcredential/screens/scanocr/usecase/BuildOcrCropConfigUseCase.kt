@@ -9,13 +9,12 @@ internal class BuildOcrCropConfigUseCase @Inject constructor(
 ) {
 
     operator fun invoke(rotationDegrees: Int, cameraPreview: View, documentScannerArea: View): OcrCropConfig {
-        val (previewWidth, previewHeight) = cameraPreview.width to cameraPreview.height
         val cutoutRect = getBoundsRelativeToParentUseCase(parent = cameraPreview, child = documentScannerArea)
         return OcrCropConfig(
             rotationDegrees = rotationDegrees,
             cutoutRect = cutoutRect,
-            previewViewWidth = previewWidth,
-            previewViewHeight = previewHeight
+            previewViewWidth = cameraPreview.width,
+            previewViewHeight = cameraPreview.height
         )
     }
 }

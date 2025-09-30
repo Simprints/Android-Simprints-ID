@@ -1,4 +1,4 @@
-package com.simprints.matcher.usecases
+package com.simprints.infra.matching.usecase
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
