@@ -203,7 +203,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
                         )
                 )
         val isSyncButtonEnabled =
-            (eventSyncVisibleState == OnStandby) &&
+            (eventSyncVisibleState == OnStandby || eventSyncVisibleState == Error) &&
                 ((!isPreLogoutUpSync && isDownSyncPossible) || isEventUpSyncPossible)
 
         val projectId = authStore.signedInProjectId
