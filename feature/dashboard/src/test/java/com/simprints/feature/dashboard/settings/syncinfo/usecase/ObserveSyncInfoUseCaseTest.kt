@@ -1169,6 +1169,20 @@ class ObserveSyncInfoUseCaseTest {
     }
 
     @Test
+    fun `sync button should be enabled when sync has failed for non-CommCare and non-network reasons`() = runTest {
+        val mockCommCarePermissionErrorEventSyncState = mockk<EventSyncState>(relaxed = true) {
+            every { isSyncFailed() } returns true
+            every { isSyncFailedBecauseCommCarePermissionIsMissing() } returns false
+        }
+        every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockCommCarePermissionErrorEventSyncState)
+
+        createUseCase()
+        val result = useCase().first()
+
+        assertThat(result.syncInfoSectionRecords.isSyncButtonEnabled).isTrue()
+    }
+
+    @Test
     fun `should calculate correct record last sync time when sync time available`() = runTest {
         val timestamp = Timestamp(0L)
         coEvery { eventSyncManager.getLastSyncTime() } returns timestamp
