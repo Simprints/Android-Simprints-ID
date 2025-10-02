@@ -1,4 +1,4 @@
-package com.simprints.infra.images.remote.firestore
+package com.simprints.infra.images.remote.firebase
 
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
@@ -28,7 +28,7 @@ import java.io.FileInputStream
 
 @Suppress("DEPRECATION")
 @RunWith(AndroidJUnit4::class)
-class FirestoreSampleUploaderTest {
+class FirebaseSampleUploaderTest {
     @MockK
     private lateinit var timeHelper: TimeHelper
 
@@ -53,7 +53,7 @@ class FirestoreSampleUploaderTest {
     @MockK
     private lateinit var localDataSource: ImageLocalDataSource
 
-    private lateinit var remoteDataSource: FirestoreSampleUploader
+    private lateinit var remoteDataSource: FirebaseSampleUploader
 
     @Before
     fun setup() {
@@ -61,7 +61,7 @@ class FirestoreSampleUploaderTest {
 
         every { mockSecuredImageRef.relativePath.parts } returns arrayOf("Test1")
 
-        remoteDataSource = FirestoreSampleUploader(
+        remoteDataSource = FirebaseSampleUploader(
             timeHelper = timeHelper,
             configManager = configManager,
             authStore = authStore,
@@ -261,7 +261,7 @@ class FirestoreSampleUploaderTest {
 
     private fun mockImage() = SecuredImageRef(Path(VALID_PATH))
 
-    companion object {
+    companion object Companion {
         private const val VALID_PATH = "valid.txt"
         private const val PROJECT_ID = "projectId"
     }

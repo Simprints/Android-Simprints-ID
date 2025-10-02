@@ -1,4 +1,4 @@
-package com.simprints.infra.images.remote.firestore
+package com.simprints.infra.images.remote.firebase
 
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageMetadata
@@ -23,7 +23,7 @@ import kotlinx.coroutines.tasks.await
 import java.io.FileInputStream
 import javax.inject.Inject
 
-internal class FirestoreSampleUploader @Inject constructor(
+internal class FirebaseSampleUploader @Inject constructor(
     private val timeHelper: TimeHelper,
     private val configManager: ConfigManager,
     private val authStore: AuthStore,
@@ -43,7 +43,7 @@ internal class FirestoreSampleUploader @Inject constructor(
         }
         var allImagesUploaded = true
 
-        Simber.i("Starting sample upload to Firestore")
+        Simber.i("Starting sample upload to Firebase storage")
         val bucketUrl = configManager.getProject(projectId).imageBucket
         val rootRef = FirebaseStorage
             .getInstance(firebaseApp, bucketUrl)
