@@ -3,12 +3,19 @@ package com.simprints.infra.images.remote.firestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.samples.SampleUpSyncRequestEvent
+import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
+import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.metadata.ImageMetadataStore
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.remote.SampleUploader
+import com.simprints.infra.images.usecase.SamplePathConverter
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SAMPLE_UPLOAD
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
@@ -17,10 +24,13 @@ import java.io.FileInputStream
 import javax.inject.Inject
 
 internal class FirestoreSampleUploader @Inject constructor(
+    private val timeHelper: TimeHelper,
     private val configManager: ConfigManager,
     private val authStore: AuthStore,
     private val localDataSource: ImageLocalDataSource,
     private val metadataStore: ImageMetadataStore,
+    private val samplePathUtil: SamplePathConverter,
+    private val eventRepository: EventRepository,
 ) : SampleUploader {
     override suspend fun uploadAllSamples(
         projectId: String,
@@ -39,27 +49,45 @@ internal class FirestoreSampleUploader @Inject constructor(
             .getInstance(firebaseApp, bucketUrl)
             .reference
 
+        val urlRequestScope = eventRepository.createEventScope(type = EventScopeType.SAMPLE_UP_SYNC)
+
         val sampleReferences = localDataSource.listImages(projectId)
         sampleReferences.forEachIndexed { index, imageRef ->
             Simber.i("Reading sample file: ${imageRef.relativePath.parts.last()}", tag = SAMPLE_UPLOAD)
+
             progressCallback?.invoke(index, sampleReferences.size)
             try {
+                val requestStartTime = timeHelper.now()
                 localDataSource.decryptImage(imageRef)?.let { stream ->
                     val metadata = metadataStore.getMetadata(imageRef.relativePath)
-                    val uploadSuccessful = uploadSample(rootRef, stream, imageRef, metadata)
-                    if (uploadSuccessful) {
+
+                    val task = uploadSample(rootRef, stream, imageRef, metadata)
+                    if (task.task.isSuccessful) {
                         localDataSource.deleteImage(imageRef)
                         metadataStore.deleteMetadata(imageRef.relativePath)
                     } else {
                         allImagesUploaded = false
                         Simber.i("Failed to upload image without exception", tag = SAMPLE_UPLOAD)
                     }
+
+                    eventRepository.addOrUpdateEvent(
+                        scope = urlRequestScope,
+                        event = SampleUpSyncRequestEvent(
+                            createdAt = requestStartTime,
+                            endedAt = timeHelper.now(),
+                            requestId = null,
+                            sampleId = samplePathUtil.extract(imageRef.relativePath)?.sampleId.orEmpty(),
+                            size = task.bytesTransferred,
+                            errorType = task.error?.javaClass?.simpleName,
+                        ),
+                    )
                 }
             } catch (t: Throwable) {
                 allImagesUploaded = false
                 Simber.e("Failed to upload images", t, tag = SYNC)
             }
         }
+        eventRepository.closeEventScope(urlRequestScope, EventScopeEndCause.WORKFLOW_ENDED)
 
         return allImagesUploaded
     }
@@ -69,13 +97,13 @@ internal class FirestoreSampleUploader @Inject constructor(
         imageStream: FileInputStream,
         imageRef: SecuredImageRef,
         metadata: Map<String, String>,
-    ): Boolean {
+    ): UploadTask.TaskSnapshot {
         val fileRef = imageRef.relativePath.parts
             .fold(rootRef) { ref, pathPart -> ref.child(pathPart) }
 
         Simber.i("Uploading ${fileRef.path.last()}", tag = SAMPLE_UPLOAD)
 
-        val uploadTask = if (metadata.isEmpty()) {
+        return if (metadata.isEmpty()) {
             fileRef.putStream(imageStream).await()
         } else {
             val storeMetadata = StorageMetadata
@@ -84,6 +112,5 @@ internal class FirestoreSampleUploader @Inject constructor(
                 .build()
             fileRef.putStream(imageStream, storeMetadata).await()
         }
-        return uploadTask.task.isSuccessful
     }
 }

@@ -11,7 +11,7 @@ import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 internal data class ApiEventSampleUpSyncRequestPayload(
     override val startTime: ApiTimestamp,
     val endTime: ApiTimestamp?,
-    val requestId: String,
+    val requestId: String?,
     val sampleId: String,
     val size: Long,
     val errorType: String?,
