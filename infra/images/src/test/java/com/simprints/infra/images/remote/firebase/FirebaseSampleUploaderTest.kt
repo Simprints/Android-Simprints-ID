@@ -1,14 +1,21 @@
-package com.simprints.infra.images.remote.firestore
+package com.simprints.infra.images.remote.firebase
 
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
 import com.google.firebase.storage.FirebaseStorage
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.scope.EventScope
+import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.metadata.ImageMetadataStore
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
+import com.simprints.infra.images.usecase.SamplePathConverter
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.tasks.await
@@ -21,7 +28,10 @@ import java.io.FileInputStream
 
 @Suppress("DEPRECATION")
 @RunWith(AndroidJUnit4::class)
-class FirestoreSampleUploaderTest {
+class FirebaseSampleUploaderTest {
+    @MockK
+    private lateinit var timeHelper: TimeHelper
+
     @MockK
     private lateinit var configManager: ConfigManager
 
@@ -35,9 +45,15 @@ class FirestoreSampleUploaderTest {
     private lateinit var metadataStore: ImageMetadataStore
 
     @MockK
+    private lateinit var samplePathUtil: SamplePathConverter
+
+    @MockK
+    private lateinit var eventRepository: EventRepository
+
+    @MockK
     private lateinit var localDataSource: ImageLocalDataSource
 
-    private lateinit var remoteDataSource: FirestoreSampleUploader
+    private lateinit var remoteDataSource: FirebaseSampleUploader
 
     @Before
     fun setup() {
@@ -45,12 +61,21 @@ class FirestoreSampleUploaderTest {
 
         every { mockSecuredImageRef.relativePath.parts } returns arrayOf("Test1")
 
-        remoteDataSource = FirestoreSampleUploader(
+        remoteDataSource = FirebaseSampleUploader(
+            timeHelper = timeHelper,
             configManager = configManager,
             authStore = authStore,
             localDataSource = localDataSource,
             metadataStore = metadataStore,
+            samplePathUtil = samplePathUtil,
+            eventRepository = eventRepository,
         )
+
+        every { timeHelper.now() } returns Timestamp(0L)
+        every { samplePathUtil.extract(any()) } returns
+            SamplePathConverter.PathData("sessionID", GeneralConfiguration.Modality.FACE, "sampleId")
+        coEvery { eventRepository.createEventScope(any(), any()) } returns mockk<EventScope>()
+        coJustRun { eventRepository.closeEventScope(any<EventScope>(), any()) }
 
         // We need to mock statics and global extensions
         mockkStatic(FirebaseStorage::class)
@@ -119,6 +144,30 @@ class FirestoreSampleUploaderTest {
     }
 
     @Test
+    fun `test upload and report all upload events`() = runTest {
+        setupProjectConfig()
+        setupStorageMock()
+        configureLocalImageFiles(numberOfValidFiles = 3)
+
+        assertThat(remoteDataSource.uploadAllSamples(PROJECT_ID)).isTrue()
+        coVerify(exactly = 1) { eventRepository.createEventScope(EventScopeType.SAMPLE_UP_SYNC, any()) }
+        coVerify(exactly = 3) { eventRepository.addOrUpdateEvent(any(), any()) }
+        coVerify(exactly = 1) { eventRepository.closeEventScope(any<EventScope>(), any()) }
+    }
+
+    @Test
+    fun `test upload failed and report all upload events`() = runTest {
+        setupProjectConfig()
+        setupStorageMock(success = false)
+        configureLocalImageFiles(numberOfValidFiles = 3)
+
+        assertThat(remoteDataSource.uploadAllSamples(PROJECT_ID)).isFalse()
+        coVerify(exactly = 1) { eventRepository.createEventScope(EventScopeType.SAMPLE_UP_SYNC, any()) }
+        coVerify(exactly = 3) { eventRepository.addOrUpdateEvent(any(), any()) }
+        coVerify(exactly = 1) { eventRepository.closeEventScope(any<EventScope>(), any()) }
+    }
+
+    @Test
     fun `test failed decryption should not return success`() = runTest {
         setupProjectConfig()
         setupStorageMock()
@@ -167,10 +216,18 @@ class FirestoreSampleUploaderTest {
             every { reference.child(any()) } returns mockk {
                 every { path } returns "testPath"
                 every { putStream(any()) } returns mockk {
-                    coEvery { await().task.isSuccessful } returns success
+                    coEvery { await() } returns mockk {
+                        coEvery { bytesTransferred } returns 1L
+                        coEvery { task.isSuccessful } returns success
+                        coEvery { error } returns null
+                    }
                 }
                 every { putStream(any(), any()) } returns mockk {
-                    coEvery { await().task.isSuccessful } returns success
+                    coEvery { await() } returns mockk {
+                        coEvery { bytesTransferred } returns 1L
+                        coEvery { task.isSuccessful } returns success
+                        coEvery { error } returns null
+                    }
                 }
             }
         }
@@ -204,7 +261,7 @@ class FirestoreSampleUploaderTest {
 
     private fun mockImage() = SecuredImageRef(Path(VALID_PATH))
 
-    companion object {
+    companion object Companion {
         private const val VALID_PATH = "valid.txt"
         private const val PROJECT_ID = "projectId"
     }

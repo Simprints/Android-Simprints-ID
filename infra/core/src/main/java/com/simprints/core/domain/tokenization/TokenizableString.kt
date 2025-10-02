@@ -1,10 +1,9 @@
 package com.simprints.core.domain.tokenization
 
-import android.os.Parcelable
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString.Raw
 import com.simprints.core.domain.tokenization.TokenizableString.Tokenized
-import kotlinx.parcelize.Parcelize
+import java.io.Serializable
 
 /**
  * Sealed class for values that might be tokenized (symmetrically encrypted). Use this wrapping
@@ -15,10 +14,9 @@ import kotlinx.parcelize.Parcelize
  */
 
 @Keep
-sealed class TokenizableString : Parcelable {
+sealed class TokenizableString : Serializable {
     abstract val value: String
 
-    @Parcelize
     data class Tokenized(
         override val value: String,
     ) : TokenizableString() {
@@ -29,7 +27,6 @@ sealed class TokenizableString : Parcelable {
         override fun toString() = super.toString()
     }
 
-    @Parcelize
     data class Raw(
         override val value: String,
     ) : TokenizableString() {

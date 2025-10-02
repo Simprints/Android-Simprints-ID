@@ -28,6 +28,7 @@ class FirmwareFileUpdateWorker @AssistedInject constructor(
     override val tag: String = "FirmwareFileUpdateWorker"
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
+        showProgressNotification()
         crashlyticsLog("Started")
         try {
             firmwareRepository.updateStoredFirmwareFilesWithLatest()

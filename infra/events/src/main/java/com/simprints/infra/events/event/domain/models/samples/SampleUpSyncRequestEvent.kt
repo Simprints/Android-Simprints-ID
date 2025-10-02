@@ -20,7 +20,7 @@ class SampleUpSyncRequestEvent(
     constructor(
         createdAt: Timestamp,
         endedAt: Timestamp,
-        requestId: String,
+        requestId: String?,
         sampleId: String,
         size: Long,
         errorType: String? = null,
@@ -42,7 +42,7 @@ class SampleUpSyncRequestEvent(
     data class SampleUpSyncRequestPayload(
         override val createdAt: Timestamp,
         override val endedAt: Timestamp?,
-        val requestId: String,
+        val requestId: String?,
         val sampleId: String,
         val size: Long,
         val errorType: String?,
