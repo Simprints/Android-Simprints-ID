@@ -10,6 +10,7 @@ internal sealed class ScanOcrState {
         val successfulCaptures: Int,
         val scansRequired: Int,
     ) : ScanOcrState()
+    data object Complete : ScanOcrState()
     companion object {
         val EMPTY = ScanOcrState.NotScanning
     }

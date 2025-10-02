@@ -94,6 +94,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     }
 
     fun processOcrResultsAndFinish() {
+        updateState { ScanOcrState.Complete }
         viewModelScope.launch {
             val detectedBlock = keepOnlyBestDetectedBlockUseCase(detectedBlocks, ocrDocumentType)
             _finishOcrEvent.send(detectedBlock)
