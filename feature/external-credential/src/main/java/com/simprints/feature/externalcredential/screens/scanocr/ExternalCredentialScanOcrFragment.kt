@@ -185,6 +185,8 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         buttonScan.isVisible = false
         progressCard.isVisible = true
         progressBar.progress = progressPercentage
+        viewfinderMask.setMaskColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_white))
+        viewfinderMask.alpha = 1.0f
     }
 
     private fun renderInitialState() = with(binding) {
@@ -199,6 +201,8 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             viewModel.ocrStarted()
             startOcr()
         }
+        viewfinderMask.setMaskColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_black))
+        viewfinderMask.alpha = 0.5f
     }
 
     private fun renderNoPermission(shouldOpenPhoneSettings: Boolean) {

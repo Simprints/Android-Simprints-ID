@@ -9,6 +9,7 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import com.simprints.feature.externalcredential.R
 import com.simprints.infra.resources.R as IDR
@@ -96,5 +97,10 @@ class DocumentScanMaskView @JvmOverloads constructor(
                 canvas.drawRect(rect, clearPaint)
             }
         }
+    }
+
+    fun setMaskColor(@ColorInt color: Int) {
+        bgPaint.color = color
+        invalidate()
     }
 }
