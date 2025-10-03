@@ -1,6 +1,7 @@
 package com.simprints.feature.externalcredential
 
 import androidx.annotation.Keep
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.step.StepResult
 import com.simprints.feature.externalcredential.model.CredentialMatch
@@ -15,6 +16,7 @@ import com.simprints.feature.externalcredential.screens.search.model.ScannedCred
  * during the flow, and probes linked to the [scannedCredential]
  */
 @Keep
+@ExcludedFromGeneratedTestCoverageReports("Data class")
 data class ExternalCredentialSearchResult(
     val flowType: FlowType,
     val scannedCredential: ScannedCredential,

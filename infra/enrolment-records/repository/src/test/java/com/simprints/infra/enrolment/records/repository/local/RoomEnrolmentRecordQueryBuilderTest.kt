@@ -7,6 +7,8 @@ import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate.Companion.FORMAT_COLUMN
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate.Companion.TEMPLATE_TABLE_NAME
+import com.simprints.infra.enrolment.records.room.store.models.DbExternalCredential.Companion.EXTERNAL_CREDENTIAL_TABLE_NAME
+import com.simprints.infra.enrolment.records.room.store.models.DbExternalCredential.Companion.EXTERNAL_CREDENTIAL_VALUE_COLUMN
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.ATTENDANT_ID_COLUMN
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.MODULE_ID_COLUMN
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.PROJECT_ID_COLUMN
@@ -44,7 +46,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
     fun `buildSubjectQuery with subjectId`() {
         val subjectId = "test-subject-id"
         val subjectQuery = SubjectQuery(subjectId = subjectId)
-        val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n" +
+        val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n\n" +
             "WHERE S.$SUBJECT_ID_COLUMN = ?"
 
         val resultQuery = queryBuilder.buildSubjectQuery(subjectQuery)
@@ -57,7 +59,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
     fun `buildSubjectQuery with subjectIds`() {
         val subjectIds = listOf("id1", "id2", "id3")
         val subjectQuery = SubjectQuery(subjectIds = subjectIds)
-        val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n" +
+        val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n\n" +
             "WHERE S.$SUBJECT_ID_COLUMN IN (?,?,?)"
 
         val resultQuery = queryBuilder.buildSubjectQuery(subjectQuery)
@@ -70,7 +72,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
     fun `buildSubjectQuery with afterSubjectId`() {
         val afterSubjectId = "last-subject-id"
         val subjectQuery = SubjectQuery(afterSubjectId = afterSubjectId)
-        val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n" +
+        val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n\n" +
             "WHERE S.$SUBJECT_ID_COLUMN > ?"
 
         val resultQuery = queryBuilder.buildSubjectQuery(subjectQuery)
@@ -83,7 +85,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
     fun `buildSubjectQuery with projectId`() {
         val projectId = "test-project-id"
         val subjectQuery = SubjectQuery(projectId = projectId)
-        val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n" +
+        val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n\n" +
             "WHERE S.$PROJECT_ID_COLUMN = ?"
 
         val resultQuery = queryBuilder.buildSubjectQuery(subjectQuery)
@@ -96,7 +98,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
     fun `buildSubjectQuery with attendantId`() {
         val attendantId = "test-attendant-id".asTokenizableEncrypted()
         val subjectQuery = SubjectQuery(attendantId = attendantId)
-        val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n" +
+        val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n\n" +
             "WHERE S.$ATTENDANT_ID_COLUMN = ?"
 
         val resultQuery = queryBuilder.buildSubjectQuery(subjectQuery)
@@ -109,7 +111,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
     fun `buildSubjectQuery with moduleId`() {
         val moduleId = "test-module-id".asTokenizableEncrypted()
         val subjectQuery = SubjectQuery(moduleId = moduleId)
-        val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n" +
+        val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n\n" +
             "WHERE S.$MODULE_ID_COLUMN = ?"
 
         val resultQuery = queryBuilder.buildSubjectQuery(subjectQuery)
@@ -125,6 +127,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
             """
             SELECT * FROM $SUBJECT_TABLE_NAME S
             
+            
             ORDER BY S.$SUBJECT_ID_COLUMN ASC
             """.trimIndent()
 
@@ -138,7 +141,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
         val projectId = "proj1"
         val attendantId = "att1".asTokenizableEncrypted()
         val subjectQuery = SubjectQuery(projectId = projectId, attendantId = attendantId, sort = true)
-        val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n" +
+        val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n\n" +
             "WHERE S.$PROJECT_ID_COLUMN = ? AND S.$ATTENDANT_ID_COLUMN = ?\n" +
             "ORDER BY S.$SUBJECT_ID_COLUMN ASC"
 
@@ -403,6 +406,26 @@ class RoomEnrolmentRecordQueryBuilderTest {
         val resultQuery = queryBuilder.buildDeleteQuery(subjectQuery)
         assertThat(resultQuery.sql).isEqualTo(expectedSql)
         assertThat(getArgs(resultQuery)).isEqualTo(arrayOf<Any?>(projectId, moduleId.value))
+    }
+
+    @Test
+    fun `buildSubjectQuery includes credential join clause when externalCredential is provided`() {
+        val credentialValue = "credentialValue"
+        val query = SubjectQuery(
+            projectId = "projectId",
+            externalCredential = credentialValue.asTokenizableEncrypted()
+        )
+
+        val result = RoomEnrolmentRecordQueryBuilder().buildSubjectQuery(query)
+
+        val expectedSql = """
+        SELECT * FROM $SUBJECT_TABLE_NAME S
+        INNER JOIN $EXTERNAL_CREDENTIAL_TABLE_NAME C ON S.$SUBJECT_ID_COLUMN = C.$SUBJECT_ID_COLUMN
+        WHERE S.$PROJECT_ID_COLUMN = ? AND C.$EXTERNAL_CREDENTIAL_VALUE_COLUMN = ?
+        
+    """.trimIndent()
+
+        assertThat(result.sql).isEqualTo(expectedSql)
     }
 
     private fun getArgs(query: SimpleSQLiteQuery): Array<Any?> {
