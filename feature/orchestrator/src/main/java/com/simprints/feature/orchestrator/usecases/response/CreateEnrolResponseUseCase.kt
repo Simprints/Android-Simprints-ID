@@ -2,10 +2,18 @@ package com.simprints.feature.orchestrator.usecases.response
 
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.core.domain.tokenization.isTokenized
 import com.simprints.face.capture.FaceCaptureResult
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.eventsync.sync.common.SubjectFactory
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
@@ -13,11 +21,14 @@ import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppResponse
 import java.io.Serializable
+import java.security.GeneralSecurityException
+import java.util.UUID
 import javax.inject.Inject
 
 internal class CreateEnrolResponseUseCase @Inject constructor(
     private val subjectFactory: SubjectFactory,
     private val enrolSubject: EnrolSubjectUseCase,
+    private val tokenizationProcessor: TokenizationProcessor,
 ) {
     suspend operator fun invoke(
         request: ActionRequest.EnrolActionRequest,
@@ -27,8 +38,8 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
     ): AppResponse {
         val fingerprintCapture = results.filterIsInstance(FingerprintCaptureResult::class.java).lastOrNull()
         val faceCapture = results.filterIsInstance(FaceCaptureResult::class.java).lastOrNull()
-        // TODO [CORE-3421] When an external credential can be extracted from the UI-level steps, extract it here
-        val externalCredential: ExternalCredential? = null
+        val credentialResult = results.filterIsInstance(ExternalCredentialSearchResult::class.java).lastOrNull()
+        val externalCredential = credentialResult?.scannedCredential?.toExternalCredential(enrolmentSubjectId, project)
 
         return try {
             val subject = subjectFactory.buildSubjectFromCaptureResults(
@@ -47,5 +58,29 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
             Simber.e("Error creating enrol response", e, tag = ORCHESTRATION)
             AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR)
         }
+    }
+
+    private fun ScannedCredential.toExternalCredential(subjectId: String, project: Project): ExternalCredential? {
+        val credential = tokenizationProcessor.encrypt(
+            decrypted = credential.asTokenizableRaw(),
+            tokenKeyType = TokenKeyType.ExternalCredential,
+            project = project,
+        )
+
+        if (!credential.isTokenized()) {
+            Simber.e(
+                "Tokenization of credential for subject ID $subjectId in project ${project.id} failed. Unable to save external credential",
+                GeneralSecurityException(),
+                tag = MULTI_FACTOR_ID
+            )
+            return null
+        }
+
+        return ExternalCredential(
+            id = UUID.randomUUID().toString(),
+            value = credential as TokenizableString.Tokenized,
+            subjectId = subjectId,
+            type = credentialType
+        )
     }
 }

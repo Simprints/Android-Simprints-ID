@@ -88,3 +88,41 @@ fun ProjectConfiguration.isProjectWithPeriodicallyUpSync(): Boolean =
     synchronization.up.simprints.frequency == Frequency.ONLY_PERIODICALLY_UP_SYNC
 
 fun ProjectConfiguration.isModuleSelectionAvailable(): Boolean = isProjectWithModuleSync() && !isProjectWithPeriodicallyUpSync()
+
+fun ProjectConfiguration.determineFaceSDKs(
+    ageGroup: AgeGroup?
+): List<FaceConfiguration.BioSdk> {
+    if (!isAgeRestricted()) {
+        return face?.allowedSDKs.orEmpty()
+    }
+
+    return buildList {
+        ageGroup?.let { age ->
+            if (face?.rankOne?.allowedAgeRange?.contains(age) == true) {
+                add(FaceConfiguration.BioSdk.RANK_ONE)
+            }
+            if (face?.simFace?.allowedAgeRange?.contains(age) == true) {
+                add(FaceConfiguration.BioSdk.SIM_FACE)
+            }
+        }
+    }
+}
+
+fun ProjectConfiguration.determineFingerprintSDKs(
+    ageGroup: AgeGroup?
+): List<FingerprintConfiguration.BioSdk> {
+    if (!isAgeRestricted()) {
+        return fingerprint?.allowedSDKs.orEmpty()
+    }
+
+    return buildList {
+        ageGroup?.let { age ->
+            if (fingerprint?.secugenSimMatcher?.allowedAgeRange?.contains(age) == true) {
+                add(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
+            }
+            if (fingerprint?.nec?.allowedAgeRange?.contains(age) == true) {
+                add(FingerprintConfiguration.BioSdk.NEC)
+            }
+        }
+    }
+}

@@ -1,12 +1,14 @@
 package com.simprints.feature.orchestrator.usecases.response
 
+import com.simprints.core.domain.response.AppMatchConfidence
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.session.SessionEventRepository
+import com.simprints.infra.matching.FaceMatchResult
+import com.simprints.infra.matching.FingerprintMatchResult
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.orchestration.data.responses.AppResponse
-import com.simprints.infra.matching.FaceMatchResult
-import com.simprints.infra.matching.FingerprintMatchResult
 import java.io.Serializable
 import javax.inject.Inject
 
@@ -17,21 +19,24 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
         projectConfiguration: ProjectConfiguration,
         results: List<Serializable>,
     ): AppResponse {
+        val credentialFaceMatchResults = credentialResultsMapper(results, isFace = true)
+        val credentialFingerprintMatchResults = credentialResultsMapper(results, isFace = false)
+
         val currentSessionId = eventRepository.getCurrentSessionScope().id
 
-        val faceResults = getFaceMatchResults(results, projectConfiguration)
+        val faceResults = credentialFaceMatchResults + getFaceMatchResults(results, projectConfiguration)
         val bestFaceConfidence = faceResults.firstOrNull()?.confidenceScore ?: 0
 
-        val fingerprintResults = getFingerprintResults(results, projectConfiguration)
+        val fingerprintResults = credentialFingerprintMatchResults + getFingerprintResults(results, projectConfiguration)
         val bestFingerprintConfidence = fingerprintResults.firstOrNull()?.confidenceScore ?: 0
 
         return AppIdentifyResponse(
             sessionId = currentSessionId,
             // Return the results with the highest confidence score
             identifications = if (bestFingerprintConfidence > bestFaceConfidence) {
-                fingerprintResults
+                fingerprintResults.distinctBy(AppMatchResult::guid)
             } else {
-                faceResults
+                faceResults.distinctBy(AppMatchResult::guid)
             },
         )
     }
@@ -77,4 +82,35 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
                     .map { AppMatchResult(it.subjectId, it.confidence, faceDecisionPolicy) }
             }
     } ?: emptyList()
+
+    /**
+     * Checks if any of the [results] items is an instance of [ExternalCredentialSearchResult]. If such item is found, then returns a list
+     * of candidates whose verification matching score  between the taken biometric probe, and a biometric probe linked to is above
+     * project's verification threshold.
+     *
+     * @return list of [AppMatchResult] containing possible verification matches
+     */
+    private fun credentialResultsMapper(
+        results: List<Serializable>,
+        isFace: Boolean,
+    ): List<AppMatchResult> = results.filterIsInstance<ExternalCredentialSearchResult>()
+        .firstOrNull()
+        ?.matchResults
+        ?.filter {
+            if (isFace) {
+                it.faceBioSdk != null
+            } else {
+                it.fingerprintBioSdk != null
+            }
+        }
+        ?.map {
+            AppMatchResult(
+                guid = it.matchResult.subjectId,
+                confidenceScore = it.matchResult.confidence.toInt(),
+                matchConfidence = AppMatchConfidence.HIGH,
+                verificationSuccess = true
+            )
+        }
+        ?.sortedByDescending(AppMatchResult::confidenceScore)
+        .orEmpty()
 }

@@ -53,6 +53,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         const val FINGERPRINT_SAMPLES_FIELD = "fingerprintSamples"
         const val FACE_SAMPLES_FIELD = "faceSamples"
         const val FORMAT_FIELD = "format"
+        const val EXTERNAL_CREDENTIAL_FIELD = "externalCredentials"
 
         // Although batches are processed sequentially, we use a small channel capacity to prevent blocking and reduce the risk of out-of-memory errors.
         const val CHANNEL_CAPACITY = 4
@@ -332,6 +333,12 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                 "$IS_ATTENDANT_ID_TOKENIZED_FIELD == $0 OR $IS_MODULE_ID_TOKENIZED_FIELD == $1",
                 false,
                 false,
+            )
+        }
+        if (query.externalCredential != null) {
+            realmQuery = realmQuery.query(
+                "ANY $EXTERNAL_CREDENTIAL_FIELD.value == $0",
+                query.externalCredential.value,
             )
         }
         if (query.sort) {

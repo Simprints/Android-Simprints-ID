@@ -4,6 +4,8 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate.Companion.FORMAT_COLUMN
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate.Companion.TEMPLATE_TABLE_NAME
+import com.simprints.infra.enrolment.records.room.store.models.DbExternalCredential.Companion.EXTERNAL_CREDENTIAL_TABLE_NAME
+import com.simprints.infra.enrolment.records.room.store.models.DbExternalCredential.Companion.EXTERNAL_CREDENTIAL_VALUE_COLUMN
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.ATTENDANT_ID_COLUMN
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.MODULE_ID_COLUMN
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.PROJECT_ID_COLUMN
@@ -27,10 +29,12 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
             "Cannot set format for subject query, use buildBiometricTemplatesQuery instead"
         }
         val (whereClause, args) = buildWhereClause(query)
+        val credentialJoinClause = buildCredentialJoinClause(query)
         val orderByClause = buildOrderByClause(query)
         val sql =
             """
             SELECT * FROM $SUBJECT_TABLE_NAME S
+            $credentialJoinClause
             $whereClause
             $orderByClause
             """.trimIndent()
@@ -88,6 +92,7 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
             query,
             subjectAlias = "",
             templateAlias = "",
+            credentialAlias = "",
         )
         val sql = "DELETE FROM DbSubject $whereClause"
         return SimpleSQLiteQuery(sql, args.toTypedArray())
@@ -97,6 +102,7 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
         query: SubjectQuery,
         subjectAlias: String = "S.", // Default alias for subject table, dot included. Empty string for no alias.
         templateAlias: String = "T.", // Default alias for template table, dot included. Empty string for no alias.
+        credentialAlias: String = "C.",
     ): Pair<String, List<Any?>> {
         val clauses = mutableListOf<String>()
         val args = mutableListOf<Any?>()
@@ -143,8 +149,25 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
             args.add(it)
         }
 
+        query.externalCredential?.let {
+            clauses.add("${credentialAlias}$EXTERNAL_CREDENTIAL_VALUE_COLUMN = ?")
+            args.add(query.externalCredential)
+        }
+
         var whereClauseResult = if (clauses.isNotEmpty()) "WHERE ${clauses.joinToString(" AND ")}" else ""
         return Pair(whereClauseResult, args)
+    }
+
+    private fun buildCredentialJoinClause(
+        query: SubjectQuery,
+        subjectAlias: String = "S",
+        credentialAlias: String = "C",
+    ): String {
+        return if (query.externalCredential != null) {
+            "INNER JOIN $EXTERNAL_CREDENTIAL_TABLE_NAME C ON $subjectAlias.$SUBJECT_ID_COLUMN = $credentialAlias.$SUBJECT_ID_COLUMN"
+        } else {
+            ""
+        }
     }
 
     private fun buildOrderByClause(
