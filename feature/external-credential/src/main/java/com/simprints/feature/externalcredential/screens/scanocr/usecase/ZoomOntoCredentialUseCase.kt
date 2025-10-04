@@ -1,6 +1,7 @@
-package com.simprints.feature.externalcredential.screens.search.usecase
+package com.simprints.feature.externalcredential.screens.scanocr.usecase
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import com.simprints.feature.externalcredential.model.BoundingBox
 import javax.inject.Inject
 import kotlin.math.max
@@ -16,11 +17,12 @@ internal class ZoomOntoCredentialUseCase @Inject constructor() {
     /**
      * Zooms into given image. Zoom area defined by the [boundingBox]
      *
-     * @param bitmap bitmap containing the document to zoom into
+     * @param imagePath path to image containing the document to zoom into
      * @param boundingBox bounding box that defines the zoom area
      * @return zoomed-in bitmap
      */
-    operator fun invoke(bitmap: Bitmap, boundingBox: BoundingBox): Bitmap {
+    operator fun invoke(imagePath: String, boundingBox: BoundingBox): Bitmap {
+        val bitmap = BitmapFactory.decodeFile(imagePath)
         val expandedBox = expandBoundingBox(boundingBox, BOX_INCREASE_PERCENTAGE)
 
         val left = expandedBox.left.coerceIn(0, bitmap.width)

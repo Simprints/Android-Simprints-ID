@@ -11,10 +11,16 @@ import com.simprints.core.livedata.send
 import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
+import com.simprints.feature.externalcredential.screens.scanocr.model.mapToCredentialType
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.CropDocumentFromPreviewUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetCredentialCoordinatesUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.KeepOnlyBestDetectedBlockUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.NormalizeBitmapToPreviewUseCase
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.SaveScannedImageUseCase
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.SaveScannedImageUseCase.ScanImageType.ZoomedInCredential
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.ZoomOntoCredentialUseCase
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.resources.R
 import dagger.assisted.Assisted
@@ -29,6 +35,8 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     private val cropDocumentFromPreviewUseCase: CropDocumentFromPreviewUseCase,
     private val getCredentialCoordinatesUseCase: GetCredentialCoordinatesUseCase,
     private val keepOnlyBestDetectedBlockUseCase: KeepOnlyBestDetectedBlockUseCase,
+    private val saveScannedImageUseCase: SaveScannedImageUseCase,
+    private val zoomOntoCredentialUseCase: ZoomOntoCredentialUseCase,
     @DispatcherBG private val bgDispatcher: CoroutineDispatcher
 ) : ViewModel() {
     @AssistedFactory
@@ -48,9 +56,9 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
         }
     private val _stateLiveData = MutableLiveData<ScanOcrState>()
     val stateLiveData: LiveData<ScanOcrState> = _stateLiveData
-    val finishOcrEvent: LiveData<LiveDataEventWithContent<DetectedOcrBlock>>
+    val finishOcrEvent: LiveData<LiveDataEventWithContent<ScannedCredential>>
         get() = _finishOcrEvent
-    private val _finishOcrEvent = MutableLiveData<LiveDataEventWithContent<DetectedOcrBlock>>()
+    private val _finishOcrEvent = MutableLiveData<LiveDataEventWithContent<ScannedCredential>>()
 
     private fun updateState(state: (ScanOcrState) -> ScanOcrState) {
         this.state = state(this.state)
@@ -97,8 +105,35 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
         updateState { ScanOcrState.Complete }
         viewModelScope.launch {
             val detectedBlock = keepOnlyBestDetectedBlockUseCase(detectedBlocks, ocrDocumentType)
-            _finishOcrEvent.send(detectedBlock)
+            val credentialType = detectedBlock.documentType.mapToCredentialType()
+            val blockBoundingBox = detectedBlock.blockBoundingBox
+            val zoomedCredentialImagePath = buildZoomedImagePath(detectedBlock)
+            val credential = ScannedCredential(
+                credential = detectedBlock.readoutValue,
+                credentialType = credentialType,
+                documentImagePath = detectedBlock.imagePath,
+                zoomedCredentialImagePath = zoomedCredentialImagePath,
+                credentialBoundingBox = blockBoundingBox
+            )
+            _finishOcrEvent.send(credential)
             detectedBlocks = emptyList()
+        }
+    }
+
+    private fun buildZoomedImagePath(detectedBlock: DetectedOcrBlock): String? {
+        return try {
+            saveScannedImageUseCase(
+                bitmap = zoomOntoCredentialUseCase(detectedBlock.imagePath, detectedBlock.blockBoundingBox),
+                documentType = detectedBlock.documentType,
+                imageType = ZoomedInCredential
+            )
+        } catch (e: Exception) {
+            Simber.e(
+                "Unable to zoom into bounding box [${detectedBlock.blockBoundingBox}] of ${detectedBlock.documentType} image ${detectedBlock.imagePath}",
+                e,
+                MULTI_FACTOR_ID
+            )
+            null
         }
     }
 

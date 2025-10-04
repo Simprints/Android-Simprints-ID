@@ -20,12 +20,11 @@ import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.extentions.hideKeyboard
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialSearchBinding
-import com.simprints.feature.externalcredential.model.BoundingBox
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.externalcredential.screens.search.model.SearchCredentialState
 import com.simprints.feature.externalcredential.screens.search.model.SearchState
-import com.simprints.feature.externalcredential.screens.search.usecase.ZoomOntoCredentialUseCase
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.ZoomOntoCredentialUseCase
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.navigateSafely
@@ -125,7 +124,7 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
                     FlowType.ENROL -> renderEnrolCredentialLinked(credentialType)
                     else -> { // Identification flow
                         if (searchState.hasSuccessfulVerifications) {
-                            renderIdentifyCredentialVerificationConfirmed(credentialType)
+                            renderIdentifyCredentialVerificationConfirmed()
                         } else {
                             renderIdentifyCredentialVerificationFailed(credentialType)
                         }
@@ -152,7 +151,7 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         textSearchResult.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_red))
     }
 
-    private fun renderIdentifyCredentialVerificationConfirmed(credentialType: ExternalCredentialType) = with(binding) {
+    private fun renderIdentifyCredentialVerificationConfirmed() = with(binding) {
         iconSearchResult.setImageResource(IDR.drawable.ic_checked_green_large)
         iconSearchResult.isVisible = true
         textSearchResult.setText(IDR.string.mfid_search_found_identification)
@@ -199,20 +198,18 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         }
     }
 
-    private fun renderImage(scannedCredential: ScannedCredential) {
-        val imagePath: String? = scannedCredential.previewImagePath
-        val boundingBox: BoundingBox? = scannedCredential.imageBoundingBox
-        binding.documentPreview.isVisible = imagePath != null
-        if (imagePath == null) return
+    private fun renderImage(credential: ScannedCredential) {
+        val documentImagePath: String? = credential.documentImagePath
+        binding.documentPreview.isVisible = documentImagePath != null
+        if (documentImagePath == null) return
+
 
         try {
-            val fullImage = BitmapFactory.decodeFile(imagePath)
-            val finalBitmap = if (boundingBox != null) {
-                zoomOntoCredentialUseCase(fullImage, boundingBox)
-            } else fullImage
-            binding.documentPreview.setImageBitmap(finalBitmap)
+            val imagePath: String = credential.zoomedCredentialImagePath ?: documentImagePath
+            val displayedImage = BitmapFactory.decodeFile(imagePath)
+            binding.documentPreview.setImageBitmap(displayedImage)
         } catch (e: Exception) {
-            Simber.e("Unable to get [$imagePath] OCR image", e, tag = MULTI_FACTOR_ID)
+            Simber.e("Unable to get [$documentImagePath] OCR image", e, tag = MULTI_FACTOR_ID)
         }
 
     }

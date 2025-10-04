@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
+import com.simprints.feature.externalcredential.model.BoundingBox
 import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
@@ -11,6 +12,8 @@ import com.simprints.feature.externalcredential.screens.scanocr.usecase.CropDocu
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetCredentialCoordinatesUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.KeepOnlyBestDetectedBlockUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.NormalizeBitmapToPreviewUseCase
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.SaveScannedImageUseCase
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.ZoomOntoCredentialUseCase
 import com.simprints.infra.resources.R
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -41,6 +44,12 @@ internal class ExternalCredentialScanOcrViewModelTest {
     private lateinit var keepOnlyBestDetectedBlockUseCase: KeepOnlyBestDetectedBlockUseCase
 
     @MockK
+    private lateinit var zoomOntoCredentialUseCase: ZoomOntoCredentialUseCase
+
+    @MockK
+    private lateinit var saveScannedImageUseCase: SaveScannedImageUseCase
+
+    @MockK
     private lateinit var bitmap: Bitmap
 
     @MockK
@@ -62,6 +71,8 @@ internal class ExternalCredentialScanOcrViewModelTest {
         cropDocumentFromPreviewUseCase = cropDocumentFromPreviewUseCase,
         getCredentialCoordinatesUseCase = getCredentialCoordinatesUseCase,
         keepOnlyBestDetectedBlockUseCase = keepOnlyBestDetectedBlockUseCase,
+        zoomOntoCredentialUseCase = zoomOntoCredentialUseCase,
+        saveScannedImageUseCase = saveScannedImageUseCase,
         bgDispatcher = testCoroutineRule.testCoroutineDispatcher
     )
 
@@ -96,17 +107,62 @@ internal class ExternalCredentialScanOcrViewModelTest {
     }
 
     @Test
-    fun `processOcrResultsAndFinish sends finish event and resets state`() = runTest {
-        val mockBestBlock = mockk<DetectedOcrBlock>()
+    fun `processOcrResultsAndFinish sends finish event with scanned credential`() = runTest {
+        val detectedBlockImagePath = "detectedBlockImagePath"
+        val readoutValue = "readoutValue"
+        val zoomedImagePath = "zoomedImagePath"
+        val mockBoundingBox = mockk<BoundingBox>()
+        val mockBitmap = mockk<Bitmap>()
+
+        val mockBestBlock = mockk<DetectedOcrBlock> {
+            every { documentType } returns OcrDocumentType.NhisCard
+            every { blockBoundingBox } returns mockBoundingBox
+            every { imagePath } returns detectedBlockImagePath
+            every { this@mockk.readoutValue } returns readoutValue
+        }
+
+        coEvery { keepOnlyBestDetectedBlockUseCase(any(), documentType) } returns mockBestBlock
+        coEvery { zoomOntoCredentialUseCase(detectedBlockImagePath, mockBoundingBox) } returns mockBitmap
+        coEvery { saveScannedImageUseCase(mockBitmap, OcrDocumentType.NhisCard, any()) } returns zoomedImagePath
+
         val finishObserver = viewModel.finishOcrEvent.test()
         val stateObserver = viewModel.stateLiveData.test()
-        val ocrDocumentType = OcrDocumentType.NhisCard
-        coEvery { keepOnlyBestDetectedBlockUseCase(any(), ocrDocumentType) } returns mockBestBlock
+
         viewModel.processOcrResultsAndFinish()
 
-        assertThat(finishObserver.value()?.peekContent()).isEqualTo(mockBestBlock)
-        assertThat(stateObserver.value()).isEqualTo(ScanOcrState.NotScanning)
+        val scannedCredential = finishObserver.value()?.peekContent()
+        assertThat(scannedCredential?.credential).isEqualTo(readoutValue)
+        assertThat(scannedCredential?.documentImagePath).isEqualTo(detectedBlockImagePath)
+        assertThat(scannedCredential?.zoomedCredentialImagePath).isEqualTo(zoomedImagePath)
+        assertThat(scannedCredential?.credentialBoundingBox).isEqualTo(mockBoundingBox)
+        assertThat(stateObserver.value()).isEqualTo(ScanOcrState.Complete)
         assertThat(viewModel.isOcrActive).isFalse()
+    }
+
+    @Test
+    fun `processOcrResultsAndFinish sets null zoomed image path when zoom fails`() = runTest {
+        val detectedBlockImagePath = "detectedBlockImagePath"
+        val readoutValue = "readoutValue"
+        val mockBoundingBox = mockk<BoundingBox>()
+
+        val mockBestBlock = mockk<DetectedOcrBlock> {
+            every { documentType } returns OcrDocumentType.NhisCard
+            every { blockBoundingBox } returns mockBoundingBox
+            every { imagePath } returns detectedBlockImagePath
+            every { this@mockk.readoutValue } returns readoutValue
+        }
+
+        coEvery { keepOnlyBestDetectedBlockUseCase(any(), documentType) } returns mockBestBlock
+        coEvery { zoomOntoCredentialUseCase(detectedBlockImagePath, mockBoundingBox) } throws Exception("Zoom failed")
+
+        val finishObserver = viewModel.finishOcrEvent.test()
+
+        viewModel.processOcrResultsAndFinish()
+
+        val scannedCredential = finishObserver.value()?.peekContent()
+        assertThat(scannedCredential?.zoomedCredentialImagePath).isNull()
+        assertThat(scannedCredential?.credential).isEqualTo(readoutValue)
+        assertThat(scannedCredential?.documentImagePath).isEqualTo(detectedBlockImagePath)
     }
 
     @Test

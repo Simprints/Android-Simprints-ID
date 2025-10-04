@@ -139,8 +139,9 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
                 val args = ScannedCredential(
                     credential = qrCodeValue,
                     credentialType = ExternalCredentialType.QRCode,
-                    previewImagePath = null,
-                    imageBoundingBox = null
+                    documentImagePath = null,
+                    credentialBoundingBox = null,
+                    zoomedCredentialImagePath = null,
                 )
                 findNavController().navigateSafely(
                     this@ExternalCredentialScanQrFragment,

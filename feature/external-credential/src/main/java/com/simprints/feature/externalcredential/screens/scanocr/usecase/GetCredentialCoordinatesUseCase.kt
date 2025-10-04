@@ -9,6 +9,7 @@ import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.feature.externalcredential.model.toBoundingBox
 import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.SaveScannedImageUseCase.ScanImageType.FullDocument
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
@@ -57,7 +58,7 @@ internal class GetCredentialCoordinatesUseCase @Inject constructor(
                     if (isValid) {
                         val blockBoundingRect = textBlock.boundingBox ?: return@firstNotNullOfOrNull null
                         val lineBoundingRect = textLine.boundingBox ?: return@firstNotNullOfOrNull null
-                        val savedImagePath = saveScannedImageUseCase(bitmap, documentType)
+                        val savedImagePath = saveScannedImageUseCase(bitmap, documentType, imageType = FullDocument)
                         DetectedOcrBlock(
                             imagePath = savedImagePath,
                             documentType = documentType,

@@ -32,9 +32,7 @@ import com.simprints.feature.externalcredential.databinding.FragmentExternalCred
 import com.simprints.feature.externalcredential.ext.animateIn
 import com.simprints.feature.externalcredential.ext.animateOut
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
-import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
-import com.simprints.feature.externalcredential.screens.scanocr.model.mapToCredentialType
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.BuildOcrCropConfigUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ProvideCameraListenerUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
@@ -171,8 +169,8 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
 
         viewModel.finishOcrEvent.observe(
             viewLifecycleOwner,
-            LiveDataEventWithContentObserver { detectedBlock ->
-                finish(detectedBlock)
+            LiveDataEventWithContentObserver { scannedCredential ->
+                scheduleFinish(scannedCredential)
             }
         )
     }
@@ -313,18 +311,19 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         }
     }
 
-    private fun finish(detectedBlock: DetectedOcrBlock) {
+    /**
+     * Waits until all animations are complete before navigating away. Completion animations are in place because the execution of
+     * [ExternalCredentialScanOcrViewModel.processOcrResultsAndFinish] is not immediate, and it makes the transition to the next fragment
+     * smoother for user.
+     *
+     * The animation state is stored in the [isAnimatingCompletion]. If it is set to true, the navigation action is set to
+     * [pendingFinishAction] which will be executed once animations are complete. If false, the navigation will proceed immediately.
+     */
+    private fun scheduleFinish(credential: ScannedCredential) {
         val navigationAction = {
-            val credentialType = detectedBlock.documentType.mapToCredentialType()
-            val args = ScannedCredential(
-                credential = detectedBlock.readoutValue,
-                credentialType = credentialType,
-                previewImagePath = detectedBlock.imagePath,
-                imageBoundingBox = detectedBlock.blockBoundingBox
-            )
             findNavController().navigateSafely(
                 this@ExternalCredentialScanOcrFragment,
-                ExternalCredentialScanOcrFragmentDirections.actionExternalCredentialScanOcrToExternalCredentialSearch(args)
+                ExternalCredentialScanOcrFragmentDirections.actionExternalCredentialScanOcrToExternalCredentialSearch(credential)
             )
         }
         if (isAnimatingCompletion) {

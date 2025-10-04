@@ -9,6 +9,7 @@ import java.io.Serializable
 data class ScannedCredential(
     val credential: String,
     val credentialType: ExternalCredentialType,
-    val previewImagePath: String?,
-    val imageBoundingBox: BoundingBox?
+    val documentImagePath: String?,
+    val zoomedCredentialImagePath: String?,
+    val credentialBoundingBox: BoundingBox?
 ) : Serializable
