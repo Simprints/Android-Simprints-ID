@@ -232,7 +232,7 @@ class ProjectConfigurationTest {
         val config = projectConfiguration.copy(
             synchronization = synchronizationConfiguration.copy(
                 down = synchronizationConfiguration.down.copy(
-                    simprints = null
+                    simprints = null,
                 ),
             ),
         )
@@ -245,7 +245,7 @@ class ProjectConfigurationTest {
         val config = projectConfiguration.copy(
             synchronization = synchronizationConfiguration.copy(
                 down = synchronizationConfiguration.down.copy(
-                    commCare = DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration
+                    commCare = DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration,
                 ),
             ),
         )
@@ -258,7 +258,7 @@ class ProjectConfigurationTest {
         val config = projectConfiguration.copy(
             synchronization = synchronizationConfiguration.copy(
                 down = synchronizationConfiguration.down.copy(
-                    commCare = null
+                    commCare = null,
                 ),
             ),
         )
@@ -294,6 +294,7 @@ class ProjectConfigurationTest {
                 rankOne = faceConfiguration.rankOne?.copy(
                     allowedAgeRange = faceAgeRange,
                 ),
+                simFace = null,
             ),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(
@@ -428,7 +429,7 @@ class ProjectConfigurationTest {
             AgeGroup(faceAgeRange.startInclusive, secugenSimMatcherAgeRange.startInclusive),
             AgeGroup(secugenSimMatcherAgeRange.startInclusive, faceAgeRange.endExclusive),
             AgeGroup(faceAgeRange.endExclusive!!, secugenSimMatcherAgeRange.endExclusive!!),
-            AgeGroup(secugenSimMatcherAgeRange.endExclusive!!, null),
+            AgeGroup(secugenSimMatcherAgeRange.endExclusive, null),
         )
 
         assertThat(result).isEqualTo(expected)

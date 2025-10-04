@@ -37,8 +37,7 @@ fun ProjectConfiguration.canSyncBiometricDataToSimprints(): Boolean =
 fun ProjectConfiguration.canSyncAnalyticsDataToSimprints(): Boolean =
     synchronization.up.simprints.kind == UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
 
-fun ProjectConfiguration.isSimprintsEventDownSyncAllowed(): Boolean =
-    synchronization.down.simprints != null &&
+fun ProjectConfiguration.isSimprintsEventDownSyncAllowed(): Boolean = synchronization.down.simprints != null &&
     synchronization.down.simprints.frequency != Frequency.ONLY_PERIODICALLY_UP_SYNC
 
 fun ProjectConfiguration.isCommCareEventDownSyncAllowed(): Boolean = synchronization.down.commCare != null
@@ -47,6 +46,7 @@ fun ProjectConfiguration.imagesUploadRequiresUnmeteredConnection(): Boolean = sy
 
 fun ProjectConfiguration.allowedAgeRanges(): List<AgeGroup> = listOfNotNull(
     face?.rankOne?.allowedAgeRange,
+    face?.simFace?.allowedAgeRange,
     fingerprint?.secugenSimMatcher?.allowedAgeRange,
     fingerprint?.nec?.allowedAgeRange,
 )
