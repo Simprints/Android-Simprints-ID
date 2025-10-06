@@ -33,7 +33,7 @@ internal class SignedUrlSampleUploader @Inject constructor(
         val batchSize = getBatchSize()
         val urlRequestScope = eventRepository.createEventScope(type = EventScopeType.SAMPLE_UP_SYNC)
 
-        Simber.i("Starting image upload in batches of $batchSize (Scope ID: ${urlRequestScope.id}")
+        Simber.i("Starting image upload in batches of $batchSize (Scope ID: ${urlRequestScope.id})", tag = SAMPLE_UPLOAD)
         var sampleIndex = 0
         var samplesSize = 0
         val sampleReferenceBatches = localDataSource
@@ -44,6 +44,8 @@ internal class SignedUrlSampleUploader @Inject constructor(
             // cases where there are large amounts of files and the coroutine is being interrupted,
             // even if the result is that some requested batches are not at max size.
             .chunked(batchSize)
+        Simber.i("Images to upload: $samplesSize", tag = SAMPLE_UPLOAD)
+
         for (batch in sampleReferenceBatches) {
             if (!coroutineContext.isActive) {
                 // Do not process next batch if coroutine is being cancelled
@@ -73,7 +75,7 @@ internal class SignedUrlSampleUploader @Inject constructor(
             // Fetch upload urls for each image
             val sampleIdToUrlMap = fetchUploadUrlsPerSample(projectId, batchUploadData)
 
-            Simber.i("${sampleIdToUrlMap.size} signed URLs fetched")
+            Simber.i("${sampleIdToUrlMap.size} signed URLs fetched", tag = SAMPLE_UPLOAD)
 
             for (sample in batchUploadData) {
                 if (!coroutineContext.isActive) {
@@ -81,7 +83,7 @@ internal class SignedUrlSampleUploader @Inject constructor(
                     allImagesUploaded = false
                     break
                 }
-                Simber.i("Uploading ${sample.sampleId}")
+                Simber.i("Uploading ${sample.sampleId}", tag = SAMPLE_UPLOAD)
                 progressCallback?.invoke(sampleIndex++, samplesSize)
 
                 val url = sampleIdToUrlMap[sample.sampleId]
@@ -96,7 +98,7 @@ internal class SignedUrlSampleUploader @Inject constructor(
                 if (success) {
                     localDataSource.deleteImage(sample.imageRef)
                     metadataStore.deleteMetadata(sample.imageRef.relativePath)
-                    Simber.i("Uploaded ${sample.sampleId} successfully")
+                    Simber.i("Uploaded ${sample.sampleId} successfully", tag = SAMPLE_UPLOAD)
                 } else {
                     allImagesUploaded = false
                 }

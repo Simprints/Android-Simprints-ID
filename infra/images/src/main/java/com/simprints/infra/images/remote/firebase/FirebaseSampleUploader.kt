@@ -43,7 +43,7 @@ internal class FirebaseSampleUploader @Inject constructor(
         }
         var allImagesUploaded = true
 
-        Simber.i("Starting sample upload to Firebase storage")
+        Simber.i("Starting sample upload to Firebase storage", tag = SAMPLE_UPLOAD)
         val bucketUrl = configManager.getProject(projectId).imageBucket
         val rootRef = FirebaseStorage
             .getInstance(firebaseApp, bucketUrl)
@@ -52,6 +52,8 @@ internal class FirebaseSampleUploader @Inject constructor(
         val urlRequestScope = eventRepository.createEventScope(type = EventScopeType.SAMPLE_UP_SYNC)
 
         val sampleReferences = localDataSource.listImages(projectId)
+        Simber.i("Images to upload ${sampleReferences.size}", tag = SAMPLE_UPLOAD)
+
         sampleReferences.forEachIndexed { index, imageRef ->
             Simber.i("Reading sample file: ${imageRef.relativePath.parts.last()}", tag = SAMPLE_UPLOAD)
 
@@ -84,7 +86,7 @@ internal class FirebaseSampleUploader @Inject constructor(
                 }
             } catch (t: Throwable) {
                 allImagesUploaded = false
-                Simber.e("Failed to upload images", t, tag = SYNC)
+                Simber.e("Failed to upload images", t, tag = SAMPLE_UPLOAD)
             }
         }
         eventRepository.closeEventScope(urlRequestScope, EventScopeEndCause.WORKFLOW_ENDED)
