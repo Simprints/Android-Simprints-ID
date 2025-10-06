@@ -1,5 +1,6 @@
 package com.simprints.feature.setup.location
 
+import android.os.PowerManager
 import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -33,7 +34,11 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
         coEvery { eventRepository.getCurrentSessionScope() } returns createSessionScope()
 
         worker = StoreUserLocationIntoCurrentSessionWorker(
-            mockk(relaxed = true),
+            mockk(relaxed = true) {
+                every { getSystemService<PowerManager>(any()) } returns mockk {
+                    every { isIgnoringBatteryOptimizations(any()) } returns true
+                }
+            },
             mockk(relaxed = true),
             eventRepository,
             locationManager,

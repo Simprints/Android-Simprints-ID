@@ -1,12 +1,13 @@
 package com.simprints.infra.eventsync.sync.down.workers
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import android.os.PowerManager
+import androidx.test.ext.junit.runners.*
 import androidx.work.ListenableWorker
 import androidx.work.WorkInfo
 import androidx.work.WorkInfo.State.RUNNING
 import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.workDataOf
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationFlagsStore
@@ -22,12 +23,8 @@ import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownload
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -68,7 +65,11 @@ internal class CommCareEventSyncDownloaderWorkerTest {
         MockKAnnotations.init(this, relaxed = true)
 
         eventDownSyncDownloaderWorker = CommCareEventSyncDownloaderWorker(
-            mockk(relaxed = true),
+            mockk(relaxed = true) {
+                every { getSystemService<PowerManager>(any()) } returns mockk {
+                    every { isIgnoringBatteryOptimizations(any()) } returns true
+                }
+            },
             mockk(relaxed = true) {
                 every { inputData } returns workDataOf(
                     INPUT_DOWN_SYNC_OPS to JsonHelper.toJson(projectDownSyncScope.operations.first()),

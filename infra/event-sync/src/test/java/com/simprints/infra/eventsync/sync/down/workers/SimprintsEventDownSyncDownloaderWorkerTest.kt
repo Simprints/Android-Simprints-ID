@@ -1,5 +1,6 @@
 package com.simprints.infra.eventsync.sync.down.workers
 
+import android.os.PowerManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ListenableWorker
 import androidx.work.WorkInfo
@@ -75,7 +76,11 @@ internal class SimprintsEventDownSyncDownloaderWorkerTest {
         MockKAnnotations.init(this, relaxed = true)
 
         eventDownSyncDownloaderWorker = SimprintsEventDownSyncDownloaderWorker(
-            mockk(relaxed = true),
+            mockk(relaxed = true) {
+                every { getSystemService<PowerManager>(any()) } returns mockk {
+                    every { isIgnoringBatteryOptimizations(any()) } returns true
+                }
+            },
             mockk(relaxed = true) {
                 every { inputData } returns workDataOf(
                     INPUT_DOWN_SYNC_OPS to JsonHelper.toJson(projectDownSyncScope.operations.first()),
