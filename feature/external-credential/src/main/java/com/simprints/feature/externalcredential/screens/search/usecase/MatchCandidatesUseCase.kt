@@ -1,5 +1,6 @@
 package com.simprints.feature.externalcredential.screens.search.usecase
 
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.infra.config.store.models.Project
@@ -18,7 +19,7 @@ internal class MatchCandidatesUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         candidates: List<Subject>,
-        credential: String,
+        credential: TokenizableString.Tokenized,
         externalCredentialParams: ExternalCredentialParams,
         project: Project,
         projectConfig: ProjectConfiguration,

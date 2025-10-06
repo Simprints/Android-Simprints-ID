@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.extentions.hideKeyboard
 import com.simprints.feature.externalcredential.R
@@ -84,15 +85,16 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
     }
 
     private fun renderCredentialCard(state: SearchCredentialState) = with(binding) {
-        val credential = state.scannedCredential.credential
+        val credential = state.displayedCredential?.value.orEmpty()
         val credentialType = state.scannedCredential.credentialType
         val credentialField = getString(mainViewModel.mapTypeToCredentialFieldResource(credentialType))
+        val currentEditTextValue = credentialEditText.text.toString()
         renderImage(state.scannedCredential)
+        credential.takeIf { currentEditTextValue.isEmpty() }?.let { credentialEditText.setText(it) /*Setting only once at the start*/ }
         documentTypeTitle.text = credentialField
-        credentialValue.text = credential
         credentialEditText.inputType = viewModel.getKeyBoardInputType()
-        credentialEditText.setText(credential)
         credentialEditText.hint = credentialField
+        credentialValue.text = currentEditTextValue
         confirmCredentialCheckbox.isVisible = state.searchState != SearchState.Searching
         confirmCredentialCheckbox.text = getString(IDR.string.mfid_confirmation_checkbox_text, credentialField)
         confirmCredentialCheckbox.isChecked = state.isConfirmed
@@ -101,7 +103,7 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
             viewModel.updateConfirmation(isConfirmed = false)
             toggleCredentialEdit()
             if (!isEditingCredential) {
-                viewModel.updateCredentialValue(credentialEditText.text.toString())
+                viewModel.confirmCredentialUpdate(credentialEditText.text.toString().asTokenizableRaw())
             }
         }
         confirmCredentialCheckbox.setOnCheckedChangeListener { _, checkedId ->

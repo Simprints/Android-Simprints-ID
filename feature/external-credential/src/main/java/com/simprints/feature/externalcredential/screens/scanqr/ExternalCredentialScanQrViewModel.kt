@@ -3,14 +3,25 @@ package com.simprints.feature.externalcredential.screens.scanqr
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.permission.PermissionStatus
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.externalcredential.screens.scanqr.usecase.ExternalCredentialQrCodeValidatorUseCase
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.config.sync.ConfigManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 internal class ExternalCredentialScanQrViewModel @Inject constructor(
-    private val externalCredentialQrCodeValidator: ExternalCredentialQrCodeValidatorUseCase
+    private val externalCredentialQrCodeValidator: ExternalCredentialQrCodeValidatorUseCase,
+    private val authStore: AuthStore,
+    private val configManager: ConfigManager,
+    private val tokenizationProcessor: TokenizationProcessor,
 ) : ViewModel() {
 
     private var state: ScanQrState = ScanQrState.ReadyToScan
@@ -26,11 +37,21 @@ internal class ExternalCredentialScanQrViewModel @Inject constructor(
     }
 
     fun updateCapturedValue(value: String?) {
-        val newState = when (value) {
-            null -> ScanQrState.ReadyToScan
-            else -> ScanQrState.QrCodeCaptured(value)
+        viewModelScope.launch {
+            val newState = when (value) {
+                null -> ScanQrState.ReadyToScan
+                else -> {
+                    val project = configManager.getProject(authStore.signedInProjectId)
+                    val qrCodeEncrypted = tokenizationProcessor.encrypt(
+                        decrypted = value.asTokenizableRaw(),
+                        tokenKeyType = TokenKeyType.ExternalCredential,
+                        project = project,
+                    ) as TokenizableString.Tokenized
+                    ScanQrState.QrCodeCaptured(qrCode = value.asTokenizableRaw(), qrCodeEncrypted = qrCodeEncrypted)
+                }
+            }
+            updateState { newState }
         }
-        updateState { newState }
     }
 
     fun updateCameraPermissionStatus(permissionStatus: PermissionStatus) {
@@ -42,5 +63,5 @@ internal class ExternalCredentialScanQrViewModel @Inject constructor(
         updateState { newState }
     }
 
-    fun isValidQrCodeFormat(qrCodeValue: String): Boolean = externalCredentialQrCodeValidator(qrCodeValue)
+    fun isValidQrCodeFormat(qrCodeValue: TokenizableString.Raw): Boolean = externalCredentialQrCodeValidator(qrCodeValue.value)
 }

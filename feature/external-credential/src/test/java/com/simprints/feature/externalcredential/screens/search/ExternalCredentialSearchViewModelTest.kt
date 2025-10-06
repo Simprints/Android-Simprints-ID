@@ -6,15 +6,19 @@ import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.externalcredential.screens.search.model.SearchState
-import com.simprints.feature.externalcredential.screens.search.usecase.FindSubjectsByCredentialUseCase
 import com.simprints.feature.externalcredential.screens.search.usecase.MatchCandidatesUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -39,9 +43,6 @@ internal class ExternalCredentialSearchViewModelTest {
     lateinit var configManager: ConfigManager
 
     @MockK
-    lateinit var findSubjectsByCredentialUseCase: FindSubjectsByCredentialUseCase
-
-    @MockK
     lateinit var matchCandidatesUseCase: MatchCandidatesUseCase
 
     @MockK
@@ -62,9 +63,14 @@ internal class ExternalCredentialSearchViewModelTest {
     @MockK
     lateinit var externalCredentialParams: ExternalCredentialParams
 
+    @MockK
+    private lateinit var tokenizationProcessor: TokenizationProcessor
+
+    @MockK
+    private lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
+
     private lateinit var viewModel: ExternalCredentialSearchViewModel
 
-    private val credential = "credential"
     private val projectId = "projectId"
 
     @Before
@@ -81,47 +87,74 @@ internal class ExternalCredentialSearchViewModelTest {
         externalCredentialParams = externalCredentialParams,
         authStore = authStore,
         configManager = configManager,
-        findSubjectsByCredentialUseCase = findSubjectsByCredentialUseCase,
-        matchCandidatesUseCase = matchCandidatesUseCase
+        matchCandidatesUseCase = matchCandidatesUseCase,
+        tokenizationProcessor = tokenizationProcessor,
+        enrolmentRecordRepository = enrolmentRecordRepository
     )
 
     @Test
     fun `initial state starts searching when credential not found`() = runTest {
-        coEvery { findSubjectsByCredentialUseCase(credential, project) } returns emptyList()
+        val decryptedCredential = mockk<TokenizableString.Raw>()
+        coEvery { tokenizationProcessor.decrypt(any(), TokenKeyType.ExternalCredential, project) } returns decryptedCredential
+        coEvery { enrolmentRecordRepository.load(any()) } returns emptyList()
+
+        viewModel = createViewModel()
         val observer = viewModel.stateLiveData.test()
+
         assertThat(observer.value()?.searchState).isEqualTo(SearchState.CredentialNotFound)
         assertThat(observer.value()?.scannedCredential).isEqualTo(scannedCredential)
         assertThat(observer.value()?.isConfirmed).isFalse()
+        assertThat(observer.value()?.displayedCredential).isEqualTo(decryptedCredential)
     }
 
     @Test
     fun `initial state searches and finds linked credential`() = runTest {
-        coEvery { findSubjectsByCredentialUseCase(any(), any()) } returns listOf(subject)
+        val decryptedCredential = mockk<TokenizableString.Raw>()
+        coEvery { tokenizationProcessor.decrypt(any(), TokenKeyType.ExternalCredential, project) } returns decryptedCredential
+        coEvery { enrolmentRecordRepository.load(any()) } returns listOf(subject)
         coEvery {
             matchCandidatesUseCase(any(), any(), any(), any(), any())
         } returns listOf(candidateMatch)
+
         viewModel = createViewModel()
-        val searchState = viewModel.stateLiveData.value.searchState as SearchState.CredentialLinked
+
+        val searchState = viewModel.stateLiveData.value?.searchState as SearchState.CredentialLinked
         assertThat(searchState.matchResults).hasSize(1)
         assertThat(searchState.matchResults.first()).isEqualTo(candidateMatch)
     }
 
     @Test
     fun `updateConfirmation updates isConfirmed state`() = runTest {
-        coEvery { findSubjectsByCredentialUseCase(credential, project) } returns emptyList()
+        val decryptedCredential = mockk<TokenizableString.Raw>()
+        coEvery { tokenizationProcessor.decrypt(any(), TokenKeyType.ExternalCredential, project) } returns decryptedCredential
+        coEvery { enrolmentRecordRepository.load(any()) } returns emptyList()
+
+        viewModel = createViewModel()
         val observer = viewModel.stateLiveData.test()
+
         viewModel.updateConfirmation(true)
         assertThat(observer.value()?.isConfirmed).isTrue()
         viewModel.updateConfirmation(false)
         assertThat(observer.value()?.isConfirmed).isFalse()
     }
 
-
     @Test
-    fun `updateCredentialValue triggers new search`() = runTest {
-        val newCredential = "newCredential"
-        viewModel.updateCredentialValue(newCredential)
-        coVerify { findSubjectsByCredentialUseCase(newCredential, any()) }
+    fun `confirmCredentialUpdate triggers new search and encrypts credential`() = runTest {
+        val decryptedCredential = mockk<TokenizableString.Raw>()
+        val newCredential = "newCredential".asTokenizableRaw()
+        val encryptedCredential = mockk<TokenizableString.Tokenized>()
+
+        coEvery { tokenizationProcessor.decrypt(any(), TokenKeyType.ExternalCredential, project) } returns decryptedCredential
+        coEvery { enrolmentRecordRepository.load(any()) } returns emptyList()
+        coEvery { tokenizationProcessor.encrypt(newCredential, TokenKeyType.ExternalCredential, project) } returns encryptedCredential
+
+        viewModel = createViewModel()
+
+        viewModel.confirmCredentialUpdate(newCredential)
+
+        coVerify { tokenizationProcessor.encrypt(newCredential, TokenKeyType.ExternalCredential, project) }
+        coVerify { enrolmentRecordRepository.load(match { it.externalCredential == encryptedCredential }) }
+        assertThat(viewModel.stateLiveData.value?.displayedCredential).isEqualTo(newCredential)
     }
 
     @Test
@@ -139,7 +172,7 @@ internal class ExternalCredentialSearchViewModelTest {
 
     @Test
     fun `getButtonTextResource returns 'continue' when credential linked and not verified and flow is IDENTIFY`() = runTest {
-        coEvery { findSubjectsByCredentialUseCase(credential, project) } returns emptyList()
+        coEvery { enrolmentRecordRepository.load(any()) } returns emptyList()
         val searchState = SearchState.CredentialLinked(listOf(candidateMatch))
         every { candidateMatch.isVerificationSuccessful } returns false
         val result = viewModel.getButtonTextResource(searchState, FlowType.IDENTIFY)
@@ -204,5 +237,20 @@ internal class ExternalCredentialSearchViewModelTest {
         assertThat(finishEvent?.matchResults).hasSize(1)
         assertThat(finishEvent?.matchResults?.first()).isEqualTo(candidateMatch)
         assertThat(finishEvent?.scannedCredential).isEqualTo(scannedCredential)
+    }
+
+    @Test
+    fun `decryptCredentialToDisplay updates displayedCredential state`() = runTest {
+        val encryptedCredential = mockk<TokenizableString.Tokenized>()
+        val decryptedCredential = "decryptedValue".asTokenizableRaw()
+
+        every { scannedCredential.credential } returns encryptedCredential
+        coEvery { tokenizationProcessor.decrypt(encryptedCredential, TokenKeyType.ExternalCredential, project) } returns decryptedCredential
+        coEvery { enrolmentRecordRepository.load(any()) } returns emptyList()
+
+        viewModel = createViewModel()
+
+        assertThat(viewModel.stateLiveData.value?.displayedCredential).isEqualTo(decryptedCredential)
+        coVerify { tokenizationProcessor.decrypt(encryptedCredential, TokenKeyType.ExternalCredential, project) }
     }
 }

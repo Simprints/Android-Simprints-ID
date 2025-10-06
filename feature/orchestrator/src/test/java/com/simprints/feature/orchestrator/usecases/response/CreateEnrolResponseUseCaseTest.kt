@@ -34,14 +34,10 @@ internal class CreateEnrolResponseUseCaseTest {
     lateinit var enrolSubject: EnrolSubjectUseCase
 
     @MockK
-    lateinit var tokenizationProcessor: TokenizationProcessor
-
-    @MockK
     lateinit var project: Project
 
     private val enrolmentSubjectId = "enrolmentSubjectId"
     private val projectId = "projectId"
-    private val credentialRaw = "credential".asTokenizableRaw()
     private val credentialEncrypted = "credentialEncrypted".asTokenizableEncrypted()
 
     private val action = mockk<ActionRequest.EnrolActionRequest> {
@@ -58,7 +54,7 @@ internal class CreateEnrolResponseUseCaseTest {
 
         coJustRun { enrolSubject.invoke(any(), any()) }
 
-        useCase = CreateEnrolResponseUseCase(subjectFactory, enrolSubject, tokenizationProcessor)
+        useCase = CreateEnrolResponseUseCase(subjectFactory, enrolSubject)
     }
 
     @Test
@@ -107,23 +103,15 @@ internal class CreateEnrolResponseUseCaseTest {
     }
 
     @Test
-    fun `processes external credential result and tokenizes credential`() = runTest {
+    fun `correctly processes external credential result`() = runTest {
         val externalCredentialType = ExternalCredentialType.GhanaIdCard
         val scannedCredentialMock = mockk<ScannedCredential>() {
-            every { credential } returns credentialRaw.value
+            every { credential } returns credentialEncrypted
             every { credentialType } returns externalCredentialType
         }
         val credentialSearchResult = mockk<ExternalCredentialSearchResult> {
             every { scannedCredential } returns scannedCredentialMock
         }
-
-        every {
-            tokenizationProcessor.encrypt(
-                decrypted = credentialRaw,
-                tokenKeyType = TokenKeyType.ExternalCredential,
-                project = project
-            )
-        } returns credentialEncrypted
 
         every {
             subjectFactory.buildSubjectFromCaptureResults(
@@ -147,13 +135,6 @@ internal class CreateEnrolResponseUseCaseTest {
             enrolmentSubjectId = enrolmentSubjectId
         )
 
-        verify {
-            tokenizationProcessor.encrypt(
-                decrypted = credentialRaw,
-                tokenKeyType = TokenKeyType.ExternalCredential,
-                project = project
-            )
-        }
         verify {
             subjectFactory.buildSubjectFromCaptureResults(
                 subjectId = enrolmentSubjectId,
@@ -166,66 +147,4 @@ internal class CreateEnrolResponseUseCaseTest {
             )
         }
     }
-
-    @Test
-    fun `handles failed tokenization and passes null external credential`() = runTest {
-        val externalCredentialType = ExternalCredentialType.GhanaIdCard
-        val scannedCredentialMock = mockk<ScannedCredential>() {
-            every { credential } returns credentialRaw.value
-            every { credentialType } returns externalCredentialType
-        }
-        val credentialSearchResult = mockk<ExternalCredentialSearchResult> {
-            every { scannedCredential } returns scannedCredentialMock
-        }
-
-        every {
-            tokenizationProcessor.encrypt(
-                decrypted = credentialRaw,
-                tokenKeyType = TokenKeyType.ExternalCredential,
-                project = project
-            )
-        } returns credentialRaw
-
-        every {
-            subjectFactory.buildSubjectFromCaptureResults(
-                subjectId = any(),
-                projectId = any(),
-                attendantId = any(),
-                moduleId = any(),
-                fingerprintResponse = any(),
-                faceResponse = any(),
-                externalCredential = any(),
-            )
-        } returns mockk { every { subjectId } returns enrolmentSubjectId }
-
-        useCase(
-            request = action,
-            results = listOf(
-                FingerprintCaptureResult("", emptyList()),
-                credentialSearchResult
-            ),
-            project = project,
-            enrolmentSubjectId = enrolmentSubjectId
-        )
-
-        verify {
-            tokenizationProcessor.encrypt(
-                decrypted = credentialRaw,
-                tokenKeyType = TokenKeyType.ExternalCredential,
-                project = project
-            )
-        }
-        verify {
-            subjectFactory.buildSubjectFromCaptureResults(
-                subjectId = enrolmentSubjectId,
-                projectId = projectId,
-                attendantId = any(),
-                moduleId = any(),
-                fingerprintResponse = any(),
-                faceResponse = null,
-                externalCredential = null
-            )
-        }
-    }
-
 }

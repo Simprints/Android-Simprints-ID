@@ -6,6 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DispatcherBG
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
@@ -20,6 +22,10 @@ import com.simprints.feature.externalcredential.screens.scanocr.usecase.SaveScan
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.SaveScannedImageUseCase.ScanImageType.ZoomedInCredential
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ZoomOntoCredentialUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.resources.R
@@ -37,6 +43,9 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     private val keepOnlyBestDetectedBlockUseCase: KeepOnlyBestDetectedBlockUseCase,
     private val saveScannedImageUseCase: SaveScannedImageUseCase,
     private val zoomOntoCredentialUseCase: ZoomOntoCredentialUseCase,
+    private val tokenizationProcessor: TokenizationProcessor,
+    private val authStore: AuthStore,
+    private val configManager: ConfigManager,
     @DispatcherBG private val bgDispatcher: CoroutineDispatcher
 ) : ViewModel() {
     @AssistedFactory
@@ -104,18 +113,24 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     fun processOcrResultsAndFinish() {
         updateState { ScanOcrState.Complete }
         viewModelScope.launch {
+            val project = configManager.getProject(authStore.signedInProjectId)
             val detectedBlock = keepOnlyBestDetectedBlockUseCase(detectedBlocks, ocrDocumentType)
             val credentialType = detectedBlock.documentType.mapToCredentialType()
             val blockBoundingBox = detectedBlock.blockBoundingBox
             val zoomedCredentialImagePath = buildZoomedImagePath(detectedBlock)
-            val credential = ScannedCredential(
-                credential = detectedBlock.readoutValue,
+            val credential = tokenizationProcessor.encrypt(
+                decrypted = detectedBlock.readoutValue.asTokenizableRaw(),
+                tokenKeyType = TokenKeyType.ExternalCredential,
+                project = project,
+            ) as TokenizableString.Tokenized
+            val scannedCredential = ScannedCredential(
+                credential = credential,
                 credentialType = credentialType,
                 documentImagePath = detectedBlock.imagePath,
                 zoomedCredentialImagePath = zoomedCredentialImagePath,
                 credentialBoundingBox = blockBoundingBox
             )
-            _finishOcrEvent.send(credential)
+            _finishOcrEvent.send(scannedCredential)
             detectedBlocks = emptyList()
         }
     }

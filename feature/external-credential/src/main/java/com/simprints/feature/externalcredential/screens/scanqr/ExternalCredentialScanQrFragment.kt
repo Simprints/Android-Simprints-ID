@@ -23,6 +23,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.extentions.getCurrentPermissionStatus
 import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.core.tools.extentions.permissionFromResult
@@ -128,16 +129,16 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
     }
 
     private fun renderScanComplete(state: ScanQrState.QrCodeCaptured) = with(binding) {
-        val qrCodeValue = state.qrCodeValue
+        val qrCodeRaw = state.qrCode
         qrInstructionsText.isVisible = false
         qrPreviewCard.isVisible = true
-        qrPreviewText.text = state.qrCodeValue
+        qrPreviewText.text = qrCodeRaw.value
         buttonScan.setText(IDR.string.mfid_continue)
         buttonScan.isEnabled = true
         buttonScan.setOnClickListener {
-            if (viewModel.isValidQrCodeFormat(qrCodeValue)) {
+            if (viewModel.isValidQrCodeFormat(qrCodeRaw)) {
                 val args = ScannedCredential(
-                    credential = qrCodeValue,
+                    credential = state.qrCodeEncrypted,
                     credentialType = ExternalCredentialType.QRCode,
                     documentImagePath = null,
                     credentialBoundingBox = null,
@@ -149,7 +150,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
                 )
             } else {
                 showInvalidQrCodeFormatDialog(
-                    qrCodeValue = qrCodeValue,
+                    qrCodeValue = qrCodeRaw,
                     onDismiss = {
                         dismissDialog()
                         viewModel.updateCapturedValue(null)
@@ -160,7 +161,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
     }
 
     private fun showInvalidQrCodeFormatDialog(
-        qrCodeValue: String,
+        qrCodeValue: TokenizableString.Raw,
         onDismiss: () -> Unit,
     ) {
         dismissDialog()
@@ -169,7 +170,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
                 .also { view ->
                     val qrValueTextView = view.findViewById<TextView>(R.id.qrValue)
                     val buttonRescan = view.findViewById<Button>(R.id.buttonRescan)
-                    qrValueTextView.text = qrCodeValue
+                    qrValueTextView.text = qrCodeValue.value
                     buttonRescan.setOnClickListener { dismissDialog() }
                 }
             it.setContentView(view)

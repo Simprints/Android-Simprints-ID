@@ -2,6 +2,7 @@ package com.simprints.feature.externalcredential.screens.search.usecase
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
@@ -76,7 +77,7 @@ internal class MatchCandidatesUseCaseTest {
     @MockK
     private lateinit var matcherSuccess: MatcherState.Success
 
-    private val credential = "credential"
+    private val credential = "credential".asTokenizableEncrypted()
     private val subjectId = "subjectId"
     private val probeReferenceId = "probeReferenceId"
     private val verificationMatchThreshold = 50.0f
