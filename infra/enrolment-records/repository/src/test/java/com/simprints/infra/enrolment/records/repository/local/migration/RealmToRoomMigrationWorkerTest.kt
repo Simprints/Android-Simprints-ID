@@ -1,6 +1,7 @@
 package com.simprints.infra.enrolment.records.repository.local.migration
 
 import android.content.Context
+import android.os.PowerManager
 import androidx.work.ListenableWorker.Result
 import androidx.work.WorkerParameters
 import com.google.common.truth.Truth.assertThat
@@ -13,6 +14,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.just
@@ -53,6 +55,10 @@ class RealmToRoomMigrationWorkerTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
+
+        every { appContext.getSystemService<PowerManager>(any()) } returns mockk {
+            every { isIgnoringBatteryOptimizations(any()) } returns true
+        }
     }
 
     @Test

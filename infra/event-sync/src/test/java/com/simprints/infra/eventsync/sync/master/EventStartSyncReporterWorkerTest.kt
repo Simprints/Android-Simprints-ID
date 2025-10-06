@@ -1,5 +1,6 @@
 package com.simprints.infra.eventsync.sync.master
 
+import android.os.PowerManager
 import androidx.work.ListenableWorker
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
@@ -20,7 +21,11 @@ class EventStartSyncReporterWorkerTest {
     val testCoroutineRule = TestCoroutineRule()
 
     private val startSyncReportWorker = EventStartSyncReporterWorker(
-        mockk(relaxed = true),
+        mockk(relaxed = true) {
+            every { getSystemService<PowerManager>(any()) } returns mockk {
+                every { isIgnoringBatteryOptimizations(any()) } returns true
+            }
+        },
         mockk(relaxed = true) {
             every { inputData } returns INPUT_DATA
         },

@@ -1,5 +1,6 @@
 package com.simprints.infra.sync.files
 
+import android.os.PowerManager
 import androidx.work.ListenableWorker.Result
 import com.google.common.truth.Truth
 import com.simprints.fingerprint.infra.imagedistortionconfig.ImageDistortionConfigRepo
@@ -46,7 +47,11 @@ class FileUpSyncWorkerTest {
         every { authStore.signedInProjectId } returns PROJECT_ID
 
         fileUpSyncWorker = FileUpSyncWorker(
-            mockk(relaxed = true),
+            mockk(relaxed = true) {
+                every { getSystemService<PowerManager>(any()) } returns mockk {
+                    every { isIgnoringBatteryOptimizations(any()) } returns true
+                }
+            },
             mockk(relaxed = true),
             imageRepository,
             imageDistortionConfigRepo,
@@ -162,10 +167,12 @@ class FileUpSyncWorkerTest {
 
         // Then
         coVerify(exactly = 1) { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID, any()) }
-        Truth.assertThat(progressValues).containsExactly(
-            2 to 10,
-            5 to 10,
-            10 to 10,
-        ).inOrder()
+        Truth
+            .assertThat(progressValues)
+            .containsExactly(
+                2 to 10,
+                5 to 10,
+                10 to 10,
+            ).inOrder()
     }
 }
