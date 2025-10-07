@@ -29,23 +29,15 @@ internal class CreateMatchParamsUseCase @Inject constructor() {
                 biometricDataSource = BiometricDataSource.Simprints, // [MS-1167] No CoSync in initial MF-ID implementation
             )
             when (modality) {
-                Modality.FACE -> {
-                    projectConfiguration.determineFaceSDKs(ageGroup).map { faceSDK ->
-                        template.copy(
-                            faceSDK = faceSDK,
-                            probeFaceSamples = faceSamples,
-                        )
-                    }
-                }
+                Modality.FACE ->
+                    projectConfiguration
+                        .determineFaceSDKs(ageGroup)
+                        .map { template.copy(faceSDK = it, probeFaceSamples = faceSamples) }
 
-                Modality.FINGERPRINT -> {
-                    projectConfiguration.determineFingerprintSDKs(ageGroup).map { fingerprintSDK ->
-                        template.copy(
-                            fingerprintSDK = fingerprintSDK,
-                            probeFingerprintSamples = fingerprintSamples,
-                        )
-                    }
-                }
+                Modality.FINGERPRINT ->
+                    projectConfiguration
+                        .determineFingerprintSDKs(ageGroup)
+                        .map { template.copy(fingerprintSDK = it, probeFingerprintSamples = fingerprintSamples) }
             }
         }.flatten()
 }
