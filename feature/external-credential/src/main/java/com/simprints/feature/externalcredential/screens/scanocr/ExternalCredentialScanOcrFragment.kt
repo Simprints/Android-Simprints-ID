@@ -2,7 +2,6 @@ package com.simprints.feature.externalcredential.screens.scanocr
 
 import android.Manifest.permission.CAMERA
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
@@ -201,14 +200,10 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         progressContainer.isVisible = true
         progressBar.isVisible = true
         iconScanComplete.alpha = 0f
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            progressBar.setProgress(progressPercentage, true)
-        } else {
-            progressBar.progress = progressPercentage
-        }
+        progressBar.setProgressCompat(progressPercentage, true)
         instructionsText.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_black))
         viewfinderMask.setMaskColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_white))
-        viewfinderMask.alpha = 0.9f
+        viewfinderMask.alpha = VIEW_FINDER_ALPHA_SCAN_ACTIVE
     }
 
     private fun renderInitialState() = with(binding) {
@@ -225,15 +220,14 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             startOcr()
         }
         viewfinderMask.setMaskColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_black))
-        viewfinderMask.alpha = 0.5f
+        viewfinderMask.alpha = VIEW_FINDER_ALPHA_INITIAL
     }
 
     private fun animateCompletionState() = with(binding) {
-        val duration = 300L
         isAnimatingCompletion = true
-        progressBar.fadeOut(duration, scaleX = true, fragment = this@ExternalCredentialScanOcrFragment)
-        scanInstructions.fadeOut(duration, scaleX = false, fragment = this@ExternalCredentialScanOcrFragment)
-        iconScanComplete.fadeIn(duration, fragment = this@ExternalCredentialScanOcrFragment, onComplete = {
+        progressBar.fadeOut(FINISH_ANIMATION_DURATION, scaleX = true, fragment = this@ExternalCredentialScanOcrFragment)
+        scanInstructions.fadeOut(FINISH_ANIMATION_DURATION, scaleX = false, fragment = this@ExternalCredentialScanOcrFragment)
+        iconScanComplete.fadeIn(FINISH_ANIMATION_DURATION, fragment = this@ExternalCredentialScanOcrFragment, onComplete = {
             isAnimatingCompletion = false
             // Execute any pending action after the animation. Currently used is for next fragment navigation
             pendingFinishAction?.invoke()
@@ -332,5 +326,11 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         } else {
             navigationAction.invoke()
         }
+    }
+
+    companion object {
+        private const val VIEW_FINDER_ALPHA_INITIAL = 0.5f
+        private const val VIEW_FINDER_ALPHA_SCAN_ACTIVE = 0.9f
+        private const val FINISH_ANIMATION_DURATION = 300L
     }
 }
