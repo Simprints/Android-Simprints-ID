@@ -63,6 +63,7 @@ fun ProjectConfiguration.isSampleUploadEnabledInProject(): Boolean = listOfNotNu
 
 fun ProjectConfiguration.allowedAgeRanges(): List<AgeGroup> = listOfNotNull(
     face?.rankOne?.allowedAgeRange,
+    face?.simFace?.allowedAgeRange,
     fingerprint?.secugenSimMatcher?.allowedAgeRange,
     fingerprint?.nec?.allowedAgeRange,
 )
