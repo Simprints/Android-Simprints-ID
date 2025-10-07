@@ -1,20 +1,19 @@
 package com.simprints.feature.externalcredential.screens.controller
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
-import io.mockk.mockk
-import com.simprints.infra.resources.R as IDR
+import io.mockk.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import com.simprints.infra.resources.R as IDR
 
 internal class ExternalCredentialViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -72,8 +71,8 @@ internal class ExternalCredentialViewModelTest {
         val observer = viewModel.stateLiveData.test()
         val subjectId = "subjectId"
         val flowType = FlowType.IDENTIFY
-        val params = emptyParams(subjectId = subjectId, flowType)
-        val paramsSecond = emptyParams(subjectId = "other", flowType)
+        val params = createParams(subjectId = subjectId, flowType)
+        val paramsSecond = createParams(subjectId = "other", flowType)
 
         viewModel.init(params)
         val firstState = observer.value()
@@ -95,12 +94,15 @@ internal class ExternalCredentialViewModelTest {
         assertThat(observer.value()?.peekContent()).isEqualTo(mockResult)
     }
 
-    private fun emptyParams(subjectId: String, flowType: FlowType) = ExternalCredentialParams(
+    private fun createParams(
+        subjectId: String,
+        flowType: FlowType,
+    ) = ExternalCredentialParams(
         subjectId = subjectId,
         flowType = flowType,
         ageGroup = null,
         probeReferenceId = null,
         faceSamples = emptyList(),
-        fingerprintSamples = emptyList()
+        fingerprintSamples = emptyList(),
     )
 }
