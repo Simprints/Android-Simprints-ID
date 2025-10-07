@@ -23,7 +23,6 @@ internal class ExternalCredentialScanQrViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val tokenizationProcessor: TokenizationProcessor,
 ) : ViewModel() {
-
     private var state: ScanQrState = ScanQrState.ReadyToScan
         set(value) {
             field = value

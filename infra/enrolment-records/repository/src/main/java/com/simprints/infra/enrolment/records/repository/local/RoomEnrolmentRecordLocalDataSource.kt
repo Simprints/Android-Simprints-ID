@@ -307,7 +307,8 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             require(
                 referencesToDelete.size != dbSubject.biometricTemplates.size ||
                     action.faceSamplesToAdd.isNotEmpty() ||
-                    action.fingerprintSamplesToAdd.isNotEmpty(),
+                    action.fingerprintSamplesToAdd.isNotEmpty() ||
+                    action.externalCredentialsToAdd.isNotEmpty()
             ) {
                 val errorMsg =
                     "Cannot delete all samples for subject ${action.subjectId} without adding new ones"

@@ -8,13 +8,11 @@ import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import io.mockk.mockk
-import com.simprints.infra.resources.R as IDR
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 internal class ExternalCredentialViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -47,16 +45,6 @@ internal class ExternalCredentialViewModelTest {
         viewModel.setSelectedExternalCredentialType(null)
 
         assertThat(observer.value()?.selectedType).isNull()
-    }
-
-    @Test
-    fun `mapTypeToStringResource returns correct string ids`() {
-        assertThat(viewModel.mapTypeToStringResource(ExternalCredentialType.NHISCard))
-            .isEqualTo(IDR.string.mfid_type_nhis_card)
-        assertThat(viewModel.mapTypeToStringResource(ExternalCredentialType.GhanaIdCard))
-            .isEqualTo(IDR.string.mfid_type_ghana_id_card)
-        assertThat(viewModel.mapTypeToStringResource(ExternalCredentialType.QRCode))
-            .isEqualTo(IDR.string.mfid_type_qr_code)
     }
 
     @Test
@@ -95,12 +83,15 @@ internal class ExternalCredentialViewModelTest {
         assertThat(observer.value()?.peekContent()).isEqualTo(mockResult)
     }
 
-    private fun emptyParams(subjectId: String, flowType: FlowType) = ExternalCredentialParams(
+    private fun emptyParams(
+        subjectId: String,
+        flowType: FlowType,
+    ) = ExternalCredentialParams(
         subjectId = subjectId,
         flowType = flowType,
         ageGroup = null,
         probeReferenceId = null,
         faceSamples = emptyList(),
-        fingerprintSamples = emptyList()
+        fingerprintSamples = emptyList(),
     )
 }

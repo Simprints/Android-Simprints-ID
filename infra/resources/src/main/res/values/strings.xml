@@ -516,6 +516,8 @@
     <string name="mfid_action_go_to_record">Go to record</string>
     <string name="mfid_action_enrol">Enrol</string>
     <string name="mfid_action_enrol_anyway">Enrol anyway</string>
+    <string name="mfid_action_add">Add</string>
+    <string name="mfid_action_skip">Skip</string>
     <string name="mfid_action_continue">Continue</string>
     <string name="mfid_searching">Searching…</string>
 
@@ -523,6 +525,8 @@
     <string name="mfid_search_found_identification">Record found</string>
     <string name="mfid_search_found_identification_low_match_score">This %1$s might be linked to another patient</string>
     <string name="mfid_search_not_found_identification">No record is found with this %1$s. You wil be able to link this %2$s to a patient later</string>
+
+    <string name="mfid_add_document_title">Add this %1$s?</string>
 
 
 

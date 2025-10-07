@@ -232,7 +232,7 @@ class ProjectConfigurationTest {
         val config = projectConfiguration.copy(
             synchronization = synchronizationConfiguration.copy(
                 down = synchronizationConfiguration.down.copy(
-                    simprints = null
+                    simprints = null,
                 ),
             ),
         )
@@ -245,7 +245,7 @@ class ProjectConfigurationTest {
         val config = projectConfiguration.copy(
             synchronization = synchronizationConfiguration.copy(
                 down = synchronizationConfiguration.down.copy(
-                    commCare = DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration
+                    commCare = DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration,
                 ),
             ),
         )
@@ -258,7 +258,7 @@ class ProjectConfigurationTest {
         val config = projectConfiguration.copy(
             synchronization = synchronizationConfiguration.copy(
                 down = synchronizationConfiguration.down.copy(
-                    commCare = null
+                    commCare = null,
                 ),
             ),
         )
@@ -695,7 +695,10 @@ class ProjectConfigurationTest {
         ),
     )
 
-    private fun createAgeRestrictedFaceConfig(rankOneRange: AgeGroup, simFaceRange: AgeGroup) = projectConfiguration.copy(
+    private fun createAgeRestrictedFaceConfig(
+        rankOneRange: AgeGroup,
+        simFaceRange: AgeGroup,
+    ) = projectConfiguration.copy(
         face = faceConfiguration.copy(
             rankOne = faceSdkConfiguration.copy(allowedAgeRange = rankOneRange),
             simFace = faceSdkConfiguration.copy(allowedAgeRange = simFaceRange),
@@ -710,7 +713,10 @@ class ProjectConfigurationTest {
         ),
     )
 
-    private fun createAgeRestrictedFingerprintConfig(secugenRange: AgeGroup, necRange: AgeGroup) = projectConfiguration.copy(
+    private fun createAgeRestrictedFingerprintConfig(
+        secugenRange: AgeGroup,
+        necRange: AgeGroup,
+    ) = projectConfiguration.copy(
         fingerprint = fingerprintConfiguration.copy(
             secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = secugenRange),
             nec = fingerprintConfiguration.nec?.copy(allowedAgeRange = necRange),

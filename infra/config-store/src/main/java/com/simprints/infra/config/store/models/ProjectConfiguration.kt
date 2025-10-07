@@ -38,8 +38,7 @@ fun ProjectConfiguration.canSyncBiometricDataToSimprints(): Boolean =
 fun ProjectConfiguration.canSyncAnalyticsDataToSimprints(): Boolean =
     synchronization.up.simprints.kind == UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
 
-fun ProjectConfiguration.isSimprintsEventDownSyncAllowed(): Boolean =
-    synchronization.down.simprints != null &&
+fun ProjectConfiguration.isSimprintsEventDownSyncAllowed(): Boolean = synchronization.down.simprints != null &&
     synchronization.down.simprints.frequency != Frequency.ONLY_PERIODICALLY_UP_SYNC
 
 fun ProjectConfiguration.isCommCareEventDownSyncAllowed(): Boolean = synchronization.down.commCare != null
@@ -89,9 +88,7 @@ fun ProjectConfiguration.isProjectWithPeriodicallyUpSync(): Boolean =
 
 fun ProjectConfiguration.isModuleSelectionAvailable(): Boolean = isProjectWithModuleSync() && !isProjectWithPeriodicallyUpSync()
 
-fun ProjectConfiguration.determineFaceSDKs(
-    ageGroup: AgeGroup?
-): List<FaceConfiguration.BioSdk> {
+fun ProjectConfiguration.determineFaceSDKs(ageGroup: AgeGroup?): List<FaceConfiguration.BioSdk> {
     if (!isAgeRestricted()) {
         return face?.allowedSDKs.orEmpty()
     }
@@ -108,9 +105,7 @@ fun ProjectConfiguration.determineFaceSDKs(
     }
 }
 
-fun ProjectConfiguration.determineFingerprintSDKs(
-    ageGroup: AgeGroup?
-): List<FingerprintConfiguration.BioSdk> {
+fun ProjectConfiguration.determineFingerprintSDKs(ageGroup: AgeGroup?): List<FingerprintConfiguration.BioSdk> {
     if (!isAgeRestricted()) {
         return fingerprint?.allowedSDKs.orEmpty()
     }

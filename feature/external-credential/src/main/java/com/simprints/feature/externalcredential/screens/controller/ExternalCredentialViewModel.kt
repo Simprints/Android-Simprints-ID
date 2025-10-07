@@ -14,7 +14,6 @@ import com.simprints.infra.resources.R as IDR
 
 @HiltViewModel
 internal class ExternalCredentialViewModel @Inject internal constructor() : ViewModel() {
-
     private var isInitialized = false
     lateinit var params: ExternalCredentialParams
         private set
@@ -47,20 +46,6 @@ internal class ExternalCredentialViewModel @Inject internal constructor() : View
             this.params = params
             updateState { ExternalCredentialState.EMPTY.copy(subjectId = params.subjectId, flowType = params.flowType) }
         }
-    }
-
-
-    fun mapTypeToStringResource(type: ExternalCredentialType?) = when (type) {
-        ExternalCredentialType.NHISCard -> IDR.string.mfid_type_nhis_card
-        ExternalCredentialType.GhanaIdCard -> IDR.string.mfid_type_ghana_id_card
-        ExternalCredentialType.QRCode -> IDR.string.mfid_type_qr_code
-        null -> IDR.string.mfid_type_any_document
-    }
-
-    fun mapTypeToCredentialFieldResource(type: ExternalCredentialType) = when (type) {
-        ExternalCredentialType.NHISCard -> IDR.string.mfid_nhis_card_credential_field
-        ExternalCredentialType.GhanaIdCard -> IDR.string.mfid_ghana_id_credential_field
-        ExternalCredentialType.QRCode -> IDR.string.mfid_qr_credential_field
     }
 
     fun finish(result: ExternalCredentialSearchResult) {

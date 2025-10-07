@@ -14,7 +14,7 @@ data class CredentialMatch(
     val matchResult: MatchResultItem,
     val verificationThreshold: Float,
     val faceBioSdk: FaceConfiguration.BioSdk?,
-    val fingerprintBioSdk: FingerprintConfiguration.BioSdk?
+    val fingerprintBioSdk: FingerprintConfiguration.BioSdk?,
 ) {
     val isVerificationSuccessful = matchResult.confidence >= verificationThreshold
 }

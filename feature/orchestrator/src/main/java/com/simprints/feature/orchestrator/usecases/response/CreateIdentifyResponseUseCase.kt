@@ -2,15 +2,20 @@ package com.simprints.feature.orchestrator.usecases.response
 
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.matching.FaceMatchResult
 import com.simprints.infra.matching.FingerprintMatchResult
+import com.simprints.infra.matching.MatchResultItem
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.orchestration.data.responses.AppResponse
 import java.io.Serializable
 import javax.inject.Inject
+import kotlin.collections.ifEmpty
+import kotlin.collections.map
+import kotlin.collections.take
 
 internal class CreateIdentifyResponseUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
@@ -19,8 +24,8 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
         projectConfiguration: ProjectConfiguration,
         results: List<Serializable>,
     ): AppResponse {
-        val credentialFaceMatchResults = credentialResultsMapper(results, isFace = true)
-        val credentialFingerprintMatchResults = credentialResultsMapper(results, isFace = false)
+        val credentialFaceMatchResults = credentialResultsMapper(results, projectConfiguration, isFace = true)
+        val credentialFingerprintMatchResults = credentialResultsMapper(results, projectConfiguration, isFace = false)
 
         val currentSessionId = eventRepository.getCurrentSessionScope().id
 
@@ -49,16 +54,7 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
             ?.getSdkConfiguration(fingerprintMatchResult.sdk)
             ?.decisionPolicy
             ?.let { fingerprintDecisionPolicy ->
-                val matches = fingerprintMatchResult.results
-                val goodResults = matches
-                    .filter { it.confidence >= fingerprintDecisionPolicy.low }
-                    .sortedByDescending { it.confidence }
-                // Attempt to include only high confidence matches
-                goodResults
-                    .filter { it.confidence >= fingerprintDecisionPolicy.high }
-                    .ifEmpty { goodResults }
-                    .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
-                    .map { AppMatchResult(it.subjectId, it.confidence, fingerprintDecisionPolicy) }
+                fingerprintMatchResult.results.mapToMatchResults(fingerprintDecisionPolicy, projectConfiguration)
             }
     } ?: emptyList()
 
@@ -70,18 +66,24 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
             ?.getSdkConfiguration(faceMatchResult.sdk)
             ?.decisionPolicy
             ?.let { faceDecisionPolicy ->
-                val matches = faceMatchResult.results
-                val goodResults = matches
-                    .filter { it.confidence >= faceDecisionPolicy.low }
-                    .sortedByDescending { it.confidence }
-                // Attempt to include only high confidence matches
-                goodResults
-                    .filter { it.confidence >= faceDecisionPolicy.high }
-                    .ifEmpty { goodResults }
-                    .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
-                    .map { AppMatchResult(it.subjectId, it.confidence, faceDecisionPolicy) }
+                faceMatchResult.results.mapToMatchResults(faceDecisionPolicy, projectConfiguration)
             }
     } ?: emptyList()
+
+    private fun List<MatchResultItem>.mapToMatchResults(
+        decisionPolicy: DecisionPolicy,
+        projectConfiguration: ProjectConfiguration,
+    ): List<AppMatchResult> {
+        val goodResults = this
+            .filter { it.confidence >= decisionPolicy.low }
+            .sortedByDescending { it.confidence }
+        // Attempt to include only high confidence matches
+        return goodResults
+            .filter { it.confidence >= decisionPolicy.high }
+            .ifEmpty { goodResults }
+            .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
+            .map { AppMatchResult(it.subjectId, it.confidence, decisionPolicy) }
+    }
 
     /**
      * Checks if any of the [results] items is an instance of [ExternalCredentialSearchResult]. If such item is found, then returns a list
@@ -92,25 +94,32 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
      */
     private fun credentialResultsMapper(
         results: List<Serializable>,
+        projectConfiguration: ProjectConfiguration,
         isFace: Boolean,
-    ): List<AppMatchResult> = results.filterIsInstance<ExternalCredentialSearchResult>()
+    ) = results
+        .filterIsInstance<ExternalCredentialSearchResult>()
         .firstOrNull()
-        ?.matchResults
-        ?.filter {
-            if (isFace) {
-                it.faceBioSdk != null
+        ?.let { credentialSearchResult ->
+            val credentialMatchItems = credentialSearchResult.matchResults.map { it.matchResult }
+            val faceMatchItems = credentialMatchItems.filterIsInstance<FaceMatchResult.Item>()
+            val fingerMatchItems = credentialMatchItems.filterIsInstance<FingerprintMatchResult.Item>()
+            val decisionPolicy = if (isFace) {
+                credentialSearchResult.matchResults.find { it.faceBioSdk != null }?.faceBioSdk?.let { sdk ->
+                    projectConfiguration.face
+                        ?.getSdkConfiguration(sdk)
+                        ?.decisionPolicy
+                }
             } else {
-                it.fingerprintBioSdk != null
+                credentialSearchResult.matchResults.find { it.fingerprintBioSdk != null }?.fingerprintBioSdk?.let { sdk ->
+                    projectConfiguration.fingerprint
+                        ?.getSdkConfiguration(sdk)
+                        ?.decisionPolicy
+                }
             }
-        }
-        ?.map {
-            AppMatchResult(
-                guid = it.matchResult.subjectId,
-                confidenceScore = it.matchResult.confidence.toInt(),
-                matchConfidence = AppMatchConfidence.HIGH,
-                verificationSuccess = true
-            )
-        }
-        ?.sortedByDescending(AppMatchResult::confidenceScore)
-        .orEmpty()
+            if (decisionPolicy == null) return@let emptyList()
+            val matches = if (isFace) faceMatchItems else fingerMatchItems
+            return@let matches
+                .mapToMatchResults(decisionPolicy, projectConfiguration)
+                .sortedByDescending(AppMatchResult::confidenceScore)
+        }.orEmpty()
 }

@@ -73,6 +73,7 @@ import java.io.Serializable
     JsonSubTypes.Type(value = ExitFormResult::class, name = "ExitFormResult"),
     JsonSubTypes.Type(value = ValidateSubjectPoolResult::class, name = "ValidateSubjectPoolResult"),
     JsonSubTypes.Type(value = SelectSubjectAgeGroupResult::class, name = "SelectSubjectAgeGroupResult"),
+    JsonSubTypes.Type(value = ExternalCredentialSearchResult::class, name = "ExternalCredentialSearchResult"),
 )
 abstract class StepResultMixin : StepResult
 

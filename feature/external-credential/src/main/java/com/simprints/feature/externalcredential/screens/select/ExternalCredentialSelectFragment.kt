@@ -15,6 +15,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialSelectBinding
+import com.simprints.feature.externalcredential.ext.getCredentialTypeRes
 import com.simprints.feature.externalcredential.ext.getQuantityCredentialString
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
@@ -75,7 +76,7 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
     private fun initViews(types: List<ExternalCredentialType>) {
         binding.title.text = resources.getQuantityCredentialString(
             id = IDR.plurals.mfid_scan_action,
-            specificCredentialRes = mainViewModel.mapTypeToStringResource(types.firstOrNull()),
+            specificCredentialRes = resources.getCredentialTypeRes(types.firstOrNull()),
             multipleCredentialsRes = IDR.string.mfid_type_any_document,
             credentialTypes = types,
         )
@@ -136,7 +137,7 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
                     bodyText.text = resources.getQuantityCredentialString(
                         id = IDR.plurals.mfid_dialog_skip_scan_body,
                         credentialTypes = credentialTypes,
-                        specificCredentialRes = mainViewModel.mapTypeToStringResource(credentialTypes.firstOrNull()),
+                        specificCredentialRes = resources.getCredentialTypeRes(credentialTypes.firstOrNull()),
                         multipleCredentialsRes = IDR.string.mfid_type_any_document
                     )
 

@@ -37,15 +37,13 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
     private val tokenizationProcessor: TokenizationProcessor,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
 ) : ViewModel() {
-
     @AssistedFactory
     interface Factory {
         fun create(
             scannedCredential: ScannedCredential,
-            externalCredentialParams: ExternalCredentialParams
+            externalCredentialParams: ExternalCredentialParams,
         ): ExternalCredentialSearchViewModel
     }
-
 
     val finishEvent: LiveData<LiveDataEventWithContent<ExternalCredentialSearchResult>>
         get() = _finishEvent
@@ -58,6 +56,7 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         }
     private val _stateLiveData = MutableLiveData(state)
     val stateLiveData: LiveData<SearchCredentialState> = _stateLiveData
+
     private fun updateState(state: (SearchCredentialState) -> SearchCredentialState) {
         this.state = state(this.state)
     }
@@ -85,34 +84,36 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
                 currentState.copy(
                     isConfirmed = false,
                     scannedCredential = currentState.scannedCredential.copy(
-                        credential = encryptedCredential
+                        credential = encryptedCredential,
                     ),
-                    displayedCredential = updatedCredential
+                    displayedCredential = updatedCredential,
                 )
             }
             searchSubjectsLinkedToCredential(encryptedCredential)
         }
     }
 
-    fun getButtonTextResource(searchState: SearchState, flowType: FlowType): Int? =
-        when (searchState) {
-            SearchState.Searching -> null // button is not displayed during search
-            is SearchState.CredentialLinked -> when (flowType) {
-                FlowType.ENROL -> IDR.string.mfid_action_enrol_anyway
-                else -> {
-                    if (searchState.hasSuccessfulVerifications) {
-                        IDR.string.mfid_action_go_to_record
-                    } else {
-                        IDR.string.mfid_action_continue
-                    }
+    fun getButtonTextResource(
+        searchState: SearchState,
+        flowType: FlowType,
+    ): Int? = when (searchState) {
+        SearchState.Searching -> null // button is not displayed during search
+        is SearchState.CredentialLinked -> when (flowType) {
+            FlowType.ENROL -> IDR.string.mfid_action_enrol_anyway
+            else -> {
+                if (searchState.hasSuccessfulVerifications) {
+                    IDR.string.mfid_action_go_to_record
+                } else {
+                    IDR.string.mfid_action_continue
                 }
             }
-
-            SearchState.CredentialNotFound -> when (flowType) {
-                FlowType.ENROL -> IDR.string.mfid_action_enrol
-                else -> IDR.string.mfid_continue
-            }
         }
+
+        SearchState.CredentialNotFound -> when (flowType) {
+            FlowType.ENROL -> IDR.string.mfid_action_enrol
+            else -> IDR.string.mfid_continue
+        }
+    }
 
     private suspend fun decryptCredentialToDisplay(credential: TokenizableString.Tokenized) {
         val project = configManager.getProject(authStore.signedInProjectId)
@@ -151,7 +152,8 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
     fun finish(searchState: SearchState) {
         val matches = when (searchState) {
             SearchState.Searching,
-            SearchState.CredentialNotFound -> emptyList()
+            SearchState.CredentialNotFound,
+            -> emptyList()
 
             is SearchState.CredentialLinked -> searchState.matchResults
         }
@@ -160,8 +162,7 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
                 flowType = externalCredentialParams.flowType,
                 scannedCredential = scannedCredential,
                 matchResults = matches,
-            )
+            ),
         )
     }
-
 }

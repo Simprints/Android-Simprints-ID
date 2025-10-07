@@ -150,6 +150,15 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+
+    <style name="Text.Headline5.Blue">
+        <item name="android:textColor">@color/simprints_blue</item>
+    </style>
+
+    <style name="Text.Headline5.Blue.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <!-- H6 variants -->
 
     <style name="Text.Headline6" parent="Widget.MaterialComponents.TextView">

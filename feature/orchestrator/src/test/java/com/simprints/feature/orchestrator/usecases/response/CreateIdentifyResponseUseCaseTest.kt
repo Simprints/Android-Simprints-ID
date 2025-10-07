@@ -7,9 +7,9 @@ import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.events.session.SessionEventRepository
-import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.matching.FaceMatchResult
 import com.simprints.infra.matching.FingerprintMatchResult
+import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -200,44 +200,45 @@ class CreateIdentifyResponseUseCaseTest {
         val (faceBigConfidence, bigConfidence) = "faceBigConfidence" to 99f
         val faceMatches = listOf<CredentialMatch>(
             mockk {
-                every { matchResult } returns mockk {
-                    every { subjectId } returns faceSmallConfidence
-                    every { confidence } returns smallConfidence
-                }
+                every { matchResult } returns FaceMatchResult.Item(
+                    subjectId = faceSmallConfidence,
+                    confidence = smallConfidence,
+                )
                 every { faceBioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
                 every { fingerprintBioSdk } returns null
             },
             mockk {
-                every { matchResult } returns mockk {
-                    every { subjectId } returns faceBigConfidence
-                    every { confidence } returns bigConfidence
-                }
+                every { matchResult } returns FaceMatchResult.Item(
+                    subjectId = faceBigConfidence,
+                    confidence = bigConfidence,
+                )
                 every { faceBioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
                 every { fingerprintBioSdk } returns null
-            }
+            },
         )
 
         val fingerprintMatches = listOf<CredentialMatch>(
             mockk {
-                every { matchResult } returns mockk {
-                    every { subjectId } returns "fingerprint"
-                    every { confidence } returns 90f
-                }
+                every { matchResult } returns FingerprintMatchResult.Item(
+                    subjectId = "fingerprintSubjectId",
+                    confidence = 90f,
+                )
                 every { faceBioSdk } returns null
                 every { fingerprintBioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
-            }
+            },
         )
 
         val result = useCase(
             mockk {
                 every { identification.maxNbOfReturnedCandidates } returns 5
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns null
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
+                every { face?.getSdkConfiguration(FaceConfiguration.BioSdk.RANK_ONE)?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { fingerprint?.getSdkConfiguration(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)?.decisionPolicy } returns
+                    DecisionPolicy(20, 50, 100)
             },
             results = listOf(
                 mockk<ExternalCredentialSearchResult> {
                     every { matchResults } returns faceMatches + fingerprintMatches
-                }
+                },
             ),
         )
 
@@ -245,50 +246,52 @@ class CreateIdentifyResponseUseCaseTest {
         assertThat(result.identifications.map { it.guid }).isEqualTo(listOf(faceBigConfidence, faceSmallConfidence))
         assertThat(result.identifications.map { it.confidenceScore }).isEqualTo(listOf(bigConfidence.toInt(), smallConfidence.toInt()))
     }
+
     @Test
     fun `Returns only fingerprint credential results sorted by confidence descending`() = runTest {
         val (fingerprintSmallConfidence, smallConfidence) = "fingerprintSmallConfidence" to 50f
         val (fingerprintBigConfidence, bigConfidence) = "fingerprintBigConfidence" to 99f
         val fingerprintMatches = listOf<CredentialMatch>(
             mockk {
-                every { matchResult } returns mockk {
-                    every { subjectId } returns fingerprintSmallConfidence
-                    every { confidence } returns smallConfidence
-                }
+                every { matchResult } returns FingerprintMatchResult.Item(
+                    subjectId = fingerprintSmallConfidence,
+                    confidence = smallConfidence,
+                )
                 every { faceBioSdk } returns null
                 every { fingerprintBioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
             },
             mockk {
-                every { matchResult } returns mockk {
-                    every { subjectId } returns fingerprintBigConfidence
-                    every { confidence } returns bigConfidence
-                }
+                every { matchResult } returns FingerprintMatchResult.Item(
+                    subjectId = fingerprintBigConfidence,
+                    confidence = bigConfidence,
+                )
                 every { faceBioSdk } returns null
                 every { fingerprintBioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
-            }
+            },
         )
 
         val faceMatches = listOf<CredentialMatch>(
             mockk {
-                every { matchResult } returns mockk {
-                    every { subjectId } returns "face1"
-                    every { confidence } returns 90f
-                }
+                every { matchResult } returns FaceMatchResult.Item(
+                    subjectId = "faceSubjectId",
+                    confidence = 90f,
+                )
                 every { faceBioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
                 every { fingerprintBioSdk } returns null
-            }
+            },
         )
 
         val result = useCase(
             mockk {
                 every { identification.maxNbOfReturnedCandidates } returns 5
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns null
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
+                every { face?.getSdkConfiguration(FaceConfiguration.BioSdk.RANK_ONE)?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { fingerprint?.getSdkConfiguration(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)?.decisionPolicy } returns
+                    DecisionPolicy(20, 50, 100)
             },
             results = listOf(
                 mockk<ExternalCredentialSearchResult> {
                     every { matchResults } returns fingerprintMatches + faceMatches
-                }
+                },
             ),
         )
 
@@ -305,19 +308,19 @@ class CreateIdentifyResponseUseCaseTest {
 
         val credentialFaceMatches = listOf<CredentialMatch>(
             mockk {
-                every { matchResult } returns mockk {
-                    every { subjectId } returns sharedGuid
-                    every { confidence } returns credentialConfidence
-                }
+                every { matchResult } returns FaceMatchResult.Item(
+                    subjectId = sharedGuid,
+                    confidence = credentialConfidence,
+                )
                 every { faceBioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
                 every { fingerprintBioSdk } returns null
-            }
+            },
         )
 
         val result = useCase(
             mockk {
                 every { identification.maxNbOfReturnedCandidates } returns 5
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { face?.getSdkConfiguration(FaceConfiguration.BioSdk.RANK_ONE)?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
             },
             results = listOf(
@@ -326,10 +329,10 @@ class CreateIdentifyResponseUseCaseTest {
                 },
                 FaceMatchResult(
                     listOf(
-                        FaceMatchResult.Item(subjectId = sharedGuid, confidence = faceConfidence)
+                        FaceMatchResult.Item(subjectId = sharedGuid, confidence = faceConfidence),
                     ),
                     FaceConfiguration.BioSdk.RANK_ONE,
-                )
+                ),
             ),
         )
 
@@ -346,20 +349,21 @@ class CreateIdentifyResponseUseCaseTest {
 
         val credentialFingerprintMatches = listOf<CredentialMatch>(
             mockk {
-                every { matchResult } returns mockk {
-                    every { subjectId } returns sharedGuid
-                    every { confidence } returns credentialConfidence
-                }
+                every { matchResult } returns FingerprintMatchResult.Item(
+                    subjectId = sharedGuid,
+                    confidence = credentialConfidence,
+                )
                 every { faceBioSdk } returns null
                 every { fingerprintBioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
-            }
+            },
         )
 
         val result = useCase(
             mockk {
                 every { identification.maxNbOfReturnedCandidates } returns 5
                 every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns null
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { fingerprint?.getSdkConfiguration(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)?.decisionPolicy } returns
+                    DecisionPolicy(20, 50, 100)
             },
             results = listOf(
                 mockk<ExternalCredentialSearchResult> {
@@ -367,10 +371,10 @@ class CreateIdentifyResponseUseCaseTest {
                 },
                 FingerprintMatchResult(
                     listOf(
-                        FingerprintMatchResult.Item(subjectId = sharedGuid, confidence = fingerprintConfidence)
+                        FingerprintMatchResult.Item(subjectId = sharedGuid, confidence = fingerprintConfidence),
                     ),
                     FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
-                )
+                ),
             ),
         )
 
