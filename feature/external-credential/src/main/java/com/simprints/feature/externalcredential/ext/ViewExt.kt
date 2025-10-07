@@ -30,8 +30,8 @@ fun View.fadeOut(
 @ExcludedFromGeneratedTestCoverageReports("View animation")
 fun View.fadeIn(
     duration: Long,
-    onComplete: (() -> Unit)?,
     fragment: Fragment,
+    onComplete: (() -> Unit)?,
 ) = animate()
     .alpha(1f)
     .setInterpolator(AccelerateInterpolator())
