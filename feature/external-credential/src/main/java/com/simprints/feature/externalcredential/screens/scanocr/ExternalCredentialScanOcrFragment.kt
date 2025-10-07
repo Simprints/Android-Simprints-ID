@@ -29,8 +29,8 @@ import com.simprints.core.tools.extentions.getCurrentPermissionStatus
 import com.simprints.core.tools.extentions.permissionFromResult
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialScanOcrBinding
-import com.simprints.feature.externalcredential.ext.animateIn
-import com.simprints.feature.externalcredential.ext.animateOut
+import com.simprints.feature.externalcredential.ext.fadeIn
+import com.simprints.feature.externalcredential.ext.fadeOut
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.BuildOcrCropConfigUseCase
@@ -96,7 +96,10 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     @DispatcherBG
     lateinit var bgDispatcher: CoroutineDispatcher
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         applySystemBarInsets(view)
         Simber.i("ExternalCredentialScanOcrFragment started", tag = MULTI_FACTOR_ID)
@@ -124,7 +127,6 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
                 renderNoPermission(shouldOpenPhoneSettings = true)
             }
         }
-
     }
 
     override fun onDestroy() {
@@ -148,7 +150,6 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
                 startOcr()
             }
         })
-
     }
 
     private fun initObservers() {
@@ -171,7 +172,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             viewLifecycleOwner,
             LiveDataEventWithContentObserver { scannedCredential ->
                 scheduleFinish(scannedCredential)
-            }
+            },
         )
     }
 
@@ -189,7 +190,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             onImageAnalysisReady = {
                 imageAnalysis = it
                 onComplete()
-            }
+            },
         )
         cameraProviderFuture.addListener(cameraListener, ContextCompat.getMainExecutor(requireContext()))
     }
@@ -230,9 +231,9 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     private fun animateCompletionState() = with(binding) {
         val duration = 300L
         isAnimatingCompletion = true
-        progressBar.animateOut(duration, scaleX = true, fragment = this@ExternalCredentialScanOcrFragment)
-        scanInstructions.animateOut(duration, scaleX = false, fragment = this@ExternalCredentialScanOcrFragment)
-        iconScanComplete.animateIn(duration, fragment = this@ExternalCredentialScanOcrFragment, onComplete = {
+        progressBar.fadeOut(duration, scaleX = true, fragment = this@ExternalCredentialScanOcrFragment)
+        scanInstructions.fadeOut(duration, scaleX = false, fragment = this@ExternalCredentialScanOcrFragment)
+        iconScanComplete.fadeIn(duration, fragment = this@ExternalCredentialScanOcrFragment, onComplete = {
             isAnimatingCompletion = false
             // Execute any pending action after the animation. Currently used is for next fragment navigation
             pendingFinishAction?.invoke()
@@ -260,7 +261,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
                                 "package:${requireActivity().packageName}".toUri(),
                             ),
                         )
-                    }
+                    },
                 )
             } else {
                 permissionRequestView.init(
@@ -269,7 +270,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
                     buttonText = IDR.string.face_capture_permission_action,
                     onClickListener = {
                         launchPermissionRequest.launch(CAMERA)
-                    }
+                    },
                 )
             }
             permissionRequestView.isVisible = true
@@ -289,7 +290,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
                     val cropConfig: OcrCropConfig = buildOcrCropConfigUseCase(
                         rotationDegrees = imageInfo.rotationDegrees,
                         cameraPreview = binding.preview,
-                        documentScannerArea = binding.documentScannerArea
+                        documentScannerArea = binding.documentScannerArea,
                     )
                     viewModel.runOcrOnFrame(frame = bitmap, cropConfig)
                 } finally {
@@ -323,7 +324,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         val navigationAction = {
             findNavController().navigateSafely(
                 this@ExternalCredentialScanOcrFragment,
-                ExternalCredentialScanOcrFragmentDirections.actionExternalCredentialScanOcrToExternalCredentialSearch(credential)
+                ExternalCredentialScanOcrFragmentDirections.actionExternalCredentialScanOcrToExternalCredentialSearch(credential),
             )
         }
         if (isAnimatingCompletion) {
@@ -332,5 +333,4 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             navigationAction.invoke()
         }
     }
-
 }
