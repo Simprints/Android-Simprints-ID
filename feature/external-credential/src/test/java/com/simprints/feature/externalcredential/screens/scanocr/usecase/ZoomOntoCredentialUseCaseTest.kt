@@ -9,7 +9,6 @@ import org.junit.Before
 import org.junit.Test
 
 class ZoomOntoCredentialUseCaseTest {
-
     private lateinit var useCase: ZoomOntoCredentialUseCase
     private lateinit var mockBitmap: Bitmap
     private val bitmapWidth = 1600
@@ -26,7 +25,6 @@ class ZoomOntoCredentialUseCaseTest {
         }
         every { BitmapFactory.decodeFile(any()) } returns mockBitmap
     }
-
 
     @Test
     fun `returns original bitmap when bounding box has zero width`() {
