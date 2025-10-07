@@ -7,6 +7,7 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.externalcredential.model.BoundingBox
 import java.io.Serializable
 import java.util.UUID
+import kotlin.toString
 
 @Keep
 data class ScannedCredential(

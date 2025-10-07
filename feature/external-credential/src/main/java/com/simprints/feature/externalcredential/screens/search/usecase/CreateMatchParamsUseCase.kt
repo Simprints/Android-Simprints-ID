@@ -12,7 +12,6 @@ import com.simprints.infra.matching.MatchParams
 import javax.inject.Inject
 
 internal class CreateMatchParamsUseCase @Inject constructor() {
-
     operator fun invoke(
         candidateSubjectId: String,
         flowType: FlowType,
@@ -20,34 +19,25 @@ internal class CreateMatchParamsUseCase @Inject constructor() {
         projectConfiguration: ProjectConfiguration,
         faceSamples: List<MatchParams.FaceSample>,
         fingerprintSamples: List<MatchParams.FingerprintSample>,
-        ageGroup: AgeGroup?
-    ): List<MatchParams> {
-        return projectConfiguration.general.matchingModalities.map { modality ->
+        ageGroup: AgeGroup?,
+    ): List<MatchParams> = projectConfiguration.general.matchingModalities
+        .map { modality ->
             val template = MatchParams(
                 probeReferenceId = probeReferenceId.orEmpty(),
                 flowType = flowType,
                 queryForCandidates = SubjectQuery(subjectId = candidateSubjectId),
-                biometricDataSource = BiometricDataSource.Simprints // [MS-1167] No CoSync in initial MF-ID implementation
+                biometricDataSource = BiometricDataSource.Simprints, // [MS-1167] No CoSync in initial MF-ID implementation
             )
             when (modality) {
-                Modality.FACE -> {
-                    projectConfiguration.determineFaceSDKs(ageGroup).map { faceSDK ->
-                        template.copy(
-                            faceSDK = faceSDK,
-                            probeFaceSamples = faceSamples
-                        )
-                    }
-                }
+                Modality.FACE ->
+                    projectConfiguration
+                        .determineFaceSDKs(ageGroup)
+                        .map { template.copy(faceSDK = it, probeFaceSamples = faceSamples) }
 
-                Modality.FINGERPRINT -> {
-                    projectConfiguration.determineFingerprintSDKs(ageGroup).map { fingerprintSDK ->
-                        template.copy(
-                            fingerprintSDK = fingerprintSDK,
-                            probeFingerprintSamples = fingerprintSamples
-                        )
-                    }
-                }
+                Modality.FINGERPRINT ->
+                    projectConfiguration
+                        .determineFingerprintSDKs(ageGroup)
+                        .map { template.copy(fingerprintSDK = it, probeFingerprintSamples = fingerprintSamples) }
             }
         }.flatten()
-    }
 }

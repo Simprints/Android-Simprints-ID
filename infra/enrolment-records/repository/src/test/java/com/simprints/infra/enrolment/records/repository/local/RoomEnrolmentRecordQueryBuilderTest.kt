@@ -413,17 +413,18 @@ class RoomEnrolmentRecordQueryBuilderTest {
         val credentialValue = "credentialValue"
         val query = SubjectQuery(
             projectId = "projectId",
-            externalCredential = credentialValue.asTokenizableEncrypted()
+            externalCredential = credentialValue.asTokenizableEncrypted(),
         )
 
         val result = RoomEnrolmentRecordQueryBuilder().buildSubjectQuery(query)
 
-        val expectedSql = """
-        SELECT * FROM $SUBJECT_TABLE_NAME S
-        INNER JOIN $EXTERNAL_CREDENTIAL_TABLE_NAME C ON S.$SUBJECT_ID_COLUMN = C.$SUBJECT_ID_COLUMN
-        WHERE S.$PROJECT_ID_COLUMN = ? AND C.$EXTERNAL_CREDENTIAL_VALUE_COLUMN = ?
-        
-    """.trimIndent()
+        val expectedSql =
+            """
+            SELECT * FROM $SUBJECT_TABLE_NAME S
+            INNER JOIN $EXTERNAL_CREDENTIAL_TABLE_NAME C ON S.$SUBJECT_ID_COLUMN = C.$SUBJECT_ID_COLUMN
+            WHERE S.$PROJECT_ID_COLUMN = ? AND C.$EXTERNAL_CREDENTIAL_VALUE_COLUMN = ?
+            
+            """.trimIndent()
 
         assertThat(result.sql).isEqualTo(expectedSql)
     }

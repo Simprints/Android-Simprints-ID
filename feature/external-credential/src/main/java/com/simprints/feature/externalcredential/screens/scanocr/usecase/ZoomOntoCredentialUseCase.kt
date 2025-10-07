@@ -8,12 +8,6 @@ import kotlin.math.max
 import kotlin.math.min
 
 internal class ZoomOntoCredentialUseCase @Inject constructor() {
-
-    companion object {
-        private const val TARGET_ASPECT_RATIO = 16f / 10f
-        private const val BOX_INCREASE_PERCENTAGE = 15
-    }
-
     /**
      * Zooms into given image. Zoom area defined by the [boundingBox]
      *
@@ -21,9 +15,12 @@ internal class ZoomOntoCredentialUseCase @Inject constructor() {
      * @param boundingBox bounding box that defines the zoom area
      * @return zoomed-in bitmap
      */
-    operator fun invoke(imagePath: String, boundingBox: BoundingBox): Bitmap {
+    operator fun invoke(
+        imagePath: String,
+        boundingBox: BoundingBox,
+    ): Bitmap {
         val bitmap = BitmapFactory.decodeFile(imagePath)
-        val expandedBox = expandBoundingBox(boundingBox, BOX_INCREASE_PERCENTAGE)
+        val expandedBox = scaleBoundingBox(boundingBox, BOX_SCALE_FACTOR)
 
         val left = expandedBox.left.coerceIn(0, bitmap.width)
         val top = expandedBox.top.coerceIn(0, bitmap.height)
@@ -50,10 +47,8 @@ internal class ZoomOntoCredentialUseCase @Inject constructor() {
 
         val extraWidth = finalWidth - boxWidth
         val extraHeight = finalHeight - boxHeight
-        val cropLeft = max(0, left - extraWidth / 2)
-        val cropTop = max(0, top - extraHeight / 2)
-        val cropRight = min(bitmap.width, cropLeft + finalWidth)
-        val cropBottom = min(bitmap.height, cropTop + finalHeight)
+        val cropRight = min(bitmap.width, right + extraWidth / 2)
+        val cropBottom = min(bitmap.height, bottom + extraHeight / 2)
 
         // Adjust if we hit image boundaries
         val adjustedLeft = max(0, cropRight - finalWidth)
@@ -69,16 +64,24 @@ internal class ZoomOntoCredentialUseCase @Inject constructor() {
      * @param box Original bounding box
      * @return Expanded bounding box that may exceed image bounds as it is addressed later
      */
-    private fun expandBoundingBox(box: BoundingBox, percentage: Int): BoundingBox {
+    private fun scaleBoundingBox(
+        box: BoundingBox,
+        scale: Float,
+    ): BoundingBox {
         val boxWidth = box.right - box.left
         val boxHeight = box.bottom - box.top
-        val horizontalExpansion = (boxWidth * percentage / 100f).toInt()
-        val verticalExpansion = (boxHeight * percentage / 100f).toInt()
+        val horizontalExpansion = (boxWidth * (scale - 1f) / 2f).toInt()
+        val verticalExpansion = (boxHeight * (scale - 1f) / 2f).toInt()
         return BoundingBox(
             left = box.left - horizontalExpansion,
             top = box.top - verticalExpansion,
             right = box.right + horizontalExpansion,
-            bottom = box.bottom + verticalExpansion
+            bottom = box.bottom + verticalExpansion,
         )
+    }
+
+    companion object {
+        private const val TARGET_ASPECT_RATIO = 16f / 10f
+        private const val BOX_SCALE_FACTOR = 1.15f
     }
 }

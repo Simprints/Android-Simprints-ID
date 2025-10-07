@@ -16,8 +16,13 @@ internal class IsNewEnrolmentUseCase @Inject constructor() {
         projectConfiguration: ProjectConfiguration,
         results: List<Serializable>,
     ): Boolean {
-        val externalCredentialResult = results.find { it is ExternalCredentialSearchResult } as? ExternalCredentialSearchResult
-        if (externalCredentialResult?.matchResults?.isNotEmpty() == true) {
+        val hasCredentialMatchResults =
+            results
+                .filterIsInstance<ExternalCredentialSearchResult>()
+                .firstOrNull()
+                ?.matchResults
+                ?.isNotEmpty() ?: false
+        if (hasCredentialMatchResults) {
             return false
         }
 

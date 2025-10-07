@@ -157,7 +157,7 @@ internal class IsNewEnrolmentUseCaseTest {
                 }
                 every { faceBioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
                 every { fingerprintBioSdk } returns null
-            }
+            },
         )
 
         assertThat(
@@ -166,11 +166,12 @@ internal class IsNewEnrolmentUseCaseTest {
                 listOf(
                     mockk<ExternalCredentialSearchResult> {
                         every { matchResults } returns credentialMatches
-                    }
+                    },
                 ),
             ),
         ).isFalse()
     }
+
     companion object {
         private const val MEDIUM_CONFIDENCE_SCORE = 30
         private const val LOWER_THAN_MEDIUM_SCORE = MEDIUM_CONFIDENCE_SCORE - 1f

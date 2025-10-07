@@ -32,46 +32,42 @@ fun View.setPulseAnimation(isEnabled: Boolean) {
         }
     tag = progressBarPulseAnimator
 }
+
 @ExcludedFromGeneratedTestCoverageReports("View animation")
-fun View.animateOut(
+fun View.fadeOut(
     duration: Long,
     scaleX: Boolean,
     fragment: Fragment,
-): ViewPropertyAnimator {
-    return animate()
-        .alpha(0f)
-        .setDuration(duration)
-        .setInterpolator(DecelerateInterpolator())
-        .withEndAction {
-            if (fragment.isAdded) {
-                this.isVisible = false
-            }
-        }.also {
-            if (scaleX) {
-                it.scaleX(0f)
-            }
-            it.start()
+) = animate()
+    .alpha(0f)
+    .setDuration(duration)
+    .setInterpolator(DecelerateInterpolator())
+    .withEndAction {
+        if (fragment.isAdded) {
+            this.isVisible = false
         }
-}
+    }.also {
+        if (scaleX) {
+            it.scaleX(0f)
+        }
+        it.start()
+    }
 
 @ExcludedFromGeneratedTestCoverageReports("View animation")
-fun View.animateIn(
+fun View.fadeIn(
     duration: Long,
-    onComplete: (() -> Unit)?,
     fragment: Fragment,
-): ViewPropertyAnimator {
-    return animate()
-        .alpha(1f)
-        .setInterpolator(AccelerateInterpolator())
-        .setDuration(duration)
-        .withEndAction {
-            if (fragment.isAdded) {
-                this.isVisible = true
-                onComplete?.invoke()
-            }
+    onComplete: (() -> Unit)?,
+) = animate()
+    .alpha(1f)
+    .setInterpolator(AccelerateInterpolator())
+    .setDuration(duration)
+    .withEndAction {
+        if (fragment.isAdded) {
+            this.isVisible = true
+            onComplete?.invoke()
         }
-        .also { it.start() }
-}
+    }.also { it.start() }
 
 private const val PULSE_ANIMATION_ALPHA_FULL = 1.0f
 private const val PULSE_ANIMATION_ALPHA_INTERMEDIATE = 0.9f

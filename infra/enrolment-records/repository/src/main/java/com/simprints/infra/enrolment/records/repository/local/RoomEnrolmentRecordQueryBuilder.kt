@@ -102,7 +102,7 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
         query: SubjectQuery,
         subjectAlias: String = "S.", // Default alias for subject table, dot included. Empty string for no alias.
         templateAlias: String = "T.", // Default alias for template table, dot included. Empty string for no alias.
-        credentialAlias: String = "C.",
+        credentialAlias: String = "C.", // Default alias for credentials table, dot included. Empty string for no alias.
     ): Pair<String, List<Any?>> {
         val clauses = mutableListOf<String>()
         val args = mutableListOf<Any?>()
@@ -162,12 +162,10 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
         query: SubjectQuery,
         subjectAlias: String = "S",
         credentialAlias: String = "C",
-    ): String {
-        return if (query.externalCredential != null) {
-            "INNER JOIN $EXTERNAL_CREDENTIAL_TABLE_NAME C ON $subjectAlias.$SUBJECT_ID_COLUMN = $credentialAlias.$SUBJECT_ID_COLUMN"
-        } else {
-            ""
-        }
+    ): String = if (query.externalCredential != null) {
+        "INNER JOIN $EXTERNAL_CREDENTIAL_TABLE_NAME $credentialAlias ON $subjectAlias.$SUBJECT_ID_COLUMN = $credentialAlias.$SUBJECT_ID_COLUMN"
+    } else {
+        ""
     }
 
     private fun buildOrderByClause(

@@ -17,7 +17,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class CreateMatchParamsUseCaseTest {
-
     private val useCase = CreateMatchParamsUseCase()
 
     private val subjectId = "subjectId"
@@ -48,7 +47,7 @@ internal class CreateMatchParamsUseCaseTest {
     fun ` creates correct MatchParams for face modality`() {
         every { projectConfiguration.determineFaceSDKs(ageGroup) } returns listOf(
             FaceConfiguration.BioSdk.RANK_ONE,
-            FaceConfiguration.BioSdk.SIM_FACE
+            FaceConfiguration.BioSdk.SIM_FACE,
         )
         every { projectConfiguration.determineFingerprintSDKs(ageGroup) } returns emptyList()
         every { generalConfiguration.matchingModalities } returns listOf(GeneralConfiguration.Modality.FACE)
@@ -60,7 +59,7 @@ internal class CreateMatchParamsUseCaseTest {
             projectConfiguration = projectConfiguration,
             faceSamples = listOf(faceSample),
             fingerprintSamples = emptyList(),
-            ageGroup = ageGroup
+            ageGroup = ageGroup,
         )
 
         assertThat(result).hasSize(2)
@@ -81,7 +80,7 @@ internal class CreateMatchParamsUseCaseTest {
         every { projectConfiguration.determineFaceSDKs(ageGroup) } returns emptyList()
         every { projectConfiguration.determineFingerprintSDKs(ageGroup) } returns listOf(
             FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
-            FingerprintConfiguration.BioSdk.NEC
+            FingerprintConfiguration.BioSdk.NEC,
         )
         every { generalConfiguration.matchingModalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
 
@@ -92,7 +91,7 @@ internal class CreateMatchParamsUseCaseTest {
             projectConfiguration = projectConfiguration,
             faceSamples = emptyList(),
             fingerprintSamples = listOf(fingerprintSample),
-            ageGroup = ageGroup
+            ageGroup = ageGroup,
         )
 
         assertThat(result).hasSize(2)
@@ -112,13 +111,13 @@ internal class CreateMatchParamsUseCaseTest {
     fun ` creates correct  MatchParams for multiple`() {
         every { generalConfiguration.matchingModalities } returns listOf(
             GeneralConfiguration.Modality.FACE,
-            GeneralConfiguration.Modality.FINGERPRINT
+            GeneralConfiguration.Modality.FINGERPRINT,
         )
         every { projectConfiguration.determineFaceSDKs(ageGroup) } returns listOf(
-            FaceConfiguration.BioSdk.RANK_ONE
+            FaceConfiguration.BioSdk.RANK_ONE,
         )
         every { projectConfiguration.determineFingerprintSDKs(ageGroup) } returns listOf(
-            FingerprintConfiguration.BioSdk.NEC
+            FingerprintConfiguration.BioSdk.NEC,
         )
 
         val result = useCase(
@@ -128,7 +127,7 @@ internal class CreateMatchParamsUseCaseTest {
             projectConfiguration = projectConfiguration,
             faceSamples = listOf(faceSample),
             fingerprintSamples = listOf(fingerprintSample),
-            ageGroup = ageGroup
+            ageGroup = ageGroup,
         )
 
         assertThat(result).hasSize(2)
@@ -147,7 +146,7 @@ internal class CreateMatchParamsUseCaseTest {
     @Test
     fun ` handles null ageGroup`() {
         every { projectConfiguration.determineFaceSDKs(null) } returns listOf(
-            FaceConfiguration.BioSdk.RANK_ONE
+            FaceConfiguration.BioSdk.RANK_ONE,
         )
         every { projectConfiguration.determineFingerprintSDKs(null) } returns emptyList()
         every { generalConfiguration.matchingModalities } returns listOf(GeneralConfiguration.Modality.FACE)
@@ -159,7 +158,7 @@ internal class CreateMatchParamsUseCaseTest {
             projectConfiguration = projectConfiguration,
             faceSamples = listOf(faceSample),
             fingerprintSamples = emptyList(),
-            ageGroup = null
+            ageGroup = null,
         )
 
         assertThat(result).hasSize(1)
@@ -177,7 +176,7 @@ internal class CreateMatchParamsUseCaseTest {
             projectConfiguration = projectConfiguration,
             faceSamples = listOf(faceSample),
             fingerprintSamples = listOf(fingerprintSample),
-            ageGroup = ageGroup
+            ageGroup = ageGroup,
         )
 
         assertThat(result).isEmpty()
@@ -187,7 +186,7 @@ internal class CreateMatchParamsUseCaseTest {
     fun ` creates multiple MatchParams for multiple face SDKs`() {
         every { projectConfiguration.determineFaceSDKs(ageGroup) } returns listOf(
             FaceConfiguration.BioSdk.RANK_ONE,
-            FaceConfiguration.BioSdk.SIM_FACE
+            FaceConfiguration.BioSdk.SIM_FACE,
         )
         every { projectConfiguration.determineFingerprintSDKs(ageGroup) } returns emptyList()
         every { generalConfiguration.matchingModalities } returns listOf(GeneralConfiguration.Modality.FACE)
@@ -201,7 +200,7 @@ internal class CreateMatchParamsUseCaseTest {
             projectConfiguration = projectConfiguration,
             faceSamples = faceSamples,
             fingerprintSamples = emptyList(),
-            ageGroup = ageGroup
+            ageGroup = ageGroup,
         )
 
         assertThat(result).hasSize(2)

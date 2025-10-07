@@ -13,7 +13,7 @@ import com.simprints.core.livedata.send
 import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
-import com.simprints.feature.externalcredential.screens.scanocr.model.mapToCredentialType
+import com.simprints.feature.externalcredential.screens.scanocr.model.asExternalCredentialType
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.CropDocumentFromPreviewUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetCredentialCoordinatesUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.KeepOnlyBestDetectedBlockUseCase
@@ -118,7 +118,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
         viewModelScope.launch {
             val project = configManager.getProject(authStore.signedInProjectId)
             val detectedBlock = keepOnlyBestDetectedBlockUseCase(detectedBlocks, ocrDocumentType)
-            val credentialType = detectedBlock.documentType.mapToCredentialType()
+            val credentialType = detectedBlock.documentType.asExternalCredentialType()
             val blockBoundingBox = detectedBlock.blockBoundingBox
             val zoomedCredentialImagePath = buildZoomedImagePath(detectedBlock)
             val credential = tokenizationProcessor.encrypt(
