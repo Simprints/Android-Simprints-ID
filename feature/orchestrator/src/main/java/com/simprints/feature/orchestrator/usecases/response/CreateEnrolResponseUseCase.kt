@@ -52,12 +52,10 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
         }
     }
 
-    private fun ScannedCredential.toExternalCredential(subjectId: String): ExternalCredential? {
-        return ExternalCredential(
-            id = UUID.randomUUID().toString(),
-            value = credential,
-            subjectId = subjectId,
-            type = credentialType
-        )
-    }
+    private fun ScannedCredential.toExternalCredential(subjectId: String) = ExternalCredential(
+        id = UUID.randomUUID().toString(),
+        value = credential,
+        subjectId = subjectId,
+        type = credentialType,
+    )
 }
