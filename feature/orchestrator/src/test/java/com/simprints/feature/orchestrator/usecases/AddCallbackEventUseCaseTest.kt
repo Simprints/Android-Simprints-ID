@@ -1,6 +1,6 @@
 package com.simprints.feature.orchestrator.usecases
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.core.tools.time.TimeHelper
@@ -19,12 +19,8 @@ import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.orchestration.data.responses.AppRefusalResponse
 import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.Runs
-import io.mockk.coEvery
-import io.mockk.coVerify
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.just
 import kotlinx.coroutines.CoroutineScope
 import org.junit.Before
 import org.junit.Rule
@@ -101,7 +97,7 @@ class AddCallbackEventUseCaseTest {
 
     @Test
     fun `adds event for confirmation response`() {
-        useCase(AppConfirmationResponse(true))
+        useCase(AppConfirmationResponse(true, mockk()))
 
         coVerify {
             eventRepository.addOrUpdateEvent(

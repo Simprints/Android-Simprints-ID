@@ -133,6 +133,7 @@ include(
     ":infra:events",
     ":infra:config-store",
     ":infra:config-sync",
+    ":infra:credential-store",
     ":infra:enrolment-records:repository",
     ":infra:enrolment-records:realm-store",
     ":infra:enrolment-records:room-store",

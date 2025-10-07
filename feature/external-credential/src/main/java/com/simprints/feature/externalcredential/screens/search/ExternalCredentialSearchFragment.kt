@@ -199,7 +199,7 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         buttonConfirm.isEnabled = state.isConfirmed
         viewModel.getButtonTextResource(state.searchState, state.flowType)?.run(buttonConfirm::setText)
         buttonConfirm.setOnClickListener {
-            viewModel.finish(state.searchState)
+            viewModel.finish(state)
         }
         buttonRecapture.setOnClickListener {
             findNavController().navigateSafely(

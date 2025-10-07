@@ -1,8 +1,9 @@
 package com.simprints.feature.externalcredential.screens.scanocr.usecase
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
+import com.simprints.infra.credential.store.CredentialImageRepository
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
@@ -10,7 +11,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class KeepOnlyBestDetectedBlockUseCaseTest {
-
     @MockK
     private lateinit var getExternalCredentialBasedOnConfidenceUseCase: GetExternalCredentialBasedOnConfidenceUseCase
 
@@ -18,7 +18,7 @@ internal class KeepOnlyBestDetectedBlockUseCaseTest {
     private lateinit var findBestTextBlockForCredentialUseCase: FindBestTextBlockForCredentialUseCase
 
     @MockK
-    private lateinit var deleteScannedImageUseCase: DeleteScannedImageUseCase
+    private lateinit var credentialImageRepository: CredentialImageRepository
 
     private lateinit var useCase: KeepOnlyBestDetectedBlockUseCase
 
@@ -36,7 +36,7 @@ internal class KeepOnlyBestDetectedBlockUseCaseTest {
         useCase = KeepOnlyBestDetectedBlockUseCase(
             getExternalCredentialBasedOnConfidenceUseCase = getExternalCredentialBasedOnConfidenceUseCase,
             findBestTextBlockForCredentialUseCase = findBestTextBlockForCredentialUseCase,
-            deleteScannedImageUseCase = deleteScannedImageUseCase
+            credentialImageRepository = credentialImageRepository,
         )
     }
 
@@ -57,9 +57,9 @@ internal class KeepOnlyBestDetectedBlockUseCaseTest {
         val result = useCase(allBlocks, OcrDocumentType.NhisCard)
 
         assertThat(result).isEqualTo(bestBlock)
-        coVerify { deleteScannedImageUseCase(otherBlockImagePath1) }
-        coVerify { deleteScannedImageUseCase(otherBlockImagePath2) }
-        coVerify(exactly = 0) { deleteScannedImageUseCase(bestBlockImagePath) }
+        coVerify { credentialImageRepository.deleteByPath(otherBlockImagePath1) }
+        coVerify { credentialImageRepository.deleteByPath(otherBlockImagePath2) }
+        coVerify(exactly = 0) { credentialImageRepository.deleteByPath(bestBlockImagePath) }
     }
 
     @Test
@@ -75,9 +75,9 @@ internal class KeepOnlyBestDetectedBlockUseCaseTest {
         val result = useCase(allBlocks, OcrDocumentType.GhanaIdCard)
 
         assertThat(result).isEqualTo(bestBlock)
-        coVerify { deleteScannedImageUseCase(otherBlockImagePath1) }
-        coVerify { deleteScannedImageUseCase(otherBlockImagePath2) }
-        coVerify(exactly = 0) { deleteScannedImageUseCase(bestBlockImagePath) }
+        coVerify { credentialImageRepository.deleteByPath(otherBlockImagePath1) }
+        coVerify { credentialImageRepository.deleteByPath(otherBlockImagePath2) }
+        coVerify(exactly = 0) { credentialImageRepository.deleteByPath(bestBlockImagePath) }
     }
 
     @Test
@@ -117,7 +117,7 @@ internal class KeepOnlyBestDetectedBlockUseCaseTest {
         val result = useCase(allBlocks, OcrDocumentType.NhisCard)
 
         assertThat(result).isEqualTo(singleBlock)
-        coVerify(exactly = 0) { deleteScannedImageUseCase(any()) }
+        coVerify(exactly = 0) { credentialImageRepository.deleteByPath(any()) }
     }
 
     @Test
@@ -141,7 +141,7 @@ internal class KeepOnlyBestDetectedBlockUseCaseTest {
             createMockBlock("/path2.jpg"),
             bestBlock,
             createMockBlock("/path3.jpg"),
-            createMockBlock("/path4.jpg")
+            createMockBlock("/path4.jpg"),
         )
         val mockCredential = "GHA-123456789-0"
 
@@ -150,10 +150,10 @@ internal class KeepOnlyBestDetectedBlockUseCaseTest {
 
         useCase(blocks, OcrDocumentType.GhanaIdCard)
 
-        coVerify { deleteScannedImageUseCase("/path1.jpg") }
-        coVerify { deleteScannedImageUseCase("/path2.jpg") }
-        coVerify { deleteScannedImageUseCase("/path3.jpg") }
-        coVerify { deleteScannedImageUseCase("/path4.jpg") }
-        coVerify(exactly = 0) { deleteScannedImageUseCase(bestBlockImagePath) }
+        coVerify { credentialImageRepository.deleteByPath("/path1.jpg") }
+        coVerify { credentialImageRepository.deleteByPath("/path2.jpg") }
+        coVerify { credentialImageRepository.deleteByPath("/path3.jpg") }
+        coVerify { credentialImageRepository.deleteByPath("/path4.jpg") }
+        coVerify(exactly = 0) { credentialImageRepository.deleteByPath(bestBlockImagePath) }
     }
 }

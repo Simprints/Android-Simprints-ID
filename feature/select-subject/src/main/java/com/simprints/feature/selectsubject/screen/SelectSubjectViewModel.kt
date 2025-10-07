@@ -9,6 +9,7 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
 import com.simprints.feature.selectsubject.SelectSubjectParams
 import com.simprints.feature.selectsubject.SelectSubjectResult
 import com.simprints.feature.selectsubject.model.SelectSubjectState
@@ -62,45 +63,55 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
 
     init {
         sessionCoroutineScope.launch {
-            saveGuidSelection(projectId = params.projectId, subjectId = params.subjectId, scannedCredential = params.scannedCredential)
+            val isSaved = saveGuidSelection(projectId = params.projectId, subjectId = params.subjectId)
+            if (!isSaved) {
+                _finish.send(SelectSubjectResult(isSubjectIdSaved = false, savedCredential = null))
+                return@launch
+            }
+
+            val dialogDisplayedState = getDisplayDialogStateIfRequired(params.scannedCredential, params.subjectId)
+            if (dialogDisplayedState != null) {
+                updateState { dialogDisplayedState }
+            } else {
+                val credential = params.scannedCredential?.toExternalCredential(params.subjectId)
+                _finish.send(SelectSubjectResult(isSubjectIdSaved = true, savedCredential = credential))
+            }
         }
     }
 
     private suspend fun saveGuidSelection(
         projectId: String,
         subjectId: String,
-        scannedCredential: ScannedCredential?,
-    ) {
+    ): Boolean {
         updateState { SelectSubjectState.SavingSubjectId }
-        if (authStore.isProjectIdSignedIn(projectId)) {
-            val isSubjectIdSaved = saveSelectionEvent(subjectId)
-            if (isSubjectIdSaved && scannedCredential != null) {
-                val credential = scannedCredential.credential
-                val project = configManager.getProject(authStore.signedInProjectId)
-                val shouldDisplayAddCredentialDialog = enrolmentRecordRepository
-                    .load(
-                        SubjectQuery(
-                            projectId = project.id,
-                            subjectId = subjectId,
-                            externalCredential = credential,
-                        ),
-                    ).isEmpty()
-                if (shouldDisplayAddCredentialDialog) {
-                    val decrypted = tokenizationProcessor.decrypt(
-                        encrypted = credential,
-                        tokenKeyType = TokenKeyType.ExternalCredential,
-                        project = project,
-                    ) as TokenizableString.Raw
-                    updateState {
-                        SelectSubjectState.CredentialDialogDisplayed(scannedCredential = scannedCredential, displayedCredential = decrypted)
-                    }
-                }
-            } else {
-                _finish.send(SelectSubjectResult(isSubjectIdSaved = isSubjectIdSaved, savedCredential = null))
-            }
-        } else {
-            _finish.send(SelectSubjectResult(isSubjectIdSaved = false, savedCredential = null))
-        }
+        if (!authStore.isProjectIdSignedIn(projectId)) return false
+        return saveSelectionEvent(subjectId)
+    }
+
+    private suspend fun getDisplayDialogStateIfRequired(
+        scannedCredential: ScannedCredential?,
+        subjectId: String,
+    ): SelectSubjectState.CredentialDialogDisplayed? {
+        if (scannedCredential == null) return null
+        val credential = scannedCredential.credential
+        val project = configManager.getProject(authStore.signedInProjectId)
+        val isCredentialAlreadyLinkedToSubject = enrolmentRecordRepository
+            .load(
+                SubjectQuery(
+                    projectId = project.id,
+                    subjectId = subjectId,
+                    externalCredential = credential,
+                ),
+            ).isNotEmpty()
+
+        if (isCredentialAlreadyLinkedToSubject) return null
+
+        val decrypted = tokenizationProcessor.decrypt(
+            encrypted = credential,
+            tokenKeyType = TokenKeyType.ExternalCredential,
+            project = project,
+        ) as TokenizableString.Raw
+        return SelectSubjectState.CredentialDialogDisplayed(scannedCredential = scannedCredential, displayedCredential = decrypted)
     }
 
     fun saveCredential(scannedCredential: ScannedCredential) {
@@ -113,7 +124,12 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
                 Simber.e("Failed to attach scanned credential", e, tag = SESSION)
                 null
             }
-            _finish.send(SelectSubjectResult(isSubjectIdSaved = true, savedCredential = addedCredential?.credential))
+            _finish.send(
+                SelectSubjectResult(
+                    isSubjectIdSaved = true,
+                    savedCredential = addedCredential?.toExternalCredential(params.subjectId),
+                ),
+            )
         }
     }
 

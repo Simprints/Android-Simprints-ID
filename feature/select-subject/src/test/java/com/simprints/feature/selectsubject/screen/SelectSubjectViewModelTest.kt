@@ -1,17 +1,27 @@
 package com.simprints.feature.selectsubject.screen
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.selectsubject.SelectSubjectParams
+import com.simprints.feature.selectsubject.model.SelectSubjectState
+import com.simprints.feature.selectsubject.usecase.AddExternalCredentialToSubjectUseCase
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
@@ -21,10 +31,10 @@ import org.junit.Test
 
 internal class SelectSubjectViewModelTest {
     @get:Rule
-    val testCoroutineRule = TestCoroutineRule()
+    val rule = InstantTaskExecutorRule()
 
     @get:Rule
-    val rule = InstantTaskExecutorRule()
+    val testCoroutineRule = TestCoroutineRule()
 
     @MockK
     lateinit var timeHelper: TimeHelper
@@ -35,6 +45,21 @@ internal class SelectSubjectViewModelTest {
     @MockK
     lateinit var eventRepository: SessionEventRepository
 
+    @MockK
+    lateinit var configManager: ConfigManager
+
+    @MockK
+    lateinit var addExternalCredentialToSubjectUseCase: AddExternalCredentialToSubjectUseCase
+
+    @MockK
+    lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
+
+    @MockK
+    lateinit var tokenizationProcessor: TokenizationProcessor
+
+    @MockK
+    lateinit var selectSubjectParams: SelectSubjectParams
+
     private lateinit var viewModel: SelectSubjectViewModel
 
     @Before
@@ -42,55 +67,220 @@ internal class SelectSubjectViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
 
         every { timeHelper.now() } returns TIMESTAMP
+        every { selectSubjectParams.projectId } returns PROJECT_ID
+        every { selectSubjectParams.subjectId } returns SUBJECT_ID
 
         viewModel = SelectSubjectViewModel(
-            timeHelper,
-            authStore,
-            eventRepository,
-            CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
+            params = selectSubjectParams,
+            timeHelper = timeHelper,
+            authStore = authStore,
+            eventRepository = eventRepository,
+            configManager = configManager,
+            addExternalCredentialToSubjectUseCase = addExternalCredentialToSubjectUseCase,
+            enrolmentRecordRepository = enrolmentRecordRepository,
+            tokenizationProcessor = tokenizationProcessor,
+            sessionCoroutineScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
     }
 
+    private fun createViewModel() = SelectSubjectViewModel(
+        params = selectSubjectParams,
+        timeHelper = timeHelper,
+        authStore = authStore,
+        eventRepository = eventRepository,
+        configManager = configManager,
+        addExternalCredentialToSubjectUseCase = addExternalCredentialToSubjectUseCase,
+        enrolmentRecordRepository = enrolmentRecordRepository,
+        tokenizationProcessor = tokenizationProcessor,
+        sessionCoroutineScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
+    )
+
     @Test
     fun `saves selection if signed in`() = runTest {
-        every { authStore.isProjectIdSignedIn(any()) } returns true
+        every { selectSubjectParams.scannedCredential } returns null
+        coEvery { authStore.isProjectIdSignedIn(PROJECT_ID) } returns true
+        val viewModel = createViewModel()
 
-        viewModel.saveGuidSelection(PROJECT_ID, SUBJECT_ID)
+        coVerify { eventRepository.addOrUpdateEvent(any()) }
         val result = viewModel.finish
             .test()
             .value()
             .getContentIfNotHandled()
-
-        assertThat(result).isTrue()
-        coVerify { eventRepository.addOrUpdateEvent(any()) }
+        assertThat(result?.isSubjectIdSaved).isTrue()
+        assertThat(result?.savedCredential).isNull()
     }
 
     @Test
     fun `does not save selection if not signed in`() = runTest {
-        every { authStore.isProjectIdSignedIn(any()) } returns false
+        coEvery { authStore.isProjectIdSignedIn(PROJECT_ID) } returns false
 
-        viewModel.saveGuidSelection(PROJECT_ID, SUBJECT_ID)
+        val viewModel = createViewModel()
+
+        coVerify(exactly = 0) { eventRepository.addOrUpdateEvent(any()) }
         val result = viewModel.finish
             .test()
             .value()
             .getContentIfNotHandled()
-
-        assertThat(result).isFalse()
-        coVerify(exactly = 0) { eventRepository.addOrUpdateEvent(any()) }
+        assertThat(result?.isSubjectIdSaved).isFalse()
+        assertThat(result?.savedCredential).isNull()
     }
 
     @Test
     fun `correctly handles exception with saving`() = runTest {
-        every { authStore.isProjectIdSignedIn(any()) } returns true
-        coEvery { eventRepository.addOrUpdateEvent(any()) } throws Exception()
+        every { selectSubjectParams.scannedCredential } returns null
+        coEvery { authStore.isProjectIdSignedIn(PROJECT_ID) } returns true
+        coEvery { eventRepository.addOrUpdateEvent(any()) } throws RuntimeException("RuntimeException")
 
-        viewModel.saveGuidSelection(PROJECT_ID, SUBJECT_ID)
+        val viewModel = createViewModel()
+
+        coVerify { eventRepository.addOrUpdateEvent(any()) }
         val result = viewModel.finish
             .test()
             .value()
             .getContentIfNotHandled()
+        assertThat(result?.isSubjectIdSaved).isFalse()
+        assertThat(result?.savedCredential).isNull()
+    }
 
-        assertThat(result).isFalse()
+    @Test
+    fun `displays credential dialog when credential is scanned and not already linked`() = runTest {
+        val scannedCredential = mockk<ScannedCredential>(relaxed = true)
+        val displayedCredential = mockk<TokenizableString.Raw>(relaxed = true)
+        setupCredentialState(scannedCredential, displayedCredential, repositoryResponse = emptyList())
+
+        val viewModel = createViewModel()
+
+        val state = viewModel.stateLiveData.test().value()
+        assertThat(state).isInstanceOf(SelectSubjectState.CredentialDialogDisplayed::class.java)
+        val dialogState = state as SelectSubjectState.CredentialDialogDisplayed
+        assertThat(dialogState.scannedCredential).isEqualTo(scannedCredential)
+        assertThat(dialogState.displayedCredential).isEqualTo(displayedCredential)
+    }
+
+    @Test
+    fun `does not display credential dialog when credential is already linked`() = runTest {
+        val tokenizedValue = "tokenizedValue".asTokenizableEncrypted()
+        val type = ExternalCredentialType.NHISCard
+        val scannedCredential = mockk<ScannedCredential> {
+            every { credential } returns tokenizedValue
+            every { credentialType } returns type
+        }
+        val displayedCredential = mockk<TokenizableString.Raw>(relaxed = true)
+        val repositoryResponse = listOf<Subject>(mockk())
+        setupCredentialState(scannedCredential, displayedCredential, repositoryResponse = repositoryResponse)
+
+        val viewModel = createViewModel()
+
+        val result = viewModel.finish
+            .test()
+            .value()
+            .getContentIfNotHandled()
+        assertThat(result?.isSubjectIdSaved).isTrue()
+        assertThat(result?.savedCredential?.value).isEqualTo(tokenizedValue)
+        assertThat(result?.savedCredential?.type).isEqualTo(type)
+    }
+
+    @Test
+    fun `finishes without credential when no credential is scanned`() = runTest {
+        coEvery { authStore.isProjectIdSignedIn(PROJECT_ID) } returns true
+        every { selectSubjectParams.scannedCredential } returns null
+
+        val viewModel = createViewModel()
+
+        val result = viewModel.finish
+            .test()
+            .value()
+            .getContentIfNotHandled()
+        assertThat(result?.isSubjectIdSaved).isTrue()
+        assertThat(result?.savedCredential).isNull()
+    }
+
+    private fun setupCredentialState(
+        scannedCredential: ScannedCredential,
+        displayedCredential: TokenizableString.Raw,
+        repositoryResponse: List<Subject>,
+    ) {
+        val project = mockk<Project>(relaxed = true)
+
+        every { selectSubjectParams.scannedCredential } returns scannedCredential
+        coEvery { authStore.isProjectIdSignedIn(PROJECT_ID) } returns true
+        coEvery { authStore.signedInProjectId } returns PROJECT_ID
+        coEvery { configManager.getProject(PROJECT_ID) } returns project
+        every { project.id } returns PROJECT_ID
+        coEvery { enrolmentRecordRepository.load(any()) } returns repositoryResponse
+        coEvery {
+            tokenizationProcessor.decrypt(
+                encrypted = any(),
+                tokenKeyType = TokenKeyType.ExternalCredential,
+                project = project,
+            )
+        } returns displayedCredential
+    }
+
+    @Test
+    fun `saveCredential successfully saves credential`() = runTest {
+        val tokenizedValue = "tokenizedValue".asTokenizableEncrypted()
+        val type = ExternalCredentialType.NHISCard
+        val scannedCredential = mockk<ScannedCredential> {
+            every { credential } returns tokenizedValue
+            every { credentialType } returns type
+        }
+        coEvery {
+            addExternalCredentialToSubjectUseCase(
+                scannedCredential,
+                subjectId = SUBJECT_ID,
+                projectId = PROJECT_ID,
+            )
+        } returns Unit
+
+        viewModel.saveCredential(scannedCredential)
+
+        val state = viewModel.stateLiveData.test().value()
+        assertThat(state).isEqualTo(SelectSubjectState.SavingExternalCredential)
+
+        val result = viewModel.finish
+            .test()
+            .value()
+            .getContentIfNotHandled()
+        assertThat(result?.isSubjectIdSaved).isTrue()
+        assertThat(result?.savedCredential?.value).isEqualTo(tokenizedValue)
+        assertThat(result?.savedCredential?.type).isEqualTo(type)
+    }
+
+    @Test
+    fun `saveCredential handles exception when saving fails`() = runTest {
+        val scannedCredential = mockk<ScannedCredential>(relaxed = true)
+        coEvery {
+            addExternalCredentialToSubjectUseCase(
+                scannedCredential,
+                subjectId = SUBJECT_ID,
+                projectId = PROJECT_ID,
+            )
+        } throws RuntimeException("RuntimeException")
+
+        viewModel.saveCredential(scannedCredential)
+
+        val state = viewModel.stateLiveData.test().value()
+        assertThat(state).isEqualTo(SelectSubjectState.SavingExternalCredential)
+
+        val result = viewModel.finish
+            .test()
+            .value()
+            .getContentIfNotHandled()
+        assertThat(result?.isSubjectIdSaved).isTrue()
+        assertThat(result?.savedCredential).isNull()
+    }
+
+    @Test
+    fun `finishWithoutSavingCredential finishes with no credential`() = runTest {
+        viewModel.finishWithoutSavingCredential()
+
+        val result = viewModel.finish
+            .test()
+            .value()
+            .getContentIfNotHandled()
+        assertThat(result?.isSubjectIdSaved).isTrue()
+        assertThat(result?.savedCredential).isNull()
     }
 
     companion object {

@@ -149,8 +149,8 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         ExternalCredentialType.QRCode -> InputType.TYPE_CLASS_TEXT
     }
 
-    fun finish(searchState: SearchState) {
-        val matches = when (searchState) {
+    fun finish(state: SearchCredentialState) {
+        val matches = when (val searchState = state.searchState) {
             SearchState.Searching,
             SearchState.CredentialNotFound,
             -> emptyList()
@@ -160,7 +160,7 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         _finishEvent.send(
             ExternalCredentialSearchResult(
                 flowType = externalCredentialParams.flowType,
-                scannedCredential = scannedCredential,
+                scannedCredential = state.scannedCredential,
                 matchResults = matches,
             ),
         )

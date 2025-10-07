@@ -2,17 +2,24 @@ package com.simprints.feature.clientapi.mappers.response
 
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.response.AppMatchConfidence
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.feature.clientapi.mappers.request.requestFactories.ConfirmIdentityActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolLastBiometricsActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.IdentifyRequestActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.VerifyActionFactory
+import com.simprints.feature.clientapi.mappers.response.LibSimprintsResponseMapper.Companion.HAS_CREDENTIAL
+import com.simprints.feature.clientapi.mappers.response.LibSimprintsResponseMapper.Companion.SCANNED_CREDENTIAL
+import com.simprints.feature.clientapi.mappers.response.LibSimprintsResponseMapper.Companion.SCANNED_CREDENTIAL_TYPE
+import com.simprints.feature.clientapi.mappers.response.LibSimprintsResponseMapper.Companion.SCANNED_CREDENTIAL_VALUE
 import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.contracts.VersionsList
+import io.mockk.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import com.simprints.libsimprints.Identification as LegacyIdentification
@@ -126,11 +133,18 @@ class LibSimprintsResponseMapperTest {
 
     @Test
     fun `correctly maps confirm response`() {
+        val expectedValue = "expectedValue".asTokenizableEncrypted()
+        val expectedType = ExternalCredentialType.NHISCard
+        val expectedJson = "{\"$SCANNED_CREDENTIAL_VALUE\":\"$expectedValue\",\"$SCANNED_CREDENTIAL_TYPE\":\"$expectedType\"}"
         val extras = mapper(
             ActionResponse.ConfirmActionResponse(
                 actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
                 sessionId = "sessionId",
                 confirmed = true,
+                externalCredential = mockk {
+                    every { value } returns expectedValue
+                    every { type } returns expectedType
+                },
             ),
         )
 
@@ -138,6 +152,8 @@ class LibSimprintsResponseMapperTest {
         assertThat(extras.getString(Constants.SIMPRINTS_DEVICE_ID)).isEqualTo("deviceId")
         assertThat(extras.getString(Constants.SIMPRINTS_APP_VERSION_NAME)).isEqualTo("appVersionName")
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
+        assertThat(extras.getBoolean(HAS_CREDENTIAL)).isTrue()
+        assertThat(extras.getString(SCANNED_CREDENTIAL)).isEqualTo(expectedJson)
     }
 
     @Test
