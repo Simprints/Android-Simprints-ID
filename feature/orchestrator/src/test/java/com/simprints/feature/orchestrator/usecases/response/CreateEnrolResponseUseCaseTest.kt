@@ -80,7 +80,7 @@ internal class CreateEnrolResponseUseCaseTest {
                     mockk(),
                 ),
                 project = project,
-                enrolmentSubjectId = enrolmentSubjectId
+                enrolmentSubjectId = enrolmentSubjectId,
             ),
         ).isInstanceOf(AppEnrolResponse::class.java)
     }
@@ -95,7 +95,7 @@ internal class CreateEnrolResponseUseCaseTest {
                 moduleId = any(),
                 fingerprintResponse = null,
                 faceResponse = null,
-                externalCredential = null
+                externalCredential = null,
             )
         } throws MissingCaptureException()
 
@@ -105,7 +105,7 @@ internal class CreateEnrolResponseUseCaseTest {
     @Test
     fun `correctly processes external credential result`() = runTest {
         val externalCredentialType = ExternalCredentialType.GhanaIdCard
-        val scannedCredentialMock = mockk<ScannedCredential>() {
+        val scannedCredentialMock = mockk<ScannedCredential> {
             every { credential } returns credentialEncrypted
             every { credentialType } returns externalCredentialType
         }
@@ -129,10 +129,10 @@ internal class CreateEnrolResponseUseCaseTest {
             request = action,
             results = listOf(
                 FingerprintCaptureResult("", emptyList()),
-                credentialSearchResult
+                credentialSearchResult,
             ),
             project = project,
-            enrolmentSubjectId = enrolmentSubjectId
+            enrolmentSubjectId = enrolmentSubjectId,
         )
 
         verify {
@@ -143,7 +143,7 @@ internal class CreateEnrolResponseUseCaseTest {
                 moduleId = any(),
                 fingerprintResponse = any(),
                 faceResponse = null,
-                externalCredential = match { it.value == credentialEncrypted && it.type == externalCredentialType }
+                externalCredential = match { it.value == credentialEncrypted && it.type == externalCredentialType },
             )
         }
     }
