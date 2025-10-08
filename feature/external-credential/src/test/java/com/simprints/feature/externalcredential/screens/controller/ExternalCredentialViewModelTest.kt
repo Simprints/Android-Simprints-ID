@@ -1,11 +1,13 @@
 package com.simprints.feature.externalcredential.screens.controller
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import io.mockk.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -69,8 +71,8 @@ internal class ExternalCredentialViewModelTest {
         val observer = viewModel.stateLiveData.test()
         val subjectId = "subjectId"
         val flowType = FlowType.IDENTIFY
-        val params = ExternalCredentialParams(subjectId = subjectId, flowType = flowType)
-        val paramsSecond = ExternalCredentialParams(subjectId = "other", flowType = FlowType.VERIFY)
+        val params = createParams(subjectId = subjectId, flowType)
+        val paramsSecond = createParams(subjectId = "other", flowType)
 
         viewModel.init(params)
         val firstState = observer.value()
@@ -81,4 +83,26 @@ internal class ExternalCredentialViewModelTest {
         assertThat(observer.value()?.subjectId).isEqualTo(subjectId)
         assertThat(observer.value()?.flowType).isEqualTo(flowType)
     }
+
+    @Test
+    fun `finish sends result to finishEvent`() {
+        val observer = viewModel.finishEvent.test()
+        val mockResult = mockk<ExternalCredentialSearchResult>(relaxed = true)
+        viewModel.finish(mockResult)
+
+        assertThat(observer.value()).isNotNull()
+        assertThat(observer.value()?.peekContent()).isEqualTo(mockResult)
+    }
+
+    private fun createParams(
+        subjectId: String,
+        flowType: FlowType,
+    ) = ExternalCredentialParams(
+        subjectId = subjectId,
+        flowType = flowType,
+        ageGroup = null,
+        probeReferenceId = null,
+        faceSamples = emptyList(),
+        fingerprintSamples = emptyList(),
+    )
 }

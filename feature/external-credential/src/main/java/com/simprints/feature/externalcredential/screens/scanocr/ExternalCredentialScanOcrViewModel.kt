@@ -6,15 +6,27 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DispatcherBG
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
+import com.simprints.feature.externalcredential.screens.scanocr.model.asExternalCredentialType
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.CropDocumentFromPreviewUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetCredentialCoordinatesUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.KeepOnlyBestDetectedBlockUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.NormalizeBitmapToPreviewUseCase
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.SaveScannedImageUseCase
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.SaveScannedImageUseCase.ScanImageType.ZoomedInCredential
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.ZoomOntoCredentialUseCase
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.resources.R
 import dagger.assisted.Assisted
@@ -29,6 +41,11 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     private val cropDocumentFromPreviewUseCase: CropDocumentFromPreviewUseCase,
     private val getCredentialCoordinatesUseCase: GetCredentialCoordinatesUseCase,
     private val keepOnlyBestDetectedBlockUseCase: KeepOnlyBestDetectedBlockUseCase,
+    private val saveScannedImageUseCase: SaveScannedImageUseCase,
+    private val zoomOntoCredentialUseCase: ZoomOntoCredentialUseCase,
+    private val tokenizationProcessor: TokenizationProcessor,
+    private val authStore: AuthStore,
+    private val configManager: ConfigManager,
     @DispatcherBG private val bgDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     @AssistedFactory
@@ -48,9 +65,9 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
         }
     private val _stateLiveData = MutableLiveData<ScanOcrState>()
     val stateLiveData: LiveData<ScanOcrState> = _stateLiveData
-    val finishOcrEvent: LiveData<LiveDataEventWithContent<DetectedOcrBlock>>
+    val finishOcrEvent: LiveData<LiveDataEventWithContent<ScannedCredential>>
         get() = _finishOcrEvent
-    private val _finishOcrEvent = MutableLiveData<LiveDataEventWithContent<DetectedOcrBlock>>()
+    private val _finishOcrEvent = MutableLiveData<LiveDataEventWithContent<ScannedCredential>>()
 
     private fun updateState(state: (ScanOcrState) -> ScanOcrState) {
         this.state = state(this.state)
@@ -97,12 +114,43 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     }
 
     fun processOcrResultsAndFinish() {
+        updateState { ScanOcrState.Complete }
         viewModelScope.launch {
+            val project = configManager.getProject(authStore.signedInProjectId)
             val detectedBlock = keepOnlyBestDetectedBlockUseCase(detectedBlocks, ocrDocumentType)
-            _finishOcrEvent.send(detectedBlock)
+            val credentialType = detectedBlock.documentType.asExternalCredentialType()
+            val blockBoundingBox = detectedBlock.blockBoundingBox
+            val zoomedCredentialImagePath = buildZoomedImagePath(detectedBlock)
+            val credential = tokenizationProcessor.encrypt(
+                decrypted = detectedBlock.readoutValue.asTokenizableRaw(),
+                tokenKeyType = TokenKeyType.ExternalCredential,
+                project = project,
+            ) as TokenizableString.Tokenized
+            val scannedCredential = ScannedCredential(
+                credential = credential,
+                credentialType = credentialType,
+                documentImagePath = detectedBlock.imagePath,
+                zoomedCredentialImagePath = zoomedCredentialImagePath,
+                credentialBoundingBox = blockBoundingBox,
+            )
+            _finishOcrEvent.send(scannedCredential)
             detectedBlocks = emptyList()
-            updateState { ScanOcrState.NotScanning }
         }
+    }
+
+    private fun buildZoomedImagePath(detectedBlock: DetectedOcrBlock): String? = try {
+        saveScannedImageUseCase(
+            bitmap = zoomOntoCredentialUseCase(detectedBlock.imagePath, detectedBlock.blockBoundingBox),
+            documentType = detectedBlock.documentType,
+            imageType = ZoomedInCredential,
+        )
+    } catch (e: Exception) {
+        Simber.e(
+            "Unable to zoom into bounding box [${detectedBlock.blockBoundingBox}] of ${detectedBlock.documentType} image ${detectedBlock.imagePath}",
+            e,
+            MULTI_FACTOR_ID,
+        )
+        null
     }
 
     fun ocrOnFrameStarted() {

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
+import android.view.ViewPropertyAnimator
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -21,17 +22,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.DispatcherBG
-import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.extentions.getCurrentPermissionStatus
 import com.simprints.core.tools.extentions.permissionFromResult
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialScanOcrBinding
+import com.simprints.feature.externalcredential.ext.fadeIn
+import com.simprints.feature.externalcredential.ext.fadeOut
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
-import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
-import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.BuildOcrCropConfigUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ProvideCameraListenerUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
@@ -77,6 +77,10 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     private var previousPermissionStatus: PermissionStatus? = null
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var imageAnalysis: ImageAnalysis
+    private var progressAnimator: ViewPropertyAnimator? = null
+    private var checkAnimator: ViewPropertyAnimator? = null
+    private var isAnimatingCompletion: Boolean = false
+    private var pendingFinishAction: (() -> Unit)? = null
 
     @Inject
     lateinit var viewModelFactory: ExternalCredentialScanOcrViewModel.Factory
@@ -127,7 +131,15 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     override fun onDestroy() {
         stopOcr()
         stopCamera()
+        clearAnimations()
         super.onDestroy()
+    }
+
+    private fun clearAnimations() {
+        pendingFinishAction = null
+        isAnimatingCompletion = false
+        checkAnimator?.cancel()
+        progressAnimator?.cancel()
     }
 
     private fun initializeFragment() {
@@ -151,13 +163,14 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
                 }
 
                 ScanOcrState.NotScanning -> renderInitialState()
+                ScanOcrState.Complete -> animateCompletionState()
             }
         }
 
         viewModel.finishOcrEvent.observe(
             viewLifecycleOwner,
-            LiveDataEventWithContentObserver { detectedBlock ->
-                finish(detectedBlock)
+            LiveDataEventWithContentObserver { scannedCredential ->
+                scheduleFinish(scannedCredential)
             },
         )
     }
@@ -184,8 +197,13 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     private fun renderProgress(state: ScanOcrState.ScanningInProgress) = with(binding) {
         val progressPercentage = (state.successfulCaptures * 100 / state.scansRequired).coerceAtMost(100)
         buttonScan.isVisible = false
-        progressCard.isVisible = true
-        progressBar.progress = progressPercentage
+        progressContainer.isVisible = true
+        progressBar.isVisible = true
+        iconScanComplete.alpha = 0f
+        progressBar.setProgressCompat(progressPercentage, true)
+        instructionsText.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_black))
+        viewfinderMask.setMaskColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_white))
+        viewfinderMask.alpha = VIEW_FINDER_ALPHA_SCAN_ACTIVE
     }
 
     private fun renderInitialState() = with(binding) {
@@ -193,19 +211,34 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         permissionRequestView.isVisible = false
         instructionsText.isVisible = true
         instructionsText.text = getString(IDR.string.mfid_scan_instructions, documentTypeText)
+        instructionsText.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_white))
         documentScannerArea.isVisible = true
-        progressCard.isVisible = false
+        progressContainer.isVisible = false
         buttonScan.isVisible = true
         buttonScan.setOnClickListener {
             viewModel.ocrStarted()
             startOcr()
         }
+        viewfinderMask.setMaskColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_black))
+        viewfinderMask.alpha = VIEW_FINDER_ALPHA_INITIAL
+    }
+
+    private fun animateCompletionState() = with(binding) {
+        isAnimatingCompletion = true
+        progressBar.fadeOut(FINISH_ANIMATION_DURATION, scaleX = true, fragment = this@ExternalCredentialScanOcrFragment)
+        scanInstructions.fadeOut(FINISH_ANIMATION_DURATION, scaleX = false, fragment = this@ExternalCredentialScanOcrFragment)
+        iconScanComplete.fadeIn(FINISH_ANIMATION_DURATION, fragment = this@ExternalCredentialScanOcrFragment, onComplete = {
+            isAnimatingCompletion = false
+            // Execute any pending action after the animation. Currently used is for next fragment navigation
+            pendingFinishAction?.invoke()
+            pendingFinishAction = null
+        })
     }
 
     private fun renderNoPermission(shouldOpenPhoneSettings: Boolean) {
         with(binding) {
             instructionsText.isVisible = false
-            progressCard.isVisible = false
+            progressContainer.isVisible = false
             documentScannerArea.isInvisible = true
             buttonScan.isVisible = false
             val documentTypeText = viewModel.getDocumentTypeRes().run(::getString)
@@ -273,20 +306,31 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         }
     }
 
-    private fun finish(detectedBlock: DetectedOcrBlock) {
-        val credentialType = when (detectedBlock.documentType) {
-            OcrDocumentType.NhisCard -> ExternalCredentialType.NHISCard
-            OcrDocumentType.GhanaIdCard -> ExternalCredentialType.GhanaIdCard
+    /**
+     * Waits until all animations are complete before navigating away. Completion animations are in place because the execution of
+     * [ExternalCredentialScanOcrViewModel.processOcrResultsAndFinish] is not immediate, and it makes the transition to the next fragment
+     * smoother for user.
+     *
+     * The animation state is stored in the [isAnimatingCompletion]. If it is set to true, the navigation action is set to
+     * [pendingFinishAction] which will be executed once animations are complete. If false, the navigation will proceed immediately.
+     */
+    private fun scheduleFinish(credential: ScannedCredential) {
+        val navigationAction = {
+            findNavController().navigateSafely(
+                this@ExternalCredentialScanOcrFragment,
+                ExternalCredentialScanOcrFragmentDirections.actionExternalCredentialScanOcrToExternalCredentialSearch(credential),
+            )
         }
-        val args = ScannedCredential(
-            credential = detectedBlock.readoutValue,
-            credentialType = credentialType,
-            previewImagePath = detectedBlock.imagePath,
-            imageBoundingBox = detectedBlock.blockBoundingBox,
-        )
-        findNavController().navigateSafely(
-            this@ExternalCredentialScanOcrFragment,
-            ExternalCredentialScanOcrFragmentDirections.actionExternalCredentialScanOcrToExternalCredentialSearch(args),
-        )
+        if (isAnimatingCompletion) {
+            pendingFinishAction = navigationAction
+        } else {
+            navigationAction.invoke()
+        }
+    }
+
+    companion object {
+        private const val VIEW_FINDER_ALPHA_INITIAL = 0.5f
+        private const val VIEW_FINDER_ALPHA_SCAN_ACTIVE = 0.9f
+        private const val FINISH_ANIMATION_DURATION = 300L
     }
 }

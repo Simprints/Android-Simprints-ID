@@ -174,38 +174,4 @@ internal class CropDocumentFromPreviewUseCaseTest {
         }
         unmockkStatic(Bitmap::class)
     }
-
-    @Test
-    fun `handles empty cutout rect by creating 1x1 bitmap`() {
-        val left = 100
-        val top = 100
-        val expectedWidth = 0
-        val expectedHeight = 0
-        val cutoutRect = Rect(left, top, left, top)
-
-        mockkStatic(Bitmap::class)
-        every {
-            Bitmap.createBitmap(
-                sourceBitmap,
-                left,
-                top,
-                expectedWidth,
-                expectedHeight,
-            )
-        } returns croppedBitmap
-
-        val result = useCase(sourceBitmap, cutoutRect)
-
-        assertThat(result).isEqualTo(croppedBitmap)
-        verify {
-            Bitmap.createBitmap(
-                sourceBitmap,
-                left,
-                top,
-                expectedWidth,
-                expectedHeight,
-            )
-        }
-        unmockkStatic(Bitmap::class)
-    }
 }

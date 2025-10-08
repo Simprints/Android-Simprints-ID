@@ -13,6 +13,8 @@ import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
 import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
@@ -429,6 +431,111 @@ internal class OrchestratorViewModelTest {
         viewModel.currentStep.test().value().peekContent()?.let { step ->
             assertThat(step.params?.let { it as? EnrolLastBiometricParams }?.steps).containsExactly(mockEnrolLastStep)
         }
+    }
+
+    @Test
+    fun `Updates external credential step payload with fingerprint samples when receiving fingerprint capture result`() = runTest {
+        val fingerprintReferenceId = "fingerprintReferenceId"
+        val fingerId1 = IFingerIdentifier.LEFT_INDEX_FINGER
+        val fingerId2 = IFingerIdentifier.RIGHT_THUMB
+        val template1 = ByteArray(10)
+        val template2 = ByteArray(20)
+        val format1 = "format1"
+        val format2 = "format2"
+
+        val fingerprintSample1 = mockk<FingerprintCaptureResult.Sample> {
+            every { fingerIdentifier } returns fingerId1
+            every { template } returns template1
+            every { format } returns format1
+        }
+        val fingerprintSample2 = mockk<FingerprintCaptureResult.Sample> {
+            every { fingerIdentifier } returns fingerId2
+            every { template } returns template2
+            every { format } returns format2
+        }
+
+        val fingerprintItem1 = mockk<FingerprintCaptureResult.Item> {
+            every { sample } returns fingerprintSample1
+        }
+        val fingerprintItem2 = mockk<FingerprintCaptureResult.Item> {
+            every { sample } returns fingerprintSample2
+        }
+
+        val externalCredentialParams = mockk<ExternalCredentialParams>(relaxed = true) {
+            every { copy(probeReferenceId = any(), fingerprintSamples = any()) } returns this
+        }
+
+        coEvery { stepsBuilder.build(any(), any(), any()) } returns listOf(
+            createMockStep(StepId.FINGERPRINT_CAPTURE),
+            createMockStep(StepId.EXTERNAL_CREDENTIAL, externalCredentialParams)
+        )
+        coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
+
+        viewModel.handleAction(mockk())
+        viewModel.handleResult(
+            FingerprintCaptureResult(
+                fingerprintReferenceId,
+                listOf(fingerprintItem1, fingerprintItem2)
+            )
+        )
+
+        val expectedFingerprintSamples = listOf(
+            MatchParams.FingerprintSample(fingerId1, format1, template1),
+            MatchParams.FingerprintSample(fingerId2, format2, template2)
+        )
+
+        verify {
+            externalCredentialParams.copy(
+                probeReferenceId = fingerprintReferenceId,
+                fingerprintSamples = expectedFingerprintSamples
+            )
+        }
+    }
+
+    @Test
+    fun `Removes matcher steps when external credential search has good matches in identify flow`() = runTest {
+        val externalCredentialResult = mockk<ExternalCredentialSearchResult> {
+            every { flowType } returns FlowType.IDENTIFY
+            every { goodMatches } returns listOf(mockk())
+        }
+
+        coEvery { stepsBuilder.build(any(), any(), any()) } returns listOf(
+            createMockStep(StepId.FACE_CAPTURE),
+            createMockStep(StepId.FINGERPRINT_CAPTURE),
+            createMockStep(StepId.FACE_MATCHER),
+            createMockStep(StepId.FINGERPRINT_MATCHER)
+        )
+        coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
+
+        viewModel.handleAction(mockk())
+        viewModel.handleResult(externalCredentialResult)
+
+        viewModel.currentStep.test().value().peekContent()?.let { step ->
+            assertThat(step.id).isNotEqualTo(StepId.FACE_MATCHER)
+            assertThat(step.id).isNotEqualTo(StepId.FINGERPRINT_MATCHER)
+        }
+    }
+
+    @Test
+    fun `Does not remove matcher steps when flow type is enrol even with good matches`() = runTest {
+        val externalCredentialResult = mockk<ExternalCredentialSearchResult> {
+            every { flowType } returns FlowType.ENROL
+            every { goodMatches } returns listOf(mockk())
+        }
+
+        coEvery { stepsBuilder.build(any(), any(), any()) } returns listOf(
+            createMockStep(StepId.FACE_CAPTURE),
+            createMockStep(StepId.FACE_MATCHER),
+        )
+        coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
+
+        viewModel.handleAction(mockk())
+        viewModel.handleResult(externalCredentialResult)
+
+        val stepsObserver = viewModel.currentStep.test()
+        val allStepIds = stepsObserver.valueHistory().mapNotNull { it.peekContent()?.id }
+
+        assertThat(allStepIds).contains(StepId.FACE_MATCHER)
     }
 
     private fun createMockStep(

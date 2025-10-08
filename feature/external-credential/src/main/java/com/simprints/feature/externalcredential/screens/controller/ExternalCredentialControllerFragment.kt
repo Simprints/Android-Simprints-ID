@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.externalcredential.GraphExternalCredentialInternalDirections
@@ -17,7 +18,6 @@ import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.navigation.navigationParams
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.getValue
 
 @AndroidEntryPoint
 internal class ExternalCredentialControllerFragment : Fragment(R.layout.fragment_external_credential_controller) {
@@ -65,6 +65,12 @@ internal class ExternalCredentialControllerFragment : Fragment(R.layout.fragment
     private fun initObservers() {
         viewModel.stateLiveData.observe(viewLifecycleOwner) {
         }
+        viewModel.finishEvent.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver { result ->
+                findNavController().finishWithResult(this, result)
+            },
+        )
     }
 
     private fun initListeners() {

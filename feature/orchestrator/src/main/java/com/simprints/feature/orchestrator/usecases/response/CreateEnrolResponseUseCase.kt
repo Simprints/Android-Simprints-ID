@@ -3,6 +3,8 @@ package com.simprints.feature.orchestrator.usecases.response
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.face.capture.FaceCaptureResult
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.eventsync.sync.common.SubjectFactory
@@ -13,6 +15,7 @@ import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppResponse
 import java.io.Serializable
+import java.util.UUID
 import javax.inject.Inject
 
 internal class CreateEnrolResponseUseCase @Inject constructor(
@@ -27,8 +30,8 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
     ): AppResponse {
         val fingerprintCapture = results.filterIsInstance(FingerprintCaptureResult::class.java).lastOrNull()
         val faceCapture = results.filterIsInstance(FaceCaptureResult::class.java).lastOrNull()
-        // TODO [CORE-3421] When an external credential can be extracted from the UI-level steps, extract it here
-        val externalCredential: ExternalCredential? = null
+        val credentialResult = results.filterIsInstance(ExternalCredentialSearchResult::class.java).lastOrNull()
+        val externalCredential = credentialResult?.scannedCredential?.toExternalCredential(enrolmentSubjectId)
 
         return try {
             val subject = subjectFactory.buildSubjectFromCaptureResults(
@@ -48,4 +51,11 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
             AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR)
         }
     }
+
+    private fun ScannedCredential.toExternalCredential(subjectId: String) = ExternalCredential(
+        id = UUID.randomUUID().toString(),
+        value = credential,
+        subjectId = subjectId,
+        type = credentialType,
+    )
 }

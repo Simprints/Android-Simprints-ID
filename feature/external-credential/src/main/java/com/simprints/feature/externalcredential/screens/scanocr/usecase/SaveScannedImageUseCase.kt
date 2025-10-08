@@ -18,9 +18,10 @@ internal class SaveScannedImageUseCase @Inject constructor(
     operator fun invoke(
         bitmap: Bitmap,
         documentType: OcrDocumentType,
+        imageType: ScanImageType,
     ): String {
         val documentTypeName = documentType.toString().trim().replace(" ", "")
-        val fileName = "ocr_scan_${documentTypeName}_${System.currentTimeMillis()}.jpg"
+        val fileName = "ocr_scan_${documentTypeName}_${imageType}_${System.currentTimeMillis()}.jpg"
         val file = File(context.cacheDir, fileName)
 
         file.outputStream().use { outputStream ->
@@ -28,5 +29,10 @@ internal class SaveScannedImageUseCase @Inject constructor(
         }
 
         return file.absolutePath
+    }
+
+    enum class ScanImageType {
+        FullDocument,
+        ZoomedInCredential,
     }
 }

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
+import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.step.StepResult
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -18,6 +19,8 @@ import com.simprints.face.capture.FaceCaptureParams
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
 import com.simprints.feature.orchestrator.model.OrchestratorResult
@@ -119,6 +122,7 @@ internal class OrchestratorViewModel @Inject constructor(
             Simber.i("Completed step: ${step.id}", tag = ORCHESTRATION)
 
             updateMatcherStepPayload(step, result)
+            updateExternalCredentialStepPayload(step, result)
         }
 
         if (result is SelectSubjectAgeGroupResult) {
@@ -129,6 +133,10 @@ internal class OrchestratorViewModel @Inject constructor(
                 enrolmentSubjectId = enrolmentSubjectId
             )
             steps = steps + captureAndMatchSteps
+        }
+
+        if (result is ExternalCredentialSearchResult) {
+            removeMatcherStepIfRequired(result)
         }
 
         doNextStep()
@@ -177,6 +185,22 @@ internal class OrchestratorViewModel @Inject constructor(
                 locationStore.cancelLocationCollection()
                 cache.steps = steps
                 buildAppResponse()
+            }
+        }
+    }
+
+    /**
+     * Removes Matcher steps during [FlowType.IDENTIFY] flow if External Credential search found any match.
+     */
+    private fun removeMatcherStepIfRequired(result: ExternalCredentialSearchResult) {
+        if (result.flowType == FlowType.IDENTIFY) {
+            val confirmedVerifications = result.goodMatches.size
+            if(confirmedVerifications > 0) {
+                steps = steps.filterNot { it.id in listOf(StepId.FACE_MATCHER, StepId.FINGERPRINT_MATCHER) }
+                Simber.i(
+                    "Matcher steps removed because External Credential search verified [$confirmedVerifications] candidate(s). Flow type = [${result.flowType}]",
+                    tag = ORCHESTRATION
+                )
             }
         }
     }
@@ -275,6 +299,45 @@ internal class OrchestratorViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * Passes face or fingerprint samples to the External Credential search step
+     */
+    private fun updateExternalCredentialStepPayload(currentStep: Step, result: StepResult) {
+        if (currentStep.id !in listOf(StepId.FACE_CAPTURE, StepId.FINGERPRINT_CAPTURE)) return
+        val step = steps.firstOrNull { it.id == StepId.EXTERNAL_CREDENTIAL } ?: return
+        val params = step.params as? ExternalCredentialParams ?: return
+        val updatedParams = when {
+            currentStep.id == StepId.FACE_CAPTURE && result is FaceCaptureResult -> {
+                val faceSamples = result.results
+                    .mapNotNull { it.sample }
+                    .map { MatchParams.FaceSample(it.faceId, it.template) }
+                params.copy(
+                    probeReferenceId = result.referenceId,
+                    faceSamples = faceSamples,
+                )
+            }
+
+            currentStep.id == StepId.FINGERPRINT_CAPTURE && result is FingerprintCaptureResult -> {
+                val fingerprintSamples = result.results
+                    .mapNotNull { it.sample }
+                    .map {
+                        MatchParams.FingerprintSample(
+                            fingerId = it.fingerIdentifier,
+                            format = it.format,
+                            template = it.template,
+                        )
+                    }
+                params.copy(
+                    probeReferenceId = result.referenceId,
+                    fingerprintSamples = fingerprintSamples,
+                )
+            }
+
+            else -> params
+        }
+        step.params = updatedParams
     }
 
     fun setActionRequestFromJson(json: String) {

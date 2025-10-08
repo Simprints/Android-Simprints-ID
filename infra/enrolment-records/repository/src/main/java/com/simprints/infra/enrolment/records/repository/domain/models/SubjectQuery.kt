@@ -17,5 +17,5 @@ data class SubjectQuery(
     val sort: Boolean = false,
     val afterSubjectId: String? = null,
     val metadata: String? = null,
-    val externalCredential: String? = null,
+    val externalCredential: TokenizableString.Tokenized? = null,
 ) : StepParams

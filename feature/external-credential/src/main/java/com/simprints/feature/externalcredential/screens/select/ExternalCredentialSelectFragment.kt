@@ -18,6 +18,7 @@ import com.simprints.feature.externalcredential.databinding.FragmentExternalCred
 import com.simprints.feature.externalcredential.ext.getQuantityCredentialString
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
+import com.simprints.feature.externalcredential.screens.scanocr.model.asOcrDocumentType
 import com.simprints.feature.externalcredential.screens.select.view.ExternalCredentialTypeAdapter
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
@@ -107,8 +108,10 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
 
     private fun navigateToScanner(type: ExternalCredentialType) {
         when (type) {
-            ExternalCredentialType.NHISCard -> startOcr(OcrDocumentType.NhisCard)
-            ExternalCredentialType.GhanaIdCard -> startOcr(OcrDocumentType.GhanaIdCard)
+            ExternalCredentialType.NHISCard,
+            ExternalCredentialType.GhanaIdCard,
+            -> startOcr(type.asOcrDocumentType())
+
             ExternalCredentialType.QRCode -> startQrScan()
         }
     }

@@ -18,6 +18,7 @@ import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.feature.enrollast.MatchResult
 import com.simprints.feature.exitform.ExitFormResult
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.fetchsubject.FetchSubjectParams
 import com.simprints.feature.fetchsubject.FetchSubjectResult
@@ -114,6 +115,7 @@ abstract class StepResultMixin : StepResult
         name = "EnrolLastBiometricStepResult.FaceCaptureResult",
     ),
     JsonSubTypes.Type(value = ExternalCredentialParams::class, name = "ExternalCredentialParams"),
+    JsonSubTypes.Type(value = ExternalCredentialSearchResult::class, name = "ExternalCredentialSearchResult"),
     JsonSubTypes.Type(value = MatchResult::class, name = "MatchResult"),
     JsonSubTypes.Type(value = FingerTemplateCaptureResult::class, name = "FingerTemplateCaptureResult"),
     JsonSubTypes.Type(value = FaceTemplateCaptureResult::class, name = "FaceTemplateCaptureResult"),

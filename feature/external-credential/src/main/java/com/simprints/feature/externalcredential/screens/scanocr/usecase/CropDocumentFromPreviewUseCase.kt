@@ -17,6 +17,12 @@ internal class CropDocumentFromPreviewUseCase @Inject constructor() {
         val width = right - left
         val height = bottom - top
 
+        if (width <= 0 || height <= 0) {
+            throw IllegalStateException(
+                "Invalid OCR crop dimensions: width=$width, height=$height. CutoutRect=[$cutoutRect], bitmapSize(w,h)=[${bitmap.width}x${bitmap.height}]",
+            )
+        }
+
         return Bitmap.createBitmap(bitmap, left, top, width, height)
     }
 }

@@ -491,6 +491,9 @@
     <string name="mfid_type_nhis_card">NHIS Card</string>
     <string name="mfid_type_ghana_id_card">Ghana ID Card</string>
     <string name="mfid_type_qr_code">QR Code</string>
+    <string name="mfid_nhis_card_credential_field">Membership number</string>
+    <string name="mfid_ghana_id_credential_field">Personal ID</string>
+    <string name="mfid_qr_credential_field">QR Code value</string>
     <string name="mfid_type_any_document">a document</string>
     <string name="mfid_dialog_skip_scan_title">Skip scanning?</string>
 
@@ -509,5 +512,18 @@
     <string name="mfid_dialog_wrong_qr_rescan">Re-scan</string>
     <string name="mfid_ocr_progress_title">Scanning, keep card in frame…</string>
     <string name="mfid_scan_camera_permission_body">Cannot scan the %1$s without permission to use the camera</string>
+    <string name="mfid_confirmation_checkbox_text">I confirm that the %1$s is scanned correctly</string>
+    <string name="mfid_action_go_to_record">Go to record</string>
+    <string name="mfid_action_enrol">Enrol</string>
+    <string name="mfid_action_enrol_anyway">Enrol anyway</string>
+    <string name="mfid_action_continue">Continue</string>
+    <string name="mfid_searching">Searching…</string>
+
+    <string name="mfid_search_found_enrol">This %1$s is already registered</string>
+    <string name="mfid_search_found_identification">Record found</string>
+    <string name="mfid_search_found_identification_low_match_score">This %1$s might be linked to another patient</string>
+    <string name="mfid_search_not_found_identification">No record is found with this %1$s. You wil be able to link this %2$s to a patient later</string>
+
+
 
 </resources>
