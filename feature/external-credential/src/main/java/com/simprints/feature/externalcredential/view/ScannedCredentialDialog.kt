@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.DialogScannedCredentialBinding
@@ -17,7 +18,6 @@ import com.simprints.feature.externalcredential.databinding.ItemScannedImageBind
 import com.simprints.feature.externalcredential.ext.getCredentialFieldTitle
 import com.simprints.feature.externalcredential.ext.getCredentialTypeString
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
-import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.resources.R as IDR
 
 @ExcludedFromGeneratedTestCoverageReports("UI class")

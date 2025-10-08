@@ -10,10 +10,10 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
+import com.simprints.feature.externalcredential.usecase.AddExternalCredentialToSubjectUseCase
 import com.simprints.feature.selectsubject.SelectSubjectParams
 import com.simprints.feature.selectsubject.SelectSubjectResult
 import com.simprints.feature.selectsubject.model.SelectSubjectState
-import com.simprints.feature.selectsubject.usecase.AddExternalCredentialToSubjectUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor

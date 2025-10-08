@@ -6,9 +6,8 @@ import android.graphics.Rect
 import androidx.core.graphics.scale
 import com.google.common.truth.Truth.*
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
-import io.mockk.every
-import io.mockk.impl.annotations.*
-import io.mockk.verify
+import io.mockk.*
+import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
