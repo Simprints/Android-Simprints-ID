@@ -10,6 +10,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 
+@ExcludedFromGeneratedTestCoverageReports("View animation")
 fun View.setPulseAnimation(isEnabled: Boolean) {
     (tag as? ObjectAnimator?)?.run {
         cancel()
