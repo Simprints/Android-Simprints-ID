@@ -2,7 +2,7 @@ package com.simprints.feature.clientapi
 
 import android.os.Bundle
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.ext.junit.runners.*
 import com.jraska.livedata.test
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
@@ -22,14 +22,8 @@ import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.logging.persistent.PersistentLogger
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coJustRun
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule

@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.Rect
 import androidx.core.graphics.scale
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import io.mockk.*
 import io.mockk.impl.annotations.MockK

@@ -1,8 +1,8 @@
 package com.simprints.feature.clientapi.mappers.response
 
 import androidx.core.os.bundleOf
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import androidx.test.ext.junit.runners.*
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.feature.clientapi.mappers.request.requestFactories.ConfirmIdentityActionFactory

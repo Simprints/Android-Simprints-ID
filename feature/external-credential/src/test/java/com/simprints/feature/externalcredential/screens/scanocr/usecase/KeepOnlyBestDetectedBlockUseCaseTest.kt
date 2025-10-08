@@ -1,6 +1,6 @@
 package com.simprints.feature.externalcredential.screens.scanocr.usecase
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import io.mockk.*
