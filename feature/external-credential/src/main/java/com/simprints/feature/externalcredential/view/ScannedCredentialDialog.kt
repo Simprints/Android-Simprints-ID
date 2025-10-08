@@ -78,6 +78,7 @@ class ScannedCredentialDialog(
         }
     }
 
+    @ExcludedFromGeneratedTestCoverageReports("UI class")
     private inner class ImageAdapter(
         private val imagePaths: List<String>,
     ) : RecyclerView.Adapter<ImageAdapter.ImageViewHolder>() {
@@ -100,6 +101,7 @@ class ScannedCredentialDialog(
 
         override fun getItemCount() = imagePaths.size
 
+        @ExcludedFromGeneratedTestCoverageReports("UI class")
         inner class ImageViewHolder(
             itemView: View,
         ) : RecyclerView.ViewHolder(itemView) {
