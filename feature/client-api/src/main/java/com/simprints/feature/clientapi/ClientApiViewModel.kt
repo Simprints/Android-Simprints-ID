@@ -115,6 +115,7 @@ class ClientApiViewModel @Inject internal constructor(
                     sessionId = currentSessionId,
                     enrolledGuid = enrolResponse.guid,
                     subjectActions = coSyncEnrolmentRecords,
+                    externalCredential = enrolResponse.externalCredential,
                 ),
             ),
         )

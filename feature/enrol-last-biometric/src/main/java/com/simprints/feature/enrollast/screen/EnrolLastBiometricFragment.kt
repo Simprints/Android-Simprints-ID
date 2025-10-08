@@ -6,6 +6,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.alert.AlertContract
@@ -21,6 +23,8 @@ import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType
 import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.DUPLICATE_ENROLMENTS
 import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.GENERAL_ERROR
 import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.NO_MATCH_RESULTS
+import com.simprints.feature.enrollast.screen.model.CredentialDialogItem
+import com.simprints.feature.externalcredential.view.ScannedCredentialDialog
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
@@ -37,6 +41,7 @@ import com.simprints.infra.resources.R as IDR
 internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_last) {
     private val viewModel: EnrolLastBiometricViewModel by viewModels()
     private val params: EnrolLastBiometricParams by navigationParams()
+    private var dialog: BottomSheetDialog? = null
 
     override fun onViewCreated(
         view: View,
@@ -50,17 +55,35 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
             viewLifecycleOwner,
             R.id.enrolLastBiometricFragment,
             AlertContract.DESTINATION,
-        ) { finishWithSubjectId(null) }
+        ) { finish(newSubjectId = null, credential = null) }
 
-        viewModel.finish.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { finishWithResult(it) })
+        initObservers()
         viewModel.onViewCreated(params)
+    }
+
+    private fun initObservers() {
+        viewModel.finish.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { finishWithResult(it) })
+        viewModel.showAddCredentialDialog.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver(::displayCredentialDialog),
+        )
+    }
+
+    private fun displayCredentialDialog(credentialDialogItem: CredentialDialogItem) {
+        dialog = ScannedCredentialDialog(
+            context = requireActivity(),
+            credential = credentialDialogItem.scannedCredential,
+            displayedCredential = credentialDialogItem.displayedCredential,
+            onConfirm = { viewModel.enrolBiometric(params, isAddingCredential = true) },
+            onSkip = { viewModel.enrolBiometric(params, isAddingCredential = false) },
+        ).also(ScannedCredentialDialog::show)
     }
 
     private fun finishWithResult(result: EnrolLastState) = when (result) {
         is EnrolLastState.Failed -> showError(result.errorType, result.modalities)
         is EnrolLastState.Success -> {
             Toast.makeText(requireContext(), getString(IDR.string.enrol_last_biometrics_success), Toast.LENGTH_LONG).show()
-            finishWithSubjectId(result.newGuid)
+            finish(result.newGuid, result.externalCredential)
         }
     }
 
@@ -103,7 +126,10 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
             }
         }.let { getString(it) }
 
-    private fun finishWithSubjectId(newSubjectId: String?) {
-        findNavController().finishWithResult(this, EnrolLastBiometricResult(newSubjectId))
+    private fun finish(
+        newSubjectId: String?,
+        credential: ExternalCredential?,
+    ) {
+        findNavController().finishWithResult(this, EnrolLastBiometricResult(newSubjectId, credential))
     }
 }

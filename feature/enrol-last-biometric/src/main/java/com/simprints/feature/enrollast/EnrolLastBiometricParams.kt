@@ -3,6 +3,7 @@ package com.simprints.feature.enrollast
 import androidx.annotation.Keep
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
@@ -13,6 +14,7 @@ data class EnrolLastBiometricParams(
     val userId: TokenizableString,
     val moduleId: TokenizableString,
     val steps: List<EnrolLastBiometricStepResult>,
+    val scannedCredential: ScannedCredential?,
 ) : StepParams
 
 sealed class EnrolLastBiometricStepResult : StepParams {

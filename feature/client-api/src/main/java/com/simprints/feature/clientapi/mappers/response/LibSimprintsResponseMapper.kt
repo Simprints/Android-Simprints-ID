@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
+import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.libsimprints.Constants
@@ -32,6 +33,7 @@ internal class LibSimprintsResponseMapper @Inject constructor(
             Constants.SIMPRINTS_DEVICE_ID to deviceId,
             Constants.SIMPRINTS_APP_VERSION_NAME to appVersionName,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
+            HAS_CREDENTIAL to (response.externalCredential != null),
         ).appendDataPerContractVersion(response) { version ->
             when {
                 version < VersionsList.INITIAL_REWORK -> putParcelable(
@@ -42,6 +44,7 @@ internal class LibSimprintsResponseMapper @Inject constructor(
                 else -> putString(Constants.SIMPRINTS_ENROLMENT, Enrolment(response.enrolledGuid).toJson())
             }
         }.appendCoSyncData(response.subjectActions)
+            .appendExternalCredential(response.externalCredential)
 
         is ActionResponse.IdentifyActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
@@ -73,18 +76,7 @@ internal class LibSimprintsResponseMapper @Inject constructor(
                 Constants.SIMPRINTS_APP_VERSION_NAME to appVersionName,
                 Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
                 HAS_CREDENTIAL to (response.externalCredential != null),
-            ).also { bundle ->
-                val credentialJson = response.externalCredential?.let {
-                    JSONObject()
-                        .also {
-                            it.put(SCANNED_CREDENTIAL_VALUE, response.externalCredential?.value)
-                            it.put(SCANNED_CREDENTIAL_TYPE, response.externalCredential?.type)
-                        }.toString()
-                }
-                if (credentialJson != null) {
-                    bundle.putString(SCANNED_CREDENTIAL, credentialJson)
-                }
-            }
+            ).appendExternalCredential(response.externalCredential)
         }
 
         is ActionResponse.VerifyActionResponse -> bundleOf(
@@ -158,6 +150,18 @@ internal class LibSimprintsResponseMapper @Inject constructor(
 
     private fun Bundle.appendCoSyncData(actions: String?) = apply {
         actions?.let { putString(Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS, it) }
+    }
+
+    private fun Bundle.appendExternalCredential(credential: ExternalCredential?) = apply {
+        if (credential != null) {
+            val credentialJson =
+                JSONObject()
+                    .also {
+                        it.put(SCANNED_CREDENTIAL_VALUE, credential.value)
+                        it.put(SCANNED_CREDENTIAL_TYPE, credential.type)
+                    }.toString()
+            putString(SCANNED_CREDENTIAL, credentialJson)
+        }
     }
 
     private fun AppErrorReason.libSimprintsResultCode() = when (this) {
