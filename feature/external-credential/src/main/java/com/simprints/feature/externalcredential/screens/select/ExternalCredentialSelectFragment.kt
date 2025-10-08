@@ -7,7 +7,6 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -32,7 +31,6 @@ import com.simprints.infra.resources.R as IDR
 @AndroidEntryPoint
 internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_external_credential_select) {
     private val mainViewModel: ExternalCredentialViewModel by activityViewModels()
-    private val viewModel by viewModels<ExternalCredentialSelectViewModel>()
     private val binding by viewBinding(FragmentExternalCredentialSelectBinding::bind)
 
     private var dialog: Dialog? = null
@@ -46,7 +44,6 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
         Simber.i("ExternalCredentialSelectFragment started", tag = ORCHESTRATION)
 
         observeChanges()
-        viewModel.loadExternalCredentials()
     }
 
     override fun onDestroy() {
@@ -85,7 +82,7 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
     }
 
     private fun observeChanges() {
-        viewModel.externalCredentialTypes.observe(viewLifecycleOwner) { externalCredentialTypes ->
+        mainViewModel.externalCredentialTypes.observe(viewLifecycleOwner) { externalCredentialTypes ->
             updateSelectedCredentialType(null)
             fillRecyclerView(externalCredentialTypes)
             initViews(externalCredentialTypes)

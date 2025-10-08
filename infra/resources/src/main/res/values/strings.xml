@@ -527,7 +527,18 @@
     <string name="mfid_search_not_found_identification">No record is found with this %1$s. You wil be able to link this %2$s to a patient later</string>
 
     <string name="mfid_add_document_title">Add this %1$s?</string>
-
+    <string name="mfid_skip_title">Why did you skip the %1$s scan?</string>
+    <string name="mfid_skip_reason_does_not_have">Does not have %1$s</string>
+    <string name="mfid_skip_reason_did_not_bring">Did not bring %1$s</string>
+    <string name="mfid_skip_reason_incorrect">Brought incorrect %1$s</string>
+    <string name="mfid_skip_reason_does_not_want_to_provide">Does not want to priovide %1$s</string>
+    <string name="mfid_skip_reason_damaged">%1$s damaged or unreadable</string>
+    <string name="mfid_skip_reason_unable_to_scan">Unable to scan %1$s</string>
+    <string name="mfid_skip_reason_other">Other</string>
+    <string name="mfid_skip_reason_hint">Reason</string>
+    <string name="mfid_skip_reason_helper_text">Please provide a reason for skipping</string>
+    <string name="mfid_skip_confirm">Skip Scanning</string>
+    <string name="mfid_skip_go_back">Go Back</string>
 
 
 </resources>
