@@ -4,7 +4,6 @@ import javax.inject.Inject
 import kotlin.math.min
 
 internal class CalculateLevenshteinDistanceUseCase @Inject constructor() {
-
     /**
      * Calculates the Levenshtein distance between two strings.
      *
@@ -20,7 +19,10 @@ internal class CalculateLevenshteinDistanceUseCase @Inject constructor() {
      * @param s2 second string
      * @return minimum number of edits needed to transform s1 into s2
      */
-    operator fun invoke(s1: String, s2: String): Int {
+    operator fun invoke(
+        s1: String,
+        s2: String,
+    ): Int {
         if (s1 == s2) return 0
         if (s1.isEmpty()) return s2.length
         if (s2.isEmpty()) return s1.length
@@ -33,9 +35,9 @@ internal class CalculateLevenshteinDistanceUseCase @Inject constructor() {
                 dp[i][j] = min(
                     min(
                         dp[i - 1][j] + 1,
-                        dp[i][j - 1] + 1
+                        dp[i][j - 1] + 1,
                     ),
-                    dp[i - 1][j - 1] + cost
+                    dp[i - 1][j - 1] + cost,
                 )
             }
         }

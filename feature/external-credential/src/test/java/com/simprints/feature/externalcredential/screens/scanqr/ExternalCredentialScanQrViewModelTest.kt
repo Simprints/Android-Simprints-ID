@@ -24,7 +24,6 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class ExternalCredentialScanQrViewModelTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -43,7 +42,6 @@ internal class ExternalCredentialScanQrViewModelTest {
     @MockK
     private lateinit var configManager: ConfigManager
 
-
     private lateinit var viewModel: ExternalCredentialScanQrViewModel
 
     @Before
@@ -53,7 +51,7 @@ internal class ExternalCredentialScanQrViewModelTest {
             externalCredentialQrCodeValidator = validator,
             tokenizationProcessor = tokenizationProcessor,
             configManager = configManager,
-            authStore = authStore
+            authStore = authStore,
         )
     }
 
@@ -100,7 +98,7 @@ internal class ExternalCredentialScanQrViewModelTest {
         val observer = viewModel.stateLiveData.test()
         viewModel.updateCameraPermissionStatus(PermissionStatus.Denied)
         assertThat(observer.value()).isEqualTo(
-            ScanQrState.NoCameraPermission(shouldOpenPhoneSettings = false)
+            ScanQrState.NoCameraPermission(shouldOpenPhoneSettings = false),
         )
     }
 
@@ -109,7 +107,7 @@ internal class ExternalCredentialScanQrViewModelTest {
         val observer = viewModel.stateLiveData.test()
         viewModel.updateCameraPermissionStatus(PermissionStatus.DeniedNeverAskAgain)
         assertThat(observer.value()).isEqualTo(
-            ScanQrState.NoCameraPermission(shouldOpenPhoneSettings = true)
+            ScanQrState.NoCameraPermission(shouldOpenPhoneSettings = true),
         )
     }
 

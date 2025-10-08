@@ -22,10 +22,10 @@ import com.simprints.core.tools.extentions.hideKeyboard
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialSearchBinding
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.ZoomOntoCredentialUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.externalcredential.screens.search.model.SearchCredentialState
 import com.simprints.feature.externalcredential.screens.search.model.SearchState
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.ZoomOntoCredentialUseCase
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.navigateSafely
@@ -45,7 +45,7 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
                 @Suppress("UNCHECKED_CAST")
                 return viewModelFactory.create(
                     scannedCredential = args.scannedCredential,
-                    externalCredentialParams = mainViewModel.params
+                    externalCredentialParams = mainViewModel.params,
                 ) as T
             }
         }
@@ -54,13 +54,14 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
     @Inject
     lateinit var viewModelFactory: ExternalCredentialSearchViewModel.Factory
 
-
     @Inject
     lateinit var zoomOntoCredentialUseCase: ZoomOntoCredentialUseCase
     private var isEditingCredential: Boolean = false
 
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         initObservers()
     }
@@ -80,7 +81,7 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
             viewLifecycleOwner,
             LiveDataEventWithContentObserver { result ->
                 mainViewModel.finish(result)
-            }
+            },
         )
     }
 
@@ -90,7 +91,9 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         val credentialField = getString(mainViewModel.mapTypeToCredentialFieldResource(credentialType))
         val currentEditTextValue = credentialEditText.text.toString()
         renderImage(state.scannedCredential)
-        credential.takeIf { currentEditTextValue.isEmpty() }?.let { credentialEditText.setText(it) /*Setting only once at the start*/ }
+        credential.takeIf { currentEditTextValue.isEmpty() }?.let {
+            credentialEditText.setText(it) // Setting only once at the start
+        }
         documentTypeTitle.text = credentialField
         credentialEditText.inputType = viewModel.getKeyBoardInputType()
         credentialEditText.hint = credentialField
@@ -111,7 +114,11 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         }
     }
 
-    private fun renderSearchProgress(searchState: SearchState, credentialType: ExternalCredentialType, flowType: FlowType) = with(binding) {
+    private fun renderSearchProgress(
+        searchState: SearchState,
+        credentialType: ExternalCredentialType,
+        flowType: FlowType,
+    ) = with(binding) {
         when (searchState) {
             SearchState.Searching -> {
                 searchProgressCard.isVisible = true
@@ -195,7 +202,7 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         buttonRecapture.setOnClickListener {
             findNavController().navigateSafely(
                 this@ExternalCredentialSearchFragment,
-                ExternalCredentialSearchFragmentDirections.actionExternalCredentialSearchToExternalCredentialSelectFragment()
+                ExternalCredentialSearchFragmentDirections.actionExternalCredentialSearchToExternalCredentialSelectFragment(),
             )
         }
     }
@@ -205,7 +212,6 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         binding.documentPreview.isVisible = documentImagePath != null
         if (documentImagePath == null) return
 
-
         try {
             val imagePath: String = credential.zoomedCredentialImagePath ?: documentImagePath
             val displayedImage = BitmapFactory.decodeFile(imagePath)
@@ -213,7 +219,6 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         } catch (e: Exception) {
             Simber.e("Unable to get [$documentImagePath] OCR image", e, tag = MULTI_FACTOR_ID)
         }
-
     }
 
     private fun toggleCredentialEdit() = with(binding) {

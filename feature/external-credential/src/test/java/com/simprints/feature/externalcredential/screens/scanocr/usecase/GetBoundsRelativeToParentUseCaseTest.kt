@@ -14,7 +14,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 internal class GetBoundsRelativeToParentUseCaseTest {
-
     private lateinit var useCase: GetBoundsRelativeToParentUseCase
 
     companion object {
@@ -58,7 +57,7 @@ internal class GetBoundsRelativeToParentUseCaseTest {
             parentWidth = PARENT_WIDTH_LARGE,
             parentHeight = PARENT_HEIGHT_LARGE,
             childWidth = CHILD_WIDTH_MEDIUM,
-            childHeight = CHILD_HEIGHT_MEDIUM
+            childHeight = CHILD_HEIGHT_MEDIUM,
         )
 
         val result = useCase(parent, child)
@@ -75,7 +74,7 @@ internal class GetBoundsRelativeToParentUseCaseTest {
             parentWidth = PARENT_WIDTH_LARGE,
             parentHeight = PARENT_HEIGHT_LARGE,
             childWidth = CHILD_WIDTH_MEDIUM,
-            childHeight = CHILD_HEIGHT_MEDIUM
+            childHeight = CHILD_HEIGHT_MEDIUM,
         )
 
         val result = useCase(parent, child)
@@ -94,7 +93,7 @@ internal class GetBoundsRelativeToParentUseCaseTest {
             parentWidth = PARENT_WIDTH_MEDIUM,
             parentHeight = PARENT_HEIGHT_MEDIUM,
             childWidth = CHILD_WIDTH_SMALL,
-            childHeight = CHILD_HEIGHT_SMALL
+            childHeight = CHILD_HEIGHT_SMALL,
         )
 
         val result = useCase(parent, child)
@@ -113,7 +112,7 @@ internal class GetBoundsRelativeToParentUseCaseTest {
             parentWidth = PARENT_WIDTH_SMALL,
             parentHeight = PARENT_HEIGHT_SMALL,
             childWidth = CHILD_WIDTH_LARGE,
-            childHeight = CHILD_HEIGHT_LARGE
+            childHeight = CHILD_HEIGHT_LARGE,
         )
 
         val result = useCase(parent, child)
@@ -130,7 +129,7 @@ internal class GetBoundsRelativeToParentUseCaseTest {
         parentWidth: Int,
         parentHeight: Int,
         childWidth: Int,
-        childHeight: Int
+        childHeight: Int,
     ): Pair<View, View> {
         val parent = mockk<View>()
         val child = mockk<View>()

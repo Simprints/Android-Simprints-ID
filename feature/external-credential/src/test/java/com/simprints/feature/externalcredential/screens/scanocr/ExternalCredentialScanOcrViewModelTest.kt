@@ -30,7 +30,6 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class ExternalCredentialScanOcrViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -91,7 +90,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
         bgDispatcher = testCoroutineRule.testCoroutineDispatcher,
         tokenizationProcessor = tokenizationProcessor,
         configManager = configManager,
-        authStore = authStore
+        authStore = authStore,
     )
 
     @Test

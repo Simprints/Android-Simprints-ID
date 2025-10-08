@@ -6,11 +6,11 @@ sealed class ScanQrState {
     data object ReadyToScan : ScanQrState()
 
     data class NoCameraPermission(
-        val shouldOpenPhoneSettings: Boolean
+        val shouldOpenPhoneSettings: Boolean,
     ) : ScanQrState()
 
     data class QrCodeCaptured(
         val qrCode: TokenizableString.Raw,
-        val qrCodeEncrypted: TokenizableString.Tokenized
+        val qrCodeEncrypted: TokenizableString.Tokenized,
     ) : ScanQrState()
 }

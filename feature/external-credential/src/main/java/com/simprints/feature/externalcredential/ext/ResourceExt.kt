@@ -20,6 +20,6 @@ fun Resources.getQuantityCredentialString(
     return getQuantityString(
         id,
         credentialsAmount,
-        getString(documentTypeRes)
+        getString(documentTypeRes),
     )
 }

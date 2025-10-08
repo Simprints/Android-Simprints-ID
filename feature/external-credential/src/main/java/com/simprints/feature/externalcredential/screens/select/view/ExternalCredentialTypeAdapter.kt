@@ -12,21 +12,23 @@ import com.simprints.infra.resources.R as IDR
 @ExcludedFromGeneratedTestCoverageReports("UI classes are not unit tested")
 internal class ExternalCredentialTypeAdapter(
     private val items: List<ExternalCredentialType>,
-    private val onClick: (ExternalCredentialType) -> Unit = {}
+    private val onClick: (ExternalCredentialType) -> Unit = {},
 ) : RecyclerView.Adapter<ExternalCredentialTypeAdapter.ViewHolder>() {
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): ViewHolder = ViewHolder(ItemDocumentBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
     override fun onBindViewHolder(
         holder: ViewHolder,
-        position: Int
+        position: Int,
     ) = holder.bind(items[position])
 
     override fun getItemCount(): Int = items.size
 
-    inner class ViewHolder(private val binding: ItemDocumentBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(
+        private val binding: ItemDocumentBinding,
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(credentialType: ExternalCredentialType) {
             val c = binding.root.context
             val credentialTypeText = when (credentialType) {

@@ -23,7 +23,6 @@ object ExternalCredentialContract {
         ageGroup = ageGroup,
         probeReferenceId = probeReferenceId,
         faceSamples = faceSamples,
-        fingerprintSamples = fingerprintSamples
+        fingerprintSamples = fingerprintSamples,
     )
-
 }

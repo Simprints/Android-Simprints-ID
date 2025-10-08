@@ -14,7 +14,6 @@ import javax.inject.Inject
 internal class ExternalCredentialSelectViewModel @Inject internal constructor(
     private val configManager: ConfigManager,
 ) : ViewModel() {
-
     val externalCredentialTypes: LiveData<List<ExternalCredentialType>>
         get() = _externalCredentialTypes
     private val _externalCredentialTypes = MutableLiveData<List<ExternalCredentialType>>()

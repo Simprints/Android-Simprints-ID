@@ -48,7 +48,6 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_external_credential_scan_qr) {
-
     private val binding by viewBinding(FragmentExternalCredentialScanQrBinding::bind)
     private val crashReportTag = MULTI_FACTOR_ID
     private val mainViewModel: ExternalCredentialViewModel by activityViewModels()
@@ -74,11 +73,13 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
         viewModel.updateCameraPermissionStatus(cameraPermissionStatus)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         applySystemBarInsets(view)
         Simber.i("ExternalCredentialScanQrFragment started", tag = MULTI_FACTOR_ID)
-
 
         initObservers()
 
@@ -146,7 +147,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
                 )
                 findNavController().navigateSafely(
                     this@ExternalCredentialScanQrFragment,
-                    ExternalCredentialScanQrFragmentDirections.actionExternalCredentialSelectScanQrToExternalCredentialSearch(args)
+                    ExternalCredentialScanQrFragmentDirections.actionExternalCredentialSelectScanQrToExternalCredentialSearch(args),
                 )
             } else {
                 showInvalidQrCodeFormatDialog(
@@ -154,7 +155,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
                     onDismiss = {
                         dismissDialog()
                         viewModel.updateCapturedValue(null)
-                    }
+                    },
                 )
             }
         }
@@ -166,7 +167,8 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
     ) {
         dismissDialog()
         dialog = BottomSheetDialog(requireContext()).also {
-            val view = layoutInflater.inflate(R.layout.dialog_qr_wrong_value, null)
+            val view = layoutInflater
+                .inflate(R.layout.dialog_qr_wrong_value, null)
                 .also { view ->
                     val qrValueTextView = view.findViewById<TextView>(R.id.qrValue)
                     val buttonRescan = view.findViewById<Button>(R.id.buttonRescan)
@@ -223,7 +225,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
             qrScannerArea.left,
             qrScannerArea.top,
             qrScannerArea.right,
-            qrScannerArea.bottom
+            qrScannerArea.bottom,
         )
         val orientation = resources.configuration.orientation
         val previewWidth = qrScannerPreview.width
@@ -232,7 +234,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
             rect = qrScannerArea,
             orientation = orientation,
             rootViewWidth = previewWidth,
-            rootViewHeight = previewHeight
+            rootViewHeight = previewHeight,
         )
     }
 
@@ -252,7 +254,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
                             "package:${requireActivity().packageName}".toUri(),
                         ),
                     )
-                }
+                },
             )
         } else {
             permissionRequestView.init(
@@ -261,7 +263,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
                 buttonText = IDR.string.face_capture_permission_action,
                 onClickListener = {
                     launchPermissionRequest.launch(CAMERA)
-                }
+                },
             )
         }
         permissionRequestView.isVisible = true

@@ -6,7 +6,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class GhanaNhisCardOcrSelectorUseCaseTest {
-
     private lateinit var useCase: GhanaNhisCardOcrSelectorUseCase
 
     @Before
@@ -20,7 +19,7 @@ internal class GhanaNhisCardOcrSelectorUseCaseTest {
         val validNumbers = listOf(
             "12345678",
             "98765432",
-            "00000000"
+            "00000000",
         )
 
         validNumbers.forEach { number ->

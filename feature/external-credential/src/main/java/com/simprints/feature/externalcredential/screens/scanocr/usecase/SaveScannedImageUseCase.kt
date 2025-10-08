@@ -10,13 +10,16 @@ import javax.inject.Inject
 internal class SaveScannedImageUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
-
     /**
      * Saves a bitmap to the application's cache directory as a JPEG file.
      * @param bitmap the bitmap to save
      * @return absolute path to the saved file
      */
-    operator fun invoke(bitmap: Bitmap, documentType: OcrDocumentType, imageType: ScanImageType): String {
+    operator fun invoke(
+        bitmap: Bitmap,
+        documentType: OcrDocumentType,
+        imageType: ScanImageType,
+    ): String {
         val documentTypeName = documentType.toString().trim().replace(" ", "")
         val fileName = "ocr_scan_${documentTypeName}_${imageType}_${System.currentTimeMillis()}.jpg"
         val file = File(context.cacheDir, fileName)
@@ -29,7 +32,7 @@ internal class SaveScannedImageUseCase @Inject constructor(
     }
 
     enum class ScanImageType {
-        FullDocument, ZoomedInCredential
+        FullDocument,
+        ZoomedInCredential,
     }
-
 }

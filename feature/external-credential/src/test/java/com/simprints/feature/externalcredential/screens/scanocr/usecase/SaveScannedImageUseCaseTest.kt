@@ -10,7 +10,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class SaveScannedImageUseCaseTest {
-
     @MockK
     private lateinit var context: Context
 
@@ -30,10 +29,10 @@ internal class SaveScannedImageUseCaseTest {
     @Test
     fun `saves bitmap with correct document type name and returns file path`() {
         OcrDocumentType.entries.forEach { documentType ->
-            SaveScannedImageUseCase.ScanImageType.entries.forEach {scanImageType ->
+            SaveScannedImageUseCase.ScanImageType.entries.forEach { scanImageType ->
                 every { bitmap.compress(any(), any(), any()) } returns true
                 val result = useCase(bitmap, documentType, scanImageType)
-                assertThat(result).contains("ocr_scan_${documentType}_${scanImageType}")
+                assertThat(result).contains("ocr_scan_${documentType}_$scanImageType")
                 assertThat(result).endsWith(".jpg")
                 verify { bitmap.compress(Bitmap.CompressFormat.JPEG, 100, any()) }
             }

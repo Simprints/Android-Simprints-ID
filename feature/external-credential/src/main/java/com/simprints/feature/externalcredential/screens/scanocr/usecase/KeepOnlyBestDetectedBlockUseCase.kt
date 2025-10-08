@@ -9,9 +9,11 @@ internal class KeepOnlyBestDetectedBlockUseCase @Inject constructor(
     private val findBestTextBlockForCredentialUseCase: FindBestTextBlockForCredentialUseCase,
     private val deleteScannedImageUseCase: DeleteScannedImageUseCase,
 ) {
-
-    suspend operator fun invoke(allDetectedBlock: List<DetectedOcrBlock>, documentType: OcrDocumentType): DetectedOcrBlock {
-        val credentialLength = when(documentType){
+    suspend operator fun invoke(
+        allDetectedBlock: List<DetectedOcrBlock>,
+        documentType: OcrDocumentType,
+    ): DetectedOcrBlock {
+        val credentialLength = when (documentType) {
             OcrDocumentType.NhisCard -> 8 // NHIS membership number contains 8 digits: 12345678
             OcrDocumentType.GhanaIdCard -> 15 // Ghana ID field contains 15 chars: GHA-123456789-0
         }

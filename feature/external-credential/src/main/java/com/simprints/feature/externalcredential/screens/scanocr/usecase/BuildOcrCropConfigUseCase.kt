@@ -5,16 +5,19 @@ import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropCon
 import javax.inject.Inject
 
 internal class BuildOcrCropConfigUseCase @Inject constructor(
-    private val getBoundsRelativeToParentUseCase: GetBoundsRelativeToParentUseCase
+    private val getBoundsRelativeToParentUseCase: GetBoundsRelativeToParentUseCase,
 ) {
-
-    operator fun invoke(rotationDegrees: Int, cameraPreview: View, documentScannerArea: View): OcrCropConfig {
+    operator fun invoke(
+        rotationDegrees: Int,
+        cameraPreview: View,
+        documentScannerArea: View,
+    ): OcrCropConfig {
         val cutoutRect = getBoundsRelativeToParentUseCase(parent = cameraPreview, child = documentScannerArea)
         return OcrCropConfig(
             rotationDegrees = rotationDegrees,
             cutoutRect = cutoutRect,
             previewViewWidth = cameraPreview.width,
-            previewViewHeight = cameraPreview.height
+            previewViewHeight = cameraPreview.height,
         )
     }
 }

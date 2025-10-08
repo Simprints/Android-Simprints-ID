@@ -89,7 +89,7 @@ internal class ExternalCredentialSearchViewModelTest {
         configManager = configManager,
         matchCandidatesUseCase = matchCandidatesUseCase,
         tokenizationProcessor = tokenizationProcessor,
-        enrolmentRecordRepository = enrolmentRecordRepository
+        enrolmentRecordRepository = enrolmentRecordRepository,
     )
 
     @Test

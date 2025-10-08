@@ -16,14 +16,16 @@ internal data class SearchCredentialState(
     val isConfirmed: Boolean,
 ) {
     companion object {
-        fun buildInitial(scannedCredential: ScannedCredential, flowType: FlowType) =
-            SearchCredentialState(
-                scannedCredential = scannedCredential,
-                displayedCredential = null,
-                flowType = flowType,
-                searchState = SearchState.Searching,
-                isConfirmed = false
-            )
+        fun buildInitial(
+            scannedCredential: ScannedCredential,
+            flowType: FlowType,
+        ) = SearchCredentialState(
+            scannedCredential = scannedCredential,
+            displayedCredential = null,
+            flowType = flowType,
+            searchState = SearchState.Searching,
+            isConfirmed = false,
+        )
     }
 }
 
