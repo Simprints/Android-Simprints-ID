@@ -1,7 +1,7 @@
 package com.simprints.feature.externalcredential.screens.controller
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.*
+import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.externalcredential.ExternalCredentialType

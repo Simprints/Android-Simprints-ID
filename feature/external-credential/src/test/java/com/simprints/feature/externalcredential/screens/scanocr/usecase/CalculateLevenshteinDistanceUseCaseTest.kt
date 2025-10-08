@@ -6,7 +6,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class CalculateLevenshteinDistanceUseCaseTest {
-
     private lateinit var useCase: CalculateLevenshteinDistanceUseCase
 
     private val kitten = "kitten"
@@ -24,7 +23,10 @@ internal class CalculateLevenshteinDistanceUseCaseTest {
         useCase = CalculateLevenshteinDistanceUseCase()
     }
 
-    private fun calculateDistance(s1: String, s2: String) = useCase(s1, s2)
+    private fun calculateDistance(
+        s1: String,
+        s2: String,
+    ) = useCase(s1, s2)
 
     @Test
     fun `returns zero for identical strings`() {

@@ -142,7 +142,7 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
                         id = IDR.plurals.mfid_dialog_skip_scan_body,
                         credentialTypes = credentialTypes,
                         specificCredentialRes = resources.getCredentialTypeRes(credentialTypes.firstOrNull()),
-                        multipleCredentialsRes = IDR.string.mfid_type_any_document
+                        multipleCredentialsRes = IDR.string.mfid_type_any_document,
                     )
 
                     confirmButton.setOnClickListener { onConfirm() }

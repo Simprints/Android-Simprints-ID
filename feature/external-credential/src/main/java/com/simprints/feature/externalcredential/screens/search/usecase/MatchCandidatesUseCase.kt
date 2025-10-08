@@ -31,42 +31,47 @@ internal class MatchCandidatesUseCase @Inject constructor(
             projectConfiguration = projectConfig,
             faceSamples = externalCredentialParams.faceSamples,
             fingerprintSamples = externalCredentialParams.fingerprintSamples,
-            ageGroup = externalCredentialParams.ageGroup
+            ageGroup = externalCredentialParams.ageGroup,
         )
-        matchParams.mapNotNull { matchParams ->
-            when {
-                matchParams.probeFaceSamples.isNotEmpty() -> {
-                    val faceSdk = matchParams.faceSDK ?: return@mapNotNull null
-                    projectConfig.face?.getSdkConfiguration(faceSdk)?.verificationMatchThreshold?.let { matchThreshold ->
-                        (faceMatcher(matchParams, project).last() as? MatcherState.Success)?.matchResultItems.orEmpty()
-                            .map { result ->
-                                CredentialMatch(
-                                    credential = credential,
-                                    matchResult = result,
-                                    verificationThreshold = matchThreshold,
-                                    faceBioSdk = faceSdk,
-                                    fingerprintBioSdk = null
-                                )
-                            }
+        matchParams
+            .mapNotNull { matchParams ->
+                when {
+                    matchParams.probeFaceSamples.isNotEmpty() -> {
+                        val faceSdk = matchParams.faceSDK ?: return@mapNotNull null
+                        projectConfig.face?.getSdkConfiguration(faceSdk)?.verificationMatchThreshold?.let { matchThreshold ->
+                            (faceMatcher(matchParams, project).last() as? MatcherState.Success)
+                                ?.matchResultItems
+                                .orEmpty()
+                                .map { result ->
+                                    CredentialMatch(
+                                        credential = credential,
+                                        matchResult = result,
+                                        verificationThreshold = matchThreshold,
+                                        faceBioSdk = faceSdk,
+                                        fingerprintBioSdk = null,
+                                    )
+                                }
+                        }
                     }
-                }
 
-                else -> {
-                    val fingerprintSdk = matchParams.fingerprintSDK ?: return@mapNotNull null
-                    projectConfig.fingerprint?.getSdkConfiguration(fingerprintSdk)?.verificationMatchThreshold?.let { matchThreshold ->
-                        (fingerprintMatcher(matchParams, project).last() as? MatcherState.Success)?.matchResultItems.orEmpty()
-                            .map { result ->
-                                CredentialMatch(
-                                    credential = credential,
-                                    matchResult = result,
-                                    verificationThreshold = matchThreshold,
-                                    faceBioSdk = null,
-                                    fingerprintBioSdk = fingerprintSdk
-                                )
-                            }
+                    else -> {
+                        val fingerprintSdk = matchParams.fingerprintSDK ?: return@mapNotNull null
+                        projectConfig.fingerprint?.getSdkConfiguration(fingerprintSdk)?.verificationMatchThreshold?.let { matchThreshold ->
+                            (fingerprintMatcher(matchParams, project).last() as? MatcherState.Success)
+                                ?.matchResultItems
+                                .orEmpty()
+                                .map { result ->
+                                    CredentialMatch(
+                                        credential = credential,
+                                        matchResult = result,
+                                        verificationThreshold = matchThreshold,
+                                        faceBioSdk = null,
+                                        fingerprintBioSdk = fingerprintSdk,
+                                    )
+                                }
+                        }
                     }
                 }
-            }
-        }.flatten()
+            }.flatten()
     }
 }

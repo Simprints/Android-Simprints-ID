@@ -6,7 +6,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class GhanaIdCardOcrSelectorUseCaseTest {
-
     private lateinit var useCase: GhanaIdCardOcrSelectorUseCase
 
     @Before
@@ -20,7 +19,7 @@ internal class GhanaIdCardOcrSelectorUseCaseTest {
         val validIds = listOf(
             "GHA-123456789-0",
             "GHA-987654321-5",
-            "GHA-000000000-9"
+            "GHA-000000000-9",
         )
 
         validIds.forEach { id ->
@@ -40,7 +39,7 @@ internal class GhanaIdCardOcrSelectorUseCaseTest {
             "GHA-123456789-A",
             "GHA-123456789-01",
             "",
-            "GHA-123456789-0 "
+            "GHA-123456789-0 ",
         )
 
         invalidIds.forEach { id ->

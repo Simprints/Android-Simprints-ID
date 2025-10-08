@@ -9,7 +9,7 @@ import java.io.File
 import javax.inject.Inject
 
 internal class DeleteScannedImageUseCase @Inject constructor(
-    @DispatcherIO private val ioDispatcher: CoroutineDispatcher
+    @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) {
     /**
      * Deletes a file from the given absolute path.
@@ -28,7 +28,7 @@ internal class DeleteScannedImageUseCase @Inject constructor(
                 }
             } catch (e: Exception) {
                 Simber.e("OCR: Unable to delete cached scan file [$filePath]", e, tag = MULTI_FACTOR_ID)
-                throw(e)
+                throw (e)
             }
         }
     }

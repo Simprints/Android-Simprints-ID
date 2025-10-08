@@ -2,10 +2,12 @@ package com.simprints.infra.credential.store
 
 import android.content.Context
 import android.graphics.Bitmap
-import com.google.common.truth.Truth.*
+import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.credential.store.model.CredentialScanImageType
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.verify
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.After

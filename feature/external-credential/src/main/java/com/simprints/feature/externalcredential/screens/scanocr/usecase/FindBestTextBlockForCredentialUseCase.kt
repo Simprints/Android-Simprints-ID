@@ -4,9 +4,8 @@ import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOc
 import javax.inject.Inject
 
 internal class FindBestTextBlockForCredentialUseCase @Inject constructor(
-    private val calculateLevenshteinDistanceUseCase: CalculateLevenshteinDistanceUseCase
+    private val calculateLevenshteinDistanceUseCase: CalculateLevenshteinDistanceUseCase,
 ) {
-
     /**
      * Finds the detected OCR block that contains the readout value most similar to the given credential string.
      *
@@ -18,7 +17,10 @@ internal class FindBestTextBlockForCredentialUseCase @Inject constructor(
      * @return the detected OCR block with the best matching readout value
      * @throws IllegalArgumentException if no blocks provided
      */
-    operator fun invoke(credential: String, detectedBlocks: List<DetectedOcrBlock>): DetectedOcrBlock {
+    operator fun invoke(
+        credential: String,
+        detectedBlocks: List<DetectedOcrBlock>,
+    ): DetectedOcrBlock {
         if (detectedBlocks.isEmpty()) {
             throw IllegalArgumentException("OCR: cannot find match for credential, provided detected block list is empty")
         }
@@ -33,8 +35,9 @@ internal class FindBestTextBlockForCredentialUseCase @Inject constructor(
         }
 
         // If no exact match, finding the closest one using Levenshtein distance. Updating its credential value to the given for consistency
-        return detectedBlocks.minBy { block ->
-            calculateLevenshteinDistanceUseCase(credential, block.readoutValue)
-        }.copy(readoutValue = credential)
+        return detectedBlocks
+            .minBy { block ->
+                calculateLevenshteinDistanceUseCase(credential, block.readoutValue)
+            }.copy(readoutValue = credential)
     }
 }

@@ -1,6 +1,6 @@
 package com.simprints.feature.externalcredential.screens.scanocr.usecase
 
-import com.google.common.truth.Truth.*
+import com.google.common.truth.Truth.assertThat
 import com.simprints.testtools.common.syntax.assertThrows
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -10,7 +10,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DeleteScannedImageUseCaseTest {
-
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var useCase: DeleteScannedImageUseCase
 
@@ -21,7 +20,9 @@ class DeleteScannedImageUseCaseTest {
 
     @Test
     fun `deletes file when it exists`() = runTest(testDispatcher) {
-        val tempFile = kotlin.io.path.createTempFile().toFile()
+        val tempFile = kotlin.io.path
+            .createTempFile()
+            .toFile()
         tempFile.writeText("any-content")
         check(tempFile.exists())
         useCase(tempFile.absolutePath)

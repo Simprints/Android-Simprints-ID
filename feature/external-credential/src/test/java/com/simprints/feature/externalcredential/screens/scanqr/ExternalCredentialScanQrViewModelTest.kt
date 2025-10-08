@@ -1,7 +1,7 @@
 package com.simprints.feature.externalcredential.screens.scanqr
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -13,18 +13,14 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 internal class ExternalCredentialScanQrViewModelTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -43,7 +39,6 @@ internal class ExternalCredentialScanQrViewModelTest {
     @MockK
     private lateinit var configManager: ConfigManager
 
-
     private lateinit var viewModel: ExternalCredentialScanQrViewModel
 
     @Before
@@ -53,7 +48,7 @@ internal class ExternalCredentialScanQrViewModelTest {
             externalCredentialQrCodeValidator = validator,
             tokenizationProcessor = tokenizationProcessor,
             configManager = configManager,
-            authStore = authStore
+            authStore = authStore,
         )
     }
 
@@ -100,7 +95,7 @@ internal class ExternalCredentialScanQrViewModelTest {
         val observer = viewModel.stateLiveData.test()
         viewModel.updateCameraPermissionStatus(PermissionStatus.Denied)
         assertThat(observer.value()).isEqualTo(
-            ScanQrState.NoCameraPermission(shouldOpenPhoneSettings = false)
+            ScanQrState.NoCameraPermission(shouldOpenPhoneSettings = false),
         )
     }
 
@@ -109,7 +104,7 @@ internal class ExternalCredentialScanQrViewModelTest {
         val observer = viewModel.stateLiveData.test()
         viewModel.updateCameraPermissionStatus(PermissionStatus.DeniedNeverAskAgain)
         assertThat(observer.value()).isEqualTo(
-            ScanQrState.NoCameraPermission(shouldOpenPhoneSettings = true)
+            ScanQrState.NoCameraPermission(shouldOpenPhoneSettings = true),
         )
     }
 
