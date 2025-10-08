@@ -42,7 +42,10 @@ internal class GetCredentialCoordinatesUseCase @Inject constructor(
      *
      * @return [DetectedOcrBlock] if any Line satisfies the [documentType] pattern, or null if none.
      */
-    suspend operator fun invoke(bitmap: Bitmap, documentType: OcrDocumentType): DetectedOcrBlock? {
+    suspend operator fun invoke(
+        bitmap: Bitmap,
+        documentType: OcrDocumentType,
+    ): DetectedOcrBlock? {
         val image = InputImage.fromBitmap(bitmap, 0)
         return try {
             val result = Tasks.await(recognizer.process(image)) ?: return null
@@ -65,7 +68,9 @@ internal class GetCredentialCoordinatesUseCase @Inject constructor(
                             lineBoundingBox = lineBoundingRect.toBoundingBox(),
                             readoutValue = lineReadout,
                         )
-                    } else null
+                    } else {
+                        null
+                    }
                 }
             }
         } catch (e: Exception) {

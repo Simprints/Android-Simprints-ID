@@ -29,7 +29,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     private val cropDocumentFromPreviewUseCase: CropDocumentFromPreviewUseCase,
     private val getCredentialCoordinatesUseCase: GetCredentialCoordinatesUseCase,
     private val keepOnlyBestDetectedBlockUseCase: KeepOnlyBestDetectedBlockUseCase,
-    @DispatcherBG private val bgDispatcher: CoroutineDispatcher
+    @DispatcherBG private val bgDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     @AssistedFactory
     interface Factory {
@@ -66,12 +66,15 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
             ScanOcrState.ScanningInProgress(
                 ocrDocumentType = ocrDocumentType,
                 successfulCaptures = 0,
-                scansRequired = SUCCESSFUL_SCANS_REQUIRED
+                scansRequired = SUCCESSFUL_SCANS_REQUIRED,
             )
         }
     }
 
-    fun runOcrOnFrame(frame: Bitmap, cropConfig: OcrCropConfig) {
+    fun runOcrOnFrame(
+        frame: Bitmap,
+        cropConfig: OcrCropConfig,
+    ) {
         viewModelScope.launch(bgDispatcher) {
             try {
                 Simber.d("started OCR")
@@ -84,7 +87,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
                     ScanOcrState.ScanningInProgress(
                         ocrDocumentType = ocrDocumentType,
                         successfulCaptures = detectedBlocks.size,
-                        scansRequired = SUCCESSFUL_SCANS_REQUIRED
+                        scansRequired = SUCCESSFUL_SCANS_REQUIRED,
                     )
                 }
             } finally {

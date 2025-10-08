@@ -10,7 +10,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DeleteScannedImageUseCaseTest {
-
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var useCase: DeleteScannedImageUseCase
 
@@ -21,7 +20,9 @@ class DeleteScannedImageUseCaseTest {
 
     @Test
     fun `deletes file when it exists`() = runTest(testDispatcher) {
-        val tempFile = kotlin.io.path.createTempFile().toFile()
+        val tempFile = kotlin.io.path
+            .createTempFile()
+            .toFile()
         tempFile.writeText("any-content")
         check(tempFile.exists())
         useCase(tempFile.absolutePath)

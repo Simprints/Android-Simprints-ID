@@ -2,12 +2,11 @@ package com.simprints.feature.externalcredential.screens.scanocr.usecase
 
 import android.graphics.Bitmap
 import android.graphics.Matrix
-import javax.inject.Inject
 import androidx.core.graphics.scale
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
+import javax.inject.Inject
 
 internal class NormalizeBitmapToPreviewUseCase @Inject constructor() {
-
     /**
      * Normalizes a camera capture [inputBitmap] bitmap to match the PreviewView's dimensions and aspect ratio.
      *
@@ -26,7 +25,7 @@ internal class NormalizeBitmapToPreviewUseCase @Inject constructor() {
      */
     suspend operator fun invoke(
         inputBitmap: Bitmap,
-        cropConfig: OcrCropConfig
+        cropConfig: OcrCropConfig,
     ): Bitmap {
         val rotationDegrees = cropConfig.rotationDegrees
         val previewViewWidth = cropConfig.previewViewWidth
@@ -36,7 +35,9 @@ internal class NormalizeBitmapToPreviewUseCase @Inject constructor() {
         val rotated = if (rotationDegrees != 0) {
             val matrix = Matrix().apply { postRotate(rotationDegrees.toFloat()) }
             Bitmap.createBitmap(inputBitmap, 0, 0, inputBitmap.width, inputBitmap.height, matrix, true)
-        } else inputBitmap
+        } else {
+            inputBitmap
+        }
 
         // Center-crop to match PreviewView aspect ratio
         val previewRatio = previewViewWidth.toFloat() / previewViewHeight
@@ -65,4 +66,3 @@ internal class NormalizeBitmapToPreviewUseCase @Inject constructor() {
         return cropped.scale(previewViewWidth, previewViewHeight)
     }
 }
-

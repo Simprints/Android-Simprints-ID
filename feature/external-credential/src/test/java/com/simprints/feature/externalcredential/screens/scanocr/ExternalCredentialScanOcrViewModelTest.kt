@@ -21,7 +21,6 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class ExternalCredentialScanOcrViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -62,7 +61,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
         cropDocumentFromPreviewUseCase = cropDocumentFromPreviewUseCase,
         getCredentialCoordinatesUseCase = getCredentialCoordinatesUseCase,
         keepOnlyBestDetectedBlockUseCase = keepOnlyBestDetectedBlockUseCase,
-        bgDispatcher = testCoroutineRule.testCoroutineDispatcher
+        bgDispatcher = testCoroutineRule.testCoroutineDispatcher,
     )
 
     @Test

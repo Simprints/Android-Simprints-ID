@@ -5,5 +5,4 @@ import com.simprints.feature.externalcredential.R
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ExternalCredentialSkipFragment : Fragment(R.layout.fragment_external_credential_skip) {
-}
+class ExternalCredentialSkipFragment : Fragment(R.layout.fragment_external_credential_skip)

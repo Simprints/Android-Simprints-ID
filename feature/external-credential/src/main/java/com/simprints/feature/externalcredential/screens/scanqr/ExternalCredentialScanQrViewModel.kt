@@ -10,9 +10,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class ExternalCredentialScanQrViewModel @Inject constructor(
-    private val externalCredentialQrCodeValidator: ExternalCredentialQrCodeValidatorUseCase
+    private val externalCredentialQrCodeValidator: ExternalCredentialQrCodeValidatorUseCase,
 ) : ViewModel() {
-
     private var state: ScanQrState = ScanQrState.ReadyToScan
         set(value) {
             field = value

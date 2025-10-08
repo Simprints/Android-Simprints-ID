@@ -11,7 +11,6 @@ import com.simprints.infra.resources.R as IDR
 
 @HiltViewModel
 internal class ExternalCredentialViewModel @Inject internal constructor() : ViewModel() {
-
     private var isInitialized = false
     private var state: ExternalCredentialState = ExternalCredentialState.EMPTY
         set(value) {
@@ -39,7 +38,6 @@ internal class ExternalCredentialViewModel @Inject internal constructor() : View
             updateState { ExternalCredentialState.EMPTY.copy(subjectId = params.subjectId, flowType = params.flowType) }
         }
     }
-
 
     fun mapTypeToStringResource(type: ExternalCredentialType?) = when (type) {
         ExternalCredentialType.NHISCard -> IDR.string.mfid_type_nhis_card

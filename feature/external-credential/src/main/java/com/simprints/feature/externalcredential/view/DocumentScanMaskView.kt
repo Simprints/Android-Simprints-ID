@@ -11,16 +11,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.simprints.feature.externalcredential.R
-import com.simprints.infra.resources.R as IDR
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.infra.resources.R as IDR
 
 @ExcludedFromGeneratedTestCoverageReports("UI Code")
 class DocumentScanMaskView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : View(context, attrs, defStyleAttr) {
-
     private val bgPaint = Paint()
     private val clearPaint = Paint().apply {
         xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
@@ -33,31 +32,33 @@ class DocumentScanMaskView @JvmOverloads constructor(
     private var insetValue: Float? = null
 
     init {
-        context.theme.obtainStyledAttributes(
-            attrs,
-            R.styleable.DocumentMaskView,
-            0, 0
-        ).apply {
-            try {
-                targetViewId = getResourceId(R.styleable.DocumentMaskView_targetViewId, NO_ID)
+        context.theme
+            .obtainStyledAttributes(
+                attrs,
+                R.styleable.DocumentMaskView,
+                0,
+                0,
+            ).apply {
+                try {
+                    targetViewId = getResourceId(R.styleable.DocumentMaskView_targetViewId, NO_ID)
 
-                val backgroundColor = getColor(
-                    R.styleable.DocumentMaskView_maskColor,
-                    ContextCompat.getColor(context, IDR.color.simprints_black)
-                )
-                bgPaint.color = backgroundColor
+                    val backgroundColor = getColor(
+                        R.styleable.DocumentMaskView_maskColor,
+                        ContextCompat.getColor(context, IDR.color.simprints_black),
+                    )
+                    bgPaint.color = backgroundColor
 
-                if (hasValue(R.styleable.DocumentMaskView_cornerRadius)) {
-                    cornerRadius = getDimension(R.styleable.DocumentMaskView_cornerRadius, 0f)
+                    if (hasValue(R.styleable.DocumentMaskView_cornerRadius)) {
+                        cornerRadius = getDimension(R.styleable.DocumentMaskView_cornerRadius, 0f)
+                    }
+
+                    if (hasValue(R.styleable.DocumentMaskView_inset)) {
+                        insetValue = getDimension(R.styleable.DocumentMaskView_inset, 0f)
+                    }
+                } finally {
+                    recycle()
                 }
-
-                if (hasValue(R.styleable.DocumentMaskView_inset)) {
-                    insetValue = getDimension(R.styleable.DocumentMaskView_inset, 0f)
-                }
-            } finally {
-                recycle()
             }
-        }
 
         require(targetViewId != NO_ID) { "targetViewId must be specified" }
     }
@@ -90,7 +91,7 @@ class DocumentScanMaskView @JvmOverloads constructor(
                     rect.bottom.toFloat(),
                     radius,
                     radius,
-                    clearPaint
+                    clearPaint,
                 )
             } else {
                 canvas.drawRect(rect, clearPaint)

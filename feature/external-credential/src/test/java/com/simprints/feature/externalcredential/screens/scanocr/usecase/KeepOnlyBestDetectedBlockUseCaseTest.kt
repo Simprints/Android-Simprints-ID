@@ -10,7 +10,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class KeepOnlyBestDetectedBlockUseCaseTest {
-
     @MockK
     private lateinit var getExternalCredentialBasedOnConfidenceUseCase: GetExternalCredentialBasedOnConfidenceUseCase
 
@@ -36,7 +35,7 @@ internal class KeepOnlyBestDetectedBlockUseCaseTest {
         useCase = KeepOnlyBestDetectedBlockUseCase(
             getExternalCredentialBasedOnConfidenceUseCase = getExternalCredentialBasedOnConfidenceUseCase,
             findBestTextBlockForCredentialUseCase = findBestTextBlockForCredentialUseCase,
-            deleteScannedImageUseCase = deleteScannedImageUseCase
+            deleteScannedImageUseCase = deleteScannedImageUseCase,
         )
     }
 
@@ -141,7 +140,7 @@ internal class KeepOnlyBestDetectedBlockUseCaseTest {
             createMockBlock("/path2.jpg"),
             bestBlock,
             createMockBlock("/path3.jpg"),
-            createMockBlock("/path4.jpg")
+            createMockBlock("/path4.jpg"),
         )
         val mockCredential = "GHA-123456789-0"
 

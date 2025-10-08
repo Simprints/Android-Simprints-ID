@@ -11,9 +11,9 @@ import org.junit.Before
 import org.junit.Test
 
 internal class FindBestTextBlockForCredentialUseCaseTest {
-
     @MockK
     private lateinit var calculateLevenshteinDistanceUseCase: CalculateLevenshteinDistanceUseCase
+
     @MockK
     private lateinit var useCase: FindBestTextBlockForCredentialUseCase
 

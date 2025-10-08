@@ -9,7 +9,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class GetExternalCredentialBasedOnConfidenceUseCaseTest {
-
     private lateinit var useCase: GetExternalCredentialBasedOnConfidenceUseCase
 
     private val credentialLength3 = 3
@@ -31,7 +30,7 @@ internal class GetExternalCredentialBasedOnConfidenceUseCaseTest {
         val blocks = listOf(
             createBlock("ABC"),
             createBlock("ACD"),
-            createBlock("CCD")
+            createBlock("CCD"),
         )
 
         val result = useCase(blocks, credentialLength3)
@@ -54,7 +53,7 @@ internal class GetExternalCredentialBasedOnConfidenceUseCaseTest {
         val blocks = listOf(
             createBlock("ABCDE"),
             createBlock("ACD"),
-            createBlock("ACDGH")
+            createBlock("ACDGH"),
         )
 
         val result = useCase(blocks, credentialLength3)
@@ -68,7 +67,7 @@ internal class GetExternalCredentialBasedOnConfidenceUseCaseTest {
         val blocks = listOf(
             createBlock(nhisMembership),
             createBlock(nhisMembership),
-            createBlock(nhisMembership)
+            createBlock(nhisMembership),
         )
 
         val result = useCase(blocks, credentialLengthNhis)
@@ -88,7 +87,7 @@ internal class GetExternalCredentialBasedOnConfidenceUseCaseTest {
         val blocks = listOf(
             createBlock("AB"),
             createBlock("ABCD"),
-            createBlock("ABCDE")
+            createBlock("ABCDE"),
         )
 
         useCase(blocks, credentialLength3)
@@ -99,7 +98,7 @@ internal class GetExternalCredentialBasedOnConfidenceUseCaseTest {
         val blocks = listOf(
             createBlock("A"),
             createBlock("B"),
-            createBlock("A")
+            createBlock("A"),
         )
 
         val result = useCase(blocks, 1)
@@ -113,7 +112,7 @@ internal class GetExternalCredentialBasedOnConfidenceUseCaseTest {
         val blocks = listOf(
             createBlock("GHA-123456789-0"),
             createBlock("GHA-123456789-1"),
-            createBlock("GHA-123456789-0")
+            createBlock("GHA-123456789-0"),
         )
 
         val result = useCase(blocks, credentialLengthGhanaID)
@@ -128,7 +127,7 @@ internal class GetExternalCredentialBasedOnConfidenceUseCaseTest {
             createBlock("ABCDE"),
             createBlock("FGHIJ"),
             createBlock("AB"),
-            createBlock("ABCDEFGH")
+            createBlock("ABCDEFGH"),
         )
 
         val result = useCase(blocks, targetLength)

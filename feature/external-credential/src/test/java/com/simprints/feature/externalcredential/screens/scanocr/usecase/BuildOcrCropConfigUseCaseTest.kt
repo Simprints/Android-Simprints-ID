@@ -11,7 +11,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class BuildOcrCropConfigUseCaseTest {
-
     private lateinit var getBoundsRelativeToParentUseCase: GetBoundsRelativeToParentUseCase
     private lateinit var useCase: BuildOcrCropConfigUseCase
 
@@ -32,9 +31,7 @@ internal class BuildOcrCropConfigUseCaseTest {
         every { getBoundsRelativeToParentUseCase(mockCameraPreview, mockDocumentScannerArea) } returns mockRect
     }
 
-
-    private fun runUseCaseTest(rotationDegrees: Int = 0) =
-        useCase(rotationDegrees, mockCameraPreview, mockDocumentScannerArea)
+    private fun runUseCaseTest(rotationDegrees: Int = 0) = useCase(rotationDegrees, mockCameraPreview, mockDocumentScannerArea)
 
     @Test
     fun `creates config with correct rotation degrees`() {
@@ -65,8 +62,8 @@ internal class BuildOcrCropConfigUseCaseTest {
                 rotationDegrees = rotationDegrees,
                 cutoutRect = mockRect,
                 previewViewWidth = width800,
-                previewViewHeight = height600
-            )
+                previewViewHeight = height600,
+            ),
         )
     }
 

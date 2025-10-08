@@ -2,9 +2,9 @@ package com.simprints.feature.externalcredential.screens.scanocr.usecase
 
 import android.graphics.Bitmap
 import android.graphics.Matrix
-import com.google.common.truth.Truth.assertThat
 import android.graphics.Rect
 import androidx.core.graphics.scale
+import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -14,7 +14,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class NormalizeBitmapToPreviewUseCaseTest {
-
     @MockK
     private lateinit var inputBitmap: Bitmap
 
@@ -59,6 +58,7 @@ internal class NormalizeBitmapToPreviewUseCaseTest {
         unmockkStatic("androidx.core.graphics.BitmapKt")
         unmockkConstructor(Matrix::class)
     }
+
     @Test
     fun `returns original bitmap when no rotation is needed`() = runTest {
         val cropConfig = createCropConfig(rotationDegrees = 0)
@@ -98,6 +98,6 @@ internal class NormalizeBitmapToPreviewUseCaseTest {
         rotationDegrees = rotationDegrees,
         cutoutRect = Rect(0, 0, 100, 100),
         previewViewWidth = previewWidth,
-        previewViewHeight = previewHeight
+        previewViewHeight = previewHeight,
     )
 }

@@ -33,7 +33,10 @@ internal class ExternalCredentialControllerFragment : Fragment(R.layout.fragment
     private val currentlyDisplayedInternalFragment: Fragment?
         get() = hostFragment?.childFragmentManager?.fragments?.first()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.init(params)
@@ -49,7 +52,7 @@ internal class ExternalCredentialControllerFragment : Fragment(R.layout.fragment
             } else {
                 internalNavController?.navigateSafely(
                     currentlyDisplayedInternalFragment,
-                    GraphExternalCredentialInternalDirections.actionGlobalExternalCredentialSelect()
+                    GraphExternalCredentialInternalDirections.actionGlobalExternalCredentialSelect(),
                 )
             }
         }

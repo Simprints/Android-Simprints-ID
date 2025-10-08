@@ -7,5 +7,5 @@ import com.simprints.core.domain.step.StepParams
 @Keep
 data class ExternalCredentialParams(
     val subjectId: String?,
-    val flowType: FlowType
+    val flowType: FlowType,
 ) : StepParams

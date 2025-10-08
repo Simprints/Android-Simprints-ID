@@ -13,7 +13,6 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class ExternalCredentialScanQrViewModelTest {
-
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
@@ -60,7 +59,7 @@ internal class ExternalCredentialScanQrViewModelTest {
         val observer = viewModel.stateLiveData.test()
         viewModel.updateCameraPermissionStatus(PermissionStatus.Denied)
         assertThat(observer.value()).isEqualTo(
-            ScanQrState.NoCameraPermission(shouldOpenPhoneSettings = false)
+            ScanQrState.NoCameraPermission(shouldOpenPhoneSettings = false),
         )
     }
 
@@ -69,7 +68,7 @@ internal class ExternalCredentialScanQrViewModelTest {
         val observer = viewModel.stateLiveData.test()
         viewModel.updateCameraPermissionStatus(PermissionStatus.DeniedNeverAskAgain)
         assertThat(observer.value()).isEqualTo(
-            ScanQrState.NoCameraPermission(shouldOpenPhoneSettings = true)
+            ScanQrState.NoCameraPermission(shouldOpenPhoneSettings = true),
         )
     }
 

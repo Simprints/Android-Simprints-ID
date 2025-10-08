@@ -10,5 +10,5 @@ data class ScannedCredential(
     val credential: String,
     val credentialType: ExternalCredentialType,
     val previewImagePath: String?,
-    val imageBoundingBox: BoundingBox?
+    val imageBoundingBox: BoundingBox?,
 ) : Serializable

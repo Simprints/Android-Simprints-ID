@@ -15,7 +15,10 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
     private val args: ExternalCredentialSearchFragmentArgs by navArgs()
     private val binding by viewBinding(FragmentExternalCredentialSearchBinding::bind)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         super.onCreate(savedInstanceState)
         val imagePath = args.scannedCredential.previewImagePath!!

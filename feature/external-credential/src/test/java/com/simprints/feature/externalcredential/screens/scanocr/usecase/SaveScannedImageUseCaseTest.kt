@@ -10,7 +10,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class SaveScannedImageUseCaseTest {
-
     @MockK
     private lateinit var context: Context
 

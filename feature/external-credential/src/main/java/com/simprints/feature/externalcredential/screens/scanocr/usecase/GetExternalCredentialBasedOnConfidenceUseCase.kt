@@ -6,7 +6,6 @@ import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
 internal class GetExternalCredentialBasedOnConfidenceUseCase @Inject constructor() {
-
     /**
      * Constructs the most likely credential string by selecting the most frequent character at each position across all detected OCR
      * blocks. This is necessary because during the OCR readouts, detection mechanisms might confuse characters (think, 'l' versus 'I').
@@ -26,7 +25,10 @@ internal class GetExternalCredentialBasedOnConfidenceUseCase @Inject constructor
      * @return most likely credential string based on character frequency voting
      * @throws [IllegalArgumentException] if [detectedBlocks] is empty
      */
-    operator fun invoke(detectedBlocks: List<DetectedOcrBlock>, credentialLength: Int): String {
+    operator fun invoke(
+        detectedBlocks: List<DetectedOcrBlock>,
+        credentialLength: Int,
+    ): String {
         val detectedValues: List<String> = detectedBlocks
             .map(DetectedOcrBlock::readoutValue)
             .filter { it.length == credentialLength }
@@ -35,13 +37,14 @@ internal class GetExternalCredentialBasedOnConfidenceUseCase @Inject constructor
         }
 
         // Grouping characters at each position across all strings and picking the most frequent one
-        return (0 until credentialLength).map { position ->
-            detectedValues
-                .map { it[position] }
-                .groupingBy { it }
-                .eachCount()
-                .maxBy { it.value }
-                .key
-        }.joinToString(separator = "")
+        return (0 until credentialLength)
+            .map { position ->
+                detectedValues
+                    .map { it[position] }
+                    .groupingBy { it }
+                    .eachCount()
+                    .maxBy { it.value }
+                    .key
+            }.joinToString(separator = "")
     }
 }

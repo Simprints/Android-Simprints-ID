@@ -7,7 +7,7 @@ internal data class ExternalCredentialState(
     val subjectId: String?,
     val flowType: FlowType,
     val credentialValue: String?,
-    val selectedType: ExternalCredentialType?
+    val selectedType: ExternalCredentialType?,
 ) {
     companion object {
         val EMPTY = ExternalCredentialState(

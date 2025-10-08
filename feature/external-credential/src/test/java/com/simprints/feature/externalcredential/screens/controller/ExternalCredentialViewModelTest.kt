@@ -6,13 +6,12 @@ import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
-import com.simprints.infra.resources.R as IDR
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import com.simprints.infra.resources.R as IDR
 
 internal class ExternalCredentialViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -82,5 +81,4 @@ internal class ExternalCredentialViewModelTest {
         assertThat(observer.value()?.subjectId).isEqualTo(subjectId)
         assertThat(observer.value()?.flowType).isEqualTo(flowType)
     }
-
 }

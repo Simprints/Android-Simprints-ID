@@ -13,7 +13,6 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 import javax.inject.Inject
 
-
 @ExcludedFromGeneratedTestCoverageReports("UI Code")
 internal class ProvideCameraListenerUseCase @Inject constructor() {
     operator fun invoke(
@@ -24,18 +23,22 @@ internal class ProvideCameraListenerUseCase @Inject constructor() {
     ) = Runnable {
         val cameraProvider = cameraProviderFuture.get()
         val aspectRatio = AspectRatio.RATIO_16_9
-        val preview = Preview.Builder()
+        val preview = Preview
+            .Builder()
             .setTargetAspectRatio(aspectRatio)
-            .build().also {
+            .build()
+            .also {
                 it.setSurfaceProvider(surfaceProvider)
             }
 
-        val imageCapture = ImageCapture.Builder()
+        val imageCapture = ImageCapture
+            .Builder()
             .setTargetAspectRatio(aspectRatio)
             .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
             .build()
 
-        val imageAnalysis = ImageAnalysis.Builder()
+        val imageAnalysis = ImageAnalysis
+            .Builder()
             .setTargetAspectRatio(aspectRatio)
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build()

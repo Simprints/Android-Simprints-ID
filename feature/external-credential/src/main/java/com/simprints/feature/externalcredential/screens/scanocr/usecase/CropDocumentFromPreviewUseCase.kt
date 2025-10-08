@@ -7,7 +7,7 @@ import javax.inject.Inject
 internal class CropDocumentFromPreviewUseCase @Inject constructor() {
     operator fun invoke(
         bitmap: Bitmap,
-        cutoutRect: Rect
+        cutoutRect: Rect,
     ): Bitmap {
         val left = cutoutRect.left.coerceIn(0, bitmap.width)
         val top = cutoutRect.top.coerceIn(0, bitmap.height)

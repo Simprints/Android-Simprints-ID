@@ -16,7 +16,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 internal class CropDocumentFromPreviewUseCaseTest {
-
     @MockK
     lateinit var sourceBitmap: Bitmap
 
@@ -49,7 +48,7 @@ internal class CropDocumentFromPreviewUseCaseTest {
                 cutoutRect.left,
                 cutoutRect.top,
                 cutoutRect.width(),
-                cutoutRect.height()
+                cutoutRect.height(),
             )
         } returns croppedBitmap
 
@@ -62,7 +61,7 @@ internal class CropDocumentFromPreviewUseCaseTest {
                 cutoutRect.left,
                 cutoutRect.top,
                 cutoutRect.width(),
-                cutoutRect.height()
+                cutoutRect.height(),
             )
         }
         unmockkStatic(Bitmap::class)
@@ -83,7 +82,7 @@ internal class CropDocumentFromPreviewUseCaseTest {
                 expectedLeft,
                 expectedTop,
                 expectedRight - expectedLeft,
-                expectedBottom - expectedTop
+                expectedBottom - expectedTop,
             )
         } returns croppedBitmap
 
@@ -96,7 +95,7 @@ internal class CropDocumentFromPreviewUseCaseTest {
                 expectedLeft,
                 expectedTop,
                 expectedRight - expectedLeft,
-                expectedBottom - expectedTop
+                expectedBottom - expectedTop,
             )
         }
         unmockkStatic(Bitmap::class)
@@ -121,7 +120,7 @@ internal class CropDocumentFromPreviewUseCaseTest {
                 expectedLeft,
                 expectedTop,
                 expectedWidth,
-                expectedHeight
+                expectedHeight,
             )
         } returns croppedBitmap
 
@@ -134,7 +133,7 @@ internal class CropDocumentFromPreviewUseCaseTest {
                 expectedLeft,
                 expectedTop,
                 expectedWidth,
-                expectedHeight
+                expectedHeight,
             )
         }
         unmockkStatic(Bitmap::class)
@@ -157,7 +156,7 @@ internal class CropDocumentFromPreviewUseCaseTest {
                 left,
                 top,
                 expectedWidth,
-                expectedHeight
+                expectedHeight,
             )
         } returns croppedBitmap
 
@@ -170,7 +169,7 @@ internal class CropDocumentFromPreviewUseCaseTest {
                 left,
                 top,
                 expectedWidth,
-                expectedHeight
+                expectedHeight,
             )
         }
         unmockkStatic(Bitmap::class)
@@ -191,7 +190,7 @@ internal class CropDocumentFromPreviewUseCaseTest {
                 left,
                 top,
                 expectedWidth,
-                expectedHeight
+                expectedHeight,
             )
         } returns croppedBitmap
 
@@ -204,7 +203,7 @@ internal class CropDocumentFromPreviewUseCaseTest {
                 left,
                 top,
                 expectedWidth,
-                expectedHeight
+                expectedHeight,
             )
         }
         unmockkStatic(Bitmap::class)
