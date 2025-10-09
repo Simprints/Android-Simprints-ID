@@ -126,11 +126,10 @@ internal class SyncInfoViewModel @Inject constructor(
         }
 
         merge(
+            dataLayerDrivenSyncInfoFlow,
             eventSyncButtonResponsiveSyncInfo,
             imageSyncButtonResponsiveSyncInfo,
-        ).onStart {
-            emit(dataLayerDrivenSyncInfoFlow.firstOrNull() ?: SyncInfo())
-        }.distinctUntilChanged()
+        ).distinctUntilChanged()
             .flowOn(ioDispatcher)
             .asLiveData(viewModelScope.coroutineContext)
     }

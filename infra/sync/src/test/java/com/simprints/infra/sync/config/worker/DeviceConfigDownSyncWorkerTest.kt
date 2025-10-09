@@ -1,5 +1,6 @@
 package com.simprints.infra.sync.config.worker
 
+import android.os.PowerManager
 import androidx.work.ListenableWorker
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.models.DeviceState
@@ -11,6 +12,7 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.verify
@@ -39,7 +41,11 @@ class DeviceConfigDownSyncWorkerTest {
         MockKAnnotations.init(this, relaxed = true)
 
         deviceConfigWorker = DeviceConfigDownSyncWorker(
-            context = mockk(),
+            context = mockk(relaxed = true) {
+                every { getSystemService<PowerManager>(any()) } returns mockk {
+                    every { isIgnoringBatteryOptimizations(any()) } returns true
+                }
+            },
             params = mockk(relaxed = true),
             configManager = configManager,
             logoutUseCase = logoutUseCase,

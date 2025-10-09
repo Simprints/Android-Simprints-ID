@@ -1,8 +1,9 @@
 package com.simprints.infra.eventsync.sync.master
 
+import android.os.PowerManager
 import androidx.work.ListenableWorker
 import androidx.work.workDataOf
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.EventRepository
@@ -10,11 +11,8 @@ import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.master.EventEndSyncReporterWorker.Companion.EVENT_DOWN_SYNC_SCOPE_TO_CLOSE
 import com.simprints.infra.eventsync.sync.master.EventEndSyncReporterWorker.Companion.SYNC_ID_TO_MARK_AS_COMPLETED
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -89,7 +87,11 @@ internal class EventEndSyncReporterWorkerTest {
         downScopeId: String?,
         upScopeId: String?,
     ) = EventEndSyncReporterWorker(
-        mockk(relaxed = true),
+        mockk(relaxed = true) {
+            every { getSystemService<PowerManager>(any()) } returns mockk {
+                every { isIgnoringBatteryOptimizations(any()) } returns true
+            }
+        },
         mockk(relaxed = true) {
             every { inputData } returns workDataOf(
                 SYNC_ID_TO_MARK_AS_COMPLETED to syncId,
