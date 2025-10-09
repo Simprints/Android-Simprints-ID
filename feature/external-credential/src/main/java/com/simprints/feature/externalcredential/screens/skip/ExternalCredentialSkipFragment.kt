@@ -81,6 +81,8 @@ class ExternalCredentialSkipFragment : Fragment(R.layout.fragment_external_crede
         buttonGoBack.setOnClickListener {
             findNavController().popBackStack()
         }
+
+        // [MS-1166] We should log skip reasons in analytics.
         buttonSkip.setOnClickListener {
             mainViewModel.finish(
                 ExternalCredentialSearchResult(
