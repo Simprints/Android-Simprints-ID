@@ -39,7 +39,7 @@ class CredentialImageRepository @Inject constructor(
     /**
      * Deletes cached scan file
      */
-    fun deleteByPath(path: String) {
+    suspend fun deleteByPath(path: String) = with(ioDispatcher) {
         try {
             val file = File(path)
             if (file.exists()) {
@@ -58,7 +58,7 @@ class CredentialImageRepository @Inject constructor(
     /**
      * Deletes all cached scans associated with the give external credential
      */
-    fun deleteAllCredentialScans() = CredentialScanImageType.entries.forEach { imageType ->
+    suspend fun deleteAllCredentialScans() = CredentialScanImageType.entries.forEach { imageType ->
         deleteByPath(imageType.toFile().absolutePath)
     }
 

@@ -3,6 +3,7 @@ package com.simprints.feature.selectsubject.screen
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.livedata.LiveDataEventWithContent
@@ -62,7 +63,7 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
     }
 
     init {
-        sessionCoroutineScope.launch {
+        viewModelScope.launch {
             val isSaved = saveGuidSelection(projectId = params.projectId, subjectId = params.subjectId)
             if (!isSaved) {
                 _finish.send(SelectSubjectResult(isSubjectIdSaved = false, savedCredential = null))
@@ -116,7 +117,7 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
 
     fun saveCredential(scannedCredential: ScannedCredential) {
         updateState { SelectSubjectState.SavingExternalCredential }
-        sessionCoroutineScope.launch {
+        viewModelScope.launch {
             val addedCredential = try {
                 addExternalCredentialToSubjectUseCase(scannedCredential, subjectId = params.subjectId, projectId = params.projectId)
                 scannedCredential
@@ -137,7 +138,7 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
         _finish.send(SelectSubjectResult(isSubjectIdSaved = true, savedCredential = null))
     }
 
-    private suspend fun saveSelectionEvent(subjectId: String): Boolean {
+    private suspend fun saveSelectionEvent(subjectId: String): Boolean = with(sessionCoroutineScope) {
         try {
             val event = GuidSelectionEvent(timeHelper.now(), subjectId)
             eventRepository.addOrUpdateEvent(event)
