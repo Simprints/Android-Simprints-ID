@@ -117,7 +117,7 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
 
     fun saveCredential(scannedCredential: ScannedCredential) {
         updateState { SelectSubjectState.SavingExternalCredential }
-        sessionCoroutineScope.launch {
+        viewModelScope.launch {
             val addedCredential = try {
                 addExternalCredentialToSubjectUseCase(scannedCredential, subjectId = params.subjectId, projectId = params.projectId)
                 scannedCredential
