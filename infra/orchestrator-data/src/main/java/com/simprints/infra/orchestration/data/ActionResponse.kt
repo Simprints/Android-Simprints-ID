@@ -16,6 +16,7 @@ sealed class ActionResponse(
         override val sessionId: String,
         val enrolledGuid: String,
         val subjectActions: String?,
+        val externalCredential: ExternalCredential?,
     ) : ActionResponse(actionIdentifier, sessionId)
 
     @ExcludedFromGeneratedTestCoverageReports("Data struct")

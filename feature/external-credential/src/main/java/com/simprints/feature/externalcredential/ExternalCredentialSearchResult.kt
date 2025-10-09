@@ -19,7 +19,7 @@ import com.simprints.feature.externalcredential.screens.search.model.ScannedCred
 @ExcludedFromGeneratedTestCoverageReports("Data class")
 data class ExternalCredentialSearchResult(
     val flowType: FlowType,
-    val scannedCredential: ScannedCredential,
+    val scannedCredential: ScannedCredential?,
     val matchResults: List<CredentialMatch>,
 ) : StepResult {
     val goodMatches = matchResults.filter(CredentialMatch::isVerificationSuccessful)

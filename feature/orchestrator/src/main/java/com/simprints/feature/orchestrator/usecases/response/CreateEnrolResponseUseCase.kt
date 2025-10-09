@@ -43,7 +43,7 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
             )
             enrolSubject(subject, project)
 
-            AppEnrolResponse(subject.subjectId)
+            AppEnrolResponse(subject.subjectId, externalCredential)
         } catch (e: Exception) {
             Simber.e("Error creating enrol response", e, tag = ORCHESTRATION)
             AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR)
