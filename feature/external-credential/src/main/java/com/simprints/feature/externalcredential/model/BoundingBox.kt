@@ -16,6 +16,6 @@ data class BoundingBox(
     val bottom: Int,
 ) : Serializable
 
-internal fun Rect.toBoundingBox(): BoundingBox = BoundingBox(left, top, right, bottom)
+fun Rect.toBoundingBox(): BoundingBox = BoundingBox(left, top, right, bottom)
 
-internal fun BoundingBox.toRect(): Rect = Rect(left, top, right, bottom)
+fun BoundingBox.toRect(): Rect = Rect(left, top, right, bottom)

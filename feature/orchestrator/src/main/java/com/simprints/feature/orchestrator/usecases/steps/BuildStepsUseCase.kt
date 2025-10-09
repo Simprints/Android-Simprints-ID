@@ -6,6 +6,7 @@ import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.externalcredential.ExternalCredentialContract
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.fetchsubject.FetchSubjectContract
 import com.simprints.feature.orchestrator.R
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
@@ -45,6 +46,7 @@ internal class BuildStepsUseCase @Inject constructor(
         action: ActionRequest,
         projectConfiguration: ProjectConfiguration,
         enrolmentSubjectId: String,
+        cachedScannedCredential: ScannedCredential?,
     ) = when (action) {
         is ActionRequest.EnrolActionRequest -> listOf(
             buildSetupStep(),
@@ -70,7 +72,7 @@ internal class BuildStepsUseCase @Inject constructor(
                     action = action,
                     projectConfiguration = projectConfiguration,
                     subjectQuery = subjectQuery,
-                    enrolmentSubjectId = enrolmentSubjectId
+                    enrolmentSubjectId = enrolmentSubjectId,
                 ),
             )
         }
@@ -94,7 +96,7 @@ internal class BuildStepsUseCase @Inject constructor(
         )
 
         is ActionRequest.ConfirmIdentityActionRequest -> listOf(
-            buildConfirmIdentityStep(action),
+            buildConfirmIdentityStep(action, cachedScannedCredential),
         )
     }.flatten()
 
@@ -108,7 +110,7 @@ internal class BuildStepsUseCase @Inject constructor(
             action,
             projectConfiguration,
             ageGroup,
-            enrolmentSubjectId
+            enrolmentSubjectId,
         )
 
         is ActionRequest.IdentifyActionRequest -> buildCaptureAndMatchStepsForIdentify(
@@ -116,7 +118,7 @@ internal class BuildStepsUseCase @Inject constructor(
             projectConfiguration = projectConfiguration,
             ageGroup = ageGroup,
             subjectQuery = buildMatcherSubjectQuery(projectConfiguration, action),
-            enrolmentSubjectId = enrolmentSubjectId
+            enrolmentSubjectId = enrolmentSubjectId,
         )
 
         is ActionRequest.VerifyActionRequest -> buildCaptureAndMatchStepsForVerify(
@@ -132,7 +134,7 @@ internal class BuildStepsUseCase @Inject constructor(
         ageGroup: AgeGroup?,
         enrolmentSubjectId: String,
         projectConfiguration: ProjectConfiguration,
-        flowType: FlowType
+        flowType: FlowType,
     ): List<Step> {
         val isExternalCredentialEnabled = projectConfiguration.multifactorId?.allowedExternalCredentials?.isNotEmpty() ?: false
         if (!isExternalCredentialEnabled) return emptyList()
@@ -149,7 +151,7 @@ internal class BuildStepsUseCase @Inject constructor(
                             flowType = flowType,
                             ageGroup = ageGroup,
                         ),
-                    )
+                    ),
                 )
             }
 
@@ -177,7 +179,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 ageGroup = ageGroup,
                 enrolmentSubjectId = enrolmentSubjectId,
                 projectConfiguration = projectConfiguration,
-                flowType = enrolFlowType
+                flowType = enrolFlowType,
             )
         }
         val matcherSteps = if (projectConfiguration.general.duplicateBiometricEnrolmentCheck) {
@@ -202,7 +204,7 @@ internal class BuildStepsUseCase @Inject constructor(
         projectConfiguration: ProjectConfiguration,
         ageGroup: AgeGroup? = null,
         subjectQuery: SubjectQuery,
-        enrolmentSubjectId: String
+        enrolmentSubjectId: String,
     ): List<Step> {
         val action = fallbackToCommCareDataSourceIfNeeded(action, projectConfiguration)
         val resolvedAgeGroup = ageGroup ?: ageGroupFromSubjectAge(action, projectConfiguration)
@@ -218,7 +220,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 ageGroup = ageGroup,
                 enrolmentSubjectId = enrolmentSubjectId,
                 projectConfiguration = projectConfiguration,
-                flowType = identifyFlowType
+                flowType = identifyFlowType,
             )
         }
         val matcherSteps = buildMatcherSteps(
@@ -529,7 +531,10 @@ internal class BuildStepsUseCase @Inject constructor(
         )
     }
 
-    private fun buildConfirmIdentityStep(action: ActionRequest.ConfirmIdentityActionRequest) = listOf(
+    private fun buildConfirmIdentityStep(
+        action: ActionRequest.ConfirmIdentityActionRequest,
+        cachedScannedCredential: ScannedCredential?,
+    ) = listOf(
         Step(
             id = StepId.CONFIRM_IDENTITY,
             navigationActionId = R.id.action_orchestratorFragment_to_selectSubject,
@@ -537,10 +542,10 @@ internal class BuildStepsUseCase @Inject constructor(
             params = SelectSubjectContract.getParams(
                 projectId = action.projectId,
                 subjectId = action.selectedGuid,
+                scannedCredential = cachedScannedCredential,
             ),
         ),
     )
-
 
     private fun ageGroupFromSubjectAge(
         action: ActionRequest,

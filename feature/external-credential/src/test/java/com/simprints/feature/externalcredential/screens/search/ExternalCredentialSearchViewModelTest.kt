@@ -11,6 +11,7 @@ import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.screens.search.model.SearchCredentialState
 import com.simprints.feature.externalcredential.screens.search.model.SearchState
 import com.simprints.feature.externalcredential.screens.search.usecase.MatchCandidatesUseCase
 import com.simprints.infra.authstore.AuthStore
@@ -212,7 +213,11 @@ internal class ExternalCredentialSearchViewModelTest {
     @Test
     fun `finish sends empty matches when credential not found`() = runTest {
         viewModel = createViewModel()
-        viewModel.finish(SearchState.CredentialNotFound)
+        val state = mockk<SearchCredentialState> {
+            every { scannedCredential } returns this@ExternalCredentialSearchViewModelTest.scannedCredential
+            every { searchState } returns SearchState.CredentialNotFound
+        }
+        viewModel.finish(state)
         val finishEvent = viewModel.finishEvent.value?.peekContent()
         assertThat(finishEvent).isNotNull()
         assertThat(finishEvent?.matchResults).isEmpty()
@@ -222,7 +227,11 @@ internal class ExternalCredentialSearchViewModelTest {
     @Test
     fun `finish sends empty matches when still searching`() = runTest {
         viewModel = createViewModel()
-        viewModel.finish(SearchState.Searching)
+        val state = mockk<SearchCredentialState> {
+            every { scannedCredential } returns this@ExternalCredentialSearchViewModelTest.scannedCredential
+            every { searchState } returns SearchState.Searching
+        }
+        viewModel.finish(state)
         val finishEvent = viewModel.finishEvent.value?.peekContent()
         assertThat(finishEvent).isNotNull()
         assertThat(finishEvent?.matchResults).isEmpty()
@@ -230,8 +239,13 @@ internal class ExternalCredentialSearchViewModelTest {
 
     @Test
     fun `finish sends match results when credential linked`() = runTest {
-        val searchState = SearchState.CredentialLinked(listOf(candidateMatch))
-        viewModel.finish(searchState)
+        val state = mockk<SearchCredentialState> {
+            every { scannedCredential } returns this@ExternalCredentialSearchViewModelTest.scannedCredential
+            every { searchState } returns mockk<SearchState.CredentialLinked> {
+                every { matchResults } returns listOf(candidateMatch)
+            }
+        }
+        viewModel.finish(state)
         val finishEvent = viewModel.finishEvent.value?.peekContent()
         assertThat(finishEvent).isNotNull()
         assertThat(finishEvent?.matchResults).hasSize(1)

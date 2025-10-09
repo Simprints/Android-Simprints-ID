@@ -73,5 +73,6 @@ class ActionToIntentMapperTest {
         actionIdentifier = ConfirmIdentityActionFactory.getIdentifier().copy(packageName = packageName),
         sessionId = "sessionId",
         confirmed = true,
+        externalCredential = null,
     )
 }

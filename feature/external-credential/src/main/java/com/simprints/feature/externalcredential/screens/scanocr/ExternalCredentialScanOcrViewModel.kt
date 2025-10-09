@@ -18,14 +18,14 @@ import com.simprints.feature.externalcredential.screens.scanocr.usecase.CropDocu
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetCredentialCoordinatesUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.KeepOnlyBestDetectedBlockUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.NormalizeBitmapToPreviewUseCase
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.SaveScannedImageUseCase
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.SaveScannedImageUseCase.ScanImageType.ZoomedInCredential
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ZoomOntoCredentialUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.credential.store.CredentialImageRepository
+import com.simprints.infra.credential.store.model.CredentialScanImageType.ZoomedInCredential
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.resources.R
@@ -41,7 +41,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     private val cropDocumentFromPreviewUseCase: CropDocumentFromPreviewUseCase,
     private val getCredentialCoordinatesUseCase: GetCredentialCoordinatesUseCase,
     private val keepOnlyBestDetectedBlockUseCase: KeepOnlyBestDetectedBlockUseCase,
-    private val saveScannedImageUseCase: SaveScannedImageUseCase,
+    private val credentialImageRepository: CredentialImageRepository,
     private val zoomOntoCredentialUseCase: ZoomOntoCredentialUseCase,
     private val tokenizationProcessor: TokenizationProcessor,
     private val authStore: AuthStore,
@@ -138,10 +138,9 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
         }
     }
 
-    private fun buildZoomedImagePath(detectedBlock: DetectedOcrBlock): String? = try {
-        saveScannedImageUseCase(
+    private suspend fun buildZoomedImagePath(detectedBlock: DetectedOcrBlock): String? = try {
+        credentialImageRepository.saveCredentialScan(
             bitmap = zoomOntoCredentialUseCase(detectedBlock.imagePath, detectedBlock.blockBoundingBox),
-            documentType = detectedBlock.documentType,
             imageType = ZoomedInCredential,
         )
     } catch (e: Exception) {

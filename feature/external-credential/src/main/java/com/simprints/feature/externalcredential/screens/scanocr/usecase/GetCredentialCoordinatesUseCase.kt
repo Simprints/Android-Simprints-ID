@@ -9,7 +9,8 @@ import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.feature.externalcredential.model.toBoundingBox
 import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.SaveScannedImageUseCase.ScanImageType.FullDocument
+import com.simprints.infra.credential.store.CredentialImageRepository
+import com.simprints.infra.credential.store.model.CredentialScanImageType.FullDocument
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
@@ -20,7 +21,7 @@ import javax.inject.Singleton
 internal class GetCredentialCoordinatesUseCase @Inject constructor(
     private val ghanaNhisCardOcrSelectorUseCase: GhanaNhisCardOcrSelectorUseCase,
     private val ghanaIdCardOcrSelectorUseCase: GhanaIdCardOcrSelectorUseCase,
-    private val saveScannedImageUseCase: SaveScannedImageUseCase,
+    private val credentialImageRepository: CredentialImageRepository,
 ) {
     private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
@@ -61,8 +62,8 @@ internal class GetCredentialCoordinatesUseCase @Inject constructor(
                     if (isValid) {
                         val blockBoundingRect = textBlock.boundingBox ?: return@firstNotNullOfOrNull null
                         val lineBoundingRect = textLine.boundingBox ?: return@firstNotNullOfOrNull null
-                        val savedImagePath = saveScannedImageUseCase(bitmap, documentType, imageType = FullDocument)
-                        DetectedOcrBlock(
+                        val savedImagePath = credentialImageRepository.saveCredentialScan(bitmap, imageType = FullDocument)
+                        return@firstNotNullOfOrNull DetectedOcrBlock(
                             imagePath = savedImagePath,
                             documentType = documentType,
                             blockBoundingBox = blockBoundingRect.toBoundingBox(),
@@ -70,7 +71,7 @@ internal class GetCredentialCoordinatesUseCase @Inject constructor(
                             readoutValue = lineReadout,
                         )
                     } else {
-                        null
+                        return@firstNotNullOfOrNull null
                     }
                 }
             }

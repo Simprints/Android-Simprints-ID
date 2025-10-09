@@ -23,7 +23,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class MatchCandidatesUseCaseTest {
-
     private lateinit var useCase: MatchCandidatesUseCase
 
     @MockK
@@ -88,7 +87,7 @@ internal class MatchCandidatesUseCaseTest {
         useCase = MatchCandidatesUseCase(
             createMatchParamsUseCase = createMatchParamsUseCase,
             faceMatcher = faceMatcher,
-            fingerprintMatcher = fingerprintMatcher
+            fingerprintMatcher = fingerprintMatcher,
         )
 
         every { subject.subjectId } returns subjectId
@@ -108,7 +107,7 @@ internal class MatchCandidatesUseCaseTest {
                 projectConfiguration = any(),
                 faceSamples = any(),
                 fingerprintSamples = any(),
-                ageGroup = any()
+                ageGroup = any(),
             )
         } returns listOf(matchParams)
         every { projectConfig.face } returns faceConfig
@@ -132,7 +131,6 @@ internal class MatchCandidatesUseCaseTest {
         every { matchParams.faceSDK } returns FaceConfiguration.BioSdk.RANK_ONE
         every { matchParams.probeFingerprintSamples } returns fingerprintSamples
         every { matchParams.fingerprintSDK } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
-
     }
 
     @Test
@@ -143,7 +141,7 @@ internal class MatchCandidatesUseCaseTest {
             credential = credential,
             externalCredentialParams = externalCredentialParams,
             project = project,
-            projectConfig = projectConfig
+            projectConfig = projectConfig,
         )
 
         assertThat(result).hasSize(1)
@@ -162,7 +160,7 @@ internal class MatchCandidatesUseCaseTest {
             credential = credential,
             externalCredentialParams = externalCredentialParams,
             project = project,
-            projectConfig = projectConfig
+            projectConfig = projectConfig,
         )
 
         assertThat(result).hasSize(1)
@@ -180,7 +178,7 @@ internal class MatchCandidatesUseCaseTest {
             credential = credential,
             externalCredentialParams = externalCredentialParams,
             project = project,
-            projectConfig = projectConfig
+            projectConfig = projectConfig,
         )
 
         assertThat(result).isEmpty()
@@ -196,7 +194,7 @@ internal class MatchCandidatesUseCaseTest {
             credential = credential,
             externalCredentialParams = externalCredentialParams,
             project = project,
-            projectConfig = projectConfig
+            projectConfig = projectConfig,
         )
 
         assertThat(result).isEmpty()
@@ -212,7 +210,7 @@ internal class MatchCandidatesUseCaseTest {
             credential = credential,
             externalCredentialParams = externalCredentialParams,
             project = project,
-            projectConfig = projectConfig
+            projectConfig = projectConfig,
         )
 
         assertThat(result).isEmpty()
@@ -228,7 +226,7 @@ internal class MatchCandidatesUseCaseTest {
             credential = credential,
             externalCredentialParams = externalCredentialParams,
             project = project,
-            projectConfig = projectConfig
+            projectConfig = projectConfig,
         )
 
         assertThat(result).isEmpty()
@@ -244,7 +242,7 @@ internal class MatchCandidatesUseCaseTest {
             credential = credential,
             externalCredentialParams = externalCredentialParams,
             project = project,
-            projectConfig = projectConfig
+            projectConfig = projectConfig,
         )
 
         assertThat(result).isEmpty()
@@ -259,7 +257,7 @@ internal class MatchCandidatesUseCaseTest {
             credential = credential,
             externalCredentialParams = externalCredentialParams,
             project = project,
-            projectConfig = projectConfig
+            projectConfig = projectConfig,
         )
         assertThat(result).isEmpty()
     }
@@ -273,7 +271,7 @@ internal class MatchCandidatesUseCaseTest {
             credential = credential,
             externalCredentialParams = externalCredentialParams,
             project = project,
-            projectConfig = projectConfig
+            projectConfig = projectConfig,
         )
         assertThat(result).isEmpty()
     }

@@ -13,13 +13,13 @@ import com.simprints.feature.externalcredential.screens.scanocr.usecase.CropDocu
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetCredentialCoordinatesUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.KeepOnlyBestDetectedBlockUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.NormalizeBitmapToPreviewUseCase
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.SaveScannedImageUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ZoomOntoCredentialUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.credential.store.CredentialImageRepository
 import com.simprints.infra.resources.R
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -52,7 +52,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
     private lateinit var zoomOntoCredentialUseCase: ZoomOntoCredentialUseCase
 
     @MockK
-    private lateinit var saveScannedImageUseCase: SaveScannedImageUseCase
+    private lateinit var credentialImageRepository: CredentialImageRepository
 
     @MockK
     private lateinit var tokenizationProcessor: TokenizationProcessor
@@ -86,7 +86,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
         getCredentialCoordinatesUseCase = getCredentialCoordinatesUseCase,
         keepOnlyBestDetectedBlockUseCase = keepOnlyBestDetectedBlockUseCase,
         zoomOntoCredentialUseCase = zoomOntoCredentialUseCase,
-        saveScannedImageUseCase = saveScannedImageUseCase,
+        credentialImageRepository = credentialImageRepository,
         bgDispatcher = testCoroutineRule.testCoroutineDispatcher,
         tokenizationProcessor = tokenizationProcessor,
         configManager = configManager,
@@ -146,7 +146,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
         coEvery { keepOnlyBestDetectedBlockUseCase(any(), documentType) } returns mockBestBlock
         coEvery { tokenizationProcessor.encrypt(any(), TokenKeyType.ExternalCredential, mockProject) } returns mockTokenizedCredential
         coEvery { zoomOntoCredentialUseCase(detectedBlockImagePath, mockBoundingBox) } returns mockBitmap
-        coEvery { saveScannedImageUseCase(mockBitmap, OcrDocumentType.NhisCard, any()) } returns zoomedImagePath
+        coEvery { credentialImageRepository.saveCredentialScan(mockBitmap, any()) } returns zoomedImagePath
 
         val finishObserver = viewModel.finishOcrEvent.test()
         val stateObserver = viewModel.stateLiveData.test()

@@ -85,6 +85,7 @@ class CommCareResponseMapperTest {
                 actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
                 sessionId = "sessionId",
                 confirmed = true,
+                externalCredential = null,
             ),
         ).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
 

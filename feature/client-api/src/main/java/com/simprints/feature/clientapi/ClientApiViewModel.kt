@@ -161,6 +161,7 @@ class ClientApiViewModel @Inject internal constructor(
                     actionIdentifier = action.actionIdentifier,
                     sessionId = currentSessionId,
                     confirmed = confirmResponse.identificationOutcome,
+                    externalCredential = confirmResponse.externalCredential,
                 ),
             ),
         )

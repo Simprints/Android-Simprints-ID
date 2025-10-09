@@ -174,7 +174,10 @@ internal class ClientApiViewModelTest {
     fun `handleConfirmResponse saves correct events`() = runTest {
         viewModel.handleConfirmResponse(
             mockRequest(),
-            mockk { every { identificationOutcome } returns true },
+            mockk {
+                every { identificationOutcome } returns true
+                every { externalCredential } returns mockk()
+            },
         )
 
         coVerify {

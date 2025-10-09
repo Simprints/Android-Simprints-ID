@@ -28,8 +28,6 @@ import com.simprints.core.tools.extentions.getCurrentPermissionStatus
 import com.simprints.core.tools.extentions.permissionFromResult
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialScanOcrBinding
-import com.simprints.feature.externalcredential.ext.fadeIn
-import com.simprints.feature.externalcredential.ext.fadeOut
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.BuildOcrCropConfigUseCase
@@ -39,6 +37,8 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.view.applySystemBarInsets
+import com.simprints.infra.uibase.view.fadeIn
+import com.simprints.infra.uibase.view.fadeOut
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher

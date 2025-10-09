@@ -1,17 +1,16 @@
 package com.simprints.feature.externalcredential.screens.controller
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.*
+import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
-import io.mockk.*
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import com.simprints.infra.resources.R as IDR
 
 internal class ExternalCredentialViewModelTest {
     @get:Rule
@@ -46,16 +45,6 @@ internal class ExternalCredentialViewModelTest {
         viewModel.setSelectedExternalCredentialType(null)
 
         assertThat(observer.value()?.selectedType).isNull()
-    }
-
-    @Test
-    fun `mapTypeToStringResource returns correct string ids`() {
-        assertThat(viewModel.mapTypeToStringResource(ExternalCredentialType.NHISCard))
-            .isEqualTo(IDR.string.mfid_type_nhis_card)
-        assertThat(viewModel.mapTypeToStringResource(ExternalCredentialType.GhanaIdCard))
-            .isEqualTo(IDR.string.mfid_type_ghana_id_card)
-        assertThat(viewModel.mapTypeToStringResource(ExternalCredentialType.QRCode))
-            .isEqualTo(IDR.string.mfid_type_qr_code)
     }
 
     @Test

@@ -10,6 +10,7 @@ android {
 dependencies {
     implementation(project(":infra:config-store"))
     implementation(project(":infra:auth-store"))
+    implementation(project(":infra:credential-store"))
 
     implementation(libs.jackson.core)
 

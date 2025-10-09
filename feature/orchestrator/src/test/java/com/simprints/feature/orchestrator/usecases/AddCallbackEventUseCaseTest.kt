@@ -97,7 +97,7 @@ class AddCallbackEventUseCaseTest {
 
     @Test
     fun `adds event for confirmation response`() {
-        useCase(AppConfirmationResponse(true))
+        useCase(AppConfirmationResponse(true, mockk()))
 
         coVerify {
             eventRepository.addOrUpdateEvent(

@@ -1,6 +1,6 @@
 package com.simprints.feature.externalcredential.screens.scanocr.usecase
 
-import com.google.common.truth.Truth.*
+import com.google.common.truth.Truth.assertThat
 import com.simprints.testtools.common.syntax.assertThrows
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
