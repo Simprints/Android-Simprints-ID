@@ -62,7 +62,7 @@ internal class CredentialImageRepositoryTest {
     }
 
     @Test
-    fun `deleteByPath successfully deletes existing file`() {
+    fun `deleteByPath successfully deletes existing file`() = runTest {
         cacheDir.mkdirs()
         val testFile = File(cacheDir, "test_credential.jpg")
         testFile.createNewFile()
@@ -72,13 +72,13 @@ internal class CredentialImageRepositoryTest {
     }
 
     @Test
-    fun `deleteByPath handles non-existing file without exceptions`() {
+    fun `deleteByPath handles non-existing file without exceptions`() = runTest {
         val nonExistentPath = File(cacheDir, "non_existent.jpg").absolutePath
         repository.deleteByPath(nonExistentPath)
     }
 
     @Test
-    fun `deleteAllCredentialScans deletes all credential scans`() {
+    fun `deleteAllCredentialScans deletes all credential scans`() = runTest {
         cacheDir.mkdirs()
         listOf("randomFile1", "randomFile2", "randomFile3").forEach { fileName ->
             File(cacheDir, fileName).createNewFile()
