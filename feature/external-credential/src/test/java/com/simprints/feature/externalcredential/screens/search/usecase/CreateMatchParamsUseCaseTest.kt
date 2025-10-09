@@ -69,7 +69,7 @@ internal class CreateMatchParamsUseCaseTest {
             assertThat(matchParams.flowType).isEqualTo(flowType)
             assertThat(matchParams.queryForCandidates.subjectId).isEqualTo(subjectId)
             assertThat(matchParams.biometricDataSource).isEqualTo(BiometricDataSource.Simprints)
-            assertThat(matchParams.probeFaceSamples).containsExactly(faceSample)
+            assertThat(matchParams.probeSamples).containsExactly(faceSample)
             assertThat(matchParams.bioSdk).isNotNull()
         }
         assertThat(result[0].bioSdk).isEqualTo(FaceConfiguration.BioSdk.RANK_ONE)
@@ -101,7 +101,7 @@ internal class CreateMatchParamsUseCaseTest {
             assertThat(matchParams.flowType).isEqualTo(flowType)
             assertThat(matchParams.queryForCandidates.subjectId).isEqualTo(subjectId)
             assertThat(matchParams.biometricDataSource).isEqualTo(BiometricDataSource.Simprints)
-            assertThat(matchParams.probeFingerprintSamples).containsExactly(fingerprintSample)
+            assertThat(matchParams.probeSamples).containsExactly(fingerprintSample)
             assertThat(matchParams.bioSdk).isNotNull()
         }
         assertThat(result[0].bioSdk).isEqualTo(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
@@ -136,12 +136,12 @@ internal class CreateMatchParamsUseCaseTest {
         val faceMatch = result.find { it.bioSdk is FaceConfiguration.BioSdk }
         assertThat(faceMatch).isNotNull()
         assertThat(faceMatch?.bioSdk).isEqualTo(FaceConfiguration.BioSdk.RANK_ONE)
-        assertThat(faceMatch?.probeFaceSamples).containsExactly(faceSample)
+        assertThat(faceMatch?.probeSamples).containsExactly(faceSample)
 
         val fingerprintMatch = result.find { it.bioSdk is FingerprintConfiguration.BioSdk }
         assertThat(fingerprintMatch).isNotNull()
         assertThat(fingerprintMatch?.bioSdk).isEqualTo(FingerprintConfiguration.BioSdk.NEC)
-        assertThat(fingerprintMatch?.probeFingerprintSamples).containsExactly(fingerprintSample)
+        assertThat(fingerprintMatch?.probeSamples).containsExactly(fingerprintSample)
     }
 
     @Test
@@ -206,7 +206,7 @@ internal class CreateMatchParamsUseCaseTest {
 
         assertThat(result).hasSize(2)
         result.forEach { matchParams ->
-            assertThat(matchParams.probeFaceSamples).hasSize(2)
+            assertThat(matchParams.probeSamples).hasSize(2)
         }
     }
 }

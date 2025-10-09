@@ -122,12 +122,10 @@ internal class MatchCandidatesUseCaseTest {
 
     private fun initMatchParams(isFace: Boolean) {
         if (isFace) {
-            every { matchParams.probeFingerprintSamples } returns emptyList()
-            every { matchParams.probeFaceSamples } returns listOf(faceSample)
+            every { matchParams.probeSamples } returns listOf(faceSample)
             every { matchParams.bioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
         } else {
-            every { matchParams.probeFingerprintSamples } returns listOf(fingerprintSample)
-            every { matchParams.probeFaceSamples } returns emptyList()
+            every { matchParams.probeSamples } returns listOf(fingerprintSample)
             every { matchParams.bioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
         }
     }

@@ -277,7 +277,7 @@ class OrchestratorCacheIntegrationTest {
                     queryForCandidates = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.CommCare("name"),
                     bioSdk = FingerprintConfiguration.BioSdk.NEC,
-                    probeFingerprintSamples = listOf(
+                    probeSamples = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
                             identifier = SampleIdentifier.LEFT_THUMB,
@@ -337,7 +337,7 @@ class OrchestratorCacheIntegrationTest {
                     queryForCandidates = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
                     bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
-                    probeFaceSamples = listOf(
+                    probeSamples = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
                             identifier = SampleIdentifier.LEFT_THUMB,
