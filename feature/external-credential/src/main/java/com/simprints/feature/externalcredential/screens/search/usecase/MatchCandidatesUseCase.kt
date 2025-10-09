@@ -37,10 +37,9 @@ internal class MatchCandidatesUseCase @Inject constructor(
         )
         matchParams
             .mapNotNull { matchParams ->
-                when {
-                    matchParams.probeFaceSamples.isNotEmpty() -> {
-                        val faceSdk = matchParams.bioSdk
-                        projectConfig.face?.getSdkConfiguration(faceSdk)?.verificationMatchThreshold?.let { matchThreshold ->
+                when (val sdk = matchParams.bioSdk) {
+                    is FaceConfiguration.BioSdk -> {
+                        projectConfig.face?.getSdkConfiguration(sdk)?.verificationMatchThreshold?.let { matchThreshold ->
                             (faceMatcher(matchParams, project).last() as? MatcherState.Success)
                                 ?.comparisonResults
                                 .orEmpty()
@@ -49,16 +48,15 @@ internal class MatchCandidatesUseCase @Inject constructor(
                                         credential = credential,
                                         matchResult = result,
                                         verificationThreshold = matchThreshold,
-                                        faceBioSdk = faceSdk as FaceConfiguration.BioSdk,
+                                        faceBioSdk = sdk,
                                         fingerprintBioSdk = null,
                                     )
                                 }
                         }
                     }
 
-                    else -> {
-                        val fingerprintSdk = matchParams.bioSdk
-                        projectConfig.fingerprint?.getSdkConfiguration(fingerprintSdk)?.verificationMatchThreshold?.let { matchThreshold ->
+                    is FingerprintConfiguration.BioSdk -> {
+                        projectConfig.fingerprint?.getSdkConfiguration(sdk)?.verificationMatchThreshold?.let { matchThreshold ->
                             (fingerprintMatcher(matchParams, project).last() as? MatcherState.Success)
                                 ?.comparisonResults
                                 .orEmpty()
@@ -68,11 +66,13 @@ internal class MatchCandidatesUseCase @Inject constructor(
                                         matchResult = result,
                                         verificationThreshold = matchThreshold,
                                         faceBioSdk = null,
-                                        fingerprintBioSdk = fingerprintSdk as FingerprintConfiguration.BioSdk,
+                                        fingerprintBioSdk = sdk,
                                     )
                                 }
                         }
                     }
+
+                    else -> null
                 }
             }.flatten()
     }

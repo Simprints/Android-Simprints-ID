@@ -26,7 +26,7 @@ internal data class MatchStepStubPayload(
         samples: List<CaptureSample>,
     ) = MatchContract.getParams(
         referenceId = referenceId,
-        faceSamples = samples,
+        probeSamples = samples,
         bioSdk = bioSdk,
         flowType = flowType,
         subjectQuery = subjectQuery,
@@ -38,7 +38,7 @@ internal data class MatchStepStubPayload(
         samples: List<CaptureSample>,
     ) = MatchContract.getParams(
         referenceId = referenceId,
-        fingerprintSamples = samples,
+        probeSamples = samples,
         bioSdk = bioSdk,
         flowType = flowType,
         subjectQuery = subjectQuery,

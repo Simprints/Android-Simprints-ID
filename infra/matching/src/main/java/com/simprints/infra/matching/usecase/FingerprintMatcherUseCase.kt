@@ -48,7 +48,7 @@ class FingerprintMatcherUseCase @Inject constructor(
         }
         val bioSdkWrapper = resolveBioSdkWrapper(matchParams.bioSdk)
 
-        if (matchParams.probeFingerprintSamples.isEmpty()) {
+        if (matchParams.probeSamples.isEmpty()) {
             send(MatcherState.Success(emptyList(), emptyList(), 0, bioSdkWrapper.matcherName))
             return@channelFlow
         }
@@ -87,7 +87,7 @@ class FingerprintMatcherUseCase @Inject constructor(
 
         val batchInfo = consumeAndMatch(
             channel = channel,
-            samples = matchParams.probeFingerprintSamples,
+            samples = matchParams.probeSamples,
             resultSet = resultSet,
             bioSdk = matchParams.bioSdk,
             bioSdkWrapper = bioSdkWrapper,

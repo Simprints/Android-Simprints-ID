@@ -10,6 +10,7 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.DecisionPolicy
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.getModalitySdkConfig
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.matching.MatchParams
@@ -54,9 +55,8 @@ internal class MatchViewModel @Inject constructor(
         isInitialized = true
         val startTime = timeHelper.now()
 
-        val isFaceMatch = params.isFaceMatch()
-        val matcherUseCase = when {
-            isFaceMatch -> faceMatcher
+        val matcherUseCase = when (params.bioSdk) {
+            is FaceConfiguration.BioSdk -> faceMatcher
             else -> fingerprintMatcher
         }
         val project = configManager.getProject(authStore.signedInProjectId)

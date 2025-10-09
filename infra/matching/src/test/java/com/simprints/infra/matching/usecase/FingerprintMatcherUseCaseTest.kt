@@ -85,7 +85,7 @@ internal class FingerprintMatcherUseCaseTest {
             .invoke(
                 MatchParams(
                     probeReferenceId = "referenceId",
-                    probeFingerprintSamples = emptyList(),
+                    probeSamples = emptyList(),
                     bioSdk = SECUGEN_SIM_MATCHER,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = SubjectQuery(),
@@ -118,7 +118,7 @@ internal class FingerprintMatcherUseCaseTest {
             .invoke(
                 MatchParams(
                     probeReferenceId = "referenceId",
-                    probeFingerprintSamples = listOf(
+                    probeSamples = listOf(
                         CaptureSample(
                             captureEventId = "fingerprintId",
                             template = byteArrayOf(1, 2, 3),
@@ -185,7 +185,7 @@ internal class FingerprintMatcherUseCaseTest {
             .invoke(
                 matchParams = MatchParams(
                     probeReferenceId = "referenceId",
-                    probeFingerprintSamples = listOf(
+                    probeSamples = listOf(
                         CaptureSample(
                             captureEventId = "fingerprintId",
                             template = byteArrayOf(1, 2, 3),
