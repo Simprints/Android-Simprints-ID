@@ -59,7 +59,7 @@ internal class MapRefusalOrErrorResultUseCase @Inject constructor(
         is ValidateSubjectPoolResult ->
             result
                 .takeUnless { it.isValid }
-                ?.let { AppIdentifyResponse(emptyList(), eventRepository.getCurrentSessionScope().id) }
+                ?.let { AppIdentifyResponse(emptyList(), eventRepository.getCurrentSessionScope().id, isMultiFactorIdEnabled = false) }
 
         is SelectSubjectAgeGroupResult ->
             result

@@ -2,6 +2,7 @@ package com.simprints.feature.clientapi.mappers.response
 
 import android.os.Bundle
 import androidx.core.os.bundleOf
+import com.simprints.core.BuildConfig
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
 import com.simprints.core.domain.externalcredential.ExternalCredential
@@ -15,6 +16,7 @@ import com.simprints.libsimprints.contracts.data.Identification
 import com.simprints.libsimprints.contracts.data.Identification.Companion.toJson
 import com.simprints.libsimprints.contracts.data.RefusalForm
 import com.simprints.libsimprints.contracts.data.Verification
+import org.json.JSONArray
 import org.json.JSONObject
 import javax.inject.Inject
 import com.simprints.libsimprints.Identification as LegacyIdentification
@@ -53,11 +55,16 @@ internal class LibSimprintsResponseMapper @Inject constructor(
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
         ).appendDataPerContractVersion(response) { version ->
             when {
-                version < VersionsList.INITIAL_REWORK -> putParcelableArrayList(
+                !BuildConfig.DEBUG && version < VersionsList.INITIAL_REWORK -> putParcelableArrayList(
                     Constants.SIMPRINTS_IDENTIFICATIONS,
                     response.identifications
                         .map { LegacyIdentification(it.guid, it.confidenceScore, LegacyTier.valueOf(it.tier.name)) }
                         .toCollection(ArrayList()),
+                )
+
+                response.isMultiFactorIdEnabled -> putString(
+                    Constants.SIMPRINTS_IDENTIFICATIONS,
+                    response.mapIdentificationsWithCredentials(),
                 )
 
                 else -> putString(
@@ -164,6 +171,21 @@ internal class LibSimprintsResponseMapper @Inject constructor(
         }
     }
 
+    private fun ActionResponse.IdentifyActionResponse.mapIdentificationsWithCredentials(): String = identifications
+        .map { identification ->
+            JSONObject()
+                .also { json ->
+                    json.put(KEY_GUID, identification.guid)
+                    json.put(KEY_CONFIDENCE_BAND, identification.matchConfidence.name)
+                    json.put(KEY_CONFIDENCE, identification.confidenceScore.toFloat())
+                    json.put(KEY_IS_LINKED_TO_CREDENTIAL, identification.isLinkedToScannedCredential ?: false)
+                    identification.isCredentialVerified?.let {
+                        json.put(KEY_IS_CREDENTIAL_VERIFIED, it)
+                    }
+                }
+        }.run(::JSONArray)
+        .toString()
+
     private fun AppErrorReason.libSimprintsResultCode() = when (this) {
         AppErrorReason.UNEXPECTED_ERROR -> Constants.SIMPRINTS_UNEXPECTED_ERROR
         AppErrorReason.ROOTED_DEVICE -> Constants.SIMPRINTS_ROOTED_DEVICE
@@ -204,5 +226,12 @@ internal class LibSimprintsResponseMapper @Inject constructor(
         internal const val SCANNED_CREDENTIAL = "scannedCredential"
         internal const val SCANNED_CREDENTIAL_VALUE = "value"
         internal const val SCANNED_CREDENTIAL_TYPE = "type"
+
+        // TODO [MS-1190] Move implementation to LibSimprints. These constats are copies of com.simprints.libsimprints.contracts.data.Identification
+        private const val KEY_GUID = "guid"
+        private const val KEY_CONFIDENCE = "confidence"
+        private const val KEY_CONFIDENCE_BAND = "confidenceBand"
+        private const val KEY_IS_LINKED_TO_CREDENTIAL = "isLinkedToCredential"
+        private const val KEY_IS_CREDENTIAL_VERIFIED = "isVerified"
     }
 }
