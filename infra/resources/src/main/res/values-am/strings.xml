@@ -334,7 +334,7 @@
     <string name="sync_info_section_module_selection">የተመረጡ ሞጁሎች</string>
 
     <string name="sync_info_instruction_records">ይህን ቁልፍ በመጫን መዝገቦችን በእጅ ያመሳስሉ።<font fgcolor='#FF7C00'><u> ተጨማሪ መረጃ</u></font></string>
-    <string name="sync_info_instruction_images">ይህንን ቁልፍ በመጫን ምስሎችን በእጅ ወደ ደመናው ይላኩ።</string>
+    <string name="sync_info_instruction_images">ይህንን ቁልፍ በመጫን ምስሎችን በእራስዎ ወደ ክላውድ ይላኩ። <font fgcolor='#FF7C00'><u>ለበለጠ መረጃ</u></font></string>
     <string name="sync_info_instruction_modules">ከተመረጡት ሞጁሎች ውስጥ ያሉት መዝገቦች ይጣጣማሉ. <font fgcolor='#FF7C00'><u>ለበለጠ መረጃ</u></font></string>
     <string name="sync_info_instruction_comm_care_permission">ከCommCare ለማመሳሰል በስይስተም ቅንብሮች ውስጥ ፍቃድ ያስፈልገዋል<font fgcolor='#FF7C00'><u> ስይስተም ቅንብሮች</u></font></string>
     <string name="sync_info_instruction_error_offline">ለማመሳሰል ኢንተርኔት ግንኙነት ያስፈልገዋል።  <font fgcolor='#FF7C00'><u>የኢንተርኔት ግንኙነት ቅንብሮች</u></font></string>
