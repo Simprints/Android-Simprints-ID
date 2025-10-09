@@ -10,6 +10,7 @@ internal data class ParentalConsentTextHelper(
     private val config: ConsentConfiguration,
     private val modalities: List<Modality>,
     private val consentType: ConsentType,
+    private val isMultiFactorIdEnabled: Boolean,
 ) {
     // TODO All the `getString(id).format(arg,arg)` calls should be `getString(id,arg,arg)` one strings are fixed
 
@@ -17,10 +18,13 @@ internal data class ParentalConsentTextHelper(
     fun assembleText(context: Context): String = StringBuilder()
         .apply {
             val modalityUseCase = getModalitySpecificUseCaseText(context, modalities)
-            val modalityAccess = getModalitySpecificAccessText(context, modalities)
+            val modalityAccess =
+                getModalitySpecificAccessText(context, modalities) + getMultiFactorIdAccessText(context, isMultiFactorIdEnabled)
 
-            filterAppRequestForParentalConsent(context, consentType, config, modalityUseCase)
-            extractDataSharingOptions(context, config, modalityUseCase, modalityAccess)
+            val requestModalityUseCase = modalityUseCase + getMultiFactorIdUseCaseText(context, isMultiFactorIdEnabled)
+            val dataSharingModalityUseCase = modalityUseCase + getMultiFactorIdSharingText(context, isMultiFactorIdEnabled)
+            filterAppRequestForParentalConsent(context, consentType, config, requestModalityUseCase)
+            extractDataSharingOptions(context, config, dataSharingModalityUseCase, modalityAccess)
         }.toString()
 
     private fun StringBuilder.filterAppRequestForParentalConsent(
@@ -135,5 +139,43 @@ internal data class ParentalConsentTextHelper(
         Modality.FACE -> context.getString(R.string.consent_biometrics_access_face)
         Modality.FINGERPRINT -> context.getString(R.string.consent_biometrics_access_fingerprint)
         else -> ""
+    }
+
+    private fun getMultiFactorIdAccessText(
+        context: Context,
+        isMultiFactorIdEnabled: Boolean,
+    ): String = if (isMultiFactorIdEnabled) {
+        listOf(
+            ",",
+            context.getString(R.string.consent_credentials_parental_access),
+        ).joinToString(separator = " ")
+    } else {
+        ""
+    }
+
+    private fun getMultiFactorIdUseCaseText(
+        context: Context,
+        isMultiFactorIdEnabled: Boolean,
+    ): String = if (isMultiFactorIdEnabled) {
+        listOf(
+            ",",
+            context.getString(R.string.consent_biometric_concat_modalities),
+            context.getString(R.string.consent_credentials_parental_general),
+        ).joinToString(separator = " ")
+    } else {
+        ""
+    }
+
+    private fun getMultiFactorIdSharingText(
+        context: Context,
+        isMultiFactorIdEnabled: Boolean,
+    ): String = if (isMultiFactorIdEnabled) {
+        listOf(
+            ",",
+            context.getString(R.string.consent_biometric_concat_modalities),
+            context.getString(R.string.consent_credentials_parental_your_id),
+        ).joinToString(separator = " ")
+    } else {
+        ""
     }
 }

@@ -10,6 +10,7 @@ internal data class GeneralConsentTextHelper(
     private val config: ConsentConfiguration,
     private val modalities: List<Modality>,
     private val consentType: ConsentType,
+    private val isMultiFactorIdEnabled: Boolean,
 ) {
     // TODO All the `getString(id).format(arg,arg)` calls should be `getString(id,arg,arg)` one strings are fixed
 
@@ -17,10 +18,14 @@ internal data class GeneralConsentTextHelper(
     fun assembleText(context: Context) = StringBuilder()
         .apply {
             val modalityUseCase = getModalitySpecificUseCaseText(context, modalities)
-            val modalityAccess = getModalitySpecificAccessText(context, modalities)
+            val modalityAccess =
+                getModalitySpecificAccessText(context, modalities) + getMultiFactorIdAccessText(context, isMultiFactorIdEnabled)
 
-            filterAppRequestForConsent(context, consentType, config, modalityUseCase)
-            filterForDataSharingOptions(context, config, modalityUseCase, modalityAccess)
+            val requestModalityUseCase = modalityUseCase + getMultiFactorIdUseCaseText(context, isMultiFactorIdEnabled)
+            val dataSharingModalityUseCase = modalityUseCase + getMultiFactorIdSharingText(context, isMultiFactorIdEnabled)
+
+            filterAppRequestForConsent(context, consentType, config, requestModalityUseCase)
+            filterForDataSharingOptions(context, config, dataSharingModalityUseCase, modalityAccess)
         }.toString()
 
     private fun StringBuilder.filterAppRequestForConsent(
@@ -133,5 +138,43 @@ internal data class GeneralConsentTextHelper(
     ) = when (modalities.first()) {
         Modality.FACE -> context.getString(R.string.consent_biometrics_access_face)
         Modality.FINGERPRINT -> context.getString(R.string.consent_biometrics_access_fingerprint)
+    }
+
+    private fun getMultiFactorIdUseCaseText(
+        context: Context,
+        isMultiFactorIdEnabled: Boolean,
+    ): String = if (isMultiFactorIdEnabled) {
+        listOf(
+            ",",
+            context.getString(R.string.consent_biometric_concat_modalities),
+            context.getString(R.string.consent_credentials_general),
+        ).joinToString(separator = " ")
+    } else {
+        ""
+    }
+
+    private fun getMultiFactorIdAccessText(
+        context: Context,
+        isMultiFactorIdEnabled: Boolean,
+    ): String = if (isMultiFactorIdEnabled) {
+        listOf(
+            ",",
+            context.getString(R.string.consent_credentials_access),
+        ).joinToString(separator = " ")
+    } else {
+        ""
+    }
+
+    private fun getMultiFactorIdSharingText(
+        context: Context,
+        isMultiFactorIdEnabled: Boolean,
+    ): String = if (isMultiFactorIdEnabled) {
+        listOf(
+            ",",
+            context.getString(R.string.consent_biometric_concat_modalities),
+            context.getString(R.string.consent_credentials_your_id),
+        ).joinToString(separator = " ")
+    } else {
+        ""
     }
 }
