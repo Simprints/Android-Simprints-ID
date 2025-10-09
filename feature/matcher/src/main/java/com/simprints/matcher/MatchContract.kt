@@ -12,8 +12,7 @@ object MatchContract {
 
     fun getParams(
         referenceId: String = "",
-        fingerprintSamples: List<CaptureSample> = emptyList(),
-        faceSamples: List<CaptureSample> = emptyList(),
+        probeSamples: List<CaptureSample> = emptyList(),
         bioSdk: ModalitySdkType,
         flowType: FlowType,
         subjectQuery: SubjectQuery,
@@ -21,8 +20,7 @@ object MatchContract {
     ) = MatchParams(
         probeReferenceId = referenceId,
         bioSdk = bioSdk,
-        probeFaceSamples = faceSamples,
-        probeFingerprintSamples = fingerprintSamples,
+        probeSamples = probeSamples,
         flowType = flowType,
         queryForCandidates = subjectQuery,
         biometricDataSource = biometricDataSource,

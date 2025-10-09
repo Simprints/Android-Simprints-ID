@@ -33,7 +33,7 @@ internal class CreateMatchParamsUseCase @Inject constructor() {
                                 flowType = flowType,
                                 queryForCandidates = SubjectQuery(subjectId = candidateSubjectId),
                                 bioSdk = it,
-                                probeFaceSamples = faceSamples,
+                                probeSamples = faceSamples,
                                 biometricDataSource = BiometricDataSource.Simprints, // [MS-1167] No CoSync in initial MF-ID implementation
                             )
                         }
@@ -47,7 +47,7 @@ internal class CreateMatchParamsUseCase @Inject constructor() {
                                 flowType = flowType,
                                 queryForCandidates = SubjectQuery(subjectId = candidateSubjectId),
                                 bioSdk = it,
-                                probeFingerprintSamples = fingerprintSamples,
+                                probeSamples = fingerprintSamples,
                                 biometricDataSource = BiometricDataSource.Simprints, // [MS-1167] No CoSync in initial MF-ID implementation
                             )
                         }

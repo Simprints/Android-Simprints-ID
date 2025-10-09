@@ -102,7 +102,7 @@ internal class FaceMatcherUseCaseTest {
             .invoke(
                 MatchParams(
                     probeReferenceId = "referenceId",
-                    probeFaceSamples = listOf(
+                    probeSamples = listOf(
                         CaptureSample(
                             captureEventId = "faceId",
                             template = byteArrayOf(1, 2, 3),
@@ -166,7 +166,7 @@ internal class FaceMatcherUseCaseTest {
             .invoke(
                 matchParams = MatchParams(
                     probeReferenceId = "referenceId",
-                    probeFaceSamples = listOf(
+                    probeSamples = listOf(
                         CaptureSample(
                             captureEventId = "faceId",
                             template = byteArrayOf(1, 2, 3),
