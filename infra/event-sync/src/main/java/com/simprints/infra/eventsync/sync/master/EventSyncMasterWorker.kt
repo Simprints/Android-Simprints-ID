@@ -64,8 +64,8 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
     }
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
-        crashlyticsLog("Started")
         showProgressNotification()
+        crashlyticsLog("Started")
         try {
             // check if device is rooted before starting the sync
             securityManager.checkIfDeviceIsRooted()

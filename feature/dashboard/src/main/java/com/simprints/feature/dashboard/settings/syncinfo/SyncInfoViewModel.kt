@@ -7,7 +7,6 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DispatcherIO
-import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.feature.dashboard.settings.syncinfo.usecase.ObserveSyncInfoUseCase
@@ -23,13 +22,17 @@ import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -60,34 +63,96 @@ internal class SyncInfoViewModel @Inject constructor(
     private val imageSyncStatusFlow =
         syncOrchestrator.observeImageSyncStatus()
 
-    val logoutEventFlow: Flow<LiveDataEventWithContent<Unit>> = combine(
+    private val eventSyncButtonClickFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private val imageSyncButtonClickFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+
+    val logoutEventFlow: Flow<LogoutActionReason?> = combine(
+        authStore.observeSignedInProjectId(),
         eventSyncStateFlow,
         imageSyncStatusFlow,
-    ) { eventSyncState, imageSyncStatus ->
-        val isReadyToLogOut =
-            isPreLogoutUpSync && eventSyncState.isSyncCompleted() && !imageSyncStatus.isSyncing
-        return@combine isReadyToLogOut
+    ) { projectId, eventSyncState, imageSyncStatus ->
+        when {
+            projectId.isEmpty() -> LogoutActionReason.PROJECT_ENDING_OR_DEVICE_COMPROMISED
+            isPreLogoutUpSync && eventSyncState.isSyncCompleted() && !imageSyncStatus.isSyncing -> LogoutActionReason.USER_ACTION
+            else -> null
+        }
     }.debounce(LOGOUT_DELAY_MILLIS)
-        .filter { isReadyToLogOut ->
-            isReadyToLogOut // only when ready
-        }.map {
-            LiveDataEventWithContent(Unit)
-        }.flowOn(ioDispatcher)
+        .filter { it != null }
+        .flowOn(ioDispatcher)
 
     val syncInfoLiveData: LiveData<SyncInfo> by lazy {
-        observeSyncInfo(isPreLogoutUpSync)
+        val dataLayerDrivenSyncInfoFlow = observeSyncInfo(isPreLogoutUpSync)
             .onStart {
                 startInitialSyncIfRequired()
                 syncImagesAfterEventsWhenRequired()
-            }.flowOn(ioDispatcher)
+            }
+
+        /*
+         * Visual sync button responsiveness optimization
+         *
+         * The problem: data layer-driven progress visualization is simple programmatically, but can be slow in the UI.
+         *
+         * How it would work without the optimization:
+         * The forceEventSync and toggleImageSync invoke sync purely on the data layer,
+         * so the UI may remain unaware of the forced sync command until data-driven evidence of sync starts appearing.
+         * This may take seconds on slow devices.
+         *
+         * How it works with the optimization:
+         * Each forced sync, invoked by forceEventSync and toggleImageSync, immediately reshapes the flow of events:
+         * At first we immediately emit a sync state that is forcefully marked as in progress, for events or images separately.
+         * And we start ignoring sync states that happen before the true progress in data layer appears.
+         * Once the true progress in data layer starts, we keep showing that true progress.
+         * Additionally, an initial progress is emitted on start, before any forced sync invocations. To prevent getting stuck.
+         */
+
+        val eventSyncButtonResponsiveSyncInfo = eventSyncButtonClickFlow.flatMapLatest {
+            dataLayerDrivenSyncInfoFlow
+                .dropWhile { syncInfo ->
+                    !syncInfo.syncInfoSectionRecords.isProgressVisible
+                }.onStart {
+                    val initialState = syncInfoLiveData.value ?: SyncInfo()
+                    emit(initialState.forceEventSyncProgress())
+                }
+        }
+
+        val imageSyncButtonResponsiveSyncInfo = imageSyncButtonClickFlow.flatMapLatest {
+            dataLayerDrivenSyncInfoFlow
+                .dropWhile { syncInfo ->
+                    !syncInfo.syncInfoSectionImages.isProgressVisible
+                }.onStart {
+                    val initialState = syncInfoLiveData.value ?: SyncInfo()
+                    emit(initialState.forceImageSyncProgress())
+                }
+        }
+
+        merge(
+            dataLayerDrivenSyncInfoFlow,
+            eventSyncButtonResponsiveSyncInfo,
+            imageSyncButtonResponsiveSyncInfo,
+        ).distinctUntilChanged()
+            .flowOn(ioDispatcher)
             .asLiveData(viewModelScope.coroutineContext)
     }
 
-    fun forceEventSync() {
+    fun forceEventSync(canEmitSyncButtonClick: Boolean = true) {
         viewModelScope.launch {
+            if (canEmitSyncButtonClick) {
+                val isEventSyncing = eventSyncStateFlow.firstOrNull()?.isSyncInProgress() == true
+                if (!isEventSyncing) {
+                    eventSyncButtonClickFlow.emit(Unit)
+                }
+            }
+
             syncOrchestrator.stopEventSync()
-            val isDownSyncAllowed =
-                !isPreLogoutUpSync && configManager.getProject(authStore.signedInProjectId).state == ProjectState.RUNNING
+            val projectState = try {
+                configManager.getProject(authStore.signedInProjectId).state
+            } catch (_: Exception) {
+                // If the device is compromised, project data is deleted. Access attempts will throw an exception,
+                // effectively appearing to the user as if the project has ended.
+                ProjectState.PROJECT_ENDED
+            }
+
+            val isDownSyncAllowed = !isPreLogoutUpSync && projectState == ProjectState.RUNNING
             syncOrchestrator.startEventSync(isDownSyncAllowed)
         }
     }
@@ -98,15 +163,14 @@ internal class SyncInfoViewModel @Inject constructor(
             if (isImageSyncing) {
                 syncOrchestrator.stopImageSync()
             } else {
+                imageSyncButtonClickFlow.emit(Unit)
                 syncOrchestrator.startImageSync()
             }
         }
     }
 
     fun performLogout() {
-        viewModelScope.launch {
-            logoutUseCase()
-        }
+        logoutUseCase()
     }
 
     fun requestNavigationToLogin() {
@@ -142,7 +206,7 @@ internal class SyncInfoViewModel @Inject constructor(
                 else -> false
             }
             if (isForceEventSync) {
-                forceEventSync()
+                forceEventSync(canEmitSyncButtonClick = false)
             }
         }
     }
@@ -161,6 +225,32 @@ internal class SyncInfoViewModel @Inject constructor(
             }
         }
     }
+
+    private fun SyncInfo.forceEventSyncProgress() = copy(
+        syncInfoSectionRecords = syncInfoSectionRecords.copy(
+            counterTotalRecords = "",
+            counterRecordsToUpload = "",
+            counterRecordsToDownload = "",
+            isInstructionDefaultVisible = false,
+            isInstructionCommCarePermissionVisible = false,
+            isInstructionNoModulesVisible = false,
+            isInstructionOfflineVisible = false,
+            isInstructionErrorVisible = false,
+            isProgressVisible = true,
+            isSyncButtonEnabled = false,
+            footerLastSyncMinutesAgo = "",
+        ),
+    )
+
+    private fun SyncInfo.forceImageSyncProgress() = copy(
+        syncInfoSectionImages = syncInfoSectionImages.copy(
+            counterImagesToUpload = "",
+            isInstructionDefaultVisible = false,
+            isInstructionOfflineVisible = false,
+            isProgressVisible = true,
+            footerLastSyncMinutesAgo = "",
+        ),
+    )
 
     private suspend fun ConfigManager.isModuleSelectionRequired() =
         getProjectConfiguration().isModuleSelectionAvailable() && getDeviceConfiguration().selectedModules.isEmpty()

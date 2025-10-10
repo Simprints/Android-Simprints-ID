@@ -1,14 +1,15 @@
 package com.simprints.infra.eventsync.sync.up.workers
 
 import android.content.Context
+import android.os.PowerManager
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.ext.junit.runners.*
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
@@ -28,12 +29,8 @@ import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.C
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -255,7 +252,11 @@ internal class EventUpSyncUploaderWorkerTest {
         scope: String?,
         eventScopeId: String? = "scopeId",
     ): EventUpSyncUploaderWorker = TestListenableWorkerBuilder<EventUpSyncUploaderWorker>(
-        mockk(),
+        mockk(relaxed = true) {
+            every { getSystemService<PowerManager>(any()) } returns mockk {
+                every { isIgnoringBatteryOptimizations(any()) } returns true
+            }
+        },
         workDataOf(
             INPUT_UP_SYNC to scope,
             INPUT_EVENT_UP_SYNC_SCOPE_ID to eventScopeId,

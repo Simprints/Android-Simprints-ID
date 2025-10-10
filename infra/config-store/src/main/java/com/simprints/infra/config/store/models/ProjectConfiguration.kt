@@ -45,8 +45,26 @@ fun ProjectConfiguration.isCommCareEventDownSyncAllowed(): Boolean = synchroniza
 
 fun ProjectConfiguration.imagesUploadRequiresUnmeteredConnection(): Boolean = synchronization.up.simprints.imagesRequireUnmeteredConnection
 
+fun ProjectConfiguration.isSampleUploadEnabledInProject(): Boolean = listOfNotNull(
+    face?.rankOne?.imageSavingStrategy?.let { it != FaceConfiguration.ImageSavingStrategy.NEVER },
+    face?.simFace?.imageSavingStrategy?.let { it != FaceConfiguration.ImageSavingStrategy.NEVER },
+    fingerprint
+        ?.nec
+        ?.vero2
+        ?.imageSavingStrategy
+        ?.let { it != Vero2Configuration.ImageSavingStrategy.NEVER },
+    fingerprint
+        ?.secugenSimMatcher
+        ?.vero2
+        ?.imageSavingStrategy
+        ?.let { it != Vero2Configuration.ImageSavingStrategy.NEVER },
+).let { explicitStrategies ->
+    explicitStrategies.isNotEmpty() && explicitStrategies.any { it }
+}
+
 fun ProjectConfiguration.allowedAgeRanges(): List<AgeGroup> = listOfNotNull(
     face?.rankOne?.allowedAgeRange,
+    face?.simFace?.allowedAgeRange,
     fingerprint?.secugenSimMatcher?.allowedAgeRange,
     fingerprint?.nec?.allowedAgeRange,
 )

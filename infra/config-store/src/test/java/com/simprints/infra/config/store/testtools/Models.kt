@@ -267,20 +267,22 @@ internal val apiFingerprintConfiguration = ApiFingerprintConfiguration(
     nec = null,
 )
 
+internal val fingerprintSdkConfiguration = FingerprintConfiguration.FingerprintSdkConfiguration(
+    fingersToCapture = listOf(Finger.LEFT_3RD_FINGER),
+    decisionPolicy = decisionPolicy,
+    comparisonStrategyForVerification = FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+    vero1 = Vero1Configuration(qualityThreshold = 10),
+    vero2 = vero2Configuration,
+    allowedAgeRange = allowedAgeRange,
+    verificationMatchThreshold = 42.0f,
+    maxCaptureAttempts = MaxCaptureAttempts(noFingerDetected = 17),
+)
+
 internal val fingerprintConfiguration = FingerprintConfiguration(
     allowedScanners = listOf(FingerprintConfiguration.VeroGeneration.VERO_2),
     allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
     displayHandIcons = true,
-    secugenSimMatcher = FingerprintConfiguration.FingerprintSdkConfiguration(
-        fingersToCapture = listOf(Finger.LEFT_3RD_FINGER),
-        decisionPolicy = decisionPolicy,
-        comparisonStrategyForVerification = FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
-        vero1 = Vero1Configuration(qualityThreshold = 10),
-        vero2 = vero2Configuration,
-        allowedAgeRange = allowedAgeRange,
-        verificationMatchThreshold = 42.0f,
-        maxCaptureAttempts = MaxCaptureAttempts(noFingerDetected = 17),
-    ),
+    secugenSimMatcher = fingerprintSdkConfiguration,
     nec = null,
 )
 

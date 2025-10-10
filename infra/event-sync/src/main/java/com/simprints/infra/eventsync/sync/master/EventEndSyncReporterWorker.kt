@@ -31,8 +31,8 @@ internal class EventEndSyncReporterWorker @AssistedInject constructor(
     override val tag: String = "EventEndSyncReporter"
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
-        crashlyticsLog("Started")
         showProgressNotification()
+        crashlyticsLog("Started")
         try {
             val syncId = inputData.getString(SYNC_ID_TO_MARK_AS_COMPLETED)
             Simber.d("Params: $syncId", tag = tag)
