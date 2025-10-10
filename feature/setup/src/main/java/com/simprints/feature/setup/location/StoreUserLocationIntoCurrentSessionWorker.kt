@@ -32,8 +32,8 @@ internal class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constru
     override val tag: String = "StoreUserLocationWorker"
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
-        crashlyticsLog("Started")
         showProgressNotification()
+        crashlyticsLog("Started")
         try {
             createLocationFlow()
                 .filterNotNull()

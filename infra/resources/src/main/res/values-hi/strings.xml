@@ -315,27 +315,58 @@
     <string name="dashboard_project_card_current_user">वर्तमान उपयोगकर्ता: %1$s</string>
 
     <!-- Sync Info -->
-    <string name="sync_info_header_title">सिंक की स्थिति</string>
-    <string name="sync_info_complete">सिंक सफल हुआ</string>
-    <string name="sync_info_incomplete">सिंक असफल</string>
-    <string name="sync_info_connecting">कनेक्ट हो रहा है</string>
-    <string name="sync_info_progress">सिंक हो रहा है......%1$s</string>
-    <string name="sync_info_sync_button">अभी सिंक करें</string>
-    <string name="sync_info_details_error">सिंक असफल रहा। कृपया अपने सुपरवाईज़र से सम्पर्क करें</string>
-    <string name="sync_info_no_modules_message">कृपया सिंक करने के लिए मॉड्यूल चुनें</string>
-    <string name="sync_info_no_modules_button">मॉड्यूल्स</string>
-    <string name="sync_info_offline_message">कृपया सेटिंग में जाकर इंटरनेट को चालू करें</string>
-    <string name="sync_info_header_settings_button"><font fgcolor='#FF7C00'><u>सेटिंग</u></font></string>
-    <string name="sync_info_details_too_many_modules">बहुत सारे मॉड्यूल डाउनलोड किए जा चुके हैं.</string>
-    <string name="sync_info_re_login_required">सिंक करने के लिए आपको फिर से लॉग इन करना होगा</string>
+    <string name="sync_info_title">सिंक जानकारी</string>
 
-    <string name="sync_info_last_sync">अंतिम बार सिंक: %1$s</string>
-    <string name="sync_info_records_uploaded">सभी रिकॉर्ड अपलोड किए गए</string>
-    <plurals name="sync_info_records_to_upload">
-        <item quantity="one">%1$d अपलोड करने हेतु रिकार्ड</item>
-        <item quantity="other">%1$dअपलोड करने हेतु रिकार्ड</item>
-    </plurals>
+    <string name="sync_info_header_title">सिंक स्थिति</string>
+    <string name="sync_info_header_settings_button"><font fgcolor='#FF7C00'><u>सेटिंग्स</u></font></string>
+
+    <string name="sync_info_re_login_required">सिंक करने के लिए आपको पुनः लॉग इन करना होगा</string>
+
+    <string name="sync_info_section_record_sync">रिकॉर्ड सिंक</string>
+    <string name="sync_info_section_image_sync">छवि सिंक</string>
+    <string name="sync_info_section_module_selection">चयनित मॉड्यूल</string>
+
+    <string name="sync_info_instruction_records">इस बटन को दबाकर रिकॉर्ड्स को मैन्युअल रूप से सिंक्रोनाइज़ करें। <font fgcolor='#FF7C00'><u>अधिक जानकारी</u></font></string>
+    <string name="sync_info_instruction_images">इस बटन को दबाकर छवियों को मैन्युअल रूप से क्लाउड पर भेजें। <font fgcolor='#FF7C00'><u>अधिक जानकारी</u></font></string>
+    <string name="sync_info_instruction_modules">चयनित मॉड्यूल के रिकॉर्ड सिंक्रनाइज़ किए जाएँगे। <font fgcolor='#FF7C00'><u>अधिक जानकारी</u></font></string>
+    <string name="sync_info_instruction_comm_care_permission">CommCare से सिंक करने के लिए <font fgcolor='#FF7C00'><u>सिस्टम सेटिंग्स</u></font> में अनुमति की आवश्यकता होती है</string>
+    <string name="sync_info_instruction_error_offline">सिंक के लिए इंटरनेट कनेक्शन ज़रूरी है। <font fgcolor='#FF7C00'><u>कनेक्शन सेटिंग</u></font></string>
+    <string name="sync_info_instruction_error_no_modules">सिंक के लिए मॉड्यूल का चयन आवश्यक है. <font fgcolor='#FF7C00'><u>मॉड्यूल चुनें</u></font></string>
+    <string name="sync_info_instruction_error">समन्वयन विफल. <font fgcolor='#FF7C00'><u>अधिक जानकारी</u></font></string>
+
+    <string name="sync_info_details_event_sync_default">इस बटन को दबाकर रिकॉर्ड्स को मैन्युअल रूप से सिंक्रोनाइज़ करें। आपका डिवाइस बैकग्राउंड में भी नियमित रूप से रिकॉर्ड्स को सिंक्रोनाइज़ करने का प्रयास करेगा।</string>
+    <string name="sync_info_details_image_sync_default">इस बटन को दबाकर छवियों को क्लाउड पर मैन्युअल रूप से भेजें। आपका डिवाइस नियमित रूप से पृष्ठभूमि में भी छवियां भेजने का प्रयास करेगा। ध्यान दें कि छवि समन्वयन के लिए एक मजबूत इंटरनेट कनेक्शन की आवश्यकता हो सकती है।</string>
+    <string name="sync_info_details_module_selection">चयनित मॉड्यूल के रिकॉर्ड आपके डिवाइस से सिंक्रोनाइज़ हो जाएँगे। अपने डिवाइस से सिंक्रोनाइज़ करने के लिए मॉड्यूल चुनने हेतु नीचे/ऊपर क्लिक करें।</string>
+    <string name="sync_info_details_error">समन्वयन विफल. कृपया अपने पर्यवेक्षक से संपर्क करें</string>
+    <string name="sync_info_details_too_many_modules">बहुत सारे मॉड्यूल डाउनलोड हो गए हैं |</string>
+    <string name="sync_info_details_ok">ठीक</string>
+
+    <string name="sync_info_records_on_device">डिवाइस पर कुल रिकॉर्ड</string>
+    <string name="sync_info_records_to_up_sync">अपलोड करने हेतु रिकार्ड</string>
+    <string name="sync_info_records_to_down_sync">सिंक्रनाइज़ करने के लिए रिकॉर्ड</string>
+    <string name="sync_info_images_to_up_sync">अपलोड करने के लिए चित्र</string>
+
+    <string name="sync_info_button_sync_records">अभी सिंक करें</string>
+    <string name="sync_info_button_records_syncing">सिंक हो रहा है</string>
+    <string name="sync_info_button_sync_images">अभी छवियाँ सिंक करें</string>
+    <string name="sync_info_button_images_sync_stop">छवियों का समन्वयन रोकें</string>
     <string name="sync_info_button_try_again">पुनः प्रयास करें</string>
+    <string name="sync_info_button_select_modules">मॉड्यूल का चुनाव करें</string>
+
+    <string name="sync_info_progress_pending">%1$sसिंक लंबित…</string>
+    <string name="sync_info_progress_complete">%1$s सिंक सफल हुआ</string>
+    <string name="sync_info_progress_ongoing_no_counters">%1$s समन्वयन प्रगति पर है</string>
+    <string name="sync_info_progress_ongoing">%1$sसिंक: %2$d का %3$d…</string>
+
+    <string name="sync_info_item_default">वस्तु</string>
+    <string name="sync_info_item_record_or_event">रिकॉर्ड &amp; इवेंट</string>
+    <string name="sync_info_item_image">छवि</string>
+
+    <string name="sync_info_total_records">कुल रिकोर्ड्स</string>
+
+    <string name="sync_info_footer_sync_in_progress">समन्वयन प्रगति पर है</string>
+    <string name="sync_info_footer_sync_incomplete">सिंक अपूर्ण</string>
+    <string name="sync_info_footer_sync_complete_logging_out">सिंक पूरा हो गया, आपको लॉग आउट किया जा रहा है...</string>
 
     <!-- Dashboard - Daily activity card -->
     <string name="dashboard_activity_card_activity">गतिविधि: %1$s</string>
@@ -379,18 +410,6 @@
     <string name="dashboard_preference_update_config_finished">कॉन्फ़िगरेशन अपडेट किया गया</string>
     <string name="dashboard_preference_enable_audio_on_scan_complete">ऑडियो अलर्ट</string>
     <string name="dashboard_preference_enable_auto_capture">ऑटो-कैप्चर</string>
-
-    <!-- Sync info -->
-    <string name="sync_info_total_records">कुल रिकोर्ड्स</string>
-    <string name="sync_info_title">सिंक सम्बंधित जानकारी</string>
-    <string name="sync_info_button_select_modules">मॉड्यूल का चुनाव करें</string>
-    <string name="sync_info_records_to_up_sync">रिकोर्ड्स अपलोड किए जाने हैं</string>
-    <string name="sync_info_records_to_download_or_delete">डाउनलोड करने या हटाने के लिए रिकॉर्ड</string>
-    <string name="sync_info_records_to_delete">रिकोर्ड्स डिलीट किए जाने हैं</string>
-    <string name="sync_info_records_on_device">डिवाइस में कुल रिकोर्ड्स</string>
-    <string name="sync_info_section_module_selection">चुने गए मॉड्यूल</string>
-    <string name="sync_info_images_to_up_sync">अपलोड करने के लिए चित्र</string>
-    <string name="sync_info_button_records_syncing">सिंक हो रहा है …</string>
 
     <!-- Dashboard - Module selection -->
     <string name="dashboard_select_modules_no_modules">अमान्य चुनाव। कृपया कम से कम एक मॉड्यूल चुनें</string>

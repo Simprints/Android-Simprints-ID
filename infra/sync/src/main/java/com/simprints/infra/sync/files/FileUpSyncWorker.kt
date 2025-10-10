@@ -32,6 +32,7 @@ internal class FileUpSyncWorker @AssistedInject constructor(
     override val tag: String = "FileUpSyncWorker"
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
+        showProgressNotification()
         crashlyticsLog("Started")
         try {
             when {

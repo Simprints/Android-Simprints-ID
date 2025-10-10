@@ -9,6 +9,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":feature:exit-form"))
 
     implementation(project(":infra:orchestrator-data"))
     implementation(project(":infra:enrolment-records:repository"))

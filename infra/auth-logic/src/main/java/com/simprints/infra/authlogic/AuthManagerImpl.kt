@@ -4,7 +4,9 @@ import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.authlogic.authenticator.Authenticator
 import com.simprints.infra.authlogic.authenticator.SignerManager
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 internal class AuthManagerImpl @Inject constructor(
     private val authenticator: Authenticator,
     private val signerManager: SignerManager,

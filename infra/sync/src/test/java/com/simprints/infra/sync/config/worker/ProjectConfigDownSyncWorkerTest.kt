@@ -1,5 +1,6 @@
 package com.simprints.infra.sync.config.worker
 
+import android.os.PowerManager
 import androidx.work.ListenableWorker
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.authstore.AuthStore
@@ -48,7 +49,11 @@ class ProjectConfigDownSyncWorkerTest {
         MockKAnnotations.init(this, relaxed = true)
 
         projectConfigDownSyncWorker = ProjectConfigDownSyncWorker(
-            context = mockk(),
+            context = mockk(relaxed = true) {
+                every { getSystemService<PowerManager>(any()) } returns mockk {
+                    every { isIgnoringBatteryOptimizations(any()) } returns true
+                }
+            },
             params = mockk(relaxed = true),
             authStore = authStore,
             configManager = configManager,

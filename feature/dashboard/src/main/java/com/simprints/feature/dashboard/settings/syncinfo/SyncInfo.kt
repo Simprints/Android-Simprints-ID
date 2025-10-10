@@ -4,6 +4,7 @@ data class SyncInfo(
     val isLoggedIn: Boolean = true,
     val isConfigurationLoadingProgressBarVisible: Boolean = false,
     val isLoginPromptSectionVisible: Boolean = false,
+    val isImageSyncSectionVisible: Boolean = false,
     val syncInfoSectionRecords: SyncInfoSectionRecords = SyncInfoSectionRecords(),
     val syncInfoSectionImages: SyncInfoSectionImages = SyncInfoSectionImages(),
     val syncInfoSectionModules: SyncInfoSectionModules = SyncInfoSectionModules(),
@@ -84,3 +85,8 @@ data class SyncInfoModuleCount(
     val name: String,
     val count: String = "",
 )
+
+enum class LogoutActionReason {
+    USER_ACTION,
+    PROJECT_ENDING_OR_DEVICE_COMPROMISED,
+}

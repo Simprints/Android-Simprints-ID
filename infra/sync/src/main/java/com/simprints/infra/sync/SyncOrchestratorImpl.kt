@@ -10,6 +10,7 @@ import androidx.work.workDataOf
 import com.simprints.core.AppScope
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.imagesUploadRequiresUnmeteredConnection
+import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.sync.master.EventSyncMasterWorker
@@ -112,11 +113,12 @@ internal class SyncOrchestratorImpl @Inject constructor(
             }.map { } // Converts flow emissions to Unit value as we only care about when it happens, not the value
     }
 
-    override fun rescheduleEventSync(withDelay: Boolean) {
+    override suspend fun rescheduleEventSync(withDelay: Boolean) {
         workManager.schedulePeriodicWorker<EventSyncMasterWorker>(
-            SyncConstants.EVENT_SYNC_WORK_NAME,
-            SyncConstants.EVENT_SYNC_WORKER_INTERVAL,
+            workName = SyncConstants.EVENT_SYNC_WORK_NAME,
+            repeatInterval = SyncConstants.EVENT_SYNC_WORKER_INTERVAL,
             initialDelay = if (withDelay) SyncConstants.EVENT_SYNC_WORKER_INTERVAL else 0,
+            constraints = getEventSyncConstraints(),
             tags = eventSyncManager.getPeriodicWorkTags(),
         )
     }
@@ -126,9 +128,10 @@ internal class SyncOrchestratorImpl @Inject constructor(
         stopEventSync()
     }
 
-    override fun startEventSync(isDownSyncAllowed: Boolean) {
+    override suspend fun startEventSync(isDownSyncAllowed: Boolean) {
         workManager.startWorker<EventSyncMasterWorker>(
-            SyncConstants.EVENT_SYNC_WORK_NAME_ONE_TIME,
+            workName = SyncConstants.EVENT_SYNC_WORK_NAME_ONE_TIME,
+            constraints = getEventSyncConstraints(),
             tags = eventSyncManager.getOneTimeWorkTags(),
             inputData = workDataOf(EventSyncMasterWorker.IS_DOWN_SYNC_ALLOWED to isDownSyncAllowed),
         )
@@ -236,6 +239,15 @@ internal class SyncOrchestratorImpl @Inject constructor(
             .getProjectConfiguration()
             .imagesUploadRequiresUnmeteredConnection()
             .let { if (it) NetworkType.UNMETERED else NetworkType.CONNECTED }
+        return Constraints.Builder().setRequiredNetworkType(networkType).build()
+    }
+
+    private suspend fun getEventSyncConstraints(): Constraints {
+        // CommCare doesn't require network connection
+        val networkType = configManager
+            .getProjectConfiguration()
+            .isCommCareEventDownSyncAllowed()
+            .let { if (it) NetworkType.NOT_REQUIRED else NetworkType.CONNECTED }
         return Constraints.Builder().setRequiredNetworkType(networkType).build()
     }
 }
