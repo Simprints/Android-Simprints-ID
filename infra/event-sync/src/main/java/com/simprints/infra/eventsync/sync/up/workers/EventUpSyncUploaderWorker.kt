@@ -71,8 +71,8 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
         ?: throw IllegalArgumentException("input required")
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
-        crashlyticsLog("Started")
         showProgressNotification()
+        crashlyticsLog("Started")
         try {
             val workerId = this@EventUpSyncUploaderWorker.id.toString()
             var count = eventSyncCache.readProgress(workerId)

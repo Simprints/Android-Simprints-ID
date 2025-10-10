@@ -12,4 +12,9 @@
             android:name="params"
             app:argType="com.simprints.core.domain.step.StepParams" />
     </fragment>
+
+    <include app:graph="@navigation/graph_exit_form" />
+    <action
+        android:id="@+id/action_global_refusalFragment"
+        app:destination="@+id/graph_exit_form" />
 </navigation>

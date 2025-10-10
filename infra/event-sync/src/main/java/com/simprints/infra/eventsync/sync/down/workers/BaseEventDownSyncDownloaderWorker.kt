@@ -65,8 +65,8 @@ internal abstract class BaseEventDownSyncDownloaderWorker(
     }
 
     protected open suspend fun performDownSync(): Result = withContext(dispatcher) {
-        crashlyticsLog("Started")
         showProgressNotification()
+        crashlyticsLog("Started")
         try {
             val workerId = id.toString()
             var count = syncCache.readProgress(workerId)
