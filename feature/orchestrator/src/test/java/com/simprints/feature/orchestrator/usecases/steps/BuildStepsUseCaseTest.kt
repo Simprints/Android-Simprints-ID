@@ -61,6 +61,7 @@ class BuildStepsUseCaseTest {
         MockKAnnotations.init(this)
         useCase = BuildStepsUseCase(buildMatcherSubjectQuery, cache, mapStepsForLastBiometrics, fallbackToCommCareDataSourceIfNeeded)
         enrolmentSubjectId = "enrolmentSubjectId"
+
         // Setup fallback use case to return the input actions unchanged by default
         coEvery { fallbackToCommCareDataSourceIfNeeded(any<ActionRequest.EnrolActionRequest>(), any()) } answers { firstArg() }
         coEvery { fallbackToCommCareDataSourceIfNeeded(any<ActionRequest.IdentifyActionRequest>(), any()) } answers { firstArg() }
@@ -95,6 +96,7 @@ class BuildStepsUseCaseTest {
         every { projectConfiguration.face?.allowedSDKs } returns listOf(FaceConfiguration.BioSdk.RANK_ONE)
         every { projectConfiguration.face?.rankOne?.nbOfImagesToCapture } returns 3
         every { projectConfiguration.face?.rankOne?.allowedAgeRange } returns null
+        every { projectConfiguration.face?.simFace?.allowedAgeRange } returns null
 
         return projectConfiguration
     }

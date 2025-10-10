@@ -6,7 +6,6 @@ import androidx.work.WorkerParameters
 import com.simprints.core.DispatcherIO
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource
@@ -38,13 +37,10 @@ internal class RealmToRoomMigrationWorker @AssistedInject constructor(
     override val tag: String
         get() = REALM_DB_MIGRATION.name
 
-    lateinit var project: Project
-
     override suspend fun doWork(): Result = withContext(dispatcher) {
-        project = configRepo.getProject()
+        showProgressNotification()
         crashlyticsLog("[RealmToRoomMigrationWorker] MigrationWorker started.")
         try {
-            showProgressNotification()
             // 1. Check if down sync is in progress to retry latter (no need to increase the retry count)
             if (realmToRoomMigrationFlagsStore.isDownSyncInProgress()) {
                 realmToRoomMigrationFlagsStore.updateStatus(MigrationStatus.NOT_STARTED)
@@ -87,6 +83,7 @@ internal class RealmToRoomMigrationWorker @AssistedInject constructor(
     private suspend fun processRecords() {
         // log realm db info
         crashlyticsLog("[RealmToRoomMigrationWorker] ${realmDataSource.getLocalDBInfo()}")
+        val project = configRepo.getProject()
         var index = 0
         realmDataSource
             .loadAllSubjectsInBatches(BATCH_SIZE)

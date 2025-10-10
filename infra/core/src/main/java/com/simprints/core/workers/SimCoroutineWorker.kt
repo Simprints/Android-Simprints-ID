@@ -7,6 +7,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Build
+import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.Data
@@ -58,6 +59,9 @@ abstract class SimCoroutineWorker(
 
     protected suspend fun showProgressNotification() {
         try {
+            if (isFollowingBatteryOptimizations(context)) {
+                return
+            }
             setForeground(getForegroundInfo())
         } catch (setForegroundException: Throwable) {
             // Setting foreground (showing the notification) may be restricted by the system
@@ -119,6 +123,11 @@ abstract class SimCoroutineWorker(
             else -> Simber.e("Unexpected worker error", t, tag = tag)
         }
     }
+
+    private fun isFollowingBatteryOptimizations(context: Context): Boolean = context
+        .getSystemService(PowerManager::class.java)
+        .isIgnoringBatteryOptimizations(context.packageName)
+        .not()
 
     private companion object {
         private const val WORKER_FOREGROUND_NOTIFICATION_ID = 2

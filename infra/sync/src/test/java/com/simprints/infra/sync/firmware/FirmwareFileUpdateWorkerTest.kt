@@ -1,5 +1,6 @@
 package com.simprints.infra.sync.firmware
 
+import android.os.PowerManager
 import androidx.work.ListenableWorker.Result.Retry
 import androidx.work.ListenableWorker.Result.Success
 import com.google.common.truth.Truth.assertThat
@@ -8,6 +9,7 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coJustRun
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -30,7 +32,11 @@ class FirmwareFileUpdateWorkerTest {
         MockKAnnotations.init(this, relaxed = true)
 
         worker = FirmwareFileUpdateWorker(
-            mockk(relaxed = true),
+            mockk(relaxed = true) {
+                every { getSystemService<PowerManager>(any()) } returns mockk {
+                    every { isIgnoringBatteryOptimizations(any()) } returns true
+                }
+            },
             mockk(relaxed = true),
             firmwareRepository,
             testCoroutineRule.testCoroutineDispatcher,

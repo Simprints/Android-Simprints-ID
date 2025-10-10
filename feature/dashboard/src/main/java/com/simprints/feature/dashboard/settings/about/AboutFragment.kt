@@ -19,9 +19,9 @@ import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsAboutBinding
 import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality.FINGERPRINT
-import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.system.Clipboard
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
@@ -96,7 +96,7 @@ internal class AboutFragment : PreferenceFragmentCompat() {
             LiveDataEventWithContentObserver {
                 val destination = when (it) {
                     LogoutDestination.LogoutDataSyncScreen -> AboutFragmentDirections.actionAboutFragmentToLogoutNavigation()
-                    LogoutDestination.LoginScreen -> AboutFragmentDirections.actionAboutFragmentToRequestLoginFragment()
+                    LogoutDestination.LoginScreen -> AboutFragmentDirections.actionToRequestLoginFragment()
                 }
                 findNavController().navigateSafely(this, destination)
             },

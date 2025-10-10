@@ -3,6 +3,7 @@ package com.simprints.matcher.screen
 import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -14,15 +15,21 @@ import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.extentions.applicationSettingsIntent
 import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.core.tools.extentions.permissionFromResult
+import com.simprints.feature.exitform.ExitFormContract
+import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.matching.MatchParams
 import com.simprints.infra.uibase.navigation.finishWithResult
+import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.navigation.navigationParams
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.matcher.R
 import com.simprints.matcher.databinding.FragmentMatcherBinding
+import com.simprints.matcher.screen.MatchFragment.Companion.LOADING_PROGRESS
+import com.simprints.matcher.screen.MatchFragment.Companion.MATCHING_PROGRESS
 import com.simprints.matcher.screen.MatchViewModel.MatchState
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
@@ -56,7 +63,24 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
         applySystemBarInsets(view)
         Simber.i("MatchFragment started (isFace=${params.isFaceMatch()})", tag = ORCHESTRATION)
 
+        findNavController().handleResult<ExitFormResult>(
+            this,
+            R.id.matcherFragment,
+            ExitFormContract.DESTINATION,
+        ) {
+            val option = it.submittedOption()
+            if (option != null) {
+                findNavController().finishWithResult(this, it)
+            }
+        }
+
         observeViewModel()
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            findNavController().navigateSafely(
+                this@MatchFragment,
+                MatchFragmentDirections.actionGlobalRefusalFragment(),
+            )
+        }
     }
 
     override fun onResume() {

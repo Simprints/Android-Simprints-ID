@@ -1,6 +1,6 @@
 package com.simprints.infra.config.store.models
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
@@ -10,10 +10,12 @@ import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.Up
 import com.simprints.infra.config.store.testtools.faceConfiguration
 import com.simprints.infra.config.store.testtools.faceSdkConfiguration
 import com.simprints.infra.config.store.testtools.fingerprintConfiguration
+import com.simprints.infra.config.store.testtools.fingerprintSdkConfiguration
 import com.simprints.infra.config.store.testtools.projectConfiguration
 import com.simprints.infra.config.store.testtools.simprintsDownSyncConfigurationConfiguration
 import com.simprints.infra.config.store.testtools.simprintsUpSyncConfigurationConfiguration
 import com.simprints.infra.config.store.testtools.synchronizationConfiguration
+import com.simprints.infra.config.store.testtools.vero2Configuration
 import org.junit.Test
 
 class ProjectConfigurationTest {
@@ -285,6 +287,74 @@ class ProjectConfigurationTest {
     }
 
     @Test
+    fun `isSampleUploadEnabledInProject should return correct based on available saving strategy`() {
+        data class TestData(
+            val rankOneStrategy: FaceConfiguration.ImageSavingStrategy? = null,
+            val simFaceStrategy: FaceConfiguration.ImageSavingStrategy? = null,
+            val secugenStrategy: Vero2Configuration.ImageSavingStrategy? = null,
+            val necStragery: Vero2Configuration.ImageSavingStrategy? = null,
+            val result: Boolean,
+        )
+        listOf(
+            TestData(
+                rankOneStrategy = FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN,
+                simFaceStrategy = FaceConfiguration.ImageSavingStrategy.NEVER,
+                result = true,
+            ),
+            TestData(
+                necStragery = Vero2Configuration.ImageSavingStrategy.NEVER,
+                secugenStrategy = Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN,
+                result = true,
+            ),
+            TestData(
+                simFaceStrategy = FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN,
+                secugenStrategy = Vero2Configuration.ImageSavingStrategy.NEVER,
+                result = true,
+            ),
+            TestData(
+                simFaceStrategy = FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN,
+                secugenStrategy = Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN,
+                result = true,
+            ),
+            TestData(
+                necStragery = Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN,
+                result = true,
+            ),
+            TestData(
+                rankOneStrategy = FaceConfiguration.ImageSavingStrategy.NEVER,
+                simFaceStrategy = FaceConfiguration.ImageSavingStrategy.NEVER,
+                necStragery = Vero2Configuration.ImageSavingStrategy.NEVER,
+                secugenStrategy = Vero2Configuration.ImageSavingStrategy.NEVER,
+                result = false,
+            ),
+            TestData(
+                rankOneStrategy = FaceConfiguration.ImageSavingStrategy.NEVER,
+                necStragery = Vero2Configuration.ImageSavingStrategy.NEVER,
+                result = false,
+            ),
+            TestData(result = false),
+        ).forEach { (rankOne, simFace, secugen, nec, result) ->
+            assertThat(
+                projectConfiguration
+                    .copy(
+                        face = faceConfiguration.copy(
+                            rankOne = rankOne?.let { faceSdkConfiguration.copy(imageSavingStrategy = it) },
+                            simFace = simFace?.let { faceSdkConfiguration.copy(imageSavingStrategy = it) },
+                        ),
+                        fingerprint = fingerprintConfiguration.copy(
+                            secugenSimMatcher = secugen?.let {
+                                fingerprintSdkConfiguration.copy(vero2 = vero2Configuration.copy(imageSavingStrategy = it))
+                            },
+                            nec = nec?.let {
+                                fingerprintSdkConfiguration.copy(vero2 = vero2Configuration.copy(imageSavingStrategy = it))
+                            },
+                        ),
+                    ).isSampleUploadEnabledInProject(),
+            ).isEqualTo(result)
+        }
+    }
+
+    @Test
     fun `allowedAgeRanges returns all non-null age ranges`() {
         val faceAgeRange = AgeGroup(10, 20)
         val secugenSimMatcherAgeRange = AgeGroup(20, 30)
@@ -294,6 +364,7 @@ class ProjectConfigurationTest {
                 rankOne = faceConfiguration.rankOne?.copy(
                     allowedAgeRange = faceAgeRange,
                 ),
+                simFace = null,
             ),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(
@@ -428,7 +499,7 @@ class ProjectConfigurationTest {
             AgeGroup(faceAgeRange.startInclusive, secugenSimMatcherAgeRange.startInclusive),
             AgeGroup(secugenSimMatcherAgeRange.startInclusive, faceAgeRange.endExclusive),
             AgeGroup(faceAgeRange.endExclusive!!, secugenSimMatcherAgeRange.endExclusive!!),
-            AgeGroup(secugenSimMatcherAgeRange.endExclusive!!, null),
+            AgeGroup(secugenSimMatcherAgeRange.endExclusive, null),
         )
 
         assertThat(result).isEqualTo(expected)

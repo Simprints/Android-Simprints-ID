@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.sync.master
 
 import android.content.Context
+import android.os.PowerManager
 import androidx.test.core.app.ApplicationProvider.*
 import androidx.test.ext.junit.runners.*
 import androidx.work.Configuration
@@ -163,8 +164,9 @@ internal class EventSyncMasterWorkerTest {
                 dispatcher = testCoroutineRule.testCoroutineDispatcher,
                 securityManager = securityManager,
                 eventRepository = eventRepository,
-            )
+            ),
         )
+
         coEvery { masterWorker["showProgressNotification"]() } returns Unit
     }
 
@@ -383,8 +385,11 @@ internal class EventSyncMasterWorkerTest {
     private fun canDownSyncFromCommCare(should: Boolean) {
         every { synchronizationConfiguration.down.simprints } returns null
         every { synchronizationConfiguration.down.commCare } returns
-            if (should) DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration
-            else null
+            if (should) {
+                DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration
+            } else {
+                null
+            }
     }
 
     private fun canUpSync(should: Boolean) {

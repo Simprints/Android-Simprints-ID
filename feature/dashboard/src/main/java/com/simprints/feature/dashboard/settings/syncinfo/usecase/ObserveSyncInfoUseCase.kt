@@ -25,6 +25,7 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
+import com.simprints.infra.config.store.models.isSampleUploadEnabledInProject
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
@@ -202,7 +203,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
                         )
                 )
         val isSyncButtonEnabled =
-            (eventSyncVisibleState == OnStandby) &&
+            (eventSyncVisibleState == OnStandby || eventSyncVisibleState == Error) &&
                 ((!isPreLogoutUpSync && isDownSyncPossible) || isEventUpSyncPossible)
 
         val projectId = authStore.signedInProjectId
@@ -233,23 +234,33 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             else -> DownSyncCounts(0, isLowerBound = false)
         }
 
-        val project = configManager.getProject(projectId)
-        val isProjectRunning =
-            project.state == ProjectState.RUNNING
-        val moduleCounts = deviceConfig.selectedModules.map { moduleName ->
-            ModuleCount(
-                name = when (moduleName) {
-                    is TokenizableString.Raw -> moduleName
-                    is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
-                        encrypted = moduleName,
-                        tokenKeyType = TokenKeyType.ModuleId,
-                        project,
-                    )
-                }.value,
-                count = enrolmentRecordRepository.count(
-                    SubjectQuery(projectId = projectId, moduleId = moduleName),
-                ),
-            )
+        val project = try {
+            projectId.takeUnless { it.isBlank() }?.let { configManager.getProject(it) }
+        } catch (_: Exception) {
+            // If the device is compromised, project data is deleted. Access attempts will throw an exception,
+            // effectively appearing to the user as if the project has ended.
+            null
+        }
+
+        val isProjectRunning = project?.state == ProjectState.RUNNING
+        val moduleCounts = if (project != null) {
+            deviceConfig.selectedModules.map { moduleName ->
+                ModuleCount(
+                    name = when (moduleName) {
+                        is TokenizableString.Raw -> moduleName
+                        is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
+                            encrypted = moduleName,
+                            tokenKeyType = TokenKeyType.ModuleId,
+                            project,
+                        )
+                    }.value,
+                    count = enrolmentRecordRepository.count(
+                        SubjectQuery(projectId = projectId, moduleId = moduleName),
+                    ),
+                )
+            }
+        } else {
+            emptyList()
         }
         val modulesCountTotal = SyncInfoModuleCount(
             isTotal = true,
@@ -310,12 +321,13 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         )
 
         val syncInfo = SyncInfo(
-            isLoggedIn,
+            isLoggedIn = isLoggedIn,
             isConfigurationLoadingProgressBarVisible = isRefreshing,
             isLoginPromptSectionVisible = isReLoginRequired && !isPreLogoutUpSync,
-            syncInfoSectionRecords,
-            syncInfoSectionImages,
-            syncInfoSectionModules,
+            isImageSyncSectionVisible = projectConfig.isSampleUploadEnabledInProject(),
+            syncInfoSectionRecords = syncInfoSectionRecords,
+            syncInfoSectionImages = syncInfoSectionImages,
+            syncInfoSectionModules = syncInfoSectionModules,
         )
         return@combine9 syncInfo
     }.onRecordSyncComplete {
