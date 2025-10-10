@@ -79,7 +79,9 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
         }
 
         binding.syncStart.setOnClickListener {
-            syncOrchestrator.startEventSync()
+            lifecycleScope.launch(dispatcher) {
+                syncOrchestrator.startEventSync()
+            }
         }
 
         binding.syncStop.setOnClickListener {
@@ -87,7 +89,9 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
         }
 
         binding.syncSchedule.setOnClickListener {
-            syncOrchestrator.rescheduleEventSync()
+            lifecycleScope.launch(dispatcher) {
+                syncOrchestrator.rescheduleEventSync()
+            }
         }
 
         binding.clearFirebaseToken.setOnClickListener {

@@ -117,11 +117,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 vm.initCapture(mainVm.bioSDK, mainVm.samplesToCapture, mainVm.attemptNumber)
             }
         }
-        if (vm.isAutoCapture) {
-            // Await until capture button is pressed
-            vm.holdOffAutoCapture()
-            binding.captureFeedbackBtn.isClickable = true
-        }
+        enableCaptureButtonIfAutoCapture()
 
         binding.captureInstructionsBtn.setOnClickListener {
             findNavController().navigateSafely(
@@ -185,9 +181,12 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     override fun onResume() {
         super.onResume()
-
         when {
-            requireActivity().hasPermission(Manifest.permission.CAMERA) -> setUpCamera()
+            requireActivity().hasPermission(Manifest.permission.CAMERA) -> {
+                setUpCamera()
+                enableCaptureButtonIfAutoCapture()
+            }
+
             mainVm.shouldCheckCameraPermissions.getAndSet(false) -> {
                 // Check permission in onResume() so that if user left the app to go to Settings
                 // and give the permission, it's reflected when they come back to SID
@@ -199,6 +198,14 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             }
 
             else -> mainVm.shouldCheckCameraPermissions.set(true)
+        }
+    }
+
+    private fun enableCaptureButtonIfAutoCapture() {
+        if (vm.isAutoCapture) {
+            // Await until capture button is pressed
+            vm.holdOffAutoCapture()
+            binding.captureFeedbackBtn.isClickable = true
         }
     }
 

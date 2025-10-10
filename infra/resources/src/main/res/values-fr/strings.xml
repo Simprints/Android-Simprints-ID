@@ -320,28 +320,58 @@
     <string name="dashboard_project_card_current_user">Utilisateur actuel: %1$s</string>
 
     <!-- Sync Info -->
+    <string name="sync_info_title">Informations sur la synchronisation</string>
+
     <string name="sync_info_header_title">Statut de la synchronisation</string>
-    <string name="sync_info_complete">Synchronisation terminée</string>
-    <string name="sync_info_incomplete">Synchronisation incomplète</string>
-    <string name="sync_info_connecting">Connexion</string>
-    <string name="sync_info_progress">Synchronisation… %1$s</string>
-    <string name="sync_info_sync_button">Synchroniser maintenant</string>
-    <string name="sync_info_details_error">La synchronisation a échoué. Veuillez contacter votre superviseur</string>
-    <string name="sync_info_no_modules_message">Veuillez sélectionner les modules à synchroniser</string>
-    <string name="sync_info_no_modules_button">Modules</string>
-    <string name="sync_info_offline_message">Veuillez activer la connexion Internet dans les réglages</string>
     <string name="sync_info_header_settings_button"><font fgcolor='#FF7C00'><u>Réglages</u></font></string>
-    <string name="sync_info_details_too_many_modules">Trop de modules ont été téléchargés.</string>
+
     <string name="sync_info_re_login_required">Vous devez vous connecter pour synchroniser.</string>
 
-    <string name="sync_info_last_sync">Dernière synchronisation : %1$s</string>
-    <string name="sync_info_records_uploaded">Tous enregistrements téléchargés</string>
-    <plurals name="sync_info_records_to_upload">
-        <item quantity="one">%1$d enregistrement à envoyer</item>
-        <item quantity="many">%1$d enregistrements à envoyer</item>
-        <item quantity="other">%1$d enregistrements à envoyer</item>
-    </plurals>
+    <string name="sync_info_section_record_sync">Synchronisation des enregistrements</string>
+    <string name="sync_info_section_image_sync">Sync d\'images</string>
+    <string name="sync_info_section_module_selection">Modules sélectionnés</string>
+
+    <string name="sync_info_instruction_records">Synchroniser manuellement les enregistrements en appuyant sur ce bouton. <font fgcolor='#FF7C00'><u>Plus d\'infos</u></font></string>
+    <string name="sync_info_instruction_images">Envoyer manuellement les images au serveur en appuyant sur ce bouton. <font fgcolor='#FF7C00'><u>Plus d\'infos</u></font></string>
+    <string name="sync_info_instruction_modules">Les enregistrements des modules sélectionnés  vont être synchronisés. <font fgcolor='#FF7C00'><u>Plus d\'infos</u></font></string>
+    <string name="sync_info_instruction_comm_care_permission">Synchroniser depuis CommCare requiert des permissions depuis <font fgcolor='#FF7C00'><u>Réglages systeme</u></font></string>
+    <string name="sync_info_instruction_error_offline">Synchroniser requiert une connection internet. <font fgcolor='#FF7C00'><u>Réglages systeme</u></font></string>
+    <string name="sync_info_instruction_error_no_modules">Sélectionner des modules pour synchroniser. <font fgcolor='#FF7C00'><u>Selectionner des modules</u></font></string>
+    <string name="sync_info_instruction_error">Sync échouée. <font fgcolor='#FF7C00'><u>Plus d\'infos</u></font></string>
+
+    <string name="sync_info_details_event_sync_default">Synchroniser manuellement les enregistrements en appuyant sur ce bouton. Votre appareil va aussi régulièrement essayer de synchroniser les enregistrements en tache de fond.</string>
+    <string name="sync_info_details_image_sync_default">Synchroniser manuellement les images en appuyant sur ce bouton. Votre appareil va aussi régulièrement essayer de synchroniser les images en tache de fond. Veuillez noter que la synchronisation des images a besoin d\'une bonne connection internet.</string>
+    <string name="sync_info_details_module_selection">Les enregistrements des modules sélectionnés vont être synchronisés sur votre appareil. Appuyez au dessus / au dessous pour sélectionner les modules à synchroniser sur votre appareil.</string>
+    <string name="sync_info_details_error">La synchronisation a échoué. Veuillez contacter votre superviseur</string>
+    <string name="sync_info_details_too_many_modules">Trop de modules ont été téléchargés.</string>
+    <string name="sync_info_details_ok">OK</string>
+
+    <string name="sync_info_records_on_device">Enregistrements au total sur votre appareil</string>
+    <string name="sync_info_records_to_up_sync">Enregistrements à uploader</string>
+    <string name="sync_info_records_to_down_sync">Enregistrements à synchroniser</string>
+    <string name="sync_info_images_to_up_sync">Images à envoyer</string>
+
+    <string name="sync_info_button_sync_records">Synchroniser les enregistrements maintenant</string>
+    <string name="sync_info_button_records_syncing">Synchronisation</string>
+    <string name="sync_info_button_sync_images">Synchroniser les images maintenant</string>
+    <string name="sync_info_button_images_sync_stop">Arrêter la synchronisation des images</string>
     <string name="sync_info_button_try_again">Réessayez</string>
+    <string name="sync_info_button_select_modules">Sélectionner les modules</string>
+
+    <string name="sync_info_progress_pending">%1$s synchro en attente…</string>
+    <string name="sync_info_progress_complete">%1$s synchro terminée</string>
+    <string name="sync_info_progress_ongoing_no_counters">%1$s synchro en cours…</string>
+    <string name="sync_info_progress_ongoing">%1$s synchro: %2$d sur %3$d…</string>
+
+    <string name="sync_info_item_default">Item</string>
+    <string name="sync_info_item_record_or_event">Enregistrements &amp; Évènements </string>
+    <string name="sync_info_item_image">Image</string>
+
+    <string name="sync_info_total_records">Enregistrements totaux</string>
+
+    <string name="sync_info_footer_sync_in_progress">Synchronisation en cours</string>
+    <string name="sync_info_footer_sync_incomplete">Synchronisation incomplète</string>
+    <string name="sync_info_footer_sync_complete_logging_out">Synchronisation terminée, déconnexion en cours…</string>
 
     <!-- Dashboard - Daily activity card -->
     <string name="dashboard_activity_card_activity">Activité : %1$s</string>
@@ -388,18 +418,6 @@
     <string name="dashboard_preference_update_config_finished">Configuration mise à jour</string>
     <string name="dashboard_preference_enable_audio_on_scan_complete">Alerte audio</string>
     <string name="dashboard_preference_enable_auto_capture">Auto-capture</string>
-
-    <!-- Sync info -->
-    <string name="sync_info_total_records">Nombre total d\'enregistrements</string>
-    <string name="sync_info_title">Informations sur la synchronisation</string>
-    <string name="sync_info_button_select_modules">Sélectionner les modules</string>
-    <string name="sync_info_records_to_up_sync">Enregistrements à envoyer</string>
-    <string name="sync_info_records_to_download_or_delete">Enregistrements à télécharger ou à supprimer</string>
-    <string name="sync_info_records_to_delete">Enregistrements à supprimer</string>
-    <string name="sync_info_records_on_device">Nombre total d\'enregistrements sur l\'appareil</string>
-    <string name="sync_info_section_module_selection">Modules sélectionnés</string>
-    <string name="sync_info_images_to_up_sync">Images à envoyer</string>
-    <string name="sync_info_button_records_syncing">Synchronisation…</string>
 
     <!-- Dashboard - Module selection -->
     <string name="dashboard_select_modules_no_modules">Sélection invalide. Veuillez sélectionner au moins un module.</string>

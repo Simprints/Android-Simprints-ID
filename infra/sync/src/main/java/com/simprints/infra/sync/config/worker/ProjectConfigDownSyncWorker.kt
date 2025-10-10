@@ -29,8 +29,8 @@ internal class ProjectConfigDownSyncWorker @AssistedInject constructor(
     override val tag = "ProjectConfigDownSync"
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
-        crashlyticsLog("Started")
         showProgressNotification()
+        crashlyticsLog("Started")
         try {
             val projectId = authStore.signedInProjectId
             val oldConfig = configManager.getProjectConfiguration()

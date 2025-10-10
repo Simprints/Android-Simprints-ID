@@ -20,7 +20,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 internal class EnrolmentRecordRepositoryImpl @Inject constructor(
     private val remoteDataSource: EnrolmentRecordRemoteDataSource,
     @CommCareDataSource private val commCareDataSource: IdentityDataSource,

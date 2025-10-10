@@ -18,7 +18,7 @@ internal class BaseFragment : Fragment(R.layout.fragment_base) {
         if (authStore.signedInProjectId.isNotEmpty()) {
             findNavController().navigateSafely(this, BaseFragmentDirections.actionBaseFragmentToMainFragment())
         } else {
-            findNavController().navigateSafely(this, BaseFragmentDirections.actionBaseFragmentToRequestLoginFragment())
+            findNavController().navigateSafely(this, BaseFragmentDirections.actionToRequestLoginFragment())
         }
     }
 }
