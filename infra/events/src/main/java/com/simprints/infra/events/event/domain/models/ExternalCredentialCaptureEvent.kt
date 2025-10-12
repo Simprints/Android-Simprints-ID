@@ -1,0 +1,70 @@
+package com.simprints.infra.events.event.domain.models
+
+import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_CAPTURE
+import java.util.UUID
+
+@Keep
+data class ExternalCredentialCaptureEvent(
+    override val id: String = UUID.randomUUID().toString(),
+    override val payload: ExternalCredentialCapturePayload,
+    override val type: EventType,
+    override var scopeId: String? = null,
+    override var projectId: String? = null,
+) : Event() {
+    constructor(
+        createdAt: Timestamp,
+        id: String,
+        endTime: Timestamp,
+        autoCaptureStartTime: Timestamp,
+        autoCaptureEndTime: Timestamp,
+        ocrErrorCount: Int,
+        capturedTextLength: Int,
+        credentialTextLength: Int,
+        selectionId: String,
+    ) : this(
+        id = UUID.randomUUID().toString(),
+        payload = ExternalCredentialCapturePayload(
+            createdAt = createdAt,
+            eventVersion = EVENT_VERSION,
+            id = id,
+            endTime = endTime,
+            autoCaptureStartTime = autoCaptureStartTime,
+            autoCaptureEndTime = autoCaptureEndTime,
+            ocrErrorCount = ocrErrorCount,
+            capturedTextLength = capturedTextLength,
+            credentialTextLength = credentialTextLength,
+            selectionId = selectionId,
+        ),
+        type = EXTERNAL_CREDENTIAL_CAPTURE,
+    )
+
+    override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized field
+
+    @Keep
+    data class ExternalCredentialCapturePayload(
+        override val createdAt: Timestamp,
+        override val eventVersion: Int,
+        val id: String,
+        val endTime: Timestamp,
+        val autoCaptureStartTime: Timestamp,
+        val autoCaptureEndTime: Timestamp,
+        val ocrErrorCount: Int,
+        val capturedTextLength: Int,
+        val credentialTextLength: Int,
+        val selectionId: String,
+        override val endedAt: Timestamp? = null,
+        override val type: EventType = EXTERNAL_CREDENTIAL_CAPTURE,
+    ) : EventPayload() {
+        override fun toSafeString(): String = "credential capture: $id"
+    }
+
+    companion object {
+        const val EVENT_VERSION = 0
+    }
+}

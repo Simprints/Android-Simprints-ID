@@ -39,7 +39,10 @@ internal class GetEnrolmentCreationEventForSubjectUseCase @Inject constructor(
             ?.fromSubjectToEnrolmentCreationEvent()
 
         if (recordCreationEvent == null) {
-            Simber.e("Couldn't find enrolment for subjectActions", IllegalStateException("No enrolment record found for subjectId: $subjectId"))
+            Simber.e(
+                "Couldn't find enrolment for subjectActions",
+                IllegalStateException("No enrolment record found for subjectId: $subjectId"),
+            )
             return null
         }
 
@@ -52,8 +55,7 @@ internal class GetEnrolmentCreationEventForSubjectUseCase @Inject constructor(
         moduleId = moduleId,
         attendantId = attendantId,
         biometricReferences = EnrolmentRecordCreationEvent.buildBiometricReferences(fingerprintSamples, faceSamples, encoder),
-        // TODO [CORE-3421] Review if EnrolmentRecordCreationEvent should contain List of external credentials, as it currently doesn't make sense
-        externalCredentials = externalCredentials
+        externalCredentials = externalCredentials,
     )
 
     companion object {

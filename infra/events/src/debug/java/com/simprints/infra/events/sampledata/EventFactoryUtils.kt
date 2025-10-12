@@ -378,6 +378,7 @@ fun createEnrolmentEventV4() = EnrolmentEventV4(
     DEFAULT_MODULE_ID,
     DEFAULT_USER_ID,
     listOf(GUID1, GUID2),
+    emptyList(),
 )
 
 fun createFingerprintCaptureEvent() = FingerprintCaptureEvent(

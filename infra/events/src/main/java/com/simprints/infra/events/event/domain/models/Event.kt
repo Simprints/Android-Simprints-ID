@@ -30,10 +30,13 @@ import com.simprints.infra.events.event.domain.models.EventType.Companion.CANDID
 import com.simprints.infra.events.event.domain.models.EventType.Companion.COMPLETION_CHECK_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CONNECTIVITY_SNAPSHOT_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CONSENT_KEY
+import com.simprints.infra.events.event.domain.models.EventType.Companion.ENROLMENT_UPDATE_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.ENROLMENT_V2_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.ENROLMENT_V4_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.EVENT_DOWN_SYNC_REQUEST_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.EVENT_UP_SYNC_REQUEST_KEY
+import com.simprints.infra.events.event.domain.models.EventType.Companion.EXTERNAL_CREDENTIAL_CAPTURE_KEY
+import com.simprints.infra.events.event.domain.models.EventType.Companion.EXTERNAL_CREDENTIAL_CAPTURE_VALUE_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.FACE_CAPTURE_BIOMETRICS_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.FACE_CAPTURE_CONFIRMATION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.FACE_CAPTURE_KEY
@@ -137,6 +140,9 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
     JsonSubTypes.Type(value = AgeGroupSelectionEvent::class, name = AGE_GROUP_SELECTION_KEY),
     JsonSubTypes.Type(value = BiometricReferenceCreationEvent::class, name = BIOMETRIC_REFERENCE_CREATION_KEY),
     JsonSubTypes.Type(value = SampleUpSyncRequestEvent::class, name = SAMPLE_UP_SYNC_REQUEST),
+    JsonSubTypes.Type(value = EnrolmentUpdateEvent::class, name = ENROLMENT_UPDATE_KEY),
+    JsonSubTypes.Type(value = ExternalCredentialCaptureValueEvent::class, name = EXTERNAL_CREDENTIAL_CAPTURE_VALUE_KEY),
+    JsonSubTypes.Type(value = ExternalCredentialCaptureEvent::class, name = EXTERNAL_CREDENTIAL_CAPTURE_KEY),
 )
 abstract class Event {
     abstract val id: String

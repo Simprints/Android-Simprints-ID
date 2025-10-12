@@ -25,6 +25,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAct
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
+import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ENROLMENT
 import com.simprints.infra.logging.Simber
@@ -136,21 +137,27 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
 
     private suspend fun registerEvent(subject: Subject) {
         Simber.d("Register events for enrolments", tag = ENROLMENT)
-
-        val biometricReferenceIds = eventRepository
+        val events = eventRepository
             .getEventsInCurrentSession()
+
+        val biometricReferenceIds = events
             .filterIsInstance<BiometricReferenceCreationEvent>()
             .sortedByDescending { it.payload.createdAt }
             .map { it.payload.id }
 
+        val externalCredentialIds = events
+            .filterIsInstance<ExternalCredentialCaptureValueEvent>()
+            .map { it.payload.id }
+
         eventRepository.addOrUpdateEvent(
             EnrolmentEventV4(
-                timeHelper.now(),
-                subject.subjectId,
-                subject.projectId,
-                subject.moduleId,
-                subject.attendantId,
-                biometricReferenceIds,
+                createdAt = timeHelper.now(),
+                subjectId = subject.subjectId,
+                projectId = subject.projectId,
+                moduleId = subject.moduleId,
+                attendantId = subject.attendantId,
+                biometricReferenceIds = biometricReferenceIds,
+                externalCredentialIds = externalCredentialIds,
             ),
         )
     }

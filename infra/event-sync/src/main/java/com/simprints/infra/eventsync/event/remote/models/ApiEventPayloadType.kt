@@ -27,10 +27,13 @@ import com.simprints.infra.events.event.domain.models.EventType.CANDIDATE_READ
 import com.simprints.infra.events.event.domain.models.EventType.COMPLETION_CHECK
 import com.simprints.infra.events.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
 import com.simprints.infra.events.event.domain.models.EventType.CONSENT
+import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_UPDATE
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V2
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V4
 import com.simprints.infra.events.event.domain.models.EventType.EVENT_DOWN_SYNC_REQUEST
 import com.simprints.infra.events.event.domain.models.EventType.EVENT_UP_SYNC_REQUEST
+import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_CAPTURE
+import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_CAPTURE_VALUE
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_BIOMETRICS
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
@@ -88,6 +91,9 @@ internal enum class ApiEventPayloadType {
     LicenseCheck,
     AgeGroupSelection,
     BiometricReferenceCreation,
+    EnrolmentUpdate,
+    ExternalCredentialCaptureValue,
+    ExternalCredentialCapture,
 }
 
 internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
@@ -143,6 +149,9 @@ internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     LICENSE_CHECK -> ApiEventPayloadType.LicenseCheck
     AGE_GROUP_SELECTION -> ApiEventPayloadType.AgeGroupSelection
     BIOMETRIC_REFERENCE_CREATION -> ApiEventPayloadType.BiometricReferenceCreation
+    ENROLMENT_UPDATE -> ApiEventPayloadType.EnrolmentUpdate
+    EXTERNAL_CREDENTIAL_CAPTURE_VALUE -> ApiEventPayloadType.ExternalCredentialCaptureValue
+    EXTERNAL_CREDENTIAL_CAPTURE -> ApiEventPayloadType.ExternalCredentialCapture
 }
 
 internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
@@ -180,4 +189,7 @@ internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.BiometricReferenceCreation -> BIOMETRIC_REFERENCE_CREATION
     ApiEventPayloadType.Callout -> throw UnsupportedOperationException("")
     ApiEventPayloadType.Callback -> throw UnsupportedOperationException("")
+    ApiEventPayloadType.EnrolmentUpdate -> ENROLMENT_UPDATE
+    ApiEventPayloadType.ExternalCredentialCaptureValue -> EXTERNAL_CREDENTIAL_CAPTURE_VALUE
+    ApiEventPayloadType.ExternalCredentialCapture -> EXTERNAL_CREDENTIAL_CAPTURE
 }

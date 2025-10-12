@@ -7,17 +7,26 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent
+import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
+import com.simprints.infra.events.session.SessionEventRepository
+import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.collections.orEmpty
 
 @HiltViewModel
 internal class ExternalCredentialViewModel @Inject internal constructor(
+    private val timeHelper: TimeHelper,
     private val configManager: ConfigManager,
+    private val eventRepository: SessionEventRepository,
 ) : ViewModel() {
     private var isInitialized = false
     lateinit var params: ExternalCredentialParams
@@ -66,6 +75,32 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
     }
 
     fun finish(result: ExternalCredentialSearchResult) {
-        _finishEvent.send(result)
+        viewModelScope.launch {
+            result.scannedCredential?.let { scannedCredential ->
+                Simber.d("Saving External Credential Events for $scannedCredential")
+                val credential = scannedCredential.toExternalCredential(params.subjectId.orEmpty())
+                eventRepository.addOrUpdateEvent(
+                    ExternalCredentialCaptureValueEvent(
+                        createdAt = timeHelper.now(),
+                        id = UUID.randomUUID().toString(),
+                        credential = credential,
+                    ),
+                )
+                eventRepository.addOrUpdateEvent(
+                    ExternalCredentialCaptureEvent(
+                        createdAt = timeHelper.now(),
+                        id = UUID.randomUUID().toString(),
+                        endTime = timeHelper.now(),
+                        autoCaptureStartTime = timeHelper.now(),
+                        autoCaptureEndTime = timeHelper.now(),
+                        ocrErrorCount = 0,
+                        capturedTextLength = 0,
+                        credentialTextLength = 0,
+                        selectionId = credential.id,
+                    ),
+                )
+            }
+            _finishEvent.send(result)
+        }
     }
 }
