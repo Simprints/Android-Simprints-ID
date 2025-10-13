@@ -352,12 +352,14 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         moduleCountAdapter.submitList(moduleCountsForAdapter)
 
         // RecyclerView height fix (wrong height may be caused by ConstraintLayout in parent views)
-        binding.selectedModulesView.post {
-            val itemHeight = resources.getDimensionPixelSize(R.dimen.module_item_height)
-            val itemCount = moduleCountsForAdapter.size.coerceAtMost(MAX_MODULE_LIST_HEIGHT_ITEMS)
-            binding.selectedModulesView.apply {
-                layoutParams = layoutParams.apply {
-                    height = itemHeight * itemCount
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                val itemHeight = resources.getDimensionPixelSize(R.dimen.module_item_height)
+                val itemCount = moduleCountsForAdapter.size.coerceAtMost(MAX_MODULE_LIST_HEIGHT_ITEMS)
+                binding.selectedModulesView.apply {
+                    layoutParams = layoutParams.apply {
+                        height = itemHeight * itemCount
+                    }
                 }
             }
         }
