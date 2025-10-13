@@ -56,7 +56,12 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
             ?.getSdkConfiguration(fingerprintMatchResult.sdk)
             ?.decisionPolicy
             ?.let { fingerprintDecisionPolicy ->
-                fingerprintMatchResult.results.mapToMatchResults(fingerprintDecisionPolicy, projectConfiguration, isCredentialMatch = false)
+                fingerprintMatchResult.results.mapToMatchResults(
+                    decisionPolicy = fingerprintDecisionPolicy,
+                    projectConfiguration = projectConfiguration,
+                    isCredentialMatch = false,
+                    verificationMatchThreshold = null,
+                )
             }
     } ?: emptyList()
 
@@ -68,12 +73,18 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
             ?.getSdkConfiguration(faceMatchResult.sdk)
             ?.decisionPolicy
             ?.let { faceDecisionPolicy ->
-                faceMatchResult.results.mapToMatchResults(faceDecisionPolicy, projectConfiguration, isCredentialMatch = false)
+                faceMatchResult.results.mapToMatchResults(
+                    decisionPolicy = faceDecisionPolicy,
+                    projectConfiguration = projectConfiguration,
+                    isCredentialMatch = false,
+                    verificationMatchThreshold = null,
+                )
             }
     } ?: emptyList()
 
     private fun List<MatchResultItem>.mapToMatchResults(
         decisionPolicy: DecisionPolicy,
+        verificationMatchThreshold: Float?,
         projectConfiguration: ProjectConfiguration,
         isCredentialMatch: Boolean,
     ): List<AppMatchResult> {
@@ -91,6 +102,7 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
                     confidenceScore = it.confidence,
                     decisionPolicy = decisionPolicy,
                     isCredentialMatch = isCredentialMatch,
+                    verificationMatchThreshold = verificationMatchThreshold,
                 )
             }
     }
@@ -113,23 +125,26 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
             val credentialMatchItems = credentialSearchResult.matchResults.map { it.matchResult }
             val faceMatchItems = credentialMatchItems.filterIsInstance<FaceMatchResult.Item>()
             val fingerMatchItems = credentialMatchItems.filterIsInstance<FingerprintMatchResult.Item>()
-            val decisionPolicy = if (isFace) {
+            val (decisionPolicy, verificationMatchThreshold) = if (isFace) {
                 credentialSearchResult.matchResults.find { it.faceBioSdk != null }?.faceBioSdk?.let { sdk ->
-                    projectConfiguration.face
-                        ?.getSdkConfiguration(sdk)
-                        ?.decisionPolicy
+                    val config = projectConfiguration.face?.getSdkConfiguration(sdk)
+                    config?.decisionPolicy to config?.verificationMatchThreshold
                 }
             } else {
                 credentialSearchResult.matchResults.find { it.fingerprintBioSdk != null }?.fingerprintBioSdk?.let { sdk ->
-                    projectConfiguration.fingerprint
-                        ?.getSdkConfiguration(sdk)
-                        ?.decisionPolicy
+                    val config = projectConfiguration.fingerprint?.getSdkConfiguration(sdk)
+                    config?.decisionPolicy to config?.verificationMatchThreshold
                 }
-            }
+            } ?: (null to null)
+
             if (decisionPolicy == null) return@let emptyList()
             val matches = if (isFace) faceMatchItems else fingerMatchItems
             return@let matches
-                .mapToMatchResults(decisionPolicy, projectConfiguration, isCredentialMatch = true)
-                .sortedByDescending(AppMatchResult::confidenceScore)
+                .mapToMatchResults(
+                    decisionPolicy = decisionPolicy,
+                    projectConfiguration = projectConfiguration,
+                    isCredentialMatch = true,
+                    verificationMatchThreshold = verificationMatchThreshold,
+                ).sortedByDescending(AppMatchResult::confidenceScore)
         }.orEmpty()
 }
