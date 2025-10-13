@@ -55,12 +55,13 @@ internal class LibSimprintsResponseMapper @Inject constructor(
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
         ).appendDataPerContractVersion(response) { version ->
             when {
-                !BuildConfig.DEBUG && version < VersionsList.INITIAL_REWORK -> putParcelableArrayList(
-                    Constants.SIMPRINTS_IDENTIFICATIONS,
-                    response.identifications
-                        .map { LegacyIdentification(it.guid, it.confidenceScore, LegacyTier.valueOf(it.tier.name)) }
-                        .toCollection(ArrayList()),
-                )
+                // TODO [MFID preview] remove commented out code for release versions
+//                !BuildConfig.DEBUG && version < VersionsList.INITIAL_REWORK -> putParcelableArrayList(
+//                    Constants.SIMPRINTS_IDENTIFICATIONS,
+//                    response.identifications
+//                        .map { LegacyIdentification(it.guid, it.confidenceScore, LegacyTier.valueOf(it.tier.name)) }
+//                        .toCollection(ArrayList()),
+//                )
 
                 response.isMultiFactorIdEnabled -> putString(
                     Constants.SIMPRINTS_IDENTIFICATIONS,
