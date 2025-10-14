@@ -308,7 +308,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                 referencesToDelete.size != dbSubject.biometricTemplates.size ||
                     action.faceSamplesToAdd.isNotEmpty() ||
                     action.fingerprintSamplesToAdd.isNotEmpty() ||
-                    action.externalCredentialsToAdd.isNotEmpty()
+                    action.externalCredentialsToAdd.isNotEmpty(),
             ) {
                 val errorMsg =
                     "Cannot delete all samples for subject ${action.subjectId} without adding new ones"
@@ -325,6 +325,9 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                 subjectDao.insertBiometricSamples(templatesToAdd)
             }
             if (action.externalCredentialsToAdd.isNotEmpty()) {
+                Simber.i(
+                    "[Room] Adding external credentials to subject ${dbSubject.subject.subjectId}. Credentials: [${action.externalCredentialsToAdd}]",
+                )
                 subjectDao.insertExternalCredentials(action.externalCredentialsToAdd.map { it.toRoomDb() })
             }
         } else {
