@@ -15,14 +15,14 @@ data class EnrolmentRecordUpdateEvent(
         subjectId: String,
         biometricReferencesAdded: List<BiometricReference>,
         biometricReferencesRemoved: List<String>,
-        externalCredentialAdded: ExternalCredential?,
+        externalCredentialsAdded: List<ExternalCredential>,
     ) : this(
         UUID.randomUUID().toString(),
         EnrolmentRecordUpdatePayload(
             subjectId = subjectId,
             biometricReferencesAdded = biometricReferencesAdded,
             biometricReferencesRemoved = biometricReferencesRemoved,
-            externalCredentialAdded = externalCredentialAdded,
+            externalCredentialsAdded = externalCredentialsAdded,
         ),
     )
 
@@ -31,6 +31,6 @@ data class EnrolmentRecordUpdateEvent(
         val subjectId: String,
         val biometricReferencesAdded: List<BiometricReference>,
         val biometricReferencesRemoved: List<String>,
-        val externalCredentialAdded: ExternalCredential?,
+        val externalCredentialsAdded: List<ExternalCredential>,
     )
 }

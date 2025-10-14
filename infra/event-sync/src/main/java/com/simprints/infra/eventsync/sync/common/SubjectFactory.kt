@@ -56,6 +56,7 @@ class SubjectFactory @Inject constructor(
         val removedBiometricReferences = payload.biometricReferencesRemoved.toSet() // to make lookup O(1)
         val addedFaceSamples = extractFaceSamplesFromBiometricReferences(payload.biometricReferencesAdded)
         val addedFingerprintSamples = extractFingerprintSamplesFromBiometricReferences(payload.biometricReferencesAdded)
+        val externalCredentialsAdded = payload.externalCredentialsAdded
 
         return existingSubject.copy(
             faceSamples = existingSubject.faceSamples
@@ -64,6 +65,9 @@ class SubjectFactory @Inject constructor(
             fingerprintSamples = existingSubject.fingerprintSamples
                 .filterNot { it.referenceId in removedBiometricReferences }
                 .plus(addedFingerprintSamples),
+            externalCredentials = existingSubject.externalCredentials
+                .plus(externalCredentialsAdded)
+                .distinctBy { it.value.value },
         )
     }
 
@@ -75,18 +79,16 @@ class SubjectFactory @Inject constructor(
         fingerprintResponse: FingerprintCaptureResult?,
         faceResponse: FaceCaptureResult?,
         externalCredential: ExternalCredential?,
-    ): Subject {
-        return buildSubject(
-            subjectId = subjectId,
-            projectId = projectId,
-            attendantId = attendantId,
-            moduleId = moduleId,
-            createdAt = Date(timeHelper.now().ms),
-            fingerprintSamples = fingerprintResponse?.let { extractFingerprintSamples(it) }.orEmpty(),
-            faceSamples = faceResponse?.let { extractFaceSamples(it) }.orEmpty(),
-            externalCredentials = externalCredential?.let {  listOf(it) } ?: emptyList(),
-        )
-    }
+    ): Subject = buildSubject(
+        subjectId = subjectId,
+        projectId = projectId,
+        attendantId = attendantId,
+        moduleId = moduleId,
+        createdAt = Date(timeHelper.now().ms),
+        fingerprintSamples = fingerprintResponse?.let { extractFingerprintSamples(it) }.orEmpty(),
+        faceSamples = faceResponse?.let { extractFaceSamples(it) }.orEmpty(),
+        externalCredentials = externalCredential?.let { listOf(it) } ?: emptyList(),
+    )
 
     fun buildSubject(
         subjectId: String,
@@ -107,7 +109,7 @@ class SubjectFactory @Inject constructor(
         updatedAt = updatedAt,
         fingerprintSamples = fingerprintSamples,
         faceSamples = faceSamples,
-        externalCredentials = externalCredentials
+        externalCredentials = externalCredentials,
     )
 
     private fun extractFingerprintSamples(fingerprintResponse: FingerprintCaptureResult) =
