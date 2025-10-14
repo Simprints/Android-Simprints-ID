@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
@@ -21,6 +23,9 @@ import com.simprints.feature.clientapi.usecases.GetEnrolmentCreationEventForSubj
 import com.simprints.feature.clientapi.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.usecases.SimpleEventReporter
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
@@ -30,6 +35,7 @@ import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.infra.orchestration.data.responses.AppConfirmationResponse
 import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
+import com.simprints.infra.orchestration.data.responses.AppExternalCredential
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.orchestration.data.responses.AppRefusalResponse
 import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
@@ -53,6 +59,7 @@ class ClientApiViewModel @Inject internal constructor(
     private val configManager: ConfigManager,
     private val timeHelper: TimeHelper,
     private val persistentLogger: PersistentLogger,
+    private val tokenizationProcessor: TokenizationProcessor,
 ) : ViewModel() {
     val returnResponse: LiveData<LiveDataEventWithContent<Bundle>>
         get() = _returnResponse
@@ -115,7 +122,7 @@ class ClientApiViewModel @Inject internal constructor(
                     sessionId = currentSessionId,
                     enrolledGuid = enrolResponse.guid,
                     subjectActions = coSyncEnrolmentRecords,
-                    externalCredential = enrolResponse.externalCredential,
+                    externalCredential = enrolResponse.externalCredential?.toAppExternalCredential(tokenizationProcessor, getProject()),
                 ),
             ),
         )
@@ -163,7 +170,7 @@ class ClientApiViewModel @Inject internal constructor(
                     actionIdentifier = action.actionIdentifier,
                     sessionId = currentSessionId,
                     confirmed = confirmResponse.identificationOutcome,
-                    externalCredential = confirmResponse.externalCredential,
+                    externalCredential = confirmResponse.externalCredential?.toAppExternalCredential(tokenizationProcessor, getProject()),
                 ),
             ),
         )
@@ -263,6 +270,23 @@ class ClientApiViewModel @Inject internal constructor(
             timestampMs = action.actionIdentifier.timestampMs,
             title = currentSessionId,
             body = "${action.actionIdentifier}\n$response",
+        )
+    }
+
+    private fun ExternalCredential.toAppExternalCredential(
+        tokenizationProcessor: TokenizationProcessor,
+        project: Project?,
+    ): AppExternalCredential? {
+        if (project == null) return null
+        val decryptedValue = tokenizationProcessor.decrypt(
+            encrypted = value,
+            tokenKeyType = TokenKeyType.ExternalCredential,
+            project = project,
+        ) as? TokenizableString.Raw ?: return null
+        return AppExternalCredential(
+            id = id,
+            value = decryptedValue,
+            type = type,
         )
     }
 }

@@ -1,8 +1,8 @@
 package com.simprints.infra.orchestration.data
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.infra.orchestration.data.responses.AppExternalCredential
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 
 @ExcludedFromGeneratedTestCoverageReports("Data struct")
@@ -16,7 +16,7 @@ sealed class ActionResponse(
         override val sessionId: String,
         val enrolledGuid: String,
         val subjectActions: String?,
-        val externalCredential: ExternalCredential?,
+        val externalCredential: AppExternalCredential?,
     ) : ActionResponse(actionIdentifier, sessionId)
 
     @ExcludedFromGeneratedTestCoverageReports("Data struct")
@@ -32,7 +32,7 @@ sealed class ActionResponse(
         override val actionIdentifier: ActionRequestIdentifier,
         override val sessionId: String,
         val confirmed: Boolean,
-        val externalCredential: ExternalCredential?,
+        val externalCredential: AppExternalCredential?,
     ) : ActionResponse(actionIdentifier, sessionId)
 
     @ExcludedFromGeneratedTestCoverageReports("Data struct")

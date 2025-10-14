@@ -5,9 +5,9 @@ import androidx.core.os.bundleOf
 import com.simprints.core.BuildConfig
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
-import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.infra.orchestration.data.ActionResponse
+import com.simprints.infra.orchestration.data.responses.AppExternalCredential
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.contracts.VersionsList
 import com.simprints.libsimprints.contracts.data.ConfidenceBand
@@ -160,7 +160,7 @@ internal class LibSimprintsResponseMapper @Inject constructor(
         actions?.let { putString(Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS, it) }
     }
 
-    private fun Bundle.appendExternalCredential(credential: ExternalCredential?) = apply {
+    private fun Bundle.appendExternalCredential(credential: AppExternalCredential?) = apply {
         if (credential != null) {
             val credentialJson =
                 JSONObject()
