@@ -146,7 +146,8 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
             val externalCredentialIdsToAdd = eventRepository
                 .getEventsInCurrentSession()
                 .filterIsInstance<ExternalCredentialCaptureValueEvent>()
-                .map { it.payload.credential.id }
+                .map { it.payload.id }
+
             Simber.d("Adding credentials $externalCredentialIdsToAdd to subject $subjectId", tag = SESSION)
             eventRepository.addOrUpdateEvent(
                 EnrolmentUpdateEvent(
