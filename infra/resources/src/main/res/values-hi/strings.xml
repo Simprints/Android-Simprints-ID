@@ -364,6 +364,8 @@
 
     <string name="sync_info_total_records">कुल रिकोर्ड्स</string>
 
+    <string name="sync_info_last_sync">अंतिम बार सिंक: %1$s</string>
+
     <string name="sync_info_footer_sync_in_progress">समन्वयन प्रगति पर है</string>
     <string name="sync_info_footer_sync_incomplete">सिंक अपूर्ण</string>
     <string name="sync_info_footer_sync_complete_logging_out">सिंक पूरा हो गया, आपको लॉग आउट किया जा रहा है...</string>
