@@ -142,7 +142,10 @@ internal class ClientApiViewModelTest {
     fun `handleEnrolResponse saves correct events`() = runTest {
         viewModel.handleEnrolResponse(
             mockRequest(),
-            mockk { every { guid } returns "guid" },
+            mockk {
+                every { guid } returns "guid"
+                every { externalCredential } returns null
+            },
         )
 
         coVerify {

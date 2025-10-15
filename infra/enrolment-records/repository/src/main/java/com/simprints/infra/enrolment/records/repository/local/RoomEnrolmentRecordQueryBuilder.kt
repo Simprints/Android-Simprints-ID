@@ -149,9 +149,9 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
             args.add(it)
         }
 
-        query.externalCredential?.value?.let {
+        query.externalCredential?.let { tokenizedCredential ->
             clauses.add("${credentialAlias}$EXTERNAL_CREDENTIAL_VALUE_COLUMN = ?")
-            args.add(it)
+            args.add(tokenizedCredential.value)
         }
 
         var whereClauseResult = if (clauses.isNotEmpty()) "WHERE ${clauses.joinToString(" AND ")}" else ""

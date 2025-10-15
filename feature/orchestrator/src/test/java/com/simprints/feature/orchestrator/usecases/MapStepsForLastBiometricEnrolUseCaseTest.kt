@@ -29,7 +29,7 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
     fun `maps EnrolLastBiometricRequest correctly`() {
         val result = useCase(
             listOf(
-                EnrolLastBiometricResult("subjectId"),
+                EnrolLastBiometricResult("subjectId", null),
             ),
         )
 
