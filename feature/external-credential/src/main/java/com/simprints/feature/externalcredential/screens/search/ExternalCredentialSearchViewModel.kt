@@ -22,7 +22,6 @@ import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.infra.logging.Simber
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -130,21 +129,8 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         updateState { it.copy(searchState = SearchState.Searching) }
         val project = configManager.getProject(authStore.signedInProjectId)
         val candidates = enrolmentRecordRepository.load(SubjectQuery(projectId = project.id, externalCredential = credential))
-        Simber.i("Search by credential $credential returned ${candidates.size} candidates")
         when {
-            candidates.isEmpty() -> {
-                val allSubjects =
-                    enrolmentRecordRepository.load(SubjectQuery(projectId = project.id)).filter { it.externalCredentials.isNotEmpty() }
-                Simber.i(
-                    "There are total of ${allSubjects.size} subjects that have credentials.\n${
-                        allSubjects.map {
-                            "guid: " + it.subjectId + ", credentials: " + it.externalCredentials + "\n"
-                        }
-                    }",
-                )
-                updateState { it.copy(searchState = SearchState.CredentialNotFound) }
-            }
-
+            candidates.isEmpty() -> updateState { it.copy(searchState = SearchState.CredentialNotFound) }
             else -> {
                 val projectConfig = configManager.getProjectConfiguration()
                 val matches = matchCandidatesUseCase(candidates, credential, externalCredentialParams, project, projectConfig)

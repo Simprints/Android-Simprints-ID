@@ -241,11 +241,6 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                                     .distinctBy { it.id }
                                     .toSet()
 
-                            if (action.externalCredentialsToAdd.isNotEmpty()) {
-                                Simber.i(
-                                    "[Realm] Adding external credentials to subject ${dbSubject.subjectId}. Credentials: [${action.externalCredentialsToAdd}]",
-                                )
-                            }
                             // Append new samples to the list of samples that remain after removing
                             dbSubject.faceSamples = (
                                 faceSamplesMap[false].orEmpty() + action.faceSamplesToAdd.map { it.toRealmDb() }

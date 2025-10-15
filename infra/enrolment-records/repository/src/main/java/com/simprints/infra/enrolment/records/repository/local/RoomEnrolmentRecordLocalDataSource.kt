@@ -325,9 +325,6 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                 subjectDao.insertBiometricSamples(templatesToAdd)
             }
             if (action.externalCredentialsToAdd.isNotEmpty()) {
-                Simber.i(
-                    "[Room] Adding external credentials to subject ${dbSubject.subject.subjectId}. Credentials: [${action.externalCredentialsToAdd}]",
-                )
                 subjectDao.insertExternalCredentials(action.externalCredentialsToAdd.map { it.toRoomDb() })
             }
         } else {
