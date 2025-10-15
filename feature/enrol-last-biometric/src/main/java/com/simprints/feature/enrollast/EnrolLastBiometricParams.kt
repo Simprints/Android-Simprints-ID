@@ -1,6 +1,7 @@
 package com.simprints.feature.enrollast
 
 import androidx.annotation.Keep
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
@@ -9,6 +10,7 @@ import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 
 @Keep
+@ExcludedFromGeneratedTestCoverageReports("Data class")
 data class EnrolLastBiometricParams(
     val projectId: String,
     val userId: TokenizableString,

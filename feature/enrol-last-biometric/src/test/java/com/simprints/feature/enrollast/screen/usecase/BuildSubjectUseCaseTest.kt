@@ -1,7 +1,10 @@
 package com.simprints.feature.enrollast.screen.usecase
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
@@ -9,6 +12,8 @@ import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
 import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.eventsync.sync.common.SubjectFactory
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
@@ -22,6 +27,9 @@ import org.junit.Test
 class BuildSubjectUseCaseTest {
     @MockK
     private lateinit var timeHelper: TimeHelper
+
+    @MockK
+    private lateinit var scannedCredential: ScannedCredential
 
     private lateinit var useCase: BuildSubjectUseCase
 
@@ -40,7 +48,7 @@ class BuildSubjectUseCaseTest {
 
     @Test
     fun `has no samples if no steps provided`() {
-        val result = useCase(createParams(emptyList()))
+        val result = useCase(createParams(steps = emptyList(), scannedCredential = scannedCredential), isAddingCredential = false)
 
         assertThat(result.fingerprintSamples).isEmpty()
         assertThat(result.faceSamples).isEmpty()
@@ -50,12 +58,14 @@ class BuildSubjectUseCaseTest {
     fun `has no samples if no valid steps provided`() {
         val result = useCase(
             createParams(
-                listOf(
+                steps = listOf(
                     EnrolLastBiometricStepResult.EnrolLastBiometricsResult(null),
                     EnrolLastBiometricStepResult.FingerprintMatchResult(emptyList(), mockk()),
                     EnrolLastBiometricStepResult.FaceMatchResult(emptyList(), mockk()),
                 ),
+                scannedCredential = scannedCredential,
             ),
+            isAddingCredential = false,
         )
 
         assertThat(result.fingerprintSamples).isEmpty()
@@ -66,7 +76,7 @@ class BuildSubjectUseCaseTest {
     fun `maps first available fingerprint capture step results`() {
         val result = useCase(
             createParams(
-                listOf(
+                steps = listOf(
                     EnrolLastBiometricStepResult.FingerprintMatchResult(emptyList(), mockk()),
                     EnrolLastBiometricStepResult.FingerprintCaptureResult(
                         REFERENCE_ID,
@@ -77,7 +87,9 @@ class BuildSubjectUseCaseTest {
                         listOf(mockFingerprintResults(Finger.LEFT_THUMB)),
                     ),
                 ),
+                scannedCredential = scannedCredential,
             ),
+            isAddingCredential = false,
         )
 
         assertThat(result.fingerprintSamples).isNotEmpty()
@@ -89,7 +101,7 @@ class BuildSubjectUseCaseTest {
         val result = useCase(
             createParams(
                 listOf(
-                    EnrolLastBiometricStepResult.FingerprintCaptureResult(
+                    element = EnrolLastBiometricStepResult.FingerprintCaptureResult(
                         REFERENCE_ID,
                         listOf(
                             mockFingerprintResults(Finger.RIGHT_5TH_FINGER),
@@ -105,7 +117,9 @@ class BuildSubjectUseCaseTest {
                         ),
                     ),
                 ),
+                scannedCredential,
             ),
+            isAddingCredential = false,
         )
 
         assertThat(result.fingerprintSamples).isNotEmpty()
@@ -115,24 +129,57 @@ class BuildSubjectUseCaseTest {
     @Test
     fun `maps first available face capture step results`() {
         val result = useCase(
-            createParams(
+            params = createParams(
                 listOf(
                     EnrolLastBiometricStepResult.FaceMatchResult(emptyList(), mockk()),
                     EnrolLastBiometricStepResult.FaceCaptureResult(REFERENCE_ID, mockFaceResultsList("first")),
                     EnrolLastBiometricStepResult.FaceCaptureResult(REFERENCE_ID, mockFaceResultsList("second")),
                 ),
+                scannedCredential = scannedCredential,
             ),
+            isAddingCredential = false,
         )
 
         assertThat(result.faceSamples).isNotEmpty()
         assertThat(result.faceSamples.first().format).isEqualTo("first")
     }
 
-    private fun createParams(steps: List<EnrolLastBiometricStepResult>) = EnrolLastBiometricParams(
+    @Test
+    fun `includes external credential when isAddingCredential is true and scannedCredential is not null`() {
+        val mockTokenized = mockk<TokenizableString.Tokenized>()
+        val mockCredentialType = mockk<ExternalCredentialType>()
+
+        val scannedCredential = ScannedCredential(
+            credential = mockTokenized,
+            credentialType = mockCredentialType,
+            documentImagePath = null,
+            zoomedCredentialImagePath = null,
+            credentialBoundingBox = null,
+        )
+
+        val result = useCase(createParams(steps = emptyList(), scannedCredential = scannedCredential), isAddingCredential = true)
+
+        assertThat(result.externalCredentials).hasSize(1)
+        assertThat(result.externalCredentials.first().value).isEqualTo(mockTokenized)
+        assertThat(result.externalCredentials.first().type).isEqualTo(mockCredentialType)
+    }
+
+    @Test
+    fun `has no external credentials when isAddingCredential is true but scannedCredential is null`() {
+        val result = useCase(createParams(steps = emptyList(), scannedCredential = null), isAddingCredential = true)
+
+        assertThat(result.externalCredentials).isEmpty()
+    }
+
+    private fun createParams(
+        steps: List<EnrolLastBiometricStepResult>,
+        scannedCredential: ScannedCredential?,
+    ) = EnrolLastBiometricParams(
         projectId = PROJECT_ID,
         userId = USER_ID,
         moduleId = MODULE_ID,
         steps = steps,
+        scannedCredential = scannedCredential,
     )
 
     private fun mockFingerprintResults(finger: Finger) = FingerTemplateCaptureResult(finger, byteArrayOf(), 1, "ISO_19794_2")

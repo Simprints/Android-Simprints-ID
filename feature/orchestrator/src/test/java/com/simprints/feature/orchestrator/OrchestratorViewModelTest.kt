@@ -412,10 +412,11 @@ internal class OrchestratorViewModelTest {
         val captureStep = createMockStep(StepId.FINGERPRINT_CAPTURE)
         val enrolLastStep = createMockStep(StepId.ENROL_LAST_BIOMETRIC)
         enrolLastStep.params = EnrolLastBiometricParams(
-            "projectId",
-            TokenizableString.Tokenized("userId"),
-            TokenizableString.Tokenized("moduleId"),
-            listOf(mockk<EnrolLastBiometricStepResult>()),
+            projectId = "projectId",
+            userId = TokenizableString.Tokenized("userId"),
+            moduleId = TokenizableString.Tokenized("moduleId"),
+            steps = listOf(mockk<EnrolLastBiometricStepResult>()),
+            scannedCredential = null,
         )
         coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
             captureStep,
