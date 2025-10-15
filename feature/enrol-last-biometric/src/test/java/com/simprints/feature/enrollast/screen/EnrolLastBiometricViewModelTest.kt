@@ -10,10 +10,15 @@ import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.screen.usecase.BuildSubjectUseCase
 import com.simprints.feature.enrollast.screen.usecase.CheckForDuplicateEnrolmentsUseCase
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
+import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent.BiometricReferenceCreationPayload
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
@@ -44,6 +49,9 @@ internal class EnrolLastBiometricViewModelTest {
     lateinit var projectConfig: ProjectConfiguration
 
     @MockK
+    lateinit var project: Project
+
+    @MockK
     lateinit var eventRepository: SessionEventRepository
 
     @MockK
@@ -57,6 +65,12 @@ internal class EnrolLastBiometricViewModelTest {
 
     @MockK
     lateinit var subject: Subject
+
+    @MockK
+    lateinit var scannedCredential: ScannedCredential
+
+    @MockK
+    lateinit var tokenizationProcessor: TokenizationProcessor
 
     private lateinit var viewModel: EnrolLastBiometricViewModel
 
@@ -75,12 +89,13 @@ internal class EnrolLastBiometricViewModelTest {
         )
 
         viewModel = EnrolLastBiometricViewModel(
-            timeHelper,
-            configManager,
-            eventRepository,
-            enrolmentRecordRepository,
-            checkForDuplicateEnrolments,
-            buildSubject,
+            timeHelper = timeHelper,
+            configManager = configManager,
+            eventRepository = eventRepository,
+            enrolmentRecordRepository = enrolmentRecordRepository,
+            checkForDuplicateEnrolments = checkForDuplicateEnrolments,
+            tokenizationProcessor = tokenizationProcessor,
+            buildSubject = buildSubject,
         )
     }
 
@@ -112,13 +127,14 @@ internal class EnrolLastBiometricViewModelTest {
                     EnrolLastBiometricStepResult.EnrolLastBiometricsResult("previousSubjectId"),
                 ),
             ),
+            isAddingCredential = false,
         )
 
         val result = viewModel.finish
             .test()
             .value()
             .getContentIfNotHandled()
-        assertThat(result).isEqualTo(EnrolLastState.Success("previousSubjectId"))
+        assertThat(result).isEqualTo(EnrolLastState.Success(newGuid = "previousSubjectId", externalCredential = null))
     }
 
     @Test
@@ -129,6 +145,7 @@ internal class EnrolLastBiometricViewModelTest {
                     EnrolLastBiometricStepResult.EnrolLastBiometricsResult("previousSubjectId"),
                 ),
             ),
+            isAddingCredential = false,
         )
 
         coVerify(exactly = 0) { eventRepository.addOrUpdateEvent(any()) }
@@ -143,6 +160,7 @@ internal class EnrolLastBiometricViewModelTest {
                     EnrolLastBiometricStepResult.EnrolLastBiometricsResult(null),
                 ),
             ),
+            isAddingCredential = false,
         )
 
         val result =
@@ -157,7 +175,7 @@ internal class EnrolLastBiometricViewModelTest {
     fun `returns failure when has duplicate enrolments`() = runTest {
         every { checkForDuplicateEnrolments.invoke(any(), any()) } returns EnrolLastState.ErrorType.DUPLICATE_ENROLMENTS
 
-        viewModel.enrolBiometric(createParams(listOf()))
+        viewModel.enrolBiometric(createParams(listOf()), isAddingCredential = false)
 
         val result =
             viewModel.finish
@@ -171,9 +189,9 @@ internal class EnrolLastBiometricViewModelTest {
     @Test
     fun `returns success when no duplicate enrolments`() = runTest {
         every { checkForDuplicateEnrolments.invoke(any(), any()) } returns null
-        coEvery { buildSubject.invoke(any()) } returns subject
+        coEvery { buildSubject.invoke(any(), any()) } returns subject
 
-        viewModel.enrolBiometric(createParams(listOf()))
+        viewModel.enrolBiometric(createParams(listOf()), isAddingCredential = false)
 
         val result = viewModel.finish
             .test()
@@ -185,9 +203,9 @@ internal class EnrolLastBiometricViewModelTest {
     @Test
     fun `saves event and record when no duplicate enrolments`() = runTest {
         every { checkForDuplicateEnrolments.invoke(any(), any()) } returns null
-        coEvery { buildSubject.invoke(any()) } returns subject
+        coEvery { buildSubject.invoke(any(), any()) } returns subject
 
-        viewModel.enrolBiometric(createParams(listOf()))
+        viewModel.enrolBiometric(createParams(listOf()), isAddingCredential = false)
 
         coVerify { eventRepository.addOrUpdateEvent(any()) }
         coVerify { enrolmentRecordRepository.performActions(any(), any()) }
@@ -196,10 +214,10 @@ internal class EnrolLastBiometricViewModelTest {
     @Test
     fun `returns failure record saving fails`() = runTest {
         every { checkForDuplicateEnrolments.invoke(any(), any()) } returns null
-        coEvery { buildSubject.invoke(any()) } returns subject
+        coEvery { buildSubject.invoke(any(), any()) } returns subject
         coEvery { enrolmentRecordRepository.performActions(any(), any()) } throws Exception()
 
-        viewModel.enrolBiometric(createParams(listOf()))
+        viewModel.enrolBiometric(createParams(listOf()), isAddingCredential = false)
 
         val result =
             viewModel.finish
@@ -232,7 +250,7 @@ internal class EnrolLastBiometricViewModelTest {
             biometricReferenceCreationEvent1,
         )
 
-        viewModel.enrolBiometric(createParams(listOf()))
+        viewModel.enrolBiometric(createParams(listOf()), isAddingCredential = false)
 
         coVerify {
             eventRepository.addOrUpdateEvent(
@@ -245,11 +263,39 @@ internal class EnrolLastBiometricViewModelTest {
         }
     }
 
+    @Test
+    fun `shows add credential dialog when scanned credential is linked to another subject`() = runTest {
+        val decryptedCredential = "decryptedCredential".asTokenizableRaw()
+        coEvery { enrolmentRecordRepository.load(any()) } returns listOf(subject)
+        coEvery { configManager.getProject(PROJECT_ID) } returns project
+        coEvery {
+            tokenizationProcessor.decrypt(
+                encrypted = scannedCredential.credential,
+                tokenKeyType = TokenKeyType.ExternalCredential,
+                project = project,
+            )
+        } returns decryptedCredential
+
+        viewModel.onViewCreated(createParams(listOf()))
+
+        val result = viewModel.showAddCredentialDialog
+            .test()
+            .value()
+            .getContentIfNotHandled()
+
+        assertThat(result).isNotNull()
+        assertThat(result?.scannedCredential).isEqualTo(scannedCredential)
+        assertThat(result?.displayedCredential).isEqualTo(decryptedCredential)
+        coVerify(exactly = 0) { buildSubject.invoke(any(), any()) }
+        coVerify(exactly = 0) { enrolmentRecordRepository.performActions(any(), any()) }
+    }
+
     private fun createParams(steps: List<EnrolLastBiometricStepResult>) = EnrolLastBiometricParams(
         projectId = PROJECT_ID,
         userId = USER_ID,
         moduleId = MODULE_ID,
         steps = steps,
+        scannedCredential = scannedCredential,
     )
 
     companion object {

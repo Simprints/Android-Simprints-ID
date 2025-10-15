@@ -31,6 +31,7 @@ class CommCareResponseMapperTest {
                 sessionId = "sessionId",
                 enrolledGuid = "guid",
                 subjectActions = "subjects",
+                externalCredential = null,
             ),
         ).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
 
