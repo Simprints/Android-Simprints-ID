@@ -11,11 +11,14 @@ import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.screen.usecase.BuildSubjectUseCase
 import com.simprints.feature.enrollast.screen.usecase.CheckForDuplicateEnrolmentsUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
+import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent.BiometricReferenceCreationPayload
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
@@ -44,6 +47,9 @@ internal class EnrolLastBiometricViewModelTest {
 
     @MockK
     lateinit var projectConfig: ProjectConfiguration
+
+    @MockK
+    lateinit var project: Project
 
     @MockK
     lateinit var eventRepository: SessionEventRepository
@@ -255,6 +261,33 @@ internal class EnrolLastBiometricViewModelTest {
                 },
             )
         }
+    }
+
+    @Test
+    fun `shows add credential dialog when scanned credential is linked to another subject`() = runTest {
+        val decryptedCredential = "decryptedCredential".asTokenizableRaw()
+        coEvery { enrolmentRecordRepository.load(any()) } returns listOf(subject)
+        coEvery { configManager.getProject(PROJECT_ID) } returns project
+        coEvery {
+            tokenizationProcessor.decrypt(
+                encrypted = scannedCredential.credential,
+                tokenKeyType = TokenKeyType.ExternalCredential,
+                project = project,
+            )
+        } returns decryptedCredential
+
+        viewModel.onViewCreated(createParams(listOf()))
+
+        val result = viewModel.showAddCredentialDialog
+            .test()
+            .value()
+            .getContentIfNotHandled()
+
+        assertThat(result).isNotNull()
+        assertThat(result?.scannedCredential).isEqualTo(scannedCredential)
+        assertThat(result?.displayedCredential).isEqualTo(decryptedCredential)
+        coVerify(exactly = 0) { buildSubject.invoke(any(), any()) }
+        coVerify(exactly = 0) { enrolmentRecordRepository.performActions(any(), any()) }
     }
 
     private fun createParams(steps: List<EnrolLastBiometricStepResult>) = EnrolLastBiometricParams(
