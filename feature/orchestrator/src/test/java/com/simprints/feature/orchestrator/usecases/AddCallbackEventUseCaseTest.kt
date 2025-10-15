@@ -53,7 +53,7 @@ class AddCallbackEventUseCaseTest {
 
     @Test
     fun `adds event for enrol response`() {
-        useCase(AppEnrolResponse("guid"))
+        useCase(AppEnrolResponse("guid", null))
 
         coVerify {
             eventRepository.addOrUpdateEvent(
