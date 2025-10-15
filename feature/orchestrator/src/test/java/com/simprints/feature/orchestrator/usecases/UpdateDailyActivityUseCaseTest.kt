@@ -45,7 +45,7 @@ class UpdateDailyActivityUseCaseTest {
 
     @Test
     fun `Update daily activity on enrol response`() = runTest {
-        useCase(AppEnrolResponse("guid"))
+        useCase(AppEnrolResponse("guid", null))
 
         coVerify { recentUserActivityManager.updateRecentUserActivity(any()) }
     }

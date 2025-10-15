@@ -1,8 +1,10 @@
 package com.simprints.feature.enrollast
 
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 
+@ExcludedFromGeneratedTestCoverageReports("Data class")
 object EnrolLastBiometricContract {
     val DESTINATION = R.id.enrolLastBiometricFragment
 
