@@ -1,6 +1,7 @@
 package com.simprints.face.capture
 
 import androidx.annotation.Keep
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.step.StepResult
 import com.simprints.infra.images.model.SecuredImageRef
 
@@ -22,5 +23,29 @@ data class FaceCaptureResult(
         val template: ByteArray,
         val imageRef: SecuredImageRef?,
         val format: String,
-    ) : StepResult
+    ) : StepResult {
+        @ExcludedFromGeneratedTestCoverageReports("Generated code")
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Sample
+
+            if (faceId != other.faceId) return false
+            if (!template.contentEquals(other.template)) return false
+            if (imageRef != other.imageRef) return false
+            if (format != other.format) return false
+
+            return true
+        }
+
+        @ExcludedFromGeneratedTestCoverageReports("Generated code")
+        override fun hashCode(): Int {
+            var result = faceId.hashCode()
+            result = 31 * result + template.contentHashCode()
+            result = 31 * result + (imageRef?.hashCode() ?: 0)
+            result = 31 * result + format.hashCode()
+            return result
+        }
+    }
 }

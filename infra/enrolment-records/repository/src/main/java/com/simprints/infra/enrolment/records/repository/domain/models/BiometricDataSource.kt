@@ -13,7 +13,7 @@ sealed class BiometricDataSource : StepParams {
     data object Simprints : BiometricDataSource()
 
     data class CommCare(
-        private val callerPackageName: String,
+        val callerPackageName: String,
     ) : BiometricDataSource() {
         override fun callerPackageName() = callerPackageName
 

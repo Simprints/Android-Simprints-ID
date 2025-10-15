@@ -121,6 +121,14 @@ abstract class StepResultMixin : StepResult
 )
 abstract class StepParamsMixin : StepParams
 
+/**
+ * Step contains all of the information required to execute an orchestration step and the result of the execution.
+ *
+ * All classes used in the params structure must implement [StepParams] interface and added to [StepParamsMixin].
+ * All classes used in the result structure must implement [StepResult] interface and added to [StepResultMixin].
+ *
+ * Additionally, [StepParams] and [StepResult] subclasses can only have fields of primitives, enums and serializeables classes.
+ */
 @Keep
 internal data class Step(
     val id: Int,
