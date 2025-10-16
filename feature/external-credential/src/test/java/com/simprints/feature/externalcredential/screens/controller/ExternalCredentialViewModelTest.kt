@@ -91,7 +91,6 @@ internal class ExternalCredentialViewModelTest {
         flowType = flowType,
         ageGroup = null,
         probeReferenceId = null,
-        faceSamples = emptyList(),
-        fingerprintSamples = emptyList(),
+        samples = emptyMap(),
     )
 }

@@ -3,6 +3,7 @@ package com.simprints.feature.externalcredential.model
 import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.step.StepParams
 import com.simprints.infra.config.store.models.AgeGroup
@@ -14,6 +15,5 @@ data class ExternalCredentialParams(
     val flowType: FlowType,
     val ageGroup: AgeGroup?,
     val probeReferenceId: String?,
-    val faceSamples: List<CaptureSample>,
-    val fingerprintSamples: List<CaptureSample>,
+    val samples: Map<Modality, List<CaptureSample>>,
 ) : StepParams

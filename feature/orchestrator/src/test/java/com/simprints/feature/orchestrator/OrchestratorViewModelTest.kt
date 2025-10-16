@@ -454,7 +454,7 @@ internal class OrchestratorViewModelTest {
         )
 
         val externalCredentialParams = mockk<ExternalCredentialParams>(relaxed = true) {
-            every { copy(probeReferenceId = any(), fingerprintSamples = any()) } returns this
+            every { copy(probeReferenceId = any(), samples = any()) } returns this
         }
 
         coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
@@ -476,7 +476,7 @@ internal class OrchestratorViewModelTest {
         verify {
             externalCredentialParams.copy(
                 probeReferenceId = fingerprintReferenceId,
-                fingerprintSamples = expectedFingerprintSamples,
+                samples = mapOf(Modality.FINGERPRINT to expectedFingerprintSamples),
             )
         }
     }

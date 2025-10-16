@@ -18,6 +18,7 @@ import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.fetchsubject.FetchSubjectParams
 import com.simprints.feature.fetchsubject.FetchSubjectResult
@@ -32,6 +33,7 @@ import com.simprints.feature.validatepool.ValidateSubjectPoolResult
 import com.simprints.fingerprint.capture.FingerprintCaptureParams
 import com.simprints.fingerprint.connect.FingerprintConnectParams
 import com.simprints.fingerprint.connect.FingerprintConnectResult
+import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.matching.MatchParams
@@ -53,6 +55,7 @@ import java.io.Serializable
     JsonSubTypes.Type(value = ValidateSubjectPoolResult::class, name = "ValidateSubjectPoolResult"),
     JsonSubTypes.Type(value = SelectSubjectAgeGroupResult::class, name = "SelectSubjectAgeGroupResult"),
     JsonSubTypes.Type(value = ExternalCredentialSearchResult::class, name = "ExternalCredentialSearchResult"),
+    JsonSubTypes.Type(value = CredentialMatch::class, name = " CredentialMatch"),
     // Common data types
     JsonSubTypes.Type(value = CaptureIdentity::class, name = "CaptureIdentity"),
     JsonSubTypes.Type(value = CaptureSample::class, name = "CaptureSample"),
@@ -89,13 +92,14 @@ abstract class StepResultMixin : StepResult
         name = "EnrolLastBiometricStepResult.CaptureResult",
     ),
     JsonSubTypes.Type(value = ExternalCredentialParams::class, name = "ExternalCredentialParams"),
-    JsonSubTypes.Type(value = ExternalCredentialSearchResult::class, name = "ExternalCredentialSearchResult"),
-    JsonSubTypes.Type(value = MatchResult::class, name = "MatchResult"),
     // Additional types that are used in top-level params
     JsonSubTypes.Type(value = CaptureSample::class, name = "CaptureSample"),
     JsonSubTypes.Type(value = MatchConfidence::class, name = "MatchConfidence"),
     JsonSubTypes.Type(value = BiometricDataSource::class, name = "BiometricDataSource"),
+    JsonSubTypes.Type(value = BiometricDataSource.CommCare::class, name = "BiometricDataSource.CommCare"),
+    JsonSubTypes.Type(value = BiometricDataSource.Simprints::class, name = "BiometricDataSource.Simprints"),
     JsonSubTypes.Type(value = SubjectQuery::class, name = "SubjectQuery"),
+    JsonSubTypes.Type(value = AgeGroup::class, name = "AgeGroup"),
 )
 abstract class StepParamsMixin : StepParams
 

@@ -64,7 +64,7 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
         // Mapping the result to the common final type and pairing it with the sdk for later grouping
         .flatMap { credentialSearchResult ->
             credentialSearchResult.matchResults.mapNotNull { credentialMatchResult ->
-                val sdk = credentialMatchResult.faceBioSdk ?: credentialMatchResult.fingerprintBioSdk ?: return@mapNotNull null
+                val sdk = credentialMatchResult.bioSdk
                 val policy = projectConfiguration.getModalitySdkConfig(sdk)?.decisionPolicy ?: return@mapNotNull null
                 val matchResult = credentialMatchResult.matchResult
 
