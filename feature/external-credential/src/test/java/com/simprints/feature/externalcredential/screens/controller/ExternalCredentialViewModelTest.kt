@@ -1,19 +1,18 @@
 package com.simprints.feature.externalcredential.screens.controller
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -27,13 +26,19 @@ internal class ExternalCredentialViewModelTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
+    lateinit var eventRepository: SessionEventRepository
+
+    @MockK
+    lateinit var timeHelper: TimeHelper
+
+    @MockK
     private lateinit var configManager: ConfigManager
     private lateinit var viewModel: ExternalCredentialViewModel
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        viewModel = ExternalCredentialViewModel(configManager = configManager)
+        viewModel = ExternalCredentialViewModel(configManager = configManager, timeHelper = timeHelper, eventRepository = eventRepository)
     }
 
     @Test
@@ -87,13 +92,18 @@ internal class ExternalCredentialViewModelTest {
     }
 
     @Test
-    fun `finish sends result to finishEvent`() {
-        val observer = viewModel.finishEvent.test()
-        val mockResult = mockk<ExternalCredentialSearchResult>(relaxed = true)
+    fun `finish sends result to finishEvent`() = runTest {
+        val mockResult = mockk<ExternalCredentialSearchResult>(relaxed = true) {
+            every { scannedCredential } returns null
+        }
         viewModel.finish(mockResult)
+        val observer = viewModel.finishEvent
+            .test()
+            .value()
+            .getContentIfNotHandled()
 
-        assertThat(observer.value()).isNotNull()
-        assertThat(observer.value()?.peekContent()).isEqualTo(mockResult)
+        assertThat(observer).isNotNull()
+        assertThat(observer).isEqualTo(mockResult)
     }
 
     @Test
@@ -102,26 +112,25 @@ internal class ExternalCredentialViewModelTest {
             ExternalCredentialType.NHISCard,
             ExternalCredentialType.GhanaIdCard,
         )
-        setupProjectConfig(allowedCredentials = allowedCredentials)
-        val viewModel = ExternalCredentialViewModel(configManager = configManager)
+        val viewModel = setupViewModel(allowedCredentials = allowedCredentials)
         val observer = viewModel.externalCredentialTypes.test()
         assertThat(observer.value()).isEqualTo(allowedCredentials)
     }
 
     @Test
     fun `init block sets empty list if no allowed credentials configured`() = runTest {
-        setupProjectConfig(allowedCredentials = emptyList())
-        val viewModel = ExternalCredentialViewModel(configManager = configManager)
+        val viewModel = setupViewModel(allowedCredentials = emptyList())
         val observer = viewModel.externalCredentialTypes.test()
         assertThat(observer.value()).isEmpty()
     }
 
-    private fun setupProjectConfig(allowedCredentials: List<ExternalCredentialType>) {
+    private fun setupViewModel(allowedCredentials: List<ExternalCredentialType>): ExternalCredentialViewModel {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { multifactorId } returns mockk {
                 every { allowedExternalCredentials } returns allowedCredentials
             }
         }
+        return ExternalCredentialViewModel(configManager = configManager, timeHelper = timeHelper, eventRepository = eventRepository)
     }
 
     private fun createParams(

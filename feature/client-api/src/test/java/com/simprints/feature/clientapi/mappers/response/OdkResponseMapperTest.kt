@@ -54,6 +54,7 @@ class OdkResponseMapperTest {
                         matchConfidence = AppMatchConfidence.LOW,
                     ),
                 ),
+                isMultiFactorIdEnabled = false,
             ),
         )
 
@@ -73,6 +74,7 @@ class OdkResponseMapperTest {
                 actionIdentifier = IdentifyRequestActionFactory.getIdentifier(),
                 sessionId = "sessionId",
                 identifications = listOf(),
+                isMultiFactorIdEnabled = false,
             ),
         )
 

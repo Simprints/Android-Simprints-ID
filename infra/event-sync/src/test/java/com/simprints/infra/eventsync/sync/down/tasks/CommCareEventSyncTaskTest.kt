@@ -70,8 +70,8 @@ class CommCareEventSyncTaskTest {
                     id = "id",
                     value = "value".asTokenizableEncrypted(),
                     subjectId = "subjectId",
-                    type = ExternalCredentialType.NHISCard
-                )
+                    type = ExternalCredentialType.NHISCard,
+                ),
             ),
         )
         val ENROLMENT_RECORD_MOVE_MODULE = EnrolmentRecordMoveEvent(
@@ -85,8 +85,8 @@ class CommCareEventSyncTaskTest {
                     id = "id",
                     value = "value".asTokenizableEncrypted(),
                     subjectId = "subjectId",
-                    type = ExternalCredentialType.NHISCard
-                )
+                    type = ExternalCredentialType.NHISCard,
+                ),
             ),
             EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
                 subjectId = "subjectId",
@@ -106,8 +106,8 @@ class CommCareEventSyncTaskTest {
                     id = "id",
                     value = "value".asTokenizableEncrypted(),
                     subjectId = "subjectId",
-                    type = ExternalCredentialType.NHISCard
-                )
+                    type = ExternalCredentialType.NHISCard,
+                ),
             ),
             EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
                 subjectId = "subjectId",
@@ -117,14 +117,16 @@ class CommCareEventSyncTaskTest {
             ),
         )
         val ENROLMENT_RECORD_UPDATE = EnrolmentRecordUpdateEvent(
-            "subjectId",
-            listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
-            listOf("referenceIdToDelete"),
-            externalCredentialAdded = ExternalCredential(
-                id = "id",
-                value = "value".asTokenizableEncrypted(),
-                subjectId = "subjectId",
-                type = ExternalCredentialType.NHISCard
+            subjectId = "subjectId",
+            biometricReferencesAdded = listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+            biometricReferencesRemoved = listOf("referenceIdToDelete"),
+            externalCredentialsAdded = listOf(
+                ExternalCredential(
+                    id = "id",
+                    value = "value".asTokenizableEncrypted(),
+                    subjectId = "subjectId",
+                    type = ExternalCredentialType.NHISCard,
+                ),
             ),
         )
     }

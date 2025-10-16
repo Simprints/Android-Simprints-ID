@@ -28,8 +28,11 @@ import com.simprints.infra.events.sampledata.createEnrolmentCalloutEventV2
 import com.simprints.infra.events.sampledata.createEnrolmentCalloutEventV3
 import com.simprints.infra.events.sampledata.createEnrolmentEventV2
 import com.simprints.infra.events.sampledata.createEnrolmentEventV4
+import com.simprints.infra.events.sampledata.createEnrolmentUpdateEvent
 import com.simprints.infra.events.sampledata.createEventDownSyncRequestEvent
 import com.simprints.infra.events.sampledata.createEventUpSyncRequestEvent
+import com.simprints.infra.events.sampledata.createExternalCredentialCaptureEvent
+import com.simprints.infra.events.sampledata.createExternalCredentialCaptureValueEvent
 import com.simprints.infra.events.sampledata.createFaceCaptureBiometricsEvent
 import com.simprints.infra.events.sampledata.createFaceCaptureConfirmationEvent
 import com.simprints.infra.events.sampledata.createFaceCaptureEvent
@@ -73,8 +76,11 @@ import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Com
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.ConnectivitySnapshot
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Consent
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Enrolment
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.EnrolmentUpdate
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.EventDownSyncRequest
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.EventUpSyncRequest
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.ExternalCredentialCapture
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.ExternalCredentialCaptureValue
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceCapture
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceCaptureBiometrics
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceCaptureConfirmation
@@ -112,6 +118,9 @@ import com.simprints.infra.eventsync.event.validateConsentEventApiModel
 import com.simprints.infra.eventsync.event.validateDownSyncRequestEventApiModel
 import com.simprints.infra.eventsync.event.validateEnrolmentEventV2ApiModel
 import com.simprints.infra.eventsync.event.validateEnrolmentEventV4ApiModel
+import com.simprints.infra.eventsync.event.validateEnrolmentUpdateEventApiModel
+import com.simprints.infra.eventsync.event.validateExternalCredentialCaptureEventApiModel
+import com.simprints.infra.eventsync.event.validateExternalCredentialCaptureValueEventApiModel
 import com.simprints.infra.eventsync.event.validateFaceCaptureBiometricsEventApiModel
 import com.simprints.infra.eventsync.event.validateFaceCaptureConfirmationEventApiModel
 import com.simprints.infra.eventsync.event.validateFaceCaptureEventApiModel
@@ -597,6 +606,33 @@ internal class MapDomainEventToApiUseCaseTest {
     }
 
     @Test
+    fun validate_enrolmentUpdateEventApiModel() {
+        val event = createEnrolmentUpdateEvent()
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateEnrolmentUpdateEventApiModel(json)
+    }
+
+    @Test
+    fun validate_externalCredentialCaptureValueEventApiModel() {
+        val event = createExternalCredentialCaptureValueEvent()
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateExternalCredentialCaptureValueEventApiModel(json)
+    }
+
+    @Test
+    fun validate_externalCredentialCaptureEventApiModel() {
+        val event = createExternalCredentialCaptureEvent()
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateExternalCredentialCaptureEventApiModel(json)
+    }
+
+    @Test
     fun `when event contains tokenized attendant id, then ApiEvent should contain tokenizedField`() {
         validateUserIdTokenization(attendantId = "attendantId".asTokenizableEncrypted())
     }
@@ -698,6 +734,9 @@ internal class MapDomainEventToApiUseCaseTest {
             LicenseCheck -> validate_licenseCheckEventApiModel()
             AgeGroupSelection -> validate_ageGroupSelectionEventApiModel()
             BiometricReferenceCreation -> validate_biometricReferenceCreationEventApiModel()
+            EnrolmentUpdate -> TODO()
+            ExternalCredentialCaptureValue -> TODO()
+            ExternalCredentialCapture -> TODO()
             null -> TODO()
         }.safeSealedWhens
     }

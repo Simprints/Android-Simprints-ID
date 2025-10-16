@@ -6,6 +6,7 @@ import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.clientapi.mappers.request.requestFactories.ConfirmIdentityActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolLastBiometricsActionFactory
@@ -92,6 +93,7 @@ class LibSimprintsResponseMapperTest {
                         matchConfidence = AppMatchConfidence.LOW,
                     ),
                 ),
+                isMultiFactorIdEnabled = false,
             ),
         )
 
@@ -119,6 +121,7 @@ class LibSimprintsResponseMapperTest {
                         matchConfidence = AppMatchConfidence.MEDIUM,
                     ),
                 ),
+                isMultiFactorIdEnabled = false,
             ),
         )
 
@@ -135,7 +138,7 @@ class LibSimprintsResponseMapperTest {
 
     @Test
     fun `correctly maps confirm response`() {
-        val expectedValue = "expectedValue".asTokenizableEncrypted()
+        val expectedValue = "expectedValue".asTokenizableRaw()
         val expectedType = ExternalCredentialType.NHISCard
         val expectedJson = "{\"$SCANNED_CREDENTIAL_VALUE\":\"$expectedValue\",\"$SCANNED_CREDENTIAL_TYPE\":\"$expectedType\"}"
         val extras = mapper(

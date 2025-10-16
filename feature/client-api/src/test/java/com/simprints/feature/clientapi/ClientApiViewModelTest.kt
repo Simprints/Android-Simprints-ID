@@ -16,6 +16,7 @@ import com.simprints.feature.clientapi.usecases.GetEnrolmentCreationEventForSubj
 import com.simprints.feature.clientapi.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.usecases.SimpleEventReporter
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
@@ -74,6 +75,9 @@ internal class ClientApiViewModelTest {
     @MockK
     lateinit var persistentLogger: PersistentLogger
 
+    @MockK
+    lateinit var tokenizationProcessor: TokenizationProcessor
+
     private lateinit var viewModel: ClientApiViewModel
 
     @Before
@@ -101,6 +105,7 @@ internal class ClientApiViewModelTest {
             configManager = configManager,
             timeHelper = timeHelper,
             persistentLogger = persistentLogger,
+            tokenizationProcessor = tokenizationProcessor,
         )
     }
 
@@ -162,7 +167,10 @@ internal class ClientApiViewModelTest {
     fun `handleIdentifyResponse saves correct events`() = runTest {
         viewModel.handleIdentifyResponse(
             mockRequest(),
-            mockk { every { identifications } returns emptyList() },
+            mockk {
+                every { identifications } returns emptyList()
+                every { isMultiFactorIdEnabled } returns false
+            },
         )
 
         coVerify {

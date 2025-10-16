@@ -60,6 +60,7 @@ class CommCareResponseMapperTest {
                         matchConfidence = AppMatchConfidence.LOW,
                     ),
                 ),
+                isMultiFactorIdEnabled = false,
             ),
         )
 
