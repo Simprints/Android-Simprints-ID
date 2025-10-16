@@ -7,11 +7,12 @@ import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.getModalitySdkConfig
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.matching.usecase.FaceMatcherUseCase
 import com.simprints.infra.matching.usecase.FingerprintMatcherUseCase
 import com.simprints.infra.matching.usecase.MatcherUseCase.MatcherState
-import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.lastOrNull
 import javax.inject.Inject
 
 internal class MatchCandidatesUseCase @Inject constructor(
@@ -31,48 +32,27 @@ internal class MatchCandidatesUseCase @Inject constructor(
             flowType = externalCredentialParams.flowType,
             probeReferenceId = externalCredentialParams.probeReferenceId,
             projectConfiguration = projectConfig,
-            faceSamples = externalCredentialParams.faceSamples,
-            fingerprintSamples = externalCredentialParams.fingerprintSamples,
+            samples = externalCredentialParams.samples,
             ageGroup = externalCredentialParams.ageGroup,
         )
         matchParams
-            .mapNotNull { matchParams ->
-                when (val sdk = matchParams.bioSdk) {
-                    is FaceConfiguration.BioSdk -> {
-                        projectConfig.face?.getSdkConfiguration(sdk)?.verificationMatchThreshold?.let { matchThreshold ->
-                            (faceMatcher(matchParams, project).last() as? MatcherState.Success)
-                                ?.comparisonResults
-                                .orEmpty()
-                                .map { result ->
-                                    CredentialMatch(
-                                        credential = credential,
-                                        matchResult = result,
-                                        verificationThreshold = matchThreshold,
-                                        faceBioSdk = sdk,
-                                        fingerprintBioSdk = null,
-                                    )
-                                }
-                        }
-                    }
-
-                    is FingerprintConfiguration.BioSdk -> {
-                        projectConfig.fingerprint?.getSdkConfiguration(sdk)?.verificationMatchThreshold?.let { matchThreshold ->
-                            (fingerprintMatcher(matchParams, project).last() as? MatcherState.Success)
-                                ?.comparisonResults
-                                .orEmpty()
-                                .map { result ->
-                                    CredentialMatch(
-                                        credential = credential,
-                                        matchResult = result,
-                                        verificationThreshold = matchThreshold,
-                                        faceBioSdk = null,
-                                        fingerprintBioSdk = sdk,
-                                    )
-                                }
-                        }
-                    }
-
+            .mapNotNull { matchParam ->
+                val matchThreshold = projectConfig
+                    .getModalitySdkConfig(matchParam.bioSdk)
+                    ?.verificationMatchThreshold
+                    ?: return@mapNotNull null
+                val lastMatchSuccess = when (matchParam.bioSdk) {
+                    is FaceConfiguration.BioSdk -> faceMatcher(matchParam, project).lastOrNull() as? MatcherState.Success
+                    is FingerprintConfiguration.BioSdk -> fingerprintMatcher(matchParam, project).lastOrNull() as? MatcherState.Success
                     else -> null
+                }
+                lastMatchSuccess?.comparisonResults?.map { result ->
+                    CredentialMatch(
+                        credential = credential,
+                        matchResult = result,
+                        verificationThreshold = matchThreshold,
+                        bioSdk = matchParam.bioSdk,
+                    )
                 }
             }.flatten()
     }

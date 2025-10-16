@@ -315,14 +315,14 @@ internal class OrchestratorViewModel @Inject constructor(
             currentStep.id == StepId.FACE_CAPTURE && result is CaptureIdentity -> {
                 params.copy(
                     probeReferenceId = result.referenceId,
-                    faceSamples = result.samples,
+                    samples = params.samples + (Modality.FACE to result.samples),
                 )
             }
 
             currentStep.id == StepId.FINGERPRINT_CAPTURE && result is CaptureIdentity -> {
                 params.copy(
                     probeReferenceId = result.referenceId,
-                    fingerprintSamples = result.samples,
+                    samples = params.samples + (Modality.FINGERPRINT to result.samples),
                 )
             }
 

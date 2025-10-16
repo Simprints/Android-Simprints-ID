@@ -36,7 +36,7 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
      * the highest overall score in descending order. Credential matches take precedence over direct matches.
      *
      * If there are any matches of [AppMatchConfidence.HIGH], only those will be returned,
-     * otherwise everything above [AppMatchConfidence.HIGH] is returned.
+     * otherwise everything above [AppMatchConfidence.NONE] is returned.
      */
     private fun getResults(
         results: List<Serializable>,
@@ -68,7 +68,7 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
         // Mapping the result to the common final type and pairing it with the sdk for later grouping
         .flatMap { credentialSearchResult ->
             credentialSearchResult.matchResults.mapNotNull { credentialMatchResult ->
-                val sdk = credentialMatchResult.faceBioSdk ?: credentialMatchResult.fingerprintBioSdk ?: return@mapNotNull null
+                val sdk = credentialMatchResult.bioSdk
                 val policy = projectConfiguration.getModalitySdkConfig(sdk)?.decisionPolicy ?: return@mapNotNull null
                 val matchResult = credentialMatchResult.matchResult
 

@@ -211,16 +211,14 @@ class CreateIdentifyResponseUseCaseTest {
                     subjectId = faceSmallConfidence,
                     confidence = smallConfidence,
                 )
-                every { faceBioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
-                every { fingerprintBioSdk } returns null
+                every { bioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
             },
             mockk {
                 every { matchResult } returns MatchComparisonResult(
                     subjectId = faceBigConfidence,
                     confidence = bigConfidence,
                 )
-                every { faceBioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
-                every { fingerprintBioSdk } returns null
+                every { bioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
             },
         )
 
@@ -230,8 +228,7 @@ class CreateIdentifyResponseUseCaseTest {
                     subjectId = "fingerprintSubjectId",
                     confidence = 90f,
                 )
-                every { faceBioSdk } returns null
-                every { fingerprintBioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+                every { bioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
             },
         )
 
@@ -267,16 +264,14 @@ class CreateIdentifyResponseUseCaseTest {
                     subjectId = fingerprintSmallConfidence,
                     confidence = smallConfidence,
                 )
-                every { faceBioSdk } returns null
-                every { fingerprintBioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+                every { bioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
             },
             mockk {
                 every { matchResult } returns MatchComparisonResult(
                     subjectId = fingerprintBigConfidence,
                     confidence = bigConfidence,
                 )
-                every { faceBioSdk } returns null
-                every { fingerprintBioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+                every { bioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
             },
         )
 
@@ -286,8 +281,7 @@ class CreateIdentifyResponseUseCaseTest {
                     subjectId = "faceSubjectId",
                     confidence = 90f,
                 )
-                every { faceBioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
-                every { fingerprintBioSdk } returns null
+                every { bioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
             },
         )
 
@@ -324,8 +318,7 @@ class CreateIdentifyResponseUseCaseTest {
                     subjectId = sharedGuid,
                     confidence = credentialConfidence,
                 )
-                every { faceBioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
-                every { fingerprintBioSdk } returns null
+                every { bioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
             },
         )
 
@@ -366,8 +359,7 @@ class CreateIdentifyResponseUseCaseTest {
                     subjectId = sharedGuid,
                     confidence = credentialConfidence,
                 )
-                every { faceBioSdk } returns null
-                every { fingerprintBioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+                every { bioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
             },
         )
 

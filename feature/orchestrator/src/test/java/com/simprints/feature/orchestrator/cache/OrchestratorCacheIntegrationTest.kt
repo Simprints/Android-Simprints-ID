@@ -185,22 +185,24 @@ class OrchestratorCacheIntegrationTest {
                     flowType = FlowType.IDENTIFY,
                     ageGroup = AgeGroup(1, 2),
                     probeReferenceId = "referenceId",
-                    faceSamples = listOf(
-                        CaptureSample(
-                            captureEventId = GUID1,
-                            identifier = SampleIdentifier.LEFT_THUMB,
-                            template = byteArrayOf(1, 2, 3),
-                            modality = Modality.FACE,
-                            format = "format",
+                    samples = mapOf(
+                        Modality.FACE to listOf(
+                            CaptureSample(
+                                captureEventId = GUID1,
+                                identifier = SampleIdentifier.LEFT_THUMB,
+                                template = byteArrayOf(1, 2, 3),
+                                modality = Modality.FACE,
+                                format = "format",
+                            ),
                         ),
-                    ),
-                    fingerprintSamples = listOf(
-                        CaptureSample(
-                            captureEventId = GUID1,
-                            identifier = SampleIdentifier.LEFT_THUMB,
-                            template = byteArrayOf(1, 2, 3),
-                            modality = Modality.FINGERPRINT,
-                            format = "format",
+                        Modality.FINGERPRINT to listOf(
+                            CaptureSample(
+                                captureEventId = GUID1,
+                                identifier = SampleIdentifier.LEFT_THUMB,
+                                template = byteArrayOf(1, 2, 3),
+                                modality = Modality.FINGERPRINT,
+                                format = "format",
+                            ),
                         ),
                     ),
                 ),
@@ -223,8 +225,7 @@ class OrchestratorCacheIntegrationTest {
                             credential = "credential".asTokenizableEncrypted(),
                             matchResult = MatchComparisonResult("subjectId", 0.5f),
                             verificationThreshold = 55f,
-                            faceBioSdk = FaceConfiguration.BioSdk.RANK_ONE,
-                            fingerprintBioSdk = FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
+                            bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                         ),
                     ),
                 ),
