@@ -3,8 +3,8 @@ package com.simprints.feature.orchestrator.usecases.steps
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
 import com.simprints.feature.orchestrator.steps.Step

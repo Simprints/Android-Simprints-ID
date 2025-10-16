@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.core.domain.step.StepParams
 import java.io.Serializable
 
 @Keep
@@ -11,8 +12,11 @@ import java.io.Serializable
 data class AgeGroup(
     @JsonProperty("startInclusive") val startInclusive: Int,
     @JsonProperty("endExclusive") val endExclusive: Int?,
-) : Serializable {
-    @JsonIgnore // prevents Jackson isEmpty unwanted serialization bug, see https://stackoverflow.com/questions/69616587/why-does-jackson-add-an-empty-false-into-the-json
+) : StepParams,
+    Serializable {
+    // prevents Jackson isEmpty unwanted serialization bug,
+    // see https://stackoverflow.com/questions/69616587/why-does-jackson-add-an-empty-false-into-the-json
+    @JsonIgnore
     fun isEmpty() = startInclusive == 0 && (endExclusive == null || endExclusive == 0)
 
     fun includes(age: Int): Boolean {
