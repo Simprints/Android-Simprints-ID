@@ -369,6 +369,8 @@
 
     <string name="sync_info_total_records">Enregistrements totaux</string>
 
+    <string name="sync_info_last_sync">Dernière synchronisation : %1$s</string>
+
     <string name="sync_info_footer_sync_in_progress">Synchronisation en cours</string>
     <string name="sync_info_footer_sync_incomplete">Synchronisation incomplète</string>
     <string name="sync_info_footer_sync_complete_logging_out">Synchronisation terminée, déconnexion en cours…</string>
