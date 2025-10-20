@@ -14,7 +14,6 @@ internal data class GeneralConsentTextHelper(
 ) {
     // TODO All the `getString(id).format(arg,arg)` calls should be `getString(id,arg,arg)` one strings are fixed
 
-    // First argument in consent text should always be program name, second is modality specific access/use case text
     fun assembleText(context: Context) = StringBuilder()
         .apply {
             val modalityUseCase = getModalitySpecificUseCaseText(context, modalities)
