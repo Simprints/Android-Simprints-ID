@@ -438,7 +438,6 @@
     <!-- Dashboard - Logout request -->
     <string name="dashboard_logout_title">लॉग-आउट</string>
     <string name="dashboard_logout_confirmation_sync_decline_button">डेटा सिंक किए बिना लॉग आउट करें</string>
-    <string name="dashboard_logout_confirmation_sync_info">आपके डिवाइस पर ऐसे रिकॉर्ड हैं जिन्हें लॉग आउट करने से पहले सिंक्रनाइज़ करने की आवश्यकता है। कृपया सिंक्रोनाइज़ेशन प्रक्रिया को पूरा होने दें।\n\nएक बार सिंक्रोनाइज़ेशन समाप्त हो जाने पर आप लॉग आउट कर सकेंगे।</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_title">चेतावनी</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_body">यह सुनिश्चित करने के लिए कि आपके प्रोजेक्ट में अद्यतन रिकॉर्ड हैं, डेटा सिंक्रनाइज़ेशन आवश्यक है। बिना किसी वैध कारण के आपके डेटा को सिंक्रोनाइज़ करने में विफल रहने से आपके सहकर्मियों की महत्वपूर्ण रिकॉर्ड तक पहुंच और प्रोजेक्ट की सटीक रिपोर्ट करने की क्षमता प्रभावित होगी।\n\nबिना किसी वैध कारण के डेटा को सिंक्रोनाइज़ करने में विफल होना भी डेटा संग्रह प्रोटोकॉल का उल्लंघन हो सकता है और इसके परिणामस्वरूप आपके और प्रोजेक्ट के लिए अवांछित परिणाम हो सकते हैं।</string>
     <string name="dashboard_logout_confirmation_title">लॉग-आउट</string>
