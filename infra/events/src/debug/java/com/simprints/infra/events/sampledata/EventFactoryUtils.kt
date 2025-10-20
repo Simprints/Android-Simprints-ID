@@ -546,13 +546,13 @@ fun createEnrolmentUpdateEvent() = EnrolmentUpdateEvent(
 
 fun createExternalCredentialCaptureValueEvent() = ExternalCredentialCaptureValueEvent(
     createdAt = CREATED_AT,
-    id = CREDENTIAL_ID,
+    payloadId = CREDENTIAL_ID,
     credential = EXTERNAL_CREDENTIAL,
 )
 
 fun createExternalCredentialCaptureEvent() = ExternalCredentialCaptureEvent(
-    createdAt = CREATED_AT,
-    id = CREDENTIAL_ID,
+    startTime = CREATED_AT,
+    payloadId = CREDENTIAL_ID,
     endTime = CREATED_AT,
     autoCaptureStartTime = CREATED_AT,
     autoCaptureEndTime = CREATED_AT,

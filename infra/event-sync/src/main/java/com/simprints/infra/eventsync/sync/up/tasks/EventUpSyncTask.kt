@@ -17,7 +17,9 @@ import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
+import com.simprints.infra.events.event.domain.models.EnrolmentUpdateEvent
 import com.simprints.infra.events.event.domain.models.Event
+import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
@@ -334,11 +336,15 @@ internal class EventUpSyncTask @Inject constructor(
                 it is PersonCreationEvent ||
                 it is FingerprintCaptureBiometricsEvent ||
                 it is FaceCaptureBiometricsEvent ||
-                it is BiometricReferenceCreationEvent
+                it is BiometricReferenceCreationEvent ||
+                it is EnrolmentUpdateEvent ||
+                it is ExternalCredentialCaptureValueEvent
         }
 
         config.canSyncAnalyticsDataToSimprints() -> events.filterNot {
-            it is FingerprintCaptureBiometricsEvent || it is FaceCaptureBiometricsEvent
+            it is FingerprintCaptureBiometricsEvent ||
+                it is FaceCaptureBiometricsEvent ||
+                it is ExternalCredentialCaptureValueEvent
         }
 
         else -> emptyList()

@@ -106,6 +106,7 @@ internal class CreateEnrolResponseUseCaseTest {
     fun `correctly processes external credential result`() = runTest {
         val externalCredentialType = ExternalCredentialType.GhanaIdCard
         val scannedCredentialMock = mockk<ScannedCredential> {
+            every { credentialScanId } returns "scanId"
             every { credential } returns credentialEncrypted
             every { credentialType } returns externalCredentialType
         }

@@ -4,13 +4,13 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.utils.randomUUID
 import com.simprints.feature.externalcredential.model.BoundingBox
 import java.io.Serializable
-import java.util.UUID
-import kotlin.toString
 
 @Keep
 data class ScannedCredential(
+    val credentialScanId: String = randomUUID(),
     val credential: TokenizableString.Tokenized,
     val credentialType: ExternalCredentialType,
     val documentImagePath: String?,
@@ -19,7 +19,7 @@ data class ScannedCredential(
 ) : Serializable
 
 fun ScannedCredential.toExternalCredential(subjectId: String) = ExternalCredential(
-    id = UUID.randomUUID().toString(),
+    id = credentialScanId,
     value = credential,
     subjectId = subjectId,
     type = credentialType,

@@ -20,14 +20,14 @@ data class ExternalCredentialCaptureValueEvent(
 ) : Event() {
     constructor(
         createdAt: Timestamp,
-        id: String,
+        payloadId: String,
         credential: ExternalCredential,
     ) : this(
         id = UUID.randomUUID().toString(),
         payload = ExternalCredentialCaptureValuePayload(
             createdAt = createdAt,
             eventVersion = EVENT_VERSION,
-            id = id,
+            id = payloadId,
             credential = credential,
         ),
         type = EXTERNAL_CREDENTIAL_CAPTURE_VALUE,

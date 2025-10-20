@@ -162,6 +162,7 @@ internal class SelectSubjectViewModelTest {
         val tokenizedValue = "tokenizedValue".asTokenizableEncrypted()
         val type = ExternalCredentialType.NHISCard
         val scannedCredential = mockk<ScannedCredential> {
+            every { credentialScanId } returns "credentialId"
             every { credential } returns tokenizedValue
             every { credentialType } returns type
         }
@@ -222,6 +223,7 @@ internal class SelectSubjectViewModelTest {
         val tokenizedValue = "tokenizedValue".asTokenizableEncrypted()
         val type = ExternalCredentialType.NHISCard
         val scannedCredential = mockk<ScannedCredential> {
+            every { credentialScanId } returns "credentialId"
             every { credential } returns tokenizedValue
             every { credentialType } returns type
         }

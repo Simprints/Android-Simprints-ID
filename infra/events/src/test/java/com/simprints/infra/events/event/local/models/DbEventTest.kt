@@ -320,4 +320,20 @@ class DbEventTest {
 
         assertThat(original).isEqualTo(transformed)
     }
+
+    @Test
+    fun convert_ExternalCredentialCaptureEvent() {
+        val original = createExternalCredentialCaptureEvent()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
+
+        assertThat(original).isEqualTo(transformed)
+    }
+
+    @Test
+    fun convert_ExternalCredentialCaptureValueEvent() {
+        val original = createExternalCredentialCaptureValueEvent()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
+
+        assertThat(original).isEqualTo(transformed)
+    }
 }

@@ -734,9 +734,9 @@ internal class MapDomainEventToApiUseCaseTest {
             LicenseCheck -> validate_licenseCheckEventApiModel()
             AgeGroupSelection -> validate_ageGroupSelectionEventApiModel()
             BiometricReferenceCreation -> validate_biometricReferenceCreationEventApiModel()
-            EnrolmentUpdate -> TODO()
-            ExternalCredentialCaptureValue -> TODO()
-            ExternalCredentialCapture -> TODO()
+            EnrolmentUpdate -> validate_enrolmentUpdateEventApiModel()
+            ExternalCredentialCaptureValue -> validate_externalCredentialCaptureValueEventApiModel()
+            ExternalCredentialCapture -> validate_externalCredentialCaptureEventApiModel()
             null -> TODO()
         }.safeSealedWhens
     }

@@ -82,15 +82,16 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
                 eventRepository.addOrUpdateEvent(
                     ExternalCredentialCaptureValueEvent(
                         createdAt = timeHelper.now(),
-                        id = UUID.randomUUID().toString(),
+                        payloadId = scannedCredential.credentialScanId,
                         credential = credential,
                     ),
                 )
+                // TODO Add valid capture event data
                 eventRepository.addOrUpdateEvent(
                     ExternalCredentialCaptureEvent(
-                        createdAt = timeHelper.now(),
-                        id = UUID.randomUUID().toString(),
+                        startTime = timeHelper.now(),
                         endTime = timeHelper.now(),
+                        payloadId = scannedCredential.credentialScanId,
                         autoCaptureStartTime = timeHelper.now(),
                         autoCaptureEndTime = timeHelper.now(),
                         ocrErrorCount = 0,

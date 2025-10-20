@@ -8,7 +8,7 @@ import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureE
 internal data class ApiExternalCredentialCapturePayload(
     override val startTime: ApiTimestamp,
     val id: String,
-    val endTime: ApiTimestamp,
+    val endTime: ApiTimestamp?,
     val autoCaptureStartTime: ApiTimestamp,
     val autoCaptureEndTime: ApiTimestamp,
     val ocrErrorCount: Int,
@@ -18,8 +18,8 @@ internal data class ApiExternalCredentialCapturePayload(
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: ExternalCredentialCapturePayload) : this(
         startTime = domainPayload.createdAt.fromDomainToApi(),
+        endTime = domainPayload.endedAt?.fromDomainToApi(),
         id = domainPayload.id,
-        endTime = domainPayload.endTime.fromDomainToApi(),
         autoCaptureStartTime = domainPayload.autoCaptureStartTime.fromDomainToApi(),
         autoCaptureEndTime = domainPayload.autoCaptureEndTime.fromDomainToApi(),
         ocrErrorCount = domainPayload.ocrErrorCount,
