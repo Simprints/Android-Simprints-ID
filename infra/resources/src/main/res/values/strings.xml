@@ -440,7 +440,7 @@
     <!-- Dashboard - Logout request -->
     <string name="dashboard_logout_title">Logout</string>
     <string name="dashboard_logout_confirmation_sync_decline_button">Log out without sync</string>
-    <string name="dashboard_logout_confirmation_sync_info">There are records on your device that need to be synchronised before logging out. Please allow the synchronisation process to complete.\n\nOnce the synchronization is finished you will be able to log out.</string>
+    <string name="dashboard_logout_confirmation_sync_info">Records on your device will be automatically synchronised before logging out. Please allow the synchronisation process to complete.\n\nOnce the synchronization is finished you will be able to log out.</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_title">Warning</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_body">Data synchronisation is essential for ensuring your project has up-to-date records. Failing to synchronise your data without a valid reason will impact your colleagues\' access to important records and the project\'s ability to report accurately.\n\nFailing to synchronise data without a valid reason may also be a breach of data collection protocol and may result in unwanted consequences for you and the project.</string>
     <string name="dashboard_logout_confirmation_title">Logout</string>
