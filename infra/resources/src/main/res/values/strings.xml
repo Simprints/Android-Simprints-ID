@@ -29,9 +29,15 @@
     <string name="consent_biometric_general_face">take photographs of your face</string>
     <string name="consent_biometrics_access_fingerprint">fingerprint information</string>
     <string name="consent_biometrics_access_face">photographs</string>
+    <string name="consent_credentials_general">scan your national ID document or other external credentials with their unique number(s)</string>
+    <string name="consent_credentials_access">national ID details</string>
+    <string name="consent_credentials_your_id">capture your national ID or other external credential information</string>
     <string name="consent_biometrics_access_fingerprint_face">fingerprint information, photographs</string>
     <string name="consent_biometrics_parental_fingerprint">use your child\'s fingerprints</string>
     <string name="consent_biometrics_parental_face">take photographs of your child\'s face</string>
+    <string name="consent_credentials_parental_general">scan your child\'s national ID document or other external credentials with their unique number(s)</string>
+    <string name="consent_credentials_parental_access">child\'s national ID details</string>
+    <string name="consent_credentials_parental_your_id">capture your child\'s national ID or other external credential information</string>
     <string name="consent_biometric_concat_modalities">and</string>
     <string name="consent_decline_button">Decline</string>
     <string name="consent_accept_button">Accept</string>
@@ -366,8 +372,6 @@
 
     <string name="sync_info_total_records">Total records</string>
 
-    <string name="sync_info_last_sync">Last sync: %1$s</string>
-
     <string name="sync_info_footer_sync_in_progress">Sync in progress</string>
     <string name="sync_info_footer_sync_incomplete">Sync incomplete</string>
     <string name="sync_info_footer_sync_complete_logging_out">Sync complete, logging you out…</string>
@@ -482,5 +486,59 @@
         <item quantity="one">%d year</item>
         <item quantity="other">%d years</item>
     </plurals>
+
+    <!-- MultiFactor Identification -->
+    <string name="mfid_scan_action">Scan %1$s</string>
+
+    <string name="mfid_scanner_selection_skip">Skip document scan</string>
+    <string name="mfid_type_nhis_card">NHIS Card</string>
+    <string name="mfid_type_ghana_id_card">Ghana ID Card</string>
+    <string name="mfid_type_qr_code">QR Code</string>
+    <string name="mfid_nhis_card_credential_field">Membership number</string>
+    <string name="mfid_ghana_id_credential_field">Personal ID</string>
+    <string name="mfid_qr_credential_field">QR Code value</string>
+    <string name="mfid_type_any_document">a document</string>
+
+    <string name="mfid_skip_scan_dialog_title">Skip scanning?</string>
+    <string name="mfid_skip_scan_dialog_body">Scanning %1$s is required by this project. Are you sure you want to skip this step?</string>
+    <string name="mfid_skip_scan_dialog_confirm">Skip</string>
+
+    <string name="mfid_qr_scan_no_qr_detected">No QR code detected</string>
+    <string name="mfid_scan_instructions">Place %1$s in window</string>
+    <string name="mfid_continue">Continue</string>
+    <string name="mfid_dialog_wrong_qr_title">Invalid QR Code type</string>
+    <string name="mfid_dialog_wrong_qr_body_top">Wrong QR code format is scanned</string>
+    <string name="mfid_dialog_wrong_qr_body_bottom">This value cannot be used as a person document. Please make sure that correct QR code is scanned</string>
+    <string name="mfid_dialog_wrong_qr_rescan">Re-scan</string>
+    <string name="mfid_ocr_progress_title">Scanning, keep card in frame…</string>
+    <string name="mfid_scan_camera_permission_body">Cannot scan the %1$s without permission to use the camera</string>
+    <string name="mfid_confirmation_checkbox_text">I confirm that the %1$s is scanned correctly</string>
+    <string name="mfid_action_go_to_record">Go to record</string>
+    <string name="mfid_action_enrol">Enrol</string>
+    <string name="mfid_action_enrol_anyway">Enrol anyway</string>
+    <string name="mfid_action_add">Add</string>
+    <string name="mfid_action_skip">Skip</string>
+    <string name="mfid_action_continue">Continue</string>
+    <string name="mfid_searching">Searching…</string>
+
+    <string name="mfid_search_found_enrol">This %1$s is already registered</string>
+    <string name="mfid_search_found_identification">Record found</string>
+    <string name="mfid_search_found_identification_low_match_score">This %1$s might be linked to another patient</string>
+    <string name="mfid_search_not_found_identification">No record is found with this %1$s. You wil be able to link this %2$s to a patient later</string>
+
+    <string name="mfid_add_document_title">Add this %1$s?</string>
+    <string name="mfid_skip_title">Why did you skip the %1$s scan?</string>
+    <string name="mfid_skip_reason_does_not_have">Does not have %1$s</string>
+    <string name="mfid_skip_reason_did_not_bring">Did not bring %1$s</string>
+    <string name="mfid_skip_reason_incorrect">Brought incorrect %1$s</string>
+    <string name="mfid_skip_reason_does_not_want_to_provide">Does not want to priovide %1$s</string>
+    <string name="mfid_skip_reason_damaged">%1$s damaged or unreadable</string>
+    <string name="mfid_skip_reason_unable_to_scan">Unable to scan %1$s</string>
+    <string name="mfid_skip_reason_other">Other</string>
+    <string name="mfid_skip_reason_hint">Reason</string>
+    <string name="mfid_skip_reason_helper_text">Please provide a reason for skipping</string>
+    <string name="mfid_skip_confirm">Skip Scanning</string>
+    <string name="mfid_skip_go_back">Go Back</string>
+
 
 </resources>
