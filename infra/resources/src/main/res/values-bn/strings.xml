@@ -368,6 +368,8 @@
 
     <string name="sync_info_total_records">মোট রেকর্ড</string>
 
+    <string name="sync_info_last_sync">সর্বশেষ সিঙ্ক: %1$s</string>
+
     <string name="sync_info_footer_sync_in_progress">সিঙ্ক হচ্ছে </string>
     <string name="sync_info_footer_sync_incomplete">সিঙ্ক অসম্পূর্ণ</string>
     <string name="sync_info_footer_sync_complete_logging_out">সিঙ্ক সম্পূর্ণ হয়েছে, আপনাকে লগ আউট করা হচ্ছে...</string>
