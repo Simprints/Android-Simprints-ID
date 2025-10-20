@@ -266,7 +266,8 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         binding.textFooterRecordLoggingOut.isGone = !records.isFooterReadyToLogOutVisible
         binding.textFooterRecordSyncIncomplete.isGone = !records.isFooterSyncIncompleteVisible
         binding.textFooterRecordLastSyncedWhen.isGone = !records.isFooterLastSyncTimeVisible
-        binding.textFooterRecordLastSyncedWhen.text = records.footerLastSyncMinutesAgo
+        binding.textFooterRecordLastSyncedWhen.text =
+            String.format(getString(IDR.string.sync_info_last_sync), records.footerLastSyncMinutesAgo)
     }
 
     private fun SyncInfoError.configureErrorPopup() {
@@ -326,7 +327,8 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
         // Footer
         binding.textFooterImageLastSyncedWhen.isInvisible = !images.isFooterLastSyncTimeVisible
-        binding.textFooterImageLastSyncedWhen.text = images.footerLastSyncMinutesAgo
+        binding.textFooterImageLastSyncedWhen.text =
+            String.format(getString(IDR.string.sync_info_last_sync), images.footerLastSyncMinutesAgo)
     }
 
     private fun renderModulesSection(

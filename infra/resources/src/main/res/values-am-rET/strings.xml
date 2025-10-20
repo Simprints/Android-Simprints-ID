@@ -369,6 +369,8 @@
 
     <string name="sync_info_total_records">ጠቅላላ መዝገቦች</string>
 
+    <string name="sync_info_last_sync">ያለፈው ግንኙነት: %1$s</string>
+
     <string name="sync_info_footer_sync_in_progress">ማመሳሰል በሂደት ላይ</string>
     <string name="sync_info_footer_sync_incomplete">ማመሳሰል ተጠናቅቋል</string>
     <string name="sync_info_footer_sync_complete_logging_out">ማመሳሰል ተጠናቅቋል፣ እርስዎን በማስወጣት ላይ…</string>
