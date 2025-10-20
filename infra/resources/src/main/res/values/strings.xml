@@ -29,9 +29,15 @@
     <string name="consent_biometric_general_face">take photographs of your face</string>
     <string name="consent_biometrics_access_fingerprint">fingerprint information</string>
     <string name="consent_biometrics_access_face">photographs</string>
+    <string name="consent_credentials_general">scan your national ID document or other external credentials with their unique number(s)</string>
+    <string name="consent_credentials_access">national ID details</string>
+    <string name="consent_credentials_your_id">capture your national ID or other external credential information</string>
     <string name="consent_biometrics_access_fingerprint_face">fingerprint information, photographs</string>
     <string name="consent_biometrics_parental_fingerprint">use your child\'s fingerprints</string>
     <string name="consent_biometrics_parental_face">take photographs of your child\'s face</string>
+    <string name="consent_credentials_parental_general">scan your child\'s national ID document or other external credentials with their unique number(s)</string>
+    <string name="consent_credentials_parental_access">child\'s national ID details</string>
+    <string name="consent_credentials_parental_your_id">capture your child\'s national ID or other external credential information</string>
     <string name="consent_biometric_concat_modalities">and</string>
     <string name="consent_decline_button">Decline</string>
     <string name="consent_accept_button">Accept</string>
@@ -366,8 +372,6 @@
 
     <string name="sync_info_total_records">Total records</string>
 
-    <string name="sync_info_last_sync">Last sync: %1$s</string>
-
     <string name="sync_info_footer_sync_in_progress">Sync in progress</string>
     <string name="sync_info_footer_sync_incomplete">Sync incomplete</string>
     <string name="sync_info_footer_sync_complete_logging_out">Sync complete, logging you out…</string>
@@ -484,10 +488,7 @@
     </plurals>
 
     <!-- MultiFactor Identification -->
-    <plurals name="mfid_scan_action">
-        <item quantity="one">Scan %1$s</item>
-        <item quantity="other">Scan %1$s</item>
-    </plurals>
+    <string name="mfid_scan_action">Scan %1$s</string>
 
     <string name="mfid_scanner_selection_skip">Skip document scan</string>
     <string name="mfid_type_nhis_card">NHIS Card</string>
@@ -497,14 +498,11 @@
     <string name="mfid_ghana_id_credential_field">Personal ID</string>
     <string name="mfid_qr_credential_field">QR Code value</string>
     <string name="mfid_type_any_document">a document</string>
-    <string name="mfid_dialog_skip_scan_title">Skip scanning?</string>
 
-    <plurals name="mfid_dialog_skip_scan_body">
-        <item quantity="one">Scanning %1$s is required by this project. Are you sure you want to skip this step?</item>
-        <item quantity="other">Scanning %1$s is required by this project. Are you sure you want to skip this step?</item>
-    </plurals>
+    <string name="mfid_skip_scan_dialog_title">Skip scanning?</string>
+    <string name="mfid_skip_scan_dialog_body">Scanning %1$s is required by this project. Are you sure you want to skip this step?</string>
+    <string name="mfid_skip_scan_dialog_confirm">Skip</string>
 
-    <string name="mfid_dialog_skip_scan_confirm">Skip</string>
     <string name="mfid_qr_scan_no_qr_detected">No QR code detected</string>
     <string name="mfid_scan_instructions">Place %1$s in window</string>
     <string name="mfid_continue">Continue</string>
@@ -533,7 +531,7 @@
     <string name="mfid_skip_reason_does_not_have">Does not have %1$s</string>
     <string name="mfid_skip_reason_did_not_bring">Did not bring %1$s</string>
     <string name="mfid_skip_reason_incorrect">Brought incorrect %1$s</string>
-    <string name="mfid_skip_reason_does_not_want_to_provide">Does not want to provide %1$s</string>
+    <string name="mfid_skip_reason_does_not_want_to_provide">Does not want to priovide %1$s</string>
     <string name="mfid_skip_reason_damaged">%1$s damaged or unreadable</string>
     <string name="mfid_skip_reason_unable_to_scan">Unable to scan %1$s</string>
     <string name="mfid_skip_reason_other">Other</string>
@@ -541,5 +539,6 @@
     <string name="mfid_skip_reason_helper_text">Please provide a reason for skipping</string>
     <string name="mfid_skip_confirm">Skip Scanning</string>
     <string name="mfid_skip_go_back">Go Back</string>
+
 
 </resources>
