@@ -7,22 +7,17 @@ import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.infra.resources.R as IDR
 
 fun Resources.getQuantityCredentialString(
-    @PluralsRes id: Int,
+    @StringRes id: Int,
     @StringRes specificCredentialRes: Int,
     @StringRes multipleCredentialsRes: Int,
     credentialTypes: List<ExternalCredentialType>,
 ): String {
-    val credentialsAmount = credentialTypes.size
-    val documentTypeRes = if (credentialsAmount == 1) {
+    val documentTypeRes = if (credentialTypes.size == 1) {
         specificCredentialRes
     } else {
         multipleCredentialsRes
     }
-    return getQuantityString(
-        id,
-        credentialsAmount,
-        getString(documentTypeRes),
-    )
+    return getString(id, documentTypeRes)
 }
 
 fun Resources.getCredentialFieldTitle(type: ExternalCredentialType): String = when (type) {

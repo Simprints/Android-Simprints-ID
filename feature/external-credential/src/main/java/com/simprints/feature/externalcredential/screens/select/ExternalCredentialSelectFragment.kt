@@ -74,7 +74,7 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
 
     private fun initViews(types: List<ExternalCredentialType>) {
         binding.title.text = resources.getQuantityCredentialString(
-            id = IDR.plurals.mfid_scan_action,
+            id = IDR.string.mfid_scan_action,
             specificCredentialRes = resources.getCredentialTypeRes(types.firstOrNull()),
             multipleCredentialsRes = IDR.string.mfid_type_any_document,
             credentialTypes = types,
@@ -136,7 +136,7 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
                     val confirmButton = view.findViewById<Button>(R.id.buttonSkip)
 
                     bodyText.text = resources.getQuantityCredentialString(
-                        id = IDR.plurals.mfid_dialog_skip_scan_body,
+                        id = IDR.string.mfid_skip_scan_dialog_body,
                         credentialTypes = credentialTypes,
                         specificCredentialRes = resources.getCredentialTypeRes(credentialTypes.firstOrNull()),
                         multipleCredentialsRes = IDR.string.mfid_type_any_document,
