@@ -32,6 +32,7 @@ import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
+import com.simprints.infra.events.event.domain.models.ExternalCredentialSearchEvent
 import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent
@@ -560,4 +561,11 @@ fun createExternalCredentialCaptureEvent() = ExternalCredentialCaptureEvent(
     capturedTextLength = 0,
     credentialTextLength = 0,
     selectionId = GUID1,
+)
+
+fun createExternalCredentialSearchEvent() = ExternalCredentialSearchEvent(
+    createdAt = CREATED_AT,
+    endedAt = CREATED_AT,
+    probeExternalCredentialId = GUID1,
+    candidateIds = listOf(GUID1, GUID2),
 )

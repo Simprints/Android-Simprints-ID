@@ -16,6 +16,7 @@ import com.simprints.infra.events.event.domain.models.EnrolmentUpdateEvent.Enrol
 import com.simprints.infra.events.event.domain.models.EventType.Companion
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent.ExternalCredentialCapturePayload
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent.ExternalCredentialCaptureValuePayload
+import com.simprints.infra.events.event.domain.models.ExternalCredentialSearchEvent.*
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent.GuidSelectionPayload
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent.IntentParsingPayload
 import com.simprints.infra.events.event.domain.models.InvalidIntentEvent.InvalidIntentPayload
@@ -121,6 +122,7 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
     JsonSubTypes.Type(value = EnrolmentUpdatePayload::class, name = Companion.ENROLMENT_UPDATE_KEY),
     JsonSubTypes.Type(value = ExternalCredentialCaptureValuePayload::class, name = Companion.EXTERNAL_CREDENTIAL_CAPTURE_VALUE_KEY),
     JsonSubTypes.Type(value = ExternalCredentialCapturePayload::class, name = Companion.EXTERNAL_CREDENTIAL_CAPTURE_KEY),
+    JsonSubTypes.Type(value = ExternalCredentialSearchPayload::class, name = Companion.EXTERNAL_CREDENTIAL_SEARCH_KEY),
 )
 abstract class EventPayload {
     abstract val type: EventType

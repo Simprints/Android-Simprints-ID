@@ -33,6 +33,7 @@ import com.simprints.infra.events.sampledata.createEventDownSyncRequestEvent
 import com.simprints.infra.events.sampledata.createEventUpSyncRequestEvent
 import com.simprints.infra.events.sampledata.createExternalCredentialCaptureEvent
 import com.simprints.infra.events.sampledata.createExternalCredentialCaptureValueEvent
+import com.simprints.infra.events.sampledata.createExternalSearchEvent
 import com.simprints.infra.events.sampledata.createFaceCaptureBiometricsEvent
 import com.simprints.infra.events.sampledata.createFaceCaptureConfirmationEvent
 import com.simprints.infra.events.sampledata.createFaceCaptureEvent
@@ -81,6 +82,7 @@ import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Eve
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.EventUpSyncRequest
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.ExternalCredentialCapture
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.ExternalCredentialCaptureValue
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.ExternalCredentialSearch
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceCapture
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceCaptureBiometrics
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceCaptureConfirmation
@@ -121,6 +123,7 @@ import com.simprints.infra.eventsync.event.validateEnrolmentEventV4ApiModel
 import com.simprints.infra.eventsync.event.validateEnrolmentUpdateEventApiModel
 import com.simprints.infra.eventsync.event.validateExternalCredentialCaptureEventApiModel
 import com.simprints.infra.eventsync.event.validateExternalCredentialCaptureValueEventApiModel
+import com.simprints.infra.eventsync.event.validateExternalCredentialSearchApiModel
 import com.simprints.infra.eventsync.event.validateFaceCaptureBiometricsEventApiModel
 import com.simprints.infra.eventsync.event.validateFaceCaptureConfirmationEventApiModel
 import com.simprints.infra.eventsync.event.validateFaceCaptureEventApiModel
@@ -633,6 +636,15 @@ internal class MapDomainEventToApiUseCaseTest {
     }
 
     @Test
+    fun validate_externalCredentialSearchEventApiModel() {
+        val event = createExternalCredentialSearchEvent()
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateExternalCredentialSearchApiModel(json)
+    }
+
+    @Test
     fun `when event contains tokenized attendant id, then ApiEvent should contain tokenizedField`() {
         validateUserIdTokenization(attendantId = "attendantId".asTokenizableEncrypted())
     }
@@ -737,6 +749,7 @@ internal class MapDomainEventToApiUseCaseTest {
             EnrolmentUpdate -> validate_enrolmentUpdateEventApiModel()
             ExternalCredentialCaptureValue -> validate_externalCredentialCaptureValueEventApiModel()
             ExternalCredentialCapture -> validate_externalCredentialCaptureEventApiModel()
+            ExternalCredentialSearch -> validate_externalCredentialSearchEventApiModel()
             null -> TODO()
         }.safeSealedWhens
     }

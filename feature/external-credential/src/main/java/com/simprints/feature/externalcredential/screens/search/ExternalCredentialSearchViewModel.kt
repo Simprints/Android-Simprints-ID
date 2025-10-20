@@ -10,6 +10,8 @@ import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
@@ -21,7 +23,10 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.events.event.domain.models.ExternalCredentialSearchEvent
+import com.simprints.infra.events.session.SessionEventRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -31,11 +36,13 @@ import com.simprints.infra.resources.R as IDR
 internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
     @Assisted val scannedCredential: ScannedCredential,
     @Assisted val externalCredentialParams: ExternalCredentialParams,
+    private val timeHelper: TimeHelper,
     private val authStore: AuthStore,
     private val configManager: ConfigManager,
     private val matchCandidatesUseCase: MatchCandidatesUseCase,
     private val tokenizationProcessor: TokenizationProcessor,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
+    private val eventRepository: SessionEventRepository,
 ) : ViewModel() {
     @AssistedFactory
     interface Factory {
@@ -129,14 +136,35 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         updateState { it.copy(searchState = SearchState.Searching) }
         val project = configManager.getProject(authStore.signedInProjectId)
         val candidates = enrolmentRecordRepository.load(SubjectQuery(projectId = project.id, externalCredential = credential))
+
+        val startTime = timeHelper.now()
         when {
-            candidates.isEmpty() -> updateState { it.copy(searchState = SearchState.CredentialNotFound) }
+            candidates.isEmpty() -> {
+                saveSearchEvent(startTime, emptyList())
+                updateState { it.copy(searchState = SearchState.CredentialNotFound) }
+            }
+
             else -> {
                 val projectConfig = configManager.getProjectConfiguration()
                 val matches = matchCandidatesUseCase(candidates, credential, externalCredentialParams, project, projectConfig)
+                saveSearchEvent(startTime, candidates)
                 updateState { state -> state.copy(searchState = SearchState.CredentialLinked(matchResults = matches)) }
             }
         }
+    }
+
+    private fun saveSearchEvent(
+        startTime: Timestamp,
+        candidates: List<Subject>,
+    ) = viewModelScope.launch {
+        eventRepository.addOrUpdateEvent(
+            ExternalCredentialSearchEvent(
+                createdAt = startTime,
+                endedAt = timeHelper.now(),
+                probeExternalCredentialId = scannedCredential.credentialScanId,
+                candidateIds = candidates.map { it.subjectId },
+            ),
+        )
     }
 
     /**

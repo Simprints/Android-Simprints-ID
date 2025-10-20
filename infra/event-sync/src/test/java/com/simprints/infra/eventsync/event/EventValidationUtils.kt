@@ -758,4 +758,16 @@ fun validateExternalCredentialCaptureEventApiModel(json: JSONObject) {
     }
 }
 
+fun validateExternalCredentialSearchApiModel(json: JSONObject) {
+    validateCommonParams(json, "ExternalCredentialSearch", 0)
+    with(json.getJSONObject("payload")) {
+        validateTimestamp(getJSONObject("startTime"))
+        assertThat(getString("id")).isNotNull()
+        assertThat(getString("endTime")).isNotNull()
+        assertThat(getString("probeExternalCredentialId")).isNotNull()
+        assertThat(getJSONObject("result")).isNotNull()
+        assertThat(getJSONObject("result").getJSONArray("candidateIds").length()).isGreaterThan(0)
+    }
+}
+
 private fun <T> Array<T>.valuesAsStrings(): List<String> = this.map { it.toString() }

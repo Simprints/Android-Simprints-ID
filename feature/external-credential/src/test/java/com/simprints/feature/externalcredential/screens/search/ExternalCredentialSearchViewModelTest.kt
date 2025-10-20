@@ -8,6 +8,8 @@ import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
@@ -21,6 +23,7 @@ import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -36,6 +39,9 @@ internal class ExternalCredentialSearchViewModelTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
+
+    @MockK
+    lateinit var timeHelper: TimeHelper
 
     @MockK
     lateinit var authStore: AuthStore
@@ -70,6 +76,9 @@ internal class ExternalCredentialSearchViewModelTest {
     @MockK
     private lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
+    @MockK
+    lateinit var eventRepository: SessionEventRepository
+
     private lateinit var viewModel: ExternalCredentialSearchViewModel
 
     private val projectId = "projectId"
@@ -77,20 +86,24 @@ internal class ExternalCredentialSearchViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
+        every { timeHelper.now() } returns Timestamp(1L)
         every { authStore.signedInProjectId } returns projectId
         coEvery { configManager.getProject(projectId) } returns project
         coEvery { configManager.getProjectConfiguration() } returns projectConfig
+        coJustRun { eventRepository.addOrUpdateEvent(any()) }
         viewModel = createViewModel()
     }
 
     fun createViewModel() = ExternalCredentialSearchViewModel(
         scannedCredential = scannedCredential,
         externalCredentialParams = externalCredentialParams,
+        timeHelper = timeHelper,
         authStore = authStore,
         configManager = configManager,
         matchCandidatesUseCase = matchCandidatesUseCase,
         tokenizationProcessor = tokenizationProcessor,
         enrolmentRecordRepository = enrolmentRecordRepository,
+        eventRepository = eventRepository,
     )
 
     @Test
@@ -106,6 +119,7 @@ internal class ExternalCredentialSearchViewModelTest {
         assertThat(observer.value()?.scannedCredential).isEqualTo(scannedCredential)
         assertThat(observer.value()?.isConfirmed).isFalse()
         assertThat(observer.value()?.displayedCredential).isEqualTo(decryptedCredential)
+        coVerify { eventRepository.addOrUpdateEvent(any()) }
     }
 
     @Test
@@ -122,6 +136,7 @@ internal class ExternalCredentialSearchViewModelTest {
         val searchState = viewModel.stateLiveData.value?.searchState as SearchState.CredentialLinked
         assertThat(searchState.matchResults).hasSize(1)
         assertThat(searchState.matchResults.first()).isEqualTo(candidateMatch)
+        coVerify { eventRepository.addOrUpdateEvent(any()) }
     }
 
     @Test
