@@ -3,17 +3,22 @@ package com.simprints.feature.externalcredential.screens.controller
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.infra.config.sync.ConfigManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.simprints.infra.resources.R as IDR
+import kotlin.collections.orEmpty
 
 @HiltViewModel
-internal class ExternalCredentialViewModel @Inject internal constructor() : ViewModel() {
+internal class ExternalCredentialViewModel @Inject internal constructor(
+    private val configManager: ConfigManager,
+) : ViewModel() {
     private var isInitialized = false
     lateinit var params: ExternalCredentialParams
         private set
@@ -27,6 +32,18 @@ internal class ExternalCredentialViewModel @Inject internal constructor() : View
         }
     private val _stateLiveData = MutableLiveData(ExternalCredentialState.EMPTY)
     val stateLiveData: LiveData<ExternalCredentialState> = _stateLiveData
+
+    val externalCredentialTypes: LiveData<List<ExternalCredentialType>>
+        get() = _externalCredentialTypes
+    private val _externalCredentialTypes = MutableLiveData<List<ExternalCredentialType>>()
+
+    init {
+        viewModelScope.launch {
+            val config = configManager.getProjectConfiguration()
+            val allowedExternalCredentials = config.multifactorId?.allowedExternalCredentials.orEmpty()
+            _externalCredentialTypes.postValue(allowedExternalCredentials)
+        }
+    }
 
     private fun updateState(state: (ExternalCredentialState) -> ExternalCredentialState) {
         this.state = state(this.state)
