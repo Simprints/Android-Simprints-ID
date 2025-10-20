@@ -22,7 +22,7 @@ class CreateEnrolLastBiometricResponseUseCaseTest {
             .assertThat(
                 useCase(
                     listOf(
-                        EnrolLastBiometricResult("1234"),
+                        EnrolLastBiometricResult("1234", null),
                         mockk(),
                     ),
                 ),

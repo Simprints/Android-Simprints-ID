@@ -11,7 +11,10 @@ internal class CreateEnrolLastBiometricResponseUseCase @Inject constructor() {
     operator fun invoke(results: List<Serializable>) = results
         .filterIsInstance(EnrolLastBiometricResult::class.java)
         .lastOrNull()
-        ?.newSubjectId
-        ?.let { AppEnrolResponse(it) }
+        ?.let { result ->
+            result.newSubjectId?.let { guid ->
+                AppEnrolResponse(guid, result.externalCredential)
+            }
+        }
         ?: AppErrorResponse(AppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED)
 }

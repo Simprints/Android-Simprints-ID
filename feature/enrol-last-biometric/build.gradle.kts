@@ -10,6 +10,7 @@ android {
 dependencies {
 
     implementation(project(":feature:alert"))
+    implementation(project(":feature:external-credential"))
     implementation(project(":infra:event-sync"))
     implementation(project(":infra:config-store"))
     implementation(project(":infra:config-sync"))

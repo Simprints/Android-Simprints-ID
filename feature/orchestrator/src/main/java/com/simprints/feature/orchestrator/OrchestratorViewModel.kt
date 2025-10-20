@@ -142,7 +142,7 @@ internal class OrchestratorViewModel @Inject constructor(
                 action = actionRequest!!,
                 projectConfiguration = projectConfiguration,
                 ageGroup = result.ageGroup,
-                enrolmentSubjectId = enrolmentSubjectId
+                enrolmentSubjectId = enrolmentSubjectId,
             )
             steps = steps + captureAndMatchSteps
         }
@@ -207,11 +207,11 @@ internal class OrchestratorViewModel @Inject constructor(
     private fun removeMatcherStepIfRequired(result: ExternalCredentialSearchResult) {
         if (result.flowType == FlowType.IDENTIFY) {
             val confirmedVerifications = result.goodMatches.size
-            if(confirmedVerifications > 0) {
+            if (confirmedVerifications > 0) {
                 steps = steps.filterNot { it.id in listOf(StepId.FACE_MATCHER, StepId.FINGERPRINT_MATCHER) }
                 Simber.i(
                     "Matcher steps removed because External Credential search verified [$confirmedVerifications] candidate(s). Flow type = [${result.flowType}]",
-                    tag = ORCHESTRATION
+                    tag = ORCHESTRATION,
                 )
             }
         }
@@ -226,11 +226,13 @@ internal class OrchestratorViewModel @Inject constructor(
                 val updatedParams = params.copy(
                     steps = mapStepsForLastBiometrics(steps.mapNotNull { it.result }),
                 )
+                val cachedExternalCredentialResponse = getCachedCredentialResponse(cache.steps)
                 step.params = EnrolLastBiometricContract.getParams(
                     projectId = updatedParams.projectId,
                     userId = updatedParams.userId,
                     moduleId = updatedParams.moduleId,
                     steps = updatedParams.steps,
+                    scannedCredential = cachedExternalCredentialResponse?.scannedCredential,
                 )
             }
         }
@@ -316,7 +318,10 @@ internal class OrchestratorViewModel @Inject constructor(
     /**
      * Passes face or fingerprint samples to the External Credential search step
      */
-    private fun updateExternalCredentialStepPayload(currentStep: Step, result: StepResult) {
+    private fun updateExternalCredentialStepPayload(
+        currentStep: Step,
+        result: StepResult,
+    ) {
         if (currentStep.id !in listOf(StepId.FACE_CAPTURE, StepId.FINGERPRINT_CAPTURE)) return
         val step = steps.firstOrNull { it.id == StepId.EXTERNAL_CREDENTIAL } ?: return
         val params = step.params as? ExternalCredentialParams ?: return

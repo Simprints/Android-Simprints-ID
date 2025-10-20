@@ -82,20 +82,23 @@ internal class ConsentViewModel @Inject constructor(
         selectedTabIndex: Int,
     ): ConsentViewState {
         val allowParentalConsent = projectConfig.consent.allowParentalConsent
+        val isMultiFactorIdEnabled = projectConfig.multifactorId?.allowedExternalCredentials?.isNotEmpty() ?: false
 
         return ConsentViewState(
             showLogo = projectConfig.consent.displaySimprintsLogo,
             showParentalConsent = allowParentalConsent,
             consentTextBuilder = GeneralConsentTextHelper(
-                projectConfig.consent,
-                projectConfig.general.modalities,
-                consentType,
+                config = projectConfig.consent,
+                modalities = projectConfig.general.modalities,
+                consentType = consentType,
+                isMultiFactorIdEnabled = isMultiFactorIdEnabled,
             ),
             parentalTextBuilder = if (allowParentalConsent) {
                 ParentalConsentTextHelper(
-                    projectConfig.consent,
-                    projectConfig.general.modalities,
-                    consentType,
+                    config = projectConfig.consent,
+                    modalities = projectConfig.general.modalities,
+                    consentType = consentType,
+                    isMultiFactorIdEnabled = isMultiFactorIdEnabled,
                 )
             } else {
                 null
