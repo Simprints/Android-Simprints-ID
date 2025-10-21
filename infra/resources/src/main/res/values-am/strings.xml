@@ -448,7 +448,6 @@
     <!-- Dashboard - Logout request -->
     <string name="dashboard_logout_title">መውጣት</string>
     <string name="dashboard_logout_confirmation_sync_decline_button">ሳይመሳሰል ውጣ</string>
-    <string name="dashboard_logout_confirmation_sync_info">በመሳሪያዎ ላይ ከመውጣትዎ በፊት መመሳሰል ያለባቸው መዝገቦች አሉ። እባክህ የማመሳሰል ሂደቱ እንዲጠናቀቅ ፍቀድ።\n\nአንዴ ማመሳሰል እንደተጠናቀቀ ዘግተህ መውጣት ትችላለህ።</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_title">ማስጠንቀቂያ</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_body">የእርስዎ ፕሮጀክት ወቅታዊ መዛግብት እንዳለው ለማረጋገጥ የውሂብ ማመሳሰል አስፈላጊ ነው። ያለ ትክክለኛ ምክንያት የእርስዎን ውሂብ ማመሳሰል አለመቻል የስራ ባልደረቦችዎ ጠቃሚ መዝገቦችን ማግኘት እና የፕሮጀክቱን ትክክለኛ ሪፖርት የማድረግ ችሎታ ላይ ተጽእኖ ያሳድራል። እና ለእርስዎ እና ለፕሮጀክቱ የማይፈለጉ ውጤቶችን ሊያስከትል ይችላል.</string>
     <string name="dashboard_logout_confirmation_title">መውጣት</string>
