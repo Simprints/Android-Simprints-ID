@@ -1051,6 +1051,24 @@ class ObserveSyncInfoUseCaseTest {
     }
 
     @Test
+    fun `should hide default instruction for pre-logout sync`() = runTest {
+        createUseCase()
+
+        val result = useCase(isPreLogoutUpSync = true).first()
+
+        assertThat(result.syncInfoSectionRecords.isInstructionDefaultVisible).isFalse()
+    }
+
+    @Test
+    fun `should not hide default instruction for regular non-pre-logout sync`() = runTest {
+        createUseCase()
+
+        val result = useCase().first()
+
+        assertThat(result.syncInfoSectionRecords.isInstructionDefaultVisible).isTrue()
+    }
+
+    @Test
     fun `sync button should be disabled when not on standby`() = runTest {
         val mockSyncingEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncInProgress() } returns true

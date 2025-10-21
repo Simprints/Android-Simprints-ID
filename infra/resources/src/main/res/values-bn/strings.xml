@@ -444,7 +444,6 @@
     <!-- Dashboard - Logout request -->
     <string name="dashboard_logout_title">লগআউট করুন</string>
     <string name="dashboard_logout_confirmation_sync_decline_button">সিঙ্ক ব্যাতিত লগ আউট করুন</string>
-    <string name="dashboard_logout_confirmation_sync_info">আপনার এই ডিভাইসে কিছু তথ্য সংরক্ষিত আছে যা সিঙ্ক করা প্রয়োজন। অনুগ্রহ করে সিঙ্ক প্রক্রিয়া সম্পন্ন করুণ। \n\nসিঙ্ক প্রক্রিয়া সম্পন্ন হলে লগ আউট করতে পারবেন।</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_title">সতর্কতা</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_body">আপনার প্রকল্পের সকল রেকর্ড আপ-টু-ডেট রয়েছে তা নিশ্চিত করার জন্য ডেটা সিঙ্ক্রোনাইজেশন অপরিহার্য। কোনো বৈধ কারণ ছাড়া ডেটা সিঙ্ক্রোনাইজ করতে ব্যর্থ হলে তা আপনার সহকর্মীদের গুরুত্বপূর্ণ রেকর্ডে অ্যাক্সেস এবং প্রকল্পের সঠিকভাবে রিপোর্ট করার ক্ষমতাকে প্রভাবিত করবে।\n\nকোনও বৈধ কারণ ছাড়া ডেটা সিঙ্ক্রোনাইজ করতে ব্যর্থ হওয়া ডেটা সংগ্রহ প্রোটোকলের লঙ্ঘনও হিসেবে গণ্য হতে পারে যার ফলে প্রকল্পের অবাঞ্ছিত পরিণতি হবার সুযোগ থাকে।</string>
     <string name="dashboard_logout_confirmation_title">লগআউট করুন</string>

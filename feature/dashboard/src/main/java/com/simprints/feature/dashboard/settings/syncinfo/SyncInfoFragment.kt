@@ -263,7 +263,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         // Footer
         val isFooterSyncInProgressVisible = config.isSyncInfoLogoutOnComplete && records.isFooterSyncInProgressVisible
         binding.textFooterRecordSyncInProgress.isGone = !isFooterSyncInProgressVisible
-        binding.textFooterRecordLoggingOut.isGone = !records.isFooterReadyToLogOutVisible
+        binding.layoutFooterRecordLoggingOut.isGone = !records.isFooterReadyToLogOutVisible
         binding.textFooterRecordSyncIncomplete.isGone = !records.isFooterSyncIncompleteVisible
         binding.textFooterRecordLastSyncedWhen.isGone = !records.isFooterLastSyncTimeVisible
         binding.textFooterRecordLastSyncedWhen.text =
