@@ -2,7 +2,10 @@ package com.simprints.feature.externalcredential.screens.search.model
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.core.tools.time.Timestamp
 import org.junit.Test
 
 class ScannedCredentialTest {
@@ -19,6 +22,9 @@ class ScannedCredentialTest {
             documentImagePath = null,
             zoomedCredentialImagePath = null,
             credentialBoundingBox = null,
+            scanStartTime = Timestamp(1L),
+            scanEndTime = Timestamp(2L),
+            scannedValue = "".asTokenizableRaw(),
         )
 
         val result = scannedCredential.toExternalCredential(subjectId)

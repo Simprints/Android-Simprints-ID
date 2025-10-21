@@ -6,6 +6,8 @@ import com.jraska.livedata.test
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.screens.scanqr.usecase.ExternalCredentialQrCodeValidatorUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.Project
@@ -28,6 +30,9 @@ internal class ExternalCredentialScanQrViewModelTest {
     val instantExecutorRule = InstantTaskExecutorRule()
 
     @MockK
+    private lateinit var timeHelper: TimeHelper
+
+    @MockK
     private lateinit var validator: ExternalCredentialQrCodeValidatorUseCase
 
     @MockK
@@ -45,11 +50,14 @@ internal class ExternalCredentialScanQrViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         viewModel = ExternalCredentialScanQrViewModel(
+            timeHelper = timeHelper,
             externalCredentialQrCodeValidator = validator,
             tokenizationProcessor = tokenizationProcessor,
             configManager = configManager,
             authStore = authStore,
         )
+
+        every { timeHelper.now() } returns Timestamp(1L)
     }
 
     @Test
@@ -77,9 +85,15 @@ internal class ExternalCredentialScanQrViewModelTest {
         coEvery { configManager.getProject(projectId) } returns mockProject
         coEvery { tokenizationProcessor.encrypt(any(), TokenKeyType.ExternalCredential, mockProject) } returns mockTokenizedCredential
 
+        viewModel.updateCameraPermissionStatus(permissionStatus = PermissionStatus.Granted) // inits the capture timing
         viewModel.updateCapturedValue(value)
 
-        val expected = ScanQrState.QrCodeCaptured(value.asTokenizableRaw(), mockTokenizedCredential)
+        val expected = ScanQrState.QrCodeCaptured(
+            scanStartTime = Timestamp(1L),
+            scanEndTime = Timestamp(1L),
+            qrCode = value.asTokenizableRaw(),
+            qrCodeEncrypted = mockTokenizedCredential,
+        )
         assertThat(observer.value()).isEqualTo(expected)
     }
 

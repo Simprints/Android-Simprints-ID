@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.feature.externalcredential.model.BoundingBox
 import java.io.Serializable
@@ -16,6 +17,9 @@ data class ScannedCredential(
     val documentImagePath: String?,
     val zoomedCredentialImagePath: String?,
     val credentialBoundingBox: BoundingBox?,
+    val scanStartTime: Timestamp,
+    val scanEndTime: Timestamp,
+    val scannedValue: TokenizableString.Raw,
 ) : Serializable
 
 fun ScannedCredential.toExternalCredential(subjectId: String) = ExternalCredential(

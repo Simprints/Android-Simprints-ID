@@ -63,7 +63,8 @@ data class ExternalCredentialCaptureEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = EXTERNAL_CREDENTIAL_CAPTURE,
     ) : EventPayload() {
-        override fun toSafeString(): String = "credential capture: $id"
+        override fun toSafeString(): String = "capture ID: $id, ocrErrors: $ocrErrorCount, captured text length: $capturedTextLength" +
+            "credential length: $credentialTextLength, selection id: $selectionId"
     }
 
     companion object {

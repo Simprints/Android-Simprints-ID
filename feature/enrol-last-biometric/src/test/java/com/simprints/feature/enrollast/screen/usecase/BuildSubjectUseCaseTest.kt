@@ -155,6 +155,9 @@ class BuildSubjectUseCaseTest {
             documentImagePath = null,
             zoomedCredentialImagePath = null,
             credentialBoundingBox = null,
+            scanStartTime = Timestamp(1L),
+            scanEndTime = Timestamp(1L),
+            scannedValue = TokenizableString.Raw("test"),
         )
 
         val result = useCase(createParams(steps = emptyList(), scannedCredential = scannedCredential), isAddingCredential = true)
