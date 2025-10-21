@@ -1,6 +1,7 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -8,6 +9,7 @@ import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENT
 import java.util.UUID
 
 @Keep
+@ExcludedFromGeneratedTestCoverageReports("Data struct")
 data class ExternalCredentialCaptureEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: ExternalCredentialCapturePayload,
@@ -47,6 +49,7 @@ data class ExternalCredentialCaptureEvent(
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized field
 
     @Keep
+    @ExcludedFromGeneratedTestCoverageReports("Data struct")
     data class ExternalCredentialCapturePayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
