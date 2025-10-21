@@ -2,7 +2,6 @@ package com.simprints.feature.clientapi.mappers.response
 
 import android.os.Bundle
 import androidx.core.os.bundleOf
-import com.simprints.core.BuildConfig
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
 import com.simprints.core.domain.response.AppErrorReason
