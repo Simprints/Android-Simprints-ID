@@ -14,6 +14,8 @@ import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
+import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirmationEvent
+import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirmationEvent.ExternalCredentialConfirmationResult
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent.SkipReason
 import com.simprints.infra.events.session.SessionEventRepository
@@ -149,6 +151,19 @@ class ExternalCredentialEventTrackerUseCaseTest {
             assertThat(payload.credentialType).isNull()
             assertThat(payload.skipReason).isEqualTo(SkipReason.OTHER)
             assertThat(payload.skipOther).isEqualTo("other")
+        }
+    }
+
+    @Test
+    fun `saveConfirmation should save correct event`() = runTest {
+        useCase.saveConfirmation(START_TIME, ExternalCredentialConfirmationResult.CONTINUE)
+
+        val captureEventSlot = slot<ExternalCredentialConfirmationEvent>()
+        coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
+        with(captureEventSlot.captured) {
+            assertThat(payload.createdAt).isEqualTo(START_TIME)
+            assertThat(payload.endedAt).isEqualTo(END_TIME)
+            assertThat(payload.result).isEqualTo(ExternalCredentialConfirmationResult.CONTINUE)
         }
     }
 

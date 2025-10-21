@@ -36,7 +36,7 @@ internal class ExternalCredentialViewModelTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    lateinit var saveExternalCaptureEvents: ExternalCredentialEventTrackerUseCase
+    lateinit var eventsTracker: ExternalCredentialEventTrackerUseCase
 
     @MockK
     lateinit var timeHelper: TimeHelper
@@ -51,7 +51,7 @@ internal class ExternalCredentialViewModelTest {
         viewModel = ExternalCredentialViewModel(
             configManager = configManager,
             timeHelper = timeHelper,
-            saveExternalCaptureEvents = saveExternalCaptureEvents,
+            eventsTracker = eventsTracker,
         )
         every { timeHelper.now() } returns Timestamp(1L)
     }
@@ -148,15 +148,15 @@ internal class ExternalCredentialViewModelTest {
         val mockResult = mockk<ExternalCredentialSearchResult>(relaxed = true) {
             every { scannedCredential } returns mockk(relaxed = true)
         }
-        coEvery { saveExternalCaptureEvents.saveSelectionEvent(any(), any(), any()) } returns "selectionId"
+        coEvery { eventsTracker.saveSelectionEvent(any(), any(), any()) } returns "selectionId"
 
         viewModel.selectionStarted()
         viewModel.init(createParams(subjectId = "subjectId", FlowType.IDENTIFY))
         viewModel.setSelectedExternalCredentialType(ExternalCredentialType.QRCode) // init capture timer
         viewModel.finish(mockResult)
 
-        coVerify { saveExternalCaptureEvents.saveSelectionEvent(any(), any(), any()) }
-        coVerify { saveExternalCaptureEvents.saveCaptureEvents(any(), any(), any(), any()) }
+        coVerify { eventsTracker.saveSelectionEvent(any(), any(), any()) }
+        coVerify { eventsTracker.saveCaptureEvents(any(), any(), any(), any()) }
     }
 
     @Test
@@ -169,7 +169,7 @@ internal class ExternalCredentialViewModelTest {
         viewModel.skipOtherReasonChanged("other")
         viewModel.finish(mockResult)
 
-        coVerify { saveExternalCaptureEvents.saveSkippedEvent(any(), any(), any()) }
+        coVerify { eventsTracker.saveSkippedEvent(any(), any(), any()) }
     }
 
     @Test
@@ -199,7 +199,7 @@ internal class ExternalCredentialViewModelTest {
         return ExternalCredentialViewModel(
             configManager = configManager,
             timeHelper = timeHelper,
-            saveExternalCaptureEvents = saveExternalCaptureEvents,
+            eventsTracker = eventsTracker,
         )
     }
 

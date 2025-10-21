@@ -11,8 +11,12 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
+import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirmationEvent
+import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirmationEvent.ExternalCredentialConfirmationResult
+import com.simprints.infra.events.event.domain.models.ExternalCredentialSearchEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.logging.Simber
@@ -26,6 +30,21 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
     private val calculateDistance: CalculateLevenshteinDistanceUseCase,
 ) {
+    suspend fun saveSearchEvent(
+        startTime: Timestamp,
+        externalCredentialId: String,
+        candidates: List<Subject>,
+    ) {
+        eventRepository.addOrUpdateEvent(
+            ExternalCredentialSearchEvent(
+                createdAt = startTime,
+                endedAt = timeHelper.now(),
+                probeExternalCredentialId = externalCredentialId,
+                candidateIds = candidates.map { it.subjectId },
+            ),
+        )
+    }
+
     suspend fun saveCaptureEvents(
         startTime: Timestamp,
         subjectId: String,
@@ -95,6 +114,19 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
     ) {
         eventRepository.addOrUpdateEvent(
             ExternalCredentialSelectionEvent(startTime, timeHelper.now(), skipReason, skipOther),
+        )
+    }
+
+    suspend fun saveConfirmation(
+        startTime: Timestamp,
+        result: ExternalCredentialConfirmationResult,
+    ) {
+        eventRepository.addOrUpdateEvent(
+            ExternalCredentialConfirmationEvent(
+                createdAt = startTime,
+                endedAt = timeHelper.now(),
+                result = result,
+            ),
         )
     }
 

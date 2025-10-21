@@ -781,4 +781,12 @@ fun validateExternalCredentialSearchApiModel(json: JSONObject) {
     }
 }
 
+fun validateExternalCredentialConfirmationApiModel(json: JSONObject) {
+    validateCommonParams(json, "ExternalCredentialConfirmation", 0)
+    with(json.getJSONObject("payload")) {
+        validateTimestamp(getJSONObject("startTime"))
+        assertThat(getString("result")).isNotNull()
+    }
+}
+
 private fun <T> Array<T>.valuesAsStrings(): List<String> = this.map { it.toString() }

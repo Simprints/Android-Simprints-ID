@@ -37,6 +37,7 @@ import com.simprints.infra.events.event.domain.models.EventType.Companion.EVENT_
 import com.simprints.infra.events.event.domain.models.EventType.Companion.EVENT_UP_SYNC_REQUEST_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.EXTERNAL_CREDENTIAL_CAPTURE_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.EXTERNAL_CREDENTIAL_CAPTURE_VALUE_KEY
+import com.simprints.infra.events.event.domain.models.EventType.Companion.EXTERNAL_CREDENTIAL_CONFIRMATION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.EXTERNAL_CREDENTIAL_SEARCH_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.EXTERNAL_CREDENTIAL_SELECTION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.FACE_CAPTURE_BIOMETRICS_KEY
@@ -147,6 +148,7 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
     JsonSubTypes.Type(value = ExternalCredentialCaptureValueEvent::class, name = EXTERNAL_CREDENTIAL_CAPTURE_VALUE_KEY),
     JsonSubTypes.Type(value = ExternalCredentialCaptureEvent::class, name = EXTERNAL_CREDENTIAL_CAPTURE_KEY),
     JsonSubTypes.Type(value = ExternalCredentialSearchEvent::class, name = EXTERNAL_CREDENTIAL_SEARCH_KEY),
+    JsonSubTypes.Type(value = ExternalCredentialConfirmationEvent::class, name = EXTERNAL_CREDENTIAL_CONFIRMATION_KEY),
 )
 abstract class Event {
     abstract val id: String

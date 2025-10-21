@@ -32,6 +32,8 @@ import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
+import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirmationEvent
+import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirmationEvent.ExternalCredentialConfirmationResult
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSearchEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
 import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
@@ -576,4 +578,11 @@ fun createExternalCredentialSearchEvent() = ExternalCredentialSearchEvent(
     endedAt = CREATED_AT,
     probeExternalCredentialId = GUID1,
     candidateIds = listOf(GUID1, GUID2),
+)
+
+fun createExternalCredentialConfirmationEvent() = ExternalCredentialConfirmationEvent(
+    createdAt = CREATED_AT,
+    endedAt = CREATED_AT,
+    result = ExternalCredentialConfirmationResult.CONTINUE,
+    userInteractedWithImage = true,
 )

@@ -2,7 +2,61 @@ package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.EventType.*
+import com.simprints.infra.events.event.domain.models.EventType.AGE_GROUP_SELECTION
+import com.simprints.infra.events.event.domain.models.EventType.ALERT_SCREEN
+import com.simprints.infra.events.event.domain.models.EventType.AUTHENTICATION
+import com.simprints.infra.events.event.domain.models.EventType.AUTHORIZATION
+import com.simprints.infra.events.event.domain.models.EventType.BIOMETRIC_REFERENCE_CREATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_CONFIRMATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
+import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ERROR
+import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_IDENTIFICATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_REFUSAL
+import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_VERIFICATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_CONFIRMATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_CONFIRMATION_V3
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_ENROLMENT
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_ENROLMENT_V3
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_IDENTIFICATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_IDENTIFICATION_V3
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_LAST_BIOMETRICS
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_LAST_BIOMETRICS_V3
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_VERIFICATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_VERIFICATION_V3
+import com.simprints.infra.events.event.domain.models.EventType.CANDIDATE_READ
+import com.simprints.infra.events.event.domain.models.EventType.COMPLETION_CHECK
+import com.simprints.infra.events.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
+import com.simprints.infra.events.event.domain.models.EventType.CONSENT
+import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_UPDATE
+import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V2
+import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V4
+import com.simprints.infra.events.event.domain.models.EventType.EVENT_DOWN_SYNC_REQUEST
+import com.simprints.infra.events.event.domain.models.EventType.EVENT_UP_SYNC_REQUEST
+import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_CAPTURE
+import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_CAPTURE_VALUE
+import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_CONFIRMATION
+import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_SEARCH
+import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_SELECTION
+import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE
+import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_BIOMETRICS
+import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
+import com.simprints.infra.events.event.domain.models.EventType.FACE_FALLBACK_CAPTURE
+import com.simprints.infra.events.event.domain.models.EventType.FACE_ONBOARDING_COMPLETE
+import com.simprints.infra.events.event.domain.models.EventType.FINGERPRINT_CAPTURE
+import com.simprints.infra.events.event.domain.models.EventType.FINGERPRINT_CAPTURE_BIOMETRICS
+import com.simprints.infra.events.event.domain.models.EventType.GUID_SELECTION
+import com.simprints.infra.events.event.domain.models.EventType.INTENT_PARSING
+import com.simprints.infra.events.event.domain.models.EventType.INVALID_INTENT
+import com.simprints.infra.events.event.domain.models.EventType.LICENSE_CHECK
+import com.simprints.infra.events.event.domain.models.EventType.ONE_TO_MANY_MATCH
+import com.simprints.infra.events.event.domain.models.EventType.ONE_TO_ONE_MATCH
+import com.simprints.infra.events.event.domain.models.EventType.PERSON_CREATION
+import com.simprints.infra.events.event.domain.models.EventType.REFUSAL
+import com.simprints.infra.events.event.domain.models.EventType.SAMPLE_UP_SYNC_REQUEST
+import com.simprints.infra.events.event.domain.models.EventType.SCANNER_CONNECTION
+import com.simprints.infra.events.event.domain.models.EventType.SCANNER_FIRMWARE_UPDATE
+import com.simprints.infra.events.event.domain.models.EventType.SUSPICIOUS_INTENT
+import com.simprints.infra.events.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
 
 @Keep
 internal enum class ApiEventPayloadType {
@@ -45,6 +99,7 @@ internal enum class ApiEventPayloadType {
     ExternalCredentialCaptureValue,
     ExternalCredentialCapture,
     ExternalCredentialSearch,
+    ExternalCredentialConfirmation,
 }
 
 internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
@@ -105,6 +160,7 @@ internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     EXTERNAL_CREDENTIAL_CAPTURE_VALUE -> ApiEventPayloadType.ExternalCredentialCaptureValue
     EXTERNAL_CREDENTIAL_CAPTURE -> ApiEventPayloadType.ExternalCredentialCapture
     EXTERNAL_CREDENTIAL_SEARCH -> ApiEventPayloadType.ExternalCredentialSearch
+    EXTERNAL_CREDENTIAL_CONFIRMATION -> ApiEventPayloadType.ExternalCredentialConfirmation
 }
 
 internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
@@ -147,4 +203,5 @@ internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.ExternalCredentialCaptureValue -> EXTERNAL_CREDENTIAL_CAPTURE_VALUE
     ApiEventPayloadType.ExternalCredentialCapture -> EXTERNAL_CREDENTIAL_CAPTURE
     ApiEventPayloadType.ExternalCredentialSearch -> EXTERNAL_CREDENTIAL_SEARCH
+    ApiEventPayloadType.ExternalCredentialConfirmation -> EXTERNAL_CREDENTIAL_CONFIRMATION
 }

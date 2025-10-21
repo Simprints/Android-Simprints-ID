@@ -11,22 +11,20 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.externalcredential.screens.search.model.SearchCredentialState
 import com.simprints.feature.externalcredential.screens.search.model.SearchState
 import com.simprints.feature.externalcredential.screens.search.usecase.MatchCandidatesUseCase
+import com.simprints.feature.externalcredential.usecase.ExternalCredentialEventTrackerUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.infra.events.event.domain.models.ExternalCredentialSearchEvent
-import com.simprints.infra.events.session.SessionEventRepository
+import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirmationEvent.ExternalCredentialConfirmationResult
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -42,7 +40,7 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
     private val matchCandidatesUseCase: MatchCandidatesUseCase,
     private val tokenizationProcessor: TokenizationProcessor,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
-    private val eventRepository: SessionEventRepository,
+    private val eventsTracker: ExternalCredentialEventTrackerUseCase,
 ) : ViewModel() {
     @AssistedFactory
     interface Factory {
@@ -63,6 +61,8 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         }
     private val _stateLiveData = MutableLiveData(state)
     val stateLiveData: LiveData<SearchCredentialState> = _stateLiveData
+
+    private val confirmationStartTime = timeHelper.now()
 
     private fun updateState(state: (SearchCredentialState) -> SearchCredentialState) {
         this.state = state(this.state)
@@ -140,31 +140,18 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         val startTime = timeHelper.now()
         when {
             candidates.isEmpty() -> {
-                saveSearchEvent(startTime, emptyList())
+                eventsTracker.saveSearchEvent(startTime, scannedCredential.credentialScanId, emptyList())
                 updateState { it.copy(searchState = SearchState.CredentialNotFound) }
             }
 
             else -> {
                 val projectConfig = configManager.getProjectConfiguration()
                 val matches = matchCandidatesUseCase(candidates, credential, externalCredentialParams, project, projectConfig)
-                saveSearchEvent(startTime, candidates)
+                eventsTracker.saveSearchEvent(startTime, scannedCredential.credentialScanId, candidates)
+
                 updateState { state -> state.copy(searchState = SearchState.CredentialLinked(matchResults = matches)) }
             }
         }
-    }
-
-    private fun saveSearchEvent(
-        startTime: Timestamp,
-        candidates: List<Subject>,
-    ) = viewModelScope.launch {
-        eventRepository.addOrUpdateEvent(
-            ExternalCredentialSearchEvent(
-                createdAt = startTime,
-                endedAt = timeHelper.now(),
-                probeExternalCredentialId = scannedCredential.credentialScanId,
-                candidateIds = candidates.map { it.subjectId },
-            ),
-        )
     }
 
     /**
@@ -177,20 +164,35 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         ExternalCredentialType.QRCode -> InputType.TYPE_CLASS_TEXT
     }
 
-    fun finish(state: SearchCredentialState) {
-        val matches = when (val searchState = state.searchState) {
-            SearchState.Searching,
-            SearchState.CredentialNotFound,
-            -> emptyList()
-
-            is SearchState.CredentialLinked -> searchState.matchResults
+    fun trackRecapture() {
+        viewModelScope.launch {
+            eventsTracker.saveConfirmation(
+                confirmationStartTime,
+                ExternalCredentialConfirmationResult.RECAPTURE,
+            )
         }
-        _finishEvent.send(
-            ExternalCredentialSearchResult(
-                flowType = externalCredentialParams.flowType,
-                scannedCredential = state.scannedCredential,
-                matchResults = matches,
-            ),
-        )
+    }
+
+    fun finish(state: SearchCredentialState) {
+        viewModelScope.launch {
+            eventsTracker.saveConfirmation(
+                confirmationStartTime,
+                ExternalCredentialConfirmationResult.CONTINUE,
+            )
+            val matches = when (val searchState = state.searchState) {
+                SearchState.Searching,
+                SearchState.CredentialNotFound,
+                -> emptyList()
+
+                is SearchState.CredentialLinked -> searchState.matchResults
+            }
+            _finishEvent.send(
+                ExternalCredentialSearchResult(
+                    flowType = externalCredentialParams.flowType,
+                    scannedCredential = state.scannedCredential,
+                    matchResults = matches,
+                ),
+            )
+        }
     }
 }

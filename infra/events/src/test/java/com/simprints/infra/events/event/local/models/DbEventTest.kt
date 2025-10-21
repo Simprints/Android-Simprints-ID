@@ -352,4 +352,12 @@ class DbEventTest {
 
         assertThat(original).isEqualTo(transformed)
     }
+
+    @Test
+    fun convert_ExternalCredentialConfirmationEvent() {
+        val original = createExternalCredentialConfirmationEvent()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
+
+        assertThat(original).isEqualTo(transformed)
+    }
 }

@@ -22,7 +22,7 @@ import javax.inject.Inject
 internal class ExternalCredentialViewModel @Inject internal constructor(
     private val timeHelper: TimeHelper,
     private val configManager: ConfigManager,
-    private val saveExternalCaptureEvents: ExternalCredentialEventTrackerUseCase,
+    private val eventsTracker: ExternalCredentialEventTrackerUseCase,
 ) : ViewModel() {
     private var isInitialized = false
     lateinit var params: ExternalCredentialParams
@@ -76,7 +76,7 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
         viewModelScope.launch {
             if (selectedType != null) {
                 val selectionEndTime = timeHelper.now()
-                selectionEventId = saveExternalCaptureEvents.saveSelectionEvent(selectionStartTime, selectionEndTime, selectedType)
+                selectionEventId = eventsTracker.saveSelectionEvent(selectionStartTime, selectionEndTime, selectedType)
                 captureStartTime = timeHelper.now()
             }
             updateState { it.copy(selectedType = selectedType) }
@@ -99,10 +99,10 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
         viewModelScope.launch {
             if (result.scannedCredential == null) {
                 selectedSkipReason?.let { reason ->
-                    saveExternalCaptureEvents.saveSkippedEvent(selectionStartTime, reason, selectedSkipOtherText)
+                    eventsTracker.saveSkippedEvent(selectionStartTime, reason, selectedSkipOtherText)
                 }
             } else {
-                saveExternalCaptureEvents.saveCaptureEvents(
+                eventsTracker.saveCaptureEvents(
                     captureStartTime,
                     params.subjectId.orEmpty(),
                     result.scannedCredential,
