@@ -552,16 +552,39 @@
                             android:text="@string/sync_info_footer_sync_incomplete"
                             android:visibility="gone" />
 
-                        <TextView
-                            android:id="@+id/textFooterRecordLoggingOut"
-                            style="@style/Text.Body2.Secondary"
-                            android:textColor="@color/simprints_green_dark"
-                            android:layout_width="wrap_content"
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/layoutFooterRecordLoggingOut"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="start"
                             android:layout_marginHorizontal="8dp"
-                            android:text="@string/sync_info_footer_sync_complete_logging_out"
-                            android:visibility="gone" />
+                            android:visibility="gone">
+
+                            <ProgressBar
+                                android:id="@+id/footerRecordLoggingOutProgress"
+                                style="@style/Widget.Simprints.CircularProgressIndicator"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginStart="8dp"
+                                android:indeterminate="true"
+                                android:indeterminateTint="@color/simprints_green_dark"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/textFooterRecordLoggingOut"
+                                style="@style/Text.Body2.Secondary"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/sync_info_footer_sync_complete_logging_out"
+                                android:textColor="@color/simprints_green_dark"
+                                app:layout_constraintHorizontal_bias="0"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toStartOf="@id/footerRecordLoggingOutProgress"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
 
                     </FrameLayout>
 
@@ -814,5 +837,4 @@
     </ScrollView>
 
 </LinearLayout>
-
 

@@ -287,7 +287,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             counterRecordsToDownload = recordsToDownload?.let { "${it.count}${if (it.isLowerBound) "+" else ""}" }.orEmpty(),
             isCounterImagesToUploadVisible = isPreLogoutUpSync,
             counterImagesToUpload = imagesToUpload?.toString().orEmpty(),
-            isInstructionDefaultVisible = eventSyncVisibleState == OnStandby,
+            isInstructionDefaultVisible = eventSyncVisibleState == OnStandby && !isPreLogoutUpSync,
             isInstructionCommCarePermissionVisible = eventSyncVisibleState == CommCareError,
             isInstructionNoModulesVisible = eventSyncVisibleState == NoModulesError,
             isInstructionOfflineVisible = eventSyncVisibleState == OfflineError,
