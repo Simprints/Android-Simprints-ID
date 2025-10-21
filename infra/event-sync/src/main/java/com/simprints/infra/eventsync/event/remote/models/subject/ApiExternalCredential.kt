@@ -4,6 +4,7 @@ import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.remote.models.ApiExternalCredentialType
+import com.simprints.infra.config.store.remote.models.fromDomainToApi
 
 data class ApiExternalCredential(
     val id: String,
@@ -21,9 +22,5 @@ internal fun ApiExternalCredential.fromApiToDomain(subjectId: String) = External
 internal fun ExternalCredential.fromDomainToApi() = ApiExternalCredential(
     id = id,
     value = value.value,
-    type = when (type) {
-        ExternalCredentialType.NHISCard -> ApiExternalCredentialType.NHIS_CARD
-        ExternalCredentialType.GhanaIdCard -> ApiExternalCredentialType.GHANA_CARD
-        ExternalCredentialType.QRCode -> ApiExternalCredentialType.QR_CODE
-    },
+    type = type.fromDomainToApi(),
 )

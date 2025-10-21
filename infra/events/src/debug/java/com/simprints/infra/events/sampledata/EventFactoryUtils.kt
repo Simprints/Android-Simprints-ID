@@ -33,6 +33,7 @@ import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSearchEvent
+import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
 import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent
@@ -543,6 +544,13 @@ fun createEnrolmentUpdateEvent() = EnrolmentUpdateEvent(
     createdAt = CREATED_AT,
     subjectId = GUID1,
     externalCredentialIdsToAdd = listOf(CREDENTIAL_ID),
+)
+
+fun createExternalCredentialSelectionEvent() = ExternalCredentialSelectionEvent(
+    createdAt = CREATED_AT,
+    endedAt = CREATED_AT,
+    skipReason = ExternalCredentialSelectionEvent.SkipReason.OTHER,
+    skipOther = DEFAULT_METADATA,
 )
 
 fun createExternalCredentialCaptureValueEvent() = ExternalCredentialCaptureValueEvent(

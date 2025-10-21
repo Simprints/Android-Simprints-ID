@@ -15,6 +15,7 @@ import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.externalcredential.usecase.ExternalCredentialEventTrackerUseCase
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -65,6 +66,7 @@ internal class ExternalCredentialViewModelTest {
     fun `setSelectedExternalCredentialType updates state`() {
         val observer = viewModel.stateLiveData.test()
 
+        viewModel.selectionStarted()
         viewModel.setSelectedExternalCredentialType(ExternalCredentialType.GhanaIdCard)
 
         assertThat(observer.value()?.selectedType).isEqualTo(ExternalCredentialType.GhanaIdCard)
@@ -129,6 +131,7 @@ internal class ExternalCredentialViewModelTest {
             every { scannedCredential } returns createScannedCredential()
         }
         viewModel.init(params)
+        viewModel.selectionStarted()
         viewModel.setSelectedExternalCredentialType(ExternalCredentialType.QRCode) // init capture timer
         viewModel.finish(credentialSearchResult)
 
@@ -141,15 +144,32 @@ internal class ExternalCredentialViewModelTest {
     }
 
     @Test
-    fun `finish saves capture events`() = runTest {
+    fun `finish saves success flow events`() = runTest {
         val mockResult = mockk<ExternalCredentialSearchResult>(relaxed = true) {
             every { scannedCredential } returns mockk(relaxed = true)
         }
+        coEvery { saveExternalCaptureEvents.saveSelectionEvent(any(), any(), any()) } returns "selectionId"
+
+        viewModel.selectionStarted()
         viewModel.init(createParams(subjectId = "subjectId", FlowType.IDENTIFY))
         viewModel.setSelectedExternalCredentialType(ExternalCredentialType.QRCode) // init capture timer
         viewModel.finish(mockResult)
 
-        coVerify { saveExternalCaptureEvents.saveCaptureEvents(any(), any(), any()) }
+        coVerify { saveExternalCaptureEvents.saveSelectionEvent(any(), any(), any()) }
+        coVerify { saveExternalCaptureEvents.saveCaptureEvents(any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `finish saves skip event`() = runTest {
+        val mockResult = mockk<ExternalCredentialSearchResult>(relaxed = true) {
+            every { scannedCredential } returns null
+        }
+        viewModel.selectionStarted()
+        viewModel.skipOptionSelected(ExternalCredentialSelectionEvent.SkipReason.OTHER)
+        viewModel.skipOtherReasonChanged("other")
+        viewModel.finish(mockResult)
+
+        coVerify { saveExternalCaptureEvents.saveSkippedEvent(any(), any(), any()) }
     }
 
     @Test

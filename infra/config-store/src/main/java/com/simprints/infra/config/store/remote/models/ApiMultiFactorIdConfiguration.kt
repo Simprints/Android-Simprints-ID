@@ -3,6 +3,9 @@ package com.simprints.infra.config.store.remote.models
 import androidx.annotation.Keep
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.infra.config.store.models.MultiFactorIdConfiguration
+import com.simprints.infra.config.store.remote.models.ApiExternalCredentialType.GHANA_CARD
+import com.simprints.infra.config.store.remote.models.ApiExternalCredentialType.NHIS_CARD
+import com.simprints.infra.config.store.remote.models.ApiExternalCredentialType.QR_CODE
 
 @Keep
 internal data class ApiMultiFactorIdConfiguration(
@@ -25,4 +28,10 @@ enum class ApiExternalCredentialType {
         GHANA_CARD -> ExternalCredentialType.GhanaIdCard
         QR_CODE -> ExternalCredentialType.QRCode
     }
+}
+
+fun ExternalCredentialType.fromDomainToApi(): ApiExternalCredentialType = when (this) {
+    ExternalCredentialType.NHISCard -> NHIS_CARD
+    ExternalCredentialType.GhanaIdCard -> GHANA_CARD
+    ExternalCredentialType.QRCode -> QR_CODE
 }

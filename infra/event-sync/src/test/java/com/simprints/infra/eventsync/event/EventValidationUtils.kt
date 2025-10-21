@@ -734,6 +734,17 @@ fun validateEnrolmentUpdateEventApiModel(json: JSONObject) {
     }
 }
 
+fun validateExternalCredentialSelectionEventApiModel(json: JSONObject) {
+    validateCommonParams(json, "ExternalCredentialSelection", 0)
+    with(json.getJSONObject("payload")) {
+        validateTimestamp(getJSONObject("startTime"))
+        validateTimestamp(getJSONObject("endTime"))
+        assertThat(getString("id")).isNotNull()
+        assertThat(getString("skipReason")).isNotNull()
+        assertThat(getString("skipOther")).isNotNull()
+    }
+}
+
 fun validateExternalCredentialCaptureValueEventApiModel(json: JSONObject) {
     validateCommonParams(json, "ExternalCredentialCaptureValue", 0)
     with(json.getJSONObject("payload")) {

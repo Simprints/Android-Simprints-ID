@@ -13,6 +13,7 @@ import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
+import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
@@ -29,6 +30,7 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
         startTime: Timestamp,
         subjectId: String,
         scannedCredential: ScannedCredential,
+        selectionEventId: String,
     ) {
         Simber.d("Saving External Credential Events for $scannedCredential")
         val credential = scannedCredential.toExternalCredential(subjectId)
@@ -50,7 +52,7 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
                 ocrErrorCount = calculateOcrErrorCount(scannedCredential),
                 capturedTextLength = getActualCapturedCredentialLength(scannedCredential),
                 credentialTextLength = getExpectedCredentialValueLength(credential),
-                selectionId = "", // TODO - add ExternalCredentialSelectionEvent eventId here
+                selectionId = selectionEventId,
             ),
         )
     }
@@ -73,6 +75,26 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
         return calculateDistance(
             scannedCredential.scannedValue.value,
             actualCredentialRaw.value,
+        )
+    }
+
+    suspend fun saveSelectionEvent(
+        startTime: Timestamp,
+        endTime: Timestamp,
+        selectedType: ExternalCredentialType,
+    ): String {
+        val event = ExternalCredentialSelectionEvent(startTime, endTime, selectedType)
+        eventRepository.addOrUpdateEvent(event)
+        return event.id
+    }
+
+    suspend fun saveSkippedEvent(
+        startTime: Timestamp,
+        skipReason: ExternalCredentialSelectionEvent.SkipReason,
+        skipOther: String?,
+    ) {
+        eventRepository.addOrUpdateEvent(
+            ExternalCredentialSelectionEvent(startTime, timeHelper.now(), skipReason, skipOther),
         )
     }
 

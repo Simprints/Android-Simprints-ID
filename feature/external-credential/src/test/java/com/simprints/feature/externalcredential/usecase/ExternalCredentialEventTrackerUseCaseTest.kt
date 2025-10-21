@@ -14,6 +14,8 @@ import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
+import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
+import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent.SkipReason
 import com.simprints.infra.events.session.SessionEventRepository
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -68,7 +70,7 @@ class ExternalCredentialEventTrackerUseCaseTest {
     @Test
     fun `saveCaptureEvents should save external credential capture events`() = runTest {
         val scannedCredential = makeScannedCredential(ExternalCredentialType.QRCode)
-        useCase.saveCaptureEvents(START_TIME, SUBJECT_ID, scannedCredential)
+        useCase.saveCaptureEvents(START_TIME, SUBJECT_ID, scannedCredential, SELECTION_ID)
 
         val valueEventSlot = slot<ExternalCredentialCaptureValueEvent>()
         coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(valueEventSlot)) }
@@ -93,7 +95,7 @@ class ExternalCredentialEventTrackerUseCaseTest {
     @Test
     fun `saveCaptureEvents should correctly calculate length for NHISCard`() = runTest {
         val scannedCredential = makeScannedCredential(ExternalCredentialType.NHISCard)
-        useCase.saveCaptureEvents(START_TIME, SUBJECT_ID, scannedCredential)
+        useCase.saveCaptureEvents(START_TIME, SUBJECT_ID, scannedCredential, SELECTION_ID)
 
         val captureEventSlot = slot<ExternalCredentialCaptureEvent>()
         coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
@@ -103,7 +105,7 @@ class ExternalCredentialEventTrackerUseCaseTest {
     @Test
     fun `saveCaptureEvents should correctly calculate length for GhanaIdCard`() = runTest {
         val scannedCredential = makeScannedCredential(ExternalCredentialType.GhanaIdCard)
-        useCase.saveCaptureEvents(START_TIME, SUBJECT_ID, scannedCredential)
+        useCase.saveCaptureEvents(START_TIME, SUBJECT_ID, scannedCredential, SELECTION_ID)
 
         val captureEventSlot = slot<ExternalCredentialCaptureEvent>()
         coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
@@ -113,11 +115,41 @@ class ExternalCredentialEventTrackerUseCaseTest {
     @Test
     fun `saveCaptureEvents should correctly calculate length for QRCode`() = runTest {
         val scannedCredential = makeScannedCredential(ExternalCredentialType.QRCode)
-        useCase.saveCaptureEvents(START_TIME, SUBJECT_ID, scannedCredential)
+        useCase.saveCaptureEvents(START_TIME, SUBJECT_ID, scannedCredential, SELECTION_ID)
 
         val captureEventSlot = slot<ExternalCredentialCaptureEvent>()
         coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
         assertThat(captureEventSlot.captured.payload.credentialTextLength).isEqualTo(6)
+    }
+
+    @Test
+    fun `saveSelectionEvent should save correct event`() = runTest {
+        useCase.saveSelectionEvent(START_TIME, END_TIME, ExternalCredentialType.QRCode)
+
+        val captureEventSlot = slot<ExternalCredentialSelectionEvent>()
+        coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
+        with(captureEventSlot.captured) {
+            assertThat(payload.createdAt).isEqualTo(START_TIME)
+            assertThat(payload.endedAt).isEqualTo(END_TIME)
+            assertThat(payload.credentialType).isEqualTo(ExternalCredentialType.QRCode)
+            assertThat(payload.skipReason).isNull()
+            assertThat(payload.skipOther).isNull()
+        }
+    }
+
+    @Test
+    fun `saveSkippedEvent should save correct event`() = runTest {
+        useCase.saveSkippedEvent(START_TIME, SkipReason.OTHER, "other")
+
+        val captureEventSlot = slot<ExternalCredentialSelectionEvent>()
+        coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
+        with(captureEventSlot.captured) {
+            assertThat(payload.createdAt).isEqualTo(START_TIME)
+            assertThat(payload.endedAt).isEqualTo(END_TIME)
+            assertThat(payload.credentialType).isNull()
+            assertThat(payload.skipReason).isEqualTo(SkipReason.OTHER)
+            assertThat(payload.skipOther).isEqualTo("other")
+        }
     }
 
     private fun makeScannedCredential(type: ExternalCredentialType) = ScannedCredential(
@@ -141,5 +173,6 @@ class ExternalCredentialEventTrackerUseCaseTest {
         private const val SUBJECT_ID = "test-subject-id"
         private const val RAW_SCANNED_VALUE = "scanned-value"
         private const val DEFAULT_DISTANCE = 7
+        private const val SELECTION_ID = "selection_id"
     }
 }
