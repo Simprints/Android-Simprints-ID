@@ -5,10 +5,15 @@ import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.feature.externalcredential.model.BoundingBox
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent
+import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -107,6 +112,27 @@ internal class ExternalCredentialViewModelTest {
     }
 
     @Test
+    fun `finish handles non-null scannedCredential in result`() = runTest {
+        val subjectId = "subjectId"
+        val flowType = FlowType.IDENTIFY
+        val params = createParams(subjectId, flowType)
+        val credentialSearchResult = mockk<ExternalCredentialSearchResult>(relaxed = true) {
+            every { scannedCredential } returns createScannedCredential()
+        }
+        viewModel.init(params)
+        viewModel.finish(credentialSearchResult)
+
+        val observer = viewModel.finishEvent
+            .test()
+            .value()
+            .getContentIfNotHandled()
+
+        assertThat(observer).isEqualTo(credentialSearchResult)
+        coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(ofType<ExternalCredentialCaptureValueEvent>()) }
+        coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(ofType<ExternalCredentialCaptureEvent>()) }
+    }
+
+    @Test
     fun `init block loads allowed external credentials from config`() = runTest {
         val allowedCredentials = listOf(
             ExternalCredentialType.NHISCard,
@@ -132,6 +158,20 @@ internal class ExternalCredentialViewModelTest {
         }
         return ExternalCredentialViewModel(configManager = configManager, timeHelper = timeHelper, eventRepository = eventRepository)
     }
+
+    private fun createScannedCredential(
+        credential: String = "credential",
+        credentialType: ExternalCredentialType = ExternalCredentialType.NHISCard,
+        documentImagePath: String? = "documentImagePath",
+        zoomedCredentialImagePath: String? = "zoomedCredentialImagePath",
+        credentialBoundingBox: BoundingBox? = BoundingBox(0, 0, 100, 100),
+    ) = ScannedCredential(
+        credential = credential.asTokenizableEncrypted(),
+        credentialType = credentialType,
+        documentImagePath = documentImagePath,
+        zoomedCredentialImagePath = zoomedCredentialImagePath,
+        credentialBoundingBox = credentialBoundingBox,
+    )
 
     private fun createParams(
         subjectId: String,
