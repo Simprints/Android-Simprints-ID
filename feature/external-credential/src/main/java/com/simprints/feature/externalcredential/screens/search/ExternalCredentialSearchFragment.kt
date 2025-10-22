@@ -202,6 +202,7 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
             viewModel.finish(state)
         }
         buttonRecapture.setOnClickListener {
+            viewModel.trackRecapture()
             findNavController().navigateSafely(
                 this@ExternalCredentialSearchFragment,
                 ExternalCredentialSearchFragmentDirections.actionExternalCredentialSearchToExternalCredentialSelectFragment(),

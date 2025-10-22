@@ -5,6 +5,8 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.model.BoundingBox
 import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
@@ -28,6 +30,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import kotlin.concurrent.timer
 
 internal class ExternalCredentialScanOcrViewModelTest {
     @get:Rule
@@ -35,6 +38,9 @@ internal class ExternalCredentialScanOcrViewModelTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
+
+    @MockK
+    private lateinit var timeHelper: TimeHelper
 
     @MockK
     private lateinit var normalizeBitmapToPreviewUseCase: NormalizeBitmapToPreviewUseCase
@@ -77,10 +83,13 @@ internal class ExternalCredentialScanOcrViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         viewModel = initViewModel(documentType)
+
+        every { timeHelper.now() } returns Timestamp(1L)
     }
 
     private fun initViewModel(documentType: OcrDocumentType) = ExternalCredentialScanOcrViewModel(
         ocrDocumentType = documentType,
+        timeHelper = timeHelper,
         normalizeBitmapToPreviewUseCase = normalizeBitmapToPreviewUseCase,
         cropDocumentFromPreviewUseCase = cropDocumentFromPreviewUseCase,
         getCredentialCoordinatesUseCase = getCredentialCoordinatesUseCase,
@@ -151,6 +160,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
         val finishObserver = viewModel.finishOcrEvent.test()
         val stateObserver = viewModel.stateLiveData.test()
 
+        viewModel.ocrStarted() // Initialises capture timing
         viewModel.processOcrResultsAndFinish()
 
         val scannedCredential = finishObserver.value()?.peekContent()
@@ -186,6 +196,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
 
         val finishObserver = viewModel.finishOcrEvent.test()
 
+        viewModel.ocrStarted() // Initialises capture timing
         viewModel.processOcrResultsAndFinish()
 
         val scannedCredential = finishObserver.value()?.peekContent()

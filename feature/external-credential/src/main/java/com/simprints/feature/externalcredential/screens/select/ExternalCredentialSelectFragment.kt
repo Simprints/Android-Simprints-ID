@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -87,6 +88,7 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
             fillRecyclerView(externalCredentialTypes)
             initViews(externalCredentialTypes)
             initListeners(externalCredentialTypes)
+            mainViewModel.selectionStarted()
         }
     }
 

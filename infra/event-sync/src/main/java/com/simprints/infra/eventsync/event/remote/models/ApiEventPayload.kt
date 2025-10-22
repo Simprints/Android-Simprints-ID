@@ -47,6 +47,9 @@ import com.simprints.infra.events.event.domain.models.EventType.EVENT_DOWN_SYNC_
 import com.simprints.infra.events.event.domain.models.EventType.EVENT_UP_SYNC_REQUEST
 import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_CAPTURE
 import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_CAPTURE_VALUE
+import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_CONFIRMATION
+import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_SEARCH
+import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_SELECTION
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_BIOMETRICS
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
@@ -69,6 +72,9 @@ import com.simprints.infra.events.event.domain.models.EventType.SUSPICIOUS_INTEN
 import com.simprints.infra.events.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent.ExternalCredentialCapturePayload
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent.ExternalCredentialCaptureValuePayload
+import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirmationEvent.ExternalCredentialConfirmationPayload
+import com.simprints.infra.events.event.domain.models.ExternalCredentialSearchEvent.ExternalCredentialSearchPayload
+import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent.ExternalCredentialSelectionPayload
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent.GuidSelectionPayload
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent.IntentParsingPayload
 import com.simprints.infra.events.event.domain.models.InvalidIntentEvent.InvalidIntentPayload
@@ -177,6 +183,9 @@ internal fun EventPayload.fromDomainToApi(): ApiEventPayload = when (this.type) 
     AGE_GROUP_SELECTION -> ApiAgeGroupSelectionPayload(this as AgeGroupSelectionEvent.AgeGroupSelectionPayload)
     BIOMETRIC_REFERENCE_CREATION -> ApiBiometricReferenceCreationPayload(this as BiometricReferenceCreationPayload)
     ENROLMENT_UPDATE -> ApiEnrolmentUpdatePayload(this as EnrolmentUpdatePayload)
+    EXTERNAL_CREDENTIAL_SELECTION -> ApiExternalCredentialSelectionPayload(this as ExternalCredentialSelectionPayload)
     EXTERNAL_CREDENTIAL_CAPTURE -> ApiExternalCredentialCapturePayload(this as ExternalCredentialCapturePayload)
     EXTERNAL_CREDENTIAL_CAPTURE_VALUE -> ApiExternalCredentialCaptureValuePayload(this as ExternalCredentialCaptureValuePayload)
+    EXTERNAL_CREDENTIAL_SEARCH -> ApiExternalCredentialSearchPayload(this as ExternalCredentialSearchPayload)
+    EXTERNAL_CREDENTIAL_CONFIRMATION -> ApiExternalCredentialConfirmationPayload(this as ExternalCredentialConfirmationPayload)
 }

@@ -43,7 +43,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.getValue
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
@@ -144,6 +143,9 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
                     documentImagePath = null,
                     credentialBoundingBox = null,
                     zoomedCredentialImagePath = null,
+                    scanStartTime = state.scanStartTime,
+                    scanEndTime = state.scanEndTime,
+                    scannedValue = state.qrCode,
                 )
                 findNavController().navigateSafely(
                     this@ExternalCredentialScanQrFragment,

@@ -18,9 +18,9 @@ data class ExternalCredentialCaptureEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
-        id: String,
+        startTime: Timestamp,
         endTime: Timestamp,
+        payloadId: String,
         autoCaptureStartTime: Timestamp,
         autoCaptureEndTime: Timestamp,
         ocrErrorCount: Int,
@@ -30,10 +30,10 @@ data class ExternalCredentialCaptureEvent(
     ) : this(
         id = UUID.randomUUID().toString(),
         payload = ExternalCredentialCapturePayload(
-            createdAt = createdAt,
+            createdAt = startTime,
             eventVersion = EVENT_VERSION,
-            id = id,
-            endTime = endTime,
+            id = payloadId,
+            endedAt = endTime,
             autoCaptureStartTime = autoCaptureStartTime,
             autoCaptureEndTime = autoCaptureEndTime,
             ocrErrorCount = ocrErrorCount,
@@ -54,7 +54,6 @@ data class ExternalCredentialCaptureEvent(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
         val id: String,
-        val endTime: Timestamp,
         val autoCaptureStartTime: Timestamp,
         val autoCaptureEndTime: Timestamp,
         val ocrErrorCount: Int,
@@ -64,7 +63,8 @@ data class ExternalCredentialCaptureEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = EXTERNAL_CREDENTIAL_CAPTURE,
     ) : EventPayload() {
-        override fun toSafeString(): String = "credential capture: $id"
+        override fun toSafeString(): String = "capture ID: $id, ocrErrors: $ocrErrorCount, captured text length: $capturedTextLength" +
+            "credential length: $credentialTextLength, selection id: $selectionId"
     }
 
     companion object {

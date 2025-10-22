@@ -9,13 +9,11 @@ import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.eventsync.event.remote.models.ApiEvent
-import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-
 
 internal class MapDomainEventScopeToApiUseCaseTest {
     @MockK
@@ -36,7 +34,7 @@ internal class MapDomainEventScopeToApiUseCaseTest {
     fun `should map events using use case`() {
         val scope = createBlankSessionScope()
         val events = listOf(
-            mockk<Event>()
+            mockk<Event>(),
         )
         val resultEvent = mockk<ApiEvent>()
         every { mapDomainEventToApiUseCase(any(), any()) } returns resultEvent
@@ -50,7 +48,7 @@ internal class MapDomainEventScopeToApiUseCaseTest {
     fun `should map fields correctly`() {
         val scope = createBlankSessionScope()
         val events = listOf(
-            mockk<Event>()
+            mockk<Event>(),
         )
         val resultEvent = mockk<ApiEvent>()
         every { mapDomainEventToApiUseCase(any(), any()) } returns resultEvent
@@ -61,7 +59,6 @@ internal class MapDomainEventScopeToApiUseCaseTest {
             assertEquals(startTime.unixMs, scope.createdAt.ms)
             assertEquals(endTime, scope.endedAt)
         }
-
     }
 
     private fun createBlankSessionScope() = EventScope(

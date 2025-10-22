@@ -734,6 +734,17 @@ fun validateEnrolmentUpdateEventApiModel(json: JSONObject) {
     }
 }
 
+fun validateExternalCredentialSelectionEventApiModel(json: JSONObject) {
+    validateCommonParams(json, "ExternalCredentialSelection", 0)
+    with(json.getJSONObject("payload")) {
+        validateTimestamp(getJSONObject("startTime"))
+        validateTimestamp(getJSONObject("endTime"))
+        assertThat(getString("id")).isNotNull()
+        assertThat(getString("skipReason")).isNotNull()
+        assertThat(getString("skipOther")).isNotNull()
+    }
+}
+
 fun validateExternalCredentialCaptureValueEventApiModel(json: JSONObject) {
     validateCommonParams(json, "ExternalCredentialCaptureValue", 0)
     with(json.getJSONObject("payload")) {
@@ -755,6 +766,26 @@ fun validateExternalCredentialCaptureEventApiModel(json: JSONObject) {
         assertThat(getString("capturedTextLength")).isNotNull()
         assertThat(getString("credentialTextLength")).isNotNull()
         assertThat(getString("selectionId")).isNotNull()
+    }
+}
+
+fun validateExternalCredentialSearchApiModel(json: JSONObject) {
+    validateCommonParams(json, "ExternalCredentialSearch", 0)
+    with(json.getJSONObject("payload")) {
+        validateTimestamp(getJSONObject("startTime"))
+        assertThat(getString("id")).isNotNull()
+        assertThat(getString("endTime")).isNotNull()
+        assertThat(getString("probeExternalCredentialId")).isNotNull()
+        assertThat(getJSONObject("result")).isNotNull()
+        assertThat(getJSONObject("result").getJSONArray("candidateIds").length()).isGreaterThan(0)
+    }
+}
+
+fun validateExternalCredentialConfirmationApiModel(json: JSONObject) {
+    validateCommonParams(json, "ExternalCredentialConfirmation", 0)
+    with(json.getJSONObject("payload")) {
+        validateTimestamp(getJSONObject("startTime"))
+        assertThat(getString("result")).isNotNull()
     }
 }
 

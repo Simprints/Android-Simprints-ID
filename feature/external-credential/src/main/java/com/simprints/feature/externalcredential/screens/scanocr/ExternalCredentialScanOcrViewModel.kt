@@ -10,6 +10,8 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
@@ -37,6 +39,7 @@ import kotlinx.coroutines.launch
 
 internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     @Assisted val ocrDocumentType: OcrDocumentType,
+    private val timeHelper: TimeHelper,
     private val normalizeBitmapToPreviewUseCase: NormalizeBitmapToPreviewUseCase,
     private val cropDocumentFromPreviewUseCase: CropDocumentFromPreviewUseCase,
     private val getCredentialCoordinatesUseCase: GetCredentialCoordinatesUseCase,
@@ -69,6 +72,8 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
         get() = _finishOcrEvent
     private val _finishOcrEvent = MutableLiveData<LiveDataEventWithContent<ScannedCredential>>()
 
+    private lateinit var startTime: Timestamp
+
     private fun updateState(state: (ScanOcrState) -> ScanOcrState) {
         this.state = state(this.state)
     }
@@ -79,6 +84,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     }
 
     fun ocrStarted() {
+        startTime = timeHelper.now()
         updateState {
             ScanOcrState.ScanningInProgress(
                 ocrDocumentType = ocrDocumentType,
@@ -121,17 +127,22 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
             val credentialType = detectedBlock.documentType.asExternalCredentialType()
             val blockBoundingBox = detectedBlock.blockBoundingBox
             val zoomedCredentialImagePath = buildZoomedImagePath(detectedBlock)
+            val detectedValueRaw = detectedBlock.readoutValue.asTokenizableRaw()
             val credential = tokenizationProcessor.encrypt(
-                decrypted = detectedBlock.readoutValue.asTokenizableRaw(),
+                decrypted = detectedValueRaw,
                 tokenKeyType = TokenKeyType.ExternalCredential,
                 project = project,
             ) as TokenizableString.Tokenized
+
             val scannedCredential = ScannedCredential(
                 credential = credential,
                 credentialType = credentialType,
                 documentImagePath = detectedBlock.imagePath,
                 zoomedCredentialImagePath = zoomedCredentialImagePath,
                 credentialBoundingBox = blockBoundingBox,
+                scanStartTime = startTime,
+                scanEndTime = timeHelper.now(),
+                scannedValue = detectedValueRaw,
             )
             _finishOcrEvent.send(scannedCredential)
             detectedBlocks = emptyList()

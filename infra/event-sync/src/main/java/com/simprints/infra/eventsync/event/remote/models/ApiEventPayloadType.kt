@@ -34,6 +34,9 @@ import com.simprints.infra.events.event.domain.models.EventType.EVENT_DOWN_SYNC_
 import com.simprints.infra.events.event.domain.models.EventType.EVENT_UP_SYNC_REQUEST
 import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_CAPTURE
 import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_CAPTURE_VALUE
+import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_CONFIRMATION
+import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_SEARCH
+import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_SELECTION
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_BIOMETRICS
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
@@ -92,8 +95,11 @@ internal enum class ApiEventPayloadType {
     AgeGroupSelection,
     BiometricReferenceCreation,
     EnrolmentUpdate,
+    ExternalCredentialSelection,
     ExternalCredentialCaptureValue,
     ExternalCredentialCapture,
+    ExternalCredentialSearch,
+    ExternalCredentialConfirmation,
 }
 
 internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
@@ -150,8 +156,11 @@ internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     AGE_GROUP_SELECTION -> ApiEventPayloadType.AgeGroupSelection
     BIOMETRIC_REFERENCE_CREATION -> ApiEventPayloadType.BiometricReferenceCreation
     ENROLMENT_UPDATE -> ApiEventPayloadType.EnrolmentUpdate
+    EXTERNAL_CREDENTIAL_SELECTION -> ApiEventPayloadType.ExternalCredentialSelection
     EXTERNAL_CREDENTIAL_CAPTURE_VALUE -> ApiEventPayloadType.ExternalCredentialCaptureValue
     EXTERNAL_CREDENTIAL_CAPTURE -> ApiEventPayloadType.ExternalCredentialCapture
+    EXTERNAL_CREDENTIAL_SEARCH -> ApiEventPayloadType.ExternalCredentialSearch
+    EXTERNAL_CREDENTIAL_CONFIRMATION -> ApiEventPayloadType.ExternalCredentialConfirmation
 }
 
 internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
@@ -190,6 +199,9 @@ internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.Callout -> throw UnsupportedOperationException("")
     ApiEventPayloadType.Callback -> throw UnsupportedOperationException("")
     ApiEventPayloadType.EnrolmentUpdate -> ENROLMENT_UPDATE
+    ApiEventPayloadType.ExternalCredentialSelection -> EXTERNAL_CREDENTIAL_SELECTION
     ApiEventPayloadType.ExternalCredentialCaptureValue -> EXTERNAL_CREDENTIAL_CAPTURE_VALUE
     ApiEventPayloadType.ExternalCredentialCapture -> EXTERNAL_CREDENTIAL_CAPTURE
+    ApiEventPayloadType.ExternalCredentialSearch -> EXTERNAL_CREDENTIAL_SEARCH
+    ApiEventPayloadType.ExternalCredentialConfirmation -> EXTERNAL_CREDENTIAL_CONFIRMATION
 }
