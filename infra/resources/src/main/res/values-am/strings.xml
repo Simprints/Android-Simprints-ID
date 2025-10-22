@@ -29,9 +29,15 @@
     <string name="consent_biometric_general_face">የፊትዎን ፎቶ ልውሰድ</string>
     <string name="consent_biometrics_access_fingerprint">የጣት አሻራ መረጃ</string>
     <string name="consent_biometrics_access_face">ፎቶግራፍ</string>
+    <string name="consent_credentials_general">የብሔራዊ መታወቂያ ሰነድዎን ወይም ሌሎች ማረጋገጫዎችን በልዩ  ቁጥራቸው(ዎች) ጋር ስካን አድርጉ።</string>
+    <string name="consent_credentials_access">ብሔራዊ መታወቂያ ዝርዝር.</string>
+    <string name="consent_credentials_your_id">የእርስዎን ብሔራዊ መታወቂያ ወይም ሌሎች ማረጋገጫዎችን መረጃ ይሙሉ/አስገቡ።</string>
     <string name="consent_biometrics_access_fingerprint_face">የጣት አሻራ መረጃ፤ፎቶግራፍ</string>
     <string name="consent_biometrics_parental_fingerprint">የልጅዎትን የጣት አሻራ ልውሰድ</string>
     <string name="consent_biometrics_parental_face">የልጅዎትን ፎቶግራፍ ልውሰድ</string>
+    <string name="consent_credentials_parental_general">የልጅዎን ብሄራዊ መታወቂያ ሰነድ ወይም ሌሎች ማረጋገጫዎችን  በልዩ ቁጥራቸው(ዎች) ጋር ስካን አድርጉ።</string>
+    <string name="consent_credentials_parental_access">የልጅዎን ብሄራዊ መታወቂያ ዝርዝር</string>
+    <string name="consent_credentials_parental_your_id">የልጅዎን ብሄራዊ መታወቂያ ወይም ሌሎች ማረጋገጫዎችን መረጃ ይሙሉ/አስገቡ።</string>
     <string name="consent_biometric_concat_modalities">እና</string>
     <string name="consent_decline_button">አለመቀበል</string>
     <string name="consent_accept_button">መቀበል</string>
@@ -372,7 +378,7 @@
 
     <string name="sync_info_total_records">ጠቅላላ መዝገቦች</string>
 
-    <string name="sync_info_last_sync">መጨረሻ ጊዜ ወደ ሰርቨር የተላከው : %1$s</string>
+    <string name="sync_info_last_sync">መጨረሻ የተመሳሰለው፡ %1$s</string>
 
     <string name="sync_info_footer_sync_in_progress">ማመሳሰል በሂደት ላይ</string>
     <string name="sync_info_footer_sync_incomplete">ማመሳሰል ተጠናቅቋል</string>
@@ -448,6 +454,7 @@
     <!-- Dashboard - Logout request -->
     <string name="dashboard_logout_title">መውጣት</string>
     <string name="dashboard_logout_confirmation_sync_decline_button">ሳይመሳሰል ውጣ</string>
+    <string name="dashboard_logout_confirmation_sync_info">ከመውጣትዎ በፊት በስልክዎ ላይ ያሉ መዝገቦች  በፍጥነት ይመሳሰላሉ። የማመሳሰል ሂደቱ እስኪጠናቀቅ ድረስ እባክዎ በትዕግስት ይጠብቁ። \n\nየማመሳሰል ሂደቱ ከተጠናቀቀ በኋላ መውጣት ይችላሉ።</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_title">ማስጠንቀቂያ</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_body">የእርስዎ ፕሮጀክት ወቅታዊ መዛግብት እንዳለው ለማረጋገጥ የውሂብ ማመሳሰል አስፈላጊ ነው። ያለ ትክክለኛ ምክንያት የእርስዎን ውሂብ ማመሳሰል አለመቻል የስራ ባልደረቦችዎ ጠቃሚ መዝገቦችን ማግኘት እና የፕሮጀክቱን ትክክለኛ ሪፖርት የማድረግ ችሎታ ላይ ተጽእኖ ያሳድራል። እና ለእርስዎ እና ለፕሮጀክቱ የማይፈለጉ ውጤቶችን ሊያስከትል ይችላል.</string>
     <string name="dashboard_logout_confirmation_title">መውጣት</string>
@@ -487,5 +494,59 @@
         <item quantity="one">%d አመት</item>
         <item quantity="other">%d አመታት</item>
     </plurals>
+
+    <!-- MultiFactor Identification -->
+    <string name="mfid_scan_action">ስካን ያድርጉ%1$s</string>
+
+    <string name="mfid_scanner_selection_skip">ሰነድ ስካን ማድረግን ዝለል።</string>
+    <string name="mfid_type_nhis_card">NHIS ካርድ</string>
+    <string name="mfid_type_ghana_id_card">የጋና መታወቂያ ካርድ</string>
+    <string name="mfid_type_qr_code">QR ኮድ</string>
+    <string name="mfid_nhis_card_credential_field">የአባልነት ቁጥር</string>
+    <string name="mfid_ghana_id_credential_field">የግል መታወቂያ</string>
+    <string name="mfid_qr_credential_field">የQR ኮድ ውጤት</string>
+    <string name="mfid_type_any_document">ሰነድ</string>
+
+    <string name="mfid_skip_scan_dialog_title">ስካንን ልዝለል?</string>
+    <string name="mfid_skip_scan_dialog_body">ስካን ማድረግ%1$sበዚህ ፕሮጀክት ያስፈልጋል። እርግጠኛ ነዎት ይህንን መዝለል ይፈልጋሉ? </string>
+    <string name="mfid_skip_scan_dialog_confirm">ዝለል</string>
+
+    <string name="mfid_qr_scan_no_qr_detected">ምንም የQR ኮድ አልተገኘም</string>
+    <string name="mfid_scan_instructions">ይህንን%1$s በመስኮቱ ውስጥ ያስቀምጡት</string>
+    <string name="mfid_continue">ቀጥል</string>
+    <string name="mfid_dialog_wrong_qr_title">ልክ ያልሆነ የQR ኮድ አይነት</string>
+    <string name="mfid_dialog_wrong_qr_body_top">የተሳሳተ የQR ኮድ ስካን ተደርጓል</string>
+    <string name="mfid_dialog_wrong_qr_body_bottom">ይህ ውጤት እንደ ሰው ሰነድ ሆኖ ሊያገለግል አይችልም። እባክዎ ትክክለኛው የQR ኮድ ስካን መሆኑን ያረጋግጡ</string>
+    <string name="mfid_dialog_wrong_qr_rescan">እንደገና ስካን ያድርጉ</string>
+    <string name="mfid_ocr_progress_title">ስካን እየተደረገ ነው። ካርዱን በፍሬም ውስጥ ይያዙት.</string>
+    <string name="mfid_scan_camera_permission_body">ካሜራውን ለመጠቀም ፍቃድ ካልተሰጠ ስካን%1$s ማድረግ አይችልም።</string>
+    <string name="mfid_confirmation_checkbox_text">%1$sበትክክል ስካን መሆኑን  አረጋግጣለሁ።</string>
+    <string name="mfid_action_go_to_record">ወደ መዝገብ ይሂዱ።</string>
+    <string name="mfid_action_enrol">ይመዝገቡ</string>
+    <string name="mfid_action_enrol_anyway">ለማንኛውም ይመዝገቡ</string>
+    <string name="mfid_action_add">ጨምር።</string>
+    <string name="mfid_action_skip">ዝለል</string>
+    <string name="mfid_action_continue">ቀጥል</string>
+    <string name="mfid_searching">በመፈለግ ላይ...</string>
+
+    <string name="mfid_search_found_enrol">ይህ %1$sአስቀድሞ ተመዝግቧል</string>
+    <string name="mfid_search_found_identification">መዝገብ ተገኝቷል</string>
+    <string name="mfid_search_found_identification_low_match_score">ይህ %1$sከሌላ ታካሚ ጋር ሊገናኝ ይችላል።</string>
+    <string name="mfid_search_not_found_identification">ከዚህ %1$sጋር ምንም መዝገቦች አልተገኙም ይህንን %2$sከታካሚ ጋር በኋላ ማገናኘት ይችላሉ።</string>
+
+    <string name="mfid_add_document_title">ይህንን %1$sይጨምር?</string>
+    <string name="mfid_skip_title">ለምን %1$sን ስካን ማድረግ ዘለልከው?</string>
+    <string name="mfid_skip_reason_does_not_have">%1$sየለውም</string>
+    <string name="mfid_skip_reason_did_not_bring">%1$sአላመጣም።</string>
+    <string name="mfid_skip_reason_incorrect">በስህተት  የመጣ %1$sነው</string>
+    <string name="mfid_skip_reason_does_not_want_to_provide">%1$sማቅረብ አልፈለግም።</string>
+    <string name="mfid_skip_reason_damaged">የተበላሸ %1$s ወይም የማይነበብ</string>
+    <string name="mfid_skip_reason_unable_to_scan">%1$sን ስካን ማድረግ አልተቻለም</string>
+    <string name="mfid_skip_reason_other">ሌላ</string>
+    <string name="mfid_skip_reason_hint">ምክንያት</string>
+    <string name="mfid_skip_reason_helper_text">እባክዎ ለመዝለል ምክንያት ያቅርቡ</string>
+    <string name="mfid_skip_confirm">ስካን ማድረግን ዝለል</string>
+    <string name="mfid_skip_go_back">ተመለስ</string>
+
 
 </resources>
