@@ -29,9 +29,15 @@
     <string name="consent_biometric_general_face">prendre des photos de votre visage</string>
     <string name="consent_biometrics_access_fingerprint">empreintes digitales</string>
     <string name="consent_biometrics_access_face">photos</string>
+    <string name="consent_credentials_general">Scannez votre pièce d\'identité ou autres justificatifs d\'identité avec leur(s) numéro(s) unique(s)</string>
+    <string name="consent_credentials_access">détails de la carte d\'identité nationale</string>
+    <string name="consent_credentials_your_id">enregistrez votre carte d\'identité ou autres justificatifs d\'identité.</string>
     <string name="consent_biometrics_access_fingerprint_face">empreintes digitales, photos</string>
     <string name="consent_biometrics_parental_fingerprint">utiliser les empreintes digitales de votre enfant</string>
     <string name="consent_biometrics_parental_face">prendre des photos du visage de votre enfant</string>
+    <string name="consent_credentials_parental_general">Scannez la pièce d\'identité de votre enfant ou autres justificatifs avec leur(s) numéro(s) unique(s)</string>
+    <string name="consent_credentials_parental_access">Détails de la carte d\'identité de l\'enfant</string>
+    <string name="consent_credentials_parental_your_id">enregistrez  la pièce d\'identité de votre enfant ou autres justificatifs d\'identité.</string>
     <string name="consent_biometric_concat_modalities">et</string>
     <string name="consent_decline_button">Refuser</string>
     <string name="consent_accept_button">Accepter</string>
@@ -369,7 +375,7 @@
 
     <string name="sync_info_total_records">Enregistrements totaux</string>
 
-    <string name="sync_info_last_sync">Dernière synchronisation : %1$s</string>
+    <string name="sync_info_last_sync">dernière synchronisation : %1$s</string>
 
     <string name="sync_info_footer_sync_in_progress">Synchronisation en cours</string>
     <string name="sync_info_footer_sync_incomplete">Synchronisation incomplète</string>
@@ -448,6 +454,7 @@
     <!-- Dashboard - Logout request -->
     <string name="dashboard_logout_title">Déconnexion</string>
     <string name="dashboard_logout_confirmation_sync_decline_button">Se déconnecter sans synchronisation</string>
+    <string name="dashboard_logout_confirmation_sync_info">Les informations sur votre appareil seront automatiquement synchronisées avant votre déconnexion. Veuillez patienter jusqu\'à la fin du processus de synchronisation. \n\nUne fois la synchronisation terminée, vous pourrez vous déconnecter.</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_title">Avertissement</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_body">La synchronisation des données est essentielle pour garantir que votre projet dispose d\'enregistrements à jour. Ne pas synchroniser vos données sans raison valable aura un impact sur l\'accès de vos collègues aux enregistrements importants et sur la capacité du projet à générer des rapports précis.\n\nNe pas synchroniser les données sans raison valable peut également constituer une violation du protocole de collecte de données et peut entraîner des conséquences indésirables pour vous et le projet.</string>
     <string name="dashboard_logout_confirmation_title">Déconnexion</string>
@@ -489,5 +496,59 @@
         <item quantity="many">%d années</item>
         <item quantity="other">%d année(s)</item>
     </plurals>
+
+    <!-- MultiFactor Identification -->
+    <string name="mfid_scan_action">Scanner %1$s</string>
+
+    <string name="mfid_scanner_selection_skip">Ignorer le scan des documents</string>
+    <string name="mfid_type_nhis_card">Carte NHIS</string>
+    <string name="mfid_type_ghana_id_card">Carte d\'Identité Ghana</string>
+    <string name="mfid_type_qr_code">QR Code</string>
+    <string name="mfid_nhis_card_credential_field">Numéro de membre</string>
+    <string name="mfid_ghana_id_credential_field">Identité Personnelle</string>
+    <string name="mfid_qr_credential_field">Valeur du QR Code</string>
+    <string name="mfid_type_any_document">un document</string>
+
+    <string name="mfid_skip_scan_dialog_title">ignorer le scan?</string>
+    <string name="mfid_skip_scan_dialog_body">Scanner %1$sest nécessaire pour ce projet. Êtes-vous sûr de vouloir passer cette étape?</string>
+    <string name="mfid_skip_scan_dialog_confirm">ignorer</string>
+
+    <string name="mfid_qr_scan_no_qr_detected">QR Code non detecté</string>
+    <string name="mfid_scan_instructions">Placer %1$s dans la fenêtre</string>
+    <string name="mfid_continue">Continuer</string>
+    <string name="mfid_dialog_wrong_qr_title">Type de QR Code non valide</string>
+    <string name="mfid_dialog_wrong_qr_body_top">Mauvais format de QR Code scanné</string>
+    <string name="mfid_dialog_wrong_qr_body_bottom">Cette valeur ne peut pas être utilisée comme document personnel. Veuillez vous assurer que le code QR correct est scanné.</string>
+    <string name="mfid_dialog_wrong_qr_rescan">Re-scanner</string>
+    <string name="mfid_ocr_progress_title">Scan en cours, garder la carte dans le cadre</string>
+    <string name="mfid_scan_camera_permission_body">Impossible de scanner %1$ssans la permission d\'utiliser l\'appareil photo</string>
+    <string name="mfid_confirmation_checkbox_text">Je confirme que %1$sest scanné(e) correctement</string>
+    <string name="mfid_action_go_to_record">Aller à l\'enregistrement</string>
+    <string name="mfid_action_enrol">Inscrire</string>
+    <string name="mfid_action_enrol_anyway">Inscrire malgré tout</string>
+    <string name="mfid_action_add">Ajouter</string>
+    <string name="mfid_action_skip">Ignorer</string>
+    <string name="mfid_action_continue">Continuer</string>
+    <string name="mfid_searching">Recherche en cours...</string>
+
+    <string name="mfid_search_found_enrol">Ce(tte) %1$s est déjà enregistré(e)</string>
+    <string name="mfid_search_found_identification">Enregistrement trouvé</string>
+    <string name="mfid_search_found_identification_low_match_score">Ce %1$s doit être lié à un autre patient</string>
+    <string name="mfid_search_not_found_identification">Aucun enregistrement trouvé pour ce %1$s. Vous pourrez lier %2$s à un patient plus tard.</string>
+
+    <string name="mfid_add_document_title">Ajouter ce %1$s?</string>
+    <string name="mfid_skip_title">Pourquoi avez-vous passé le scan de %1$s ?</string>
+    <string name="mfid_skip_reason_does_not_have">N\'a pas %1$s</string>
+    <string name="mfid_skip_reason_did_not_bring">N\'a pas apporter %1$s</string>
+    <string name="mfid_skip_reason_incorrect">A apporté le mauvais %1$s</string>
+    <string name="mfid_skip_reason_does_not_want_to_provide">Ne veut pas présenter %1$s</string>
+    <string name="mfid_skip_reason_damaged">%1$sest endommagé ou pas lisible</string>
+    <string name="mfid_skip_reason_unable_to_scan">Impossible de scanner %1$s</string>
+    <string name="mfid_skip_reason_other">Autre</string>
+    <string name="mfid_skip_reason_hint">Raison</string>
+    <string name="mfid_skip_reason_helper_text">Détaillé la raison pour ignorer </string>
+    <string name="mfid_skip_confirm">Ignorer le scan</string>
+    <string name="mfid_skip_go_back">Retour</string>
+
 
 </resources>

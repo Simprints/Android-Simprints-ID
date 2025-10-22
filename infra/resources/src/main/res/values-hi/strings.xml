@@ -29,9 +29,15 @@
     <string name="consent_biometric_general_face">अपने चेहरे की फ़ोटो लें</string>
     <string name="consent_biometrics_access_fingerprint">फ़िंगरप्रिंट जानकारी</string>
     <string name="consent_biometrics_access_face">चित्र</string>
+    <string name="consent_credentials_general">अपने राष्ट्रीय पहचान दस्तावेज़ या अन्य बाहरी क्रेडेंशियल्स को उनके विशिष्ट नंबर(नों) के साथ स्कैन करें</string>
+    <string name="consent_credentials_access">राष्ट्रीय पहचान पत्र विवरण</string>
+    <string name="consent_credentials_your_id">आपकी राष्ट्रीय पहचान या अन्य बाहरी क्रेडेंशियल जानकारी प्राप्त करना</string>
     <string name="consent_biometrics_access_fingerprint_face">फिंगरप्रिंट जानकारी, तस्वीरें</string>
     <string name="consent_biometrics_parental_fingerprint">अपने बच्चे की उंगलियों के निशान का उपयोग करें</string>
     <string name="consent_biometrics_parental_face">अपने बच्चे के चेहरे की फ़ोटो लें</string>
+    <string name="consent_credentials_parental_general">अपने बच्चे के राष्ट्रीय पहचान दस्तावेज़ या अन्य बाहरी क्रेडेंशियल्स को उनके विशिष्ट नंबर(नों) के साथ स्कैन करें</string>
+    <string name="consent_credentials_parental_access">बच्चे की राष्ट्रीय पहचान का विवरण</string>
+    <string name="consent_credentials_parental_your_id">आपके बच्चे की राष्ट्रीय पहचान पत्र या अन्य बाहरी क्रेडेंशियल जानकारी प्राप्त करना</string>
     <string name="consent_biometric_concat_modalities">और</string>
     <string name="consent_decline_button">असहमत</string>
     <string name="consent_accept_button">सहमत</string>
@@ -364,7 +370,7 @@
 
     <string name="sync_info_total_records">कुल रिकोर्ड्स</string>
 
-    <string name="sync_info_last_sync">अंतिम बार सिंक: %1$s</string>
+    <string name="sync_info_last_sync">अंतिम समन्वयन: %1$s</string>
 
     <string name="sync_info_footer_sync_in_progress">समन्वयन प्रगति पर है</string>
     <string name="sync_info_footer_sync_incomplete">सिंक अपूर्ण</string>
@@ -440,6 +446,7 @@
     <!-- Dashboard - Logout request -->
     <string name="dashboard_logout_title">लॉग-आउट</string>
     <string name="dashboard_logout_confirmation_sync_decline_button">डेटा सिंक किए बिना लॉग आउट करें</string>
+    <string name="dashboard_logout_confirmation_sync_info">लॉग आउट करने से पहले आपके डिवाइस पर मौजूद रिकॉर्ड अपने आप सिंक्रोनाइज़ हो जाएँगे। कृपया सिंक्रोनाइज़ेशन प्रक्रिया पूरी होने दें। सिंक्रोनाइज़ेशन पूरा होने के बाद, आप लॉग आउट कर पाएँगे।</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_title">चेतावनी</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_body">यह सुनिश्चित करने के लिए कि आपके प्रोजेक्ट में अद्यतन रिकॉर्ड हैं, डेटा सिंक्रनाइज़ेशन आवश्यक है। बिना किसी वैध कारण के आपके डेटा को सिंक्रोनाइज़ करने में विफल रहने से आपके सहकर्मियों की महत्वपूर्ण रिकॉर्ड तक पहुंच और प्रोजेक्ट की सटीक रिपोर्ट करने की क्षमता प्रभावित होगी।\n\nबिना किसी वैध कारण के डेटा को सिंक्रोनाइज़ करने में विफल होना भी डेटा संग्रह प्रोटोकॉल का उल्लंघन हो सकता है और इसके परिणामस्वरूप आपके और प्रोजेक्ट के लिए अवांछित परिणाम हो सकते हैं।</string>
     <string name="dashboard_logout_confirmation_title">लॉग-आउट</string>
@@ -479,5 +486,59 @@
         <item quantity="one">%d साल</item>
         <item quantity="other">%d साल</item>
     </plurals>
+
+    <!-- MultiFactor Identification -->
+    <string name="mfid_scan_action">स्कैन करें %1$s</string>
+
+    <string name="mfid_scanner_selection_skip">दस्तावेज़ स्कैन छोड़ें</string>
+    <string name="mfid_type_nhis_card">एनएचआईएस कार्ड</string>
+    <string name="mfid_type_ghana_id_card">घाना आईडी कार्ड</string>
+    <string name="mfid_type_qr_code">क्यू आर संहिता</string>
+    <string name="mfid_nhis_card_credential_field">सदस्यता संख्या</string>
+    <string name="mfid_ghana_id_credential_field">निजी आईडी</string>
+    <string name="mfid_qr_credential_field">QR कोड मान</string>
+    <string name="mfid_type_any_document">एक दस्तावेज़</string>
+
+    <string name="mfid_skip_scan_dialog_title">स्कैनिंग छोड़ें?</string>
+    <string name="mfid_skip_scan_dialog_body">इस प्रोजेक्ट के लिए %1$s स्कैन करना ज़रूरी है। क्या आप वाकई इस चरण को छोड़ना चाहते हैं?</string>
+    <string name="mfid_skip_scan_dialog_confirm">छोडना</string>
+
+    <string name="mfid_qr_scan_no_qr_detected">कोई QR कोड नहीं मिला</string>
+    <string name="mfid_scan_instructions">%1$s को विंडो में रखें</string>
+    <string name="mfid_continue">जारी रखना</string>
+    <string name="mfid_dialog_wrong_qr_title">अमान्य QR कोड प्रकार</string>
+    <string name="mfid_dialog_wrong_qr_body_top">गलत QR कोड प्रारूप स्कैन किया गया है</string>
+    <string name="mfid_dialog_wrong_qr_body_bottom">इस मान का उपयोग व्यक्तिगत दस्तावेज़ के रूप में नहीं किया जा सकता। कृपया सुनिश्चित करें कि सही QR कोड स्कैन किया गया है।</string>
+    <string name="mfid_dialog_wrong_qr_rescan">फिर से स्कैन</string>
+    <string name="mfid_ocr_progress_title">स्कैनिंग हो रही है, कार्ड को फ्रेम में रखें...</string>
+    <string name="mfid_scan_camera_permission_body">कैमरे का उपयोग करने की अनुमति के बिना %1$s को स्कैन नहीं किया जा सकता</string>
+    <string name="mfid_confirmation_checkbox_text">मैं पुष्टि करता/करती हूँ कि %1$s सही ढंग से स्कैन किया गया है</string>
+    <string name="mfid_action_go_to_record">रिकॉर्ड पर जाएँ</string>
+    <string name="mfid_action_enrol">भर्ती</string>
+    <string name="mfid_action_enrol_anyway">फिर भी नामांकन करें</string>
+    <string name="mfid_action_add">जोड़ना</string>
+    <string name="mfid_action_skip">छोडना</string>
+    <string name="mfid_action_continue">जारी रखना</string>
+    <string name="mfid_searching">खोज रहे हैं...</string>
+
+    <string name="mfid_search_found_enrol">यह %1$s पहले से पंजीकृत है</string>
+    <string name="mfid_search_found_identification">रिकॉर्ड मिला</string>
+    <string name="mfid_search_found_identification_low_match_score">यह %1$s किसी अन्य मरीज़ से जुड़ा हो सकता है</string>
+    <string name="mfid_search_not_found_identification">इस %1$s के साथ कोई रिकॉर्ड नहीं मिला। आप इस %2$s को बाद में किसी मरीज़ से लिंक कर पाएँगे</string>
+
+    <string name="mfid_add_document_title">इस %1$s को जोड़ें?</string>
+    <string name="mfid_skip_title">आपने %1$s स्कैन क्यों छोड़ दिया?</string>
+    <string name="mfid_skip_reason_does_not_have">%1$s नहीं है</string>
+    <string name="mfid_skip_reason_did_not_bring">%1$s नहीं लाया</string>
+    <string name="mfid_skip_reason_incorrect">ग़लत %1$s लाया गया</string>
+    <string name="mfid_skip_reason_does_not_want_to_provide">%1$s को विशेषाधिकार नहीं देना चाहता</string>
+    <string name="mfid_skip_reason_damaged">%1$s क्षतिग्रस्त या अपठनीय</string>
+    <string name="mfid_skip_reason_unable_to_scan">%1$s को स्कैन करने में असमर्थ</string>
+    <string name="mfid_skip_reason_other">अन्य</string>
+    <string name="mfid_skip_reason_hint">कारण</string>
+    <string name="mfid_skip_reason_helper_text">कृपया छोड़ने का कारण बताएँ</string>
+    <string name="mfid_skip_confirm">स्कैनिंग छोड़ें</string>
+    <string name="mfid_skip_go_back">वापस जाओ</string>
+
 
 </resources>
