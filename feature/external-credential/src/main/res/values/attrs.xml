@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="DocumentMaskView">
+        <attr name="targetViewId" format="reference" />
+        <attr name="cornerRadius" format="dimension" />
+        <attr name="maskColor" format="color" />
+        <attr name="inset" format="dimension" />
+    </declare-styleable>
+</resources>

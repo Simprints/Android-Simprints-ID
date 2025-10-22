@@ -2,17 +2,24 @@ package com.simprints.feature.clientapi.mappers.response
 
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.response.AppMatchConfidence
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.clientapi.mappers.request.requestFactories.ConfirmIdentityActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolLastBiometricsActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.IdentifyRequestActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.VerifyActionFactory
+import com.simprints.feature.clientapi.mappers.response.LibSimprintsResponseMapper.Companion.HAS_CREDENTIAL
+import com.simprints.feature.clientapi.mappers.response.LibSimprintsResponseMapper.Companion.SCANNED_CREDENTIAL
+import com.simprints.feature.clientapi.mappers.response.LibSimprintsResponseMapper.Companion.SCANNED_CREDENTIAL_TYPE
+import com.simprints.feature.clientapi.mappers.response.LibSimprintsResponseMapper.Companion.SCANNED_CREDENTIAL_VALUE
 import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.contracts.VersionsList
+import io.mockk.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import com.simprints.libsimprints.Identification as LegacyIdentification
@@ -33,6 +40,7 @@ class LibSimprintsResponseMapperTest {
                 sessionId = "sessionId",
                 enrolledGuid = "guid",
                 subjectActions = "subjects",
+                externalCredential = null,
             ),
         )
 
@@ -55,6 +63,7 @@ class LibSimprintsResponseMapperTest {
                 sessionId = "sessionId",
                 enrolledGuid = "guid",
                 subjectActions = "subjects",
+                externalCredential = null,
             ),
         )
 
@@ -83,6 +92,7 @@ class LibSimprintsResponseMapperTest {
                         matchConfidence = AppMatchConfidence.LOW,
                     ),
                 ),
+                isMultiFactorIdEnabled = false,
             ),
         )
 
@@ -110,6 +120,7 @@ class LibSimprintsResponseMapperTest {
                         matchConfidence = AppMatchConfidence.MEDIUM,
                     ),
                 ),
+                isMultiFactorIdEnabled = false,
             ),
         )
 
@@ -126,11 +137,18 @@ class LibSimprintsResponseMapperTest {
 
     @Test
     fun `correctly maps confirm response`() {
+        val expectedValue = "expectedValue".asTokenizableRaw()
+        val expectedType = ExternalCredentialType.NHISCard
+        val expectedJson = "{\"$SCANNED_CREDENTIAL_VALUE\":\"$expectedValue\",\"$SCANNED_CREDENTIAL_TYPE\":\"$expectedType\"}"
         val extras = mapper(
             ActionResponse.ConfirmActionResponse(
                 actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
                 sessionId = "sessionId",
                 confirmed = true,
+                externalCredential = mockk {
+                    every { value } returns expectedValue
+                    every { type } returns expectedType
+                },
             ),
         )
 
@@ -138,6 +156,8 @@ class LibSimprintsResponseMapperTest {
         assertThat(extras.getString(Constants.SIMPRINTS_DEVICE_ID)).isEqualTo("deviceId")
         assertThat(extras.getString(Constants.SIMPRINTS_APP_VERSION_NAME)).isEqualTo("appVersionName")
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
+        assertThat(extras.getBoolean(HAS_CREDENTIAL)).isTrue()
+        assertThat(extras.getString(SCANNED_CREDENTIAL)).isEqualTo(expectedJson)
     }
 
     @Test
@@ -380,5 +400,147 @@ class LibSimprintsResponseMapperTest {
                 expectedCode,
             )
         }
+    }
+
+    @Test
+    fun `correctly maps enrol response with external credential`() {
+        val expectedValue = "expectedValue".asTokenizableRaw()
+        val expectedType = ExternalCredentialType.NHISCard
+        val expectedJson = "{\"$SCANNED_CREDENTIAL_VALUE\":\"$expectedValue\",\"$SCANNED_CREDENTIAL_TYPE\":\"$expectedType\"}"
+
+        val extras = mapper(
+            ActionResponse.EnrolActionResponse(
+                actionIdentifier = EnrolActionFactory.getIdentifier(),
+                sessionId = "sessionId",
+                enrolledGuid = "guid",
+                subjectActions = "subjects",
+                externalCredential = mockk {
+                    every { value } returns expectedValue
+                    every { type } returns expectedType
+                },
+            ),
+        )
+
+        assertThat(extras.getBoolean(HAS_CREDENTIAL)).isTrue()
+        assertThat(extras.getString(SCANNED_CREDENTIAL)).isEqualTo(expectedJson)
+    }
+
+    @Test
+    fun `correctly maps confirm response without external credential`() {
+        val extras = mapper(
+            ActionResponse.ConfirmActionResponse(
+                actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
+                sessionId = "sessionId",
+                confirmed = true,
+                externalCredential = null,
+            ),
+        )
+
+        assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(Constants.SIMPRINTS_APP_VERSION_NAME)).isEqualTo("appVersionName")
+        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
+        assertThat(extras.getBoolean(HAS_CREDENTIAL)).isFalse()
+        assertThat(extras.keySet()).doesNotContain(SCANNED_CREDENTIAL)
+    }
+
+    @Test
+    fun `correctly maps identify response with multi-factor ID enabled`() {
+        val identification1 = AppMatchResult(
+            guid = "guid-1",
+            confidenceScore = 100,
+            matchConfidence = AppMatchConfidence.MEDIUM,
+            isLinkedToScannedCredential = true,
+            isCredentialVerified = true,
+        )
+        val identification2 = AppMatchResult(
+            guid = "guid-2",
+            confidenceScore = 75,
+            matchConfidence = AppMatchConfidence.LOW,
+            isLinkedToScannedCredential = false,
+            isCredentialVerified = null,
+        )
+
+        val expectedIdentifications = "[${identification1.toResponseJson()},${identification2.toResponseJson()}]"
+
+        val extras = mapper(
+            ActionResponse.IdentifyActionResponse(
+                actionIdentifier = IdentifyRequestActionFactory.getIdentifier(),
+                sessionId = "sessionId",
+                identifications = listOf(identification1, identification2),
+                isMultiFactorIdEnabled = true,
+            ),
+        )
+
+        assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(Constants.SIMPRINTS_APP_VERSION_NAME)).isEqualTo("appVersionName")
+        assertThat(extras.getString(Constants.SIMPRINTS_IDENTIFICATIONS)).isEqualTo(expectedIdentifications)
+        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
+    }
+
+    @Test
+    fun `mapIdentificationsWithCredentials omits isVerified when null`() {
+        val guid = "guid"
+        val extras = mapper(
+            ActionResponse.IdentifyActionResponse(
+                actionIdentifier = IdentifyRequestActionFactory.getIdentifier(),
+                sessionId = "sessionId",
+                identifications = listOf(
+                    AppMatchResult(
+                        guid = guid,
+                        confidenceScore = 80,
+                        matchConfidence = AppMatchConfidence.MEDIUM,
+                        isLinkedToScannedCredential = false,
+                        isCredentialVerified = null,
+                    ),
+                ),
+                isMultiFactorIdEnabled = true,
+            ),
+        )
+
+        val identificationsJson = extras.getString(Constants.SIMPRINTS_IDENTIFICATIONS)
+        assertThat(identificationsJson).contains("\"guid\":\"$guid\"")
+        assertThat(identificationsJson).contains("\"isLinkedToCredential\":false")
+        assertThat(identificationsJson).doesNotContain("isVerified")
+    }
+
+    @Test
+    fun `identify response uses legacy format when multi-factor ID is disabled`() {
+        val guid = "guid"
+        val confidenceScore = 100
+        val extras = mapper(
+            ActionResponse.IdentifyActionResponse(
+                actionIdentifier = IdentifyRequestActionFactory.getIdentifier(),
+                sessionId = "sessionId",
+                identifications = listOf(
+                    AppMatchResult(
+                        guid = guid,
+                        confidenceScore = confidenceScore,
+                        matchConfidence = AppMatchConfidence.MEDIUM,
+                        isLinkedToScannedCredential = true,
+                        isCredentialVerified = true,
+                    ),
+                ),
+                isMultiFactorIdEnabled = false,
+            ),
+        )
+
+        assertThat(extras.getParcelableArrayList<LegacyIdentification>(Constants.SIMPRINTS_IDENTIFICATIONS)).containsExactly(
+            LegacyIdentification(guid = guid, confidence = confidenceScore, tier = LegacyTier.TIER_2),
+        )
+    }
+
+    private fun AppMatchResult.toResponseJson(): String {
+        val jsonBuilder = StringBuilder()
+        jsonBuilder.append("{\"guid\":\"$guid\"")
+        jsonBuilder.append(",\"confidenceBand\":\"${matchConfidence.name}\"")
+        jsonBuilder.append(",\"confidence\":$confidenceScore")
+        jsonBuilder.append(",\"isLinkedToCredential\":$isLinkedToScannedCredential")
+        isCredentialVerified?.let {
+            jsonBuilder.append(",\"isVerified\":$it")
+        }
+        jsonBuilder.append("}")
+        return jsonBuilder.toString()
     }
 }

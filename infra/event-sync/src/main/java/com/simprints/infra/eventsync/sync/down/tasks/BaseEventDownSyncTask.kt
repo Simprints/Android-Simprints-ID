@@ -42,7 +42,6 @@ internal abstract class BaseEventDownSyncTask(
     protected val timeHelper: TimeHelper,
     protected val eventRepository: EventRepository,
 ) {
-
     abstract suspend fun fetchEvents(
         operation: EventDownSyncOperation,
         scope: CoroutineScope,
@@ -277,6 +276,7 @@ internal abstract class BaseEventDownSyncTask(
                 faceSamplesToAdd = subjectFactory.extractFaceSamplesFromBiometricReferences(biometricReferencesAdded),
                 fingerprintSamplesToAdd = subjectFactory.extractFingerprintSamplesFromBiometricReferences(biometricReferencesAdded),
                 referenceIdsToRemove = biometricReferencesRemoved,
+                externalCredentialsToAdd = externalCredentialsAdded,
             ),
         )
     }

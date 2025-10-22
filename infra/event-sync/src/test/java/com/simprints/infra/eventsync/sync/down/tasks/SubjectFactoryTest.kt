@@ -1,9 +1,12 @@
 package com.simprints.infra.eventsync.sync.down.tasks
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
@@ -62,6 +65,7 @@ class SubjectFactoryTest {
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
             biometricReferences = listOf(FINGERPRINT_REFERENCE, faceReference),
+            externalCredentials = emptyList(),
         )
         val result = factory.buildSubjectFromCreationPayload(payload)
         val expected = Subject(
@@ -96,6 +100,7 @@ class SubjectFactoryTest {
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
             biometricReferences = listOf(FINGERPRINT_REFERENCE, faceReference),
+            externalCredential = null,
         )
         val result = factory.buildSubjectFromMovePayload(payload)
 
@@ -156,6 +161,7 @@ class SubjectFactoryTest {
                     referenceId = "referenceId-finger-4",
                 ),
             ),
+            externalCredentials = listOf(EXTERNAL_CREDENTIAL),
         )
 
         val payload = EnrolmentRecordUpdatePayload(
@@ -178,6 +184,7 @@ class SubjectFactoryTest {
                     templates = listOf(FaceTemplate(template = BASE_64_BYTES.toString())),
                 ),
             ),
+            externalCredentialsAdded = listOf(EXTERNAL_CREDENTIAL),
         )
         val result = factory.buildSubjectFromUpdatePayload(subject, payload)
 
@@ -212,6 +219,7 @@ class SubjectFactoryTest {
                     referenceId = "referenceId-finger-6",
                 ),
             ),
+            externalCredentials = listOf(EXTERNAL_CREDENTIAL),
         )
         assertThat(result).isEqualTo(expected)
     }
@@ -241,9 +249,11 @@ class SubjectFactoryTest {
                     referenceId = REFERENCE_ID,
                 ),
             ),
+            externalCredentials = listOf(EXTERNAL_CREDENTIAL),
         )
 
         val result = factory.buildSubjectFromCaptureResults(
+            subjectId = expected.subjectId,
             projectId = expected.projectId,
             attendantId = expected.attendantId,
             moduleId = expected.moduleId,
@@ -278,6 +288,7 @@ class SubjectFactoryTest {
                     ),
                 ),
             ),
+            externalCredential = EXTERNAL_CREDENTIAL,
         )
         assertThat(result).isEqualTo(expected)
     }
@@ -304,6 +315,7 @@ class SubjectFactoryTest {
                     referenceId = REFERENCE_ID,
                 ),
             ),
+            externalCredentials = listOf(EXTERNAL_CREDENTIAL),
         )
 
         val result = factory.buildSubject(
@@ -313,6 +325,7 @@ class SubjectFactoryTest {
             moduleId = expected.moduleId,
             fingerprintSamples = expected.fingerprintSamples,
             faceSamples = expected.faceSamples,
+            externalCredentials = expected.externalCredentials,
         )
         assertThat(result).isEqualTo(expected)
     }
@@ -321,12 +334,15 @@ class SubjectFactoryTest {
         private lateinit var factory: SubjectFactory
         private const val PROJECT_ID = "projectId"
         private const val SUBJECT_ID = "subjectId"
+        private const val EXTERNAL_CREDENTIAL_ID = "credentialId"
         private val ATTENDANT_ID = "encryptedAttendantId".asTokenizableRaw()
         private val MODULE_ID = "encryptedModuleId".asTokenizableRaw()
         private val BASE_64_BYTES = byteArrayOf(1)
         private const val REFERENCE_ID = "fpRefId"
         private const val REFERENCE_FORMAT = "NEC_1"
         private const val TEMPLATE_NAME = "template"
+        private val EXTERNAL_CREDENTIAL_VALUE = "value".asTokenizableEncrypted()
+        private val EXTERNAL_CREDENTIAL_TYPE = ExternalCredentialType.NHISCard
         private val IDENTIFIER = IFingerIdentifier.LEFT_THUMB
         private const val QUALITY = 10
         private val FINGERPRINT_REFERENCE = FingerprintReference(
@@ -343,6 +359,12 @@ class SubjectFactoryTest {
             id = REFERENCE_ID,
             templates = listOf(FaceTemplate(TEMPLATE_NAME)),
             format = REFERENCE_FORMAT,
+        )
+        private val EXTERNAL_CREDENTIAL = ExternalCredential(
+            id = EXTERNAL_CREDENTIAL_ID,
+            value = EXTERNAL_CREDENTIAL_VALUE,
+            subjectId = SUBJECT_ID,
+            type = EXTERNAL_CREDENTIAL_TYPE,
         )
     }
 }

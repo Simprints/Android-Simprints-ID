@@ -1,8 +1,8 @@
 package com.simprints.feature.clientapi.mappers.response
 
 import androidx.core.os.bundleOf
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import androidx.test.ext.junit.runners.*
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.feature.clientapi.mappers.request.requestFactories.ConfirmIdentityActionFactory
@@ -31,6 +31,7 @@ class CommCareResponseMapperTest {
                 sessionId = "sessionId",
                 enrolledGuid = "guid",
                 subjectActions = "subjects",
+                externalCredential = null,
             ),
         ).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
 
@@ -59,6 +60,7 @@ class CommCareResponseMapperTest {
                         matchConfidence = AppMatchConfidence.LOW,
                     ),
                 ),
+                isMultiFactorIdEnabled = false,
             ),
         )
 
@@ -85,6 +87,7 @@ class CommCareResponseMapperTest {
                 actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
                 sessionId = "sessionId",
                 confirmed = true,
+                externalCredential = null,
             ),
         ).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
 

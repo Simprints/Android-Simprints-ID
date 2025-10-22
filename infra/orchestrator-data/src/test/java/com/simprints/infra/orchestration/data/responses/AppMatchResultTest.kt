@@ -14,12 +14,14 @@ class AppMatchResultTest {
                 guid = "guid",
                 confidenceScore = 25.0f,
                 decisionPolicy = DecisionPolicy(low = 10, medium = 20, high = 30),
+                isCredentialMatch = false,
             ),
         ).isEqualTo(
             AppMatchResult(
                 guid = "guid",
                 confidenceScore = 25,
                 matchConfidence = AppMatchConfidence.MEDIUM,
+                isLinkedToScannedCredential = false,
             ),
         )
     }
@@ -44,6 +46,7 @@ class AppMatchResultTest {
                     guid = "guid",
                     confidenceScore = score,
                     decisionPolicy = DecisionPolicy(low = 20, medium = 40, high = 60),
+                    isCredentialMatch = false,
                 ).tier,
             ).isEqualTo(expected)
         }

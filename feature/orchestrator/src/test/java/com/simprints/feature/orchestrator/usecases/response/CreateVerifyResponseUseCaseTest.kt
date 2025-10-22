@@ -4,8 +4,8 @@ import com.google.common.truth.Truth.*
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
+import com.simprints.infra.matching.FaceMatchResult
+import com.simprints.infra.matching.FingerprintMatchResult
 import io.mockk.*
 import org.junit.Before
 import org.junit.Test

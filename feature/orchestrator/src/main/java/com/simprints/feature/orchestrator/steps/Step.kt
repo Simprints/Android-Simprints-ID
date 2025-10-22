@@ -18,6 +18,8 @@ import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.feature.enrollast.MatchResult
 import com.simprints.feature.exitform.ExitFormResult
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.fetchsubject.FetchSubjectParams
 import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.login.LoginParams
@@ -34,9 +36,9 @@ import com.simprints.fingerprint.connect.FingerprintConnectParams
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
-import com.simprints.matcher.MatchParams
+import com.simprints.infra.matching.FaceMatchResult
+import com.simprints.infra.matching.FingerprintMatchResult
+import com.simprints.infra.matching.MatchParams
 import java.io.Serializable
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "resultType")
@@ -71,6 +73,7 @@ import java.io.Serializable
     JsonSubTypes.Type(value = ExitFormResult::class, name = "ExitFormResult"),
     JsonSubTypes.Type(value = ValidateSubjectPoolResult::class, name = "ValidateSubjectPoolResult"),
     JsonSubTypes.Type(value = SelectSubjectAgeGroupResult::class, name = "SelectSubjectAgeGroupResult"),
+    JsonSubTypes.Type(value = ExternalCredentialSearchResult::class, name = "ExternalCredentialSearchResult"),
 )
 abstract class StepResultMixin : StepResult
 
@@ -112,6 +115,8 @@ abstract class StepResultMixin : StepResult
         value = EnrolLastBiometricStepResult.FaceCaptureResult::class,
         name = "EnrolLastBiometricStepResult.FaceCaptureResult",
     ),
+    JsonSubTypes.Type(value = ExternalCredentialParams::class, name = "ExternalCredentialParams"),
+    JsonSubTypes.Type(value = ExternalCredentialSearchResult::class, name = "ExternalCredentialSearchResult"),
     JsonSubTypes.Type(value = MatchResult::class, name = "MatchResult"),
     JsonSubTypes.Type(value = FingerTemplateCaptureResult::class, name = "FingerTemplateCaptureResult"),
     JsonSubTypes.Type(value = FaceTemplateCaptureResult::class, name = "FaceTemplateCaptureResult"),

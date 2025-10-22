@@ -4,12 +4,12 @@ import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_MATCHING
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.matching.FaceMatchResult
+import com.simprints.infra.matching.FingerprintMatchResult
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.orchestration.data.responses.AppResponse
 import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
 import java.io.Serializable
 import javax.inject.Inject
 
@@ -45,6 +45,7 @@ internal class CreateVerifyResponseUseCase @Inject constructor() {
                                 confidenceScore = it.confidence,
                                 decisionPolicy = sdkConfiguration.decisionPolicy,
                                 verificationMatchThreshold = sdkConfiguration.verificationMatchThreshold,
+                                isCredentialMatch = false,
                             )
                         }
                 }
@@ -68,6 +69,7 @@ internal class CreateVerifyResponseUseCase @Inject constructor() {
                                 confidenceScore = it.confidence,
                                 decisionPolicy = faceConfiguration.decisionPolicy,
                                 verificationMatchThreshold = faceConfiguration.verificationMatchThreshold,
+                                isCredentialMatch = false,
                             )
                         }
                 }

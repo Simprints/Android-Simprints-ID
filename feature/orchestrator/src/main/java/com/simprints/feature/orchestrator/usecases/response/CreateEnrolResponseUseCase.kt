@@ -2,6 +2,8 @@ package com.simprints.feature.orchestrator.usecases.response
 
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.face.capture.FaceCaptureResult
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.eventsync.sync.common.SubjectFactory
@@ -22,21 +24,26 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
         request: ActionRequest.EnrolActionRequest,
         results: List<Serializable>,
         project: Project,
+        enrolmentSubjectId: String,
     ): AppResponse {
         val fingerprintCapture = results.filterIsInstance(FingerprintCaptureResult::class.java).lastOrNull()
         val faceCapture = results.filterIsInstance(FaceCaptureResult::class.java).lastOrNull()
+        val credentialResult = results.filterIsInstance(ExternalCredentialSearchResult::class.java).lastOrNull()
+        val externalCredential = credentialResult?.scannedCredential?.toExternalCredential(enrolmentSubjectId)
 
         return try {
             val subject = subjectFactory.buildSubjectFromCaptureResults(
+                subjectId = enrolmentSubjectId,
                 projectId = request.projectId,
                 attendantId = request.userId,
                 moduleId = request.moduleId,
                 fingerprintResponse = fingerprintCapture,
                 faceResponse = faceCapture,
+                externalCredential = externalCredential,
             )
             enrolSubject(subject, project)
 
-            AppEnrolResponse(subject.subjectId)
+            AppEnrolResponse(subject.subjectId, externalCredential)
         } catch (e: Exception) {
             Simber.e("Error creating enrol response", e, tag = ORCHESTRATION)
             AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR)

@@ -14,5 +14,6 @@ data class Project(
 enum class TokenKeyType {
     AttendantId,
     ModuleId,
+    ExternalCredential,
     Unknown,
 }

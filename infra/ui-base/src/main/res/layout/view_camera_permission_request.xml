@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/permissionCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/margin_large"
+        app:cardElevation="2dp"
+        app:cardUseCompatPadding="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/padding_large">
+
+            <TextView
+                android:id="@+id/permissionTitle"
+                style="@style/Text.Headline5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Camera Permission Required" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="@dimen/margin_large"
+                android:background="@color/simprints_grey_light" />
+
+            <TextView
+                android:id="@+id/permissionBody"
+                style="@style/Text.Body1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="This app requires access to your camera to scan documents." />
+
+            <Button
+                android:id="@+id/permissionAction"
+                style="@style/Widget.Simprints.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_large"
+                tools:text="Grant Permission" />
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</merge>

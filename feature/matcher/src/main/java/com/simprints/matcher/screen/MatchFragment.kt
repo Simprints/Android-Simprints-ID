@@ -19,13 +19,13 @@ import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.matching.MatchParams
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.navigation.navigationParams
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
-import com.simprints.matcher.MatchParams
 import com.simprints.matcher.R
 import com.simprints.matcher.databinding.FragmentMatcherBinding
 import com.simprints.matcher.screen.MatchFragment.Companion.LOADING_PROGRESS

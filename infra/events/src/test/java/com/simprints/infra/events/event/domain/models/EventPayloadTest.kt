@@ -43,6 +43,7 @@ import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCap
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.infra.events.sampledata.SampleDefaults.CREDENTIAL_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_BIOMETRIC_DATA_SOURCE
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -217,6 +218,7 @@ class EventPayloadTest {
             moduleId = DEFAULT_MODULE_ID,
             attendantId = DEFAULT_USER_ID,
             biometricReferenceIds = listOf(GUID1, GUID2),
+            externalCredentialIds = listOf(CREDENTIAL_ID),
         ),
         GuidSelectionEvent(CREATED_AT, GUID1),
         IntentParsingEvent(CREATED_AT, COMMCARE),

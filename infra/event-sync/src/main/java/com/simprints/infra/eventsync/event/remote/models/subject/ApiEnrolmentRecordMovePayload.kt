@@ -31,25 +31,27 @@ internal data class ApiEnrolmentRecordMovePayload(
         val moduleId: String,
         val attendantId: String,
         val biometricReferences: List<ApiBiometricReference>?,
+        val externalCredential: ApiExternalCredential?,
     )
 }
 
 internal fun ApiEnrolmentRecordMovePayload.fromApiToDomain() = EnrolmentRecordMoveEvent.EnrolmentRecordMovePayload(
     with(enrolmentRecordCreation) {
         EnrolmentRecordCreationInMove(
-            subjectId,
-            projectId,
-            moduleId.asTokenizableEncrypted(),
-            attendantId.asTokenizableEncrypted(),
-            biometricReferences?.map { it.fromApiToDomain() },
+            subjectId = subjectId,
+            projectId = projectId,
+            moduleId = moduleId.asTokenizableEncrypted(),
+            attendantId = attendantId.asTokenizableEncrypted(),
+            biometricReferences = biometricReferences?.map { it.fromApiToDomain() },
+            externalCredential = externalCredential?.fromApiToDomain(subjectId)
         )
     },
     enrolmentRecordDeletion.let {
         EnrolmentRecordDeletionInMove(
-            it.subjectId,
-            it.projectId,
-            it.moduleId.asTokenizableEncrypted(),
-            it.attendantId.asTokenizableEncrypted(),
+            subjectId = it.subjectId,
+            projectId = it.projectId,
+            moduleId = it.moduleId.asTokenizableEncrypted(),
+            attendantId = it.attendantId.asTokenizableEncrypted(),
         )
     },
 )

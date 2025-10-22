@@ -21,4 +21,5 @@ dependencies {
     implementation(libs.libsimprints)
     implementation(libs.retrofit.core)
     implementation(libs.jackson.core)
+    implementation(libs.testing.androidX.room)
 }

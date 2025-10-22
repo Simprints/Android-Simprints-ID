@@ -1,6 +1,8 @@
 package com.simprints.infra.enrolment.records.repository.local
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
@@ -19,6 +21,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.Fingerprin
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource.Companion.EXTERNAL_CREDENTIAL_FIELD
 import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource.Companion.FACE_SAMPLES_FIELD
 import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource.Companion.FINGERPRINT_SAMPLES_FIELD
 import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource.Companion.FORMAT_FIELD
@@ -321,6 +324,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
                     faceSamplesToAdd = listOf(getRandomFaceSample()),
                     fingerprintSamplesToAdd = listOf(getRandomFingerprintSample()),
                     referenceIdsToRemove = listOf(faceReferenceId, fingerReferenceId),
+                    externalCredentialsToAdd = listOf(),
                 ),
             ),
             project,
@@ -403,6 +407,32 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         assertThat(result).contains("Number of Subjects: 6")
     }
 
+    @Test
+    fun `loads subjects by external credential value`() = runTest {
+        val credentialValue = "credentialValue"
+        val externalCredential = ExternalCredential(
+            id = "id",
+            value = credentialValue.asTokenizableEncrypted(),
+            subjectId = "subjectId",
+            type = ExternalCredentialType.NHISCard
+        )
+
+        saveFakePeople(listOf(
+            getRandomSubject(externalCredentials = listOf(externalCredential))
+        ))
+
+        enrolmentRecordLocalDataSource.load(
+            SubjectQuery(externalCredential = credentialValue.asTokenizableEncrypted())
+        )
+
+        verify {
+            realmQuery.query(
+                "ANY $EXTERNAL_CREDENTIAL_FIELD.value == $0",
+                credentialValue.asTokenizableEncrypted().value,
+            )
+        }
+    }
+
     private fun getFakePerson(): DbSubject = getRandomSubject().toRealmDb()
 
     private fun saveFakePerson(fakeSubject: DbSubject): DbSubject = fakeSubject.also { localSubjects.add(it.toDomain()) }
@@ -435,6 +465,9 @@ class RealmEnrolmentRecordLocalDataSourceTest {
             getRandomFaceSample(),
         ),
         fingerprintSamples: List<FingerprintSample> = listOf(),
+        externalCredentials: List<ExternalCredential> = listOf(
+            getRandomExternalCredential()
+        ),
     ): Subject = Subject(
         subjectId = patientId,
         projectId = projectId,
@@ -442,6 +475,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         moduleId = moduleId.asTokenizableRaw(),
         faceSamples = faceSamples,
         fingerprintSamples = fingerprintSamples,
+        externalCredentials = externalCredentials
     )
 
     private fun getRandomFaceSample(
@@ -453,4 +487,11 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         id: String = UUID.randomUUID().toString(),
         referenceId: String = "referenceId",
     ) = FingerprintSample(IFingerIdentifier.LEFT_3RD_FINGER, Random.nextBytes(64), "fingerprintTemplateFormat", referenceId, id)
+
+    private fun getRandomExternalCredential() = ExternalCredential(
+        id = "id",
+        value = "value".asTokenizableEncrypted(),
+        subjectId = "subjectId",
+        type = ExternalCredentialType.NHISCard
+    )
 }

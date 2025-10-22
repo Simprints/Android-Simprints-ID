@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector android:height="200dp" android:viewportHeight="120"
+    android:viewportWidth="120" android:width="200dp" xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="@color/simprints_blue"
+        android:pathData="M0,0l4,0l0,30l-4,0z"/>
+    <path android:fillColor="@color/simprints_blue"
+        android:pathData="M0,0l40,0l0,4l-40,0z"/>
+    <path android:fillColor="@color/simprints_blue"
+        android:pathData="M0,0l4,0l0,40l-4,0z"/>
+    <path android:fillColor="@color/simprints_blue"
+        android:pathData="M80,0l40,0l0,4l-40,0z"/>
+    <path android:fillColor="@color/simprints_blue"
+        android:pathData="M116,0l4,0l0,40l-4,0z"/>
+    <path android:fillColor="@color/simprints_blue"
+        android:pathData="M0,80l4,0l0,40l-4,0z"/>
+    <path android:fillColor="@color/simprints_blue"
+        android:pathData="M0,116l40,0l0,4l-40,0z"/>
+    <path android:fillColor="@color/simprints_blue"
+        android:pathData="M80,116l40,0l0,4l-40,0z"/>
+    <path android:fillColor="@color/simprints_blue"
+        android:pathData="M116,80l4,0l0,36l-4,0z"/>
+</vector>

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
+import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.step.StepResult
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -18,6 +19,8 @@ import com.simprints.face.capture.FaceCaptureParams
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
 import com.simprints.feature.orchestrator.model.OrchestratorResult
@@ -39,13 +42,14 @@ import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.matching.MatchParams
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppResponse
-import com.simprints.matcher.MatchParams
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.io.Serializable
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -61,6 +65,9 @@ internal class OrchestratorViewModel @Inject constructor(
     private val mapStepsForLastBiometrics: MapStepsForLastBiometricEnrolUseCase,
 ) : ViewModel() {
     var isRequestProcessed = false
+
+    // [MS-1127] MF-ID: during enrolment, the same 'subjectId' needs to be used during the entire workflow
+    private val enrolmentSubjectId = UUID.randomUUID().toString()
     private var modalities = emptySet<GeneralConfiguration.Modality>()
     private var steps = emptyList<Step>()
     private var actionRequest: ActionRequest? = null
@@ -83,7 +90,14 @@ internal class OrchestratorViewModel @Inject constructor(
             // In case of a follow-up action, we should restore completed steps from cache
             // and add new ones to the list. This way all session steps are available throughout
             // the app for reference (i.e. have we already captured face in this session?)
-            steps = cache.steps + stepsBuilder.build(action, projectConfiguration)
+            val cachedSteps = cache.steps
+            val cachedExternalCredentialResponse = getCachedCredentialResponse(cachedSteps)
+            steps = cachedSteps + stepsBuilder.build(
+                action = action,
+                projectConfiguration = projectConfiguration,
+                enrolmentSubjectId = enrolmentSubjectId,
+                cachedScannedCredential = cachedExternalCredentialResponse?.scannedCredential,
+            )
             Simber.i("Steps to execute: ${steps.joinToString { it.id.toString() }}", tag = ORCHESTRATION)
         } catch (_: SubjectAgeNotSupportedException) {
             handleErrorResponse(AppErrorResponse(AppErrorReason.AGE_GROUP_NOT_SUPPORTED))
@@ -91,6 +105,15 @@ internal class OrchestratorViewModel @Inject constructor(
         }
 
         doNextStep()
+    }
+
+    private fun getCachedCredentialResponse(steps: List<Step>): ExternalCredentialSearchResult? {
+        steps.forEach { step ->
+            if (step.id == StepId.EXTERNAL_CREDENTIAL) {
+                return step.result as? ExternalCredentialSearchResult
+            }
+        }
+        return null
     }
 
     fun handleResult(result: StepResult) = viewModelScope.launch {
@@ -111,15 +134,21 @@ internal class OrchestratorViewModel @Inject constructor(
             Simber.i("Completed step: ${step.id}", tag = ORCHESTRATION)
 
             updateMatcherStepPayload(step, result)
+            updateExternalCredentialStepPayload(step, result)
         }
 
         if (result is SelectSubjectAgeGroupResult) {
             val captureAndMatchSteps = stepsBuilder.buildCaptureAndMatchStepsForAgeGroup(
-                actionRequest!!,
-                projectConfiguration,
-                result.ageGroup,
+                action = actionRequest!!,
+                projectConfiguration = projectConfiguration,
+                ageGroup = result.ageGroup,
+                enrolmentSubjectId = enrolmentSubjectId,
             )
             steps = steps + captureAndMatchSteps
+        }
+
+        if (result is ExternalCredentialSearchResult) {
+            removeMatcherStepIfRequired(result)
         }
 
         doNextStep()
@@ -173,6 +202,22 @@ internal class OrchestratorViewModel @Inject constructor(
     }
 
     /**
+     * Removes Matcher steps during [FlowType.IDENTIFY] flow if External Credential search found any match.
+     */
+    private fun removeMatcherStepIfRequired(result: ExternalCredentialSearchResult) {
+        if (result.flowType == FlowType.IDENTIFY) {
+            val confirmedVerifications = result.goodMatches.size
+            if (confirmedVerifications > 0) {
+                steps = steps.filterNot { it.id in listOf(StepId.FACE_MATCHER, StepId.FINGERPRINT_MATCHER) }
+                Simber.i(
+                    "Matcher steps removed because External Credential search verified [$confirmedVerifications] candidate(s). Flow type = [${result.flowType}]",
+                    tag = ORCHESTRATION,
+                )
+            }
+        }
+    }
+
+    /**
      * Update the enrol last biometric params in case there were more steps executed in the current flow.
      */
     private fun updateEnrolLastBiometricParamsIfNeeded(step: Step) {
@@ -181,11 +226,13 @@ internal class OrchestratorViewModel @Inject constructor(
                 val updatedParams = params.copy(
                     steps = mapStepsForLastBiometrics(steps.mapNotNull { it.result }),
                 )
+                val cachedExternalCredentialResponse = getCachedCredentialResponse(cache.steps)
                 step.params = EnrolLastBiometricContract.getParams(
                     projectId = updatedParams.projectId,
                     userId = updatedParams.userId,
                     moduleId = updatedParams.moduleId,
                     steps = updatedParams.steps,
+                    scannedCredential = cachedExternalCredentialResponse?.scannedCredential,
                 )
             }
         }
@@ -195,10 +242,11 @@ internal class OrchestratorViewModel @Inject constructor(
         val projectConfiguration = configManager.getProjectConfiguration()
         val project = configManager.getProject(projectConfiguration.projectId)
         val appResponse = appResponseBuilder(
-            projectConfiguration,
-            actionRequest,
-            steps.mapNotNull { it.result },
-            project,
+            projectConfiguration = projectConfiguration,
+            request = actionRequest,
+            results = steps.mapNotNull { it.result },
+            project = project,
+            enrolmentSubjectId = enrolmentSubjectId,
         )
 
         updateDailyActivity(appResponse)
@@ -265,6 +313,48 @@ internal class OrchestratorViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * Passes face or fingerprint samples to the External Credential search step
+     */
+    private fun updateExternalCredentialStepPayload(
+        currentStep: Step,
+        result: StepResult,
+    ) {
+        if (currentStep.id !in listOf(StepId.FACE_CAPTURE, StepId.FINGERPRINT_CAPTURE)) return
+        val step = steps.firstOrNull { it.id == StepId.EXTERNAL_CREDENTIAL } ?: return
+        val params = step.params as? ExternalCredentialParams ?: return
+        val updatedParams = when {
+            currentStep.id == StepId.FACE_CAPTURE && result is FaceCaptureResult -> {
+                val faceSamples = result.results
+                    .mapNotNull { it.sample }
+                    .map { MatchParams.FaceSample(it.faceId, it.template) }
+                params.copy(
+                    probeReferenceId = result.referenceId,
+                    faceSamples = faceSamples,
+                )
+            }
+
+            currentStep.id == StepId.FINGERPRINT_CAPTURE && result is FingerprintCaptureResult -> {
+                val fingerprintSamples = result.results
+                    .mapNotNull { it.sample }
+                    .map {
+                        MatchParams.FingerprintSample(
+                            fingerId = it.fingerIdentifier,
+                            format = it.format,
+                            template = it.template,
+                        )
+                    }
+                params.copy(
+                    probeReferenceId = result.referenceId,
+                    fingerprintSamples = fingerprintSamples,
+                )
+            }
+
+            else -> params
+        }
+        step.params = updatedParams
     }
 
     fun setActionRequestFromJson(json: String) {

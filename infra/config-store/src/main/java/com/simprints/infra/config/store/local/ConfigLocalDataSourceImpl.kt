@@ -248,6 +248,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                     ),
                 ),
                 custom = null,
+                multifactorId = null
             ).toProto()
         val defaultDeviceConfiguration: ProtoDeviceConfiguration = DeviceConfiguration(
             language = "",

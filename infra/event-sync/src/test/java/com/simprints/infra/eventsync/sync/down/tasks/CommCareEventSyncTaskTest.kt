@@ -1,7 +1,10 @@
 package com.simprints.infra.eventsync.sync.down.tasks
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.models.DeviceConfiguration
@@ -57,46 +60,74 @@ class CommCareEventSyncTaskTest {
             "attendantId",
         )
         val ENROLMENT_RECORD_CREATION = EnrolmentRecordCreationEvent(
-            "subjectId",
-            "projectId",
-            "moduleId".asTokenizableRaw(),
-            "attendantId".asTokenizableRaw(),
-            listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+            subjectId = "subjectId",
+            projectId = "projectId",
+            moduleId = "moduleId".asTokenizableRaw(),
+            attendantId = "attendantId".asTokenizableRaw(),
+            biometricReferences = listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+            externalCredentials = listOf(
+                ExternalCredential(
+                    id = "id",
+                    value = "value".asTokenizableEncrypted(),
+                    subjectId = "subjectId",
+                    type = ExternalCredentialType.NHISCard,
+                ),
+            ),
         )
         val ENROLMENT_RECORD_MOVE_MODULE = EnrolmentRecordMoveEvent(
             EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove(
-                "subjectId",
-                "projectId",
-                DEFAULT_MODULE_ID_2,
-                "attendantId".asTokenizableRaw(),
-                listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+                subjectId = "subjectId",
+                projectId = "projectId",
+                moduleId = DEFAULT_MODULE_ID_2,
+                attendantId = "attendantId".asTokenizableRaw(),
+                biometricReferences = listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+                externalCredential = ExternalCredential(
+                    id = "id",
+                    value = "value".asTokenizableEncrypted(),
+                    subjectId = "subjectId",
+                    type = ExternalCredentialType.NHISCard,
+                ),
             ),
             EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
-                "subjectId",
-                "projectId",
-                DEFAULT_MODULE_ID,
-                "attendantId".asTokenizableRaw(),
+                subjectId = "subjectId",
+                projectId = "projectId",
+                moduleId = DEFAULT_MODULE_ID,
+                attendantId = "attendantId".asTokenizableRaw(),
             ),
         )
         val ENROLMENT_RECORD_MOVE_ATTENDANT = EnrolmentRecordMoveEvent(
             EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove(
-                "subjectId",
-                "projectId",
-                "moduleId".asTokenizableRaw(),
-                DEFAULT_USER_ID,
-                listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+                subjectId = "subjectId",
+                projectId = "projectId",
+                moduleId = "moduleId".asTokenizableRaw(),
+                attendantId = DEFAULT_USER_ID,
+                biometricReferences = listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+                externalCredential = ExternalCredential(
+                    id = "id",
+                    value = "value".asTokenizableEncrypted(),
+                    subjectId = "subjectId",
+                    type = ExternalCredentialType.NHISCard,
+                ),
             ),
             EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
-                "subjectId",
-                "projectId",
-                "moduleId".asTokenizableRaw(),
-                DEFAULT_USER_ID_2,
+                subjectId = "subjectId",
+                projectId = "projectId",
+                moduleId = "moduleId".asTokenizableRaw(),
+                attendantId = DEFAULT_USER_ID_2,
             ),
         )
         val ENROLMENT_RECORD_UPDATE = EnrolmentRecordUpdateEvent(
-            "subjectId",
-            listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
-            listOf("referenceIdToDelete"),
+            subjectId = "subjectId",
+            biometricReferencesAdded = listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+            biometricReferencesRemoved = listOf("referenceIdToDelete"),
+            externalCredentialsAdded = listOf(
+                ExternalCredential(
+                    id = "id",
+                    value = "value".asTokenizableEncrypted(),
+                    subjectId = "subjectId",
+                    type = ExternalCredentialType.NHISCard,
+                ),
+            ),
         )
     }
 

@@ -19,6 +19,7 @@ import com.simprints.feature.clientapi.extensions.getResultCodeFromExtras
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.exitform.ExitFormContract
+import com.simprints.feature.externalcredential.ExternalCredentialContract
 import com.simprints.feature.fetchsubject.FetchSubjectContract
 import com.simprints.feature.login.LoginContract
 import com.simprints.feature.login.LoginResult
@@ -126,6 +127,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         handleResult(FetchSubjectContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(ValidateSubjectPoolContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(SelectSubjectAgeGroupContract.DESTINATION, orchestratorVm::handleResult)
+        handleResult(ExternalCredentialContract.DESTINATION, orchestratorVm::handleResult)
     }
 
     private fun <T : Serializable> handleResult(

@@ -12,8 +12,8 @@ import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
+import com.simprints.infra.matching.FaceMatchResult
+import com.simprints.infra.matching.FingerprintMatchResult
 import org.junit.Before
 import org.junit.Test
 
@@ -29,7 +29,7 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
     fun `maps EnrolLastBiometricRequest correctly`() {
         val result = useCase(
             listOf(
-                EnrolLastBiometricResult("subjectId"),
+                EnrolLastBiometricResult("subjectId", null),
             ),
         )
 

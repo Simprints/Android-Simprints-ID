@@ -53,6 +53,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         const val FINGERPRINT_SAMPLES_FIELD = "fingerprintSamples"
         const val FACE_SAMPLES_FIELD = "faceSamples"
         const val FORMAT_FIELD = "format"
+        const val EXTERNAL_CREDENTIAL_FIELD = "externalCredentials"
 
         // Although batches are processed sequentially, we use a small channel capacity to prevent blocking and reduce the risk of out-of-memory errors.
         const val CHANNEL_CAPACITY = 4
@@ -218,6 +219,12 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                                 .filterNot { it.id in faceSampleIds }
                                 .takeIf { it.isNotEmpty() }
                                 ?.forEach { realm.delete(it) }
+
+                            val externalCredentialIds = newSubject.externalCredentials.map { it.id }.toSet()
+                            dbSubject.externalCredentials
+                                .filterNot { it.id in externalCredentialIds }
+                                .takeIf { it.isNotEmpty() }
+                                ?.forEach { realm.delete(it) }
                         }
 
                         realm.copyToRealm(newSubject, updatePolicy = UpdatePolicy.ALL)
@@ -229,6 +236,10 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                             val referencesToDelete = action.referenceIdsToRemove.toSet() // to make lookup O(1)
                             val faceSamplesMap = dbSubject.faceSamples.groupBy { it.referenceId in referencesToDelete }
                             val fingerprintSamplesMap = dbSubject.fingerprintSamples.groupBy { it.referenceId in referencesToDelete }
+                            val allExternalCredentials =
+                                (dbSubject.externalCredentials + action.externalCredentialsToAdd.map { it.toRealmDb() })
+                                    .distinctBy { it.id }
+                                    .toSet()
 
                             // Append new samples to the list of samples that remain after removing
                             dbSubject.faceSamples = (
@@ -237,6 +248,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                             dbSubject.fingerprintSamples = (
                                 fingerprintSamplesMap[false].orEmpty() + action.fingerprintSamplesToAdd.map { it.toRealmDb() }
                             ).toRealmList()
+                            dbSubject.externalCredentials = allExternalCredentials.toRealmList()
 
                             faceSamplesMap[true]?.forEach { realm.delete(it) }
                             fingerprintSamplesMap[true]?.forEach { realm.delete(it) }
@@ -324,6 +336,12 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                 "$IS_ATTENDANT_ID_TOKENIZED_FIELD == $0 OR $IS_MODULE_ID_TOKENIZED_FIELD == $1",
                 false,
                 false,
+            )
+        }
+        if (query.externalCredential != null) {
+            realmQuery = realmQuery.query(
+                "ANY $EXTERNAL_CREDENTIAL_FIELD.value == $0",
+                query.externalCredential.value,
             )
         }
         if (query.sort) {

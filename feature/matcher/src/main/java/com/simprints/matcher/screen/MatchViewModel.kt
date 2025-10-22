@@ -10,14 +10,14 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
-import com.simprints.matcher.MatchParams
-import com.simprints.matcher.MatchResultItem
-import com.simprints.matcher.usecases.FaceMatcherUseCase
-import com.simprints.matcher.usecases.FingerprintMatcherUseCase
-import com.simprints.matcher.usecases.MatcherUseCase
-import com.simprints.matcher.usecases.SaveMatchEventUseCase
+import com.simprints.infra.matching.FaceMatchResult
+import com.simprints.infra.matching.FingerprintMatchResult
+import com.simprints.infra.matching.MatchParams
+import com.simprints.infra.matching.MatchResultItem
+import com.simprints.infra.matching.usecase.FaceMatcherUseCase
+import com.simprints.infra.matching.usecase.FingerprintMatcherUseCase
+import com.simprints.infra.matching.usecase.MatcherUseCase
+import com.simprints.infra.matching.usecase.SaveMatchEventUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -104,9 +104,11 @@ internal class MatchViewModel @Inject constructor(
 
     private suspend fun getDecisionPolicy(params: MatchParams): DecisionPolicy {
         val config = configManager.getProjectConfiguration()
+        val faceSDK = params.faceSDK
+        val fingerprintSDK = params.fingerprintSDK
         val policy = when {
-            params.faceSDK != null -> config.face?.getSdkConfiguration(params.faceSDK)?.decisionPolicy
-            params.fingerprintSDK != null -> config.fingerprint?.getSdkConfiguration(params.fingerprintSDK)?.decisionPolicy
+            faceSDK != null -> config.face?.getSdkConfiguration(faceSDK)?.decisionPolicy
+            fingerprintSDK != null -> config.fingerprint?.getSdkConfiguration(fingerprintSDK)?.decisionPolicy
             else -> null
         }
         return policy ?: fallbackDecisionPolicy()

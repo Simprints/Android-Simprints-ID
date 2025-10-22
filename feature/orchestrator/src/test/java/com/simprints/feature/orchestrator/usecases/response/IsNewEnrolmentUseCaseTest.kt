@@ -1,15 +1,15 @@
 package com.simprints.feature.orchestrator.usecases.response
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import com.simprints.infra.matching.FaceMatchResult
+import com.simprints.infra.matching.FingerprintMatchResult
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 
@@ -140,6 +140,33 @@ internal class IsNewEnrolmentUseCaseTest {
                         mockk(),
                     ),
                     FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE),
+                ),
+            ),
+        ).isFalse()
+    }
+
+    @Test
+    fun `Results are not new enrolment if external credential match results exist`() {
+        every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
+
+        val credentialMatches = listOf<CredentialMatch>(
+            mockk {
+                every { matchResult } returns mockk {
+                    every { subjectId } returns "subjectId"
+                    every { confidence } returns 50f
+                }
+                every { faceBioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
+                every { fingerprintBioSdk } returns null
+            },
+        )
+
+        assertThat(
+            useCase(
+                projectConfiguration,
+                listOf(
+                    mockk<ExternalCredentialSearchResult> {
+                        every { matchResults } returns credentialMatches
+                    },
                 ),
             ),
         ).isFalse()

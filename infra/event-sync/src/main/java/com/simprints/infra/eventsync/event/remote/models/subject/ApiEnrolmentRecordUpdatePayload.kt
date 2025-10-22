@@ -10,10 +10,12 @@ internal data class ApiEnrolmentRecordUpdatePayload(
     val subjectId: String,
     val biometricReferencesAdded: List<ApiBiometricReference>?,
     val biometricReferencesRemoved: List<String>?,
+    val externalCredentialsAdded: List<ApiExternalCredential>?,
 ) : ApiEnrolmentRecordEventPayload(ApiEnrolmentRecordPayloadType.EnrolmentRecordUpdate)
 
 internal fun ApiEnrolmentRecordUpdatePayload.fromApiToDomain() = EnrolmentRecordUpdateEvent.EnrolmentRecordUpdatePayload(
     subjectId,
     biometricReferencesAdded?.map { it.fromApiToDomain() }.orEmpty(),
     biometricReferencesRemoved.orEmpty(),
+    externalCredentialsAdded?.map { it.fromApiToDomain(subjectId) }.orEmpty(),
 )

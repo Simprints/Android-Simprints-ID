@@ -5,8 +5,8 @@ import androidx.core.os.bundleOf
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
 import com.simprints.core.domain.response.AppErrorReason
-import com.simprints.infra.events.event.domain.models.scope.Device
 import com.simprints.infra.orchestration.data.ActionResponse
+import com.simprints.infra.orchestration.data.responses.AppExternalCredential
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.contracts.VersionsList
 import com.simprints.libsimprints.contracts.data.ConfidenceBand
@@ -15,6 +15,8 @@ import com.simprints.libsimprints.contracts.data.Identification
 import com.simprints.libsimprints.contracts.data.Identification.Companion.toJson
 import com.simprints.libsimprints.contracts.data.RefusalForm
 import com.simprints.libsimprints.contracts.data.Verification
+import org.json.JSONArray
+import org.json.JSONObject
 import javax.inject.Inject
 import com.simprints.libsimprints.Identification as LegacyIdentification
 import com.simprints.libsimprints.RefusalForm as LegacyRefusalForm
@@ -32,6 +34,7 @@ internal class LibSimprintsResponseMapper @Inject constructor(
             Constants.SIMPRINTS_DEVICE_ID to deviceId,
             Constants.SIMPRINTS_APP_VERSION_NAME to appVersionName,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
+            HAS_CREDENTIAL to (response.externalCredential != null),
         ).appendDataPerContractVersion(response) { version ->
             when {
                 version < VersionsList.INITIAL_REWORK -> putParcelable(
@@ -42,6 +45,7 @@ internal class LibSimprintsResponseMapper @Inject constructor(
                 else -> putString(Constants.SIMPRINTS_ENROLMENT, Enrolment(response.enrolledGuid).toJson())
             }
         }.appendCoSyncData(response.subjectActions)
+            .appendExternalCredential(response.externalCredential)
 
         is ActionResponse.IdentifyActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
@@ -50,6 +54,11 @@ internal class LibSimprintsResponseMapper @Inject constructor(
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
         ).appendDataPerContractVersion(response) { version ->
             when {
+                response.isMultiFactorIdEnabled -> putString(
+                    Constants.SIMPRINTS_IDENTIFICATIONS,
+                    response.mapIdentificationsWithCredentials(),
+                )
+
                 version < VersionsList.INITIAL_REWORK -> putParcelableArrayList(
                     Constants.SIMPRINTS_IDENTIFICATIONS,
                     response.identifications
@@ -66,12 +75,15 @@ internal class LibSimprintsResponseMapper @Inject constructor(
             }
         }
 
-        is ActionResponse.ConfirmActionResponse -> bundleOf(
-            Constants.SIMPRINTS_SESSION_ID to response.sessionId,
-            Constants.SIMPRINTS_DEVICE_ID to deviceId,
-            Constants.SIMPRINTS_APP_VERSION_NAME to appVersionName,
-            Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
-        )
+        is ActionResponse.ConfirmActionResponse -> {
+            bundleOf(
+                Constants.SIMPRINTS_SESSION_ID to response.sessionId,
+                Constants.SIMPRINTS_DEVICE_ID to deviceId,
+                Constants.SIMPRINTS_APP_VERSION_NAME to appVersionName,
+                Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
+                HAS_CREDENTIAL to (response.externalCredential != null),
+            ).appendExternalCredential(response.externalCredential)
+        }
 
         is ActionResponse.VerifyActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
@@ -146,6 +158,33 @@ internal class LibSimprintsResponseMapper @Inject constructor(
         actions?.let { putString(Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS, it) }
     }
 
+    private fun Bundle.appendExternalCredential(credential: AppExternalCredential?) = apply {
+        if (credential != null) {
+            val credentialJson =
+                JSONObject()
+                    .also {
+                        it.put(SCANNED_CREDENTIAL_VALUE, credential.value)
+                        it.put(SCANNED_CREDENTIAL_TYPE, credential.type)
+                    }.toString()
+            putString(SCANNED_CREDENTIAL, credentialJson)
+        }
+    }
+
+    private fun ActionResponse.IdentifyActionResponse.mapIdentificationsWithCredentials(): String = identifications
+        .map { identification ->
+            JSONObject()
+                .also { json ->
+                    json.put(KEY_GUID, identification.guid)
+                    json.put(KEY_CONFIDENCE_BAND, identification.matchConfidence.name)
+                    json.put(KEY_CONFIDENCE, identification.confidenceScore.toFloat())
+                    json.put(KEY_IS_LINKED_TO_CREDENTIAL, identification.isLinkedToScannedCredential ?: false)
+                    identification.isCredentialVerified?.let {
+                        json.put(KEY_IS_CREDENTIAL_VERIFIED, it)
+                    }
+                }
+        }.run(::JSONArray)
+        .toString()
+
     private fun AppErrorReason.libSimprintsResultCode() = when (this) {
         AppErrorReason.UNEXPECTED_ERROR -> Constants.SIMPRINTS_UNEXPECTED_ERROR
         AppErrorReason.ROOTED_DEVICE -> Constants.SIMPRINTS_ROOTED_DEVICE
@@ -182,5 +221,16 @@ internal class LibSimprintsResponseMapper @Inject constructor(
 
     companion object {
         internal const val RESULT_CODE_OVERRIDE = "result_code_override"
+        internal const val HAS_CREDENTIAL = "hasCredential"
+        internal const val SCANNED_CREDENTIAL = "scannedCredential"
+        internal const val SCANNED_CREDENTIAL_VALUE = "value"
+        internal const val SCANNED_CREDENTIAL_TYPE = "type"
+
+        // TODO [MS-1190] Move implementation to LibSimprints. These constats are copies of com.simprints.libsimprints.contracts.data.Identification
+        private const val KEY_GUID = "guid"
+        private const val KEY_CONFIDENCE = "confidence"
+        private const val KEY_CONFIDENCE_BAND = "confidenceBand"
+        private const val KEY_IS_LINKED_TO_CREDENTIAL = "isLinkedToCredential"
+        private const val KEY_IS_CREDENTIAL_VERIFIED = "isVerified"
     }
 }

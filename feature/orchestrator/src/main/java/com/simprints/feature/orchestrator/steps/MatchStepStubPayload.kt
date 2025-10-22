@@ -6,8 +6,8 @@ import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.matching.MatchParams
 import com.simprints.matcher.MatchContract
-import com.simprints.matcher.MatchParams
 
 /**
  * Actual matching step payload is based on capture step results, so until the it is done we are storing

@@ -1,10 +1,12 @@
 package com.simprints.infra.enrolment.records.repository.local.models
 
+import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.domain.tokenization.isTokenized
+import com.simprints.infra.enrolment.records.realm.store.models.DbExternalCredential
 import com.simprints.infra.enrolment.records.realm.store.models.DbFaceSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbFingerprintSample
 import com.simprints.infra.enrolment.records.realm.store.models.toDate
@@ -29,6 +31,7 @@ internal fun RealmSubject.toDomain(): Subject {
         updatedAt = updatedAt?.toDate(),
         fingerprintSamples = fingerprintSamples.map(DbFingerprintSample::toDomain),
         faceSamples = faceSamples.map(DbFaceSample::toDomain),
+        externalCredentials = externalCredentials.map(DbExternalCredential::toDomain)
     )
 }
 
@@ -44,4 +47,5 @@ internal fun Subject.toRealmDb(): RealmSubject = RealmSubject().also { subject -
     subject.faceSamples = faceSamples.map(FaceSample::toRealmDb).toRealmList()
     subject.isModuleIdTokenized = moduleId.isTokenized()
     subject.isAttendantIdTokenized = attendantId.isTokenized()
+    subject.externalCredentials = externalCredentials.map(ExternalCredential::toRealmDb).toRealmList()
 }

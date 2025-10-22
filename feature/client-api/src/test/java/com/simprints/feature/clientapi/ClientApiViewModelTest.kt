@@ -2,8 +2,12 @@ package com.simprints.feature.clientapi
 
 import android.os.Bundle
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.ext.junit.runners.*
 import com.jraska.livedata.test
+import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
@@ -16,20 +20,18 @@ import com.simprints.feature.clientapi.usecases.GetEnrolmentCreationEventForSubj
 import com.simprints.feature.clientapi.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.usecases.SimpleEventReporter
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import com.simprints.infra.orchestration.data.ActionResponse
+import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
 import com.simprints.logging.persistent.PersistentLogger
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coJustRun
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -80,6 +82,9 @@ internal class ClientApiViewModelTest {
     @MockK
     lateinit var persistentLogger: PersistentLogger
 
+    @MockK
+    lateinit var tokenizationProcessor: TokenizationProcessor
+
     private lateinit var viewModel: ClientApiViewModel
 
     @Before
@@ -107,6 +112,7 @@ internal class ClientApiViewModelTest {
             configManager = configManager,
             timeHelper = timeHelper,
             persistentLogger = persistentLogger,
+            tokenizationProcessor = tokenizationProcessor,
         )
     }
 
@@ -148,7 +154,10 @@ internal class ClientApiViewModelTest {
     fun `handleEnrolResponse saves correct events`() = runTest {
         viewModel.handleEnrolResponse(
             mockRequest(),
-            mockk { every { guid } returns "guid" },
+            mockk {
+                every { guid } returns "guid"
+                every { externalCredential } returns null
+            },
         )
 
         coVerify {
@@ -165,7 +174,10 @@ internal class ClientApiViewModelTest {
     fun `handleIdentifyResponse saves correct events`() = runTest {
         viewModel.handleIdentifyResponse(
             mockRequest(),
-            mockk { every { identifications } returns emptyList() },
+            mockk {
+                every { identifications } returns emptyList()
+                every { isMultiFactorIdEnabled } returns false
+            },
         )
 
         coVerify {
@@ -180,7 +192,10 @@ internal class ClientApiViewModelTest {
     fun `handleConfirmResponse saves correct events`() = runTest {
         viewModel.handleConfirmResponse(
             mockRequest(),
-            mockk { every { identificationOutcome } returns true },
+            mockk {
+                every { identificationOutcome } returns true
+                every { externalCredential } returns mockk()
+            },
         )
 
         coVerify {
@@ -244,6 +259,80 @@ internal class ClientApiViewModelTest {
         }
         verify { resultMapper.invoke(match<ActionResponse> { it is ActionResponse.ErrorActionResponse }) }
         viewModel.returnResponse.test().assertHasValue()
+    }
+
+    @Test
+    fun `handleEnrolResponse with externalCredential decrypts and includes it in response`() = runTest {
+        val mockGuid = "mockGuid"
+        val expectedCredentialId = "credentialId"
+        val expectedType = ExternalCredentialType.NHISCard
+        val credential = mockExternalCredential(expectedCredentialId, expectedType)
+        val project = mockk<Project>(relaxed = true)
+        setupDecryption(project, "decrypted-value".asTokenizableRaw())
+
+        viewModel.handleEnrolResponse(mockRequest(), mockEnrolResponseWithCredential(mockGuid, credential))
+
+        verify {
+            resultMapper.invoke(
+                match<ActionResponse.EnrolActionResponse> {
+                    it.externalCredential?.id == expectedCredentialId &&
+                        it.externalCredential?.type == expectedType
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `handleEnrolResponse with externalCredential but encrypted decryption returns null credential`() = runTest {
+        val mockGuid = "mockGuid"
+        val expectedCredentialId = "credentialId"
+        val expectedType = ExternalCredentialType.NHISCard
+        val credential = mockExternalCredential(expectedCredentialId, expectedType)
+        val project = mockk<Project>(relaxed = true)
+        setupDecryption(project, mockk<TokenizableString.Tokenized>())
+
+        viewModel.handleEnrolResponse(mockRequest(), mockEnrolResponseWithCredential(mockGuid, credential))
+
+        verify {
+            resultMapper.invoke(
+                match<ActionResponse.EnrolActionResponse> {
+                    it.externalCredential == null
+                },
+            )
+        }
+    }
+
+    private fun mockEnrolResponseWithCredential(
+        mockGuid: String,
+        credential: ExternalCredential?,
+    ): AppEnrolResponse = mockk {
+        every { guid } returns mockGuid
+        every { externalCredential } returns credential
+    }
+
+    private fun mockExternalCredential(
+        mockId: String,
+        mockType: ExternalCredentialType,
+    ): ExternalCredential = mockk {
+        every { id } returns mockId
+        every { value } returns mockk()
+        every { type } returns mockType
+    }
+
+    private fun setupDecryption(
+        project: Project,
+        returnValue: TokenizableString,
+    ) {
+        val projectId = "projectId"
+        every { authStore.signedInProjectId } returns projectId
+        coEvery { configManager.getProject(projectId) } returns project
+        every {
+            tokenizationProcessor.decrypt(
+                encrypted = any(),
+                tokenKeyType = TokenKeyType.ExternalCredential,
+                project = project,
+            )
+        } returns returnValue
     }
 
     private fun mockRequest(): ActionRequest = mockk {

@@ -1,11 +1,11 @@
 package com.simprints.feature.orchestrator.usecases.response
 
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
+import com.simprints.infra.matching.FaceMatchResult
+import com.simprints.infra.matching.FingerprintMatchResult
 import java.io.Serializable
 import javax.inject.Inject
-import kotlin.text.compareTo
 
 internal class IsNewEnrolmentUseCase @Inject constructor() {
     /**
@@ -16,6 +16,16 @@ internal class IsNewEnrolmentUseCase @Inject constructor() {
         projectConfiguration: ProjectConfiguration,
         results: List<Serializable>,
     ): Boolean {
+        val hasCredentialMatchResults =
+            results
+                .filterIsInstance<ExternalCredentialSearchResult>()
+                .firstOrNull()
+                ?.matchResults
+                ?.isNotEmpty() ?: false
+        if (hasCredentialMatchResults) {
+            return false
+        }
+
         if (!projectConfiguration.general.duplicateBiometricEnrolmentCheck) {
             // Duplicate check on enrolment is disabled
             return true
