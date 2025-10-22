@@ -70,6 +70,7 @@ class AddCallbackEventUseCaseTest {
             AppIdentifyResponse(
                 listOf(AppMatchResult("guid", 0, AppMatchConfidence.HIGH)),
                 "sessionId",
+                isMultiFactorIdEnabled = false,
             ),
         )
 

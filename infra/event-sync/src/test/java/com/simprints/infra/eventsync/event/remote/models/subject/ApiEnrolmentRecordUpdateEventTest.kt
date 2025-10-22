@@ -5,6 +5,7 @@ import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.infra.config.store.remote.models.ApiExternalCredentialType
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordUpdateEvent
 import com.simprints.infra.events.event.domain.models.subject.FaceReference
 import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
@@ -36,11 +37,13 @@ class ApiEnrolmentRecordUpdateEventTest {
                 ),
             ),
             biometricReferencesRemoved = listOf("fpRefId2"),
-            externalCredentialAdded = ApiExternalCredential(
-                id = "id",
-                type = ExternalCredentialType.NHISCard.toString(),
-                value = "value"
-            )
+            externalCredentialsAdded = listOf(
+                ApiExternalCredential(
+                    id = "id",
+                    type = ApiExternalCredentialType.NHIS_CARD,
+                    value = "value",
+                ),
+            ),
         )
         val expectedPayload = EnrolmentRecordUpdateEvent.EnrolmentRecordUpdatePayload(
             subjectId = "subjectId",
@@ -57,12 +60,14 @@ class ApiEnrolmentRecordUpdateEventTest {
                 ),
             ),
             biometricReferencesRemoved = listOf("fpRefId2"),
-            externalCredentialAdded = ExternalCredential(
-                id = "id",
-                value = "value".asTokenizableEncrypted(),
-                subjectId = "subjectId",
-                type = ExternalCredentialType.NHISCard
-            )
+            externalCredentialsAdded = listOf(
+                ExternalCredential(
+                    id = "id",
+                    value = "value".asTokenizableEncrypted(),
+                    subjectId = "subjectId",
+                    type = ExternalCredentialType.NHISCard,
+                ),
+            ),
         )
 
         assertThat(apiPayload.fromApiToDomain()).isEqualTo(expectedPayload)

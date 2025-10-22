@@ -5,12 +5,21 @@ import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.feature.externalcredential.model.BoundingBox
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.usecase.ExternalCredentialEventTrackerUseCase
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
@@ -27,13 +36,24 @@ internal class ExternalCredentialViewModelTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
+    lateinit var eventsTracker: ExternalCredentialEventTrackerUseCase
+
+    @MockK
+    lateinit var timeHelper: TimeHelper
+
+    @MockK
     private lateinit var configManager: ConfigManager
     private lateinit var viewModel: ExternalCredentialViewModel
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        viewModel = ExternalCredentialViewModel(configManager = configManager)
+        viewModel = ExternalCredentialViewModel(
+            configManager = configManager,
+            timeHelper = timeHelper,
+            eventsTracker = eventsTracker,
+        )
+        every { timeHelper.now() } returns Timestamp(1L)
     }
 
     @Test
@@ -46,6 +66,7 @@ internal class ExternalCredentialViewModelTest {
     fun `setSelectedExternalCredentialType updates state`() {
         val observer = viewModel.stateLiveData.test()
 
+        viewModel.selectionStarted()
         viewModel.setSelectedExternalCredentialType(ExternalCredentialType.GhanaIdCard)
 
         assertThat(observer.value()?.selectedType).isEqualTo(ExternalCredentialType.GhanaIdCard)
@@ -87,13 +108,68 @@ internal class ExternalCredentialViewModelTest {
     }
 
     @Test
-    fun `finish sends result to finishEvent`() {
-        val observer = viewModel.finishEvent.test()
-        val mockResult = mockk<ExternalCredentialSearchResult>(relaxed = true)
+    fun `finish sends result to finishEvent`() = runTest {
+        val mockResult = mockk<ExternalCredentialSearchResult>(relaxed = true) {
+            every { scannedCredential } returns null
+        }
+        viewModel.finish(mockResult)
+        val observer = viewModel.finishEvent
+            .test()
+            .value()
+            .getContentIfNotHandled()
+
+        assertThat(observer).isNotNull()
+        assertThat(observer).isEqualTo(mockResult)
+    }
+
+    @Test
+    fun `finish handles non-null scannedCredential in result`() = runTest {
+        val subjectId = "subjectId"
+        val flowType = FlowType.IDENTIFY
+        val params = createParams(subjectId, flowType)
+        val credentialSearchResult = mockk<ExternalCredentialSearchResult>(relaxed = true) {
+            every { scannedCredential } returns createScannedCredential()
+        }
+        viewModel.init(params)
+        viewModel.selectionStarted()
+        viewModel.setSelectedExternalCredentialType(ExternalCredentialType.QRCode) // init capture timer
+        viewModel.finish(credentialSearchResult)
+
+        val observer = viewModel.finishEvent
+            .test()
+            .value()
+            .getContentIfNotHandled()
+
+        assertThat(observer).isEqualTo(credentialSearchResult)
+    }
+
+    @Test
+    fun `finish saves success flow events`() = runTest {
+        val mockResult = mockk<ExternalCredentialSearchResult>(relaxed = true) {
+            every { scannedCredential } returns mockk(relaxed = true)
+        }
+        coEvery { eventsTracker.saveSelectionEvent(any(), any(), any()) } returns "selectionId"
+
+        viewModel.selectionStarted()
+        viewModel.init(createParams(subjectId = "subjectId", FlowType.IDENTIFY))
+        viewModel.setSelectedExternalCredentialType(ExternalCredentialType.QRCode) // init capture timer
         viewModel.finish(mockResult)
 
-        assertThat(observer.value()).isNotNull()
-        assertThat(observer.value()?.peekContent()).isEqualTo(mockResult)
+        coVerify { eventsTracker.saveSelectionEvent(any(), any(), any()) }
+        coVerify { eventsTracker.saveCaptureEvents(any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `finish saves skip event`() = runTest {
+        val mockResult = mockk<ExternalCredentialSearchResult>(relaxed = true) {
+            every { scannedCredential } returns null
+        }
+        viewModel.selectionStarted()
+        viewModel.skipOptionSelected(ExternalCredentialSelectionEvent.SkipReason.OTHER)
+        viewModel.skipOtherReasonChanged("other")
+        viewModel.finish(mockResult)
+
+        coVerify { eventsTracker.saveSkippedEvent(any(), any(), any()) }
     }
 
     @Test
@@ -102,27 +178,47 @@ internal class ExternalCredentialViewModelTest {
             ExternalCredentialType.NHISCard,
             ExternalCredentialType.GhanaIdCard,
         )
-        setupProjectConfig(allowedCredentials = allowedCredentials)
-        val viewModel = ExternalCredentialViewModel(configManager = configManager)
+        val viewModel = setupViewModel(allowedCredentials = allowedCredentials)
         val observer = viewModel.externalCredentialTypes.test()
         assertThat(observer.value()).isEqualTo(allowedCredentials)
     }
 
     @Test
     fun `init block sets empty list if no allowed credentials configured`() = runTest {
-        setupProjectConfig(allowedCredentials = emptyList())
-        val viewModel = ExternalCredentialViewModel(configManager = configManager)
+        val viewModel = setupViewModel(allowedCredentials = emptyList())
         val observer = viewModel.externalCredentialTypes.test()
         assertThat(observer.value()).isEmpty()
     }
 
-    private fun setupProjectConfig(allowedCredentials: List<ExternalCredentialType>) {
+    private fun setupViewModel(allowedCredentials: List<ExternalCredentialType>): ExternalCredentialViewModel {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { multifactorId } returns mockk {
                 every { allowedExternalCredentials } returns allowedCredentials
             }
         }
+        return ExternalCredentialViewModel(
+            configManager = configManager,
+            timeHelper = timeHelper,
+            eventsTracker = eventsTracker,
+        )
     }
+
+    private fun createScannedCredential(
+        credential: String = "credential",
+        credentialType: ExternalCredentialType = ExternalCredentialType.NHISCard,
+        documentImagePath: String? = "documentImagePath",
+        zoomedCredentialImagePath: String? = "zoomedCredentialImagePath",
+        credentialBoundingBox: BoundingBox? = BoundingBox(0, 0, 100, 100),
+    ) = ScannedCredential(
+        credential = credential.asTokenizableEncrypted(),
+        credentialType = credentialType,
+        documentImagePath = documentImagePath,
+        zoomedCredentialImagePath = zoomedCredentialImagePath,
+        credentialBoundingBox = credentialBoundingBox,
+        scanStartTime = Timestamp(1L),
+        scanEndTime = Timestamp(2L),
+        scannedValue = credential.asTokenizableRaw(),
+    )
 
     private fun createParams(
         subjectId: String,

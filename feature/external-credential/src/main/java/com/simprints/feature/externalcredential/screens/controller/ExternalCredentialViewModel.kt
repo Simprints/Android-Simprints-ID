@@ -7,17 +7,22 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.feature.externalcredential.usecase.ExternalCredentialEventTrackerUseCase
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.collections.orEmpty
 
 @HiltViewModel
 internal class ExternalCredentialViewModel @Inject internal constructor(
+    private val timeHelper: TimeHelper,
     private val configManager: ConfigManager,
+    private val eventsTracker: ExternalCredentialEventTrackerUseCase,
 ) : ViewModel() {
     private var isInitialized = false
     lateinit var params: ExternalCredentialParams
@@ -37,6 +42,12 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
         get() = _externalCredentialTypes
     private val _externalCredentialTypes = MutableLiveData<List<ExternalCredentialType>>()
 
+    private lateinit var selectionStartTime: Timestamp
+    private lateinit var selectionEventId: String
+    private lateinit var captureStartTime: Timestamp
+    private var selectedSkipReason: ExternalCredentialSelectionEvent.SkipReason? = null
+    private var selectedSkipOtherText: String? = null
+
     init {
         viewModelScope.launch {
             val config = configManager.getProjectConfiguration()
@@ -45,12 +56,31 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
         }
     }
 
+    fun selectionStarted() {
+        selectionStartTime = timeHelper.now()
+    }
+
+    fun skipOptionSelected(skipOption: ExternalCredentialSelectionEvent.SkipReason) {
+        selectedSkipReason = skipOption
+    }
+
+    fun skipOtherReasonChanged(otherText: String?) {
+        selectedSkipOtherText = otherText?.ifBlank { null }
+    }
+
     private fun updateState(state: (ExternalCredentialState) -> ExternalCredentialState) {
         this.state = state(this.state)
     }
 
     fun setSelectedExternalCredentialType(selectedType: ExternalCredentialType?) {
-        updateState { it.copy(selectedType = selectedType) }
+        viewModelScope.launch {
+            if (selectedType != null) {
+                val selectionEndTime = timeHelper.now()
+                selectionEventId = eventsTracker.saveSelectionEvent(selectionStartTime, selectionEndTime, selectedType)
+                captureStartTime = timeHelper.now()
+            }
+            updateState { it.copy(selectedType = selectedType) }
+        }
     }
 
     fun setExternalCredentialValue(value: String) {
@@ -66,6 +96,20 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
     }
 
     fun finish(result: ExternalCredentialSearchResult) {
-        _finishEvent.send(result)
+        viewModelScope.launch {
+            if (result.scannedCredential == null) {
+                selectedSkipReason?.let { reason ->
+                    eventsTracker.saveSkippedEvent(selectionStartTime, reason, selectedSkipOtherText)
+                }
+            } else {
+                eventsTracker.saveCaptureEvents(
+                    captureStartTime,
+                    params.subjectId.orEmpty(),
+                    result.scannedCredential,
+                    selectionEventId,
+                )
+            }
+            _finishEvent.send(result)
+        }
     }
 }

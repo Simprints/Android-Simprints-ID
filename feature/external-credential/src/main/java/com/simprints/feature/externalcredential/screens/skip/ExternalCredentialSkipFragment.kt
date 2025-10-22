@@ -13,6 +13,7 @@ import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialSkipBinding
 import com.simprints.feature.externalcredential.ext.getCredentialTypeString
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
+import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
@@ -39,19 +40,15 @@ class ExternalCredentialSkipFragment : Fragment(R.layout.fragment_external_crede
     }
 
     private fun initViews(credentialTypes: List<ExternalCredentialType>) = with(binding) {
-        val dynamicTextReasonItemMap =
-            mapOf(
-                title to IDR.string.mfid_skip_title,
-                skipReasonDoesNotHaveDocument to IDR.string.mfid_skip_reason_does_not_have,
-                skipReasonDidNotBring to IDR.string.mfid_skip_reason_did_not_bring,
-                skipReasonIncorrect to IDR.string.mfid_skip_reason_incorrect,
-                skipReasonDoesNotWantToProvide to IDR.string.mfid_skip_reason_does_not_want_to_provide,
-                skipReasonDamaged to IDR.string.mfid_skip_reason_damaged,
-                skipReasonUnableToScan to IDR.string.mfid_skip_reason_unable_to_scan,
-            )
-        dynamicTextReasonItemMap.forEach { entry ->
-            val textView = entry.key
-            val stringRes = entry.value
+        mapOf(
+            title to IDR.string.mfid_skip_title,
+            skipReasonDoesNotHaveDocument to IDR.string.mfid_skip_reason_does_not_have,
+            skipReasonDidNotBring to IDR.string.mfid_skip_reason_did_not_bring,
+            skipReasonIncorrect to IDR.string.mfid_skip_reason_incorrect,
+            skipReasonDoesNotWantToProvide to IDR.string.mfid_skip_reason_does_not_want_to_provide,
+            skipReasonDamaged to IDR.string.mfid_skip_reason_damaged,
+            skipReasonUnableToScan to IDR.string.mfid_skip_reason_unable_to_scan,
+        ).forEach { (textView, stringRes) ->
             val credentialText = when (credentialTypes.size) {
                 1 -> resources.getCredentialTypeString(credentialTypes.first())
                 else -> getString(IDR.string.mfid_type_any_document)
@@ -62,6 +59,7 @@ class ExternalCredentialSkipFragment : Fragment(R.layout.fragment_external_crede
 
     private fun initListeners() = with(binding) {
         skipCredentialScanRadioGroup.setOnCheckedChangeListener { _, checkedId ->
+            mainViewModel.skipOptionSelected(viewIdToOption(checkedId))
             reasonTextInputLayout.isVisible = checkedId == R.id.skipReasonOther
 
             val isSkipButtonEnabled = when (checkedId) {
@@ -75,7 +73,9 @@ class ExternalCredentialSkipFragment : Fragment(R.layout.fragment_external_crede
         }
         reasonTextInput.addTextChangedListener(
             afterTextChanged = {
-                buttonSkip.isEnabled = it.toString().isNotEmpty()
+                val text = it.toString()
+                mainViewModel.skipOtherReasonChanged(text)
+                buttonSkip.isEnabled = text.isNotEmpty()
             },
         )
         buttonGoBack.setOnClickListener {
@@ -92,5 +92,15 @@ class ExternalCredentialSkipFragment : Fragment(R.layout.fragment_external_crede
                 ),
             )
         }
+    }
+
+    private fun viewIdToOption(checkedId: Int) = when (checkedId) {
+        R.id.skipReasonDoesNotHaveDocument -> ExternalCredentialSelectionEvent.SkipReason.DOES_NOT_HAVE_ID
+        R.id.skipReasonDidNotBring -> ExternalCredentialSelectionEvent.SkipReason.DID_NOT_BRING_ID
+        R.id.skipReasonIncorrect -> ExternalCredentialSelectionEvent.SkipReason.BROUGHT_INCORRECT_ID
+        R.id.skipReasonDoesNotWantToProvide -> ExternalCredentialSelectionEvent.SkipReason.NO_CONSENT
+        R.id.skipReasonDamaged -> ExternalCredentialSelectionEvent.SkipReason.ID_DAMAGED
+        R.id.skipReasonUnableToScan -> ExternalCredentialSelectionEvent.SkipReason.UNABLE_TO_SCAN
+        else -> ExternalCredentialSelectionEvent.SkipReason.OTHER
     }
 }

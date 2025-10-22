@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.screens.scanqr.usecase.ExternalCredentialQrCodeValidatorUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -18,11 +20,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class ExternalCredentialScanQrViewModel @Inject constructor(
+    private val timeHelper: TimeHelper,
     private val externalCredentialQrCodeValidator: ExternalCredentialQrCodeValidatorUseCase,
     private val authStore: AuthStore,
     private val configManager: ConfigManager,
     private val tokenizationProcessor: TokenizationProcessor,
 ) : ViewModel() {
+    private lateinit var startTime: Timestamp
     private var state: ScanQrState = ScanQrState.ReadyToScan
         set(value) {
             field = value
@@ -46,7 +50,12 @@ internal class ExternalCredentialScanQrViewModel @Inject constructor(
                         tokenKeyType = TokenKeyType.ExternalCredential,
                         project = project,
                     ) as TokenizableString.Tokenized
-                    ScanQrState.QrCodeCaptured(qrCode = value.asTokenizableRaw(), qrCodeEncrypted = qrCodeEncrypted)
+                    ScanQrState.QrCodeCaptured(
+                        scanStartTime = startTime,
+                        scanEndTime = timeHelper.now(),
+                        qrCode = value.asTokenizableRaw(),
+                        qrCodeEncrypted = qrCodeEncrypted,
+                    )
                 }
             }
             updateState { newState }
@@ -55,7 +64,10 @@ internal class ExternalCredentialScanQrViewModel @Inject constructor(
 
     fun updateCameraPermissionStatus(permissionStatus: PermissionStatus) {
         val newState = when (permissionStatus) {
-            PermissionStatus.Granted -> ScanQrState.ReadyToScan
+            PermissionStatus.Granted -> {
+                startTime = timeHelper.now() // Reset scan timer
+                ScanQrState.ReadyToScan
+            }
             PermissionStatus.Denied -> ScanQrState.NoCameraPermission(shouldOpenPhoneSettings = false)
             PermissionStatus.DeniedNeverAskAgain -> ScanQrState.NoCameraPermission(shouldOpenPhoneSettings = true)
         }

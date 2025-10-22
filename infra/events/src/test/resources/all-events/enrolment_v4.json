@@ -23,6 +23,9 @@
     },
     "biometricReferenceIds": [
       "94828488-47ce-4c76-8ace-33d69b2a6d75"
+    ],
+    "externalCredentialIds": [
+      "dbc27bdb-cab3-463e-9004-68065e05f812"
     ]
   }
 }

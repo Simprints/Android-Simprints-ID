@@ -5,6 +5,7 @@ import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.infra.config.store.remote.models.ApiExternalCredentialType
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
 import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
@@ -29,10 +30,12 @@ class ApiEnrolmentRecordCreationEventTest {
                     "NEC_1",
                 ),
             ),
-            externalCredential = ApiExternalCredential(
-                id = "id",
-                type = ExternalCredentialType.NHISCard.toString(),
-                value = "value"
+            externalCredentials = listOf(
+                ApiExternalCredential(
+                    id = "id",
+                    type = ApiExternalCredentialType.NHIS_CARD,
+                    value = "value",
+                ),
             ),
         )
         val expectedPayload = EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload(
@@ -54,8 +57,8 @@ class ApiEnrolmentRecordCreationEventTest {
                     id = "id",
                     value = "value".asTokenizableEncrypted(),
                     subjectId = "subjectId",
-                    type = ExternalCredentialType.NHISCard
-                )
+                    type = ExternalCredentialType.NHISCard,
+                ),
             ),
         )
 

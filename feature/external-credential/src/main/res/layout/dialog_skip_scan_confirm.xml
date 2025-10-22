@@ -27,7 +27,7 @@
                 style="@style/Text.Headline5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/mfid_dialog_skip_scan_title" />
+                android:text="@string/mfid_skip_scan_dialog_title" />
 
             <View
                 android:layout_width="match_parent"
@@ -52,7 +52,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/mfid_dialog_skip_scan_confirm"
+            android:text="@string/mfid_skip_scan_dialog_confirm"
             android:textColor="@color/simprints_red" />
 
         <Button

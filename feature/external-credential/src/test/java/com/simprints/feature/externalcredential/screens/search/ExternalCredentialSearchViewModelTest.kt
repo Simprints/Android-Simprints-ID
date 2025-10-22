@@ -8,12 +8,15 @@ import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.externalcredential.screens.search.model.SearchCredentialState
 import com.simprints.feature.externalcredential.screens.search.model.SearchState
 import com.simprints.feature.externalcredential.screens.search.usecase.MatchCandidatesUseCase
+import com.simprints.feature.externalcredential.usecase.ExternalCredentialEventTrackerUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -38,6 +41,9 @@ internal class ExternalCredentialSearchViewModelTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
+    lateinit var timeHelper: TimeHelper
+
+    @MockK
     lateinit var authStore: AuthStore
 
     @MockK
@@ -59,7 +65,7 @@ internal class ExternalCredentialSearchViewModelTest {
     lateinit var candidateMatch: CredentialMatch
 
     @MockK
-    lateinit var scannedCredential: ScannedCredential
+    lateinit var mockScannedCredential: ScannedCredential
 
     @MockK
     lateinit var externalCredentialParams: ExternalCredentialParams
@@ -70,6 +76,9 @@ internal class ExternalCredentialSearchViewModelTest {
     @MockK
     private lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
+    @MockK
+    lateinit var eventsTracker: ExternalCredentialEventTrackerUseCase
+
     private lateinit var viewModel: ExternalCredentialSearchViewModel
 
     private val projectId = "projectId"
@@ -77,20 +86,25 @@ internal class ExternalCredentialSearchViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
+        every { timeHelper.now() } returns Timestamp(1L)
         every { authStore.signedInProjectId } returns projectId
         coEvery { configManager.getProject(projectId) } returns project
         coEvery { configManager.getProjectConfiguration() } returns projectConfig
+        coJustRun { eventsTracker.saveSearchEvent(any(), any(), any()) }
+        coJustRun { eventsTracker.saveConfirmation(any(), any()) }
         viewModel = createViewModel()
     }
 
     fun createViewModel() = ExternalCredentialSearchViewModel(
-        scannedCredential = scannedCredential,
+        scannedCredential = mockScannedCredential,
         externalCredentialParams = externalCredentialParams,
+        timeHelper = timeHelper,
         authStore = authStore,
         configManager = configManager,
         matchCandidatesUseCase = matchCandidatesUseCase,
         tokenizationProcessor = tokenizationProcessor,
         enrolmentRecordRepository = enrolmentRecordRepository,
+        eventsTracker = eventsTracker,
     )
 
     @Test
@@ -103,9 +117,10 @@ internal class ExternalCredentialSearchViewModelTest {
         val observer = viewModel.stateLiveData.test()
 
         assertThat(observer.value()?.searchState).isEqualTo(SearchState.CredentialNotFound)
-        assertThat(observer.value()?.scannedCredential).isEqualTo(scannedCredential)
+        assertThat(observer.value()?.scannedCredential).isEqualTo(mockScannedCredential)
         assertThat(observer.value()?.isConfirmed).isFalse()
         assertThat(observer.value()?.displayedCredential).isEqualTo(decryptedCredential)
+        coVerify { eventsTracker.saveSearchEvent(any(), any(), any()) }
     }
 
     @Test
@@ -122,6 +137,7 @@ internal class ExternalCredentialSearchViewModelTest {
         val searchState = viewModel.stateLiveData.value?.searchState as SearchState.CredentialLinked
         assertThat(searchState.matchResults).hasSize(1)
         assertThat(searchState.matchResults.first()).isEqualTo(candidateMatch)
+        coVerify { eventsTracker.saveSearchEvent(any(), any(), any()) }
     }
 
     @Test
@@ -188,7 +204,7 @@ internal class ExternalCredentialSearchViewModelTest {
 
     @Test
     fun `getKeyBoardInputType returns number for NHIS card`() = runTest {
-        every { scannedCredential.credentialType } returns ExternalCredentialType.NHISCard
+        every { mockScannedCredential.credentialType } returns ExternalCredentialType.NHISCard
         viewModel = createViewModel()
         val result = viewModel.getKeyBoardInputType()
         assertThat(result).isEqualTo(InputType.TYPE_CLASS_NUMBER)
@@ -196,7 +212,7 @@ internal class ExternalCredentialSearchViewModelTest {
 
     @Test
     fun `getKeyBoardInputType returns text for Ghana ID card`() = runTest {
-        every { scannedCredential.credentialType } returns ExternalCredentialType.GhanaIdCard
+        every { mockScannedCredential.credentialType } returns ExternalCredentialType.GhanaIdCard
         viewModel = createViewModel()
         val result = viewModel.getKeyBoardInputType()
         assertThat(result).isEqualTo(InputType.TYPE_CLASS_TEXT)
@@ -204,7 +220,7 @@ internal class ExternalCredentialSearchViewModelTest {
 
     @Test
     fun `getKeyBoardInputType returns text for QR code`() = runTest {
-        every { scannedCredential.credentialType } returns ExternalCredentialType.QRCode
+        every { mockScannedCredential.credentialType } returns ExternalCredentialType.QRCode
         viewModel = createViewModel()
         val result = viewModel.getKeyBoardInputType()
         assertThat(result).isEqualTo(InputType.TYPE_CLASS_TEXT)
@@ -214,21 +230,21 @@ internal class ExternalCredentialSearchViewModelTest {
     fun `finish sends empty matches when credential not found`() = runTest {
         viewModel = createViewModel()
         val state = mockk<SearchCredentialState> {
-            every { scannedCredential } returns this@ExternalCredentialSearchViewModelTest.scannedCredential
+            every { scannedCredential } returns mockScannedCredential
             every { searchState } returns SearchState.CredentialNotFound
         }
         viewModel.finish(state)
         val finishEvent = viewModel.finishEvent.value?.peekContent()
         assertThat(finishEvent).isNotNull()
         assertThat(finishEvent?.matchResults).isEmpty()
-        assertThat(finishEvent?.scannedCredential).isEqualTo(scannedCredential)
+        assertThat(finishEvent?.scannedCredential).isEqualTo(mockScannedCredential)
     }
 
     @Test
     fun `finish sends empty matches when still searching`() = runTest {
         viewModel = createViewModel()
         val state = mockk<SearchCredentialState> {
-            every { scannedCredential } returns this@ExternalCredentialSearchViewModelTest.scannedCredential
+            every { scannedCredential } returns mockScannedCredential
             every { searchState } returns SearchState.Searching
         }
         viewModel.finish(state)
@@ -240,7 +256,7 @@ internal class ExternalCredentialSearchViewModelTest {
     @Test
     fun `finish sends match results when credential linked`() = runTest {
         val state = mockk<SearchCredentialState> {
-            every { scannedCredential } returns this@ExternalCredentialSearchViewModelTest.scannedCredential
+            every { scannedCredential } returns mockScannedCredential
             every { searchState } returns mockk<SearchState.CredentialLinked> {
                 every { matchResults } returns listOf(candidateMatch)
             }
@@ -250,7 +266,27 @@ internal class ExternalCredentialSearchViewModelTest {
         assertThat(finishEvent).isNotNull()
         assertThat(finishEvent?.matchResults).hasSize(1)
         assertThat(finishEvent?.matchResults?.first()).isEqualTo(candidateMatch)
-        assertThat(finishEvent?.scannedCredential).isEqualTo(scannedCredential)
+        assertThat(finishEvent?.scannedCredential).isEqualTo(mockScannedCredential)
+    }
+
+    @Test
+    fun `trackRecapture sends confirmation event`() = runTest {
+        viewModel.trackRecapture()
+
+        coVerify { eventsTracker.saveConfirmation(any(), any()) }
+    }
+
+    @Test
+    fun `finish sends confirmation event`() = runTest {
+        val state = mockk<SearchCredentialState> {
+            every { scannedCredential } returns mockScannedCredential
+            every { searchState } returns mockk<SearchState.CredentialLinked> {
+                every { matchResults } returns listOf(candidateMatch)
+            }
+        }
+        viewModel.finish(state)
+
+        coVerify { eventsTracker.saveConfirmation(any(), any()) }
     }
 
     @Test
@@ -258,7 +294,7 @@ internal class ExternalCredentialSearchViewModelTest {
         val encryptedCredential = mockk<TokenizableString.Tokenized>()
         val decryptedCredential = "decryptedValue".asTokenizableRaw()
 
-        every { scannedCredential.credential } returns encryptedCredential
+        every { mockScannedCredential.credential } returns encryptedCredential
         coEvery { tokenizationProcessor.decrypt(encryptedCredential, TokenKeyType.ExternalCredential, project) } returns decryptedCredential
         coEvery { enrolmentRecordRepository.load(any()) } returns emptyList()
 

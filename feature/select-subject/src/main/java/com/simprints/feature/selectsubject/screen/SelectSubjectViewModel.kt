@@ -21,6 +21,8 @@ import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.events.event.domain.models.EnrolmentUpdateEvent
+import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SESSION
@@ -120,6 +122,7 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
         viewModelScope.launch {
             val addedCredential = try {
                 addExternalCredentialToSubjectUseCase(scannedCredential, subjectId = params.subjectId, projectId = params.projectId)
+                saveCredentialSelectionEvent(params.subjectId)
                 scannedCredential
             } catch (e: Exception) {
                 Simber.e("Failed to attach scanned credential", e, tag = SESSION)
@@ -136,6 +139,26 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
 
     fun finishWithoutSavingCredential() {
         _finish.send(SelectSubjectResult(isSubjectIdSaved = true, savedCredential = null))
+    }
+
+    private suspend fun saveCredentialSelectionEvent(subjectId: String) = with(sessionCoroutineScope) {
+        try {
+            val externalCredentialIdsToAdd = eventRepository
+                .getEventsInCurrentSession()
+                .filterIsInstance<ExternalCredentialCaptureValueEvent>()
+                .map { it.payload.id }
+
+            Simber.d("Adding credentials $externalCredentialIdsToAdd to subject $subjectId", tag = SESSION)
+            eventRepository.addOrUpdateEvent(
+                EnrolmentUpdateEvent(
+                    timeHelper.now(),
+                    subjectId = subjectId,
+                    externalCredentialIdsToAdd = externalCredentialIdsToAdd,
+                ),
+            )
+        } catch (t: Throwable) {
+            Simber.e("Failed to save Enrolment Update Event", t, tag = SESSION)
+        }
     }
 
     private suspend fun saveSelectionEvent(subjectId: String): Boolean = with(sessionCoroutineScope) {

@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":infra:enrolment-records:repository"))
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:matching"))
+    implementation(project(":infra:events"))
     implementation(project(":infra:credential-store"))
     implementation(libs.androidX.cameraX.view)
     implementation(libs.mlkit.text.recognition)

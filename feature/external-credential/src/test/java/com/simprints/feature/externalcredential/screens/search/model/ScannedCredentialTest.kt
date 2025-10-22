@@ -2,29 +2,31 @@ package com.simprints.feature.externalcredential.screens.search.model
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
-import io.mockk.*
-import org.junit.Before
+import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.core.tools.time.Timestamp
 import org.junit.Test
-import java.util.UUID
 
 class ScannedCredentialTest {
     private val testUuid = "testUuid"
     private val subjectId = "subjectId"
 
-    @Before
-    fun setup() {
-        mockkStatic(UUID::class)
-        every { UUID.randomUUID().toString() } returns testUuid
-    }
-
     @Test
     fun `toExternalCredential maps fields correctly`() {
         val tokenizedValue = "tokenizedValue".asTokenizableEncrypted()
-        val scannedCredential = mockk<ScannedCredential> {
-            every { credential } returns tokenizedValue
-            every { credentialType } returns ExternalCredentialType.NHISCard
-        }
+        val scannedCredential = ScannedCredential(
+            credentialScanId = testUuid,
+            credential = tokenizedValue,
+            credentialType = ExternalCredentialType.NHISCard,
+            documentImagePath = null,
+            zoomedCredentialImagePath = null,
+            credentialBoundingBox = null,
+            scanStartTime = Timestamp(1L),
+            scanEndTime = Timestamp(2L),
+            scannedValue = "".asTokenizableRaw(),
+        )
+
         val result = scannedCredential.toExternalCredential(subjectId)
 
         assertThat(result.id).isEqualTo(testUuid)

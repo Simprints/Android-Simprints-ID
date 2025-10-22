@@ -14,20 +14,21 @@ internal data class ApiEnrolmentPayloadV4(
     val moduleId: String,
     val attendantId: String,
     val biometricReferenceIds: List<String>,
+    val externalCredentialIds: List<String>,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: EnrolmentEventV4.EnrolmentPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.subjectId,
-        domainPayload.projectId,
-        domainPayload.moduleId.value,
-        domainPayload.attendantId.value,
-        domainPayload.biometricReferenceIds,
+        startTime = domainPayload.createdAt.fromDomainToApi(),
+        subjectId = domainPayload.subjectId,
+        projectId = domainPayload.projectId,
+        moduleId = domainPayload.moduleId.value,
+        attendantId = domainPayload.attendantId.value,
+        biometricReferenceIds = domainPayload.biometricReferenceIds,
+        externalCredentialIds = domainPayload.externalCredentialIds,
     )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = when (tokenKeyType) {
         TokenKeyType.AttendantId -> "attendantId"
         TokenKeyType.ModuleId -> "moduleId"
-        TokenKeyType.ExternalCredential -> "externalCredential"
-        TokenKeyType.Unknown -> null
+        else -> null
     }
 }

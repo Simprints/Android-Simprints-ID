@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -74,7 +75,7 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
 
     private fun initViews(types: List<ExternalCredentialType>) {
         binding.title.text = resources.getQuantityCredentialString(
-            id = IDR.plurals.mfid_scan_action,
+            id = IDR.string.mfid_scan_action,
             specificCredentialRes = resources.getCredentialTypeRes(types.firstOrNull()),
             multipleCredentialsRes = IDR.string.mfid_type_any_document,
             credentialTypes = types,
@@ -87,6 +88,7 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
             fillRecyclerView(externalCredentialTypes)
             initViews(externalCredentialTypes)
             initListeners(externalCredentialTypes)
+            mainViewModel.selectionStarted()
         }
     }
 
@@ -136,7 +138,7 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
                     val confirmButton = view.findViewById<Button>(R.id.buttonSkip)
 
                     bodyText.text = resources.getQuantityCredentialString(
-                        id = IDR.plurals.mfid_dialog_skip_scan_body,
+                        id = IDR.string.mfid_skip_scan_dialog_body,
                         credentialTypes = credentialTypes,
                         specificCredentialRes = resources.getCredentialTypeRes(credentialTypes.firstOrNull()),
                         multipleCredentialsRes = IDR.string.mfid_type_any_document,
