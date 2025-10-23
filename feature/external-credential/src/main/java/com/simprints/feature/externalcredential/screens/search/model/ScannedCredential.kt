@@ -3,6 +3,7 @@ package com.simprints.feature.externalcredential.screens.search.model
 import androidx.annotation.Keep
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.step.StepResult
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
@@ -20,7 +21,7 @@ data class ScannedCredential(
     val scanStartTime: Timestamp,
     val scanEndTime: Timestamp,
     val scannedValue: TokenizableString.Raw,
-) : Serializable
+) : StepResult
 
 fun ScannedCredential.toExternalCredential(subjectId: String) = ExternalCredential(
     id = credentialScanId,
