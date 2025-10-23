@@ -4,10 +4,14 @@ import android.content.SharedPreferences
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.FaceCaptureParams
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.alert.AlertResult
@@ -21,6 +25,11 @@ import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.feature.enrollast.MatchResult
 import com.simprints.feature.exitform.ExitFormOption
 import com.simprints.feature.exitform.ExitFormResult
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.feature.externalcredential.model.BoundingBox
+import com.simprints.feature.externalcredential.model.CredentialMatch
+import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.fetchsubject.FetchSubjectParams
 import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.login.LoginError
@@ -176,6 +185,54 @@ class OrchestratorCacheIntegrationTest {
                 params = null,
                 status = StepStatus.COMPLETED,
                 result = SelectSubjectAgeGroupResult(AgeGroup(10, null)),
+            ),
+            Step(
+                id = StepId.EXTERNAL_CREDENTIAL,
+                navigationActionId = 5,
+                destinationId = 6,
+                params = ExternalCredentialParams(
+                    subjectId = "subjectId",
+                    flowType = FlowType.IDENTIFY,
+                    ageGroup = AgeGroup(1, 2),
+                    probeReferenceId = "referenceId",
+                    faceSamples = listOf(
+                        MatchParams.FaceSample(
+                            faceId = "faceId",
+                            template = byteArrayOf(1, 2, 3),
+                        ),
+                    ),
+                    fingerprintSamples = listOf(
+                        MatchParams.FingerprintSample(
+                            fingerId = IFingerIdentifier.LEFT_4TH_FINGER,
+                            format = "NEC",
+                            template = byteArrayOf(1, 2, 3),
+                        ),
+                    ),
+                ),
+                status = StepStatus.COMPLETED,
+                result = ExternalCredentialSearchResult(
+                    flowType = FlowType.IDENTIFY,
+                    scannedCredential = ScannedCredential(
+                        credentialScanId = "scanId",
+                        credential = "credential".asTokenizableEncrypted(),
+                        credentialType = ExternalCredentialType.GhanaIdCard,
+                        documentImagePath = "image/path.jpg",
+                        zoomedCredentialImagePath = "image/path.jpg",
+                        credentialBoundingBox = BoundingBox(0, 1, 2, 3),
+                        scanStartTime = Timestamp(1L),
+                        scanEndTime = Timestamp(2L, false, 123L),
+                        scannedValue = "credential".asTokenizableRaw(),
+                    ),
+                    matchResults = listOf(
+                        CredentialMatch(
+                            credential = "credential".asTokenizableEncrypted(),
+                            matchResult = FaceMatchResult.Item("subjectId", 0.5f),
+                            verificationThreshold = 55f,
+                            faceBioSdk = FaceConfiguration.BioSdk.RANK_ONE,
+                            fingerprintBioSdk = FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
+                        ),
+                    ),
+                ),
             ),
         )
 
