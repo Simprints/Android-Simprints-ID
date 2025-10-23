@@ -46,10 +46,10 @@ import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQue
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
+import com.simprints.infra.matching.FaceMatchResult
+import com.simprints.infra.matching.FingerprintMatchResult
+import com.simprints.infra.matching.MatchParams
 import com.simprints.infra.security.SecurityManager
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.FingerprintMatchResult
-import com.simprints.matcher.MatchParams
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import org.junit.Before
@@ -148,6 +148,7 @@ class OrchestratorCacheIntegrationTest {
                         ),
                         EnrolLastBiometricStepResult.EnrolLastBiometricsResult("subjectId"),
                     ),
+                    scannedCredential = null,
                 ),
                 status = StepStatus.COMPLETED,
                 result = ValidateSubjectPoolResult(true),
@@ -156,9 +157,9 @@ class OrchestratorCacheIntegrationTest {
                 id = StepId.CONFIRM_IDENTITY,
                 navigationActionId = 5,
                 destinationId = 6,
-                params = SelectSubjectParams("projectId", "subjectId"),
+                params = SelectSubjectParams("projectId", "subjectId", null),
                 status = StepStatus.COMPLETED,
-                result = SelectSubjectResult(true),
+                result = SelectSubjectResult(true, savedCredential = null),
             ),
             Step(
                 id = StepId.VALIDATE_ID_POOL,
