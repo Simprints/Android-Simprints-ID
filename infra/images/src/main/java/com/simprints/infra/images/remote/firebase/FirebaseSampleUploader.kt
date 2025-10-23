@@ -17,7 +17,6 @@ import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.remote.SampleUploader
 import com.simprints.infra.images.usecase.SamplePathConverter
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SAMPLE_UPLOAD
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.tasks.await
 import java.io.FileInputStream
@@ -103,7 +102,7 @@ internal class FirebaseSampleUploader @Inject constructor(
         val fileRef = imageRef.relativePath.parts
             .fold(rootRef) { ref, pathPart -> ref.child(pathPart) }
 
-        Simber.i("Uploading ${fileRef.path.last()}", tag = SAMPLE_UPLOAD)
+        Simber.i("Uploading ${imageRef.relativePath.parts.last()}", tag = SAMPLE_UPLOAD)
 
         return if (metadata.isEmpty()) {
             fileRef.putStream(imageStream).await()
