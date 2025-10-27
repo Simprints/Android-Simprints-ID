@@ -69,13 +69,18 @@ class DocumentScanMaskView @JvmOverloads constructor(
         (parent as ViewGroup).findViewById<View>(targetViewId)?.let { targetView ->
             canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), bgPaint)
 
-            // Calculating target view position relative to this view
-            rect.setEmpty()
-            targetView.getGlobalVisibleRect(rect)
-            val offset = IntArray(2)
-            getLocationOnScreen(offset)
-            rect.offset(-offset[0], -offset[1])
+//            // Calculating target view position relative to this view
+            val targetLocation = IntArray(2)
+            val maskLocation = IntArray(2)
+            targetView.getLocationInWindow(targetLocation)
+            getLocationInWindow(maskLocation)
 
+            rect.set(
+                targetLocation[0] - maskLocation[0],
+                targetLocation[1] - maskLocation[1],
+                targetLocation[0] - maskLocation[0] + targetView.width,
+                targetLocation[1] - maskLocation[1] + targetView.height,
+            )
             // Apply inset if specified. This might be useful for QR scanners to create sense of depth
             insetValue?.let { inset ->
                 val insetInt = inset.toInt()
