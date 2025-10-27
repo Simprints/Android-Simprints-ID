@@ -5,9 +5,12 @@ import com.simprints.feature.clientapi.mappers.request.builders.EnrolLastBiometr
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.EnrolLastBiometricsRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.EnrolLastBiometricsValidator
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.infra.orchestration.data.ActionConstants
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 
@@ -30,11 +33,18 @@ internal object EnrolLastBiometricsActionFactory : RequestActionFactory() {
         unknownExtras = emptyMap(),
     )
 
-    override fun getValidator(extractor: ActionRequestExtractor): EnrolLastBiometricsValidator = EnrolLastBiometricsValidator(
-        extractor as EnrolLastBiometricsRequestExtractor,
-        MOCK_SESSION_ID,
-        true,
-    )
+    override fun getValidator(extractor: ActionRequestExtractor): EnrolLastBiometricsValidator {
+        val mockEventRepository = mockk<EventRepository>()
+        // Return a valid identification callback event
+        coEvery { mockEventRepository.getEventsFromScope(any()) } returns listOf(
+            mockk<IdentificationCallbackEvent>(),
+        )
+        return EnrolLastBiometricsValidator(
+            extractor as EnrolLastBiometricsRequestExtractor,
+            MOCK_SESSION_ID,
+            mockEventRepository,
+        )
+    }
 
     override fun getBuilder(extractor: ActionRequestExtractor): EnrolLastBiometricsRequestBuilder = EnrolLastBiometricsRequestBuilder(
         actionIdentifier = getIdentifier(),
