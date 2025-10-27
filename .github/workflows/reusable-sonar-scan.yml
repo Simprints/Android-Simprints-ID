@@ -42,7 +42,7 @@ jobs:
                     google-services-file: ${{ secrets.GOOGLE_SERVICES_FILE }}
 
             -   name: download all artifacts
-                uses: actions/download-artifact@v5
+                uses: actions/download-artifact@v6
                 with:
                     path: test-reports
 
