@@ -20,6 +20,7 @@ internal class ProvideCameraListenerUseCase @Inject constructor() {
         surfaceProvider: Preview.SurfaceProvider,
         viewLifecycleOwner: LifecycleOwner,
         onImageAnalysisReady: (ImageAnalysis) -> Unit,
+        onImageCaptureReady: (ImageCapture) -> Unit,
     ) = Runnable {
         val cameraProvider = cameraProviderFuture.get()
         val aspectRatio = AspectRatio.RATIO_16_9
@@ -49,6 +50,7 @@ internal class ProvideCameraListenerUseCase @Inject constructor() {
             cameraProvider.unbindAll()
             cameraProvider.bindToLifecycle(viewLifecycleOwner, cameraSelector, preview, imageCapture, imageAnalysis)
             onImageAnalysisReady(imageAnalysis)
+            onImageCaptureReady(imageCapture)
         } catch (e: Exception) {
             Simber.e("Camera binding failed in OCR", e, MULTI_FACTOR_ID)
         }

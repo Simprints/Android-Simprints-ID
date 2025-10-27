@@ -168,6 +168,6 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     }
 
     companion object {
-        private const val SUCCESSFUL_SCANS_REQUIRED = 5
+        private const val SUCCESSFUL_SCANS_REQUIRED = 3
     }
 }
