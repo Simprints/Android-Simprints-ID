@@ -5,6 +5,7 @@ import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.mappers.request.requestFactories.VerifyActionFactory
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.every
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Test
 import java.util.UUID
@@ -13,7 +14,7 @@ internal class VerifyValidatorTest : ActionRequestValidatorTest(VerifyActionFact
     private val mockExtractor = VerifyActionFactory.getMockExtractor()
 
     @Test
-    fun `should fail if no guid to verify`() {
+    fun `should fail if no guid to verify`() = runTest {
         every { mockExtractor.getVerifyGuid() } returns ""
 
         assertThrows<InvalidRequestException> {
@@ -22,7 +23,7 @@ internal class VerifyValidatorTest : ActionRequestValidatorTest(VerifyActionFact
     }
 
     @Test
-    fun `should fail if not guid `() {
+    fun `should fail if not guid `() = runTest {
         every { mockExtractor.getVerifyGuid() } returns "Trust me, this is a valid GUID!"
 
         assertThrows<InvalidRequestException> {
@@ -31,7 +32,7 @@ internal class VerifyValidatorTest : ActionRequestValidatorTest(VerifyActionFact
     }
 
     @Test
-    fun `should fail if not valid guid`() {
+    fun `should fail if not valid guid`() = runTest {
         // The following UUID is one character short of fitting into the valid pattern
         every { mockExtractor.getVerifyGuid() } returns "123e4567-e89b-12d3-a456-55664244000"
 
@@ -41,7 +42,7 @@ internal class VerifyValidatorTest : ActionRequestValidatorTest(VerifyActionFact
     }
 
     @Test
-    fun `should fail if nil guid`() {
+    fun `should fail if nil guid`() = runTest {
         val nilUuid = UUID(0, 0).toString()
         every { mockExtractor.getVerifyGuid() } returns nilUuid
 
@@ -51,12 +52,12 @@ internal class VerifyValidatorTest : ActionRequestValidatorTest(VerifyActionFact
     }
 
     @Test
-    fun `should not fail if valid guid`() {
+    fun `should not fail if valid guid`() = runTest {
         every { mockExtractor.getVerifyGuid() } returns randomUUID()
 
         try {
             VerifyActionFactory.getValidator(mockExtractor).validate()
-        } catch (ex: Exception) {
+        } catch (_: Exception) {
             Assert.fail()
         }
     }

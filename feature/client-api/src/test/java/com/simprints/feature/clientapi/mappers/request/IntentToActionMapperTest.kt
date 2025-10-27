@@ -6,8 +6,8 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.models.ClientApiConstants
 import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
-import com.simprints.feature.clientapi.usecases.SessionHasIdentificationCallbackUseCase
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.libsimprints.Constants.SIMPRINTS_LIB_VERSION
 import com.simprints.libsimprints.Constants.SIMPRINTS_MODULE_ID
@@ -22,6 +22,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -36,13 +37,13 @@ class IntentToActionMapperTest {
     private lateinit var getCurrentSessionIdUseCase: GetCurrentSessionIdUseCase
 
     @MockK
-    private lateinit var sessionHasIdentificationCallback: SessionHasIdentificationCallbackUseCase
-
-    @MockK
     private lateinit var tokenizationProcessor: TokenizationProcessor
 
     @MockK
     private lateinit var timeHelper: TimeHelper
+
+    @MockK
+    private lateinit var eventRepository: com.simprints.infra.events.EventRepository
 
     private lateinit var mapper: IntentToActionMapper
 
@@ -51,14 +52,24 @@ class IntentToActionMapperTest {
         MockKAnnotations.init(this, relaxed = true)
 
         coEvery { getCurrentSessionIdUseCase.invoke() } returns SESSION_ID
-        coEvery { sessionHasIdentificationCallback.invoke(any()) } returns true
         every { timeHelper.now() } returns Timestamp(0L)
+        coEvery { eventRepository.getEventsFromScope(any()) } returns listOf(
+            mockk<IdentificationCallbackEvent> {
+                every { payload } returns mockk {
+                    every { scores } returns listOf(
+                        mockk {
+                            every { guid } returns SESSION_ID
+                        },
+                    )
+                }
+            },
+        )
 
         mapper = IntentToActionMapper(
             getCurrentSessionIdUseCase,
-            sessionHasIdentificationCallback,
             tokenizationProcessor,
             timeHelper,
+            eventRepository,
         )
     }
 

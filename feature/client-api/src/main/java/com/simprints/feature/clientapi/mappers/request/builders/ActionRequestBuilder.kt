@@ -29,7 +29,7 @@ internal abstract class ActionRequestBuilder(
         value
     }
 
-    fun build(): ActionRequest {
+    suspend fun build(): ActionRequest {
         validator.validate()
         return buildAction().run(::encryptIfNecessary)
     }
