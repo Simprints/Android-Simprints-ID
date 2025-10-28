@@ -52,7 +52,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     @DispatcherBG private val bgDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     @AssistedFactory
-    interface Factory {
+    fun interface Factory {
         fun create(ocrDocumentType: OcrDocumentType): ExternalCredentialScanOcrViewModel
     }
 
@@ -168,6 +168,6 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     }
 
     companion object {
-        private const val SUCCESSFUL_SCANS_REQUIRED = 5
+        private const val SUCCESSFUL_SCANS_REQUIRED = 3
     }
 }
