@@ -232,8 +232,19 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
 
     private fun animateCompletionState() = with(binding) {
         isAnimatingCompletion = true
-        progressBar.fadeOut(FINISH_ANIMATION_DURATION, scaleX = true, fragment = this@ExternalCredentialScanOcrFragment)
-        scanInstructions.fadeOut(FINISH_ANIMATION_DURATION, scaleX = false, fragment = this@ExternalCredentialScanOcrFragment)
+        val finalVisibility = View.INVISIBLE
+        progressBar.fadeOut(
+            FINISH_ANIMATION_DURATION,
+            scaleX = true,
+            fragment = this@ExternalCredentialScanOcrFragment,
+            finalVisibility = finalVisibility,
+        )
+        scanInstructions.fadeOut(
+            FINISH_ANIMATION_DURATION,
+            scaleX = false,
+            fragment = this@ExternalCredentialScanOcrFragment,
+            finalVisibility = finalVisibility,
+        )
         iconScanComplete.fadeIn(FINISH_ANIMATION_DURATION, fragment = this@ExternalCredentialScanOcrFragment, onComplete = {
             isAnimatingCompletion = false
             // Execute any pending action after the animation. Currently used is for next fragment navigation

@@ -39,13 +39,14 @@ fun View.fadeOut(
     duration: Long,
     scaleX: Boolean,
     fragment: Fragment,
+    finalVisibility: Int = View.GONE,
 ) = animate()
     .alpha(0f)
     .setDuration(duration)
     .setInterpolator(DecelerateInterpolator())
     .withEndAction {
         if (fragment.isAdded) {
-            this.isVisible = false
+            this.visibility = finalVisibility
         }
     }.also {
         if (scaleX) {
