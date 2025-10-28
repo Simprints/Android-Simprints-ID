@@ -213,7 +213,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         instructionsText.text = getString(IDR.string.mfid_scan_instructions, documentTypeText)
         instructionsText.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_white))
         documentScannerArea.isVisible = true
-        progressContainer.isVisible = false
+        progressContainer.isInvisible = true
         buttonScan.isVisible = true
         buttonScan.setOnClickListener {
             viewModel.ocrStarted()
@@ -238,7 +238,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     private fun renderNoPermission(shouldOpenPhoneSettings: Boolean) {
         with(binding) {
             instructionsText.isVisible = false
-            progressContainer.isVisible = false
+            progressContainer.isInvisible = true
             documentScannerArea.isInvisible = true
             buttonScan.isVisible = false
             val documentTypeText = viewModel.getDocumentTypeRes().run(::getString)
