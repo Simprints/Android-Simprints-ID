@@ -13,6 +13,7 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
+import com.simprints.feature.externalcredential.screens.scanocr.model.OcrConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import com.simprints.feature.externalcredential.screens.scanocr.model.asExternalCredentialType
@@ -23,7 +24,9 @@ import com.simprints.feature.externalcredential.screens.scanocr.usecase.Normaliz
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ZoomOntoCredentialUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.credential.store.CredentialImageRepository
@@ -73,6 +76,19 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     private val _finishOcrEvent = MutableLiveData<LiveDataEventWithContent<ScannedCredential>>()
 
     private lateinit var startTime: Timestamp
+    lateinit var ocrConfig: OcrConfig
+        private set
+
+    init {
+        viewModelScope.launch {
+            ocrConfig = configManager.getProjectConfiguration().experimental().let { config ->
+                OcrConfig(
+                    useHighRes = config.ocrUseHighRes,
+                    capturesRequired = config.ocrCaptures.coerceIn(OCR_CAPTURE_MIN, OCR_CAPTURE_MAX),
+                )
+            }
+        }
+    }
 
     private fun updateState(state: (ScanOcrState) -> ScanOcrState) {
         this.state = state(this.state)
@@ -89,7 +105,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
             ScanOcrState.ScanningInProgress(
                 ocrDocumentType = ocrDocumentType,
                 successfulCaptures = 0,
-                scansRequired = SUCCESSFUL_SCANS_REQUIRED,
+                scansRequired = ocrConfig.capturesRequired,
             )
         }
     }
@@ -110,7 +126,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
                     ScanOcrState.ScanningInProgress(
                         ocrDocumentType = ocrDocumentType,
                         successfulCaptures = detectedBlocks.size,
-                        scansRequired = SUCCESSFUL_SCANS_REQUIRED,
+                        scansRequired = ocrConfig.capturesRequired,
                     )
                 }
             } finally {
@@ -168,6 +184,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     }
 
     companion object {
-        private const val SUCCESSFUL_SCANS_REQUIRED = 3
+        private const val OCR_CAPTURE_MIN = 1
+        private const val OCR_CAPTURE_MAX = 10
     }
 }

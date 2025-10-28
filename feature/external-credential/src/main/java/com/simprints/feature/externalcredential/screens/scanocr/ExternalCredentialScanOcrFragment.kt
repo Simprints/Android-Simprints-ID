@@ -279,19 +279,40 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     }
 
     private fun startOcr() {
-        imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
+        imageAnalysis.setAnalyzer(cameraExecutor) { videoFrame: ImageProxy ->
             if (viewModel.isRunningOcrOnFrame) {
-                imageProxy.close()
+                videoFrame.close()
                 return@setAnalyzer
             }
-            viewModel.ocrOnFrameStarted()
+
             // Running OCR as often as we can while camera feedback is displayed to the user
-            captureFullResImageForOcr()
-            imageProxy.close()
+            viewModel.ocrOnFrameStarted()
+            if (viewModel.ocrConfig.useHighRes) {
+                captureHighResImageForOcr()
+                videoFrame.close()
+            } else {
+                captureFrameFromVideoStreamForOcr(videoFrame)
+            }
         }
     }
 
-    private fun captureFullResImageForOcr() {
+    private fun captureFrameFromVideoStreamForOcr(imageProxy: ImageProxy) {
+        lifecycleScope.launch(bgDispatcher) {
+            try {
+                val (bitmap, imageInfo) = imageProxy.toBitmap() to imageProxy.imageInfo
+                val cropConfig: OcrCropConfig = buildOcrCropConfigUseCase(
+                    rotationDegrees = imageInfo.rotationDegrees,
+                    cameraPreview = binding.preview,
+                    documentScannerArea = binding.documentScannerArea,
+                )
+                viewModel.runOcrOnFrame(frame = bitmap, cropConfig)
+            } finally {
+                imageProxy.close()
+            }
+        }
+    }
+
+    private fun captureHighResImageForOcr() {
         imageCapture.takePicture(
             cameraExecutor,
             object : ImageCapture.OnImageCapturedCallback() {
