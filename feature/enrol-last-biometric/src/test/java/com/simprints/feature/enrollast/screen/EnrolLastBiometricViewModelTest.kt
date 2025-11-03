@@ -11,6 +11,7 @@ import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.screen.usecase.BuildSubjectUseCase
 import com.simprints.feature.enrollast.screen.usecase.CheckForDuplicateEnrolmentsUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.usecase.ResetExternalCredentialsInSessionUseCase
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -71,6 +72,9 @@ internal class EnrolLastBiometricViewModelTest {
     @MockK
     lateinit var tokenizationProcessor: TokenizationProcessor
 
+    @MockK
+    lateinit var resetEnrolmentUpdateEventsFromSession: ResetExternalCredentialsInSessionUseCase
+
     private lateinit var viewModel: EnrolLastBiometricViewModel
     private val guidToEnrol = "guidToEnrol"
 
@@ -87,6 +91,7 @@ internal class EnrolLastBiometricViewModelTest {
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
             mockk<PersonCreationEvent> { every { id } returns SESSION_ID },
         )
+        coJustRun { resetEnrolmentUpdateEventsFromSession.invoke(any()) }
 
         every { subject.subjectId } returns guidToEnrol
 
@@ -98,6 +103,7 @@ internal class EnrolLastBiometricViewModelTest {
             checkForDuplicateEnrolments = checkForDuplicateEnrolments,
             tokenizationProcessor = tokenizationProcessor,
             buildSubject = buildSubject,
+            resetEnrolmentUpdateEventsFromSession = resetEnrolmentUpdateEventsFromSession,
         )
     }
 
@@ -254,6 +260,7 @@ internal class EnrolLastBiometricViewModelTest {
 
         viewModel.enrolBiometric(createParams(listOf()), isAddingCredential = false)
 
+        coVerify { resetEnrolmentUpdateEventsFromSession.invoke(any(), any()) }
         coVerify {
             eventRepository.addOrUpdateEvent(
                 withArg {
