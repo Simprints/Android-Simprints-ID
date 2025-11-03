@@ -1,7 +1,7 @@
 package com.simprints.infra.enrolment.records.repository.local
 
-import androidx.test.core.app.ApplicationProvider
-import com.google.common.truth.Truth.assertThat
+import androidx.test.core.app.*
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.face.FaceSample
@@ -70,14 +70,6 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
     // --- Test Data ---
     private val date = Date() // Use a fixed date for consistent timestamps in tests
-
-    // External credentials
-    private val externalCredential = ExternalCredential(
-        id = "id",
-        value = "value".asTokenizableEncrypted(),
-        subjectId = "subjectId",
-        type = ExternalCredentialType.NHISCard,
-    )
 
     // Samples defined first
     private val faceSample1 = FaceSample(
@@ -366,6 +358,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             fingerprintSamplesToAdd = listOf(fingerprintSample1),
             referenceIdsToRemove = listOf(),
             externalCredentialsToAdd = listOf(),
+            externalCredentialIdsToRemove = listOf(),
         )
 
         // When
@@ -398,6 +391,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             fingerprintSamplesToAdd = listOf(), // Explicitly empty as in original
             referenceIdsToRemove = listOf(faceSample2.referenceId),
             externalCredentialsToAdd = listOf(),
+            externalCredentialIdsToRemove = listOf(),
         )
 
         // When
@@ -428,6 +422,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             fingerprintSamplesToAdd = listOf(),
             referenceIdsToRemove = listOf(fingerprintSample2.referenceId),
             externalCredentialsToAdd = listOf(),
+            externalCredentialIdsToRemove = listOf(),
         )
 
         // When
@@ -457,6 +452,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             fingerprintSamplesToAdd = listOf(),
             referenceIdsToRemove = listOf(faceSample1.referenceId),
             externalCredentialsToAdd = listOf(),
+            externalCredentialIdsToRemove = listOf(),
         )
 
         // When
@@ -481,6 +477,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             fingerprintSamplesToAdd = listOf(),
             referenceIdsToRemove = listOf(fingerprintSample1.referenceId),
             externalCredentialsToAdd = listOf(),
+            externalCredentialIdsToRemove = listOf(),
         )
 
         // When
@@ -501,6 +498,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             fingerprintSamplesToAdd = listOf(fingerprintSample1),
             referenceIdsToRemove = listOf(),
             externalCredentialsToAdd = listOf(),
+            externalCredentialIdsToRemove = listOf(),
         )
 
         // When
@@ -531,6 +529,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             fingerprintSamplesToAdd = listOf(),
             referenceIdsToRemove = listOf(),
             externalCredentialsToAdd = listOf(),
+            externalCredentialIdsToRemove = listOf(),
         )
 
         // When
@@ -640,6 +639,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             fingerprintSamplesToAdd = listOf(fingerprintSample1),
             referenceIdsToRemove = listOf(),
             externalCredentialsToAdd = listOf(),
+            externalCredentialIdsToRemove = listOf(),
         )
         dataSource.performActions(listOf(updateAction), project)
         loadedSubject =
@@ -1662,6 +1662,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             fingerprintSamplesToAdd = listOf(),
             referenceIdsToRemove = listOf(faceSample2.referenceId, fingerprintSample2.referenceId), // Remove all samples
             externalCredentialsToAdd = listOf(newExternalCredential),
+            externalCredentialIdsToRemove = listOf(),
         )
 
         dataSource.performActions(listOf(updateAction), project)
@@ -1670,5 +1671,40 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         assertThat(loaded.fingerprintSamples).isEmpty()
         assertThat(loaded.externalCredentials).hasSize(2)
         assertThat(loaded.externalCredentials).contains(newExternalCredential)
+    }
+
+    @Test
+    fun `performActions - Update - should succeed when removing external credentials`() = runTest {
+        val subject = subject3P1WithBoth.copy(
+            externalCredentials = listOf(
+                ExternalCredential(
+                    id = "credential-id-1",
+                    value = "value-1".asTokenizableEncrypted(),
+                    subjectId = subject3P1WithBoth.subjectId,
+                    type = ExternalCredentialType.NHISCard,
+                ),
+                ExternalCredential(
+                    id = "credential-id-2",
+                    value = "value-2".asTokenizableEncrypted(),
+                    subjectId = subject3P1WithBoth.subjectId,
+                    type = ExternalCredentialType.NHISCard,
+                ),
+            ),
+        )
+        dataSource.performActions(listOf(SubjectAction.Creation(subject)), project)
+
+        val updateAction = SubjectAction.Update(
+            subjectId = subject3P1WithBoth.subjectId,
+            faceSamplesToAdd = listOf(),
+            fingerprintSamplesToAdd = listOf(),
+            referenceIdsToRemove = listOf(),
+            externalCredentialsToAdd = listOf(),
+            externalCredentialIdsToRemove = listOf("credential-id-1"),
+        )
+
+        dataSource.performActions(listOf(updateAction), project)
+        val loaded = dataSource.load(SubjectQuery(subjectId = subject3P1WithBoth.subjectId)).first()
+        assertThat(loaded.externalCredentials).hasSize(1)
+        assertThat(loaded.externalCredentials.map { it.id }).containsExactly("credential-id-2")
     }
 }
