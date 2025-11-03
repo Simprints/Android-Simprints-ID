@@ -210,6 +210,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
 
         val recordsTotal = when {
             isEventSyncInProgress -> null
+            projectId.isBlank() -> null // without project ID, repository access attempts will throw an exception
             else -> enrolmentRecordRepository.count(SubjectQuery(projectId))
         }
         val recordsToUpload = when {

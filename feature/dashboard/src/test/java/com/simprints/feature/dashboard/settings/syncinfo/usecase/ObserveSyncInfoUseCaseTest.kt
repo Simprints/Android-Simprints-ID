@@ -576,6 +576,24 @@ class ObserveSyncInfoUseCaseTest {
     }
 
     @Test
+    fun `should not count records when project id blank`() = runTest {
+        every { authStore.signedInProjectId } returns ""
+        every { authStore.observeSignedInProjectId() } returns MutableStateFlow("")
+        val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
+            every { isSyncInProgress() } returns false
+            every { isSyncRunning() } returns false
+        }
+        every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockIdleEventSyncState)
+        coEvery { enrolmentRecordRepository.count(any()) } returns 123
+        createUseCase()
+
+        val result = useCase().first()
+
+        assertThat(result.syncInfoSectionRecords.counterTotalRecords).isEmpty()
+        coVerify(exactly = 0) { enrolmentRecordRepository.count(any()) }
+    }
+
+    @Test
     fun `should emit SyncInfo with empty record counters when sync in progress`() = runTest {
         val mockInProgressEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncInProgress() } returns true
