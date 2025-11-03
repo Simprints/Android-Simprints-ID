@@ -73,6 +73,7 @@ internal class EnrolLastBiometricViewModelTest {
     lateinit var tokenizationProcessor: TokenizationProcessor
 
     private lateinit var viewModel: EnrolLastBiometricViewModel
+    private val guidToEnrol = "guidToEnrol"
 
     @Before
     fun setUp() {
@@ -87,6 +88,8 @@ internal class EnrolLastBiometricViewModelTest {
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
             mockk<PersonCreationEvent> { every { id } returns SESSION_ID },
         )
+
+        every { subject.subjectId } returns guidToEnrol
 
         viewModel = EnrolLastBiometricViewModel(
             timeHelper = timeHelper,
@@ -276,7 +279,13 @@ internal class EnrolLastBiometricViewModelTest {
             )
         } returns decryptedCredential
 
-        viewModel.onViewCreated(createParams(listOf()))
+        viewModel.onViewCreated(
+            createParams(
+                listOf(
+                    EnrolLastBiometricStepResult.EnrolLastBiometricsResult(subjectId = "anotherSubjectId"),
+                ),
+            ),
+        )
 
         val result = viewModel.showAddCredentialDialog
             .test()
@@ -288,6 +297,32 @@ internal class EnrolLastBiometricViewModelTest {
         assertThat(result?.displayedCredential).isEqualTo(decryptedCredential)
         coVerify(exactly = 0) { buildSubject.invoke(any(), any()) }
         coVerify(exactly = 0) { enrolmentRecordRepository.performActions(any(), any()) }
+    }
+
+    @Test
+    fun `add credential dialog is not shown when credential is already linked to same subject`() = runTest {
+        val decryptedCredential = "decryptedCredential".asTokenizableRaw()
+        coEvery { enrolmentRecordRepository.load(any()) } returns listOf(subject)
+        coEvery { configManager.getProject(PROJECT_ID) } returns project
+        coEvery {
+            tokenizationProcessor.decrypt(
+                encrypted = scannedCredential.credential,
+                tokenKeyType = TokenKeyType.ExternalCredential,
+                project = project,
+            )
+        } returns decryptedCredential
+
+        viewModel.onViewCreated(
+            createParams(
+                listOf(
+                    EnrolLastBiometricStepResult.EnrolLastBiometricsResult(subjectId = subject.subjectId),
+                ),
+            ),
+        )
+
+        viewModel.showAddCredentialDialog
+            .test()
+            .assertNoValue()
     }
 
     private fun createParams(steps: List<EnrolLastBiometricStepResult>) = EnrolLastBiometricParams(
