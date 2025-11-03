@@ -533,7 +533,7 @@
     <string name="mfid_skip_reason_does_not_have">Does not have %1$s</string>
     <string name="mfid_skip_reason_did_not_bring">Did not bring %1$s</string>
     <string name="mfid_skip_reason_incorrect">Brought incorrect %1$s</string>
-    <string name="mfid_skip_reason_does_not_want_to_provide">Does not want to priovide %1$s</string>
+    <string name="mfid_skip_reason_does_not_want_to_provide">Does not want to provide %1$s</string>
     <string name="mfid_skip_reason_damaged">%1$s damaged or unreadable</string>
     <string name="mfid_skip_reason_unable_to_scan">Unable to scan %1$s</string>
     <string name="mfid_skip_reason_other">Other</string>
