@@ -55,7 +55,7 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
         val credential = scannedCredential.toExternalCredential(subjectId)
         eventRepository.addOrUpdateEvent(
             ExternalCredentialCaptureValueEvent(
-                createdAt = timeHelper.now(),
+                createdAt = startTime,
                 payloadId = scannedCredential.credentialScanId,
                 credential = credential,
             ),
