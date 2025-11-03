@@ -81,7 +81,11 @@ class SetupViewModelTest {
     fun `should not request location permission if collectLocation is disabled`() = runTest {
         // Given
         coEvery { configManager.getProjectConfiguration().general.collectLocation } returns false
-        coEvery { configManager.getProjectConfiguration().synchronization.down.commCare } returns mockk()
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .synchronization.down.commCare
+        } returns mockk()
 
         // when
         viewModel.start()
@@ -95,7 +99,11 @@ class SetupViewModelTest {
         // Given
         justRun { locationStore.collectLocationInBackground() }
         coEvery { configManager.getProjectConfiguration() } returns mockk<ProjectConfiguration>()
-        coEvery { configManager.getProjectConfiguration().synchronization.down.commCare } returns mockk()
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .synchronization.down.commCare
+        } returns mockk()
 
         // when
         viewModel.locationPermissionCheckDone(granted = true)
@@ -109,7 +117,11 @@ class SetupViewModelTest {
         // Given
         justRun { locationStore.collectLocationInBackground() }
         coEvery { configManager.getProjectConfiguration() } returns mockk<ProjectConfiguration>()
-        coEvery { configManager.getProjectConfiguration().synchronization.down.commCare } returns mockk()
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .synchronization.down.commCare
+        } returns mockk()
 
         // when
         viewModel.locationPermissionCheckDone(granted = false)
@@ -122,7 +134,11 @@ class SetupViewModelTest {
     fun `should request CommCare permission if needed when location permission is granted`() = runTest {
         // Given
         justRun { locationStore.collectLocationInBackground() }
-        coEvery { configManager.getProjectConfiguration().synchronization.down.commCare } returns mockk()
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .synchronization.down.commCare
+        } returns mockk()
 
         // When
         viewModel.locationPermissionCheckDone(true)
@@ -135,7 +151,11 @@ class SetupViewModelTest {
     fun `should request CommCare permission if needed when location permission is not granted`() = runTest {
         // Given
         justRun { locationStore.collectLocationInBackground() }
-        coEvery { configManager.getProjectConfiguration().synchronization.down.commCare } returns mockk()
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .synchronization.down.commCare
+        } returns mockk()
 
         // When
         viewModel.locationPermissionCheckDone(false)
