@@ -56,7 +56,8 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
     fun onViewCreated(params: EnrolLastBiometricParams) {
         viewModelScope.launch {
             params.scannedCredential?.let { scannedCredential ->
-                if (isCredentialLinkedToAnotherSubject(scannedCredential, params.projectId)) {
+                val guidToEnrol = getPreviousEnrolmentResult(params.steps)?.subjectId
+                if (isCredentialLinkedToAnotherSubject(scannedCredential, guidToEnrol = guidToEnrol, projectId = params.projectId)) {
                     displayAddCredentialDialog(scannedCredential, params.projectId)
                     return@launch
                 }
@@ -119,9 +120,10 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
 
     private suspend fun isCredentialLinkedToAnotherSubject(
         scannedCredential: ScannedCredential?,
+        guidToEnrol: String?,
         projectId: String,
     ): Boolean {
-        if (scannedCredential == null) return false
+        if (scannedCredential == null || guidToEnrol == null) return false
 
         return enrolmentRecordRepository
             .load(
@@ -129,7 +131,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
                     projectId = projectId,
                     externalCredential = scannedCredential.credential,
                 ),
-            ).isNotEmpty()
+            ).any { it.subjectId != guidToEnrol }
     }
 
     private fun getPreviousEnrolmentResult(steps: List<EnrolLastBiometricStepResult>) =
