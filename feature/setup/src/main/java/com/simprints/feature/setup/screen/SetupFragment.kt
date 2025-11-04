@@ -94,7 +94,9 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
         // Overall setup result
         observeOverallSetupResult()
         // Start the setup process
-        viewModel.start()
+        if (savedInstanceState == null) {
+            viewModel.start()
+        }
     }
 
     private fun observeOverallSetupResult() = viewModel.overallSetupResult.observe(viewLifecycleOwner) {
