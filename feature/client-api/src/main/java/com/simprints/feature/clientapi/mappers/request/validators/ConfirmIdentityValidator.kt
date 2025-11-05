@@ -3,6 +3,8 @@ package com.simprints.feature.clientapi.mappers.request.validators
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.mappers.request.extractors.ConfirmIdentityRequestExtractor
 import com.simprints.feature.clientapi.models.ClientApiError
+import com.simprints.infra.config.store.models.experimental
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SESSION
@@ -12,6 +14,7 @@ internal class ConfirmIdentityValidator(
     private val extractor: ConfirmIdentityRequestExtractor,
     private val currentSessionId: String,
     private val eventRepository: EventRepository,
+    private val configManager: ConfigManager,
 ) : RequestActionValidator(extractor) {
     private var identificationEvent: IdentificationCallbackEvent? = null
 
@@ -46,13 +49,18 @@ internal class ConfirmIdentityValidator(
         }
     }
 
-    private fun validateSelectedGuid(selectedId: String) {
+    private suspend fun validateSelectedGuid(selectedId: String) {
         if (selectedId.isBlank()) {
             throw InvalidRequestException("Missing Selected GUID", ClientApiError.INVALID_SELECTED_ID)
         }
 
         // Allow 'NONE_SELECTED' as a special case to indicate no selection
         if (selectedId.equals("NONE_SELECTED", ignoreCase = true)) {
+            return
+        }
+
+        // Skip further validation if skip flag is enabled
+        if (configManager.getProjectConfiguration().experimental().allowConfirmingGuidsNotInCallback) {
             return
         }
 

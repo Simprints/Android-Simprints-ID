@@ -45,6 +45,9 @@ class IntentToActionMapperTest {
     @MockK
     private lateinit var eventRepository: com.simprints.infra.events.EventRepository
 
+    @MockK
+    private lateinit var configManager: com.simprints.infra.config.sync.ConfigManager
+
     private lateinit var mapper: IntentToActionMapper
 
     @Before
@@ -70,6 +73,7 @@ class IntentToActionMapperTest {
             tokenizationProcessor,
             timeHelper,
             eventRepository,
+            configManager,
         )
     }
 

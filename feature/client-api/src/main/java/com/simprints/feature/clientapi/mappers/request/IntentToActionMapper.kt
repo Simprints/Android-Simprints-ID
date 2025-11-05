@@ -28,6 +28,7 @@ import com.simprints.feature.clientapi.models.OdkConstants
 import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.orchestration.data.ActionConstants
 import com.simprints.infra.orchestration.data.ActionRequest
@@ -40,6 +41,7 @@ internal class IntentToActionMapper @Inject constructor(
     private val tokenizationProcessor: TokenizationProcessor,
     private val timeHelper: TimeHelper,
     private val eventRepository: EventRepository,
+    private val configManager: ConfigManager,
 ) {
     suspend operator fun invoke(
         action: String,
@@ -262,6 +264,7 @@ internal class IntentToActionMapper @Inject constructor(
             extractor = extractor,
             currentSessionId = getCurrentSessionId(),
             eventRepository = eventRepository,
+            configManager = configManager,
         ),
     )
 }
