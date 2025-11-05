@@ -75,6 +75,12 @@ data class ExperimentalProjectConfiguration(
             ?.let { it as? Int }
             ?: OCR_CAPTURES_DEFAULT
 
+    val allowConfirmingGuidsNotInCallback: Boolean
+        get() = customConfig
+            ?.get(ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK)
+            ?.let { it as? Boolean }
+            .let { it == true }
+
     companion object {
         internal const val ENABLE_ID_POOL_VALIDATION = "validateIdentificationPool"
         internal const val SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED = "singleQualityFallbackRequired"
@@ -99,5 +105,7 @@ data class ExperimentalProjectConfiguration(
         internal const val OCR_USE_HIGH_RES_DEFAULT = true
         internal const val OCR_CAPTURES = "ocrCaptures"
         internal const val OCR_CAPTURES_DEFAULT = 3
+
+        const val ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK = "allowConfirmingGuidsNotInCallback"
     }
 }

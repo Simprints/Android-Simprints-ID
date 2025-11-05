@@ -5,6 +5,7 @@ import com.simprints.feature.clientapi.mappers.request.builders.ConfirmIdentifyR
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.ConfirmIdentityRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.ConfirmIdentityValidator
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.infra.orchestration.data.ActionConstants
@@ -48,10 +49,13 @@ internal object ConfirmIdentityActionFactory : RequestActionFactory() {
             },
         )
 
+        val mockConfigManager = mockk<ConfigManager>(relaxed = true)
+
         return ConfirmIdentityValidator(
             extractor as ConfirmIdentityRequestExtractor,
             MOCK_SESSION_ID,
             mockEventRepository,
+            configManager = mockConfigManager,
         )
     }
 
