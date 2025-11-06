@@ -1,6 +1,7 @@
 package com.simprints.infra.config.store.models
 
 import com.google.common.truth.Truth.*
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.CAMERA_FLASH_CONTROLS_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.ENABLE_ID_POOL_VALIDATION
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_ENABLED
@@ -185,6 +186,22 @@ internal class ExperimentalProjectConfigurationTest {
             mapOf(ExperimentalProjectConfiguration.OCR_CAPTURES to expectedOcrCaptures) to expectedOcrCaptures,
         ).forEach { (config, result) ->
             assertThat(ExperimentalProjectConfiguration(config).ocrCaptures).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `check allow confirming GUIDs not in callback flag correctly`() {
+        mapOf(
+            // Value not present
+            emptyMap<String, Any>() to false,
+            // Value not boolean
+            mapOf(ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK to 1) to false,
+            // Value present and FALSE
+            mapOf(ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK to false) to false,
+            // Value present and TRUE
+            mapOf(ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK to true) to true,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).allowConfirmingGuidsNotInCallback).isEqualTo(result)
         }
     }
 }
