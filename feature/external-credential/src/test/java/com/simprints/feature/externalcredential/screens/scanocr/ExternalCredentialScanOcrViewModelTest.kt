@@ -110,7 +110,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
         val state = observer.value() as ScanOcrState.ScanningInProgress
         assertThat(state.ocrDocumentType).isEqualTo(documentType)
         assertThat(state.successfulCaptures).isEqualTo(0)
-        assertThat(state.scansRequired).isEqualTo(5)
+        assertThat(state.scansRequired).isEqualTo(3)
     }
 
     @Test

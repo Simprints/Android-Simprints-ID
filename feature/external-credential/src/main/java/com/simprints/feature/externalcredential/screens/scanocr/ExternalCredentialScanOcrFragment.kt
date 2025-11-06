@@ -8,6 +8,9 @@ import android.view.View
 import android.view.ViewPropertyAnimator
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.ImageProxy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -77,6 +80,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     private var previousPermissionStatus: PermissionStatus? = null
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var imageAnalysis: ImageAnalysis
+    private lateinit var imageCapture: ImageCapture
     private var progressAnimator: ViewPropertyAnimator? = null
     private var checkAnimator: ViewPropertyAnimator? = null
     private var isAnimatingCompletion: Boolean = false
@@ -186,9 +190,12 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             cameraProviderFuture = cameraProviderFuture,
             surfaceProvider = binding.preview.surfaceProvider,
             viewLifecycleOwner = viewLifecycleOwner,
-            onImageAnalysisReady = {
-                imageAnalysis = it
+            onImageAnalysisReady = { analysis ->
+                imageAnalysis = analysis
                 onComplete()
+            },
+            onImageCaptureReady = { capture ->
+                imageCapture = capture
             },
         )
         cameraProviderFuture.addListener(cameraListener, ContextCompat.getMainExecutor(requireContext()))
@@ -213,7 +220,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         instructionsText.text = getString(IDR.string.mfid_scan_instructions, documentTypeText)
         instructionsText.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_white))
         documentScannerArea.isVisible = true
-        progressContainer.isVisible = false
+        progressContainer.isInvisible = true
         buttonScan.isVisible = true
         buttonScan.setOnClickListener {
             viewModel.ocrStarted()
@@ -225,8 +232,19 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
 
     private fun animateCompletionState() = with(binding) {
         isAnimatingCompletion = true
-        progressBar.fadeOut(FINISH_ANIMATION_DURATION, scaleX = true, fragment = this@ExternalCredentialScanOcrFragment)
-        scanInstructions.fadeOut(FINISH_ANIMATION_DURATION, scaleX = false, fragment = this@ExternalCredentialScanOcrFragment)
+        val finalVisibility = View.INVISIBLE
+        progressBar.fadeOut(
+            FINISH_ANIMATION_DURATION,
+            scaleX = true,
+            fragment = this@ExternalCredentialScanOcrFragment,
+            finalVisibility = finalVisibility,
+        )
+        scanInstructions.fadeOut(
+            FINISH_ANIMATION_DURATION,
+            scaleX = false,
+            fragment = this@ExternalCredentialScanOcrFragment,
+            finalVisibility = finalVisibility,
+        )
         iconScanComplete.fadeIn(FINISH_ANIMATION_DURATION, fragment = this@ExternalCredentialScanOcrFragment, onComplete = {
             isAnimatingCompletion = false
             // Execute any pending action after the animation. Currently used is for next fragment navigation
@@ -238,7 +256,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     private fun renderNoPermission(shouldOpenPhoneSettings: Boolean) {
         with(binding) {
             instructionsText.isVisible = false
-            progressContainer.isVisible = false
+            progressContainer.isInvisible = true
             documentScannerArea.isInvisible = true
             buttonScan.isVisible = false
             val documentTypeText = viewModel.getDocumentTypeRes().run(::getString)
@@ -272,26 +290,64 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     }
 
     private fun startOcr() {
-        imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
+        imageAnalysis.setAnalyzer(cameraExecutor) { videoFrame: ImageProxy ->
             if (viewModel.isRunningOcrOnFrame) {
-                imageProxy.close()
+                videoFrame.close()
                 return@setAnalyzer
             }
+
+            // Running OCR as often as we can while camera feedback is displayed to the user
             viewModel.ocrOnFrameStarted()
-            lifecycleScope.launch(bgDispatcher) {
-                try {
-                    val (bitmap, imageInfo) = imageProxy.toBitmap() to imageProxy.imageInfo
-                    val cropConfig: OcrCropConfig = buildOcrCropConfigUseCase(
-                        rotationDegrees = imageInfo.rotationDegrees,
-                        cameraPreview = binding.preview,
-                        documentScannerArea = binding.documentScannerArea,
-                    )
-                    viewModel.runOcrOnFrame(frame = bitmap, cropConfig)
-                } finally {
-                    imageProxy.close()
-                }
+            if (viewModel.ocrConfig.useHighRes) {
+                captureHighResImageForOcr()
+                videoFrame.close()
+            } else {
+                captureFrameFromVideoStreamForOcr(videoFrame)
             }
         }
+    }
+
+    private fun captureFrameFromVideoStreamForOcr(imageProxy: ImageProxy) {
+        lifecycleScope.launch(bgDispatcher) {
+            try {
+                val (bitmap, imageInfo) = imageProxy.toBitmap() to imageProxy.imageInfo
+                val cropConfig: OcrCropConfig = buildOcrCropConfigUseCase(
+                    rotationDegrees = imageInfo.rotationDegrees,
+                    cameraPreview = binding.preview,
+                    documentScannerArea = binding.documentScannerArea,
+                )
+                viewModel.runOcrOnFrame(frame = bitmap, cropConfig)
+            } finally {
+                imageProxy.close()
+            }
+        }
+    }
+
+    private fun captureHighResImageForOcr() {
+        imageCapture.takePicture(
+            cameraExecutor,
+            object : ImageCapture.OnImageCapturedCallback() {
+                override fun onCaptureSuccess(imageProxy: ImageProxy) {
+                    lifecycleScope.launch(bgDispatcher) {
+                        try {
+                            val (bitmap, imageInfo) = imageProxy.toBitmap() to imageProxy.imageInfo
+                            val cropConfig: OcrCropConfig = buildOcrCropConfigUseCase(
+                                rotationDegrees = imageInfo.rotationDegrees,
+                                cameraPreview = binding.preview,
+                                documentScannerArea = binding.documentScannerArea,
+                            )
+                            viewModel.runOcrOnFrame(frame = bitmap, cropConfig)
+                        } finally {
+                            imageProxy.close()
+                        }
+                    }
+                }
+
+                override fun onError(e: ImageCaptureException) {
+                    Simber.e("Photo capture failed in OCR", e, MULTI_FACTOR_ID)
+                }
+            },
+        )
     }
 
     private fun stopCamera() {

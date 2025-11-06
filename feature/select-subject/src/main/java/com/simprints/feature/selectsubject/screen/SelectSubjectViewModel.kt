@@ -8,10 +8,11 @@ import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.core.tools.extentions.isValidGuid
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
-import com.simprints.feature.externalcredential.usecase.AddExternalCredentialToSubjectUseCase
+import com.simprints.feature.externalcredential.usecase.ResetExternalCredentialsInSessionUseCase
 import com.simprints.feature.selectsubject.SelectSubjectParams
 import com.simprints.feature.selectsubject.SelectSubjectResult
 import com.simprints.feature.selectsubject.model.SelectSubjectState
@@ -39,7 +40,7 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
     private val authStore: AuthStore,
     private val eventRepository: SessionEventRepository,
     private val configManager: ConfigManager,
-    private val addExternalCredentialToSubjectUseCase: AddExternalCredentialToSubjectUseCase,
+    private val resetExternalCredentialsUseCase: ResetExternalCredentialsInSessionUseCase,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val tokenizationProcessor: TokenizationProcessor,
     @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
@@ -98,16 +99,28 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
         if (scannedCredential == null) return null
         val credential = scannedCredential.credential
         val project = configManager.getProject(authStore.signedInProjectId)
-        val isCredentialAlreadyLinkedToSubject = enrolmentRecordRepository
+        val alreadyLinkedSubject = enrolmentRecordRepository
             .load(
                 SubjectQuery(
                     projectId = project.id,
                     subjectId = subjectId,
                     externalCredential = credential,
                 ),
-            ).isNotEmpty()
+            ).firstOrNull()
 
-        if (isCredentialAlreadyLinkedToSubject) return null
+        if (!subjectId.isValidGuid()) {
+            // Confirmation of "none_selected" (or any non UUID value) should not display the dialog,
+            // but still remove update event from session and reset previously linked external credentials
+            resetExternalCredentialsUseCase(
+                projectId = params.projectId,
+                scannedCredential = scannedCredential,
+                subjectId = params.subjectId,
+            )
+            return null
+        }
+
+        // Credentials already linked to the correct subject, so no need to re-link
+        if (alreadyLinkedSubject != null && alreadyLinkedSubject.subjectId == subjectId) return null
 
         val decrypted = tokenizationProcessor.decrypt(
             encrypted = credential,
@@ -121,8 +134,16 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
         updateState { SelectSubjectState.SavingExternalCredential }
         viewModelScope.launch {
             val addedCredential = try {
-                addExternalCredentialToSubjectUseCase(scannedCredential, subjectId = params.subjectId, projectId = params.projectId)
-                saveCredentialSelectionEvent(params.subjectId)
+                resetExternalCredentialsUseCase(
+                    scannedCredential = scannedCredential,
+                    subjectId = params.subjectId,
+                    projectId = params.projectId,
+                )
+
+                // Confirmation of "none_selected" (or any non UUID value) should not produce an EnrolmentUpdateEvent
+                if (params.subjectId.isValidGuid()) {
+                    saveCredentialSelectionEvent(params.subjectId)
+                }
                 scannedCredential
             } catch (e: Exception) {
                 Simber.e("Failed to attach scanned credential", e, tag = SESSION)
@@ -149,6 +170,7 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
                 .map { it.payload.id }
 
             Simber.d("Adding credentials $externalCredentialIdsToAdd to subject $subjectId", tag = SESSION)
+
             eventRepository.addOrUpdateEvent(
                 EnrolmentUpdateEvent(
                     timeHelper.now(),

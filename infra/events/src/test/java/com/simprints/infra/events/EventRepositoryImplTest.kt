@@ -400,6 +400,13 @@ internal class EventRepositoryImplTest {
     }
 
     @Test
+    fun `should delegate delete events`() = runTest {
+        eventRepo.deleteEvents(listOf("eventId"))
+
+        coVerify { eventLocalDataSource.deleteEvents(listOf("eventId")) }
+    }
+
+    @Test
     fun `should delegate delete all`() = runTest {
         eventRepo.deleteAll()
 

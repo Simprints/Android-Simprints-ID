@@ -162,6 +162,37 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
     }
 
     @Test
+    fun `should reset local records when sync partition changes`() = runTest {
+        useCase(
+            projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    down = synchronizationConfiguration.down.copy(
+                        simprints = synchronizationConfiguration.down.simprints?.copy(
+                            partitionType = DownSynchronizationConfiguration.PartitionType.PROJECT,
+                        ),
+                        commCare = null,
+                    ),
+                ),
+            ),
+            projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    down = synchronizationConfiguration.down.copy(
+                        simprints = null,
+                        commCare = null,
+                    ),
+                ),
+            ),
+        )
+
+        coVerify {
+            syncOrchestrator.cancelEventSync()
+            syncOrchestrator.rescheduleEventSync()
+            eventSyncManager.resetDownSyncInfo()
+            enrolmentRecordRepository.deleteAll()
+        }
+    }
+
+    @Test
     fun `should not reset local records when sync frequency changes`() = runTest {
         useCase(
             projectConfiguration.copy(

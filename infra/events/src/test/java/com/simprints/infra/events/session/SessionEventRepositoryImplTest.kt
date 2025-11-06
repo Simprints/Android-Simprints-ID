@@ -205,6 +205,18 @@ internal class SessionEventRepositoryImplTest {
     }
 
     @Test
+    fun `deletes provided events from DB and cache`() = runTest {
+        val event = createEventWithSessionId("eventId", "mockId")
+        sessionDataCache.eventCache["eventId"] = event
+        coJustRun { eventRepository.deleteEvents(any()) }
+
+        sessionEventRepository.deleteEvents(listOf(event))
+
+        assertThat(sessionDataCache.eventCache["eventId"]).isNull()
+        coVerify { eventRepository.deleteEvents(listOf("eventId")) }
+    }
+
+    @Test
     fun `clears cache when closing session`() = runTest {
         sessionDataCache.eventScope = createSessionScope("mockId")
         sessionDataCache.eventCache["eventId"] = createEventWithSessionId("eventId", "mockId")
