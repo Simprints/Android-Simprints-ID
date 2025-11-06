@@ -34,6 +34,9 @@ internal interface EventRoomDao {
     )
     fun observeCountInClosedScopes(): Flow<Int>
 
+    @Query("delete from DbEvent where id in (:eventIds)")
+    suspend fun deleteById(eventIds: List<String>)
+
     @Query("delete from DbEvent where scopeId = :scopeId")
     suspend fun deleteAllFromScope(scopeId: String)
 

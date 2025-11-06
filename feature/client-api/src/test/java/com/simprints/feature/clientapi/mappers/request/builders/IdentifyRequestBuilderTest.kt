@@ -13,11 +13,12 @@ import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 internal class IdentifyRequestBuilderTest {
     @Test
-    fun `IdentifyActionRequest should contain mandatory fields`() {
+    fun `IdentifyActionRequest should contain mandatory fields`() = runTest {
         val extractor = IdentifyRequestActionFactory.getMockExtractor()
         val validator = IdentifyRequestActionFactory.getValidator(extractor)
         val tokenizationProcessor = mockk<TokenizationProcessor>()

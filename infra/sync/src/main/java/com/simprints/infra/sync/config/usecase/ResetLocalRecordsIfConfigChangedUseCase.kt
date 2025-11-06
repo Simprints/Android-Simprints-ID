@@ -23,10 +23,15 @@ internal class ResetLocalRecordsIfConfigChangedUseCase @Inject constructor(
         }
     }
 
+    //
     private fun hasPartitionTypeChanged(
         oldConfig: ProjectConfiguration,
         newConfig: ProjectConfiguration,
     ) = (oldConfig.synchronization.down.commCare != newConfig.synchronization.down.commCare) ||
-        (oldConfig.synchronization.down.simprints != newConfig.synchronization.down.simprints) ||
-        (oldConfig.synchronization.down.simprints?.partitionType != newConfig.synchronization.down.simprints?.partitionType)
+        // This also covers simprints changing from/to null since the partition will always be present if simprints is
+        (
+            oldConfig.synchronization.down.simprints
+                ?.partitionType != newConfig.synchronization.down.simprints
+                ?.partitionType
+        )
 }

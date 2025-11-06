@@ -16,6 +16,7 @@ import com.simprints.feature.enrollast.screen.usecase.BuildSubjectUseCase
 import com.simprints.feature.enrollast.screen.usecase.CheckForDuplicateEnrolmentsUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
+import com.simprints.feature.externalcredential.usecase.ResetExternalCredentialsInSessionUseCase
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
@@ -42,6 +43,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
     private val checkForDuplicateEnrolments: CheckForDuplicateEnrolmentsUseCase,
     private val tokenizationProcessor: TokenizationProcessor,
     private val buildSubject: BuildSubjectUseCase,
+    private val resetEnrolmentUpdateEventsFromSession: ResetExternalCredentialsInSessionUseCase,
 ) : ViewModel() {
     val finish: LiveData<LiveDataEventWithContent<EnrolLastState>>
         get() = _finish
@@ -56,7 +58,8 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
     fun onViewCreated(params: EnrolLastBiometricParams) {
         viewModelScope.launch {
             params.scannedCredential?.let { scannedCredential ->
-                if (isCredentialLinkedToAnotherSubject(scannedCredential, params.projectId)) {
+                val guidToEnrol = getPreviousEnrolmentResult(params.steps)?.subjectId
+                if (isCredentialLinkedToAnotherSubject(scannedCredential, guidToEnrol = guidToEnrol, projectId = params.projectId)) {
                     displayAddCredentialDialog(scannedCredential, params.projectId)
                     return@launch
                 }
@@ -95,7 +98,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
 
         try {
             val subject = buildSubject(params, isAddingCredential = isAddingCredential)
-            registerEvent(subject)
+            registerEvent(params, subject)
             enrolmentRecordRepository.performActions(listOf(SubjectAction.Creation(subject)), project)
             _finish.send(EnrolLastState.Success(subject.subjectId, scannedCredential?.toExternalCredential(subject.subjectId)))
         } catch (t: Throwable) {
@@ -119,9 +122,10 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
 
     private suspend fun isCredentialLinkedToAnotherSubject(
         scannedCredential: ScannedCredential?,
+        guidToEnrol: String?,
         projectId: String,
     ): Boolean {
-        if (scannedCredential == null) return false
+        if (scannedCredential == null || guidToEnrol == null) return false
 
         return enrolmentRecordRepository
             .load(
@@ -129,16 +133,21 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
                     projectId = projectId,
                     externalCredential = scannedCredential.credential,
                 ),
-            ).isNotEmpty()
+            ).any { it.subjectId != guidToEnrol }
     }
 
     private fun getPreviousEnrolmentResult(steps: List<EnrolLastBiometricStepResult>) =
         steps.filterIsInstance<EnrolLastBiometricStepResult.EnrolLastBiometricsResult>().firstOrNull()
 
-    private suspend fun registerEvent(subject: Subject) {
+    private suspend fun registerEvent(
+        params: EnrolLastBiometricParams,
+        subject: Subject,
+    ) {
         Simber.d("Register events for enrolments", tag = ENROLMENT)
-        val events = eventRepository
-            .getEventsInCurrentSession()
+        val events = eventRepository.getEventsInCurrentSession()
+
+        // Ensures that any previous confirmations are removed from session
+        resetEnrolmentUpdateEventsFromSession(params.projectId)
 
         val biometricReferenceIds = events
             .filterIsInstance<BiometricReferenceCreationEvent>()

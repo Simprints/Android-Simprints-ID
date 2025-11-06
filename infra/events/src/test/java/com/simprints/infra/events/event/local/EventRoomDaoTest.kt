@@ -2,9 +2,9 @@ package com.simprints.infra.events.event.local
 
 import android.content.Context
 import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import androidx.test.core.app.*
+import androidx.test.ext.junit.runners.*
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.local.models.DbEvent
@@ -13,7 +13,8 @@ import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
-import io.mockk.MockKAnnotations
+import com.simprints.infra.events.sampledata.SampleDefaults.GUID3
+import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -54,43 +55,45 @@ internal class EventRoomDaoTest {
     }
 
     @Test
-    fun loadBySessionId() {
-        runTest {
-            val wrongEvent = event.copy(id = randomUUID(), scopeId = GUID2)
-            addIntoDb(event, wrongEvent)
-            verifyEvents(listOf(event), eventDao.loadFromScope(scopeId = GUID1))
-        }
+    fun loadBySessionId() = runTest {
+        val wrongEvent = event.copy(id = randomUUID(), scopeId = GUID2)
+        addIntoDb(event, wrongEvent)
+        verifyEvents(listOf(event), eventDao.loadFromScope(scopeId = GUID1))
     }
 
     @Test
-    fun loadEventJsonFormSession() {
-        runTest {
-            addIntoDb(event)
-            val results = eventDao.loadEventJsonFromScope(GUID1)
-            assertThat(results).containsExactlyElementsIn(listOf(eventJson))
-        }
+    fun loadEventJsonFormSession() = runTest {
+        addIntoDb(event)
+        val results = eventDao.loadEventJsonFromScope(GUID1)
+        assertThat(results).containsExactlyElementsIn(listOf(eventJson))
     }
 
     @Test
-    fun loadAll() {
-        runTest {
-            val secondEvent = event.copy(id = randomUUID())
-            addIntoDb(event, secondEvent)
-            verifyEvents(listOf(event, secondEvent), eventDao.loadAll())
-        }
+    fun loadAll() = runTest {
+        val secondEvent = event.copy(id = randomUUID())
+        addIntoDb(event, secondEvent)
+        verifyEvents(listOf(event, secondEvent), eventDao.loadAll())
     }
 
     @Test
-    fun deletionBySessionId() {
-        runTest {
-            val eventSameSession =
-                event.copy(id = randomUUID(), scopeId = GUID1)
-            val eventDifferentSession =
-                event.copy(id = randomUUID(), scopeId = GUID2)
-            addIntoDb(event, eventSameSession, eventDifferentSession)
-            db.eventDao.deleteAllFromScope(scopeId = GUID1)
-            verifyEvents(listOf(eventDifferentSession), eventDao.loadAll())
-        }
+    fun deletionBySessionId() = runTest {
+        val eventSameSession =
+            event.copy(id = randomUUID(), scopeId = GUID1)
+        val eventDifferentSession =
+            event.copy(id = randomUUID(), scopeId = GUID2)
+        addIntoDb(event, eventSameSession, eventDifferentSession)
+        db.eventDao.deleteAllFromScope(scopeId = GUID1)
+        verifyEvents(listOf(eventDifferentSession), eventDao.loadAll())
+    }
+
+    @Test
+    fun deletionEventsById() = runTest {
+        val event1 = event.copy(id = GUID1)
+        val event2 = event.copy(id = GUID2)
+        val event3 = event.copy(id = GUID3)
+        addIntoDb(event1, event2, event3)
+        db.eventDao.deleteById(listOf(GUID1, GUID2))
+        verifyEvents(listOf(event3), eventDao.loadAll())
     }
 
     private suspend fun addIntoDb(vararg events: DbEvent) {

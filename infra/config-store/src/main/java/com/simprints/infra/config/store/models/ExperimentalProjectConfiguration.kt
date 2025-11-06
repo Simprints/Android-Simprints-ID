@@ -63,6 +63,24 @@ data class ExperimentalProjectConfiguration(
             ?.toLong()
             ?: FALLBACK_TO_COMMCARE_THRESHOLD_DAYS_DEFAULT
 
+    val ocrUseHighRes: Boolean
+        get() = customConfig
+            ?.get(OCR_USE_HIGH_RES)
+            ?.let { it as? Boolean }
+            ?: OCR_USE_HIGH_RES_DEFAULT
+
+    val ocrCaptures: Int
+        get() = customConfig
+            ?.get(OCR_CAPTURES)
+            ?.let { it as? Int }
+            ?: OCR_CAPTURES_DEFAULT
+
+    val allowConfirmingGuidsNotInCallback: Boolean
+        get() = customConfig
+            ?.get(ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK)
+            ?.let { it as? Boolean }
+            .let { it == true }
+
     companion object {
         internal const val ENABLE_ID_POOL_VALIDATION = "validateIdentificationPool"
         internal const val SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED = "singleQualityFallbackRequired"
@@ -82,5 +100,12 @@ data class ExperimentalProjectConfiguration(
 
         internal const val FALLBACK_TO_COMMCARE_THRESHOLD_DAYS = "fallbackToCommCareThresholdDays"
         internal const val FALLBACK_TO_COMMCARE_THRESHOLD_DAYS_DEFAULT = 5L
+
+        internal const val OCR_USE_HIGH_RES = "ocrHighRes"
+        internal const val OCR_USE_HIGH_RES_DEFAULT = true
+        internal const val OCR_CAPTURES = "ocrCaptures"
+        internal const val OCR_CAPTURES_DEFAULT = 3
+
+        const val ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK = "allowConfirmingGuidsNotInCallback"
     }
 }

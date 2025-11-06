@@ -17,7 +17,7 @@ fun Resources.getQuantityCredentialString(
     } else {
         multipleCredentialsRes
     }
-    return getString(id, documentTypeRes)
+    return getString(id, getString(documentTypeRes))
 }
 
 fun Resources.getCredentialFieldTitle(type: ExternalCredentialType): String = when (type) {

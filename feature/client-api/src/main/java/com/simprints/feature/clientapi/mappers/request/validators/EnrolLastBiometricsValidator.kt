@@ -3,18 +3,20 @@ package com.simprints.feature.clientapi.mappers.request.validators
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.mappers.request.extractors.EnrolLastBiometricsRequestExtractor
 import com.simprints.feature.clientapi.models.ClientApiError
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SESSION
 import com.simprints.infra.logging.Simber
 
 internal class EnrolLastBiometricsValidator(
     private val extractor: EnrolLastBiometricsRequestExtractor,
     private val currentSessionId: String,
-    private val sessionHasIdentificationCallback: Boolean,
+    private val eventRepository: EventRepository,
 ) : RequestActionValidator(extractor) {
-    override fun validate() {
+    override suspend fun validate() {
         super.validate()
         validateSessionId(extractor.getSessionId())
-        validateSessionEvents()
+        validateSessionEvents(extractor.getSessionId())
     }
 
     private fun validateSessionId(sessionId: String) {
@@ -27,8 +29,12 @@ internal class EnrolLastBiometricsValidator(
         }
     }
 
-    private fun validateSessionEvents() {
-        if (!sessionHasIdentificationCallback) {
+    private suspend fun validateSessionEvents(sessionId: String) {
+        val hasIdentificationCallback = eventRepository
+            .getEventsFromScope(sessionId)
+            .any { it is IdentificationCallbackEvent }
+
+        if (!hasIdentificationCallback) {
             throw InvalidRequestException(
                 "Calling app wants to enrol last biometrics, but the session doesn't have an identification callback event.",
                 ClientApiError.INVALID_STATE_FOR_INTENT_ACTION,

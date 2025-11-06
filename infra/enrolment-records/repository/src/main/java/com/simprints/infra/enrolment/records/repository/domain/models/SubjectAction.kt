@@ -15,8 +15,9 @@ sealed class SubjectAction {
         val subjectId: String,
         val faceSamplesToAdd: List<FaceSample>,
         val fingerprintSamplesToAdd: List<FingerprintSample>,
-        val externalCredentialsToAdd: List<ExternalCredential>,
         val referenceIdsToRemove: List<String>,
+        val externalCredentialsToAdd: List<ExternalCredential>,
+        val externalCredentialIdsToRemove: List<String>,
     ) : SubjectAction()
 
     data class Deletion(

@@ -66,6 +66,12 @@ internal class SessionEventRepositoryImpl @Inject constructor(
         sessionDataCache.eventCache[savedEvent.id] = savedEvent
     }
 
+    override suspend fun deleteEvents(events: List<Event>): Unit = withLockedContext {
+        val ids = events.map { it.id }
+        eventRepository.deleteEvents(ids)
+        ids.forEach { sessionDataCache.eventCache.remove(it) }
+    }
+
     override suspend fun closeCurrentSession(reason: EventScopeEndCause?) = withLockedContext {
         eventRepository.closeEventScope(getCurrentScopeInternal(), reason)
         credentialImageRepository.deleteAllCredentialScans()
