@@ -243,6 +243,14 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
                 referenceId = "ref1",
             ),
         )
+        originalSubject.externalCredentials = listOf(
+            ExternalCredential(
+                id = "id-1",
+                value = "value".asTokenizableEncrypted(),
+                subjectId = "subjectId",
+                type = ExternalCredentialType.NHISCard,
+            ),
+        )
         dataSource.performActions(listOf(SubjectAction.Creation(originalSubject)), mockk())
 
         val updateAction = SubjectAction.Update(
@@ -265,12 +273,13 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
             referenceIdsToRemove = listOf("ref1"),
             externalCredentialsToAdd = listOf(
                 ExternalCredential(
-                    id = "id",
+                    id = "id-2",
                     value = "value".asTokenizableEncrypted(),
                     subjectId = "subjectId",
-                    type = ExternalCredentialType.NHISCard
-                )
-            )
+                    type = ExternalCredentialType.NHISCard,
+                ),
+            ),
+            externalCredentialIdsToRemove = listOf("id-1"),
         )
         val project = mockk<Project>()
         // When
@@ -290,7 +299,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         assertThat(savedSubject?.fingerprintSamples).hasSize(1)
         assertThat(savedSubject?.fingerprintSamples?.first()?.referenceId).isEqualTo("ref3")
         savedSubject?.externalCredentials?.first()?.let {
-            assertThat(it.id).isEqualTo("id")
+            assertThat(it.id).isEqualTo("id-2")
             assertThat(it.value).isEqualTo("value")
             assertThat(it.subjectId).isEqualTo("subjectId")
             assertThat(it.type).isEqualTo(ExternalCredentialType.NHISCard.toString())

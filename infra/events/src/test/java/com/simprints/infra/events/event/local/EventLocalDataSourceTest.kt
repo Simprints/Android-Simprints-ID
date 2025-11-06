@@ -442,6 +442,13 @@ internal class EventLocalDataSourceTest {
     }
 
     @Test
+    fun deleteEvents() = runTest {
+        eventLocalDataSource.deleteEvents(listOf(GUID1))
+
+        coVerify { eventDao.deleteById(listOf(GUID1)) }
+    }
+
+    @Test
     fun deleteAll() = runTest {
         eventLocalDataSource.deleteAll()
 

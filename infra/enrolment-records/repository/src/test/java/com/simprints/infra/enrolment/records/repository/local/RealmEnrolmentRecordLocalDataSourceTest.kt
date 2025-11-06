@@ -12,6 +12,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.realm.store.RealmWrapper
+import com.simprints.infra.enrolment.records.realm.store.models.DbExternalCredential
 import com.simprints.infra.enrolment.records.realm.store.models.DbFaceSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbFingerprintSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
@@ -325,6 +326,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
                     fingerprintSamplesToAdd = listOf(getRandomFingerprintSample()),
                     referenceIdsToRemove = listOf(faceReferenceId, fingerReferenceId),
                     externalCredentialsToAdd = listOf(),
+                    externalCredentialIdsToRemove = listOf(),
                 ),
             ),
             project,
@@ -338,9 +340,47 @@ class RealmEnrolmentRecordLocalDataSourceTest {
                 match<DbSubject> {
                     // one old + one new
                     it.faceSamples.size == 2 &&
-                    it.fingerprintSamples.size == 2 &&
-                    it.faceSamples.none { sample -> sample.referenceId == faceReferenceId } &&
-                    it.fingerprintSamples.none { sample -> sample.referenceId == fingerReferenceId }
+                        it.fingerprintSamples.size == 2 &&
+                        it.faceSamples.none { sample -> sample.referenceId == faceReferenceId } &&
+                        it.fingerprintSamples.none { sample -> sample.referenceId == fingerReferenceId }
+                },
+                any(),
+            )
+        }
+    }
+
+    @Test
+    fun performSubjectUpdateExternalActions() = runTest {
+        val subject = getFakePerson()
+        every { realmSingleQuery.find() } returns getRandomSubject(
+            faceSamples = listOf(getRandomFaceSample()),
+            fingerprintSamples = listOf(getRandomFingerprintSample()),
+            externalCredentials = listOf(
+                getRandomExternalCredential("id1"),
+                getRandomExternalCredential("id2"),
+            ),
+        ).toRealmDb()
+
+        enrolmentRecordLocalDataSource.performActions(
+            listOf(
+                SubjectAction.Update(
+                    subject.subjectId.toString(),
+                    faceSamplesToAdd = listOf(),
+                    fingerprintSamplesToAdd = listOf(),
+                    referenceIdsToRemove = listOf(),
+                    externalCredentialsToAdd = listOf(),
+                    externalCredentialIdsToRemove = listOf("id1"),
+                ),
+            ),
+            project,
+        )
+        val peopleCount = enrolmentRecordLocalDataSource.count()
+        assertThat(peopleCount).isEqualTo(1)
+        verify {
+            mutableRealm.delete(match<DbExternalCredential> { it.id == "id1" })
+            mutableRealm.copyToRealm(
+                match<DbSubject> { subject ->
+                    subject.externalCredentials.map { it.id } == listOf("id2")
                 },
                 any(),
             )
@@ -414,15 +454,17 @@ class RealmEnrolmentRecordLocalDataSourceTest {
             id = "id",
             value = credentialValue.asTokenizableEncrypted(),
             subjectId = "subjectId",
-            type = ExternalCredentialType.NHISCard
+            type = ExternalCredentialType.NHISCard,
         )
 
-        saveFakePeople(listOf(
-            getRandomSubject(externalCredentials = listOf(externalCredential))
-        ))
+        saveFakePeople(
+            listOf(
+                getRandomSubject(externalCredentials = listOf(externalCredential)),
+            ),
+        )
 
         enrolmentRecordLocalDataSource.load(
-            SubjectQuery(externalCredential = credentialValue.asTokenizableEncrypted())
+            SubjectQuery(externalCredential = credentialValue.asTokenizableEncrypted()),
         )
 
         verify {
@@ -466,7 +508,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         ),
         fingerprintSamples: List<FingerprintSample> = listOf(),
         externalCredentials: List<ExternalCredential> = listOf(
-            getRandomExternalCredential()
+            getRandomExternalCredential(),
         ),
     ): Subject = Subject(
         subjectId = patientId,
@@ -475,7 +517,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         moduleId = moduleId.asTokenizableRaw(),
         faceSamples = faceSamples,
         fingerprintSamples = fingerprintSamples,
-        externalCredentials = externalCredentials
+        externalCredentials = externalCredentials,
     )
 
     private fun getRandomFaceSample(
@@ -488,10 +530,10 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         referenceId: String = "referenceId",
     ) = FingerprintSample(IFingerIdentifier.LEFT_3RD_FINGER, Random.nextBytes(64), "fingerprintTemplateFormat", referenceId, id)
 
-    private fun getRandomExternalCredential() = ExternalCredential(
-        id = "id",
+    private fun getRandomExternalCredential(id: String = "id") = ExternalCredential(
+        id = id,
         value = "value".asTokenizableEncrypted(),
         subjectId = "subjectId",
-        type = ExternalCredentialType.NHISCard
+        type = ExternalCredentialType.NHISCard,
     )
 }

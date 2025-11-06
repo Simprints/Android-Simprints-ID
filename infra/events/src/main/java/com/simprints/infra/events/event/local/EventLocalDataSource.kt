@@ -170,6 +170,10 @@ internal open class EventLocalDataSource @Inject constructor(
         }
     }
 
+    suspend fun deleteEvents(eventIds: List<String>) = useRoom(writingContext) {
+        eventDao.deleteById(eventIds)
+    }
+
     suspend fun deleteAll() = useRoom(writingContext) {
         scopeDao.deleteAll()
         eventDao.deleteAll()

@@ -32,6 +32,9 @@ interface SubjectDao {
     @Query("DELETE FROM DbExternalCredential WHERE value = :value")
     suspend fun deleteExternalCredential(value: String)
 
+    @Query("DELETE FROM DbExternalCredential WHERE id = :id")
+    suspend fun deleteExternalCredentialById(id: String)
+
     @RawQuery
     suspend fun deleteSubjects(query: SupportSQLiteQuery): Int
 

@@ -236,10 +236,12 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                             val referencesToDelete = action.referenceIdsToRemove.toSet() // to make lookup O(1)
                             val faceSamplesMap = dbSubject.faceSamples.groupBy { it.referenceId in referencesToDelete }
                             val fingerprintSamplesMap = dbSubject.fingerprintSamples.groupBy { it.referenceId in referencesToDelete }
+
+                            val credentialsToDelete = action.externalCredentialIdsToRemove.toSet()
+                            val externalCredentialMap = dbSubject.externalCredentials.groupBy { it.id in credentialsToDelete }
                             val allExternalCredentials =
-                                (dbSubject.externalCredentials + action.externalCredentialsToAdd.map { it.toRealmDb() })
+                                (externalCredentialMap[false].orEmpty() + action.externalCredentialsToAdd.map { it.toRealmDb() })
                                     .distinctBy { it.id }
-                                    .toSet()
 
                             // Append new samples to the list of samples that remain after removing
                             dbSubject.faceSamples = (
@@ -252,6 +254,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
 
                             faceSamplesMap[true]?.forEach { realm.delete(it) }
                             fingerprintSamplesMap[true]?.forEach { realm.delete(it) }
+                            externalCredentialMap[true]?.forEach { realm.delete(it) }
                             realm.copyToRealm(dbSubject, updatePolicy = UpdatePolicy.ALL)
                         } else {
                             Simber.i("[SubjectLocalDataSourceImpl] Subject not found for update", tag = REALM_DB)

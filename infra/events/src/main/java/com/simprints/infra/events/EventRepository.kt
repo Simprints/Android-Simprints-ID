@@ -65,6 +65,8 @@ interface EventRepository {
         scopeEvents: List<Event>? = null,
     ): Event
 
+    suspend fun deleteEvents(eventIds: List<String>)
+
     suspend fun deleteAll()
 
     /**

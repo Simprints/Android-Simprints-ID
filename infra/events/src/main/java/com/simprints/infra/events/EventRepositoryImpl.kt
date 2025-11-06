@@ -193,6 +193,8 @@ internal open class EventRepositoryImpl @Inject constructor(
         return event
     }
 
+    override suspend fun deleteEvents(eventIds: List<String>) = eventLocalDataSource.deleteEvents(eventIds)
+
     override suspend fun deleteAll() = eventLocalDataSource.deleteAll()
 
     private suspend fun <T> reportException(block: suspend () -> T): T = try {

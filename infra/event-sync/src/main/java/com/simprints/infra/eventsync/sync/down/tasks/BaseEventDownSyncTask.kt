@@ -277,6 +277,7 @@ internal abstract class BaseEventDownSyncTask(
                 fingerprintSamplesToAdd = subjectFactory.extractFingerprintSamplesFromBiometricReferences(biometricReferencesAdded),
                 referenceIdsToRemove = biometricReferencesRemoved,
                 externalCredentialsToAdd = externalCredentialsAdded,
+                externalCredentialIdsToRemove = emptyList(), // Only used locally to ensure a single credential is linked per session
             ),
         )
     }

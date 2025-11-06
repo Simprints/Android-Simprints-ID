@@ -308,7 +308,8 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                 referencesToDelete.size != dbSubject.biometricTemplates.size ||
                     action.faceSamplesToAdd.isNotEmpty() ||
                     action.fingerprintSamplesToAdd.isNotEmpty() ||
-                    action.externalCredentialsToAdd.isNotEmpty(),
+                    action.externalCredentialsToAdd.isNotEmpty() ||
+                    action.externalCredentialIdsToRemove.isNotEmpty(),
             ) {
                 val errorMsg =
                     "Cannot delete all samples for subject ${action.subjectId} without adding new ones"
@@ -323,6 +324,10 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                     action.fingerprintSamplesToAdd.map { it.toRoomDb(action.subjectId) }
             if (templatesToAdd.isNotEmpty()) {
                 subjectDao.insertBiometricSamples(templatesToAdd)
+            }
+
+            dbSubject.externalCredentials.filter { it.id in action.externalCredentialIdsToRemove }.forEach {
+                subjectDao.deleteExternalCredentialById(it.id)
             }
             if (action.externalCredentialsToAdd.isNotEmpty()) {
                 subjectDao.insertExternalCredentials(action.externalCredentialsToAdd.map { it.toRoomDb() })
