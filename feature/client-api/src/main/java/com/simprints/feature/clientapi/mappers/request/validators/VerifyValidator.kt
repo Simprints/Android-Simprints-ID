@@ -8,7 +8,7 @@ import com.simprints.feature.clientapi.models.ClientApiError
 internal class VerifyValidator(
     private val extractor: VerifyRequestExtractor,
 ) : RequestActionValidator(extractor) {
-    override fun validate() {
+    override suspend fun validate() {
         super.validate()
         validateVerifyGuid(extractor.getVerifyGuid())
     }
