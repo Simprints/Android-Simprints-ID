@@ -8,7 +8,7 @@ import com.simprints.feature.clientapi.models.ClientApiError
 internal abstract class RequestActionValidator(
     private val extractor: ActionRequestExtractor,
 ) {
-    open fun validate() {
+    open suspend fun validate() {
         validateProjectId()
         validateUserId()
         validateModuleId()

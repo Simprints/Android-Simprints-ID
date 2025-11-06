@@ -3,11 +3,47 @@ package com.simprints.feature.clientapi.mappers.request.validators
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.mappers.request.requestFactories.ConfirmIdentityActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.RequestActionFactory
+import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.callback.CallbackComparisonScore
+import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.testtools.common.syntax.assertThrows
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
 import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Test
 
 internal class ConfirmIdentityValidatorTest : ActionRequestValidatorTest(ConfirmIdentityActionFactory) {
+    @MockK
+    private lateinit var mockEventRepository: EventRepository
+
+    @MockK
+    private lateinit var mockCallback: IdentificationCallbackEvent
+
+    @MockK
+    private lateinit var mockCallbackPayload: IdentificationCallbackEvent.IdentificationCallbackPayload
+
+    @MockK
+    private lateinit var mockScore1: CallbackComparisonScore
+
+    @MockK
+    private lateinit var mockScore2: CallbackComparisonScore
+
+    @MockK
+    private lateinit var mockProjectConfig: ProjectConfiguration
+
+    @MockK(relaxed = true)
+    private lateinit var mockConfigManager: ConfigManager
+
+    @Before
+    fun setUp() {
+        MockKAnnotations.init(this)
+    }
+
     override fun `should fail if no moduleId`() {}
 
     override fun `should fail with illegal moduleId`() {}
@@ -17,7 +53,7 @@ internal class ConfirmIdentityValidatorTest : ActionRequestValidatorTest(Confirm
     override fun `should fail with illegal metadata`() {}
 
     @Test
-    fun `should fail if no sessionId`() {
+    fun `should fail if no sessionId`() = runTest {
         val extractor = ConfirmIdentityActionFactory.getMockExtractor()
         every { extractor.getSessionId() } returns ""
 
@@ -27,7 +63,7 @@ internal class ConfirmIdentityValidatorTest : ActionRequestValidatorTest(Confirm
     }
 
     @Test
-    fun `should fail if no selectedGuid`() {
+    fun `should fail if no selectedGuid`() = runTest {
         val extractor = ConfirmIdentityActionFactory.getMockExtractor()
         every { extractor.getSelectedGuid() } returns ""
 
@@ -37,18 +73,168 @@ internal class ConfirmIdentityValidatorTest : ActionRequestValidatorTest(Confirm
     }
 
     @Test
-    fun `should fail if no identification callback in session`() {
+    fun `should fail if no identification callback in session`() = runTest {
         val extractor = ConfirmIdentityActionFactory.getMockExtractor()
-        val validator = ConfirmIdentityValidator(extractor, RequestActionFactory.MOCK_SESSION_ID, false)
+        coEvery { mockEventRepository.getEventsFromScope(any()) } returns emptyList()
+        val validator = ConfirmIdentityValidator(
+            extractor,
+            RequestActionFactory.MOCK_SESSION_ID,
+            mockEventRepository,
+            configManager = mockConfigManager,
+        )
         assertThrows<InvalidRequestException> {
             validator.validate()
         }
     }
 
     @Test
-    fun `should fail if invalid sessionId`() {
+    fun `should fail if invalid sessionId`() = runTest {
         val extractor = ConfirmIdentityActionFactory.getMockExtractor()
-        val validator = ConfirmIdentityValidator(extractor, "anotherSessionID", false)
+        coEvery { mockEventRepository.getEventsFromScope(any()) } returns emptyList()
+        val validator = ConfirmIdentityValidator(
+            extractor,
+            "anotherSessionID",
+            mockEventRepository,
+            configManager = mockConfigManager,
+        )
+        assertThrows<InvalidRequestException> {
+            validator.validate()
+        }
+    }
+
+    @Test
+    fun `should succeed when selected GUID is in identification results`() = runTest {
+        val extractor = ConfirmIdentityActionFactory.getMockExtractor()
+        every { extractor.getSelectedGuid() } returns "valid-guid-123"
+
+        every { mockScore1.guid } returns "other-guid-456"
+        every { mockScore2.guid } returns "valid-guid-123"
+        every { mockCallbackPayload.scores } returns listOf(mockScore1, mockScore2)
+        every { mockCallback.payload } returns mockCallbackPayload
+
+        coEvery { mockEventRepository.getEventsFromScope(any()) } returns listOf(mockCallback)
+
+        val validator = ConfirmIdentityValidator(
+            extractor,
+            RequestActionFactory.MOCK_SESSION_ID,
+            mockEventRepository,
+            configManager = mockConfigManager,
+        )
+
+        // Should not throw
+        validator.validate()
+    }
+
+    @Test
+    fun `should fail when selected GUID is not in identification results`() = runTest {
+        val extractor = ConfirmIdentityActionFactory.getMockExtractor()
+        every { extractor.getSelectedGuid() } returns "invalid-guid-999"
+
+        every { mockScore1.guid } returns "valid-guid-123"
+        every { mockScore2.guid } returns "valid-guid-456"
+        every { mockCallbackPayload.scores } returns listOf(mockScore1, mockScore2)
+        every { mockCallback.payload } returns mockCallbackPayload
+
+        coEvery { mockEventRepository.getEventsFromScope(any()) } returns listOf(mockCallback)
+
+        val validator = ConfirmIdentityValidator(
+            extractor,
+            RequestActionFactory.MOCK_SESSION_ID,
+            mockEventRepository,
+            configManager = mockConfigManager,
+        )
+
+        assertThrows<InvalidRequestException> {
+            validator.validate()
+        }
+    }
+
+    @Test
+    fun `should fail when identification results have no scores`() = runTest {
+        val extractor = ConfirmIdentityActionFactory.getMockExtractor()
+        every { extractor.getSelectedGuid() } returns "any-guid"
+
+        every { mockCallbackPayload.scores } returns emptyList()
+        every { mockCallback.payload } returns mockCallbackPayload
+
+        coEvery { mockEventRepository.getEventsFromScope(any()) } returns listOf(mockCallback)
+
+        val validator = ConfirmIdentityValidator(
+            extractor,
+            RequestActionFactory.MOCK_SESSION_ID,
+            mockEventRepository,
+            configManager = mockConfigManager,
+        )
+
+        assertThrows<InvalidRequestException> {
+            validator.validate()
+        }
+    }
+
+    @Test
+    fun `should succeed if selectedGuid is NONE_SELECTED`() = runTest {
+        val extractor = ConfirmIdentityActionFactory.getMockExtractor()
+        every { extractor.getSelectedGuid() } returns "NONE_SELECTED"
+        every { mockCallbackPayload.scores } returns emptyList()
+        every { mockCallback.payload } returns mockCallbackPayload
+        coEvery { mockEventRepository.getEventsFromScope(any()) } returns listOf(mockCallback)
+        val validator = ConfirmIdentityValidator(
+            extractor,
+            RequestActionFactory.MOCK_SESSION_ID,
+            mockEventRepository,
+            configManager = mockConfigManager,
+        )
+        // Should not throw
+        validator.validate()
+    }
+
+    @Test
+    fun `should succeed when GUID not in results but skip feature flag is enabled`() = runTest {
+        val extractor = ConfirmIdentityActionFactory.getMockExtractor()
+        every { extractor.getSelectedGuid() } returns "guid-not-in-results"
+
+        every { mockScore1.guid } returns "different-guid"
+        every { mockCallbackPayload.scores } returns listOf(mockScore1)
+        every { mockCallback.payload } returns mockCallbackPayload
+        coEvery { mockEventRepository.getEventsFromScope(any()) } returns listOf(mockCallback)
+
+        // Mock ConfigManager with feature flag enabled
+        every { mockProjectConfig.custom } returns mapOf("allowConfirmingGuidsNotInCallback" to true)
+        coEvery { mockConfigManager.getProjectConfiguration() } returns mockProjectConfig
+
+        val validator = ConfirmIdentityValidator(
+            extractor,
+            RequestActionFactory.MOCK_SESSION_ID,
+            mockEventRepository,
+            mockConfigManager,
+        )
+
+        // Should not throw despite GUID not being in results
+        validator.validate()
+    }
+
+    @Test
+    fun `should fail when GUID not in results and feature flag is disabled`() = runTest {
+        val extractor = ConfirmIdentityActionFactory.getMockExtractor()
+        every { extractor.getSelectedGuid() } returns "guid-not-in-results"
+
+        every { mockScore1.guid } returns "different-guid"
+        every { mockCallbackPayload.scores } returns listOf(mockScore1)
+        every { mockCallback.payload } returns mockCallbackPayload
+        coEvery { mockEventRepository.getEventsFromScope(any()) } returns listOf(mockCallback)
+
+        // Mock ConfigManager with feature flag disabled
+        every { mockProjectConfig.custom } returns mapOf("allowConfirmingGuidsNotInCallback" to false)
+        coEvery { mockConfigManager.getProjectConfiguration() } returns mockProjectConfig
+
+        val validator = ConfirmIdentityValidator(
+            extractor,
+            RequestActionFactory.MOCK_SESSION_ID,
+            mockEventRepository,
+            mockConfigManager,
+        )
+
+        // Should throw because GUID is not in results and flag is disabled
         assertThrows<InvalidRequestException> {
             validator.validate()
         }
