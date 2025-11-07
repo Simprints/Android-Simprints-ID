@@ -63,12 +63,12 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
         private set
     val isOcrActive: Boolean
         get() = detectedBlocks.isNotEmpty()
-    private var state: ScanOcrState = ScanOcrState.EMPTY
+    private var ocrState: ScanOcrState = ScanOcrState.EMPTY
         set(value) {
             field = value
             _scanOcrStateLiveData.postValue(value)
         }
-    private val _scanOcrStateLiveData = MutableLiveData(state)
+    private val _scanOcrStateLiveData = MutableLiveData(ocrState)
     val scanOcrStateLiveData: LiveData<ScanOcrState> = _scanOcrStateLiveData
     val finishOcrEvent: LiveData<LiveDataEventWithContent<ScannedCredential>>
         get() = _finishOcrEvent
@@ -90,7 +90,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     }
 
     private fun updateState(state: (ScanOcrState) -> ScanOcrState) {
-        this.state = state(this.state)
+        this.ocrState = state(this.ocrState)
     }
 
     fun getDocumentTypeRes(): Int = when (ocrDocumentType) {
