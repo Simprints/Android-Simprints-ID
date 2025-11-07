@@ -24,7 +24,6 @@ import com.simprints.feature.externalcredential.screens.scanocr.usecase.Normaliz
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ZoomOntoCredentialUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
@@ -67,10 +66,10 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     private var state: ScanOcrState = ScanOcrState.EMPTY
         set(value) {
             field = value
-            _stateLiveData.postValue(value)
+            _scanOcrStateLiveData.postValue(value)
         }
-    private val _stateLiveData = MutableLiveData<ScanOcrState>()
-    val stateLiveData: LiveData<ScanOcrState> = _stateLiveData
+    private val _scanOcrStateLiveData = MutableLiveData(state)
+    val scanOcrStateLiveData: LiveData<ScanOcrState> = _scanOcrStateLiveData
     val finishOcrEvent: LiveData<LiveDataEventWithContent<ScannedCredential>>
         get() = _finishOcrEvent
     private val _finishOcrEvent = MutableLiveData<LiveDataEventWithContent<ScannedCredential>>()
