@@ -45,6 +45,7 @@ import com.simprints.infra.uibase.view.fadeOut
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -85,6 +86,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     private var checkAnimator: ViewPropertyAnimator? = null
     private var isAnimatingCompletion: Boolean = false
     private var pendingFinishAction: (() -> Unit)? = null
+    private var ocrPreProcessingJob: Job? = null
 
     @Inject
     lateinit var viewModelFactory: ExternalCredentialScanOcrViewModel.Factory
@@ -132,11 +134,11 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         }
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         stopOcr()
         stopCamera()
         clearAnimations()
-        super.onDestroy()
+        super.onDestroyView()
     }
 
     private fun clearAnimations() {
@@ -299,48 +301,46 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             // Running OCR as often as we can while camera feedback is displayed to the user
             viewModel.ocrOnFrameStarted()
             if (viewModel.ocrConfig.useHighRes) {
-                captureHighResImageForOcr()
                 videoFrame.close()
+                captureHighResImageForOcr { highResImage ->
+                    preProcessImageAndRunOcr(highResImage)
+                }
             } else {
-                captureFrameFromVideoStreamForOcr(videoFrame)
+                preProcessImageAndRunOcr(videoFrame)
             }
         }
     }
 
-    private fun captureFrameFromVideoStreamForOcr(imageProxy: ImageProxy) {
-        lifecycleScope.launch(bgDispatcher) {
+    private fun preProcessImageAndRunOcr(imageProxy: ImageProxy) {
+        ocrPreProcessingJob?.cancel()
+        ocrPreProcessingJob = lifecycleScope.launch(bgDispatcher) {
             try {
                 val (bitmap, imageInfo) = imageProxy.toBitmap() to imageProxy.imageInfo
-                val cropConfig: OcrCropConfig = buildOcrCropConfigUseCase(
-                    rotationDegrees = imageInfo.rotationDegrees,
-                    cameraPreview = binding.preview,
-                    documentScannerArea = binding.documentScannerArea,
-                )
-                viewModel.runOcrOnFrame(frame = bitmap, cropConfig)
+                if (ocrPreProcessingJob?.isActive == true) {
+                    val cropConfig: OcrCropConfig = buildOcrCropConfigUseCase(
+                        rotationDegrees = imageInfo.rotationDegrees,
+                        cameraPreview = binding.preview,
+                        documentScannerArea = binding.documentScannerArea,
+                    )
+                    viewModel.runOcrOnFrame(frame = bitmap, cropConfig)
+                } else {
+                    Simber.i(
+                        "Unable to run OCR preprocessing, coroutine context is cancelled",
+                        tag = MULTI_FACTOR_ID,
+                    )
+                }
             } finally {
                 imageProxy.close()
             }
         }
     }
 
-    private fun captureHighResImageForOcr() {
+    private fun captureHighResImageForOcr(onImageCaptured: (ImageProxy) -> Unit) {
         imageCapture.takePicture(
             cameraExecutor,
             object : ImageCapture.OnImageCapturedCallback() {
                 override fun onCaptureSuccess(imageProxy: ImageProxy) {
-                    lifecycleScope.launch(bgDispatcher) {
-                        try {
-                            val (bitmap, imageInfo) = imageProxy.toBitmap() to imageProxy.imageInfo
-                            val cropConfig: OcrCropConfig = buildOcrCropConfigUseCase(
-                                rotationDegrees = imageInfo.rotationDegrees,
-                                cameraPreview = binding.preview,
-                                documentScannerArea = binding.documentScannerArea,
-                            )
-                            viewModel.runOcrOnFrame(frame = bitmap, cropConfig)
-                        } finally {
-                            imageProxy.close()
-                        }
-                    }
+                    onImageCaptured(imageProxy)
                 }
 
                 override fun onError(e: ImageCaptureException) {
@@ -357,6 +357,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     }
 
     private fun stopOcr() {
+        ocrPreProcessingJob?.cancel()
         if (::imageAnalysis.isInitialized) {
             imageAnalysis.clearAnalyzer()
         }
