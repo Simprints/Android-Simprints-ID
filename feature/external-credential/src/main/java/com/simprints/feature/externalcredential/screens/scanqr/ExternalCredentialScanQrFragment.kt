@@ -87,15 +87,23 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
         }
     }
 
+    override fun onPause() {
+        if (isCameraInitialized) {
+            cameraHelper.stopCamera()
+            isCameraInitialized = false
+        }
+        super.onPause()
+    }
+
     override fun onResume() {
         super.onResume()
         val cameraPermissionStatus = requireActivity().getCurrentPermissionStatus(CAMERA)
         viewModel.updateCameraPermissionStatus(cameraPermissionStatus)
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         dismissDialog()
-        super.onDestroy()
+        super.onDestroyView()
     }
 
     private fun dismissDialog() {
