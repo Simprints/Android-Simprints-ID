@@ -33,6 +33,8 @@ internal class MatchViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val timeHelper: TimeHelper,
 ) : ViewModel() {
+    var isMatcherRunning = false
+        private set
     var isInitialized = false
         private set
     private var candidatesLoaded = 0
@@ -48,6 +50,8 @@ internal class MatchViewModel @Inject constructor(
     private val _matchResponse = MutableLiveData<LiveDataEventWithContent<Serializable>>()
 
     fun setupMatch(params: MatchParams) = viewModelScope.launch {
+        if (isMatcherRunning) return@launch
+        isMatcherRunning = true
         isInitialized = true
         val startTime = timeHelper.now()
 
