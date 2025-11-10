@@ -30,7 +30,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import kotlin.concurrent.timer
 
 internal class ExternalCredentialScanOcrViewModelTest {
     @get:Rule
@@ -104,7 +103,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
 
     @Test
     fun `ocrStarted updates state to ScanningInProgress`() {
-        val observer = viewModel.stateLiveData.test()
+        val observer = viewModel.scanOcrStateLiveData.test()
         viewModel.ocrStarted()
 
         val state = observer.value() as ScanOcrState.ScanningInProgress
@@ -122,7 +121,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
         coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
         coEvery { getCredentialCoordinatesUseCase(mockCroppedBitmap, documentType) } returns mockDetectedBlock
 
-        val observer = viewModel.stateLiveData.test()
+        val observer = viewModel.scanOcrStateLiveData.test()
         viewModel.ocrOnFrameStarted()
         viewModel.runOcrOnFrame(bitmap, cropConfig)
 
@@ -158,7 +157,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
         coEvery { credentialImageRepository.saveCredentialScan(mockBitmap, any()) } returns zoomedImagePath
 
         val finishObserver = viewModel.finishOcrEvent.test()
-        val stateObserver = viewModel.stateLiveData.test()
+        val stateObserver = viewModel.scanOcrStateLiveData.test()
 
         viewModel.ocrStarted() // Initialises capture timing
         viewModel.processOcrResultsAndFinish()

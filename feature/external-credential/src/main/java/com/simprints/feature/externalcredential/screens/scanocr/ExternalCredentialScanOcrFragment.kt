@@ -108,7 +108,6 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         super.onViewCreated(view, savedInstanceState)
         applySystemBarInsets(view)
         Simber.i("ExternalCredentialScanOcrFragment started", tag = MULTI_FACTOR_ID)
-        initObservers()
     }
 
     override fun onResume() {
@@ -149,7 +148,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     }
 
     private fun initializeFragment() {
-        renderInitialState()
+        initObservers()
         initCamera(onComplete = {
             if (viewModel.isOcrActive) {
                 startOcr()
@@ -158,7 +157,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     }
 
     private fun initObservers() {
-        viewModel.stateLiveData.observe(viewLifecycleOwner) { state ->
+        viewModel.scanOcrStateLiveData.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is ScanOcrState.ScanningInProgress -> {
                     renderProgress(state)
