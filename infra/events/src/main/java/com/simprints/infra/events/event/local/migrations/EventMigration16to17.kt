@@ -5,6 +5,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
+import org.json.JSONArray
+import org.json.JSONObject
 
 /**
  * Starting from 2025.4.0, EnrolmentEventV4 requires the `externalCredentialIds` field.
@@ -31,32 +33,35 @@ internal class EventMigration16to17 : Migration(16, 17) {
                 val id = cursor.getStringWithColumnName("id") ?: continue
                 val jsonData = cursor.getStringWithColumnName(DB_EVENT_JSON_FIELD) ?: continue
 
-                // Only adding if 'externalCredentialIds' field doesn't exist
-                if (!jsonData.contains(EXTERNAL_CREDENTIAL_IDS)) {
-                    val migratedJson = jsonData.addExternalCredentialIdsField()
-                    database.execSQL(
-                        "UPDATE $DB_EVENT_ENTITY SET $DB_EVENT_JSON_FIELD = ? WHERE id = ?",
-                        arrayOf(migratedJson, id),
+                try {
+                    val jsonObject = JSONObject(jsonData)
+                    val payload = jsonObject.optJSONObject(PAYLOAD_JSON_FIELD) ?: continue
+
+                    // Only adding if 'externalCredentialIds' field doesn't exist
+                    if (!payload.has(EXTERNAL_CREDENTIAL_IDS_JSON_FIELD)) {
+                        payload.put(EXTERNAL_CREDENTIAL_IDS_JSON_FIELD, JSONArray())
+                        val migratedJson = jsonObject.toString()
+                        database.execSQL(
+                            "UPDATE $DB_EVENT_ENTITY SET $DB_EVENT_JSON_FIELD = ? WHERE id = ?",
+                            arrayOf(migratedJson, id),
+                        )
+                    }
+                } catch (e: Exception) {
+                    Simber.e(
+                        "Failed to migrate room db from schema 16 to schema 17.",
+                        e,
+                        tag = MIGRATION,
                     )
                 }
             }
         }
     }
 
-    private fun String.addExternalCredentialIdsField(): String {
-        val searchPattern = "\"type\":\"$EVENT_TYPE_ENROLMENT_V4\""
-        val insertPosition = indexOf(searchPattern)
-
-        if (insertPosition == -1) return this
-
-        val newField = "\"$EXTERNAL_CREDENTIAL_IDS\":[],"
-        return StringBuilder(this).insert(insertPosition, newField).toString()
-    }
-
     companion object {
         private const val DB_EVENT_ENTITY = "DbEvent"
         private const val DB_EVENT_JSON_FIELD = "eventJson"
         private const val EVENT_TYPE_ENROLMENT_V4 = "ENROLMENT_V4"
-        private const val EXTERNAL_CREDENTIAL_IDS = "externalCredentialIds"
+        private const val EXTERNAL_CREDENTIAL_IDS_JSON_FIELD = "externalCredentialIds"
+        private const val PAYLOAD_JSON_FIELD = "payload"
     }
 }
