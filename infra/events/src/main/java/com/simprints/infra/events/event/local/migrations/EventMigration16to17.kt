@@ -44,7 +44,7 @@ internal class EventMigration16to17 : Migration(16, 17) {
     }
 
     private fun String.addExternalCredentialIdsField(): String {
-        val searchPattern = "\"type\":\"$EVENT_TYPE_ENROLMENT_V4"
+        val searchPattern = "\"type\":\"$EVENT_TYPE_ENROLMENT_V4\""
         val insertPosition = indexOf(searchPattern)
 
         if (insertPosition == -1) return this
