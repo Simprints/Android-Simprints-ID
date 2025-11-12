@@ -15,9 +15,9 @@ import com.simprints.infra.logging.Simber
  * before the "type" field within the payload
  */
 internal class EventMigration16to17 : Migration(16, 17) {
-    override fun migrate(database: SupportSQLiteDatabase) {
+    override fun migrate(db: SupportSQLiteDatabase) {
         Simber.i("Migrating room db from schema 16 to schema 17.", tag = MIGRATION)
-        migrateEnrolmentEventJson(database)
+        migrateEnrolmentEventJson(db)
         Simber.i("Migration from schema 16 to schema 17 done.", tag = MIGRATION)
     }
 
