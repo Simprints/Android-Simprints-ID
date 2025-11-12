@@ -261,7 +261,7 @@ internal class EventUpSyncTask @Inject constructor(
                 .also { listOfEvents -> emit(listOfEvents.size) }
         } catch (ex: Exception) {
             if (ex is JsonParseException || ex is JsonMappingException) {
-                Simber.i("Failed to un-marshal events", ex, tag = SYNC)
+                Simber.e("Failed to un-marshal events", ex, tag = SYNC)
             } else {
                 throw ex
             }
