@@ -187,7 +187,7 @@ class EventMigration16to17Test {
             "eventJson",
             """
             {
-               "id":"d256e644-ce5b-4ec5-8909-3a372a930206",
+               "id":"$id",
                "projectId":"9WNCAbWVNrxttDe5hgwb",
                "sessionId":"2bdc1145-cbec-4e6a-ac8a-61c1e5b53bb4",
                "payload":{

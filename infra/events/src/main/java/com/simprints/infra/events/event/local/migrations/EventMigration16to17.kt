@@ -14,7 +14,7 @@ import org.json.JSONObject
  *
  * This migration adds:
  *   "externalCredentialIds": [],
- * before the "type" field within the payload
+ * to the payload object.
  */
 internal class EventMigration16to17 : Migration(16, 17) {
     override fun migrate(db: SupportSQLiteDatabase) {
