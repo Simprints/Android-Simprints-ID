@@ -13,6 +13,7 @@ import com.simprints.infra.events.event.local.migrations.EventMigration12to13
 import com.simprints.infra.events.event.local.migrations.EventMigration13to14
 import com.simprints.infra.events.event.local.migrations.EventMigration14to15
 import com.simprints.infra.events.event.local.migrations.EventMigration15to16
+import com.simprints.infra.events.event.local.migrations.EventMigration16to17
 import com.simprints.infra.events.event.local.migrations.EventMigration1to2
 import com.simprints.infra.events.event.local.migrations.EventMigration2to3
 import com.simprints.infra.events.event.local.migrations.EventMigration3to4
@@ -31,7 +32,7 @@ import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
         DbEvent::class,
         DbEventScope::class,
     ],
-    version = 16,
+    version = 17,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)
@@ -64,6 +65,7 @@ internal abstract class EventRoomDatabase : RoomDatabase() {
                 .addMigrations(EventMigration13to14())
                 .addMigrations(EventMigration14to15())
                 .addMigrations(EventMigration15to16())
+                .addMigrations(EventMigration16to17())
 
             if (BuildConfig.DB_ENCRYPTION) {
                 builder.openHelperFactory(factory)
