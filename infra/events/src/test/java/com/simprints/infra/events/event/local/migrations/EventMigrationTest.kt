@@ -47,7 +47,7 @@ class EventMigrationTest {
             }
             close()
         }
-        val db = helper.runMigrationsAndValidate(TEST_DB, 16, true, *ALL_MIGRATIONS)
+        val db = helper.runMigrationsAndValidate(TEST_DB, 17, true, *ALL_MIGRATIONS)
         db.query("SELECT * FROM $TABLE_NAME").use { cursor ->
             while (cursor.moveToNext()) {
                 val eventJson = cursor.getStringWithColumnName("eventJson")!!
