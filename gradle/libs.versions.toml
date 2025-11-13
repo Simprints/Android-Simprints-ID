@@ -1,9 +1,9 @@
 [versions]
-kotlin_version = "2.2.0"
+kotlin_version = "2.2.21"
 kotlin_coroutine_version = "1.10.2"
-ksp_version = "2.2.0-2.0.2"
+ksp_version = "2.3.2"
 
-android_gradlePlugin_version = "8.13.0"
+android_gradlePlugin_version = "8.13.1"
 androidx_version = "1.7.0"
 androidx_core_version = "1.17.0"
 androidx_app_compat_version = "1.7.1"
@@ -85,7 +85,7 @@ uiAutomator_version = "2.3.0"
 jacoco_version = "0.8.13"
 
 sonar_plugin_version = "6.3.1.5724"
-realm_version = "4.0.0"
+realm_version = "4.0.1"
 protobuf_plugin_version = "0.9.5"
 deps_graph_version = "0.8.0"
 tink_version = "1.18.0"
