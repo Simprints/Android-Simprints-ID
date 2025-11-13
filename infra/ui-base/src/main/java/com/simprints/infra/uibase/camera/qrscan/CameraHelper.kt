@@ -28,6 +28,7 @@ class CameraHelper @AssistedInject constructor(
     private val cameraFocusManagerFactory: CameraFocusManager.Factory,
 ) {
     private val cameraFocusManager by lazy { cameraFocusManagerFactory.create(crashReportTag) }
+    private var cameraProvider: ProcessCameraProvider? = null
 
     @AssistedFactory
     interface Factory {
@@ -43,9 +44,13 @@ class CameraHelper @AssistedInject constructor(
         val providerFuture = ProcessCameraProvider.getInstance(context)
         providerFuture.addListener(
             {
-                val cameraProvider = providerFuture.get()
+                val provider = providerFuture.get().also { provider ->
+                    cameraProvider = provider
+                    provider.unbindAll()
+                }
+
                 // Check if the back camera is available
-                if (cameraProvider.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA).not()) {
+                if (provider.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA).not()) {
                     initializationErrorListener.onCameraError()
                     return@addListener
                 }
@@ -54,7 +59,7 @@ class CameraHelper @AssistedInject constructor(
                 val preview = buildPreview(cameraPreview)
 
                 try {
-                    cameraProvider
+                    provider
                         .bindToLifecycle(
                             lifecycleOwner,
                             cameraSelector,
@@ -73,6 +78,11 @@ class CameraHelper @AssistedInject constructor(
             },
             ContextCompat.getMainExecutor(context),
         )
+    }
+
+    fun stopCamera() {
+        cameraProvider?.unbindAll()
+        cameraProvider = null
     }
 
     private fun buildAnalyser(qrAnalyser: QrCodeAnalyzer) = ImageAnalysis

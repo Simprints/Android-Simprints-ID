@@ -355,6 +355,43 @@ internal class MatchViewModelTest {
         )
     }
 
+    @Test
+    fun `setupMatch does not continue when isMatcherRunning is true`() = runTest {
+        // Seting up a matcher runs in background
+        coEvery { faceMatcherUseCase.invoke(any(), any()) } returns flow {
+            emit(MatcherUseCase.MatcherState.LoadingStarted(1))
+            emit(MatcherUseCase.MatcherState.CandidateLoaded)
+            emit(
+                MatcherUseCase.MatcherState.Success(
+                    matchResultItems = listOf(FaceMatchResult.Item("1", 90f)),
+                    totalCandidates = 1,
+                    matcherName = MATCHER_NAME,
+                    matchBatches = emptyList(),
+                ),
+            )
+        }
+        coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any(), any()) }
+
+        val states = viewModel.matchState.test()
+        val matchParams = MatchParams(
+            probeReferenceId = "referenceId",
+            probeFaceSamples = listOf(getFaceSample()),
+            faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
+            flowType = FlowType.ENROL,
+            queryForCandidates = mockk {},
+            biometricDataSource = BiometricDataSource.Simprints,
+        )
+
+        viewModel.setupMatch(matchParams)
+        assertThat(viewModel.isMatcherRunning).isTrue()
+        viewModel.setupMatch(matchParams)
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { faceMatcherUseCase.invoke(any(), any()) }
+        // Checking that no new states were emitted. History = (NotStarted, LoadingCandidates LoadingCandidates, Finished)
+        assertThat(states.valueHistory()).hasSize(4)
+    }
+
     private fun getFaceSample(): MatchParams.FaceSample = MatchParams.FaceSample(UUID.randomUUID().toString(), Random.nextBytes(20))
 
     private fun getFingerprintSample(): MatchParams.FingerprintSample = MatchParams.FingerprintSample(
