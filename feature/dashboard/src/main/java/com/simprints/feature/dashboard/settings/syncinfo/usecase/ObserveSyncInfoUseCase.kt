@@ -1,12 +1,14 @@
 package com.simprints.feature.dashboard.settings.syncinfo.usecase
 
 import androidx.lifecycle.asFlow
+import com.simprints.core.DispatcherIO
+import com.simprints.core.DispatcherMain
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.lifecycle.AppForegroundStateTracker
 import com.simprints.core.tools.extentions.combine9
 import com.simprints.core.tools.extentions.onChange
-import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Ticker
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.dashboard.settings.syncinfo.SyncInfo
 import com.simprints.feature.dashboard.settings.syncinfo.SyncInfoError
@@ -23,6 +25,7 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
+import com.simprints.infra.config.store.models.isSampleUploadEnabledInProject
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
@@ -30,14 +33,17 @@ import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepositor
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.sync.SyncOrchestrator
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
@@ -55,9 +61,15 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val ticker: Ticker,
     private val appForegroundStateTracker: AppForegroundStateTracker,
+    private val commCarePermissionChecker: CommCarePermissionChecker,
+    @DispatcherMain private val mainDispatcher: CoroutineDispatcher,
+    @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) {
     private val eventSyncStateFlow =
-        eventSyncManager.getLastSyncState(useDefaultValue = true /* otherwise value not guaranteed */).asFlow()
+        eventSyncManager
+            .getLastSyncState(
+                useDefaultValue = true, // otherwise value not guaranteed
+            ).asFlow()
     private val imageSyncStatusFlow =
         syncOrchestrator.observeImageSyncStatus()
 
@@ -69,7 +81,11 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         imageSyncStatusFlow,
         configManager.observeProjectConfiguration(),
         configManager.observeDeviceConfiguration(),
-        appForegroundStateTracker.observeAppInForeground().filter { it }, // only when going to foreground
+        appForegroundStateTracker
+            .observeAppInForeground()
+            .filter {
+                it // only when going to foreground
+            }.flowOn(mainDispatcher), // runs in main thread by design
         ticker.observeTickOncePerMinute(),
     ) { isOnline, isLoggedIn, isRefreshing, eventSyncState, imageSyncStatus, projectConfig, deviceConfig, _, _ ->
         val currentEvents = eventSyncState.progress?.coerceAtLeast(0) ?: 0
@@ -157,9 +173,13 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             !isPreLogoutUpSync && projectConfig.isCommCareEventDownSyncAllowed()
 
         val isCommCareSyncBlockedByDeniedPermission =
-            isCommCareSyncExpected && eventSyncState.isSyncFailedBecauseCommCarePermissionIsMissing()
+            isCommCareSyncExpected &&
+                eventSyncState.isSyncFailedBecauseCommCarePermissionIsMissing() &&
+                !commCarePermissionChecker.hasCommCarePermissions()
         val isEventSyncConnectionBlocked =
             !isOnline && !isCommCareSyncExpected // CommCare would be able to sync even if device is offline
+        val isSyncFailedForNonCommCareReason =
+            eventSyncState.isSyncFailed() && !eventSyncState.isSyncFailedBecauseCommCarePermissionIsMissing()
 
         // an intermediate calculation of sync state shown in UI - not to be confused with the data layer-specific EventSyncState
         val eventSyncVisibleState = when {
@@ -167,7 +187,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             isCommCareSyncBlockedByDeniedPermission -> CommCareError
             isModuleSelectionRequired -> NoModulesError
             isEventSyncConnectionBlocked -> OfflineError
-            eventSyncState.isSyncFailed() -> Error
+            isSyncFailedForNonCommCareReason -> Error
             else -> OnStandby
         }
 
@@ -175,15 +195,22 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             projectConfig.canSyncDataToSimprints() && isOnline
         val isDownSyncPossible =
             (projectConfig.isSimprintsEventDownSyncAllowed() && isOnline && !isReLoginRequired) ||
-                (projectConfig.isCommCareEventDownSyncAllowed() && !eventSyncState.isSyncFailedBecauseCommCarePermissionIsMissing())
+                (
+                    projectConfig.isCommCareEventDownSyncAllowed() &&
+                        (
+                            !eventSyncState.isSyncFailedBecauseCommCarePermissionIsMissing() ||
+                                commCarePermissionChecker.hasCommCarePermissions()
+                        )
+                )
         val isSyncButtonEnabled =
-            (eventSyncVisibleState == OnStandby) &&
+            (eventSyncVisibleState == OnStandby || eventSyncVisibleState == Error) &&
                 ((!isPreLogoutUpSync && isDownSyncPossible) || isEventUpSyncPossible)
 
         val projectId = authStore.signedInProjectId
 
         val recordsTotal = when {
             isEventSyncInProgress -> null
+            projectId.isBlank() -> null // without project ID, repository access attempts will throw an exception
             else -> enrolmentRecordRepository.count(SubjectQuery(projectId))
         }
         val recordsToUpload = when {
@@ -208,23 +235,33 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             else -> DownSyncCounts(0, isLowerBound = false)
         }
 
-        val project = configManager.getProject(projectId)
-        val isProjectEnding =
-            project.state == ProjectState.PROJECT_ENDING
-        val moduleCounts = deviceConfig.selectedModules.map { moduleName ->
-            ModuleCount(
-                name = when (moduleName) {
-                    is TokenizableString.Raw -> moduleName
-                    is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
-                        encrypted = moduleName,
-                        tokenKeyType = TokenKeyType.ModuleId,
-                        project,
-                    )
-                }.value,
-                count = enrolmentRecordRepository.count(
-                    SubjectQuery(projectId = projectId, moduleId = moduleName),
-                ),
-            )
+        val project = try {
+            projectId.takeUnless { it.isBlank() }?.let { configManager.getProject(it) }
+        } catch (_: Exception) {
+            // If the device is compromised, project data is deleted. Access attempts will throw an exception,
+            // effectively appearing to the user as if the project has ended.
+            null
+        }
+
+        val isProjectRunning = project?.state == ProjectState.RUNNING
+        val moduleCounts = if (project != null) {
+            deviceConfig.selectedModules.map { moduleName ->
+                ModuleCount(
+                    name = when (moduleName) {
+                        is TokenizableString.Raw -> moduleName
+                        is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
+                            encrypted = moduleName,
+                            tokenKeyType = TokenKeyType.ModuleId,
+                            project,
+                        )
+                    }.value,
+                    count = enrolmentRecordRepository.count(
+                        SubjectQuery(projectId = projectId, moduleId = moduleName),
+                    ),
+                )
+            }
+        } else {
+            emptyList()
         }
         val modulesCountTotal = SyncInfoModuleCount(
             isTotal = true,
@@ -247,11 +284,11 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         val syncInfoSectionRecords = SyncInfoSectionRecords(
             counterTotalRecords = recordsTotal?.toString().orEmpty(),
             counterRecordsToUpload = recordsToUpload?.toString().orEmpty(),
-            isCounterRecordsToDownloadVisible = !isPreLogoutUpSync && !isProjectEnding,
+            isCounterRecordsToDownloadVisible = !isPreLogoutUpSync && isProjectRunning,
             counterRecordsToDownload = recordsToDownload?.let { "${it.count}${if (it.isLowerBound) "+" else ""}" }.orEmpty(),
             isCounterImagesToUploadVisible = isPreLogoutUpSync,
             counterImagesToUpload = imagesToUpload?.toString().orEmpty(),
-            isInstructionDefaultVisible = eventSyncVisibleState == OnStandby,
+            isInstructionDefaultVisible = eventSyncVisibleState == OnStandby && !isPreLogoutUpSync,
             isInstructionCommCarePermissionVisible = eventSyncVisibleState == CommCareError,
             isInstructionNoModulesVisible = eventSyncVisibleState == NoModulesError,
             isInstructionOfflineVisible = eventSyncVisibleState == OfflineError,
@@ -285,19 +322,20 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         )
 
         val syncInfo = SyncInfo(
-            isLoggedIn,
+            isLoggedIn = isLoggedIn,
             isConfigurationLoadingProgressBarVisible = isRefreshing,
             isLoginPromptSectionVisible = isReLoginRequired && !isPreLogoutUpSync,
-            syncInfoSectionRecords,
-            syncInfoSectionImages,
-            syncInfoSectionModules,
+            isImageSyncSectionVisible = projectConfig.isSampleUploadEnabledInProject(),
+            syncInfoSectionRecords = syncInfoSectionRecords,
+            syncInfoSectionImages = syncInfoSectionImages,
+            syncInfoSectionModules = syncInfoSectionModules,
         )
         return@combine9 syncInfo
     }.onRecordSyncComplete {
         delay(timeMillis = SYNC_COMPLETION_HOLD_MILLIS)
     }.onImageSyncComplete {
         delay(timeMillis = SYNC_COMPLETION_HOLD_MILLIS)
-    }
+    }.flowOn(ioDispatcher) // upstream flows mostly do IO work
 
     // sync info change detection helpers
 
@@ -345,7 +383,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
  * A representation of a non-overlapping, exhaustive "sync state" as shown in UI.
  * To be used in a temporary UI state calculation: good to be used with exhaustive pattern matching.
  * Not to be confused with the data layer-specific EventSyncState.
-  */
+ */
 private sealed class EventSyncVisibleState
 
 private object OnStandby : EventSyncVisibleState()

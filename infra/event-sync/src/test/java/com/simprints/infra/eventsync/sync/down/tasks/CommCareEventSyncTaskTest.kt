@@ -1,7 +1,10 @@
 package com.simprints.infra.eventsync.sync.down.tasks
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.models.DeviceConfiguration
@@ -57,46 +60,74 @@ class CommCareEventSyncTaskTest {
             "attendantId",
         )
         val ENROLMENT_RECORD_CREATION = EnrolmentRecordCreationEvent(
-            "subjectId",
-            "projectId",
-            "moduleId".asTokenizableRaw(),
-            "attendantId".asTokenizableRaw(),
-            listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+            subjectId = "subjectId",
+            projectId = "projectId",
+            moduleId = "moduleId".asTokenizableRaw(),
+            attendantId = "attendantId".asTokenizableRaw(),
+            biometricReferences = listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+            externalCredentials = listOf(
+                ExternalCredential(
+                    id = "id",
+                    value = "value".asTokenizableEncrypted(),
+                    subjectId = "subjectId",
+                    type = ExternalCredentialType.NHISCard,
+                ),
+            ),
         )
         val ENROLMENT_RECORD_MOVE_MODULE = EnrolmentRecordMoveEvent(
             EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove(
-                "subjectId",
-                "projectId",
-                DEFAULT_MODULE_ID_2,
-                "attendantId".asTokenizableRaw(),
-                listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+                subjectId = "subjectId",
+                projectId = "projectId",
+                moduleId = DEFAULT_MODULE_ID_2,
+                attendantId = "attendantId".asTokenizableRaw(),
+                biometricReferences = listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+                externalCredential = ExternalCredential(
+                    id = "id",
+                    value = "value".asTokenizableEncrypted(),
+                    subjectId = "subjectId",
+                    type = ExternalCredentialType.NHISCard,
+                ),
             ),
             EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
-                "subjectId",
-                "projectId",
-                DEFAULT_MODULE_ID,
-                "attendantId".asTokenizableRaw(),
+                subjectId = "subjectId",
+                projectId = "projectId",
+                moduleId = DEFAULT_MODULE_ID,
+                attendantId = "attendantId".asTokenizableRaw(),
             ),
         )
         val ENROLMENT_RECORD_MOVE_ATTENDANT = EnrolmentRecordMoveEvent(
             EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove(
-                "subjectId",
-                "projectId",
-                "moduleId".asTokenizableRaw(),
-                DEFAULT_USER_ID,
-                listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+                subjectId = "subjectId",
+                projectId = "projectId",
+                moduleId = "moduleId".asTokenizableRaw(),
+                attendantId = DEFAULT_USER_ID,
+                biometricReferences = listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+                externalCredential = ExternalCredential(
+                    id = "id",
+                    value = "value".asTokenizableEncrypted(),
+                    subjectId = "subjectId",
+                    type = ExternalCredentialType.NHISCard,
+                ),
             ),
             EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
-                "subjectId",
-                "projectId",
-                "moduleId".asTokenizableRaw(),
-                DEFAULT_USER_ID_2,
+                subjectId = "subjectId",
+                projectId = "projectId",
+                moduleId = "moduleId".asTokenizableRaw(),
+                attendantId = DEFAULT_USER_ID_2,
             ),
         )
         val ENROLMENT_RECORD_UPDATE = EnrolmentRecordUpdateEvent(
-            "subjectId",
-            listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
-            listOf("referenceIdToDelete"),
+            subjectId = "subjectId",
+            biometricReferencesAdded = listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+            biometricReferencesRemoved = listOf("referenceIdToDelete"),
+            externalCredentialsAdded = listOf(
+                ExternalCredential(
+                    id = "id",
+                    value = "value".asTokenizableEncrypted(),
+                    subjectId = "subjectId",
+                    type = ExternalCredentialType.NHISCard,
+                ),
+            ),
         )
     }
 
@@ -206,7 +237,7 @@ class CommCareEventSyncTaskTest {
 
     @Test
     fun downSync_shouldEmitAFailureIfDownloadFails() = runTest {
-        coEvery { commCareEventDataSource.getEvents() } throws Throwable("CommCare Exception")
+        coEvery { commCareEventDataSource.getEvents(any()) } throws Throwable("CommCare Exception")
 
         val progress = commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
@@ -216,21 +247,21 @@ class CommCareEventSyncTaskTest {
 
     @Test(expected = SecurityException::class)
     fun downSync_shouldThrowUpIfSecurityExceptionOccurs() = runTest {
-        coEvery { commCareEventDataSource.getEvents() } throws SecurityException("Security Exception")
+        coEvery { commCareEventDataSource.getEvents(any()) } throws SecurityException("Security Exception")
 
         commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
     }
 
     @Test(expected = IllegalStateException::class)
     fun downSync_shouldThrowUpIfIllegalStateExceptionOccurs() = runTest {
-        coEvery { commCareEventDataSource.getEvents() } throws IllegalStateException("Illegal State Exception")
+        coEvery { commCareEventDataSource.getEvents(any()) } throws IllegalStateException("Illegal State Exception")
 
         commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
     }
 
     @Test
     fun downSync_shouldAddEventWithErrorIfDownloadFails() = runTest {
-        coEvery { commCareEventDataSource.getEvents() } throws Throwable("CommCare Exception")
+        coEvery { commCareEventDataSource.getEvents(any()) } throws Throwable("CommCare Exception")
         commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
         coVerify(exactly = 1) {
@@ -277,7 +308,7 @@ class CommCareEventSyncTaskTest {
     @Test
     fun downSync_shouldAddEventWithExceptionClassSimpleNameIfDownloadFails() = runTest {
         val expectedException = Exception("Test")
-        coEvery { commCareEventDataSource.getEvents() } throws expectedException
+        coEvery { commCareEventDataSource.getEvents(any()) } throws expectedException
 
         commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
@@ -322,42 +353,14 @@ class CommCareEventSyncTaskTest {
     }
 
     @Test
-    fun downSync_shouldTrackSubjectIdsAndDeleteSubjectsNotInCommCare() = runTest {
-        val creationEvent = ENROLMENT_RECORD_CREATION
-        mockCommCareDataSource(listOf(creationEvent))
-
-        // Mock existing subjects in the repository
-        coEvery { enrolmentRecordRepository.getAllSubjectIds() } returns listOf("subjectId", "subjectNotInCommCare")
+    fun downSync_shouldCallOnEventsProcessedOnDataSource() = runTest {
+        val eventsToDownload = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION)
+        mockCommCareDataSource(eventsToDownload)
 
         commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
-        // Verify that subjects not in CommCare are deleted
-        coVerify {
-            enrolmentRecordRepository.performActions(
-                match<List<SubjectAction>> { actions ->
-                    actions.any { it is Deletion && it.subjectId == "subjectNotInCommCare" }
-                },
-                project,
-            )
-        }
-    }
-
-    @Test
-    fun downSync_shouldNotDeleteSubjectsIfNoEventsProcessed() = runTest {
-        mockCommCareDataSource(emptyList())
-        coEvery { enrolmentRecordRepository.getAllSubjectIds() } returns listOf("existingSubject")
-
-        commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
-
-        // Verify that no deletion actions are performed when no events are processed
-        coVerify(exactly = 0) {
-            enrolmentRecordRepository.performActions(
-                match<List<SubjectAction>> { actions ->
-                    actions.any { it is Deletion }
-                },
-                project,
-            )
-        }
+        coVerify { commCareEventDataSource.onEventsProcessed(listOf(ENROLMENT_RECORD_CREATION)) }
+        coVerify { commCareEventDataSource.onEventsProcessed(listOf(ENROLMENT_RECORD_DELETION)) }
     }
 
     @Test
@@ -422,7 +425,7 @@ class CommCareEventSyncTaskTest {
     }
 
     private fun mockCommCareDataSource(events: List<EnrolmentRecordEvent>) {
-        coEvery { commCareEventDataSource.getEvents() } returns CommCareEventSyncResult(
+        coEvery { commCareEventDataSource.getEvents(any()) } returns CommCareEventSyncResult(
             totalCount = events.size,
             eventFlow = flowOf(*events.toTypedArray()),
         )

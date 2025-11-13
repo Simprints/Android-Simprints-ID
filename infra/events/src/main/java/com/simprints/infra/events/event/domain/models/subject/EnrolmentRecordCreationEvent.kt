@@ -1,6 +1,8 @@
 package com.simprints.infra.events.event.domain.models.subject
 
 import androidx.annotation.Keep
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -8,6 +10,7 @@ import com.simprints.core.tools.utils.EncodingUtils
 import java.util.UUID
 
 @Keep
+@ExcludedFromGeneratedTestCoverageReports("Data class")
 data class EnrolmentRecordCreationEvent(
     override val id: String,
     val payload: EnrolmentRecordCreationPayload,
@@ -18,14 +21,16 @@ data class EnrolmentRecordCreationEvent(
         moduleId: TokenizableString,
         attendantId: TokenizableString,
         biometricReferences: List<BiometricReference>,
+        externalCredentials: List<ExternalCredential>,
     ) : this(
         UUID.randomUUID().toString(),
         EnrolmentRecordCreationPayload(
-            subjectId,
-            projectId,
-            moduleId,
-            attendantId,
-            biometricReferences,
+            subjectId = subjectId,
+            projectId = projectId,
+            moduleId = moduleId,
+            attendantId = attendantId,
+            biometricReferences = biometricReferences,
+            externalCredentials = externalCredentials,
         ),
     )
 
@@ -36,6 +41,7 @@ data class EnrolmentRecordCreationEvent(
         val moduleId: TokenizableString,
         val attendantId: TokenizableString,
         val biometricReferences: List<BiometricReference>,
+        val externalCredentials: List<ExternalCredential>
     )
 
     companion object {

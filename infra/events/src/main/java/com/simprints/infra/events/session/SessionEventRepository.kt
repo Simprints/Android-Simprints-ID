@@ -23,5 +23,7 @@ interface SessionEventRepository {
 
     suspend fun addOrUpdateEvent(event: Event)
 
+    suspend fun deleteEvents(events: List<Event>)
+
     suspend fun closeCurrentSession(reason: EventScopeEndCause? = null)
 }

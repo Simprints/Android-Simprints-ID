@@ -10,6 +10,7 @@ data class ProjectConfiguration(
     val consent: ConsentConfiguration,
     val identification: IdentificationConfiguration,
     val synchronization: SynchronizationConfiguration,
+    val multifactorId: MultiFactorIdConfiguration?,
     val custom: Map<String, Any>?,
 )
 
@@ -37,16 +38,33 @@ fun ProjectConfiguration.canSyncBiometricDataToSimprints(): Boolean =
 fun ProjectConfiguration.canSyncAnalyticsDataToSimprints(): Boolean =
     synchronization.up.simprints.kind == UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
 
-fun ProjectConfiguration.isSimprintsEventDownSyncAllowed(): Boolean =
-    synchronization.down.simprints != null &&
+fun ProjectConfiguration.isSimprintsEventDownSyncAllowed(): Boolean = synchronization.down.simprints != null &&
     synchronization.down.simprints.frequency != Frequency.ONLY_PERIODICALLY_UP_SYNC
 
 fun ProjectConfiguration.isCommCareEventDownSyncAllowed(): Boolean = synchronization.down.commCare != null
 
 fun ProjectConfiguration.imagesUploadRequiresUnmeteredConnection(): Boolean = synchronization.up.simprints.imagesRequireUnmeteredConnection
 
+fun ProjectConfiguration.isSampleUploadEnabledInProject(): Boolean = listOfNotNull(
+    face?.rankOne?.imageSavingStrategy?.let { it != FaceConfiguration.ImageSavingStrategy.NEVER },
+    face?.simFace?.imageSavingStrategy?.let { it != FaceConfiguration.ImageSavingStrategy.NEVER },
+    fingerprint
+        ?.nec
+        ?.vero2
+        ?.imageSavingStrategy
+        ?.let { it != Vero2Configuration.ImageSavingStrategy.NEVER },
+    fingerprint
+        ?.secugenSimMatcher
+        ?.vero2
+        ?.imageSavingStrategy
+        ?.let { it != Vero2Configuration.ImageSavingStrategy.NEVER },
+).let { explicitStrategies ->
+    explicitStrategies.isNotEmpty() && explicitStrategies.any { it }
+}
+
 fun ProjectConfiguration.allowedAgeRanges(): List<AgeGroup> = listOfNotNull(
     face?.rankOne?.allowedAgeRange,
+    face?.simFace?.allowedAgeRange,
     fingerprint?.secugenSimMatcher?.allowedAgeRange,
     fingerprint?.nec?.allowedAgeRange,
 )
@@ -87,3 +105,37 @@ fun ProjectConfiguration.isProjectWithPeriodicallyUpSync(): Boolean =
     synchronization.up.simprints.frequency == Frequency.ONLY_PERIODICALLY_UP_SYNC
 
 fun ProjectConfiguration.isModuleSelectionAvailable(): Boolean = isProjectWithModuleSync() && !isProjectWithPeriodicallyUpSync()
+
+fun ProjectConfiguration.determineFaceSDKs(ageGroup: AgeGroup?): List<FaceConfiguration.BioSdk> {
+    if (!isAgeRestricted()) {
+        return face?.allowedSDKs.orEmpty()
+    }
+
+    return buildList {
+        ageGroup?.let { age ->
+            if (face?.rankOne?.allowedAgeRange?.contains(age) == true) {
+                add(FaceConfiguration.BioSdk.RANK_ONE)
+            }
+            if (face?.simFace?.allowedAgeRange?.contains(age) == true) {
+                add(FaceConfiguration.BioSdk.SIM_FACE)
+            }
+        }
+    }
+}
+
+fun ProjectConfiguration.determineFingerprintSDKs(ageGroup: AgeGroup?): List<FingerprintConfiguration.BioSdk> {
+    if (!isAgeRestricted()) {
+        return fingerprint?.allowedSDKs.orEmpty()
+    }
+
+    return buildList {
+        ageGroup?.let { age ->
+            if (fingerprint?.secugenSimMatcher?.allowedAgeRange?.contains(age) == true) {
+                add(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
+            }
+            if (fingerprint?.nec?.allowedAgeRange?.contains(age) == true) {
+                add(FingerprintConfiguration.BioSdk.NEC)
+            }
+        }
+    }
+}

@@ -29,9 +29,15 @@
     <string name="consent_biometric_general_face">আপনার ছবি তোলা হবে</string>
     <string name="consent_biometrics_access_fingerprint">আঙ্গুলের ছাপের তথ্য</string>
     <string name="consent_biometrics_access_face">ছবি</string>
+    <string name="consent_credentials_general">আপনার জাতীয় পরিচয়পত্র বা অন্যান্য বহিরাগত শংসাপত্রগুলি তাদের অনন্য নম্বর(গুলি) দিয়ে স্ক্যান করুন।</string>
+    <string name="consent_credentials_access">জাতীয় পরিচয়পত্রের বিবরণ</string>
+    <string name="consent_credentials_your_id">আপনার জাতীয় পরিচয়পত্র বা অন্যান্য বহিরাগত শংসাপত্রের তথ্য সংগ্রহ করুন</string>
     <string name="consent_biometrics_access_fingerprint_face">আঙ্গুলের ছাপের তথ্য, ছবি</string>
     <string name="consent_biometrics_parental_fingerprint">আপনার সন্তানের আঙ্গুলের ছাপ দ্বারা</string>
     <string name="consent_biometrics_parental_face">আপানার সন্তানের ছবি</string>
+    <string name="consent_credentials_parental_general">আপনার সন্তানের জাতীয় পরিচয়পত্র বা অন্যান্য বহিরাগত শংসাপত্রগুলি তাদের অনন্য নম্বর(গুলি) দিয়ে স্ক্যান করুন।</string>
+    <string name="consent_credentials_parental_access">শিশুর জাতীয় পরিচয়পত্রের বিবরণ</string>
+    <string name="consent_credentials_parental_your_id">আপনার সন্তানের জাতীয় পরিচয়পত্র বা অন্যান্য বহিরাগত শংসাপত্রের তথ্য সংগ্রহ করুন</string>
     <string name="consent_biometric_concat_modalities">এবং</string>
     <string name="consent_decline_button">প্রত্যাখ্যান করুন</string>
     <string name="consent_accept_button">গ্রহণ করুন</string>
@@ -319,27 +325,60 @@
     <string name="dashboard_project_card_current_user">বর্তমান ব্যবহারকারী: %1$s</string>
 
     <!-- Sync Info -->
-    <string name="sync_info_header_title">সিঙ্ক স্ট্যাটাস</string>
-    <string name="sync_info_complete">সিঙ্ক হয়েছে</string>
-    <string name="sync_info_incomplete">সিঙ্ক অসম্পূর্ণ</string>
-    <string name="sync_info_connecting">সংযুক্ত হচ্ছে</string>
-    <string name="sync_info_progress">সিঙ্ক করা হচ্ছে… %1$s</string>
-    <string name="sync_info_sync_button">সিঙ্ক করুন</string>
-    <string name="sync_info_details_error">সিঙ্ক অসফল হয়েছে</string>
-    <string name="sync_info_no_modules_message">সিঙ্ক করতে মডিউল নির্বাচন করুন</string>
-    <string name="sync_info_no_modules_button">মডিউল সমূহ</string>
-    <string name="sync_info_offline_message">সেটিংস্‌ থেকে ইন্টারনেট সংযোগ চালু করুন</string>
-    <string name="sync_info_header_settings_button"><font fgcolor='#FF7C00'><u>স্ক্যানার যোগ করুন</u></font></string>
-    <string name="sync_info_details_too_many_modules">অনেক বেশি মডিউল ডাউনলোড করা হয়েছে </string>
-    <string name="sync_info_re_login_required">সিঙ্ক করতে পুনরায় লগইন করুন </string>
+    <string name="sync_info_title">সিঙ্ক তথ্য</string>
 
-    <string name="sync_info_last_sync">সর্বশেষ সিঙ্ক: %1$s</string>
-    <string name="sync_info_records_uploaded">সমস্ত রেকর্ড আপলোড হয়েছে</string>
-    <plurals name="sync_info_records_to_upload">
-        <item quantity="one"> %1$dটি রেকর্ড আপলোড হওয়া বাকি </item>
-        <item quantity="other">%1$dটি রেকর্ড আপলোড হওয়া বাকি </item>
-    </plurals>
+    <string name="sync_info_header_title">সিঙ্ক স্ট্যাটাস</string>
+    <string name="sync_info_header_settings_button"><font fgcolor='#FF7C00'><u>সেটিংস</u></font></string>
+
+    <string name="sync_info_re_login_required">সিঙ্ক করার জন্য আপনাকে আবার লগ ইন করতে হবে</string>
+
+    <string name="sync_info_section_record_sync">রেকর্ড সিঙ্ক</string>
+    <string name="sync_info_section_image_sync">চিত্র সিঙ্ক</string>
+    <string name="sync_info_section_module_selection">নির্বাচিত মডিউলগুলি</string>
+
+    <string name="sync_info_instruction_records">এই বোতামটি টিপে রেকর্ডগুলি ম্যানুয়ালি সিঙ্ক্রোনাইজ করুন। <font fgcolor='#FF7C00'><u>আরও তথ্য</u></font></string>
+    <string name="sync_info_instruction_images">এই বোতামটি টিপে ম্যানুয়ালি ক্লাউডে ছবি পাঠান। <font fgcolor='#FF7C00'><u>আরও তথ্য</u></font></string>
+    <string name="sync_info_instruction_modules">নির্বাচিত মডিউলগুলির রেকর্ডগুলি সিঙ্ক্রোনাইজ করা হবে। <font fgcolor='#FF7C00'><u>আরও তথ্য</u></font></string>
+    <string name="sync_info_instruction_comm_care_permission">CommCare থেকে সিঙ্ক করার জন্য সিস্টেম <font fgcolor='#FF7C00'><u>সেটিংসে অনুমতি</u></font> প্রয়োজন।</string>
+    <string name="sync_info_instruction_error_offline">সিঙ্কের জন্য একটি ইন্টারনেট সংযোগ প্রয়োজন। <font fgcolor='#FF7C00'><u>সংযোগ সেটিংস</u></font></string>
+    <string name="sync_info_instruction_error_no_modules">সিঙ্কের জন্য মডিউল নির্বাচন করা প্রয়োজন। <font fgcolor='#FF7C00'><u>মডিউল নির্বাচন করুন।</u></font></string>
+    <string name="sync_info_instruction_error">সিঙ্ক ব্যর্থ হয়েছে। <font fgcolor='#FF7C00'><u>আরও তথ্য</u></font></string>
+
+    <string name="sync_info_details_event_sync_default">এই বোতামটি টিপে রেকর্ডগুলি ম্যানুয়ালি সিঙ্ক্রোনাইজ করুন। আপনার ডিভাইসটি নিয়মিতভাবে ব্যাকগ্রাউন্ডে রেকর্ডগুলি সিঙ্ক্রোনাইজ করার চেষ্টা করবে।</string>
+    <string name="sync_info_details_image_sync_default">এই বোতামটি টিপে ক্লাউডে ছবিগুলি ম্যানুয়ালি পাঠান। আপনার ডিভাইসটি নিয়মিতভাবে ব্যাকগ্রাউন্ডে ছবি পাঠানোর চেষ্টা করবে। মনে রাখবেন যে ছবি সিঙ্ক করার জন্য একটি শক্তিশালী ইন্টারনেট সংযোগের প্রয়োজন হতে পারে।</string>
+    <string name="sync_info_details_module_selection">নির্বাচিত মডিউলগুলির রেকর্ডগুলি আপনার ডিভাইসে সিঙ্ক্রোনাইজ করা হবে। আপনার ডিভাইসে সিঙ্ক্রোনাইজ করার জন্য মডিউলগুলি নির্বাচন করতে নীচে/উপরে ক্লিক করুন।</string>
+    <string name="sync_info_details_error">সিঙ্ক ব্যর্থ হয়েছে। অনুগ্রহ করে আপনার সুপারভাইজারের সাথে যোগাযোগ করুন।</string>
+    <string name="sync_info_details_too_many_modules">অনেক বেশি মডিউল ডাউনলোড করা হয়েছে।</string>
+    <string name="sync_info_details_ok">ঠিক আছে</string>
+
+    <string name="sync_info_records_on_device">ডিভাইসে মোট রেকর্ড</string>
+    <string name="sync_info_records_to_up_sync">আপলোড করার জন্য রেকর্ড</string>
+    <string name="sync_info_records_to_down_sync">সিঙ্ক্রোনাইজ করার জন্য রেকর্ড</string>
+    <string name="sync_info_images_to_up_sync">আপলোড করার জন্য ছবি</string>
+
+    <string name="sync_info_button_sync_records">এখনই রেকর্ড সিঙ্ক করুন</string>
+    <string name="sync_info_button_records_syncing">সিঙ্ক হচ্ছে</string>
+    <string name="sync_info_button_sync_images">এখনই ছবি সিঙ্ক করুন</string>
+    <string name="sync_info_button_images_sync_stop">ছবি সিঙ্ক করা বন্ধ করুন</string>
     <string name="sync_info_button_try_again">আবার চেষ্টা করুন</string>
+    <string name="sync_info_button_select_modules">মডিউল নির্বাচন করুন</string>
+
+    <string name="sync_info_progress_pending">%1$s সিঙ্ক মুলতুবি আছে...</string>
+    <string name="sync_info_progress_complete">%1$s সিঙ্ক সম্পূর্ণ হয়েছে</string>
+    <string name="sync_info_progress_ongoing_no_counters">%1$s সিঙ্ক চলছে...</string>
+    <string name="sync_info_progress_ongoing">%1$s সিঙ্ক: %2$d এর %3$d…</string>
+
+    <string name="sync_info_item_default">আইটেম</string>
+    <string name="sync_info_item_record_or_event">ইভেন্ট রেকর্ড করুন</string>
+    <string name="sync_info_item_image">ভাবমূর্তি</string>
+
+    <string name="sync_info_total_records">মোট রেকর্ড</string>
+
+    <string name="sync_info_last_sync">শেষ সিঙ্ক: %1$s</string>
+
+    <string name="sync_info_footer_sync_in_progress">সিঙ্ক হচ্ছে </string>
+    <string name="sync_info_footer_sync_incomplete">সিঙ্ক অসম্পূর্ণ</string>
+    <string name="sync_info_footer_sync_complete_logging_out">সিঙ্ক সম্পূর্ণ হয়েছে, আপনাকে লগ আউট করা হচ্ছে...</string>
 
     <!-- Dashboard - Daily activity card -->
     <string name="dashboard_activity_card_activity">কার্যক্রম তথ্য: %1$s</string>
@@ -384,18 +423,6 @@
     <string name="dashboard_preference_enable_audio_on_scan_complete">অডিও সতর্কতা</string>
     <string name="dashboard_preference_enable_auto_capture">অটো-ক্যাপচার</string>
 
-    <!-- Sync info -->
-    <string name="sync_info_total_records">সকল রেকর্ড</string>
-    <string name="sync_info_title">তথ্য সিঙ্ক করুন</string>
-    <string name="sync_info_button_select_modules">মডিউল নির্বাচন করুন</string>
-    <string name="sync_info_records_to_up_sync">আপলোড এর জন্য প্রস্তুত রেকর্ড</string>
-    <string name="sync_info_records_to_download_or_delete">ডাউনলোড বা মুছে ফেলার রেকর্ড</string>
-    <string name="sync_info_records_to_delete">মুছে ফেলার জন্য প্রস্তুত রেকর্ড</string>
-    <string name="sync_info_records_on_device">ফোনে সংরক্ষিত সকল রেকর্ড</string>
-    <string name="sync_info_section_module_selection">নির্বাচিত মডিউল</string>
-    <string name="sync_info_images_to_up_sync">আপলোড বাকি</string>
-    <string name="sync_info_button_records_syncing">সিঙ্ক হচ্ছে…</string>
-
     <!-- Dashboard - Module selection -->
     <string name="dashboard_select_modules_no_modules">অবৈধ নির্বাচন। অন্তত একটি মডিউল নির্বাচন করুন।</string>
     <string name="dashboard_select_modules_too_many_modules">অবৈধ নির্বাচন। %1$d এর বেশি মডিউল নির্বাচন করবেন না।</string>
@@ -423,7 +450,7 @@
     <!-- Dashboard - Logout request -->
     <string name="dashboard_logout_title">লগআউট করুন</string>
     <string name="dashboard_logout_confirmation_sync_decline_button">সিঙ্ক ব্যাতিত লগ আউট করুন</string>
-    <string name="dashboard_logout_confirmation_sync_info">আপনার এই ডিভাইসে কিছু তথ্য সংরক্ষিত আছে যা সিঙ্ক করা প্রয়োজন। অনুগ্রহ করে সিঙ্ক প্রক্রিয়া সম্পন্ন করুণ। \n\nসিঙ্ক প্রক্রিয়া সম্পন্ন হলে লগ আউট করতে পারবেন।</string>
+    <string name="dashboard_logout_confirmation_sync_info">লগ আউট করার আগে আপনার ডিভাইসের রেকর্ডগুলি স্বয়ংক্রিয়ভাবে সিঙ্ক্রোনাইজ হবে। অনুগ্রহ করে সিঙ্ক্রোনাইজেশন প্রক্রিয়াটি সম্পূর্ণ হতে দিন।\n\nসিঙ্ক্রোনাইজেশন শেষ হয়ে গেলে আপনি লগ আউট করতে পারবেন।</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_title">সতর্কতা</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_body">আপনার প্রকল্পের সকল রেকর্ড আপ-টু-ডেট রয়েছে তা নিশ্চিত করার জন্য ডেটা সিঙ্ক্রোনাইজেশন অপরিহার্য। কোনো বৈধ কারণ ছাড়া ডেটা সিঙ্ক্রোনাইজ করতে ব্যর্থ হলে তা আপনার সহকর্মীদের গুরুত্বপূর্ণ রেকর্ডে অ্যাক্সেস এবং প্রকল্পের সঠিকভাবে রিপোর্ট করার ক্ষমতাকে প্রভাবিত করবে।\n\nকোনও বৈধ কারণ ছাড়া ডেটা সিঙ্ক্রোনাইজ করতে ব্যর্থ হওয়া ডেটা সংগ্রহ প্রোটোকলের লঙ্ঘনও হিসেবে গণ্য হতে পারে যার ফলে প্রকল্পের অবাঞ্ছিত পরিণতি হবার সুযোগ থাকে।</string>
     <string name="dashboard_logout_confirmation_title">লগআউট করুন</string>
@@ -463,5 +490,59 @@
         <item quantity="one">%d বছর</item>
         <item quantity="other">%d বছর</item>
     </plurals>
+
+    <!-- MultiFactor Identification -->
+    <string name="mfid_scan_action">%1$s স্ক্যান করুন</string>
+
+    <string name="mfid_scanner_selection_skip">ডকুমেন্ট স্ক্যান এড়িয়ে যান</string>
+    <string name="mfid_type_nhis_card">এনএইচআইএস কার্ড</string>
+    <string name="mfid_type_ghana_id_card">ঘানা আইডি কার্ড</string>
+    <string name="mfid_type_qr_code">QR কোড</string>
+    <string name="mfid_nhis_card_credential_field">সদস্য সংখ্যা</string>
+    <string name="mfid_ghana_id_credential_field">ব্যক্তিগত পরিচয়পত্র</string>
+    <string name="mfid_qr_credential_field">QR কোডের মান</string>
+    <string name="mfid_type_any_document">একটি নথি</string>
+
+    <string name="mfid_skip_scan_dialog_title">স্ক্যানিং এড়িয়ে যাবেন?</string>
+    <string name="mfid_skip_scan_dialog_body">এই প্রকল্পের জন্য %1$s স্ক্যান করা আবশ্যক। আপনি কি নিশ্চিত যে আপনি এই ধাপটি এড়িয়ে যেতে চান?</string>
+    <string name="mfid_skip_scan_dialog_confirm">এড়িয়ে যান</string>
+
+    <string name="mfid_qr_scan_no_qr_detected">কোনও QR কোড শনাক্ত করা যায়নি</string>
+    <string name="mfid_scan_instructions">%1$s কে উইন্ডোতে রাখুন</string>
+    <string name="mfid_continue">চালিয়ে যান</string>
+    <string name="mfid_dialog_wrong_qr_title">QR কোডের ধরণ ভুল</string>
+    <string name="mfid_dialog_wrong_qr_body_top">ভুল QR কোড ফর্ম্যাট স্ক্যান করা হয়েছে</string>
+    <string name="mfid_dialog_wrong_qr_body_bottom">এই মানটি ব্যক্তিগত নথি হিসেবে ব্যবহার করা যাবে না। দয়া করে নিশ্চিত করুন যে সঠিক QR কোডটি স্ক্যান করা আছে।</string>
+    <string name="mfid_dialog_wrong_qr_rescan">পুনরায় স্ক্যান করুন</string>
+    <string name="mfid_ocr_progress_title">স্ক্যান করা হচ্ছে, কার্ডটি ফ্রেমে রাখুন...</string>
+    <string name="mfid_scan_camera_permission_body">ক্যামেরা ব্যবহারের অনুমতি ছাড়া %1$s স্ক্যান করা যাবে না</string>
+    <string name="mfid_confirmation_checkbox_text">আমি নিশ্চিত করছি যে %1$s সঠিকভাবে স্ক্যান করা হয়েছে।</string>
+    <string name="mfid_action_go_to_record">রেকর্ডে যান</string>
+    <string name="mfid_action_enrol">নথিভুক্ত করুন</string>
+    <string name="mfid_action_enrol_anyway">যাই হোক নথিভুক্ত করুন</string>
+    <string name="mfid_action_add">যোগ করুন</string>
+    <string name="mfid_action_skip">এড়িয়ে যান</string>
+    <string name="mfid_action_continue">চালিয়ে যান</string>
+    <string name="mfid_searching">অনুসন্ধান করা হচ্ছে...</string>
+
+    <string name="mfid_search_found_enrol">এই %1$s ইতিমধ্যেই নিবন্ধিত।</string>
+    <string name="mfid_search_found_identification">রেকর্ড পাওয়া গেছে</string>
+    <string name="mfid_search_found_identification_low_match_score">এই %1$s অন্য কোনও রোগীর সাথে লিঙ্ক করা হতে পারে।</string>
+    <string name="mfid_search_not_found_identification">এই %1$s এর সাথে কোন রেকর্ড পাওয়া যায়নি। আপনি পরে এই %2$s রোগীর সাথে লিঙ্ক করতে পারবেন।</string>
+
+    <string name="mfid_add_document_title">এই %1$s যোগ করবেন?</string>
+    <string name="mfid_skip_title">তুমি %1$s স্ক্যান এড়িয়ে গেলে কেন?</string>
+    <string name="mfid_skip_reason_does_not_have">%1$s নেই</string>
+    <string name="mfid_skip_reason_did_not_bring">%1$s আনেনি</string>
+    <string name="mfid_skip_reason_incorrect">ভুল %1$s আনা হয়েছে</string>
+    <string name="mfid_skip_reason_does_not_want_to_provide">%1$s গোপন রাখতে চায় না</string>
+    <string name="mfid_skip_reason_damaged">%1$s ক্ষতিগ্রস্ত বা পড়া যাচ্ছে না</string>
+    <string name="mfid_skip_reason_unable_to_scan">%1$s স্ক্যান করা যাচ্ছে না</string>
+    <string name="mfid_skip_reason_other">অন্যান্য</string>
+    <string name="mfid_skip_reason_hint">কারণ</string>
+    <string name="mfid_skip_reason_helper_text">এড়িয়ে যাওয়ার কারণ দিন</string>
+    <string name="mfid_skip_confirm">স্ক্যানিং এড়িয়ে যান</string>
+    <string name="mfid_skip_go_back">ফিরে যাও</string>
+
 
 </resources>

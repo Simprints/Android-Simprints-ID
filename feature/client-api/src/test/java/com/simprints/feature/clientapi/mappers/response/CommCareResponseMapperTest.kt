@@ -1,8 +1,8 @@
 package com.simprints.feature.clientapi.mappers.response
 
 import androidx.core.os.bundleOf
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import androidx.test.ext.junit.runners.*
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.feature.clientapi.mappers.request.requestFactories.ConfirmIdentityActionFactory
@@ -21,7 +21,7 @@ import com.simprints.libsimprints.Tier as LegacyTier
 
 @RunWith(AndroidJUnit4::class)
 class CommCareResponseMapperTest {
-    private val mapper = CommCareResponseMapper()
+    private val mapper = CommCareResponseMapper("deviceId", "appVersionName")
 
     @Test
     fun `correctly maps enrol response`() {
@@ -31,10 +31,13 @@ class CommCareResponseMapperTest {
                 sessionId = "sessionId",
                 enrolledGuid = "guid",
                 subjectActions = "subjects",
+                externalCredential = null,
             ),
         ).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
 
         assertThat(extras.getString(CommCareConstants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(CommCareConstants.COMMCARE_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(CommCareConstants.COMMCARE_SID_VERSION)).isEqualTo("appVersionName")
         assertThat(extras.getString(CommCareConstants.REGISTRATION_GUID_KEY)).isEqualTo("guid")
         assertThat(extras.getString(CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY)).isEqualTo("true")
     }
@@ -57,10 +60,13 @@ class CommCareResponseMapperTest {
                         matchConfidence = AppMatchConfidence.LOW,
                     ),
                 ),
+                isMultiFactorIdEnabled = false,
             ),
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(CommCareConstants.COMMCARE_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(CommCareConstants.COMMCARE_SID_VERSION)).isEqualTo("appVersionName")
         @Suppress("DEPRECATION")
         // Intentionally using deprecated getParcelableArrayList() as this is what CommCare uses
         assertThat(extras.getParcelableArrayList<LegacyIdentification>(Constants.SIMPRINTS_IDENTIFICATIONS))
@@ -81,10 +87,13 @@ class CommCareResponseMapperTest {
                 actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
                 sessionId = "sessionId",
                 confirmed = true,
+                externalCredential = null,
             ),
         ).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
 
         assertThat(extras.getString(CommCareConstants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(CommCareConstants.COMMCARE_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(CommCareConstants.COMMCARE_SID_VERSION)).isEqualTo("appVersionName")
         assertThat(extras.getString(CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY)).isEqualTo("true")
     }
 
@@ -104,6 +113,8 @@ class CommCareResponseMapperTest {
         ).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
 
         assertThat(extras.getString(CommCareConstants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(CommCareConstants.COMMCARE_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(CommCareConstants.COMMCARE_SID_VERSION)).isEqualTo("appVersionName")
         assertThat(extras.getString(CommCareConstants.VERIFICATION_GUID_KEY)).isEqualTo("guid")
         assertThat(extras.getString(CommCareConstants.VERIFICATION_CONFIDENCE_KEY)).isEqualTo("50")
         assertThat(extras.getString(CommCareConstants.VERIFICATION_TIER_KEY)).isEqualTo("TIER_1")
@@ -127,6 +138,8 @@ class CommCareResponseMapperTest {
         ).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
 
         assertThat(extras.getString(CommCareConstants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(CommCareConstants.COMMCARE_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(CommCareConstants.COMMCARE_SID_VERSION)).isEqualTo("appVersionName")
         assertThat(extras.getString(CommCareConstants.VERIFICATION_GUID_KEY)).isEqualTo("guid")
         assertThat(extras.getString(CommCareConstants.VERIFICATION_CONFIDENCE_KEY)).isEqualTo("50")
         assertThat(extras.getString(CommCareConstants.VERIFICATION_TIER_KEY)).isEqualTo("TIER_1")
@@ -150,6 +163,8 @@ class CommCareResponseMapperTest {
         ).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
 
         assertThat(extras.getString(CommCareConstants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(CommCareConstants.COMMCARE_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(CommCareConstants.COMMCARE_SID_VERSION)).isEqualTo("appVersionName")
         assertThat(extras.getString(CommCareConstants.VERIFICATION_GUID_KEY)).isEqualTo("guid")
         assertThat(extras.getString(CommCareConstants.VERIFICATION_CONFIDENCE_KEY)).isEqualTo("50")
         assertThat(extras.getString(CommCareConstants.VERIFICATION_TIER_KEY)).isEqualTo("TIER_1")
@@ -186,6 +201,8 @@ class CommCareResponseMapperTest {
         ).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
 
         assertThat(extras.getString(CommCareConstants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(CommCareConstants.COMMCARE_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(CommCareConstants.COMMCARE_SID_VERSION)).isEqualTo("appVersionName")
         assertThat(extras.getString(CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY)).isEqualTo("true")
     }
 }

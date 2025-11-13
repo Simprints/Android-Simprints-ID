@@ -22,6 +22,7 @@ data class EnrolmentEventV4(
         moduleId: TokenizableString,
         attendantId: TokenizableString,
         biometricReferenceIds: List<String>,
+        externalCredentialIds: List<String>,
     ) : this(
         UUID.randomUUID().toString(),
         EnrolmentPayload(
@@ -32,6 +33,7 @@ data class EnrolmentEventV4(
             moduleId = moduleId,
             attendantId = attendantId,
             biometricReferenceIds = biometricReferenceIds,
+            externalCredentialIds = externalCredentialIds,
         ),
         ENROLMENT_V4,
     )
@@ -57,6 +59,7 @@ data class EnrolmentEventV4(
         val moduleId: TokenizableString,
         val attendantId: TokenizableString,
         val biometricReferenceIds: List<String>,
+        val externalCredentialIds: List<String>,
         override val endedAt: Timestamp? = null,
         override val type: EventType = ENROLMENT_V4,
     ) : EventPayload() {

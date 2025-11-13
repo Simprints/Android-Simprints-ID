@@ -1,18 +1,15 @@
 package com.simprints.infra.events.session
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.credential.store.CredentialImageRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.sampledata.createEventWithSessionId
 import com.simprints.infra.events.sampledata.createSessionScope
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -24,6 +21,9 @@ internal class SessionEventRepositoryImplTest {
     @MockK
     private lateinit var sessionDataCache: SessionDataCache
 
+    @MockK
+    private lateinit var credentialImageRepository: CredentialImageRepository
+
     private lateinit var sessionEventRepository: SessionEventRepositoryImpl
 
     @Before
@@ -32,8 +32,9 @@ internal class SessionEventRepositoryImplTest {
         sessionDataCache = SessionDataCache()
 
         sessionEventRepository = SessionEventRepositoryImpl(
-            eventRepository,
-            sessionDataCache,
+            eventRepository = eventRepository,
+            sessionDataCache = sessionDataCache,
+            credentialImageRepository = credentialImageRepository,
         )
     }
 
@@ -204,12 +205,25 @@ internal class SessionEventRepositoryImplTest {
     }
 
     @Test
+    fun `deletes provided events from DB and cache`() = runTest {
+        val event = createEventWithSessionId("eventId", "mockId")
+        sessionDataCache.eventCache["eventId"] = event
+        coJustRun { eventRepository.deleteEvents(any()) }
+
+        sessionEventRepository.deleteEvents(listOf(event))
+
+        assertThat(sessionDataCache.eventCache["eventId"]).isNull()
+        coVerify { eventRepository.deleteEvents(listOf("eventId")) }
+    }
+
+    @Test
     fun `clears cache when closing session`() = runTest {
         sessionDataCache.eventScope = createSessionScope("mockId")
         sessionDataCache.eventCache["eventId"] = createEventWithSessionId("eventId", "mockId")
 
         sessionEventRepository.closeCurrentSession(null)
 
+        coVerify { credentialImageRepository.deleteAllCredentialScans() }
         coVerify { eventRepository.closeEventScope(any<EventScope>(), null) }
         assertThat(sessionDataCache.eventScope).isNull()
         assertThat(sessionDataCache.eventCache).isEmpty()

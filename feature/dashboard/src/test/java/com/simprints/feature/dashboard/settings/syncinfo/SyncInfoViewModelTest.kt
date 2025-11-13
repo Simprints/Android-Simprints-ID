@@ -2,17 +2,16 @@ package com.simprints.feature.dashboard.settings.syncinfo
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.asFlow
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.feature.dashboard.settings.syncinfo.usecase.ObserveSyncInfoUseCase
 import com.simprints.feature.login.LoginResult
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.Project
@@ -29,23 +28,21 @@ import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.slot
-import io.mockk.verify
+import com.simprints.testtools.common.livedata.getOrAwaitValues
+import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import kotlin.test.fail
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class SyncInfoViewModelTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
@@ -164,6 +161,7 @@ class SyncInfoViewModelTest {
             timeHelper = timeHelper,
             observeSyncInfo = observeSyncInfo,
             logoutUseCase = logoutUseCase,
+            ioDispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
     }
 
@@ -226,7 +224,6 @@ class SyncInfoViewModelTest {
 
     // LiveData logoutEventLiveData tests
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `should trigger logout when pre-logout sync completes successfully`() = runTest {
         val mockCompletedEventSyncState = mockk<EventSyncState>(relaxed = true) {
@@ -241,20 +238,18 @@ class SyncInfoViewModelTest {
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockNotSyncingImageStatus)
         createViewModel()
         viewModel.isPreLogoutUpSync = true
-        val observer = mockk<Observer<LiveDataEventWithContent<Unit>>>(relaxed = true)
-        val slot = slot<LiveDataEventWithContent<Unit>>()
-        val capturedValues = mutableListOf<LiveDataEventWithContent<Unit>>()
-        every { observer.onChanged(capture(slot)) } answers {
-            capturedValues.add(slot.captured)
+
+        var numberOfEmissions = 0
+        val flowCollector = async {
+            viewModel.logoutEventFlow.collect {
+                numberOfEmissions++
+            }
         }
-
-        viewModel.logoutEventLiveData.observeForever(observer)
         advanceTimeBy(3100L) // after the logout delay (3000ms)
-
-        assertThat(capturedValues.map { it.peekContent() }).contains(Unit)
+        assertThat(numberOfEmissions).isEqualTo(1)
+        flowCollector.cancel()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `should emit a logout event after the intended delay since ready to logout`() = runTest {
         val mockCompletedEventSyncState = mockk<EventSyncState>(relaxed = true) {
@@ -269,25 +264,39 @@ class SyncInfoViewModelTest {
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockNotSyncingImageStatus)
         createViewModel()
         viewModel.isPreLogoutUpSync = true
-        val observer = mockk<Observer<LiveDataEventWithContent<Unit>>>(relaxed = true)
-        val slot = slot<LiveDataEventWithContent<Unit>>()
-        val capturedValues = mutableListOf<LiveDataEventWithContent<Unit>>()
-        every { observer.onChanged(capture(slot)) } answers {
-            capturedValues.add(slot.captured)
+
+        var numberOfEmissions = 0
+        val flowCollector = async {
+            viewModel.logoutEventFlow.collect {
+                numberOfEmissions++
+            }
         }
-
-        viewModel.logoutEventLiveData.observeForever(observer)
         advanceTimeBy(2900L) // still during the debounce delay
-
-        assertThat(capturedValues).isEmpty() // no logout event yet
-
+        assertThat(numberOfEmissions).isEqualTo(0)
         advanceTimeBy(200L) // after the debounce delay (total 3100ms > 3000ms)
-
-        assertThat(capturedValues).hasSize(1)
-        assertThat(capturedValues[0].peekContent()).isEqualTo(Unit)
+        assertThat(numberOfEmissions).isEqualTo(1)
+        flowCollector.cancel()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `should emit a logout event when auth store is cleared`() = runTest {
+        val projectIdFlow = MutableStateFlow(TEST_PROJECT_ID)
+        every { authStore.observeSignedInProjectId() } returns projectIdFlow
+        createViewModel()
+
+        var numberOfEmissions = 0
+        val flowCollector = async {
+            viewModel.logoutEventFlow.collect {
+                numberOfEmissions++
+            }
+        }
+        projectIdFlow.value = ""
+        advanceUntilIdle()
+
+        assertThat(numberOfEmissions).isEqualTo(1)
+        flowCollector.cancel()
+    }
+
     @Test
     fun `should not trigger logout when not in pre-logout mode`() = runTest {
         val mockCompletedEventSyncState = mockk<EventSyncState>(relaxed = true) {
@@ -302,20 +311,17 @@ class SyncInfoViewModelTest {
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockNotSyncingImageStatus)
         createViewModel()
         viewModel.isPreLogoutUpSync = false
-        val observer = mockk<Observer<LiveDataEventWithContent<Unit>>>(relaxed = true)
-        val slot = slot<LiveDataEventWithContent<Unit>>()
-        val capturedValues = mutableListOf<LiveDataEventWithContent<Unit>>()
-        every { observer.onChanged(capture(slot)) } answers {
-            capturedValues.add(slot.captured)
+
+        val flowCollector = async {
+            viewModel.logoutEventFlow.collect {
+                // fail if any logout event is emitted
+                fail("should not emit logout event")
+            }
         }
-
-        viewModel.logoutEventLiveData.observeForever(observer)
         advanceTimeBy(3100L) // after the logout delay (3000ms)
-
-        assertThat(capturedValues).isEmpty()
+        flowCollector.cancel()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `should not trigger logout when records still syncing`() = runTest {
         val mockInProgressEventSyncState = mockk<EventSyncState>(relaxed = true) {
@@ -331,20 +337,17 @@ class SyncInfoViewModelTest {
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockNotSyncingImageStatus)
         createViewModel()
         viewModel.isPreLogoutUpSync = true
-        val observer = mockk<Observer<LiveDataEventWithContent<Unit>>>(relaxed = true)
-        val slot = slot<LiveDataEventWithContent<Unit>>()
-        val capturedValues = mutableListOf<LiveDataEventWithContent<Unit>>()
-        every { observer.onChanged(capture(slot)) } answers {
-            capturedValues.add(slot.captured)
+
+        val flowCollector = async {
+            viewModel.logoutEventFlow.collect {
+                // fail if any logout event is emitted
+                fail("should not emit logout event")
+            }
         }
-
-        viewModel.logoutEventLiveData.observeForever(observer)
         advanceTimeBy(3100L) // after the logout delay (3000ms)
-
-        assertThat(capturedValues).isEmpty()
+        flowCollector.cancel()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `should not trigger logout when images still syncing`() = runTest {
         val mockCompletedEventSyncState = mockk<EventSyncState>(relaxed = true) {
@@ -359,17 +362,15 @@ class SyncInfoViewModelTest {
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockSyncingImageStatus)
         createViewModel()
         viewModel.isPreLogoutUpSync = true
-        val observer = mockk<Observer<LiveDataEventWithContent<Unit>>>(relaxed = true)
-        val slot = slot<LiveDataEventWithContent<Unit>>()
-        val capturedValues = mutableListOf<LiveDataEventWithContent<Unit>>()
-        every { observer.onChanged(capture(slot)) } answers {
-            capturedValues.add(slot.captured)
+
+        val flowCollector = async {
+            viewModel.logoutEventFlow.collect {
+                // fail test if any logout event is emitted
+                fail("should not emit logout event")
+            }
         }
-
-        viewModel.logoutEventLiveData.observeForever(observer)
         advanceTimeBy(3100L) // after the logout delay (3000ms)
-
-        assertThat(capturedValues).isEmpty()
+        flowCollector.cancel()
     }
 
     // forceEventSync() tests
@@ -395,9 +396,39 @@ class SyncInfoViewModelTest {
     }
 
     @Test
+    fun `should start event sync with down sync disabled when project paused`() = runTest {
+        val mockPausedProject = mockk<Project> {
+            every { state } returns ProjectState.PROJECT_PAUSED
+        }
+        coEvery { configManager.getProject(any()) } returns mockPausedProject
+        createViewModel()
+        viewModel.isPreLogoutUpSync = false
+
+        viewModel.forceEventSync()
+
+        coVerify { syncOrchestrator.stopEventSync() }
+        coVerify { syncOrchestrator.startEventSync(isDownSyncAllowed = false) }
+    }
+
+    @Test
     fun `should start event sync with down sync disabled when project ending`() = runTest {
         val mockEndingProject = mockk<Project> {
             every { state } returns ProjectState.PROJECT_ENDING
+        }
+        coEvery { configManager.getProject(any()) } returns mockEndingProject
+        createViewModel()
+        viewModel.isPreLogoutUpSync = false
+
+        viewModel.forceEventSync()
+
+        coVerify { syncOrchestrator.stopEventSync() }
+        coVerify { syncOrchestrator.startEventSync(isDownSyncAllowed = false) }
+    }
+
+    @Test
+    fun `should start event sync with down sync disabled event sync when logged out`() = runTest {
+        val mockEndingProject = mockk<Project> {
+            every { state } throws RemoteDbNotSignedInException("stub!")
         }
         coEvery { configManager.getProject(any()) } returns mockEndingProject
         createViewModel()
@@ -453,7 +484,7 @@ class SyncInfoViewModelTest {
     fun `should call logout use case when logout invoked`() = runTest {
         viewModel.performLogout()
 
-        verify { logoutUseCase() }
+        coVerify { logoutUseCase() }
     }
 
     // requestNavigationToLogin() tests
@@ -510,6 +541,126 @@ class SyncInfoViewModelTest {
         viewModel.handleLoginResult(failureResult)
 
         coVerify(exactly = 0) { syncOrchestrator.startEventSync(any()) }
+    }
+
+    // Sync button responsiveness optimization
+
+    @Test
+    fun `should immediately show event progress snapshot when forcing event sync`() = runTest {
+        createViewModel()
+
+        val values = viewModel.syncInfoLiveData.getOrAwaitValues(number = 2) {
+            viewModel.forceEventSync()
+        }
+
+        val initial = values[0]
+        val forced = values[1]
+        assertThat(initial.syncInfoSectionRecords.isProgressVisible).isFalse()
+        assertThat(forced.syncInfoSectionRecords.isProgressVisible).isTrue()
+    }
+
+    @Test
+    fun `should not emit forced event progress when events already syncing`() = runTest {
+        val mockInProgressEventSyncState = mockk<EventSyncState>(relaxed = true) {
+            every { isSyncInProgress() } returns true
+        }
+        every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockInProgressEventSyncState)
+        createViewModel()
+
+        val values = viewModel.syncInfoLiveData.getOrAwaitValues(number = 1) {
+            viewModel.forceEventSync()
+        }
+
+        val initial = values[0]
+        assertThat(initial.syncInfoSectionRecords.isProgressVisible).isFalse()
+    }
+
+    @Test
+    fun `should immediately show image progress snapshot when starting image sync`() = runTest {
+        val mockNotSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
+            every { isSyncing } returns false
+        }
+        every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockNotSyncingImageStatus)
+        createViewModel()
+
+        val values = viewModel.syncInfoLiveData.getOrAwaitValues(number = 2) {
+            viewModel.toggleImageSync()
+        }
+
+        val initial = values[0]
+        val forced = values[1]
+        assertThat(initial.syncInfoSectionImages.isProgressVisible).isFalse()
+        assertThat(forced.syncInfoSectionImages.isProgressVisible).isTrue()
+    }
+
+    @Test
+    fun `should not emit forced image progress when stopping image sync`() = runTest {
+        val mockSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
+            every { isSyncing } returns true
+        }
+        every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockSyncingImageStatus)
+        createViewModel()
+
+        val values = viewModel.syncInfoLiveData.getOrAwaitValues(number = 1) {
+            viewModel.toggleImageSync()
+        }
+
+        val initial = values[0]
+        assertThat(initial.syncInfoSectionImages.isProgressVisible).isFalse()
+    }
+
+    @Test
+    fun `should switch from forced to data-driven event sync progress once available`() = runTest {
+        val base = createDefaultSyncInfo()
+        val dataFlow = MutableStateFlow(base)
+        every { observeSyncInfo(any()) } returns dataFlow
+        createViewModel()
+
+        val values = viewModel.syncInfoLiveData.getOrAwaitValues(number = 3) {
+            viewModel.forceEventSync()
+            dataFlow.value = base.copy(
+                syncInfoSectionRecords = base.syncInfoSectionRecords.copy(
+                    isProgressVisible = true,
+                    counterTotalRecords = "123",
+                ),
+            )
+        }
+
+        val initial = values[0]
+        val forced = values[1]
+        val dataDriven = values[2]
+        assertThat(initial.syncInfoSectionRecords.isProgressVisible).isFalse()
+        assertThat(forced.syncInfoSectionRecords.isProgressVisible).isTrue()
+        assertThat(forced.syncInfoSectionRecords.counterTotalRecords).isEmpty()
+        assertThat(dataDriven.syncInfoSectionRecords.isProgressVisible).isTrue()
+        assertThat(dataDriven.syncInfoSectionRecords.counterTotalRecords).isEqualTo("123")
+    }
+
+    @Test
+    fun `should switch from forced to data-driven image sync progress once available`() = runTest {
+        val base = createDefaultSyncInfo()
+        val dataFlow = MutableStateFlow(base)
+        every { observeSyncInfo(any()) } returns dataFlow
+        createViewModel()
+
+        val values = viewModel.syncInfoLiveData.getOrAwaitValues(number = 3) {
+            viewModel.toggleImageSync()
+            dataFlow.value = base.copy(
+                syncInfoSectionImages = base.syncInfoSectionImages.copy(
+                    isProgressVisible = true,
+                    counterImagesToUpload = "123",
+                ),
+            )
+        }
+
+        val initial = values[0]
+        val forced = values[1]
+        val dataDriven = values[2]
+        assertThat(initial.syncInfoSectionImages.isProgressVisible).isFalse()
+        assertThat(forced.syncInfoSectionImages.isProgressVisible).isTrue()
+        assertThat(forced.syncInfoSectionImages.counterImagesToUpload).isEmpty()
+        assertThat(dataDriven.syncInfoSectionImages.isProgressVisible).isTrue()
+        assertThat(dataDriven.syncInfoSectionImages.counterImagesToUpload).isEqualTo("123")
     }
 
     // Other/combined UX case tests

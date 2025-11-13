@@ -13,6 +13,7 @@ import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent.
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
+import com.simprints.infra.events.event.domain.models.EnrolmentUpdateEvent.EnrolmentUpdatePayload
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType.AGE_GROUP_SELECTION
 import com.simprints.infra.events.event.domain.models.EventType.ALERT_SCREEN
@@ -39,10 +40,16 @@ import com.simprints.infra.events.event.domain.models.EventType.CANDIDATE_READ
 import com.simprints.infra.events.event.domain.models.EventType.COMPLETION_CHECK
 import com.simprints.infra.events.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
 import com.simprints.infra.events.event.domain.models.EventType.CONSENT
+import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_UPDATE
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V2
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V4
 import com.simprints.infra.events.event.domain.models.EventType.EVENT_DOWN_SYNC_REQUEST
 import com.simprints.infra.events.event.domain.models.EventType.EVENT_UP_SYNC_REQUEST
+import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_CAPTURE
+import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_CAPTURE_VALUE
+import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_CONFIRMATION
+import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_SEARCH
+import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_SELECTION
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_BIOMETRICS
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
@@ -63,6 +70,11 @@ import com.simprints.infra.events.event.domain.models.EventType.SCANNER_CONNECTI
 import com.simprints.infra.events.event.domain.models.EventType.SCANNER_FIRMWARE_UPDATE
 import com.simprints.infra.events.event.domain.models.EventType.SUSPICIOUS_INTENT
 import com.simprints.infra.events.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
+import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent.ExternalCredentialCapturePayload
+import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent.ExternalCredentialCaptureValuePayload
+import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirmationEvent.ExternalCredentialConfirmationPayload
+import com.simprints.infra.events.event.domain.models.ExternalCredentialSearchEvent.ExternalCredentialSearchPayload
+import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent.ExternalCredentialSelectionPayload
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent.GuidSelectionPayload
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent.IntentParsingPayload
 import com.simprints.infra.events.event.domain.models.InvalidIntentEvent.InvalidIntentPayload
@@ -170,4 +182,10 @@ internal fun EventPayload.fromDomainToApi(): ApiEventPayload = when (this.type) 
     LICENSE_CHECK -> ApiLicenseCheckEventPayload(this as LicenseCheckEvent.LicenseCheckEventPayload)
     AGE_GROUP_SELECTION -> ApiAgeGroupSelectionPayload(this as AgeGroupSelectionEvent.AgeGroupSelectionPayload)
     BIOMETRIC_REFERENCE_CREATION -> ApiBiometricReferenceCreationPayload(this as BiometricReferenceCreationPayload)
+    ENROLMENT_UPDATE -> ApiEnrolmentUpdatePayload(this as EnrolmentUpdatePayload)
+    EXTERNAL_CREDENTIAL_SELECTION -> ApiExternalCredentialSelectionPayload(this as ExternalCredentialSelectionPayload)
+    EXTERNAL_CREDENTIAL_CAPTURE -> ApiExternalCredentialCapturePayload(this as ExternalCredentialCapturePayload)
+    EXTERNAL_CREDENTIAL_CAPTURE_VALUE -> ApiExternalCredentialCaptureValuePayload(this as ExternalCredentialCaptureValuePayload)
+    EXTERNAL_CREDENTIAL_SEARCH -> ApiExternalCredentialSearchPayload(this as ExternalCredentialSearchPayload)
+    EXTERNAL_CREDENTIAL_CONFIRMATION -> ApiExternalCredentialConfirmationPayload(this as ExternalCredentialConfirmationPayload)
 }

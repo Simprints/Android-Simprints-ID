@@ -1,7 +1,7 @@
 package com.simprints.feature.clientapi.mappers.response
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import androidx.test.ext.junit.runners.*
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.feature.clientapi.mappers.request.requestFactories.ConfirmIdentityActionFactory
@@ -27,6 +27,7 @@ class OdkResponseMapperTest {
                 sessionId = "sessionId",
                 enrolledGuid = "guid",
                 subjectActions = "subjects",
+                externalCredential = null,
             ),
         )
 
@@ -53,6 +54,7 @@ class OdkResponseMapperTest {
                         matchConfidence = AppMatchConfidence.LOW,
                     ),
                 ),
+                isMultiFactorIdEnabled = false,
             ),
         )
 
@@ -72,6 +74,7 @@ class OdkResponseMapperTest {
                 actionIdentifier = IdentifyRequestActionFactory.getIdentifier(),
                 sessionId = "sessionId",
                 identifications = listOf(),
+                isMultiFactorIdEnabled = false,
             ),
         )
 
@@ -85,6 +88,7 @@ class OdkResponseMapperTest {
                 actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
                 sessionId = "sessionId",
                 confirmed = true,
+                externalCredential = null,
             ),
         )
 

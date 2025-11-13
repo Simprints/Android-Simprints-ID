@@ -3,9 +3,11 @@ package com.simprints.infra.events.event.domain.models
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V4
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.infra.events.sampledata.SampleDefaults.CREDENTIAL_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.EXTERNAL_CREDENTIAL
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import org.junit.Test
@@ -20,6 +22,7 @@ class EnrolmentEventV4Test {
             DEFAULT_MODULE_ID,
             DEFAULT_USER_ID,
             listOf(GUID2),
+            listOf(CREDENTIAL_ID),
         )
 
         assertThat(event.id).isNotNull()

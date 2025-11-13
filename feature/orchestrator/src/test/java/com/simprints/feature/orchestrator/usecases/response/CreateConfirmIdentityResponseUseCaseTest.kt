@@ -21,7 +21,7 @@ class CreateConfirmIdentityResponseUseCaseTest {
         assertThat(
             useCase(
                 listOf(
-                    SelectSubjectResult(true),
+                    SelectSubjectResult(true, mockk()),
                     mockk(),
                 ),
             ),

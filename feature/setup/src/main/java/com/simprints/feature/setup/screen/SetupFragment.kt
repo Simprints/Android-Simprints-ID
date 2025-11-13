@@ -8,6 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.simprints.core.domain.permission.CommCarePermissions
 import com.simprints.core.tools.utils.TimeUtils
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
@@ -24,14 +25,14 @@ import com.simprints.infra.license.models.LicenseState.Started
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LICENSE
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import com.simprints.infra.resources.R as IDR
 import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class SetupFragment : Fragment(R.layout.fragment_setup) {
@@ -78,7 +79,9 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
         }
         // Request CommCare permission
         viewModel.requestCommCarePermission.observe(viewLifecycleOwner) {
-            launchCommCarePermissionRequest.launch("${lastCallingPackageStore.lastCallingPackageName}.provider.cases.read")
+            launchCommCarePermissionRequest.launch(
+                CommCarePermissions.buildPermissionForPackage(lastCallingPackageStore.lastCallingPackageName ?: ""),
+            )
         }
         // Request notification permission
         viewModel.requestNotificationPermission.observe(viewLifecycleOwner) {
@@ -91,9 +94,10 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
         // Overall setup result
         observeOverallSetupResult()
         // Start the setup process
-        viewModel.start()
+        if (savedInstanceState == null) {
+            viewModel.start()
+        }
     }
-
 
     private fun observeOverallSetupResult() = viewModel.overallSetupResult.observe(viewLifecycleOwner) {
         // if the overall setup result is success, finish the setup flow else an alert will be shown

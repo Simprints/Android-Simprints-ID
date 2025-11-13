@@ -1,6 +1,9 @@
 package com.simprints.infra.events.sampledata
 
+import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.modality.Modes
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.event.domain.models.callout.BiometricDataSource
@@ -28,4 +31,13 @@ object SampleDefaults {
     val TIME1 = System.currentTimeMillis()
 
     val DEFAULT_MODES = listOf(Modes.FINGERPRINT)
+    const val CREDENTIAL_ID = "CREDENTIAL_ID"
+    val CREDENTIAL_TYPE = ExternalCredentialType.NHISCard
+    val CREDENTIAL_VALUE = "CREDENTIAL_VALUE".asTokenizableEncrypted()
+    val EXTERNAL_CREDENTIAL = ExternalCredential(
+        id = CREDENTIAL_ID,
+        value = CREDENTIAL_VALUE,
+        subjectId = GUID1,
+        type = CREDENTIAL_TYPE,
+    )
 }

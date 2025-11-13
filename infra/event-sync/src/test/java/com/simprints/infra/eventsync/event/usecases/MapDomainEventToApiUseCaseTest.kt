@@ -28,8 +28,14 @@ import com.simprints.infra.events.sampledata.createEnrolmentCalloutEventV2
 import com.simprints.infra.events.sampledata.createEnrolmentCalloutEventV3
 import com.simprints.infra.events.sampledata.createEnrolmentEventV2
 import com.simprints.infra.events.sampledata.createEnrolmentEventV4
+import com.simprints.infra.events.sampledata.createEnrolmentUpdateEvent
 import com.simprints.infra.events.sampledata.createEventDownSyncRequestEvent
 import com.simprints.infra.events.sampledata.createEventUpSyncRequestEvent
+import com.simprints.infra.events.sampledata.createExternalCredentialCaptureEvent
+import com.simprints.infra.events.sampledata.createExternalCredentialCaptureValueEvent
+import com.simprints.infra.events.sampledata.createExternalCredentialConfirmationEvent
+import com.simprints.infra.events.sampledata.createExternalCredentialSearchEvent
+import com.simprints.infra.events.sampledata.createExternalCredentialSelectionEvent
 import com.simprints.infra.events.sampledata.createFaceCaptureBiometricsEvent
 import com.simprints.infra.events.sampledata.createFaceCaptureConfirmationEvent
 import com.simprints.infra.events.sampledata.createFaceCaptureEvent
@@ -61,40 +67,7 @@ import com.simprints.infra.events.sampledata.createVerificationCalloutEventV2
 import com.simprints.infra.events.sampledata.createVerificationCalloutEventV3
 import com.simprints.infra.events.sampledata.createVero2InfoSnapshotEvent
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.AgeGroupSelection
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.AlertScreen
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Authentication
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Authorization
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.BiometricReferenceCreation
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Callback
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Callout
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.CandidateRead
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.CompletionCheck
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.ConnectivitySnapshot
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Consent
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Enrolment
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.EventDownSyncRequest
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.EventUpSyncRequest
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceCapture
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceCaptureBiometrics
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceCaptureConfirmation
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceFallbackCapture
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceOnboardingComplete
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FingerprintCapture
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FingerprintCaptureBiometrics
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.GuidSelection
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.IntentParsing
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.InvalidIntent
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.LicenseCheck
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.OneToManyMatch
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.OneToOneMatch
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.PersonCreation
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Refusal
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.SampleUpSyncRequest
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.ScannerConnection
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.ScannerFirmwareUpdate
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.SuspiciousIntent
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Vero2InfoSnapshot
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.*
 import com.simprints.infra.eventsync.event.validateAgeGroupSelectionEventApiModel
 import com.simprints.infra.eventsync.event.validateAlertScreenEventApiModel
 import com.simprints.infra.eventsync.event.validateAuthenticationEventApiModel
@@ -112,6 +85,12 @@ import com.simprints.infra.eventsync.event.validateConsentEventApiModel
 import com.simprints.infra.eventsync.event.validateDownSyncRequestEventApiModel
 import com.simprints.infra.eventsync.event.validateEnrolmentEventV2ApiModel
 import com.simprints.infra.eventsync.event.validateEnrolmentEventV4ApiModel
+import com.simprints.infra.eventsync.event.validateEnrolmentUpdateEventApiModel
+import com.simprints.infra.eventsync.event.validateExternalCredentialCaptureEventApiModel
+import com.simprints.infra.eventsync.event.validateExternalCredentialCaptureValueEventApiModel
+import com.simprints.infra.eventsync.event.validateExternalCredentialConfirmationApiModel
+import com.simprints.infra.eventsync.event.validateExternalCredentialSearchApiModel
+import com.simprints.infra.eventsync.event.validateExternalCredentialSelectionEventApiModel
 import com.simprints.infra.eventsync.event.validateFaceCaptureBiometricsEventApiModel
 import com.simprints.infra.eventsync.event.validateFaceCaptureConfirmationEventApiModel
 import com.simprints.infra.eventsync.event.validateFaceCaptureEventApiModel
@@ -597,6 +576,60 @@ internal class MapDomainEventToApiUseCaseTest {
     }
 
     @Test
+    fun validate_enrolmentUpdateEventApiModel() {
+        val event = createEnrolmentUpdateEvent()
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateEnrolmentUpdateEventApiModel(json)
+    }
+
+    @Test
+    fun validate_externalCredentialSelectionEventApiModel() {
+        val event = createExternalCredentialSelectionEvent()
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateExternalCredentialSelectionEventApiModel(json)
+    }
+
+    @Test
+    fun validate_externalCredentialCaptureValueEventApiModel() {
+        val event = createExternalCredentialCaptureValueEvent()
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateExternalCredentialCaptureValueEventApiModel(json)
+    }
+
+    @Test
+    fun validate_externalCredentialCaptureEventApiModel() {
+        val event = createExternalCredentialCaptureEvent()
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateExternalCredentialCaptureEventApiModel(json)
+    }
+
+    @Test
+    fun validate_externalCredentialSearchEventApiModel() {
+        val event = createExternalCredentialSearchEvent()
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateExternalCredentialSearchApiModel(json)
+    }
+
+    @Test
+    fun validate_externalCredentialConfirmationEventApiModel() {
+        val event = createExternalCredentialConfirmationEvent()
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateExternalCredentialConfirmationApiModel(json)
+    }
+
+    @Test
     fun `when event contains tokenized attendant id, then ApiEvent should contain tokenizedField`() {
         validateUserIdTokenization(attendantId = "attendantId".asTokenizableEncrypted())
     }
@@ -698,6 +731,12 @@ internal class MapDomainEventToApiUseCaseTest {
             LicenseCheck -> validate_licenseCheckEventApiModel()
             AgeGroupSelection -> validate_ageGroupSelectionEventApiModel()
             BiometricReferenceCreation -> validate_biometricReferenceCreationEventApiModel()
+            EnrolmentUpdate -> validate_enrolmentUpdateEventApiModel()
+            ExternalCredentialSelection -> validate_externalCredentialSelectionEventApiModel()
+            ExternalCredentialCaptureValue -> validate_externalCredentialCaptureValueEventApiModel()
+            ExternalCredentialCapture -> validate_externalCredentialCaptureEventApiModel()
+            ExternalCredentialSearch -> validate_externalCredentialSearchEventApiModel()
+            ExternalCredentialConfirmation -> validate_externalCredentialConfirmationEventApiModel()
             null -> TODO()
         }.safeSealedWhens
     }

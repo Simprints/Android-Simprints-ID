@@ -5,9 +5,13 @@ import com.simprints.feature.clientapi.mappers.request.builders.ConfirmIdentifyR
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.ConfirmIdentityRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.ConfirmIdentityValidator
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.infra.orchestration.data.ActionConstants
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 
@@ -30,11 +34,30 @@ internal object ConfirmIdentityActionFactory : RequestActionFactory() {
         unknownExtras = emptyMap(),
     )
 
-    override fun getValidator(extractor: ActionRequestExtractor): ConfirmIdentityValidator = ConfirmIdentityValidator(
-        extractor as ConfirmIdentityRequestExtractor,
-        MOCK_SESSION_ID,
-        true,
-    )
+    override fun getValidator(extractor: ActionRequestExtractor): ConfirmIdentityValidator {
+        val mockEventRepository = mockk<EventRepository>()
+        // Return a valid identification callback event with the selected GUID
+        coEvery { mockEventRepository.getEventsFromScope(any()) } returns listOf(
+            mockk<IdentificationCallbackEvent> {
+                every { payload } returns mockk {
+                    every { scores } returns listOf(
+                        mockk {
+                            every { guid } returns MOCK_SELECTED_GUID
+                        },
+                    )
+                }
+            },
+        )
+
+        val mockConfigManager = mockk<ConfigManager>(relaxed = true)
+
+        return ConfirmIdentityValidator(
+            extractor as ConfirmIdentityRequestExtractor,
+            MOCK_SESSION_ID,
+            mockEventRepository,
+            configManager = mockConfigManager,
+        )
+    }
 
     override fun getBuilder(extractor: ActionRequestExtractor): ConfirmIdentifyRequestBuilder = ConfirmIdentifyRequestBuilder(
         actionIdentifier = getIdentifier(),

@@ -13,11 +13,11 @@ interface SyncOrchestrator {
      */
     fun refreshConfiguration(): Flow<Unit>
 
-    fun rescheduleEventSync(withDelay: Boolean = false)
+    suspend fun rescheduleEventSync(withDelay: Boolean = false)
 
     fun cancelEventSync()
 
-    fun startEventSync(isDownSyncAllowed: Boolean = true)
+    suspend fun startEventSync(isDownSyncAllowed: Boolean = true)
 
     fun stopEventSync()
 

@@ -1,6 +1,7 @@
 package com.simprints.infra.enrolment.records.repository.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 
@@ -15,6 +16,8 @@ sealed class SubjectAction {
         val faceSamplesToAdd: List<FaceSample>,
         val fingerprintSamplesToAdd: List<FingerprintSample>,
         val referenceIdsToRemove: List<String>,
+        val externalCredentialsToAdd: List<ExternalCredential>,
+        val externalCredentialIdsToRemove: List<String>,
     ) : SubjectAction()
 
     data class Deletion(

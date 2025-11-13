@@ -15,6 +15,7 @@ internal fun ProjectConfiguration.toProto(): ProtoProjectConfiguration = ProtoPr
     .also {
         if (face != null) it.face = face.toProto()
         if (fingerprint != null) it.fingerprint = fingerprint.toProto()
+        if (multifactorId != null) it.multiFactorId = multifactorId.toProto()
     }.also {
         if (custom != null) {
             try {
@@ -28,16 +29,17 @@ internal fun ProjectConfiguration.toProto(): ProtoProjectConfiguration = ProtoPr
     }.build()
 
 internal fun ProtoProjectConfiguration.toDomain(): ProjectConfiguration = ProjectConfiguration(
-    id,
-    projectId,
-    updatedAt,
-    general.toDomain(),
-    hasFace().let { if (it) face.toDomain() else null },
-    hasFingerprint().let { if (it) fingerprint.toDomain() else null },
-    consent.toDomain(),
-    identification.toDomain(),
-    synchronization.toDomain(),
-    customJson?.takeIf { it.isNotBlank() }?.let {
+    id = id,
+    projectId = projectId,
+    updatedAt = updatedAt,
+    general = general.toDomain(),
+    face = hasFace().let { if (it) face.toDomain() else null },
+    fingerprint = hasFingerprint().let { if (it) fingerprint.toDomain() else null },
+    consent = consent.toDomain(),
+    identification = identification.toDomain(),
+    synchronization = synchronization.toDomain(),
+    multifactorId = multiFactorId?.toDomain(),
+    custom = customJson?.takeIf { it.isNotBlank() }?.let {
         try {
             JsonHelper.fromJson(it)
         } catch (_: Exception) {

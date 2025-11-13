@@ -128,6 +128,10 @@
         <item name="android:textAppearance">@style/TextAppearance.Simprints.Headline4</item>
     </style>
 
+    <style name="Text.Headline4.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <!-- H5 variants -->
 
     <style name="Text.Headline5" parent="Widget.MaterialComponents.TextView">
@@ -143,6 +147,15 @@
     </style>
 
     <style name="Text.Headline5.White.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+
+    <style name="Text.Headline5.Blue">
+        <item name="android:textColor">@color/simprints_blue</item>
+    </style>
+
+    <style name="Text.Headline5.Blue.Bold">
         <item name="android:textStyle">bold</item>
     </style>
 

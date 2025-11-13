@@ -1,6 +1,7 @@
 package com.simprints.infra.enrolment.records.repository.local
 
 import com.simprints.core.DispatcherIO
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
@@ -9,6 +10,7 @@ import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
+import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
@@ -36,6 +38,7 @@ import javax.inject.Singleton
 
 @Singleton
 internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
+    private val timeHelper: TimeHelper,
     private val realmWrapper: RealmWrapper,
     private val tokenizationProcessor: TokenizationProcessor,
     @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
@@ -50,6 +53,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         const val FINGERPRINT_SAMPLES_FIELD = "fingerprintSamples"
         const val FACE_SAMPLES_FIELD = "faceSamples"
         const val FORMAT_FIELD = "format"
+        const val EXTERNAL_CREDENTIAL_FIELD = "externalCredentials"
 
         // Although batches are processed sequentially, we use a small channel capacity to prevent blocking and reduce the risk of out-of-memory errors.
         const val CHANNEL_CAPACITY = 4
@@ -70,10 +74,11 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<List<FaceIdentity>> {
-        val channel = Channel<List<FaceIdentity>>(CHANNEL_CAPACITY)
+    ): ReceiveChannel<IdentityBatch<FaceIdentity>> {
+        val channel = Channel<IdentityBatch<FaceIdentity>>(CHANNEL_CAPACITY)
         scope.launch(dispatcherIO) {
             ranges.forEach { range ->
+                val startTime = timeHelper.now()
                 val identities = loadIdentitiesRange(
                     query = query,
                     range = range,
@@ -87,7 +92,8 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                     },
                     onCandidateLoaded = onCandidateLoaded,
                 )
-                channel.send(identities)
+                val endTime = timeHelper.now()
+                channel.send(IdentityBatch(identities, startTime, endTime))
             }
             channel.close()
         }
@@ -101,10 +107,11 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<List<FingerprintIdentity>> {
-        val channel = Channel<List<FingerprintIdentity>>(CHANNEL_CAPACITY)
+    ): ReceiveChannel<IdentityBatch<FingerprintIdentity>> {
+        val channel = Channel<IdentityBatch<FingerprintIdentity>>(CHANNEL_CAPACITY)
         scope.launch(dispatcherIO) {
             ranges.forEach { range ->
+                val startTime = timeHelper.now()
                 val identities = loadIdentitiesRange(
                     query = query,
                     range = range,
@@ -118,7 +125,8 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                     },
                     onCandidateLoaded = onCandidateLoaded,
                 )
-                channel.send(identities)
+                val endTime = timeHelper.now()
+                channel.send(IdentityBatch(identities, startTime, endTime))
             }
             channel.close()
         }
@@ -211,6 +219,12 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                                 .filterNot { it.id in faceSampleIds }
                                 .takeIf { it.isNotEmpty() }
                                 ?.forEach { realm.delete(it) }
+
+                            val externalCredentialIds = newSubject.externalCredentials.map { it.id }.toSet()
+                            dbSubject.externalCredentials
+                                .filterNot { it.id in externalCredentialIds }
+                                .takeIf { it.isNotEmpty() }
+                                ?.forEach { realm.delete(it) }
                         }
 
                         realm.copyToRealm(newSubject, updatePolicy = UpdatePolicy.ALL)
@@ -223,6 +237,12 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                             val faceSamplesMap = dbSubject.faceSamples.groupBy { it.referenceId in referencesToDelete }
                             val fingerprintSamplesMap = dbSubject.fingerprintSamples.groupBy { it.referenceId in referencesToDelete }
 
+                            val credentialsToDelete = action.externalCredentialIdsToRemove.toSet()
+                            val externalCredentialMap = dbSubject.externalCredentials.groupBy { it.id in credentialsToDelete }
+                            val allExternalCredentials =
+                                (externalCredentialMap[false].orEmpty() + action.externalCredentialsToAdd.map { it.toRealmDb() })
+                                    .distinctBy { it.id }
+
                             // Append new samples to the list of samples that remain after removing
                             dbSubject.faceSamples = (
                                 faceSamplesMap[false].orEmpty() + action.faceSamplesToAdd.map { it.toRealmDb() }
@@ -230,9 +250,11 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                             dbSubject.fingerprintSamples = (
                                 fingerprintSamplesMap[false].orEmpty() + action.fingerprintSamplesToAdd.map { it.toRealmDb() }
                             ).toRealmList()
+                            dbSubject.externalCredentials = allExternalCredentials.toRealmList()
 
                             faceSamplesMap[true]?.forEach { realm.delete(it) }
                             fingerprintSamplesMap[true]?.forEach { realm.delete(it) }
+                            externalCredentialMap[true]?.forEach { realm.delete(it) }
                             realm.copyToRealm(dbSubject, updatePolicy = UpdatePolicy.ALL)
                         } else {
                             Simber.i("[SubjectLocalDataSourceImpl] Subject not found for update", tag = REALM_DB)
@@ -319,6 +341,12 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                 false,
             )
         }
+        if (query.externalCredential != null) {
+            realmQuery = realmQuery.query(
+                "ANY $EXTERNAL_CREDENTIAL_FIELD.value == $0",
+                query.externalCredential.value,
+            )
+        }
         if (query.sort) {
             realmQuery = realmQuery.sort(SUBJECT_ID_FIELD, Sort.ASCENDING)
         }
@@ -358,4 +386,6 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
             .find()
             .map { it.subjectId.toString() }
     }
+
+    override suspend fun closeOpenDbConnection() = realmWrapper.close()
 }

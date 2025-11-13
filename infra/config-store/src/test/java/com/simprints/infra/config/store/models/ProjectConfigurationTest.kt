@@ -1,6 +1,6 @@
 package com.simprints.infra.config.store.models
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
@@ -10,10 +10,12 @@ import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.Up
 import com.simprints.infra.config.store.testtools.faceConfiguration
 import com.simprints.infra.config.store.testtools.faceSdkConfiguration
 import com.simprints.infra.config.store.testtools.fingerprintConfiguration
+import com.simprints.infra.config.store.testtools.fingerprintSdkConfiguration
 import com.simprints.infra.config.store.testtools.projectConfiguration
 import com.simprints.infra.config.store.testtools.simprintsDownSyncConfigurationConfiguration
 import com.simprints.infra.config.store.testtools.simprintsUpSyncConfigurationConfiguration
 import com.simprints.infra.config.store.testtools.synchronizationConfiguration
+import com.simprints.infra.config.store.testtools.vero2Configuration
 import org.junit.Test
 
 class ProjectConfigurationTest {
@@ -232,7 +234,7 @@ class ProjectConfigurationTest {
         val config = projectConfiguration.copy(
             synchronization = synchronizationConfiguration.copy(
                 down = synchronizationConfiguration.down.copy(
-                    simprints = null
+                    simprints = null,
                 ),
             ),
         )
@@ -245,7 +247,7 @@ class ProjectConfigurationTest {
         val config = projectConfiguration.copy(
             synchronization = synchronizationConfiguration.copy(
                 down = synchronizationConfiguration.down.copy(
-                    commCare = DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration
+                    commCare = DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration,
                 ),
             ),
         )
@@ -258,7 +260,7 @@ class ProjectConfigurationTest {
         val config = projectConfiguration.copy(
             synchronization = synchronizationConfiguration.copy(
                 down = synchronizationConfiguration.down.copy(
-                    commCare = null
+                    commCare = null,
                 ),
             ),
         )
@@ -285,6 +287,74 @@ class ProjectConfigurationTest {
     }
 
     @Test
+    fun `isSampleUploadEnabledInProject should return correct based on available saving strategy`() {
+        data class TestData(
+            val rankOneStrategy: FaceConfiguration.ImageSavingStrategy? = null,
+            val simFaceStrategy: FaceConfiguration.ImageSavingStrategy? = null,
+            val secugenStrategy: Vero2Configuration.ImageSavingStrategy? = null,
+            val necStragery: Vero2Configuration.ImageSavingStrategy? = null,
+            val result: Boolean,
+        )
+        listOf(
+            TestData(
+                rankOneStrategy = FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN,
+                simFaceStrategy = FaceConfiguration.ImageSavingStrategy.NEVER,
+                result = true,
+            ),
+            TestData(
+                necStragery = Vero2Configuration.ImageSavingStrategy.NEVER,
+                secugenStrategy = Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN,
+                result = true,
+            ),
+            TestData(
+                simFaceStrategy = FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN,
+                secugenStrategy = Vero2Configuration.ImageSavingStrategy.NEVER,
+                result = true,
+            ),
+            TestData(
+                simFaceStrategy = FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN,
+                secugenStrategy = Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN,
+                result = true,
+            ),
+            TestData(
+                necStragery = Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN,
+                result = true,
+            ),
+            TestData(
+                rankOneStrategy = FaceConfiguration.ImageSavingStrategy.NEVER,
+                simFaceStrategy = FaceConfiguration.ImageSavingStrategy.NEVER,
+                necStragery = Vero2Configuration.ImageSavingStrategy.NEVER,
+                secugenStrategy = Vero2Configuration.ImageSavingStrategy.NEVER,
+                result = false,
+            ),
+            TestData(
+                rankOneStrategy = FaceConfiguration.ImageSavingStrategy.NEVER,
+                necStragery = Vero2Configuration.ImageSavingStrategy.NEVER,
+                result = false,
+            ),
+            TestData(result = false),
+        ).forEach { (rankOne, simFace, secugen, nec, result) ->
+            assertThat(
+                projectConfiguration
+                    .copy(
+                        face = faceConfiguration.copy(
+                            rankOne = rankOne?.let { faceSdkConfiguration.copy(imageSavingStrategy = it) },
+                            simFace = simFace?.let { faceSdkConfiguration.copy(imageSavingStrategy = it) },
+                        ),
+                        fingerprint = fingerprintConfiguration.copy(
+                            secugenSimMatcher = secugen?.let {
+                                fingerprintSdkConfiguration.copy(vero2 = vero2Configuration.copy(imageSavingStrategy = it))
+                            },
+                            nec = nec?.let {
+                                fingerprintSdkConfiguration.copy(vero2 = vero2Configuration.copy(imageSavingStrategy = it))
+                            },
+                        ),
+                    ).isSampleUploadEnabledInProject(),
+            ).isEqualTo(result)
+        }
+    }
+
+    @Test
     fun `allowedAgeRanges returns all non-null age ranges`() {
         val faceAgeRange = AgeGroup(10, 20)
         val secugenSimMatcherAgeRange = AgeGroup(20, 30)
@@ -294,6 +364,7 @@ class ProjectConfigurationTest {
                 rankOne = faceConfiguration.rankOne?.copy(
                     allowedAgeRange = faceAgeRange,
                 ),
+                simFace = null,
             ),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(
@@ -428,7 +499,7 @@ class ProjectConfigurationTest {
             AgeGroup(faceAgeRange.startInclusive, secugenSimMatcherAgeRange.startInclusive),
             AgeGroup(secugenSimMatcherAgeRange.startInclusive, faceAgeRange.endExclusive),
             AgeGroup(faceAgeRange.endExclusive!!, secugenSimMatcherAgeRange.endExclusive!!),
-            AgeGroup(secugenSimMatcherAgeRange.endExclusive!!, null),
+            AgeGroup(secugenSimMatcherAgeRange.endExclusive, null),
         )
 
         assertThat(result).isEqualTo(expected)
@@ -616,4 +687,110 @@ class ProjectConfigurationTest {
         )
         assertThat(config.isModuleSelectionAvailable()).isFalse()
     }
+
+    @Test
+    fun `determineFaceSDKs returns all allowed SDKs when not age restricted`() {
+        val config = createAgeUnrestrictedFaceConfig()
+        val result = config.determineFaceSDKs(AgeGroup(25, 30))
+        assertThat(result).containsExactly(FaceConfiguration.BioSdk.RANK_ONE, FaceConfiguration.BioSdk.SIM_FACE)
+    }
+
+    @Test
+    fun `determineFaceSDKs returns empty list when age group is null and age restricted`() {
+        val config = createAgeRestrictedFaceConfig(rankOneRange = AgeGroup(10, 20), simFaceRange = AgeGroup(20, 30))
+        val result = config.determineFaceSDKs(null)
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun `determineFaceSDKs returns only RankOne when age group matches RankOne range`() {
+        val config = createAgeRestrictedFaceConfig(rankOneRange = AgeGroup(10, 20), simFaceRange = AgeGroup(20, 30))
+        val result = config.determineFaceSDKs(AgeGroup(10, 20))
+        assertThat(result).containsExactly(FaceConfiguration.BioSdk.RANK_ONE)
+    }
+
+    @Test
+    fun `determineFaceSDKs returns only SimFace when age group matches SimFace range`() {
+        val config = createAgeRestrictedFaceConfig(rankOneRange = AgeGroup(10, 20), simFaceRange = AgeGroup(20, 30))
+        val result = config.determineFaceSDKs(AgeGroup(20, 30))
+        assertThat(result).containsExactly(FaceConfiguration.BioSdk.SIM_FACE)
+    }
+
+    @Test
+    fun `determineFaceSDKs returns both SDKs when age group matches both ranges`() {
+        val config = createAgeRestrictedFaceConfig(rankOneRange = AgeGroup(10, 30), simFaceRange = AgeGroup(15, 25))
+        val result = config.determineFaceSDKs(AgeGroup(15, 25))
+        assertThat(result).containsExactly(FaceConfiguration.BioSdk.RANK_ONE, FaceConfiguration.BioSdk.SIM_FACE)
+    }
+
+    @Test
+    fun `determineFaceSDKs returns empty list when age group matches no ranges`() {
+        val config = createAgeRestrictedFaceConfig(rankOneRange = AgeGroup(10, 20), simFaceRange = AgeGroup(20, 30))
+        val result = config.determineFaceSDKs(AgeGroup(30, 40))
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun `determineFingerprintSDKs returns all allowed SDKs when not age restricted`() {
+        val config = createAgeUnrestrictedFingerprintConfig()
+        val result = config.determineFingerprintSDKs(AgeGroup(25, 30))
+        assertThat(result).containsExactly(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER, FingerprintConfiguration.BioSdk.NEC)
+    }
+
+    @Test
+    fun `determineFingerprintSDKs returns empty list when age group is null and age restricted`() {
+        val config = createAgeRestrictedFingerprintConfig(secugenRange = AgeGroup(10, 20), necRange = AgeGroup(20, 30))
+        val result = config.determineFingerprintSDKs(null)
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun `determineFingerprintSDKs returns only SecugenSimMatcher when age group matches SecugenSimMatcher range`() {
+        val config = createAgeRestrictedFingerprintConfig(secugenRange = AgeGroup(10, 20), necRange = AgeGroup(20, 30))
+        val result = config.determineFingerprintSDKs(AgeGroup(10, 20))
+        assertThat(result).containsExactly(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
+    }
+
+    @Test
+    fun `determineFingerprintSDKs returns empty list when age group matches no ranges`() {
+        val config = createAgeRestrictedFingerprintConfig(secugenRange = AgeGroup(10, 20), necRange = AgeGroup(20, 30))
+        val result = config.determineFingerprintSDKs(AgeGroup(30, 40))
+        assertThat(result).isEmpty()
+    }
+
+    private fun createAgeUnrestrictedFaceConfig() = projectConfiguration.copy(
+        face = faceConfiguration.copy(
+            allowedSDKs = listOf(FaceConfiguration.BioSdk.RANK_ONE, FaceConfiguration.BioSdk.SIM_FACE),
+            rankOne = faceSdkConfiguration.copy(allowedAgeRange = AgeGroup(0, null)),
+            simFace = faceSdkConfiguration.copy(allowedAgeRange = AgeGroup(0, null)),
+        ),
+    )
+
+    private fun createAgeRestrictedFaceConfig(
+        rankOneRange: AgeGroup,
+        simFaceRange: AgeGroup,
+    ) = projectConfiguration.copy(
+        face = faceConfiguration.copy(
+            rankOne = faceSdkConfiguration.copy(allowedAgeRange = rankOneRange),
+            simFace = faceSdkConfiguration.copy(allowedAgeRange = simFaceRange),
+        ),
+    )
+
+    private fun createAgeUnrestrictedFingerprintConfig() = projectConfiguration.copy(
+        fingerprint = fingerprintConfiguration.copy(
+            allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER, FingerprintConfiguration.BioSdk.NEC),
+            secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = AgeGroup(0, null)),
+            nec = fingerprintConfiguration.nec?.copy(allowedAgeRange = AgeGroup(0, null)),
+        ),
+    )
+
+    private fun createAgeRestrictedFingerprintConfig(
+        secugenRange: AgeGroup,
+        necRange: AgeGroup,
+    ) = projectConfiguration.copy(
+        fingerprint = fingerprintConfiguration.copy(
+            secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = secugenRange),
+            nec = fingerprintConfiguration.nec?.copy(allowedAgeRange = necRange),
+        ),
+    )
 }

@@ -1,6 +1,8 @@
 package com.simprints.infra.sync.config.usecase
 
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.sync.SyncOrchestrator
@@ -106,6 +108,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
                         simprints = synchronizationConfiguration.down.simprints?.copy(
                             partitionType = DownSynchronizationConfiguration.PartitionType.PROJECT,
                         ),
+                        commCare = null,
                     ),
                 ),
             ),
@@ -113,7 +116,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
                 synchronization = synchronizationConfiguration.copy(
                     down = synchronizationConfiguration.down.copy(
                         simprints = null,
-                        commCare = DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration
+                        commCare = DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration,
                     ),
                 ),
             ),
@@ -134,7 +137,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
                 synchronization = synchronizationConfiguration.copy(
                     down = synchronizationConfiguration.down.copy(
                         simprints = null,
-                        commCare = DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration
+                        commCare = DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration,
                     ),
                 ),
             ),
@@ -144,12 +147,168 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
                         simprints = synchronizationConfiguration.down.simprints?.copy(
                             partitionType = DownSynchronizationConfiguration.PartitionType.PROJECT,
                         ),
+                        commCare = null,
                     ),
                 ),
             ),
         )
 
         coVerify {
+            syncOrchestrator.cancelEventSync()
+            syncOrchestrator.rescheduleEventSync()
+            eventSyncManager.resetDownSyncInfo()
+            enrolmentRecordRepository.deleteAll()
+        }
+    }
+
+    @Test
+    fun `should reset local records when sync partition changes`() = runTest {
+        useCase(
+            projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    down = synchronizationConfiguration.down.copy(
+                        simprints = synchronizationConfiguration.down.simprints?.copy(
+                            partitionType = DownSynchronizationConfiguration.PartitionType.PROJECT,
+                        ),
+                        commCare = null,
+                    ),
+                ),
+            ),
+            projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    down = synchronizationConfiguration.down.copy(
+                        simprints = null,
+                        commCare = null,
+                    ),
+                ),
+            ),
+        )
+
+        coVerify {
+            syncOrchestrator.cancelEventSync()
+            syncOrchestrator.rescheduleEventSync()
+            eventSyncManager.resetDownSyncInfo()
+            enrolmentRecordRepository.deleteAll()
+        }
+    }
+
+    @Test
+    fun `should not reset local records when sync frequency changes`() = runTest {
+        useCase(
+            projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    down = synchronizationConfiguration.down.copy(
+                        simprints = synchronizationConfiguration.down.simprints?.copy(
+                            frequency = Frequency.ONLY_PERIODICALLY_UP_SYNC,
+                        ),
+                    ),
+                ),
+            ),
+            projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    down = synchronizationConfiguration.down.copy(
+                        simprints = synchronizationConfiguration.down.simprints?.copy(
+                            frequency = Frequency.PERIODICALLY,
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        coVerify(exactly = 0) {
+            syncOrchestrator.cancelEventSync()
+            syncOrchestrator.rescheduleEventSync()
+            eventSyncManager.resetDownSyncInfo()
+            enrolmentRecordRepository.deleteAll()
+        }
+    }
+
+    @Test
+    fun `should not reset local records when sync modules changes`() = runTest {
+        useCase(
+            projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    down = synchronizationConfiguration.down.copy(
+                        simprints = synchronizationConfiguration.down.simprints?.copy(
+                            moduleOptions = listOf("One".asTokenizableEncrypted(), "Two".asTokenizableEncrypted()),
+                        ),
+                    ),
+                ),
+            ),
+            projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    down = synchronizationConfiguration.down.copy(
+                        simprints = synchronizationConfiguration.down.simprints?.copy(
+                            moduleOptions = listOf("Three".asTokenizableEncrypted()),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        coVerify(exactly = 0) {
+            syncOrchestrator.cancelEventSync()
+            syncOrchestrator.rescheduleEventSync()
+            eventSyncManager.resetDownSyncInfo()
+            enrolmentRecordRepository.deleteAll()
+        }
+    }
+
+    @Test
+    fun `should not reset local records when sync max age changes`() = runTest {
+        useCase(
+            projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    down = synchronizationConfiguration.down.copy(
+                        simprints = synchronizationConfiguration.down.simprints?.copy(
+                            maxAge = "PT24H",
+                        ),
+                    ),
+                ),
+            ),
+            projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    down = synchronizationConfiguration.down.copy(
+                        simprints = synchronizationConfiguration.down.simprints?.copy(
+                            maxAge = "PT12H",
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        coVerify(exactly = 0) {
+            syncOrchestrator.cancelEventSync()
+            syncOrchestrator.rescheduleEventSync()
+            eventSyncManager.resetDownSyncInfo()
+            enrolmentRecordRepository.deleteAll()
+        }
+    }
+
+    @Test
+    fun `should not reset local records when sync module count changes`() = runTest {
+        useCase(
+            projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    down = synchronizationConfiguration.down.copy(
+                        simprints = synchronizationConfiguration.down.simprints?.copy(
+                            maxNbOfModules = 2,
+                        ),
+                    ),
+                ),
+            ),
+            projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    down = synchronizationConfiguration.down.copy(
+                        simprints = synchronizationConfiguration.down.simprints?.copy(
+                            maxNbOfModules = 5,
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        coVerify(exactly = 0) {
             syncOrchestrator.cancelEventSync()
             syncOrchestrator.rescheduleEventSync()
             eventSyncManager.resetDownSyncInfo()

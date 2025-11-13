@@ -18,7 +18,9 @@ internal class RemoteTestingHelper {
             ApiEventPayloadType.FingerprintCaptureBiometrics, ApiEventPayloadType.FaceCaptureBiometrics,
             ApiEventPayloadType.EventDownSyncRequest, ApiEventPayloadType.EventUpSyncRequest, ApiEventPayloadType.LicenseCheck,
             ApiEventPayloadType.AgeGroupSelection, ApiEventPayloadType.BiometricReferenceCreation, ApiEventPayloadType.SampleUpSyncRequest,
-            null,
+            ApiEventPayloadType.EnrolmentUpdate, ApiEventPayloadType.ExternalCredentialSelection,
+            ApiEventPayloadType.ExternalCredentialCaptureValue, ApiEventPayloadType.ExternalCredentialCapture,
+            ApiEventPayloadType.ExternalCredentialSearch, ApiEventPayloadType.ExternalCredentialConfirmation, null,
             -> {
                 // ADD TEST FOR NEW EVENT IN THIS CLASS
             }

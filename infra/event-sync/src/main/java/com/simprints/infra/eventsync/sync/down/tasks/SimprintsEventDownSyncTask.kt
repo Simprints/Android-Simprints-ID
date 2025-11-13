@@ -2,7 +2,6 @@ package com.simprints.infra.eventsync.sync.down.tasks
 
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
-import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
@@ -62,9 +61,5 @@ internal class SimprintsEventDownSyncTask @Inject constructor(
     override fun shouldRethrowError(throwable: Throwable): Boolean {
         // Return true to re-throw specific exceptions that should not be handled by the base class
         return throwable is RemoteDbNotSignedInException
-    }
-
-    override suspend fun performPostSyncCleanup(project: Project, count: Int) {
-        // No additional cleanup needed for Simprints sync
     }
 }

@@ -347,7 +347,6 @@
     <!-- Dashboard - Logout request -->
     <string name="dashboard_logout_title">Keessaa bahi</string>
     <string name="dashboard_logout_confirmation_sync_decline_button">Walsimsiisaa malee ba\'aa</string>
-    <string name="dashboard_logout_confirmation_sync_info">Meeshaa keessan irratti galmeewwan osoo hin ba\'iin dura walsimsiisuu qaban jiru. Mee adeemsi walsimsiisaa akka xumuramu hayyami.Erga walsimsiisni xumurame bahuu ni dandeessa.</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_title">Akeekkachiisa</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_body">Pirojektiin kee galmee yeroo ammaa akka qabu mirkaneessuuf walsimsiisni deetaa barbaachisaa dha. Sababa sirrii malee deetaa kee walsimsiisuu dadhabuun galmeewwan barbaachisoo ta\'uu fi dandeettii pirojektichi sirritti gabaasuu irratti dhiibbaa qaba.\n\nSababni sirrii malee deetaa walsimsiisuu dadhabuunis pirootokoolii walitti qabuu deetaa cabsuu ta\'uu danda\'a akkasumas bu’aa hin barbaachifne siifi pirojektichaaf fiduu danda’a.</string>
     <string name="dashboard_logout_confirmation_title">Keessaa bahi</string>

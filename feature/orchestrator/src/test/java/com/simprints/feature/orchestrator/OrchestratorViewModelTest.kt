@@ -13,6 +13,9 @@ import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
 import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
@@ -37,8 +40,8 @@ import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.matching.MatchParams
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
-import com.simprints.matcher.MatchParams
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.clearMocks
@@ -112,7 +115,7 @@ internal class OrchestratorViewModelTest {
 
     @Test
     fun `Starts executing steps when action when received`() = runTest {
-        every { stepsBuilder.build(any(), any()) } returns listOf(
+        coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
             createMockStep(StepId.SETUP),
         )
 
@@ -125,7 +128,7 @@ internal class OrchestratorViewModelTest {
 
     @Test
     fun `Executes next steps after step result`() = runTest {
-        every { stepsBuilder.build(any(), any()) } returns listOf(
+        coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
             createMockStep(StepId.SETUP),
             createMockStep(StepId.CONSENT),
         )
@@ -142,12 +145,12 @@ internal class OrchestratorViewModelTest {
 
     @Test
     fun `Returns response when all steps executed`() = runTest {
-        every { stepsBuilder.build(any(), any()) } returns listOf(
+        coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
             createMockStep(StepId.SETUP),
             createMockStep(StepId.CONSENT),
         )
         coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
-        coEvery { appResponseBuilder(any(), any(), any(), any()) } returns mockk()
+        coEvery { appResponseBuilder(any(), any(), any(), any(), any()) } returns mockk()
         coJustRun { dailyActivityUseCase(any()) }
         justRun { addCallbackEvent(any()) }
 
@@ -160,7 +163,7 @@ internal class OrchestratorViewModelTest {
 
     @Test
     fun `Returns response when error result received`() = runTest {
-        every { stepsBuilder.build(any(), any()) } returns listOf(
+        coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
             createMockStep(StepId.SETUP),
             createMockStep(StepId.CONSENT),
         )
@@ -174,7 +177,7 @@ internal class OrchestratorViewModelTest {
 
     @Test
     fun `Returns AGE_GROUP_NOT_SUPPORTED response when step builder throws SubjectAgeNotSupportedException`() = runTest {
-        every { stepsBuilder.build(any(), any()) } throws SubjectAgeNotSupportedException()
+        coEvery { stepsBuilder.build(any(), any(), any(), any()) } throws SubjectAgeNotSupportedException()
 
         viewModel.handleAction(mockk())
 
@@ -187,7 +190,7 @@ internal class OrchestratorViewModelTest {
 
     @Test
     fun `Appends capture and match steps upon receiving SelectSubjectAgeGroupResult`() = runTest {
-        every { stepsBuilder.build(any(), any()) } returns listOf(
+        coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
             createMockStep(StepId.SELECT_SUBJECT_AGE),
         )
         coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
@@ -202,12 +205,12 @@ internal class OrchestratorViewModelTest {
                 ),
             ),
         )
-        every { stepsBuilder.buildCaptureAndMatchStepsForAgeGroup(any(), any(), any()) } returns captureAndMatchSteps
+        coEvery { stepsBuilder.buildCaptureAndMatchStepsForAgeGroup(any(), any(), any(), any()) } returns captureAndMatchSteps
 
         viewModel.handleAction(mockk())
         viewModel.handleResult(SelectSubjectAgeGroupResult(AgeGroup(0, 1)))
 
-        verify { stepsBuilder.buildCaptureAndMatchStepsForAgeGroup(any(), any(), any()) }
+        coVerify { stepsBuilder.buildCaptureAndMatchStepsForAgeGroup(any(), any(), any(), any()) }
         viewModel.currentStep.test().value().peekContent()?.let { step ->
             assertThat(step.id).isEqualTo(StepId.FACE_CAPTURE)
         }
@@ -215,7 +218,7 @@ internal class OrchestratorViewModelTest {
 
     @Test
     fun `Updates face matcher step payload when receiving face capture`() = runTest {
-        every { stepsBuilder.build(any(), any()) } returns listOf(
+        coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
             createMockStep(StepId.FACE_CAPTURE),
             createMockStep(
                 StepId.FACE_MATCHER,
@@ -238,7 +241,7 @@ internal class OrchestratorViewModelTest {
 
     @Test
     fun `Updates fingerprint matcher step payload when receiving fingerprint capture`() = runTest {
-        every { stepsBuilder.build(any(), any()) } returns listOf(
+        coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
             createMockStep(StepId.FINGERPRINT_CAPTURE),
             createMockStep(
                 StepId.FINGERPRINT_MATCHER,
@@ -261,7 +264,7 @@ internal class OrchestratorViewModelTest {
 
     @Test
     fun `Updates the correct fingerprint match step when multiple fingerprint SDKs are used`() = runTest {
-        every { stepsBuilder.build(any(), any()) } returns listOf(
+        coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
             createMockStep(
                 StepId.FINGERPRINT_CAPTURE,
                 FingerprintCaptureContract.getParams(
@@ -350,7 +353,7 @@ internal class OrchestratorViewModelTest {
         val originalSteps = listOf(
             createMockStep(StepId.FINGERPRINT_CAPTURE),
         )
-        every { stepsBuilder.build(any(), any()) } returns originalSteps
+        coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns originalSteps
         val savedSteps = listOf(
             createMockStep(StepId.SETUP),
             createMockStep(StepId.CONSENT),
@@ -409,12 +412,13 @@ internal class OrchestratorViewModelTest {
         val captureStep = createMockStep(StepId.FINGERPRINT_CAPTURE)
         val enrolLastStep = createMockStep(StepId.ENROL_LAST_BIOMETRIC)
         enrolLastStep.params = EnrolLastBiometricParams(
-            "projectId",
-            TokenizableString.Tokenized("userId"),
-            TokenizableString.Tokenized("moduleId"),
-            listOf(mockk<EnrolLastBiometricStepResult>()),
+            projectId = "projectId",
+            userId = TokenizableString.Tokenized("userId"),
+            moduleId = TokenizableString.Tokenized("moduleId"),
+            steps = listOf(mockk<EnrolLastBiometricStepResult>()),
+            scannedCredential = null,
         )
-        every { stepsBuilder.build(any(), any()) } returns listOf(
+        coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
             captureStep,
             enrolLastStep,
         )
@@ -428,6 +432,145 @@ internal class OrchestratorViewModelTest {
 
         viewModel.currentStep.test().value().peekContent()?.let { step ->
             assertThat(step.params?.let { it as? EnrolLastBiometricParams }?.steps).containsExactly(mockEnrolLastStep)
+        }
+    }
+
+    @Test
+    fun `Updates external credential step payload with fingerprint samples when receiving fingerprint capture result`() = runTest {
+        val fingerprintReferenceId = "fingerprintReferenceId"
+        val fingerId1 = IFingerIdentifier.LEFT_INDEX_FINGER
+        val fingerId2 = IFingerIdentifier.RIGHT_THUMB
+        val template1 = ByteArray(10)
+        val template2 = ByteArray(20)
+        val format1 = "format1"
+        val format2 = "format2"
+
+        val fingerprintSample1 = mockk<FingerprintCaptureResult.Sample> {
+            every { fingerIdentifier } returns fingerId1
+            every { template } returns template1
+            every { format } returns format1
+        }
+        val fingerprintSample2 = mockk<FingerprintCaptureResult.Sample> {
+            every { fingerIdentifier } returns fingerId2
+            every { template } returns template2
+            every { format } returns format2
+        }
+
+        val fingerprintItem1 = mockk<FingerprintCaptureResult.Item> {
+            every { sample } returns fingerprintSample1
+        }
+        val fingerprintItem2 = mockk<FingerprintCaptureResult.Item> {
+            every { sample } returns fingerprintSample2
+        }
+
+        val externalCredentialParams = mockk<ExternalCredentialParams>(relaxed = true) {
+            every { copy(probeReferenceId = any(), fingerprintSamples = any()) } returns this
+        }
+
+        coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
+            createMockStep(StepId.FINGERPRINT_CAPTURE),
+            createMockStep(StepId.EXTERNAL_CREDENTIAL, externalCredentialParams),
+        )
+        coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
+
+        viewModel.handleAction(mockk())
+        viewModel.handleResult(
+            FingerprintCaptureResult(
+                fingerprintReferenceId,
+                listOf(fingerprintItem1, fingerprintItem2),
+            ),
+        )
+
+        val expectedFingerprintSamples = listOf(
+            MatchParams.FingerprintSample(fingerId1, format1, template1),
+            MatchParams.FingerprintSample(fingerId2, format2, template2),
+        )
+
+        verify {
+            externalCredentialParams.copy(
+                probeReferenceId = fingerprintReferenceId,
+                fingerprintSamples = expectedFingerprintSamples,
+            )
+        }
+    }
+
+    @Test
+    fun `Removes matcher steps when external credential search has good matches in identify flow`() = runTest {
+        val externalCredentialResult = mockk<ExternalCredentialSearchResult> {
+            every { flowType } returns FlowType.IDENTIFY
+            every { goodMatches } returns listOf(mockk())
+        }
+
+        coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
+            createMockStep(StepId.FACE_CAPTURE),
+            createMockStep(StepId.FINGERPRINT_CAPTURE),
+            createMockStep(StepId.FACE_MATCHER),
+            createMockStep(StepId.FINGERPRINT_MATCHER),
+        )
+        coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
+
+        viewModel.handleAction(mockk())
+        viewModel.handleResult(externalCredentialResult)
+
+        viewModel.currentStep.test().value().peekContent()?.let { step ->
+            assertThat(step.id).isNotEqualTo(StepId.FACE_MATCHER)
+            assertThat(step.id).isNotEqualTo(StepId.FINGERPRINT_MATCHER)
+        }
+    }
+
+    @Test
+    fun `Does not remove matcher steps when flow type is enrol even with good matches`() = runTest {
+        val externalCredentialResult = mockk<ExternalCredentialSearchResult> {
+            every { flowType } returns FlowType.ENROL
+            every { goodMatches } returns listOf(mockk())
+        }
+
+        coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
+            createMockStep(StepId.FACE_CAPTURE),
+            createMockStep(StepId.FACE_MATCHER),
+        )
+        coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
+
+        viewModel.handleAction(mockk())
+        viewModel.handleResult(externalCredentialResult)
+
+        val stepsObserver = viewModel.currentStep.test()
+        val allStepIds = stepsObserver.valueHistory().mapNotNull { it.peekContent()?.id }
+
+        assertThat(allStepIds).contains(StepId.FACE_MATCHER)
+    }
+
+    @Test
+    fun `Passes cached scanned credential to steps builder when external credential step exists in cache`() = runTest {
+        val mockScannedCredential = mockk<ScannedCredential>(relaxed = true)
+        val externalCredentialResult = mockk<ExternalCredentialSearchResult> {
+            every { scannedCredential } returns mockScannedCredential
+        }
+
+        val externalCredentialStep = createMockStep(StepId.EXTERNAL_CREDENTIAL).apply {
+            status = StepStatus.COMPLETED
+            result = externalCredentialResult
+        }
+
+        val cachedSteps = listOf(
+            createMockStep(StepId.SETUP).apply { status = StepStatus.COMPLETED },
+            externalCredentialStep,
+        )
+
+        every { cache.steps } returns cachedSteps
+        coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
+            createMockStep(StepId.CONFIRM_IDENTITY),
+        )
+
+        viewModel.handleAction(mockk(relaxed = true))
+
+        coVerify {
+            stepsBuilder.build(
+                action = any(),
+                projectConfiguration = any(),
+                enrolmentSubjectId = any(),
+                cachedScannedCredential = mockScannedCredential,
+            )
         }
     }
 

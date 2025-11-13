@@ -29,9 +29,15 @@
     <string name="consent_biometric_general_face">अपने चेहरे की फ़ोटो लें</string>
     <string name="consent_biometrics_access_fingerprint">फ़िंगरप्रिंट जानकारी</string>
     <string name="consent_biometrics_access_face">चित्र</string>
+    <string name="consent_credentials_general">अपने राष्ट्रीय पहचान दस्तावेज़ या अन्य बाहरी क्रेडेंशियल्स को उनके विशिष्ट नंबर(नों) के साथ स्कैन करें</string>
+    <string name="consent_credentials_access">राष्ट्रीय पहचान पत्र विवरण</string>
+    <string name="consent_credentials_your_id">आपकी राष्ट्रीय पहचान या अन्य बाहरी क्रेडेंशियल जानकारी प्राप्त करना</string>
     <string name="consent_biometrics_access_fingerprint_face">फिंगरप्रिंट जानकारी, तस्वीरें</string>
     <string name="consent_biometrics_parental_fingerprint">अपने बच्चे की उंगलियों के निशान का उपयोग करें</string>
     <string name="consent_biometrics_parental_face">अपने बच्चे के चेहरे की फ़ोटो लें</string>
+    <string name="consent_credentials_parental_general">अपने बच्चे के राष्ट्रीय पहचान दस्तावेज़ या अन्य बाहरी क्रेडेंशियल्स को उनके विशिष्ट नंबर(नों) के साथ स्कैन करें</string>
+    <string name="consent_credentials_parental_access">बच्चे की राष्ट्रीय पहचान का विवरण</string>
+    <string name="consent_credentials_parental_your_id">आपके बच्चे की राष्ट्रीय पहचान पत्र या अन्य बाहरी क्रेडेंशियल जानकारी प्राप्त करना</string>
     <string name="consent_biometric_concat_modalities">और</string>
     <string name="consent_decline_button">असहमत</string>
     <string name="consent_accept_button">सहमत</string>
@@ -315,27 +321,60 @@
     <string name="dashboard_project_card_current_user">वर्तमान उपयोगकर्ता: %1$s</string>
 
     <!-- Sync Info -->
-    <string name="sync_info_header_title">सिंक की स्थिति</string>
-    <string name="sync_info_complete">सिंक सफल हुआ</string>
-    <string name="sync_info_incomplete">सिंक असफल</string>
-    <string name="sync_info_connecting">कनेक्ट हो रहा है</string>
-    <string name="sync_info_progress">सिंक हो रहा है......%1$s</string>
-    <string name="sync_info_sync_button">अभी सिंक करें</string>
-    <string name="sync_info_details_error">सिंक असफल रहा। कृपया अपने सुपरवाईज़र से सम्पर्क करें</string>
-    <string name="sync_info_no_modules_message">कृपया सिंक करने के लिए मॉड्यूल चुनें</string>
-    <string name="sync_info_no_modules_button">मॉड्यूल्स</string>
-    <string name="sync_info_offline_message">कृपया सेटिंग में जाकर इंटरनेट को चालू करें</string>
-    <string name="sync_info_header_settings_button"><font fgcolor='#FF7C00'><u>सेटिंग</u></font></string>
-    <string name="sync_info_details_too_many_modules">बहुत सारे मॉड्यूल डाउनलोड किए जा चुके हैं.</string>
-    <string name="sync_info_re_login_required">सिंक करने के लिए आपको फिर से लॉग इन करना होगा</string>
+    <string name="sync_info_title">सिंक जानकारी</string>
 
-    <string name="sync_info_last_sync">अंतिम बार सिंक: %1$s</string>
-    <string name="sync_info_records_uploaded">सभी रिकॉर्ड अपलोड किए गए</string>
-    <plurals name="sync_info_records_to_upload">
-        <item quantity="one">%1$d अपलोड करने हेतु रिकार्ड</item>
-        <item quantity="other">%1$dअपलोड करने हेतु रिकार्ड</item>
-    </plurals>
+    <string name="sync_info_header_title">सिंक स्थिति</string>
+    <string name="sync_info_header_settings_button"><font fgcolor='#FF7C00'><u>सेटिंग्स</u></font></string>
+
+    <string name="sync_info_re_login_required">सिंक करने के लिए आपको पुनः लॉग इन करना होगा</string>
+
+    <string name="sync_info_section_record_sync">रिकॉर्ड सिंक</string>
+    <string name="sync_info_section_image_sync">छवि सिंक</string>
+    <string name="sync_info_section_module_selection">चयनित मॉड्यूल</string>
+
+    <string name="sync_info_instruction_records">इस बटन को दबाकर रिकॉर्ड्स को मैन्युअल रूप से सिंक्रोनाइज़ करें। <font fgcolor='#FF7C00'><u>अधिक जानकारी</u></font></string>
+    <string name="sync_info_instruction_images">इस बटन को दबाकर छवियों को मैन्युअल रूप से क्लाउड पर भेजें। <font fgcolor='#FF7C00'><u>अधिक जानकारी</u></font></string>
+    <string name="sync_info_instruction_modules">चयनित मॉड्यूल के रिकॉर्ड सिंक्रनाइज़ किए जाएँगे। <font fgcolor='#FF7C00'><u>अधिक जानकारी</u></font></string>
+    <string name="sync_info_instruction_comm_care_permission">CommCare से सिंक करने के लिए <font fgcolor='#FF7C00'><u>सिस्टम सेटिंग्स</u></font> में अनुमति की आवश्यकता होती है</string>
+    <string name="sync_info_instruction_error_offline">सिंक के लिए इंटरनेट कनेक्शन ज़रूरी है। <font fgcolor='#FF7C00'><u>कनेक्शन सेटिंग</u></font></string>
+    <string name="sync_info_instruction_error_no_modules">सिंक के लिए मॉड्यूल का चयन आवश्यक है. <font fgcolor='#FF7C00'><u>मॉड्यूल चुनें</u></font></string>
+    <string name="sync_info_instruction_error">समन्वयन विफल. <font fgcolor='#FF7C00'><u>अधिक जानकारी</u></font></string>
+
+    <string name="sync_info_details_event_sync_default">इस बटन को दबाकर रिकॉर्ड्स को मैन्युअल रूप से सिंक्रोनाइज़ करें। आपका डिवाइस बैकग्राउंड में भी नियमित रूप से रिकॉर्ड्स को सिंक्रोनाइज़ करने का प्रयास करेगा।</string>
+    <string name="sync_info_details_image_sync_default">इस बटन को दबाकर छवियों को क्लाउड पर मैन्युअल रूप से भेजें। आपका डिवाइस नियमित रूप से पृष्ठभूमि में भी छवियां भेजने का प्रयास करेगा। ध्यान दें कि छवि समन्वयन के लिए एक मजबूत इंटरनेट कनेक्शन की आवश्यकता हो सकती है।</string>
+    <string name="sync_info_details_module_selection">चयनित मॉड्यूल के रिकॉर्ड आपके डिवाइस से सिंक्रोनाइज़ हो जाएँगे। अपने डिवाइस से सिंक्रोनाइज़ करने के लिए मॉड्यूल चुनने हेतु नीचे/ऊपर क्लिक करें।</string>
+    <string name="sync_info_details_error">समन्वयन विफल. कृपया अपने पर्यवेक्षक से संपर्क करें</string>
+    <string name="sync_info_details_too_many_modules">बहुत सारे मॉड्यूल डाउनलोड हो गए हैं |</string>
+    <string name="sync_info_details_ok">ठीक</string>
+
+    <string name="sync_info_records_on_device">डिवाइस पर कुल रिकॉर्ड</string>
+    <string name="sync_info_records_to_up_sync">अपलोड करने हेतु रिकार्ड</string>
+    <string name="sync_info_records_to_down_sync">सिंक्रनाइज़ करने के लिए रिकॉर्ड</string>
+    <string name="sync_info_images_to_up_sync">अपलोड करने के लिए चित्र</string>
+
+    <string name="sync_info_button_sync_records">अभी सिंक करें</string>
+    <string name="sync_info_button_records_syncing">सिंक हो रहा है</string>
+    <string name="sync_info_button_sync_images">अभी छवियाँ सिंक करें</string>
+    <string name="sync_info_button_images_sync_stop">छवियों का समन्वयन रोकें</string>
     <string name="sync_info_button_try_again">पुनः प्रयास करें</string>
+    <string name="sync_info_button_select_modules">मॉड्यूल का चुनाव करें</string>
+
+    <string name="sync_info_progress_pending">%1$sसिंक लंबित…</string>
+    <string name="sync_info_progress_complete">%1$s सिंक सफल हुआ</string>
+    <string name="sync_info_progress_ongoing_no_counters">%1$s समन्वयन प्रगति पर है</string>
+    <string name="sync_info_progress_ongoing">%1$sसिंक: %2$d का %3$d…</string>
+
+    <string name="sync_info_item_default">वस्तु</string>
+    <string name="sync_info_item_record_or_event">रिकॉर्ड &amp; इवेंट</string>
+    <string name="sync_info_item_image">छवि</string>
+
+    <string name="sync_info_total_records">कुल रिकोर्ड्स</string>
+
+    <string name="sync_info_last_sync">अंतिम समन्वयन: %1$s</string>
+
+    <string name="sync_info_footer_sync_in_progress">समन्वयन प्रगति पर है</string>
+    <string name="sync_info_footer_sync_incomplete">सिंक अपूर्ण</string>
+    <string name="sync_info_footer_sync_complete_logging_out">सिंक पूरा हो गया, आपको लॉग आउट किया जा रहा है...</string>
 
     <!-- Dashboard - Daily activity card -->
     <string name="dashboard_activity_card_activity">गतिविधि: %1$s</string>
@@ -380,18 +419,6 @@
     <string name="dashboard_preference_enable_audio_on_scan_complete">ऑडियो अलर्ट</string>
     <string name="dashboard_preference_enable_auto_capture">ऑटो-कैप्चर</string>
 
-    <!-- Sync info -->
-    <string name="sync_info_total_records">कुल रिकोर्ड्स</string>
-    <string name="sync_info_title">सिंक सम्बंधित जानकारी</string>
-    <string name="sync_info_button_select_modules">मॉड्यूल का चुनाव करें</string>
-    <string name="sync_info_records_to_up_sync">रिकोर्ड्स अपलोड किए जाने हैं</string>
-    <string name="sync_info_records_to_download_or_delete">डाउनलोड करने या हटाने के लिए रिकॉर्ड</string>
-    <string name="sync_info_records_to_delete">रिकोर्ड्स डिलीट किए जाने हैं</string>
-    <string name="sync_info_records_on_device">डिवाइस में कुल रिकोर्ड्स</string>
-    <string name="sync_info_section_module_selection">चुने गए मॉड्यूल</string>
-    <string name="sync_info_images_to_up_sync">अपलोड करने के लिए चित्र</string>
-    <string name="sync_info_button_records_syncing">सिंक हो रहा है …</string>
-
     <!-- Dashboard - Module selection -->
     <string name="dashboard_select_modules_no_modules">अमान्य चुनाव। कृपया कम से कम एक मॉड्यूल चुनें</string>
     <string name="dashboard_select_modules_too_many_modules">अमान्य चुनाव। कृपया %1$d से अधिक मॉड्यूल्स नहीं चुनें।</string>
@@ -419,7 +446,7 @@
     <!-- Dashboard - Logout request -->
     <string name="dashboard_logout_title">लॉग-आउट</string>
     <string name="dashboard_logout_confirmation_sync_decline_button">डेटा सिंक किए बिना लॉग आउट करें</string>
-    <string name="dashboard_logout_confirmation_sync_info">आपके डिवाइस पर ऐसे रिकॉर्ड हैं जिन्हें लॉग आउट करने से पहले सिंक्रनाइज़ करने की आवश्यकता है। कृपया सिंक्रोनाइज़ेशन प्रक्रिया को पूरा होने दें।\n\nएक बार सिंक्रोनाइज़ेशन समाप्त हो जाने पर आप लॉग आउट कर सकेंगे।</string>
+    <string name="dashboard_logout_confirmation_sync_info">लॉग आउट करने से पहले आपके डिवाइस पर मौजूद रिकॉर्ड अपने आप सिंक्रोनाइज़ हो जाएँगे। कृपया सिंक्रोनाइज़ेशन प्रक्रिया पूरी होने दें। सिंक्रोनाइज़ेशन पूरा होने के बाद, आप लॉग आउट कर पाएँगे।</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_title">चेतावनी</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_body">यह सुनिश्चित करने के लिए कि आपके प्रोजेक्ट में अद्यतन रिकॉर्ड हैं, डेटा सिंक्रनाइज़ेशन आवश्यक है। बिना किसी वैध कारण के आपके डेटा को सिंक्रोनाइज़ करने में विफल रहने से आपके सहकर्मियों की महत्वपूर्ण रिकॉर्ड तक पहुंच और प्रोजेक्ट की सटीक रिपोर्ट करने की क्षमता प्रभावित होगी।\n\nबिना किसी वैध कारण के डेटा को सिंक्रोनाइज़ करने में विफल होना भी डेटा संग्रह प्रोटोकॉल का उल्लंघन हो सकता है और इसके परिणामस्वरूप आपके और प्रोजेक्ट के लिए अवांछित परिणाम हो सकते हैं।</string>
     <string name="dashboard_logout_confirmation_title">लॉग-आउट</string>
@@ -459,5 +486,59 @@
         <item quantity="one">%d साल</item>
         <item quantity="other">%d साल</item>
     </plurals>
+
+    <!-- MultiFactor Identification -->
+    <string name="mfid_scan_action">स्कैन करें %1$s</string>
+
+    <string name="mfid_scanner_selection_skip">दस्तावेज़ स्कैन छोड़ें</string>
+    <string name="mfid_type_nhis_card">एनएचआईएस कार्ड</string>
+    <string name="mfid_type_ghana_id_card">घाना आईडी कार्ड</string>
+    <string name="mfid_type_qr_code">क्यू आर संहिता</string>
+    <string name="mfid_nhis_card_credential_field">सदस्यता संख्या</string>
+    <string name="mfid_ghana_id_credential_field">निजी आईडी</string>
+    <string name="mfid_qr_credential_field">QR कोड मान</string>
+    <string name="mfid_type_any_document">एक दस्तावेज़</string>
+
+    <string name="mfid_skip_scan_dialog_title">स्कैनिंग छोड़ें?</string>
+    <string name="mfid_skip_scan_dialog_body">इस प्रोजेक्ट के लिए %1$s स्कैन करना ज़रूरी है। क्या आप वाकई इस चरण को छोड़ना चाहते हैं?</string>
+    <string name="mfid_skip_scan_dialog_confirm">छोडना</string>
+
+    <string name="mfid_qr_scan_no_qr_detected">कोई QR कोड नहीं मिला</string>
+    <string name="mfid_scan_instructions">%1$s को विंडो में रखें</string>
+    <string name="mfid_continue">जारी रखना</string>
+    <string name="mfid_dialog_wrong_qr_title">अमान्य QR कोड प्रकार</string>
+    <string name="mfid_dialog_wrong_qr_body_top">गलत QR कोड प्रारूप स्कैन किया गया है</string>
+    <string name="mfid_dialog_wrong_qr_body_bottom">इस मान का उपयोग व्यक्तिगत दस्तावेज़ के रूप में नहीं किया जा सकता। कृपया सुनिश्चित करें कि सही QR कोड स्कैन किया गया है।</string>
+    <string name="mfid_dialog_wrong_qr_rescan">फिर से स्कैन</string>
+    <string name="mfid_ocr_progress_title">स्कैनिंग हो रही है, कार्ड को फ्रेम में रखें...</string>
+    <string name="mfid_scan_camera_permission_body">कैमरे का उपयोग करने की अनुमति के बिना %1$s को स्कैन नहीं किया जा सकता</string>
+    <string name="mfid_confirmation_checkbox_text">मैं पुष्टि करता/करती हूँ कि %1$s सही ढंग से स्कैन किया गया है</string>
+    <string name="mfid_action_go_to_record">रिकॉर्ड पर जाएँ</string>
+    <string name="mfid_action_enrol">भर्ती</string>
+    <string name="mfid_action_enrol_anyway">फिर भी नामांकन करें</string>
+    <string name="mfid_action_add">जोड़ना</string>
+    <string name="mfid_action_skip">छोडना</string>
+    <string name="mfid_action_continue">जारी रखना</string>
+    <string name="mfid_searching">खोज रहे हैं...</string>
+
+    <string name="mfid_search_found_enrol">यह %1$s पहले से पंजीकृत है</string>
+    <string name="mfid_search_found_identification">रिकॉर्ड मिला</string>
+    <string name="mfid_search_found_identification_low_match_score">यह %1$s किसी अन्य मरीज़ से जुड़ा हो सकता है</string>
+    <string name="mfid_search_not_found_identification">इस %1$s के साथ कोई रिकॉर्ड नहीं मिला। आप इस %2$s को बाद में किसी मरीज़ से लिंक कर पाएँगे</string>
+
+    <string name="mfid_add_document_title">इस %1$s को जोड़ें?</string>
+    <string name="mfid_skip_title">आपने %1$s स्कैन क्यों छोड़ दिया?</string>
+    <string name="mfid_skip_reason_does_not_have">%1$s नहीं है</string>
+    <string name="mfid_skip_reason_did_not_bring">%1$s नहीं लाया</string>
+    <string name="mfid_skip_reason_incorrect">ग़लत %1$s लाया गया</string>
+    <string name="mfid_skip_reason_does_not_want_to_provide">%1$s को विशेषाधिकार नहीं देना चाहता</string>
+    <string name="mfid_skip_reason_damaged">%1$s क्षतिग्रस्त या अपठनीय</string>
+    <string name="mfid_skip_reason_unable_to_scan">%1$s को स्कैन करने में असमर्थ</string>
+    <string name="mfid_skip_reason_other">अन्य</string>
+    <string name="mfid_skip_reason_hint">कारण</string>
+    <string name="mfid_skip_reason_helper_text">कृपया छोड़ने का कारण बताएँ</string>
+    <string name="mfid_skip_confirm">स्कैनिंग छोड़ें</string>
+    <string name="mfid_skip_go_back">वापस जाओ</string>
+
 
 </resources>

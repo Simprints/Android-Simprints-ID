@@ -5,6 +5,8 @@ import com.simprints.face.capture.FaceCaptureContract
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
+import com.simprints.feature.externalcredential.ExternalCredentialContract
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.fetchsubject.FetchSubjectContract
 import com.simprints.feature.orchestrator.R
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
@@ -19,11 +21,11 @@ import com.simprints.feature.setup.SetupContract
 import com.simprints.feature.validatepool.ValidateSubjectPoolContract
 import com.simprints.fingerprint.capture.FingerprintCaptureContract
 import com.simprints.infra.config.store.models.AgeGroup
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.allowedAgeRanges
+import com.simprints.infra.config.store.models.determineFaceSDKs
+import com.simprints.infra.config.store.models.determineFingerprintSDKs
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.store.models.fromDomainToModuleApi
 import com.simprints.infra.config.store.models.isAgeRestricted
@@ -38,16 +40,19 @@ internal class BuildStepsUseCase @Inject constructor(
     private val buildMatcherSubjectQuery: BuildMatcherSubjectQueryUseCase,
     private val cache: OrchestratorCache,
     private val mapStepsForLastBiometrics: MapStepsForLastBiometricEnrolUseCase,
+    private val fallbackToCommCareDataSourceIfNeeded: FallbackToCommCareDataSourceIfNeededUseCase,
 ) {
-    fun build(
+    suspend fun build(
         action: ActionRequest,
         projectConfiguration: ProjectConfiguration,
+        enrolmentSubjectId: String,
+        cachedScannedCredential: ScannedCredential?,
     ) = when (action) {
         is ActionRequest.EnrolActionRequest -> listOf(
             buildSetupStep(),
             buildAgeSelectionStepIfNeeded(action, projectConfiguration),
             buildConsentStepIfNeeded(ConsentType.ENROL, projectConfiguration),
-            buildCaptureAndMatchStepsForEnrol(action, projectConfiguration),
+            buildCaptureAndMatchStepsForEnrol(action, projectConfiguration, enrolmentSubjectId = enrolmentSubjectId),
         )
 
         is ActionRequest.IdentifyActionRequest -> {
@@ -64,9 +69,10 @@ internal class BuildStepsUseCase @Inject constructor(
                 buildAgeSelectionStepIfNeeded(action, projectConfiguration),
                 buildConsentStepIfNeeded(ConsentType.IDENTIFY, projectConfiguration),
                 buildCaptureAndMatchStepsForIdentify(
-                    action,
-                    projectConfiguration,
+                    action = action,
+                    projectConfiguration = projectConfiguration,
                     subjectQuery = subjectQuery,
+                    enrolmentSubjectId = enrolmentSubjectId,
                 ),
             )
         }
@@ -79,36 +85,40 @@ internal class BuildStepsUseCase @Inject constructor(
                 subjectId = action.verifyGuid,
                 biometricDataSource = action.biometricDataSource,
                 callerPackageName = action.actionIdentifier.callerPackageName,
+                metadata = action.metadata,
             ),
             buildConsentStepIfNeeded(ConsentType.VERIFY, projectConfiguration),
             buildCaptureAndMatchStepsForVerify(action, projectConfiguration),
         )
 
         is ActionRequest.EnrolLastBiometricActionRequest -> listOf(
-            buildEnrolLastBiometricStep(action, projectConfiguration),
+            buildEnrolLastBiometricStep(action, projectConfiguration, cachedScannedCredential),
         )
 
         is ActionRequest.ConfirmIdentityActionRequest -> listOf(
-            buildConfirmIdentityStep(action),
+            buildConfirmIdentityStep(action, cachedScannedCredential),
         )
     }.flatten()
 
-    fun buildCaptureAndMatchStepsForAgeGroup(
+    suspend fun buildCaptureAndMatchStepsForAgeGroup(
         action: ActionRequest,
         projectConfiguration: ProjectConfiguration,
         ageGroup: AgeGroup,
+        enrolmentSubjectId: String,
     ): List<Step> = when (action) {
         is ActionRequest.EnrolActionRequest -> buildCaptureAndMatchStepsForEnrol(
             action,
             projectConfiguration,
             ageGroup,
+            enrolmentSubjectId,
         )
 
         is ActionRequest.IdentifyActionRequest -> buildCaptureAndMatchStepsForIdentify(
-            action,
-            projectConfiguration,
-            ageGroup,
+            action = action,
+            projectConfiguration = projectConfiguration,
+            ageGroup = ageGroup,
             subjectQuery = buildMatcherSubjectQuery(projectConfiguration, action),
+            enrolmentSubjectId = enrolmentSubjectId,
         )
 
         is ActionRequest.VerifyActionRequest -> buildCaptureAndMatchStepsForVerify(
@@ -120,61 +130,110 @@ internal class BuildStepsUseCase @Inject constructor(
         else -> emptyList()
     }
 
-    private fun buildCaptureAndMatchStepsForEnrol(
+    private fun buildExternalCredentialStepIfNeeded(
+        ageGroup: AgeGroup?,
+        enrolmentSubjectId: String,
+        projectConfiguration: ProjectConfiguration,
+        flowType: FlowType,
+    ): List<Step> {
+        val isExternalCredentialEnabled = projectConfiguration.multifactorId?.allowedExternalCredentials?.isNotEmpty() ?: false
+        if (!isExternalCredentialEnabled) return emptyList()
+
+        return when (flowType) {
+            FlowType.ENROL, FlowType.IDENTIFY -> {
+                listOf(
+                    Step(
+                        id = StepId.EXTERNAL_CREDENTIAL,
+                        navigationActionId = R.id.action_orchestratorFragment_to_externalCredential,
+                        destinationId = ExternalCredentialContract.DESTINATION,
+                        params = ExternalCredentialContract.getParams(
+                            subjectId = enrolmentSubjectId,
+                            flowType = flowType,
+                            ageGroup = ageGroup,
+                        ),
+                    ),
+                )
+            }
+
+            FlowType.VERIFY -> emptyList()
+        }
+    }
+
+    private suspend fun buildCaptureAndMatchStepsForEnrol(
         action: ActionRequest.EnrolActionRequest,
         projectConfiguration: ProjectConfiguration,
         ageGroup: AgeGroup? = null,
+        enrolmentSubjectId: String,
     ): List<Step> {
+        val action = fallbackToCommCareDataSourceIfNeeded(action, projectConfiguration)
         val resolvedAgeGroup = ageGroup ?: ageGroupFromSubjectAge(action, projectConfiguration)
-
-        return listOf(
-            buildCaptureSteps(
-                projectConfiguration,
-                FlowType.ENROL,
-                resolvedAgeGroup,
-            ),
-            if (projectConfiguration.general.duplicateBiometricEnrolmentCheck) {
-                buildMatcherSteps(
-                    projectConfiguration,
-                    FlowType.ENROL,
-                    resolvedAgeGroup,
-                    buildMatcherSubjectQuery(projectConfiguration, action),
-                    BiometricDataSource.fromString(
-                        action.biometricDataSource,
-                        action.actionIdentifier.callerPackageName,
-                    ),
-                )
-            } else {
-                emptyList()
-            },
-        ).flatten()
-    }
-
-    private fun buildCaptureAndMatchStepsForIdentify(
-        action: ActionRequest.IdentifyActionRequest,
-        projectConfiguration: ProjectConfiguration,
-        ageGroup: AgeGroup? = null,
-        subjectQuery: SubjectQuery,
-    ): List<Step> {
-        val resolvedAgeGroup = ageGroup ?: ageGroupFromSubjectAge(action, projectConfiguration)
-
-        return listOf(
-            buildCaptureSteps(
-                projectConfiguration,
-                FlowType.IDENTIFY,
-                resolvedAgeGroup,
-            ),
+        val enrolFlowType = FlowType.ENROL
+        val captureSteps = buildCaptureSteps(
+            projectConfiguration,
+            enrolFlowType,
+            resolvedAgeGroup,
+        )
+        val externalCredentialStep = when {
+            captureSteps.isEmpty() -> emptyList()
+            else -> buildExternalCredentialStepIfNeeded(
+                ageGroup = ageGroup,
+                enrolmentSubjectId = enrolmentSubjectId,
+                projectConfiguration = projectConfiguration,
+                flowType = enrolFlowType,
+            )
+        }
+        val matcherSteps = if (projectConfiguration.general.duplicateBiometricEnrolmentCheck) {
             buildMatcherSteps(
                 projectConfiguration,
-                FlowType.IDENTIFY,
+                enrolFlowType,
                 resolvedAgeGroup,
-                subjectQuery,
+                buildMatcherSubjectQuery(projectConfiguration, action),
                 BiometricDataSource.fromString(
                     action.biometricDataSource,
                     action.actionIdentifier.callerPackageName,
                 ),
+            )
+        } else {
+            emptyList()
+        }
+        return captureSteps + externalCredentialStep + matcherSteps
+    }
+
+    private suspend fun buildCaptureAndMatchStepsForIdentify(
+        action: ActionRequest.IdentifyActionRequest,
+        projectConfiguration: ProjectConfiguration,
+        ageGroup: AgeGroup? = null,
+        subjectQuery: SubjectQuery,
+        enrolmentSubjectId: String,
+    ): List<Step> {
+        val action = fallbackToCommCareDataSourceIfNeeded(action, projectConfiguration)
+        val resolvedAgeGroup = ageGroup ?: ageGroupFromSubjectAge(action, projectConfiguration)
+        val identifyFlowType = FlowType.IDENTIFY
+        val captureSteps = buildCaptureSteps(
+            projectConfiguration,
+            identifyFlowType,
+            resolvedAgeGroup,
+        )
+        val externalCredentialStep = when {
+            captureSteps.isEmpty() -> emptyList()
+            else -> buildExternalCredentialStepIfNeeded(
+                ageGroup = ageGroup,
+                enrolmentSubjectId = enrolmentSubjectId,
+                projectConfiguration = projectConfiguration,
+                flowType = identifyFlowType,
+            )
+        }
+        val matcherSteps = buildMatcherSteps(
+            projectConfiguration,
+            identifyFlowType,
+            resolvedAgeGroup,
+            subjectQuery,
+            BiometricDataSource.fromString(
+                action.biometricDataSource,
+                action.actionIdentifier.callerPackageName,
             ),
-        ).flatten()
+        )
+        return captureSteps + externalCredentialStep + matcherSteps
     }
 
     private fun buildCaptureAndMatchStepsForVerify(
@@ -194,7 +253,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 projectConfiguration,
                 FlowType.VERIFY,
                 resolvedAgeGroup,
-                SubjectQuery(subjectId = action.verifyGuid),
+                SubjectQuery(subjectId = action.verifyGuid, metadata = action.metadata),
                 BiometricDataSource.fromString(
                     action.biometricDataSource,
                     action.actionIdentifier.callerPackageName,
@@ -238,6 +297,7 @@ internal class BuildStepsUseCase @Inject constructor(
         subjectId: String,
         biometricDataSource: String,
         callerPackageName: String,
+        metadata: String,
     ) = when (
         BiometricDataSource.fromString(
             value = biometricDataSource,
@@ -249,7 +309,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 id = StepId.FETCH_GUID,
                 navigationActionId = R.id.action_orchestratorFragment_to_fetchSubject,
                 destinationId = FetchSubjectContract.DESTINATION,
-                params = FetchSubjectContract.getParams(projectId, subjectId),
+                params = FetchSubjectContract.getParams(projectId, subjectId, metadata),
             ),
         )
 
@@ -342,7 +402,7 @@ internal class BuildStepsUseCase @Inject constructor(
         flowType: FlowType,
     ): List<Step> = when (modality) {
         Modality.FINGERPRINT -> {
-            determineFingerprintSDKs(projectConfiguration, ageGroup).map { bioSDK ->
+            projectConfiguration.determineFingerprintSDKs(ageGroup).map { bioSDK ->
 
                 val sdkConfiguration = projectConfiguration.fingerprint?.getSdkConfiguration(bioSDK)
 
@@ -362,7 +422,7 @@ internal class BuildStepsUseCase @Inject constructor(
         }
 
         Modality.FACE -> {
-            determineFaceSDKs(projectConfiguration, ageGroup).map { bioSDK ->
+            projectConfiguration.determineFaceSDKs(ageGroup).map { bioSDK ->
                 val sdkConfiguration = projectConfiguration.face?.getSdkConfiguration(bioSDK)
 
                 // TODO: samplesToCapture can be read directly from FaceCapture
@@ -405,7 +465,7 @@ internal class BuildStepsUseCase @Inject constructor(
         biometricDataSource: BiometricDataSource,
     ): List<Step> = when (modality) {
         Modality.FINGERPRINT -> {
-            determineFingerprintSDKs(projectConfiguration, ageGroup).map { bioSDK ->
+            projectConfiguration.determineFingerprintSDKs(ageGroup).map { bioSDK ->
                 Step(
                     id = StepId.FINGERPRINT_MATCHER,
                     navigationActionId = R.id.action_orchestratorFragment_to_matcher,
@@ -421,7 +481,7 @@ internal class BuildStepsUseCase @Inject constructor(
         }
 
         Modality.FACE -> {
-            determineFaceSDKs(projectConfiguration, ageGroup).map { bioSDK ->
+            projectConfiguration.determineFaceSDKs(ageGroup).map { bioSDK ->
                 // Face bio SDK is currently ignored until we add a second one
                 Step(
                     id = StepId.FACE_MATCHER,
@@ -441,6 +501,7 @@ internal class BuildStepsUseCase @Inject constructor(
     private fun buildEnrolLastBiometricStep(
         action: ActionRequest.EnrolLastBiometricActionRequest,
         projectConfiguration: ProjectConfiguration,
+        cachedScannedCredential: ScannedCredential?,
     ): List<Step> {
         // Get capture steps needed for enrolment
         val enrolCaptureSteps = buildCaptureSteps(
@@ -466,12 +527,16 @@ internal class BuildStepsUseCase @Inject constructor(
                         userId = action.userId,
                         moduleId = action.moduleId,
                         steps = mapStepsForLastBiometrics(cache.steps.mapNotNull { it.result }),
+                        scannedCredential = cachedScannedCredential,
                     ),
                 )
         )
     }
 
-    private fun buildConfirmIdentityStep(action: ActionRequest.ConfirmIdentityActionRequest) = listOf(
+    private fun buildConfirmIdentityStep(
+        action: ActionRequest.ConfirmIdentityActionRequest,
+        cachedScannedCredential: ScannedCredential?,
+    ) = listOf(
         Step(
             id = StepId.CONFIRM_IDENTITY,
             navigationActionId = R.id.action_orchestratorFragment_to_selectSubject,
@@ -479,69 +544,10 @@ internal class BuildStepsUseCase @Inject constructor(
             params = SelectSubjectContract.getParams(
                 projectId = action.projectId,
                 subjectId = action.selectedGuid,
+                scannedCredential = cachedScannedCredential,
             ),
         ),
     )
-
-    private fun determineFingerprintSDKs(
-        projectConfiguration: ProjectConfiguration,
-        ageGroup: AgeGroup?,
-    ): List<FingerprintConfiguration.BioSdk> {
-        val sdks = mutableListOf<FingerprintConfiguration.BioSdk>()
-
-        if (!projectConfiguration.isAgeRestricted()) {
-            projectConfiguration.fingerprint?.allowedSDKs?.let { sdks.addAll(it) }
-        } else {
-            ageGroup?.let {
-                if (projectConfiguration.fingerprint
-                        ?.secugenSimMatcher
-                        ?.allowedAgeRange
-                        ?.contains(ageGroup) == true
-                ) {
-                    sdks.add(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
-                }
-                if (projectConfiguration.fingerprint
-                        ?.nec
-                        ?.allowedAgeRange
-                        ?.contains(ageGroup) == true
-                ) {
-                    sdks.add(FingerprintConfiguration.BioSdk.NEC)
-                }
-            }
-        }
-
-        return sdks
-    }
-
-    private fun determineFaceSDKs(
-        projectConfiguration: ProjectConfiguration,
-        ageGroup: AgeGroup?,
-    ): List<FaceConfiguration.BioSdk> {
-        val sdks = mutableListOf<FaceConfiguration.BioSdk>()
-
-        if (!projectConfiguration.isAgeRestricted()) {
-            projectConfiguration.face?.allowedSDKs?.let { sdks.addAll(it) }
-        } else {
-            ageGroup?.let {
-                if (projectConfiguration.face
-                        ?.rankOne
-                        ?.allowedAgeRange
-                        ?.contains(ageGroup) == true
-                ) {
-                    sdks.add(FaceConfiguration.BioSdk.RANK_ONE)
-                }
-                if (projectConfiguration.face
-                        ?.simFace
-                        ?.allowedAgeRange
-                        ?.contains(ageGroup) == true
-                ) {
-                    sdks.add(FaceConfiguration.BioSdk.SIM_FACE)
-                }
-            }
-        }
-
-        return sdks
-    }
 
     private fun ageGroupFromSubjectAge(
         action: ActionRequest,

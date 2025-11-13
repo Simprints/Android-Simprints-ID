@@ -8,6 +8,8 @@ import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
 import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.eventsync.sync.common.SubjectFactory
@@ -19,19 +21,36 @@ internal class BuildSubjectUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val subjectFactory: SubjectFactory,
 ) {
-    operator fun invoke(params: EnrolLastBiometricParams): Subject = subjectFactory.buildSubject(
-        UUID.randomUUID().toString(),
-        params.projectId,
-        params.userId,
-        params.moduleId,
-        createdAt = Date(timeHelper.now().ms),
-        fingerprintSamples = getFingerprintCaptureResult(params.steps)
-            ?.let { result -> result.results.map { fingerprintSample(result.referenceId, it) } }
-            .orEmpty(),
-        faceSamples = getFaceCaptureResult(params.steps)
-            ?.let { result -> result.results.map { faceSample(result.referenceId, it) } }
-            .orEmpty(),
-    )
+    operator fun invoke(
+        params: EnrolLastBiometricParams,
+        isAddingCredential: Boolean,
+    ): Subject {
+        val subjectId = UUID.randomUUID().toString()
+        val externalCredentials = if (isAddingCredential) {
+            getExternalCredentialResult(params.scannedCredential, subjectId)?.let(::listOf) ?: emptyList()
+        } else {
+            emptyList()
+        }
+        return subjectFactory.buildSubject(
+            subjectId = subjectId,
+            projectId = params.projectId,
+            attendantId = params.userId,
+            moduleId = params.moduleId,
+            createdAt = Date(timeHelper.now().ms),
+            fingerprintSamples = getFingerprintCaptureResult(params.steps)
+                ?.let { result -> result.results.map { fingerprintSample(result.referenceId, it) } }
+                .orEmpty(),
+            faceSamples = getFaceCaptureResult(params.steps)
+                ?.let { result -> result.results.map { faceSample(result.referenceId, it) } }
+                .orEmpty(),
+            externalCredentials = externalCredentials,
+        )
+    }
+
+    private fun getExternalCredentialResult(
+        credential: ScannedCredential?,
+        subjectId: String,
+    ) = credential?.toExternalCredential(subjectId)
 
     private fun getFingerprintCaptureResult(steps: List<EnrolLastBiometricStepResult>) = steps
         .filterIsInstance<EnrolLastBiometricStepResult.FingerprintCaptureResult>()

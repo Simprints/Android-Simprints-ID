@@ -27,8 +27,15 @@ import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayloa
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
+import com.simprints.infra.events.event.domain.models.EnrolmentUpdateEvent
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
+import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent
+import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
+import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirmationEvent
+import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirmationEvent.ExternalCredentialConfirmationResult
+import com.simprints.infra.events.event.domain.models.ExternalCredentialSearchEvent
+import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
 import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent
@@ -87,12 +94,14 @@ import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.infra.events.sampledata.SampleDefaults.CREDENTIAL_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_BIOMETRIC_DATA_SOURCE
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
+import com.simprints.infra.events.sampledata.SampleDefaults.EXTERNAL_CREDENTIAL
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 
@@ -378,6 +387,7 @@ fun createEnrolmentEventV4() = EnrolmentEventV4(
     DEFAULT_MODULE_ID,
     DEFAULT_USER_ID,
     listOf(GUID1, GUID2),
+    listOf(CREDENTIAL_ID),
 )
 
 fun createFingerprintCaptureEvent() = FingerprintCaptureEvent(
@@ -530,4 +540,49 @@ fun createBiometricReferenceCreationEvent() = BiometricReferenceCreationEvent(
     referenceId = GUID1,
     modality = BiometricReferenceCreationEvent.BiometricReferenceModality.FACE,
     captureIds = listOf(GUID1, GUID2),
+)
+
+fun createEnrolmentUpdateEvent() = EnrolmentUpdateEvent(
+    createdAt = CREATED_AT,
+    subjectId = GUID1,
+    externalCredentialIdsToAdd = listOf(CREDENTIAL_ID),
+)
+
+fun createExternalCredentialSelectionEvent() = ExternalCredentialSelectionEvent(
+    createdAt = CREATED_AT,
+    endedAt = CREATED_AT,
+    skipReason = ExternalCredentialSelectionEvent.SkipReason.OTHER,
+    skipOther = DEFAULT_METADATA,
+)
+
+fun createExternalCredentialCaptureValueEvent() = ExternalCredentialCaptureValueEvent(
+    createdAt = CREATED_AT,
+    payloadId = CREDENTIAL_ID,
+    credential = EXTERNAL_CREDENTIAL,
+)
+
+fun createExternalCredentialCaptureEvent() = ExternalCredentialCaptureEvent(
+    startTime = CREATED_AT,
+    payloadId = CREDENTIAL_ID,
+    endTime = CREATED_AT,
+    autoCaptureStartTime = CREATED_AT,
+    autoCaptureEndTime = CREATED_AT,
+    ocrErrorCount = 0,
+    capturedTextLength = 0,
+    credentialTextLength = 0,
+    selectionId = GUID1,
+)
+
+fun createExternalCredentialSearchEvent() = ExternalCredentialSearchEvent(
+    createdAt = CREATED_AT,
+    endedAt = CREATED_AT,
+    probeExternalCredentialId = GUID1,
+    candidateIds = listOf(GUID1, GUID2),
+)
+
+fun createExternalCredentialConfirmationEvent() = ExternalCredentialConfirmationEvent(
+    createdAt = CREATED_AT,
+    endedAt = CREATED_AT,
+    result = ExternalCredentialConfirmationResult.CONTINUE,
+    userInteractedWithImage = true,
 )

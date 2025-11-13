@@ -99,6 +99,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         val currentDetection = viewModel.currentDetection.testObserver()
         val capturingState = viewModel.capturingState.testObserver()
 
+        viewModel.initAutoCapture()
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
         viewModel.process(frame)
 
@@ -116,6 +117,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         val currentDetection = viewModel.currentDetection.testObserver()
         val capturingState = viewModel.capturingState.testObserver()
 
+        viewModel.initAutoCapture()
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
         viewModel.startCapture()
         viewModel.holdOffAutoCapture()
@@ -135,6 +137,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         val currentDetection = viewModel.currentDetection.testObserver()
         val capturingState = viewModel.capturingState.testObserver()
 
+        viewModel.initAutoCapture()
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
         viewModel.startCapture()
         viewModel.process(frame)
@@ -153,6 +156,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         val currentDetection = viewModel.currentDetection.testObserver()
         val capturingState = viewModel.capturingState.testObserver()
 
+        viewModel.initAutoCapture()
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
         viewModel.startCapture()
         viewModel.process(frame)
@@ -169,6 +173,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         val currentDetection = viewModel.currentDetection.testObserver()
         val capturingState = viewModel.capturingState.testObserver()
 
+        viewModel.initAutoCapture()
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
         viewModel.startCapture()
         viewModel.process(frame)
@@ -190,6 +195,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         val currentDetection = viewModel.currentDetection.testObserver()
         val capturingState = viewModel.capturingState.testObserver()
 
+        viewModel.initAutoCapture()
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
         viewModel.startCapture()
         viewModel.process(frame)
@@ -213,6 +219,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     fun `Process fallback image when valid face correctly but not started capture`() = runTest {
         coEvery { faceDetector.analyze(frame) } returns getFace()
 
+        viewModel.initAutoCapture()
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
         viewModel.process(frame) // a fallback image frame before the preparation delay elapses
         viewModel.startCapture()
@@ -258,6 +265,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         )
 
         val detections = viewModel.currentDetection.testObserver()
+        viewModel.initAutoCapture()
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 2, 0)
         viewModel.startCapture()
 
@@ -297,6 +305,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         )
 
         val detections = viewModel.currentDetection.testObserver()
+        viewModel.initAutoCapture()
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
         // fallback image frames before the preparation delay elapses
         viewModel.process(frame)
@@ -323,6 +332,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         } returns AUTO_CAPTURE_IMAGING_DURATION_MS
         val capturingState = viewModel.capturingState.testObserver()
 
+        viewModel.initAutoCapture()
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
         viewModel.startCapture()
         viewModel.process(frame)
@@ -349,6 +359,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         } returns configDuration
         val capturingState = viewModel.capturingState.testObserver()
 
+        viewModel.initAutoCapture()
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
         viewModel.startCapture()
         viewModel.process(frame)
@@ -371,6 +382,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
         val capturingStateObserver = viewModel.capturingState.testObserver()
         val samplesToKeep = 2
+        viewModel.initAutoCapture()
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, samplesToKeep, 0)
         viewModel.process(frame) // won't be observed during the preparation phase
         viewModel.startCapture()

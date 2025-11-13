@@ -1,5 +1,6 @@
 package com.simprints.infra.sync.enrolments
 
+import android.os.PowerManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
@@ -31,7 +32,11 @@ class EnrolmentRecordWorkerTest {
         )
     }
     private val worker = EnrolmentRecordWorker(
-        mockk(relaxed = true),
+        mockk(relaxed = true) {
+            every { getSystemService<PowerManager>(any()) } returns mockk {
+                every { isIgnoringBatteryOptimizations(any()) } returns true
+            }
+        },
         params,
         repository,
         configManager,

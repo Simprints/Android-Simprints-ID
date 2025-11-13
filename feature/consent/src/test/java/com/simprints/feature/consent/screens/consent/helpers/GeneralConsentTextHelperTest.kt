@@ -40,6 +40,7 @@ class GeneralConsentTextHelperTest {
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.ENROL,
+            false,
         ).assembleText(context)
 
         val expectedString = context
@@ -63,6 +64,7 @@ class GeneralConsentTextHelperTest {
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT, GeneralConfiguration.Modality.FACE),
             ConsentType.ENROL,
+            false,
         ).assembleText(context)
 
         val expectedString = context
@@ -86,6 +88,7 @@ class GeneralConsentTextHelperTest {
             ),
             listOf(GeneralConfiguration.Modality.FACE),
             ConsentType.ENROL,
+            false,
         ).assembleText(context)
 
         val expectedString = context
@@ -109,6 +112,7 @@ class GeneralConsentTextHelperTest {
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT, GeneralConfiguration.Modality.FACE),
             ConsentType.ENROL,
+            false,
         ).assembleText(context)
 
         val expectedString = context
@@ -132,6 +136,7 @@ class GeneralConsentTextHelperTest {
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.VERIFY,
+            false,
         ).assembleText(context)
 
         val expectedString = context
@@ -155,6 +160,7 @@ class GeneralConsentTextHelperTest {
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
+            false,
         ).assembleText(context)
 
         val expectedString = context
@@ -178,6 +184,7 @@ class GeneralConsentTextHelperTest {
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT, GeneralConfiguration.Modality.FACE),
             ConsentType.IDENTIFY,
+            false,
         ).assembleText(context)
 
         val expectedString = context
@@ -201,6 +208,7 @@ class GeneralConsentTextHelperTest {
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
+            false,
         ).assembleText(context)
 
         val expectedString = context
@@ -225,6 +233,7 @@ class GeneralConsentTextHelperTest {
             ),
             listOf(GeneralConfiguration.Modality.FACE),
             ConsentType.IDENTIFY,
+            false,
         ).assembleText(context)
 
         val expectedString = context
@@ -249,6 +258,7 @@ class GeneralConsentTextHelperTest {
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT, GeneralConfiguration.Modality.FACE),
             ConsentType.IDENTIFY,
+            false,
         ).assembleText(context)
 
         val expectedString = context
@@ -273,6 +283,7 @@ class GeneralConsentTextHelperTest {
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
+            false,
         ).assembleText(context)
 
         val expectedString = context
@@ -296,6 +307,7 @@ class GeneralConsentTextHelperTest {
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
+            false,
         ).assembleText(context)
 
         val expectedString = context
@@ -318,6 +330,7 @@ class GeneralConsentTextHelperTest {
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
+            false,
         ).assembleText(context)
 
         val expectedString = context
@@ -340,6 +353,7 @@ class GeneralConsentTextHelperTest {
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
+            false,
         ).assembleText(context)
 
         val expectedString = context
@@ -362,6 +376,7 @@ class GeneralConsentTextHelperTest {
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
+            false,
         ).assembleText(context)
 
         val expectedString = context
@@ -384,6 +399,7 @@ class GeneralConsentTextHelperTest {
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
+            false,
         ).assembleText(context)
 
         val expectedString = context
@@ -407,6 +423,7 @@ class GeneralConsentTextHelperTest {
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
+            false,
         ).assembleText(context)
 
         val expectedString = context
@@ -429,6 +446,7 @@ class GeneralConsentTextHelperTest {
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
+            false,
         ).assembleText(context)
 
         assertThat(generalConsentText).doesNotContainMatch("\\.\\w")
@@ -448,6 +466,7 @@ class GeneralConsentTextHelperTest {
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
+            false,
         ).assembleText(context)
 
         assertThat(generalConsentText).doesNotContainMatch("^\\s.*")
@@ -467,9 +486,82 @@ class GeneralConsentTextHelperTest {
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
+            false,
         ).assembleText(context)
 
         assertThat(generalConsentText).doesNotContain("  ")
+    }
+
+    @Test
+    fun `should add multi-factor ID use case text when isMultiFactorIdEnabled is true`() {
+        val generalConsentText = GeneralConsentTextHelper(
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = false,
+                    dataUsedForRAndD = false,
+                    privacyRights = false,
+                    confirmation = false,
+                ),
+            ),
+            listOf(GeneralConfiguration.Modality.FINGERPRINT),
+            ConsentType.ENROL,
+            isMultiFactorIdEnabled = true,
+        ).assembleText(context)
+
+        val expectedText = String.format(
+            ", %s %s",
+            context.getString(R.string.consent_biometric_concat_modalities),
+            context.getString(R.string.consent_credentials_general),
+        )
+
+        assertThat(generalConsentText).contains(expectedText)
+    }
+
+    @Test
+    fun `should add multi-factor ID sharing text when isMultiFactorIdEnabled is true`() {
+        val generalConsentText = GeneralConsentTextHelper(
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = true,
+                    dataUsedForRAndD = false,
+                    privacyRights = false,
+                    confirmation = false,
+                ),
+            ),
+            listOf(GeneralConfiguration.Modality.FINGERPRINT),
+            ConsentType.IDENTIFY,
+            isMultiFactorIdEnabled = true,
+        ).assembleText(context)
+
+        // Just check for the key identifying phrase from the credentials text
+        assertThat(generalConsentText).contains("national ID document or other external credentials")
+    }
+
+    @Test
+    fun `should add multi-factor ID access text when isMultiFactorIdEnabled is true`() {
+        val generalConsentText = GeneralConsentTextHelper(
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = false,
+                    dataUsedForRAndD = false,
+                    privacyRights = false,
+                    confirmation = false,
+                ),
+            ),
+            listOf(GeneralConfiguration.Modality.FINGERPRINT),
+            ConsentType.IDENTIFY,
+            isMultiFactorIdEnabled = true,
+        ).assembleText(context)
+
+        val expectedText = String.format(
+            ", %s",
+            context.getString(R.string.consent_credentials_access),
+        )
+
+        assertThat(generalConsentText).contains(expectedText)
     }
 
     private fun configWithPrompt(prompt: ConsentConfiguration.ConsentPromptConfiguration) = ConsentConfiguration(

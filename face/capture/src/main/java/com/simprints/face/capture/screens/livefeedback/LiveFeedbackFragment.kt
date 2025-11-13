@@ -41,6 +41,7 @@ import com.simprints.infra.uibase.view.setCheckedWithLeftDrawable
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import com.simprints.infra.resources.R as IDR
@@ -66,8 +67,10 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private var cameraControl: CameraControl? = null
 
-    private val validCaptureProgressColor = ContextCompat.getColor(requireContext(), IDR.color.simprints_green_light)
-    private val defaultCaptureProgressColor = ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey_light)
+    private val validCaptureProgressColor: Int
+        get() = ContextCompat.getColor(requireContext(), IDR.color.simprints_green_light)
+    private val defaultCaptureProgressColor: Int
+        get() = ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey_light)
 
     private val launchPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -95,6 +98,12 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         bindViewModel()
         binding.captureProgress.max = 1 // normalized progress
 
+        runBlocking {
+            // Value of the `isAutoCapture` affects major parts of the UI state management and MUST be updated
+            // before anything else is processed, therefore is has to block the rest of the initialisation.
+            vm.initAutoCapture()
+        }
+
         binding.captureFeedbackBtn.setOnClickListener {
             vm.startCapture()
             if (vm.isAutoCapture) {
@@ -108,11 +117,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 vm.initCapture(mainVm.bioSDK, mainVm.samplesToCapture, mainVm.attemptNumber)
             }
         }
-        if (vm.isAutoCapture) {
-            // Await until capture button is pressed
-            vm.holdOffAutoCapture()
-            binding.captureFeedbackBtn.isClickable = true
-        }
+        enableCaptureButtonIfAutoCapture()
 
         binding.captureInstructionsBtn.setOnClickListener {
             findNavController().navigateSafely(
@@ -176,9 +181,12 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     override fun onResume() {
         super.onResume()
-
         when {
-            requireActivity().hasPermission(Manifest.permission.CAMERA) -> setUpCamera()
+            requireActivity().hasPermission(Manifest.permission.CAMERA) -> {
+                setUpCamera()
+                enableCaptureButtonIfAutoCapture()
+            }
+
             mainVm.shouldCheckCameraPermissions.getAndSet(false) -> {
                 // Check permission in onResume() so that if user left the app to go to Settings
                 // and give the permission, it's reflected when they come back to SID
@@ -190,6 +198,14 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             }
 
             else -> mainVm.shouldCheckCameraPermissions.set(true)
+        }
+    }
+
+    private fun enableCaptureButtonIfAutoCapture() {
+        if (vm.isAutoCapture) {
+            // Await until capture button is pressed
+            vm.holdOffAutoCapture()
+            binding.captureFeedbackBtn.isClickable = true
         }
     }
 
@@ -288,6 +304,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 captureFeedbackBtn.setText(IDR.string.face_capture_prep_begin_button_capturing)
             } else {
                 captureFeedbackBtn.setText(IDR.string.face_capture_begin_button)
+                setManualCaptureButtonClickable(true)
             }
 
             captureFeedbackTxtExplanation.text = null
@@ -298,7 +315,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 true,
                 ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp),
             )
-            setManualCaptureButtonClickable(false)
         }
     }
 

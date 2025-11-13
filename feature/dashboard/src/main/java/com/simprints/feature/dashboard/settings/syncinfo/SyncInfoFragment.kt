@@ -12,6 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -19,15 +20,17 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.progressindicator.LinearProgressIndicator
-import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.utils.TimeUtils
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSyncInfoBinding
+import com.simprints.feature.dashboard.requestlogin.LogoutReason
+import com.simprints.feature.dashboard.requestlogin.RequestLoginFragmentArgs
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCountAdapter
 import com.simprints.feature.dashboard.view.ConfigurableSyncInfoFragmentContainer
 import com.simprints.feature.login.LoginContract
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.navigation.toBundle
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.view.setPulseAnimation
@@ -102,7 +105,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
             startActivity(
                 Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                     data = Uri.fromParts("package", requireContext().packageName, null)
-                }
+                },
             )
         }
         binding.textEventSyncInstructionsOffline.setOnClickListener {
@@ -139,12 +142,21 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.logoutEventLiveData.observe(
-                    viewLifecycleOwner,
-                    LiveDataEventWithContentObserver {
-                        viewModel.performLogout()
-                    },
-                )
+                viewModel.logoutEventFlow.collect { reason ->
+                    viewModel.performLogout()
+
+                    val logoutReason = reason?.takeIf { it == LogoutActionReason.PROJECT_ENDING_OR_DEVICE_COMPROMISED }?.let {
+                        LogoutReason(
+                            title = getString(IDR.string.dashboard_sync_project_ending_alert_title),
+                            body = getString(IDR.string.dashboard_sync_project_ending_message),
+                        )
+                    }
+                    findNavController().navigateSafely(
+                        parentFragment,
+                        R.id.action_to_requestLoginFragment,
+                        RequestLoginFragmentArgs(logoutReason = logoutReason).toBundle(),
+                    )
+                }
             }
         }
 
@@ -184,7 +196,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         renderRecordsSection(syncInfo.syncInfoSectionRecords, config)
 
         // Images section
-        binding.layoutImagesSync.isGone = !config.isSyncInfoImageSyncVisible
+        binding.layoutImagesSync.isVisible = config.isSyncInfoImageSyncVisible && syncInfo.isImageSyncSectionVisible
         renderImagesSection(syncInfo.syncInfoSectionImages)
 
         // Modules section
@@ -251,10 +263,11 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         // Footer
         val isFooterSyncInProgressVisible = config.isSyncInfoLogoutOnComplete && records.isFooterSyncInProgressVisible
         binding.textFooterRecordSyncInProgress.isGone = !isFooterSyncInProgressVisible
-        binding.textFooterRecordLoggingOut.isGone = !records.isFooterReadyToLogOutVisible
+        binding.layoutFooterRecordLoggingOut.isGone = !records.isFooterReadyToLogOutVisible
         binding.textFooterRecordSyncIncomplete.isGone = !records.isFooterSyncIncompleteVisible
         binding.textFooterRecordLastSyncedWhen.isGone = !records.isFooterLastSyncTimeVisible
-        binding.textFooterRecordLastSyncedWhen.text = records.footerLastSyncMinutesAgo
+        binding.textFooterRecordLastSyncedWhen.text =
+            String.format(getString(IDR.string.sync_info_last_sync), records.footerLastSyncMinutesAgo)
     }
 
     private fun SyncInfoError.configureErrorPopup() {
@@ -314,7 +327,8 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
         // Footer
         binding.textFooterImageLastSyncedWhen.isInvisible = !images.isFooterLastSyncTimeVisible
-        binding.textFooterImageLastSyncedWhen.text = images.footerLastSyncMinutesAgo
+        binding.textFooterImageLastSyncedWhen.text =
+            String.format(getString(IDR.string.sync_info_last_sync), images.footerLastSyncMinutesAgo)
     }
 
     private fun renderModulesSection(
@@ -340,12 +354,14 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         moduleCountAdapter.submitList(moduleCountsForAdapter)
 
         // RecyclerView height fix (wrong height may be caused by ConstraintLayout in parent views)
-        binding.selectedModulesView.post {
-            val itemHeight = resources.getDimensionPixelSize(R.dimen.module_item_height)
-            val itemCount = moduleCountsForAdapter.size.coerceAtMost(MAX_MODULE_LIST_HEIGHT_ITEMS)
-            binding.selectedModulesView.apply {
-                layoutParams = layoutParams.apply {
-                    height = itemHeight * itemCount
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                val itemHeight = resources.getDimensionPixelSize(R.dimen.module_item_height)
+                val itemCount = moduleCountsForAdapter.size.coerceAtMost(MAX_MODULE_LIST_HEIGHT_ITEMS)
+                binding.selectedModulesView.apply {
+                    layoutParams = layoutParams.apply {
+                        height = itemHeight * itemCount
+                    }
                 }
             }
         }

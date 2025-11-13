@@ -14,6 +14,8 @@ data class AppMatchResult(
     val confidenceScore: Int,
     val matchConfidence: AppMatchConfidence,
     val verificationSuccess: Boolean? = null,
+    val isLinkedToScannedCredential: Boolean? = null,
+    val isCredentialVerified: Boolean? = null,
 ) : Parcelable {
     // Temporarily using match confidence as a proxy for tiers.
     val tier: AppResponseTier
@@ -28,12 +30,19 @@ data class AppMatchResult(
         guid: String,
         confidenceScore: Float,
         decisionPolicy: DecisionPolicy,
+        isCredentialMatch: Boolean,
         verificationMatchThreshold: Float? = null,
     ) : this(
         guid = guid,
         confidenceScore = confidenceScore.toInt(),
         matchConfidence = computeMatchConfidence(confidenceScore.toInt(), decisionPolicy),
         verificationSuccess = computeVerificationSuccess(confidenceScore.toInt(), verificationMatchThreshold),
+        isLinkedToScannedCredential = isCredentialMatch,
+        isCredentialVerified = if (isCredentialMatch) {
+            computeVerificationSuccess(confidenceScore.toInt(), verificationMatchThreshold)
+        } else {
+            null
+        },
     )
 
     companion object {

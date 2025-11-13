@@ -10,7 +10,9 @@ import com.simprints.core.domain.fingerprint.IFingerIdentifier.LEFT_INDEX_FINGER
 import com.simprints.core.domain.fingerprint.IFingerIdentifier.LEFT_THUMB
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.core.tools.utils.ExtractCommCareCaseIdUseCase
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.commcare.CommCareIdentityDataSource.Companion.COLUMN_DATUM_ID
 import com.simprints.infra.enrolment.records.repository.commcare.CommCareIdentityDataSource.Companion.COLUMN_VALUE
@@ -141,6 +143,9 @@ class CommCareIdentityDataSourceTest {
         }
     }
 
+    @MockK(relaxed = true)
+    private lateinit var timeHelper: TimeHelper
+
     @MockK
     private lateinit var encoder: EncodingUtils
 
@@ -152,6 +157,9 @@ class CommCareIdentityDataSourceTest {
 
     @MockK
     private lateinit var useCase: CompareImplicitTokenizedStringsUseCase
+
+    @MockK
+    private lateinit var extractCommCareCaseIdUseCase: ExtractCommCareCaseIdUseCase
 
     private lateinit var mockMetadataCursor: Cursor
 
@@ -202,11 +210,14 @@ class CommCareIdentityDataSourceTest {
 
         every { encoder.base64ToBytes(any()) } returns byteArrayOf()
         every { useCase.invoke(any(), any(), any(), any()) } returns true
+        every { extractCommCareCaseIdUseCase.invoke(any()) } returns null
 
         dataSource = CommCareIdentityDataSource(
+            timeHelper,
             encoder,
             JsonHelper,
             useCase,
+            extractCommCareCaseIdUseCase,
             4,
             context,
             testCoroutineRule.testCoroutineDispatcher,
@@ -246,7 +257,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(1, actualIdentities.size)
@@ -307,7 +318,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(1, actualIdentities.size)
@@ -360,7 +371,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(1, actualIdentities.size)
@@ -418,7 +429,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(1, actualIdentities.size)
@@ -468,7 +479,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(1, actualIdentities.size)
@@ -522,7 +533,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(1, actualIdentities.size)
@@ -578,7 +589,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertTrue(actualIdentities.isEmpty())
@@ -610,7 +621,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertTrue(actualIdentities.isEmpty())
@@ -659,7 +670,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(1, actualIdentities.size)
@@ -702,7 +713,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(0, actualIdentities.size)
@@ -742,7 +753,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(0, actualIdentities.size)
@@ -786,7 +797,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(0, actualIdentities.size)
@@ -817,7 +828,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(0, actualIdentities.size)
@@ -853,7 +864,7 @@ class CommCareIdentityDataSourceTest {
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it)
+                actualIdentities.addAll(it.identities)
             }
 
         assertEquals(0, actualIdentities.size)
@@ -879,5 +890,58 @@ class CommCareIdentityDataSourceTest {
 
         assertEquals(0, actualCount)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `count with case ID in metadata returns 1 without database query`() = runTest {
+        val testCaseId = "test-case-id"
+        every { extractCommCareCaseIdUseCase.invoke(any()) } returns testCaseId
+
+        val query = SubjectQuery(metadata = "test-metadata")
+        val actualCount = dataSource.count(query, commCareBiometricDataSource)
+
+        assertEquals(1, actualCount)
+        // Verify that no ContentResolver query was made since we have a case ID
+        coVerify(exactly = 0) { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `count without case ID in metadata queries database`() = runTest {
+        val expectedCount = 3
+        every { extractCommCareCaseIdUseCase.invoke(any()) } returns null
+        every { mockMetadataCursor.count } returns expectedCount
+
+        val query = SubjectQuery(metadata = "test-metadata")
+        val actualCount = dataSource.count(query, commCareBiometricDataSource)
+
+        assertEquals(expectedCount, actualCount)
+        coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `loadFingerprintIdentities with case ID calls onCandidateLoaded`() = runTest {
+        val testCaseId = "test-case-id"
+        var onCandidateLoadedCalled = false
+        every { extractCommCareCaseIdUseCase.invoke(any()) } returns testCaseId
+        every { mockDataCursor.moveToNext() } returns true
+        every { mockDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID) } returns 0
+        every { mockDataCursor.getColumnIndexOrThrow(COLUMN_VALUE) } returns 1
+        every { mockDataCursor.getString(0) } returnsMany listOf("someOtherDatumId", "subjectActions")
+        every { mockDataCursor.getString(1) } returns SUBJECT_ACTIONS_FINGERPRINT_1
+
+        val query = SubjectQuery(metadata = "test-metadata")
+        dataSource.loadFingerprintIdentities(
+            query = query,
+            ranges = listOf(0..1),
+            project = project,
+            dataSource = commCareBiometricDataSource,
+            scope = this,
+            onCandidateLoaded = { onCandidateLoadedCalled = true }
+        ).consumeEach { }
+
+        assertTrue(onCandidateLoadedCalled)
+        coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
+        // Verify that metadata query was not made since we have a case ID
+        coVerify(exactly = 0) { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
     }
 }

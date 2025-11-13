@@ -45,7 +45,7 @@ class UpdateDailyActivityUseCaseTest {
 
     @Test
     fun `Update daily activity on enrol response`() = runTest {
-        useCase(AppEnrolResponse("guid"))
+        useCase(AppEnrolResponse("guid", null))
 
         coVerify { recentUserActivityManager.updateRecentUserActivity(any()) }
     }
@@ -59,7 +59,7 @@ class UpdateDailyActivityUseCaseTest {
 
     @Test
     fun `Update daily activity on identify response`() = runTest {
-        useCase(AppIdentifyResponse(emptyList(), "guid"))
+        useCase(AppIdentifyResponse(emptyList(), "guid", isMultiFactorIdEnabled = false))
 
         coVerify { recentUserActivityManager.updateRecentUserActivity(any()) }
     }

@@ -1,5 +1,6 @@
 package com.simprints.infra.events.session
 
+import com.simprints.infra.credential.store.CredentialImageRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.scope.EventScope
@@ -15,6 +16,7 @@ import javax.inject.Singleton
 internal class SessionEventRepositoryImpl @Inject constructor(
     private val eventRepository: EventRepository,
     private val sessionDataCache: SessionDataCache,
+    private val credentialImageRepository: CredentialImageRepository,
 ) : SessionEventRepository {
     private val eventsLock = Mutex()
 
@@ -64,8 +66,15 @@ internal class SessionEventRepositoryImpl @Inject constructor(
         sessionDataCache.eventCache[savedEvent.id] = savedEvent
     }
 
+    override suspend fun deleteEvents(events: List<Event>): Unit = withLockedContext {
+        val ids = events.map { it.id }
+        eventRepository.deleteEvents(ids)
+        ids.forEach { sessionDataCache.eventCache.remove(it) }
+    }
+
     override suspend fun closeCurrentSession(reason: EventScopeEndCause?) = withLockedContext {
         eventRepository.closeEventScope(getCurrentScopeInternal(), reason)
+        credentialImageRepository.deleteAllCredentialScans()
         sessionDataCache.eventCache.clear()
         sessionDataCache.eventScope = null
     }

@@ -29,9 +29,15 @@
     <string name="consent_biometric_general_face">የፊትዎን ፎቶ ልውሰድ</string>
     <string name="consent_biometrics_access_fingerprint">የጣት አሻራ መረጃ</string>
     <string name="consent_biometrics_access_face">ፎቶግራፍ</string>
+    <string name="consent_credentials_general">የብሔራዊ መታወቂያ ሰነድዎን ወይም ሌሎች ማረጋገጫዎችን በልዩ  ቁጥራቸው(ዎች) ጋር ስካን አድርጉ።</string>
+    <string name="consent_credentials_access">ብሔራዊ መታወቂያ ዝርዝር.</string>
+    <string name="consent_credentials_your_id">የእርስዎን ብሔራዊ መታወቂያ ወይም ሌሎች ማረጋገጫዎችን መረጃ ይሙሉ/አስገቡ።</string>
     <string name="consent_biometrics_access_fingerprint_face">የጣት አሻራ መረጃ፤ፎቶግራፍ</string>
     <string name="consent_biometrics_parental_fingerprint">የልጅዎትን የጣት አሻራ ልውሰድ</string>
     <string name="consent_biometrics_parental_face">የልጅዎትን ፎቶግራፍ ልውሰድ</string>
+    <string name="consent_credentials_parental_general">የልጅዎን ብሄራዊ መታወቂያ ሰነድ ወይም ሌሎች ማረጋገጫዎችን  በልዩ ቁጥራቸው(ዎች) ጋር ስካን አድርጉ።</string>
+    <string name="consent_credentials_parental_access">የልጅዎን ብሄራዊ መታወቂያ ዝርዝር</string>
+    <string name="consent_credentials_parental_your_id">የልጅዎን ብሄራዊ መታወቂያ ወይም ሌሎች ማረጋገጫዎችን መረጃ ይሙሉ/አስገቡ።</string>
     <string name="consent_biometric_concat_modalities">እና</string>
     <string name="consent_decline_button">አለመቀበል</string>
     <string name="consent_accept_button">መቀበል</string>
@@ -322,27 +328,61 @@
     <string name="dashboard_project_card_current_user">አሁን ያለ ተጠቃሚ: %1$s</string>
 
     <!-- Sync Info -->
-    <string name="sync_info_header_title">መረጃውን መገናኘት</string>
-    <string name="sync_info_complete">ሲንክ ማድረጉ ተጠናቋል</string>
-    <string name="sync_info_incomplete">ሲንክ ማድረጉ አልተጠናቀቀም</string>
-    <string name="sync_info_connecting">በመገኛኘት ላይ ነው</string>
-    <string name="sync_info_progress">በግንኙነት ላይ...%1$s</string>
-    <string name="sync_info_sync_button">አሁን ግንኙነት ፍጠር</string>
-    <string name="sync_info_details_error">ሲንክ ማድረግ አልተቻለም እባክዎ የበላይ አካል ያግኙ</string>
-    <string name="sync_info_no_modules_message">ሲንክ ለማድረግ ሞጁል ይምረጡ</string>
-    <string name="sync_info_no_modules_button">ሞጁሎች</string>
-    <string name="sync_info_offline_message">የስልኩ ሴቲንግ በመግባት የሞባይል ዳታ ያብሩ</string>
-    <string name="sync_info_header_settings_button"><font fgcolor='#FF7C00'><u>ማስተካከያ</u></font></string>
-    <string name="sync_info_details_too_many_modules">ከተፈቀደው ሞጁል በላይ ወርዷል</string>
-    <string name="sync_info_re_login_required">በቅድሚያ መግባት አለበት መረጃዉን ለመላክ</string>
+    <string name="sync_info_title">የማመሳሰል መረጃ</string>
 
-    <string name="sync_info_last_sync">መጨረሻ ጊዜ ወደ ሰርቨር የተላከው : %1$s</string>
-    <string name="sync_info_records_uploaded">ሁሉም መዝገቦች ተጭነዋል</string>
-    <plurals name="sync_info_records_to_upload">
-        <item quantity="one">%1$d ለመስቀል መዝገብ</item>
-        <item quantity="other">%1$d ለመስቀል መዝገቦች</item>
-    </plurals>
+    <string name="sync_info_header_title">የማመሳሰል ሁኔታ</string>
+    <string name="sync_info_header_settings_button"><font fgcolor='#FF7C00'><u> ቅንብሮች</u></font></string>
+
+    <string name="sync_info_re_login_required">ለማመሳሰል እንደገና መግባት አለብህ</string>
+
+    <string name="sync_info_section_record_sync">ማመሳሰልን ይቅዱ</string>
+    <string name="sync_info_section_image_sync">የምስል ማመሳሰል</string>
+    <string name="sync_info_section_module_selection">የተመረጡ ሞጁሎች</string>
+
+    <string name="sync_info_instruction_records">ይህን ቁልፍ በመጫን መዝገቦችን በእጅ ያመሳስሉ።<font fgcolor='#FF7C00'><u> ተጨማሪ መረጃ</u></font></string>
+    <string name="sync_info_instruction_images">ይህንን ቁልፍ በመጫን ምስሎችን በእራስዎ ወደ ክላውድ ይላኩ። <font fgcolor='#FF7C00'><u>ለበለጠ መረጃ</u></font></string>
+    <string name="sync_info_instruction_modules">ከተመረጡት ሞጁሎች ውስጥ ያሉት መዝገቦች ይጣጣማሉ. <font fgcolor='#FF7C00'><u>ለበለጠ መረጃ</u></font></string>
+    <string name="sync_info_instruction_comm_care_permission">ከCommCare ለማመሳሰል በስይስተም ቅንብሮች ውስጥ ፍቃድ ያስፈልገዋል<font fgcolor='#FF7C00'><u> ስይስተም ቅንብሮች</u></font></string>
+    <string name="sync_info_instruction_error_offline">ለማመሳሰል ኢንተርኔት ግንኙነት ያስፈልገዋል።  <font fgcolor='#FF7C00'><u>የኢንተርኔት ግንኙነት ቅንብሮች</u></font></string>
+    <string name="sync_info_instruction_error_no_modules">ለማመሳሰል ሞጁሎች መመረጥ አለባቸው።<font fgcolor='#FF7C00'><u>ሞጁሎችን ይምረጡ </u></font></string>
+    <string name="sync_info_instruction_error">ማመሳሰል አልተሳካም። <font fgcolor='#FF7C00'><u>ለበለጠ መረጃ</u></font></string>
+
+    <string name="sync_info_details_event_sync_default">ይህንን ቁልፍ እራስዎ በመጫን መዝገቦችን ያመሳስሉ ። ሞባይልዎ በመደበኛነት መዛግብትን ከበስተጀርባ ለማመሳሰል ይሞክራል።</string>
+    <string name="sync_info_details_image_sync_default">ምስሎቹን በእራስዎ ወደ ክላውድ ለመላክ ይህን ቁልፍ ይጫኑ። ሞባይልዎ በመደበኛነት ምስሎቹን ከበስተጀርባ ለማመሳሰል ይሞክራል። እባክዎን ያስተውሉ፣ ምስል ማመሳሰል ጠንካራ የኢንተርኔት  ግንኙነት ሊፈልግ ይችላል።</string>
+    <string name="sync_info_details_module_selection">.
+ከተመረጡት ሞጁሎች ውስጥ ያሉት መዝገቦች  ከሞባይልዎ ጋር ይጣጣማሉ። ከሞባይልዎ ጋር ለማመሳሰል ሞጁሎችን ለመምረጥ ከታች/ከላይ ይጫኑ።</string>
+    <string name="sync_info_details_error">ማመሳሰል አልተሳካም። እባክዎን ተቆጣጣሪዎን ያነጋግሩ</string>
+    <string name="sync_info_details_too_many_modules">በጣም ብዙ ሞጁሎች ወርደዋል።</string>
+    <string name="sync_info_details_ok">እሺ</string>
+
+    <string name="sync_info_records_on_device">በሞባይልዎ ላይ ያሉ አጠቃላይ መዝገቦች።</string>
+    <string name="sync_info_records_to_up_sync">የሚላኩ መዝገቦች።</string>
+    <string name="sync_info_records_to_down_sync">መዝገቦችን ለማመሳሰል።</string>
+    <string name="sync_info_images_to_up_sync">የሚላኩ ምስሎች</string>
+
+    <string name="sync_info_button_sync_records">መዝገቦችን አሁን ያመሳስሉ/ ይላኩ።</string>
+    <string name="sync_info_button_records_syncing">በማመሳሰል ላይ</string>
+    <string name="sync_info_button_sync_images">አሁን ምስሎችን ያመሳስሉ/ ይላኩ።</string>
+    <string name="sync_info_button_images_sync_stop">ምስሎችን ማመሳሰል/መላክን አቁም</string>
     <string name="sync_info_button_try_again">እንደገና ይሞክሩ</string>
+    <string name="sync_info_button_select_modules">ሞጁሎችን ይምረጡ</string>
+
+    <string name="sync_info_progress_pending">%1$sማመሳሰል በመጠባበቅ ላይ…</string>
+    <string name="sync_info_progress_complete">%1$sማመሳሰል ተጠናቅቋል</string>
+    <string name="sync_info_progress_ongoing_no_counters">%1$sማመሳሰል በሂደት ላይ…</string>
+    <string name="sync_info_progress_ongoing">%1$sአመሳስል፡ %2$dከ…%3$d</string>
+
+    <string name="sync_info_item_default">ንጥል</string>
+    <string name="sync_info_item_record_or_event">መዝገብ &amp; ክስተት</string>
+    <string name="sync_info_item_image">ምስል</string>
+
+    <string name="sync_info_total_records">ጠቅላላ መዝገቦች</string>
+
+    <string name="sync_info_last_sync">መጨረሻ የተመሳሰለው፡ %1$s</string>
+
+    <string name="sync_info_footer_sync_in_progress">ማመሳሰል በሂደት ላይ</string>
+    <string name="sync_info_footer_sync_incomplete">ማመሳሰል ተጠናቅቋል</string>
+    <string name="sync_info_footer_sync_complete_logging_out">ማመሳሰል ተጠናቅቋል፣ እርስዎን በማስወጣት ላይ…</string>
 
     <!-- Dashboard - Daily activity card -->
     <string name="dashboard_activity_card_activity">የየዕለት ተግባር: %1$s</string>
@@ -387,18 +427,6 @@
     <string name="dashboard_preference_enable_audio_on_scan_complete">የድምጽ ማንቂያ</string>
     <string name="dashboard_preference_enable_auto_capture">ራስ-ሰር ቀረጻ</string>
 
-    <!-- Sync info -->
-    <string name="sync_info_total_records">አጠቃላይ የተመዘገበ</string>
-    <string name="sync_info_title">ሲንክ የተደረገ መረጃ</string>
-    <string name="sync_info_button_select_modules">ሞጅውሎችን ይምረጡ</string>
-    <string name="sync_info_records_to_up_sync">የተመዘገበውን ለመጫን</string>
-    <string name="sync_info_records_to_download_or_delete">ሪክርዶች ለማውረድ ወይም ለመሰረዝ</string>
-    <string name="sync_info_records_to_delete">የተመዘገበውን ለመሰረዝ</string>
-    <string name="sync_info_records_on_device">በስልኩ አጠቃላይ የተመዘገበ</string>
-    <string name="sync_info_section_module_selection">የተመረጡ ሞጁሎች</string>
-    <string name="sync_info_images_to_up_sync">የሚጫኑ ምስሎች</string>
-    <string name="sync_info_button_records_syncing">በግንኙነት ላይ</string>
-
     <!-- Dashboard - Module selection -->
     <string name="dashboard_select_modules_no_modules">የተሳሳተ ምርጫ፡ እባክዎት ካለው የምዕራፍ አማራጭ ውስጥ ቢያንስ አንድ ይምረጡ</string>
     <string name="dashboard_select_modules_too_many_modules">የተሳሳተ ምርጫ ፡ካሉት ምዕራፎች ውስጥ ከ %1$d በላይ መምረጥ አይችሉም</string>
@@ -426,7 +454,7 @@
     <!-- Dashboard - Logout request -->
     <string name="dashboard_logout_title">መውጣት</string>
     <string name="dashboard_logout_confirmation_sync_decline_button">ሳይመሳሰል ውጣ</string>
-    <string name="dashboard_logout_confirmation_sync_info">በመሳሪያዎ ላይ ከመውጣትዎ በፊት መመሳሰል ያለባቸው መዝገቦች አሉ። እባክህ የማመሳሰል ሂደቱ እንዲጠናቀቅ ፍቀድ።\n\nአንዴ ማመሳሰል እንደተጠናቀቀ ዘግተህ መውጣት ትችላለህ።</string>
+    <string name="dashboard_logout_confirmation_sync_info">ከመውጣትዎ በፊት በስልክዎ ላይ ያሉ መዝገቦች  በፍጥነት ይመሳሰላሉ። የማመሳሰል ሂደቱ እስኪጠናቀቅ ድረስ እባክዎ በትዕግስት ይጠብቁ። \n\nየማመሳሰል ሂደቱ ከተጠናቀቀ በኋላ መውጣት ይችላሉ።</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_title">ማስጠንቀቂያ</string>
     <string name="dashboard_logout_confirmation_sync_decline_warning_body">የእርስዎ ፕሮጀክት ወቅታዊ መዛግብት እንዳለው ለማረጋገጥ የውሂብ ማመሳሰል አስፈላጊ ነው። ያለ ትክክለኛ ምክንያት የእርስዎን ውሂብ ማመሳሰል አለመቻል የስራ ባልደረቦችዎ ጠቃሚ መዝገቦችን ማግኘት እና የፕሮጀክቱን ትክክለኛ ሪፖርት የማድረግ ችሎታ ላይ ተጽእኖ ያሳድራል። እና ለእርስዎ እና ለፕሮጀክቱ የማይፈለጉ ውጤቶችን ሊያስከትል ይችላል.</string>
     <string name="dashboard_logout_confirmation_title">መውጣት</string>
@@ -466,5 +494,59 @@
         <item quantity="one">%d አመት</item>
         <item quantity="other">%d አመታት</item>
     </plurals>
+
+    <!-- MultiFactor Identification -->
+    <string name="mfid_scan_action">ስካን ያድርጉ%1$s</string>
+
+    <string name="mfid_scanner_selection_skip">ሰነድ ስካን ማድረግን ዝለል።</string>
+    <string name="mfid_type_nhis_card">NHIS ካርድ</string>
+    <string name="mfid_type_ghana_id_card">የጋና መታወቂያ ካርድ</string>
+    <string name="mfid_type_qr_code">QR ኮድ</string>
+    <string name="mfid_nhis_card_credential_field">የአባልነት ቁጥር</string>
+    <string name="mfid_ghana_id_credential_field">የግል መታወቂያ</string>
+    <string name="mfid_qr_credential_field">የQR ኮድ ውጤት</string>
+    <string name="mfid_type_any_document">ሰነድ</string>
+
+    <string name="mfid_skip_scan_dialog_title">ስካንን ልዝለል?</string>
+    <string name="mfid_skip_scan_dialog_body">ስካን ማድረግ%1$sበዚህ ፕሮጀክት ያስፈልጋል። እርግጠኛ ነዎት ይህንን መዝለል ይፈልጋሉ? </string>
+    <string name="mfid_skip_scan_dialog_confirm">ዝለል</string>
+
+    <string name="mfid_qr_scan_no_qr_detected">ምንም የQR ኮድ አልተገኘም</string>
+    <string name="mfid_scan_instructions">ይህንን%1$s በመስኮቱ ውስጥ ያስቀምጡት</string>
+    <string name="mfid_continue">ቀጥል</string>
+    <string name="mfid_dialog_wrong_qr_title">ልክ ያልሆነ የQR ኮድ አይነት</string>
+    <string name="mfid_dialog_wrong_qr_body_top">የተሳሳተ የQR ኮድ ስካን ተደርጓል</string>
+    <string name="mfid_dialog_wrong_qr_body_bottom">ይህ ውጤት እንደ ሰው ሰነድ ሆኖ ሊያገለግል አይችልም። እባክዎ ትክክለኛው የQR ኮድ ስካን መሆኑን ያረጋግጡ</string>
+    <string name="mfid_dialog_wrong_qr_rescan">እንደገና ስካን ያድርጉ</string>
+    <string name="mfid_ocr_progress_title">ስካን እየተደረገ ነው። ካርዱን በፍሬም ውስጥ ይያዙት.</string>
+    <string name="mfid_scan_camera_permission_body">ካሜራውን ለመጠቀም ፍቃድ ካልተሰጠ ስካን%1$s ማድረግ አይችልም።</string>
+    <string name="mfid_confirmation_checkbox_text">%1$sበትክክል ስካን መሆኑን  አረጋግጣለሁ።</string>
+    <string name="mfid_action_go_to_record">ወደ መዝገብ ይሂዱ።</string>
+    <string name="mfid_action_enrol">ይመዝገቡ</string>
+    <string name="mfid_action_enrol_anyway">ለማንኛውም ይመዝገቡ</string>
+    <string name="mfid_action_add">ጨምር።</string>
+    <string name="mfid_action_skip">ዝለል</string>
+    <string name="mfid_action_continue">ቀጥል</string>
+    <string name="mfid_searching">በመፈለግ ላይ...</string>
+
+    <string name="mfid_search_found_enrol">ይህ %1$sአስቀድሞ ተመዝግቧል</string>
+    <string name="mfid_search_found_identification">መዝገብ ተገኝቷል</string>
+    <string name="mfid_search_found_identification_low_match_score">ይህ %1$sከሌላ ታካሚ ጋር ሊገናኝ ይችላል።</string>
+    <string name="mfid_search_not_found_identification">ከዚህ %1$sጋር ምንም መዝገቦች አልተገኙም ይህንን %2$sከታካሚ ጋር በኋላ ማገናኘት ይችላሉ።</string>
+
+    <string name="mfid_add_document_title">ይህንን %1$sይጨምር?</string>
+    <string name="mfid_skip_title">ለምን %1$sን ስካን ማድረግ ዘለልከው?</string>
+    <string name="mfid_skip_reason_does_not_have">%1$sየለውም</string>
+    <string name="mfid_skip_reason_did_not_bring">%1$sአላመጣም።</string>
+    <string name="mfid_skip_reason_incorrect">በስህተት  የመጣ %1$sነው</string>
+    <string name="mfid_skip_reason_does_not_want_to_provide">%1$sማቅረብ አልፈለግም።</string>
+    <string name="mfid_skip_reason_damaged">የተበላሸ %1$s ወይም የማይነበብ</string>
+    <string name="mfid_skip_reason_unable_to_scan">%1$sን ስካን ማድረግ አልተቻለም</string>
+    <string name="mfid_skip_reason_other">ሌላ</string>
+    <string name="mfid_skip_reason_hint">ምክንያት</string>
+    <string name="mfid_skip_reason_helper_text">እባክዎ ለመዝለል ምክንያት ያቅርቡ</string>
+    <string name="mfid_skip_confirm">ስካን ማድረግን ዝለል</string>
+    <string name="mfid_skip_go_back">ተመለስ</string>
+
 
 </resources>
