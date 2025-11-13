@@ -1,7 +1,8 @@
 package com.simprints.feature.orchestrator.usecases
 
-import com.google.common.truth.Truth.assertThat
-import com.simprints.face.capture.FaceCaptureResult
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.exitform.ExitFormOption
 import com.simprints.feature.exitform.ExitFormResult
@@ -16,11 +17,8 @@ import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.orchestration.data.responses.AppRefusalResponse
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -64,7 +62,7 @@ class MapRefusalOrErrorResultUseCaseTest {
         listOf(
             FetchSubjectResult(found = true),
             SetupResult(isSuccess = true),
-            FaceCaptureResult("", emptyList()),
+            CaptureIdentity("", modality = Modality.FACE, emptyList()),
         ).forEach { result -> assertThat(useCase(result, mockk())).isNull() }
     }
 

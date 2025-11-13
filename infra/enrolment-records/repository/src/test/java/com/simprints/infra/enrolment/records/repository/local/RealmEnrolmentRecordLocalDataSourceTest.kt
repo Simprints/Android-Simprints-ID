@@ -1,11 +1,12 @@
 package com.simprints.infra.enrolment.records.repository.local
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.Identity
+import com.simprints.core.domain.sample.Sample
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
@@ -17,8 +18,6 @@ import com.simprints.infra.enrolment.records.realm.store.models.DbFaceSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbFingerprintSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
-import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
@@ -146,7 +145,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
         val fakePerson = savedPersons[0].toRealmDb()
 
-        val people = mutableListOf<FingerprintIdentity>()
+        val people = mutableListOf<Identity>()
         enrolmentRecordLocalDataSource
             .loadFingerprintIdentities(
                 SubjectQuery(),
@@ -210,7 +209,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
         val fakePerson = savedPersons[0].toRealmDb()
 
-        val people = mutableListOf<FaceIdentity>()
+        val people = mutableListOf<Identity>()
         enrolmentRecordLocalDataSource
             .loadFaceIdentities(
                 SubjectQuery(),
@@ -502,11 +501,11 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         projectId: String = UUID.randomUUID().toString(),
         userId: String = UUID.randomUUID().toString(),
         moduleId: String = UUID.randomUUID().toString(),
-        faceSamples: List<FaceSample> = listOf(
+        faceSamples: List<Sample> = listOf(
             getRandomFaceSample(),
             getRandomFaceSample(),
         ),
-        fingerprintSamples: List<FingerprintSample> = listOf(),
+        fingerprintSamples: List<Sample> = listOf(),
         externalCredentials: List<ExternalCredential> = listOf(
             getRandomExternalCredential(),
         ),
@@ -523,12 +522,25 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     private fun getRandomFaceSample(
         id: String = UUID.randomUUID().toString(),
         referenceId: String = "referenceId",
-    ) = FaceSample(Random.nextBytes(64), "faceTemplateFormat", referenceId, id)
+    ) = Sample(
+        id = id,
+        referenceId = referenceId,
+        template = Random.nextBytes(64),
+        format = "faceTemplateFormat",
+        modality = Modality.FACE,
+    )
 
     private fun getRandomFingerprintSample(
         id: String = UUID.randomUUID().toString(),
         referenceId: String = "referenceId",
-    ) = FingerprintSample(IFingerIdentifier.LEFT_3RD_FINGER, Random.nextBytes(64), "fingerprintTemplateFormat", referenceId, id)
+    ) = Sample(
+        id = id,
+        referenceId = referenceId,
+        identifier = SampleIdentifier.LEFT_3RD_FINGER,
+        template = Random.nextBytes(64),
+        format = "fingerprintTemplateFormat",
+        modality = Modality.FINGERPRINT,
+    )
 
     private fun getRandomExternalCredential(id: String = "id") = ExternalCredential(
         id = id,

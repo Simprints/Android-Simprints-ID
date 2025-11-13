@@ -1,7 +1,7 @@
 package com.simprints.infra.events.event.domain.models.scope
 
 import androidx.annotation.Keep
-import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.core.domain.common.Modality
 
 @Keep
 data class EventScopePayload(
@@ -11,7 +11,7 @@ data class EventScopePayload(
     val language: String,
     val projectConfigurationUpdatedAt: String,
     val projectConfigurationId: String? = null,
-    val modalities: List<GeneralConfiguration.Modality>,
+    val modalities: List<Modality>,
     val device: Device,
     val databaseInfo: DatabaseInfo,
     val location: Location? = null,

@@ -1,11 +1,11 @@
 package com.simprints.fingerprint.capture.usecase
 
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.fingerprint.capture.extensions.deduceFileExtension
 import com.simprints.fingerprint.capture.extensions.toInt
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerInfo
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.images.ImageRepository
@@ -21,7 +21,7 @@ internal class SaveFingerprintSampleUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         vero2Configuration: Vero2Configuration,
-        finger: IFingerIdentifier,
+        finger: SampleIdentifier,
         captureEventId: String?,
         collectedFinger: CaptureState.ScanProcess.Collected,
     ) = if (collectedFinger.scanResult.image != null && captureEventId != null) {
@@ -45,7 +45,7 @@ internal class SaveFingerprintSampleUseCase @Inject constructor(
         imageBytes: ByteArray,
         captureEventId: String,
         fileExtension: String,
-        finger: IFingerIdentifier,
+        finger: SampleIdentifier,
         dpi: Int,
         scannerId: String?,
         un20SerialNumber: String?,
@@ -59,7 +59,7 @@ internal class SaveFingerprintSampleUseCase @Inject constructor(
         return coreImageRepository.storeSample(
             projectId = currentSession.projectId,
             sessionId = currentSession.id,
-            modality = GeneralConfiguration.Modality.FINGERPRINT,
+            modality = Modality.FINGERPRINT,
             sampleId = captureEventId,
             fileExtension = fileExtension,
             sampleBytes = imageBytes,

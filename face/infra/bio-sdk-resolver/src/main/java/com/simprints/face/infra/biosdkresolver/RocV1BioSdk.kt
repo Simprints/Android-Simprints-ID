@@ -1,7 +1,7 @@
 package com.simprints.face.infra.biosdkresolver
 
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
-import com.simprints.face.infra.basebiosdk.matching.FaceSample
 import com.simprints.face.infra.rocv1.detection.RocV1Detector
 import com.simprints.face.infra.rocv1.detection.RocV1Detector.Companion.RANK_ONE_TEMPLATE_FORMAT_1_23
 import com.simprints.face.infra.rocv1.initialization.RocV1Initializer
@@ -20,5 +20,5 @@ class RocV1BioSdk @Inject constructor(
 
     override fun matcherName(): String = "RANK_ONE"
 
-    override fun createMatcher(probeSamples: List<FaceSample>): FaceMatcher = RocV1Matcher(probeSamples)
+    override fun createMatcher(probeSamples: List<CaptureSample>): FaceMatcher = RocV1Matcher(probeSamples)
 }

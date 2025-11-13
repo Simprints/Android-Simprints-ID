@@ -1,8 +1,10 @@
 package com.simprints.feature.orchestrator.usecases.steps
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
 import com.simprints.feature.orchestrator.steps.Step
@@ -11,19 +13,14 @@ import com.simprints.feature.orchestrator.usecases.MapStepsForLastBiometricEnrol
 import com.simprints.feature.selectsubject.SelectSubjectParams
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.NEC
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
-import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.orchestration.data.ActionRequest
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.impl.annotations.RelaxedMockK
-import io.mockk.mockk
+import io.mockk.*
+import io.mockk.impl.annotations.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -78,16 +75,16 @@ class BuildStepsUseCaseTest {
         )
 
         every { secugenSimMatcher.fingersToCapture } returns listOf(
-            Finger.LEFT_THUMB,
-            Finger.RIGHT_THUMB,
+            SampleIdentifier.LEFT_THUMB,
+            SampleIdentifier.RIGHT_THUMB,
         )
         every { secugenSimMatcher.allowedAgeRange } returns AgeGroup(0, null)
         every { projectConfiguration.fingerprint?.secugenSimMatcher } returns secugenSimMatcher
         every { projectConfiguration.fingerprint?.getSdkConfiguration(SECUGEN_SIM_MATCHER) } returns secugenSimMatcher
 
         every { nec.fingersToCapture } returns listOf(
-            Finger.LEFT_INDEX_FINGER,
-            Finger.RIGHT_INDEX_FINGER,
+            SampleIdentifier.LEFT_INDEX_FINGER,
+            SampleIdentifier.RIGHT_INDEX_FINGER,
         )
         every { nec.allowedAgeRange } returns AgeGroup(0, null)
         every { projectConfiguration.fingerprint?.nec } returns nec

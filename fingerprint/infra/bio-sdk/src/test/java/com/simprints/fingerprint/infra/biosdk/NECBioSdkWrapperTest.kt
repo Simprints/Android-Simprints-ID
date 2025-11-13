@@ -1,20 +1,17 @@
 package com.simprints.fingerprint.infra.biosdk
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.Identity
 import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.ImageResponse
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateResponse
-import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.template.FingerprintTemplateAcquisitionSettings
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.template.FingerprintTemplateMetadata
 import com.simprints.fingerprint.infra.necsdkimpl.matching.NecMatchingSettings
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.impl.annotations.RelaxedMockK
-import io.mockk.mockk
-import io.mockk.slot
+import io.mockk.*
+import io.mockk.impl.annotations.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -72,8 +69,8 @@ class NECBioSdkWrapperTest {
     @Test
     fun `calls match on bio sdk`() = runTest {
         // Given
-        val probe = mockk<FingerprintIdentity>()
-        val candidates = listOf(mockk<FingerprintIdentity>())
+        val probe = listOf(mockk<CaptureSample>())
+        val candidates = listOf(mockk<Identity>())
         val isCrossFingerMatchingEnabled = true
         val settings = NecMatchingSettings(isCrossFingerMatchingEnabled)
         // When

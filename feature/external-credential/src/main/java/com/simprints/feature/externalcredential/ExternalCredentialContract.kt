@@ -2,9 +2,9 @@ package com.simprints.feature.externalcredential
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.infra.config.store.models.AgeGroup
-import com.simprints.infra.matching.MatchParams
 
 @ExcludedFromGeneratedTestCoverageReports("Navigation class")
 object ExternalCredentialContract {
@@ -15,8 +15,8 @@ object ExternalCredentialContract {
         flowType: FlowType,
         ageGroup: AgeGroup?,
         probeReferenceId: String? = null,
-        faceSamples: List<MatchParams.FaceSample> = emptyList(),
-        fingerprintSamples: List<MatchParams.FingerprintSample> = emptyList(),
+        faceSamples: List<CaptureSample> = emptyList(),
+        fingerprintSamples: List<CaptureSample> = emptyList(),
     ) = ExternalCredentialParams(
         subjectId = subjectId,
         flowType = flowType,

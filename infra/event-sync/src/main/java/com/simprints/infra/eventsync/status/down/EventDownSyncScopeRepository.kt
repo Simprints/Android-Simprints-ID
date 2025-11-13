@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.status.down
 
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.common.Partitioning
-import com.simprints.core.domain.modality.Modes
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -26,7 +26,7 @@ internal class EventDownSyncScopeRepository @Inject constructor(
     private val tokenizationProcessor: TokenizationProcessor,
 ) {
     suspend fun getDownSyncScope(
-        modes: List<Modes>,
+        modes: List<Modality>,
         selectedModuleIDs: List<String>,
         syncPartitioning: Partitioning,
     ): EventDownSyncScope {
@@ -90,7 +90,7 @@ internal class EventDownSyncScopeRepository @Inject constructor(
 
     suspend fun deleteOperations(
         moduleIds: List<String>,
-        modes: List<Modes>,
+        modes: List<Modality>,
     ) {
         val scope = SubjectModuleScope(getProjectId(), moduleIds, modes)
         scope.operations.forEach {

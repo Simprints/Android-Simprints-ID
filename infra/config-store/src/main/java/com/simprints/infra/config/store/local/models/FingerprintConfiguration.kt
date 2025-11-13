@@ -18,7 +18,7 @@ internal fun FingerprintConfiguration.toProto(): ProtoFingerprintConfiguration =
 
 internal fun FingerprintConfiguration.FingerprintSdkConfiguration.toProto() = ProtoFingerprintConfiguration.ProtoFingerprintSdkConfiguration
     .newBuilder()
-    .addAllFingersToCapture(fingersToCapture.map { it.toProto() })
+    .addAllFingersToCapture(fingersToCapture.map { it.toProtoFinger() })
     .setDecisionPolicy(decisionPolicy.toProto())
     .setComparisonStrategyForVerification(comparisonStrategyForVerification.toProto())
     .setAllowedAgeRange(allowedAgeRange.toProto())
@@ -41,7 +41,8 @@ internal fun FingerprintConfiguration.BioSdk.toProto() = when (this) {
 
 internal fun FingerprintConfiguration.FingerComparisonStrategy.toProto() = when (this) {
     FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER -> ProtoFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER
-    FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX -> ProtoFingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
+    FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX ->
+        ProtoFingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
 }
 
 internal fun MaxCaptureAttempts.toProto() = ProtoMaxCaptureAttempts.newBuilder().setNoFingerDetected(noFingerDetected).build()

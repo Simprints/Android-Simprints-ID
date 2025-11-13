@@ -2,10 +2,11 @@ package com.simprints.face.infra.simface.matching
 
 import com.google.common.truth.Truth.*
 import com.simprints.biometrics.simface.SimFace
-import com.simprints.face.infra.basebiosdk.matching.FaceIdentity
-import com.simprints.face.infra.basebiosdk.matching.FaceSample
-import io.mockk.every
-import io.mockk.mockk
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.Identity
+import com.simprints.core.domain.sample.Sample
+import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
@@ -43,12 +44,26 @@ class SimFaceMatcherTest {
             }
             val matcher = SimFaceMatcher(
                 simFace = simFace,
-                probeSamples = listOf(FaceSample(faceId = "id", template = byteArrayOf(1))),
+                probeSamples = listOf(
+                    CaptureSample(
+                        captureEventId = "id",
+                        modality = Modality.FACE,
+                        format = "ROC",
+                        template = byteArrayOf(1),
+                    ),
+                ),
             )
             val result = matcher.getHighestComparisonScoreForCandidate(
-                candidate = FaceIdentity(
+                candidate = Identity(
                     subjectId = "id",
-                    faces = listOf(FaceSample(faceId = "id", template = byteArrayOf(1))),
+                    samples = listOf(
+                        Sample(
+                            referenceId = "id",
+                            modality = Modality.FACE,
+                            template = byteArrayOf(1),
+                            format = "ROC",
+                        ),
+                    ),
                 ),
             )
             assertThat(result - expectedScore).isLessThan(0.0001f)
@@ -62,12 +77,26 @@ class SimFaceMatcherTest {
         }
         val matcher = SimFaceMatcher(
             simFace = simFace,
-            probeSamples = listOf(FaceSample(faceId = "id", template = byteArrayOf(1))),
+            probeSamples = listOf(
+                CaptureSample(
+                    captureEventId = "id",
+                    modality = Modality.FACE,
+                    format = "ROC",
+                    template = byteArrayOf(1),
+                ),
+            ),
         )
         val result = matcher.getHighestComparisonScoreForCandidate(
-            candidate = FaceIdentity(
+            candidate = Identity(
                 subjectId = "id",
-                faces = listOf(FaceSample(faceId = "id", template = byteArrayOf(1))),
+                samples = listOf(
+                    Sample(
+                        referenceId = "id",
+                        modality = Modality.FACE,
+                        template = byteArrayOf(1),
+                        format = "ROC",
+                    ),
+                ),
             ),
         )
         assertThat(result - 80f).isLessThan(0.0001f)

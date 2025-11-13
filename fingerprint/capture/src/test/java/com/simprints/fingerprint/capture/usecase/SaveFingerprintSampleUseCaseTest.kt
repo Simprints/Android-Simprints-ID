@@ -1,22 +1,18 @@
 package com.simprints.fingerprint.capture.usecase
 
-import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.ScanResult
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerInfo
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -48,7 +44,7 @@ class SaveFingerprintSampleUseCaseTest {
     fun `Returns null if no scan image`() = runTest {
         val result = useCase.invoke(
             vero2Configuration,
-            IFingerIdentifier.LEFT_3RD_FINGER,
+            SampleIdentifier.LEFT_3RD_FINGER,
             "captureEventId",
             createCollectedStub(null),
         )
@@ -59,7 +55,7 @@ class SaveFingerprintSampleUseCaseTest {
     fun `Returns null if no capture event id`() = runTest {
         val result = useCase.invoke(
             vero2Configuration,
-            IFingerIdentifier.LEFT_3RD_FINGER,
+            SampleIdentifier.LEFT_3RD_FINGER,
             null,
             createCollectedStub(byteArrayOf()),
         )
@@ -71,7 +67,7 @@ class SaveFingerprintSampleUseCaseTest {
         val scannerId = "scannerId"
         val un20SerialNumber = "un20SerialNumber"
         val expectedMetadata = mapOf(
-            "finger" to IFingerIdentifier.LEFT_3RD_FINGER.name,
+            "finger" to SampleIdentifier.LEFT_3RD_FINGER.name,
             "dpi" to "1300",
             "scannerID" to scannerId,
             "un20SerialNumber" to un20SerialNumber,
@@ -98,7 +94,7 @@ class SaveFingerprintSampleUseCaseTest {
         assertThat(
             useCase.invoke(
                 vero2Configuration,
-                IFingerIdentifier.LEFT_3RD_FINGER,
+                SampleIdentifier.LEFT_3RD_FINGER,
                 "captureEventId",
                 createCollectedStub(byteArrayOf()),
             ),
@@ -114,7 +110,7 @@ class SaveFingerprintSampleUseCaseTest {
         assertThat(
             useCase.invoke(
                 vero2Configuration,
-                IFingerIdentifier.LEFT_3RD_FINGER,
+                SampleIdentifier.LEFT_3RD_FINGER,
                 "captureEventId",
                 createCollectedStub(byteArrayOf()),
             ),
@@ -128,13 +124,13 @@ class SaveFingerprintSampleUseCaseTest {
             every { id } returns "sessionId"
         }
         coEvery {
-            imageRepo.storeSample(any(), any(), GeneralConfiguration.Modality.FINGERPRINT, any(), any(), any(), any())
+            imageRepo.storeSample(any(), any(), Modality.FINGERPRINT, any(), any(), any(), any())
         } returns null
 
         assertThat(
             useCase.invoke(
                 vero2Configuration,
-                IFingerIdentifier.LEFT_3RD_FINGER,
+                SampleIdentifier.LEFT_3RD_FINGER,
                 "captureEventId",
                 createCollectedStub(byteArrayOf()),
             ),

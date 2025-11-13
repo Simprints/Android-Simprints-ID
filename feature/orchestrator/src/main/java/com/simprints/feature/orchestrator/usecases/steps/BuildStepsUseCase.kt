@@ -1,6 +1,7 @@
 package com.simprints.feature.orchestrator.usecases.steps
 
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.common.Modality
 import com.simprints.face.capture.FaceCaptureContract
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentType
@@ -21,13 +22,11 @@ import com.simprints.feature.setup.SetupContract
 import com.simprints.feature.validatepool.ValidateSubjectPoolContract
 import com.simprints.fingerprint.capture.FingerprintCaptureContract
 import com.simprints.infra.config.store.models.AgeGroup
-import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.allowedAgeRanges
 import com.simprints.infra.config.store.models.determineFaceSDKs
 import com.simprints.infra.config.store.models.determineFingerprintSDKs
 import com.simprints.infra.config.store.models.experimental
-import com.simprints.infra.config.store.models.fromDomainToModuleApi
 import com.simprints.infra.config.store.models.isAgeRestricted
 import com.simprints.infra.config.store.models.sortedUniqueAgeGroups
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
@@ -410,7 +409,6 @@ internal class BuildStepsUseCase @Inject constructor(
                 val fingersToCollect = sdkConfiguration
                     ?.fingersToCapture
                     .orEmpty()
-                    .map { finger -> finger.fromDomainToModuleApi() }
 
                 Step(
                     id = StepId.FINGERPRINT_CAPTURE,
@@ -474,7 +472,7 @@ internal class BuildStepsUseCase @Inject constructor(
                         flowType = flowType,
                         subjectQuery = subjectQuery,
                         biometricDataSource = biometricDataSource,
-                        fingerprintSDK = bioSDK,
+                        bioSdk = bioSDK,
                     ),
                 )
             }
@@ -491,7 +489,7 @@ internal class BuildStepsUseCase @Inject constructor(
                         flowType = flowType,
                         subjectQuery = subjectQuery,
                         biometricDataSource = biometricDataSource,
-                        faceSDK = bioSDK,
+                        bioSdk = bioSDK,
                     ),
                 )
             }
