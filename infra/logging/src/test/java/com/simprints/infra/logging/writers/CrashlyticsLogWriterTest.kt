@@ -57,21 +57,6 @@ class CrashlyticsLogWriterTest {
     }
 
     @Test
-    fun `should log and record error on WARN priority`() {
-        val crashMock = mockk<FirebaseCrashlytics>(relaxed = true)
-        val spyCrashReportingTree = spyk(CrashlyticsLogWriter(crashMock))
-
-        Logger.setLogWriters(spyCrashReportingTree)
-        Simber.w("Test Message", null)
-
-        verify {
-            crashMock.recordException(
-                match<Exception> { it.message?.contains("Test Message") == true }
-            )
-        }
-    }
-
-    @Test
     fun `with custom exception should log and record error on WARN priority`() {
         val crashMock = mockk<FirebaseCrashlytics>(relaxed = true)
         val spyCrashReportingTree = spyk(CrashlyticsLogWriter(crashMock))

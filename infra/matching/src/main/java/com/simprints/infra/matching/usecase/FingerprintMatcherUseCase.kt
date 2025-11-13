@@ -46,7 +46,11 @@ class FingerprintMatcherUseCase @Inject constructor(
     ): Flow<MatcherState> = channelFlow {
         Simber.i("Initialising matcher", tag = crashReportTag)
         if (matchParams.fingerprintSDK == null) {
-            Simber.w("Fingerprint SDK was not provided", tag = crashReportTag)
+            Simber.w(
+                message = "Fingerprint SDK was not provided",
+                t = IllegalArgumentException("Fingerprint SDK was not provided"),
+                tag = crashReportTag,
+            )
             send(MatcherState.Success(emptyList(), emptyList(), 0, ""))
             return@channelFlow
         }
@@ -107,10 +111,15 @@ class FingerprintMatcherUseCase @Inject constructor(
         for (batch in channel) {
             val comparingStartTime = timeHelper.now()
             val matchResults =
-                match(samples, batch.identities.mapToFingerprintIdentity(), matchParams.flowType, bioSdkWrapper, bioSdk = matchParams.fingerprintSDK!!)
-                    .fold(MatchResultSet<FingerprintMatchResult.Item>()) { acc, item ->
-                        acc.add(FingerprintMatchResult.Item(item.id, item.score))
-                    }
+                match(
+                    samples,
+                    batch.identities.mapToFingerprintIdentity(),
+                    matchParams.flowType,
+                    bioSdkWrapper,
+                    bioSdk = matchParams.fingerprintSDK!!,
+                ).fold(MatchResultSet<FingerprintMatchResult.Item>()) { acc, item ->
+                    acc.add(FingerprintMatchResult.Item(item.id, item.score))
+                }
             resultSet.addAll(matchResults)
             val comparingEndTime = timeHelper.now()
             matchBatches.add(
