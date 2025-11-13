@@ -85,7 +85,7 @@ internal class FingerprintMatcherUseCaseTest {
             .invoke(
                 MatchParams(
                     probeReferenceId = "referenceId",
-                    probeFingerprintSamples = emptyList(),
+                    probeSamples = emptyList(),
                     bioSdk = SECUGEN_SIM_MATCHER,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = SubjectQuery(),
@@ -109,15 +109,16 @@ internal class FingerprintMatcherUseCaseTest {
     @Test
     fun `Skips matching if there are no candidates`() = runTest {
         coEvery { enrolmentRecordRepository.count(any()) } returns 0
-        coEvery { enrolmentRecordRepository.loadFingerprintIdentities(any(), any(), any(), project, any(), any()) } returns
-            createTestChannel(emptyList())
+        coEvery {
+            enrolmentRecordRepository.loadIdentities(any(), any(), any(), project, any(), any())
+        } returns createTestChannel(emptyList())
         coEvery { bioSdkWrapper.match(any(), any(), any()) } returns listOf()
 
         val results = useCase
             .invoke(
                 MatchParams(
                     probeReferenceId = "referenceId",
-                    probeFingerprintSamples = listOf(
+                    probeSamples = listOf(
                         CaptureSample(
                             captureEventId = "fingerprintId",
                             template = byteArrayOf(1, 2, 3),
@@ -151,7 +152,7 @@ internal class FingerprintMatcherUseCaseTest {
         coEvery { enrolmentRecordRepository.count(any(), any()) } returns 100
         coEvery { createRangesUseCase(any()) } returns listOf(0..99)
         coEvery {
-            enrolmentRecordRepository.loadFingerprintIdentities(
+            enrolmentRecordRepository.loadIdentities(
                 any(),
                 any(),
                 any(),
@@ -184,7 +185,7 @@ internal class FingerprintMatcherUseCaseTest {
             .invoke(
                 matchParams = MatchParams(
                     probeReferenceId = "referenceId",
-                    probeFingerprintSamples = listOf(
+                    probeSamples = listOf(
                         CaptureSample(
                             captureEventId = "fingerprintId",
                             template = byteArrayOf(1, 2, 3),
@@ -212,8 +213,8 @@ internal class FingerprintMatcherUseCaseTest {
     )
 }
 
-fun createTestChannel(vararg lists: List<Identity>): ReceiveChannel<IdentityBatch<Identity>> {
-    val channel = Channel<IdentityBatch<Identity>>(lists.size)
+fun createTestChannel(vararg lists: List<Identity>): ReceiveChannel<IdentityBatch> {
+    val channel = Channel<IdentityBatch>(lists.size)
     runBlocking {
         var time = 0L
         for (list in lists) {

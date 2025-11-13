@@ -48,8 +48,7 @@ class DbSubjectTest {
             moduleId = MODULE_ID,
             createdAt = Date(0),
             updatedAt = Date(1500),
-            fingerprintSamples = listOf(fingerprintSample),
-            faceSamples = listOf(faceSample),
+            samples = listOf(fingerprintSample, faceSample),
         )
 
         val dbSubject = domainSubject.toRealmDb()
@@ -104,9 +103,9 @@ class DbSubjectTest {
             assertThat(updatedAt).isEqualTo(Date(1500))
             assertThat(moduleId).isEqualTo(MODULE_ID)
             assertThat(projectId).isEqualTo(PROJECT_ID)
-            assertThat(fingerprintSamples.first().id).isEqualTo(fingerprintSample.id)
-            assertThat(fingerprintSamples.first().referenceId).isEqualTo(REFERENCE_ID)
-            assertThat(faceSamples.first().referenceId).isEqualTo(REFERENCE_ID)
+            assertThat(samples.first { it.modality == Modality.FINGERPRINT }.id).isEqualTo(fingerprintSample.id)
+            assertThat(samples.first { it.modality == Modality.FINGERPRINT }.referenceId).isEqualTo(REFERENCE_ID)
+            assertThat(samples.first { it.modality == Modality.FACE }.referenceId).isEqualTo(REFERENCE_ID)
         }
     }
 }

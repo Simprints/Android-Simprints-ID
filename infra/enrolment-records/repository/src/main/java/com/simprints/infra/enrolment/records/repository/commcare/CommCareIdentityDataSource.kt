@@ -59,27 +59,85 @@ internal class CommCareIdentityDataSource @Inject constructor(
 
     private fun getCaseDataUri(packageName: String): Uri = "content://$packageName.case/casedb/data".toUri()
 
-    private suspend fun loadFingerprintIdentities(
+    override suspend fun loadIdentities(
+        query: SubjectQuery,
+        ranges: List<IntRange>,
+        dataSource: BiometricDataSource,
+        project: Project,
+        scope: CoroutineScope,
+        onCandidateLoaded: suspend () -> Unit,
+    ): ReceiveChannel<IdentityBatch> = loadIdentitiesConcurrently(
+        ranges = ranges,
+        scope = scope,
+    ) { range ->
+        val startTime = timeHelper.now()
+        val identities = loadIdentities(
+            query = query,
+            range = range,
+            project = project,
+            dataSource = dataSource,
+            onCandidateLoaded = onCandidateLoaded,
+        )
+        val endTime = timeHelper.now()
+        IdentityBatch(identities, startTime, endTime)
+    }
+
+    private fun loadIdentitiesConcurrently(
+        ranges: List<IntRange>,
+        scope: CoroutineScope,
+        load: suspend (IntRange) -> IdentityBatch,
+    ): ReceiveChannel<IdentityBatch> {
+        val channel = Channel<IdentityBatch>(availableProcessors)
+        val semaphore = Semaphore(availableProcessors)
+        scope.launch(dispatcher) {
+            ranges
+                .map { range ->
+                    async { semaphore.withPermit { channel.send(load(range)) } }
+                }.joinAll()
+            channel.close()
+        }
+        return channel
+    }
+
+    private suspend fun loadIdentities(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
         project: Project,
         onCandidateLoaded: suspend () -> Unit,
     ): List<Identity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
-        .filter { erce ->
-            erce.payload.biometricReferences.any { it is FingerprintReference && it.format == query.fingerprintSampleFormat }
-        }.map {
+        .filter { erce -> erce.payload.biometricReferences.any { it.format == query.format } }
+        .map { erce ->
             Identity(
-                it.payload.subjectId,
-                it.payload.biometricReferences.filterIsInstance<FingerprintReference>().flatMap { fingerprintReference ->
-                    fingerprintReference.templates.map { fingerprintTemplate ->
-                        Sample(
-                            identifier = fingerprintTemplate.finger,
-                            template = encoder.base64ToBytes(fingerprintTemplate.template),
-                            format = fingerprintReference.format,
-                            referenceId = fingerprintReference.id,
-                            modality = Modality.FINGERPRINT,
-                        )
+                erce.payload.subjectId,
+                erce.payload.biometricReferences.flatMap { reference ->
+                    when (reference) {
+                        is FaceReference -> reference.templates.mapNotNull { faceTemplate ->
+                            if (reference.format != query.format) {
+                                null
+                            } else {
+                                Sample(
+                                    template = encoder.base64ToBytes(faceTemplate.template),
+                                    format = reference.format,
+                                    referenceId = reference.id,
+                                    modality = Modality.FACE,
+                                )
+                            }
+                        }
+
+                        is FingerprintReference -> reference.templates.mapNotNull { fingerprintTemplate ->
+                            if (reference.format != query.format) {
+                                null
+                            } else {
+                                Sample(
+                                    identifier = fingerprintTemplate.finger,
+                                    template = encoder.base64ToBytes(fingerprintTemplate.template),
+                                    format = reference.format,
+                                    referenceId = reference.id,
+                                    modality = Modality.FINGERPRINT,
+                                )
+                            }
+                        }
                     }
                 },
             )
@@ -112,9 +170,8 @@ internal class CommCareIdentityDataSource @Inject constructor(
                         do {
                             caseMetadataCursor.getString(caseMetadataCursor.getColumnIndexOrThrow(COLUMN_CASE_ID))?.let { caseId ->
                                 enrolmentRecordCreationEvents
-                                    .addAll(
-                                        loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query, project),
-                                    ).also { onCandidateLoaded() }
+                                    .addAll(loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query, project))
+                                    .also { onCandidateLoaded() }
                             }
                         } while (caseMetadataCursor.moveToNext() && caseMetadataCursor.position <= range.last)
                     }
@@ -125,31 +182,6 @@ internal class CommCareIdentityDataSource @Inject constructor(
 
         return enrolmentRecordCreationEvents
     }
-
-    private suspend fun loadFaceIdentities(
-        query: SubjectQuery,
-        range: IntRange,
-        dataSource: BiometricDataSource,
-        project: Project,
-        onCandidateLoaded: suspend () -> Unit,
-    ): List<Identity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
-        .filter { erce ->
-            erce.payload.biometricReferences.any { it is FaceReference && it.format == query.faceSampleFormat }
-        }.map {
-            Identity(
-                it.payload.subjectId,
-                it.payload.biometricReferences.filterIsInstance<FaceReference>().flatMap { faceReference ->
-                    faceReference.templates.map { faceTemplate ->
-                        Sample(
-                            template = encoder.base64ToBytes(faceTemplate.template),
-                            format = faceReference.format,
-                            referenceId = faceReference.id,
-                            modality = Modality.FACE,
-                        )
-                    }
-                },
-            )
-        }
 
     private fun loadEnrolmentRecordCreationEvents(
         caseId: String,
@@ -267,73 +299,6 @@ internal class CommCareIdentityDataSource @Inject constructor(
                 )?.use { caseMetadataCursor -> count = caseMetadataCursor.count }
         }
         count
-    }
-
-    override suspend fun loadFaceIdentities(
-        query: SubjectQuery,
-        ranges: List<IntRange>,
-        dataSource: BiometricDataSource,
-        project: Project,
-        scope: CoroutineScope,
-        onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<IdentityBatch<Identity>> = loadIdentitiesConcurrently(
-        ranges = ranges,
-        scope = scope,
-    ) { range ->
-        val startTime = timeHelper.now()
-        val identities = loadFaceIdentities(
-            query = query,
-            range = range,
-            project = project,
-            dataSource = dataSource,
-            onCandidateLoaded = onCandidateLoaded,
-        )
-        val endTime = timeHelper.now()
-        IdentityBatch(identities, startTime, endTime)
-    }
-
-    override suspend fun loadFingerprintIdentities(
-        query: SubjectQuery,
-        ranges: List<IntRange>,
-        dataSource: BiometricDataSource,
-        project: Project,
-        scope: CoroutineScope,
-        onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<IdentityBatch<Identity>> = loadIdentitiesConcurrently(
-        ranges = ranges,
-        scope = scope,
-    ) { range ->
-        val startTime = timeHelper.now()
-        val identities = loadFingerprintIdentities(
-            query = query,
-            range = range,
-            project = project,
-            dataSource = dataSource,
-            onCandidateLoaded = onCandidateLoaded,
-        )
-        val endTime = timeHelper.now()
-        IdentityBatch(identities, startTime, endTime)
-    }
-
-    private fun <T> loadIdentitiesConcurrently(
-        ranges: List<IntRange>,
-        scope: CoroutineScope,
-        load: suspend (IntRange) -> IdentityBatch<T>,
-    ): ReceiveChannel<IdentityBatch<T>> {
-        val channel = Channel<IdentityBatch<T>>(availableProcessors)
-        val semaphore = Semaphore(availableProcessors)
-        scope.launch(dispatcher) {
-            ranges
-                .map { range ->
-                    async {
-                        semaphore.withPermit {
-                            channel.send(load(range))
-                        }
-                    }
-                }.joinAll()
-            channel.close()
-        }
-        return channel
     }
 
     companion object {

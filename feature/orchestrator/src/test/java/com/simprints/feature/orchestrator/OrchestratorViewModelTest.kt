@@ -323,9 +323,9 @@ internal class OrchestratorViewModelTest {
             val params = step.params?.let { it as? MatchParams }
             assertThat(params).isNotNull()
             assertThat(params?.bioSdk).isEqualTo(SECUGEN_SIM_MATCHER)
-            assertThat(params?.probeFingerprintSamples?.size).isEqualTo(2)
-            assertThat(params?.probeFingerprintSamples?.get(0)?.format).isEqualTo(format)
-            assertThat(params?.probeFingerprintSamples?.get(1)?.format).isEqualTo(format)
+            assertThat(params?.probeSamples?.size).isEqualTo(2)
+            assertThat(params?.probeSamples?.get(0)?.format).isEqualTo(format)
+            assertThat(params?.probeSamples?.get(1)?.format).isEqualTo(format)
         }
     }
 
@@ -455,7 +455,7 @@ internal class OrchestratorViewModelTest {
         )
 
         val externalCredentialParams = mockk<ExternalCredentialParams>(relaxed = true) {
-            every { copy(probeReferenceId = any(), fingerprintSamples = any()) } returns this
+            every { copy(probeReferenceId = any(), samples = any()) } returns this
         }
 
         coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
@@ -477,7 +477,7 @@ internal class OrchestratorViewModelTest {
         verify {
             externalCredentialParams.copy(
                 probeReferenceId = fingerprintReferenceId,
-                fingerprintSamples = expectedFingerprintSamples,
+                samples = mapOf(Modality.FINGERPRINT to expectedFingerprintSamples),
             )
         }
     }

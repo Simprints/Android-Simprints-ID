@@ -24,8 +24,8 @@ internal class IsNewEnrolmentUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
-        every { projectConfiguration.face?.getSdkConfiguration((any()))?.decisionPolicy } returns faceConfidenceDecisionPolicy
-        every { projectConfiguration.fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns fingerprintConfidenceDecisionPolicy
+        every { projectConfiguration.face?.rankOne?.decisionPolicy } returns faceConfidenceDecisionPolicy
+        every { projectConfiguration.fingerprint?.secugenSimMatcher?.decisionPolicy } returns fingerprintConfidenceDecisionPolicy
 
         useCase = IsNewEnrolmentUseCase()
     }
@@ -166,8 +166,7 @@ internal class IsNewEnrolmentUseCaseTest {
                     every { subjectId } returns "subjectId"
                     every { confidence } returns 50f
                 }
-                every { faceBioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
-                every { fingerprintBioSdk } returns null
+                every { bioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
             },
         )
 

@@ -1,6 +1,5 @@
 package com.simprints.infra.enrolment.records.repository
 
-import com.simprints.core.domain.sample.Identity
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
@@ -14,23 +13,14 @@ interface IdentityDataSource {
         dataSource: BiometricDataSource = BiometricDataSource.Simprints,
     ): Int
 
-    suspend fun loadFingerprintIdentities(
+    suspend fun loadIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<IdentityBatch<Identity>>
-
-    suspend fun loadFaceIdentities(
-        query: SubjectQuery,
-        ranges: List<IntRange>,
-        dataSource: BiometricDataSource,
-        project: Project,
-        scope: CoroutineScope,
-        onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<IdentityBatch<Identity>>
+    ): ReceiveChannel<IdentityBatch>
 
     /**
      * Loads identities concurrently using the provided dispatcher and parallelism level.

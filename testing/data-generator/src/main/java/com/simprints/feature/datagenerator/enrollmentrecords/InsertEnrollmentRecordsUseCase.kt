@@ -50,11 +50,10 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
                 moduleId = tokenizedModuleId,
                 createdAt = creationDate,
                 updatedAt = updateDate,
-                fingerprintSamples = generateFingerprintTemplates(
+                samples = generateFingerprintTemplates(
                     templatesPerFormat = templatesPerFormat,
                     fingerOrder = fingerOrder,
-                ),
-                faceSamples = generateFaceSamples(
+                ) + generateFaceSamples(
                     templatesPerFormat = templatesPerFormat,
                 ),
             )

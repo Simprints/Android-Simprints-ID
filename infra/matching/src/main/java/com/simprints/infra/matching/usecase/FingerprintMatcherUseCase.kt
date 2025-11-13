@@ -48,14 +48,14 @@ class FingerprintMatcherUseCase @Inject constructor(
         }
         val bioSdkWrapper = resolveBioSdkWrapper(matchParams.bioSdk)
 
-        if (matchParams.probeFingerprintSamples.isEmpty()) {
+        if (matchParams.probeSamples.isEmpty()) {
             send(MatcherState.Success(emptyList(), emptyList(), 0, bioSdkWrapper.matcherName))
             return@channelFlow
         }
         // Only candidates with supported template format are considered
         val queryWithSupportedFormat =
             matchParams.queryForCandidates.copy(
-                fingerprintSampleFormat = bioSdkWrapper.supportedTemplateFormat,
+                format = bioSdkWrapper.supportedTemplateFormat,
             )
         val expectedCandidates = enrolmentRecordRepository.count(queryWithSupportedFormat, dataSource = matchParams.biometricDataSource)
         if (expectedCandidates == 0) {
@@ -72,7 +72,7 @@ class FingerprintMatcherUseCase @Inject constructor(
         val loadedCandidates = AtomicInteger(0)
         val ranges = createRanges(expectedCandidates)
         // if number of ranges less than the number of cores then use the number of ranges
-        val channel = enrolmentRecordRepository.loadFingerprintIdentities(
+        val channel = enrolmentRecordRepository.loadIdentities(
             query = queryWithSupportedFormat,
             ranges = ranges,
             dataSource = matchParams.biometricDataSource,
@@ -87,7 +87,7 @@ class FingerprintMatcherUseCase @Inject constructor(
 
         val batchInfo = consumeAndMatch(
             channel = channel,
-            samples = matchParams.probeFingerprintSamples,
+            samples = matchParams.probeSamples,
             resultSet = resultSet,
             bioSdk = matchParams.bioSdk,
             bioSdkWrapper = bioSdkWrapper,
@@ -99,7 +99,7 @@ class FingerprintMatcherUseCase @Inject constructor(
     }.flowOn(dispatcherBG)
 
     private suspend fun consumeAndMatch(
-        channel: ReceiveChannel<IdentityBatch<Identity>>,
+        channel: ReceiveChannel<IdentityBatch>,
         samples: List<CaptureSample>,
         resultSet: MatchResultSet,
         bioSdk: FingerprintConfiguration.BioSdk,

@@ -147,7 +147,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
 
         val people = mutableListOf<Identity>()
         enrolmentRecordLocalDataSource
-            .loadFingerprintIdentities(
+            .loadIdentities(
                 SubjectQuery(),
                 listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
@@ -162,43 +162,22 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     }
 
     @Test
-    fun `correctly query supported fingerprint format`() = runTest {
+    fun `correctly query supported format`() = runTest {
         val format = "SupportedFormat"
 
         enrolmentRecordLocalDataSource
-            .loadFingerprintIdentities(
-                SubjectQuery(fingerprintSampleFormat = format),
+            .loadIdentities(
+                SubjectQuery(format = format),
                 listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
                 project,
                 this,
                 onCandidateLoaded,
             ).consumeEach { }
-
         verify {
             realmQuery.query(
-                "ANY ${FINGERPRINT_SAMPLES_FIELD}.${FORMAT_FIELD} == $0",
+                "ANY ${FINGERPRINT_SAMPLES_FIELD}.${FORMAT_FIELD} == $0 OR ANY $FACE_SAMPLES_FIELD.$FORMAT_FIELD == $1",
                 format,
-            )
-        }
-    }
-
-    @Test
-    fun `correctly query supported face format`() = runTest {
-        val format = "SupportedFormat"
-
-        enrolmentRecordLocalDataSource
-            .loadFingerprintIdentities(
-                SubjectQuery(faceSampleFormat = format),
-                listOf(IntRange(0, 20)),
-                BiometricDataSource.Simprints,
-                project,
-                this,
-                onCandidateLoaded,
-            ).consumeEach { }
-        verify {
-            realmQuery.query(
-                "ANY ${FACE_SAMPLES_FIELD}.${FORMAT_FIELD} == $0",
                 format,
             )
         }
@@ -211,7 +190,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
 
         val people = mutableListOf<Identity>()
         enrolmentRecordLocalDataSource
-            .loadFaceIdentities(
+            .loadIdentities(
                 SubjectQuery(),
                 listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
@@ -277,15 +256,15 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     fun performSubjectCreationAction_deletesOldSamples() = runTest {
         val faceReferenceId = "faceToDelete"
         val fingerReferenceId = "fingerToDelete"
-        every { realmSingleQuery.find() } returns getRandomSubject()
-            .copy(
-                faceSamples = listOf(
-                    getRandomFaceSample(referenceId = faceReferenceId),
-                ),
-                fingerprintSamples = listOf(
-                    getRandomFingerprintSample(referenceId = fingerReferenceId),
-                ),
-            ).toRealmDb()
+        every { realmSingleQuery.find() } returns getRandomSubject(
+            faceSamples = listOf(
+                getRandomFaceSample(referenceId = faceReferenceId),
+            ),
+            fingerprintSamples = listOf(
+                getRandomFingerprintSample(referenceId = fingerReferenceId),
+            ),
+        ).toRealmDb()
+
         val subject = getFakePerson()
 
         enrolmentRecordLocalDataSource.performActions(
@@ -321,8 +300,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
             listOf(
                 SubjectAction.Update(
                     subject.subjectId.toString(),
-                    faceSamplesToAdd = listOf(getRandomFaceSample()),
-                    fingerprintSamplesToAdd = listOf(getRandomFingerprintSample()),
+                    samplesToAdd = listOf(getRandomFaceSample(), getRandomFingerprintSample()),
                     referenceIdsToRemove = listOf(faceReferenceId, fingerReferenceId),
                     externalCredentialsToAdd = listOf(),
                     externalCredentialIdsToRemove = listOf(),
@@ -332,9 +310,10 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         )
         val peopleCount = enrolmentRecordLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(1)
+
         verify {
-            mutableRealm.delete(match<DbFaceSample> { it.referenceId == faceReferenceId })
             mutableRealm.delete(match<DbFingerprintSample> { it.referenceId == fingerReferenceId })
+            mutableRealm.delete(match<DbFaceSample> { it.referenceId == faceReferenceId })
             mutableRealm.copyToRealm(
                 match<DbSubject> {
                     // one old + one new
@@ -364,8 +343,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
             listOf(
                 SubjectAction.Update(
                     subject.subjectId.toString(),
-                    faceSamplesToAdd = listOf(),
-                    fingerprintSamplesToAdd = listOf(),
+                    samplesToAdd = listOf(),
                     referenceIdsToRemove = listOf(),
                     externalCredentialsToAdd = listOf(),
                     externalCredentialIdsToRemove = listOf("id1"),
@@ -514,8 +492,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         projectId = projectId,
         attendantId = userId.asTokenizableRaw(),
         moduleId = moduleId.asTokenizableRaw(),
-        faceSamples = faceSamples,
-        fingerprintSamples = fingerprintSamples,
+        samples = fingerprintSamples + faceSamples,
         externalCredentials = externalCredentials,
     )
 

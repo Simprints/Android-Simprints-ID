@@ -5,7 +5,6 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
@@ -235,7 +234,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         // Given
         val subjectId = UUID.randomUUID().toString()
         val originalSubject = createTestSubject(subjectId)
-        originalSubject.faceSamples = listOf(
+        originalSubject.samples = listOf(
             Sample(
                 template = byteArrayOf(),
                 format = "ISO",
@@ -255,15 +254,13 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
 
         val updateAction = SubjectAction.Update(
             subjectId,
-            faceSamplesToAdd = listOf(
+            samplesToAdd = listOf(
                 Sample(
                     template = byteArrayOf(1, 2, 3),
                     format = "ISO",
                     referenceId = "ref2",
                     modality = Modality.FACE,
                 ),
-            ),
-            fingerprintSamplesToAdd = listOf(
                 Sample(
                     template = byteArrayOf(4, 5, 6),
                     format = "ISO",
@@ -309,11 +306,11 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
     }
 
     @Test
-    fun givenManySubjectsWithFaceSamples_whenLoadFaceIdentitiesIsCalledWithRanges_thenReturnsBatchedFaceIdentities() = runTest {
+    fun givenManySubjectsWithFaceSamples_whenLoadIdentitiesIsCalledWithRanges_thenReturnsBatchedIdentities() = runTest {
         // Given
         val subjects = (1..10).map { i ->
             createTestSubject(subjectId = UUID.randomUUID().toString()).apply {
-                faceSamples = listOf(
+                samples = listOf(
                     Sample(
                         template = byteArrayOf(i.toByte()),
                         format = "ISO",
@@ -328,12 +325,12 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
             mockk(),
         )
 
-        val query = SubjectQuery(faceSampleFormat = "ISO")
+        val query = SubjectQuery(format = "ISO")
         val ranges = listOf(0..2, 3..5, 6..9) // 3 batches
         val loadedCandidates = mutableListOf<Unit>()
 
         // When
-        val channel = dataSource.loadFaceIdentities(
+        val channel = dataSource.loadIdentities(
             query = query,
             ranges = ranges,
             dataSource = mockk(),
@@ -342,7 +339,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
             onCandidateLoaded = { loadedCandidates.add(Unit) },
         )
 
-        val results = mutableListOf<IdentityBatch<Identity>>()
+        val results = mutableListOf<IdentityBatch>()
         for (batch in channel) {
             results.add(batch)
         }
@@ -356,53 +353,52 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
     }
 
     @Test
-    fun givenManySubjectsWithFingerprintSamples_whenLoadFingerprintIdentitiesIsCalledWithRanges_thenReturnsBatchedFingerprintIdentities() =
-        runTest {
-            // Given
-            val subjects = (1..10).map { i ->
-                createTestSubject(subjectId = UUID.randomUUID().toString()).apply {
-                    fingerprintSamples = listOf(
-                        Sample(
-                            template = byteArrayOf(i.toByte()),
-                            format = "ISO",
-                            referenceId = "ref$i",
-                            identifier = SampleIdentifier.LEFT_THUMB,
-                            modality = Modality.FINGERPRINT,
-                        ),
-                    )
-                }
+    fun givenManySubjectsWithFingerprintSamples_whenFingerprintIdentitiesIsCalledWithRanges_thenReturnsBatchedIdentities() = runTest {
+        // Given
+        val subjects = (1..10).map { i ->
+            createTestSubject(subjectId = UUID.randomUUID().toString()).apply {
+                samples = listOf(
+                    Sample(
+                        template = byteArrayOf(i.toByte()),
+                        format = "ISO",
+                        referenceId = "ref$i",
+                        identifier = SampleIdentifier.LEFT_THUMB,
+                        modality = Modality.FINGERPRINT,
+                    ),
+                )
             }
-            dataSource.performActions(
-                subjects.map { SubjectAction.Creation(it) },
-                mockk(),
-            )
-
-            val query = SubjectQuery(fingerprintSampleFormat = "ISO")
-            val ranges = listOf(0..2, 3..5, 6..9) // 3 batches
-            val loadedCandidates = mutableListOf<Unit>()
-
-            // When
-            val channel = dataSource.loadFingerprintIdentities(
-                query = query,
-                ranges = ranges,
-                dataSource = mockk(),
-                project = mockk(),
-                scope = this,
-                onCandidateLoaded = { loadedCandidates.add(Unit) },
-            )
-
-            val results = mutableListOf<IdentityBatch<Identity>>()
-            for (batch in channel) {
-                results.add(batch)
-            }
-
-            // Then
-            assertThat(results).hasSize(3)
-            assertThat(results[0].identities).hasSize(3)
-            assertThat(results[1].identities).hasSize(3)
-            assertThat(results[2].identities).hasSize(4)
-            assertThat(loadedCandidates).hasSize(10)
         }
+        dataSource.performActions(
+            subjects.map { SubjectAction.Creation(it) },
+            mockk(),
+        )
+
+        val query = SubjectQuery(format = "ISO")
+        val ranges = listOf(0..2, 3..5, 6..9) // 3 batches
+        val loadedCandidates = mutableListOf<Unit>()
+
+        // When
+        val channel = dataSource.loadIdentities(
+            query = query,
+            ranges = ranges,
+            dataSource = mockk(),
+            project = mockk(),
+            scope = this,
+            onCandidateLoaded = { loadedCandidates.add(Unit) },
+        )
+
+        val results = mutableListOf<IdentityBatch>()
+        for (batch in channel) {
+            results.add(batch)
+        }
+
+        // Then
+        assertThat(results).hasSize(3)
+        assertThat(results[0].identities).hasSize(3)
+        assertThat(results[1].identities).hasSize(3)
+        assertThat(results[2].identities).hasSize(4)
+        assertThat(loadedCandidates).hasSize(10)
+    }
 
     @Test
     fun givenManySubjects_whenLoadAllSubjectsInBatchesIsCalled_thenReturnsSubjectsInBatches() = runTest {
