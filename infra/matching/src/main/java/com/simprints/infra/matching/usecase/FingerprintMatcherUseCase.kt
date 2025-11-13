@@ -42,7 +42,11 @@ class FingerprintMatcherUseCase @Inject constructor(
     ): Flow<MatcherState> = channelFlow {
         Simber.i("Initialising matcher", tag = crashReportTag)
         if (matchParams.bioSdk !is FingerprintConfiguration.BioSdk) {
-            Simber.w("Fingerprint SDK was not provided", tag = crashReportTag)
+            Simber.w(
+                message = "Fingerprint SDK was not provided",
+                t = IllegalArgumentException("Fingerprint SDK was not provided"),
+                tag = crashReportTag,
+            )
             send(MatcherState.Success(emptyList(), emptyList(), 0, ""))
             return@channelFlow
         }

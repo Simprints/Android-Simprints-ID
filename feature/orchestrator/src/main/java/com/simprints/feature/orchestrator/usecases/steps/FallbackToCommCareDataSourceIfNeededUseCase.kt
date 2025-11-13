@@ -45,7 +45,11 @@ internal class FallbackToCommCareDataSourceIfNeededUseCase @Inject constructor(
             return false
         }
 
-        Simber.w("Falling back to CommCare data source because threshold is $thresholdMs and last sync was at $lastSyncTime", tag = SYNC)
+        Simber.w(
+            message = "Falling back to CommCare data source because threshold is $thresholdMs and last sync was at $lastSyncTime",
+            t = Exception("Fallback to CommCare just-in-time reading"),
+            tag = SYNC,
+        )
         return true
     }
 }

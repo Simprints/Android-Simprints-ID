@@ -40,7 +40,11 @@ class FaceMatcherUseCase @Inject constructor(
     ): Flow<MatcherState> = channelFlow {
         Simber.i("Initialising matcher", tag = crashReportTag)
         if (matchParams.bioSdk !is FaceConfiguration.BioSdk) {
-            Simber.w("Face SDK was not provided", tag = crashReportTag)
+            Simber.w(
+                message = "Face SDK was not provided",
+                t = IllegalArgumentException("Face SDK was not provided"),
+                tag = crashReportTag,
+            )
             send(MatcherState.Success(emptyList(), emptyList(), 0, ""))
             return@channelFlow
         }

@@ -12,10 +12,13 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.logging.LoggingConstants
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.matching.MatchParams
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -128,6 +131,52 @@ internal class FaceMatcherUseCaseTest {
                 matchBatches = emptyList(),
             ),
         )
+    }
+
+    @Test
+    fun `Logs warning and returns empty success when wrong SDK type is provided`() = runTest {
+        mockkObject(Simber)
+        justRun { Simber.w(message = any<String>(), t = any<Throwable>(), tag = any<String>()) }
+
+        val results = useCase
+            .invoke(
+                MatchParams(
+                    probeReferenceId = "referenceId",
+                    probeSamples = listOf(
+                        CaptureSample(
+                            captureEventId = "faceId",
+                            template = byteArrayOf(1, 2, 3),
+                            modality = Modality.FACE,
+                            format = "format",
+                        ),
+                    ),
+                    bioSdk = FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER, // Wrong SDK type
+                    flowType = FlowType.VERIFY,
+                    queryForCandidates = SubjectQuery(),
+                    biometricDataSource = BiometricDataSource.Simprints,
+                ),
+                project,
+            ).toList()
+
+        verify {
+            Simber.w(
+                message = "Face SDK was not provided",
+                t = ofType<IllegalArgumentException>(),
+                tag = LoggingConstants.CrashReportTag.FACE_MATCHING,
+            )
+        }
+
+        assertThat(results).containsExactly(
+            MatcherUseCase.MatcherState.Success(
+                comparisonResults = emptyList(),
+                totalCandidates = 0,
+                matcherName = "",
+                matchBatches = emptyList(),
+            ),
+        )
+
+        coVerify(exactly = 0) { faceMatcher.getHighestComparisonScoreForCandidate(any()) }
+        unmockkObject(Simber)
     }
 
     @Test
