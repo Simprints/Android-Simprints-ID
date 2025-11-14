@@ -168,7 +168,7 @@ private fun NavController.navigateIfPossible(
     } else {
         val fragmentName = currentFragment.toString().takeWhile { it != ' ' }
         val target = (currentDestination as? FragmentNavigator.Destination)?.className
-        Simber.w("Cannot navigate from $fragmentName to $target")
+        Simber.w("Cannot navigate from $fragmentName to $target", t = IllegalStateException("Navigation not possible"))
     }
 }
 

@@ -253,7 +253,11 @@ internal class CommCareEventDataSource @Inject constructor(
             }
         }
 
-        Simber.w("All date parsing attempts failed for: $dateString", tag = COMMCARE_SYNC)
+        Simber.w(
+            message = "All date parsing attempts failed for: $dateString",
+            t = IllegalArgumentException("Could not parse date string"),
+            tag = COMMCARE_SYNC,
+        )
         return 0L
     }
 
