@@ -7,7 +7,6 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationScheduler
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -48,9 +47,6 @@ class ConfigManagerTest {
     private lateinit var deviceConfiguration: DeviceConfiguration
 
     @MockK
-    private lateinit var realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler
-
-    @MockK
     private lateinit var project: Project
 
     @Before
@@ -60,7 +56,6 @@ class ConfigManagerTest {
             configRepository = configRepository,
             enrolmentRecordRepository = enrolmentRecordRepository,
             configSyncCache = configSyncCache,
-            realmToRoomMigrationScheduler = realmToRoomMigrationScheduler,
         )
     }
 
@@ -72,7 +67,6 @@ class ConfigManagerTest {
         assertThat(refreshedProject).isEqualTo(projectWithConfig)
 
         coVerify { configSyncCache.saveUpdateTime() }
-        coVerify { realmToRoomMigrationScheduler.scheduleMigrationWorkerIfNeeded() }
     }
 
     @Test
@@ -228,7 +222,7 @@ class ConfigManagerTest {
         launch {
             try {
                 configManager.refreshProject(PROJECT_ID)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Expected
             }
         }

@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationScheduler
 import com.simprints.infra.sync.config.testtools.project
 import com.simprints.infra.sync.config.testtools.projectConfiguration
 import com.simprints.infra.sync.config.usecase.HandleProjectStateUseCase
@@ -42,6 +43,9 @@ class ProjectConfigDownSyncWorkerTest {
     @MockK
     private lateinit var resetLocalRecordsIfConfigChangedUseCase: ResetLocalRecordsIfConfigChangedUseCase
 
+    @MockK
+    private lateinit var realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler
+
     private lateinit var projectConfigDownSyncWorker: ProjectConfigDownSyncWorker
 
     @Before
@@ -60,6 +64,7 @@ class ProjectConfigDownSyncWorkerTest {
             handleProjectState = handleProjectStateUseCase,
             rescheduleWorkersIfConfigChanged = rescheduleWorkersIfConfigChangedUseCase,
             resetLocalRecordsIfConfigChanged = resetLocalRecordsIfConfigChangedUseCase,
+            realmToRoomMigrationScheduler = realmToRoomMigrationScheduler,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
     }
@@ -94,8 +99,9 @@ class ProjectConfigDownSyncWorkerTest {
 
         coVerify {
             handleProjectStateUseCase.invoke(any())
-            rescheduleWorkersIfConfigChangedUseCase.invoke(any(), any())
             resetLocalRecordsIfConfigChangedUseCase.invoke(any(), any())
+            realmToRoomMigrationScheduler.scheduleMigrationWorkerIfNeeded()
+            rescheduleWorkersIfConfigChangedUseCase.invoke(any(), any())
         }
     }
 

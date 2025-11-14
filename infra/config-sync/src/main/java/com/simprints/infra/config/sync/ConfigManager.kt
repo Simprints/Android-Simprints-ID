@@ -8,7 +8,6 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationScheduler
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +20,6 @@ class ConfigManager @Inject constructor(
     private val configRepository: ConfigRepository,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val configSyncCache: ConfigSyncCache,
-    private val realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler,
 ) {
     private val isProjectRefreshingFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
@@ -31,7 +29,6 @@ class ConfigManager @Inject constructor(
             return configRepository.refreshProject(projectId).also {
                 enrolmentRecordRepository.tokenizeExistingRecords(it.project)
                 configSyncCache.saveUpdateTime()
-                realmToRoomMigrationScheduler.scheduleMigrationWorkerIfNeeded()
             }
         } finally {
             isProjectRefreshingFlow.tryEmit(false)
