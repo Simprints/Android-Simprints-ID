@@ -7,6 +7,7 @@ import com.simprints.core.DispatcherBG
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationScheduler
 import com.simprints.infra.sync.config.usecase.HandleProjectStateUseCase
 import com.simprints.infra.sync.config.usecase.RescheduleWorkersIfConfigChangedUseCase
 import com.simprints.infra.sync.config.usecase.ResetLocalRecordsIfConfigChangedUseCase
@@ -24,6 +25,7 @@ internal class ProjectConfigDownSyncWorker @AssistedInject constructor(
     private val handleProjectState: HandleProjectStateUseCase,
     private val rescheduleWorkersIfConfigChanged: RescheduleWorkersIfConfigChangedUseCase,
     private val resetLocalRecordsIfConfigChanged: ResetLocalRecordsIfConfigChangedUseCase,
+    private val realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
     override val tag = "ProjectConfigDownSync"
@@ -41,8 +43,9 @@ internal class ProjectConfigDownSyncWorker @AssistedInject constructor(
             } else {
                 val (project, config) = configManager.refreshProject(projectId)
                 handleProjectState(project.state)
-                rescheduleWorkersIfConfigChanged(oldConfig, config)
                 resetLocalRecordsIfConfigChanged(oldConfig, config)
+                realmToRoomMigrationScheduler.scheduleMigrationWorkerIfNeeded()
+                rescheduleWorkersIfConfigChanged(oldConfig, config)
                 success()
             }
         } catch (t: Throwable) {
