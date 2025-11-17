@@ -55,11 +55,29 @@ internal class ConfigRepositoryImpl @Inject constructor(
 
     override suspend fun getProjectConfiguration(): ProjectConfiguration {
         val config = localDataSource.getProjectConfiguration()
-        return tokenizeModules(config)
+
+        // DEMO OVERRIDE: Force enable MFID with Fayda card for testing
+        val demoConfig = config.copy(
+            multifactorId = com.simprints.infra.config.store.models.MultiFactorIdConfiguration(
+                allowedExternalCredentials = listOf(
+                    com.simprints.core.domain.externalcredential.ExternalCredentialType.FaydaCard
+                )
+            )
+        )
+
+        return tokenizeModules(demoConfig)
     }
 
     override fun observeProjectConfiguration(): Flow<ProjectConfiguration> = localDataSource.observeProjectConfiguration().map { config ->
-        tokenizeModules(config)
+        // DEMO OVERRIDE: Force enable MFID with Fayda card for testing
+        val demoConfig = config.copy(
+            multifactorId = com.simprints.infra.config.store.models.MultiFactorIdConfiguration(
+                allowedExternalCredentials = listOf(
+                    com.simprints.core.domain.externalcredential.ExternalCredentialType.FaydaCard
+                )
+            )
+        )
+        tokenizeModules(demoConfig)
     }
 
     override suspend fun getDeviceState(): DeviceState {
