@@ -36,7 +36,16 @@ android {
 dependencies {
     implementation(libs.firebase.crashlytics)
     api(libs.firebase.analytics)
-    implementation(libs.firebase.perf)
+    implementation(libs.firebase.perf) {
+        /*
+        This exclude resolves a build failure (duplicate class/resource error)
+        caused by a conflict between 'com.google.firebase:protolite-well-known-types'
+        (a dependency of firebase-perf) and the 'com.google.protobuf:protobuf-javalite'
+        library. This forces Gradle to use the explicitly defined protobuf-javalite version.
+        Related issue: https://github.com/firebase/firebase-android-sdk/issues/5997/
+         */
+        exclude(group = "com.google.firebase", module = "protolite-well-known-types")
+    }
     implementation(libs.kermit)
     implementation(libs.kermit.io)
 
