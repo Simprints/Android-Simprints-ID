@@ -17,6 +17,7 @@ internal class KeepOnlyBestDetectedBlockUseCase @Inject constructor(
         val credentialLength = when (documentType) {
             OcrDocumentType.NhisCard -> 8 // NHIS membership number contains 8 digits: 12345678
             OcrDocumentType.GhanaIdCard -> 15 // Ghana ID field contains 15 chars: GHA-123456789-0
+            OcrDocumentType.FaydaCard -> 19 // Fayda ID contains 19 chars: FCN1234567890123456
         }
         val externalCredential = getExternalCredentialBasedOnConfidenceUseCase(allDetectedBlock, credentialLength)
         val detectedBlock = findBestTextBlockForCredentialUseCase(credential = externalCredential, detectedBlocks = allDetectedBlock)

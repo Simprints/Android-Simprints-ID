@@ -23,6 +23,7 @@ fun Resources.getQuantityCredentialString(
 fun Resources.getCredentialFieldTitle(type: ExternalCredentialType): String = when (type) {
     ExternalCredentialType.NHISCard -> IDR.string.mfid_nhis_card_credential_field
     ExternalCredentialType.GhanaIdCard -> IDR.string.mfid_ghana_id_credential_field
+    ExternalCredentialType.FaydaCard -> IDR.string.mfid_fayda_card_credential_field
     ExternalCredentialType.QRCode -> IDR.string.mfid_qr_credential_field
 }.run(::getString)
 
@@ -31,6 +32,7 @@ fun Resources.getCredentialTypeString(type: ExternalCredentialType?): String = g
 fun Resources.getCredentialTypeRes(type: ExternalCredentialType?): Int = when (type) {
     ExternalCredentialType.NHISCard -> IDR.string.mfid_type_nhis_card
     ExternalCredentialType.GhanaIdCard -> IDR.string.mfid_type_ghana_id_card
+    ExternalCredentialType.FaydaCard -> IDR.string.mfid_type_fayda_card
     ExternalCredentialType.QRCode -> IDR.string.mfid_type_qr_code
     null -> IDR.string.mfid_type_any_document
 }

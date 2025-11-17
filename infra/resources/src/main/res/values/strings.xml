@@ -495,9 +495,11 @@
     <string name="mfid_scanner_selection_skip">Skip document scan</string>
     <string name="mfid_type_nhis_card">NHIS Card</string>
     <string name="mfid_type_ghana_id_card">Ghana ID Card</string>
+    <string name="mfid_type_fayda_card">Fayda Card</string>
     <string name="mfid_type_qr_code">QR Code</string>
     <string name="mfid_nhis_card_credential_field">Membership number</string>
     <string name="mfid_ghana_id_credential_field">Personal ID</string>
+    <string name="mfid_fayda_card_credential_field">FCN number</string>
     <string name="mfid_qr_credential_field">QR Code value</string>
     <string name="mfid_type_any_document">a document</string>
 

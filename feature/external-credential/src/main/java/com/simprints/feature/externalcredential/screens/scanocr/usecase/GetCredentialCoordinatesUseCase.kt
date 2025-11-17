@@ -21,6 +21,7 @@ import javax.inject.Singleton
 internal class GetCredentialCoordinatesUseCase @Inject constructor(
     private val ghanaNhisCardOcrSelectorUseCase: GhanaNhisCardOcrSelectorUseCase,
     private val ghanaIdCardOcrSelectorUseCase: GhanaIdCardOcrSelectorUseCase,
+    private val faydaCardOcrSelectorUseCase: FaydaCardOcrSelectorUseCase,
     private val credentialImageRepository: CredentialImageRepository,
 ) {
     private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
@@ -58,6 +59,7 @@ internal class GetCredentialCoordinatesUseCase @Inject constructor(
                     val isValid = when (documentType) {
                         OcrDocumentType.NhisCard -> ghanaNhisCardOcrSelectorUseCase(lineReadout)
                         OcrDocumentType.GhanaIdCard -> ghanaIdCardOcrSelectorUseCase(lineReadout)
+                        OcrDocumentType.FaydaCard -> faydaCardOcrSelectorUseCase(lineReadout)
                     }
                     if (isValid) {
                         val blockBoundingRect = textBlock.boundingBox ?: return@firstNotNullOfOrNull null

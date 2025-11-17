@@ -21,7 +21,8 @@ enum ProtoExternalCredentialType {
     EXTERNAL_CREDENTIAL_TYPE_UNSPECIFIED = 0;
     NHIS_CARD = 1;
     GHANA_ID_CARD = 2;
-    QR_CODE = 3;
+    FAYDA_CARD = 3;
+    QR_CODE = 4;
 }
 
 message ProtoMultiFactorIdConfiguration {

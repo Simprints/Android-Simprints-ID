@@ -97,6 +97,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     fun getDocumentTypeRes(): Int = when (ocrDocumentType) {
         OcrDocumentType.NhisCard -> R.string.mfid_type_nhis_card
         OcrDocumentType.GhanaIdCard -> R.string.mfid_type_ghana_id_card
+        OcrDocumentType.FaydaCard -> R.string.mfid_type_fayda_card
     }
 
     fun ocrStarted() {

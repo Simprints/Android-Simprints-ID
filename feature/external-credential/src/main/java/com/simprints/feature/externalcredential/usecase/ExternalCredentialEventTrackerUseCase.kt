@@ -81,6 +81,7 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
     private fun getExpectedCredentialValueLength(credential: ExternalCredential): Int = when (credential.type) {
         ExternalCredentialType.NHISCard -> NHIS_CARD_ID_LENGTH
         ExternalCredentialType.GhanaIdCard -> GHANA_ID_CARD_ID_LENGTH
+        ExternalCredentialType.FaydaCard -> FAYDA_CARD_ID_LENGTH
         ExternalCredentialType.QRCode -> QR_CODE_LENGTH
     }
 
@@ -133,6 +134,7 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
     companion object Companion {
         private const val NHIS_CARD_ID_LENGTH = 8
         private const val GHANA_ID_CARD_ID_LENGTH = 15
+        private const val FAYDA_CARD_ID_LENGTH = 19
         private const val QR_CODE_LENGTH = 6
     }
 }

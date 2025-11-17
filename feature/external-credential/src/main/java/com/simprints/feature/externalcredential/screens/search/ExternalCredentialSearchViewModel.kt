@@ -161,6 +161,7 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
     fun getKeyBoardInputType() = when (scannedCredential.credentialType) {
         ExternalCredentialType.NHISCard -> InputType.TYPE_CLASS_NUMBER // NHIS card membership contains only numbers
         ExternalCredentialType.GhanaIdCard -> InputType.TYPE_CLASS_TEXT
+        ExternalCredentialType.FaydaCard -> InputType.TYPE_CLASS_TEXT
         ExternalCredentialType.QRCode -> InputType.TYPE_CLASS_TEXT
     }
 

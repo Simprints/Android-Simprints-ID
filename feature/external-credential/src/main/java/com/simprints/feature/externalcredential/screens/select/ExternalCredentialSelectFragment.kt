@@ -110,6 +110,7 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
         when (type) {
             ExternalCredentialType.NHISCard,
             ExternalCredentialType.GhanaIdCard,
+            ExternalCredentialType.FaydaCard,
             -> startOcr(type.asOcrDocumentType())
 
             ExternalCredentialType.QRCode -> startQrScan()

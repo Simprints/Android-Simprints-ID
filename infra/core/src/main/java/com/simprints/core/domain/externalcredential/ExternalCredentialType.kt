@@ -6,5 +6,6 @@ import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 enum class ExternalCredentialType {
     NHISCard,
     GhanaIdCard,
+    FaydaCard,
     QRCode,
 }
