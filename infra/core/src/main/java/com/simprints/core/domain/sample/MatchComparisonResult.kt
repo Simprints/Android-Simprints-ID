@@ -8,7 +8,7 @@ import kotlinx.parcelize.Parcelize
 
 @Keep
 @Parcelize
-data class MatchConfidence(
+data class MatchComparisonResult(
     val subjectId: String,
     val confidence: Float,
 ) : StepParams,

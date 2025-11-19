@@ -1,7 +1,7 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.google.common.truth.Truth.*
-import com.simprints.core.domain.sample.MatchConfidence
+import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
@@ -248,12 +248,12 @@ class CreateVerifyResponseUseCaseTest {
     }
 
     private fun createFingerprintMatchResult(vararg confidences: Float): Serializable = MatchResult(
-        confidences.map { MatchConfidence(subjectId = "1", confidence = it) },
+        confidences.map { MatchComparisonResult(subjectId = "1", confidence = it) },
         FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
     )
 
     private fun createFaceMatchResult(vararg confidences: Float): Serializable = MatchResult(
-        confidences.map { MatchConfidence(subjectId = "1", confidence = it) },
+        confidences.map { MatchComparisonResult(subjectId = "1", confidence = it) },
         FaceConfiguration.BioSdk.RANK_ONE,
     )
 }

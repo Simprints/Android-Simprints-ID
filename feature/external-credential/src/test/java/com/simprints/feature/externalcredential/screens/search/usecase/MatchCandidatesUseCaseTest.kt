@@ -3,7 +3,7 @@ package com.simprints.feature.externalcredential.screens.search.usecase
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.sample.CaptureSample
-import com.simprints.core.domain.sample.MatchConfidence
+import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.infra.config.store.models.AgeGroup
@@ -60,7 +60,7 @@ internal class MatchCandidatesUseCaseTest {
     private lateinit var fingerprintSdkConfig: FingerprintConfiguration.FingerprintSdkConfiguration
 
     @MockK
-    private lateinit var matchResultItem: MatchConfidence
+    private lateinit var matchResultItem: MatchComparisonResult
 
     @MockK
     private lateinit var matchParams: MatchParams
@@ -115,7 +115,7 @@ internal class MatchCandidatesUseCaseTest {
         every { faceSdkConfig.verificationMatchThreshold } returns verificationMatchThreshold
         every { fingerprintConfig.getSdkConfiguration(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER) } returns fingerprintSdkConfig
         every { fingerprintSdkConfig.verificationMatchThreshold } returns verificationMatchThreshold
-        every { matcherSuccess.matchResultItems } returns listOf(matchResultItem)
+        every { matcherSuccess.comparisonResults } returns listOf(matchResultItem)
         coEvery { faceMatcher(matchParams, project) } returns flowOf(matcherSuccess)
         coEvery { fingerprintMatcher(matchParams, project) } returns flowOf(matcherSuccess)
     }

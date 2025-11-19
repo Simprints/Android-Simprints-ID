@@ -110,7 +110,7 @@ class SubjectFactory @Inject constructor(
         externalCredentials = externalCredentials,
     )
 
-    private fun extractFingerprintSamples(fingerprintResponse: CaptureIdentity) = fingerprintResponse.results.map { sample ->
+    private fun extractFingerprintSamples(fingerprintResponse: CaptureIdentity) = fingerprintResponse.samples.map { sample ->
         Sample(
             identifier = sample.identifier,
             template = sample.template,
@@ -120,7 +120,7 @@ class SubjectFactory @Inject constructor(
         )
     }
 
-    private fun extractFaceSamples(faceResponse: CaptureIdentity) = faceResponse.results.map {
+    private fun extractFaceSamples(faceResponse: CaptureIdentity) = faceResponse.samples.map {
         Sample(
             template = it.template,
             format = it.format,

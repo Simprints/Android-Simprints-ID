@@ -42,7 +42,7 @@ internal class MatchCandidatesUseCase @Inject constructor(
                         val faceSdk = matchParams.bioSdk
                         projectConfig.face?.getSdkConfiguration(faceSdk)?.verificationMatchThreshold?.let { matchThreshold ->
                             (faceMatcher(matchParams, project).last() as? MatcherState.Success)
-                                ?.matchResultItems
+                                ?.comparisonResults
                                 .orEmpty()
                                 .map { result ->
                                     CredentialMatch(
@@ -60,7 +60,7 @@ internal class MatchCandidatesUseCase @Inject constructor(
                         val fingerprintSdk = matchParams.bioSdk
                         projectConfig.fingerprint?.getSdkConfiguration(fingerprintSdk)?.verificationMatchThreshold?.let { matchThreshold ->
                             (fingerprintMatcher(matchParams, project).last() as? MatcherState.Success)
-                                ?.matchResultItems
+                                ?.comparisonResults
                                 .orEmpty()
                                 .map { result ->
                                     CredentialMatch(

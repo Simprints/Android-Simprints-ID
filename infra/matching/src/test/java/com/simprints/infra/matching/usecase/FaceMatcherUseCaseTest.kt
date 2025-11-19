@@ -6,7 +6,7 @@ import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.MatchConfidence
+import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
@@ -86,7 +86,7 @@ internal class FaceMatcherUseCaseTest {
 
         assertThat(results).containsExactly(
             MatcherUseCase.MatcherState.Success(
-                matchResultItems = emptyList(),
+                comparisonResults = emptyList(),
                 totalCandidates = 0,
                 matcherName = "",
                 matchBatches = emptyList(),
@@ -122,7 +122,7 @@ internal class FaceMatcherUseCaseTest {
 
         assertThat(results).containsExactly(
             MatcherUseCase.MatcherState.Success(
-                matchResultItems = emptyList(),
+                comparisonResults = emptyList(),
                 totalCandidates = 0,
                 matcherName = "",
                 matchBatches = emptyList(),
@@ -190,7 +190,7 @@ internal class FaceMatcherUseCaseTest {
         assertThat(results[1]).isInstanceOf(MatcherUseCase.MatcherState.CandidateLoaded::class.java)
 
         val successState = results[2] as MatcherUseCase.MatcherState.Success
-        assertThat(successState.matchResultItems).containsExactly(MatchConfidence("subjectId", 42f))
+        assertThat(successState.comparisonResults).containsExactly(MatchComparisonResult("subjectId", 42f))
         assertThat(successState.totalCandidates).isEqualTo(totalCandidates)
         assertThat(successState.matcherName).isEqualTo("")
 

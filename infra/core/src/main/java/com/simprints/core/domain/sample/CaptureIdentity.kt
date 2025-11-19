@@ -8,5 +8,5 @@ import com.simprints.core.domain.step.StepResult
 data class CaptureIdentity(
     val referenceId: String,
     val modality: Modality,
-    var results: List<CaptureSample>,
+    var samples: List<CaptureSample>,
 ) : StepResult

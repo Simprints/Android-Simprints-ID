@@ -9,7 +9,7 @@ import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.sample.CaptureSample
-import com.simprints.core.domain.sample.MatchConfidence
+import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
@@ -138,11 +138,11 @@ class OrchestratorCacheIntegrationTest {
                             ),
                         ),
                         EnrolLastBiometricStepResult.MatchResult(
-                            listOf(MatchConfidence("subjectId", 0.5f)),
+                            listOf(MatchComparisonResult("subjectId", 0.5f)),
                             FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                         ),
                         EnrolLastBiometricStepResult.MatchResult(
-                            listOf(MatchConfidence("subjectId", 0.5f)),
+                            listOf(MatchComparisonResult("subjectId", 0.5f)),
                             FaceConfiguration.BioSdk.RANK_ONE,
                         ),
                         EnrolLastBiometricStepResult.EnrolLastBiometricsResult("subjectId"),
@@ -221,7 +221,7 @@ class OrchestratorCacheIntegrationTest {
                     matchResults = listOf(
                         CredentialMatch(
                             credential = "credential".asTokenizableEncrypted(),
-                            matchResult = MatchConfidence("subjectId", 0.5f),
+                            matchResult = MatchComparisonResult("subjectId", 0.5f),
                             verificationThreshold = 55f,
                             faceBioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                             fingerprintBioSdk = FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
@@ -256,7 +256,7 @@ class OrchestratorCacheIntegrationTest {
                 result = CaptureIdentity(
                     "",
                     modality = Modality.FINGERPRINT,
-                    results = listOf(
+                    samples = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
                             identifier = SampleIdentifier.LEFT_THUMB,
@@ -289,7 +289,7 @@ class OrchestratorCacheIntegrationTest {
                 ),
                 status = StepStatus.COMPLETED,
                 result = MatchResult(
-                    listOf(MatchConfidence("subjectId", 0.5f)),
+                    listOf(MatchComparisonResult("subjectId", 0.5f)),
                     FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                 ),
             ),
@@ -316,7 +316,7 @@ class OrchestratorCacheIntegrationTest {
                 result = CaptureIdentity(
                     "",
                     modality = Modality.FACE,
-                    results = listOf(
+                    samples = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
                             identifier = SampleIdentifier.LEFT_THUMB,
@@ -349,7 +349,7 @@ class OrchestratorCacheIntegrationTest {
                 ),
                 status = StepStatus.COMPLETED,
                 result = MatchResult(
-                    listOf(MatchConfidence("subjectId", 0.5f)),
+                    listOf(MatchComparisonResult("subjectId", 0.5f)),
                     FaceConfiguration.BioSdk.RANK_ONE,
                 ),
             ),

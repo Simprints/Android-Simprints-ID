@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.sample.CaptureSample
-import com.simprints.core.domain.sample.MatchConfidence
+import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.step.StepResult
 import com.simprints.face.capture.FaceCaptureParams
@@ -58,7 +58,7 @@ import java.io.Serializable
     // Common data types
     JsonSubTypes.Type(value = CaptureIdentity::class, name = "CaptureIdentity"),
     JsonSubTypes.Type(value = CaptureSample::class, name = "CaptureSample"),
-    JsonSubTypes.Type(value = MatchConfidence::class, name = "MatchConfidence"),
+    JsonSubTypes.Type(value = MatchComparisonResult::class, name = "MatchComparisonResult"),
 )
 abstract class StepResultMixin : StepResult
 
@@ -95,7 +95,7 @@ abstract class StepResultMixin : StepResult
     JsonSubTypes.Type(value = MatchResult::class, name = "MatchResult"),
     // Additional types that are used in top-level params
     JsonSubTypes.Type(value = CaptureSample::class, name = "CaptureSample"),
-    JsonSubTypes.Type(value = MatchConfidence::class, name = "MatchConfidence"),
+    JsonSubTypes.Type(value = MatchComparisonResult::class, name = "MatchComparisonResult"),
     JsonSubTypes.Type(value = BiometricDataSource::class, name = "BiometricDataSource"),
     JsonSubTypes.Type(value = SubjectQuery::class, name = "SubjectQuery"),
     JsonSubTypes.Type(value = FingerprintConfiguration.BioSdk::class, name = "FingerprintConfiguration.BioSdk"),

@@ -1,7 +1,7 @@
 package com.simprints.feature.orchestrator.usecases
 
 import com.simprints.core.domain.sample.CaptureIdentity
-import com.simprints.core.domain.sample.MatchConfidence
+import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.infra.matching.MatchResult
@@ -18,11 +18,11 @@ internal class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
 
             is CaptureIdentity -> EnrolLastBiometricStepResult.CaptureResult(
                 result.referenceId,
-                result.results,
+                result.samples,
             )
 
             is MatchResult -> EnrolLastBiometricStepResult.MatchResult(
-                result.results.map { MatchConfidence(it.subjectId, it.confidence) },
+                result.results.map { MatchComparisonResult(it.subjectId, it.confidence) },
                 result.sdk,
             )
 

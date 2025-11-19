@@ -51,7 +51,7 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
                 CaptureIdentity(
                     "referenceId",
                     modality = Modality.FACE,
-                    results = listOf(
+                    samples = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
                             modality = Modality.FACE,
@@ -98,7 +98,7 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
                 CaptureIdentity(
                     "referenceId",
                     modality = Modality.FINGERPRINT,
-                    results = listOf(
+                    samples = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
                             modality = Modality.FINGERPRINT,

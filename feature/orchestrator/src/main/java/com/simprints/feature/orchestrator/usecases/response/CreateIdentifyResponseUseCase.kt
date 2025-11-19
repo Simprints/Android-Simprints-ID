@@ -1,6 +1,6 @@
 package com.simprints.feature.orchestrator.usecases.response
 
-import com.simprints.core.domain.sample.MatchConfidence
+import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.FaceConfiguration
@@ -107,7 +107,7 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
                 }
         } ?: emptyList()
 
-    private fun List<MatchConfidence>.mapToMatchResults(
+    private fun List<MatchComparisonResult>.mapToMatchResults(
         decisionPolicy: DecisionPolicy,
         verificationMatchThreshold: Float?,
         projectConfiguration: ProjectConfiguration,

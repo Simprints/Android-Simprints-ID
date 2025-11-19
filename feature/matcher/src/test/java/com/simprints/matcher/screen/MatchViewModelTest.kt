@@ -6,7 +6,7 @@ import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.sample.CaptureSample
-import com.simprints.core.domain.sample.MatchConfidence
+import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
@@ -87,7 +87,7 @@ internal class MatchViewModelTest {
     @Test
     fun `when setup is called, then view model becomes initialized`() = runTest {
         val responseItems = listOf(
-            MatchConfidence("1", 90f),
+            MatchComparisonResult("1", 90f),
         )
 
         coEvery { faceMatcherUseCase.invoke(any(), any()) } returns flow {
@@ -95,7 +95,7 @@ internal class MatchViewModelTest {
             emit(MatcherUseCase.MatcherState.CandidateLoaded)
             emit(
                 MatcherUseCase.MatcherState.Success(
-                    matchResultItems = responseItems,
+                    comparisonResults = responseItems,
                     totalCandidates = responseItems.size,
                     matcherName = "MatcherName",
                     matchBatches = emptyList(),
@@ -139,13 +139,13 @@ internal class MatchViewModelTest {
         } returns DecisionPolicy(20, 35, 50)
 
         val responseItems = listOf(
-            MatchConfidence("1", 90f),
-            MatchConfidence("1", 80f),
-            MatchConfidence("1", 55f),
-            MatchConfidence("1", 40f),
-            MatchConfidence("1", 36f),
-            MatchConfidence("1", 20f),
-            MatchConfidence("1", 10f),
+            MatchComparisonResult("1", 90f),
+            MatchComparisonResult("1", 80f),
+            MatchComparisonResult("1", 55f),
+            MatchComparisonResult("1", 40f),
+            MatchComparisonResult("1", 36f),
+            MatchComparisonResult("1", 20f),
+            MatchComparisonResult("1", 10f),
         )
         val batches = listOf(
             MatchBatchInfo(
@@ -169,7 +169,7 @@ internal class MatchViewModelTest {
             emit(MatcherUseCase.MatcherState.CandidateLoaded)
             emit(
                 MatcherUseCase.MatcherState.Success(
-                    matchResultItems = responseItems,
+                    comparisonResults = responseItems,
                     totalCandidates = responseItems.size,
                     matcherName = MATCHER_NAME,
                     matchBatches = batches,
@@ -228,13 +228,13 @@ internal class MatchViewModelTest {
         } returns DecisionPolicy(200, 350, 500)
 
         val responseItems = listOf(
-            MatchConfidence("1", 900f),
-            MatchConfidence("1", 800f),
-            MatchConfidence("1", 550f),
-            MatchConfidence("1", 400f),
-            MatchConfidence("1", 360f),
-            MatchConfidence("1", 200f),
-            MatchConfidence("1", 100f),
+            MatchComparisonResult("1", 900f),
+            MatchComparisonResult("1", 800f),
+            MatchComparisonResult("1", 550f),
+            MatchComparisonResult("1", 400f),
+            MatchComparisonResult("1", 360f),
+            MatchComparisonResult("1", 200f),
+            MatchComparisonResult("1", 100f),
         )
         val batches = listOf(
             MatchBatchInfo(
@@ -258,7 +258,7 @@ internal class MatchViewModelTest {
             emit(MatcherUseCase.MatcherState.CandidateLoaded)
             emit(
                 MatcherUseCase.MatcherState.Success(
-                    matchResultItems = responseItems,
+                    comparisonResults = responseItems,
                     totalCandidates = responseItems.size,
                     matcherName = MATCHER_NAME,
                     matchBatches = batches,
@@ -319,14 +319,14 @@ internal class MatchViewModelTest {
         } returns null
 
         val responseItems = listOf(
-            MatchConfidence("1", 90f),
-            MatchConfidence("1", 10f),
+            MatchComparisonResult("1", 90f),
+            MatchComparisonResult("1", 10f),
         )
         coEvery { faceMatcherUseCase.invoke(any(), any()) } returns flow {
             emit(MatcherUseCase.MatcherState.LoadingStarted(responseItems.size))
             emit(
                 MatcherUseCase.MatcherState.Success(
-                    matchResultItems = responseItems,
+                    comparisonResults = responseItems,
                     totalCandidates = responseItems.size,
                     matcherName = MATCHER_NAME,
                     matchBatches = emptyList(),
@@ -365,7 +365,7 @@ internal class MatchViewModelTest {
             emit(MatcherUseCase.MatcherState.CandidateLoaded)
             emit(
                 MatcherUseCase.MatcherState.Success(
-                    matchResultItems = listOf(MatchConfidence("1", 90f)),
+                    comparisonResults = listOf(MatchComparisonResult("1", 90f)),
                     totalCandidates = 1,
                     matcherName = MATCHER_NAME,
                     matchBatches = emptyList(),
@@ -378,7 +378,7 @@ internal class MatchViewModelTest {
         val matchParams = MatchParams(
             probeReferenceId = "referenceId",
             probeFaceSamples = listOf(getFaceSample()),
-            faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
+            bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
             flowType = FlowType.ENROL,
             queryForCandidates = mockk {},
             biometricDataSource = BiometricDataSource.Simprints,

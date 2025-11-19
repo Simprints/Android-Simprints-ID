@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.domain.sample.MatchConfidence
+import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
@@ -86,16 +86,16 @@ internal class MatchViewModel @Inject constructor(
                         params,
                         matcherState.totalCandidates,
                         matcherState.matcherName,
-                        matcherState.matchResultItems,
+                        matcherState.comparisonResults,
                         matcherState.matchBatches,
                     )
 
-                    setMatchState(matcherState.totalCandidates, matcherState.matchResultItems, decisionPolicy)
+                    setMatchState(matcherState.totalCandidates, matcherState.comparisonResults, decisionPolicy)
 
                     // wait a bit for the user to see the results
                     delay(MATCHING_END_WAIT_TIME_MS)
 
-                    _matchResponse.send(MatchResult(matcherState.matchResultItems, params.bioSdk))
+                    _matchResponse.send(MatchResult(matcherState.comparisonResults, params.bioSdk))
                 }
             }
         }
@@ -113,7 +113,7 @@ internal class MatchViewModel @Inject constructor(
 
     private fun setMatchState(
         candidatesMatched: Int,
-        results: List<MatchConfidence>,
+        results: List<MatchComparisonResult>,
         decisionPolicy: DecisionPolicy,
     ) {
         val veryGoodMatches = results.count { decisionPolicy.high <= it.confidence }

@@ -3,7 +3,7 @@ package com.simprints.fingerprint.infra.biosdkimpl.matching
 import com.google.common.truth.*
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.MatchConfidence
+import com.simprints.core.domain.sample.MatchComparisonResult
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -19,7 +19,7 @@ class FingerprintMatcherImplTest {
         val candidates: List<Identity> = mockk()
         val simAfisMatcherSettings = SimAfisMatcherSettings()
         simAfisMatcherSettings.crossFingerComparison = false
-        val matchResult: List<MatchConfidence> = mockk()
+        val matchResult: List<MatchComparisonResult> = mockk()
         every {
             simAfisMatcher.match(probe, candidates, false)
         } returns matchResult

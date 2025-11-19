@@ -1,6 +1,6 @@
 package com.simprints.infra.matching.usecase
 
-import com.simprints.core.domain.sample.MatchConfidence
+import com.simprints.core.domain.sample.MatchComparisonResult
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.locks.ReentrantLock
@@ -13,10 +13,10 @@ internal class MatchResultSet(
     private val lock = ReentrantLock()
 
     private val skipListSet = ConcurrentSkipListSet(
-        compareByDescending<MatchConfidence> { it.confidence }.thenByDescending { it.subjectId },
+        compareByDescending<MatchComparisonResult> { it.confidence }.thenByDescending { it.subjectId },
     )
 
-    fun add(element: MatchConfidence): MatchResultSet {
+    fun add(element: MatchComparisonResult): MatchResultSet {
         // Use a lock to ensure thread safety during the entire add operation
         lock.withLock {
             // Only perform this optimization when we know the set is at max capacity
@@ -42,7 +42,7 @@ internal class MatchResultSet(
         return this
     }
 
-    fun toList(): List<MatchConfidence> = skipListSet.toList()
+    fun toList(): List<MatchComparisonResult> = skipListSet.toList()
 
     companion object {
         /**

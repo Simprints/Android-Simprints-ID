@@ -2,7 +2,7 @@ package com.simprints.infra.matching.usecase
 
 import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.sample.MatchConfidence
+import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
@@ -30,7 +30,7 @@ class SaveMatchEventUseCase @Inject constructor(
         matchParams: MatchParams,
         candidatesCount: Int,
         matcherName: String,
-        results: List<MatchConfidence>,
+        results: List<MatchComparisonResult>,
         batches: List<MatchBatchInfo>,
     ) {
         sessionCoroutineScope.launch {

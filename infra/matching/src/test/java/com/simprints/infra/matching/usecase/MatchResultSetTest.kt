@@ -1,7 +1,7 @@
 package com.simprints.infra.matching.usecase
 
 import com.google.common.truth.Truth.*
-import com.simprints.core.domain.sample.MatchConfidence
+import com.simprints.core.domain.sample.MatchComparisonResult
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
@@ -12,17 +12,17 @@ class MatchResultSetTest {
     fun `Stores results sorted descending by confidence up to the limit`() {
         val set = MatchResultSet(3)
 
-        set.add(MatchConfidence("4", 0.4f))
-        set.add(MatchConfidence("1", 0.1f))
-        set.add(MatchConfidence("3", 0.3f))
-        set.add(MatchConfidence("3", 0.1f))
-        set.add(MatchConfidence("2", 0.2f))
+        set.add(MatchComparisonResult("4", 0.4f))
+        set.add(MatchComparisonResult("1", 0.1f))
+        set.add(MatchComparisonResult("3", 0.3f))
+        set.add(MatchComparisonResult("3", 0.1f))
+        set.add(MatchComparisonResult("2", 0.2f))
 
         assertThat(set.toList()).isEqualTo(
             listOf(
-                MatchConfidence("4", 0.4f),
-                MatchConfidence("3", 0.3f),
-                MatchConfidence("2", 0.2f),
+                MatchComparisonResult("4", 0.4f),
+                MatchComparisonResult("3", 0.3f),
+                MatchComparisonResult("2", 0.2f),
             ),
         )
     }
@@ -30,12 +30,12 @@ class MatchResultSetTest {
     @Test
     fun `Merges sets preserving the total limit`() {
         val setOne = MatchResultSet(2)
-        setOne.add(MatchConfidence("1", 0.1f))
-        setOne.add(MatchConfidence("3", 0.3f))
+        setOne.add(MatchComparisonResult("1", 0.1f))
+        setOne.add(MatchComparisonResult("3", 0.3f))
 
         val setTwo = MatchResultSet(2)
-        setTwo.add(MatchConfidence("2", 0.2f))
-        setTwo.add(MatchConfidence("4", 0.4f))
+        setTwo.add(MatchComparisonResult("2", 0.2f))
+        setTwo.add(MatchComparisonResult("4", 0.4f))
 
         val set = MatchResultSet(3)
         set.addAll(setOne)
@@ -43,9 +43,9 @@ class MatchResultSetTest {
 
         assertThat(set.toList()).isEqualTo(
             listOf(
-                MatchConfidence("4", 0.4f),
-                MatchConfidence("3", 0.3f),
-                MatchConfidence("2", 0.2f),
+                MatchComparisonResult("4", 0.4f),
+                MatchComparisonResult("3", 0.3f),
+                MatchComparisonResult("2", 0.2f),
             ),
         )
     }
@@ -55,16 +55,16 @@ class MatchResultSetTest {
     fun `Stores results sorted descending by confidence and id`() {
         val set = MatchResultSet(3)
 
-        set.add(MatchConfidence("4", 0.4f))
-        set.add(MatchConfidence("1", 0.4f))
-        set.add(MatchConfidence("3", 0.3f))
-        set.add(MatchConfidence("2", 0.3f))
+        set.add(MatchComparisonResult("4", 0.4f))
+        set.add(MatchComparisonResult("1", 0.4f))
+        set.add(MatchComparisonResult("3", 0.3f))
+        set.add(MatchComparisonResult("2", 0.3f))
 
         assertThat(set.toList()).isEqualTo(
             listOf(
-                MatchConfidence("4", 0.4f),
-                MatchConfidence("1", 0.4f),
-                MatchConfidence("3", 0.3f),
+                MatchComparisonResult("4", 0.4f),
+                MatchComparisonResult("1", 0.4f),
+                MatchComparisonResult("3", 0.3f),
             ),
         )
     }
@@ -88,7 +88,7 @@ class MatchResultSetTest {
                     // Each thread adds its own batch of elements
                     repeat(elementsPerThread) { i ->
                         val confidence = (threadIndex * elementsPerThread + i) / 100f
-                        set.add(MatchConfidence("T$threadIndex-$i", confidence))
+                        set.add(MatchComparisonResult("T$threadIndex-$i", confidence))
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -129,7 +129,7 @@ class MatchResultSetTest {
             MatchResultSet(3).apply {
                 repeat(5) { i ->
                     val confidence = 0.5f + (threadIndex * 5 + i) / 100f
-                    add(MatchConfidence("S$threadIndex-$i", confidence))
+                    add(MatchComparisonResult("S$threadIndex-$i", confidence))
                 }
             }
         }
@@ -175,18 +175,18 @@ class MatchResultSetTest {
         val set = MatchResultSet(3)
 
         // Add higher confidence items first to fill the set
-        set.add(MatchConfidence("A", 0.8f))
-        set.add(MatchConfidence("B", 0.7f))
-        set.add(MatchConfidence("C", 0.6f))
+        set.add(MatchComparisonResult("A", 0.8f))
+        set.add(MatchComparisonResult("B", 0.7f))
+        set.add(MatchComparisonResult("C", 0.6f))
 
         // Try to add a new set with lower confidence items
         val lowerSet = MatchResultSet(3)
-        lowerSet.add(MatchConfidence("D", 0.5f))
-        lowerSet.add(MatchConfidence("E", 0.4f))
-        lowerSet.add(MatchConfidence("F", 0.3f))
+        lowerSet.add(MatchComparisonResult("D", 0.5f))
+        lowerSet.add(MatchComparisonResult("E", 0.4f))
+        lowerSet.add(MatchComparisonResult("F", 0.3f))
 
         // Add one higher item to verify it still gets added
-        lowerSet.add(MatchConfidence("G", 0.9f))
+        lowerSet.add(MatchComparisonResult("G", 0.9f))
 
         set.addAll(lowerSet)
 

@@ -98,7 +98,7 @@ internal class FingerprintMatcherUseCaseTest {
 
         assertThat(results).containsExactly(
             MatcherUseCase.MatcherState.Success(
-                matchResultItems = emptyList(),
+                comparisonResults = emptyList(),
                 totalCandidates = 0,
                 matcherName = "",
                 matchBatches = emptyList(),
@@ -138,7 +138,7 @@ internal class FingerprintMatcherUseCaseTest {
 
         assertThat(results).containsExactly(
             MatcherUseCase.MatcherState.Success(
-                matchResultItems = emptyList(),
+                comparisonResults = emptyList(),
                 totalCandidates = 0,
                 matcherName = "",
                 matchBatches = emptyList(),
