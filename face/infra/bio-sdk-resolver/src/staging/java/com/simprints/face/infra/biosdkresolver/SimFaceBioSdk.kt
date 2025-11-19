@@ -1,10 +1,11 @@
 package com.simprints.face.infra.biosdkresolver
 
-import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.biometrics.simface.SimFace
 import com.simprints.core.domain.sample.CaptureSample
-import com.simprints.face.infra.basebiosdk.detection.FaceDetector
-import com.simprints.face.infra.basebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
+import com.simprints.face.infra.simface.detection.SimFaceDetector
+import com.simprints.face.infra.simface.initialization.SimFaceInitializer
+import com.simprints.face.infra.simface.matching.SimFaceMatcher
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,19 +13,17 @@ import javax.inject.Singleton
  * Class interfaces in the different build types must be identical for it to work,
  * therefore we have to stub the whole class for now.
  */
-@ExcludedFromGeneratedTestCoverageReports("Stubs for build types")
 @Singleton
-class SimFaceBioSdk @Inject constructor() : FaceBioSDK {
-    override val initializer: FaceBioSdkInitializer
-        get() = TODO()
-    override val detector: FaceDetector
-        get() = TODO()
+class SimFaceBioSdk @Inject constructor(
+    override val initializer: SimFaceInitializer,
+    override val detector: SimFaceDetector,
+    private val simFace: SimFace,
+) : FaceBioSDK {
+    override fun version(): String = "1"
 
-    override fun version(): String = TODO()
+    override fun templateFormat(): String = simFace.getTemplateVersion()
 
-    override fun templateFormat(): String = TODO()
+    override fun matcherName(): String = "SIM_FACE"
 
-    override fun matcherName(): String = TODO()
-
-    override fun createMatcher(probeSamples: List<CaptureSample>): FaceMatcher = TODO()
+    override fun createMatcher(probeSamples: List<CaptureSample>): FaceMatcher = SimFaceMatcher(simFace, probeSamples)
 }
