@@ -126,14 +126,14 @@ jobs:
                     echo "mapping=$FILE_NAME-mapping.txt" >> $GITHUB_OUTPUT
 
             -   name: Upload artifact
-                uses: actions/upload-artifact@v4
+                uses: actions/upload-artifact@v5
                 with:
                     name: ${{ env.FILE_NAME }}
                     path: ${{ env.FILE_NAME }}
 
             -   name: Upload mapping if available
                 if: steps.build-internal-apk.outputs.mapping
-                uses: actions/upload-artifact@v4
+                uses: actions/upload-artifact@v5
                 with:
                     name: ${{ steps.build-internal-apk.outputs.mapping }}
                     path: ${{ steps.build-internal-apk.outputs.mapping }}
