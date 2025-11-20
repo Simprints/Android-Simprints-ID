@@ -3,8 +3,8 @@ package com.simprints.feature.selectagegroup.screen
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth
 import com.jraska.livedata.test
+import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue

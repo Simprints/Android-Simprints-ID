@@ -18,7 +18,7 @@ enum class DbSampleIdentifier(
     ;
 
     companion object Companion {
-        fun fromId(id: Int) = DbSampleIdentifier.entries.firstOrNull { it.id == id }
+        fun fromId(id: Int?) = DbSampleIdentifier.entries.firstOrNull { it.id == id }
     }
 }
 

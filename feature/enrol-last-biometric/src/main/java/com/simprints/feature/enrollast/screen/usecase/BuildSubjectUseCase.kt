@@ -1,6 +1,5 @@
 package com.simprints.feature.enrollast.screen.usecase
 
-import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.tools.time.TimeHelper
@@ -31,7 +30,6 @@ internal class BuildSubjectUseCase @Inject constructor(
         val captureResult = params.steps
             .filterIsInstance<EnrolLastBiometricStepResult.CaptureResult>()
             .flatMap { result -> result.results.map { toSample(result.referenceId, it) } }
-            .groupBy { it.modality }
 
         return subjectFactory.buildSubject(
             subjectId = subjectId,
@@ -39,8 +37,7 @@ internal class BuildSubjectUseCase @Inject constructor(
             attendantId = params.userId,
             moduleId = params.moduleId,
             createdAt = Date(timeHelper.now().ms),
-            fingerprintSamples = captureResult[Modality.FINGERPRINT].orEmpty(),
-            faceSamples = captureResult[Modality.FACE].orEmpty(),
+            samples = captureResult,
             externalCredentials = externalCredentials,
         )
     }

@@ -1,8 +1,8 @@
 package com.simprints.infra.config.store.local.models
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.sample.SampleIdentifier
-import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.testtools.fingerprintConfiguration
 import com.simprints.infra.config.store.testtools.protoFingerprintConfiguration

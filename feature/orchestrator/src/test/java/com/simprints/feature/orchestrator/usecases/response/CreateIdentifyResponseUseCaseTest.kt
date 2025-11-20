@@ -37,8 +37,8 @@ class CreateIdentifyResponseUseCaseTest {
         val result = useCase(
             mockk {
                 every { multifactorId?.allowedExternalCredentials } returns null
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns null
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
+                every { face?.rankOne?.decisionPolicy } returns null
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns null
             },
             results = listOf(createFaceMatchResult(10f, 20f, 30f)),
         )
@@ -52,8 +52,8 @@ class CreateIdentifyResponseUseCaseTest {
             mockk {
                 every { multifactorId?.allowedExternalCredentials } returns null
                 every { identification.maxNbOfReturnedCandidates } returns 2
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns null
             },
             results = listOf(createFaceMatchResult(10f, 20f, 30f)),
         )
@@ -68,8 +68,8 @@ class CreateIdentifyResponseUseCaseTest {
             mockk {
                 every { multifactorId?.allowedExternalCredentials } returns null
                 every { identification.maxNbOfReturnedCandidates } returns 2
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns null
             },
             results = listOf(createFaceMatchResult(20f, 25f, 30f, 40f)),
         )
@@ -84,8 +84,8 @@ class CreateIdentifyResponseUseCaseTest {
             mockk {
                 every { multifactorId?.allowedExternalCredentials } returns null
                 every { identification.maxNbOfReturnedCandidates } returns 2
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns null
             },
             results = listOf(createFaceMatchResult(15f, 30f, 100f)),
         )
@@ -100,8 +100,8 @@ class CreateIdentifyResponseUseCaseTest {
             mockk {
                 every { multifactorId?.allowedExternalCredentials } returns null
                 every { identification.maxNbOfReturnedCandidates } returns 2
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns null
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
+                every { face?.rankOne?.decisionPolicy } returns null
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns DecisionPolicy(
                     20,
                     50,
                     100,
@@ -120,8 +120,8 @@ class CreateIdentifyResponseUseCaseTest {
             mockk {
                 every { multifactorId?.allowedExternalCredentials } returns null
                 every { identification.maxNbOfReturnedCandidates } returns 2
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns null
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
+                every { face?.rankOne?.decisionPolicy } returns null
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns DecisionPolicy(
                     20,
                     50,
                     100,
@@ -140,8 +140,8 @@ class CreateIdentifyResponseUseCaseTest {
             mockk {
                 every { multifactorId?.allowedExternalCredentials } returns null
                 every { identification.maxNbOfReturnedCandidates } returns 2
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns null
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
+                every { face?.rankOne?.decisionPolicy } returns null
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns DecisionPolicy(
                     20,
                     50,
                     100,
@@ -160,8 +160,8 @@ class CreateIdentifyResponseUseCaseTest {
             mockk {
                 every { multifactorId?.allowedExternalCredentials } returns null
                 every { identification.maxNbOfReturnedCandidates } returns 2
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns DecisionPolicy(
                     20,
                     50,
                     100,
@@ -183,8 +183,8 @@ class CreateIdentifyResponseUseCaseTest {
             mockk {
                 every { multifactorId?.allowedExternalCredentials } returns null
                 every { identification.maxNbOfReturnedCandidates } returns 2
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns DecisionPolicy(
                     20,
                     50,
                     100,
@@ -211,16 +211,14 @@ class CreateIdentifyResponseUseCaseTest {
                     subjectId = faceSmallConfidence,
                     confidence = smallConfidence,
                 )
-                every { faceBioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
-                every { fingerprintBioSdk } returns null
+                every { bioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
             },
             mockk {
                 every { matchResult } returns MatchComparisonResult(
                     subjectId = faceBigConfidence,
                     confidence = bigConfidence,
                 )
-                every { faceBioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
-                every { fingerprintBioSdk } returns null
+                every { bioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
             },
         )
 
@@ -230,8 +228,7 @@ class CreateIdentifyResponseUseCaseTest {
                     subjectId = "fingerprintSubjectId",
                     confidence = 90f,
                 )
-                every { faceBioSdk } returns null
-                every { fingerprintBioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+                every { bioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
             },
         )
 
@@ -239,17 +236,10 @@ class CreateIdentifyResponseUseCaseTest {
             mockk {
                 every { multifactorId?.allowedExternalCredentials } returns null
                 every { identification.maxNbOfReturnedCandidates } returns 5
-                every { face?.getSdkConfiguration(FaceConfiguration.BioSdk.RANK_ONE)?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
-                every { face?.getSdkConfiguration(FaceConfiguration.BioSdk.RANK_ONE)?.verificationMatchThreshold } returns 0.0f
-                every { fingerprint?.getSdkConfiguration(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)?.decisionPolicy } returns
-                    DecisionPolicy(20, 50, 100)
-                every {
-                    fingerprint
-                        ?.getSdkConfiguration(
-                            FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
-                        )?.verificationMatchThreshold
-                } returns
-                    0.0f
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { face?.rankOne?.verificationMatchThreshold } returns 0.0f
+                every { fingerprint?.secugenSimMatcher?.verificationMatchThreshold } returns 0.0f
             },
             results = listOf(
                 mockk<ExternalCredentialSearchResult> {
@@ -274,16 +264,14 @@ class CreateIdentifyResponseUseCaseTest {
                     subjectId = fingerprintSmallConfidence,
                     confidence = smallConfidence,
                 )
-                every { faceBioSdk } returns null
-                every { fingerprintBioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+                every { bioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
             },
             mockk {
                 every { matchResult } returns MatchComparisonResult(
                     subjectId = fingerprintBigConfidence,
                     confidence = bigConfidence,
                 )
-                every { faceBioSdk } returns null
-                every { fingerprintBioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+                every { bioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
             },
         )
 
@@ -293,8 +281,7 @@ class CreateIdentifyResponseUseCaseTest {
                     subjectId = "faceSubjectId",
                     confidence = 90f,
                 )
-                every { faceBioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
-                every { fingerprintBioSdk } returns null
+                every { bioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
             },
         )
 
@@ -302,17 +289,10 @@ class CreateIdentifyResponseUseCaseTest {
             mockk {
                 every { multifactorId?.allowedExternalCredentials } returns null
                 every { identification.maxNbOfReturnedCandidates } returns 5
-                every { face?.getSdkConfiguration(FaceConfiguration.BioSdk.RANK_ONE)?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
-                every { face?.getSdkConfiguration(FaceConfiguration.BioSdk.RANK_ONE)?.verificationMatchThreshold } returns 0.0f
-                every { fingerprint?.getSdkConfiguration(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)?.decisionPolicy } returns
-                    DecisionPolicy(20, 50, 100)
-                every {
-                    fingerprint
-                        ?.getSdkConfiguration(
-                            FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
-                        )?.verificationMatchThreshold
-                } returns
-                    0.0f
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { face?.rankOne?.verificationMatchThreshold } returns 0.0f
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { fingerprint?.secugenSimMatcher?.verificationMatchThreshold } returns 0.0f
             },
             results = listOf(
                 mockk<ExternalCredentialSearchResult> {
@@ -338,8 +318,7 @@ class CreateIdentifyResponseUseCaseTest {
                     subjectId = sharedGuid,
                     confidence = credentialConfidence,
                 )
-                every { faceBioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
-                every { fingerprintBioSdk } returns null
+                every { bioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
             },
         )
 
@@ -347,9 +326,9 @@ class CreateIdentifyResponseUseCaseTest {
             mockk {
                 every { identification.maxNbOfReturnedCandidates } returns 5
                 every { multifactorId?.allowedExternalCredentials } returns null
-                every { face?.getSdkConfiguration(FaceConfiguration.BioSdk.RANK_ONE)?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
-                every { face?.getSdkConfiguration(FaceConfiguration.BioSdk.RANK_ONE)?.verificationMatchThreshold } returns 0.0f
-                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { face?.rankOne?.verificationMatchThreshold } returns 0.0f
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns null
             },
             results = listOf(
                 mockk<ExternalCredentialSearchResult> {
@@ -380,8 +359,7 @@ class CreateIdentifyResponseUseCaseTest {
                     subjectId = sharedGuid,
                     confidence = credentialConfidence,
                 )
-                every { faceBioSdk } returns null
-                every { fingerprintBioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+                every { bioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
             },
         )
 
@@ -389,16 +367,9 @@ class CreateIdentifyResponseUseCaseTest {
             mockk {
                 every { multifactorId?.allowedExternalCredentials } returns null
                 every { identification.maxNbOfReturnedCandidates } returns 5
-                every { face?.getSdkConfiguration((any()))?.decisionPolicy } returns null
-                every { fingerprint?.getSdkConfiguration(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)?.decisionPolicy } returns
-                    DecisionPolicy(20, 50, 100)
-                every {
-                    fingerprint
-                        ?.getSdkConfiguration(
-                            FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
-                        )?.verificationMatchThreshold
-                } returns
-                    0.0f
+                every { face?.rankOne?.decisionPolicy } returns null
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { fingerprint?.secugenSimMatcher?.verificationMatchThreshold } returns 0.0f
             },
             results = listOf(
                 mockk<ExternalCredentialSearchResult> {

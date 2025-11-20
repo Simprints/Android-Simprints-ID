@@ -7,8 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.domain.common.AgeGroup
 import com.simprints.feature.selectagegroup.R
-import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.resources.R as IDR
 
 // The age groups should be sorted as follows: Newborn, Baby, Child, Adult

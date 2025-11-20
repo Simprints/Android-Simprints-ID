@@ -2,9 +2,8 @@ package com.simprints.feature.enrollast.screen.usecase
 
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.screen.EnrolLastState
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.getModalitySdkConfig
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ENROLMENT
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
@@ -15,12 +14,10 @@ internal class CheckForDuplicateEnrolmentsUseCase @Inject constructor() {
         steps: List<EnrolLastBiometricStepResult>,
     ): EnrolLastState.ErrorType? {
         if (!projectConfig.general.duplicateBiometricEnrolmentCheck) return null
-
-        val fingerprintResponse = getFingerprintMatchResult(steps)
-        val faceResponse = getFaceMatchResult(steps)
+        val matchResults = getFingerprintMatchResult(steps)
 
         return when {
-            fingerprintResponse == null && faceResponse == null -> {
+            matchResults.isEmpty() -> {
                 Simber.e(
                     "No match response. Must be either fingerprint, face or both",
                     MissingMatchResultException(),
@@ -29,7 +26,7 @@ internal class CheckForDuplicateEnrolmentsUseCase @Inject constructor() {
                 EnrolLastState.ErrorType.NO_MATCH_RESULTS
             }
 
-            isAnyResponseWithHighConfidence(projectConfig, fingerprintResponse, faceResponse) -> {
+            isAnyResponseWithHighConfidence(projectConfig, matchResults) -> {
                 Simber.i("There is a subject with confidence score above the high confidence level", tag = ENROLMENT)
                 EnrolLastState.ErrorType.DUPLICATE_ENROLMENTS
             }
@@ -40,35 +37,18 @@ internal class CheckForDuplicateEnrolmentsUseCase @Inject constructor() {
 
     private fun getFingerprintMatchResult(steps: List<EnrolLastBiometricStepResult>) = steps
         .filterIsInstance<EnrolLastBiometricStepResult.MatchResult>()
-        .lastOrNull { it.sdk is FingerprintConfiguration.BioSdk }
-
-    private fun getFaceMatchResult(steps: List<EnrolLastBiometricStepResult>) = steps
-        .filterIsInstance<EnrolLastBiometricStepResult.MatchResult>()
-        .lastOrNull { it.sdk is FaceConfiguration.BioSdk }
 
     private fun isAnyResponseWithHighConfidence(
         configuration: ProjectConfiguration,
-        fingerprintResponse: EnrolLastBiometricStepResult.MatchResult?,
-        faceResponse: EnrolLastBiometricStepResult.MatchResult?,
-    ): Boolean {
-        val fingerprintThreshold = fingerprintResponse?.let {
-            configuration.fingerprint
-                ?.getSdkConfiguration(fingerprintResponse.sdk)
-                ?.decisionPolicy
-                ?.high
-                ?.toFloat()
-        } ?: Float.MAX_VALUE
+        responses: List<EnrolLastBiometricStepResult.MatchResult>,
+    ): Boolean = responses.any { result ->
+        val threshold = configuration
+            .getModalitySdkConfig(result.sdk)
+            ?.decisionPolicy
+            ?.high
+            ?.toFloat() ?: Float.MAX_VALUE
 
-        val faceThreshold = faceResponse?.let {
-            configuration.face
-                ?.getSdkConfiguration(faceResponse.sdk)
-                ?.decisionPolicy
-                ?.high
-                ?.toFloat()
-        } ?: Float.MAX_VALUE
-
-        return fingerprintResponse?.results?.any { it.confidence >= fingerprintThreshold } == true ||
-            faceResponse?.results?.any { it.confidence >= faceThreshold } == true
+        result.results.any { it.confidence >= threshold }
     }
 
     private class MissingMatchResultException : IllegalStateException("No match response in duplicate check.")

@@ -1,5 +1,9 @@
 package com.simprints.infra.config.store.models
 
+import com.simprints.core.domain.common.AgeGroup
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.common.ModalitySdkType
+
 data class ProjectConfiguration(
     val id: String,
     val projectId: String,
@@ -106,36 +110,46 @@ fun ProjectConfiguration.isProjectWithPeriodicallyUpSync(): Boolean =
 
 fun ProjectConfiguration.isModuleSelectionAvailable(): Boolean = isProjectWithModuleSync() && !isProjectWithPeriodicallyUpSync()
 
-fun ProjectConfiguration.determineFaceSDKs(ageGroup: AgeGroup?): List<FaceConfiguration.BioSdk> {
+fun ProjectConfiguration.getSdkListForAgeGroup(
+    modality: Modality,
+    ageGroup: AgeGroup?,
+): List<ModalitySdkType> {
     if (!isAgeRestricted()) {
-        return face?.allowedSDKs.orEmpty()
+        return when (modality) {
+            Modality.FACE -> face?.allowedSDKs.orEmpty()
+            Modality.FINGERPRINT -> fingerprint?.allowedSDKs.orEmpty()
+        }
     }
 
     return buildList {
         ageGroup?.let { age ->
-            if (face?.rankOne?.allowedAgeRange?.contains(age) == true) {
-                add(FaceConfiguration.BioSdk.RANK_ONE)
-            }
-            if (face?.simFace?.allowedAgeRange?.contains(age) == true) {
-                add(FaceConfiguration.BioSdk.SIM_FACE)
+            when (modality) {
+                Modality.FACE -> {
+                    if (face?.rankOne?.allowedAgeRange?.contains(age) == true) {
+                        add(FaceConfiguration.BioSdk.RANK_ONE)
+                    }
+                    if (face?.simFace?.allowedAgeRange?.contains(age) == true) {
+                        add(FaceConfiguration.BioSdk.SIM_FACE)
+                    }
+                }
+
+                Modality.FINGERPRINT -> {
+                    if (fingerprint?.secugenSimMatcher?.allowedAgeRange?.contains(age) == true) {
+                        add(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
+                    }
+                    if (fingerprint?.nec?.allowedAgeRange?.contains(age) == true) {
+                        add(FingerprintConfiguration.BioSdk.NEC)
+                    }
+                }
             }
         }
     }
 }
 
-fun ProjectConfiguration.determineFingerprintSDKs(ageGroup: AgeGroup?): List<FingerprintConfiguration.BioSdk> {
-    if (!isAgeRestricted()) {
-        return fingerprint?.allowedSDKs.orEmpty()
-    }
-
-    return buildList {
-        ageGroup?.let { age ->
-            if (fingerprint?.secugenSimMatcher?.allowedAgeRange?.contains(age) == true) {
-                add(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
-            }
-            if (fingerprint?.nec?.allowedAgeRange?.contains(age) == true) {
-                add(FingerprintConfiguration.BioSdk.NEC)
-            }
-        }
-    }
+fun ProjectConfiguration.getModalitySdkConfig(bioSdk: ModalitySdkType): ModalitySdkConfiguration? = when (bioSdk) {
+    FaceConfiguration.BioSdk.RANK_ONE -> face?.rankOne
+    FaceConfiguration.BioSdk.SIM_FACE -> face?.simFace
+    FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER -> fingerprint?.secugenSimMatcher
+    FingerprintConfiguration.BioSdk.NEC -> fingerprint?.nec
+    else -> null
 }

@@ -46,12 +46,12 @@ class FaceMatcherUseCase @Inject constructor(
         }
         val bioSdk = resolveFaceBioSdk(matchParams.bioSdk)
 
-        if (matchParams.probeFaceSamples.isEmpty()) {
+        if (matchParams.probeSamples.isEmpty()) {
             send(MatcherState.Success(emptyList(), emptyList(), 0, bioSdk.matcherName()))
             return@channelFlow
         }
         val queryWithSupportedFormat = matchParams.queryForCandidates.copy(
-            faceSampleFormat = bioSdk.templateFormat(),
+            format = bioSdk.templateFormat(),
         )
         val expectedCandidates = enrolmentRecordRepository.count(
             queryWithSupportedFormat,
@@ -72,7 +72,7 @@ class FaceMatcherUseCase @Inject constructor(
         val ranges = createRanges(expectedCandidates)
         val resultSet = MatchResultSet()
         val candidatesChannel = enrolmentRecordRepository
-            .loadFaceIdentities(
+            .loadIdentities(
                 query = queryWithSupportedFormat,
                 ranges = ranges,
                 dataSource = matchParams.biometricDataSource,
@@ -83,12 +83,12 @@ class FaceMatcherUseCase @Inject constructor(
                 this@channelFlow.send(MatcherState.CandidateLoaded)
             }
 
-        val batchInfo = consumeAndMatch(candidatesChannel, matchParams.probeFaceSamples, resultSet, bioSdk)
+        val batchInfo = consumeAndMatch(candidatesChannel, matchParams.probeSamples, resultSet, bioSdk)
         send(MatcherState.Success(resultSet.toList(), batchInfo, loadedCandidates.get(), bioSdk.matcherName()))
     }.flowOn(dispatcherBG)
 
     private suspend fun consumeAndMatch(
-        candidatesChannel: ReceiveChannel<IdentityBatch<Identity>>,
+        candidatesChannel: ReceiveChannel<IdentityBatch>,
         samples: List<CaptureSample>,
         resultSet: MatchResultSet,
         bioSdk: FaceBioSDK,

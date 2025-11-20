@@ -1,5 +1,6 @@
 package com.simprints.infra.enrolment.records.repository.local.models
 
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
@@ -28,8 +29,8 @@ internal fun RealmSubject.toDomain(): Subject {
         moduleId = moduleId,
         createdAt = createdAt?.toDate(),
         updatedAt = updatedAt?.toDate(),
-        fingerprintSamples = fingerprintSamples.map(DbFingerprintSample::toDomain),
-        faceSamples = faceSamples.map(DbFaceSample::toDomain),
+        samples = fingerprintSamples.map(DbFingerprintSample::toDomain) +
+            faceSamples.map(DbFaceSample::toDomain),
         externalCredentials = externalCredentials.map(DbExternalCredential::toDomain),
     )
 }
@@ -41,10 +42,16 @@ internal fun Subject.toRealmDb(): RealmSubject = RealmSubject().also { subject -
     subject.moduleId = moduleId.value
     subject.createdAt = createdAt?.toRealmInstant()
     subject.updatedAt = updatedAt?.toRealmInstant()
-    subject.fingerprintSamples =
-        fingerprintSamples.map(Sample::toRealmFingerprintDb).toRealmList()
-    subject.faceSamples = faceSamples.map(Sample::toRealmFaceDb).toRealmList()
     subject.isModuleIdTokenized = moduleId.isTokenized()
     subject.isAttendantIdTokenized = attendantId.isTokenized()
     subject.externalCredentials = externalCredentials.map(ExternalCredential::toRealmDb).toRealmList()
+
+    subject.fingerprintSamples = samples
+        .filter { it.modality == Modality.FINGERPRINT }
+        .map(Sample::toRealmFingerprintDb)
+        .toRealmList()
+    subject.faceSamples = samples
+        .filter { it.modality == Modality.FACE }
+        .map(Sample::toRealmFaceDb)
+        .toRealmList()
 }

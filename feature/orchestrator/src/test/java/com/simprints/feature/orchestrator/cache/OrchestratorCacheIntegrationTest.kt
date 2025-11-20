@@ -3,6 +3,7 @@ package com.simprints.feature.orchestrator.cache
 import android.content.SharedPreferences
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
@@ -45,7 +46,6 @@ import com.simprints.feature.setup.SetupResult
 import com.simprints.feature.validatepool.ValidateSubjectPoolFragmentParams
 import com.simprints.feature.validatepool.ValidateSubjectPoolResult
 import com.simprints.fingerprint.capture.FingerprintCaptureParams
-import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
@@ -185,22 +185,24 @@ class OrchestratorCacheIntegrationTest {
                     flowType = FlowType.IDENTIFY,
                     ageGroup = AgeGroup(1, 2),
                     probeReferenceId = "referenceId",
-                    faceSamples = listOf(
-                        CaptureSample(
-                            captureEventId = GUID1,
-                            identifier = SampleIdentifier.LEFT_THUMB,
-                            template = byteArrayOf(1, 2, 3),
-                            modality = Modality.FACE,
-                            format = "format",
+                    samples = mapOf(
+                        Modality.FACE to listOf(
+                            CaptureSample(
+                                captureEventId = GUID1,
+                                identifier = SampleIdentifier.LEFT_THUMB,
+                                template = byteArrayOf(1, 2, 3),
+                                modality = Modality.FACE,
+                                format = "format",
+                            ),
                         ),
-                    ),
-                    fingerprintSamples = listOf(
-                        CaptureSample(
-                            captureEventId = GUID1,
-                            identifier = SampleIdentifier.LEFT_THUMB,
-                            template = byteArrayOf(1, 2, 3),
-                            modality = Modality.FINGERPRINT,
-                            format = "format",
+                        Modality.FINGERPRINT to listOf(
+                            CaptureSample(
+                                captureEventId = GUID1,
+                                identifier = SampleIdentifier.LEFT_THUMB,
+                                template = byteArrayOf(1, 2, 3),
+                                modality = Modality.FINGERPRINT,
+                                format = "format",
+                            ),
                         ),
                     ),
                 ),
@@ -223,8 +225,7 @@ class OrchestratorCacheIntegrationTest {
                             credential = "credential".asTokenizableEncrypted(),
                             matchResult = MatchComparisonResult("subjectId", 0.5f),
                             verificationThreshold = 55f,
-                            faceBioSdk = FaceConfiguration.BioSdk.RANK_ONE,
-                            fingerprintBioSdk = FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
+                            bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                         ),
                     ),
                 ),
@@ -277,7 +278,7 @@ class OrchestratorCacheIntegrationTest {
                     queryForCandidates = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.CommCare("name"),
                     bioSdk = FingerprintConfiguration.BioSdk.NEC,
-                    probeFingerprintSamples = listOf(
+                    probeSamples = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
                             identifier = SampleIdentifier.LEFT_THUMB,
@@ -337,7 +338,7 @@ class OrchestratorCacheIntegrationTest {
                     queryForCandidates = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
                     bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
-                    probeFaceSamples = listOf(
+                    probeSamples = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
                             identifier = SampleIdentifier.LEFT_THUMB,

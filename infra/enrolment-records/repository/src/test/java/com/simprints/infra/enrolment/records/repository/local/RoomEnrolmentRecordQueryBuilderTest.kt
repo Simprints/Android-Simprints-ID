@@ -152,17 +152,8 @@ class RoomEnrolmentRecordQueryBuilderTest {
     }
 
     @Test
-    fun `buildSubjectQuery throws error if fingerprintSampleFormat is set`() {
-        val subjectQuery = SubjectQuery(fingerprintSampleFormat = "ISO_19794_2_2005")
-        val exception = assertThrows<IllegalArgumentException> {
-            queryBuilder.buildSubjectQuery(subjectQuery)
-        }
-        assertThat(exception.message).isEqualTo("Cannot set format for subject query, use buildBiometricTemplatesQuery instead")
-    }
-
-    @Test
-    fun `buildSubjectQuery throws error if faceSampleFormat is set`() {
-        val subjectQuery = SubjectQuery(faceSampleFormat = "RAW")
+    fun `buildSubjectQuery throws error if format is set`() {
+        val subjectQuery = SubjectQuery(format = "ISO_19794_2_2005")
         val exception = assertThrows<IllegalArgumentException> {
             queryBuilder.buildSubjectQuery(subjectQuery)
         }
@@ -207,9 +198,9 @@ class RoomEnrolmentRecordQueryBuilderTest {
     }
 
     @Test
-    fun `buildCountQuery with fingerprintSampleFormat`() {
+    fun `buildCountQuery with format`() {
         val format = "ISO_FP"
-        val subjectQuery = SubjectQuery(fingerprintSampleFormat = format)
+        val subjectQuery = SubjectQuery(format = format)
         val expectedSql =
             "SELECT COUNT(DISTINCT S.$SUBJECT_ID_COLUMN) FROM $SUBJECT_TABLE_NAME S  INNER JOIN  $TEMPLATE_TABLE_NAME T" +
                 " using(subjectId) WHERE T.$FORMAT_COLUMN = ?"
@@ -221,24 +212,10 @@ class RoomEnrolmentRecordQueryBuilderTest {
     }
 
     @Test
-    fun `buildCountQuery with faceSampleFormat`() {
-        val format = "RAW_FACE"
-        val subjectQuery = SubjectQuery(faceSampleFormat = format)
-        val expectedSql =
-            "SELECT COUNT(DISTINCT S.$SUBJECT_ID_COLUMN) FROM $SUBJECT_TABLE_NAME S  INNER JOIN  $TEMPLATE_TABLE_NAME T" +
-                " using(subjectId) WHERE T.$FORMAT_COLUMN = ?"
-
-        val resultQuery = queryBuilder.buildCountQuery(subjectQuery)
-
-        assertThat(resultQuery.sql).isEqualTo(expectedSql)
-        assertThat(getArgs(resultQuery)).isEqualTo(arrayOf<Any?>(format))
-    }
-
-    @Test
-    fun `buildCountQuery with projectId and fingerprintSampleFormat`() {
+    fun `buildCountQuery with projectId and format`() {
         val projectId = "p1"
         val format = "ISO_FP"
-        val subjectQuery = SubjectQuery(projectId = projectId, fingerprintSampleFormat = format)
+        val subjectQuery = SubjectQuery(projectId = projectId, format = format)
         val expectedSql =
             "SELECT COUNT(DISTINCT S.$SUBJECT_ID_COLUMN) FROM $SUBJECT_TABLE_NAME S  INNER JOIN  $TEMPLATE_TABLE_NAME T" +
                 " using(subjectId) WHERE S.$PROJECT_ID_COLUMN = ? AND T.$FORMAT_COLUMN = ?"
@@ -247,15 +224,6 @@ class RoomEnrolmentRecordQueryBuilderTest {
 
         assertThat(resultQuery.sql).isEqualTo(expectedSql)
         assertThat(getArgs(resultQuery)).isEqualTo(arrayOf<Any?>(projectId, format))
-    }
-
-    @Test
-    fun `buildCountQuery throws if both fingerprint and face formats set`() {
-        val subjectQuery = SubjectQuery(fingerprintSampleFormat = "FP_FORMAT", faceSampleFormat = "FACE_FORMAT")
-        val exception = assertThrows<IllegalArgumentException> {
-            queryBuilder.buildCountQuery(subjectQuery)
-        }
-        assertThat(exception.message).isEqualTo("Cannot set both fingerprintSampleFormat and faceSampleFormat")
     }
 
     @Test
@@ -271,10 +239,10 @@ class RoomEnrolmentRecordQueryBuilderTest {
     }
 
     @Test
-    fun `buildBiometricTemplatesQuery with fingerprintSampleFormat`() {
+    fun `buildBiometricTemplatesQuery with format`() {
         val format = "ISO_FP_TEMPLATE"
         val pageSize = 10
-        val subjectQuery = SubjectQuery(fingerprintSampleFormat = format)
+        val subjectQuery = SubjectQuery(format = format)
         val expectedSql =
             """
             SELECT A.*
@@ -293,39 +261,13 @@ class RoomEnrolmentRecordQueryBuilderTest {
 
         assertThat(resultQuery.sql).isEqualTo(expectedSql)
         assertThat(getArgs(resultQuery)).isEqualTo(arrayOf<Any?>(format))
-    }
-
-    @Test
-    fun `buildBiometricTemplatesQuery with faceSampleFormat and projectId`() {
-        val format = "RAW_FACE_TEMPLATE"
-        val projectId = "projX"
-        val pageSize = 5
-        val subjectQuery = SubjectQuery(faceSampleFormat = format, projectId = projectId)
-        val expectedSql =
-            """
-            SELECT A.*
-            FROM $TEMPLATE_TABLE_NAME A
-             INNER JOIN (
-                SELECT distinct  S.subjectId
-                FROM $SUBJECT_TABLE_NAME S  INNER JOIN  $TEMPLATE_TABLE_NAME T
-                USING(subjectId)
-                WHERE S.$PROJECT_ID_COLUMN = ? AND T.$FORMAT_COLUMN = ?
-                ORDER BY S.$SUBJECT_ID_COLUMN ASC
-                LIMIT $pageSize
-            ) B USING(subjectId) where A.format ='$format'
-            """.trimIndent()
-
-        val resultQuery = queryBuilder.buildBiometricTemplatesQuery(subjectQuery, pageSize)
-
-        assertThat(resultQuery.sql).isEqualTo(expectedSql)
-        assertThat(getArgs(resultQuery)).isEqualTo(arrayOf<Any?>(projectId, format))
     }
 
     @Test
     fun `buildBiometricTemplatesQuery uses sort true internally`() {
         val format = "ANY_FORMAT"
         val pageSize = 15
-        val subjectQuery = SubjectQuery(fingerprintSampleFormat = format, sort = false)
+        val subjectQuery = SubjectQuery(format = format, sort = false)
         val expectedSql =
             """
             SELECT A.*
@@ -347,31 +289,12 @@ class RoomEnrolmentRecordQueryBuilderTest {
     }
 
     @Test
-    fun `buildBiometricTemplatesQuery throws if both fingerprint and face formats set`() {
-        val subjectQuery = SubjectQuery(fingerprintSampleFormat = "FP_FORMAT", faceSampleFormat = "FACE_FORMAT")
-        val pageSize = 10
-        val exception = assertThrows<IllegalArgumentException> {
-            queryBuilder.buildBiometricTemplatesQuery(subjectQuery, pageSize)
-        }
-        assertThat(exception.message).isEqualTo("Cannot set both fingerprintSampleFormat and faceSampleFormat")
-    }
-
-    @Test
-    fun `buildDeleteQuery throws error if fingerprintSampleFormat is set`() {
-        val subjectQuery = SubjectQuery(fingerprintSampleFormat = "ISO_19794_2_2005")
+    fun `buildDeleteQuery throws error if format is set`() {
+        val subjectQuery = SubjectQuery(format = "ISO_19794_2_2005")
         val exception = assertThrows<IllegalArgumentException> {
             queryBuilder.buildDeleteQuery(subjectQuery)
         }
-        assertThat(exception.message).isEqualTo("faceSampleFormat and fingerprintSampleFormat are not supported for deletion")
-    }
-
-    @Test
-    fun `buildDeleteQuery throws error if faceSampleFormat is set`() {
-        val subjectQuery = SubjectQuery(faceSampleFormat = "RAW")
-        val exception = assertThrows<IllegalArgumentException> {
-            queryBuilder.buildDeleteQuery(subjectQuery)
-        }
-        assertThat(exception.message).isEqualTo("faceSampleFormat and fingerprintSampleFormat are not supported for deletion")
+        assertThat(exception.message).isEqualTo("format is not supported for deletion")
     }
 
     @Test

@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
+import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.response.AppErrorReason
@@ -34,7 +35,6 @@ import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.setup.LocationStore
 import com.simprints.feature.setup.SetupResult
 import com.simprints.fingerprint.capture.FingerprintCaptureContract
-import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.NEC
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
@@ -323,9 +323,9 @@ internal class OrchestratorViewModelTest {
             val params = step.params?.let { it as? MatchParams }
             assertThat(params).isNotNull()
             assertThat(params?.bioSdk).isEqualTo(SECUGEN_SIM_MATCHER)
-            assertThat(params?.probeFingerprintSamples?.size).isEqualTo(2)
-            assertThat(params?.probeFingerprintSamples?.get(0)?.format).isEqualTo(format)
-            assertThat(params?.probeFingerprintSamples?.get(1)?.format).isEqualTo(format)
+            assertThat(params?.probeSamples?.size).isEqualTo(2)
+            assertThat(params?.probeSamples?.get(0)?.format).isEqualTo(format)
+            assertThat(params?.probeSamples?.get(1)?.format).isEqualTo(format)
         }
     }
 
@@ -455,7 +455,7 @@ internal class OrchestratorViewModelTest {
         )
 
         val externalCredentialParams = mockk<ExternalCredentialParams>(relaxed = true) {
-            every { copy(probeReferenceId = any(), fingerprintSamples = any()) } returns this
+            every { copy(probeReferenceId = any(), samples = any()) } returns this
         }
 
         coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
@@ -477,7 +477,7 @@ internal class OrchestratorViewModelTest {
         verify {
             externalCredentialParams.copy(
                 probeReferenceId = fingerprintReferenceId,
-                fingerprintSamples = expectedFingerprintSamples,
+                samples = mapOf(Modality.FINGERPRINT to expectedFingerprintSamples),
             )
         }
     }

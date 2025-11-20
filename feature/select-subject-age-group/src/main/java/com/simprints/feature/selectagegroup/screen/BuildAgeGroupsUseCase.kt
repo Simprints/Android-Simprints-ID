@@ -1,7 +1,7 @@
 package com.simprints.feature.selectagegroup.screen
 
+import com.simprints.core.domain.common.AgeGroup
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.sortedUniqueAgeGroups
 import javax.inject.Inject
 

@@ -1,16 +1,18 @@
 package com.simprints.feature.externalcredential.screens.search.usecase
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
-import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.getModalitySdkConfig
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.matching.MatchParams
 import com.simprints.infra.matching.usecase.FaceMatcherUseCase
@@ -94,8 +96,10 @@ internal class MatchCandidatesUseCaseTest {
         every { subject.subjectId } returns subjectId
         every { externalCredentialParams.probeReferenceId } returns probeReferenceId
         every { externalCredentialParams.flowType } returns FlowType.VERIFY
-        every { externalCredentialParams.faceSamples } returns listOf(faceSample)
-        every { externalCredentialParams.fingerprintSamples } returns listOf(fingerprintSample)
+        every { externalCredentialParams.samples } returns mapOf(
+            Modality.FACE to listOf(faceSample),
+            Modality.FINGERPRINT to listOf(fingerprintSample),
+        )
         every { externalCredentialParams.ageGroup } returns ageGroup
 
         coEvery {
@@ -104,16 +108,15 @@ internal class MatchCandidatesUseCaseTest {
                 flowType = any(),
                 probeReferenceId = any(),
                 projectConfiguration = any(),
-                faceSamples = any(),
-                fingerprintSamples = any(),
+                samples = any(),
                 ageGroup = any(),
             )
         } returns listOf(matchParams)
         every { projectConfig.face } returns faceConfig
         every { projectConfig.fingerprint } returns fingerprintConfig
-        every { faceConfig.getSdkConfiguration(FaceConfiguration.BioSdk.RANK_ONE) } returns faceSdkConfig
+        every { projectConfig.getModalitySdkConfig(FaceConfiguration.BioSdk.RANK_ONE) } returns faceSdkConfig
         every { faceSdkConfig.verificationMatchThreshold } returns verificationMatchThreshold
-        every { fingerprintConfig.getSdkConfiguration(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER) } returns fingerprintSdkConfig
+        every { projectConfig.getModalitySdkConfig(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER) } returns fingerprintSdkConfig
         every { fingerprintSdkConfig.verificationMatchThreshold } returns verificationMatchThreshold
         every { matcherSuccess.comparisonResults } returns listOf(matchResultItem)
         coEvery { faceMatcher(matchParams, project) } returns flowOf(matcherSuccess)
@@ -122,12 +125,10 @@ internal class MatchCandidatesUseCaseTest {
 
     private fun initMatchParams(isFace: Boolean) {
         if (isFace) {
-            every { matchParams.probeFingerprintSamples } returns emptyList()
-            every { matchParams.probeFaceSamples } returns listOf(faceSample)
+            every { matchParams.probeSamples } returns listOf(faceSample)
             every { matchParams.bioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
         } else {
-            every { matchParams.probeFingerprintSamples } returns listOf(fingerprintSample)
-            every { matchParams.probeFaceSamples } returns emptyList()
+            every { matchParams.probeSamples } returns listOf(fingerprintSample)
             every { matchParams.bioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
         }
     }
@@ -147,8 +148,7 @@ internal class MatchCandidatesUseCaseTest {
         assertThat(result[0].credential).isEqualTo(credential)
         assertThat(result[0].matchResult).isEqualTo(matchResultItem)
         assertThat(result[0].verificationThreshold).isEqualTo(verificationMatchThreshold)
-        assertThat(result[0].faceBioSdk).isEqualTo(FaceConfiguration.BioSdk.RANK_ONE)
-        assertThat(result[0].fingerprintBioSdk).isNull()
+        assertThat(result[0].bioSdk).isEqualTo(FaceConfiguration.BioSdk.RANK_ONE)
     }
 
     @Test
@@ -166,8 +166,7 @@ internal class MatchCandidatesUseCaseTest {
         assertThat(result[0].credential).isEqualTo(credential)
         assertThat(result[0].matchResult).isEqualTo(matchResultItem)
         assertThat(result[0].verificationThreshold).isEqualTo(verificationMatchThreshold)
-        assertThat(result[0].faceBioSdk).isNull()
-        assertThat(result[0].fingerprintBioSdk).isEqualTo(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
+        assertThat(result[0].bioSdk).isEqualTo(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
     }
 
     @Test
@@ -186,7 +185,7 @@ internal class MatchCandidatesUseCaseTest {
     @Test
     fun `returns empty list when face SDK configuration is null`() = runTest {
         initMatchParams(isFace = true)
-        every { faceConfig.getSdkConfiguration(FaceConfiguration.BioSdk.RANK_ONE) } returns null
+        every { projectConfig.getModalitySdkConfig(FaceConfiguration.BioSdk.RANK_ONE) } returns null
 
         val result = useCase.invoke(
             candidates = listOf(subject),
@@ -202,7 +201,7 @@ internal class MatchCandidatesUseCaseTest {
     @Test
     fun `returns empty list when fingerprint SDK configuration is null`() = runTest {
         initMatchParams(isFace = false)
-        every { fingerprintConfig.getSdkConfiguration(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER) } returns null
+        every { projectConfig.getModalitySdkConfig(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER) } returns null
 
         val result = useCase.invoke(
             candidates = listOf(subject),

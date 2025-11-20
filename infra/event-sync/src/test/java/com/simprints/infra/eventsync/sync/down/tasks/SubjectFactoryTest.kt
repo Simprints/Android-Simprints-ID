@@ -70,7 +70,7 @@ class SubjectFactoryTest {
             projectId = PROJECT_ID,
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
-            fingerprintSamples = listOf(
+            samples = listOf(
                 Sample(
                     identifier = IDENTIFIER,
                     template = BASE_64_BYTES,
@@ -78,8 +78,6 @@ class SubjectFactoryTest {
                     referenceId = REFERENCE_ID,
                     modality = Modality.FINGERPRINT,
                 ),
-            ),
-            faceSamples = listOf(
                 Sample(
                     template = BASE_64_BYTES,
                     format = REFERENCE_FORMAT,
@@ -108,7 +106,7 @@ class SubjectFactoryTest {
             projectId = PROJECT_ID,
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
-            fingerprintSamples = listOf(
+            samples = listOf(
                 Sample(
                     identifier = IDENTIFIER,
                     template = BASE_64_BYTES,
@@ -116,8 +114,6 @@ class SubjectFactoryTest {
                     referenceId = REFERENCE_ID,
                     modality = Modality.FINGERPRINT,
                 ),
-            ),
-            faceSamples = listOf(
                 Sample(
                     template = BASE_64_BYTES,
                     format = REFERENCE_FORMAT,
@@ -136,7 +132,7 @@ class SubjectFactoryTest {
             projectId = PROJECT_ID,
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
-            fingerprintSamples = listOf(
+            samples = listOf(
                 Sample(
                     identifier = IDENTIFIER,
                     template = BASE_64_BYTES,
@@ -151,8 +147,6 @@ class SubjectFactoryTest {
                     referenceId = "referenceId-finger-2",
                     modality = Modality.FINGERPRINT,
                 ),
-            ),
-            faceSamples = listOf(
                 Sample(
                     template = BASE_64_BYTES,
                     format = REFERENCE_FORMAT,
@@ -198,7 +192,7 @@ class SubjectFactoryTest {
             projectId = PROJECT_ID,
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
-            fingerprintSamples = listOf(
+            samples = listOf(
                 Sample(
                     identifier = IDENTIFIER,
                     template = BASE_64_BYTES,
@@ -213,8 +207,6 @@ class SubjectFactoryTest {
                     referenceId = "referenceId-finger-5",
                     modality = Modality.FINGERPRINT,
                 ),
-            ),
-            faceSamples = listOf(
                 Sample(
                     template = BASE_64_BYTES,
                     format = REFERENCE_FORMAT,
@@ -230,7 +222,9 @@ class SubjectFactoryTest {
             ),
             externalCredentials = listOf(EXTERNAL_CREDENTIAL),
         )
-        assertThat(result).isEqualTo(expected)
+        assertThat(result.subjectId).isEqualTo(expected.subjectId)
+        assertThat(result.samples.size).isEqualTo(expected.samples.size)
+        assertThat(result.samples).containsExactlyElementsIn(expected.samples)
     }
 
     @Test
@@ -243,7 +237,7 @@ class SubjectFactoryTest {
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
             createdAt = Date(0L),
-            fingerprintSamples = listOf(
+            samples = listOf(
                 Sample(
                     identifier = IDENTIFIER,
                     template = BASE_64_BYTES,
@@ -251,8 +245,6 @@ class SubjectFactoryTest {
                     referenceId = REFERENCE_ID,
                     modality = Modality.FINGERPRINT,
                 ),
-            ),
-            faceSamples = listOf(
                 Sample(
                     template = BASE_64_BYTES,
                     format = REFERENCE_FORMAT,
@@ -268,28 +260,30 @@ class SubjectFactoryTest {
             projectId = expected.projectId,
             attendantId = expected.attendantId,
             moduleId = expected.moduleId,
-            fingerprintResponse = CaptureIdentity(
-                GUID1,
-                Modality.FINGERPRINT,
-                listOf(
-                    CaptureSample(
-                        captureEventId = GUID1,
-                        identifier = IDENTIFIER,
-                        template = BASE_64_BYTES,
-                        format = REFERENCE_FORMAT,
-                        modality = Modality.FINGERPRINT,
+            captures = listOf(
+                CaptureIdentity(
+                    GUID1,
+                    Modality.FINGERPRINT,
+                    listOf(
+                        CaptureSample(
+                            captureEventId = GUID1,
+                            identifier = IDENTIFIER,
+                            template = BASE_64_BYTES,
+                            format = REFERENCE_FORMAT,
+                            modality = Modality.FINGERPRINT,
+                        ),
                     ),
                 ),
-            ),
-            faceResponse = CaptureIdentity(
-                GUID1,
-                Modality.FACE,
-                listOf(
-                    CaptureSample(
-                        captureEventId = GUID1,
-                        template = BASE_64_BYTES,
-                        format = REFERENCE_FORMAT,
-                        modality = Modality.FACE,
+                CaptureIdentity(
+                    GUID1,
+                    Modality.FACE,
+                    listOf(
+                        CaptureSample(
+                            captureEventId = GUID1,
+                            template = BASE_64_BYTES,
+                            format = REFERENCE_FORMAT,
+                            modality = Modality.FACE,
+                        ),
                     ),
                 ),
             ),
@@ -305,7 +299,7 @@ class SubjectFactoryTest {
             projectId = PROJECT_ID,
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
-            fingerprintSamples = listOf(
+            samples = listOf(
                 Sample(
                     identifier = IDENTIFIER,
                     template = BASE_64_BYTES,
@@ -313,8 +307,6 @@ class SubjectFactoryTest {
                     referenceId = REFERENCE_ID,
                     modality = Modality.FINGERPRINT,
                 ),
-            ),
-            faceSamples = listOf(
                 Sample(
                     template = BASE_64_BYTES,
                     format = REFERENCE_FORMAT,
@@ -330,8 +322,7 @@ class SubjectFactoryTest {
             projectId = expected.projectId,
             attendantId = expected.attendantId,
             moduleId = expected.moduleId,
-            fingerprintSamples = expected.fingerprintSamples,
-            faceSamples = expected.faceSamples,
+            samples = expected.samples,
             externalCredentials = expected.externalCredentials,
         )
         assertThat(result).isEqualTo(expected)

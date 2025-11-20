@@ -3,6 +3,7 @@ package com.simprints.feature.orchestrator.cache
 import androidx.core.content.edit
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
+import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.step.StepResult
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -12,7 +13,6 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepParamsMixin
 import com.simprints.feature.orchestrator.steps.StepResultMixin
-import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.security.SecurityManager
 import javax.inject.Inject
 import javax.inject.Singleton

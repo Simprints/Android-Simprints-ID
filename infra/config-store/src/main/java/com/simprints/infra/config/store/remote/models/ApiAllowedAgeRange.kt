@@ -1,7 +1,7 @@
 package com.simprints.infra.config.store.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.infra.config.store.models.AgeGroup
+import com.simprints.core.domain.common.AgeGroup
 
 @Keep
 data class ApiAllowedAgeRange(

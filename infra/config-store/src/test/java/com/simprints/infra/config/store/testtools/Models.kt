@@ -1,5 +1,6 @@
 package com.simprints.infra.config.store.testtools
 
+import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.sample.SampleIdentifier
@@ -26,7 +27,6 @@ import com.simprints.infra.config.store.local.models.ProtoUpSyncBatchSizes
 import com.simprints.infra.config.store.local.models.ProtoUpSynchronizationConfiguration
 import com.simprints.infra.config.store.local.models.ProtoVero1Configuration
 import com.simprints.infra.config.store.local.models.ProtoVero2Configuration
-import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.ConsentConfiguration
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.DeviceConfiguration

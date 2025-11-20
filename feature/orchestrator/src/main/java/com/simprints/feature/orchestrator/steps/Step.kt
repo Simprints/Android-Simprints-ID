@@ -4,6 +4,7 @@ import androidx.annotation.IdRes
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.MatchComparisonResult
@@ -18,6 +19,7 @@ import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.fetchsubject.FetchSubjectParams
 import com.simprints.feature.fetchsubject.FetchSubjectResult
@@ -55,6 +57,7 @@ import java.io.Serializable
     JsonSubTypes.Type(value = ValidateSubjectPoolResult::class, name = "ValidateSubjectPoolResult"),
     JsonSubTypes.Type(value = SelectSubjectAgeGroupResult::class, name = "SelectSubjectAgeGroupResult"),
     JsonSubTypes.Type(value = ExternalCredentialSearchResult::class, name = "ExternalCredentialSearchResult"),
+    JsonSubTypes.Type(value = CredentialMatch::class, name = " CredentialMatch"),
     // Common data types
     JsonSubTypes.Type(value = CaptureIdentity::class, name = "CaptureIdentity"),
     JsonSubTypes.Type(value = CaptureSample::class, name = "CaptureSample"),
@@ -91,13 +94,14 @@ abstract class StepResultMixin : StepResult
         name = "EnrolLastBiometricStepResult.CaptureResult",
     ),
     JsonSubTypes.Type(value = ExternalCredentialParams::class, name = "ExternalCredentialParams"),
-    JsonSubTypes.Type(value = ExternalCredentialSearchResult::class, name = "ExternalCredentialSearchResult"),
-    JsonSubTypes.Type(value = MatchResult::class, name = "MatchResult"),
     // Additional types that are used in top-level params
     JsonSubTypes.Type(value = CaptureSample::class, name = "CaptureSample"),
     JsonSubTypes.Type(value = MatchComparisonResult::class, name = "MatchComparisonResult"),
     JsonSubTypes.Type(value = BiometricDataSource::class, name = "BiometricDataSource"),
+    JsonSubTypes.Type(value = BiometricDataSource.CommCare::class, name = "BiometricDataSource.CommCare"),
+    JsonSubTypes.Type(value = BiometricDataSource.Simprints::class, name = "BiometricDataSource.Simprints"),
     JsonSubTypes.Type(value = SubjectQuery::class, name = "SubjectQuery"),
+    JsonSubTypes.Type(value = AgeGroup::class, name = "AgeGroup"),
     JsonSubTypes.Type(value = FingerprintConfiguration.BioSdk::class, name = "FingerprintConfiguration.BioSdk"),
     JsonSubTypes.Type(value = FaceConfiguration.BioSdk::class, name = "FaceConfiguration.BioSdk"),
 )

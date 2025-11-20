@@ -32,8 +32,7 @@ class ResetExternalCredentialsInSessionUseCase @Inject() constructor(
         val credentialsToRemove = enrolmentUpdateEvents.map {
             SubjectAction.Update(
                 subjectId = it.payload.subjectId,
-                faceSamplesToAdd = emptyList(),
-                fingerprintSamplesToAdd = emptyList(),
+                samplesToAdd = emptyList(),
                 referenceIdsToRemove = emptyList(),
                 externalCredentialsToAdd = emptyList(),
                 externalCredentialIdsToRemove = it.payload.externalCredentialIdsToAdd,
@@ -45,8 +44,7 @@ class ResetExternalCredentialsInSessionUseCase @Inject() constructor(
             listOf(
                 SubjectAction.Update(
                     subjectId = subjectId,
-                    faceSamplesToAdd = emptyList(),
-                    fingerprintSamplesToAdd = emptyList(),
+                    samplesToAdd = emptyList(),
                     referenceIdsToRemove = emptyList(),
                     externalCredentialsToAdd = listOf(scannedCredential.toExternalCredential(validSubjectId)),
                     externalCredentialIdsToRemove = emptyList(),

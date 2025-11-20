@@ -230,7 +230,7 @@ class CommCareIdentityDataSourceTest {
     }
 
     @Test
-    fun testLoadFingerprintIdentities() = runTest {
+    fun `test loadIdentities with fingerprint records`() = runTest {
         every { mockMetadataCursor.count } returns expectedFingerprintIdentities.size
         every { mockMetadataCursor.moveToPosition(0) } returns true
         every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, false)
@@ -249,12 +249,12 @@ class CommCareIdentityDataSourceTest {
         )
 
         val templateFormat = "ISO_19794_2"
-        val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
+        val query = SubjectQuery(format = templateFormat)
         val range = 0..expectedFingerprintIdentities.size
         val actualIdentities = mutableListOf<Identity>()
 
         dataSource
-            .loadFingerprintIdentities(
+            .loadIdentities(
                 query = query,
                 ranges = listOf(range),
                 project = project,
@@ -286,7 +286,7 @@ class CommCareIdentityDataSourceTest {
     }
 
     @Test
-    fun testLoadFaceIdentities() = runTest {
+    fun `test loadIdentities with face records`() = runTest {
         every { mockMetadataCursor.count } returns expectedFaceIdentities.size
         every { mockMetadataCursor.moveToPosition(0) } returns true
         every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, false)
@@ -305,7 +305,7 @@ class CommCareIdentityDataSourceTest {
         )
         val templateFormat = "ROC_1_23"
         val query = SubjectQuery(
-            faceSampleFormat = templateFormat,
+            format = templateFormat,
             attendantId = TokenizableString.Tokenized(
                 value = "AdySMrjuy7uq0Dcxov3rUFIw66uXTFrKd0BnzSr9MYXl5maWEpyKQT8AUdcPuVHUWpOkO88=",
             ),
@@ -315,7 +315,7 @@ class CommCareIdentityDataSourceTest {
         val range = 0..expectedFaceIdentities.size
         val actualIdentities = mutableListOf<Identity>()
         dataSource
-            .loadFaceIdentities(
+            .loadIdentities(
                 query = query,
                 ranges = listOf(range),
                 project = project,
@@ -343,7 +343,7 @@ class CommCareIdentityDataSourceTest {
     }
 
     @Test
-    fun `test loadFingerprintIdentities returns only identities with fingerprint references`() = runTest {
+    fun `test loadIdentities returns only identities with fingerprint references`() = runTest {
         every { mockMetadataCursor.count } returns expectedFingerprintIdentities.size + 1
         every { mockMetadataCursor.moveToPosition(0) } returns true
         every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, true, false)
@@ -364,11 +364,11 @@ class CommCareIdentityDataSourceTest {
             SUBJECT_ACTIONS_FACE_1,
         )
         val templateFormat = "NEC_1_5"
-        val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
+        val query = SubjectQuery(format = templateFormat)
         val range = 0..expectedFingerprintIdentities.size
         val actualIdentities = mutableListOf<Identity>()
         dataSource
-            .loadFingerprintIdentities(
+            .loadIdentities(
                 query = query,
                 ranges = listOf(range),
                 project = project,
@@ -400,7 +400,7 @@ class CommCareIdentityDataSourceTest {
     }
 
     @Test
-    fun `test loadFaceIdentities returns only identities with face references`() = runTest {
+    fun `test loadIdentities returns only identities with face references`() = runTest {
         every { mockMetadataCursor.count } returns expectedFaceIdentities.size + 1
         every { mockMetadataCursor.moveToPosition(0) } returns true
         every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, true, false)
@@ -422,11 +422,11 @@ class CommCareIdentityDataSourceTest {
         )
 
         val templateFormat = "ROC_1_23"
-        val query = SubjectQuery(faceSampleFormat = templateFormat)
+        val query = SubjectQuery(format = templateFormat)
         val range = 0..expectedFaceIdentities.size
         val actualIdentities = mutableListOf<Identity>()
         dataSource
-            .loadFaceIdentities(
+            .loadIdentities(
                 query = query,
                 ranges = listOf(range),
                 project = project,
@@ -454,7 +454,7 @@ class CommCareIdentityDataSourceTest {
     }
 
     @Test
-    fun `test loadFingerprintIdentities returns only fingerprint references for dual modality identities`() = runTest {
+    fun `test loadIdentities returns only fingerprint references for dual modality identities`() = runTest {
         every { mockMetadataCursor.count } returns expectedFingerprintIdentities.size
         every { mockMetadataCursor.moveToPosition(0) } returns true
         every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, false)
@@ -472,11 +472,11 @@ class CommCareIdentityDataSourceTest {
             SUBJECT_ACTIONS_FINGERPRINT_AND_FACE_2,
         )
         val templateFormat = "ISO_19794_2"
-        val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
+        val query = SubjectQuery(format = templateFormat)
         val range = 0..expectedFingerprintIdentities.size
         val actualIdentities = mutableListOf<Identity>()
         dataSource
-            .loadFingerprintIdentities(
+            .loadIdentities(
                 query = query,
                 ranges = listOf(range),
                 project = project,
@@ -508,7 +508,7 @@ class CommCareIdentityDataSourceTest {
     }
 
     @Test
-    fun `test loadFaceIdentities returns only face references for dual modality identities`() = runTest {
+    fun `test loadIdentities returns only face references for dual modality identities`() = runTest {
         every { mockMetadataCursor.count } returns expectedFaceIdentities.size
         every { mockMetadataCursor.moveToPosition(0) } returns true
         every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, false)
@@ -526,11 +526,11 @@ class CommCareIdentityDataSourceTest {
             SUBJECT_ACTIONS_FINGERPRINT_AND_FACE_2,
         )
         val templateFormat = "ROC_1_23"
-        val query = SubjectQuery(faceSampleFormat = templateFormat)
+        val query = SubjectQuery(format = templateFormat)
         val range = 0..expectedFaceIdentities.size
         val actualIdentities = mutableListOf<Identity>()
         dataSource
-            .loadFaceIdentities(
+            .loadIdentities(
                 query = query,
                 ranges = listOf(range),
                 project = project,
@@ -586,7 +586,7 @@ class CommCareIdentityDataSourceTest {
         val range = 0..0
         val actualIdentities = mutableListOf<Identity>()
         dataSource
-            .loadFingerprintIdentities(
+            .loadIdentities(
                 query = query,
                 ranges = listOf(range),
                 project = project,
@@ -618,7 +618,7 @@ class CommCareIdentityDataSourceTest {
         val range = 2..3
         val actualIdentities = mutableListOf<Identity>()
         dataSource
-            .loadFingerprintIdentities(
+            .loadIdentities(
                 query = query,
                 ranges = listOf(range),
                 project = project,
@@ -663,11 +663,11 @@ class CommCareIdentityDataSourceTest {
         )
 
         val templateFormat = "ISO_19794_2"
-        val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
+        val query = SubjectQuery(format = templateFormat)
         val range = expectedFingerprintIdentities.indices
         val actualIdentities = mutableListOf<Identity>()
         dataSource
-            .loadFingerprintIdentities(
+            .loadIdentities(
                 query = query,
                 ranges = listOf(range),
                 project = project,
@@ -710,7 +710,7 @@ class CommCareIdentityDataSourceTest {
         val range = 0..2
         val actualIdentities = mutableListOf<Identity>()
         dataSource
-            .loadFingerprintIdentities(
+            .loadIdentities(
                 query = query,
                 ranges = listOf(range),
                 project = project,
@@ -750,7 +750,7 @@ class CommCareIdentityDataSourceTest {
         val range = 0..2
         val actualIdentities = mutableListOf<Identity>()
         dataSource
-            .loadFingerprintIdentities(
+            .loadIdentities(
                 query = query,
                 ranges = listOf(range),
                 project = project,
@@ -794,7 +794,7 @@ class CommCareIdentityDataSourceTest {
         val range = 0..2
         val actualIdentities = mutableListOf<Identity>()
         dataSource
-            .loadFingerprintIdentities(
+            .loadIdentities(
                 query = query,
                 ranges = listOf(range),
                 project = project,
@@ -825,7 +825,7 @@ class CommCareIdentityDataSourceTest {
         val range = 0..2
         val actualIdentities = mutableListOf<Identity>()
         dataSource
-            .loadFingerprintIdentities(
+            .loadIdentities(
                 query = query,
                 ranges = listOf(range),
                 project = project,
@@ -861,7 +861,7 @@ class CommCareIdentityDataSourceTest {
         val range = 0..2
         val actualIdentities = mutableListOf<Identity>()
         dataSource
-            .loadFingerprintIdentities(
+            .loadIdentities(
                 query = query,
                 ranges = listOf(range),
                 project = project,
@@ -924,7 +924,7 @@ class CommCareIdentityDataSourceTest {
     }
 
     @Test
-    fun `loadFingerprintIdentities with case ID calls onCandidateLoaded`() = runTest {
+    fun `loadIdentities with case ID calls onCandidateLoaded`() = runTest {
         val testCaseId = "test-case-id"
         var onCandidateLoadedCalled = false
         every { extractCommCareCaseIdUseCase.invoke(any()) } returns testCaseId
@@ -936,7 +936,7 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery(metadata = "test-metadata")
         dataSource
-            .loadFingerprintIdentities(
+            .loadIdentities(
                 query = query,
                 ranges = listOf(0..1),
                 project = project,

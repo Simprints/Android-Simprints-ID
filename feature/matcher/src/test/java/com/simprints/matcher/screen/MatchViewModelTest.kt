@@ -110,7 +110,7 @@ internal class MatchViewModelTest {
         viewModel.setupMatch(
             MatchParams(
                 probeReferenceId = "referenceId",
-                probeFaceSamples = listOf(getFaceSample()),
+                probeSamples = listOf(getFaceSample()),
                 bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
@@ -134,7 +134,7 @@ internal class MatchViewModelTest {
             configManager
                 .getProjectConfiguration()
                 .face
-                ?.getSdkConfiguration(any())
+                ?.rankOne
                 ?.decisionPolicy
         } returns DecisionPolicy(20, 35, 50)
 
@@ -182,7 +182,7 @@ internal class MatchViewModelTest {
         viewModel.setupMatch(
             MatchParams(
                 probeReferenceId = "referenceId",
-                probeFaceSamples = listOf(getFaceSample()),
+                probeSamples = listOf(getFaceSample()),
                 bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
@@ -223,7 +223,7 @@ internal class MatchViewModelTest {
             configManager
                 .getProjectConfiguration()
                 .fingerprint
-                ?.getSdkConfiguration(any())
+                ?.secugenSimMatcher
                 ?.decisionPolicy
         } returns DecisionPolicy(200, 350, 500)
 
@@ -273,7 +273,7 @@ internal class MatchViewModelTest {
         viewModel.setupMatch(
             MatchParams(
                 probeReferenceId = "referenceId",
-                probeFingerprintSamples = listOf(getFingerprintSample()),
+                probeSamples = listOf(getFingerprintSample()),
                 bioSdk = SECUGEN_SIM_MATCHER,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
@@ -314,7 +314,7 @@ internal class MatchViewModelTest {
             configManager
                 .getProjectConfiguration()
                 .face
-                ?.getSdkConfiguration(any())
+                ?.rankOne
                 ?.decisionPolicy
         } returns null
 
@@ -338,7 +338,7 @@ internal class MatchViewModelTest {
         viewModel.setupMatch(
             MatchParams(
                 probeReferenceId = "referenceId",
-                probeFaceSamples = listOf(getFaceSample()),
+                probeSamples = listOf(getFaceSample()),
                 bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
@@ -377,7 +377,7 @@ internal class MatchViewModelTest {
         val states = viewModel.matchState.test()
         val matchParams = MatchParams(
             probeReferenceId = "referenceId",
-            probeFaceSamples = listOf(getFaceSample()),
+            probeSamples = listOf(getFaceSample()),
             bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
             flowType = FlowType.ENROL,
             queryForCandidates = mockk {},

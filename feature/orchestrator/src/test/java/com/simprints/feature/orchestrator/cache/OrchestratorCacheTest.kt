@@ -3,9 +3,9 @@ package com.simprints.feature.orchestrator.cache
 import android.content.SharedPreferences
 import com.fasterxml.jackson.core.type.TypeReference
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.feature.orchestrator.steps.Step
-import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.security.SecurityManager
 import io.mockk.MockKAnnotations
 import io.mockk.every
