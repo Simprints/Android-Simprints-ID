@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.capture.usecase
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.FingerState
 import org.junit.Test
@@ -14,16 +14,16 @@ internal class GetStartStateUseCaseTest {
         assertThat(
             getStartStateUseCase(
                 listOf(
-                    IFingerIdentifier.LEFT_THUMB,
-                    IFingerIdentifier.RIGHT_5TH_FINGER,
-                    IFingerIdentifier.LEFT_INDEX_FINGER,
+                    SampleIdentifier.LEFT_THUMB,
+                    SampleIdentifier.RIGHT_5TH_FINGER,
+                    SampleIdentifier.LEFT_INDEX_FINGER,
                 ),
             ),
         ).containsExactlyElementsIn(
             listOf(
-                FingerState(IFingerIdentifier.LEFT_THUMB, listOf(CaptureState.NotCollected)),
-                FingerState(IFingerIdentifier.RIGHT_5TH_FINGER, listOf(CaptureState.NotCollected)),
-                FingerState(IFingerIdentifier.LEFT_INDEX_FINGER, listOf(CaptureState.NotCollected)),
+                FingerState(SampleIdentifier.LEFT_THUMB, listOf(CaptureState.NotCollected)),
+                FingerState(SampleIdentifier.RIGHT_5TH_FINGER, listOf(CaptureState.NotCollected)),
+                FingerState(SampleIdentifier.LEFT_INDEX_FINGER, listOf(CaptureState.NotCollected)),
             ),
         )
     }
@@ -33,22 +33,22 @@ internal class GetStartStateUseCaseTest {
         assertThat(
             getStartStateUseCase(
                 listOf(
-                    IFingerIdentifier.LEFT_THUMB,
-                    IFingerIdentifier.LEFT_THUMB,
-                    IFingerIdentifier.LEFT_THUMB,
-                    IFingerIdentifier.RIGHT_5TH_FINGER,
-                    IFingerIdentifier.LEFT_INDEX_FINGER,
-                    IFingerIdentifier.LEFT_INDEX_FINGER,
+                    SampleIdentifier.LEFT_THUMB,
+                    SampleIdentifier.LEFT_THUMB,
+                    SampleIdentifier.LEFT_THUMB,
+                    SampleIdentifier.RIGHT_5TH_FINGER,
+                    SampleIdentifier.LEFT_INDEX_FINGER,
+                    SampleIdentifier.LEFT_INDEX_FINGER,
                 ),
             ),
         ).containsExactlyElementsIn(
             listOf(
                 FingerState(
-                    IFingerIdentifier.LEFT_THUMB,
+                    SampleIdentifier.LEFT_THUMB,
                     listOf(CaptureState.NotCollected, CaptureState.NotCollected, CaptureState.NotCollected),
                 ),
-                FingerState(IFingerIdentifier.RIGHT_5TH_FINGER, listOf(CaptureState.NotCollected)),
-                FingerState(IFingerIdentifier.LEFT_INDEX_FINGER, listOf(CaptureState.NotCollected, CaptureState.NotCollected)),
+                FingerState(SampleIdentifier.RIGHT_5TH_FINGER, listOf(CaptureState.NotCollected)),
+                FingerState(SampleIdentifier.LEFT_INDEX_FINGER, listOf(CaptureState.NotCollected, CaptureState.NotCollected)),
             ),
         )
     }
@@ -58,22 +58,22 @@ internal class GetStartStateUseCaseTest {
         assertThat(
             getStartStateUseCase(
                 listOf(
-                    IFingerIdentifier.LEFT_THUMB,
-                    IFingerIdentifier.RIGHT_5TH_FINGER,
-                    IFingerIdentifier.LEFT_INDEX_FINGER,
-                    IFingerIdentifier.LEFT_THUMB,
-                    IFingerIdentifier.LEFT_INDEX_FINGER,
-                    IFingerIdentifier.LEFT_THUMB,
+                    SampleIdentifier.LEFT_THUMB,
+                    SampleIdentifier.RIGHT_5TH_FINGER,
+                    SampleIdentifier.LEFT_INDEX_FINGER,
+                    SampleIdentifier.LEFT_THUMB,
+                    SampleIdentifier.LEFT_INDEX_FINGER,
+                    SampleIdentifier.LEFT_THUMB,
                 ),
             ),
         ).containsExactlyElementsIn(
             listOf(
                 FingerState(
-                    IFingerIdentifier.LEFT_THUMB,
+                    SampleIdentifier.LEFT_THUMB,
                     listOf(CaptureState.NotCollected, CaptureState.NotCollected, CaptureState.NotCollected),
                 ),
-                FingerState(IFingerIdentifier.RIGHT_5TH_FINGER, listOf(CaptureState.NotCollected)),
-                FingerState(IFingerIdentifier.LEFT_INDEX_FINGER, listOf(CaptureState.NotCollected, CaptureState.NotCollected)),
+                FingerState(SampleIdentifier.RIGHT_5TH_FINGER, listOf(CaptureState.NotCollected)),
+                FingerState(SampleIdentifier.LEFT_INDEX_FINGER, listOf(CaptureState.NotCollected, CaptureState.NotCollected)),
             ),
         )
     }

@@ -8,8 +8,9 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.AvailableProcessors
 import com.simprints.core.DispatcherBG
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.Identity
+import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
@@ -21,8 +22,6 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.enrolment.records.repository.IdentityDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
-import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.usecases.CompareImplicitTokenizedStringsUseCase
@@ -66,25 +65,25 @@ internal class CommCareIdentityDataSource @Inject constructor(
         dataSource: BiometricDataSource,
         project: Project,
         onCandidateLoaded: suspend () -> Unit,
-    ): List<FingerprintIdentity> =
-        loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
-            .filter { erce ->
-                erce.payload.biometricReferences.any { it is FingerprintReference && it.format == query.fingerprintSampleFormat }
-            }.map {
-                FingerprintIdentity(
-                    it.payload.subjectId,
-                    it.payload.biometricReferences.filterIsInstance<FingerprintReference>().flatMap { fingerprintReference ->
-                        fingerprintReference.templates.map { fingerprintTemplate ->
-                            FingerprintSample(
-                                fingerIdentifier = fingerprintTemplate.finger,
-                                template = encoder.base64ToBytes(fingerprintTemplate.template),
-                                format = fingerprintReference.format,
-                                referenceId = fingerprintReference.id,
-                            )
-                        }
-                    },
-                )
-            }
+    ): List<Identity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
+        .filter { erce ->
+            erce.payload.biometricReferences.any { it is FingerprintReference && it.format == query.fingerprintSampleFormat }
+        }.map {
+            Identity(
+                it.payload.subjectId,
+                it.payload.biometricReferences.filterIsInstance<FingerprintReference>().flatMap { fingerprintReference ->
+                    fingerprintReference.templates.map { fingerprintTemplate ->
+                        Sample(
+                            identifier = fingerprintTemplate.finger,
+                            template = encoder.base64ToBytes(fingerprintTemplate.template),
+                            format = fingerprintReference.format,
+                            referenceId = fingerprintReference.id,
+                            modality = Modality.FINGERPRINT,
+                        )
+                    }
+                },
+            )
+        }
 
     private suspend fun loadEnrolmentRecordCreationEvents(
         range: IntRange,
@@ -133,18 +132,19 @@ internal class CommCareIdentityDataSource @Inject constructor(
         dataSource: BiometricDataSource,
         project: Project,
         onCandidateLoaded: suspend () -> Unit,
-    ): List<FaceIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
+    ): List<Identity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
         .filter { erce ->
             erce.payload.biometricReferences.any { it is FaceReference && it.format == query.faceSampleFormat }
         }.map {
-            FaceIdentity(
+            Identity(
                 it.payload.subjectId,
                 it.payload.biometricReferences.filterIsInstance<FaceReference>().flatMap { faceReference ->
                     faceReference.templates.map { faceTemplate ->
-                        FaceSample(
+                        Sample(
                             template = encoder.base64ToBytes(faceTemplate.template),
                             format = faceReference.format,
                             referenceId = faceReference.id,
+                            modality = Modality.FACE,
                         )
                     }
                 },
@@ -276,7 +276,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<IdentityBatch<FaceIdentity>> = loadIdentitiesConcurrently(
+    ): ReceiveChannel<IdentityBatch<Identity>> = loadIdentitiesConcurrently(
         ranges = ranges,
         scope = scope,
     ) { range ->
@@ -299,7 +299,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<IdentityBatch<FingerprintIdentity>> = loadIdentitiesConcurrently(
+    ): ReceiveChannel<IdentityBatch<Identity>> = loadIdentitiesConcurrently(
         ranges = ranges,
         scope = scope,
     ) { range ->

@@ -2,11 +2,11 @@ package com.simprints.infra.enrolment.records.repository.local
 
 import androidx.test.core.app.*
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.sample.Sample
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
@@ -72,44 +72,50 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     private val date = Date() // Use a fixed date for consistent timestamps in tests
 
     // Samples defined first
-    private val faceSample1 = FaceSample(
+    private val faceSample1 = Sample(
         template = byteArrayOf(1, 2, 3),
         format = ROC_1_FORMAT,
         referenceId = "ref-face-1",
         id = "face-uuid-1",
+        modality = Modality.FACE,
     )
-    private val faceSample2 = FaceSample(
+    private val faceSample2 = Sample(
         template = byteArrayOf(4, 5, 6),
         format = ROC_3_FORMAT,
         referenceId = "ref-face-2",
         id = "face-uuid-2",
+        modality = Modality.FACE,
     )
-    private val faceSample3 = FaceSample(
+    private val faceSample3 = Sample(
         template = byteArrayOf(7, 8, 9),
         format = ROC_1_FORMAT,
         referenceId = "ref-face-3-p2",
         id = "face-uuid-3-p2",
+        modality = Modality.FACE,
     )
-    private val fingerprintSample1 = FingerprintSample(
-        fingerIdentifier = IFingerIdentifier.LEFT_THUMB,
+    private val fingerprintSample1 = Sample(
+        identifier = SampleIdentifier.LEFT_THUMB,
         template = byteArrayOf(10, 11),
         format = NEC_FORMAT,
         referenceId = "ref-fp-1",
         id = "fp-uuid-1",
+        modality = Modality.FINGERPRINT,
     )
-    private val fingerprintSample2 = FingerprintSample(
-        fingerIdentifier = IFingerIdentifier.RIGHT_THUMB,
+    private val fingerprintSample2 = Sample(
+        identifier = SampleIdentifier.RIGHT_THUMB,
         template = byteArrayOf(12, 13),
         format = ISO_FORMAT,
         referenceId = "ref-fp-2",
         id = "fp-uuid-2",
+        modality = Modality.FINGERPRINT,
     )
-    private val fingerprintSample3 = FingerprintSample(
-        fingerIdentifier = IFingerIdentifier.LEFT_INDEX_FINGER,
+    private val fingerprintSample3 = Sample(
+        identifier = SampleIdentifier.LEFT_INDEX_FINGER,
         template = byteArrayOf(14, 15),
         format = NEC_FORMAT,
         referenceId = "ref-fp-3-p2",
         id = "fp-uuid-3-p2",
+        modality = Modality.FINGERPRINT,
     )
 
     // Subjects defined using the samples
@@ -871,22 +877,22 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         // Then - P1 NEC
         assertThat(loadedP1Nec).hasSize(1)
         assertThat(loadedP1Nec[0].subjectId).isEqualTo(subject2P1WithFinger.subjectId)
-        assertThat(loadedP1Nec[0].fingerprints).hasSize(1)
-        assertThat(loadedP1Nec[0].fingerprints[0].format).isEqualTo(NEC_FORMAT)
-        assertThat(loadedP1Nec[0].fingerprints).isEqualTo(subject2P1WithFinger.fingerprintSamples)
+        assertThat(loadedP1Nec[0].samples).hasSize(1)
+        assertThat(loadedP1Nec[0].samples[0].format).isEqualTo(NEC_FORMAT)
+        assertThat(loadedP1Nec[0].samples).isEqualTo(subject2P1WithFinger.fingerprintSamples)
 
         // Then - P1 ISO
         assertThat(loadedP1Iso).hasSize(1)
         assertThat(loadedP1Iso[0].subjectId).isEqualTo(subject3P1WithBoth.subjectId)
-        assertThat(loadedP1Iso[0].fingerprints).hasSize(1)
-        assertThat(loadedP1Iso[0].fingerprints[0].format).isEqualTo(ISO_FORMAT)
-        assertThat(loadedP1Iso[0].fingerprints).isEqualTo(subject3P1WithBoth.fingerprintSamples)
+        assertThat(loadedP1Iso[0].samples).hasSize(1)
+        assertThat(loadedP1Iso[0].samples[0].format).isEqualTo(ISO_FORMAT)
+        assertThat(loadedP1Iso[0].samples).isEqualTo(subject3P1WithBoth.fingerprintSamples)
 
         // Then - P2 NEC
         assertThat(loadedP2Nec).hasSize(2)
         assertThat(loadedP2Nec[0].subjectId).isEqualTo(subject4P2WithBoth.subjectId)
-        assertThat(loadedP2Nec[0].fingerprints).hasSize(1)
-        assertThat(loadedP2Nec[0].fingerprints[0].format).isEqualTo(NEC_FORMAT)
+        assertThat(loadedP2Nec[0].samples).hasSize(1)
+        assertThat(loadedP2Nec[0].samples[0].format).isEqualTo(NEC_FORMAT)
 
         verify(exactly = 4) { mockCallback() }
     }
@@ -1079,16 +1085,16 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         // Then - P1 ROC_1
         assertThat(loadedP1Roc1).hasSize(1)
         assertThat(loadedP1Roc1[0].subjectId).isEqualTo(subject1P1WithFace.subjectId)
-        assertThat(loadedP1Roc1[0].faces).hasSize(1)
-        assertThat(loadedP1Roc1[0].faces[0].format).isEqualTo(ROC_1_FORMAT)
-        assertThat(loadedP1Roc1[0].faces).isEqualTo(subject1P1WithFace.faceSamples)
+        assertThat(loadedP1Roc1[0].samples).hasSize(1)
+        assertThat(loadedP1Roc1[0].samples[0].format).isEqualTo(ROC_1_FORMAT)
+        assertThat(loadedP1Roc1[0].samples).isEqualTo(subject1P1WithFace.faceSamples)
 
         // Then - P1 ROC_3
         assertThat(loadedP1Roc3).hasSize(1)
         assertThat(loadedP1Roc3[0].subjectId).isEqualTo(subject3P1WithBoth.subjectId)
-        assertThat(loadedP1Roc3[0].faces).hasSize(1)
-        assertThat(loadedP1Roc3[0].faces[0].format).isEqualTo(ROC_3_FORMAT)
-        assertThat(loadedP1Roc3[0].faces).isEqualTo(subject3P1WithBoth.faceSamples)
+        assertThat(loadedP1Roc3[0].samples).hasSize(1)
+        assertThat(loadedP1Roc3[0].samples[0].format).isEqualTo(ROC_3_FORMAT)
+        assertThat(loadedP1Roc3[0].samples).isEqualTo(subject3P1WithBoth.faceSamples)
 
         // Then - P2 ROC_1
         assertThat(loadedP2Roc1).hasSize(2)

@@ -1,21 +1,18 @@
 package com.simprints.feature.orchestrator.usecases.response
 
-import com.simprints.core.domain.response.AppMatchConfidence
+import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.infra.config.store.models.DecisionPolicy
+import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.session.SessionEventRepository
-import com.simprints.infra.matching.FaceMatchResult
-import com.simprints.infra.matching.FingerprintMatchResult
-import com.simprints.infra.matching.MatchResultItem
+import com.simprints.infra.matching.MatchResult
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.orchestration.data.responses.AppResponse
 import java.io.Serializable
 import javax.inject.Inject
-import kotlin.collections.ifEmpty
-import kotlin.collections.map
-import kotlin.collections.take
 
 internal class CreateIdentifyResponseUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
@@ -51,38 +48,66 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
     private fun getFingerprintResults(
         results: List<Serializable>,
         projectConfiguration: ProjectConfiguration,
-    ) = results.filterIsInstance<FingerprintMatchResult>().lastOrNull()?.let { fingerprintMatchResult ->
-        projectConfiguration.fingerprint
-            ?.getSdkConfiguration(fingerprintMatchResult.sdk)
-            ?.decisionPolicy
-            ?.let { fingerprintDecisionPolicy ->
-                fingerprintMatchResult.results.mapToMatchResults(
-                    decisionPolicy = fingerprintDecisionPolicy,
-                    projectConfiguration = projectConfiguration,
-                    isCredentialMatch = false,
-                    verificationMatchThreshold = null,
-                )
-            }
-    } ?: emptyList()
+    ) = results
+        .filterIsInstance<MatchResult>()
+        .lastOrNull { it.sdk is FingerprintConfiguration.BioSdk }
+        ?.let { fingerprintMatchResult ->
+            projectConfiguration.fingerprint
+                ?.getSdkConfiguration(fingerprintMatchResult.sdk)
+                ?.decisionPolicy
+                ?.let { fingerprintDecisionPolicy ->
+                    val matches = fingerprintMatchResult.results
+                    val goodResults = matches
+                        .filter { it.confidence >= fingerprintDecisionPolicy.low }
+                        .sortedByDescending { it.confidence }
+                    // Attempt to include only high confidence matches
+                    goodResults
+                        .filter { it.confidence >= fingerprintDecisionPolicy.high }
+                        .ifEmpty { goodResults }
+                        .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
+                        .map {
+                            AppMatchResult(
+                                guid = it.subjectId,
+                                confidenceScore = it.confidence,
+                                decisionPolicy = fingerprintDecisionPolicy,
+                                isCredentialMatch = false,
+                            )
+                        }
+                }
+        } ?: emptyList()
 
     private fun getFaceMatchResults(
         results: List<Serializable>,
         projectConfiguration: ProjectConfiguration,
-    ) = results.filterIsInstance<FaceMatchResult>().lastOrNull()?.let { faceMatchResult ->
-        projectConfiguration.face
-            ?.getSdkConfiguration(faceMatchResult.sdk)
-            ?.decisionPolicy
-            ?.let { faceDecisionPolicy ->
-                faceMatchResult.results.mapToMatchResults(
-                    decisionPolicy = faceDecisionPolicy,
-                    projectConfiguration = projectConfiguration,
-                    isCredentialMatch = false,
-                    verificationMatchThreshold = null,
-                )
-            }
-    } ?: emptyList()
+    ) = results
+        .filterIsInstance<MatchResult>()
+        .lastOrNull { it.sdk is FaceConfiguration.BioSdk }
+        ?.let { faceMatchResult ->
+            projectConfiguration.face
+                ?.getSdkConfiguration(faceMatchResult.sdk)
+                ?.decisionPolicy
+                ?.let { faceDecisionPolicy ->
+                    val matches = faceMatchResult.results
+                    val goodResults = matches
+                        .filter { it.confidence >= faceDecisionPolicy.low }
+                        .sortedByDescending { it.confidence }
+                    // Attempt to include only high confidence matches
+                    goodResults
+                        .filter { it.confidence >= faceDecisionPolicy.high }
+                        .ifEmpty { goodResults }
+                        .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
+                        .map {
+                            AppMatchResult(
+                                guid = it.subjectId,
+                                confidenceScore = it.confidence,
+                                decisionPolicy = faceDecisionPolicy,
+                                isCredentialMatch = false,
+                            )
+                        }
+                }
+        } ?: emptyList()
 
-    private fun List<MatchResultItem>.mapToMatchResults(
+    private fun List<MatchComparisonResult>.mapToMatchResults(
         decisionPolicy: DecisionPolicy,
         verificationMatchThreshold: Float?,
         projectConfiguration: ProjectConfiguration,
@@ -123,8 +148,8 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
         .firstOrNull()
         ?.let { credentialSearchResult ->
             val credentialMatchItems = credentialSearchResult.matchResults.map { it.matchResult }
-            val faceMatchItems = credentialMatchItems.filterIsInstance<FaceMatchResult.Item>()
-            val fingerMatchItems = credentialMatchItems.filterIsInstance<FingerprintMatchResult.Item>()
+            val faceMatchItems = credentialSearchResult.matchResults.filter { it.faceBioSdk != null }.map { it.matchResult }
+            val fingerMatchItems = credentialSearchResult.matchResults.filter { it.fingerprintBioSdk != null }.map { it.matchResult }
             val (decisionPolicy, verificationMatchThreshold) = if (isFace) {
                 credentialSearchResult.matchResults.find { it.faceBioSdk != null }?.faceBioSdk?.let { sdk ->
                     val config = projectConfiguration.face?.getSdkConfiguration(sdk)

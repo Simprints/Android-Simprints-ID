@@ -2,9 +2,13 @@ package com.simprints.infra.matching.usecase
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.MatchComparisonResult
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy
 import com.simprints.infra.config.sync.ConfigManager
@@ -15,7 +19,6 @@ import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToM
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent.OneToOneMatchPayload.OneToOneMatchPayloadV4
 import com.simprints.infra.events.session.SessionEventRepository
-import com.simprints.infra.matching.FaceMatchResult
 import com.simprints.infra.matching.MatchBatchInfo
 import com.simprints.infra.matching.MatchParams
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -68,15 +71,23 @@ class SaveMatchEventUseCaseTest {
             MatchParams(
                 probeReferenceId = "referenceId",
                 flowType = FlowType.VERIFY,
+                bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                 queryForCandidates = SubjectQuery(subjectId = "subjectId"),
-                probeFaceSamples = listOf(MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3))),
+                probeFaceSamples = listOf(
+                    CaptureSample(
+                        captureEventId = "faceId",
+                        template = byteArrayOf(1, 2, 3),
+                        modality = Modality.FACE,
+                        format = "format",
+                    ),
+                ),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
             2,
             "faceMatcherName",
             listOf(
-                FaceMatchResult.Item("guid1", 0.5f),
-                FaceMatchResult.Item("guid2", 0.1f),
+                MatchComparisonResult("guid1", 0.5f),
+                MatchComparisonResult("guid2", 0.1f),
             ),
             batches = emptyList(),
         )
@@ -108,20 +119,22 @@ class SaveMatchEventUseCaseTest {
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(subjectId = "subjectId"),
                 probeFingerprintSamples = listOf(
-                    MatchParams.FingerprintSample(
-                        IFingerIdentifier.RIGHT_5TH_FINGER,
-                        "format",
-                        byteArrayOf(1, 2, 3),
+                    CaptureSample(
+                        captureEventId = "fingerprintId",
+                        template = byteArrayOf(1, 2, 3),
+                        modality = Modality.FINGERPRINT,
+                        format = "format",
+                        identifier = SampleIdentifier.RIGHT_5TH_FINGER,
                     ),
                 ),
-                fingerprintSDK = SECUGEN_SIM_MATCHER,
+                bioSdk = SECUGEN_SIM_MATCHER,
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
             2,
             "faceMatcherName",
             listOf(
-                FaceMatchResult.Item("guid1", 0.5f),
-                FaceMatchResult.Item("guid2", 0.1f),
+                MatchComparisonResult("guid1", 0.5f),
+                MatchComparisonResult("guid2", 0.1f),
             ),
             batches = emptyList(),
         )
@@ -156,7 +169,7 @@ class SaveMatchEventUseCaseTest {
                 probeReferenceId = "referenceId",
                 probeFaceSamples = emptyList(),
                 probeFingerprintSamples = emptyList(),
-                fingerprintSDK = null,
+                bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                 flowType = FlowType.IDENTIFY,
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -164,8 +177,8 @@ class SaveMatchEventUseCaseTest {
             candidatesCount = 2,
             matcherName = "faceMatcherName",
             results = listOf(
-                FaceMatchResult.Item("guid1", 0.5f),
-                FaceMatchResult.Item("guid2", 0.1f),
+                MatchComparisonResult("guid1", 0.5f),
+                MatchComparisonResult("guid2", 0.1f),
             ),
             batches = batches,
         )
@@ -217,12 +230,13 @@ class SaveMatchEventUseCaseTest {
             MatchParams(
                 probeReferenceId = "referenceId",
                 flowType = FlowType.IDENTIFY,
+                bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                 queryForCandidates = SubjectQuery(attendantId = "userId".asTokenizableEncrypted()),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
             0,
             "faceMatcherName",
-            listOf(FaceMatchResult.Item("guid1", 0.5f)),
+            listOf(MatchComparisonResult("guid1", 0.5f)),
             batches = batches,
         )
 
@@ -254,6 +268,7 @@ class SaveMatchEventUseCaseTest {
             MatchParams(
                 probeReferenceId = "referenceId",
                 flowType = FlowType.IDENTIFY,
+                bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                 queryForCandidates = SubjectQuery(moduleId = "moduleId".asTokenizableEncrypted()),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
@@ -290,7 +305,8 @@ class SaveMatchEventUseCaseTest {
             Timestamp(2L),
             MatchParams(
                 probeReferenceId = "referenceId",
-                emptyList(),
+                bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
+                probeFaceSamples = emptyList(),
                 flowType = FlowType.IDENTIFY,
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,

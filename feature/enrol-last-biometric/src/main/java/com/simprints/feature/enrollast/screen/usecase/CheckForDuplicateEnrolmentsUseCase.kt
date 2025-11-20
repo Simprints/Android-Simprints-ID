@@ -2,6 +2,8 @@ package com.simprints.feature.enrollast.screen.usecase
 
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.screen.EnrolLastState
+import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ENROLMENT
 import com.simprints.infra.logging.Simber
@@ -37,17 +39,17 @@ internal class CheckForDuplicateEnrolmentsUseCase @Inject constructor() {
     }
 
     private fun getFingerprintMatchResult(steps: List<EnrolLastBiometricStepResult>) = steps
-        .filterIsInstance<EnrolLastBiometricStepResult.FingerprintMatchResult>()
-        .lastOrNull()
+        .filterIsInstance<EnrolLastBiometricStepResult.MatchResult>()
+        .lastOrNull { it.sdk is FingerprintConfiguration.BioSdk }
 
     private fun getFaceMatchResult(steps: List<EnrolLastBiometricStepResult>) = steps
-        .filterIsInstance<EnrolLastBiometricStepResult.FaceMatchResult>()
-        .lastOrNull()
+        .filterIsInstance<EnrolLastBiometricStepResult.MatchResult>()
+        .lastOrNull { it.sdk is FaceConfiguration.BioSdk }
 
     private fun isAnyResponseWithHighConfidence(
         configuration: ProjectConfiguration,
-        fingerprintResponse: EnrolLastBiometricStepResult.FingerprintMatchResult?,
-        faceResponse: EnrolLastBiometricStepResult.FaceMatchResult?,
+        fingerprintResponse: EnrolLastBiometricStepResult.MatchResult?,
+        faceResponse: EnrolLastBiometricStepResult.MatchResult?,
     ): Boolean {
         val fingerprintThreshold = fingerprintResponse?.let {
             configuration.fingerprint
@@ -65,8 +67,8 @@ internal class CheckForDuplicateEnrolmentsUseCase @Inject constructor() {
                 ?.toFloat()
         } ?: Float.MAX_VALUE
 
-        return fingerprintResponse?.results?.any { it.confidenceScore >= fingerprintThreshold } == true ||
-            faceResponse?.results?.any { it.confidenceScore >= faceThreshold } == true
+        return fingerprintResponse?.results?.any { it.confidence >= fingerprintThreshold } == true ||
+            faceResponse?.results?.any { it.confidence >= faceThreshold } == true
     }
 
     private class MissingMatchResultException : IllegalStateException("No match response in duplicate check.")

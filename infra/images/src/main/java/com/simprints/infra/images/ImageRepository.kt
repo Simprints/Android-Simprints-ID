@@ -1,6 +1,6 @@
 package com.simprints.infra.images
 
-import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.core.domain.common.Modality
 import com.simprints.infra.images.model.SecuredImageRef
 
 /**
@@ -21,7 +21,7 @@ interface ImageRepository {
     suspend fun storeSample(
         projectId: String,
         sessionId: String,
-        modality: GeneralConfiguration.Modality,
+        modality: Modality,
         sampleId: String,
         fileExtension: String,
         sampleBytes: ByteArray,

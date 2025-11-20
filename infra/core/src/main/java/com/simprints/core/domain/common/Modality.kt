@@ -1,9 +1,9 @@
-package com.simprints.core.domain.modality
+package com.simprints.core.domain.common
 
 import androidx.annotation.Keep
 
 @Keep
-enum class Modes {
+enum class Modality {
     FINGERPRINT,
     FACE,
 }

@@ -3,7 +3,8 @@ package com.simprints.feature.dashboard.settings.syncinfo.usecase
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.lifecycle.AppForegroundStateTracker
 import com.simprints.core.tools.time.Ticker
@@ -37,13 +38,7 @@ import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.verify
+import io.mockk.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -395,7 +390,7 @@ class ObserveSyncInfoUseCaseTest {
     fun `should emit SyncInfo with correct syncInfoSectionModules data`() = runTest {
         val mockProjectConfigWithModules = mockk<ProjectConfiguration> {
             every { general } returns mockk<GeneralConfiguration> {
-                every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+                every { modalities } returns listOf(Modality.FINGERPRINT)
             }
             every { synchronization } returns createMockSynchronizationConfiguration()
         }
@@ -643,7 +638,7 @@ class ObserveSyncInfoUseCaseTest {
     fun `should emit SyncInfo with correct module counts when modules selected`() = runTest {
         val mockProjectConfigWithModules = mockk<ProjectConfiguration> {
             every { general } returns mockk<GeneralConfiguration> {
-                every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+                every { modalities } returns listOf(Modality.FINGERPRINT)
             }
             every { synchronization } returns createMockSynchronizationConfiguration()
         }
@@ -949,7 +944,7 @@ class ObserveSyncInfoUseCaseTest {
 
         val mockConfigWithModules = mockk<ProjectConfiguration> {
             every { general } returns mockk<GeneralConfiguration> {
-                every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+                every { modalities } returns listOf(Modality.FINGERPRINT)
             }
             every { synchronization } returns createMockSynchronizationConfiguration()
         }
@@ -1323,7 +1318,7 @@ class ObserveSyncInfoUseCaseTest {
     fun `should show correct visibility states for module selection instructions`() = runTest {
         val mockProjectConfigRequiringModules = mockk<ProjectConfiguration> {
             every { general } returns mockk<GeneralConfiguration> {
-                every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+                every { modalities } returns listOf(Modality.FINGERPRINT)
             }
             every { synchronization } returns createMockSynchronizationConfiguration()
         }
@@ -1431,7 +1426,7 @@ class ObserveSyncInfoUseCaseTest {
         val tokenizedModule = TokenizableString.Tokenized("encrypted_module_name")
         val mockProjectConfigWithModules = mockk<ProjectConfiguration> {
             every { general } returns mockk<GeneralConfiguration> {
-                every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+                every { modalities } returns listOf(Modality.FINGERPRINT)
             }
             every { synchronization } returns createMockSynchronizationConfiguration()
         }
@@ -1462,7 +1457,7 @@ class ObserveSyncInfoUseCaseTest {
         val rawModule = TokenizableString.Raw("raw_module_name")
         val mockProjectConfigWithModules = mockk<ProjectConfiguration> {
             every { general } returns mockk<GeneralConfiguration> {
-                every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+                every { modalities } returns listOf(Modality.FINGERPRINT)
             }
             every { synchronization } returns createMockSynchronizationConfiguration()
         }

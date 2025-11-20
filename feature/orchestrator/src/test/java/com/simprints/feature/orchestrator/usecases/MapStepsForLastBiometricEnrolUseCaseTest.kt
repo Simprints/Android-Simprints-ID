@@ -1,19 +1,16 @@
 package com.simprints.feature.orchestrator.usecases
 
-import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
-import com.simprints.face.capture.FaceCaptureResult
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.CaptureIdentity
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
-import com.simprints.feature.enrollast.FaceTemplateCaptureResult
-import com.simprints.feature.enrollast.FingerTemplateCaptureResult
-import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.infra.matching.FaceMatchResult
-import com.simprints.infra.matching.FingerprintMatchResult
+import com.simprints.infra.matching.MatchResult
 import org.junit.Before
 import org.junit.Test
 
@@ -40,30 +37,26 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
     fun `maps FaceMatchResult correctly`() {
         val result = useCase(
             listOf(
-                FaceMatchResult(emptyList(), FaceConfiguration.BioSdk.RANK_ONE),
+                MatchResult(emptyList(), FaceConfiguration.BioSdk.RANK_ONE),
             ),
         )
 
-        assertThat(result.first()).isEqualTo(EnrolLastBiometricStepResult.FaceMatchResult(emptyList(), FaceConfiguration.BioSdk.RANK_ONE))
+        assertThat(result.first()).isEqualTo(EnrolLastBiometricStepResult.MatchResult(emptyList(), FaceConfiguration.BioSdk.RANK_ONE))
     }
 
     @Test
-    fun `maps FaceCaptureResult correctly`() {
+    fun `maps face CaptureIdentity correctly`() {
         val result = useCase(
             listOf(
-                FaceCaptureResult(
+                CaptureIdentity(
                     "referenceId",
-                    results = listOf(
-                        FaceCaptureResult.Item(captureEventId = null, index = 0, sample = null),
-                        FaceCaptureResult.Item(
+                    modality = Modality.FACE,
+                    samples = listOf(
+                        CaptureSample(
                             captureEventId = GUID1,
-                            index = 0,
-                            sample = FaceCaptureResult.Sample(
-                                faceId = "faceId",
-                                template = byteArrayOf(),
-                                imageRef = null,
-                                format = "format",
-                            ),
+                            modality = Modality.FACE,
+                            format = "format",
+                            template = byteArrayOf(),
                         ),
                     ),
                 ),
@@ -71,12 +64,14 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
         )
 
         assertThat(result.first()).isEqualTo(
-            EnrolLastBiometricStepResult.FaceCaptureResult(
+            EnrolLastBiometricStepResult.CaptureResult(
                 referenceId = "referenceId",
                 results = listOf(
-                    element = FaceTemplateCaptureResult(
+                    CaptureSample(
+                        captureEventId = "captureId",
                         template = byteArrayOf(),
                         format = "format",
+                        modality = Modality.FACE,
                     ),
                 ),
             ),
@@ -87,33 +82,29 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
     fun `maps FingerprintMatchResult correctly`() {
         val result = useCase(
             listOf(
-                FingerprintMatchResult(emptyList(), FingerprintConfiguration.BioSdk.NEC),
+                MatchResult(emptyList(), FingerprintConfiguration.BioSdk.NEC),
             ),
         )
 
         assertThat(
             result.first(),
-        ).isEqualTo(EnrolLastBiometricStepResult.FingerprintMatchResult(emptyList(), FingerprintConfiguration.BioSdk.NEC))
+        ).isEqualTo(EnrolLastBiometricStepResult.MatchResult(emptyList(), FingerprintConfiguration.BioSdk.NEC))
     }
 
     @Test
-    fun `maps FingerprintCaptureResult correctly`() {
+    fun `maps fingerprint CaptureIdentity correctly`() {
         val result = useCase(
             listOf(
-                FingerprintCaptureResult(
+                CaptureIdentity(
                     "referenceId",
-                    results = listOf(
-                        FingerprintCaptureResult.Item(null, IFingerIdentifier.LEFT_THUMB, null),
-                        FingerprintCaptureResult.Item(
-                            identifier = IFingerIdentifier.RIGHT_THUMB,
+                    modality = Modality.FINGERPRINT,
+                    samples = listOf(
+                        CaptureSample(
                             captureEventId = GUID1,
-                            sample = FingerprintCaptureResult.Sample(
-                                fingerIdentifier = IFingerIdentifier.RIGHT_THUMB,
-                                template = byteArrayOf(),
-                                templateQualityScore = 0,
-                                imageRef = null,
-                                format = "format",
-                            ),
+                            modality = Modality.FINGERPRINT,
+                            format = "format",
+                            template = byteArrayOf(),
+                            identifier = SampleIdentifier.RIGHT_THUMB,
                         ),
                     ),
                 ),
@@ -121,14 +112,15 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
         )
 
         assertThat(result.first()).isEqualTo(
-            EnrolLastBiometricStepResult.FingerprintCaptureResult(
+            EnrolLastBiometricStepResult.CaptureResult(
                 referenceId = "referenceId",
                 results = listOf(
-                    FingerTemplateCaptureResult(
+                    CaptureSample(
+                        captureEventId = "captureId",
                         template = byteArrayOf(),
-                        templateQualityScore = 0,
                         format = "format",
-                        finger = Finger.RIGHT_THUMB,
+                        identifier = SampleIdentifier.RIGHT_THUMB,
+                        modality = Modality.FINGERPRINT,
                     ),
                 ),
             ),

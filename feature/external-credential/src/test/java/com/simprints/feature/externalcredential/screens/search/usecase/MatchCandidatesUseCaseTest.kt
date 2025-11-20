@@ -2,6 +2,8 @@ package com.simprints.feature.externalcredential.screens.search.usecase
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.infra.config.store.models.AgeGroup
@@ -11,7 +13,6 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.matching.MatchParams
-import com.simprints.infra.matching.MatchResultItem
 import com.simprints.infra.matching.usecase.FaceMatcherUseCase
 import com.simprints.infra.matching.usecase.FingerprintMatcherUseCase
 import com.simprints.infra.matching.usecase.MatcherUseCase.MatcherState
@@ -59,16 +60,16 @@ internal class MatchCandidatesUseCaseTest {
     private lateinit var fingerprintSdkConfig: FingerprintConfiguration.FingerprintSdkConfiguration
 
     @MockK
-    private lateinit var matchResultItem: MatchResultItem
+    private lateinit var matchResultItem: MatchComparisonResult
 
     @MockK
     private lateinit var matchParams: MatchParams
 
     @MockK
-    private lateinit var faceSample: MatchParams.FaceSample
+    private lateinit var faceSample: CaptureSample
 
     @MockK
-    private lateinit var fingerprintSample: MatchParams.FingerprintSample
+    private lateinit var fingerprintSample: CaptureSample
 
     @MockK
     private lateinit var ageGroup: AgeGroup
@@ -97,8 +98,6 @@ internal class MatchCandidatesUseCaseTest {
         every { externalCredentialParams.fingerprintSamples } returns listOf(fingerprintSample)
         every { externalCredentialParams.ageGroup } returns ageGroup
 
-        every { matchParams.faceSDK } returns FaceConfiguration.BioSdk.RANK_ONE
-        every { matchParams.fingerprintSDK } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
         coEvery {
             createMatchParamsUseCase(
                 candidateSubjectId = any(),
@@ -116,21 +115,21 @@ internal class MatchCandidatesUseCaseTest {
         every { faceSdkConfig.verificationMatchThreshold } returns verificationMatchThreshold
         every { fingerprintConfig.getSdkConfiguration(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER) } returns fingerprintSdkConfig
         every { fingerprintSdkConfig.verificationMatchThreshold } returns verificationMatchThreshold
-        every { matcherSuccess.matchResultItems } returns listOf(matchResultItem)
+        every { matcherSuccess.comparisonResults } returns listOf(matchResultItem)
         coEvery { faceMatcher(matchParams, project) } returns flowOf(matcherSuccess)
         coEvery { fingerprintMatcher(matchParams, project) } returns flowOf(matcherSuccess)
     }
 
     private fun initMatchParams(isFace: Boolean) {
-        val (faceSamples, fingerprintSamples) = if (isFace) {
-            listOf(faceSample) to emptyList()
+        if (isFace) {
+            every { matchParams.probeFingerprintSamples } returns emptyList()
+            every { matchParams.probeFaceSamples } returns listOf(faceSample)
+            every { matchParams.bioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
         } else {
-            emptyList<MatchParams.FaceSample>() to listOf(fingerprintSample)
+            every { matchParams.probeFingerprintSamples } returns listOf(fingerprintSample)
+            every { matchParams.probeFaceSamples } returns emptyList()
+            every { matchParams.bioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
         }
-        every { matchParams.probeFaceSamples } returns faceSamples
-        every { matchParams.faceSDK } returns FaceConfiguration.BioSdk.RANK_ONE
-        every { matchParams.probeFingerprintSamples } returns fingerprintSamples
-        every { matchParams.fingerprintSDK } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
     }
 
     @Test
@@ -175,38 +174,6 @@ internal class MatchCandidatesUseCaseTest {
     fun `returns empty list when no candidates provided`() = runTest {
         val result = useCase.invoke(
             candidates = emptyList(),
-            credential = credential,
-            externalCredentialParams = externalCredentialParams,
-            project = project,
-            projectConfig = projectConfig,
-        )
-
-        assertThat(result).isEmpty()
-    }
-
-    @Test
-    fun `returns empty list when face SDK is null`() = runTest {
-        initMatchParams(isFace = true)
-        every { matchParams.faceSDK } returns null
-
-        val result = useCase.invoke(
-            candidates = listOf(subject),
-            credential = credential,
-            externalCredentialParams = externalCredentialParams,
-            project = project,
-            projectConfig = projectConfig,
-        )
-
-        assertThat(result).isEmpty()
-    }
-
-    @Test
-    fun `returns empty list when fingerprint SDK is null`() = runTest {
-        initMatchParams(isFace = false)
-        every { matchParams.fingerprintSDK } returns null
-
-        val result = useCase.invoke(
-            candidates = listOf(subject),
             credential = credential,
             externalCredentialParams = externalCredentialParams,
             project = project,

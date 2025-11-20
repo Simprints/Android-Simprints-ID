@@ -4,25 +4,25 @@ import android.content.SharedPreferences
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.core.domain.sample.CaptureIdentity
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.MatchComparisonResult
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.FaceCaptureParams
-import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.consent.ConsentParams
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
-import com.simprints.feature.enrollast.FaceTemplateCaptureResult
-import com.simprints.feature.enrollast.FingerTemplateCaptureResult
-import com.simprints.feature.enrollast.MatchResult
 import com.simprints.feature.exitform.ExitFormOption
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
@@ -45,19 +45,14 @@ import com.simprints.feature.setup.SetupResult
 import com.simprints.feature.validatepool.ValidateSubjectPoolFragmentParams
 import com.simprints.feature.validatepool.ValidateSubjectPoolResult
 import com.simprints.fingerprint.capture.FingerprintCaptureParams
-import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.infra.images.model.Path
-import com.simprints.infra.images.model.SecuredImageRef
-import com.simprints.infra.matching.FaceMatchResult
-import com.simprints.infra.matching.FingerprintMatchResult
 import com.simprints.infra.matching.MatchParams
+import com.simprints.infra.matching.MatchResult
 import com.simprints.infra.security.SecurityManager
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -130,29 +125,24 @@ class OrchestratorCacheIntegrationTest {
                     userId = TokenizableString.Raw("value"),
                     moduleId = TokenizableString.Raw("value"),
                     steps = listOf(
-                        EnrolLastBiometricStepResult.FingerprintCaptureResult(
+                        EnrolLastBiometricStepResult.CaptureResult(
                             "referenceId",
                             listOf(
-                                FingerTemplateCaptureResult(
-                                    Finger.LEFT_4TH_FINGER,
-                                    byteArrayOf(1, 2, 3),
-                                    10,
-                                    "NEC",
+                                CaptureSample(
+                                    captureEventId = GUID1,
+                                    identifier = SampleIdentifier.LEFT_THUMB,
+                                    template = byteArrayOf(1, 2, 3),
+                                    modality = Modality.FINGERPRINT,
+                                    format = "format",
                                 ),
                             ),
                         ),
-                        EnrolLastBiometricStepResult.FingerprintMatchResult(
-                            listOf(MatchResult("subjectId", 0.5f)),
+                        EnrolLastBiometricStepResult.MatchResult(
+                            listOf(MatchComparisonResult("subjectId", 0.5f)),
                             FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                         ),
-                        EnrolLastBiometricStepResult.FaceCaptureResult(
-                            "referenceId",
-                            listOf(
-                                FaceTemplateCaptureResult(byteArrayOf(1, 2, 3), "RankOne"),
-                            ),
-                        ),
-                        EnrolLastBiometricStepResult.FaceMatchResult(
-                            listOf(MatchResult("subjectId", 0.5f)),
+                        EnrolLastBiometricStepResult.MatchResult(
+                            listOf(MatchComparisonResult("subjectId", 0.5f)),
                             FaceConfiguration.BioSdk.RANK_ONE,
                         ),
                         EnrolLastBiometricStepResult.EnrolLastBiometricsResult("subjectId"),
@@ -196,16 +186,21 @@ class OrchestratorCacheIntegrationTest {
                     ageGroup = AgeGroup(1, 2),
                     probeReferenceId = "referenceId",
                     faceSamples = listOf(
-                        MatchParams.FaceSample(
-                            faceId = "faceId",
+                        CaptureSample(
+                            captureEventId = GUID1,
+                            identifier = SampleIdentifier.LEFT_THUMB,
                             template = byteArrayOf(1, 2, 3),
+                            modality = Modality.FACE,
+                            format = "format",
                         ),
                     ),
                     fingerprintSamples = listOf(
-                        MatchParams.FingerprintSample(
-                            fingerId = IFingerIdentifier.LEFT_4TH_FINGER,
-                            format = "NEC",
+                        CaptureSample(
+                            captureEventId = GUID1,
+                            identifier = SampleIdentifier.LEFT_THUMB,
                             template = byteArrayOf(1, 2, 3),
+                            modality = Modality.FINGERPRINT,
+                            format = "format",
                         ),
                     ),
                 ),
@@ -226,7 +221,7 @@ class OrchestratorCacheIntegrationTest {
                     matchResults = listOf(
                         CredentialMatch(
                             credential = "credential".asTokenizableEncrypted(),
-                            matchResult = FaceMatchResult.Item("subjectId", 0.5f),
+                            matchResult = MatchComparisonResult("subjectId", 0.5f),
                             verificationThreshold = 55f,
                             faceBioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                             fingerprintBioSdk = FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
@@ -254,23 +249,20 @@ class OrchestratorCacheIntegrationTest {
                 destinationId = 4,
                 params = FingerprintCaptureParams(
                     flowType = FlowType.ENROL,
-                    fingerprintsToCapture = listOf(IFingerIdentifier.LEFT_4TH_FINGER),
+                    fingerprintsToCapture = listOf(SampleIdentifier.LEFT_4TH_FINGER),
                     fingerprintSDK = FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                 ),
                 status = StepStatus.COMPLETED,
-                result = FingerprintCaptureResult(
+                result = CaptureIdentity(
                     "",
-                    results = listOf(
-                        FingerprintCaptureResult.Item(
+                    modality = Modality.FINGERPRINT,
+                    samples = listOf(
+                        CaptureSample(
                             captureEventId = GUID1,
-                            identifier = IFingerIdentifier.LEFT_THUMB,
-                            sample = FingerprintCaptureResult.Sample(
-                                fingerIdentifier = IFingerIdentifier.LEFT_4TH_FINGER,
-                                template = byteArrayOf(1, 2, 3),
-                                templateQualityScore = 10,
-                                imageRef = SecuredImageRef(Path("file/path")),
-                                format = "NEC",
-                            ),
+                            identifier = SampleIdentifier.LEFT_THUMB,
+                            template = byteArrayOf(1, 2, 3),
+                            modality = Modality.FINGERPRINT,
+                            format = "format",
                         ),
                     ),
                 ),
@@ -284,17 +276,20 @@ class OrchestratorCacheIntegrationTest {
                     flowType = FlowType.IDENTIFY,
                     queryForCandidates = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.CommCare("name"),
+                    bioSdk = FingerprintConfiguration.BioSdk.NEC,
                     probeFingerprintSamples = listOf(
-                        MatchParams.FingerprintSample(
-                            fingerId = IFingerIdentifier.LEFT_4TH_FINGER,
-                            format = "NEC",
+                        CaptureSample(
+                            captureEventId = GUID1,
+                            identifier = SampleIdentifier.LEFT_THUMB,
                             template = byteArrayOf(1, 2, 3),
+                            modality = Modality.FINGERPRINT,
+                            format = "format",
                         ),
                     ),
                 ),
                 status = StepStatus.COMPLETED,
-                result = FingerprintMatchResult(
-                    listOf(FingerprintMatchResult.Item("subjectId", 0.5f)),
+                result = MatchResult(
+                    listOf(MatchComparisonResult("subjectId", 0.5f)),
                     FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                 ),
             ),
@@ -318,18 +313,16 @@ class OrchestratorCacheIntegrationTest {
                 destinationId = 6,
                 params = FaceCaptureParams(3, FaceConfiguration.BioSdk.RANK_ONE),
                 status = StepStatus.COMPLETED,
-                result = FaceCaptureResult(
+                result = CaptureIdentity(
                     "",
-                    results = listOf(
-                        FaceCaptureResult.Item(
-                            captureEventId = "event",
-                            index = 0,
-                            sample = FaceCaptureResult.Sample(
-                                faceId = "faceId",
-                                template = byteArrayOf(1, 2, 3),
-                                imageRef = SecuredImageRef(Path("file/path")),
-                                format = "ROC",
-                            ),
+                    modality = Modality.FACE,
+                    samples = listOf(
+                        CaptureSample(
+                            captureEventId = GUID1,
+                            identifier = SampleIdentifier.LEFT_THUMB,
+                            template = byteArrayOf(1, 2, 3),
+                            modality = Modality.FACE,
+                            format = "ROC",
                         ),
                     ),
                 ),
@@ -343,16 +336,20 @@ class OrchestratorCacheIntegrationTest {
                     flowType = FlowType.IDENTIFY,
                     queryForCandidates = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
+                    bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                     probeFaceSamples = listOf(
-                        MatchParams.FaceSample(
-                            faceId = "faceId",
+                        CaptureSample(
+                            captureEventId = GUID1,
+                            identifier = SampleIdentifier.LEFT_THUMB,
                             template = byteArrayOf(1, 2, 3),
+                            modality = Modality.FACE,
+                            format = "format",
                         ),
                     ),
                 ),
                 status = StepStatus.COMPLETED,
-                result = FaceMatchResult(
-                    listOf(FaceMatchResult.Item("subjectId", 0.5f)),
+                result = MatchResult(
+                    listOf(MatchComparisonResult("subjectId", 0.5f)),
                     FaceConfiguration.BioSdk.RANK_ONE,
                 ),
             ),

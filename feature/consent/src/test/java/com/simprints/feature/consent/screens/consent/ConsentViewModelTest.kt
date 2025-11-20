@@ -2,25 +2,20 @@ package com.simprints.feature.consent.screens.consent
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.exitform.ExitFormResult
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.event.domain.models.ConsentEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.slot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -46,7 +41,7 @@ class ConsentViewModelTest {
     @MockK
     private lateinit var eventRepository: SessionEventRepository
 
-    private val defaultModalityList = listOf(GeneralConfiguration.Modality.FACE)
+    private val defaultModalityList = listOf(Modality.FACE)
 
     private lateinit var vm: ConsentViewModel
 

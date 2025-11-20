@@ -3,7 +3,11 @@ package com.simprints.infra.matching.usecase
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.Identity
+import com.simprints.core.domain.sample.MatchComparisonResult
+import com.simprints.core.domain.sample.Sample
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
@@ -11,9 +15,7 @@ import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.infra.matching.FaceMatchResult
 import com.simprints.infra.matching.MatchParams
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -74,6 +76,7 @@ internal class FaceMatcherUseCaseTest {
                     probeReferenceId = "referenceId",
                     flowType = FlowType.VERIFY,
                     queryForCandidates = SubjectQuery(),
+                    bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                     biometricDataSource = BiometricDataSource.Simprints,
                 ),
                 project,
@@ -83,7 +86,7 @@ internal class FaceMatcherUseCaseTest {
 
         assertThat(results).containsExactly(
             MatcherUseCase.MatcherState.Success(
-                matchResultItems = emptyList(),
+                comparisonResults = emptyList(),
                 totalCandidates = 0,
                 matcherName = "",
                 matchBatches = emptyList(),
@@ -100,9 +103,14 @@ internal class FaceMatcherUseCaseTest {
                 MatchParams(
                     probeReferenceId = "referenceId",
                     probeFaceSamples = listOf(
-                        MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3)),
+                        CaptureSample(
+                            captureEventId = "faceId",
+                            template = byteArrayOf(1, 2, 3),
+                            modality = Modality.FACE,
+                            format = "format",
+                        ),
                     ),
-                    faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
+                    bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
@@ -114,7 +122,7 @@ internal class FaceMatcherUseCaseTest {
 
         assertThat(results).containsExactly(
             MatcherUseCase.MatcherState.Success(
-                matchResultItems = emptyList(),
+                comparisonResults = emptyList(),
                 totalCandidates = 0,
                 matcherName = "",
                 matchBatches = emptyList(),
@@ -126,9 +134,16 @@ internal class FaceMatcherUseCaseTest {
     fun `Correctly calls SDK matcher`() = runTest {
         val totalCandidates = 1
         val faceIdentities = listOf(
-            FaceIdentity(
+            Identity(
                 "subjectId",
-                listOf(FaceSample(byteArrayOf(1, 2, 3), "format", "faceTemplate")),
+                listOf(
+                    Sample(
+                        template = byteArrayOf(1, 2, 3),
+                        format = "format",
+                        referenceId = "faceTemplate",
+                        modality = Modality.FACE,
+                    ),
+                ),
             ),
         )
         coEvery { enrolmentRecordRepository.count(any(), any()) } returns 1
@@ -152,9 +167,14 @@ internal class FaceMatcherUseCaseTest {
                 matchParams = MatchParams(
                     probeReferenceId = "referenceId",
                     probeFaceSamples = listOf(
-                        MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3)),
+                        CaptureSample(
+                            captureEventId = "faceId",
+                            template = byteArrayOf(1, 2, 3),
+                            modality = Modality.FACE,
+                            format = "format",
+                        ),
                     ),
-                    faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
+                    bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
@@ -170,7 +190,7 @@ internal class FaceMatcherUseCaseTest {
         assertThat(results[1]).isInstanceOf(MatcherUseCase.MatcherState.CandidateLoaded::class.java)
 
         val successState = results[2] as MatcherUseCase.MatcherState.Success
-        assertThat(successState.matchResultItems).containsExactly(FaceMatchResult.Item("subjectId", 42f))
+        assertThat(successState.comparisonResults).containsExactly(MatchComparisonResult("subjectId", 42f))
         assertThat(successState.totalCandidates).isEqualTo(totalCandidates)
         assertThat(successState.matcherName).isEqualTo("")
 

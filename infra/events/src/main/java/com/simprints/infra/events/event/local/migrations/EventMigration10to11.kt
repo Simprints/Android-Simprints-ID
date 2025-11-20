@@ -7,9 +7,9 @@ import androidx.annotation.Keep
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.fasterxml.jackson.core.type.TypeReference
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.scope.Device
 import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
@@ -141,7 +141,7 @@ internal class EventMigration10to11 : Migration(10, 11) {
         data class SessionCapturePayload(
             var projectId: String,
             val createdAt: Long,
-            var modalities: List<GeneralConfiguration.Modality>,
+            var modalities: List<Modality>,
             val appVersionName: String,
             val libVersionName: String,
             var language: String,

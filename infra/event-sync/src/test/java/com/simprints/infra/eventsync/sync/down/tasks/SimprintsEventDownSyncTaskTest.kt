@@ -1,9 +1,10 @@
 package com.simprints.infra.eventsync.sync.down.tasks
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
@@ -555,7 +556,12 @@ class SimprintsEventDownSyncTaskTest {
                 attendantId = "moduleId".asTokenizableRaw(),
                 moduleId = "attendantId".asTokenizableRaw(),
                 faceSamples = listOf(
-                    FaceSample(byteArrayOf(), "format", "referenceId"),
+                    Sample(
+                        template = byteArrayOf(),
+                        format = "format",
+                        referenceId = "referenceId",
+                        modality = Modality.FACE,
+                    ),
                 ),
                 externalCredentials = listOf(
                     ExternalCredential(

@@ -3,6 +3,8 @@ package com.simprints.feature.externalcredential.screens.search.usecase
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
@@ -37,17 +39,17 @@ internal class MatchCandidatesUseCase @Inject constructor(
             .mapNotNull { matchParams ->
                 when {
                     matchParams.probeFaceSamples.isNotEmpty() -> {
-                        val faceSdk = matchParams.faceSDK ?: return@mapNotNull null
+                        val faceSdk = matchParams.bioSdk
                         projectConfig.face?.getSdkConfiguration(faceSdk)?.verificationMatchThreshold?.let { matchThreshold ->
                             (faceMatcher(matchParams, project).last() as? MatcherState.Success)
-                                ?.matchResultItems
+                                ?.comparisonResults
                                 .orEmpty()
                                 .map { result ->
                                     CredentialMatch(
                                         credential = credential,
                                         matchResult = result,
                                         verificationThreshold = matchThreshold,
-                                        faceBioSdk = faceSdk,
+                                        faceBioSdk = faceSdk as FaceConfiguration.BioSdk,
                                         fingerprintBioSdk = null,
                                     )
                                 }
@@ -55,10 +57,10 @@ internal class MatchCandidatesUseCase @Inject constructor(
                     }
 
                     else -> {
-                        val fingerprintSdk = matchParams.fingerprintSDK ?: return@mapNotNull null
+                        val fingerprintSdk = matchParams.bioSdk
                         projectConfig.fingerprint?.getSdkConfiguration(fingerprintSdk)?.verificationMatchThreshold?.let { matchThreshold ->
                             (fingerprintMatcher(matchParams, project).last() as? MatcherState.Success)
-                                ?.matchResultItems
+                                ?.comparisonResults
                                 .orEmpty()
                                 .map { result ->
                                     CredentialMatch(
@@ -66,7 +68,7 @@ internal class MatchCandidatesUseCase @Inject constructor(
                                         matchResult = result,
                                         verificationThreshold = matchThreshold,
                                         faceBioSdk = null,
-                                        fingerprintBioSdk = fingerprintSdk,
+                                        fingerprintBioSdk = fingerprintSdk as FingerprintConfiguration.BioSdk,
                                     )
                                 }
                         }

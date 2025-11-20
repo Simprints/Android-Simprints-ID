@@ -1,40 +1,26 @@
 package com.simprints.infra.enrolment.records.repository.local.models
 
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.sample.Sample
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate
-import com.simprints.infra.enrolment.records.room.store.models.Modality
+import com.simprints.infra.enrolment.records.room.store.models.DbModality
+import com.simprints.infra.enrolment.records.room.store.models.fromDomain
+import com.simprints.infra.enrolment.records.room.store.models.toDomain
 
-internal fun DbBiometricTemplate.toFingerprintSample(): FingerprintSample = FingerprintSample(
+internal fun DbBiometricTemplate.toSample(): Sample = Sample(
     id = uuid,
-    fingerIdentifier = IFingerIdentifier.fromId(identifier!!).toDomain(),
-    template = templateData,
-    format = format,
+    identifier = identifier?.let { DbSampleIdentifier.fromId(it) }.toDomain(),
+    modality = DbModality.fromId(modality).toDomain(),
     referenceId = referenceId,
+    format = format,
+    template = templateData,
 )
 
-internal fun DbBiometricTemplate.toFaceSample(): FaceSample = FaceSample(
-    id = uuid,
-    template = templateData,
-    format = format,
-    referenceId = referenceId,
-)
-
-internal fun FaceSample.toRoomDb(subjectId: String): DbBiometricTemplate = DbBiometricTemplate(
+internal fun Sample.toRoomDb(subjectId: String): DbBiometricTemplate = DbBiometricTemplate(
     uuid = id,
     templateData = template,
     format = format,
+    identifier = identifier.fromDomain()?.id,
     subjectId = subjectId,
     referenceId = referenceId,
-    modality = Modality.FACE.id,
-)
-
-internal fun FingerprintSample.toRoomDb(subjectId: String) = DbBiometricTemplate(
-    uuid = id,
-    identifier = fingerIdentifier.fromDomain().id,
-    templateData = template,
-    format = format,
-    subjectId = subjectId,
-    referenceId = referenceId,
-    modality = Modality.FINGERPRINT.id,
+    modality = modality.fromDomain().id,
 )

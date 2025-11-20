@@ -4,9 +4,9 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.feature.dashboard.databinding.HeaderSdkNameBinding
 import com.simprints.feature.dashboard.databinding.ItemFingerSelectionBinding
-import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.resources.R as IDR
 
 internal class FingerSelectionItemAdapter(
@@ -89,17 +89,18 @@ internal class FingerSelectionItemAdapter(
     }
 }
 
-fun Finger.toString(context: Context) = context.getString(
+fun SampleIdentifier.toString(context: Context) = context.getString(
     when (this) {
-        Finger.LEFT_THUMB -> IDR.string.fingerprint_capture_finger_l_1
-        Finger.LEFT_INDEX_FINGER -> IDR.string.fingerprint_capture_finger_l_2
-        Finger.LEFT_3RD_FINGER -> IDR.string.fingerprint_capture_finger_l_3
-        Finger.LEFT_4TH_FINGER -> IDR.string.fingerprint_capture_finger_l_4
-        Finger.LEFT_5TH_FINGER -> IDR.string.fingerprint_capture_finger_l_5
-        Finger.RIGHT_THUMB -> IDR.string.fingerprint_capture_finger_r_1
-        Finger.RIGHT_INDEX_FINGER -> IDR.string.fingerprint_capture_finger_r_2
-        Finger.RIGHT_3RD_FINGER -> IDR.string.fingerprint_capture_finger_r_3
-        Finger.RIGHT_4TH_FINGER -> IDR.string.fingerprint_capture_finger_r_4
-        Finger.RIGHT_5TH_FINGER -> IDR.string.fingerprint_capture_finger_r_5
+        SampleIdentifier.LEFT_THUMB -> IDR.string.fingerprint_capture_finger_l_1
+        SampleIdentifier.LEFT_INDEX_FINGER -> IDR.string.fingerprint_capture_finger_l_2
+        SampleIdentifier.LEFT_3RD_FINGER -> IDR.string.fingerprint_capture_finger_l_3
+        SampleIdentifier.LEFT_4TH_FINGER -> IDR.string.fingerprint_capture_finger_l_4
+        SampleIdentifier.LEFT_5TH_FINGER -> IDR.string.fingerprint_capture_finger_l_5
+        SampleIdentifier.RIGHT_THUMB -> IDR.string.fingerprint_capture_finger_r_1
+        SampleIdentifier.RIGHT_INDEX_FINGER -> IDR.string.fingerprint_capture_finger_r_2
+        SampleIdentifier.RIGHT_3RD_FINGER -> IDR.string.fingerprint_capture_finger_r_3
+        SampleIdentifier.RIGHT_4TH_FINGER -> IDR.string.fingerprint_capture_finger_r_4
+        SampleIdentifier.RIGHT_5TH_FINGER -> IDR.string.fingerprint_capture_finger_r_5
+        SampleIdentifier.NONE -> throw IllegalArgumentException("Incorrect sample identifier")
     },
 )

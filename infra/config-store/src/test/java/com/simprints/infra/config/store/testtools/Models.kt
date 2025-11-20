@@ -1,6 +1,8 @@
 package com.simprints.infra.config.store.testtools
 
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.local.models.ProtoAllowedAgeRange
 import com.simprints.infra.config.store.local.models.ProtoConsentConfiguration
@@ -32,7 +34,6 @@ import com.simprints.infra.config.store.models.DeviceState
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FaceConfiguration.FaceSdkConfiguration
-import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.GeneralConfiguration
@@ -255,7 +256,7 @@ internal val apiFingerprintConfiguration = ApiFingerprintConfiguration(
     allowedSDKs = listOf(ApiFingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
     displayHandIcons = true,
     secugenSimMatcher = ApiFingerprintConfiguration.ApiFingerprintSdkConfiguration(
-        fingersToCapture = listOf(ApiFingerprintConfiguration.Finger.LEFT_3RD_FINGER),
+        fingersToCapture = listOf(ApiFingerprintConfiguration.ApiFinger.LEFT_3RD_FINGER),
         decisionPolicy = apiDecisionPolicy,
         comparisonStrategyForVerification = ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
         vero1 = ApiVero1Configuration(10),
@@ -268,7 +269,7 @@ internal val apiFingerprintConfiguration = ApiFingerprintConfiguration(
 )
 
 internal val fingerprintSdkConfiguration = FingerprintConfiguration.FingerprintSdkConfiguration(
-    fingersToCapture = listOf(Finger.LEFT_3RD_FINGER),
+    fingersToCapture = listOf(SampleIdentifier.LEFT_3RD_FINGER),
     decisionPolicy = decisionPolicy,
     comparisonStrategyForVerification = FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
     vero1 = Vero1Configuration(qualityThreshold = 10),
@@ -306,8 +307,8 @@ internal val protoFingerprintConfiguration = ProtoFingerprintConfiguration
     ).build()
 
 internal val apiGeneralConfiguration = ApiGeneralConfiguration(
-    listOf(ApiGeneralConfiguration.Modality.FACE),
-    listOf(ApiGeneralConfiguration.Modality.FACE),
+    listOf(ApiGeneralConfiguration.ApiModality.FACE),
+    listOf(ApiGeneralConfiguration.ApiModality.FACE),
     listOf("en"),
     "en",
     collectLocation = true,
@@ -316,8 +317,8 @@ internal val apiGeneralConfiguration = ApiGeneralConfiguration(
 )
 
 internal val generalConfiguration = GeneralConfiguration(
-    listOf(GeneralConfiguration.Modality.FACE),
-    listOf(GeneralConfiguration.Modality.FACE),
+    listOf(Modality.FACE),
+    listOf(Modality.FACE),
     listOf("en"),
     "en",
     collectLocation = true,
@@ -418,7 +419,7 @@ internal val synchronizationConfiguration = SynchronizationConfiguration(
 internal val allowedExternalCredential = ExternalCredentialType.NHISCard
 
 internal val multiFactorIdConfiguration = MultiFactorIdConfiguration(
-    allowedExternalCredentials = listOf(allowedExternalCredential)
+    allowedExternalCredentials = listOf(allowedExternalCredential),
 )
 
 internal val protoMultiFactorIdConfiguration = ProtoMultiFactorIdConfiguration
@@ -474,7 +475,7 @@ internal val protoSynchronizationConfiguration = ProtoSynchronizationConfigurati
 internal val apiAllowedExternalCredential = ApiExternalCredentialType.NHIS_CARD
 
 internal val apiMultiFactorIdConfiguration = ApiMultiFactorIdConfiguration(
-    allowedExternalCredentials = listOf(apiAllowedExternalCredential)
+    allowedExternalCredentials = listOf(apiAllowedExternalCredential),
 )
 
 internal val customKeyMap: Map<String, Any>? = mapOf(
@@ -510,7 +511,7 @@ internal val projectConfiguration = ProjectConfiguration(
     identification = identificationConfiguration,
     synchronization = synchronizationConfiguration,
     multifactorId = multiFactorIdConfiguration,
-    custom = customKeyMap
+    custom = customKeyMap,
 )
 
 internal val protoProjectConfiguration = ProtoProjectConfiguration

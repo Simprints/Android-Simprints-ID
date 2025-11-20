@@ -1,6 +1,8 @@
 package com.simprints.infra.config.store.local
 
 import androidx.datastore.core.DataStore
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.config.store.AbsolutePath
@@ -14,7 +16,6 @@ import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration.Companion.DEFAULT_DOWN_SYNC_MAX_AGE
-import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.GeneralConfiguration
@@ -75,17 +76,15 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
 
     override suspend fun getProjectConfiguration(): ProjectConfiguration = configDataStore.data.first().toDomain()
 
-    override fun observeProjectConfiguration(): Flow<ProjectConfiguration> =
-        configDataStore.data.map(ProtoProjectConfiguration::toDomain)
+    override fun observeProjectConfiguration(): Flow<ProjectConfiguration> = configDataStore.data.map(ProtoProjectConfiguration::toDomain)
 
     override suspend fun clearProjectConfiguration() {
         configDataStore.updateData { it.toBuilder().clear().build() }
     }
 
-    override suspend fun getDeviceConfiguration(): DeviceConfiguration =
-        deviceConfigDataStore.data.first().toDomain().apply {
-            selectedModules = selectedModules.mapToTokenizedModuleIds()
-        }
+    override suspend fun getDeviceConfiguration(): DeviceConfiguration = deviceConfigDataStore.data.first().toDomain().apply {
+        selectedModules = selectedModules.mapToTokenizedModuleIds()
+    }
 
     override fun observeDeviceConfiguration(): Flow<DeviceConfiguration> =
         deviceConfigDataStore.data.map(ProtoDeviceConfiguration::toDomain).map { config ->
@@ -171,8 +170,8 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                 projectId = "",
                 updatedAt = "",
                 general = GeneralConfiguration(
-                    modalities = listOf(GeneralConfiguration.Modality.FINGERPRINT),
-                    matchingModalities = listOf(GeneralConfiguration.Modality.FINGERPRINT),
+                    modalities = listOf(Modality.FINGERPRINT),
+                    matchingModalities = listOf(Modality.FINGERPRINT),
                     languageOptions = listOf(),
                     defaultLanguage = "en",
                     collectLocation = true,
@@ -186,8 +185,8 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                     allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
                     secugenSimMatcher = FingerprintConfiguration.FingerprintSdkConfiguration(
                         fingersToCapture = listOf(
-                            Finger.LEFT_THUMB,
-                            Finger.LEFT_INDEX_FINGER,
+                            SampleIdentifier.LEFT_THUMB,
+                            SampleIdentifier.LEFT_INDEX_FINGER,
                         ),
                         decisionPolicy = DecisionPolicy(
                             0,

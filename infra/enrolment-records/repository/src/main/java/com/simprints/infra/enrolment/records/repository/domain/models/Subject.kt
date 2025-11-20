@@ -2,8 +2,7 @@ package com.simprints.infra.enrolment.records.repository.domain.models
 
 import android.os.Parcelable
 import com.simprints.core.domain.externalcredential.ExternalCredential
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.TokenizableString
 import kotlinx.parcelize.Parcelize
 import java.util.Date
@@ -16,7 +15,7 @@ data class Subject(
     val moduleId: TokenizableString,
     val createdAt: Date? = null,
     val updatedAt: Date? = null,
-    var fingerprintSamples: List<FingerprintSample> = emptyList(),
-    var faceSamples: List<FaceSample> = emptyList(),
+    var fingerprintSamples: List<Sample> = emptyList(),
+    var faceSamples: List<Sample> = emptyList(),
     var externalCredentials: List<ExternalCredential> = emptyList(),
 ) : Parcelable

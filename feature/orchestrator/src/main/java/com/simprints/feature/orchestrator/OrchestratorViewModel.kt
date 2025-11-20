@@ -7,7 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.step.StepResult
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
@@ -16,7 +18,6 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.face.capture.FaceCaptureParams
-import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
@@ -37,12 +38,9 @@ import com.simprints.feature.orchestrator.usecases.steps.BuildStepsUseCase
 import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.setup.LocationStore
 import com.simprints.fingerprint.capture.FingerprintCaptureParams
-import com.simprints.fingerprint.capture.FingerprintCaptureResult
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.matching.MatchParams
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppResponse
@@ -68,7 +66,7 @@ internal class OrchestratorViewModel @Inject constructor(
 
     // [MS-1127] MF-ID: during enrolment, the same 'subjectId' needs to be used during the entire workflow
     private val enrolmentSubjectId = UUID.randomUUID().toString()
-    private var modalities = emptySet<GeneralConfiguration.Modality>()
+    private var modalities = emptySet<Modality>()
     private var steps = emptyList<Step>()
     private var actionRequest: ActionRequest? = null
 
@@ -258,55 +256,43 @@ internal class OrchestratorViewModel @Inject constructor(
         currentStep: Step,
         result: Serializable,
     ) {
-        if (currentStep.id == StepId.FACE_CAPTURE && result is FaceCaptureResult) {
+        if (currentStep.id == StepId.FACE_CAPTURE && result is CaptureIdentity) {
             val captureParams = currentStep.params?.let { it as? FaceCaptureParams }
             val matchingStep = steps.firstOrNull { step ->
                 if (step.id != StepId.FACE_MATCHER) {
                     false
                 } else {
-                    val stepSdk = step.params?.let { it as? MatchStepStubPayload }?.faceSDK
+                    val stepSdk = step.params?.let { it as? MatchStepStubPayload }?.bioSdk
                     stepSdk == captureParams?.faceSDK
                 }
             }
 
             if (matchingStep != null) {
-                val faceSamples = result.results
-                    .mapNotNull { it.sample }
-                    .map { MatchParams.FaceSample(it.faceId, it.template) }
                 val newPayload = matchingStep.params
                     ?.let { it as? MatchStepStubPayload }
-                    ?.toFaceStepArgs(result.referenceId, faceSamples)
+                    ?.toFaceStepArgs(result.referenceId, result.samples)
 
                 if (newPayload != null) {
                     matchingStep.params = newPayload
                 }
             }
         }
-        if (currentStep.id == StepId.FINGERPRINT_CAPTURE && result is FingerprintCaptureResult) {
+        if (currentStep.id == StepId.FINGERPRINT_CAPTURE && result is CaptureIdentity) {
             val captureParams = currentStep.params?.let { it as? FingerprintCaptureParams }
             // Find the matching step for the same fingerprint SDK as there may be multiple match steps
             val matchingStep = steps.firstOrNull { step ->
                 if (step.id != StepId.FINGERPRINT_MATCHER) {
                     false
                 } else {
-                    val stepSdk = step.params?.let { it as? MatchStepStubPayload }?.fingerprintSDK
+                    val stepSdk = step.params?.let { it as? MatchStepStubPayload }?.bioSdk
                     stepSdk == captureParams?.fingerprintSDK
                 }
             }
 
             if (matchingStep != null) {
-                val fingerprintSamples = result.results
-                    .mapNotNull { it.sample }
-                    .map {
-                        MatchParams.FingerprintSample(
-                            fingerId = it.fingerIdentifier,
-                            format = it.format,
-                            template = it.template,
-                        )
-                    }
                 val newPayload = matchingStep.params
                     ?.let { it as? MatchStepStubPayload }
-                    ?.toFingerprintStepArgs(result.referenceId, fingerprintSamples)
+                    ?.toFingerprintStepArgs(result.referenceId, result.samples)
 
                 if (newPayload != null) {
                     matchingStep.params = newPayload
@@ -326,29 +312,17 @@ internal class OrchestratorViewModel @Inject constructor(
         val step = steps.firstOrNull { it.id == StepId.EXTERNAL_CREDENTIAL } ?: return
         val params = step.params as? ExternalCredentialParams ?: return
         val updatedParams = when {
-            currentStep.id == StepId.FACE_CAPTURE && result is FaceCaptureResult -> {
-                val faceSamples = result.results
-                    .mapNotNull { it.sample }
-                    .map { MatchParams.FaceSample(it.faceId, it.template) }
+            currentStep.id == StepId.FACE_CAPTURE && result is CaptureIdentity -> {
                 params.copy(
                     probeReferenceId = result.referenceId,
-                    faceSamples = faceSamples,
+                    faceSamples = result.samples,
                 )
             }
 
-            currentStep.id == StepId.FINGERPRINT_CAPTURE && result is FingerprintCaptureResult -> {
-                val fingerprintSamples = result.results
-                    .mapNotNull { it.sample }
-                    .map {
-                        MatchParams.FingerprintSample(
-                            fingerId = it.fingerIdentifier,
-                            format = it.format,
-                            template = it.template,
-                        )
-                    }
+            currentStep.id == StepId.FINGERPRINT_CAPTURE && result is CaptureIdentity -> {
                 params.copy(
                     probeReferenceId = result.referenceId,
-                    fingerprintSamples = fingerprintSamples,
+                    fingerprintSamples = result.samples,
                 )
             }
 

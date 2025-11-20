@@ -4,19 +4,18 @@ import androidx.annotation.IdRes
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.core.domain.sample.CaptureIdentity
+import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.step.StepResult
 import com.simprints.face.capture.FaceCaptureParams
-import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.consent.ConsentParams
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
-import com.simprints.feature.enrollast.FaceTemplateCaptureResult
-import com.simprints.feature.enrollast.FingerTemplateCaptureResult
-import com.simprints.feature.enrollast.MatchResult
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
@@ -31,14 +30,14 @@ import com.simprints.feature.setup.SetupResult
 import com.simprints.feature.validatepool.ValidateSubjectPoolFragmentParams
 import com.simprints.feature.validatepool.ValidateSubjectPoolResult
 import com.simprints.fingerprint.capture.FingerprintCaptureParams
-import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.fingerprint.connect.FingerprintConnectParams
 import com.simprints.fingerprint.connect.FingerprintConnectResult
+import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.infra.matching.FaceMatchResult
-import com.simprints.infra.matching.FingerprintMatchResult
 import com.simprints.infra.matching.MatchParams
+import com.simprints.infra.matching.MatchResult
 import java.io.Serializable
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "resultType")
@@ -47,25 +46,7 @@ import java.io.Serializable
     JsonSubTypes.Type(value = SetupResult::class, name = "SetupResult"),
     JsonSubTypes.Type(value = ConsentResult::class, name = "ConsentResult"),
     JsonSubTypes.Type(value = FingerprintConnectResult::class, name = "FingerprintConnectResult"),
-    JsonSubTypes.Type(value = FingerprintCaptureResult::class, name = "FingerprintCaptureResult"),
-    JsonSubTypes.Type(
-        value = FingerprintCaptureResult.Item::class,
-        name = "FingerprintCaptureResult.Item",
-    ),
-    JsonSubTypes.Type(
-        value = FingerprintCaptureResult.Sample::class,
-        name = "FingerprintCaptureResult.Sample",
-    ),
-    JsonSubTypes.Type(value = FingerprintMatchResult::class, name = "FingerprintMatchResult"),
-    JsonSubTypes.Type(
-        value = FingerprintMatchResult.Item::class,
-        name = "FingerprintMatchResult.Item",
-    ),
-    JsonSubTypes.Type(value = FaceCaptureResult::class, name = "FaceCaptureResult"),
-    JsonSubTypes.Type(value = FaceCaptureResult.Item::class, name = "FaceCaptureResult.Item"),
-    JsonSubTypes.Type(value = FaceCaptureResult.Sample::class, name = "FaceCaptureResult.Sample"),
-    JsonSubTypes.Type(value = FaceMatchResult::class, name = "FaceMatchResult"),
-    JsonSubTypes.Type(value = FaceMatchResult.Item::class, name = "FaceMatchResult.Item"),
+    JsonSubTypes.Type(value = MatchResult::class, name = "MatchResult"),
     JsonSubTypes.Type(value = EnrolLastBiometricResult::class, name = "EnrolLastBiometricResult"),
     JsonSubTypes.Type(value = FetchSubjectResult::class, name = "FetchSubjectResult"),
     JsonSubTypes.Type(value = SelectSubjectResult::class, name = "SelectSubjectResult"),
@@ -74,6 +55,10 @@ import java.io.Serializable
     JsonSubTypes.Type(value = ValidateSubjectPoolResult::class, name = "ValidateSubjectPoolResult"),
     JsonSubTypes.Type(value = SelectSubjectAgeGroupResult::class, name = "SelectSubjectAgeGroupResult"),
     JsonSubTypes.Type(value = ExternalCredentialSearchResult::class, name = "ExternalCredentialSearchResult"),
+    // Common data types
+    JsonSubTypes.Type(value = CaptureIdentity::class, name = "CaptureIdentity"),
+    JsonSubTypes.Type(value = CaptureSample::class, name = "CaptureSample"),
+    JsonSubTypes.Type(value = MatchComparisonResult::class, name = "MatchComparisonResult"),
 )
 abstract class StepResultMixin : StepResult
 
@@ -90,8 +75,6 @@ abstract class StepResultMixin : StepResult
     // Match params are updated after capture steps
     JsonSubTypes.Type(value = MatchStepStubPayload::class, name = "MatchStepStubPayload"),
     JsonSubTypes.Type(value = MatchParams::class, name = "MatchParams"),
-    JsonSubTypes.Type(value = MatchParams.FaceSample::class, name = "MatchParams.FaceSample"),
-    JsonSubTypes.Type(value = MatchParams.FingerprintSample::class, name = "MatchParams.FingerprintSample"),
     // Below are subclasses of enrol-last step that takes results of other steps as parameters
     JsonSubTypes.Type(value = EnrolLastBiometricParams::class, name = "EnrolLastBiometricParams"),
     JsonSubTypes.Type(value = EnrolLastBiometricStepResult::class, name = "EnrolLastBiometricStepResult"),
@@ -100,29 +83,23 @@ abstract class StepResultMixin : StepResult
         name = "EnrolLastBiometricStepResult.EnrolLastBiometricsResult",
     ),
     JsonSubTypes.Type(
-        value = EnrolLastBiometricStepResult.FingerprintMatchResult::class,
-        name = "EnrolLastBiometricStepResult.FingerprintMatchResult",
+        value = EnrolLastBiometricStepResult.MatchResult::class,
+        name = "EnrolLastBiometricStepResult.MatchResult",
     ),
     JsonSubTypes.Type(
-        value = EnrolLastBiometricStepResult.FaceMatchResult::class,
-        name = "EnrolLastBiometricStepResult.FaceMatchResult",
-    ),
-    JsonSubTypes.Type(
-        value = EnrolLastBiometricStepResult.FingerprintCaptureResult::class,
-        name = "EnrolLastBiometricStepResult.FingerprintCaptureResult",
-    ),
-    JsonSubTypes.Type(
-        value = EnrolLastBiometricStepResult.FaceCaptureResult::class,
-        name = "EnrolLastBiometricStepResult.FaceCaptureResult",
+        value = EnrolLastBiometricStepResult.CaptureResult::class,
+        name = "EnrolLastBiometricStepResult.CaptureResult",
     ),
     JsonSubTypes.Type(value = ExternalCredentialParams::class, name = "ExternalCredentialParams"),
     JsonSubTypes.Type(value = ExternalCredentialSearchResult::class, name = "ExternalCredentialSearchResult"),
     JsonSubTypes.Type(value = MatchResult::class, name = "MatchResult"),
-    JsonSubTypes.Type(value = FingerTemplateCaptureResult::class, name = "FingerTemplateCaptureResult"),
-    JsonSubTypes.Type(value = FaceTemplateCaptureResult::class, name = "FaceTemplateCaptureResult"),
     // Additional types that are used in top-level params
+    JsonSubTypes.Type(value = CaptureSample::class, name = "CaptureSample"),
+    JsonSubTypes.Type(value = MatchComparisonResult::class, name = "MatchComparisonResult"),
     JsonSubTypes.Type(value = BiometricDataSource::class, name = "BiometricDataSource"),
     JsonSubTypes.Type(value = SubjectQuery::class, name = "SubjectQuery"),
+    JsonSubTypes.Type(value = FingerprintConfiguration.BioSdk::class, name = "FingerprintConfiguration.BioSdk"),
+    JsonSubTypes.Type(value = FaceConfiguration.BioSdk::class, name = "FaceConfiguration.BioSdk"),
 )
 abstract class StepParamsMixin : StepParams
 
