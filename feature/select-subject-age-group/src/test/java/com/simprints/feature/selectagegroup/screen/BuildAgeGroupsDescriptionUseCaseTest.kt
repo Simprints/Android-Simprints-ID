@@ -2,8 +2,8 @@ package com.simprints.feature.selectagegroup.screen
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.common.AgeGroup
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.allowedAgeRanges
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery

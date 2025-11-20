@@ -1,7 +1,7 @@
 package com.simprints.infra.config.store.remote.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.store.models.AgeGroup
+import com.simprints.core.domain.common.AgeGroup
 import org.junit.Test
 
 class ApiAllowedAgeRangeTest {

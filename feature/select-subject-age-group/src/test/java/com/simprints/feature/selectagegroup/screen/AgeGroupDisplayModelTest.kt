@@ -3,7 +3,7 @@ package com.simprints.feature.selectagegroup.screen
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth
-import com.simprints.infra.config.store.models.AgeGroup
+import com.simprints.core.domain.common.AgeGroup
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.MockKAnnotations

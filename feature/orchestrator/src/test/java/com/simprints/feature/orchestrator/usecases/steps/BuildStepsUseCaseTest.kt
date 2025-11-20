@@ -1,6 +1,7 @@
 package com.simprints.feature.orchestrator.usecases.steps
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.sample.SampleIdentifier
@@ -11,7 +12,6 @@ import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.usecases.MapStepsForLastBiometricEnrolUseCase
 import com.simprints.feature.selectsubject.SelectSubjectParams
-import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.NEC

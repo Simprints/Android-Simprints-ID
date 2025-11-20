@@ -1,4 +1,4 @@
-package com.simprints.infra.config.store.models
+package com.simprints.core.domain.common
 
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonIgnore

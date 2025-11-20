@@ -1,8 +1,8 @@
 package com.simprints.infra.config.store.remote.models
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.sample.SampleIdentifier
-import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 
 @Keep

@@ -1,8 +1,8 @@
 package com.simprints.infra.config.store.local.models
 
+import com.simprints.core.domain.common.AgeGroup
 import com.simprints.infra.config.store.exceptions.InvalidProtobufEnumException
 import com.simprints.infra.config.store.local.models.ProtoFingerprintConfiguration.ProtoMaxCaptureAttempts
-import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.MaxCaptureAttempts
 
@@ -121,7 +121,7 @@ internal fun ProtoAllowedAgeRange.toDomain() = AgeGroup(startInclusive, if (hasE
 
 internal fun AgeGroup.toProto() = ProtoAllowedAgeRange
     .newBuilder()
-    .also {
-        it.setStartInclusive(startInclusive)
-        if (endExclusive != null) it.setEndExclusive(endExclusive)
+    .also { builder ->
+        builder.setStartInclusive(startInclusive)
+        endExclusive?.let { builder.setEndExclusive(it) }
     }.build()

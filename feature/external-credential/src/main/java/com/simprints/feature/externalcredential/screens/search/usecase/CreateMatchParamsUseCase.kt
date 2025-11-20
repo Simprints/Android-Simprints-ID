@@ -1,9 +1,9 @@
 package com.simprints.feature.externalcredential.screens.search.usecase
 
+import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.sample.CaptureSample
-import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.getSdkListForAgeGroup
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource

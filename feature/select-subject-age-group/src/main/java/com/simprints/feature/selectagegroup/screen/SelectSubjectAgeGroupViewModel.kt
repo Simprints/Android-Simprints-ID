@@ -5,12 +5,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.SessionCoroutineScope
+import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.events.event.domain.models.AgeGroupSelectionEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SESSION

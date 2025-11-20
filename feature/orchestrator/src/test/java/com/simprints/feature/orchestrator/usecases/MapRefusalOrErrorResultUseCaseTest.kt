@@ -1,6 +1,7 @@
 package com.simprints.feature.orchestrator.usecases
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.feature.alert.AlertResult
@@ -11,7 +12,6 @@ import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.setup.SetupResult
 import com.simprints.feature.validatepool.ValidateSubjectPoolResult
 import com.simprints.fingerprint.connect.FingerprintConnectResult
-import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse

@@ -1,5 +1,6 @@
 package com.simprints.infra.config.store.models
 
+import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.ModalitySdkType
 import com.simprints.core.domain.sample.SampleIdentifier
 
