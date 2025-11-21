@@ -70,9 +70,8 @@ internal class EventUpSyncTask @Inject constructor(
             }
         }
 
-        val projectWithConfig = configManager.refreshProject(operation.projectId)
-        val project = projectWithConfig.project
-        val config = projectWithConfig.configuration
+        val project = configManager.getProject(operation.projectId)
+        val config = configManager.getProjectConfiguration()
         var lastOperation = operation.copy()
         var isUsefulUpload = false
 
