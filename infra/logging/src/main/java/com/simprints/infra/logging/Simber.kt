@@ -72,19 +72,19 @@ object Simber {
      */
     fun w(
         message: String,
-        t: Throwable? = null,
+        t: Throwable,
         tag: CrashReportTag,
     ) = w(message, t, tag.name)
 
     fun w(
         message: String,
-        t: Throwable? = null,
+        t: Throwable,
         tag: String = DEFAULT_TAG,
     ) {
-        when {
-            t == null -> Logger.w(message, null, ensureCharactersAreValid(tag))
-            shouldSkipThrowableReporting(t) -> Logger.i(message, t, ensureCharactersAreValid(tag))
-            else -> Logger.w(message, t, ensureCharactersAreValid(tag))
+        if (shouldSkipThrowableReporting(t)) {
+            Logger.i(message, t, ensureCharactersAreValid(tag))
+        } else {
+            Logger.w(message, t, ensureCharactersAreValid(tag))
         }
     }
 
@@ -171,7 +171,7 @@ object Simber {
                 throw IllegalArgumentException("String must be less than $max characters.")
             }
 
-            return message.substring(0, max)
+            return message.take(max)
         }
         return message
     }

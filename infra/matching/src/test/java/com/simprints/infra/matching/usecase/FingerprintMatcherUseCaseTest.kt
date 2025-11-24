@@ -12,6 +12,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
@@ -19,6 +20,8 @@ import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepositor
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.logging.LoggingConstants
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.matching.MatchParams
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -145,6 +148,53 @@ internal class FingerprintMatcherUseCaseTest {
                 matchBatches = emptyList(),
             ),
         )
+    }
+
+    @Test
+    fun `Logs warning and returns empty success when wrong SDK type is provided`() = runTest {
+        mockkObject(Simber)
+        justRun { Simber.w(message = any<String>(), t = any<Throwable>(), tag = any<String>()) }
+
+        val results = useCase
+            .invoke(
+                MatchParams(
+                    probeReferenceId = "referenceId",
+                    probeSamples = listOf(
+                        CaptureSample(
+                            captureEventId = "fingerprintId",
+                            template = byteArrayOf(1, 2, 3),
+                            modality = Modality.FINGERPRINT,
+                            format = "format",
+                            identifier = SampleIdentifier.LEFT_3RD_FINGER,
+                        ),
+                    ),
+                    bioSdk = FaceConfiguration.BioSdk.RANK_ONE, // Wrong SDK type
+                    flowType = FlowType.VERIFY,
+                    queryForCandidates = SubjectQuery(),
+                    biometricDataSource = BiometricDataSource.Simprints,
+                ),
+                project,
+            ).toList()
+
+        verify {
+            Simber.w(
+                message = "Fingerprint SDK was not provided",
+                t = ofType<IllegalArgumentException>(),
+                tag = LoggingConstants.CrashReportTag.FINGER_MATCHING,
+            )
+        }
+
+        assertThat(results).containsExactly(
+            MatcherUseCase.MatcherState.Success(
+                comparisonResults = emptyList(),
+                totalCandidates = 0,
+                matcherName = "",
+                matchBatches = emptyList(),
+            ),
+        )
+
+        coVerify(exactly = 0) { bioSdkWrapper.match(any(), any(), any()) }
+        unmockkObject(Simber)
     }
 
     @Test

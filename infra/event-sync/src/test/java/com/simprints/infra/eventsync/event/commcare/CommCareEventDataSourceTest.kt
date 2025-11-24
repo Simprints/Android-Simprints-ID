@@ -570,7 +570,7 @@ class CommCareEventDataSourceTest {
         assertEquals(1, events.size) // Still processes because invalid date defaults to 0L
         // Should log error for each format attempt plus final failure warning
         verify(atLeast = 2) { Simber.e(any(), ofType<Exception>(), tag = LoggingConstants.CrashReportTag.COMMCARE_SYNC) }
-        verify { Simber.w(any(), tag = LoggingConstants.CrashReportTag.COMMCARE_SYNC) }
+        verify { Simber.w(any(), ofType<IllegalArgumentException>(), tag = LoggingConstants.CrashReportTag.COMMCARE_SYNC) }
     }
 
     @Test
@@ -976,7 +976,7 @@ class CommCareEventDataSourceTest {
 
         // Should log date parsing errors
         verify(atLeast = 2) { Simber.e(any(), ofType<Exception>(), tag = LoggingConstants.CrashReportTag.COMMCARE_SYNC) }
-        verify { Simber.w(any(), tag = LoggingConstants.CrashReportTag.COMMCARE_SYNC) }
+        verify { Simber.w(any(), ofType<IllegalArgumentException>(), tag = LoggingConstants.CrashReportTag.COMMCARE_SYNC) }
     }
 
     @Test
