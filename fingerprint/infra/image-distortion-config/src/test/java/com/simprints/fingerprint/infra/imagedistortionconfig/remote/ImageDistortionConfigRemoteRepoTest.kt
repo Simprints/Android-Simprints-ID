@@ -100,7 +100,7 @@ class ImageDistortionConfigRemoteRepoTest {
         val bucketUrl = "bucket123"
         every { authStore.getCoreApp().options.projectId } returns "firebaseProject"
         every { authStore.signedInProjectId } returns PROJECT_ID
-        coEvery { configManager.getProject(PROJECT_ID).imageBucket } returns bucketUrl
+        coEvery { configManager.getProject().imageBucket } returns bucketUrl
 
         val mockRootRef: StorageReference = mockk()
         mockkStatic(FirebaseStorage::class)

@@ -10,7 +10,6 @@ import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.screens.scanqr.usecase.ExternalCredentialQrCodeValidatorUseCase
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
@@ -22,7 +21,6 @@ import javax.inject.Inject
 internal class ExternalCredentialScanQrViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     private val externalCredentialQrCodeValidator: ExternalCredentialQrCodeValidatorUseCase,
-    private val authStore: AuthStore,
     private val configManager: ConfigManager,
     private val tokenizationProcessor: TokenizationProcessor,
 ) : ViewModel() {
@@ -44,7 +42,7 @@ internal class ExternalCredentialScanQrViewModel @Inject constructor(
             val newState = when (value) {
                 null -> ScanQrState.ReadyToScan
                 else -> {
-                    val project = configManager.getProject(authStore.signedInProjectId)
+                    val project = configManager.getProject()
                     val qrCodeEncrypted = tokenizationProcessor.encrypt(
                         decrypted = value.asTokenizableRaw(),
                         tokenKeyType = TokenKeyType.ExternalCredential,

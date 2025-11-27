@@ -373,7 +373,7 @@ internal class OrchestratorViewModelTest {
             every { projectId } returns id
             every { general.modalities } returns emptyList() andThen projectModalities
         }
-        coEvery { configManager.getProject(id) } returns mockk()
+        coEvery { configManager.getProject() } returns mockk()
 
         viewModel.handleAction(mockk())
         viewModel.restoreModalitiesIfNeeded()
@@ -392,7 +392,7 @@ internal class OrchestratorViewModelTest {
             every { projectId } returns id
             every { general.modalities } returns projectModalities
         }
-        coEvery { configManager.getProject(id) } returns mockk()
+        coEvery { configManager.getProject() } returns mockk()
 
         viewModel.handleAction(mockk())
         viewModel.restoreModalitiesIfNeeded()

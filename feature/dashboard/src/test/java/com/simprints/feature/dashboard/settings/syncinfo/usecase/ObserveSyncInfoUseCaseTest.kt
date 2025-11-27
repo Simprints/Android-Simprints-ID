@@ -145,7 +145,7 @@ class ObserveSyncInfoUseCaseTest {
         every { configManager.observeDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfiguration)
         coEvery { configManager.getProjectConfiguration() } returns mockProjectConfiguration
         coEvery { configManager.getDeviceConfiguration() } returns mockDeviceConfiguration
-        coEvery { configManager.getProject(any()) } returns mockProject
+        coEvery { configManager.getProject() } returns mockProject
 
         val eventSyncLiveData = MutableLiveData(mockEventSyncState)
         every { eventSyncManager.getLastSyncState() } returns eventSyncLiveData
@@ -255,7 +255,7 @@ class ObserveSyncInfoUseCaseTest {
         val mockPausedProject = mockk<Project> {
             every { state } returns ProjectState.PROJECT_PAUSED
         }
-        coEvery { configManager.getProject(any()) } returns mockPausedProject
+        coEvery { configManager.getProject() } returns mockPausedProject
         createUseCase()
 
         val result = useCase().first()
@@ -268,7 +268,7 @@ class ObserveSyncInfoUseCaseTest {
         val mockEndingProject = mockk<Project> {
             every { state } returns ProjectState.PROJECT_ENDING
         }
-        coEvery { configManager.getProject(any()) } returns mockEndingProject
+        coEvery { configManager.getProject() } returns mockEndingProject
         createUseCase()
 
         val result = useCase().first()

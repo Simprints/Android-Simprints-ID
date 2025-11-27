@@ -207,7 +207,7 @@ class FirebaseSampleUploaderTest {
     }
 
     private fun setupProjectConfig() {
-        coEvery { configManager.getProject(any()).imageBucket } returns "gs://`simprints-dev.appspot.com"
+        coEvery { configManager.getProject().imageBucket } returns "gs://`simprints-dev.appspot.com"
         every { authStore.getLegacyAppFallback().options.projectId } returns "projectId"
         every { authStore.signedInProjectId } returns "projectId"
     }

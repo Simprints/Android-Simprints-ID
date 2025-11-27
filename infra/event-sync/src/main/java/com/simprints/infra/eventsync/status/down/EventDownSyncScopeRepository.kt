@@ -34,7 +34,7 @@ internal class EventDownSyncScopeRepository @Inject constructor(
 
         val syncScope = when (syncPartitioning) {
             Partitioning.GLOBAL -> SubjectProjectScope(projectId, modes)
-            Partitioning.USER -> SubjectUserScope(projectId, getUserId(projectId), modes)
+            Partitioning.USER -> SubjectUserScope(projectId, getUserId(), modes)
             Partitioning.MODULE -> SubjectModuleScope(projectId, selectedModuleIDs, modes)
         }
 
@@ -50,7 +50,7 @@ internal class EventDownSyncScopeRepository @Inject constructor(
         return projectId
     }
 
-    private suspend fun getUserId(projectId: String): String {
+    private suspend fun getUserId(): String {
         // After we are certain that all users have user IDs cached (no-one uses 2023.3 for a while), the fallback can be removed
         val possibleUserId: TokenizableString = authStore.signedInUserId
             ?: recentUserActivityManager.getRecentUserActivity().lastUserUsed
@@ -64,7 +64,7 @@ internal class EventDownSyncScopeRepository @Inject constructor(
                     .encrypt(
                         decrypted = possibleUserId,
                         tokenKeyType = TokenKeyType.AttendantId,
-                        project = configManager.getProject(projectId),
+                        project = configManager.getProject(),
                     ).value
             is TokenizableString.Tokenized -> possibleUserId.value
         }

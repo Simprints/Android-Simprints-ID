@@ -276,7 +276,7 @@ internal class EnrolLastBiometricViewModelTest {
     fun `shows add credential dialog when scanned credential is linked to another subject`() = runTest {
         val decryptedCredential = "decryptedCredential".asTokenizableRaw()
         coEvery { enrolmentRecordRepository.load(any()) } returns listOf(subject)
-        coEvery { configManager.getProject(PROJECT_ID) } returns project
+        coEvery { configManager.getProject() } returns project
         coEvery {
             tokenizationProcessor.decrypt(
                 encrypted = scannedCredential.credential,
@@ -309,7 +309,7 @@ internal class EnrolLastBiometricViewModelTest {
     fun `add credential dialog is not shown when there is no result`() = runTest {
         val decryptedCredential = "decryptedCredential".asTokenizableRaw()
         coEvery { enrolmentRecordRepository.load(any()) } returns listOf(subject)
-        coEvery { configManager.getProject(PROJECT_ID) } returns project
+        coEvery { configManager.getProject() } returns project
         coEvery {
             tokenizationProcessor.decrypt(
                 encrypted = scannedCredential.credential,
@@ -327,7 +327,7 @@ internal class EnrolLastBiometricViewModelTest {
     fun `add credential dialog is not shown when there are no credentials`() = runTest {
         val decryptedCredential = "decryptedCredential".asTokenizableRaw()
         coEvery { enrolmentRecordRepository.load(any()) } returns listOf(subject)
-        coEvery { configManager.getProject(PROJECT_ID) } returns project
+        coEvery { configManager.getProject() } returns project
         coEvery {
             tokenizationProcessor.decrypt(
                 encrypted = scannedCredential.credential,
@@ -350,7 +350,7 @@ internal class EnrolLastBiometricViewModelTest {
     fun `add credential dialog is not shown when credential is already linked to same subject`() = runTest {
         val decryptedCredential = "decryptedCredential".asTokenizableRaw()
         coEvery { enrolmentRecordRepository.load(any()) } returns listOf(subject)
-        coEvery { configManager.getProject(PROJECT_ID) } returns project
+        coEvery { configManager.getProject() } returns project
         coEvery {
             tokenizationProcessor.decrypt(
                 encrypted = scannedCredential.credential,

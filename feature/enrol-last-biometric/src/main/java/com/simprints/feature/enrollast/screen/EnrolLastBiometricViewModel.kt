@@ -60,7 +60,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
             params.scannedCredential?.let { scannedCredential ->
                 val guidToEnrol = getPreviousEnrolmentResult(params.steps)?.subjectId
                 if (isCredentialLinkedToAnotherSubject(scannedCredential, guidToEnrol = guidToEnrol, projectId = params.projectId)) {
-                    displayAddCredentialDialog(scannedCredential, params.projectId)
+                    displayAddCredentialDialog(scannedCredential)
                     return@launch
                 }
             }
@@ -77,7 +77,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
         enrolWasAttempted = true
 
         val projectConfig = configManager.getProjectConfiguration()
-        val project = configManager.getProject(projectConfig.projectId)
+        val project = configManager.getProject()
         val modalities = projectConfig.general.modalities
 
         val previousLastEnrolmentResult = getPreviousEnrolmentResult(params.steps)
@@ -98,7 +98,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
 
         try {
             val subject = buildSubject(params, isAddingCredential = isAddingCredential)
-            registerEvent(params, subject)
+            registerEvent(subject)
             enrolmentRecordRepository.performActions(listOf(SubjectAction.Creation(subject)), project)
             _finish.send(EnrolLastState.Success(subject.subjectId, scannedCredential?.toExternalCredential(subject.subjectId)))
         } catch (t: Throwable) {
@@ -107,11 +107,8 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
         }
     }
 
-    private suspend fun displayAddCredentialDialog(
-        scannedCredential: ScannedCredential,
-        projectId: String,
-    ) {
-        val project = configManager.getProject(projectId)
+    private suspend fun displayAddCredentialDialog(scannedCredential: ScannedCredential) {
+        val project = configManager.getProject()
         val decrypted = tokenizationProcessor.decrypt(
             encrypted = scannedCredential.credential,
             tokenKeyType = TokenKeyType.ExternalCredential,
@@ -139,15 +136,12 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
     private fun getPreviousEnrolmentResult(steps: List<EnrolLastBiometricStepResult>) =
         steps.filterIsInstance<EnrolLastBiometricStepResult.EnrolLastBiometricsResult>().firstOrNull()
 
-    private suspend fun registerEvent(
-        params: EnrolLastBiometricParams,
-        subject: Subject,
-    ) {
+    private suspend fun registerEvent(subject: Subject) {
         Simber.d("Register events for enrolments", tag = ENROLMENT)
         val events = eventRepository.getEventsInCurrentSession()
 
         // Ensures that any previous confirmations are removed from session
-        resetEnrolmentUpdateEventsFromSession(params.projectId)
+        resetEnrolmentUpdateEventsFromSession()
 
         val biometricReferenceIds = events
             .filterIsInstance<BiometricReferenceCreationEvent>()

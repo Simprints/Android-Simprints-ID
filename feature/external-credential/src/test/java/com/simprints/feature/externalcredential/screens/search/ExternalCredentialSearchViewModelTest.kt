@@ -17,7 +17,6 @@ import com.simprints.feature.externalcredential.screens.search.model.SearchCrede
 import com.simprints.feature.externalcredential.screens.search.model.SearchState
 import com.simprints.feature.externalcredential.screens.search.usecase.MatchCandidatesUseCase
 import com.simprints.feature.externalcredential.usecase.ExternalCredentialEventTrackerUseCase
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
@@ -42,9 +41,6 @@ internal class ExternalCredentialSearchViewModelTest {
 
     @MockK
     lateinit var timeHelper: TimeHelper
-
-    @MockK
-    lateinit var authStore: AuthStore
 
     @MockK
     lateinit var configManager: ConfigManager
@@ -81,14 +77,11 @@ internal class ExternalCredentialSearchViewModelTest {
 
     private lateinit var viewModel: ExternalCredentialSearchViewModel
 
-    private val projectId = "projectId"
-
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         every { timeHelper.now() } returns Timestamp(1L)
-        every { authStore.signedInProjectId } returns projectId
-        coEvery { configManager.getProject(projectId) } returns project
+        coEvery { configManager.getProject() } returns project
         coEvery { configManager.getProjectConfiguration() } returns projectConfig
         coJustRun { eventsTracker.saveSearchEvent(any(), any(), any()) }
         coJustRun { eventsTracker.saveConfirmation(any(), any()) }
@@ -99,7 +92,6 @@ internal class ExternalCredentialSearchViewModelTest {
         scannedCredential = mockScannedCredential,
         externalCredentialParams = externalCredentialParams,
         timeHelper = timeHelper,
-        authStore = authStore,
         configManager = configManager,
         matchCandidatesUseCase = matchCandidatesUseCase,
         tokenizationProcessor = tokenizationProcessor,

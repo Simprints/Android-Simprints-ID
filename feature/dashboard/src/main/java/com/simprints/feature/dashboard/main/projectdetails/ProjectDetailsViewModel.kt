@@ -17,7 +17,6 @@ import javax.inject.Inject
 @HiltViewModel
 internal class ProjectDetailsViewModel @Inject constructor(
     private val configManager: ConfigManager,
-    private val authStore: AuthStore,
     private val recentUserActivityManager: RecentUserActivityManager,
     private val tokenizationProcessor: TokenizationProcessor,
 ) : ViewModel() {
@@ -31,8 +30,7 @@ internal class ProjectDetailsViewModel @Inject constructor(
 
     fun load() = viewModelScope.launch {
         val state = try {
-            val projectId = authStore.signedInProjectId
-            val cachedProject = configManager.getProject(projectId)
+            val cachedProject = configManager.getProject()
             val recentUserActivity = recentUserActivityManager.getRecentUserActivity()
             val decryptedUserId = when (val userId = recentUserActivity.lastUserUsed) {
                 is TokenizableString.Raw -> userId

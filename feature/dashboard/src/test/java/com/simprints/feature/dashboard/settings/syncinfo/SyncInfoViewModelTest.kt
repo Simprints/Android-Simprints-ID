@@ -123,7 +123,7 @@ class SyncInfoViewModelTest {
         every { configManager.observeDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfiguration)
         coEvery { configManager.getProjectConfiguration() } returns mockProjectConfiguration
         coEvery { configManager.getDeviceConfiguration() } returns mockDeviceConfiguration
-        coEvery { configManager.getProject(any()) } returns mockProject
+        coEvery { configManager.getProject() } returns mockProject
 
         val eventSyncLiveData = MutableLiveData(mockEventSyncState)
         every { eventSyncManager.getLastSyncState() } returns eventSyncLiveData
@@ -401,7 +401,7 @@ class SyncInfoViewModelTest {
         val mockPausedProject = mockk<Project> {
             every { state } returns ProjectState.PROJECT_PAUSED
         }
-        coEvery { configManager.getProject(any()) } returns mockPausedProject
+        coEvery { configManager.getProject() } returns mockPausedProject
         createViewModel()
         viewModel.isPreLogoutUpSync = false
 
@@ -416,7 +416,7 @@ class SyncInfoViewModelTest {
         val mockEndingProject = mockk<Project> {
             every { state } returns ProjectState.PROJECT_ENDING
         }
-        coEvery { configManager.getProject(any()) } returns mockEndingProject
+        coEvery { configManager.getProject() } returns mockEndingProject
         createViewModel()
         viewModel.isPreLogoutUpSync = false
 
@@ -431,7 +431,7 @@ class SyncInfoViewModelTest {
         val mockEndingProject = mockk<Project> {
             every { state } throws RemoteDbNotSignedInException("stub!")
         }
-        coEvery { configManager.getProject(any()) } returns mockEndingProject
+        coEvery { configManager.getProject() } returns mockEndingProject
         createViewModel()
         viewModel.isPreLogoutUpSync = false
 

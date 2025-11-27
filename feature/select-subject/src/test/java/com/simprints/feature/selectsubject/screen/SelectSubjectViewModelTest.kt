@@ -245,7 +245,7 @@ internal class SelectSubjectViewModelTest {
 
         coEvery { authStore.isProjectIdSignedIn(PROJECT_ID) } returns true
         coEvery { authStore.signedInProjectId } returns PROJECT_ID
-        coEvery { configManager.getProject(PROJECT_ID) } returns project
+        coEvery { configManager.getProject() } returns project
         every { project.id } returns PROJECT_ID
         coEvery { enrolmentRecordRepository.load(any()) } returns repositoryResponse
         coEvery {
@@ -275,7 +275,7 @@ internal class SelectSubjectViewModelTest {
         )
 
         coJustRun {
-            resetScannedCredentialsInSession(any(), any(), any())
+            resetScannedCredentialsInSession(any(), any())
         }
 
         val viewModel = createViewModel(params = selectSubjectParams.copy(scannedCredential = scannedCredential))
@@ -294,7 +294,6 @@ internal class SelectSubjectViewModelTest {
 
         coVerify {
             resetScannedCredentialsInSession(
-                projectId = PROJECT_ID,
                 scannedCredential = scannedCredential,
                 subjectId = SUBJECT_ID,
             )
@@ -313,7 +312,7 @@ internal class SelectSubjectViewModelTest {
         }
 
         coJustRun {
-            resetScannedCredentialsInSession(any(), any(), any())
+            resetScannedCredentialsInSession(any(), any())
         }
 
         val viewModel = createViewModel(
@@ -335,7 +334,6 @@ internal class SelectSubjectViewModelTest {
         coVerify {
             // Still needs to remove previous links
             resetScannedCredentialsInSession(
-                projectId = PROJECT_ID,
                 scannedCredential = scannedCredential,
                 subjectId = "none_selected",
             )
@@ -350,7 +348,6 @@ internal class SelectSubjectViewModelTest {
             resetScannedCredentialsInSession(
                 scannedCredential = scannedCredential,
                 subjectId = SUBJECT_ID,
-                projectId = PROJECT_ID,
             )
         } throws RuntimeException("RuntimeException")
 

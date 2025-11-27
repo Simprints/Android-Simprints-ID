@@ -98,7 +98,7 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
     ): SelectSubjectState.CredentialDialogDisplayed? {
         if (scannedCredential == null) return null
         val credential = scannedCredential.credential
-        val project = configManager.getProject(authStore.signedInProjectId)
+        val project = configManager.getProject()
         val alreadyLinkedSubject = enrolmentRecordRepository
             .load(
                 SubjectQuery(
@@ -112,7 +112,6 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
             // Confirmation of "none_selected" (or any non UUID value) should not display the dialog,
             // but still remove update event from session and reset previously linked external credentials
             resetExternalCredentialsUseCase(
-                projectId = params.projectId,
                 scannedCredential = scannedCredential,
                 subjectId = params.subjectId,
             )
@@ -137,7 +136,6 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
                 resetExternalCredentialsUseCase(
                     scannedCredential = scannedCredential,
                     subjectId = params.subjectId,
-                    projectId = params.projectId,
                 )
 
                 // Confirmation of "none_selected" (or any non UUID value) should not produce an EnrolmentUpdateEvent

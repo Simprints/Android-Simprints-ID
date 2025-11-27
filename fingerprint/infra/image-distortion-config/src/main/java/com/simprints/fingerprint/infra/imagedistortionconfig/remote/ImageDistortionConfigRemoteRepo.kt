@@ -34,7 +34,7 @@ internal class ImageDistortionConfigRemoteRepo @Inject constructor(
             return false
         }
 
-        val bucketUrl = configManager.getProject(projectId).imageBucket
+        val bucketUrl = configManager.getProject().imageBucket
 
         val rootRef = FirebaseStorage
             .getInstance(

@@ -19,7 +19,6 @@ class ResetExternalCredentialsInSessionUseCase @Inject() constructor(
     @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
     suspend operator fun invoke(
-        projectId: String,
         scannedCredential: ScannedCredential? = null,
         subjectId: String = "",
     ) {
@@ -54,7 +53,7 @@ class ResetExternalCredentialsInSessionUseCase @Inject() constructor(
             emptyList()
         }
 
-        val project = configManager.getProject(projectId)
+        val project = configManager.getProject()
         val updateActions = credentialsToRemove + credentialsToAdd
         enrolmentRecordRepository.performActions(updateActions, project)
 

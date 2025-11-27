@@ -43,7 +43,7 @@ internal class FirebaseSampleUploader @Inject constructor(
         var allImagesUploaded = true
 
         Simber.i("Starting sample upload to Firebase storage", tag = SAMPLE_UPLOAD)
-        val bucketUrl = configManager.getProject(projectId).imageBucket
+        val bucketUrl = configManager.getProject().imageBucket
         val rootRef = FirebaseStorage
             .getInstance(firebaseApp, bucketUrl)
             .reference

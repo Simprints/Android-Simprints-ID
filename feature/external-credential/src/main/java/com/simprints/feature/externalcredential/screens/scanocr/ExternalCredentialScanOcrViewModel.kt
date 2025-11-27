@@ -23,7 +23,6 @@ import com.simprints.feature.externalcredential.screens.scanocr.usecase.KeepOnly
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.NormalizeBitmapToPreviewUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ZoomOntoCredentialUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
@@ -49,7 +48,6 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     private val credentialImageRepository: CredentialImageRepository,
     private val zoomOntoCredentialUseCase: ZoomOntoCredentialUseCase,
     private val tokenizationProcessor: TokenizationProcessor,
-    private val authStore: AuthStore,
     private val configManager: ConfigManager,
     @DispatcherBG private val bgDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -137,7 +135,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     fun processOcrResultsAndFinish() {
         updateState { ScanOcrState.Complete }
         viewModelScope.launch {
-            val project = configManager.getProject(authStore.signedInProjectId)
+            val project = configManager.getProject()
             val detectedBlock = keepOnlyBestDetectedBlockUseCase(detectedBlocks, ocrDocumentType)
             val credentialType = detectedBlock.documentType.asExternalCredentialType()
             val blockBoundingBox = detectedBlock.blockBoundingBox

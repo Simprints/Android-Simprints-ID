@@ -19,7 +19,6 @@ import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
 import com.simprints.feature.clientapi.usecases.GetEnrolmentCreationEventForSubjectUseCase
 import com.simprints.feature.clientapi.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.usecases.SimpleEventReporter
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
@@ -71,9 +70,6 @@ internal class ClientApiViewModelTest {
     lateinit var isFlowCompletedWithError: IsFlowCompletedWithErrorUseCase
 
     @MockK
-    lateinit var authStore: AuthStore
-
-    @MockK
     lateinit var configManager: ConfigManager
 
     @MockK
@@ -108,7 +104,6 @@ internal class ClientApiViewModelTest {
             getEnrolmentCreationEventForSubject = getEnrolmentCreationEventForSubject,
             deleteSessionEventsIfNeeded = deleteSessionEventsIfNeeded,
             isFlowCompletedWithError = isFlowCompletedWithError,
-            authStore = authStore,
             configManager = configManager,
             timeHelper = timeHelper,
             persistentLogger = persistentLogger,
@@ -323,9 +318,7 @@ internal class ClientApiViewModelTest {
         project: Project,
         returnValue: TokenizableString,
     ) {
-        val projectId = "projectId"
-        every { authStore.signedInProjectId } returns projectId
-        coEvery { configManager.getProject(projectId) } returns project
+        coEvery { configManager.getProject() } returns project
         every {
             tokenizationProcessor.decrypt(
                 encrypted = any(),

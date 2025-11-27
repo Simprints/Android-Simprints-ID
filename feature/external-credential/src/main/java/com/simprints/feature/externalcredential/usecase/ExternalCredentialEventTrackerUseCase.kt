@@ -7,7 +7,6 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.CalculateLevenshteinDistanceUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
@@ -24,7 +23,6 @@ import javax.inject.Inject
 
 internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
-    private val authStore: AuthStore,
     private val configManager: ConfigManager,
     private val tokenizationProcessor: TokenizationProcessor,
     private val eventRepository: SessionEventRepository,
@@ -85,7 +83,7 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
     }
 
     private suspend fun calculateOcrErrorCount(scannedCredential: ScannedCredential): Int {
-        val project = configManager.getProject(authStore.signedInProjectId)
+        val project = configManager.getProject()
         val actualCredentialRaw = tokenizationProcessor.decrypt(
             scannedCredential.credential,
             TokenKeyType.ExternalCredential,

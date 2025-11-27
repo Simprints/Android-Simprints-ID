@@ -10,7 +10,6 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.excepti
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.TooManyModulesSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.ModuleRepository
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
@@ -23,7 +22,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class ModuleSelectionViewModel @Inject constructor(
-    private val authStore: AuthStore,
     private val moduleRepository: ModuleRepository,
     private val syncOrchestrator: SyncOrchestrator,
     private val configManager: ConfigManager,
@@ -54,7 +52,7 @@ internal class ModuleSelectionViewModel @Inject constructor(
                         is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
                             encrypted = name,
                             tokenKeyType = TokenKeyType.ModuleId,
-                            project = configManager.getProject(authStore.signedInProjectId),
+                            project = configManager.getProject(),
                         )
                     }
                     module.copy(name = decryptedName)
@@ -102,7 +100,7 @@ internal class ModuleSelectionViewModel @Inject constructor(
                     is TokenizableString.Raw -> tokenizationProcessor.encrypt(
                         decrypted = name,
                         tokenKeyType = TokenKeyType.ModuleId,
-                        project = configManager.getProject(authStore.signedInProjectId),
+                        project = configManager.getProject(),
                     )
 
                     is TokenizableString.Tokenized -> name
