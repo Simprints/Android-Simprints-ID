@@ -4,10 +4,15 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.SCANNER_CONNECTION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.SCANNER_CONNECTION
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(SCANNER_CONNECTION_KEY)
 data class ScannerConnectionEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: ScannerConnectionPayload,
@@ -29,6 +34,7 @@ data class ScannerConnectionEvent(
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
+    @Serializable
     data class ScannerConnectionPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
@@ -40,6 +46,7 @@ data class ScannerConnectionEvent(
             "generation: ${scannerInfo.generation}, hardware version: ${scannerInfo.hardwareVersion}"
 
         @Keep
+        @Serializable
         data class ScannerInfo(
             val scannerId: String,
             val macAddress: String,
@@ -48,6 +55,7 @@ data class ScannerConnectionEvent(
         )
 
         @Keep
+        @Serializable
         enum class ScannerGeneration {
             VERO_1,
             VERO_2,

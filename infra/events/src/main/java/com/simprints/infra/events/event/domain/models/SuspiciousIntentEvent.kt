@@ -2,12 +2,18 @@ package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.json.StringNumberNullableMapSerializer
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.SUSPICIOUS_INTENT_KEY
 import com.simprints.infra.events.event.domain.models.EventType.SUSPICIOUS_INTENT
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(SUSPICIOUS_INTENT_KEY)
 data class SuspiciousIntentEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: SuspiciousIntentPayload,
@@ -29,10 +35,11 @@ data class SuspiciousIntentEvent(
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
+    @Serializable
     data class SuspiciousIntentPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
-        val unexpectedExtras: Map<String, Any?>,
+        @Serializable(with = StringNumberNullableMapSerializer::class) val unexpectedExtras: Map<String, Any?>,
         override val endedAt: Timestamp? = null,
         override val type: EventType = SUSPICIOUS_INTENT,
     ) : EventPayload() {

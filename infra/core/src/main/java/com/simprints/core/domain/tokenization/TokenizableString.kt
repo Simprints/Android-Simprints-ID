@@ -1,9 +1,15 @@
 package com.simprints.core.domain.tokenization
 
+import android.os.Parcelable
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString.Raw
 import com.simprints.core.domain.tokenization.TokenizableString.Tokenized
-import java.io.Serializable
+import com.simprints.core.domain.tokenization.serialization.TokenizableStringDefaultSerializer
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 
 /**
  * Sealed class for values that might be tokenized (symmetrically encrypted). Use this wrapping
@@ -13,29 +19,26 @@ import java.io.Serializable
  * Use [Raw] for the unencrypted values
  */
 
+@OptIn(ExperimentalSerializationApi::class)
+@Parcelize
 @Keep
-sealed class TokenizableString : Serializable {
+@Serializable(with = TokenizableStringDefaultSerializer::class)
+@SerialName("TokenizableString")
+@JsonClassDiscriminator("className")
+sealed class TokenizableString : Parcelable {
     abstract val value: String
 
+    @Serializable
+    @SerialName("TokenizableString.Tokenized")
     data class Tokenized(
         override val value: String,
-    ) : TokenizableString() {
-        override fun hashCode() = super.hashCode()
+    ) : TokenizableString()
 
-        override fun equals(other: Any?) = super.equals(other)
-
-        override fun toString() = super.toString()
-    }
-
+    @Serializable
+    @SerialName("TokenizableString.Raw")
     data class Raw(
         override val value: String,
-    ) : TokenizableString() {
-        override fun hashCode() = super.hashCode()
-
-        override fun equals(other: Any?) = super.equals(other)
-
-        override fun toString() = super.toString()
-    }
+    ) : TokenizableString()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

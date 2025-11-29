@@ -19,7 +19,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAct
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Deletion
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Update
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
+import com.simprints.infra.events.event.domain.models.EventDownSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordDeletionEvent

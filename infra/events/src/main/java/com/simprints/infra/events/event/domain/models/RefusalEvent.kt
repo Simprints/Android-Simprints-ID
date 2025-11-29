@@ -4,10 +4,15 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.REFUSAL_KEY
 import com.simprints.infra.events.event.domain.models.EventType.REFUSAL
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(REFUSAL_KEY)
 data class RefusalEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: RefusalPayload,
@@ -37,6 +42,7 @@ data class RefusalEvent(
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
+    @Serializable
     data class RefusalPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
@@ -48,6 +54,7 @@ data class RefusalEvent(
         override fun toSafeString(): String = "reason: $reason, extra: $otherText"
 
         @Keep
+        @Serializable
         enum class Answer {
             REFUSED_RELIGION,
             REFUSED_DATA_CONCERNS,

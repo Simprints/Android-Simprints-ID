@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.core.tools.time.Timestamp
 
 @Keep
-internal data class DbTimestamp(
+data class DbTimestamp(
     val unixMs: Long,
     val isTrustworthy: Boolean = false,
     val msSinceBoot: Long? = null,

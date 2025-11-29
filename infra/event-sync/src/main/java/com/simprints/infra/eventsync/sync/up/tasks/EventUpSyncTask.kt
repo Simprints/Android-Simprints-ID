@@ -19,13 +19,13 @@ import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
 import com.simprints.infra.events.event.domain.models.EnrolmentUpdateEvent
 import com.simprints.infra.events.event.domain.models.Event
+import com.simprints.infra.events.event.domain.models.EventUpSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
+import com.simprints.infra.events.event.domain.models.FaceCaptureBiometricsEvent
+import com.simprints.infra.events.event.domain.models.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
-import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
-import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
 import com.simprints.infra.eventsync.event.remote.ApiUploadEventsBody
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.event.remote.models.session.ApiEventScope

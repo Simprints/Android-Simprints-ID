@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
+import com.simprints.infra.events.event.domain.models.FaceCaptureEvent.FaceCapturePayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload.ApiFace

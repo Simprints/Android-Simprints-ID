@@ -1,16 +1,26 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.ONE_TO_MANY_MATCH_KEY
 import com.simprints.infra.events.event.domain.models.EventType.ONE_TO_MANY_MATCH
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.JsonContentPolymorphicSerializer
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import java.util.UUID
 
 @Keep
-data class OneToManyMatchEvent(
+@Serializable
+@SerialName(ONE_TO_MANY_MATCH_KEY)
+class OneToManyMatchEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: OneToManyMatchPayload,
     override val type: EventType,
@@ -29,7 +39,6 @@ data class OneToManyMatchEvent(
         id = UUID.randomUUID().toString(),
         payload = OneToManyMatchPayload.OneToManyMatchPayloadV3(
             createdAt = createdAt,
-            eventVersion = EVENT_VERSION,
             endedAt = endTime,
             pool = pool,
             matcher = matcher,
@@ -42,65 +51,52 @@ data class OneToManyMatchEvent(
 
     override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this
 
-    @JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "eventVersion",
-        visible = true,
-    )
-    @JsonSubTypes(
-        JsonSubTypes.Type(
-            value = OneToManyMatchPayload.OneToManyMatchPayloadV2::class,
-            name = EVENT_VERSION_WITHOUT_REFERENCE_ID.toString(),
-        ),
-        JsonSubTypes.Type(
-            value = OneToManyMatchPayload.OneToManyMatchPayloadV3::class,
-            name = EVENT_VERSION.toString(),
-        ),
-    )
-    @Keep
-    sealed class OneToManyMatchPayload(
-        override val createdAt: Timestamp,
-        override val eventVersion: Int,
-        override val endedAt: Timestamp?,
-        open val pool: MatchPool,
-        open val matcher: String,
-        open val result: List<MatchEntry>?,
-        override val type: EventType = ONE_TO_MANY_MATCH,
-    ) : EventPayload() {
-        override fun toSafeString(): String = "matcher: $matcher, pool: ${pool.type}, size: ${pool.count}, results: ${result?.size}"
+    // FIX 2: Apply Custom Serializer
+    @Serializable(with = OneToManyMatchPayloadSerializer::class)
+    sealed class OneToManyMatchPayload : EventPayload() {
+        abstract override val type: EventType
+
+        abstract val pool: MatchPool
+        abstract val matcher: String
+        abstract val result: List<MatchEntry>?
 
         @Keep
+        @Serializable
         data class OneToManyMatchPayloadV2(
             override val createdAt: Timestamp,
-            override val eventVersion: Int,
-            override val endedAt: Timestamp?,
+            override val endedAt: Timestamp? = null,
             override val pool: MatchPool,
             override val matcher: String,
-            override val result: List<MatchEntry>?,
-        ) : OneToManyMatchPayload(createdAt, eventVersion, endedAt, pool, matcher, result)
+            override val result: List<MatchEntry>? = null,
+            override val eventVersion: Int = EVENT_VERSION_WITHOUT_REFERENCE_ID,
+            override val type: EventType = ONE_TO_MANY_MATCH,
+        ) : OneToManyMatchPayload()
 
         @Keep
+        @Serializable
         data class OneToManyMatchPayloadV3(
-            override val createdAt: Timestamp,
-            override val eventVersion: Int,
-            override val endedAt: Timestamp?,
-            override val pool: MatchPool,
-            override val matcher: String,
-            override val result: List<MatchEntry>?,
             val probeBiometricReferenceId: String,
             val batches: List<OneToManyBatch>? = null,
-        ) : OneToManyMatchPayload(createdAt, eventVersion, endedAt, pool, matcher, result)
+            override val createdAt: Timestamp,
+            override val endedAt: Timestamp? = null,
+            override val pool: MatchPool,
+            override val matcher: String,
+            override val result: List<MatchEntry>? = null,
+            override val eventVersion: Int = EVENT_VERSION,
+            override val type: EventType = ONE_TO_MANY_MATCH,
+        ) : OneToManyMatchPayload()
 
         @Keep
+        @Serializable
         data class MatchPool(
             val type: MatchPoolType,
             val count: Int,
         )
 
         @Keep
+        @Serializable
         enum class MatchPoolType {
             USER,
             MODULE,
@@ -108,6 +104,7 @@ data class OneToManyMatchEvent(
         }
 
         @Keep
+        @Serializable
         data class OneToManyBatch(
             val loadingStartTime: Timestamp,
             val loadingEndTime: Timestamp,
@@ -121,4 +118,25 @@ data class OneToManyMatchEvent(
         const val EVENT_VERSION_WITHOUT_REFERENCE_ID = 2
         const val EVENT_VERSION = 3
     }
+}
+
+object OneToManyMatchPayloadSerializer : JsonContentPolymorphicSerializer<OneToManyMatchEvent.OneToManyMatchPayload>(
+    OneToManyMatchEvent.OneToManyMatchPayload::class,
+) {
+    // 1. DESERIALIZATION (Read)
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<OneToManyMatchEvent.OneToManyMatchPayload> =
+        when (val version = element.jsonObject["eventVersion"]?.jsonPrimitive?.intOrNull) {
+            OneToManyMatchEvent.EVENT_VERSION_WITHOUT_REFERENCE_ID -> {
+                OneToManyMatchEvent.OneToManyMatchPayload.OneToManyMatchPayloadV2
+                    .serializer()
+            }
+
+            OneToManyMatchEvent.EVENT_VERSION -> {
+                OneToManyMatchEvent.OneToManyMatchPayload.OneToManyMatchPayloadV3.serializer()
+            }
+
+            else -> {
+                throw SerializationException("Unknown OneToManyMatchPayload eventVersion: $version")
+            }
+        }
 }

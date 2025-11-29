@@ -2,7 +2,7 @@ package com.simprints.infra.eventsync.event.remote.models.face
 
 import androidx.annotation.Keep
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEvent.FaceFallbackCapturePayload
+import com.simprints.infra.events.event.domain.models.FaceFallbackCaptureEvent.FaceFallbackCapturePayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
