@@ -83,7 +83,7 @@ barista_version = "4.3.0"
 uiAutomator_version = "2.3.0"
 jacoco_version = "0.8.14"
 
-sonar_plugin_version = "7.0.1.6134"
+sonar_plugin_version = "7.1.0.6387"
 realm_version = "4.0.1"
 protobuf_plugin_version = "0.9.5"
 deps_graph_version = "0.8.0"
