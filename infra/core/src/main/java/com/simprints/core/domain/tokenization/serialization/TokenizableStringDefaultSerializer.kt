@@ -21,9 +21,7 @@ object TokenizableStringDefaultSerializer :
         val jsonDecoder = decoder as? JsonDecoder
             ?: error("TokenizableString must be deserialized from JSON")
 
-        val element = jsonDecoder.decodeJsonElement()
-
-        return when (element) {
+        return when (val element = jsonDecoder.decodeJsonElement()) {
             is JsonPrimitive -> {
                 // Plain string → Raw
                 TokenizableString.Raw(element.content)

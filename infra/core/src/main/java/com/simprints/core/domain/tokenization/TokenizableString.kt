@@ -27,18 +27,34 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 @JsonClassDiscriminator("className")
 sealed class TokenizableString : Parcelable {
     abstract val value: String
+    abstract val className: String
 
+    @Parcelize
     @Serializable
     @SerialName("TokenizableString.Tokenized")
     data class Tokenized(
         override val value: String,
-    ) : TokenizableString()
+        override val className: String = "TokenizableString.Tokenized",
+    ) : TokenizableString() {
+        override fun hashCode() = super.hashCode()
+
+        override fun equals(other: Any?) = super.equals(other)
+
+        override fun toString() = super.toString()
+    }
 
     @Serializable
     @SerialName("TokenizableString.Raw")
     data class Raw(
         override val value: String,
-    ) : TokenizableString()
+        override val className: String = "TokenizableString.Raw",
+    ) : TokenizableString() {
+        override fun hashCode() = super.hashCode()
+
+        override fun equals(other: Any?) = super.equals(other)
+
+        override fun toString() = super.toString()
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
