@@ -5,13 +5,15 @@ import android.database.Cursor
 import androidx.core.net.toUri
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
-import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
-import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.LastCallingPackageStore
-import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordCreationEventDeserializer
-import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
+import com.simprints.infra.events.event.cosync.v1.CoSyncEnrolmentRecordCreationEventV1
+import com.simprints.infra.events.event.cosync.v1.CoSyncEnrolmentRecordCreationEventV1Deserializer
+import com.simprints.infra.events.event.cosync.v1.CoSyncEnrolmentRecordEventsV1
+import com.simprints.infra.events.event.cosync.v1.TokenizableStringV1
+import com.simprints.infra.events.event.cosync.v1.TokenizableStringV1Deserializer
+import com.simprints.infra.events.event.cosync.v1.TokenizableStringV1Serializer
+import com.simprints.infra.events.event.cosync.v1.toDomain
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordDeletionEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
@@ -228,11 +230,12 @@ internal class CommCareEventDataSource @Inject constructor(
 
     private fun parseRecordEvents(subjectActions: String) = subjectActions.takeIf(String::isNotEmpty)?.let {
         try {
-            jsonHelper.fromJson<CoSyncEnrolmentRecordEvents>(
+            val v1Events = jsonHelper.fromJson<CoSyncEnrolmentRecordEventsV1>(
                 json = it,
                 module = coSyncSerializationModule,
-                type = object : TypeReference<CoSyncEnrolmentRecordEvents>() {},
+                type = object : TypeReference<CoSyncEnrolmentRecordEventsV1>() {},
             )
+            v1Events.toDomain()
         } catch (e: Exception) {
             Simber.e("Error while parsing subjectActions", e)
             null
@@ -300,16 +303,16 @@ internal class CommCareEventDataSource @Inject constructor(
 
     private val coSyncSerializationModule = SimpleModule().apply {
         addSerializer(
-            TokenizableString::class.java,
-            TokenizationClassNameSerializer(),
+            TokenizableStringV1::class.java,
+            TokenizableStringV1Serializer(),
         )
         addDeserializer(
-            TokenizableString::class.java,
-            TokenizationClassNameDeserializer(),
+            TokenizableStringV1::class.java,
+            TokenizableStringV1Deserializer(),
         )
         addDeserializer(
-            EnrolmentRecordCreationEvent::class.java,
-            CoSyncEnrolmentRecordCreationEventDeserializer(),
+            CoSyncEnrolmentRecordCreationEventV1::class.java,
+            CoSyncEnrolmentRecordCreationEventV1Deserializer(),
         )
     }
 

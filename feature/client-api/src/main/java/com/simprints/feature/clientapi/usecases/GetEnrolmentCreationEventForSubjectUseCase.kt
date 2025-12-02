@@ -1,9 +1,6 @@
 package com.simprints.feature.clientapi.usecases
 
 import com.fasterxml.jackson.databind.module.SimpleModule
-import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
-import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.config.store.models.canCoSyncAllData
@@ -12,7 +9,11 @@ import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
+import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvents
+import com.simprints.infra.events.event.cosync.v1.TokenizableStringV1
+import com.simprints.infra.events.event.cosync.v1.TokenizableStringV1Deserializer
+import com.simprints.infra.events.event.cosync.v1.TokenizableStringV1Serializer
+import com.simprints.infra.events.event.cosync.v1.toCoSyncV1
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
@@ -46,7 +47,9 @@ internal class GetEnrolmentCreationEventForSubjectUseCase @Inject constructor(
             return null
         }
 
-        return jsonHelper.toJson(CoSyncEnrolmentRecordEvents(listOf(recordCreationEvent)), coSyncSerializationModule)
+        // Convert to V1 external schema before serialization for stable contract
+        val v1Events = EnrolmentRecordEvents(listOf(recordCreationEvent)).toCoSyncV1()
+        return jsonHelper.toJson(v1Events, coSyncSerializationModule)
     }
 
     private fun Subject.fromSubjectToEnrolmentCreationEvent() = EnrolmentRecordCreationEvent(
@@ -60,8 +63,8 @@ internal class GetEnrolmentCreationEventForSubjectUseCase @Inject constructor(
 
     companion object {
         val coSyncSerializationModule = SimpleModule().apply {
-            addSerializer(TokenizableString::class.java, TokenizationClassNameSerializer())
-            addDeserializer(TokenizableString::class.java, TokenizationClassNameDeserializer())
+            addSerializer(TokenizableStringV1::class.java, TokenizableStringV1Serializer())
+            addDeserializer(TokenizableStringV1::class.java, TokenizableStringV1Deserializer())
         }
     }
 }
