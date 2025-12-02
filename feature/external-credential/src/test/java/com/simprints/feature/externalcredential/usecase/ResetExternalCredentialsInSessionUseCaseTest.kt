@@ -96,6 +96,17 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
     }
 
     @Test
+    fun `handles missing project`() = runTest {
+        clearMocks(configManager)
+        coEvery { configManager.getProject() } returns null
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf()
+
+        useCase(scannedCredential, SUBJECT_ID)
+
+        coVerify(exactly = 0) { enrolmentRecordRepository.performActions(any(), any()) }
+    }
+
+    @Test
     fun `removes correct external credential to subject`() = runTest {
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
             enrolmentUpdateEvent("subject-1", listOf("credentia-1")),

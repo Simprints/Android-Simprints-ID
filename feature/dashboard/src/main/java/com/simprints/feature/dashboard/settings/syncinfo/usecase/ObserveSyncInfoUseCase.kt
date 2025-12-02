@@ -235,14 +235,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             else -> DownSyncCounts(0, isLowerBound = false)
         }
 
-        val project = try {
-            configManager.getProject()
-        } catch (_: Exception) {
-            // If the device is compromised, project data is deleted. Access attempts will throw an exception,
-            // effectively appearing to the user as if the project has ended.
-            null
-        }
-
+        val project = configManager.getProject()
         val isProjectRunning = project?.state == ProjectState.RUNNING
         val moduleCounts = if (project != null) {
             deviceConfig.selectedModules.map { moduleName ->

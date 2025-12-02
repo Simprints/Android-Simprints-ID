@@ -69,6 +69,17 @@ internal class ExternalCredentialScanQrViewModelTest {
     }
 
     @Test
+    fun `updateCapturedValue with missing project`() = runTest {
+        val observer = viewModel.stateLiveData.test()
+        val value = "value"
+
+        coEvery { configManager.getProject() } returns null
+        viewModel.updateCapturedValue(value)
+
+        assertThat(observer.value()).isEqualTo(ScanQrState.ReadyToScan)
+    }
+
+    @Test
     fun `updateCapturedValue with non-null sets QrCodeCaptured`() = runTest {
         val observer = viewModel.stateLiveData.test()
         val value = "value"

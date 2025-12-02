@@ -277,6 +277,16 @@ class ObserveSyncInfoUseCaseTest {
     }
 
     @Test
+    fun `should handle missing project state correctly in sync info`() = runTest {
+        coEvery { configManager.getProject() } returns null
+        createUseCase()
+
+        val result = useCase().first()
+
+        assertThat(result.syncInfoSectionRecords.isCounterRecordsToDownloadVisible).isFalse()
+    }
+
+    @Test
     fun `should show correct login prompt visibility when not logged in`() = runTest {
         every { authStore.observeSignedInProjectId() } returns MutableStateFlow("")
         createUseCase()

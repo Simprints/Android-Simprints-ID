@@ -59,13 +59,12 @@ internal class EventDownSyncScopeRepository @Inject constructor(
             throw MissingArgumentForDownSyncScopeException("UserId required")
         }
         return when (possibleUserId) {
-            is TokenizableString.Raw ->
+            is TokenizableString.Raw -> configManager.getProject()?.let { project ->
                 tokenizationProcessor
-                    .encrypt(
-                        decrypted = possibleUserId,
-                        tokenKeyType = TokenKeyType.AttendantId,
-                        project = configManager.getProject(),
-                    ).value
+                    .encrypt(decrypted = possibleUserId, tokenKeyType = TokenKeyType.AttendantId, project = project)
+                    .value
+            } ?: possibleUserId.value
+
             is TokenizableString.Tokenized -> possibleUserId.value
         }
     }

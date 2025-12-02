@@ -161,6 +161,25 @@ internal class EnrolLastBiometricViewModelTest {
     }
 
     @Test
+    fun `returns failure when project is not available`() = runTest {
+        coEvery { configManager.getProject() } returns null
+        viewModel.enrolBiometric(
+            createParams(
+                listOf(
+                    EnrolLastBiometricStepResult.EnrolLastBiometricsResult(null),
+                ),
+            ),
+            isAddingCredential = false,
+        )
+
+        val result = viewModel.finish
+            .test()
+            .value()
+            .getContentIfNotHandled() as EnrolLastState.Failed
+        assertThat(result.errorType).isEqualTo(EnrolLastState.ErrorType.GENERAL_ERROR)
+    }
+
+    @Test
     fun `returns failure when has previous enrolment without subject`() = runTest {
         viewModel.enrolBiometric(
             createParams(

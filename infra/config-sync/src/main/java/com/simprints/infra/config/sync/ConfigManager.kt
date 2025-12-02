@@ -37,12 +37,19 @@ class ConfigManager @Inject constructor(
         }
     }
 
-    suspend fun getProject(): Project = try {
+    suspend fun getProject(): Project? = try {
         configRepository.getProject()
-    } catch (ex: NoSuchElementException) {
-        val signedProjectId = authStore.signedInProjectId.takeUnless { it.isEmpty() }
-            ?: throw ex // re-throw the initial exception since there is no way to refresh the data
-        refreshProject(signedProjectId).project
+    } catch (_: NoSuchElementException) {
+        val projectId = authStore.signedInProjectId
+        if (projectId.isEmpty()) {
+            null
+        } else {
+            try {
+                refreshProject(projectId).project
+            } catch (_: Exception) {
+                null
+            }
+        }
     }
 
     suspend fun getProjectConfiguration(): ProjectConfiguration {

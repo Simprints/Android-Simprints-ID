@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.NoModuleSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.TooManyModulesSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
@@ -49,11 +50,13 @@ internal class ModuleSelectionViewModel @Inject constructor(
                 moduleRepository.getModules().map { module ->
                     val decryptedName = when (val name = module.name) {
                         is TokenizableString.Raw -> name
-                        is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
-                            encrypted = name,
-                            tokenKeyType = TokenKeyType.ModuleId,
-                            project = configManager.getProject(),
-                        )
+                        is TokenizableString.Tokenized -> configManager.getProject()?.let {
+                            tokenizationProcessor.decrypt(
+                                encrypted = name,
+                                tokenKeyType = TokenKeyType.ModuleId,
+                                project = it,
+                            )
+                        } ?: "".asTokenizableRaw()
                     }
                     module.copy(name = decryptedName)
                 }
@@ -97,11 +100,13 @@ internal class ModuleSelectionViewModel @Inject constructor(
         externalScope.launch {
             val modules = modules.map { module ->
                 val encryptedName = when (val name = module.name) {
-                    is TokenizableString.Raw -> tokenizationProcessor.encrypt(
-                        decrypted = name,
-                        tokenKeyType = TokenKeyType.ModuleId,
-                        project = configManager.getProject(),
-                    )
+                    is TokenizableString.Raw -> configManager.getProject()?.let { project ->
+                        tokenizationProcessor.encrypt(
+                            decrypted = name,
+                            tokenKeyType = TokenKeyType.ModuleId,
+                            project = project,
+                        )
+                    } ?: "".asTokenizableRaw()
 
                     is TokenizableString.Tokenized -> name
                 }

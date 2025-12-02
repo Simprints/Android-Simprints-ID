@@ -53,9 +53,10 @@ class ResetExternalCredentialsInSessionUseCase @Inject() constructor(
             emptyList()
         }
 
-        val project = configManager.getProject()
-        val updateActions = credentialsToRemove + credentialsToAdd
-        enrolmentRecordRepository.performActions(updateActions, project)
+        configManager.getProject()?.let { project ->
+            val updateActions = credentialsToRemove + credentialsToAdd
+            enrolmentRecordRepository.performActions(updateActions, project)
+        }
 
         // Since we are potentially linking the credentials to a new subject, previous updates must be deleted
         with(sessionCoroutineScope) { eventRepository.deleteEvents(enrolmentUpdateEvents) }

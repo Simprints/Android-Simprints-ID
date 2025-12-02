@@ -134,9 +134,9 @@ class LoginCheckViewModel @Inject internal constructor(
     }
 
     private suspend fun validateProjectAndProceed(actionRequest: ActionRequest) {
-        when (configManager.getProject().state) {
+        when (configManager.getProject()?.state) {
+            null, ProjectState.PROJECT_ENDING -> _showAlert.send(LoginCheckError.PROJECT_ENDING)
             ProjectState.PROJECT_PAUSED -> _showAlert.send(LoginCheckError.PROJECT_PAUSED)
-            ProjectState.PROJECT_ENDING -> _showAlert.send(LoginCheckError.PROJECT_ENDING)
             ProjectState.PROJECT_ENDED -> startSignInAttempt(actionRequest)
             ProjectState.RUNNING -> proceedWithAction(actionRequest)
         }

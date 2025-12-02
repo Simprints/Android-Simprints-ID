@@ -67,7 +67,7 @@ class ProjectDetailsViewModelTest {
 
     @Test
     fun `Should handle exception by producing correct state`() = runTest {
-        coEvery { configManager.getProject() } throws Exception()
+        coEvery { configManager.getProject() } returns null
 
         viewModel = ProjectDetailsViewModel(
             configManager = configManager,

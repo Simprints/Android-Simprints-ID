@@ -277,7 +277,7 @@ internal class LoginCheckViewModelTest {
     @Test
     fun `Triggers alert if project is paused`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
-        coEvery { configManager.getProject().state } returns ProjectState.PROJECT_PAUSED
+        coEvery { configManager.getProject()?.state } returns ProjectState.PROJECT_PAUSED
 
         viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
 
@@ -287,9 +287,21 @@ internal class LoginCheckViewModelTest {
     }
 
     @Test
+    fun `Triggers alert if project is not available`() = runTest {
+        coEvery { configManager.getProject() } returns null
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
+
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
+
+        viewModel.showAlert
+            .test()
+            .assertValue { it.peekContent() == LoginCheckError.PROJECT_ENDING }
+    }
+
+    @Test
     fun `Triggers alert if project is ending`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
-        coEvery { configManager.getProject().state } returns ProjectState.PROJECT_ENDING
+        coEvery { configManager.getProject()?.state } returns ProjectState.PROJECT_ENDING
 
         viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
 
@@ -301,7 +313,7 @@ internal class LoginCheckViewModelTest {
     @Test
     fun `Triggers login attempt if project has ended`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
-        coEvery { configManager.getProject().state } returns ProjectState.PROJECT_ENDED
+        coEvery { configManager.getProject()?.state } returns ProjectState.PROJECT_ENDED
 
         viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
 
@@ -313,7 +325,7 @@ internal class LoginCheckViewModelTest {
     @Test
     fun `Correctly handles if user signed in active project`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
-        coEvery { configManager.getProject().state } returns ProjectState.RUNNING
+        coEvery { configManager.getProject()?.state } returns ProjectState.RUNNING
 
         viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
 

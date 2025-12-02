@@ -57,7 +57,7 @@ internal class MatchViewModel @Inject constructor(
             is FaceConfiguration.BioSdk -> faceMatcher
             else -> fingerprintMatcher
         }
-        val project = configManager.getProject()
+        val project = configManager.getProject() ?: return@launch
         val decisionPolicy = getDecisionPolicy(params)
 
         candidatesLoaded = 0

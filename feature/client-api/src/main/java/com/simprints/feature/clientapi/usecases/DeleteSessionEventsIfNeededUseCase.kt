@@ -15,7 +15,7 @@ internal class DeleteSessionEventsIfNeededUseCase @Inject constructor(
     @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
     operator fun invoke(sessionId: String) = sessionCoroutineScope.launch {
-        val projectNotRunning = configManager.getProject().state != ProjectState.RUNNING
+        val projectNotRunning = configManager.getProject()?.state != ProjectState.RUNNING
         val simprintsDataSyncDisabled = !configManager.getProjectConfiguration().canSyncDataToSimprints()
 
         if (simprintsDataSyncDisabled || projectNotRunning) {

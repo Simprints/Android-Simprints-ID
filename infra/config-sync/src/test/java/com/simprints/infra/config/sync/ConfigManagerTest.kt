@@ -91,12 +91,13 @@ class ConfigManagerTest {
         coVerify(exactly = 1) { configRepository.refreshProject(PROJECT_ID) }
     }
 
-    @Test(expected = NoSuchElementException::class)
-    fun `getProject should throw when cannot get from local and logged out`() = runTest {
+    @Test
+    fun `getProject should returns null when refresh fails`() = runTest {
         every { authStore.signedInProjectId } returns ""
         coEvery { configRepository.getProject() } throws NoSuchElementException()
+        coEvery { configRepository.refreshProject(any()) } throws NoSuchElementException()
 
-        configManager.getProject()
+        assertThat(configManager.getProject()).isNull()
     }
 
     @Test

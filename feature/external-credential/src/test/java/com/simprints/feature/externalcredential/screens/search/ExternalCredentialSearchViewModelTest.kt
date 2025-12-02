@@ -85,7 +85,6 @@ internal class ExternalCredentialSearchViewModelTest {
         coEvery { configManager.getProjectConfiguration() } returns projectConfig
         coJustRun { eventsTracker.saveSearchEvent(any(), any(), any()) }
         coJustRun { eventsTracker.saveConfirmation(any(), any()) }
-        viewModel = createViewModel()
     }
 
     fun createViewModel() = ExternalCredentialSearchViewModel(
@@ -98,6 +97,17 @@ internal class ExternalCredentialSearchViewModelTest {
         enrolmentRecordRepository = enrolmentRecordRepository,
         eventsTracker = eventsTracker,
     )
+
+    @Test
+    fun `initial state handles missing project`() = runTest {
+        clearMocks(configManager)
+        coEvery { configManager.getProject() } returns null
+
+        viewModel = createViewModel()
+
+        verify(exactly = 0) { tokenizationProcessor.decrypt(any(), any(), any()) }
+        coVerify(exactly = 0) { enrolmentRecordRepository.load(any()) }
+    }
 
     @Test
     fun `initial state starts searching when credential not found`() = runTest {
@@ -148,6 +158,17 @@ internal class ExternalCredentialSearchViewModelTest {
     }
 
     @Test
+    fun `confirmCredentialUpdate handles missing project`() = runTest {
+        clearMocks(configManager) // reset default behaviour
+        coEvery { configManager.getProject() } returns null
+
+        viewModel = createViewModel()
+        viewModel.confirmCredentialUpdate("".asTokenizableRaw())
+
+        coVerify(exactly = 0) { tokenizationProcessor.encrypt(any(), any(), any()) }
+    }
+
+    @Test
     fun `confirmCredentialUpdate triggers new search and encrypts credential`() = runTest {
         val decryptedCredential = mockk<TokenizableString.Raw>()
         val newCredential = "newCredential".asTokenizableRaw()
@@ -168,14 +189,14 @@ internal class ExternalCredentialSearchViewModelTest {
 
     @Test
     fun `getButtonTextResource returns null when searching`() = runTest {
-        val result = viewModel.getButtonTextResource(SearchState.Searching, FlowType.IDENTIFY)
+        val result = createViewModel().getButtonTextResource(SearchState.Searching, FlowType.IDENTIFY)
         assertThat(result).isNull()
     }
 
     @Test
     fun `getButtonTextResource returns 'enrol anyway' when credential linked and flow is ENROL`() = runTest {
         val searchState = SearchState.CredentialLinked(emptyList())
-        val result = viewModel.getButtonTextResource(searchState, FlowType.ENROL)
+        val result = createViewModel().getButtonTextResource(searchState, FlowType.ENROL)
         assertThat(result).isEqualTo(IDR.string.mfid_action_enrol_anyway)
     }
 
@@ -184,37 +205,34 @@ internal class ExternalCredentialSearchViewModelTest {
         coEvery { enrolmentRecordRepository.load(any()) } returns emptyList()
         val searchState = SearchState.CredentialLinked(listOf(candidateMatch))
         every { candidateMatch.isVerificationSuccessful } returns false
-        val result = viewModel.getButtonTextResource(searchState, FlowType.IDENTIFY)
+        val result = createViewModel().getButtonTextResource(searchState, FlowType.IDENTIFY)
         assertThat(result).isEqualTo(IDR.string.mfid_action_continue)
     }
 
     @Test
     fun `getButtonTextResource returns 'enrol' when credential not found and flow is ENROL`() = runTest {
-        val result = viewModel.getButtonTextResource(SearchState.CredentialNotFound, FlowType.ENROL)
+        val result = createViewModel().getButtonTextResource(SearchState.CredentialNotFound, FlowType.ENROL)
         assertThat(result).isEqualTo(IDR.string.mfid_action_enrol)
     }
 
     @Test
     fun `getKeyBoardInputType returns number for NHIS card`() = runTest {
         every { mockScannedCredential.credentialType } returns ExternalCredentialType.NHISCard
-        viewModel = createViewModel()
-        val result = viewModel.getKeyBoardInputType()
+        val result = createViewModel().getKeyBoardInputType()
         assertThat(result).isEqualTo(InputType.TYPE_CLASS_NUMBER)
     }
 
     @Test
     fun `getKeyBoardInputType returns text for Ghana ID card`() = runTest {
         every { mockScannedCredential.credentialType } returns ExternalCredentialType.GhanaIdCard
-        viewModel = createViewModel()
-        val result = viewModel.getKeyBoardInputType()
+        val result = createViewModel().getKeyBoardInputType()
         assertThat(result).isEqualTo(InputType.TYPE_CLASS_TEXT)
     }
 
     @Test
     fun `getKeyBoardInputType returns text for QR code`() = runTest {
         every { mockScannedCredential.credentialType } returns ExternalCredentialType.QRCode
-        viewModel = createViewModel()
-        val result = viewModel.getKeyBoardInputType()
+        val result = createViewModel().getKeyBoardInputType()
         assertThat(result).isEqualTo(InputType.TYPE_CLASS_TEXT)
     }
 
@@ -253,6 +271,7 @@ internal class ExternalCredentialSearchViewModelTest {
                 every { matchResults } returns listOf(candidateMatch)
             }
         }
+        viewModel = createViewModel()
         viewModel.finish(state)
         val finishEvent = viewModel.finishEvent.value?.peekContent()
         assertThat(finishEvent).isNotNull()
@@ -263,7 +282,7 @@ internal class ExternalCredentialSearchViewModelTest {
 
     @Test
     fun `trackRecapture sends confirmation event`() = runTest {
-        viewModel.trackRecapture()
+        createViewModel().trackRecapture()
 
         coVerify { eventsTracker.saveConfirmation(any(), any()) }
     }
@@ -276,7 +295,7 @@ internal class ExternalCredentialSearchViewModelTest {
                 every { matchResults } returns listOf(candidateMatch)
             }
         }
-        viewModel.finish(state)
+        createViewModel().finish(state)
 
         coVerify { eventsTracker.saveConfirmation(any(), any()) }
     }

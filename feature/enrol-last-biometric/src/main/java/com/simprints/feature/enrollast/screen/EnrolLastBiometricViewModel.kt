@@ -78,6 +78,10 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
 
         val projectConfig = configManager.getProjectConfiguration()
         val project = configManager.getProject()
+        if (project == null) {
+            _finish.send(EnrolLastState.Failed(GENERAL_ERROR, emptyList()))
+            return@launch
+        }
         val modalities = projectConfig.general.modalities
 
         val previousLastEnrolmentResult = getPreviousEnrolmentResult(params.steps)
@@ -108,7 +112,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
     }
 
     private suspend fun displayAddCredentialDialog(scannedCredential: ScannedCredential) {
-        val project = configManager.getProject()
+        val project = configManager.getProject() ?: return
         val decrypted = tokenizationProcessor.decrypt(
             encrypted = scannedCredential.credential,
             tokenKeyType = TokenKeyType.ExternalCredential,

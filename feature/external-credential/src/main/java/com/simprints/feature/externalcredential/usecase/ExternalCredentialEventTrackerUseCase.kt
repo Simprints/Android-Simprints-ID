@@ -83,7 +83,7 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
     }
 
     private suspend fun calculateOcrErrorCount(scannedCredential: ScannedCredential): Int {
-        val project = configManager.getProject()
+        val project = configManager.getProject() ?: return 0
         val actualCredentialRaw = tokenizationProcessor.decrypt(
             scannedCredential.credential,
             TokenKeyType.ExternalCredential,

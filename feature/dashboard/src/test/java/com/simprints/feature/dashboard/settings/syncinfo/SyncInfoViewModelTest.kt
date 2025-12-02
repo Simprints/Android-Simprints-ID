@@ -428,10 +428,7 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `should start event sync with down sync disabled event sync when logged out`() = runTest {
-        val mockEndingProject = mockk<Project> {
-            every { state } throws RemoteDbNotSignedInException("stub!")
-        }
-        coEvery { configManager.getProject() } returns mockEndingProject
+        coEvery { configManager.getProject() } returns null
         createViewModel()
         viewModel.isPreLogoutUpSync = false
 

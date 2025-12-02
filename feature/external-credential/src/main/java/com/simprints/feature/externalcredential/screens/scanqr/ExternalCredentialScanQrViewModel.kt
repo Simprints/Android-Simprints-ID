@@ -41,8 +41,7 @@ internal class ExternalCredentialScanQrViewModel @Inject constructor(
         viewModelScope.launch {
             val newState = when (value) {
                 null -> ScanQrState.ReadyToScan
-                else -> {
-                    val project = configManager.getProject()
+                else -> configManager.getProject()?.let { project ->
                     val qrCodeEncrypted = tokenizationProcessor.encrypt(
                         decrypted = value.asTokenizableRaw(),
                         tokenKeyType = TokenKeyType.ExternalCredential,
@@ -54,7 +53,7 @@ internal class ExternalCredentialScanQrViewModel @Inject constructor(
                         qrCode = value.asTokenizableRaw(),
                         qrCodeEncrypted = qrCodeEncrypted,
                     )
-                }
+                } ?: ScanQrState.ReadyToScan
             }
             updateState { newState }
         }

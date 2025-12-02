@@ -52,6 +52,9 @@ internal class SelectSubjectViewModelTest {
     lateinit var configManager: ConfigManager
 
     @MockK
+    lateinit var project: Project
+
+    @MockK
     lateinit var resetScannedCredentialsInSession: ResetExternalCredentialsInSessionUseCase
 
     @MockK
@@ -224,6 +227,30 @@ internal class SelectSubjectViewModelTest {
     }
 
     @Test
+    fun `does not display credential dialog when project not availalbe`() = runTest {
+        val scannedCredential = mockk<ScannedCredential>(relaxed = true)
+        val displayedCredential = mockk<TokenizableString.Raw>(relaxed = true)
+        val repositoryResponse = listOf<Subject>(mockk { every { subjectId } returns "not_this_subject_id" })
+        setupCredentialState(
+            displayedCredential,
+            repositoryResponse = repositoryResponse,
+            configuredProject = null,
+        )
+
+        val viewModel = createViewModel(
+            params = selectSubjectParams.copy(
+                scannedCredential = scannedCredential,
+            ),
+        )
+
+        val result = viewModel.finish
+            .test()
+            .value()
+            .getContentIfNotHandled()
+        assertThat(result?.isSubjectIdSaved).isTrue()
+    }
+
+    @Test
     fun `finishes without credential when no credential is scanned`() = runTest {
         coEvery { authStore.isProjectIdSignedIn(PROJECT_ID) } returns true
 
@@ -240,19 +267,18 @@ internal class SelectSubjectViewModelTest {
     private fun setupCredentialState(
         displayedCredential: TokenizableString.Raw,
         repositoryResponse: List<Subject>,
+        configuredProject: Project? = project,
     ) {
-        val project = mockk<Project>(relaxed = true)
-
         coEvery { authStore.isProjectIdSignedIn(PROJECT_ID) } returns true
         coEvery { authStore.signedInProjectId } returns PROJECT_ID
-        coEvery { configManager.getProject() } returns project
-        every { project.id } returns PROJECT_ID
+        every { project?.id } returns PROJECT_ID
+        coEvery { configManager.getProject() } returns configuredProject
         coEvery { enrolmentRecordRepository.load(any()) } returns repositoryResponse
         coEvery {
             tokenizationProcessor.decrypt(
                 encrypted = any(),
                 tokenKeyType = TokenKeyType.ExternalCredential,
-                project = project,
+                project = any(),
             )
         } returns displayedCredential
     }

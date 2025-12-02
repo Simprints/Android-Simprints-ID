@@ -42,7 +42,6 @@ import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState
 import com.simprints.infra.network.exceptions.NetworkConnectionException
-import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.toList
@@ -324,11 +323,15 @@ internal class EventUpSyncTaskTest {
         assertThat(capturedRequest.captured).hasSize(5)
     }
 
-    @Test
+    @Test(expected = TryToUploadEventsForNotSignedProject::class)
     fun `should not upload sessions for not signed project`() = runTest {
-        assertThrows<TryToUploadEventsForNotSignedProject> {
-            eventUpSyncTask.upSync(EventUpSyncOperation(randomUUID()), eventScope).toList()
-        }
+        eventUpSyncTask.upSync(EventUpSyncOperation(randomUUID()), eventScope).toList()
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `should not upload sessions if missing project`() = runTest {
+        coEvery { configManager.getProject() } returns null
+        eventUpSyncTask.upSync(operation, eventScope).toList()
     }
 
     @Test

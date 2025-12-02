@@ -98,7 +98,7 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
     ): SelectSubjectState.CredentialDialogDisplayed? {
         if (scannedCredential == null) return null
         val credential = scannedCredential.credential
-        val project = configManager.getProject()
+        val project = configManager.getProject() ?: return null
         val alreadyLinkedSubject = enrolmentRecordRepository
             .load(
                 SubjectQuery(

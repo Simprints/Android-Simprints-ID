@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
@@ -30,22 +29,23 @@ internal class ProjectDetailsViewModel @Inject constructor(
 
     fun load() = viewModelScope.launch {
         val state = try {
-            val cachedProject = configManager.getProject()
-            val recentUserActivity = recentUserActivityManager.getRecentUserActivity()
-            val decryptedUserId = when (val userId = recentUserActivity.lastUserUsed) {
-                is TokenizableString.Raw -> userId
-                is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
-                    encrypted = userId,
-                    tokenKeyType = TokenKeyType.AttendantId,
-                    project = cachedProject,
+            configManager.getProject()?.let { cachedProject ->
+                val recentUserActivity = recentUserActivityManager.getRecentUserActivity()
+                val decryptedUserId = when (val userId = recentUserActivity.lastUserUsed) {
+                    is TokenizableString.Raw -> userId
+                    is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
+                        encrypted = userId,
+                        tokenKeyType = TokenKeyType.AttendantId,
+                        project = cachedProject,
+                    )
+                }
+                DashboardProjectState(
+                    title = cachedProject.name,
+                    lastUser = decryptedUserId.value,
+                    lastScanner = recentUserActivity.lastScannerUsed,
+                    isLoaded = true,
                 )
-            }
-            DashboardProjectState(
-                title = cachedProject.name,
-                lastUser = decryptedUserId.value,
-                lastScanner = recentUserActivity.lastScannerUsed,
-                isLoaded = true,
-            )
+            } ?: DashboardProjectState(isLoaded = false)
         } catch (_: Throwable) {
             DashboardProjectState(isLoaded = false)
         }

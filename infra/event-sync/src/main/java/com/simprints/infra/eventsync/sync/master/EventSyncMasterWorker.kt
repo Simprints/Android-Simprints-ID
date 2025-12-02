@@ -161,7 +161,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
     }
 
     private suspend fun isEventDownSyncAllowed(configuration: ProjectConfiguration): Boolean {
-        val isProjectPaused = configManager.getProject().state == ProjectState.PROJECT_PAUSED
+        val isProjectPaused = configManager.getProject()?.state == ProjectState.PROJECT_PAUSED
         val isSimprintsDownSyncEnabled = configuration.isSimprintsEventDownSyncAllowed()
         val isCommCareDownSyncEnabled = configuration.isCommCareEventDownSyncAllowed()
 

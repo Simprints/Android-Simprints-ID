@@ -135,7 +135,9 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     fun processOcrResultsAndFinish() {
         updateState { ScanOcrState.Complete }
         viewModelScope.launch {
-            val project = configManager.getProject()
+            // Missing project at this point is impossible, so no special handling required
+            val project = configManager.getProject() ?: return@launch
+
             val detectedBlock = keepOnlyBestDetectedBlockUseCase(detectedBlocks, ocrDocumentType)
             val credentialType = detectedBlock.documentType.asExternalCredentialType()
             val blockBoundingBox = detectedBlock.blockBoundingBox

@@ -89,6 +89,21 @@ class ExternalCredentialEventTrackerUseCaseTest {
     }
 
     @Test
+    fun `saveCaptureEvents should handle missing project in capture events`() = runTest {
+        clearMocks(configManager)
+        coEvery { configManager.getProject() } returns null
+
+        val scannedCredential = makeScannedCredential(ExternalCredentialType.QRCode)
+        useCase.saveCaptureEvents(START_TIME, SUBJECT_ID, scannedCredential, SELECTION_ID)
+
+        val captureEventSlot = slot<ExternalCredentialCaptureEvent>()
+        coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
+        with(captureEventSlot.captured) {
+            assertThat(payload.ocrErrorCount).isEqualTo(0)
+        }
+    }
+
+    @Test
     fun `saveCaptureEvents should correctly calculate length for NHISCard`() = runTest {
         val scannedCredential = makeScannedCredential(ExternalCredentialType.NHISCard)
         useCase.saveCaptureEvents(START_TIME, SUBJECT_ID, scannedCredential, SELECTION_ID)
