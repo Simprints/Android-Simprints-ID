@@ -60,7 +60,7 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
             findNavController().popBackStack()
         }
         viewModel.generalConfiguration.observe(viewLifecycleOwner) {
-            enableFingerprintSettings(it.modalities)
+            enableFingerprintSettings(it.modalities.contains(Modality.FINGERPRINT))
         }
         viewModel.experimentalConfiguration.observe(viewLifecycleOwner) {
             showFaceAutoCaptureSetting(isVisible = it.faceAutoCaptureEnabled)
@@ -91,8 +91,9 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         bindClickListeners()
     }
 
-    private fun enableFingerprintSettings(modalities: List<Modality>) {
-        getFingerSelectionPreference()?.isVisible = modalities.contains(Modality.FINGERPRINT)
+    private fun enableFingerprintSettings(enabled: Boolean) {
+        getFingerSelectionPreference()?.isVisible = enabled
+        getAudioAlertPreference()?.isVisible = enabled
     }
 
     private fun bindClickListeners() {
@@ -214,6 +215,8 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
     private fun getUpdateConfig(): Preference? = findPreference(getString(R.string.preference_update_config_key))
 
     private fun getAboutPreference(): Preference? = findPreference(getString(R.string.preference_app_details_key))
+
+    private fun getAudioAlertPreference(): Preference? = findPreference(getString(R.string.preference_enable_audio_on_scan_complete_key))
 
     private fun getFaceAutoCapturePreference(): Preference? = findPreference(getString(R.string.preference_enable_face_auto_capture))
 
