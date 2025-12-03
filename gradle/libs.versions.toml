@@ -31,7 +31,7 @@ hilt_androidx_version = "1.3.0"
 
 play_base_services_version = "18.9.0"
 play_location_services_version = "21.3.0"
-play_integrity_version = "1.5.0"
+play_integrity_version = "1.6.0"
 gsm_plugin_version = "4.4.4"
 play_publisher_version = "3.12.2"
 play_barcode_version = "18.3.1"
