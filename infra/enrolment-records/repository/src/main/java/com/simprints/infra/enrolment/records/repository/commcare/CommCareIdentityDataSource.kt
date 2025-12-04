@@ -11,9 +11,6 @@ import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
-import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
-import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
@@ -25,8 +22,13 @@ import com.simprints.infra.enrolment.records.repository.domain.models.BiometricD
 import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.usecases.CompareImplicitTokenizedStringsUseCase
-import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordCreationEventDeserializer
-import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
+import com.simprints.infra.events.event.cosync.v1.CoSyncEnrolmentRecordCreationEventV1
+import com.simprints.infra.events.event.cosync.v1.CoSyncEnrolmentRecordCreationEventV1Deserializer
+import com.simprints.infra.events.event.cosync.v1.CoSyncEnrolmentRecordEventsV1
+import com.simprints.infra.events.event.cosync.v1.TokenizableStringV1
+import com.simprints.infra.events.event.cosync.v1.TokenizableStringV1Deserializer
+import com.simprints.infra.events.event.cosync.v1.TokenizableStringV1Serializer
+import com.simprints.infra.events.event.cosync.v1.toDomain
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.FaceReference
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
@@ -254,11 +256,12 @@ internal class CommCareIdentityDataSource @Inject constructor(
 
     private fun parseRecordEvents(subjectActions: String) = subjectActions.takeIf(String::isNotEmpty)?.let {
         try {
-            jsonHelper.fromJson<CoSyncEnrolmentRecordEvents>(
+            val v1Events = jsonHelper.fromJson<CoSyncEnrolmentRecordEventsV1>(
                 json = it,
                 module = coSyncSerializationModule,
-                type = object : TypeReference<CoSyncEnrolmentRecordEvents>() {},
+                type = object : TypeReference<CoSyncEnrolmentRecordEventsV1>() {},
             )
+            v1Events.toDomain()
         } catch (e: Exception) {
             Simber.e("Error while parsing subjectActions", e)
             null
@@ -267,16 +270,16 @@ internal class CommCareIdentityDataSource @Inject constructor(
 
     private val coSyncSerializationModule = SimpleModule().apply {
         addSerializer(
-            TokenizableString::class.java,
-            TokenizationClassNameSerializer(),
+            TokenizableStringV1::class.java,
+            TokenizableStringV1Serializer(),
         )
         addDeserializer(
-            TokenizableString::class.java,
-            TokenizationClassNameDeserializer(),
+            TokenizableStringV1::class.java,
+            TokenizableStringV1Deserializer(),
         )
         addDeserializer(
-            EnrolmentRecordCreationEvent::class.java,
-            CoSyncEnrolmentRecordCreationEventDeserializer(),
+            CoSyncEnrolmentRecordCreationEventV1::class.java,
+            CoSyncEnrolmentRecordCreationEventV1Deserializer(),
         )
     }
 

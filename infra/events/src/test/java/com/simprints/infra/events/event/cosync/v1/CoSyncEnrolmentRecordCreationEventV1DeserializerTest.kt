@@ -1,18 +1,16 @@
-package com.simprints.infra.events.event.cosync
+package com.simprints.infra.events.event.cosync.v1
 
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.infra.events.event.domain.models.subject.BiometricReference
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class CoSyncEnrolmentRecordCreationEventDeserializerTest {
-    private val deserializer = CoSyncEnrolmentRecordCreationEventDeserializer()
+class CoSyncEnrolmentRecordCreationEventV1DeserializerTest {
+    private val deserializer = CoSyncEnrolmentRecordCreationEventV1Deserializer()
     private val objectMapper = ObjectMapper()
 
     @Test
@@ -21,7 +19,7 @@ class CoSyncEnrolmentRecordCreationEventDeserializerTest {
         val parser = objectMapper.createParser(json)
         val context = mockk<DeserializationContext>()
         every {
-            context.readTreeAsValue<List<BiometricReference>>(
+            context.readTreeAsValue<List<BiometricReferenceV1>>(
                 any<JsonNode>(),
                 any<JavaType>(),
             )
@@ -32,21 +30,21 @@ class CoSyncEnrolmentRecordCreationEventDeserializerTest {
         assertEquals(EVENT_ID, result.id)
         assertEquals(SUBJECT_ID, result.payload.subjectId)
         assertEquals(PROJECT_ID, result.payload.projectId)
-        assertEquals(TokenizableString.Raw(MODULE_ID), result.payload.moduleId)
-        assertEquals(TokenizableString.Raw(ATTENDANT_ID), result.payload.attendantId)
-        assertEquals(emptyList<BiometricReference>(), result.payload.biometricReferences)
+        assertEquals(TokenizableStringV1.Raw(MODULE_ID), result.payload.moduleId)
+        assertEquals(TokenizableStringV1.Raw(ATTENDANT_ID), result.payload.attendantId)
+        assertEquals(emptyList<BiometricReferenceV1>(), result.payload.biometricReferences)
     }
 
     @Test
-    fun `deserialize handles new format with TokenizableString`() {
+    fun `deserialize handles new format with TokenizableStringV1`() {
         val json = JSON_TEMPLATE.format(TOKENIZED_MODULE, RAW_ATTENDANT)
         val parser = objectMapper.createParser(json)
         val context = mockk<DeserializationContext>()
         every {
-            context.readTreeAsValue(any(), TokenizableString::class.java)
-        } returns TokenizableString.Tokenized(ENCRYPTED_MODULE) andThen TokenizableString.Raw(UNENCRYPTED_ATTENDANT)
+            context.readTreeAsValue(any(), TokenizableStringV1::class.java)
+        } returns TokenizableStringV1.Tokenized(ENCRYPTED_MODULE) andThen TokenizableStringV1.Raw(UNENCRYPTED_ATTENDANT)
         every {
-            context.readTreeAsValue<List<BiometricReference>>(
+            context.readTreeAsValue<List<BiometricReferenceV1>>(
                 any<JsonNode>(),
                 any<JavaType>(),
             )
@@ -57,21 +55,21 @@ class CoSyncEnrolmentRecordCreationEventDeserializerTest {
         assertEquals(EVENT_ID, result.id)
         assertEquals(SUBJECT_ID, result.payload.subjectId)
         assertEquals(PROJECT_ID, result.payload.projectId)
-        assertEquals(TokenizableString.Tokenized(ENCRYPTED_MODULE), result.payload.moduleId)
-        assertEquals(TokenizableString.Raw(UNENCRYPTED_ATTENDANT), result.payload.attendantId)
-        assertEquals(emptyList<BiometricReference>(), result.payload.biometricReferences)
+        assertEquals(TokenizableStringV1.Tokenized(ENCRYPTED_MODULE), result.payload.moduleId)
+        assertEquals(TokenizableStringV1.Raw(UNENCRYPTED_ATTENDANT), result.payload.attendantId)
+        assertEquals(emptyList<BiometricReferenceV1>(), result.payload.biometricReferences)
     }
 
     @Test
-    fun `deserialize handles new format with TokenizableString but without explicit class`() {
+    fun `deserialize handles new format with TokenizableStringV1 but without explicit class`() {
         val json = JSON_TEMPLATE.format(TOKENIZED_MODULE_NO_CLASS, RAW_ATTENDANT_NO_CLASS)
         val parser = objectMapper.createParser(json)
         val context = mockk<DeserializationContext>()
         every {
-            context.readTreeAsValue(any(), TokenizableString::class.java)
-        } returns TokenizableString.Raw(ENCRYPTED_MODULE) andThen TokenizableString.Raw(UNENCRYPTED_ATTENDANT)
+            context.readTreeAsValue(any(), TokenizableStringV1::class.java)
+        } returns TokenizableStringV1.Raw(ENCRYPTED_MODULE) andThen TokenizableStringV1.Raw(UNENCRYPTED_ATTENDANT)
         every {
-            context.readTreeAsValue<List<BiometricReference>>(
+            context.readTreeAsValue<List<BiometricReferenceV1>>(
                 any<JsonNode>(),
                 any<JavaType>(),
             )
@@ -82,9 +80,9 @@ class CoSyncEnrolmentRecordCreationEventDeserializerTest {
         assertEquals(EVENT_ID, result.id)
         assertEquals(SUBJECT_ID, result.payload.subjectId)
         assertEquals(PROJECT_ID, result.payload.projectId)
-        assertEquals(TokenizableString.Raw(ENCRYPTED_MODULE), result.payload.moduleId)
-        assertEquals(TokenizableString.Raw(UNENCRYPTED_ATTENDANT), result.payload.attendantId)
-        assertEquals(emptyList<BiometricReference>(), result.payload.biometricReferences)
+        assertEquals(TokenizableStringV1.Raw(ENCRYPTED_MODULE), result.payload.moduleId)
+        assertEquals(TokenizableStringV1.Raw(UNENCRYPTED_ATTENDANT), result.payload.attendantId)
+        assertEquals(emptyList<BiometricReferenceV1>(), result.payload.biometricReferences)
     }
 
     companion object {
