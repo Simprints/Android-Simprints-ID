@@ -1,8 +1,8 @@
 package com.simprints.feature.dashboard.settings.syncinfo.moduleselection
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import androidx.test.ext.junit.runners.*
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
@@ -10,23 +10,17 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.excepti
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.TooManyModulesSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.ModuleRepository
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
 import org.junit.Before
 import org.junit.Rule
@@ -45,9 +39,6 @@ class ModuleSelectionViewModelTest {
     private lateinit var repository: ModuleRepository
 
     @MockK
-    private lateinit var eventSyncManager: EventSyncManager
-
-    @MockK
     private lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
@@ -55,9 +46,6 @@ class ModuleSelectionViewModelTest {
 
     @MockK
     private lateinit var tokenizationProcessor: TokenizationProcessor
-
-    @MockK
-    private lateinit var authStore: AuthStore
 
     @MockK
     private lateinit var project: Project
@@ -79,8 +67,7 @@ class ModuleSelectionViewModelTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general.settingsPassword } returns SettingsPasswordConfig.Locked("1234")
         }
-        every { authStore.signedInProjectId } returns PROJECT_ID
-        coEvery { configManager.getProject(PROJECT_ID) } returns project
+        coEvery { configManager.getProject() } returns project
         modulesDefault.forEach {
             coEvery {
                 tokenizationProcessor.decrypt(
@@ -92,7 +79,6 @@ class ModuleSelectionViewModelTest {
         }
 
         viewModel = ModuleSelectionViewModel(
-            authStore = authStore,
             moduleRepository = repository,
             syncOrchestrator = syncOrchestrator,
             configManager = configManager,

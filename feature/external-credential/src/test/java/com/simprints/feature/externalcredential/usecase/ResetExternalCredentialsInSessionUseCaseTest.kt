@@ -50,7 +50,7 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { configManager.getProject(PROJECT_ID) } returns project
+        coEvery { configManager.getProject() } returns project
 
         useCase = ResetExternalCredentialsInSessionUseCase(
             enrolmentRecordRepository = enrolmentRecordRepository,
@@ -66,7 +66,7 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
     fun `invokes enrolment repository with correct update action`() = runTest {
         coEvery { eventRepository.getEventsInCurrentSession() } returns emptyList()
 
-        useCase(PROJECT_ID, scannedCredential, SUBJECT_ID)
+        useCase(scannedCredential, SUBJECT_ID)
 
         val actionsSlot = slot<List<SubjectAction>>()
         coVerify { enrolmentRecordRepository.performActions(capture(actionsSlot), project) }
@@ -84,7 +84,7 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
     fun `adds correct external credential to subject`() = runTest {
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf()
 
-        useCase(PROJECT_ID, scannedCredential, SUBJECT_ID)
+        useCase(scannedCredential, SUBJECT_ID)
 
         val actionsSlot = slot<List<SubjectAction>>()
         coVerify { enrolmentRecordRepository.performActions(capture(actionsSlot), project) }
@@ -96,6 +96,17 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
     }
 
     @Test
+    fun `handles missing project`() = runTest {
+        clearMocks(configManager)
+        coEvery { configManager.getProject() } returns null
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf()
+
+        useCase(scannedCredential, SUBJECT_ID)
+
+        coVerify(exactly = 0) { enrolmentRecordRepository.performActions(any(), any()) }
+    }
+
+    @Test
     fun `removes correct external credential to subject`() = runTest {
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
             enrolmentUpdateEvent("subject-1", listOf("credentia-1")),
@@ -104,7 +115,6 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
         useCase(
             scannedCredential = scannedCredential,
             subjectId = SUBJECT_ID,
-            projectId = PROJECT_ID,
         )
 
         val actionsSlot = slot<List<SubjectAction>>()
@@ -132,7 +142,6 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
         useCase(
             scannedCredential = scannedCredential,
             subjectId = SUBJECT_ID,
-            projectId = PROJECT_ID,
         )
 
         coEvery { eventRepository.deleteEvents(match { it.size == 1 }) }
@@ -143,7 +152,6 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
         useCase(
             scannedCredential = scannedCredential,
             subjectId = "none_selected",
-            projectId = PROJECT_ID,
         )
 
         val actionsSlot = slot<List<SubjectAction>>()
@@ -154,8 +162,8 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
 
     @Test
     fun `retrieves project using correct project id`() = runTest {
-        useCase(PROJECT_ID, scannedCredential, SUBJECT_ID)
-        coVerify { configManager.getProject(PROJECT_ID) }
+        useCase(scannedCredential, SUBJECT_ID)
+        coVerify { configManager.getProject() }
     }
 
     private fun enrolmentUpdateEvent(
@@ -174,7 +182,6 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
     )
 
     companion object {
-        private const val PROJECT_ID = "projectId"
         private const val SUBJECT_ID = "bbaa8ff3-34f7-41d3-a6c9-ff3b952d832e"
         private val CREDENTIAL = "credential".asTokenizableEncrypted()
         private val CREDENTIAL_TYE = ExternalCredentialType.NHISCard

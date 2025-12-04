@@ -353,7 +353,7 @@ internal class EventSyncMasterWorkerTest {
         projectState: ProjectState,
         syncConfig: Frequency,
     ): ListenableWorker.Result {
-        coEvery { configManager.getProject(any()).state } returns projectState
+        coEvery { configManager.getProject()?.state } returns projectState
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { projectId } returns "projectId"
             every { synchronization } returns mockk {

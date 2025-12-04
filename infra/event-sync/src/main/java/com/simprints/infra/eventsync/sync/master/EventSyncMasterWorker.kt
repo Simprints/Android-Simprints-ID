@@ -18,11 +18,11 @@ import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
-import com.simprints.infra.eventsync.sync.down.CommCareEventSyncWorkersBuilder
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.getAllSubjectsSyncWorkersInfo
 import com.simprints.infra.eventsync.sync.common.getUniqueSyncId
 import com.simprints.infra.eventsync.sync.common.sortByScheduledTime
+import com.simprints.infra.eventsync.sync.down.CommCareEventSyncWorkersBuilder
 import com.simprints.infra.eventsync.sync.down.SimprintsEventDownSyncWorkersBuilder
 import com.simprints.infra.eventsync.sync.up.EventUpSyncWorkersBuilder
 import com.simprints.infra.logging.Simber
@@ -161,8 +161,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
     }
 
     private suspend fun isEventDownSyncAllowed(configuration: ProjectConfiguration): Boolean {
-        val isProjectPaused =
-            configManager.getProject(configuration.projectId).state == ProjectState.PROJECT_PAUSED
+        val isProjectPaused = configManager.getProject()?.state == ProjectState.PROJECT_PAUSED
         val isSimprintsDownSyncEnabled = configuration.isSimprintsEventDownSyncAllowed()
         val isCommCareDownSyncEnabled = configuration.isCommCareEventDownSyncAllowed()
 

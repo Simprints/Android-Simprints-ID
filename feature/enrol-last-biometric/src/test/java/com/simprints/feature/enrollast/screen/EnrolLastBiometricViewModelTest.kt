@@ -161,6 +161,25 @@ internal class EnrolLastBiometricViewModelTest {
     }
 
     @Test
+    fun `returns failure when project is not available`() = runTest {
+        coEvery { configManager.getProject() } returns null
+        viewModel.enrolBiometric(
+            createParams(
+                listOf(
+                    EnrolLastBiometricStepResult.EnrolLastBiometricsResult(null),
+                ),
+            ),
+            isAddingCredential = false,
+        )
+
+        val result = viewModel.finish
+            .test()
+            .value()
+            .getContentIfNotHandled() as EnrolLastState.Failed
+        assertThat(result.errorType).isEqualTo(EnrolLastState.ErrorType.GENERAL_ERROR)
+    }
+
+    @Test
     fun `returns failure when has previous enrolment without subject`() = runTest {
         viewModel.enrolBiometric(
             createParams(
@@ -276,7 +295,7 @@ internal class EnrolLastBiometricViewModelTest {
     fun `shows add credential dialog when scanned credential is linked to another subject`() = runTest {
         val decryptedCredential = "decryptedCredential".asTokenizableRaw()
         coEvery { enrolmentRecordRepository.load(any()) } returns listOf(subject)
-        coEvery { configManager.getProject(PROJECT_ID) } returns project
+        coEvery { configManager.getProject() } returns project
         coEvery {
             tokenizationProcessor.decrypt(
                 encrypted = scannedCredential.credential,
@@ -309,7 +328,7 @@ internal class EnrolLastBiometricViewModelTest {
     fun `add credential dialog is not shown when there is no result`() = runTest {
         val decryptedCredential = "decryptedCredential".asTokenizableRaw()
         coEvery { enrolmentRecordRepository.load(any()) } returns listOf(subject)
-        coEvery { configManager.getProject(PROJECT_ID) } returns project
+        coEvery { configManager.getProject() } returns project
         coEvery {
             tokenizationProcessor.decrypt(
                 encrypted = scannedCredential.credential,
@@ -327,7 +346,7 @@ internal class EnrolLastBiometricViewModelTest {
     fun `add credential dialog is not shown when there are no credentials`() = runTest {
         val decryptedCredential = "decryptedCredential".asTokenizableRaw()
         coEvery { enrolmentRecordRepository.load(any()) } returns listOf(subject)
-        coEvery { configManager.getProject(PROJECT_ID) } returns project
+        coEvery { configManager.getProject() } returns project
         coEvery {
             tokenizationProcessor.decrypt(
                 encrypted = scannedCredential.credential,
@@ -350,7 +369,7 @@ internal class EnrolLastBiometricViewModelTest {
     fun `add credential dialog is not shown when credential is already linked to same subject`() = runTest {
         val decryptedCredential = "decryptedCredential".asTokenizableRaw()
         coEvery { enrolmentRecordRepository.load(any()) } returns listOf(subject)
-        coEvery { configManager.getProject(PROJECT_ID) } returns project
+        coEvery { configManager.getProject() } returns project
         coEvery {
             tokenizationProcessor.decrypt(
                 encrypted = scannedCredential.credential,

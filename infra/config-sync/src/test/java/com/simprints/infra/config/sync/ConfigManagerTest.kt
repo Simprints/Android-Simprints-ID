@@ -1,6 +1,7 @@
 package com.simprints.infra.config.sync
 
 import com.google.common.truth.Truth.*
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.Project
@@ -38,6 +39,9 @@ class ConfigManagerTest {
     private lateinit var configSyncCache: ConfigSyncCache
 
     @MockK
+    private lateinit var authStore: AuthStore
+
+    @MockK
     private lateinit var projectWithConfig: ProjectWithConfig
 
     @MockK
@@ -56,6 +60,7 @@ class ConfigManagerTest {
             configRepository = configRepository,
             enrolmentRecordRepository = enrolmentRecordRepository,
             configSyncCache = configSyncCache,
+            authStore = authStore,
         )
     }
 
@@ -73,16 +78,26 @@ class ConfigManagerTest {
     fun `getProject should call the correct method`() = runTest {
         coEvery { configRepository.getProject() } returns project
 
-        val gottenProject = configManager.getProject(PROJECT_ID)
+        val gottenProject = configManager.getProject()
         assertThat(gottenProject).isEqualTo(project)
     }
 
     @Test
     fun `getProject should call the refresh method when cannot get from local`() = runTest {
+        every { authStore.signedInProjectId } returns PROJECT_ID
         coEvery { configRepository.getProject() } throws NoSuchElementException()
 
-        configManager.getProject(PROJECT_ID)
+        configManager.getProject()
         coVerify(exactly = 1) { configRepository.refreshProject(PROJECT_ID) }
+    }
+
+    @Test
+    fun `getProject should returns null when refresh fails`() = runTest {
+        every { authStore.signedInProjectId } returns ""
+        coEvery { configRepository.getProject() } throws NoSuchElementException()
+        coEvery { configRepository.refreshProject(any()) } throws NoSuchElementException()
+
+        assertThat(configManager.getProject()).isNull()
     }
 
     @Test
@@ -97,6 +112,17 @@ class ConfigManagerTest {
     @Test
     fun `getProjectConfiguration return default config if not logged in`() = runTest {
         every { projectConfiguration.projectId } returns ""
+        every { authStore.signedInProjectId } returns ""
+        coEvery { configRepository.getProjectConfiguration() } returns projectConfiguration
+
+        val gottenProjectConfiguration = configManager.getProjectConfiguration()
+        assertThat(gottenProjectConfiguration).isEqualTo(projectConfiguration)
+    }
+
+    @Test
+    fun `getProjectConfiguration return default config refresh fails`() = runTest {
+        every { projectConfiguration.projectId } returns ""
+        every { authStore.signedInProjectId } returns "projectId"
         coEvery { configRepository.getProjectConfiguration() } returns projectConfiguration
         coEvery { configRepository.refreshProject(any()) } throws Exception()
 

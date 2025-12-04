@@ -18,7 +18,7 @@ import com.simprints.feature.externalcredential.screens.search.model.SearchCrede
 import com.simprints.feature.externalcredential.screens.search.model.SearchState
 import com.simprints.feature.externalcredential.screens.search.usecase.MatchCandidatesUseCase
 import com.simprints.feature.externalcredential.usecase.ExternalCredentialEventTrackerUseCase
-import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
@@ -35,7 +35,6 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
     @Assisted val scannedCredential: ScannedCredential,
     @Assisted val externalCredentialParams: ExternalCredentialParams,
     private val timeHelper: TimeHelper,
-    private val authStore: AuthStore,
     private val configManager: ConfigManager,
     private val matchCandidatesUseCase: MatchCandidatesUseCase,
     private val tokenizationProcessor: TokenizationProcessor,
@@ -70,8 +69,10 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
-            decryptCredentialToDisplay(scannedCredential.credential)
-            searchSubjectsLinkedToCredential(scannedCredential.credential)
+            configManager.getProject()?.let {
+                decryptCredentialToDisplay(it, scannedCredential.credential)
+                searchSubjectsLinkedToCredential(it, scannedCredential.credential)
+            }
         }
     }
 
@@ -81,22 +82,23 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
 
     fun confirmCredentialUpdate(updatedCredential: TokenizableString.Raw) {
         viewModelScope.launch {
-            val project = configManager.getProject(authStore.signedInProjectId)
-            val encryptedCredential = tokenizationProcessor.encrypt(
-                decrypted = updatedCredential,
-                tokenKeyType = TokenKeyType.ExternalCredential,
-                project = project,
-            ) as TokenizableString.Tokenized
-            updateState { currentState ->
-                currentState.copy(
-                    isConfirmed = false,
-                    scannedCredential = currentState.scannedCredential.copy(
-                        credential = encryptedCredential,
-                    ),
-                    displayedCredential = updatedCredential,
-                )
+            configManager.getProject()?.let { project ->
+                val encryptedCredential = tokenizationProcessor.encrypt(
+                    decrypted = updatedCredential,
+                    tokenKeyType = TokenKeyType.ExternalCredential,
+                    project = project,
+                ) as TokenizableString.Tokenized
+                updateState { currentState ->
+                    currentState.copy(
+                        isConfirmed = false,
+                        scannedCredential = currentState.scannedCredential.copy(
+                            credential = encryptedCredential,
+                        ),
+                        displayedCredential = updatedCredential,
+                    )
+                }
+                searchSubjectsLinkedToCredential(project, encryptedCredential)
             }
-            searchSubjectsLinkedToCredential(encryptedCredential)
         }
     }
 
@@ -122,8 +124,10 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         }
     }
 
-    private suspend fun decryptCredentialToDisplay(credential: TokenizableString.Tokenized) {
-        val project = configManager.getProject(authStore.signedInProjectId)
+    private fun decryptCredentialToDisplay(
+        project: Project,
+        credential: TokenizableString.Tokenized,
+    ) {
         val decrypted = tokenizationProcessor.decrypt(
             encrypted = credential,
             tokenKeyType = TokenKeyType.ExternalCredential,
@@ -132,9 +136,11 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         updateState { it.copy(displayedCredential = decrypted) }
     }
 
-    private suspend fun searchSubjectsLinkedToCredential(credential: TokenizableString.Tokenized) {
+    private suspend fun searchSubjectsLinkedToCredential(
+        project: Project,
+        credential: TokenizableString.Tokenized,
+    ) {
         updateState { it.copy(searchState = SearchState.Searching) }
-        val project = configManager.getProject(authStore.signedInProjectId)
         val candidates = enrolmentRecordRepository.load(SubjectQuery(projectId = project.id, externalCredential = credential))
 
         val startTime = timeHelper.now()

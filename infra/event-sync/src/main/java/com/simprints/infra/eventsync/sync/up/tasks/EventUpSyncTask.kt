@@ -70,7 +70,7 @@ internal class EventUpSyncTask @Inject constructor(
             }
         }
 
-        val project = configManager.getProject(operation.projectId)
+        val project = configManager.getProject() ?: throw IllegalStateException("Project is missing")
         val config = configManager.getProjectConfiguration()
         var lastOperation = operation.copy()
         var isUsefulUpload = false

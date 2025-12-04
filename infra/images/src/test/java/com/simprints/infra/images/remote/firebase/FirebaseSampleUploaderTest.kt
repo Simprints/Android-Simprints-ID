@@ -91,7 +91,7 @@ class FirebaseSampleUploaderTest {
     }
 
     @Test
-    fun `null project returns failed upload`() = runTest {
+    fun `null project ID returns failed upload`() = runTest {
         every { authStore.getLegacyAppFallback().options.projectId } returns null
 
         val result = remoteDataSource.uploadAllSamples(PROJECT_ID)
@@ -100,8 +100,18 @@ class FirebaseSampleUploaderTest {
     }
 
     @Test
-    fun `empty project returns failed upload`() = runTest {
+    fun `empty project ID returns failed upload`() = runTest {
         every { authStore.getLegacyAppFallback().options.projectId } returns ""
+
+        val result = remoteDataSource.uploadAllSamples(PROJECT_ID)
+
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun `null project returns failed upload`() = runTest {
+        every { authStore.getLegacyAppFallback().options.projectId } returns "projectId"
+        coEvery { configManager.getProject() } returns null
 
         val result = remoteDataSource.uploadAllSamples(PROJECT_ID)
 
@@ -207,7 +217,7 @@ class FirebaseSampleUploaderTest {
     }
 
     private fun setupProjectConfig() {
-        coEvery { configManager.getProject(any()).imageBucket } returns "gs://`simprints-dev.appspot.com"
+        coEvery { configManager.getProject()?.imageBucket } returns "gs://`simprints-dev.appspot.com"
         every { authStore.getLegacyAppFallback().options.projectId } returns "projectId"
         every { authStore.signedInProjectId } returns "projectId"
     }

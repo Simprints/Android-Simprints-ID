@@ -22,7 +22,6 @@ import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
 import com.simprints.feature.clientapi.usecases.GetEnrolmentCreationEventForSubjectUseCase
 import com.simprints.feature.clientapi.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.usecases.SimpleEventReporter
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
@@ -55,7 +54,6 @@ class ClientApiViewModel @Inject internal constructor(
     private val getEnrolmentCreationEventForSubject: GetEnrolmentCreationEventForSubjectUseCase,
     private val deleteSessionEventsIfNeeded: DeleteSessionEventsIfNeededUseCase,
     private val isFlowCompletedWithError: IsFlowCompletedWithErrorUseCase,
-    private val authStore: AuthStore,
     private val configManager: ConfigManager,
     private val timeHelper: TimeHelper,
     private val persistentLogger: PersistentLogger,
@@ -73,7 +71,7 @@ class ClientApiViewModel @Inject internal constructor(
         get() = _showAlert
     private val _showAlert = MutableLiveData<LiveDataEventWithContent<ClientApiError>>()
 
-    private suspend fun getProject() = runCatching { configManager.getProject(authStore.signedInProjectId) }.getOrNull()
+    private suspend fun getProject() = runCatching { configManager.getProject() }.getOrNull()
 
     suspend fun handleIntent(
         action: String,

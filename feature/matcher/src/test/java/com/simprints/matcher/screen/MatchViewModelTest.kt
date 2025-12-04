@@ -10,7 +10,6 @@ import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
@@ -58,9 +57,6 @@ internal class MatchViewModelTest {
     lateinit var timeHelper: TimeHelper
 
     @MockK
-    lateinit var authStore: AuthStore
-
-    @MockK
     lateinit var configManager: ConfigManager
 
     private lateinit var cb1: CapturingSlot<(Int) -> Unit>
@@ -78,7 +74,6 @@ internal class MatchViewModelTest {
             faceMatcherUseCase,
             fingerprintMatcherUseCase,
             saveMatchEvent,
-            authStore,
             configManager,
             timeHelper,
         )

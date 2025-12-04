@@ -8,7 +8,6 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.CalculateLevenshteinDistanceUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
@@ -30,9 +29,6 @@ class ExternalCredentialEventTrackerUseCaseTest {
     private lateinit var timeHelper: TimeHelper
 
     @MockK
-    private lateinit var authStore: AuthStore
-
-    @MockK
     private lateinit var configManager: ConfigManager
 
     @MockK
@@ -51,7 +47,6 @@ class ExternalCredentialEventTrackerUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
         useCase = ExternalCredentialEventTrackerUseCase(
             timeHelper = timeHelper,
-            authStore = authStore,
             configManager = configManager,
             tokenizationProcessor = tokenizationProcessor,
             eventRepository = eventRepository,
@@ -60,8 +55,7 @@ class ExternalCredentialEventTrackerUseCaseTest {
 
         every { timeHelper.now() } returns END_TIME
 
-        coEvery { authStore.signedInProjectId } returns ""
-        coEvery { configManager.getProject(any()) } returns mockk()
+        coEvery { configManager.getProject() } returns mockk()
         coEvery {
             tokenizationProcessor.decrypt(any(), TokenKeyType.ExternalCredential, any())
         } returns RAW_SCANNED_VALUE.asTokenizableRaw()
@@ -91,6 +85,21 @@ class ExternalCredentialEventTrackerUseCaseTest {
             assertThat(payload.autoCaptureEndTime).isEqualTo(SCAN_END_TIME)
             assertThat(payload.ocrErrorCount).isEqualTo(DEFAULT_DISTANCE)
             assertThat(payload.capturedTextLength).isEqualTo(RAW_SCANNED_VALUE.length)
+        }
+    }
+
+    @Test
+    fun `saveCaptureEvents should handle missing project in capture events`() = runTest {
+        clearMocks(configManager)
+        coEvery { configManager.getProject() } returns null
+
+        val scannedCredential = makeScannedCredential(ExternalCredentialType.QRCode)
+        useCase.saveCaptureEvents(START_TIME, SUBJECT_ID, scannedCredential, SELECTION_ID)
+
+        val captureEventSlot = slot<ExternalCredentialCaptureEvent>()
+        coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
+        with(captureEventSlot.captured) {
+            assertThat(payload.ocrErrorCount).isEqualTo(0)
         }
     }
 

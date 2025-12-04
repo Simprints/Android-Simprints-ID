@@ -13,7 +13,6 @@ dependencies {
     implementation(project(":infra:ui-base"))
     implementation(project(":feature:exit-form"))
     implementation(project(":infra:enrolment-records:repository"))
-    implementation(project(":infra:auth-store"))
     implementation(project(":infra:matching"))
     implementation(project(":infra:events"))
     implementation(project(":infra:credential-store"))

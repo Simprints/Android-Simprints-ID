@@ -52,9 +52,21 @@ class ImageDistortionConfigRemoteRepoTest {
     }
 
     @Test
+    fun `uploadConfig returns false when project is missing`() = runTest {
+        every { authStore.getCoreApp().options.projectId } returns "firebaseProject"
+        every { authStore.signedInProjectId } returns PROJECT_ID
+        coEvery { configManager.getProject() } returns null
+
+        val result = repo.uploadConfig(UN20_SERIAL_NUMBER, byteArrayOf())
+
+        Truth.assertThat(result).isFalse()
+    }
+
+    @Test
     fun `uploadConfig returns true when file is already uploaded`() = runTest {
         val mockFileRef: StorageReference = mockk(relaxed = true)
         setupMockFirebase(mockFileRef)
+        coEvery { configManager.getProject()?.imageBucket } returns BUCKET_URL
 
         coEvery { mockFileRef.metadata.await() } returns mockk()
         val result = repo.uploadConfig(UN20_SERIAL_NUMBER, byteArrayOf())
@@ -68,6 +80,7 @@ class ImageDistortionConfigRemoteRepoTest {
             every { task.isSuccessful } returns true
         }
         setupMockFirebase(mockFileRef)
+        coEvery { configManager.getProject()?.imageBucket } returns BUCKET_URL
         coEvery { mockFileRef.metadata.await() } throws mockk<StorageException> {
             every { errorCode } returns StorageException.ERROR_OBJECT_NOT_FOUND
         }
@@ -87,6 +100,7 @@ class ImageDistortionConfigRemoteRepoTest {
         }
 
         setupMockFirebase(mockFileRef)
+        coEvery { configManager.getProject()?.imageBucket } returns BUCKET_URL
         coEvery { mockFileRef.putBytes(any()).await() } returns mockUploadTask
         coEvery { mockFileRef.metadata.await() } throws mockk<StorageException> {
             every { errorCode } returns StorageException.ERROR_OBJECT_NOT_FOUND
@@ -97,16 +111,14 @@ class ImageDistortionConfigRemoteRepoTest {
     }
 
     private fun setupMockFirebase(fileRef: StorageReference) {
-        val bucketUrl = "bucket123"
         every { authStore.getCoreApp().options.projectId } returns "firebaseProject"
         every { authStore.signedInProjectId } returns PROJECT_ID
-        coEvery { configManager.getProject(PROJECT_ID).imageBucket } returns bucketUrl
 
         val mockRootRef: StorageReference = mockk()
         mockkStatic(FirebaseStorage::class)
         mockkStatic("kotlinx.coroutines.tasks.TasksKt")
         every {
-            FirebaseStorage.getInstance(any(), bucketUrl).reference
+            FirebaseStorage.getInstance(any(), BUCKET_URL).reference
         } returns mockRootRef
         every { mockRootRef.child("$PROJECTS_FOLDER/$PROJECT_ID/$UN20_MODULES_FOLDER/$UN20_SERIAL_NUMBER/$FILE_NAME") } returns fileRef
     }
@@ -116,6 +128,7 @@ class ImageDistortionConfigRemoteRepoTest {
         private const val UN20_MODULES_FOLDER = "un20modules"
         private const val UN20_SERIAL_NUMBER = "serial123"
         private const val PROJECT_ID = "project123"
+        private const val BUCKET_URL = "bucket123"
         private const val FILE_NAME = "calibration.dat"
     }
 }

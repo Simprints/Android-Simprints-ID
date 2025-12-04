@@ -9,7 +9,6 @@ import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.screens.scanqr.usecase.ExternalCredentialQrCodeValidatorUseCase
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
@@ -39,9 +38,6 @@ internal class ExternalCredentialScanQrViewModelTest {
     private lateinit var tokenizationProcessor: TokenizationProcessor
 
     @MockK
-    private lateinit var authStore: AuthStore
-
-    @MockK
     private lateinit var configManager: ConfigManager
 
     private lateinit var viewModel: ExternalCredentialScanQrViewModel
@@ -54,7 +50,6 @@ internal class ExternalCredentialScanQrViewModelTest {
             externalCredentialQrCodeValidator = validator,
             tokenizationProcessor = tokenizationProcessor,
             configManager = configManager,
-            authStore = authStore,
         )
 
         every { timeHelper.now() } returns Timestamp(1L)
@@ -74,15 +69,24 @@ internal class ExternalCredentialScanQrViewModelTest {
     }
 
     @Test
+    fun `updateCapturedValue with missing project`() = runTest {
+        val observer = viewModel.stateLiveData.test()
+        val value = "value"
+
+        coEvery { configManager.getProject() } returns null
+        viewModel.updateCapturedValue(value)
+
+        assertThat(observer.value()).isEqualTo(ScanQrState.ReadyToScan)
+    }
+
+    @Test
     fun `updateCapturedValue with non-null sets QrCodeCaptured`() = runTest {
         val observer = viewModel.stateLiveData.test()
         val value = "value"
-        val projectId = "projectId"
         val mockProject = mockk<Project>()
         val mockTokenizedCredential = mockk<TokenizableString.Tokenized>()
 
-        every { authStore.signedInProjectId } returns projectId
-        coEvery { configManager.getProject(projectId) } returns mockProject
+        coEvery { configManager.getProject() } returns mockProject
         coEvery { tokenizationProcessor.encrypt(any(), TokenKeyType.ExternalCredential, mockProject) } returns mockTokenizedCredential
 
         viewModel.updateCameraPermissionStatus(permissionStatus = PermissionStatus.Granted) // inits the capture timing

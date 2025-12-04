@@ -1,5 +1,6 @@
 package com.simprints.infra.config.sync
 
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.DeviceState
@@ -20,6 +21,7 @@ class ConfigManager @Inject constructor(
     private val configRepository: ConfigRepository,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val configSyncCache: ConfigSyncCache,
+    private val authStore: AuthStore,
 ) {
     private val isProjectRefreshingFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
@@ -35,19 +37,30 @@ class ConfigManager @Inject constructor(
         }
     }
 
-    suspend fun getProject(projectId: String): Project = try {
+    suspend fun getProject(): Project? = try {
         configRepository.getProject()
     } catch (_: NoSuchElementException) {
-        refreshProject(projectId).project
+        val projectId = authStore.signedInProjectId
+        if (projectId.isEmpty()) {
+            null
+        } else {
+            try {
+                refreshProject(projectId).project
+            } catch (_: Exception) {
+                null
+            }
+        }
     }
 
     suspend fun getProjectConfiguration(): ProjectConfiguration {
         val localConfig = configRepository.getProjectConfiguration()
         // If projectId is empty, configuration hasn't been downloaded yet
         return if (localConfig.projectId.isEmpty()) {
+            val signedProjectId = authStore.signedInProjectId.takeUnless { it.isEmpty() } ?: return localConfig
+
             try {
                 // Try to refresh it with logged in projectId (if any)
-                refreshProject(configRepository.getProject().id).configuration
+                refreshProject(signedProjectId).configuration
             } catch (_: Exception) {
                 // If not logged in the above will fail. However we still depend on the 'default'
                 // configuration to create the session when login is attempted. Possibly in other
