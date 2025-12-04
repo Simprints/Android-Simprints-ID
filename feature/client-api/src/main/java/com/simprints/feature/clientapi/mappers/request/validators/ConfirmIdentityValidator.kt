@@ -6,7 +6,7 @@ import com.simprints.feature.clientapi.models.ClientApiError
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
+import com.simprints.infra.events.event.domain.models.IdentificationCallbackEvent
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SESSION
 import com.simprints.infra.logging.Simber
 

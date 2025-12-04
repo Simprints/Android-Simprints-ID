@@ -2,7 +2,7 @@ package com.simprints.infra.eventsync.event.remote.models.samples
 
 import androidx.annotation.Keep
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.events.event.domain.models.samples.SampleUpSyncRequestEvent
+import com.simprints.infra.events.event.domain.models.SampleUpSyncRequestEvent
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi

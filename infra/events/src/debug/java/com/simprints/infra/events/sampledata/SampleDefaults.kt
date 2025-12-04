@@ -6,7 +6,7 @@ import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.events.event.domain.models.callout.BiometricDataSource
+import com.simprints.infra.events.event.domain.models.BiometricDataSource
 import java.util.UUID
 
 object SampleDefaults {

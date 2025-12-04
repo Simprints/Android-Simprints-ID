@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteDatabase
 import androidx.annotation.Keep
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.json.JsonHelper
@@ -17,6 +16,7 @@ import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
 import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
+import kotlinx.serialization.Serializable
 
 internal class EventMigration10to11 : Migration(10, 11) {
     override fun migrate(db: SupportSQLiteDatabase) {
@@ -70,7 +70,7 @@ internal class EventMigration10to11 : Migration(10, 11) {
 
         val endedAt = event.payload.endedAt.takeIf { it > 0 }
 
-        val payloadJson = JsonHelper.toJson(
+        val payloadJson = JsonHelper.json.encodeToString(
             EventScopePayload(
                 // Other end causes have not been used for a long time so it is save to assume
                 // that all previous sessions ended with new session termination cause
@@ -97,10 +97,7 @@ internal class EventMigration10to11 : Migration(10, 11) {
         }
     }
 
-    private fun fromJsonToDomain(eventJson: String): OldSessionCaptureEvent = JsonHelper.fromJson(
-        json = eventJson,
-        type = object : TypeReference<OldSessionCaptureEvent>() {},
-    )
+    private fun fromJsonToDomain(eventJson: String): OldSessionCaptureEvent = JsonHelper.json.decodeFromString(eventJson)
 
     private fun deleteSessionCaptureEvents(database: SupportSQLiteDatabase) {
         database.execSQL(
@@ -127,17 +124,20 @@ internal class EventMigration10to11 : Migration(10, 11) {
     // Snapshot of the session capture event structure at the moment when this migration was
     // introduced. This is needed to be able to parse the old events from the database.
     @Keep
+    @Serializable
     internal data class OldSessionCaptureEvent(
         val id: String,
         var labels: EventLabels,
         val payload: SessionCapturePayload,
     ) {
         @Keep
+        @Serializable
         data class EventLabels(
             val sessionId: String? = null,
         )
 
         @Keep
+        @Serializable
         data class SessionCapturePayload(
             var projectId: String,
             val createdAt: Long,

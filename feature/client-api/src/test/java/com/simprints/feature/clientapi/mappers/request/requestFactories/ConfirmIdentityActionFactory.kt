@@ -7,13 +7,11 @@ import com.simprints.feature.clientapi.mappers.request.extractors.ConfirmIdentit
 import com.simprints.feature.clientapi.mappers.request.validators.ConfirmIdentityValidator
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
+import com.simprints.infra.events.event.domain.models.IdentificationCallbackEvent
 import com.simprints.infra.orchestration.data.ActionConstants
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
 
 internal object ConfirmIdentityActionFactory : RequestActionFactory() {
     override fun getIdentifier() = ActionRequestIdentifier(

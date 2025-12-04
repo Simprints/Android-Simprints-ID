@@ -5,9 +5,14 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.BIOMETRIC_REFERENCE_CREATION
+import com.simprints.infra.events.event.domain.models.EventType.Companion.BIOMETRIC_REFERENCE_CREATION_KEY
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(BIOMETRIC_REFERENCE_CREATION_KEY)
 data class BiometricReferenceCreationEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: BiometricReferenceCreationPayload,
@@ -36,6 +41,8 @@ data class BiometricReferenceCreationEvent(
 
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>): Event = this
 
+    @Keep
+    @Serializable
     data class BiometricReferenceCreationPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,

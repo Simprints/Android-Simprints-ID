@@ -1,11 +1,11 @@
 package com.simprints.infra.eventsync.event.remote.models
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
-import io.mockk.mockk
+import com.simprints.infra.events.event.domain.models.FingerprintCaptureEvent
+import io.mockk.*
 import org.junit.Test
 
 class ApiFingerprintCapturePayloadTest {

@@ -5,11 +5,11 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEventV3.ConfirmationCalloutPayload
-import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEventV3.EnrolmentCalloutPayload
-import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEventV3.EnrolmentLastBiometricsCalloutPayload
-import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEventV3.IdentificationCalloutPayload
-import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEventV3.VerificationCalloutPayload
+import com.simprints.infra.events.event.domain.models.ConfirmationCalloutEventV3.ConfirmationCalloutPayload
+import com.simprints.infra.events.event.domain.models.EnrolmentCalloutEventV3.EnrolmentCalloutPayload
+import com.simprints.infra.events.event.domain.models.EnrolmentLastBiometricsCalloutEventV3.EnrolmentLastBiometricsCalloutPayload
+import com.simprints.infra.events.event.domain.models.IdentificationCalloutEventV3.IdentificationCalloutPayload
+import com.simprints.infra.events.event.domain.models.VerificationCalloutEventV3.VerificationCalloutPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
