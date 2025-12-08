@@ -12,6 +12,7 @@ import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.orchestration.data.responses.AppResponse
 import java.io.Serializable
 import javax.inject.Inject
+import kotlin.collections.take
 
 internal class CreateIdentifyResponseUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
@@ -23,30 +24,35 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
         val isMultiFactorIdEnabled = projectConfiguration.multifactorId?.allowedExternalCredentials?.isNotEmpty() ?: false
 
         val currentSessionId = eventRepository.getCurrentSessionScope().id
+        // Results from credential match sorted by highest score (Multi-Factor Identification).
+        // SDK is not considered, since we need to attach all credential-linked GUIDs. Duplicates are removed by GUID in the final list
+        val credentialResults = mapCredentialSearchResultsPerSdk(results, projectConfiguration).values.flatten()
+        // Return the 1:N matcher results with the highest confidence score
+        val matcherResults = getMatcherResults(results, projectConfiguration)
+        val identifications = (credentialResults + matcherResults)
+            .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
+            .distinctBy(AppMatchResult::guid)
         return AppIdentifyResponse(
             sessionId = currentSessionId,
             isMultiFactorIdEnabled = isMultiFactorIdEnabled,
-            // Return the results with the highest confidence score
-            identifications = getResults(results, projectConfiguration),
+            identifications = identifications,
         )
     }
 
     /**
-     * Combines all of the matching results per SDK and returns up to [maxNbOfReturnedCandidates] results from the SDK with
+     * Combines all of the 1:N matching results per SDK and returns up to [maxNbOfReturnedCandidates] results from the SDK with
      * the highest overall score in descending order. Credential matches take precedence over direct matches.
      *
      * If there are any matches of [AppMatchConfidence.HIGH], only those will be returned,
      * otherwise everything above [AppMatchConfidence.NONE] is returned.
      */
-    private fun getResults(
+    private fun getMatcherResults(
         results: List<Serializable>,
         projectConfiguration: ProjectConfiguration,
     ): List<AppMatchResult> {
-        val credentialResultsDescending = mapCredentialSearchResultsPerSdk(results, projectConfiguration)
         val matchResultResultsDescending = mapMatchResultsPerSdk(results, projectConfiguration)
 
-        return (credentialResultsDescending.keys + matchResultResultsDescending.keys)
-            .associateWith { credentialResultsDescending[it].orEmpty() + matchResultResultsDescending[it].orEmpty() }
+        return matchResultResultsDescending
             .filterValues { it.isNotEmpty() }
             .maxByOrNull { (_, values) -> values.maxOfOrNull { it.confidenceScore } ?: 0 }
             ?.let { (_, results) ->
@@ -55,8 +61,6 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
                 goodResults
                     .filter { it.matchConfidence == AppMatchConfidence.HIGH }
                     .ifEmpty { goodResults }
-                    .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
-                    .distinctBy(AppMatchResult::guid)
             }.orEmpty()
     }
 
@@ -72,7 +76,13 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
                 val policy = projectConfiguration.getModalitySdkConfig(sdk)?.decisionPolicy ?: return@mapNotNull null
                 val matchResult = credentialMatchResult.matchResult
 
-                sdk to AppMatchResult(matchResult.subjectId, matchResult.confidence, policy, true)
+                sdk to AppMatchResult(
+                    guid = matchResult.subjectId,
+                    confidenceScore = matchResult.confidence,
+                    decisionPolicy = policy,
+                    isCredentialMatch = true,
+                    verificationMatchThreshold = projectConfiguration.getModalitySdkConfig(sdk)?.verificationMatchThreshold,
+                )
             }
         }.groupDescendingResultsBySdk()
 
