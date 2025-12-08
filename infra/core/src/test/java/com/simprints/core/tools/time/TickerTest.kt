@@ -1,8 +1,7 @@
 package com.simprints.core.tools.time
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.drop
@@ -14,24 +13,23 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import kotlin.time.Duration.Companion.minutes
 
-class TickerImplTest {
+class TickerTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private lateinit var tickerImpl: TickerImpl
+    private lateinit var ticker: Ticker
 
     @Before
     fun setUp() {
-        MockKAnnotations.init(this, relaxed = true)
-
-        tickerImpl = TickerImpl()
+        ticker = Ticker()
     }
 
     @Test
-    fun testObserveTickOncePerMinute_emitsImmediately() = runTest {
-        val result = tickerImpl
-            .observeTickOncePerMinute()
+    fun testObserveTicks_emitsImmediately() = runTest {
+        val result = ticker
+            .observeTicks(1.minutes)
             .take(1)
             .toList()
 
@@ -40,9 +38,9 @@ class TickerImplTest {
     }
 
     @Test
-    fun testObserveTickOncePerMinute_emitsMultipleTimes() = runTest {
-        val result = tickerImpl
-            .observeTickOncePerMinute()
+    fun testObserveTicks_emitsMultipleTimes() = runTest {
+        val result = ticker
+            .observeTicks(1.minutes)
             .take(3)
             .toList()
 
@@ -51,8 +49,8 @@ class TickerImplTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun testObserveTickOncePerMinute_waitsForCorrectTime() = runTest {
-        val flow = tickerImpl.observeTickOncePerMinute()
+    fun testObserveTicks_waitsForCorrectTime() = runTest {
+        val flow = ticker.observeTicks(1.minutes)
 
         // 1st tick immediately
         assertThat(flow.first()).isEqualTo(Unit)
