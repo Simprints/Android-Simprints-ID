@@ -6,6 +6,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.feature.dashboard.R
+import com.simprints.infra.resources.R as IDR
 
 internal class ModuleCountViewHolder(
     itemView: View,
@@ -18,14 +19,13 @@ internal class ModuleCountViewHolder(
         moduleCount: ModuleCount,
         isFirstElementForTotalCount: Boolean,
     ) {
-        moduleItemIcon.setImageResource(
-            if (isFirstElementForTotalCount) {
-                R.drawable.ic_global
-            } else {
-                R.drawable.ic_module
-            },
-        )
-        moduleNameText.text = moduleCount.name
+        if (isFirstElementForTotalCount) {
+            moduleItemIcon.setImageResource(R.drawable.ic_global)
+            moduleNameText.setText(IDR.string.sync_info_total_records)
+        } else {
+            moduleItemIcon.setImageResource(R.drawable.ic_module)
+            moduleNameText.text = moduleCount.name
+        }
         moduleCountText.text = moduleCount.count.toString()
 
         if (isFirstElementForTotalCount) {

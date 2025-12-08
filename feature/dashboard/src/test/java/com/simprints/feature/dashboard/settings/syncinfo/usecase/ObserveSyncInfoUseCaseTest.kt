@@ -5,15 +5,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.lifecycle.AppForegroundStateTracker
 import com.simprints.core.tools.time.Ticker
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.feature.dashboard.settings.syncinfo.SyncInfoModuleCount
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
@@ -44,7 +41,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class ObserveSyncInfoUseCaseTest {
+internal class ObserveSyncInfoUseCaseTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -67,7 +64,6 @@ class ObserveSyncInfoUseCaseTest {
 
     private companion object {
         const val TEST_PROJECT_ID = "test_project_id"
-        const val TEST_USER_ID = "test_user_id"
         const val TEST_MODULE_NAME = "test_module"
         val TEST_TIMESTAMP = Timestamp(1000L)
 
@@ -372,8 +368,7 @@ class ObserveSyncInfoUseCaseTest {
 
         assertThat(result.syncInfoSectionModules.isSectionAvailable).isTrue()
         assertThat(result.syncInfoSectionModules.moduleCounts).hasSize(2) // total + module
-        assertThat(result.syncInfoSectionModules.moduleCounts[0].isTotal).isTrue()
-        assertThat(result.syncInfoSectionModules.moduleCounts[0].count).isEqualTo("50")
+        assertThat(result.syncInfoSectionModules.moduleCounts[0].count).isEqualTo(50)
     }
 
     // Progress calculation tests
@@ -623,15 +618,14 @@ class ObserveSyncInfoUseCaseTest {
         assertThat(result.syncInfoSectionModules.isSectionAvailable).isTrue()
         assertThat(result.syncInfoSectionModules.moduleCounts).hasSize(3) // sum of modules + the 2 modules
         // sum of modules
-        assertThat(result.syncInfoSectionModules.moduleCounts[0].isTotal).isTrue()
-        assertThat(result.syncInfoSectionModules.moduleCounts[0].count).isEqualTo("40")
+        assertThat(result.syncInfoSectionModules.moduleCounts[0].count).isEqualTo(40)
         // module_1
         assertThat(result.syncInfoSectionModules.moduleCounts[1]).isEqualTo(
-            SyncInfoModuleCount(isTotal = false, name = "module_1", count = "15"),
+            ModuleCount(name = "module_1", count = 15),
         )
         // module_2
         assertThat(result.syncInfoSectionModules.moduleCounts[2]).isEqualTo(
-            SyncInfoModuleCount(isTotal = false, name = "module_2", count = "25"),
+            ModuleCount(name = "module_2", count = 25),
         )
     }
 

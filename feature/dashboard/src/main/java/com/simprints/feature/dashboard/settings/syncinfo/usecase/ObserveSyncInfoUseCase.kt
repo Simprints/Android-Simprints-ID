@@ -232,22 +232,9 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             else -> DownSyncCounts(0, isLowerBound = false)
         }
 
-        val modulesCountTotal = SyncInfoModuleCount(
-            isTotal = true,
-            name = "",
-            count = moduleCounts.sumOf { it.count }.toString(),
-        )
         val syncInfoSectionModules = SyncInfoSectionModules(
             isSectionAvailable = projectConfig.isModuleSelectionAvailable(),
-            moduleCounts = listOfNotNull(
-                modulesCountTotal.takeIf { moduleCounts.isNotEmpty() },
-            ) + moduleCounts.map { moduleCount ->
-                SyncInfoModuleCount(
-                    isTotal = false,
-                    name = moduleCount.name,
-                    count = moduleCount.count.toString(),
-                )
-            },
+            moduleCounts = moduleCounts.prependTotalModuleCount(),
         )
 
         val syncInfoSectionRecords = SyncInfoSectionRecords(
@@ -303,6 +290,12 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     }.onRecordSyncComplete { delay(timeMillis = SYNC_COMPLETION_HOLD_MILLIS) }
         .onImageSyncComplete { delay(timeMillis = SYNC_COMPLETION_HOLD_MILLIS) }
         .flowOn(ioDispatcher) // upstream flows mostly do IO work
+
+    private fun List<ModuleCount>.prependTotalModuleCount(): List<ModuleCount> = if (isEmpty()) {
+        emptyList()
+    } else {
+        listOf(ModuleCount(name = "", count = sumOf { it.count })) + this
+    }
 
     // sync info change detection helpers
 
