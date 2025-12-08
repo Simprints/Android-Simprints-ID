@@ -170,7 +170,7 @@ internal class ObserveSyncInfoUseCaseTest {
             appForegroundStateTracker = appForegroundStateTracker,
             commCarePermissionChecker = commCarePermissionChecker,
             observeConfigurationFlow = observeConfigurationFlow,
-            ioDispatcher = testCoroutineRule.testCoroutineDispatcher,
+            dispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
     }
 
