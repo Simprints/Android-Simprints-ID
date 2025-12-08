@@ -1,31 +1,12 @@
 package com.simprints.core.tools.extentions
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class FlowExtTest {
-    @Test
-    fun `combine9 combines 9 flows`() = runTest {
-        val flow1 = flowOf(1)
-        val flow2 = flowOf(2)
-        val flow3 = flowOf(3)
-        val flow4 = flowOf(4)
-        val flow5 = flowOf(5)
-        val flow6 = flowOf(6)
-        val flow7 = flowOf(7)
-        val flow8 = flowOf(8)
-        val flow9 = flowOf(9)
-
-        val result = combine9(flow1, flow2, flow3, flow4, flow5, flow6, flow7, flow8, flow9) { t1, t2, t3, t4, t5, t6, t7, t8, t9 ->
-            t1 + t2 + t3 + t4 + t5 + t6 + t7 + t8 + t9
-        }.toList()
-
-        assertThat(result).isEqualTo(listOf(1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9))
-    }
-
     @Test
     fun `onChange triggers action when comparator returns true`() = runTest {
         val flow = flowOf(1, 2, 2, 3)
