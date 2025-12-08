@@ -13,6 +13,7 @@ import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.externalcredential.GraphExternalCredentialInternalDirections
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.feature.externalcredential.screens.select.ExternalCredentialSelectFragmentDirections
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
@@ -76,15 +77,13 @@ internal class ExternalCredentialControllerFragment : Fragment(R.layout.fragment
     private fun initListeners() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             when (internalNavController?.currentDestination?.id) {
-                R.id.externalCredentialSelectFragment, R.id.externalCredentialSearch -> {
-                    // Exit form navigation
-                    findNavController().navigateSafely(
-                        this@ExternalCredentialControllerFragment,
-                        R.id.action_global_refusalFragment,
-                    )
+                R.id.externalCredentialSearch -> {
+                    internalNavController?.navigate(R.id.externalCredentialSkip)
                 }
 
-                else -> internalNavController?.popBackStack()
+                R.id.externalCredentialSkip, R.id.externalCredentialScanQr, R.id.externalCredentialScanOcr -> {
+                    internalNavController?.popBackStack()
+                }
             }
         }
     }
