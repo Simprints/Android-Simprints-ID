@@ -35,9 +35,10 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
         } else {
             faceMatchResults
         }
-        val allCredentialResults = credentialResultsMapper(results, projectConfiguration, isFace = true) +
-            credentialResultsMapper(results, projectConfiguration, isFace = false)
-                .sortedByDescending(AppMatchResult::confidenceScore)
+        val allCredentialResults = (
+            credentialResultsMapper(results, projectConfiguration, isFace = true) +
+                credentialResultsMapper(results, projectConfiguration, isFace = false)
+        ).sortedByDescending(AppMatchResult::confidenceScore)
 
         // Return the results with the credential results on top, followed by highest confidence score 1:N match results
         val identifications = (allCredentialResults + bestMatcherIdentifications)
