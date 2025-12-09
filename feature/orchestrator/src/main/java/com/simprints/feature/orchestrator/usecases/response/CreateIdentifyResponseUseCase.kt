@@ -1,6 +1,5 @@
 package com.simprints.feature.orchestrator.usecases.response
 
-import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.ProjectConfiguration
@@ -13,9 +12,6 @@ import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.orchestration.data.responses.AppResponse
 import java.io.Serializable
 import javax.inject.Inject
-import kotlin.collections.ifEmpty
-import kotlin.collections.map
-import kotlin.collections.take
 
 internal class CreateIdentifyResponseUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
@@ -25,26 +21,34 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
         results: List<Serializable>,
     ): AppResponse {
         val isMultiFactorIdEnabled = projectConfiguration.multifactorId?.allowedExternalCredentials?.isNotEmpty() ?: false
-        val credentialFaceMatchResults = credentialResultsMapper(results, projectConfiguration, isFace = true)
-        val credentialFingerprintMatchResults = credentialResultsMapper(results, projectConfiguration, isFace = false)
-
         val currentSessionId = eventRepository.getCurrentSessionScope().id
 
-        val faceResults = credentialFaceMatchResults + getFaceMatchResults(results, projectConfiguration)
-        val bestFaceConfidence = faceResults.firstOrNull()?.confidenceScore ?: 0
+        val faceMatchResults = getFaceMatchResults(results, projectConfiguration)
+        val bestFaceConfidence = faceMatchResults.firstOrNull()?.confidenceScore ?: 0
 
-        val fingerprintResults = credentialFingerprintMatchResults + getFingerprintResults(results, projectConfiguration)
-        val bestFingerprintConfidence = fingerprintResults.firstOrNull()?.confidenceScore ?: 0
+        val fingerprintMatchResults = getFingerprintResults(results, projectConfiguration)
+        val bestFingerprintConfidence = fingerprintMatchResults.firstOrNull()?.confidenceScore ?: 0
+
+        val isUsingFingerprintResults = bestFingerprintConfidence > bestFaceConfidence
+        val bestMatcherIdentifications = if (isUsingFingerprintResults) {
+            fingerprintMatchResults
+        } else {
+            faceMatchResults
+        }
+        val allCredentialResults = (
+            credentialResultsMapper(results, projectConfiguration, isFace = true) +
+                credentialResultsMapper(results, projectConfiguration, isFace = false)
+        ).sortedByDescending(AppMatchResult::confidenceScore)
+
+        // Return the results with the credential results on top, followed by highest confidence score 1:N match results
+        val identifications = (allCredentialResults + bestMatcherIdentifications)
+            .distinctBy(AppMatchResult::guid)
+            .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
 
         return AppIdentifyResponse(
             sessionId = currentSessionId,
             isMultiFactorIdEnabled = isMultiFactorIdEnabled,
-            // Return the results with the highest confidence score
-            identifications = if (bestFingerprintConfidence > bestFaceConfidence) {
-                fingerprintResults.distinctBy(AppMatchResult::guid)
-            } else {
-                faceResults.distinctBy(AppMatchResult::guid)
-            },
+            identifications = identifications,
         )
     }
 
@@ -58,7 +62,6 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
             ?.let { fingerprintDecisionPolicy ->
                 fingerprintMatchResult.results.mapToMatchResults(
                     decisionPolicy = fingerprintDecisionPolicy,
-                    projectConfiguration = projectConfiguration,
                     isCredentialMatch = false,
                     verificationMatchThreshold = null,
                 )
@@ -75,7 +78,6 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
             ?.let { faceDecisionPolicy ->
                 faceMatchResult.results.mapToMatchResults(
                     decisionPolicy = faceDecisionPolicy,
-                    projectConfiguration = projectConfiguration,
                     isCredentialMatch = false,
                     verificationMatchThreshold = null,
                 )
@@ -85,17 +87,23 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
     private fun List<MatchResultItem>.mapToMatchResults(
         decisionPolicy: DecisionPolicy,
         verificationMatchThreshold: Float?,
-        projectConfiguration: ProjectConfiguration,
         isCredentialMatch: Boolean,
     ): List<AppMatchResult> {
-        val goodResults = this
-            .filter { it.confidence >= decisionPolicy.low }
-            .sortedByDescending { it.confidence }
-        // Attempt to include only high confidence matches
-        return goodResults
-            .filter { it.confidence >= decisionPolicy.high }
-            .ifEmpty { goodResults }
-            .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
+        val results = if (isCredentialMatch) {
+            // Credential matches are returned regardless of confidence score
+            this
+        } else {
+            // Attempt to include only high confidence matches.
+            this
+                .filter { it.confidence >= decisionPolicy.low }
+                .sortedByDescending { it.confidence }
+                .let { goodResults ->
+                    goodResults
+                        .filter { it.confidence >= decisionPolicy.high }
+                        .ifEmpty { goodResults }
+                }
+        }
+        return results
             .map {
                 AppMatchResult(
                     guid = it.subjectId,
@@ -142,9 +150,8 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
             return@let matches
                 .mapToMatchResults(
                     decisionPolicy = decisionPolicy,
-                    projectConfiguration = projectConfiguration,
                     isCredentialMatch = true,
                     verificationMatchThreshold = verificationMatchThreshold,
-                ).sortedByDescending(AppMatchResult::confidenceScore)
+                )
         }.orEmpty()
 }
