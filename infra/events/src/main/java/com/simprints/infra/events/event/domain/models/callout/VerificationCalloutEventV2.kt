@@ -20,7 +20,7 @@ data class VerificationCalloutEventV2(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         projectId: String,
         userId: TokenizableString,
         moduleId: TokenizableString,
@@ -29,7 +29,7 @@ data class VerificationCalloutEventV2(
     ) : this(
         UUID.randomUUID().toString(),
         VerificationCalloutPayload(
-            createdAt = createdAt,
+            startTime = startTime,
             eventVersion = EVENT_VERSION,
             projectId = projectId,
             userId = userId,
@@ -54,14 +54,14 @@ data class VerificationCalloutEventV2(
 
     @Keep
     data class VerificationCalloutPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val projectId: String,
         val userId: TokenizableString,
         val moduleId: TokenizableString,
         val verifyGuid: String,
         val metadata: String,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = CALLOUT_VERIFICATION,
     ) : EventPayload() {
         override fun toSafeString(): String = "module ID: $moduleId, guid: $verifyGuid, metadata: $metadata"

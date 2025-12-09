@@ -9,8 +9,8 @@
   "payload": {
     "type": "ONE_TO_MANY_MATCH",
     "eventVersion": 1,
-    "createdAt": 2213456705,
-    "endedAt": 4145678930,
+    "startTime": 2213456705,
+    "endTime": 4145678930,
     "pool": {
       "type": "PROJECT",
       "count": 1040

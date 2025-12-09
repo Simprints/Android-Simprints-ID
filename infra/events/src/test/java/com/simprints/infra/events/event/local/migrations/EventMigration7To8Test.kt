@@ -221,9 +221,9 @@ class EventMigration7To8Test {
                 },
                 "payload":{
                     "id":"$id",
-                    "createdAt":$CREATED_AT,
+                    "startTime":$CREATED_AT,
                     "eventVersion":2,
-                    "endedAt":$ENDED_AT,
+                    "endTime":$ENDED_AT,
                     "finger":"${FINGER.name}",
                     "qualityThreshold":$QUALITY_THRESHOLD,
                     "result":"$result"
@@ -253,8 +253,8 @@ class EventMigration7To8Test {
                     "deviceId": "$DEVICE_ID"
                 },
                 "payload":{
-                    "createdAt":$CREATED_AT,
-                    "endedAt":0,
+                    "startTime":$CREATED_AT,
+                    "endTime":0,
                     "eventVersion":1,
                     "type":"PERSON_CREATION",
                     "fingerprintCaptureIds":[$fingerprintCaptureId,"id2"],
@@ -305,8 +305,8 @@ class EventMigration7To8Test {
                 },
                 "payload":{
                     "id":"$id",
-                    "createdAt":$CREATED_AT,
-                    "endedAt":$ENDED_AT,
+                    "startTime":$CREATED_AT,
+                    "endTime":$ENDED_AT,
                     "eventVersion":2,
                     "attemptNb":0,
                     "qualityThreshold":$QUALITY_THRESHOLD,
@@ -353,9 +353,9 @@ class EventMigration7To8Test {
                 },
                 "payload":{
                     "id":"$eventId",
-                    "createdAt":$CREATED_AT,
+                    "startTime":$CREATED_AT,
                     "eventVersion":3,
-                    "endedAt":$ENDED_AT,
+                    "endTime":$ENDED_AT,
                     "finger":"${FINGER.name}",
                     "qualityThreshold":$QUALITY_THRESHOLD,
                     "result":"$result"
@@ -423,8 +423,8 @@ class EventMigration7To8Test {
                 },
                 "payload":{
                     "id":"$eventId",
-                    "createdAt":$CREATED_AT,
-                    "endedAt":$ENDED_AT,
+                    "startTime":$CREATED_AT,
+                    "endTime":$ENDED_AT,
                     "eventVersion":3,
                     "attemptNb":0,
                     "qualityThreshold":$QUALITY_THRESHOLD,

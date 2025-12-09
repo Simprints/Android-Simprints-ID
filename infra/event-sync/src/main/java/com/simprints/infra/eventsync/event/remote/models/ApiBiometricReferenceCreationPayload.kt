@@ -12,7 +12,7 @@ internal data class ApiBiometricReferenceCreationPayload(
     val captureIds: List<String>,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: BiometricReferenceCreationPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         domainPayload.id,
         domainPayload.modality.name,
         domainPayload.captureIds,

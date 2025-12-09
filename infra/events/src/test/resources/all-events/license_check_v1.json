@@ -9,8 +9,8 @@
   "payload": {
     "type": "LICENSE_CHECK",
     "eventVersion": 1,
-    "createdAt": 1345678901,
-    "endedAt": 0,
+    "startTime": 1345678901,
+    "endTime": 0,
     "status": "VALID",
     "vendor": "NEC_FINGERPRINT"
   }

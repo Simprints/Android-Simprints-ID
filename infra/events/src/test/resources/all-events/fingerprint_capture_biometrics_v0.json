@@ -13,7 +13,7 @@
     "deviceId": "deviceId"
   },
   "payload": {
-    "createdAt": 0,
+    "startTime": 0,
     "eventVersion": 0,
     "result": "GOOD_SCAN",
     "fingerprint": {
@@ -23,7 +23,7 @@
     },
     "id": "someId",
     "type": "FINGERPRINT_CAPTURE_BIOMETRICS",
-    "endedAt": 0
+    "endTime": 0
   },
   "type": "FINGERPRINT_CAPTURE_BIOMETRICS"
 }

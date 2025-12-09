@@ -39,8 +39,8 @@ internal data class ApiFingerprintCapturePayload(
 
     constructor(domainPayload: FingerprintCapturePayload) : this(
         domainPayload.id,
-        domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.endedAt?.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
+        domainPayload.endTime?.fromDomainToApi(),
         domainPayload.qualityThreshold,
         domainPayload.finger,
         domainPayload.result.fromDomainToApi(),

@@ -15,7 +15,7 @@ class IntentParsingEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(INTENT_PARSING)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
+            assertThat(startTime).isEqualTo(CREATED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(INTENT_PARSING)
             assertThat(integration).isEqualTo(COMMCARE)

@@ -20,7 +20,7 @@ internal data class ApiConnectivitySnapshotPayload(
     }
 
     constructor(domainPayload: ConnectivitySnapshotPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         domainPayload.connections.map { ApiConnection(it) },
     )
 

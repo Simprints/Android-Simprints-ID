@@ -17,8 +17,8 @@ internal data class ApiExternalCredentialCapturePayload(
     val selectionId: String,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: ExternalCredentialCapturePayload) : this(
-        startTime = domainPayload.createdAt.fromDomainToApi(),
-        endTime = domainPayload.endedAt?.fromDomainToApi(),
+        startTime = domainPayload.startTime.fromDomainToApi(),
+        endTime = domainPayload.endTime?.fromDomainToApi(),
         id = domainPayload.id,
         autoCaptureStartTime = domainPayload.autoCaptureStartTime.fromDomainToApi(),
         autoCaptureEndTime = domainPayload.autoCaptureEndTime.fromDomainToApi(),

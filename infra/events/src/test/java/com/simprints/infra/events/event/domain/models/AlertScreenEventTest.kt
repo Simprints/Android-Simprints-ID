@@ -15,8 +15,8 @@ class AlertScreenEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(ALERT_SCREEN)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
-            assertThat(endedAt).isNull()
+            assertThat(startTime).isEqualTo(CREATED_AT)
+            assertThat(endTime).isNull()
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(ALERT_SCREEN)
             assertThat(alertType).isEqualTo(BLUETOOTH_NOT_ENABLED)

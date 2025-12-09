@@ -17,8 +17,8 @@ class RefusalEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(REFUSAL)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
-            assertThat(endedAt).isEqualTo(ENDED_AT)
+            assertThat(startTime).isEqualTo(CREATED_AT)
+            assertThat(endTime).isEqualTo(ENDED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(REFUSAL)
             assertThat(reason).isEqualTo(OTHER)

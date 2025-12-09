@@ -17,7 +17,7 @@ data class EnrolmentEventV2(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         subjectId: String,
         projectId: String,
         moduleId: TokenizableString,
@@ -26,7 +26,7 @@ data class EnrolmentEventV2(
     ) : this(
         UUID.randomUUID().toString(),
         EnrolmentPayload(
-            createdAt = createdAt,
+            startTime = startTime,
             eventVersion = EVENT_VERSION,
             subjectId = subjectId,
             projectId = projectId,
@@ -51,14 +51,14 @@ data class EnrolmentEventV2(
 
     @Keep
     data class EnrolmentPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val subjectId: String,
         val projectId: String,
         val moduleId: TokenizableString,
         val attendantId: TokenizableString,
         val personCreationEventId: String,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = ENROLMENT_V2,
     ) : EventPayload() {
         override fun toSafeString(): String = "subject ID: $subjectId, module ID: $moduleId"

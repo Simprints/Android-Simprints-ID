@@ -26,7 +26,7 @@ internal data class ApiScannerConnectionPayload(
     )
 
     constructor(domainPayload: ScannerConnectionPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         ApiScannerInfo(
             domainPayload.scannerInfo.scannerId,
             domainPayload.scannerInfo.macAddress,

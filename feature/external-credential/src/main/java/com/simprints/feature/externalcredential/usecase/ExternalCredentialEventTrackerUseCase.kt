@@ -35,8 +35,8 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
     ) {
         eventRepository.addOrUpdateEvent(
             ExternalCredentialSearchEvent(
-                createdAt = startTime,
-                endedAt = timeHelper.now(),
+                startTime = startTime,
+                endTime = timeHelper.now(),
                 probeExternalCredentialId = externalCredentialId,
                 candidateIds = candidates.map { it.subjectId },
             ),
@@ -53,7 +53,7 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
         val credential = scannedCredential.toExternalCredential(subjectId)
         eventRepository.addOrUpdateEvent(
             ExternalCredentialCaptureValueEvent(
-                createdAt = startTime,
+                startTime = startTime,
                 payloadId = scannedCredential.credentialScanId,
                 credential = credential,
             ),
@@ -121,8 +121,8 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
     ) {
         eventRepository.addOrUpdateEvent(
             ExternalCredentialConfirmationEvent(
-                createdAt = startTime,
-                endedAt = timeHelper.now(),
+                startTime = startTime,
+                endTime = timeHelper.now(),
                 result = result,
             ),
         )

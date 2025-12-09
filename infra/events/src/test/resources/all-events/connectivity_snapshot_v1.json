@@ -9,8 +9,8 @@
   "payload": {
     "type": "CONNECTIVITY_SNAPSHOT",
     "eventVersion": 1,
-    "createdAt": 2435356702,
-    "endedAt": 0,
+    "startTime": 2435356702,
+    "endTime": 0,
     "networkType": "EDGE",
     "connections": [
       {

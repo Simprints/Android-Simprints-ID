@@ -79,8 +79,8 @@ class ExternalCredentialEventTrackerUseCaseTest {
         coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
         with(captureEventSlot.captured) {
             assertThat(payload.id).isEqualTo(SCAN_ID)
-            assertThat(payload.createdAt).isEqualTo(START_TIME)
-            assertThat(payload.endedAt).isEqualTo(END_TIME)
+            assertThat(payload.startTime).isEqualTo(START_TIME)
+            assertThat(payload.endTime).isEqualTo(END_TIME)
             assertThat(payload.autoCaptureStartTime).isEqualTo(SCAN_START_TIME)
             assertThat(payload.autoCaptureEndTime).isEqualTo(SCAN_END_TIME)
             assertThat(payload.ocrErrorCount).isEqualTo(DEFAULT_DISTANCE)
@@ -140,8 +140,8 @@ class ExternalCredentialEventTrackerUseCaseTest {
         val captureEventSlot = slot<ExternalCredentialSelectionEvent>()
         coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
         with(captureEventSlot.captured) {
-            assertThat(payload.createdAt).isEqualTo(START_TIME)
-            assertThat(payload.endedAt).isEqualTo(END_TIME)
+            assertThat(payload.startTime).isEqualTo(START_TIME)
+            assertThat(payload.endTime).isEqualTo(END_TIME)
             assertThat(payload.credentialType).isEqualTo(ExternalCredentialType.QRCode)
             assertThat(payload.skipReason).isNull()
             assertThat(payload.skipOther).isNull()
@@ -155,8 +155,8 @@ class ExternalCredentialEventTrackerUseCaseTest {
         val captureEventSlot = slot<ExternalCredentialSelectionEvent>()
         coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
         with(captureEventSlot.captured) {
-            assertThat(payload.createdAt).isEqualTo(START_TIME)
-            assertThat(payload.endedAt).isEqualTo(END_TIME)
+            assertThat(payload.startTime).isEqualTo(START_TIME)
+            assertThat(payload.endTime).isEqualTo(END_TIME)
             assertThat(payload.credentialType).isNull()
             assertThat(payload.skipReason).isEqualTo(SkipReason.OTHER)
             assertThat(payload.skipOther).isEqualTo("other")
@@ -170,8 +170,8 @@ class ExternalCredentialEventTrackerUseCaseTest {
         val captureEventSlot = slot<ExternalCredentialConfirmationEvent>()
         coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
         with(captureEventSlot.captured) {
-            assertThat(payload.createdAt).isEqualTo(START_TIME)
-            assertThat(payload.endedAt).isEqualTo(END_TIME)
+            assertThat(payload.startTime).isEqualTo(START_TIME)
+            assertThat(payload.endTime).isEqualTo(END_TIME)
             assertThat(payload.result).isEqualTo(ExternalCredentialConfirmationResult.CONTINUE)
         }
     }

@@ -25,7 +25,7 @@ data class PersonCreationEvent(
     ) : this(
         UUID.randomUUID().toString(),
         PersonCreationPayload(
-            createdAt = startTime,
+            startTime = startTime,
             eventVersion = EVENT_VERSION,
             fingerprintCaptureIds = fingerprintCaptureIds,
             fingerprintReferenceId = fingerprintReferenceId,
@@ -43,13 +43,13 @@ data class PersonCreationEvent(
     @Keep
     @Deprecated("Replaced by BiometricReferenceCreationEvent")
     data class PersonCreationPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val fingerprintCaptureIds: List<String>?,
         val fingerprintReferenceId: String?,
         val faceCaptureIds: List<String>?,
         val faceReferenceId: String?,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = PERSON_CREATION,
     ) : EventPayload() {
         override fun toSafeString(): String = "face reference: $faceReferenceId, fingerprint reference: $fingerprintReferenceId"

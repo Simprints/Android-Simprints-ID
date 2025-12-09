@@ -15,7 +15,7 @@ internal data class ApiIntentParsingPayload(
     val integration: ApiIntegrationInfo,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: IntentParsingPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         domainPayload.integration.fromDomainToApi(),
     )
 

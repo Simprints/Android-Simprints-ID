@@ -9,8 +9,8 @@
   "payload": {
     "type": "CALLOUT_VERIFICATION_V3",
     "eventVersion": 1,
-    "createdAt": 65145678901,
-    "endedAt": 0,
+    "startTime": 65145678901,
+    "endTime": 0,
     "projectId": "TEST6Oai41ps1pBNrzBL",
     "userId": {
       "className": "TokenizableString.Raw",

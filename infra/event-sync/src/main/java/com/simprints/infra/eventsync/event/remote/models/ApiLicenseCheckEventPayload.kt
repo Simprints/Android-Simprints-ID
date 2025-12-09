@@ -11,7 +11,7 @@ internal data class ApiLicenseCheckEventPayload(
     val vendor: String,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: LicenseCheckEvent.LicenseCheckEventPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         domainPayload.status,
         domainPayload.vendor,
     )

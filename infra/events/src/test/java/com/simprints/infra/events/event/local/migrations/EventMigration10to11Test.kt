@@ -119,8 +119,8 @@ class EventMigration10to11Test {
                 "id":"$id",
                 "projectId":"$PROJECT_ID",
                 "type":"$OLD_CAPTURE_SESSION_EVENT_KEY",
-                "createdAt":$CREATED_AT,
-                "endedAt":${ENDED_AT.takeIf { ended } ?: 0},
+                "startTime":$CREATED_AT,
+                "endTime":${ENDED_AT.takeIf { ended } ?: 0},
                 "modalities":["FINGERPRINT","FACE"],
                 "appVersionName":"1.0.0",
                 "libVersionName":"1.0.0",
@@ -168,8 +168,8 @@ class EventMigration10to11Test {
             "payload":{
                 "type":"$OLD_ARTIFICIAL_TERMINATION_EVENT_KEY",
                 "eventVersion":2,
-                "createdAt":$CREATED_AT,
-                "endedAt":$ENDED_AT,
+                "startTime":$CREATED_AT,
+                "endTime":$ENDED_AT,
                 "reason":"NEW_SESSION"
             }
             }
@@ -200,8 +200,8 @@ class EventMigration10to11Test {
             "payload":{
                 "type":"${EventType.REFUSAL_KEY}",
                 "eventVersion":2,
-                "createdAt":$CREATED_AT,
-                "endedAt":$ENDED_AT,
+                "startTime":$CREATED_AT,
+                "endTime":$ENDED_AT,
                 "reason":"REFUSED_RELIGION",
                 "otherText":"AAA"
             }

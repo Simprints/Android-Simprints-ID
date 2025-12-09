@@ -22,8 +22,8 @@ class BiometricReferenceCreationEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(BIOMETRIC_REFERENCE_CREATION)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
-            assertThat(endedAt).isNull()
+            assertThat(startTime).isEqualTo(CREATED_AT)
+            assertThat(endTime).isNull()
             assertThat(id).isEqualTo(GUID1)
             assertThat(modality).isEqualTo(BiometricReferenceCreationEvent.BiometricReferenceModality.FACE)
             assertThat(captureIds).containsExactly(GUID2, GUID3)

@@ -43,8 +43,8 @@ internal data class ApiAuthenticationPayload(
     }
 
     constructor(domainPayload: AuthenticationPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.endedAt?.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
+        domainPayload.endTime?.fromDomainToApi(),
         ApiUserInfo(domainPayload.userInfo),
         domainPayload.result.fromDomainToApi(),
     )

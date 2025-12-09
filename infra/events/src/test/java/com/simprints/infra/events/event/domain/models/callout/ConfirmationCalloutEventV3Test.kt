@@ -26,7 +26,7 @@ class ConfirmationCalloutEventV3Test {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(CALLOUT_CONFIRMATION_V3)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
+            assertThat(startTime).isEqualTo(CREATED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(CALLOUT_CONFIRMATION_V3)
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)

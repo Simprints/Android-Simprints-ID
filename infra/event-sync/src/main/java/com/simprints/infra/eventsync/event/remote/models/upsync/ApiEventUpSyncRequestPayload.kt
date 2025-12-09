@@ -17,8 +17,8 @@ internal data class ApiEventUpSyncRequestPayload(
     val errorType: String?,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: EventUpSyncRequestEvent.EventUpSyncRequestPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.endedAt?.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
+        domainPayload.endTime?.fromDomainToApi(),
         domainPayload.requestId,
         ApiUpSyncContent(
             domainPayload.content.sessionCount,

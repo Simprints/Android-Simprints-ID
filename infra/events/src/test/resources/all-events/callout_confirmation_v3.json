@@ -9,8 +9,8 @@
   "payload": {
     "type": "CALLOUT_CONFIRMATION_V3",
     "eventVersion": 1,
-    "createdAt": 95145678901,
-    "endedAt": 0,
+    "startTime": 95145678901,
+    "endTime": 0,
     "projectId": "TEST6Oai41ps1pBNrzBL",
     "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
     "selectedGuid": "7c815bb6-b536-4090-b625-c831d544074b",

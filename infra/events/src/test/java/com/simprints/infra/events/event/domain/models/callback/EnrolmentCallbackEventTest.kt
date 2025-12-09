@@ -15,7 +15,7 @@ class EnrolmentCallbackEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(CALLBACK_ENROLMENT)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
+            assertThat(startTime).isEqualTo(CREATED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(CALLBACK_ENROLMENT)
             assertThat(guid).isEqualTo(GUID1)

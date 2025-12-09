@@ -146,7 +146,7 @@ class EventMigration16to17Test {
             {
                "id":"$id",
                "payload":{
-                  "createdAt":{
+                  "startTime":{
                      "ms":1762805893067,
                      "isTrustworthy":true,
                      "msSinceBoot":35002538
@@ -191,7 +191,7 @@ class EventMigration16to17Test {
                "projectId":"9WNCAbWVNrxttDe5hgwb",
                "sessionId":"2bdc1145-cbec-4e6a-ac8a-61c1e5b53bb4",
                "payload":{
-                  "createdAt":{
+                  "startTime":{
                      "ms":1706534485916,
                      "isTrustworthy":false,
                      "msSinceBoot":null
@@ -199,7 +199,7 @@ class EventMigration16to17Test {
                   "eventVersion":2,
                   "integration":"STANDARD",
                   "type":"INTENT_PARSING",
-                  "endedAt":{
+                  "endTime":{
                      "ms":1706534528165,
                      "isTrustworthy":false,
                      "msSinceBoot":null

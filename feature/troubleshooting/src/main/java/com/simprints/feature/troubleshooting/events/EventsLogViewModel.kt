@@ -36,8 +36,8 @@ internal class EventsLogViewModel @Inject constructor(
     private fun formatEventViewData(event: Event): TroubleshootingItemViewData = TroubleshootingItemViewData(
         title = event.type.name,
         subtitle = formatTimestampSubtitle(
-            event.payload.createdAt.ms,
-            event.payload.endedAt?.ms,
+            event.payload.startTime.ms,
+            event.payload.endTime?.ms,
         ),
         body = "ID: ${event.id}\n" + event.payload.toSafeString(),
     )

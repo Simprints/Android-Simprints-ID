@@ -15,7 +15,7 @@ class SuspiciousIntentEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(SUSPICIOUS_INTENT)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
+            assertThat(startTime).isEqualTo(CREATED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(SUSPICIOUS_INTENT)
             assertThat(unexpectedExtras).isEqualTo(extrasArg)

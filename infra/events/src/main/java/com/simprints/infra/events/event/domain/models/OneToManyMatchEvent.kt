@@ -18,7 +18,7 @@ data class OneToManyMatchEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         endTime: Timestamp,
         pool: OneToManyMatchPayload.MatchPool,
         matcher: String,
@@ -28,9 +28,9 @@ data class OneToManyMatchEvent(
     ) : this(
         id = UUID.randomUUID().toString(),
         payload = OneToManyMatchPayload.OneToManyMatchPayloadV3(
-            createdAt = createdAt,
+            startTime = startTime,
             eventVersion = EVENT_VERSION,
-            endedAt = endTime,
+            endTime = endTime,
             pool = pool,
             matcher = matcher,
             result = result,
@@ -62,9 +62,9 @@ data class OneToManyMatchEvent(
     )
     @Keep
     sealed class OneToManyMatchPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
-        override val endedAt: Timestamp?,
+        override val endTime: Timestamp?,
         open val pool: MatchPool,
         open val matcher: String,
         open val result: List<MatchEntry>?,
@@ -74,25 +74,25 @@ data class OneToManyMatchEvent(
 
         @Keep
         data class OneToManyMatchPayloadV2(
-            override val createdAt: Timestamp,
+            override val startTime: Timestamp,
             override val eventVersion: Int,
-            override val endedAt: Timestamp?,
+            override val endTime: Timestamp?,
             override val pool: MatchPool,
             override val matcher: String,
             override val result: List<MatchEntry>?,
-        ) : OneToManyMatchPayload(createdAt, eventVersion, endedAt, pool, matcher, result)
+        ) : OneToManyMatchPayload(startTime, eventVersion, endTime, pool, matcher, result)
 
         @Keep
         data class OneToManyMatchPayloadV3(
-            override val createdAt: Timestamp,
+            override val startTime: Timestamp,
             override val eventVersion: Int,
-            override val endedAt: Timestamp?,
+            override val endTime: Timestamp?,
             override val pool: MatchPool,
             override val matcher: String,
             override val result: List<MatchEntry>?,
             val probeBiometricReferenceId: String,
             val batches: List<OneToManyBatch>? = null,
-        ) : OneToManyMatchPayload(createdAt, eventVersion, endedAt, pool, matcher, result)
+        ) : OneToManyMatchPayload(startTime, eventVersion, endTime, pool, matcher, result)
 
         @Keep
         data class MatchPool(

@@ -32,8 +32,8 @@ internal data class ApiConsentPayload(
     }
 
     constructor(domainPayload: ConsentPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.endedAt?.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
+        domainPayload.endTime?.fromDomainToApi(),
         domainPayload.consentType.fromDomainToApi(),
         domainPayload.result.fromDomainToApi(),
     )

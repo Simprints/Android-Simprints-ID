@@ -17,7 +17,7 @@ internal class SaveSubjectFetchEventUseCase @Inject constructor(
     ) {
         eventRepository.addOrUpdateEvent(
             CandidateReadEvent(
-                createdAt = fetchStartTime,
+                startTime = fetchStartTime,
                 endTime = fetchEndTime,
                 candidateId = subjectId,
                 localResult = getLocalResultForFetchEvent(subjectState),

@@ -64,8 +64,8 @@ internal class UpdateSessionScopePayloadUseCaseTest {
         id = "eventId",
         projectId = "projectId",
         type = EventScopeType.SESSION,
-        createdAt = Timestamp(0L),
-        endedAt = null,
+        startTime = Timestamp(0L),
+        endTime = null,
         payload = EventScopePayload(
             endCause = null,
             modalities = emptyList(),

@@ -18,13 +18,13 @@ data class Vero2InfoSnapshotEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         version: Vero2Version.Vero2NewApiVersion,
         battery: BatteryInfo,
     ) : this(
         UUID.randomUUID().toString(),
         Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForNewApi(
-            createdAt = createdAt,
+            startTime = startTime,
             eventVersion = NEW_EVENT_VERSION,
             battery = battery,
             version = version,
@@ -54,11 +54,11 @@ data class Vero2InfoSnapshotEvent(
     )
     @Keep
     sealed class Vero2InfoSnapshotPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         open val battery: BatteryInfo,
         open val version: Vero2Version,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = VERO_2_INFO_SNAPSHOT,
     ) : EventPayload() {
         override fun toSafeString(): String = "battery charge: ${battery.charge}, " +
@@ -70,12 +70,12 @@ data class Vero2InfoSnapshotEvent(
 
         @Keep
         data class Vero2InfoSnapshotPayloadForNewApi(
-            override val createdAt: Timestamp,
+            override val startTime: Timestamp,
             override val eventVersion: Int,
             override val battery: BatteryInfo,
             override val version: Vero2Version.Vero2NewApiVersion,
         ) : Vero2InfoSnapshotPayload(
-                createdAt,
+                startTime,
                 eventVersion,
                 battery,
                 version,
@@ -84,12 +84,12 @@ data class Vero2InfoSnapshotEvent(
         @Deprecated(message = "Only used for backwards compatibility")
         @Keep
         data class Vero2InfoSnapshotPayloadForOldApi(
-            override val createdAt: Timestamp,
+            override val startTime: Timestamp,
             override val eventVersion: Int,
             override val battery: BatteryInfo,
             override val version: Vero2Version.Vero2OldApiVersion,
         ) : Vero2InfoSnapshotPayload(
-                createdAt,
+                startTime,
                 eventVersion,
                 battery,
                 version,

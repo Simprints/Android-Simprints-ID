@@ -9,8 +9,8 @@
   "payload": {
     "type": "GUID_SELECTION",
     "eventVersion": 1,
-    "createdAt": 47896789072,
-    "endedAt": 0,
+    "startTime": 47896789072,
+    "endTime": 0,
     "selectedId": "b7b66a40-71c4-4e87-afaa-80a30bd257a6"
   }
 }

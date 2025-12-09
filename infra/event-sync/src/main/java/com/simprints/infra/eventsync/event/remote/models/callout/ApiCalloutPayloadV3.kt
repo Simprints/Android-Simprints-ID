@@ -22,7 +22,7 @@ internal data class ApiCalloutPayloadV3(
     val callout: ApiCallout,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: EnrolmentCalloutPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         ApiEnrolmentCalloutV3(
             domainPayload.projectId,
             domainPayload.userId.value,
@@ -33,7 +33,7 @@ internal data class ApiCalloutPayloadV3(
     )
 
     constructor(domainPayload: IdentificationCalloutPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         ApiIdentificationCalloutV3(
             domainPayload.projectId,
             domainPayload.userId.value,
@@ -44,7 +44,7 @@ internal data class ApiCalloutPayloadV3(
     )
 
     constructor(domainPayload: VerificationCalloutPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         ApiVerificationCalloutV3(
             domainPayload.projectId,
             domainPayload.userId.value,
@@ -56,7 +56,7 @@ internal data class ApiCalloutPayloadV3(
     )
 
     constructor(domainPayload: ConfirmationCalloutPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         ApiConfirmationCalloutV3(
             domainPayload.selectedGuid,
             domainPayload.sessionId,
@@ -65,7 +65,7 @@ internal data class ApiCalloutPayloadV3(
     )
 
     constructor(domainPayload: EnrolmentLastBiometricsCalloutPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         ApiEnrolmentLastBiometricsCalloutV3(
             domainPayload.projectId,
             domainPayload.userId.value,

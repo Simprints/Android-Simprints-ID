@@ -19,7 +19,7 @@ data class EnrolmentCalloutEventV3(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         projectId: String,
         userId: TokenizableString,
         moduleId: TokenizableString,
@@ -29,7 +29,7 @@ data class EnrolmentCalloutEventV3(
     ) : this(
         id,
         EnrolmentCalloutPayload(
-            createdAt = createdAt,
+            startTime = startTime,
             eventVersion = EVENT_VERSION,
             projectId = projectId,
             userId = userId,
@@ -54,14 +54,14 @@ data class EnrolmentCalloutEventV3(
 
     @Keep
     data class EnrolmentCalloutPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val projectId: String,
         val userId: TokenizableString,
         val moduleId: TokenizableString,
         val metadata: String?,
         val biometricDataSource: BiometricDataSource,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = CALLOUT_ENROLMENT_V3,
     ) : EventPayload() {
         override fun toSafeString(): String = "module: $moduleId, metadata: $metadata, biometricDataSource: $biometricDataSource"

@@ -11,7 +11,6 @@ import kotlin.test.Test
 
 @RunWith(AndroidJUnit4::class)
 class Migration1to2Test {
-
     @get:Rule
     val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
@@ -25,7 +24,7 @@ class Migration1to2Test {
             name = TEST_DB,
             version = 2,
             validateDroppedTables = true,
-            SubjectMigration1to2()
+            SubjectMigration1to2(),
         )
 
         // Verify external credentials table exists

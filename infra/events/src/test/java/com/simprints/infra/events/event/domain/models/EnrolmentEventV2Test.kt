@@ -25,7 +25,7 @@ class EnrolmentEventV2Test {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(ENROLMENT_V2)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
+            assertThat(startTime).isEqualTo(CREATED_AT)
             assertThat(eventVersion).isEqualTo(EnrolmentEventV2.EVENT_VERSION)
             assertThat(type).isEqualTo(ENROLMENT_V2)
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)

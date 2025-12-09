@@ -13,7 +13,7 @@ internal data class ApiSuspiciousIntentPayload(
     val unexpectedExtras: Map<String, Any?>,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: SuspiciousIntentPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         domainPayload.unexpectedExtras,
     )
 

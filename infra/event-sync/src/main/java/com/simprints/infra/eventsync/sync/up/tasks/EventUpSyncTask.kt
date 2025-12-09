@@ -279,8 +279,8 @@ internal class EventUpSyncTask @Inject constructor(
             eventRepository.addOrUpdateEvent(
                 eventScope,
                 EventUpSyncRequestEvent(
-                    createdAt = startTime,
-                    endedAt = timeHelper.now(),
+                    startTime = startTime,
+                    endTime = timeHelper.now(),
                     requestId = requestId,
                     content = content,
                     responseStatus = result.status,
@@ -297,13 +297,18 @@ internal class EventUpSyncTask @Inject constructor(
     ) {
         var result: EventUpSyncResult? = null
         when (ex) {
-            is NetworkConnectionException -> Simber.i("Network connection error", ex, tag = SYNC)
+            is NetworkConnectionException -> {
+                Simber.i("Network connection error", ex, tag = SYNC)
+            }
+
             is HttpException -> {
                 Simber.i("Network HTTP request error", ex, tag = SYNC)
                 result = ex.response()?.let { EventUpSyncResult(it.code()) }
             }
 
-            is RemoteDbNotSignedInException -> throw ex
+            is RemoteDbNotSignedInException -> {
+                throw ex
+            }
 
             else -> {
                 Simber.e("Unexpected network error", ex, tag = SYNC)
@@ -314,8 +319,8 @@ internal class EventUpSyncTask @Inject constructor(
         eventRepository.addOrUpdateEvent(
             eventScope,
             EventUpSyncRequestEvent(
-                createdAt = requestStartTime,
-                endedAt = timeHelper.now(),
+                startTime = requestStartTime,
+                endTime = timeHelper.now(),
                 requestId = requestId,
                 responseStatus = result?.status,
                 errorType = ex.javaClass.simpleName,
@@ -369,7 +374,9 @@ internal class EventUpSyncTask @Inject constructor(
                 when (t) {
                     // We don't need to report http exceptions as cloud logs all of them.
                     is NetworkConnectionException, is HttpException -> Simber.i("Failed to upload invalid events", t, tag = SYNC)
+
                     is RemoteDbNotSignedInException -> throw t
+
                     else -> Simber.e("Unexpected error while uploading invalid events", t, tag = SYNC)
                 }
             }

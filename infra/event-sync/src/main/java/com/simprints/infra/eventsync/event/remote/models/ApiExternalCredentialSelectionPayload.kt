@@ -18,8 +18,8 @@ internal data class ApiExternalCredentialSelectionPayload(
     val skipOther: String?,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: ExternalCredentialSelectionEvent.ExternalCredentialSelectionPayload) : this(
-        startTime = domainPayload.createdAt.fromDomainToApi(),
-        endTime = domainPayload.endedAt?.fromDomainToApi(),
+        startTime = domainPayload.startTime.fromDomainToApi(),
+        endTime = domainPayload.endTime?.fromDomainToApi(),
         id = domainPayload.id,
         credentialType = domainPayload.credentialType?.fromDomainToApi(),
         skipReason = domainPayload.skipReason?.toApiExternalCredentialSkipReason(),

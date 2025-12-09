@@ -56,8 +56,8 @@ internal class MapDomainEventScopeToApiUseCaseTest {
         with(useCase(scope, events, project)) {
             assertEquals(id, scope.id)
             assertEquals(projectId, scope.projectId)
-            assertEquals(startTime.unixMs, scope.createdAt.ms)
-            assertEquals(endTime, scope.endedAt)
+            assertEquals(startTime.unixMs, scope.startTime.ms)
+            assertEquals(endTime, scope.endTime)
         }
     }
 
@@ -65,8 +65,8 @@ internal class MapDomainEventScopeToApiUseCaseTest {
         id = "eventId",
         projectId = "projectId",
         type = EventScopeType.SESSION,
-        createdAt = Timestamp(0L),
-        endedAt = null,
+        startTime = Timestamp(0L),
+        endTime = null,
         payload = EventScopePayload(
             endCause = null,
             modalities = emptyList(),

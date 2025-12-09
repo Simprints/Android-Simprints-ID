@@ -22,38 +22,38 @@ internal data class ApiCalloutPayloadV2(
     val callout: ApiCallout,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: EnrolmentCalloutPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         ApiEnrolmentCalloutV2(
             domainPayload.projectId,
             domainPayload.userId.value,
             domainPayload.moduleId.value,
-            domainPayload.metadata
+            domainPayload.metadata,
         ),
     )
 
     constructor(domainPayload: IdentificationCalloutPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         ApiIdentificationCalloutV2(
             domainPayload.projectId,
             domainPayload.userId.value,
             domainPayload.moduleId.value,
-            domainPayload.metadata
+            domainPayload.metadata,
         ),
     )
 
     constructor(domainPayload: VerificationCalloutPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         ApiVerificationCalloutV2(
             domainPayload.projectId,
             domainPayload.userId.value,
             domainPayload.moduleId.value,
             domainPayload.metadata,
-            domainPayload.verifyGuid
+            domainPayload.verifyGuid,
         ),
     )
 
     constructor(domainPayload: ConfirmationCalloutPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         ApiConfirmationCalloutV2(
             domainPayload.selectedGuid,
             domainPayload.sessionId,
@@ -62,7 +62,7 @@ internal data class ApiCalloutPayloadV2(
     )
 
     constructor(domainPayload: EnrolmentLastBiometricsCalloutPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         ApiEnrolmentLastBiometricsCalloutV2(
             domainPayload.projectId,
             domainPayload.userId.value,

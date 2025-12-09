@@ -97,8 +97,8 @@ class SaveMatchEventUseCaseTest {
             eventRepository.addOrUpdateEvent(
                 withArg<OneToOneMatchEvent> {
                     assertThat(it).isInstanceOf(OneToOneMatchEvent::class.java)
-                    assertThat(it.payload.createdAt).isEqualTo(Timestamp(1L))
-                    assertThat(it.payload.endedAt).isEqualTo(Timestamp(2L))
+                    assertThat(it.payload.startTime).isEqualTo(Timestamp(1L))
+                    assertThat(it.payload.endTime).isEqualTo(Timestamp(2L))
                     assertThat(it.payload.candidateId).isEqualTo("subjectId")
                     assertThat(it.payload.matcher).isEqualTo("faceMatcherName")
                     assertThat(it.payload.result?.candidateId).isEqualTo("guid1")
@@ -144,8 +144,8 @@ class SaveMatchEventUseCaseTest {
             eventRepository.addOrUpdateEvent(
                 withArg<OneToOneMatchEvent> {
                     assertThat(it).isInstanceOf(OneToOneMatchEvent::class.java)
-                    assertThat(it.payload.createdAt).isEqualTo(Timestamp(1L))
-                    assertThat(it.payload.endedAt).isEqualTo(Timestamp(2L))
+                    assertThat(it.payload.startTime).isEqualTo(Timestamp(1L))
+                    assertThat(it.payload.endTime).isEqualTo(Timestamp(2L))
                     assertThat(it.payload.candidateId).isEqualTo("subjectId")
                     assertThat(it.payload.matcher).isEqualTo("faceMatcherName")
                     assertThat(it.payload.result?.candidateId).isEqualTo("guid1")
@@ -187,8 +187,8 @@ class SaveMatchEventUseCaseTest {
             eventRepository.addOrUpdateEvent(
                 withArg<OneToManyMatchEvent> {
                     assertThat(it).isInstanceOf(OneToManyMatchEvent::class.java)
-                    assertThat(it.payload.createdAt).isEqualTo(Timestamp(1L))
-                    assertThat(it.payload.endedAt).isEqualTo(Timestamp(2L))
+                    assertThat(it.payload.startTime).isEqualTo(Timestamp(1L))
+                    assertThat(it.payload.endTime).isEqualTo(Timestamp(2L))
                     assertThat(it.payload.matcher).isEqualTo("faceMatcherName")
                     assertThat(
                         it.payload.result

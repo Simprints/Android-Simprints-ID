@@ -14,8 +14,8 @@
   },
   "payload": {
     "id": "someId",
-    "createdAt": 0,
-    "endedAt": 0,
+    "startTime": 0,
+    "endTime": 0,
     "eventVersion": 0,
     "attemptNb": 0,
     "qualityThreshold": 0.0,

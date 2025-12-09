@@ -19,8 +19,8 @@ class CandidateReadEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(CANDIDATE_READ)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
-            assertThat(endedAt).isEqualTo(ENDED_AT)
+            assertThat(startTime).isEqualTo(CREATED_AT)
+            assertThat(endTime).isEqualTo(ENDED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(CANDIDATE_READ)
             assertThat(candidateId).isEqualTo(GUID1)

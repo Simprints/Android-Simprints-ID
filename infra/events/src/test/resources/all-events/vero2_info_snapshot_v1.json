@@ -9,8 +9,8 @@
   "payload": {
     "type": "VERO_2_INFO_SNAPSHOT",
     "eventVersion": 1,
-    "createdAt": 221675670,
-    "endedAt": 9141278930,
+    "startTime": 221675670,
+    "endTime": 9141278930,
     "version": {
       "cypressApi": "1.0",
       "cypressApp": "1.1",

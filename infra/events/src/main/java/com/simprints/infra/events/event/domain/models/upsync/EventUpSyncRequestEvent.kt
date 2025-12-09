@@ -18,8 +18,8 @@ data class EventUpSyncRequestEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
-        endedAt: Timestamp,
+        startTime: Timestamp,
+        endTime: Timestamp,
         requestId: String,
         content: UpSyncContent = UpSyncContent(),
         responseStatus: Int? = null,
@@ -27,8 +27,8 @@ data class EventUpSyncRequestEvent(
     ) : this(
         UUID.randomUUID().toString(),
         EventUpSyncRequestPayload(
-            createdAt,
-            endedAt,
+            startTime,
+            endTime,
             requestId,
             content,
             responseStatus,
@@ -40,8 +40,8 @@ data class EventUpSyncRequestEvent(
 
     @Keep
     data class EventUpSyncRequestPayload(
-        override val createdAt: Timestamp,
-        override val endedAt: Timestamp?,
+        override val startTime: Timestamp,
+        override val endTime: Timestamp?,
         val requestId: String,
         val content: UpSyncContent,
         val responseStatus: Int?,

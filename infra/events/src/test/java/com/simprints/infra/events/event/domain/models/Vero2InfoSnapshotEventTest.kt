@@ -24,7 +24,7 @@ class Vero2InfoSnapshotEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(VERO_2_INFO_SNAPSHOT)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
+            assertThat(startTime).isEqualTo(CREATED_AT)
             assertThat(eventVersion).isEqualTo(NEW_EVENT_VERSION)
             assertThat(type).isEqualTo(VERO_2_INFO_SNAPSHOT)
             assertThat(version).isEqualTo(versionArg)

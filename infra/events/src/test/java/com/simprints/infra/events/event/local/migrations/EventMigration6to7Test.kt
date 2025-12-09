@@ -103,8 +103,8 @@ class EventMigration6to7Test {
               "payload": {
                 "type": "ONE_TO_ONE_MATCH",
                 "eventVersion": 1,
-                "createdAt": 2213412301,
-                "endedAt": 4145612330,
+                "startTime": 2213412301,
+                "endTime": 4145612330,
                 "candidateId": "22f3ba17-f1d8-4de2-b57a-59e5be358e00",
                 "matcher": "$matcher",
                 "result": {

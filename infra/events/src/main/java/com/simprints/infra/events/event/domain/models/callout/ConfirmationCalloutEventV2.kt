@@ -20,7 +20,7 @@ data class ConfirmationCalloutEventV2(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         projectId: String,
         selectedGuid: String,
         sessionId: String,
@@ -28,12 +28,12 @@ data class ConfirmationCalloutEventV2(
     ) : this(
         UUID.randomUUID().toString(),
         ConfirmationCalloutPayload(
-            createdAt = createdAt,
+            startTime = startTime,
             eventVersion = EVENT_VERSION,
             projectId = projectId,
             selectedGuid = selectedGuid,
             sessionId = sessionId,
-            metadata = metadata
+            metadata = metadata,
         ),
         CALLOUT_CONFIRMATION,
     )
@@ -44,13 +44,13 @@ data class ConfirmationCalloutEventV2(
 
     @Keep
     data class ConfirmationCalloutPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val projectId: String,
         val selectedGuid: String,
         val sessionId: String,
         val metadata: String?,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = CALLOUT_CONFIRMATION,
     ) : EventPayload() {
         override fun toSafeString(): String = "guid: $selectedGuid, session ID: $sessionId"

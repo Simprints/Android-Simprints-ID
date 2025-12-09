@@ -9,8 +9,8 @@
   "payload": {
     "type": "FACE_CAPTURE_CONFIRMATION",
     "eventVersion": 1,
-    "createdAt": 341345670,
-    "endedAt": 9745678930,
+    "startTime": 341345670,
+    "endTime": 9745678930,
     "result":"CONTINUE"
   }
 }

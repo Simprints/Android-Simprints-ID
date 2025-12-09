@@ -22,7 +22,7 @@ class EventMigration11to12Test {
     )
 
     @Test
-    fun `Should replace createdAt with timestamp structs in session scope`() {
+    fun `Should replace startTime with timestamp structs in session scope`() {
         helper.createDatabase(TEST_DB, 11).apply {
             insert("DbSessionScope", SQLiteDatabase.CONFLICT_NONE, createSessionScope("session-id"))
             close()

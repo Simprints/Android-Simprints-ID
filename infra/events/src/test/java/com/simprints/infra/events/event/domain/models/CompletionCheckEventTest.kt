@@ -14,7 +14,7 @@ class CompletionCheckEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(COMPLETION_CHECK)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
+            assertThat(startTime).isEqualTo(CREATED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(COMPLETION_CHECK)
             assertThat(completed).isTrue()

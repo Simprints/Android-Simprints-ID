@@ -16,8 +16,8 @@ internal data class ApiScannerFirmwareUpdatePayload(
     val failureReason: String?,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: ScannerFirmwareUpdatePayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.endedAt?.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
+        domainPayload.endTime?.fromDomainToApi(),
         domainPayload.chip,
         domainPayload.targetAppVersion,
         domainPayload.failureReason,

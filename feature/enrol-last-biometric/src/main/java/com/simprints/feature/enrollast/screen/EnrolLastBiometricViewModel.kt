@@ -149,7 +149,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
 
         val biometricReferenceIds = events
             .filterIsInstance<BiometricReferenceCreationEvent>()
-            .sortedByDescending { it.payload.createdAt }
+            .sortedByDescending { it.payload.startTime }
             .map { it.payload.id }
 
         val externalCredentialIds = events
@@ -158,7 +158,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
 
         eventRepository.addOrUpdateEvent(
             EnrolmentEventV4(
-                createdAt = timeHelper.now(),
+                startTime = timeHelper.now(),
                 subjectId = subject.subjectId,
                 projectId = subject.projectId,
                 moduleId = subject.moduleId,

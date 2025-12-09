@@ -19,12 +19,12 @@ data class RefusalCallbackEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         reason: String,
         extra: String,
     ) : this(
         UUID.randomUUID().toString(),
-        RefusalCallbackPayload(createdAt, EVENT_VERSION, reason, extra),
+        RefusalCallbackPayload(startTime, EVENT_VERSION, reason, extra),
         CALLBACK_REFUSAL,
     )
 
@@ -34,11 +34,11 @@ data class RefusalCallbackEvent(
 
     @Keep
     data class RefusalCallbackPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val reason: String,
         val extra: String,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = CALLBACK_REFUSAL,
     ) : EventPayload() {
         override fun toSafeString(): String = "reason: $reason, extra: $extra"

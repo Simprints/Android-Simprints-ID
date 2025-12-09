@@ -27,8 +27,8 @@ internal fun EventScope.fromDomainToDb(jsonHelper: JsonHelper): DbEventScope = D
     id = id,
     projectId = projectId,
     type = type,
-    createdAt = createdAt.fromDomainToDb(),
-    endedAt = endedAt?.fromDomainToDb(),
+    createdAt = startTime.fromDomainToDb(),
+    endedAt = endTime?.fromDomainToDb(),
     payloadJson = jsonHelper.toJson(payload),
 )
 
@@ -36,7 +36,7 @@ internal fun DbEventScope.fromDbToDomain(jsonHelper: JsonHelper): EventScope = E
     id = id,
     projectId = projectId,
     type = type,
-    createdAt = createdAt.fromDbToDomain(),
-    endedAt = endedAt?.fromDbToDomain(),
+    startTime = createdAt.fromDbToDomain(),
+    endTime = endedAt?.fromDbToDomain(),
     payload = jsonHelper.fromJson(payloadJson, object : TypeReference<EventScopePayload>() {}),
 )

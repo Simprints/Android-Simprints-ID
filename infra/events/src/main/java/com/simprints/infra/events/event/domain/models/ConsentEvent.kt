@@ -16,13 +16,13 @@ data class ConsentEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         endTime: Timestamp,
         consentType: ConsentPayload.Type,
         result: ConsentPayload.Result,
     ) : this(
         UUID.randomUUID().toString(),
-        ConsentPayload(createdAt, EVENT_VERSION, endTime, consentType, result),
+        ConsentPayload(startTime, EVENT_VERSION, endTime, consentType, result),
         CONSENT,
     )
 
@@ -32,9 +32,9 @@ data class ConsentEvent(
 
     @Keep
     data class ConsentPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
-        override val endedAt: Timestamp?,
+        override val endTime: Timestamp?,
         val consentType: Type,
         var result: Result,
         override val type: EventType = CONSENT,

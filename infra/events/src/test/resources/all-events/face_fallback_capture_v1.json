@@ -9,7 +9,7 @@
   "payload": {
     "type": "FACE_FALLBACK_CAPTURE",
     "eventVersion": 1,
-    "createdAt": 6781345670,
-    "endedAt": 12345678930
+    "startTime": 6781345670,
+    "endTime": 12345678930
   }
 }

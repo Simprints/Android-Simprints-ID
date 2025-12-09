@@ -55,7 +55,7 @@ class EventMigration2to3Test {
 
     private fun createSessionCaptureEvent(
         id: String,
-        endedAt: Long,
+        endTime: Long,
     ) = ContentValues().apply {
         this.put("id", id)
         this.put("type", "SESSION_CAPTURE")
@@ -69,12 +69,12 @@ class EventMigration2to3Test {
                     "projectId": "TEST6Oai41ps1pBNrzBL",
                    "sessionId": "$id"
                 },
-                "createdAt": 1611584017198,
-                "endedAt": $endedAt,
+                "startTime": 1611584017198,
+                "endTime": $endTime,
                 "payload": {
                     "eventVersion": 1,
-                    "createdAt": 1611584017198,
-                    "endedAt": $endedAt,
+                    "startTime": 1611584017198,
+                    "endTime": $endTime,
                     "modalities": ["FINGERPRINT"],
                     "appVersionName": "appVersionName",
                     "libVersionName": "libSimprintsVersionName",
@@ -92,7 +92,7 @@ class EventMigration2to3Test {
             """.trimIndent(),
         )
         this.put("createdAt", 1611584017198)
-        this.put("endedAt", endedAt)
+        this.put("endedAt", endTime)
     }
 
     private fun validateColumnCreation(

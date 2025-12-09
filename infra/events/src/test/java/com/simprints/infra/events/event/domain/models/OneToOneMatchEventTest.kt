@@ -29,8 +29,8 @@ class OneToOneMatchEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(ONE_TO_ONE_MATCH)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
-            assertThat(endedAt).isEqualTo(ENDED_AT)
+            assertThat(startTime).isEqualTo(CREATED_AT)
+            assertThat(endTime).isEqualTo(ENDED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(matcher).isEqualTo("MATCHER_NAME")
             assertThat(fingerComparisonStrategy)
@@ -66,14 +66,14 @@ class OneToOneMatchEventTest {
             "id":"3afb1b9e-b263-4073-b773-6e1dac20d72f",
             "scopeId":"6dcb3810-4789-4149-8fea-473ffb520958",
             "payload":{
-                "createdAt":{"ms":1234},
+                "startTime":{"ms":1234},
                 "eventVersion":3,
                 "candidateId":"3afb1b9e-b263-4073-b773-6e1dac20d72f",
                 "matcher":"SIM_AFIS",
                 "result":{"candidateId":"3afb1b9e-b263-4073-b773-6e1dac20d72f","score":1.0},
                 "fingerComparisonStrategy":"SAME_FINGER",
                 "type":"ONE_TO_ONE_MATCH",
-                "endedAt":{"ms":4567}
+                "endTime":{"ms":4567}
             },
             "type":"ONE_TO_ONE_MATCH"
         }
@@ -85,14 +85,14 @@ class OneToOneMatchEventTest {
             "id":"3afb1b9e-b263-4073-b773-6e1dac20d72f",
             "scopeId":"6dcb3810-4789-4149-8fea-473ffb520958",
             "payload":{
-                "createdAt":{"ms":1234},
+                "startTime":{"ms":1234},
                 "eventVersion":4,
                 "candidateId":"3afb1b9e-b263-4073-b773-6e1dac20d72f",
                 "matcher":"SIM_AFIS",
                 "result":{"candidateId":"3afb1b9e-b263-4073-b773-6e1dac20d72f","score":1.0},
                 "fingerComparisonStrategy":"SAME_FINGER",
                 "type":"ONE_TO_ONE_MATCH",
-                "endedAt":{"ms":4567},
+                "endTime":{"ms":4567},
                 "probeBiometricReferenceId": "referenceId"
             },
             "type":"ONE_TO_ONE_MATCH"

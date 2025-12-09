@@ -15,7 +15,7 @@ class InvalidIntentEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(INVALID_INTENT)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
+            assertThat(startTime).isEqualTo(CREATED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(INVALID_INTENT)
             assertThat(extras).isEqualTo(extras)

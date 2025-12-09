@@ -37,8 +37,8 @@ internal data class ApiRefusalPayload(
     }
 
     constructor(domainPayload: RefusalPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.endedAt?.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
+        domainPayload.endTime?.fromDomainToApi(),
         domainPayload.reason.toApiRefusalEventAnswer(),
         domainPayload.otherText,
     )

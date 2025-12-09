@@ -35,8 +35,8 @@ data class FaceCaptureConfirmationEvent(
 
     @Keep
     data class FaceCaptureConfirmationPayload(
-        override val createdAt: Timestamp,
-        override var endedAt: Timestamp?,
+        override val startTime: Timestamp,
+        override var endTime: Timestamp?,
         override val eventVersion: Int,
         val result: Result,
         override val type: EventType = FACE_CAPTURE_CONFIRMATION,

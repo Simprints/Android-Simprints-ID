@@ -9,8 +9,8 @@
   "payload": {
     "type": "BIOMETRIC_REFERENCE_CREATION",
     "eventVersion": 1,
-    "createdAt": 9345678901,
-    "endedAt": 0,
+    "startTime": 9345678901,
+    "endTime": 0,
     "id": "78d13639-ac13-497f-8d81-4e7b08551c93",
     "modality": "FACE",
     "captureIds": [

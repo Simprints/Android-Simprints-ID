@@ -32,8 +32,8 @@ internal class UploadSampleWithTrackingUseCase @Inject constructor(
         eventRepository.addOrUpdateEvent(
             scope = urlRequestScope,
             event = SampleUpSyncRequestEvent(
-                createdAt = requestStartTime,
-                endedAt = timeHelper.now(),
+                startTime = requestStartTime,
+                endTime = timeHelper.now(),
                 requestId = requestId,
                 sampleId = sample.sampleId,
                 size = sample.size,

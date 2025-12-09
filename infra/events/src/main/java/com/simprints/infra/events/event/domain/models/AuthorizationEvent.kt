@@ -18,12 +18,12 @@ data class AuthorizationEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         result: AuthorizationResult,
         userInfo: UserInfo?,
     ) : this(
         UUID.randomUUID().toString(),
-        AuthorizationPayload(createdAt, EVENT_VERSION, result, userInfo),
+        AuthorizationPayload(startTime, EVENT_VERSION, result, userInfo),
         AUTHORIZATION,
     )
 
@@ -43,11 +43,11 @@ data class AuthorizationEvent(
 
     @Keep
     data class AuthorizationPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val result: AuthorizationResult,
         val userInfo: UserInfo?,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = AUTHORIZATION,
     ) : EventPayload() {
         override fun toSafeString(): String = "result: $result"

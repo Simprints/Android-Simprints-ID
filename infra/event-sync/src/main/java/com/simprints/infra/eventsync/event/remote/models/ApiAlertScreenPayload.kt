@@ -49,7 +49,7 @@ internal data class ApiAlertScreenPayload(
     val alertType: ApiAlertScreenEventType,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: AlertScreenPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         domainPayload.alertType.fromDomainToApi(),
     )
 

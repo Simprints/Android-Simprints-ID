@@ -107,7 +107,7 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 
 fun createSessionScope(
     id: String = GUID1,
-    createdAt: Timestamp = CREATED_AT,
+    startTime: Timestamp = CREATED_AT,
     projectId: String = DEFAULT_PROJECT_ID,
     isClosed: Boolean = false,
 ): EventScope {
@@ -126,9 +126,9 @@ fun createSessionScope(
     return EventScope(
         id = id,
         projectId = projectId,
-        createdAt = createdAt,
+        startTime = startTime,
         type = EventScopeType.SESSION,
-        endedAt = ENDED_AT.takeIf { isClosed },
+        endTime = ENDED_AT.takeIf { isClosed },
         payload = EventScopePayload(
             sidVersion = appVersionNameArg,
             libSimprintsVersion = libSimprintsVersionNameArg,
@@ -197,7 +197,7 @@ fun createVerificationCallbackEventV2() = VerificationCallbackEvent(
 )
 
 fun createConfirmationCalloutEventV2() = ConfirmationCalloutEventV2(
-    createdAt = CREATED_AT,
+    startTime = CREATED_AT,
     projectId = DEFAULT_PROJECT_ID,
     selectedGuid = GUID1,
     sessionId = GUID2,
@@ -205,7 +205,7 @@ fun createConfirmationCalloutEventV2() = ConfirmationCalloutEventV2(
 )
 
 fun createConfirmationCalloutEventV3() = ConfirmationCalloutEventV3(
-    createdAt = CREATED_AT,
+    startTime = CREATED_AT,
     projectId = DEFAULT_PROJECT_ID,
     selectedGuid = GUID1,
     sessionId = GUID2,
@@ -391,7 +391,7 @@ fun createEnrolmentEventV4() = EnrolmentEventV4(
 )
 
 fun createFingerprintCaptureEvent() = FingerprintCaptureEvent(
-    createdAt = CREATED_AT,
+    startTime = CREATED_AT,
     endTime = ENDED_AT,
     finger = LEFT_THUMB,
     qualityThreshold = 10,
@@ -405,7 +405,7 @@ fun createFingerprintCaptureEvent() = FingerprintCaptureEvent(
 )
 
 fun createFingerprintCaptureBiometricsEvent() = FingerprintCaptureBiometricsEvent(
-    createdAt = CREATED_AT,
+    startTime = CREATED_AT,
     fingerprint = FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
         LEFT_THUMB,
         "sometemplate",
@@ -484,8 +484,8 @@ fun createVero2InfoSnapshotEvent() = Vero2InfoSnapshotEvent(
 )
 
 fun createEventDownSyncRequestEvent() = EventDownSyncRequestEvent(
-    createdAt = CREATED_AT,
-    endedAt = ENDED_AT,
+    startTime = CREATED_AT,
+    endTime = ENDED_AT,
     requestId = GUID1,
     query = EventDownSyncRequestEvent.QueryParameters(
         moduleId = DEFAULT_MODULE_ID.value,
@@ -501,8 +501,8 @@ fun createEventDownSyncRequestEvent() = EventDownSyncRequestEvent(
 )
 
 fun createEventUpSyncRequestEvent() = EventUpSyncRequestEvent(
-    createdAt = CREATED_AT,
-    endedAt = ENDED_AT,
+    startTime = CREATED_AT,
+    endTime = ENDED_AT,
     requestId = GUID1,
     content = EventUpSyncRequestEvent.UpSyncContent(
         sessionCount = 1,
@@ -515,8 +515,8 @@ fun createEventUpSyncRequestEvent() = EventUpSyncRequestEvent(
 )
 
 fun createSampleUpSyncRequestEvent() = SampleUpSyncRequestEvent(
-    createdAt = CREATED_AT,
-    endedAt = ENDED_AT,
+    startTime = CREATED_AT,
+    endTime = ENDED_AT,
     requestId = GUID1,
     sampleId = GUID2,
     size = 100,
@@ -524,14 +524,14 @@ fun createSampleUpSyncRequestEvent() = SampleUpSyncRequestEvent(
 )
 
 fun createLicenseCheckEvent() = LicenseCheckEvent(
-    createdAt = CREATED_AT,
+    startTime = CREATED_AT,
     status = LicenseCheckEvent.LicenseStatus.VALID,
     vendor = "NEC_FINGERPRINT",
 )
 
 fun createAgeGroupSelectionEvent() = AgeGroupSelectionEvent(
-    createdAt = CREATED_AT,
-    endedAt = ENDED_AT,
+    startTime = CREATED_AT,
+    endTime = ENDED_AT,
     subjectAgeGroup = AgeGroupSelectionEvent.AgeGroup(1, 2),
 )
 
@@ -543,20 +543,20 @@ fun createBiometricReferenceCreationEvent() = BiometricReferenceCreationEvent(
 )
 
 fun createEnrolmentUpdateEvent() = EnrolmentUpdateEvent(
-    createdAt = CREATED_AT,
+    startTime = CREATED_AT,
     subjectId = GUID1,
     externalCredentialIdsToAdd = listOf(CREDENTIAL_ID),
 )
 
 fun createExternalCredentialSelectionEvent() = ExternalCredentialSelectionEvent(
-    createdAt = CREATED_AT,
-    endedAt = CREATED_AT,
+    startTime = CREATED_AT,
+    endTime = CREATED_AT,
     skipReason = ExternalCredentialSelectionEvent.SkipReason.OTHER,
     skipOther = DEFAULT_METADATA,
 )
 
 fun createExternalCredentialCaptureValueEvent() = ExternalCredentialCaptureValueEvent(
-    createdAt = CREATED_AT,
+    startTime = CREATED_AT,
     payloadId = CREDENTIAL_ID,
     credential = EXTERNAL_CREDENTIAL,
 )
@@ -574,15 +574,15 @@ fun createExternalCredentialCaptureEvent() = ExternalCredentialCaptureEvent(
 )
 
 fun createExternalCredentialSearchEvent() = ExternalCredentialSearchEvent(
-    createdAt = CREATED_AT,
-    endedAt = CREATED_AT,
+    startTime = CREATED_AT,
+    endTime = CREATED_AT,
     probeExternalCredentialId = GUID1,
     candidateIds = listOf(GUID1, GUID2),
 )
 
 fun createExternalCredentialConfirmationEvent() = ExternalCredentialConfirmationEvent(
-    createdAt = CREATED_AT,
-    endedAt = CREATED_AT,
+    startTime = CREATED_AT,
+    endTime = CREATED_AT,
     result = ExternalCredentialConfirmationResult.CONTINUE,
     userInteractedWithImage = true,
 )

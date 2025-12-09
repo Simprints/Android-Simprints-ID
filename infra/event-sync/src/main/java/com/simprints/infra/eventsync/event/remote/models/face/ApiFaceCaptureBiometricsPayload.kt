@@ -31,7 +31,7 @@ internal class ApiFaceCaptureBiometricsPayload(
     }
 
     constructor(domainPayload: FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         domainPayload.id,
         Face(domainPayload.face),
     )

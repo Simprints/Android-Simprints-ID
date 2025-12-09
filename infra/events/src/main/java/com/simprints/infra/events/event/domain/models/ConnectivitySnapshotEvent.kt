@@ -17,11 +17,11 @@ data class ConnectivitySnapshotEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         connections: List<SimNetworkUtils.Connection>,
     ) : this(
         UUID.randomUUID().toString(),
-        ConnectivitySnapshotPayload(createdAt, EVENT_VERSION, connections),
+        ConnectivitySnapshotPayload(startTime, EVENT_VERSION, connections),
         CONNECTIVITY_SNAPSHOT,
     )
 
@@ -31,10 +31,10 @@ data class ConnectivitySnapshotEvent(
 
     @Keep
     data class ConnectivitySnapshotPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val connections: List<SimNetworkUtils.Connection>,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = CONNECTIVITY_SNAPSHOT,
     ) : EventPayload() {
         override fun toSafeString(): String = connections.joinToString(", ") { "${it.type}: ${it.state}" }

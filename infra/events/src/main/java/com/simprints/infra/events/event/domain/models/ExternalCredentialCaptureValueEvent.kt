@@ -19,13 +19,13 @@ data class ExternalCredentialCaptureValueEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         payloadId: String,
         credential: ExternalCredential,
     ) : this(
         id = UUID.randomUUID().toString(),
         payload = ExternalCredentialCaptureValuePayload(
-            createdAt = createdAt,
+            startTime = startTime,
             eventVersion = EVENT_VERSION,
             id = payloadId,
             credential = credential,
@@ -49,11 +49,11 @@ data class ExternalCredentialCaptureValueEvent(
     @Keep
     @ExcludedFromGeneratedTestCoverageReports("Data struct")
     data class ExternalCredentialCaptureValuePayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val id: String,
         val credential: ExternalCredential,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = EXTERNAL_CREDENTIAL_CAPTURE_VALUE,
     ) : EventPayload() {
         override fun toSafeString(): String = "id $id, credential: $credential"

@@ -27,7 +27,7 @@ internal data class ApiFingerprintCaptureBiometricsPayload(
     }
 
     constructor(domainPayload: FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         Fingerprint(domainPayload.fingerprint),
         domainPayload.id,
     )

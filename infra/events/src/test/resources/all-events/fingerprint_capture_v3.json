@@ -14,9 +14,9 @@
     "deviceId": "deviceId"
   },
   "payload": {
-    "createdAt": 0,
+    "startTime": 0,
     "eventVersion": 0,
-    "endedAt": 0,
+    "endTime": 0,
     "finger": "LEFT_3RD_FINGER",
     "qualityThreshold": 0,
     "result": "GOOD_SCAN",

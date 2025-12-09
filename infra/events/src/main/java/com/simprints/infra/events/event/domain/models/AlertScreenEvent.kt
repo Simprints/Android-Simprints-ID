@@ -16,11 +16,11 @@ data class AlertScreenEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         alertType: AlertScreenPayload.AlertScreenEventType,
     ) : this(
         UUID.randomUUID().toString(),
-        AlertScreenPayload(createdAt, EVENT_VERSION, alertType),
+        AlertScreenPayload(startTime, EVENT_VERSION, alertType),
         ALERT_SCREEN,
     )
 
@@ -30,10 +30,10 @@ data class AlertScreenEvent(
 
     @Keep
     data class AlertScreenPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val alertType: AlertScreenEventType,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = ALERT_SCREEN,
     ) : EventPayload() {
         override fun toSafeString(): String = "type: $alertType"

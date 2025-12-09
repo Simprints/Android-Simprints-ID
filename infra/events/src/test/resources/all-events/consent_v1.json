@@ -9,8 +9,8 @@
   "payload": {
     "type": "CONSENT",
     "eventVersion": 1,
-    "createdAt": 121345670,
-    "endedAt": 3145678930,
+    "startTime": 121345670,
+    "endTime": 3145678930,
     "consentType": "PARENTAL",
     "result":"ACCEPTED"
   }

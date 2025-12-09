@@ -140,16 +140,16 @@ internal class EventRepositoryImplTest {
         val event = createAlertScreenEvent()
 
         coEvery { eventLocalDataSource.loadEventsInScope(any()) } returns listOf(
-            event.copy(payload = event.payload.copy(endedAt = Timestamp(5))),
-            event.copy(payload = event.payload.copy(endedAt = Timestamp(3))),
-            event.copy(payload = event.payload.copy(endedAt = Timestamp(1))),
+            event.copy(payload = event.payload.copy(endTime = Timestamp(5))),
+            event.copy(payload = event.payload.copy(endTime = Timestamp(3))),
+            event.copy(payload = event.payload.copy(endTime = Timestamp(1))),
         )
         eventRepo.closeEventScope(scope, null)
 
         coVerify {
             eventLocalDataSource.saveEventScope(
                 match {
-                    assertThat(it.endedAt).isEqualTo(Timestamp(5L))
+                    assertThat(it.endTime).isEqualTo(Timestamp(5L))
                     true
                 },
             )
@@ -187,14 +187,14 @@ internal class EventRepositoryImplTest {
 
         coEvery { eventLocalDataSource.loadEventScope(any()) } returns scope
         coEvery { eventLocalDataSource.loadEventsInScope(any()) } returns listOf(
-            event.copy(payload = event.payload.copy(endedAt = Timestamp(5))),
+            event.copy(payload = event.payload.copy(endTime = Timestamp(5))),
         )
         eventRepo.closeEventScope("scopeId", null)
 
         coVerify {
             eventLocalDataSource.saveEventScope(
                 match {
-                    assertThat(it.endedAt).isEqualTo(Timestamp(5L))
+                    assertThat(it.endTime).isEqualTo(Timestamp(5L))
                     true
                 },
             )
@@ -224,7 +224,7 @@ internal class EventRepositoryImplTest {
 
         val event = createAlertScreenEvent()
         coEvery { eventLocalDataSource.loadEventsInScope(any()) } returns listOf(
-            event.copy(payload = event.payload.copy(endedAt = Timestamp(5))),
+            event.copy(payload = event.payload.copy(endTime = Timestamp(5))),
         )
 
         eventRepo.closeAllOpenScopes(EventScopeType.SESSION, null)
@@ -232,7 +232,7 @@ internal class EventRepositoryImplTest {
         coVerify(exactly = 2) {
             eventLocalDataSource.saveEventScope(
                 withArg {
-                    assertThat(it.endedAt).isNotNull()
+                    assertThat(it.endTime).isNotNull()
                     assertThat(it.payload.endCause).isNotNull()
                 },
             )
@@ -414,8 +414,8 @@ internal class EventRepositoryImplTest {
     }
 
     private fun assertANewSessionCaptureWasAdded(scope: EventScope): Boolean = scope.projectId == DEFAULT_PROJECT_ID &&
-        scope.createdAt == NOW &&
-        scope.endedAt == null &&
+        scope.startTime == NOW &&
+        scope.endTime == null &&
         scope.payload.modalities == listOf(Modality.FINGERPRINT, Modality.FACE) &&
         scope.payload.sidVersion == APP_VERSION_NAME &&
         scope.payload.language == LANGUAGE &&

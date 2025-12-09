@@ -24,7 +24,7 @@ class PersonCreationEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(PERSON_CREATION)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
+            assertThat(startTime).isEqualTo(CREATED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(PERSON_CREATION)
             assertThat(fingerprintCaptureIds).isEqualTo(fingerprintCaptureEventIds)

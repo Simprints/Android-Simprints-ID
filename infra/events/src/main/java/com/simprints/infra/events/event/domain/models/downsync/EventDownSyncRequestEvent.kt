@@ -18,8 +18,8 @@ data class EventDownSyncRequestEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
-        endedAt: Timestamp,
+        startTime: Timestamp,
+        endTime: Timestamp,
         query: QueryParameters,
         requestId: String,
         responseStatus: Int? = null,
@@ -29,8 +29,8 @@ data class EventDownSyncRequestEvent(
     ) : this(
         UUID.randomUUID().toString(),
         EventDownSyncRequestPayload(
-            createdAt,
-            endedAt,
+            startTime,
+            endTime,
             requestId,
             query,
             responseStatus,
@@ -51,8 +51,8 @@ data class EventDownSyncRequestEvent(
 
     @Keep
     data class EventDownSyncRequestPayload(
-        override val createdAt: Timestamp,
-        override val endedAt: Timestamp?,
+        override val startTime: Timestamp,
+        override val endTime: Timestamp?,
         val requestId: String,
         val queryParameters: QueryParameters,
         val responseStatus: Int?,

@@ -14,7 +14,7 @@
   },
   "payload": {
     "id": "someId",
-    "createdAt": 0,
+    "startTime": 0,
     "eventVersion": 0,
     "qualityThreshold": 1.0,
     "result": "VALID",
@@ -25,7 +25,7 @@
       "template": "template",
       "format": "RANK_ONE_1_23"
     },
-    "endedAt": 0,
+    "endTime": 0,
     "type": "FACE_CAPTURE_BIOMETRICS"
   },
   "type": "FACE_CAPTURE_BIOMETRICS"

@@ -19,11 +19,11 @@ data class VerificationCallbackEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         score: CallbackComparisonScore,
     ) : this(
         UUID.randomUUID().toString(),
-        VerificationCallbackPayload(createdAt, EVENT_VERSION, score),
+        VerificationCallbackPayload(startTime, EVENT_VERSION, score),
         CALLBACK_VERIFICATION,
     )
 
@@ -33,10 +33,10 @@ data class VerificationCallbackEvent(
 
     @Keep
     data class VerificationCallbackPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val score: CallbackComparisonScore,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = CALLBACK_VERIFICATION,
     ) : EventPayload() {
         override fun toSafeString(): String = "confidence: ${score.confidence}"

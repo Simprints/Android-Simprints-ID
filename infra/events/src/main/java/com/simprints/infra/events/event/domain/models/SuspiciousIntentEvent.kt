@@ -16,11 +16,11 @@ data class SuspiciousIntentEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         unexpectedExtras: Map<String, Any?>,
     ) : this(
         UUID.randomUUID().toString(),
-        SuspiciousIntentPayload(createdAt, EVENT_VERSION, unexpectedExtras),
+        SuspiciousIntentPayload(startTime, EVENT_VERSION, unexpectedExtras),
         SUSPICIOUS_INTENT,
     )
 
@@ -30,10 +30,10 @@ data class SuspiciousIntentEvent(
 
     @Keep
     data class SuspiciousIntentPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val unexpectedExtras: Map<String, Any?>,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = SUSPICIOUS_INTENT,
     ) : EventPayload() {
         override fun toSafeString(): String = unexpectedExtras.entries.joinToString(", ") {

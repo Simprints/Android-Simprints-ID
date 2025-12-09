@@ -84,7 +84,7 @@ class SaveMatchEventUseCase @Inject constructor(
         fingerComparisonStrategy: FingerComparisonStrategy?,
         biometricReferenceId: String,
     ) = OneToOneMatchEvent(
-        createdAt = startTime,
+        startTime = startTime,
         endTime = endTime,
         candidateId = queryForCandidates.subjectId!!,
         matcher = matcherName,
@@ -103,7 +103,7 @@ class SaveMatchEventUseCase @Inject constructor(
         biometricReferenceId: String,
         batches: List<MatchBatchInfo>,
     ) = OneToManyMatchEvent(
-        createdAt = startTime,
+        startTime = startTime,
         endTime = endTime,
         pool = OneToManyMatchEvent.OneToManyMatchPayload.MatchPool(
             queryForCandidates.parseQueryAsCoreMatchPoolType(),

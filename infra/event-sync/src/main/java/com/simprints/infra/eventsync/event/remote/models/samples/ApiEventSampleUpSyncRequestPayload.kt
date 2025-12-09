@@ -17,8 +17,8 @@ internal data class ApiEventSampleUpSyncRequestPayload(
     val errorType: String?,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: SampleUpSyncRequestEvent.SampleUpSyncRequestPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.endedAt?.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
+        domainPayload.endTime?.fromDomainToApi(),
         domainPayload.requestId,
         domainPayload.sampleId,
         domainPayload.size,
