@@ -17,16 +17,16 @@ data class ExternalCredentialSearchEvent(
 ) : Event() {
     constructor(
         id: String = randomUUID(),
-        createdAt: Timestamp,
-        endedAt: Timestamp,
+        startTime: Timestamp,
+        endTime: Timestamp,
         probeExternalCredentialId: String,
         candidateIds: List<String>,
     ) : this(
         id = id,
         payload = ExternalCredentialSearchPayload(
             id = id,
-            createdAt = createdAt,
-            endedAt = endedAt,
+            startTime = startTime,
+            endTime = endTime,
             eventVersion = EVENT_VERSION,
             probeExternalCredentialId = probeExternalCredentialId,
             result = ExternalCredentialSearchResult(
@@ -38,8 +38,8 @@ data class ExternalCredentialSearchEvent(
 
     @Keep
     data class ExternalCredentialSearchPayload(
-        override val createdAt: Timestamp,
-        override val endedAt: Timestamp? = null,
+        override val startTime: Timestamp,
+        override val endTime: Timestamp? = null,
         override val eventVersion: Int,
         val id: String,
         val probeExternalCredentialId: String,

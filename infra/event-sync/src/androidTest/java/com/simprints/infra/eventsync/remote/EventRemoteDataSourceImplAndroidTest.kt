@@ -96,7 +96,7 @@ package com.simprints.infra.eventsync.remote
 //            .forEach {
 //                add(
 //                    AlertScreenEvent(
-//                        createdAt = DEFAULT_TIME,
+//                        startTime = DEFAULT_TIME,
 //                        alertType = it,
 //                        labels = eventLabels
 //                    )
@@ -108,7 +108,7 @@ package com.simprints.infra.eventsync.remote
 //        ArtificialTerminationPayload.Reason.values().forEach {
 //            add(
 //                ArtificialTerminationEvent(
-//                    createdAt = DEFAULT_TIME,
+//                    startTime = DEFAULT_TIME,
 //                    reason = it,
 //                    labels = eventLabels
 //                )
@@ -129,7 +129,7 @@ package com.simprints.infra.eventsync.remote
 //        ).forEach {
 //            add(
 //                AuthenticationEvent(
-//                    createdAt = DEFAULT_TIME,
+//                    startTime = DEFAULT_TIME,
 //                    endTime = DEFAULT_TIME,
 //                    userInfo = UserInfo("some_project", DEFAULT_USER_ID),
 //                    result = it,
@@ -143,7 +143,7 @@ package com.simprints.infra.eventsync.remote
 //        AuthorizationPayload.AuthorizationResult.values().forEach {
 //            add(
 //                AuthorizationEvent(
-//                    createdAt = DEFAULT_TIME,
+//                    startTime = DEFAULT_TIME,
 //                    result = it,
 //                    userInfo = AuthorizationPayload.UserInfo("some_project", DEFAULT_USER_ID),
 //                    labels = eventLabels
@@ -157,7 +157,7 @@ package com.simprints.infra.eventsync.remote
 //            CandidateReadPayload.RemoteResult.values().forEach { remote ->
 //                add(
 //                    CandidateReadEvent(
-//                        createdAt = DEFAULT_TIME,
+//                        startTime = DEFAULT_TIME,
 //                        endTime = DEFAULT_TIME,
 //                        candidateId = randomUUID(),
 //                        localResult = local,
@@ -172,7 +172,7 @@ package com.simprints.infra.eventsync.remote
 //    private fun MutableList<Event>.addConnectivitySnapshotEvent() {
 //        add(
 //            ConnectivitySnapshotEvent(
-//                createdAt = DEFAULT_TIME,
+//                startTime = DEFAULT_TIME,
 //                connections = listOf(
 //                    SimNetworkUtils.Connection(
 //                        SimNetworkUtils.ConnectionType.MOBILE,
@@ -188,7 +188,7 @@ package com.simprints.infra.eventsync.remote
 //            ConsentPayload.Result.values().forEach { result ->
 //                add(
 //                    ConsentEvent(
-//                        createdAt = DEFAULT_TIME,
+//                        startTime = DEFAULT_TIME,
 //                        endTime = DEFAULT_TIME,
 //                        consentType = type,
 //                        result = result,
@@ -202,7 +202,7 @@ package com.simprints.infra.eventsync.remote
 //    private fun MutableList<Event>.addEnrolmentEvent() {
 //        add(
 //            EnrolmentEventV2(
-//                createdAt = DEFAULT_TIME,
+//                startTime = DEFAULT_TIME,
 //                subjectId = randomUUID(),
 //                projectId = testProject.id,
 //                moduleId = DEFAULT_MODULE_ID,
@@ -224,7 +224,7 @@ package com.simprints.infra.eventsync.remote
 //                )
 //
 //                val event = FingerprintCaptureEvent(
-//                    createdAt = DEFAULT_TIME,
+//                    startTime = DEFAULT_TIME,
 //                    endTime = DEFAULT_TIME,
 //                    finger = fingerIdentifier.fromDomainToModuleApi(),
 //                    qualityThreshold = 0,
@@ -254,7 +254,7 @@ package com.simprints.infra.eventsync.remote
 //                )
 //
 //            val event = FingerprintCaptureBiometricsEvent(
-//                createdAt = DEFAULT_TIME,
+//                startTime = DEFAULT_TIME,
 //                fingerprint = fingerprint,
 //                labels = eventLabels,
 //                payloadId = fingerPayloadId
@@ -348,7 +348,7 @@ package com.simprints.infra.eventsync.remote
 //    private fun MutableList<Event>.addGuidSelectionEvent() {
 //        add(
 //            GuidSelectionEvent(
-//                createdAt = DEFAULT_TIME,
+//                startTime = DEFAULT_TIME,
 //                selectedId = randomUUID(),
 //                labels = eventLabels
 //            )
@@ -359,7 +359,7 @@ package com.simprints.infra.eventsync.remote
 //        IntentParsingPayload.IntegrationInfo.values().forEach {
 //            add(
 //                IntentParsingEvent(
-//                    createdAt = DEFAULT_TIME,
+//                    startTime = DEFAULT_TIME,
 //                    integration = it,
 //                    labels = eventLabels
 //                )
@@ -382,7 +382,7 @@ package com.simprints.infra.eventsync.remote
 //        OneToManyMatchPayload.MatchPoolType.values().forEach {
 //            add(
 //                OneToManyMatchEvent(
-//                    createdAt = DEFAULT_TIME,
+//                    startTime = DEFAULT_TIME,
 //                    endTime = DEFAULT_TIME,
 //                    pool = OneToManyMatchPayload.MatchPool(it, 0),
 //                    matcher = Matcher.SIM_AFIS,
@@ -396,7 +396,7 @@ package com.simprints.infra.eventsync.remote
 //    private fun MutableList<Event>.addOneToOneMatchEvent() {
 //        add(
 //            OneToOneMatchEvent(
-//                createdAt = DEFAULT_TIME,
+//                startTime = DEFAULT_TIME,
 //                endTime = DEFAULT_TIME,
 //                candidateId = randomUUID(),
 //                matcher = Matcher.SIM_AFIS,
@@ -430,7 +430,7 @@ package com.simprints.infra.eventsync.remote
 //        RefusalPayload.Answer.values().forEach {
 //            add(
 //                RefusalEvent(
-//                    createdAt = DEFAULT_TIME,
+//                    startTime = DEFAULT_TIME,
 //                    endTime = DEFAULT_TIME,
 //                    reason = it,
 //                    otherText = "other_text",
@@ -443,7 +443,7 @@ package com.simprints.infra.eventsync.remote
 //    private fun MutableList<Event>.addScannerConnectionEvent() {
 //        add(
 //            ScannerConnectionEvent(
-//                createdAt = DEFAULT_TIME,
+//                startTime = DEFAULT_TIME,
 //                scannerInfo = ScannerConnectionPayload.ScannerInfo(
 //                    "scanner_id", "macAddress",
 //                    ScannerGeneration.VERO_2, "hardware"
@@ -456,7 +456,7 @@ package com.simprints.infra.eventsync.remote
 //    private fun MutableList<Event>.addVero2InfoSnapshotEvents() {
 //        add(
 //            Vero2InfoSnapshotEvent(
-//                createdAt = DEFAULT_TIME,
+//                startTime = DEFAULT_TIME,
 //                version = Vero2InfoSnapshotEvent.Vero2Version.Vero2NewApiVersion(
 //                    "E-1", "1.23",
 //                    "api", "stmApp"
@@ -470,7 +470,7 @@ package com.simprints.infra.eventsync.remote
 //    private fun MutableList<Event>.addScannerFirmwareUpdateEvent() {
 //        add(
 //            ScannerFirmwareUpdateEvent(
-//                createdAt = DEFAULT_TIME, endTime = DEFAULT_TIME, chip = "stm",
+//                startTime = DEFAULT_TIME, endTime = DEFAULT_TIME, chip = "stm",
 //                targetAppVersion = "targetApp", failureReason = "failureReason",
 //                labels = eventLabels
 //            )
@@ -480,7 +480,7 @@ package com.simprints.infra.eventsync.remote
 //    private fun MutableList<Event>.addSuspiciousIntentEvent() {
 //        add(
 //            SuspiciousIntentEvent(
-//                createdAt = DEFAULT_TIME,
+//                startTime = DEFAULT_TIME,
 //                unexpectedExtras = mapOf("some_extra_key" to "value"),
 //                labels = eventLabels
 //            )
@@ -488,7 +488,7 @@ package com.simprints.infra.eventsync.remote
 //    }
 //
 //    private fun MutableList<Event>.addCompletionCheckEvent() {
-//        add(CompletionCheckEvent(createdAt = DEFAULT_TIME, completed = true, labels = eventLabels))
+//        add(CompletionCheckEvent(startTime = DEFAULT_TIME, completed = true, labels = eventLabels))
 //    }
 //
 //    private fun MutableList<Event>.addSessionCaptureEvent() {
@@ -501,7 +501,7 @@ package com.simprints.infra.eventsync.remote
 //        val event = SessionCaptureEvent(
 //            id = randomUUID(),
 //            projectId = testProject.id,
-//            createdAt = CREATED_AT,
+//            startTime = CREATED_AT,
 //            modalities = listOf(Modality.FINGERPRINT, Modality.FACE),
 //            appVersionName = "appVersionName",
 //            libVersionName = "libSimprintsVersionName",
@@ -512,21 +512,21 @@ package com.simprints.infra.eventsync.remote
 //
 //        event.payload.location = Location(latitude = 0.0, longitude = 0.0)
 //        event.payload.uploadedAt = 1
-//        event.payload.endedAt = 1
+//        event.payload.endTime = 1
 //
 //        add(event)
 //    }
 //
 //    private fun MutableList<Event>.addCallbackErrorEvent() {
 //        ErrorCallbackPayload.Reason.values().forEach {
-//            add(ErrorCallbackEvent(createdAt = DEFAULT_TIME, reason = it, labels = eventLabels))
+//            add(ErrorCallbackEvent(startTime = DEFAULT_TIME, reason = it, labels = eventLabels))
 //        }
 //    }
 //
 //    private fun MutableList<Event>.addCallbackEnrolmentEvent() {
 //        add(
 //            EnrolmentCallbackEvent(
-//                createdAt = DEFAULT_TIME,
+//                startTime = DEFAULT_TIME,
 //                guid = randomUUID(),
 //                eventLabels = eventLabels
 //            )
@@ -536,7 +536,7 @@ package com.simprints.infra.eventsync.remote
 //    private fun MutableList<Event>.addCallbackRefusalEvent() {
 //        add(
 //            RefusalCallbackEvent(
-//                createdAt = DEFAULT_TIME,
+//                startTime = DEFAULT_TIME,
 //                reason = "reason",
 //                extra = "other_text",
 //                labels = eventLabels
@@ -548,7 +548,7 @@ package com.simprints.infra.eventsync.remote
 //        IAppResponseTier.values().forEach {
 //            add(
 //                VerificationCallbackEvent(
-//                    createdAt = DEFAULT_TIME,
+//                    startTime = DEFAULT_TIME,
 //                    score = CallbackComparisonScore(randomUUID(), 0, it),
 //                    labels = eventLabels
 //                )
@@ -560,7 +560,7 @@ package com.simprints.infra.eventsync.remote
 //        IAppResponseTier.values().forEach {
 //            add(
 //                IdentificationCallbackEvent(
-//                    createdAt = DEFAULT_TIME,
+//                    startTime = DEFAULT_TIME,
 //                    sessionId = randomUUID(),
 //                    scores = listOf(CallbackComparisonScore(randomUUID(), 0, it)),
 //                    labels = eventLabels
@@ -572,7 +572,7 @@ package com.simprints.infra.eventsync.remote
 //    private fun MutableList<Event>.addCallbackConfirmationEvent() {
 //        add(
 //            ConfirmationCallbackEvent(
-//                createdAt = DEFAULT_TIME,
+//                startTime = DEFAULT_TIME,
 //                identificationOutcome = true,
 //                labels = eventLabels
 //            )
@@ -582,7 +582,7 @@ package com.simprints.infra.eventsync.remote
 //    private fun MutableList<Event>.addCalloutEnrolmentEvent() {
 //        add(
 //            EnrolmentCalloutEvent(
-//                createdAt = DEFAULT_TIME,
+//                startTime = DEFAULT_TIME,
 //                projectId = testProject.id,
 //                userId = DEFAULT_USER_ID,
 //                moduleId = DEFAULT_MODULE_ID,
@@ -595,7 +595,7 @@ package com.simprints.infra.eventsync.remote
 //    private fun MutableList<Event>.addCalloutIdentificationEvent() {
 //        add(
 //            IdentificationCalloutEvent(
-//                createdAt = DEFAULT_TIME,
+//                startTime = DEFAULT_TIME,
 //                projectId = testProject.id,
 //                userId = DEFAULT_USER_ID,
 //                moduleId = DEFAULT_MODULE_ID,
@@ -608,7 +608,7 @@ package com.simprints.infra.eventsync.remote
 //    private fun MutableList<Event>.addCalloutVerificationEvent() {
 //        add(
 //            VerificationCalloutEvent(
-//                createdAt = DEFAULT_TIME,
+//                startTime = DEFAULT_TIME,
 //                projectId = testProject.id,
 //                userId = DEFAULT_USER_ID,
 //                moduleId = DEFAULT_MODULE_ID,
@@ -622,7 +622,7 @@ package com.simprints.infra.eventsync.remote
 //    private fun MutableList<Event>.addCalloutLastBiomentricsEvent() {
 //        add(
 //            EnrolmentLastBiometricsCalloutEvent(
-//                createdAt = DEFAULT_TIME,
+//                startTime = DEFAULT_TIME,
 //                projectId = testProject.id,
 //                userId = DEFAULT_USER_ID,
 //                moduleId = DEFAULT_MODULE_ID,
@@ -636,7 +636,7 @@ package com.simprints.infra.eventsync.remote
 //    private fun MutableList<Event>.addCalloutConfirmationCallbackEvent() {
 //        add(
 //            ConfirmationCalloutEvent(
-//                createdAt = DEFAULT_TIME,
+//                startTime = DEFAULT_TIME,
 //                projectId = testProject.id,
 //                selectedGuid = randomUUID(),
 //                sessionId = randomUUID(),

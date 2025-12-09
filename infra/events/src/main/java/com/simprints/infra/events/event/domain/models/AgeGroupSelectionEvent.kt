@@ -16,12 +16,12 @@ data class AgeGroupSelectionEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
-        endedAt: Timestamp,
+        startTime: Timestamp,
+        endTime: Timestamp,
         subjectAgeGroup: AgeGroup,
     ) : this(
         UUID.randomUUID().toString(),
-        AgeGroupSelectionPayload(createdAt, EVENT_VERSION, endedAt, subjectAgeGroup),
+        AgeGroupSelectionPayload(startTime, EVENT_VERSION, endTime, subjectAgeGroup),
         AGE_GROUP_SELECTION,
     )
 
@@ -31,9 +31,9 @@ data class AgeGroupSelectionEvent(
 
     @Keep
     data class AgeGroupSelectionPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
-        override val endedAt: Timestamp?,
+        override val endTime: Timestamp?,
         val subjectAgeGroup: AgeGroup,
         override val type: EventType = AGE_GROUP_SELECTION,
     ) : EventPayload() {

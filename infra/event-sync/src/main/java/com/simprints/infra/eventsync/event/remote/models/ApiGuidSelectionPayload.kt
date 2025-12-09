@@ -10,7 +10,7 @@ internal data class ApiGuidSelectionPayload(
     val selectedId: String,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: GuidSelectionPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         domainPayload.selectedId,
     )
 

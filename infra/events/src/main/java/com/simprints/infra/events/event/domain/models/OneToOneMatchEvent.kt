@@ -18,7 +18,7 @@ data class OneToOneMatchEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         endTime: Timestamp,
         candidateId: String,
         matcher: String,
@@ -28,9 +28,9 @@ data class OneToOneMatchEvent(
     ) : this(
         id = UUID.randomUUID().toString(),
         payload = OneToOneMatchPayload.OneToOneMatchPayloadV4(
-            createdAt = createdAt,
+            startTime = startTime,
             eventVersion = EVENT_VERSION,
-            endedAt = endTime,
+            endTime = endTime,
             candidateId = candidateId,
             matcher = matcher,
             result = result,
@@ -62,9 +62,9 @@ data class OneToOneMatchEvent(
     )
     @Keep
     sealed class OneToOneMatchPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
-        override var endedAt: Timestamp?,
+        override var endTime: Timestamp?,
         open val candidateId: String,
         open val matcher: String,
         open val result: MatchEntry?,
@@ -76,26 +76,26 @@ data class OneToOneMatchEvent(
 
         @Keep
         data class OneToOneMatchPayloadV3(
-            override val createdAt: Timestamp,
+            override val startTime: Timestamp,
             override val eventVersion: Int,
-            override var endedAt: Timestamp?,
+            override var endTime: Timestamp?,
             override val candidateId: String,
             override val matcher: String,
             override val result: MatchEntry?,
             override val fingerComparisonStrategy: FingerComparisonStrategy?,
-        ) : OneToOneMatchPayload(createdAt, eventVersion, endedAt, candidateId, matcher, result, fingerComparisonStrategy)
+        ) : OneToOneMatchPayload(startTime, eventVersion, endTime, candidateId, matcher, result, fingerComparisonStrategy)
 
         @Keep
         data class OneToOneMatchPayloadV4(
-            override val createdAt: Timestamp,
+            override val startTime: Timestamp,
             override val eventVersion: Int,
-            override var endedAt: Timestamp?,
+            override var endTime: Timestamp?,
             override val candidateId: String,
             override val matcher: String,
             override val result: MatchEntry?,
             override val fingerComparisonStrategy: FingerComparisonStrategy?,
             val probeBiometricReferenceId: String,
-        ) : OneToOneMatchPayload(createdAt, eventVersion, endedAt, candidateId, matcher, result, fingerComparisonStrategy)
+        ) : OneToOneMatchPayload(startTime, eventVersion, endTime, candidateId, matcher, result, fingerComparisonStrategy)
     }
 
     companion object {

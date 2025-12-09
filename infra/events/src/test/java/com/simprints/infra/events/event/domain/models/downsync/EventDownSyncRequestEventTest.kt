@@ -69,8 +69,8 @@ class EventDownSyncRequestEventTest {
         moduleId: String? = null,
     ): EventDownSyncRequestEvent = EventDownSyncRequestEvent(
         payload = EventDownSyncRequestEvent.EventDownSyncRequestPayload(
-            createdAt = mockk<Timestamp>(),
-            endedAt = mockk<Timestamp>(),
+            startTime = mockk<Timestamp>(),
+            endTime = mockk<Timestamp>(),
             requestId = "requestId",
             queryParameters = QueryParameters(
                 moduleId = moduleId,

@@ -9,8 +9,8 @@
   "payload": {
     "type": "CALLBACK_ERROR",
     "eventVersion": 1,
-    "createdAt": 9345678901,
-    "endedAt": 0,
+    "startTime": 9345678901,
+    "endTime": 0,
     "reason": "GUID_NOT_FOUND_ONLINE"
   }
 }

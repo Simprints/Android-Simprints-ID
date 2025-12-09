@@ -19,11 +19,11 @@ data class ConfirmationCallbackEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         identificationOutcome: Boolean,
     ) : this(
         UUID.randomUUID().toString(),
-        ConfirmationCallbackPayload(createdAt, EVENT_VERSION, identificationOutcome),
+        ConfirmationCallbackPayload(startTime, EVENT_VERSION, identificationOutcome),
         CALLBACK_CONFIRMATION,
     )
 
@@ -33,10 +33,10 @@ data class ConfirmationCallbackEvent(
 
     @Keep
     data class ConfirmationCallbackPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val identificationOutcome: Boolean,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = CALLBACK_CONFIRMATION,
     ) : EventPayload() {
         override fun toSafeString(): String = "outcome: $identificationOutcome"

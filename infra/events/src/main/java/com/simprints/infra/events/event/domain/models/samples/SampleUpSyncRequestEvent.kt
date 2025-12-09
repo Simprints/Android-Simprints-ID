@@ -18,8 +18,8 @@ class SampleUpSyncRequestEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
-        endedAt: Timestamp,
+        startTime: Timestamp,
+        endTime: Timestamp,
         requestId: String?,
         sampleId: String,
         size: Long,
@@ -27,8 +27,8 @@ class SampleUpSyncRequestEvent(
     ) : this(
         UUID.randomUUID().toString(),
         SampleUpSyncRequestPayload(
-            createdAt,
-            endedAt,
+            startTime,
+            endTime,
             requestId,
             sampleId,
             size,
@@ -40,8 +40,8 @@ class SampleUpSyncRequestEvent(
 
     @Keep
     data class SampleUpSyncRequestPayload(
-        override val createdAt: Timestamp,
-        override val endedAt: Timestamp?,
+        override val startTime: Timestamp,
+        override val endTime: Timestamp?,
         val requestId: String?,
         val sampleId: String,
         val size: Long,

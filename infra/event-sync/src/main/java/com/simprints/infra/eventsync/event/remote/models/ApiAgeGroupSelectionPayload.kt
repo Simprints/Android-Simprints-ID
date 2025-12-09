@@ -11,8 +11,8 @@ internal data class ApiAgeGroupSelectionPayload(
     val subjectAgeGroup: ApiAgeGroup,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: AgeGroupSelectionEvent.AgeGroupSelectionPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.endedAt?.fromDomainToApi() ?: ApiTimestamp(0),
+        domainPayload.startTime.fromDomainToApi(),
+        domainPayload.endTime?.fromDomainToApi() ?: ApiTimestamp(0),
         domainPayload.subjectAgeGroup.fromDomainToApi(),
     )
 

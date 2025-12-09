@@ -60,7 +60,7 @@ class EventMigration1to2Test {
         this.put("id", id)
         this.put("type", "ENROLMENT")
         val unversionedEnrolmentEvent =
-            """{"id":"$id","labels":{"projectId":"TEST6Oai41ps1pBNrzBL","sessionId":"e35c39f9-b81e-48f2-97e7-46ecc8399bb4","deviceId":"f2fd8393c0a0be67"},"payload":{"createdAt":1611584017198,"eventVersion":1,"personId":"61881de4-22f2-4e13-861a-21a209db8581","type":"ENROLMENT_V1","endedAt":0},"type":"ENROLMENT_V1"}"""
+            """{"id":"$id","labels":{"projectId":"TEST6Oai41ps1pBNrzBL","sessionId":"e35c39f9-b81e-48f2-97e7-46ecc8399bb4","deviceId":"f2fd8393c0a0be67"},"payload":{"startTime":1611584017198,"eventVersion":1,"personId":"61881de4-22f2-4e13-861a-21a209db8581","type":"ENROLMENT_V1","endTime":0},"type":"ENROLMENT_V1"}"""
         this.put("eventJson", unversionedEnrolmentEvent)
         this.put("createdAt", 0)
         this.put("endedAt", 0)
@@ -68,7 +68,7 @@ class EventMigration1to2Test {
 
     private fun createSessionCaptureEvent(
         id: String,
-        endedAt: Long,
+        endTime: Long,
     ) = ContentValues().apply {
         this.put("id", id)
         this.put("type", "SESSION_CAPTURE")
@@ -84,7 +84,7 @@ class EventMigration1to2Test {
                 },
                 "payload": {
                     "id": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
-                    "createdAt": 1611584017198,
+                    "startTime": 1611584017198,
                     "modalities": ["FINGERPRINT"],
                     "appVersionName": "appVersionName",
                     "libVersionName": "libSimprintsVersionName",
@@ -101,7 +101,7 @@ class EventMigration1to2Test {
             """.trimIndent(),
         )
         this.put("createdAt", 1611584017198)
-        this.put("endedAt", endedAt)
+        this.put("endedAt", endTime)
     }
 
     private fun validateEnrolmentMigration(

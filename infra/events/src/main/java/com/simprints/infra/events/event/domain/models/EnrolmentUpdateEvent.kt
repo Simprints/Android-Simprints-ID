@@ -18,12 +18,12 @@ data class EnrolmentUpdateEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         subjectId: String,
         externalCredentialIdsToAdd: List<String>,
     ) : this(
         UUID.randomUUID().toString(),
-        EnrolmentUpdatePayload(createdAt, EVENT_VERSION, subjectId, externalCredentialIdsToAdd),
+        EnrolmentUpdatePayload(startTime, EVENT_VERSION, subjectId, externalCredentialIdsToAdd),
         ENROLMENT_UPDATE,
     )
 
@@ -34,11 +34,11 @@ data class EnrolmentUpdateEvent(
     @Keep
     @ExcludedFromGeneratedTestCoverageReports("Data struct")
     data class EnrolmentUpdatePayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val subjectId: String,
         val externalCredentialIdsToAdd: List<String>,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = ENROLMENT_UPDATE,
     ) : EventPayload() {
         override fun toSafeString(): String = "subjectId: $subjectId, credentials: $externalCredentialIdsToAdd"

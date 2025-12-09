@@ -9,8 +9,8 @@
   "payload": {
     "type": "CALLBACK_VERIFICATION",
     "eventVersion": 1,
-    "createdAt": 934512348901,
-    "endedAt": 0,
+    "startTime": 934512348901,
+    "endTime": 0,
     "score": {
       "guid": "cc1370b8-cfbb-4196-8ba8-f187a4e8ce83",
       "confidence": 90,

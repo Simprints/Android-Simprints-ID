@@ -71,13 +71,13 @@ internal class SessionEventRepositoryImplTest {
     @Test
     fun `updates cache when saving current session scope`() = runTest {
         val mockEventScope = createSessionScope("mockId")
-        val updatedScope = mockEventScope.copy(endedAt = Timestamp(42))
+        val updatedScope = mockEventScope.copy(endTime = Timestamp(42))
         sessionDataCache.eventScope = mockEventScope
 
         sessionEventRepository.saveSessionScope(updatedScope)
 
         coVerify { eventRepository.saveEventScope(updatedScope) }
-        assertThat(sessionDataCache.eventScope?.endedAt).isEqualTo(Timestamp(42))
+        assertThat(sessionDataCache.eventScope?.endTime).isEqualTo(Timestamp(42))
     }
 
     @Test

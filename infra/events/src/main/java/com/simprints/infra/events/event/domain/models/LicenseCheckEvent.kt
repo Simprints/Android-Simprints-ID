@@ -16,13 +16,13 @@ data class LicenseCheckEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         status: LicenseStatus,
         vendor: String,
     ) : this(
         UUID.randomUUID().toString(),
         LicenseCheckEventPayload(
-            createdAt = createdAt,
+            startTime = startTime,
             eventVersion = EVENT_VERSION,
             status = status,
             vendor = vendor,
@@ -44,11 +44,11 @@ data class LicenseCheckEvent(
 
     @Keep
     data class LicenseCheckEventPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val status: LicenseStatus,
         val vendor: String,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = LICENSE_CHECK,
     ) : EventPayload() {
         override fun toSafeString(): String = "vendor: $vendor, status: $status"

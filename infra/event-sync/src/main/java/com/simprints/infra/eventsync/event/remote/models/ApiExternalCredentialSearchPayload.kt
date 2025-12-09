@@ -13,8 +13,8 @@ internal data class ApiExternalCredentialSearchPayload(
     val result: ApiExternalCredentialSearchResult,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: ExternalCredentialSearchEvent.ExternalCredentialSearchPayload) : this(
-        startTime = domainPayload.createdAt.fromDomainToApi(),
-        endTime = domainPayload.endedAt?.fromDomainToApi(),
+        startTime = domainPayload.startTime.fromDomainToApi(),
+        endTime = domainPayload.endTime?.fromDomainToApi(),
         id = domainPayload.id,
         probeExternalCredentialId = domainPayload.probeExternalCredentialId,
         result = ApiExternalCredentialSearchResult(

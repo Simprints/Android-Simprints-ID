@@ -33,8 +33,8 @@ data class FaceFallbackCaptureEvent(
 
     @Keep
     data class FaceFallbackCapturePayload(
-        override val createdAt: Timestamp,
-        override var endedAt: Timestamp?,
+        override val startTime: Timestamp,
+        override var endTime: Timestamp?,
         override val eventVersion: Int,
         override val type: EventType = FACE_FALLBACK_CAPTURE,
     ) : EventPayload()

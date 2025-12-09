@@ -9,8 +9,8 @@
   "payload": {
     "type": "EVENT_DOWN_SYNC_REQUEST",
     "eventVersion": 0,
-    "createdAt": 221675670,
-    "endedAt": 9141278930,
+    "startTime": 221675670,
+    "endTime": 9141278930,
     "requestId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
     "queryParameters": {
       "subjectId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",

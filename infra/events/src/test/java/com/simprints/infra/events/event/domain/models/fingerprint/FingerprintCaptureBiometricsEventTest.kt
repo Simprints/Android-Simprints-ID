@@ -17,7 +17,7 @@ class FingerprintCaptureBiometricsEventTest {
                 "ISO_19794_2",
             )
         val event = FingerprintCaptureBiometricsEvent(
-            createdAt = SampleDefaults.CREATED_AT,
+            startTime = SampleDefaults.CREATED_AT,
             fingerprint = fingerArg,
             id = "someId",
         )

@@ -15,8 +15,8 @@ class ErrorCallbackEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(CALLBACK_ERROR)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
-            assertThat(endedAt).isNull()
+            assertThat(startTime).isEqualTo(CREATED_AT)
+            assertThat(endTime).isNull()
             assertThat(eventVersion).isEqualTo(ErrorCallbackEvent.EVENT_VERSION)
             assertThat(type).isEqualTo(CALLBACK_ERROR)
             assertThat(reason).isEqualTo(ErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN)
@@ -29,8 +29,8 @@ class ErrorCallbackEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(CALLBACK_ERROR)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
-            assertThat(endedAt).isNull()
+            assertThat(startTime).isEqualTo(CREATED_AT)
+            assertThat(endTime).isNull()
             assertThat(eventVersion).isEqualTo(ErrorCallbackEvent.EVENT_VERSION)
             assertThat(type).isEqualTo(CALLBACK_ERROR)
             assertThat(reason).isEqualTo(ErrorReason.BACKEND_MAINTENANCE_ERROR)

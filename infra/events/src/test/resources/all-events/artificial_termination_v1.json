@@ -9,8 +9,8 @@
   "payload": {
     "type": "ARTIFICIAL_TERMINATION",
     "eventVersion": 1,
-    "createdAt": 1346545024,
-    "endedAt": 0,
+    "startTime": 1346545024,
+    "endTime": 0,
     "reason":"TIMED_OUT"
   }
 }

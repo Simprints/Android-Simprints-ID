@@ -117,8 +117,8 @@ internal abstract class BaseEventDownSyncTask(
             eventRepository.addOrUpdateEvent(
                 eventScope,
                 EventDownSyncRequestEvent(
-                    createdAt = requestStartTime,
-                    endedAt = timeHelper.now(),
+                    startTime = requestStartTime,
+                    endTime = timeHelper.now(),
                     requestId = requestId,
                     query = operation.queryEvent.let { query ->
                         EventDownSyncRequestEvent.QueryParameters(

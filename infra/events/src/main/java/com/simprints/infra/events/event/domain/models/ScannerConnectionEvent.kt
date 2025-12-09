@@ -16,11 +16,11 @@ data class ScannerConnectionEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         scannerInfo: ScannerConnectionPayload.ScannerInfo,
     ) : this(
         UUID.randomUUID().toString(),
-        ScannerConnectionPayload(createdAt, EVENT_VERSION, scannerInfo),
+        ScannerConnectionPayload(startTime, EVENT_VERSION, scannerInfo),
         SCANNER_CONNECTION,
     )
 
@@ -30,10 +30,10 @@ data class ScannerConnectionEvent(
 
     @Keep
     data class ScannerConnectionPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val scannerInfo: ScannerInfo,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = SCANNER_CONNECTION,
     ) : EventPayload() {
         override fun toSafeString(): String = "scanner: ${scannerInfo.scannerId}, mac: ${scannerInfo.macAddress}, " +

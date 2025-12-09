@@ -9,8 +9,8 @@
   "payload": {
     "type": "REFUSAL",
     "eventVersion": 1,
-    "createdAt": 221345670,
-    "endedAt": 9145678930,
+    "startTime": 221345670,
+    "endTime": 9145678930,
     "reason": "REFUSED_RELIGION",
     "otherText":"refused"
   }

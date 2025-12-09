@@ -9,7 +9,7 @@
   "payload": {
     "type": "FACE_ONBOARDING_COMPLETE",
     "eventVersion": 1,
-    "createdAt": 6191345670,
-    "endedAt": 12345619930
+    "startTime": 6191345670,
+    "endTime": 12345619930
   }
 }

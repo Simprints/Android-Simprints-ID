@@ -65,7 +65,7 @@ internal class AlertViewModelTest {
                 withArg {
                     val payload = it.payload as AlertScreenEvent.AlertScreenPayload
 
-                    assertThat(payload.createdAt.ms).isEqualTo(42)
+                    assertThat(payload.startTime.ms).isEqualTo(42)
                     assertThat(payload.type).isEqualTo(EventType.ALERT_SCREEN)
                     assertThat(payload.alertType).isEqualTo(AlertScreenEventType.DISCONNECTED)
                 },

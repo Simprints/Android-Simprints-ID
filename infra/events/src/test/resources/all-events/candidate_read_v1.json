@@ -9,8 +9,8 @@
   "payload": {
     "type": "CANDIDATE_READ",
     "eventVersion": 1,
-    "createdAt": 1494567076,
-    "endedAt": 2468965109,
+    "startTime": 1494567076,
+    "endTime": 2468965109,
     "candidateId": "a9af7863-1a27-41c1-b3df-3376ceee9cfa",
     "localResult": "NOT_FOUND",
     "remoteResult": "FOUND"

@@ -19,11 +19,11 @@ data class EnrolmentCallbackEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         guid: String,
     ) : this(
         UUID.randomUUID().toString(),
-        EnrolmentCallbackPayload(createdAt, EVENT_VERSION, guid),
+        EnrolmentCallbackPayload(startTime, EVENT_VERSION, guid),
         CALLBACK_ENROLMENT,
     )
 
@@ -33,10 +33,10 @@ data class EnrolmentCallbackEvent(
 
     @Keep
     data class EnrolmentCallbackPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val guid: String,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = CALLBACK_ENROLMENT,
     ) : EventPayload() {
         override fun toSafeString(): String = "guid: $guid"

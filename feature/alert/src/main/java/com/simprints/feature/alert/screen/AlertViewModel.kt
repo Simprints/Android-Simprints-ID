@@ -37,7 +37,7 @@ internal class AlertViewModel @Inject constructor(
 
         """
         Event ID:   ${cachedAlertEvent.id}
-        Timestamp:  ${cachedAlertEvent.payload.createdAt.ms}
+        Timestamp:  ${cachedAlertEvent.payload.startTime.ms}
         Project ID: ${authStore.signedInProjectId}
         User ID:    ${authStore.signedInUserId?.value}
         Device ID:  $deviceId

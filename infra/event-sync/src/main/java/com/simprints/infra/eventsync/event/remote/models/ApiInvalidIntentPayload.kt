@@ -14,7 +14,7 @@ internal data class ApiInvalidIntentPayload(
     val extras: Map<String, Any?>,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: InvalidIntentPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         domainPayload.action,
         domainPayload.extras,
     )

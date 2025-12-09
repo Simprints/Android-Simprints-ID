@@ -14,7 +14,7 @@ class RefusalCallbackEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(CALLBACK_REFUSAL)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
+            assertThat(startTime).isEqualTo(CREATED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(CALLBACK_REFUSAL)
             assertThat(reason).isEqualTo("some_reason")

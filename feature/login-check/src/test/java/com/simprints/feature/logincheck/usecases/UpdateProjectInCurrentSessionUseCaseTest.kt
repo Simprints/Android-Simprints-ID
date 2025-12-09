@@ -109,8 +109,8 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
         id = "eventId",
         projectId = projectId,
         type = EventScopeType.SESSION,
-        createdAt = Timestamp(0L),
-        endedAt = null,
+        startTime = Timestamp(0L),
+        endTime = null,
         payload = EventScopePayload(
             endCause = null,
             modalities = emptyList(),
@@ -126,7 +126,7 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
     private fun createBlankSessionEvent(projectId: String): Event = IntentParsingEvent(
         id = "eventId",
         payload = IntentParsingEvent.IntentParsingPayload(
-            createdAt = Timestamp(0L),
+            startTime = Timestamp(0L),
             eventVersion = 0,
             integration = IntentParsingEvent.IntentParsingPayload.IntegrationInfo.ODK,
         ),

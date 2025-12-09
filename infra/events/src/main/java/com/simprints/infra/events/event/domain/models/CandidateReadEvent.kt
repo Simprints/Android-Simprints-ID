@@ -16,7 +16,7 @@ data class CandidateReadEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         endTime: Timestamp,
         candidateId: String,
         localResult: CandidateReadPayload.LocalResult,
@@ -24,9 +24,9 @@ data class CandidateReadEvent(
     ) : this(
         UUID.randomUUID().toString(),
         CandidateReadPayload(
-            createdAt = createdAt,
+            startTime = startTime,
             eventVersion = EVENT_VERSION,
-            endedAt = endTime,
+            endTime = endTime,
             candidateId = candidateId,
             localResult = localResult,
             remoteResult = remoteResult,
@@ -40,12 +40,12 @@ data class CandidateReadEvent(
 
     @Keep
     data class CandidateReadPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val candidateId: String,
         val localResult: LocalResult,
         val remoteResult: RemoteResult?,
-        override val endedAt: Timestamp?,
+        override val endTime: Timestamp?,
         override val type: EventType = CANDIDATE_READ,
     ) : EventPayload() {
         override fun toSafeString(): String = "guid: $candidateId, local: $localResult, remote: $remoteResult"

@@ -14,8 +14,8 @@ class ConfirmationCallbackEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(CALLBACK_CONFIRMATION)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
-            assertThat(endedAt).isNull()
+            assertThat(startTime).isEqualTo(CREATED_AT)
+            assertThat(endTime).isNull()
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(CALLBACK_CONFIRMATION)
             assertThat(identificationOutcome).isEqualTo(true)

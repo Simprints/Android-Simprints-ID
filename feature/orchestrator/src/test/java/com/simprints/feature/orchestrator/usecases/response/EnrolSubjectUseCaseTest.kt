@@ -110,13 +110,13 @@ class EnrolSubjectUseCaseTest {
     fun `Uses all BiometricReferenceCreationEvent`() = runTest {
         val biometricReferenceCreationEvent1 = mockk<BiometricReferenceCreationEvent> {
             every { payload } returns mockk<BiometricReferenceCreationPayload> {
-                every { createdAt } returns Timestamp(1)
+                every { startTime } returns Timestamp(1)
                 every { id } returns "referenceId1"
             }
         }
         val biometricReferenceCreationEvent2 = mockk<BiometricReferenceCreationEvent> {
             every { payload } returns mockk<BiometricReferenceCreationPayload> {
-                every { createdAt } returns Timestamp(2)
+                every { startTime } returns Timestamp(2)
                 every { id } returns "referenceId2"
             }
         }

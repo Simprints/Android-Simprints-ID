@@ -9,8 +9,8 @@
   "payload": {
     "type": "CALLOUT_LAST_BIOMETRICS",
     "eventVersion": 1,
-    "createdAt": 43145678901,
-    "endedAt": 0,
+    "startTime": 43145678901,
+    "endTime": 0,
     "projectId": "TEST6Oai41ps1pBNrzBL",
     "userId": {
       "className": "TokenizableString.Raw",

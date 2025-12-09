@@ -16,7 +16,7 @@ data class ScannerFirmwareUpdateEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         endTime: Timestamp,
         chip: String,
         targetAppVersion: String,
@@ -24,9 +24,9 @@ data class ScannerFirmwareUpdateEvent(
     ) : this(
         UUID.randomUUID().toString(),
         ScannerFirmwareUpdatePayload(
-            createdAt = createdAt,
+            startTime = startTime,
             eventVersion = EVENT_VERSION,
-            endedAt = endTime,
+            endTime = endTime,
             chip = chip,
             targetAppVersion = targetAppVersion,
             failureReason = failureReason,
@@ -40,9 +40,9 @@ data class ScannerFirmwareUpdateEvent(
 
     @Keep
     data class ScannerFirmwareUpdatePayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
-        override var endedAt: Timestamp?,
+        override var endTime: Timestamp?,
         val chip: String,
         val targetAppVersion: String,
         var failureReason: String? = null,

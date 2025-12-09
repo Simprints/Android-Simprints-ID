@@ -30,10 +30,10 @@ data class ExternalCredentialCaptureEvent(
     ) : this(
         id = UUID.randomUUID().toString(),
         payload = ExternalCredentialCapturePayload(
-            createdAt = startTime,
+            startTime = startTime,
             eventVersion = EVENT_VERSION,
             id = payloadId,
-            endedAt = endTime,
+            endTime = endTime,
             autoCaptureStartTime = autoCaptureStartTime,
             autoCaptureEndTime = autoCaptureEndTime,
             ocrErrorCount = ocrErrorCount,
@@ -51,7 +51,7 @@ data class ExternalCredentialCaptureEvent(
     @Keep
     @ExcludedFromGeneratedTestCoverageReports("Data struct")
     data class ExternalCredentialCapturePayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val id: String,
         val autoCaptureStartTime: Timestamp,
@@ -60,7 +60,7 @@ data class ExternalCredentialCaptureEvent(
         val capturedTextLength: Int,
         val credentialTextLength: Int,
         val selectionId: String,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = EXTERNAL_CREDENTIAL_CAPTURE,
     ) : EventPayload() {
         override fun toSafeString(): String = "capture ID: $id, ocrErrors: $ocrErrorCount, captured text length: $capturedTextLength" +

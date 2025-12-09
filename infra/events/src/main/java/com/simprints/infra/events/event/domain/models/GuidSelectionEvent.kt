@@ -16,11 +16,11 @@ data class GuidSelectionEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         selectedId: String,
     ) : this(
         UUID.randomUUID().toString(),
-        GuidSelectionPayload(createdAt, EVENT_VERSION, selectedId),
+        GuidSelectionPayload(startTime, EVENT_VERSION, selectedId),
         GUID_SELECTION,
     )
 
@@ -30,10 +30,10 @@ data class GuidSelectionEvent(
 
     @Keep
     data class GuidSelectionPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val selectedId: String,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = GUID_SELECTION,
     ) : EventPayload() {
         override fun toSafeString(): String = "guid: $selectedId"

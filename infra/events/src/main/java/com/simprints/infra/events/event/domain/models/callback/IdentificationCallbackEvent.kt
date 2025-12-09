@@ -18,12 +18,12 @@ data class IdentificationCallbackEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         sessionId: String,
         scores: List<CallbackComparisonScore>,
     ) : this(
         UUID.randomUUID().toString(),
-        IdentificationCallbackPayload(createdAt, EVENT_VERSION, sessionId, scores),
+        IdentificationCallbackPayload(startTime, EVENT_VERSION, sessionId, scores),
         EventType.CALLBACK_IDENTIFICATION,
     )
 
@@ -33,11 +33,11 @@ data class IdentificationCallbackEvent(
 
     @Keep
     data class IdentificationCallbackPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val sessionId: String,
         val scores: List<CallbackComparisonScore>,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = EventType.CALLBACK_IDENTIFICATION,
     ) : EventPayload() {
         override fun toSafeString(): String = scores.joinToString(", ", prefix = "[", postfix = "]") {

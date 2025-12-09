@@ -20,11 +20,11 @@ data class ErrorCallbackEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         reason: ErrorCallbackPayload.Reason,
     ) : this(
         UUID.randomUUID().toString(),
-        ErrorCallbackPayload(createdAt, EVENT_VERSION, reason),
+        ErrorCallbackPayload(startTime, EVENT_VERSION, reason),
         CALLBACK_ERROR,
     )
 
@@ -34,10 +34,10 @@ data class ErrorCallbackEvent(
 
     @Keep
     data class ErrorCallbackPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val reason: Reason,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = CALLBACK_ERROR,
     ) : EventPayload() {
         override fun toSafeString(): String = "reason: $reason"

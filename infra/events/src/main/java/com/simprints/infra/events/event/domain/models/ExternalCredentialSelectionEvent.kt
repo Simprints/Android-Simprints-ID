@@ -16,25 +16,25 @@ data class ExternalCredentialSelectionEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
-        endedAt: Timestamp,
+        startTime: Timestamp,
+        endTime: Timestamp,
         credentialType: ExternalCredentialType,
     ) : this(
-        createdAt = createdAt,
-        endedAt = endedAt,
+        startTime = startTime,
+        endTime = endTime,
         credentialType = credentialType,
         skipReason = null,
         skipOther = null,
     )
 
     constructor(
-        createdAt: Timestamp,
-        endedAt: Timestamp,
+        startTime: Timestamp,
+        endTime: Timestamp,
         skipReason: SkipReason,
         skipOther: String?,
     ) : this(
-        createdAt = createdAt,
-        endedAt = endedAt,
+        startTime = startTime,
+        endTime = endTime,
         credentialType = null,
         skipReason = skipReason,
         skipOther = skipOther.takeIf { skipReason == SkipReason.OTHER },
@@ -42,16 +42,16 @@ data class ExternalCredentialSelectionEvent(
 
     constructor(
         id: String = randomUUID(),
-        createdAt: Timestamp,
-        endedAt: Timestamp,
+        startTime: Timestamp,
+        endTime: Timestamp,
         credentialType: ExternalCredentialType?,
         skipReason: SkipReason?,
         skipOther: String?,
     ) : this(
         id = id,
         payload = ExternalCredentialSelectionPayload(
-            createdAt = createdAt,
-            endedAt = endedAt,
+            startTime = startTime,
+            endTime = endTime,
             eventVersion = EVENT_VERSION,
             id = id,
             credentialType = credentialType,
@@ -63,8 +63,8 @@ data class ExternalCredentialSelectionEvent(
 
     @Keep
     data class ExternalCredentialSelectionPayload(
-        override val createdAt: Timestamp,
-        override val endedAt: Timestamp? = null,
+        override val startTime: Timestamp,
+        override val endTime: Timestamp? = null,
         override val eventVersion: Int,
         val id: String,
         val credentialType: ExternalCredentialType?,

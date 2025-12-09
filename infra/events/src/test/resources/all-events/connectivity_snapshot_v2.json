@@ -9,8 +9,8 @@
   "payload": {
     "type": "CONNECTIVITY_SNAPSHOT",
     "eventVersion": 2,
-    "createdAt": 2435356705,
-    "endedAt": 0,
+    "startTime": 2435356705,
+    "endTime": 0,
     "connections": [
       {
         "type": "WIFI",

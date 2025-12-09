@@ -16,16 +16,16 @@ data class RefusalEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         endTime: Timestamp,
         reason: RefusalPayload.Answer,
         otherText: String,
     ) : this(
         UUID.randomUUID().toString(),
         RefusalPayload(
-            createdAt = createdAt,
+            startTime = startTime,
             eventVersion = EVENT_VERSION,
-            endedAt = endTime,
+            endTime = endTime,
             reason = reason,
             otherText = otherText,
         ),
@@ -38,9 +38,9 @@ data class RefusalEvent(
 
     @Keep
     data class RefusalPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
-        override var endedAt: Timestamp?,
+        override var endTime: Timestamp?,
         val reason: Answer,
         val otherText: String,
         override val type: EventType = REFUSAL,

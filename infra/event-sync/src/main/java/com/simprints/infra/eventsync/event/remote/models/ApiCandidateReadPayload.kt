@@ -32,8 +32,8 @@ internal data class ApiCandidateReadPayload(
     }
 
     constructor(domainPayload: CandidateReadPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.endedAt?.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
+        domainPayload.endTime?.fromDomainToApi(),
         domainPayload.candidateId,
         domainPayload.localResult.fromDomainToApi(),
         domainPayload.remoteResult?.fromDomainToApi(),

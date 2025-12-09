@@ -25,7 +25,7 @@ class ConnectivitySnapshotEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(CONNECTIVITY_SNAPSHOT)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
+            assertThat(startTime).isEqualTo(CREATED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(CONNECTIVITY_SNAPSHOT)
             assertThat(connections).isEqualTo(connectionState)

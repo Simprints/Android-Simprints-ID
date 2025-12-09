@@ -5,8 +5,8 @@
     "type": "ENROLMENT_UPDATE",
     "eventVersion": 0,
     "subjectId": "9aa64aff-46b5-4ab4-90b5-82c0e6d9725f",
-    "createdAt": 1078967890,
-    "endedAt": 0,
+    "startTime": 1078967890,
+    "endTime": 0,
     "externalCredentialIdsToAdd": [
       "dbc27bdb-cab3-463e-9004-68065e05f812"
     ]

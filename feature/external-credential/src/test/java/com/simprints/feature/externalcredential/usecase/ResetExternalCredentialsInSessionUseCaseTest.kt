@@ -162,7 +162,7 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
         subjectId: String,
         credentialIds: List<String>,
     ) = EnrolmentUpdateEvent(
-        createdAt = Timestamp(0L),
+        startTime = Timestamp(0L),
         subjectId = subjectId,
         externalCredentialIdsToAdd = credentialIds,
     )

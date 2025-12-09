@@ -13,13 +13,14 @@ internal data class ApiExternalCredentialCaptureValuePayload(
     val credential: ApiExternalCredential,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: ExternalCredentialCaptureValuePayload) : this(
-        startTime = domainPayload.createdAt.fromDomainToApi(),
+        startTime = domainPayload.startTime.fromDomainToApi(),
         id = domainPayload.id,
         credential = domainPayload.credential.fromDomainToApi(),
     )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = when (tokenKeyType) {
         TokenKeyType.ExternalCredential -> "credential.value"
+
         TokenKeyType.AttendantId,
         TokenKeyType.ModuleId,
         TokenKeyType.Unknown,

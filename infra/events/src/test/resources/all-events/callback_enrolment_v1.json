@@ -9,8 +9,8 @@
   "payload": {
     "type": "CALLBACK_ENROLMENT",
     "eventVersion": 1,
-    "createdAt": 9345678901,
-    "endedAt": 0,
+    "startTime": 9345678901,
+    "endTime": 0,
     "guid": "13f10763-d914-41b7-b9f4-3547490dc35c"
   }
 }

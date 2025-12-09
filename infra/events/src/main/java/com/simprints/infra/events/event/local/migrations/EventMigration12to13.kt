@@ -70,12 +70,12 @@ internal class EventMigration12to13 : Migration(12, 13) {
     @VisibleForTesting(VisibleForTesting.PRIVATE)
     internal fun convertEventJson(oldEvent: String) = oldEvent
         .replace(labelsRegex, labelsReplacement)
-        .replace(createdAtRegex, createdAtReplacement)
-        .replace(endedAtRegex) { matchResult ->
+        .replace(startTimeRegex, startTimeReplacement)
+        .replace(endTimeRegex) { matchResult ->
             if (matchResult.groupValues[1] == "0") {
-                "\"endedAt\":null"
+                "\"endTime\":null"
             } else {
-                "\"endedAt\":{\"ms\":${matchResult.groupValues[1]},\"isTrustworthy\":false,\"msSinceBoot\":null}"
+                "\"endTime\":{\"ms\":${matchResult.groupValues[1]},\"isTrustworthy\":false,\"msSinceBoot\":null}"
             }
         }.replace(versionRegex) { matchResult ->
             "\"eventVersion\":${matchResult.groupValues[1].toInt().plus(1)}"
@@ -85,11 +85,11 @@ internal class EventMigration12to13 : Migration(12, 13) {
         "\"labels\":\\{(\"projectId\":\".*?\",\"sessionId\":\".*?\").*?\\}".toRegex()
     private val labelsReplacement = "$1"
 
-    private val createdAtRegex = "\"createdAt\":(\\d+)".toRegex()
-    private val createdAtReplacement =
-        "\"createdAt\":{\"ms\":$1,\"isTrustworthy\":false,\"msSinceBoot\":null}"
+    private val startTimeRegex = "\"startTime\":(\\d+)".toRegex()
+    private val startTimeReplacement =
+        "\"startTime\":{\"ms\":$1,\"isTrustworthy\":false,\"msSinceBoot\":null}"
 
-    private val endedAtRegex = "\"endedAt\":(\\d+)".toRegex()
+    private val endTimeRegex = "\"endTime\":(\\d+)".toRegex()
     private val versionRegex = "\"eventVersion\":(\\d+)".toRegex()
 
     companion object {

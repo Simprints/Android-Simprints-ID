@@ -14,7 +14,7 @@ internal data class ApiPersonCreationPayload(
     val faceReferenceId: String?,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: PersonCreationPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         domainPayload.fingerprintCaptureIds,
         domainPayload.fingerprintReferenceId,
         domainPayload.faceCaptureIds,

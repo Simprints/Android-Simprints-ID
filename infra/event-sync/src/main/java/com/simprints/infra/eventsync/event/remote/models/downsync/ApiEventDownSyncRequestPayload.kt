@@ -19,8 +19,8 @@ internal data class ApiEventDownSyncRequestPayload(
     val eventsRead: Int?,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: EventDownSyncRequestEvent.EventDownSyncRequestPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.endedAt?.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
+        domainPayload.endTime?.fromDomainToApi(),
         domainPayload.requestId,
         ApiQueryParameters(
             domainPayload.queryParameters.moduleId,

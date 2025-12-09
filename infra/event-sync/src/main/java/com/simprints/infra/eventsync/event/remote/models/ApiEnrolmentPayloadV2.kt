@@ -14,7 +14,7 @@ internal data class ApiEnrolmentPayloadV2(
     val personCreationEventId: String,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: EnrolmentEventV2.EnrolmentPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         domainPayload.subjectId,
         domainPayload.projectId,
         domainPayload.moduleId.value,

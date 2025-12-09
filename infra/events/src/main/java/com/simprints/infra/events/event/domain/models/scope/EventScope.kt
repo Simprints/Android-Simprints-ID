@@ -8,7 +8,7 @@ data class EventScope(
     val id: String,
     val projectId: String,
     val type: EventScopeType,
-    val createdAt: Timestamp,
-    var endedAt: Timestamp?,
+    val startTime: Timestamp,
+    var endTime: Timestamp?,
     val payload: EventScopePayload,
 )

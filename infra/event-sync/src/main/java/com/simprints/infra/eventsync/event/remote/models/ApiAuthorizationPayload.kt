@@ -33,7 +33,7 @@ internal data class ApiAuthorizationPayload(
     }
 
     constructor(domainPayload: AuthorizationPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         domainPayload.result.fromDomainToApi(),
         domainPayload.userInfo?.let { ApiUserInfo(it) },
     )

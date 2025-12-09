@@ -9,8 +9,8 @@
   "payload": {
     "type": "INVALID_INTENT",
     "eventVersion": 1,
-    "createdAt": 1078967890,
-    "endedAt": 0,
+    "startTime": 1078967890,
+    "endTime": 0,
     "action": "action",
     "extras": {
       "key": "value"

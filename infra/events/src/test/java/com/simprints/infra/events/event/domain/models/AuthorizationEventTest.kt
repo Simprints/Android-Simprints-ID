@@ -18,7 +18,7 @@ class AuthorizationEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(AUTHORIZATION)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
+            assertThat(startTime).isEqualTo(CREATED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(AUTHORIZATION)
             assertThat(userInfo).isEqualTo(userInfo)

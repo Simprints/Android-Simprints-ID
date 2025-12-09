@@ -24,8 +24,8 @@ class ScannerFirmwareUpdateEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(SCANNER_FIRMWARE_UPDATE)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
-            assertThat(endedAt).isEqualTo(ENDED_AT)
+            assertThat(startTime).isEqualTo(CREATED_AT)
+            assertThat(endTime).isEqualTo(ENDED_AT)
             assertThat(eventVersion).isEqualTo(ScannerConnectionEvent.EVENT_VERSION)
             assertThat(type).isEqualTo(SCANNER_FIRMWARE_UPDATE)
             assertThat(chip).isEqualTo(chipArg)

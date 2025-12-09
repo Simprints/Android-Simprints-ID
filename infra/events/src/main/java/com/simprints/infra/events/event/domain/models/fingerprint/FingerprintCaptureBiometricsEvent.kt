@@ -19,14 +19,14 @@ data class FingerprintCaptureBiometricsEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         fingerprint: FingerprintCaptureBiometricsPayload.Fingerprint,
         id: String = randomUUID(),
         payloadId: String = randomUUID(),
     ) : this(
         id = id,
         payload = FingerprintCaptureBiometricsPayload(
-            createdAt = createdAt,
+            startTime = startTime,
             eventVersion = EVENT_VERSION,
             fingerprint = fingerprint,
             id = payloadId,
@@ -40,11 +40,11 @@ data class FingerprintCaptureBiometricsEvent(
 
     @Keep
     data class FingerprintCaptureBiometricsPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val fingerprint: Fingerprint,
         val id: String,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = EventType.FINGERPRINT_CAPTURE_BIOMETRICS,
     ) : EventPayload() {
         override fun toSafeString(): String = "format: ${fingerprint.format}, quality: ${fingerprint.quality}"

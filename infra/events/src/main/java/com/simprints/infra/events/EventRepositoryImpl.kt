@@ -61,8 +61,8 @@ internal open class EventRepositoryImpl @Inject constructor(
                 id = scopeId ?: UUID.randomUUID().toString(),
                 projectId = currentProject,
                 type = type,
-                createdAt = timeHelper.now(),
-                endedAt = null,
+                startTime = timeHelper.now(),
+                endTime = null,
                 payload = EventScopePayload(
                     sidVersion = appVersionName,
                     libSimprintsVersion = libSimprintsVersionName,
@@ -105,10 +105,10 @@ internal open class EventRepositoryImpl @Inject constructor(
 
         val maxTimestamp = eventLocalDataSource
             .loadEventsInScope(eventScope.id)
-            .maxOf { event -> event.payload.let { it.endedAt ?: it.createdAt } }
+            .maxOf { event -> event.payload.let { it.endTime ?: it.startTime } }
 
         val updatedSessionScope = eventScope.copy(
-            endedAt = maxTimestamp,
+            endTime = maxTimestamp,
             payload = eventScope.payload.copy(
                 endCause = reason ?: EventScopeEndCause.WORKFLOW_ENDED,
             ),

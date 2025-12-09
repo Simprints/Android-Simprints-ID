@@ -9,8 +9,8 @@
   "payload": {
     "type": "SCANNER_FIRMWARE_UPDATE",
     "eventVersion": 1,
-    "createdAt": 221675670,
-    "endedAt": 9141278930,
+    "startTime": 221675670,
+    "endTime": 9141278930,
     "chip": "stm",
     "targetAppVersion":"1.E-1.1"
   }

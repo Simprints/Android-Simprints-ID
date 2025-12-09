@@ -9,8 +9,8 @@
   "payload": {
     "type": "COMPLETION_CHECK",
     "eventVersion": 1,
-    "createdAt": 143535670,
-    "endedAt": 0,
+    "startTime": 143535670,
+    "endTime": 0,
     "completed": true
   }
 }

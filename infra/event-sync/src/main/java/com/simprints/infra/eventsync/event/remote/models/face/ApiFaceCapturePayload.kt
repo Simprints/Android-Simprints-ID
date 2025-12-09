@@ -31,8 +31,8 @@ internal data class ApiFaceCapturePayload(
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: FaceCapturePayload) : this(
         domainPayload.id,
-        domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.endedAt?.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
+        domainPayload.endTime?.fromDomainToApi(),
         domainPayload.attemptNb,
         domainPayload.qualityThreshold,
         domainPayload.result.fromDomainToApi(),

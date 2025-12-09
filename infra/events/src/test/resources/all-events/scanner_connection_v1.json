@@ -9,8 +9,8 @@
   "payload": {
     "type": "SCANNER_CONNECTION",
     "eventVersion": 1,
-    "createdAt": 91078967890,
-    "endedAt": 0,
+    "startTime": 91078967890,
+    "endTime": 0,
     "scannerInfo": {
       "scannerId": "SP000552",
       "macAddress": "F0:AC:D7:C0:02:28",

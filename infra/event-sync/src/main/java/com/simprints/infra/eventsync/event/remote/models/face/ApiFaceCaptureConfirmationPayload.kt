@@ -20,8 +20,8 @@ internal data class ApiFaceCaptureConfirmationPayload(
     val result: ApiResult,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: FaceCaptureConfirmationPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.endedAt?.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
+        domainPayload.endTime?.fromDomainToApi(),
         domainPayload.result.fromDomainToApi(),
     )
 

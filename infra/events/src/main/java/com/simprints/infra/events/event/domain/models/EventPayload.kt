@@ -131,8 +131,8 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
 abstract class EventPayload {
     abstract val type: EventType
     abstract val eventVersion: Int
-    abstract val createdAt: Timestamp
-    abstract val endedAt: Timestamp?
+    abstract val startTime: Timestamp
+    abstract val endTime: Timestamp?
 
     open fun toSafeString(): String = ""
 }

@@ -9,8 +9,8 @@
   "payload": {
     "type": "INTENT_PARSING",
     "eventVersion": 1,
-    "createdAt": 9789678901,
-    "endedAt": 0,
+    "startTime": 9789678901,
+    "endTime": 0,
     "integration": "ODK"
   }
 }

@@ -23,7 +23,7 @@ data class BiometricReferenceCreationEvent(
     ) : this(
         UUID.randomUUID().toString(),
         BiometricReferenceCreationPayload(
-            createdAt = startTime,
+            startTime = startTime,
             eventVersion = EVENT_VERSION,
             id = referenceId,
             modality = modality,
@@ -37,12 +37,12 @@ data class BiometricReferenceCreationEvent(
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>): Event = this
 
     data class BiometricReferenceCreationPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val id: String,
         val modality: BiometricReferenceModality,
         val captureIds: List<String>,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = BIOMETRIC_REFERENCE_CREATION,
     ) : EventPayload()
 

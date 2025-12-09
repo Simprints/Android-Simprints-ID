@@ -11,7 +11,6 @@ import javax.inject.Inject
 internal class MapDomainEventScopeToApiUseCase @Inject constructor(
     private val mapDomainEventToApiUseCase: MapDomainEventToApiUseCase,
 ) {
-
     operator fun invoke(
         scope: EventScope,
         events: List<Event>,
@@ -21,8 +20,8 @@ internal class MapDomainEventScopeToApiUseCase @Inject constructor(
         return ApiEventScope(
             id = scope.id,
             projectId = scope.projectId,
-            startTime = scope.createdAt.fromDomainToApi(),
-            endTime = scope.endedAt?.fromDomainToApi(),
+            startTime = scope.startTime.fromDomainToApi(),
+            endTime = scope.endTime?.fromDomainToApi(),
             endCause = scope.payload.endCause.fromDomainToApi(),
             modalities = scope.payload.modalities.map { it.fromDomainToApi() },
             sidVersion = scope.payload.sidVersion,

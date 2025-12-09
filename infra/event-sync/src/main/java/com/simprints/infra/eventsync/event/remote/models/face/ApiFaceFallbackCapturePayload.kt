@@ -13,8 +13,8 @@ internal data class ApiFaceFallbackCapturePayload(
     val endTime: ApiTimestamp?,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: FaceFallbackCapturePayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.endedAt?.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
+        domainPayload.endTime?.fromDomainToApi(),
     )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields

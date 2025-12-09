@@ -15,15 +15,15 @@ data class ExternalCredentialConfirmationEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
-        endedAt: Timestamp,
+        startTime: Timestamp,
+        endTime: Timestamp,
         result: ExternalCredentialConfirmationResult,
         userInteractedWithImage: Boolean? = null,
     ) : this(
         id = randomUUID(),
         payload = ExternalCredentialConfirmationPayload(
-            createdAt = createdAt,
-            endedAt = endedAt,
+            startTime = startTime,
+            endTime = endTime,
             eventVersion = EVENT_VERSION,
             result = result,
             userInteractedWithImage = userInteractedWithImage,
@@ -33,8 +33,8 @@ data class ExternalCredentialConfirmationEvent(
 
     @Keep
     data class ExternalCredentialConfirmationPayload(
-        override val createdAt: Timestamp,
-        override val endedAt: Timestamp? = null,
+        override val startTime: Timestamp,
+        override val endTime: Timestamp? = null,
         override val eventVersion: Int,
         val result: ExternalCredentialConfirmationResult,
         val userInteractedWithImage: Boolean?,

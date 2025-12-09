@@ -9,8 +9,8 @@
   "payload": {
     "type": "CALLBACK_CONFIRMATION",
     "eventVersion": 1,
-    "createdAt": 9345678901,
-    "endedAt": 0,
+    "startTime": 9345678901,
+    "endTime": 0,
     "identificationOutcome": true
   }
 }

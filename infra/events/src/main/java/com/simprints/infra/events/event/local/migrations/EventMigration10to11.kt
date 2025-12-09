@@ -68,13 +68,13 @@ internal class EventMigration10to11 : Migration(10, 11) {
         val event = fromJsonToDomain(jsonData)
         val sessionId = event.labels.sessionId ?: return null
 
-        val endedAt = event.payload.endedAt.takeIf { it > 0 }
+        val endTime = event.payload.endTime.takeIf { it > 0 }
 
         val payloadJson = JsonHelper.toJson(
             EventScopePayload(
                 // Other end causes have not been used for a long time so it is save to assume
                 // that all previous sessions ended with new session termination cause
-                endCause = if (endedAt != null) EventScopeEndCause.NEW_SESSION else null,
+                endCause = if (endTime != null) EventScopeEndCause.NEW_SESSION else null,
                 sidVersion = event.payload.appVersionName,
                 libSimprintsVersion = event.payload.libVersionName,
                 language = event.payload.language,
@@ -89,9 +89,9 @@ internal class EventMigration10to11 : Migration(10, 11) {
         return ContentValues().apply {
             put("id", sessionId)
             put("projectId", event.payload.projectId)
-            put("createdAt", event.payload.createdAt)
-            if (endedAt != null) {
-                put("endedAt", endedAt)
+            put("createdAt", event.payload.startTime)
+            if (endTime != null) {
+                put("endedAt", endTime)
             }
             put("payloadJson", payloadJson)
         }
@@ -140,7 +140,7 @@ internal class EventMigration10to11 : Migration(10, 11) {
         @Keep
         data class SessionCapturePayload(
             var projectId: String,
-            val createdAt: Long,
+            val startTime: Long,
             var modalities: List<Modality>,
             val appVersionName: String,
             val libVersionName: String,
@@ -148,7 +148,7 @@ internal class EventMigration10to11 : Migration(10, 11) {
             val device: Device,
             val databaseInfo: DatabaseInfo,
             var location: Location? = null,
-            var endedAt: Long = 0,
+            var endTime: Long = 0,
         )
     }
 }

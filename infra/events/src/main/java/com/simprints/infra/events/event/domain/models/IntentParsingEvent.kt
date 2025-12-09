@@ -16,11 +16,11 @@ data class IntentParsingEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         integration: IntentParsingPayload.IntegrationInfo,
     ) : this(
         UUID.randomUUID().toString(),
-        IntentParsingPayload(createdAt, EVENT_VERSION, integration),
+        IntentParsingPayload(startTime, EVENT_VERSION, integration),
         INTENT_PARSING,
     )
 
@@ -30,10 +30,10 @@ data class IntentParsingEvent(
 
     @Keep
     data class IntentParsingPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val integration: IntegrationInfo,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = INTENT_PARSING,
     ) : EventPayload() {
         override fun toSafeString(): String = "integration: $integration"

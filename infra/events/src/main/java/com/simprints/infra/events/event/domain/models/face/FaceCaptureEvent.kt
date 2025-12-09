@@ -33,8 +33,8 @@ data class FaceCaptureEvent(
     ) : this(
         id,
         FaceCapturePayload(
-            createdAt = startTime,
-            endedAt = endTime,
+            startTime = startTime,
+            endTime = endTime,
             eventVersion = EVENT_VERSION,
             attemptNb = attemptNb,
             qualityThreshold = qualityThreshold,
@@ -54,8 +54,8 @@ data class FaceCaptureEvent(
     @Keep
     data class FaceCapturePayload(
         val id: String,
-        override val createdAt: Timestamp,
-        override var endedAt: Timestamp?,
+        override val startTime: Timestamp,
+        override var endTime: Timestamp?,
         override val eventVersion: Int,
         val attemptNb: Int,
         val qualityThreshold: Float,
@@ -65,8 +65,9 @@ data class FaceCaptureEvent(
         val face: Face?,
         override val type: EventType = FACE_CAPTURE,
     ) : EventPayload() {
-        override fun toSafeString(): String = "result: $result, attempt nr: $attemptNb, auto-capture: $isAutoCapture, fallback: $isFallback, " +
-            "quality: ${face?.quality},  format: ${face?.format}"
+        override fun toSafeString(): String =
+            "result: $result, attempt nr: $attemptNb, auto-capture: $isAutoCapture, fallback: $isFallback, " +
+                "quality: ${face?.quality},  format: ${face?.format}"
 
         @Keep
         data class Face(

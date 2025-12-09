@@ -9,8 +9,8 @@
   "payload": {
     "type": "CALLBACK_IDENTIFICATION",
     "eventVersion": 1,
-    "createdAt": 9345678901,
-    "endedAt": 0,
+    "startTime": 9345678901,
+    "endTime": 0,
     "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
     "scores": [
       {

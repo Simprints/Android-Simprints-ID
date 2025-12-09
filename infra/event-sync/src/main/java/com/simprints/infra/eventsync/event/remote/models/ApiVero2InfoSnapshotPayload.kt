@@ -117,23 +117,27 @@ internal sealed class ApiVero2InfoSnapshotPayload(
 }
 
 private fun Vero2Version.toApiVero2Version() = when (this) {
-    is Vero2Version.Vero2OldApiVersion ->
+    is Vero2Version.Vero2OldApiVersion -> {
         ApiVero2InfoSnapshotPayload.ApiVero2Version.ApiOldVero2Version(this)
-    is Vero2Version.Vero2NewApiVersion ->
+    }
+
+    is Vero2Version.Vero2NewApiVersion -> {
         ApiVero2InfoSnapshotPayload.ApiVero2Version.ApiNewVero2Version(this)
+    }
 }
 
 internal fun toApiVero2InfoSnapshotPayload(domainPayload: Vero2InfoSnapshotPayload): ApiVero2InfoSnapshotPayload = when (domainPayload) {
     is Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForNewApi -> {
         ApiVero2InfoSnapshotPayload.ApiVero2InfoSnapshotPayloadForNewApi(
-            domainPayload.createdAt.fromDomainToApi(),
+            domainPayload.startTime.fromDomainToApi(),
             domainPayload.version.toApiVero2Version(),
             ApiVero2InfoSnapshotPayload.ApiBatteryInfo(domainPayload.battery),
         )
     }
+
     is Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForOldApi -> {
         ApiVero2InfoSnapshotPayload.ApiVero2InfoSnapshotPayloadForOldApi(
-            domainPayload.createdAt.fromDomainToApi(),
+            domainPayload.startTime.fromDomainToApi(),
             domainPayload.version.toApiVero2Version(),
             ApiVero2InfoSnapshotPayload.ApiBatteryInfo(domainPayload.battery),
         )

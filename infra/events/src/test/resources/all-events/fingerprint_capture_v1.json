@@ -9,8 +9,8 @@
   "payload": {
     "type": "FINGERPRINT_CAPTURE",
     "eventVersion": 1,
-    "createdAt": 341300170,
-    "endedAt": 9700178930,
+    "startTime": 341300170,
+    "endTime": 9700178930,
     "id": "dbc27bdb-cab3-463e-9004-68065e05f8ec",
     "finger": "LEFT_THUMB",
     "qualityThreshold": 60,

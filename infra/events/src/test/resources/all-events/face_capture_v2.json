@@ -9,8 +9,8 @@
   "payload": {
     "type": "FACE_CAPTURE",
     "eventVersion": 2,
-    "createdAt": 3417259170,
-    "endedAt": 9773981930,
+    "startTime": 3417259170,
+    "endTime": 9773981930,
     "id": "98112fc2-b2a7-4a84-a5e3-7711cb89dcf2",
     "attemptNb": 13,
     "qualityThreshold": 64,

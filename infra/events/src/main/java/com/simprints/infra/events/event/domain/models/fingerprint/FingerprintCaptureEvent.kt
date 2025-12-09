@@ -20,7 +20,7 @@ data class FingerprintCaptureEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         endTime: Timestamp,
         finger: SampleIdentifier,
         qualityThreshold: Int,
@@ -31,9 +31,9 @@ data class FingerprintCaptureEvent(
     ) : this(
         id,
         FingerprintCapturePayload(
-            createdAt = createdAt,
+            startTime = startTime,
             eventVersion = EVENT_VERSION,
-            endedAt = endTime,
+            endTime = endTime,
             finger = finger,
             qualityThreshold = qualityThreshold,
             result = result,
@@ -49,9 +49,9 @@ data class FingerprintCaptureEvent(
 
     @Keep
     data class FingerprintCapturePayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
-        override var endedAt: Timestamp?,
+        override var endTime: Timestamp?,
         val finger: SampleIdentifier,
         val qualityThreshold: Int,
         val result: Result,

@@ -25,7 +25,7 @@ data class FaceCaptureBiometricsEvent(
     ) : this(
         id,
         FaceCaptureBiometricsPayload(
-            createdAt = startTime,
+            startTime = startTime,
             eventVersion = EVENT_VERSION,
             face = face,
             id = payloadId,
@@ -40,10 +40,10 @@ data class FaceCaptureBiometricsEvent(
     @Keep
     data class FaceCaptureBiometricsPayload(
         val id: String,
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val face: Face,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = EventType.FACE_CAPTURE_BIOMETRICS,
     ) : EventPayload() {
         override fun toSafeString(): String = "format: ${face.format}, quality: ${face.quality}"

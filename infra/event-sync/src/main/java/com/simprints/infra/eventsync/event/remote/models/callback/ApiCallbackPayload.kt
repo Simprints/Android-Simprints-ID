@@ -21,12 +21,12 @@ internal data class ApiCallbackPayload(
     val callback: ApiCallback,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: EnrolmentCallbackPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         ApiEnrolmentCallback(domainPayload.guid),
     )
 
     constructor(domainPayload: IdentificationCallbackPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         ApiIdentificationCallback(
             domainPayload.sessionId,
             domainPayload.scores.map { it.fromDomainToApi(domainPayload.eventVersion) },
@@ -34,22 +34,22 @@ internal data class ApiCallbackPayload(
     )
 
     constructor(domainPayload: VerificationCallbackPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         ApiVerificationCallback(domainPayload.score.fromDomainToApi(domainPayload.eventVersion)),
     )
 
     constructor(domainPayload: ConfirmationCallbackPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         ApiConfirmationCallback(domainPayload.identificationOutcome),
     )
 
     constructor(domainPayload: ErrorCallbackPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         ApiErrorCallback(domainPayload.reason.fromDomainToApi()),
     )
 
     constructor(domainPayload: RefusalCallbackPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         ApiRefusalCallback(domainPayload.reason, domainPayload.extra),
     )
 

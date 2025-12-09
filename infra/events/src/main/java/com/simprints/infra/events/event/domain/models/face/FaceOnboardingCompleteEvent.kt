@@ -33,8 +33,8 @@ data class FaceOnboardingCompleteEvent(
 
     @Keep
     data class FaceOnboardingCompletePayload(
-        override val createdAt: Timestamp,
-        override var endedAt: Timestamp?,
+        override val startTime: Timestamp,
+        override var endTime: Timestamp?,
         override val eventVersion: Int,
         override val type: EventType = FACE_ONBOARDING_COMPLETE,
     ) : EventPayload()

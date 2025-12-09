@@ -9,8 +9,8 @@
   "payload": {
     "type": "AUTHORIZATION",
     "eventVersion": 1,
-    "createdAt": 1434567034,
-    "endedAt": 0,
+    "startTime": 1434567034,
+    "endTime": 0,
     "result":"AUTHORIZED",
     "userInfo": {
       "projectId": "TEST6Oai41ps1pBNrzBL",

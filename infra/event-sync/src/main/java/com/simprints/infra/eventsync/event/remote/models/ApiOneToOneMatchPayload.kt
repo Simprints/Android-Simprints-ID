@@ -18,8 +18,8 @@ internal data class ApiOneToOneMatchPayload(
     val probeBiometricReferenceId: String? = null,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: OneToOneMatchPayload) : this(
-        startTime = domainPayload.createdAt.fromDomainToApi(),
-        endTime = domainPayload.endedAt?.fromDomainToApi(),
+        startTime = domainPayload.startTime.fromDomainToApi(),
+        endTime = domainPayload.endTime?.fromDomainToApi(),
         candidateId = domainPayload.candidateId,
         matcher = domainPayload.matcher,
         result = domainPayload.result?.let { ApiMatchEntry(it) },

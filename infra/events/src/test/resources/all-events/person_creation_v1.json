@@ -9,8 +9,8 @@
   "payload": {
     "type": "PERSON_CREATION",
     "eventVersion": 1,
-    "createdAt": 1078967890,
-    "endedAt": 0,
+    "startTime": 1078967890,
+    "endTime": 0,
     "fingerprintCaptureIds": [
       "dbc27bdb-cab3-463e-9004-68065e05f8ec"
     ],

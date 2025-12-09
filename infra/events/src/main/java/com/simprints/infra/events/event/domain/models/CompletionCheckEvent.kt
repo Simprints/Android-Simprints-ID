@@ -16,11 +16,11 @@ data class CompletionCheckEvent(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         completed: Boolean,
     ) : this(
         UUID.randomUUID().toString(),
-        CompletionCheckPayload(createdAt, EVENT_VERSION, completed),
+        CompletionCheckPayload(startTime, EVENT_VERSION, completed),
         COMPLETION_CHECK,
     )
 
@@ -30,10 +30,10 @@ data class CompletionCheckEvent(
 
     @Keep
     data class CompletionCheckPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val completed: Boolean,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = COMPLETION_CHECK,
     ) : EventPayload() {
         override fun toSafeString(): String = "completed: $completed"

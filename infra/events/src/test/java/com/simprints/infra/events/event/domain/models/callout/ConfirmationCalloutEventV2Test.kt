@@ -16,7 +16,7 @@ class ConfirmationCalloutEventV2Test {
     @Test
     fun create_ConfirmationCalloutEvent() {
         val event = ConfirmationCalloutEventV2(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             projectId = DEFAULT_PROJECT_ID,
             selectedGuid = GUID1,
             sessionId = GUID2,
@@ -26,7 +26,7 @@ class ConfirmationCalloutEventV2Test {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(CALLOUT_CONFIRMATION)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
+            assertThat(startTime).isEqualTo(CREATED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(CALLOUT_CONFIRMATION)
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
@@ -39,7 +39,7 @@ class ConfirmationCalloutEventV2Test {
     @Test
     fun getTokenizableFields_returnsEmptyMap() {
         val event = ConfirmationCalloutEventV2(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             projectId = DEFAULT_PROJECT_ID,
             selectedGuid = GUID1,
             sessionId = GUID2,

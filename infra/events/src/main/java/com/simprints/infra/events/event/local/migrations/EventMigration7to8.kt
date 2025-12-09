@@ -65,13 +65,13 @@ internal class EventMigration7to8 : Migration(7, 8) {
 
         if (isPayloadIdReferencedInPersonCreation || isFingerprintEventGoodScan) {
             val fingerprintObject = payload.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD_FINGERPRINT)
-            val createdAt = payload.getLong("createdAt")
+            val startTime = payload.getLong("startTime")
             val eventId = randomUUID()
 
             val fingerprintCaptureBiometricsEvent = createFingerprintCaptureBiometricsEvent(
                 eventId = eventId,
                 labelsObject = labelsObject,
-                createdAt = createdAt,
+                startTime = startTime,
                 fingerprintObject = fingerprintObject,
                 payloadId = payloadId,
             )
@@ -122,12 +122,12 @@ internal class EventMigration7to8 : Migration(7, 8) {
     private fun createFingerprintCaptureBiometricsEvent(
         eventId: String,
         labelsObject: JSONObject,
-        createdAt: Long,
+        startTime: Long,
         fingerprintObject: JSONObject,
         payloadId: String?,
     ): ContentValues {
         val event =
-            "{\"id\":\"${eventId}\",\"labels\":$labelsObject,\"payload\":{\"createdAt\":$createdAt,\"eventVersion\":0,\"fingerprint\":{\"finger\":\"${
+            "{\"id\":\"${eventId}\",\"labels\":$labelsObject,\"payload\":{\"startTime\":$startTime,\"eventVersion\":0,\"fingerprint\":{\"finger\":\"${
                 fingerprintObject.getString("finger")
             }\",\"template\":\"${
                 fingerprintObject.getString("template").replace("\\s".toRegex(), "")
@@ -144,7 +144,7 @@ internal class EventMigration7to8 : Migration(7, 8) {
             this.put("deviceId", labelsObject.optString("deviceId"))
             this.put("type", FINGERPRINT_CAPTURE_BIOMETRICS)
             this.put("eventJson", event)
-            this.put("createdAt", createdAt)
+            this.put("createdAt", startTime)
             this.put("endedAt", 0)
             this.put("sessionIsClosed", 0)
         }
@@ -220,13 +220,13 @@ internal class EventMigration7to8 : Migration(7, 8) {
 
         val faceObject = payload.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD_FACE)
         val labelsObject = originalObject.getJSONObject("labels")
-        val createdAt = payload.getLong("createdAt")
+        val startTime = payload.getLong("startTime")
         val eventId = randomUUID()
 
         val faceCaptureBiometricsEvent = createFaceCaptureBiometricsEvent(
             eventId = eventId,
             labelsObject = labelsObject,
-            createdAt = createdAt,
+            startTime = startTime,
             faceObject = faceObject,
             payloadId = payloadId,
         )
@@ -237,12 +237,12 @@ internal class EventMigration7to8 : Migration(7, 8) {
     private fun createFaceCaptureBiometricsEvent(
         eventId: String,
         labelsObject: JSONObject,
-        createdAt: Long,
+        startTime: Long,
         faceObject: JSONObject,
         payloadId: String?,
     ): ContentValues {
         val event =
-            "{\"id\":\"${eventId}\",\"labels\":$labelsObject,\"payload\":{\"id\":\"$payloadId\",\"createdAt\":$createdAt,\"eventVersion\":0,\"face\":{\"yaw\":${
+            "{\"id\":\"${eventId}\",\"labels\":$labelsObject,\"payload\":{\"id\":\"$payloadId\",\"startTime\":$startTime,\"eventVersion\":0,\"face\":{\"yaw\":${
                 faceObject.getDouble("yaw")
             },\"roll\":${
                 faceObject.getDouble("roll")
@@ -252,7 +252,7 @@ internal class EventMigration7to8 : Migration(7, 8) {
                 faceObject.getDouble("quality")
             },\"format\":\"${
                 faceObject.getString("format")
-            }\"},\"endedAt\":0,\"type\":\"FACE_CAPTURE_BIOMETRICS\"},\"type\":\"FACE_CAPTURE_BIOMETRICS\"}"
+            }\"},\"endTime\":0,\"type\":\"FACE_CAPTURE_BIOMETRICS\"},\"type\":\"FACE_CAPTURE_BIOMETRICS\"}"
                 .trimIndent()
 
         return ContentValues().apply {
@@ -262,7 +262,7 @@ internal class EventMigration7to8 : Migration(7, 8) {
             this.put("deviceId", labelsObject.optString("deviceId"))
             this.put("type", FACE_CAPTURE_BIOMETRICS)
             this.put("eventJson", event)
-            this.put("createdAt", createdAt)
+            this.put("createdAt", startTime)
             this.put("endedAt", 0)
             this.put("sessionIsClosed", 0)
         }

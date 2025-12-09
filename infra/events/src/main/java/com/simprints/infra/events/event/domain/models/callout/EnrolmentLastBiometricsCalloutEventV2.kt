@@ -20,7 +20,7 @@ data class EnrolmentLastBiometricsCalloutEventV2(
     override var projectId: String? = null,
 ) : Event() {
     constructor(
-        createdAt: Timestamp,
+        startTime: Timestamp,
         projectId: String,
         userId: TokenizableString,
         moduleId: TokenizableString,
@@ -29,7 +29,7 @@ data class EnrolmentLastBiometricsCalloutEventV2(
     ) : this(
         UUID.randomUUID().toString(),
         EnrolmentLastBiometricsCalloutPayload(
-            createdAt = createdAt,
+            startTime = startTime,
             eventVersion = EVENT_VERSION,
             projectId = projectId,
             userId = userId,
@@ -54,14 +54,14 @@ data class EnrolmentLastBiometricsCalloutEventV2(
 
     @Keep
     data class EnrolmentLastBiometricsCalloutPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val projectId: String,
         val userId: TokenizableString,
         val moduleId: TokenizableString,
         val metadata: String?,
         val sessionId: String,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = CALLOUT_LAST_BIOMETRICS,
     ) : EventPayload() {
         override fun toSafeString(): String = "metadata: $metadata, session ID: $sessionId"

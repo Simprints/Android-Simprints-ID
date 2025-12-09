@@ -105,7 +105,7 @@ class EventMigration3to4Test {
                     "projectId":"TEST6Oai41ps1pBNrzBL"
                 },
                 "payload":{
-                    "createdAt":1611584017198,
+                    "startTime":1611584017198,
                     "eventVersion":1,
                     "type":"CONNECTIVITY_SNAPSHOT",
                     "connections":[]

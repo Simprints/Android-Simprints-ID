@@ -78,8 +78,8 @@ class EventMigrationTest {
             this.put("id", eventJson.getString("id"))
             this.put("type", eventJson.getString("type"))
             this.put("eventJson", eventJsonStr)
-            this.put("createdAt", payload.getLong("createdAt"))
-            this.put("endedAt", payload.getLong("endedAt"))
+            this.put("createdAt", payload.getLong("startTime"))
+            this.put("endedAt", payload.getLong("endTime"))
         }
     } catch (e: Exception) {
         println("Fail to parse $file")

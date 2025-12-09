@@ -76,24 +76,24 @@ class EventPayloadTest {
         EnrolmentCallbackEvent(CREATED_AT, GUID1),
         ErrorCallbackEvent(CREATED_AT, Reason.DIFFERENT_PROJECT_ID_SIGNED_IN),
         IdentificationCallbackEvent(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             sessionId = GUID1,
             scores = listOf(CallbackComparisonScore(GUID1, 1, AppMatchConfidence.NONE)),
         ),
         RefusalCallbackEvent(CREATED_AT, "some_reason", "some_extra"),
         VerificationCallbackEvent(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             score = CallbackComparisonScore(GUID1, 1, AppMatchConfidence.NONE),
         ),
         ConfirmationCalloutEventV3(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             projectId = DEFAULT_PROJECT_ID,
             selectedGuid = GUID1,
             sessionId = GUID2,
             metadata = DEFAULT_METADATA,
         ),
         EnrolmentCalloutEventV3(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID,
             moduleId = DEFAULT_MODULE_ID,
@@ -101,7 +101,7 @@ class EventPayloadTest {
             biometricDataSource = DEFAULT_BIOMETRIC_DATA_SOURCE,
         ),
         EnrolmentLastBiometricsCalloutEventV3(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID,
             moduleId = DEFAULT_MODULE_ID,
@@ -109,7 +109,7 @@ class EventPayloadTest {
             sessionId = GUID1,
         ),
         IdentificationCalloutEventV3(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID,
             moduleId = DEFAULT_MODULE_ID,
@@ -117,7 +117,7 @@ class EventPayloadTest {
             biometricDataSource = DEFAULT_BIOMETRIC_DATA_SOURCE,
         ),
         VerificationCalloutEventV3(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID,
             moduleId = DEFAULT_MODULE_ID,
@@ -126,8 +126,8 @@ class EventPayloadTest {
             biometricDataSource = DEFAULT_BIOMETRIC_DATA_SOURCE,
         ),
         EventDownSyncRequestEvent(
-            createdAt = CREATED_AT,
-            endedAt = ENDED_AT,
+            startTime = CREATED_AT,
+            endTime = ENDED_AT,
             query = QueryParameters(
                 moduleId = DEFAULT_MODULE_ID.value,
                 attendantId = DEFAULT_USER_ID.value,
@@ -158,7 +158,7 @@ class EventPayloadTest {
         FaceFallbackCaptureEvent(CREATED_AT, ENDED_AT),
         FaceOnboardingCompleteEvent(CREATED_AT, ENDED_AT),
         FingerprintCaptureBiometricsEvent(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             fingerprint = FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
                 finger = SampleIdentifier.LEFT_3RD_FINGER,
                 template = "template",
@@ -168,7 +168,7 @@ class EventPayloadTest {
             id = "someId",
         ),
         FingerprintCaptureEvent(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             endTime = ENDED_AT,
             finger = SampleIdentifier.LEFT_THUMB,
             qualityThreshold = 10,
@@ -181,20 +181,20 @@ class EventPayloadTest {
         ),
         AlertScreenEvent(CREATED_AT, BLUETOOTH_NOT_ENABLED),
         AuthenticationEvent(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             endTime = ENDED_AT,
             userInfo = AuthenticationUserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID),
             result = AuthenticationPayload.Result.INTEGRITY_SERVICE_ERROR,
         ),
         AuthorizationEvent(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             result = AUTHORIZED,
             userInfo = AuthorizationUserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID),
         ),
         CandidateReadEvent(CREATED_AT, ENDED_AT, GUID1, LocalResult.NOT_FOUND, NOT_FOUND),
         CompletionCheckEvent(CREATED_AT, true),
         ConnectivitySnapshotEvent(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             connections = listOf(
                 Connection(
                     SimNetworkUtils.ConnectionType.MOBILE,
@@ -204,7 +204,7 @@ class EventPayloadTest {
         ),
         ConsentEvent(CREATED_AT, ENDED_AT, INDIVIDUAL, ACCEPTED),
         EnrolmentEventV2(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             subjectId = GUID1,
             projectId = DEFAULT_PROJECT_ID,
             moduleId = DEFAULT_MODULE_ID,
@@ -212,7 +212,7 @@ class EventPayloadTest {
             personCreationEventId = GUID2,
         ),
         EnrolmentEventV4(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             subjectId = GUID1,
             projectId = DEFAULT_PROJECT_ID,
             moduleId = DEFAULT_MODULE_ID,
@@ -224,7 +224,7 @@ class EventPayloadTest {
         IntentParsingEvent(CREATED_AT, COMMCARE),
         InvalidIntentEvent(CREATED_AT, "REGISTER", mapOf("extra_key" to "value")),
         OneToManyMatchEvent(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             endTime = ENDED_AT,
             pool = MatchPool(PROJECT, 100),
             matcher = "MATCHER_NAME",
@@ -232,7 +232,7 @@ class EventPayloadTest {
             probeBiometricReferenceId = GUID1,
         ),
         OneToOneMatchEvent(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             endTime = ENDED_AT,
             candidateId = GUID1,
             matcher = "MATCHER_NAME",
@@ -249,7 +249,7 @@ class EventPayloadTest {
         ),
         RefusalEvent(CREATED_AT, ENDED_AT, OTHER, "other_text"),
         ScannerConnectionEvent(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             scannerInfo = ScannerInfo(
                 scannerId = "scanner_id",
                 macAddress = "mac_address",

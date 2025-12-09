@@ -104,7 +104,7 @@ class EventMigration5to6Test {
                     "projectId":"TEST6Oai41ps1pBNrzBL"
                 },
                 "payload": {
-                    "createdAt":1611584017198,
+                    "startTime":1611584017198,
                     "eventVersion":2,
                     "connections":[
                         {"type": "WIFI","state": "CONNECTED"},

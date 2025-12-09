@@ -14,8 +14,8 @@ internal data class ApiExternalCredentialConfirmationPayload(
     val userInteractedWithImage: Boolean? = null,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: ExternalCredentialConfirmationEvent.ExternalCredentialConfirmationPayload) : this(
-        startTime = domainPayload.createdAt.fromDomainToApi(),
-        endTime = domainPayload.endedAt?.fromDomainToApi(),
+        startTime = domainPayload.startTime.fromDomainToApi(),
+        endTime = domainPayload.endTime?.fromDomainToApi(),
         result = domainPayload.result.fromDomainToApi(),
         userInteractedWithImage = domainPayload.userInteractedWithImage,
     )

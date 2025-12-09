@@ -74,8 +74,8 @@ internal class FirebaseSampleUploader @Inject constructor(
                     eventRepository.addOrUpdateEvent(
                         scope = urlRequestScope,
                         event = SampleUpSyncRequestEvent(
-                            createdAt = requestStartTime,
-                            endedAt = timeHelper.now(),
+                            startTime = requestStartTime,
+                            endTime = timeHelper.now(),
                             requestId = null,
                             sampleId = samplePathUtil.extract(imageRef.relativePath)?.sampleId.orEmpty(),
                             size = task.bytesTransferred,

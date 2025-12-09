@@ -24,8 +24,8 @@ class OneToManyMatchEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(ONE_TO_MANY_MATCH)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
-            assertThat(endedAt).isEqualTo(ENDED_AT)
+            assertThat(startTime).isEqualTo(CREATED_AT)
+            assertThat(endTime).isEqualTo(ENDED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(ONE_TO_MANY_MATCH)
             assertThat(matcher).isEqualTo("MATCHER_NAME")
@@ -60,7 +60,7 @@ class OneToManyMatchEventTest {
             "id": "3afb1b9e-b263-4073-b773-6e1dac20d72f",
             "scopeId": "6dcb3810-4789-4149-8fea-473ffb520958",
             "payload": {
-                "createdAt": {"ms": 1234},
+                "startTime": {"ms": 1234},
                 "eventVersion": 2,
                 "pool": {
                   "type": "PROJECT",
@@ -69,7 +69,7 @@ class OneToManyMatchEventTest {
                 "matcher": "SIM_AFIS",
                 "results": [],
                 "type": "ONE_TO_MANY_MATCH",
-                "endedAt": {"ms": 4567}
+                "endTime": {"ms": 4567}
             },
             "type": "ONE_TO_MANY_MATCH"
         }
@@ -81,7 +81,7 @@ class OneToManyMatchEventTest {
             "id": "3afb1b9e-b263-4073-b773-6e1dac20d72f",
             "scopeId": "6dcb3810-4789-4149-8fea-473ffb520958",
             "payload": {
-                "createdAt": {"ms": 1234},
+                "startTime": {"ms": 1234},
                 "eventVersion": 3,
                 "pool": {
                   "type": "PROJECT",
@@ -91,7 +91,7 @@ class OneToManyMatchEventTest {
                 "results": [],
                 "probeBiometricReferenceId": "referenceId",
                 "type": "ONE_TO_MANY_MATCH",
-                "endedAt": {"ms": 1234}
+                "endTime": {"ms": 1234}
             },
             "type": "ONE_TO_MANY_MATCH"
         }

@@ -10,7 +10,7 @@ internal data class ApiCompletionCheckPayload(
     val completed: Boolean,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: CompletionCheckPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.startTime.fromDomainToApi(),
         domainPayload.completed,
     )
 

@@ -31,11 +31,11 @@ data class InvalidIntentEvent(
 
     @Keep
     data class InvalidIntentPayload(
-        override val createdAt: Timestamp,
+        override val startTime: Timestamp,
         override val eventVersion: Int,
         val action: String,
         val extras: Map<String, Any?>,
-        override val endedAt: Timestamp? = null,
+        override val endTime: Timestamp? = null,
         override val type: EventType = INVALID_INTENT,
     ) : EventPayload() {
         override fun toSafeString(): String = "action: $action, extras: $extras"

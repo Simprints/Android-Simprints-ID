@@ -18,7 +18,7 @@ class EnrolmentCalloutEventV3Test {
     @Test
     fun create_EnrolmentCalloutEvent() {
         val event = EnrolmentCalloutEventV3(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID,
             moduleId = DEFAULT_MODULE_ID,
@@ -29,7 +29,7 @@ class EnrolmentCalloutEventV3Test {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(CALLOUT_ENROLMENT_V3)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
+            assertThat(startTime).isEqualTo(CREATED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(CALLOUT_ENROLMENT_V3)
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
@@ -43,7 +43,7 @@ class EnrolmentCalloutEventV3Test {
     @Test
     fun getTokenizableFields_returnsMapWithAttendantAndModuleId() {
         val event = EnrolmentCalloutEventV3(
-            createdAt = CREATED_AT,
+            startTime = CREATED_AT,
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID,
             moduleId = DEFAULT_MODULE_ID,

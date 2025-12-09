@@ -29,7 +29,7 @@ internal class AddCaptureEventsUseCase @Inject constructor(
         val captureState = fingerState.currentCapture()
 
         val captureEvent = FingerprintCaptureEvent(
-            createdAt = lastCaptureStartedAt,
+            startTime = lastCaptureStartedAt,
             endTime = timeHelper.now(),
             finger = fingerState.id,
             qualityThreshold = qualityThreshold,
@@ -43,7 +43,7 @@ internal class AddCaptureEventsUseCase @Inject constructor(
                 (captureEvent.payload.result == Result.GOOD_SCAN || tooManyBadScans)
             ) {
                 FingerprintCaptureBiometricsEvent(
-                    createdAt = lastCaptureStartedAt,
+                    startTime = lastCaptureStartedAt,
                     fingerprint = mapCaptureToBiometricFingerprint(
                         fingerState,
                         captureState.scanResult,
@@ -63,7 +63,9 @@ internal class AddCaptureEventsUseCase @Inject constructor(
 
     private fun mapCaptureStateToResult(captureState: CaptureState) = when (captureState) {
         is CaptureState.Skipped -> Result.SKIPPED
+
         is CaptureState.ScanProcess.NotDetected -> Result.NO_FINGER_DETECTED
+
         is CaptureState.ScanProcess.Collected -> if (captureState.scanResult.isGoodScan()) {
             Result.GOOD_SCAN
         } else {

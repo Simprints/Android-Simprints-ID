@@ -26,8 +26,8 @@ class FaceCaptureEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.type).isEqualTo(EventType.FACE_CAPTURE)
         with(event.payload) {
-            assertThat(createdAt).isEqualTo(SampleDefaults.CREATED_AT)
-            assertThat(endedAt).isEqualTo(SampleDefaults.ENDED_AT)
+            assertThat(startTime).isEqualTo(SampleDefaults.CREATED_AT)
+            assertThat(endTime).isEqualTo(SampleDefaults.ENDED_AT)
             assertThat(eventVersion).isEqualTo(FaceCaptureEvent.EVENT_VERSION)
             assertThat(type).isEqualTo(EventType.FACE_CAPTURE)
             assertThat(attemptNb).isEqualTo(0)

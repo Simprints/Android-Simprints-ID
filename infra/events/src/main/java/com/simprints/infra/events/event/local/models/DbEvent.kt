@@ -36,7 +36,7 @@ internal fun Event.fromDomainToDb(): DbEvent = DbEvent(
     projectId = projectId,
     type = payload.type,
     eventJson = JsonHelper.toJson(this, module = dbSerializationModule),
-    createdAt = payload.createdAt.fromDomainToDb(),
+    createdAt = payload.startTime.fromDomainToDb(),
 )
 
 internal fun DbEvent.fromDbToDomain(): Event = JsonHelper.fromJson(

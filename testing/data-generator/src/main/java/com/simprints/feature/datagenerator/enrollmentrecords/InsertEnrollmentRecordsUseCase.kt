@@ -134,16 +134,46 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
     }
 
     private fun String.toFingerIdentifier() = when (this.uppercase()) {
-        "LEFT_THUMB" -> SampleIdentifier.LEFT_THUMB
-        "LEFT_INDEX_FINGER" -> SampleIdentifier.LEFT_INDEX_FINGER
-        "LEFT_3RD_FINGER" -> SampleIdentifier.LEFT_3RD_FINGER
-        "LEFT_4TH_FINGER" -> SampleIdentifier.LEFT_4TH_FINGER
-        "LEFT_5TH_FINGER" -> SampleIdentifier.LEFT_5TH_FINGER
-        "RIGHT_THUMB" -> SampleIdentifier.RIGHT_THUMB
-        "RIGHT_INDEX_FINGER" -> SampleIdentifier.RIGHT_INDEX_FINGER
-        "RIGHT_3RD_FINGER" -> SampleIdentifier.RIGHT_3RD_FINGER
-        "RIGHT_4TH_FINGER" -> SampleIdentifier.RIGHT_4TH_FINGER
-        "RIGHT_5TH_FINGER" -> SampleIdentifier.RIGHT_5TH_FINGER
+        "LEFT_THUMB" -> {
+            SampleIdentifier.LEFT_THUMB
+        }
+
+        "LEFT_INDEX_FINGER" -> {
+            SampleIdentifier.LEFT_INDEX_FINGER
+        }
+
+        "LEFT_3RD_FINGER" -> {
+            SampleIdentifier.LEFT_3RD_FINGER
+        }
+
+        "LEFT_4TH_FINGER" -> {
+            SampleIdentifier.LEFT_4TH_FINGER
+        }
+
+        "LEFT_5TH_FINGER" -> {
+            SampleIdentifier.LEFT_5TH_FINGER
+        }
+
+        "RIGHT_THUMB" -> {
+            SampleIdentifier.RIGHT_THUMB
+        }
+
+        "RIGHT_INDEX_FINGER" -> {
+            SampleIdentifier.RIGHT_INDEX_FINGER
+        }
+
+        "RIGHT_3RD_FINGER" -> {
+            SampleIdentifier.RIGHT_3RD_FINGER
+        }
+
+        "RIGHT_4TH_FINGER" -> {
+            SampleIdentifier.RIGHT_4TH_FINGER
+        }
+
+        "RIGHT_5TH_FINGER" -> {
+            SampleIdentifier.RIGHT_5TH_FINGER
+        }
+
         else -> {
             SampleIdentifier.LEFT_THUMB
         }

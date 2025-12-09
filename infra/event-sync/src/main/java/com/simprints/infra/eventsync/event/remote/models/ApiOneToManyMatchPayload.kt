@@ -42,8 +42,8 @@ internal data class ApiOneToManyMatchPayload(
     )
 
     constructor(domainPayload: OneToManyMatchPayload) : this(
-        startTime = domainPayload.createdAt.fromDomainToApi(),
-        endTime = domainPayload.endedAt?.fromDomainToApi(),
+        startTime = domainPayload.startTime.fromDomainToApi(),
+        endTime = domainPayload.endTime?.fromDomainToApi(),
         pool = ApiMatchPool(domainPayload.pool),
         matcher = domainPayload.matcher,
         result = domainPayload.result?.map { ApiMatchEntry(it) },
@@ -51,7 +51,7 @@ internal data class ApiOneToManyMatchPayload(
             is OneToManyMatchPayload.OneToManyMatchPayloadV2 -> null
             is OneToManyMatchPayload.OneToManyMatchPayloadV3 -> domainPayload.probeBiometricReferenceId
         },
-        batches = when(domainPayload) {
+        batches = when (domainPayload) {
             is OneToManyMatchPayload.OneToManyMatchPayloadV2 -> null
             is OneToManyMatchPayload.OneToManyMatchPayloadV3 -> domainPayload.batches?.map { it.fromDomainToApi() }
         },

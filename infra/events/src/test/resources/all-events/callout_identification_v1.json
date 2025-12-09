@@ -9,8 +9,8 @@
   "payload": {
     "type": "CALLOUT_IDENTIFICATION",
     "eventVersion": 1,
-    "createdAt": 65142378901,
-    "endedAt": 0,
+    "startTime": 65142378901,
+    "endTime": 0,
     "projectId": "TEST6Oai41ps1pBNrzBL",
     "userId": {
       "className": "TokenizableString.Raw",
