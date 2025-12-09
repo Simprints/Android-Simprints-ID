@@ -268,12 +268,12 @@ class CreateIdentifyResponseUseCaseTest {
             result.identifications.map {
                 it.guid
             },
-        ).isEqualTo(listOf(faceBigConfidenceGUID, fingerprintBigConfidenceGUID, fingerprintSmallConfidenceGUID))
+        ).isEqualTo(listOf(fingerprintBigConfidenceGUID, faceBigConfidenceGUID, fingerprintSmallConfidenceGUID))
         assertThat(
             result.identifications.map {
                 it.confidenceScore
             },
-        ).isEqualTo(listOf(faceBigConfidence.toInt(), fingerprintBigConfidence.toInt(), smallConfidence.toInt()))
+        ).isEqualTo(listOf(fingerprintBigConfidence.toInt(), faceBigConfidence.toInt(), smallConfidence.toInt()))
     }
 
     @Test
