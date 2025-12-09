@@ -41,7 +41,7 @@ class AppForegroundStateTrackerTest {
         every { lifecycle.addObserver(any()) } returns Unit
         every { lifecycle.removeObserver(any()) } returns Unit
 
-        foregroundStateTracker = AppForegroundStateTracker()
+        foregroundStateTracker = AppForegroundStateTracker(testCoroutineRule.testCoroutineDispatcher)
     }
 
     @Test

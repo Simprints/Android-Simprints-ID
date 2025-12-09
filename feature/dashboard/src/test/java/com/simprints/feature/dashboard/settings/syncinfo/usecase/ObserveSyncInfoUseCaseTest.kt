@@ -5,29 +5,22 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.lifecycle.AppForegroundStateTracker
 import com.simprints.core.tools.time.Ticker
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.feature.dashboard.settings.syncinfo.SyncInfoModuleCount
+import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
-import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSampleUploadEnabledInProject
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
-import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
@@ -48,31 +41,29 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class ObserveSyncInfoUseCaseTest {
+internal class ObserveSyncInfoUseCaseTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val configManager = mockk<ConfigManager>()
     private val connectivityTracker = mockk<ConnectivityTracker>()
     private val enrolmentRecordRepository = mockk<EnrolmentRecordRepository>()
     private val authStore = mockk<AuthStore>()
     private val imageRepository = mockk<ImageRepository>()
     private val eventSyncManager = mockk<EventSyncManager>()
     private val syncOrchestrator = mockk<SyncOrchestrator>()
-    private val tokenizationProcessor = mockk<TokenizationProcessor>()
     private val timeHelper = mockk<TimeHelper>()
     private val ticker = mockk<Ticker>()
     private val appForegroundStateTracker = mockk<AppForegroundStateTracker>()
     private val commCarePermissionChecker = mockk<CommCarePermissionChecker>()
+    private val observeConfigurationFlow = mockk<ObserveConfigurationChangesUseCase>()
 
     private lateinit var useCase: ObserveSyncInfoUseCase
 
     private companion object {
         const val TEST_PROJECT_ID = "test_project_id"
-        const val TEST_USER_ID = "test_user_id"
         const val TEST_MODULE_NAME = "test_module"
         val TEST_TIMESTAMP = Timestamp(1000L)
 
@@ -94,12 +85,7 @@ class ObserveSyncInfoUseCaseTest {
         }
         every { synchronization } returns createMockSynchronizationConfiguration()
     }
-    private val mockDeviceConfiguration = mockk<DeviceConfiguration>(relaxed = true) {
-        every { selectedModules } returns emptyList()
-    }
-    private val mockProject = mockk<Project>(relaxed = true) {
-        every { state } returns ProjectState.RUNNING
-    }
+
     private val mockEventSyncState = mockk<EventSyncState>(relaxed = true) {
         every { isSyncCompleted() } returns false
         every { isSyncInProgress() } returns false
@@ -132,20 +118,11 @@ class ObserveSyncInfoUseCaseTest {
     }
 
     private fun setupDefaultMocks() {
-        every { authStore.signedInProjectId } returns TEST_PROJECT_ID
-        every { authStore.signedInUserId } returns TokenizableString.Raw(TEST_USER_ID)
         every { authStore.observeSignedInProjectId() } returns MutableStateFlow(TEST_PROJECT_ID)
 
         val connectivityLiveData = MutableLiveData(true)
         every { connectivityTracker.observeIsConnected() } returns connectivityLiveData
         every { connectivityLiveData.asFlow() } returns flowOf(true)
-
-        every { configManager.observeIsProjectRefreshing() } returns MutableStateFlow(false)
-        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfiguration)
-        every { configManager.observeDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfiguration)
-        coEvery { configManager.getProjectConfiguration() } returns mockProjectConfiguration
-        coEvery { configManager.getDeviceConfiguration() } returns mockDeviceConfiguration
-        coEvery { configManager.getProject() } returns mockProject
 
         val eventSyncLiveData = MutableLiveData(mockEventSyncState)
         every { eventSyncManager.getLastSyncState() } returns eventSyncLiveData
@@ -164,14 +141,14 @@ class ObserveSyncInfoUseCaseTest {
         coEvery { imageRepository.getNumberOfImagesToUpload(any()) } returns 0
         coEvery { enrolmentRecordRepository.count(any()) } returns 0
 
-        every { ticker.observeTickOncePerMinute() } returns MutableStateFlow(Unit)
+        every { ticker.observeTicks(any()) } returns MutableStateFlow(Unit)
         every { timeHelper.now() } returns TEST_TIMESTAMP
         every { timeHelper.msBetweenNowAndTime(any()) } returns 0L
         every { timeHelper.readableBetweenNowAndTime(any()) } returns "0 minutes ago"
 
-        every { tokenizationProcessor.decrypt(any(), any(), any()) } returns TokenizableString.Raw("decrypted_module")
-
         every { appForegroundStateTracker.observeAppInForeground() } returns flowOf(true)
+
+        every { observeConfigurationFlow.invoke() } returns flowOf(createConfigurationState())
 
         every { any<ProjectConfiguration>().isModuleSelectionAvailable() } returns false
         every { any<ProjectConfiguration>().isSimprintsEventDownSyncAllowed() } returns true
@@ -182,20 +159,18 @@ class ObserveSyncInfoUseCaseTest {
 
     private fun createUseCase() {
         useCase = ObserveSyncInfoUseCase(
-            configManager = configManager,
             connectivityTracker = connectivityTracker,
             enrolmentRecordRepository = enrolmentRecordRepository,
             authStore = authStore,
             imageRepository = imageRepository,
             eventSyncManager = eventSyncManager,
             syncOrchestrator = syncOrchestrator,
-            tokenizationProcessor = tokenizationProcessor,
             timeHelper = timeHelper,
             ticker = ticker,
             appForegroundStateTracker = appForegroundStateTracker,
             commCarePermissionChecker = commCarePermissionChecker,
-            ioDispatcher = testCoroutineRule.testCoroutineDispatcher,
-            mainDispatcher = testCoroutineRule.testCoroutineDispatcher,
+            observeConfigurationFlow = observeConfigurationFlow,
+            dispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
     }
 
@@ -214,7 +189,7 @@ class ObserveSyncInfoUseCaseTest {
 
     @Test
     fun `should show configuration loading when project is refreshing`() = runTest {
-        every { configManager.observeIsProjectRefreshing() } returns MutableStateFlow(true)
+        every { observeConfigurationFlow.invoke() } returns flowOf(createConfigurationState(isRefreshing = true))
         createUseCase()
 
         val result = useCase().first()
@@ -224,6 +199,7 @@ class ObserveSyncInfoUseCaseTest {
 
     @Test
     fun `should show re-login prompt when sync failed due to authentication required`() = runTest {
+        every { observeConfigurationFlow.invoke() } returns flowOf(createConfigurationState())
         val mockFailedEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncFailedBecauseReloginRequired() } returns true
         }
@@ -251,34 +227,8 @@ class ObserveSyncInfoUseCaseTest {
     }
 
     @Test
-    fun `should handle paused project state correctly in sync info`() = runTest {
-        val mockPausedProject = mockk<Project> {
-            every { state } returns ProjectState.PROJECT_PAUSED
-        }
-        coEvery { configManager.getProject() } returns mockPausedProject
-        createUseCase()
-
-        val result = useCase().first()
-
-        assertThat(result.syncInfoSectionRecords.isCounterRecordsToDownloadVisible).isFalse()
-    }
-
-    @Test
-    fun `should handle ending project state correctly in sync info`() = runTest {
-        val mockEndingProject = mockk<Project> {
-            every { state } returns ProjectState.PROJECT_ENDING
-        }
-        coEvery { configManager.getProject() } returns mockEndingProject
-        createUseCase()
-
-        val result = useCase().first()
-
-        assertThat(result.syncInfoSectionRecords.isCounterRecordsToDownloadVisible).isFalse()
-    }
-
-    @Test
-    fun `should handle missing project state correctly in sync info`() = runTest {
-        coEvery { configManager.getProject() } returns null
+    fun `should handle non-running project state correctly in sync info`() = runTest {
+        every { observeConfigurationFlow.invoke() } returns flowOf(createConfigurationState(isProjectRunning = false))
         createUseCase()
 
         val result = useCase().first()
@@ -404,14 +354,13 @@ class ObserveSyncInfoUseCaseTest {
             }
             every { synchronization } returns createMockSynchronizationConfiguration()
         }
-        val mockDeviceConfigWithModules = mockk<DeviceConfiguration> {
-            every { selectedModules } returns listOf(TokenizableString.Raw(TEST_MODULE_NAME))
-        }
-        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithModules)
-        every { configManager.observeDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfigWithModules)
-        coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigWithModules
-        coEvery { configManager.getDeviceConfiguration() } returns mockDeviceConfigWithModules
-        coEvery { enrolmentRecordRepository.count(any()) } returns 50
+        every { observeConfigurationFlow.invoke() } returns flowOf(
+            createConfigurationState(
+                selectedModules = listOf(ModuleCount(TEST_MODULE_NAME, 50)),
+                projectConfig = mockProjectConfigWithModules,
+            ),
+        )
+
         every { mockProjectConfigWithModules.isModuleSelectionAvailable() } returns true
         createUseCase()
 
@@ -419,8 +368,7 @@ class ObserveSyncInfoUseCaseTest {
 
         assertThat(result.syncInfoSectionModules.isSectionAvailable).isTrue()
         assertThat(result.syncInfoSectionModules.moduleCounts).hasSize(2) // total + module
-        assertThat(result.syncInfoSectionModules.moduleCounts[0].isTotal).isTrue()
-        assertThat(result.syncInfoSectionModules.moduleCounts[0].count).isEqualTo("50")
+        assertThat(result.syncInfoSectionModules.moduleCounts[0].count).isEqualTo(50)
     }
 
     // Progress calculation tests
@@ -652,14 +600,16 @@ class ObserveSyncInfoUseCaseTest {
             }
             every { synchronization } returns createMockSynchronizationConfiguration()
         }
-        val mockDeviceConfigWithModules = mockk<DeviceConfiguration> {
-            every { selectedModules } returns listOf(TokenizableString.Raw("module_1"), TokenizableString.Raw("module_2"))
-        }
-        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithModules)
-        every { configManager.observeDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfigWithModules)
-        coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigWithModules
-        coEvery { configManager.getDeviceConfiguration() } returns mockDeviceConfigWithModules
-        coEvery { enrolmentRecordRepository.count(any()) } returnsMany listOf(10, 15, 25) // records total, module_1, module_2
+        every { observeConfigurationFlow.invoke() } returns flowOf(
+            createConfigurationState(
+                selectedModules = listOf(
+                    ModuleCount("module_1", 15),
+                    ModuleCount("module_2", 25),
+                ),
+                projectConfig = mockProjectConfigWithModules,
+            ),
+        )
+
         every { mockProjectConfigWithModules.isModuleSelectionAvailable() } returns true
         createUseCase()
 
@@ -668,15 +618,14 @@ class ObserveSyncInfoUseCaseTest {
         assertThat(result.syncInfoSectionModules.isSectionAvailable).isTrue()
         assertThat(result.syncInfoSectionModules.moduleCounts).hasSize(3) // sum of modules + the 2 modules
         // sum of modules
-        assertThat(result.syncInfoSectionModules.moduleCounts[0].isTotal).isTrue()
-        assertThat(result.syncInfoSectionModules.moduleCounts[0].count).isEqualTo("40")
+        assertThat(result.syncInfoSectionModules.moduleCounts[0].count).isEqualTo(40)
         // module_1
         assertThat(result.syncInfoSectionModules.moduleCounts[1]).isEqualTo(
-            SyncInfoModuleCount(isTotal = false, name = "module_1", count = "15"),
+            ModuleCount(name = "module_1", count = 15),
         )
         // module_2
         assertThat(result.syncInfoSectionModules.moduleCounts[2]).isEqualTo(
-            SyncInfoModuleCount(isTotal = false, name = "module_2", count = "25"),
+            ModuleCount(name = "module_2", count = 25),
         )
     }
 
@@ -688,14 +637,10 @@ class ObserveSyncInfoUseCaseTest {
             }
             every { synchronization } returns createMockSynchronizationConfiguration()
         }
-        val mockDeviceConfigWithoutModules = mockk<DeviceConfiguration> {
-            every { selectedModules } returns emptyList()
-        }
-        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithoutModules)
-        every { configManager.observeDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfigWithoutModules)
-        coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigWithoutModules
-        coEvery { configManager.getDeviceConfiguration() } returns mockDeviceConfigWithoutModules
+        every { observeConfigurationFlow.invoke() } returns
+            flowOf(createConfigurationState(projectConfig = mockProjectConfigWithoutModules))
         every { mockProjectConfigWithoutModules.isModuleSelectionAvailable() } returns false
+
         createUseCase()
 
         val result = useCase().first()
@@ -715,13 +660,12 @@ class ObserveSyncInfoUseCaseTest {
         val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncInProgress() } returns false
         }
-
+        every { observeConfigurationFlow.invoke() } returns flowOf(createConfigurationState(projectConfig = mockProjectConfigWithDownSync))
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockIdleEventSyncState)
-        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithDownSync)
-        coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigWithDownSync
         coEvery { eventSyncManager.countEventsToDownload() } returns DownSyncCounts(42, isLowerBound = false)
         every { mockProjectConfigWithDownSync.isSimprintsEventDownSyncAllowed() } returns true
         every { mockProjectConfigWithDownSync.isModuleSelectionAvailable() } returns false
+
         createUseCase()
 
         val result = useCase().first()
@@ -755,10 +699,8 @@ class ObserveSyncInfoUseCaseTest {
         val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncInProgress() } returns false
         }
-
+        every { observeConfigurationFlow.invoke() } returns flowOf(createConfigurationState(projectConfig = mockProjectConfigWithDownSync))
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockIdleEventSyncState)
-        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithDownSync)
-        coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigWithDownSync
         coEvery { eventSyncManager.countEventsToDownload() } throws Exception("Timeout")
         every { mockProjectConfigWithDownSync.isSimprintsEventDownSyncAllowed() } returns true
         every { mockProjectConfigWithDownSync.isModuleSelectionAvailable() } returns false
@@ -780,9 +722,8 @@ class ObserveSyncInfoUseCaseTest {
         val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncInProgress() } returns false
         }
+        every { observeConfigurationFlow.invoke() } returns flowOf(createConfigurationState(projectConfig = mockProjectConfigWithDownSync))
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockIdleEventSyncState)
-        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithDownSync)
-        coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigWithDownSync
         coEvery { eventSyncManager.countEventsToDownload() } throws RuntimeException("Network error")
         every { mockProjectConfigWithDownSync.isSimprintsEventDownSyncAllowed() } returns true
         every { mockProjectConfigWithDownSync.isModuleSelectionAvailable() } returns false
@@ -874,15 +815,15 @@ class ObserveSyncInfoUseCaseTest {
 
     @Test
     fun `should handle changes in project refreshing stream`() = runTest {
-        val refreshingFlow = MutableStateFlow(false) // started non refreshing
-        every { configManager.observeIsProjectRefreshing() } returns refreshingFlow
+        val refreshingFlow = MutableStateFlow(createConfigurationState(isRefreshing = false)) // started non refreshing
+        every { observeConfigurationFlow.invoke() } returns refreshingFlow
         createUseCase()
 
         val notRefreshingResult = useCase().first()
 
         assertThat(notRefreshingResult.isConfigurationLoadingProgressBarVisible).isFalse()
 
-        refreshingFlow.value = true // changed to refreshing
+        refreshingFlow.value = createConfigurationState(isRefreshing = true) // changed to refreshing
 
         val refreshingResult = useCase().first()
 
@@ -944,12 +885,12 @@ class ObserveSyncInfoUseCaseTest {
 
     @Test
     fun `should handle changes in project config stream`() = runTest {
-        val projectConfigFlow = MutableStateFlow(mockProjectConfiguration)
-        every { configManager.observeProjectConfiguration() } returns projectConfigFlow // started without modules
+        val projectConfigFlow = MutableStateFlow(createConfigurationState(projectConfig = mockProjectConfiguration))
+        every { observeConfigurationFlow.invoke() } returns projectConfigFlow
+
         createUseCase()
 
         val initialResult = useCase().first()
-
         assertThat(initialResult.syncInfoSectionModules.isSectionAvailable).isFalse()
 
         val mockConfigWithModules = mockk<ProjectConfiguration> {
@@ -959,7 +900,7 @@ class ObserveSyncInfoUseCaseTest {
             every { synchronization } returns createMockSynchronizationConfiguration()
         }
         every { mockConfigWithModules.isModuleSelectionAvailable() } returns true
-        projectConfigFlow.value = mockConfigWithModules // now with modules
+        projectConfigFlow.value = createConfigurationState(projectConfig = mockConfigWithModules) // now with modules
 
         val moduleConfigResult = useCase().first()
 
@@ -968,27 +909,26 @@ class ObserveSyncInfoUseCaseTest {
 
     @Test
     fun `should handle changes in device config stream`() = runTest {
-        every { configManager.observeProjectConfiguration() } returns flowOf(
-            mockk<ProjectConfiguration> {
-                every { general } returns mockk<GeneralConfiguration> {
-                    every { modalities } returns emptyList()
+        val projectConfig = mockk<ProjectConfiguration> {
+            every { general } returns mockk<GeneralConfiguration> {
+                every { modalities } returns emptyList()
+            }
+            every { synchronization } returns mockk<SynchronizationConfiguration>(relaxed = true) {
+                every { up } returns mockk<UpSynchronizationConfiguration>(relaxed = true) {
+                    every { coSync } returns
+                        mockk<UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration>(relaxed = true) {
+                            every { kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+                        }
                 }
-                every { synchronization } returns mockk<SynchronizationConfiguration>(relaxed = true) {
-                    every { up } returns mockk<UpSynchronizationConfiguration>(relaxed = true) {
-                        every { coSync } returns
-                            mockk<UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration>(relaxed = true) {
-                                every { kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
-                            }
-                    }
-                }
-            },
-        )
+            }
+        }
         val deviceConfigFlow = MutableStateFlow(
-            mockk<DeviceConfiguration>(relaxed = true) {
-                every { selectedModules } returns emptyList()
-            },
-        ) // started without selected modules
-        every { configManager.observeDeviceConfiguration() } returns deviceConfigFlow
+            createConfigurationState(
+                selectedModules = emptyList(), // started without selected modules
+                projectConfig = projectConfig,
+            ),
+        )
+        every { observeConfigurationFlow.invoke() } returns deviceConfigFlow
         createUseCase()
 
         val noModulesResult = useCase().first()
@@ -996,10 +936,11 @@ class ObserveSyncInfoUseCaseTest {
         assertThat(noModulesResult.syncInfoSectionModules.moduleCounts).isEmpty()
 
         deviceConfigFlow.emit(
-            mockk<DeviceConfiguration>(relaxed = true) {
-                every { selectedModules } returns listOf(TokenizableString.Raw(TEST_MODULE_NAME))
-            },
-        ) // now with selected modules
+            createConfigurationState(
+                selectedModules = listOf(ModuleCount(TEST_MODULE_NAME, 0)), // now with selected modules
+                projectConfig = projectConfig,
+            ),
+        )
 
         val withModulesResult = useCase().first()
 
@@ -1017,7 +958,7 @@ class ObserveSyncInfoUseCaseTest {
         every { timeHelper.readableBetweenNowAndTime(any()) } returnsMany listOf("0 minutes ago", "1 minute ago")
         // MutableStateFlow of Unit won't emit another (identical) Unit, so we'll count minutes and map to Units
         val timePaceFlow = MutableStateFlow(0)
-        every { ticker.observeTickOncePerMinute() } returns timePaceFlow.map { }
+        every { ticker.observeTicks(any()) } returns timePaceFlow.map { }
         createUseCase()
 
         val initialResult = useCase().first()
@@ -1332,17 +1273,15 @@ class ObserveSyncInfoUseCaseTest {
             }
             every { synchronization } returns createMockSynchronizationConfiguration()
         }
-        val mockEmptyDeviceConfig = mockk<DeviceConfiguration> {
-            every { selectedModules } returns emptyList()
-        }
         val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncFailed() } returns false
             every { isSyncInProgress() } returns false
         }
-        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigRequiringModules)
-        every { configManager.observeDeviceConfiguration() } returns MutableStateFlow(mockEmptyDeviceConfig)
-        coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigRequiringModules
-        coEvery { configManager.getDeviceConfiguration() } returns mockEmptyDeviceConfig
+
+        every { observeConfigurationFlow.invoke() } returns flowOf(
+            createConfigurationState(projectConfig = mockProjectConfigRequiringModules),
+        )
+
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockIdleEventSyncState)
         every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(true)
         every { mockProjectConfigRequiringModules.isModuleSelectionAvailable() } returns true
@@ -1407,7 +1346,14 @@ class ObserveSyncInfoUseCaseTest {
                     every { commCare } returns mockk()
                 }
             }
+            every { isCommCareEventDownSyncAllowed() } returns true
         }
+        every { observeConfigurationFlow.invoke() } returns flowOf(
+            createConfigurationState(
+                projectConfig = mockProjectConfigWithCommCareDownSync,
+            ),
+        )
+
         val mockNormalEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncFailedBecauseCommCarePermissionIsMissing() } returns false
             every { isSyncRunning() } returns false
@@ -1415,11 +1361,8 @@ class ObserveSyncInfoUseCaseTest {
             every { isSyncFailed() } returns false
             every { isSyncInProgress() } returns false
         }
-        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithCommCareDownSync)
-        coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigWithCommCareDownSync
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockNormalEventSyncState)
         every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(false)
-        every { mockProjectConfigWithCommCareDownSync.isCommCareEventDownSyncAllowed() } returns true
         createUseCase()
 
         val result = useCase().first()
@@ -1427,67 +1370,6 @@ class ObserveSyncInfoUseCaseTest {
         assertThat(result.syncInfoSectionRecords.isSyncButtonEnabled).isTrue()
         assertThat(result.syncInfoSectionRecords.isInstructionOfflineVisible).isFalse()
         assertThat(result.syncInfoSectionRecords.isInstructionDefaultVisible).isTrue()
-    }
-
-    // Module tokenization tests
-
-    @Test
-    fun `should correctly decrypt tokenized module names`() = runTest {
-        val tokenizedModule = TokenizableString.Tokenized("encrypted_module_name")
-        val mockProjectConfigWithModules = mockk<ProjectConfiguration> {
-            every { general } returns mockk<GeneralConfiguration> {
-                every { modalities } returns listOf(Modality.FINGERPRINT)
-            }
-            every { synchronization } returns createMockSynchronizationConfiguration()
-        }
-        val mockDeviceConfigWithTokenizedModules = mockk<DeviceConfiguration> {
-            every { selectedModules } returns listOf(tokenizedModule)
-        }
-        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithModules)
-        every { configManager.observeDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfigWithTokenizedModules)
-        coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigWithModules
-        coEvery { configManager.getDeviceConfiguration() } returns mockDeviceConfigWithTokenizedModules
-        coEvery { enrolmentRecordRepository.count(any()) } returnsMany listOf(10, 10) // total, and the module
-        every {
-            tokenizationProcessor.decrypt(tokenizedModule, TokenKeyType.ModuleId, any())
-        } returns TokenizableString.Raw("decrypted_module")
-        every { mockProjectConfigWithModules.isModuleSelectionAvailable() } returns true
-        createUseCase()
-
-        val result = useCase().first()
-
-        assertThat(result.syncInfoSectionModules.isSectionAvailable).isTrue()
-        assertThat(result.syncInfoSectionModules.moduleCounts).hasSize(2) // total + the module
-        assertThat(result.syncInfoSectionModules.moduleCounts[1].name).isEqualTo("decrypted_module")
-        verify { tokenizationProcessor.decrypt(tokenizedModule, TokenKeyType.ModuleId, any()) }
-    }
-
-    @Test
-    fun `should correctly handle raw module names`() = runTest {
-        val rawModule = TokenizableString.Raw("raw_module_name")
-        val mockProjectConfigWithModules = mockk<ProjectConfiguration> {
-            every { general } returns mockk<GeneralConfiguration> {
-                every { modalities } returns listOf(Modality.FINGERPRINT)
-            }
-            every { synchronization } returns createMockSynchronizationConfiguration()
-        }
-        val mockDeviceConfigWithRawModules = mockk<DeviceConfiguration> {
-            every { selectedModules } returns listOf(rawModule)
-        }
-        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithModules)
-        every { configManager.observeDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfigWithRawModules)
-        coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigWithModules
-        coEvery { configManager.getDeviceConfiguration() } returns mockDeviceConfigWithRawModules
-        coEvery { enrolmentRecordRepository.count(any()) } returnsMany listOf(10, 10) // total, and the module
-        every { mockProjectConfigWithModules.isModuleSelectionAvailable() } returns true
-        createUseCase()
-
-        val result = useCase().first()
-
-        assertThat(result.syncInfoSectionModules.isSectionAvailable).isTrue()
-        assertThat(result.syncInfoSectionModules.moduleCounts).hasSize(2) // total + the module
-        assertThat(result.syncInfoSectionModules.moduleCounts[1].name).isEqualTo("raw_module_name")
-        verify(exactly = 0) { tokenizationProcessor.decrypt(any(), any(), any()) }
     }
 
     @Test
@@ -1522,4 +1404,11 @@ class ObserveSyncInfoUseCaseTest {
         assertThat(result.syncInfoSectionRecords.isSyncButtonEnabled).isTrue()
         assertThat(result.syncInfoSectionRecords.isInstructionDefaultVisible).isTrue()
     }
+
+    private fun createConfigurationState(
+        isRefreshing: Boolean = false,
+        isProjectRunning: Boolean = true,
+        selectedModules: List<ModuleCount> = emptyList(),
+        projectConfig: ProjectConfiguration = mockProjectConfiguration,
+    ) = ConfigurationState(isRefreshing, isProjectRunning, selectedModules, projectConfig)
 }

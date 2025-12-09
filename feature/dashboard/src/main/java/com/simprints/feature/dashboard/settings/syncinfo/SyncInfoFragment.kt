@@ -25,7 +25,6 @@ import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSyncInfoBinding
 import com.simprints.feature.dashboard.requestlogin.LogoutReason
 import com.simprints.feature.dashboard.requestlogin.RequestLoginFragmentArgs
-import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCountAdapter
 import com.simprints.feature.dashboard.view.ConfigurableSyncInfoFragmentContainer
 import com.simprints.feature.login.LoginContract
@@ -340,24 +339,13 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         binding.layoutModuleSelection.isGone = !isModuleSectionVisible
         binding.selectedModulesView.isGone = !config.isSyncInfoModuleListVisible
 
-        val moduleCountsForAdapter = modules.moduleCounts.map { syncInfoModuleCount ->
-            ModuleCount(
-                name = if (syncInfoModuleCount.isTotal) {
-                    getString(IDR.string.sync_info_total_records)
-                } else {
-                    syncInfoModuleCount.name
-                },
-                count = syncInfoModuleCount.count.toIntOrNull() ?: 0,
-            )
-        }
-
-        moduleCountAdapter.submitList(moduleCountsForAdapter)
+        moduleCountAdapter.submitList(modules.moduleCounts)
 
         // RecyclerView height fix (wrong height may be caused by ConstraintLayout in parent views)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 val itemHeight = resources.getDimensionPixelSize(R.dimen.module_item_height)
-                val itemCount = moduleCountsForAdapter.size.coerceAtMost(MAX_MODULE_LIST_HEIGHT_ITEMS)
+                val itemCount = modules.moduleCounts.size.coerceAtMost(MAX_MODULE_LIST_HEIGHT_ITEMS)
                 binding.selectedModulesView.apply {
                     layoutParams = layoutParams.apply {
                         height = itemHeight * itemCount
