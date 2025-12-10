@@ -1,6 +1,8 @@
 package com.simprints.feature.dashboard.settings.syncinfo
 
-data class SyncInfo(
+import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
+
+internal data class SyncInfo(
     val isLoggedIn: Boolean = true,
     val isConfigurationLoadingProgressBarVisible: Boolean = false,
     val isLoginPromptSectionVisible: Boolean = false,
@@ -10,7 +12,7 @@ data class SyncInfo(
     val syncInfoSectionModules: SyncInfoSectionModules = SyncInfoSectionModules(),
 )
 
-data class SyncInfoSectionRecords(
+internal data class SyncInfoSectionRecords(
     // counters
     val counterTotalRecords: String = "",
     val counterRecordsToUpload: String = "",
@@ -40,13 +42,13 @@ data class SyncInfoSectionRecords(
     val footerLastSyncMinutesAgo: String = "",
 )
 
-data class SyncInfoError(
+internal data class SyncInfoError(
     val isBackendMaintenance: Boolean = false,
     val backendMaintenanceEstimatedOutage: Long = -1,
     val isTooManyRequests: Boolean = false,
 )
 
-data class SyncInfoSectionImages(
+internal data class SyncInfoSectionImages(
     // counters
     val counterImagesToUpload: String = "",
     // instructions
@@ -62,12 +64,12 @@ data class SyncInfoSectionImages(
     val footerLastSyncMinutesAgo: String = "",
 )
 
-data class SyncInfoProgress(
+internal data class SyncInfoProgress(
     val progressParts: List<SyncInfoProgressPart> = listOf(),
     val progressBarPercentage: Int = 0,
 )
 
-data class SyncInfoProgressPart(
+internal data class SyncInfoProgressPart(
     val isPending: Boolean = true,
     val isDone: Boolean = false,
     val areNumbersVisible: Boolean = false,
@@ -75,18 +77,12 @@ data class SyncInfoProgressPart(
     val totalNumber: Int = 0,
 )
 
-data class SyncInfoSectionModules(
+internal data class SyncInfoSectionModules(
     val isSectionAvailable: Boolean = false,
-    val moduleCounts: List<SyncInfoModuleCount> = emptyList(),
+    val moduleCounts: List<ModuleCount> = emptyList(),
 )
 
-data class SyncInfoModuleCount(
-    val isTotal: Boolean = false,
-    val name: String,
-    val count: String = "",
-)
-
-enum class LogoutActionReason {
+internal enum class LogoutActionReason {
     USER_ACTION,
     PROJECT_ENDING_OR_DEVICE_COMPROMISED,
 }
