@@ -8,9 +8,11 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
+import com.simprints.infra.events.deviceinfo.DeviceUsageInfoProvider
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.scope.Device
+import com.simprints.infra.events.event.domain.models.scope.DeviceUsage
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.event.domain.validators.EventValidator
@@ -56,6 +58,9 @@ internal class EventRepositoryImplTest {
     @MockK
     lateinit var configRepository: ConfigRepository
 
+    @MockK
+    lateinit var deviceUsageInfoProvider: DeviceUsageInfoProvider
+
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
@@ -71,6 +76,11 @@ internal class EventRepositoryImplTest {
         coEvery { configRepository.getDeviceConfiguration() } returns mockk {
             every { language } returns LANGUAGE
         }
+        every { deviceUsageInfoProvider.getDeviceUsageInfo() } returns DeviceUsage(
+            availableStorageMb = AVAILABLE_STORAGE_MB,
+            availableRamMb = AVAILABLE_RAM_MB,
+            isBatterySaverOn = BATTERY_SAVER_ON,
+        )
 
         eventRepo = EventRepositoryImpl(
             deviceId = DEVICE_ID,
@@ -81,6 +91,7 @@ internal class EventRepositoryImplTest {
             timeHelper = timeHelper,
             validatorsFactory = sessionEventValidatorsFactory,
             configRepository = configRepository,
+            deviceUsageInfoProvider = deviceUsageInfoProvider,
         )
     }
 
@@ -423,6 +434,11 @@ internal class EventRepositoryImplTest {
             Build.VERSION.SDK_INT.toString(),
             Build.MANUFACTURER + "_" + Build.MODEL,
             DEVICE_ID,
+            DeviceUsage(
+                AVAILABLE_STORAGE_MB,
+                AVAILABLE_RAM_MB,
+                BATTERY_SAVER_ON,
+            ),
         ) &&
         scope.payload.databaseInfo == DatabaseInfo(0)
 
@@ -434,5 +450,8 @@ internal class EventRepositoryImplTest {
 
         const val N_SESSIONS_DB = 3
         val NOW = Timestamp(1000L)
+        const val AVAILABLE_STORAGE_MB = 1024L
+        const val AVAILABLE_RAM_MB = 2048L
+        const val BATTERY_SAVER_ON = true
     }
 }

@@ -5,6 +5,7 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.scope.Device
+import com.simprints.infra.events.event.domain.models.scope.DeviceUsage
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
@@ -58,6 +59,21 @@ internal class MapDomainEventScopeToApiUseCaseTest {
             assertEquals(projectId, scope.projectId)
             assertEquals(startTime.unixMs, scope.createdAt.ms)
             assertEquals(endTime, scope.endedAt)
+            assertEquals(
+                device.usage?.availableStorageMb,
+                scope.payload.device.deviceUsage
+                    ?.availableStorageMb,
+            )
+            assertEquals(
+                device.usage?.availableRamMb,
+                scope.payload.device.deviceUsage
+                    ?.availableRamMb,
+            )
+            assertEquals(
+                device.usage?.isBatterySaverOn,
+                scope.payload.device.deviceUsage
+                    ?.isBatterySaverOn,
+            )
         }
     }
 
@@ -73,11 +89,26 @@ internal class MapDomainEventScopeToApiUseCaseTest {
             sidVersion = "appVersionName",
             libSimprintsVersion = "libVersionName",
             language = "language",
-            device = Device("deviceId", "deviceModel", "deviceManufacturer"),
+            device = Device(
+                androidSdkVersion = "sdkVersion",
+                deviceModel = "deviceModel",
+                deviceId = "deviceId",
+                deviceUsage = DeviceUsage(
+                    availableStorageMb = AVAILABLE_STORAGE_MB,
+                    availableRamMb = AVAILABLE_RAM_MB,
+                    isBatterySaverOn = BATTERY_SAVER_ON,
+                ),
+            ),
             databaseInfo = DatabaseInfo(0, 0),
             projectConfigurationUpdatedAt = "",
             projectConfigurationId = "",
             location = null,
         ),
     )
+
+    companion object {
+        private const val AVAILABLE_STORAGE_MB = 1024L
+        private const val AVAILABLE_RAM_MB = 2048L
+        private const val BATTERY_SAVER_ON = true
+    }
 }
