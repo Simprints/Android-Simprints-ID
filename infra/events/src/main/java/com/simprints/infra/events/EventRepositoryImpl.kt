@@ -8,10 +8,12 @@ import com.simprints.core.PackageVersionName
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.events.deviceinfo.DeviceUsageInfoProvider
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.scope.Device
+import com.simprints.infra.events.event.domain.models.scope.DeviceUsage
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
 import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
@@ -36,6 +38,7 @@ internal open class EventRepositoryImpl @Inject constructor(
     private val timeHelper: TimeHelper,
     validatorsFactory: SessionEventValidatorsFactory,
     private val configRepository: ConfigRepository,
+    private val deviceUsageInfoProvider: DeviceUsageInfoProvider,
 ) : EventRepository {
     companion object {
         const val PROJECT_ID_FOR_NOT_SIGNED_IN = "NOT_SIGNED_IN"
@@ -56,6 +59,7 @@ internal open class EventRepositoryImpl @Inject constructor(
             val projectConfiguration = configRepository.getProjectConfiguration()
             val deviceConfiguration = configRepository.getDeviceConfiguration()
             val sessionCount = eventLocalDataSource.countEventScopes(EventScopeType.SESSION)
+            val deviceUsageInfo = deviceUsageInfoProvider.getDeviceUsageInfo()
 
             EventScope(
                 id = scopeId ?: UUID.randomUUID().toString(),
@@ -69,9 +73,14 @@ internal open class EventRepositoryImpl @Inject constructor(
                     language = deviceConfiguration.language,
                     modalities = projectConfiguration.general.modalities,
                     device = Device(
-                        VERSION.SDK_INT.toString(),
-                        Build.MANUFACTURER + "_" + Build.MODEL,
-                        deviceId,
+                        androidSdkVersion = VERSION.SDK_INT.toString(),
+                        deviceModel = Build.MANUFACTURER + "_" + Build.MODEL,
+                        deviceId = deviceId,
+                        deviceUsage = DeviceUsage(
+                            availableStorageMb = deviceUsageInfo.availableStorageMb,
+                            availableRamMb = deviceUsageInfo.availableRamMb,
+                            isBatterySaverOn = deviceUsageInfo.isBatterySaverOn,
+                        ),
                     ),
                     databaseInfo = DatabaseInfo(sessionCount),
                     projectConfigurationUpdatedAt = projectConfiguration.updatedAt,

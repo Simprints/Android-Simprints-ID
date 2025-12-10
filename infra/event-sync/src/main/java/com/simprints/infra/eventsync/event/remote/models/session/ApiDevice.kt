@@ -9,6 +9,12 @@ internal data class ApiDevice(
     var androidSdkVersion: String = Build.VERSION.SDK_INT.toString(),
     var model: String = Build.MANUFACTURER + "_" + Build.MODEL,
     var id: String = "",
+    var usage: ApiDeviceUsage? = null,
 )
 
-internal fun Device.fromDomainToApi() = ApiDevice(androidSdkVersion, deviceModel, deviceId)
+internal fun Device.fromDomainToApi() = ApiDevice(
+    androidSdkVersion = androidSdkVersion,
+    model = deviceModel,
+    id = deviceId,
+    usage = deviceUsage?.fromDomainToApi(),
+)
