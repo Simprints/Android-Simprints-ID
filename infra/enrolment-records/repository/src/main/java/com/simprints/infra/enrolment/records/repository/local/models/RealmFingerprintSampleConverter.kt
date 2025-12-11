@@ -6,7 +6,7 @@ import com.simprints.infra.enrolment.records.realm.store.models.DbFingerprintSam
 
 internal fun RealmFingerprintSample.toDomain(): Sample = Sample(
     id = id,
-    identifier = DbSampleIdentifier.fromId(fingerIdentifier).toDomain(),
+    identifier = DbTemplateIdentifier.fromId(fingerIdentifier).toDomain(),
     template = template,
     format = format,
     referenceId = referenceId,

@@ -2,10 +2,10 @@ package com.simprints.fingerprint.infra.biosdkimpl.matching
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
-import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.byteArrayOf
 import com.simprints.fingerprint.infra.simafiswrapper.JNILibAfisInterface
 import io.mockk.*
@@ -35,7 +35,7 @@ class SimAfisMatcherTest {
         val probes = listOf(
             CaptureSample(
                 captureEventId = "referenceId",
-                identifier = SampleIdentifier.RIGHT_THUMB,
+                identifier = TemplateIdentifier.RIGHT_THUMB,
                 template = IsoFingerprintTemplateGenerator.generate(1),
                 format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
                 modality = Modality.FINGERPRINT,
@@ -46,7 +46,7 @@ class SimAfisMatcherTest {
             listOf(
                 Sample(
                     referenceId = "referenceId",
-                    identifier = SampleIdentifier.RIGHT_THUMB,
+                    identifier = TemplateIdentifier.RIGHT_THUMB,
                     template = IsoFingerprintTemplateGenerator.generate(1),
                     format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
                     modality = Modality.FINGERPRINT,
@@ -66,7 +66,7 @@ class SimAfisMatcherTest {
         val probes = listOf(
             CaptureSample(
                 captureEventId = "referenceId",
-                identifier = SampleIdentifier.RIGHT_3RD_FINGER,
+                identifier = TemplateIdentifier.RIGHT_3RD_FINGER,
                 template = IsoFingerprintTemplateGenerator.generate(1),
                 format = "NEC_1",
                 modality = Modality.FINGERPRINT,
@@ -77,7 +77,7 @@ class SimAfisMatcherTest {
             listOf(
                 Sample(
                     referenceId = "referenceId",
-                    identifier = SampleIdentifier.RIGHT_3RD_FINGER,
+                    identifier = TemplateIdentifier.RIGHT_3RD_FINGER,
                     template = IsoFingerprintTemplateGenerator.generate(1),
                     format = "NEC_1",
                     modality = Modality.FINGERPRINT,
@@ -99,14 +99,14 @@ class SimAfisMatcherTest {
         val probe = listOf(
             CaptureSample(
                 captureEventId = "referenceId",
-                identifier = SampleIdentifier.RIGHT_THUMB,
+                identifier = TemplateIdentifier.RIGHT_THUMB,
                 template = template1,
                 format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
                 modality = Modality.FINGERPRINT,
             ),
             CaptureSample(
                 captureEventId = "referenceId",
-                identifier = SampleIdentifier.LEFT_THUMB,
+                identifier = TemplateIdentifier.LEFT_THUMB,
                 template = template2,
                 format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
                 modality = Modality.FINGERPRINT,
@@ -118,14 +118,14 @@ class SimAfisMatcherTest {
             samples = listOf(
                 Sample(
                     referenceId = "referenceId",
-                    identifier = SampleIdentifier.LEFT_4TH_FINGER,
+                    identifier = TemplateIdentifier.LEFT_4TH_FINGER,
                     template = template2,
                     format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
                     modality = Modality.FINGERPRINT,
                 ),
                 Sample(
                     referenceId = "referenceId",
-                    identifier = SampleIdentifier.LEFT_5TH_FINGER,
+                    identifier = TemplateIdentifier.LEFT_5TH_FINGER,
                     template = template1,
                     format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
                     modality = Modality.FINGERPRINT,
@@ -137,14 +137,14 @@ class SimAfisMatcherTest {
             samples = listOf(
                 Sample(
                     referenceId = "referenceId",
-                    identifier = SampleIdentifier.RIGHT_3RD_FINGER,
+                    identifier = TemplateIdentifier.RIGHT_3RD_FINGER,
                     template = template3,
                     format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
                     modality = Modality.FINGERPRINT,
                 ),
                 Sample(
                     referenceId = "referenceId",
-                    identifier = SampleIdentifier.RIGHT_5TH_FINGER,
+                    identifier = TemplateIdentifier.RIGHT_5TH_FINGER,
                     template = template1,
                     format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
                     modality = Modality.FINGERPRINT,
@@ -179,14 +179,14 @@ class SimAfisMatcherTest {
             listOf(
                 Sample(
                     referenceId = "referenceId",
-                    identifier = SampleIdentifier.LEFT_THUMB,
+                    identifier = TemplateIdentifier.LEFT_THUMB,
                     template = IsoFingerprintTemplateGenerator.generate(1),
                     format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
                     modality = Modality.FINGERPRINT,
                 ),
                 Sample(
                     referenceId = "referenceId",
-                    identifier = SampleIdentifier.LEFT_3RD_FINGER,
+                    identifier = TemplateIdentifier.LEFT_3RD_FINGER,
                     template = IsoFingerprintTemplateGenerator.generate(1),
                     format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
                     modality = Modality.FINGERPRINT,

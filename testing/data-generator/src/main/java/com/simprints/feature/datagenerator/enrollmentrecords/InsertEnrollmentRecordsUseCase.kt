@@ -3,8 +3,8 @@ package com.simprints.feature.datagenerator.enrollmentrecords
 import android.os.Bundle
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.Sample
-import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.ConfigRepository
@@ -121,7 +121,7 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
                         referenceId = UUID.randomUUID().toString(),
                         id = UUID.randomUUID().toString(),
                         identifier = if (fingerIdentifiers.isNullOrEmpty()) {
-                            SampleIdentifier.LEFT_THUMB
+                            TemplateIdentifier.LEFT_THUMB
                         } else {
                             fingerIdentifiers[i % fingerIdentifiers.size].toFingerIdentifier()
                         },
@@ -134,19 +134,17 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
     }
 
     private fun String.toFingerIdentifier() = when (this.uppercase()) {
-        "LEFT_THUMB" -> SampleIdentifier.LEFT_THUMB
-        "LEFT_INDEX_FINGER" -> SampleIdentifier.LEFT_INDEX_FINGER
-        "LEFT_3RD_FINGER" -> SampleIdentifier.LEFT_3RD_FINGER
-        "LEFT_4TH_FINGER" -> SampleIdentifier.LEFT_4TH_FINGER
-        "LEFT_5TH_FINGER" -> SampleIdentifier.LEFT_5TH_FINGER
-        "RIGHT_THUMB" -> SampleIdentifier.RIGHT_THUMB
-        "RIGHT_INDEX_FINGER" -> SampleIdentifier.RIGHT_INDEX_FINGER
-        "RIGHT_3RD_FINGER" -> SampleIdentifier.RIGHT_3RD_FINGER
-        "RIGHT_4TH_FINGER" -> SampleIdentifier.RIGHT_4TH_FINGER
-        "RIGHT_5TH_FINGER" -> SampleIdentifier.RIGHT_5TH_FINGER
-        else -> {
-            SampleIdentifier.LEFT_THUMB
-        }
+        "LEFT_THUMB" -> TemplateIdentifier.LEFT_THUMB
+        "LEFT_INDEX_FINGER" -> TemplateIdentifier.LEFT_INDEX_FINGER
+        "LEFT_3RD_FINGER" -> TemplateIdentifier.LEFT_3RD_FINGER
+        "LEFT_4TH_FINGER" -> TemplateIdentifier.LEFT_4TH_FINGER
+        "LEFT_5TH_FINGER" -> TemplateIdentifier.LEFT_5TH_FINGER
+        "RIGHT_THUMB" -> TemplateIdentifier.RIGHT_THUMB
+        "RIGHT_INDEX_FINGER" -> TemplateIdentifier.RIGHT_INDEX_FINGER
+        "RIGHT_3RD_FINGER" -> TemplateIdentifier.RIGHT_3RD_FINGER
+        "RIGHT_4TH_FINGER" -> TemplateIdentifier.RIGHT_4TH_FINGER
+        "RIGHT_5TH_FINGER" -> TemplateIdentifier.RIGHT_5TH_FINGER
+        else -> TemplateIdentifier.LEFT_THUMB
     }
 
     private fun getTemplateForFormat(format: String): ByteArray = when (format) {

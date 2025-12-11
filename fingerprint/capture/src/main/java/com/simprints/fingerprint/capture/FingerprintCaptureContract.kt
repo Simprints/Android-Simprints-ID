@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.capture
 
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 
 object FingerprintCaptureContract {
@@ -9,7 +9,7 @@ object FingerprintCaptureContract {
 
     fun getParams(
         flowType: FlowType,
-        fingers: List<SampleIdentifier>,
+        fingers: List<TemplateIdentifier>,
         fingerprintSDK: FingerprintConfiguration.BioSdk,
     ) = FingerprintCaptureParams(flowType, fingers, fingerprintSDK)
 }

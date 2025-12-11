@@ -5,9 +5,9 @@ import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.MatchComparisonResult
-import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.DecisionPolicy
@@ -403,7 +403,7 @@ internal class MatchViewModelTest {
         modality = Modality.FINGERPRINT,
         template = Random.nextBytes(20),
         format = "format",
-        identifier = SampleIdentifier.LEFT_3RD_FINGER,
+        identifier = TemplateIdentifier.LEFT_3RD_FINGER,
     )
 
     companion object {

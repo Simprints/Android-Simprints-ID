@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
@@ -13,7 +13,7 @@ class ApiFingerprintCapturePayloadTest {
     fun `creating fingerprint capture object has correct values`() {
         val fingerprint = ApiFingerprintCapturePayload.ApiFingerprint(
             FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(
-                finger = SampleIdentifier.LEFT_3RD_FINGER,
+                finger = TemplateIdentifier.LEFT_3RD_FINGER,
                 quality = 23,
                 format = "ISO_19794_2",
             ),
@@ -23,7 +23,7 @@ class ApiFingerprintCapturePayloadTest {
             startTime = ApiTimestamp(1),
             endTime = ApiTimestamp(1),
             qualityThreshold = 23,
-            finger = SampleIdentifier.LEFT_3RD_FINGER,
+            finger = TemplateIdentifier.LEFT_3RD_FINGER,
             result = ApiFingerprintCapturePayload.ApiResult.GOOD_SCAN,
             fingerprint = fingerprint,
         )
@@ -33,7 +33,7 @@ class ApiFingerprintCapturePayloadTest {
             assertThat(startTime).isEqualTo(ApiTimestamp(1))
             assertThat(endTime).isEqualTo(ApiTimestamp(1))
             assertThat(qualityThreshold).isEqualTo(23)
-            assertThat(finger).isEqualTo(SampleIdentifier.LEFT_3RD_FINGER)
+            assertThat(finger).isEqualTo(TemplateIdentifier.LEFT_3RD_FINGER)
             assertThat(result).isEqualTo(ApiFingerprintCapturePayload.ApiResult.GOOD_SCAN)
             assertThat(fingerprint).isEqualTo(fingerprint)
         }

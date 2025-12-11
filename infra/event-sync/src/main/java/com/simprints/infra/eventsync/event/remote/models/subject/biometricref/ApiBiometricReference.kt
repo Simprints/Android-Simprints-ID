@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
 import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
 import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.face.ApiFaceReference
@@ -58,4 +58,4 @@ internal fun FaceTemplate.fromDomainToApi() = ApiFaceTemplate(template)
 internal fun ApiFingerprintReference.fromApiToDomain() =
     DomainFingerprintReference(id, templates.map { it.fromApiToDomain() }, format, metadata)
 
-internal fun ApiFingerprintTemplate.fromApiToDomain() = FingerprintTemplate(template, SampleIdentifier.valueOf(finger.name))
+internal fun ApiFingerprintTemplate.fromApiToDomain() = FingerprintTemplate(template, TemplateIdentifier.valueOf(finger.name))

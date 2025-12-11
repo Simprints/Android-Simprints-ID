@@ -7,10 +7,10 @@ import com.jraska.livedata.test
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.sample.CaptureSample
-import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.consent.ConsentResult
@@ -303,14 +303,14 @@ internal class OrchestratorViewModelTest {
         val sample1 = CaptureSample(
             captureEventId = GUID1,
             modality = Modality.FINGERPRINT,
-            identifier = SampleIdentifier.LEFT_INDEX_FINGER,
+            identifier = TemplateIdentifier.LEFT_INDEX_FINGER,
             template = ByteArray(0),
             format = format,
         )
         val sample2 = CaptureSample(
             captureEventId = GUID2,
             modality = Modality.FINGERPRINT,
-            identifier = SampleIdentifier.LEFT_THUMB,
+            identifier = TemplateIdentifier.LEFT_THUMB,
             template = ByteArray(0),
             format = format,
         )
@@ -432,8 +432,8 @@ internal class OrchestratorViewModelTest {
     @Test
     fun `Updates external credential step payload with fingerprint samples when receiving fingerprint capture result`() = runTest {
         val fingerprintReferenceId = "fingerprintReferenceId"
-        val fingerId1 = SampleIdentifier.LEFT_INDEX_FINGER
-        val fingerId2 = SampleIdentifier.RIGHT_THUMB
+        val fingerId1 = TemplateIdentifier.LEFT_INDEX_FINGER
+        val fingerId2 = TemplateIdentifier.RIGHT_THUMB
         val template1 = ByteArray(10)
         val template2 = ByteArray(20)
         val format1 = "format1"

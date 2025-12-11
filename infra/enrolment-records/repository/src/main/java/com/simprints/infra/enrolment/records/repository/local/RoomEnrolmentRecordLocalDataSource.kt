@@ -12,7 +12,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.BiometricD
 import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.repository.local.models.DbSampleIdentifier
+import com.simprints.infra.enrolment.records.repository.local.models.DbTemplateIdentifier
 import com.simprints.infra.enrolment.records.repository.local.models.toDomain
 import com.simprints.infra.enrolment.records.repository.local.models.toRoomDb
 import com.simprints.infra.enrolment.records.room.store.BuildConfig.DB_ENCRYPTION
@@ -102,7 +102,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                     Sample(
                         id = sample.uuid,
                         template = sample.templateData,
-                        identifier = DbSampleIdentifier.fromId(sample.identifier).toDomain(),
+                        identifier = DbTemplateIdentifier.fromId(sample.identifier).toDomain(),
                         format = sample.format,
                         referenceId = sample.referenceId,
                         modality = DbModality.fromId(sample.modality).toDomain(),

@@ -1,11 +1,11 @@
-package com.simprints.core.domain.sample
+package com.simprints.core.domain.reference
 
 import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 
 @Keep
 @ExcludedFromGeneratedTestCoverageReports("Enum")
-enum class SampleIdentifier {
+enum class TemplateIdentifier {
     NONE,
 
     // Fingerprint specific identifiers

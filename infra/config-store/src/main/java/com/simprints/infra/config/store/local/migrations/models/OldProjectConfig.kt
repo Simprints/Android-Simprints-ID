@@ -3,7 +3,7 @@ package com.simprints.infra.config.store.local.migrations.models
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.models.ConsentConfiguration
@@ -135,10 +135,10 @@ internal data class OldProjectConfig(
             secugenSimMatcher = FingerprintConfiguration.FingerprintSdkConfiguration(
                 fingersToCapture = fingerprintsToCollect
                     ?.split(",")
-                    ?.map { SampleIdentifier.valueOf(it) }
+                    ?.map { TemplateIdentifier.valueOf(it) }
                     ?: listOf(
-                        SampleIdentifier.LEFT_THUMB,
-                        SampleIdentifier.LEFT_INDEX_FINGER,
+                        TemplateIdentifier.LEFT_THUMB,
+                        TemplateIdentifier.LEFT_INDEX_FINGER,
                     ),
                 decisionPolicy = fingerprintConfidenceThresholds?.let { parseDecisionPolicy(it) }
                     ?: DecisionPolicy(0, 0, 700),

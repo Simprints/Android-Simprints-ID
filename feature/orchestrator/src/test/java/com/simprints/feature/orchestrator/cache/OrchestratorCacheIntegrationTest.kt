@@ -7,11 +7,11 @@ import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.MatchComparisonResult
-import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
@@ -130,7 +130,7 @@ class OrchestratorCacheIntegrationTest {
                             listOf(
                                 CaptureSample(
                                     captureEventId = GUID1,
-                                    identifier = SampleIdentifier.LEFT_THUMB,
+                                    identifier = TemplateIdentifier.LEFT_THUMB,
                                     template = byteArrayOf(1, 2, 3),
                                     modality = Modality.FINGERPRINT,
                                     format = "format",
@@ -189,7 +189,7 @@ class OrchestratorCacheIntegrationTest {
                         Modality.FACE to listOf(
                             CaptureSample(
                                 captureEventId = GUID1,
-                                identifier = SampleIdentifier.LEFT_THUMB,
+                                identifier = TemplateIdentifier.LEFT_THUMB,
                                 template = byteArrayOf(1, 2, 3),
                                 modality = Modality.FACE,
                                 format = "format",
@@ -198,7 +198,7 @@ class OrchestratorCacheIntegrationTest {
                         Modality.FINGERPRINT to listOf(
                             CaptureSample(
                                 captureEventId = GUID1,
-                                identifier = SampleIdentifier.LEFT_THUMB,
+                                identifier = TemplateIdentifier.LEFT_THUMB,
                                 template = byteArrayOf(1, 2, 3),
                                 modality = Modality.FINGERPRINT,
                                 format = "format",
@@ -250,7 +250,7 @@ class OrchestratorCacheIntegrationTest {
                 destinationId = 4,
                 params = FingerprintCaptureParams(
                     flowType = FlowType.ENROL,
-                    fingerprintsToCapture = listOf(SampleIdentifier.LEFT_4TH_FINGER),
+                    fingerprintsToCapture = listOf(TemplateIdentifier.LEFT_4TH_FINGER),
                     fingerprintSDK = FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                 ),
                 status = StepStatus.COMPLETED,
@@ -260,7 +260,7 @@ class OrchestratorCacheIntegrationTest {
                     samples = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
-                            identifier = SampleIdentifier.LEFT_THUMB,
+                            identifier = TemplateIdentifier.LEFT_THUMB,
                             template = byteArrayOf(1, 2, 3),
                             modality = Modality.FINGERPRINT,
                             format = "format",
@@ -281,7 +281,7 @@ class OrchestratorCacheIntegrationTest {
                     probeSamples = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
-                            identifier = SampleIdentifier.LEFT_THUMB,
+                            identifier = TemplateIdentifier.LEFT_THUMB,
                             template = byteArrayOf(1, 2, 3),
                             modality = Modality.FINGERPRINT,
                             format = "format",
@@ -320,7 +320,7 @@ class OrchestratorCacheIntegrationTest {
                     samples = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
-                            identifier = SampleIdentifier.LEFT_THUMB,
+                            identifier = TemplateIdentifier.LEFT_THUMB,
                             template = byteArrayOf(1, 2, 3),
                             modality = Modality.FACE,
                             format = "ROC",
@@ -341,7 +341,7 @@ class OrchestratorCacheIntegrationTest {
                     probeSamples = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
-                            identifier = SampleIdentifier.LEFT_THUMB,
+                            identifier = TemplateIdentifier.LEFT_THUMB,
                             template = byteArrayOf(1, 2, 3),
                             modality = Modality.FACE,
                             format = "format",

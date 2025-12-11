@@ -9,7 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.events.event.local.EventRoomDatabase
@@ -475,7 +475,7 @@ class EventMigration7To8Test {
         private const val SESSION_ID = "aSessionID"
         private const val DEVICE_ID = "aDeviceID"
         private const val TEMPLATE = "template"
-        private val FINGER = SampleIdentifier.LEFT_3RD_FINGER
+        private val FINGER = TemplateIdentifier.LEFT_3RD_FINGER
         private val CREATED_AT = 1611584017198
         private val ENDED_AT = 1621588617198
         private const val QUALITY = 85

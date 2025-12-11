@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
@@ -75,16 +75,16 @@ class BuildStepsUseCaseTest {
         )
 
         every { secugenSimMatcher.fingersToCapture } returns listOf(
-            SampleIdentifier.LEFT_THUMB,
-            SampleIdentifier.RIGHT_THUMB,
+            TemplateIdentifier.LEFT_THUMB,
+            TemplateIdentifier.RIGHT_THUMB,
         )
         every { secugenSimMatcher.allowedAgeRange } returns AgeGroup(0, null)
         every { projectConfiguration.fingerprint?.secugenSimMatcher } returns secugenSimMatcher
         every { projectConfiguration.fingerprint?.getSdkConfiguration(SECUGEN_SIM_MATCHER) } returns secugenSimMatcher
 
         every { nec.fingersToCapture } returns listOf(
-            SampleIdentifier.LEFT_INDEX_FINGER,
-            SampleIdentifier.RIGHT_INDEX_FINGER,
+            TemplateIdentifier.LEFT_INDEX_FINGER,
+            TemplateIdentifier.RIGHT_INDEX_FINGER,
         )
         every { nec.allowedAgeRange } returns AgeGroup(0, null)
         every { projectConfiguration.fingerprint?.nec } returns nec

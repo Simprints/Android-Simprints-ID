@@ -2,7 +2,7 @@ package com.simprints.infra.config.store.local
 
 import androidx.datastore.core.DataStore
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.config.store.AbsolutePath
@@ -185,8 +185,8 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                     allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
                     secugenSimMatcher = FingerprintConfiguration.FingerprintSdkConfiguration(
                         fingersToCapture = listOf(
-                            SampleIdentifier.LEFT_THUMB,
-                            SampleIdentifier.LEFT_INDEX_FINGER,
+                            TemplateIdentifier.LEFT_THUMB,
+                            TemplateIdentifier.LEFT_INDEX_FINGER,
                         ),
                         decisionPolicy = DecisionPolicy(
                             0,
@@ -247,7 +247,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                     ),
                 ),
                 custom = null,
-                multifactorId = null
+                multifactorId = null,
             ).toProto()
         val defaultDeviceConfiguration: ProtoDeviceConfiguration = DeviceConfiguration(
             language = "",

@@ -2,9 +2,9 @@ package com.simprints.feature.orchestrator.usecases
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.sample.CaptureSample
-import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.infra.config.store.models.FaceConfiguration
@@ -104,7 +104,7 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
                             modality = Modality.FINGERPRINT,
                             format = "format",
                             template = byteArrayOf(),
-                            identifier = SampleIdentifier.RIGHT_THUMB,
+                            identifier = TemplateIdentifier.RIGHT_THUMB,
                         ),
                     ),
                 ),
@@ -119,7 +119,7 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
                         captureEventId = "captureId",
                         template = byteArrayOf(),
                         format = "format",
-                        identifier = SampleIdentifier.RIGHT_THUMB,
+                        identifier = TemplateIdentifier.RIGHT_THUMB,
                         modality = Modality.FINGERPRINT,
                     ),
                 ),

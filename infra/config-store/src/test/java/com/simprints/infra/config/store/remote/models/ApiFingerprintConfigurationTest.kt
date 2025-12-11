@@ -2,7 +2,7 @@ package com.simprints.infra.config.store.remote.models
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.AgeGroup
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.MaxCaptureAttempts
 import com.simprints.infra.config.store.models.Vero1Configuration
@@ -56,7 +56,7 @@ class ApiFingerprintConfigurationTest {
             listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
             true,
             FingerprintConfiguration.FingerprintSdkConfiguration(
-                fingersToCapture = listOf(SampleIdentifier.LEFT_3RD_FINGER),
+                fingersToCapture = listOf(TemplateIdentifier.LEFT_3RD_FINGER),
                 decisionPolicy = decisionPolicy,
                 comparisonStrategyForVerification = FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
                 vero1 = null,
@@ -94,7 +94,7 @@ class ApiFingerprintConfigurationTest {
             true,
             null,
             FingerprintConfiguration.FingerprintSdkConfiguration(
-                fingersToCapture = listOf(SampleIdentifier.LEFT_3RD_FINGER),
+                fingersToCapture = listOf(TemplateIdentifier.LEFT_3RD_FINGER),
                 decisionPolicy = decisionPolicy,
                 comparisonStrategyForVerification = FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
                 vero1 = Vero1Configuration(10),
@@ -111,16 +111,16 @@ class ApiFingerprintConfigurationTest {
     @Test
     fun `should map correctly the Finger enums`() {
         val mapping = mapOf(
-            ApiFingerprintConfiguration.ApiFinger.LEFT_THUMB to SampleIdentifier.LEFT_THUMB,
-            ApiFingerprintConfiguration.ApiFinger.LEFT_INDEX_FINGER to SampleIdentifier.LEFT_INDEX_FINGER,
-            ApiFingerprintConfiguration.ApiFinger.LEFT_3RD_FINGER to SampleIdentifier.LEFT_3RD_FINGER,
-            ApiFingerprintConfiguration.ApiFinger.LEFT_4TH_FINGER to SampleIdentifier.LEFT_4TH_FINGER,
-            ApiFingerprintConfiguration.ApiFinger.LEFT_5TH_FINGER to SampleIdentifier.LEFT_5TH_FINGER,
-            ApiFingerprintConfiguration.ApiFinger.RIGHT_THUMB to SampleIdentifier.RIGHT_THUMB,
-            ApiFingerprintConfiguration.ApiFinger.RIGHT_INDEX_FINGER to SampleIdentifier.RIGHT_INDEX_FINGER,
-            ApiFingerprintConfiguration.ApiFinger.RIGHT_3RD_FINGER to SampleIdentifier.RIGHT_3RD_FINGER,
-            ApiFingerprintConfiguration.ApiFinger.RIGHT_4TH_FINGER to SampleIdentifier.RIGHT_4TH_FINGER,
-            ApiFingerprintConfiguration.ApiFinger.RIGHT_5TH_FINGER to SampleIdentifier.RIGHT_5TH_FINGER,
+            ApiFingerprintConfiguration.ApiFinger.LEFT_THUMB to TemplateIdentifier.LEFT_THUMB,
+            ApiFingerprintConfiguration.ApiFinger.LEFT_INDEX_FINGER to TemplateIdentifier.LEFT_INDEX_FINGER,
+            ApiFingerprintConfiguration.ApiFinger.LEFT_3RD_FINGER to TemplateIdentifier.LEFT_3RD_FINGER,
+            ApiFingerprintConfiguration.ApiFinger.LEFT_4TH_FINGER to TemplateIdentifier.LEFT_4TH_FINGER,
+            ApiFingerprintConfiguration.ApiFinger.LEFT_5TH_FINGER to TemplateIdentifier.LEFT_5TH_FINGER,
+            ApiFingerprintConfiguration.ApiFinger.RIGHT_THUMB to TemplateIdentifier.RIGHT_THUMB,
+            ApiFingerprintConfiguration.ApiFinger.RIGHT_INDEX_FINGER to TemplateIdentifier.RIGHT_INDEX_FINGER,
+            ApiFingerprintConfiguration.ApiFinger.RIGHT_3RD_FINGER to TemplateIdentifier.RIGHT_3RD_FINGER,
+            ApiFingerprintConfiguration.ApiFinger.RIGHT_4TH_FINGER to TemplateIdentifier.RIGHT_4TH_FINGER,
+            ApiFingerprintConfiguration.ApiFinger.RIGHT_5TH_FINGER to TemplateIdentifier.RIGHT_5TH_FINGER,
         )
 
         mapping.forEach {

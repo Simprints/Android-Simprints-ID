@@ -8,7 +8,7 @@ import com.simprints.infra.enrolment.records.room.store.models.toDomain
 
 internal fun DbBiometricTemplate.toSample(): Sample = Sample(
     id = uuid,
-    identifier = identifier?.let { DbSampleIdentifier.fromId(it) }.toDomain(),
+    identifier = identifier?.let { DbTemplateIdentifier.fromId(it) }.toDomain(),
     modality = DbModality.fromId(modality).toDomain(),
     referenceId = referenceId,
     format = format,

@@ -2,8 +2,8 @@ package com.simprints.infra.enrolment.records.repository.remote
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.Sample
-import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.authstore.AuthStore
@@ -70,7 +70,7 @@ class EnrolmentRecordRemoteDataSourceImplTest {
             attendantId = ATTENDANT_ID,
             samples = listOf(
                 Sample(
-                    identifier = SampleIdentifier.LEFT_3RD_FINGER,
+                    identifier = TemplateIdentifier.LEFT_3RD_FINGER,
                     template = FINGERPRINT_TEMPLATE,
                     format = "ISO_19794_2",
                     referenceId = "5289df73-7df5-3326-bcdd-22597afb1fac",

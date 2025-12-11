@@ -1,11 +1,11 @@
 package com.simprints.fingerprint.infra.biosdkimpl.matching
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.domain.sample.Sample
-import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.fingerprint.infra.simafiswrapper.JNILibAfisInterface
 import com.simprints.fingerprint.infra.simafiswrapper.models.SimAfisFingerIdentifier
 import com.simprints.fingerprint.infra.simafiswrapper.models.SimAfisFingerprint
@@ -70,18 +70,18 @@ internal class SimAfisMatcher @Inject constructor(
         SimAfisFingerprint(identifier.toSimAfisFingerIdentifier(), template)
 
     @ExcludedFromGeneratedTestCoverageReports(reason = "This is just a mapping function")
-    private fun SampleIdentifier.toSimAfisFingerIdentifier(): SimAfisFingerIdentifier = when (this) {
-        SampleIdentifier.RIGHT_5TH_FINGER -> SimAfisFingerIdentifier.RIGHT_5TH_FINGER
-        SampleIdentifier.RIGHT_4TH_FINGER -> SimAfisFingerIdentifier.RIGHT_4TH_FINGER
-        SampleIdentifier.RIGHT_3RD_FINGER -> SimAfisFingerIdentifier.RIGHT_3RD_FINGER
-        SampleIdentifier.RIGHT_INDEX_FINGER -> SimAfisFingerIdentifier.RIGHT_INDEX_FINGER
-        SampleIdentifier.RIGHT_THUMB -> SimAfisFingerIdentifier.RIGHT_THUMB
-        SampleIdentifier.LEFT_THUMB -> SimAfisFingerIdentifier.LEFT_THUMB
-        SampleIdentifier.LEFT_INDEX_FINGER -> SimAfisFingerIdentifier.LEFT_INDEX_FINGER
-        SampleIdentifier.LEFT_3RD_FINGER -> SimAfisFingerIdentifier.LEFT_3RD_FINGER
-        SampleIdentifier.LEFT_4TH_FINGER -> SimAfisFingerIdentifier.LEFT_4TH_FINGER
-        SampleIdentifier.LEFT_5TH_FINGER -> SimAfisFingerIdentifier.LEFT_5TH_FINGER
-        SampleIdentifier.NONE -> throw IllegalArgumentException("Must be a finger sample identifier")
+    private fun TemplateIdentifier.toSimAfisFingerIdentifier(): SimAfisFingerIdentifier = when (this) {
+        TemplateIdentifier.RIGHT_5TH_FINGER -> SimAfisFingerIdentifier.RIGHT_5TH_FINGER
+        TemplateIdentifier.RIGHT_4TH_FINGER -> SimAfisFingerIdentifier.RIGHT_4TH_FINGER
+        TemplateIdentifier.RIGHT_3RD_FINGER -> SimAfisFingerIdentifier.RIGHT_3RD_FINGER
+        TemplateIdentifier.RIGHT_INDEX_FINGER -> SimAfisFingerIdentifier.RIGHT_INDEX_FINGER
+        TemplateIdentifier.RIGHT_THUMB -> SimAfisFingerIdentifier.RIGHT_THUMB
+        TemplateIdentifier.LEFT_THUMB -> SimAfisFingerIdentifier.LEFT_THUMB
+        TemplateIdentifier.LEFT_INDEX_FINGER -> SimAfisFingerIdentifier.LEFT_INDEX_FINGER
+        TemplateIdentifier.LEFT_3RD_FINGER -> SimAfisFingerIdentifier.LEFT_3RD_FINGER
+        TemplateIdentifier.LEFT_4TH_FINGER -> SimAfisFingerIdentifier.LEFT_4TH_FINGER
+        TemplateIdentifier.LEFT_5TH_FINGER -> SimAfisFingerIdentifier.LEFT_5TH_FINGER
+        TemplateIdentifier.NONE -> throw IllegalArgumentException("Must be a finger sample identifier")
     }
 
     private fun crossFingerMatch(

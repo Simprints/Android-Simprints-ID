@@ -3,8 +3,8 @@ package com.simprints.feature.enrollast.screen.usecase
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.CaptureSample
-import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
@@ -73,11 +73,11 @@ class BuildSubjectUseCaseTest {
                     EnrolLastBiometricStepResult.MatchResult(emptyList(), mockk()),
                     EnrolLastBiometricStepResult.CaptureResult(
                         REFERENCE_ID,
-                        listOf(mockFingerprintResults(SampleIdentifier.RIGHT_THUMB)),
+                        listOf(mockFingerprintResults(TemplateIdentifier.RIGHT_THUMB)),
                     ),
                     EnrolLastBiometricStepResult.CaptureResult(
                         REFERENCE_ID,
-                        listOf(mockFingerprintResults(SampleIdentifier.LEFT_THUMB)),
+                        listOf(mockFingerprintResults(TemplateIdentifier.LEFT_THUMB)),
                     ),
                 ),
                 scannedCredential = scannedCredential,
@@ -86,7 +86,7 @@ class BuildSubjectUseCaseTest {
         )
 
         assertThat(result.samples).isNotEmpty()
-        assertThat(result.samples.first().identifier).isEqualTo(SampleIdentifier.RIGHT_THUMB)
+        assertThat(result.samples.first().identifier).isEqualTo(TemplateIdentifier.RIGHT_THUMB)
     }
 
     @Test
@@ -97,16 +97,16 @@ class BuildSubjectUseCaseTest {
                     EnrolLastBiometricStepResult.CaptureResult(
                         REFERENCE_ID,
                         listOf(
-                            mockFingerprintResults(SampleIdentifier.RIGHT_5TH_FINGER),
-                            mockFingerprintResults(SampleIdentifier.RIGHT_4TH_FINGER),
-                            mockFingerprintResults(SampleIdentifier.RIGHT_3RD_FINGER),
-                            mockFingerprintResults(SampleIdentifier.RIGHT_INDEX_FINGER),
-                            mockFingerprintResults(SampleIdentifier.RIGHT_THUMB),
-                            mockFingerprintResults(SampleIdentifier.LEFT_THUMB),
-                            mockFingerprintResults(SampleIdentifier.LEFT_INDEX_FINGER),
-                            mockFingerprintResults(SampleIdentifier.LEFT_3RD_FINGER),
-                            mockFingerprintResults(SampleIdentifier.LEFT_4TH_FINGER),
-                            mockFingerprintResults(SampleIdentifier.LEFT_5TH_FINGER),
+                            mockFingerprintResults(TemplateIdentifier.RIGHT_5TH_FINGER),
+                            mockFingerprintResults(TemplateIdentifier.RIGHT_4TH_FINGER),
+                            mockFingerprintResults(TemplateIdentifier.RIGHT_3RD_FINGER),
+                            mockFingerprintResults(TemplateIdentifier.RIGHT_INDEX_FINGER),
+                            mockFingerprintResults(TemplateIdentifier.RIGHT_THUMB),
+                            mockFingerprintResults(TemplateIdentifier.LEFT_THUMB),
+                            mockFingerprintResults(TemplateIdentifier.LEFT_INDEX_FINGER),
+                            mockFingerprintResults(TemplateIdentifier.LEFT_3RD_FINGER),
+                            mockFingerprintResults(TemplateIdentifier.LEFT_4TH_FINGER),
+                            mockFingerprintResults(TemplateIdentifier.LEFT_5TH_FINGER),
                         ),
                     ),
                 ),
@@ -178,7 +178,7 @@ class BuildSubjectUseCaseTest {
         scannedCredential = scannedCredential,
     )
 
-    private fun mockFingerprintResults(finger: SampleIdentifier) = CaptureSample(
+    private fun mockFingerprintResults(finger: TemplateIdentifier) = CaptureSample(
         captureEventId = "eventId",
         identifier = finger,
         template = byteArrayOf(),

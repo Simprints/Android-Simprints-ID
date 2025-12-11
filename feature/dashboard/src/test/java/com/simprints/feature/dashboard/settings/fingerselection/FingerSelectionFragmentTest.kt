@@ -6,7 +6,7 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.feature.dashboard.R
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import dagger.hilt.android.testing.BindValue
@@ -43,9 +43,9 @@ class FingerSelectionFragmentTest {
                 FingerSelectionSection(
                     sdkName = SIM_MATCHER_NAME,
                     items = listOf(
-                        FingerSelectionItem(SampleIdentifier.LEFT_THUMB, 1),
-                        FingerSelectionItem(SampleIdentifier.RIGHT_THUMB, 2),
-                        FingerSelectionItem(SampleIdentifier.LEFT_INDEX_FINGER, 3),
+                        FingerSelectionItem(TemplateIdentifier.LEFT_THUMB, 1),
+                        FingerSelectionItem(TemplateIdentifier.RIGHT_THUMB, 2),
+                        FingerSelectionItem(TemplateIdentifier.LEFT_INDEX_FINGER, 3),
                     ),
                 ),
             ),
