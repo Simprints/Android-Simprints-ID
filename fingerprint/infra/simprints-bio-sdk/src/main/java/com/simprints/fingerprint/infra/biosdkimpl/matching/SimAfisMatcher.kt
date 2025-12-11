@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.infra.biosdkimpl.matching
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Identity
@@ -60,13 +61,11 @@ internal class SimAfisMatcher @Inject constructor(
         }
     }
 
-    private fun Identity.toSimAfisPerson(): SimAfisPerson = SimAfisPerson(subjectId, samples.map { it.toSimAfisFingerprint() })
+    private fun Identity.toSimAfisPerson(): SimAfisPerson = SimAfisPerson(subjectId, samples.map { it.template.toSimAfisFingerprint() })
 
-    private fun Sample.toSimAfisFingerprint(): SimAfisFingerprint = SimAfisFingerprint(identifier.toSimAfisFingerIdentifier(), template)
+    private fun List<CaptureSample>.toSimAfisPerson(): SimAfisPerson = SimAfisPerson("", map { it.template.toSimAfisFingerprint() })
 
-    private fun List<CaptureSample>.toSimAfisPerson(): SimAfisPerson = SimAfisPerson("", map { it.toSimAfisFingerprint() })
-
-    private fun CaptureSample.toSimAfisFingerprint(): SimAfisFingerprint =
+    private fun BiometricTemplate.toSimAfisFingerprint(): SimAfisFingerprint =
         SimAfisFingerprint(identifier.toSimAfisFingerIdentifier(), template)
 
     @ExcludedFromGeneratedTestCoverageReports(reason = "This is just a mapping function")
@@ -134,10 +133,10 @@ internal class SimAfisMatcher @Inject constructor(
 }
 
 val List<CaptureSample>.fingerprintsTemplates
-    get() = map { it.template.toByteBuffer() }
+    get() = map { it.template.template.toByteBuffer() }
 
 val Identity.fingerprintsTemplates
-    get() = samples.map { it.template.toByteBuffer() }
+    get() = samples.map { it.template.template.toByteBuffer() }
 
 private fun ByteArray.toByteBuffer(): ByteBuffer = ByteBuffer.allocateDirect(size).put(this)
 

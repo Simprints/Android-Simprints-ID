@@ -2,6 +2,7 @@ package com.simprints.infra.enrolment.records.repository.local
 
 import androidx.room.withTransaction
 import com.simprints.core.DispatcherIO
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.tools.time.TimeHelper
@@ -101,8 +102,10 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                 samples = templates.map { sample ->
                     Sample(
                         id = sample.uuid,
-                        template = sample.templateData,
-                        identifier = DbTemplateIdentifier.fromId(sample.identifier).toDomain(),
+                        template = BiometricTemplate(
+                            template = sample.templateData,
+                            identifier = DbTemplateIdentifier.fromId(sample.identifier).toDomain(),
+                        ),
                         format = sample.format,
                         referenceId = sample.referenceId,
                         modality = DbModality.fromId(sample.modality).toDomain(),

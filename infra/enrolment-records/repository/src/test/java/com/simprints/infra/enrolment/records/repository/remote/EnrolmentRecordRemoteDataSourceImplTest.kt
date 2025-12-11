@@ -2,6 +2,7 @@ package com.simprints.infra.enrolment.records.repository.remote
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
@@ -70,14 +71,18 @@ class EnrolmentRecordRemoteDataSourceImplTest {
             attendantId = ATTENDANT_ID,
             samples = listOf(
                 Sample(
-                    identifier = TemplateIdentifier.LEFT_3RD_FINGER,
-                    template = FINGERPRINT_TEMPLATE,
+                    template = BiometricTemplate(
+                        identifier = TemplateIdentifier.LEFT_3RD_FINGER,
+                        template = FINGERPRINT_TEMPLATE,
+                    ),
                     format = "ISO_19794_2",
                     referenceId = "5289df73-7df5-3326-bcdd-22597afb1fac",
                     modality = Modality.FINGERPRINT,
                 ),
                 Sample(
-                    template = FACE_TEMPLATE,
+                    template = BiometricTemplate(
+                        template = FACE_TEMPLATE,
+                    ),
                     format = "faceTemplateFormat",
                     referenceId = "b4a3ba90-6413-32b4-a4ea-a841a5a400ec",
                     modality = Modality.FACE,

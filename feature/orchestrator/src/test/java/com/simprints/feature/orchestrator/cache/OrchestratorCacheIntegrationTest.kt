@@ -7,6 +7,7 @@ import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.sample.CaptureIdentity
@@ -130,8 +131,10 @@ class OrchestratorCacheIntegrationTest {
                             listOf(
                                 CaptureSample(
                                     captureEventId = GUID1,
-                                    identifier = TemplateIdentifier.LEFT_THUMB,
-                                    template = byteArrayOf(1, 2, 3),
+                                    template = BiometricTemplate(
+                                        identifier = TemplateIdentifier.LEFT_THUMB,
+                                        template = byteArrayOf(1, 2, 3),
+                                    ),
                                     modality = Modality.FINGERPRINT,
                                     format = "format",
                                 ),
@@ -189,8 +192,10 @@ class OrchestratorCacheIntegrationTest {
                         Modality.FACE to listOf(
                             CaptureSample(
                                 captureEventId = GUID1,
-                                identifier = TemplateIdentifier.LEFT_THUMB,
-                                template = byteArrayOf(1, 2, 3),
+                                template = BiometricTemplate(
+                                    identifier = TemplateIdentifier.LEFT_THUMB,
+                                    template = byteArrayOf(1, 2, 3),
+                                ),
                                 modality = Modality.FACE,
                                 format = "format",
                             ),
@@ -198,8 +203,10 @@ class OrchestratorCacheIntegrationTest {
                         Modality.FINGERPRINT to listOf(
                             CaptureSample(
                                 captureEventId = GUID1,
-                                identifier = TemplateIdentifier.LEFT_THUMB,
-                                template = byteArrayOf(1, 2, 3),
+                                template = BiometricTemplate(
+                                    identifier = TemplateIdentifier.LEFT_THUMB,
+                                    template = byteArrayOf(1, 2, 3),
+                                ),
                                 modality = Modality.FINGERPRINT,
                                 format = "format",
                             ),
@@ -260,8 +267,10 @@ class OrchestratorCacheIntegrationTest {
                     samples = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
-                            identifier = TemplateIdentifier.LEFT_THUMB,
-                            template = byteArrayOf(1, 2, 3),
+                            template = BiometricTemplate(
+                                identifier = TemplateIdentifier.LEFT_THUMB,
+                                template = byteArrayOf(1, 2, 3),
+                            ),
                             modality = Modality.FINGERPRINT,
                             format = "format",
                         ),
@@ -281,8 +290,10 @@ class OrchestratorCacheIntegrationTest {
                     probeSamples = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
-                            identifier = TemplateIdentifier.LEFT_THUMB,
-                            template = byteArrayOf(1, 2, 3),
+                            template = BiometricTemplate(
+                                identifier = TemplateIdentifier.LEFT_THUMB,
+                                template = byteArrayOf(1, 2, 3),
+                            ),
                             modality = Modality.FINGERPRINT,
                             format = "format",
                         ),
@@ -320,7 +331,9 @@ class OrchestratorCacheIntegrationTest {
                     samples = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
-                            template = byteArrayOf(1, 2, 3),
+                            template = BiometricTemplate(
+                                template = byteArrayOf(1, 2, 3),
+                            ),
                             modality = Modality.FACE,
                             format = "ROC",
                         ),
@@ -340,8 +353,9 @@ class OrchestratorCacheIntegrationTest {
                     probeSamples = listOf(
                         CaptureSample(
                             captureEventId = GUID1,
-                            identifier = TemplateIdentifier.LEFT_THUMB,
-                            template = byteArrayOf(1, 2, 3),
+                            template = BiometricTemplate(
+                                template = byteArrayOf(1, 2, 3),
+                            ),
                             modality = Modality.FACE,
                             format = "format",
                         ),

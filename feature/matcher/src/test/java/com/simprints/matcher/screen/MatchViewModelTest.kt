@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.MatchComparisonResult
@@ -394,16 +395,20 @@ internal class MatchViewModelTest {
     private fun getFaceSample(): CaptureSample = CaptureSample(
         captureEventId = UUID.randomUUID().toString(),
         modality = Modality.FACE,
-        template = Random.nextBytes(20),
+        template = BiometricTemplate(
+            template = Random.nextBytes(20),
+        ),
         format = "format",
     )
 
     private fun getFingerprintSample(): CaptureSample = CaptureSample(
         captureEventId = UUID.randomUUID().toString(),
         modality = Modality.FINGERPRINT,
-        template = Random.nextBytes(20),
         format = "format",
-        identifier = TemplateIdentifier.LEFT_3RD_FINGER,
+        template = BiometricTemplate(
+            template = Random.nextBytes(20),
+            identifier = TemplateIdentifier.LEFT_3RD_FINGER,
+        ),
     )
 
     companion object {

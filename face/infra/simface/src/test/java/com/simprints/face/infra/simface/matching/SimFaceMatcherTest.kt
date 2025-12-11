@@ -3,6 +3,7 @@ package com.simprints.face.infra.simface.matching
 import com.google.common.truth.Truth.*
 import com.simprints.biometrics.simface.SimFace
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
@@ -49,7 +50,9 @@ class SimFaceMatcherTest {
                         captureEventId = "id",
                         modality = Modality.FACE,
                         format = "ROC",
-                        template = byteArrayOf(1),
+                        template = BiometricTemplate(
+                            template = byteArrayOf(1),
+                        ),
                     ),
                 ),
             )
@@ -60,7 +63,9 @@ class SimFaceMatcherTest {
                         Sample(
                             referenceId = "id",
                             modality = Modality.FACE,
-                            template = byteArrayOf(1),
+                            template = BiometricTemplate(
+                                template = byteArrayOf(1),
+                            ),
                             format = "ROC",
                         ),
                     ),
@@ -82,7 +87,9 @@ class SimFaceMatcherTest {
                     captureEventId = "id",
                     modality = Modality.FACE,
                     format = "ROC",
-                    template = byteArrayOf(1),
+                    template = BiometricTemplate(
+                        template = byteArrayOf(1),
+                    ),
                 ),
             ),
         )
@@ -93,7 +100,9 @@ class SimFaceMatcherTest {
                     Sample(
                         referenceId = "id",
                         modality = Modality.FACE,
-                        template = byteArrayOf(1),
+                        template = BiometricTemplate(
+                            template = byteArrayOf(1),
+                        ),
                         format = "ROC",
                     ),
                 ),

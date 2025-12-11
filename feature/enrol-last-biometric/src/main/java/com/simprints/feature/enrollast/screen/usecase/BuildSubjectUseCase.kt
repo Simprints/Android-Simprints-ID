@@ -1,5 +1,6 @@
 package com.simprints.feature.enrollast.screen.usecase
 
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.tools.time.TimeHelper
@@ -51,8 +52,10 @@ internal class BuildSubjectUseCase @Inject constructor(
         referenceId: String,
         result: CaptureSample,
     ) = Sample(
-        identifier = result.identifier,
-        template = result.template,
+        template = BiometricTemplate(
+            identifier = result.template.identifier,
+            template = result.template.template,
+        ),
         format = result.format,
         referenceId = referenceId,
         modality = result.modality,
