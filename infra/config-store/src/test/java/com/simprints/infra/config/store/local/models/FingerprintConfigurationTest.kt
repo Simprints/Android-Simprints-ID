@@ -2,7 +2,7 @@ package com.simprints.infra.config.store.local.models
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.AgeGroup
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.testtools.fingerprintConfiguration
 import com.simprints.infra.config.store.testtools.protoFingerprintConfiguration
@@ -44,16 +44,16 @@ class FingerprintConfigurationTest {
     @Test
     fun `should map correctly the Finger enums`() {
         val mapping = mapOf(
-            ProtoFinger.LEFT_THUMB to SampleIdentifier.LEFT_THUMB,
-            ProtoFinger.LEFT_INDEX_FINGER to SampleIdentifier.LEFT_INDEX_FINGER,
-            ProtoFinger.LEFT_3RD_FINGER to SampleIdentifier.LEFT_3RD_FINGER,
-            ProtoFinger.LEFT_4TH_FINGER to SampleIdentifier.LEFT_4TH_FINGER,
-            ProtoFinger.LEFT_5TH_FINGER to SampleIdentifier.LEFT_5TH_FINGER,
-            ProtoFinger.RIGHT_THUMB to SampleIdentifier.RIGHT_THUMB,
-            ProtoFinger.RIGHT_INDEX_FINGER to SampleIdentifier.RIGHT_INDEX_FINGER,
-            ProtoFinger.RIGHT_3RD_FINGER to SampleIdentifier.RIGHT_3RD_FINGER,
-            ProtoFinger.RIGHT_4TH_FINGER to SampleIdentifier.RIGHT_4TH_FINGER,
-            ProtoFinger.RIGHT_5TH_FINGER to SampleIdentifier.RIGHT_5TH_FINGER,
+            ProtoFinger.LEFT_THUMB to TemplateIdentifier.LEFT_THUMB,
+            ProtoFinger.LEFT_INDEX_FINGER to TemplateIdentifier.LEFT_INDEX_FINGER,
+            ProtoFinger.LEFT_3RD_FINGER to TemplateIdentifier.LEFT_3RD_FINGER,
+            ProtoFinger.LEFT_4TH_FINGER to TemplateIdentifier.LEFT_4TH_FINGER,
+            ProtoFinger.LEFT_5TH_FINGER to TemplateIdentifier.LEFT_5TH_FINGER,
+            ProtoFinger.RIGHT_THUMB to TemplateIdentifier.RIGHT_THUMB,
+            ProtoFinger.RIGHT_INDEX_FINGER to TemplateIdentifier.RIGHT_INDEX_FINGER,
+            ProtoFinger.RIGHT_3RD_FINGER to TemplateIdentifier.RIGHT_3RD_FINGER,
+            ProtoFinger.RIGHT_4TH_FINGER to TemplateIdentifier.RIGHT_4TH_FINGER,
+            ProtoFinger.RIGHT_5TH_FINGER to TemplateIdentifier.RIGHT_5TH_FINGER,
         )
 
         mapping.forEach {

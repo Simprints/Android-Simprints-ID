@@ -2,7 +2,7 @@ package com.simprints.infra.config.store.models
 
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.ModalitySdkType
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 
 data class FingerprintConfiguration(
     val allowedScanners: List<VeroGeneration>,
@@ -12,7 +12,7 @@ data class FingerprintConfiguration(
     val nec: FingerprintSdkConfiguration?,
 ) {
     data class FingerprintSdkConfiguration(
-        val fingersToCapture: List<SampleIdentifier>,
+        val fingersToCapture: List<TemplateIdentifier>,
         override val decisionPolicy: DecisionPolicy,
         val comparisonStrategyForVerification: FingerComparisonStrategy,
         val vero1: Vero1Configuration? = null,

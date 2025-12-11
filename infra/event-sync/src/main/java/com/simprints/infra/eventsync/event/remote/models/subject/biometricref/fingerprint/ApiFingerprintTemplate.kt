@@ -1,10 +1,10 @@
 package com.simprints.infra.eventsync.event.remote.models.subject.biometricref.fingerprint
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 
 @Keep
 internal data class ApiFingerprintTemplate(
     val template: String,
-    val finger: SampleIdentifier,
+    val finger: TemplateIdentifier,
 )

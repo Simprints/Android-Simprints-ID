@@ -4,10 +4,10 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
-import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
@@ -127,7 +127,7 @@ internal class FingerprintMatcherUseCaseTest {
                             template = byteArrayOf(1, 2, 3),
                             modality = Modality.FINGERPRINT,
                             format = "format",
-                            identifier = SampleIdentifier.LEFT_3RD_FINGER,
+                            identifier = TemplateIdentifier.LEFT_3RD_FINGER,
                         ),
                     ),
                     bioSdk = SECUGEN_SIM_MATCHER,
@@ -165,7 +165,7 @@ internal class FingerprintMatcherUseCaseTest {
                             template = byteArrayOf(1, 2, 3),
                             modality = Modality.FINGERPRINT,
                             format = "format",
-                            identifier = SampleIdentifier.LEFT_3RD_FINGER,
+                            identifier = TemplateIdentifier.LEFT_3RD_FINGER,
                         ),
                     ),
                     bioSdk = FaceConfiguration.BioSdk.RANK_ONE, // Wrong SDK type
@@ -215,16 +215,16 @@ internal class FingerprintMatcherUseCaseTest {
                 Identity(
                     "personId",
                     listOf(
-                        fingerprintSample(SampleIdentifier.RIGHT_5TH_FINGER),
-                        fingerprintSample(SampleIdentifier.RIGHT_4TH_FINGER),
-                        fingerprintSample(SampleIdentifier.RIGHT_3RD_FINGER),
-                        fingerprintSample(SampleIdentifier.RIGHT_INDEX_FINGER),
-                        fingerprintSample(SampleIdentifier.RIGHT_THUMB),
-                        fingerprintSample(SampleIdentifier.LEFT_THUMB),
-                        fingerprintSample(SampleIdentifier.LEFT_INDEX_FINGER),
-                        fingerprintSample(SampleIdentifier.LEFT_3RD_FINGER),
-                        fingerprintSample(SampleIdentifier.LEFT_4TH_FINGER),
-                        fingerprintSample(SampleIdentifier.LEFT_5TH_FINGER),
+                        fingerprintSample(TemplateIdentifier.RIGHT_5TH_FINGER),
+                        fingerprintSample(TemplateIdentifier.RIGHT_4TH_FINGER),
+                        fingerprintSample(TemplateIdentifier.RIGHT_3RD_FINGER),
+                        fingerprintSample(TemplateIdentifier.RIGHT_INDEX_FINGER),
+                        fingerprintSample(TemplateIdentifier.RIGHT_THUMB),
+                        fingerprintSample(TemplateIdentifier.LEFT_THUMB),
+                        fingerprintSample(TemplateIdentifier.LEFT_INDEX_FINGER),
+                        fingerprintSample(TemplateIdentifier.LEFT_3RD_FINGER),
+                        fingerprintSample(TemplateIdentifier.LEFT_4TH_FINGER),
+                        fingerprintSample(TemplateIdentifier.LEFT_5TH_FINGER),
                     ),
                 ),
             ),
@@ -241,7 +241,7 @@ internal class FingerprintMatcherUseCaseTest {
                             template = byteArrayOf(1, 2, 3),
                             modality = Modality.FINGERPRINT,
                             format = "format",
-                            identifier = SampleIdentifier.LEFT_3RD_FINGER,
+                            identifier = TemplateIdentifier.LEFT_3RD_FINGER,
                         ),
                     ),
                     bioSdk = SECUGEN_SIM_MATCHER,
@@ -254,7 +254,7 @@ internal class FingerprintMatcherUseCaseTest {
         coVerify { bioSdkWrapper.match(any(), any(), any()) }
     }
 
-    private fun fingerprintSample(finger: SampleIdentifier) = Sample(
+    private fun fingerprintSample(finger: TemplateIdentifier) = Sample(
         identifier = finger,
         template = byteArrayOf(1),
         format = "format",

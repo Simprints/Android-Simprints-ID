@@ -5,8 +5,8 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.Sample
-import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
@@ -94,7 +94,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         modality = Modality.FACE,
     )
     private val fingerprintSample1 = Sample(
-        identifier = SampleIdentifier.LEFT_THUMB,
+        identifier = TemplateIdentifier.LEFT_THUMB,
         template = byteArrayOf(10, 11),
         format = NEC_FORMAT,
         referenceId = "ref-fp-1",
@@ -102,7 +102,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         modality = Modality.FINGERPRINT,
     )
     private val fingerprintSample2 = Sample(
-        identifier = SampleIdentifier.RIGHT_THUMB,
+        identifier = TemplateIdentifier.RIGHT_THUMB,
         template = byteArrayOf(12, 13),
         format = ISO_FORMAT,
         referenceId = "ref-fp-2",
@@ -110,7 +110,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         modality = Modality.FINGERPRINT,
     )
     private val fingerprintSample3 = Sample(
-        identifier = SampleIdentifier.LEFT_INDEX_FINGER,
+        identifier = TemplateIdentifier.LEFT_INDEX_FINGER,
         template = byteArrayOf(14, 15),
         format = NEC_FORMAT,
         referenceId = "ref-fp-3-p2",

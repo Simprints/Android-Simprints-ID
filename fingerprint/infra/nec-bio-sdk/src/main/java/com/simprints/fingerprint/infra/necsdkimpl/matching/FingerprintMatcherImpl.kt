@@ -1,10 +1,10 @@
 package com.simprints.fingerprint.infra.necsdkimpl.matching
 
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.domain.sample.Sample
-import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.fingerprint.infra.basebiosdk.matching.FingerprintMatcher
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.template.NEC_TEMPLATE_FORMAT
@@ -99,7 +99,7 @@ internal class FingerprintMatcherImpl @Inject constructor(
         return MatchComparisonResult(candidate.subjectId, getOverallScore(total, fingers))
     }
 
-    private fun Identity.templateForFinger(fingerId: SampleIdentifier) = samples.find { it.identifier == fingerId }
+    private fun Identity.templateForFinger(fingerId: TemplateIdentifier) = samples.find { it.identifier == fingerId }
 
     private fun CaptureSample.toNecTemplate() = NECTemplate(template, 0) // Quality score not used
 

@@ -2,7 +2,7 @@ package com.simprints.fingerprint.capture.screen
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModelTest.MockAcquireImageResult.OK
 import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModelTest.MockCaptureFingerprintResponse.BAD_SCAN
@@ -844,9 +844,9 @@ class FingerprintCaptureViewModelTest {
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.samples).hasSize(3)
             assertThat(actualFingerprints?.samples?.map { it.identifier }).containsExactly(
-                SampleIdentifier.LEFT_THUMB,
-                SampleIdentifier.RIGHT_THUMB,
-                SampleIdentifier.RIGHT_INDEX_FINGER,
+                TemplateIdentifier.LEFT_THUMB,
+                TemplateIdentifier.RIGHT_THUMB,
+                TemplateIdentifier.RIGHT_INDEX_FINGER,
             )
             actualFingerprints?.samples?.forEach {
                 assertThat(it.template).isEqualTo(TEMPLATE)
@@ -956,9 +956,9 @@ class FingerprintCaptureViewModelTest {
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.samples).hasSize(3)
             assertThat(actualFingerprints?.samples?.map { it.identifier }).containsExactly(
-                SampleIdentifier.LEFT_THUMB,
-                SampleIdentifier.RIGHT_THUMB,
-                SampleIdentifier.RIGHT_INDEX_FINGER,
+                TemplateIdentifier.LEFT_THUMB,
+                TemplateIdentifier.RIGHT_THUMB,
+                TemplateIdentifier.RIGHT_INDEX_FINGER,
             )
             actualFingerprints?.samples?.forEach {
                 assertThat(it.template).isEqualTo(TEMPLATE)
@@ -1050,9 +1050,9 @@ class FingerprintCaptureViewModelTest {
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.samples).hasSize(3)
             assertThat(actualFingerprints?.samples?.map { it.identifier }).containsExactly(
-                SampleIdentifier.LEFT_THUMB,
-                SampleIdentifier.LEFT_INDEX_FINGER,
-                SampleIdentifier.RIGHT_THUMB,
+                TemplateIdentifier.LEFT_THUMB,
+                TemplateIdentifier.LEFT_INDEX_FINGER,
+                TemplateIdentifier.RIGHT_THUMB,
             )
             actualFingerprints?.samples?.forEach {
                 assertThat(it.template).isEqualTo(TEMPLATE)
@@ -1524,17 +1524,34 @@ class FingerprintCaptureViewModelTest {
         ;
 
         fun toCaptureFingerprintResponse(): Any = when (this) {
-            GOOD_SCAN -> AcquireFingerprintTemplateResponse(TEMPLATE, TEMPLATE_FORMAT, GOOD_QUALITY)
-            DIFFERENT_GOOD_SCAN -> AcquireFingerprintTemplateResponse(
-                DIFFERENT_TEMPLATE,
-                TEMPLATE_FORMAT,
-                DIFFERENT_GOOD_QUALITY,
-            )
+            GOOD_SCAN -> {
+                AcquireFingerprintTemplateResponse(TEMPLATE, TEMPLATE_FORMAT, GOOD_QUALITY)
+            }
 
-            BAD_SCAN -> AcquireFingerprintTemplateResponse(TEMPLATE, TEMPLATE_FORMAT, BAD_QUALITY)
-            NO_FINGER_DETECTED -> NoFingerDetectedException("No finger detected")
-            DISCONNECTED -> ScannerDisconnectedException()
-            UNKNOWN_ERROR -> Error("Oops!")
+            DIFFERENT_GOOD_SCAN -> {
+                AcquireFingerprintTemplateResponse(
+                    DIFFERENT_TEMPLATE,
+                    TEMPLATE_FORMAT,
+                    DIFFERENT_GOOD_QUALITY,
+                )
+            }
+
+            BAD_SCAN -> {
+                AcquireFingerprintTemplateResponse(TEMPLATE, TEMPLATE_FORMAT, BAD_QUALITY)
+            }
+
+            NO_FINGER_DETECTED -> {
+                NoFingerDetectedException("No finger detected")
+            }
+
+            DISCONNECTED -> {
+                ScannerDisconnectedException()
+            }
+
+            UNKNOWN_ERROR -> {
+                Error("Oops!")
+            }
+
             NEVER_RETURNS -> {
                 // runBlocking { delay(Duration.INFINITE) }
                 Error("Nothing to return!")
@@ -1550,14 +1567,14 @@ class FingerprintCaptureViewModelTest {
 
     companion object {
         val TWO_FINGERS_IDS = listOf(
-            SampleIdentifier.LEFT_THUMB,
-            SampleIdentifier.LEFT_INDEX_FINGER,
+            TemplateIdentifier.LEFT_THUMB,
+            TemplateIdentifier.LEFT_INDEX_FINGER,
         )
         val FOUR_FINGERS_IDS = listOf(
-            SampleIdentifier.LEFT_THUMB,
-            SampleIdentifier.LEFT_INDEX_FINGER,
-            SampleIdentifier.RIGHT_THUMB,
-            SampleIdentifier.RIGHT_INDEX_FINGER,
+            TemplateIdentifier.LEFT_THUMB,
+            TemplateIdentifier.LEFT_INDEX_FINGER,
+            TemplateIdentifier.RIGHT_THUMB,
+            TemplateIdentifier.RIGHT_INDEX_FINGER,
         )
 
         const val GOOD_QUALITY = 80

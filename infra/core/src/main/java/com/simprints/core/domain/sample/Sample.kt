@@ -3,7 +3,7 @@ package com.simprints.core.domain.sample
 import android.os.Parcelable
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 import kotlinx.parcelize.Parcelize
 import java.util.UUID
 
@@ -11,7 +11,7 @@ import java.util.UUID
 @ExcludedFromGeneratedTestCoverageReports("Data class with generated code")
 data class Sample(
     val id: String = UUID.randomUUID().toString(),
-    val identifier: SampleIdentifier = SampleIdentifier.NONE,
+    val identifier: TemplateIdentifier = TemplateIdentifier.NONE,
     val modality: Modality,
     val referenceId: String,
     val format: String,
