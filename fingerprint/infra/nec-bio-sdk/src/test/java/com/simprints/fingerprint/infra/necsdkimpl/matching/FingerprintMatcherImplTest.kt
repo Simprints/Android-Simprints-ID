@@ -2,6 +2,7 @@ package com.simprints.fingerprint.infra.necsdkimpl.matching
 
 import com.google.common.truth.*
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Identity
@@ -121,10 +122,12 @@ class FingerprintMatcherImplTest {
     ) = fingers.map {
         CaptureSample(
             captureEventId = it.name,
-            identifier = it,
             modality = Modality.FINGERPRINT,
             format = format,
-            template = ByteArray(0),
+            template = BiometricTemplate(
+                template = ByteArray(0),
+                identifier = it,
+            ),
         )
     }
 
@@ -136,10 +139,12 @@ class FingerprintMatcherImplTest {
         samples = fingers.map {
             Sample(
                 referenceId = it.name,
-                identifier = it,
                 modality = Modality.FINGERPRINT,
                 format = format,
-                template = ByteArray(0),
+                template = BiometricTemplate(
+                    template = ByteArray(0),
+                    identifier = it,
+                ),
             )
         },
     )

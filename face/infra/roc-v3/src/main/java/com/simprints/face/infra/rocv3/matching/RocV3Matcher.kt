@@ -17,14 +17,14 @@ class RocV3Matcher(
     var probeTemplates: List<SWIGTYPE_p_unsigned_char> = probeSamples.mapIndexed { i, probe ->
         val probeTemplate: SWIGTYPE_p_unsigned_char =
             roc.new_uint8_t_array(ROC_FACE_FAST_FV_SIZE.toInt())
-        roc.memmove(roc.roc_cast(probeTemplate), probe.template)
+        roc.memmove(roc.roc_cast(probeTemplate), probe.template.template)
         probeTemplate
     }
 
     override suspend fun getHighestComparisonScoreForCandidate(candidate: Identity): Float = probeTemplates
         .flatMap { probeTemplate ->
             candidate.samples.map { face ->
-                getSimilarityScoreForCandidate(probeTemplate, face.template)
+                getSimilarityScoreForCandidate(probeTemplate, face.template.template)
             }
         }.max()
 

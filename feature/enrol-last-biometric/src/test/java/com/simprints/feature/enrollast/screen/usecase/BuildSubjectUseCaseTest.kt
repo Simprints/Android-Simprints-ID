@@ -3,6 +3,7 @@ package com.simprints.feature.enrollast.screen.usecase
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -86,7 +87,11 @@ class BuildSubjectUseCaseTest {
         )
 
         assertThat(result.samples).isNotEmpty()
-        assertThat(result.samples.first().identifier).isEqualTo(TemplateIdentifier.RIGHT_THUMB)
+        assertThat(
+            result.samples
+                .first()
+                .template.identifier,
+        ).isEqualTo(TemplateIdentifier.RIGHT_THUMB)
     }
 
     @Test
@@ -180,15 +185,19 @@ class BuildSubjectUseCaseTest {
 
     private fun mockFingerprintResults(finger: TemplateIdentifier) = CaptureSample(
         captureEventId = "eventId",
-        identifier = finger,
-        template = byteArrayOf(),
+        template = BiometricTemplate(
+            identifier = finger,
+            template = byteArrayOf(),
+        ),
         format = "ISO_19794_2",
         modality = Modality.FINGERPRINT,
     )
 
     private fun mockFaceResults(format: String) = CaptureSample(
         captureEventId = "eventId",
-        template = byteArrayOf(),
+        template = BiometricTemplate(
+            template = byteArrayOf(),
+        ),
         format = format,
         modality = Modality.FACE,
     )

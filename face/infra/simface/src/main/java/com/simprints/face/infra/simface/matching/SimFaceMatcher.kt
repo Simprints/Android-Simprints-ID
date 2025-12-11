@@ -9,12 +9,12 @@ class SimFaceMatcher(
     private val simFace: SimFace,
     override val probeSamples: List<CaptureSample>,
 ) : FaceMatcher(probeSamples) {
-    private val probeTemplates = probeSamples.map { it.template }
+    private val probeTemplates = probeSamples.map { it.template.template }
 
     override suspend fun getHighestComparisonScoreForCandidate(candidate: Identity): Float = probeTemplates
         .flatMap { probeTemplate ->
             candidate.samples.map { face ->
-                val baseScore = simFace.verificationScore(probeTemplate, face.template)
+                val baseScore = simFace.verificationScore(probeTemplate, face.template.template)
                 // TODO: remove the adjustment after we find out why the returned range is biased towards [0.5;1]
                 (baseScore - 0.5).coerceAtLeast(0.0).toFloat() * 200f
             }

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DeviceID
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.livedata.LiveDataEvent
@@ -182,7 +183,9 @@ internal class FaceCaptureViewModel @Inject constructor(
             val items = faceDetections.mapIndexed { index, detection ->
                 CaptureSample(
                     captureEventId = detection.id,
-                    template = detection.face?.template ?: ByteArray(0),
+                    template = BiometricTemplate(
+                        template = detection.face?.template ?: ByteArray(0),
+                    ),
                     format = detection.face?.format ?: "",
                     modality = Modality.FACE,
                 )
