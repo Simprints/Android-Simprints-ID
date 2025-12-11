@@ -7,10 +7,10 @@ import com.simprints.core.tools.utils.randomUUID
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.FingerState
 import com.simprints.fingerprint.capture.state.ScanResult
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result
+import com.simprints.infra.events.event.domain.models.FingerprintCaptureBiometricsEvent
+import com.simprints.infra.events.event.domain.models.FingerprintCaptureEvent
+import com.simprints.infra.events.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload
+import com.simprints.infra.events.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload.Result
 import com.simprints.infra.events.session.SessionEventRepository
 import javax.inject.Inject
 

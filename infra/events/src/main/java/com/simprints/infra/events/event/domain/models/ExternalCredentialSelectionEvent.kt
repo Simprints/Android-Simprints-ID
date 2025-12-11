@@ -6,8 +6,13 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.EXTERNAL_CREDENTIAL_SELECTION_KEY
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
+@SerialName(EXTERNAL_CREDENTIAL_SELECTION_KEY)
 data class ExternalCredentialSelectionEvent(
     override val id: String = randomUUID(),
     override val payload: ExternalCredentialSelectionPayload,
@@ -62,20 +67,22 @@ data class ExternalCredentialSelectionEvent(
     )
 
     @Keep
+    @Serializable
     data class ExternalCredentialSelectionPayload(
         override val createdAt: Timestamp,
         override val endedAt: Timestamp? = null,
-        override val eventVersion: Int,
+        override val eventVersion: Int = EVENT_VERSION,
         val id: String,
-        val credentialType: ExternalCredentialType?,
-        val skipReason: SkipReason?,
-        val skipOther: String?,
+        val credentialType: ExternalCredentialType? = null,
+        val skipReason: SkipReason? = null,
+        val skipOther: String? = null,
         override val type: EventType = EventType.EXTERNAL_CREDENTIAL_SELECTION,
     ) : EventPayload() {
         override fun toSafeString(): String = "credentialType: $credentialType, skipReason: $skipReason, skipOther: $skipOther"
     }
 
     @Keep
+    @Serializable
     enum class SkipReason {
         DOES_NOT_HAVE_ID,
         DID_NOT_BRING_ID,

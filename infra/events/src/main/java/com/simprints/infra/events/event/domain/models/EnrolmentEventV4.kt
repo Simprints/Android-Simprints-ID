@@ -4,10 +4,15 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.ENROLMENT_V4_KEY
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V4
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(ENROLMENT_V4_KEY)
 data class EnrolmentEventV4(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: EnrolmentPayload,
@@ -51,6 +56,7 @@ data class EnrolmentEventV4(
     )
 
     @Keep
+    @Serializable
     data class EnrolmentPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,

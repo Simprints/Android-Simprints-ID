@@ -1,8 +1,8 @@
 package com.simprints.infra.eventsync.event.remote.models.face
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
+import com.simprints.infra.events.event.domain.models.FaceCaptureEvent
 import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
 import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import org.junit.Test
