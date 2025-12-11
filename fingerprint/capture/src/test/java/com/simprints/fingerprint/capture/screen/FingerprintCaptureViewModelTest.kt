@@ -516,11 +516,11 @@ class FingerprintCaptureViewModelTest {
         coVerify { addBiometricReferenceCreatedEvents.invoke(any(), any()) }
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.samples).hasSize(FOUR_FINGERS_IDS.size)
-            assertThat(actualFingerprints?.samples?.map { it.identifier }).containsExactlyElementsIn(
+            assertThat(actualFingerprints?.samples?.map { it.template.identifier }).containsExactlyElementsIn(
                 FOUR_FINGERS_IDS,
             )
             actualFingerprints?.samples?.forEach {
-                assertThat(it.template).isEqualTo(TEMPLATE)
+                assertThat(it.template.template).isEqualTo(TEMPLATE)
             }
         }
     }
@@ -574,11 +574,11 @@ class FingerprintCaptureViewModelTest {
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.samples).hasSize(TWO_FINGERS_IDS.size)
-            assertThat(actualFingerprints?.samples?.map { it.identifier }).containsExactlyElementsIn(
+            assertThat(actualFingerprints?.samples?.map { it.template.identifier }).containsExactlyElementsIn(
                 TWO_FINGERS_IDS,
             )
             actualFingerprints?.samples?.forEach {
-                assertThat(it.template).isEqualTo(TEMPLATE)
+                assertThat(it.template.template).isEqualTo(TEMPLATE)
             }
         }
     }
@@ -630,11 +630,11 @@ class FingerprintCaptureViewModelTest {
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.samples).hasSize(TWO_FINGERS_IDS.size)
-            assertThat(actualFingerprints?.samples?.map { it.identifier }).containsExactlyElementsIn(
+            assertThat(actualFingerprints?.samples?.map { it.template.identifier }).containsExactlyElementsIn(
                 TWO_FINGERS_IDS,
             )
             actualFingerprints?.samples?.forEach {
-                assertThat(it.template).isEqualTo(TEMPLATE)
+                assertThat(it.template.template).isEqualTo(TEMPLATE)
             }
         }
     }
@@ -843,13 +843,13 @@ class FingerprintCaptureViewModelTest {
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.samples).hasSize(3)
-            assertThat(actualFingerprints?.samples?.map { it.identifier }).containsExactly(
+            assertThat(actualFingerprints?.samples?.map { it.template.identifier }).containsExactly(
                 TemplateIdentifier.LEFT_THUMB,
                 TemplateIdentifier.RIGHT_THUMB,
                 TemplateIdentifier.RIGHT_INDEX_FINGER,
             )
             actualFingerprints?.samples?.forEach {
-                assertThat(it.template).isEqualTo(TEMPLATE)
+                assertThat(it.template.template).isEqualTo(TEMPLATE)
             }
         }
     }
@@ -955,13 +955,13 @@ class FingerprintCaptureViewModelTest {
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.samples).hasSize(3)
-            assertThat(actualFingerprints?.samples?.map { it.identifier }).containsExactly(
+            assertThat(actualFingerprints?.samples?.map { it.template.identifier }).containsExactly(
                 TemplateIdentifier.LEFT_THUMB,
                 TemplateIdentifier.RIGHT_THUMB,
                 TemplateIdentifier.RIGHT_INDEX_FINGER,
             )
             actualFingerprints?.samples?.forEach {
-                assertThat(it.template).isEqualTo(TEMPLATE)
+                assertThat(it.template.template).isEqualTo(TEMPLATE)
             }
         }
     }
@@ -1049,13 +1049,13 @@ class FingerprintCaptureViewModelTest {
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.samples).hasSize(3)
-            assertThat(actualFingerprints?.samples?.map { it.identifier }).containsExactly(
+            assertThat(actualFingerprints?.samples?.map { it.template.identifier }).containsExactly(
                 TemplateIdentifier.LEFT_THUMB,
                 TemplateIdentifier.LEFT_INDEX_FINGER,
                 TemplateIdentifier.RIGHT_THUMB,
             )
             actualFingerprints?.samples?.forEach {
-                assertThat(it.template).isEqualTo(TEMPLATE)
+                assertThat(it.template.template).isEqualTo(TEMPLATE)
             }
         }
     }

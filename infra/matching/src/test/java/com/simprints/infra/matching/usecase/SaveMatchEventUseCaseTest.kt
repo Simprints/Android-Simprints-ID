@@ -3,6 +3,7 @@ package com.simprints.infra.matching.usecase
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.MatchComparisonResult
@@ -76,7 +77,9 @@ class SaveMatchEventUseCaseTest {
                 probeSamples = listOf(
                     CaptureSample(
                         captureEventId = "faceId",
-                        template = byteArrayOf(1, 2, 3),
+                        template = BiometricTemplate(
+                            template = byteArrayOf(1, 2, 3),
+                        ),
                         modality = Modality.FACE,
                         format = "format",
                     ),
@@ -121,10 +124,12 @@ class SaveMatchEventUseCaseTest {
                 probeSamples = listOf(
                     CaptureSample(
                         captureEventId = "fingerprintId",
-                        template = byteArrayOf(1, 2, 3),
+                        template = BiometricTemplate(
+                            template = byteArrayOf(1, 2, 3),
+                            identifier = TemplateIdentifier.RIGHT_5TH_FINGER,
+                        ),
                         modality = Modality.FINGERPRINT,
                         format = "format",
-                        identifier = TemplateIdentifier.RIGHT_5TH_FINGER,
                     ),
                 ),
                 bioSdk = SECUGEN_SIM_MATCHER,

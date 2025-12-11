@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.AvailableProcessors
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -117,7 +118,9 @@ internal class CommCareIdentityDataSource @Inject constructor(
                                 null
                             } else {
                                 Sample(
-                                    template = encoder.base64ToBytes(faceTemplate.template),
+                                    template = BiometricTemplate(
+                                        template = encoder.base64ToBytes(faceTemplate.template),
+                                    ),
                                     format = reference.format,
                                     referenceId = reference.id,
                                     modality = Modality.FACE,
@@ -130,8 +133,10 @@ internal class CommCareIdentityDataSource @Inject constructor(
                                 null
                             } else {
                                 Sample(
-                                    identifier = fingerprintTemplate.finger,
-                                    template = encoder.base64ToBytes(fingerprintTemplate.template),
+                                    template = BiometricTemplate(
+                                        identifier = fingerprintTemplate.finger,
+                                        template = encoder.base64ToBytes(fingerprintTemplate.template),
+                                    ),
                                     format = reference.format,
                                     referenceId = reference.id,
                                     modality = Modality.FINGERPRINT,

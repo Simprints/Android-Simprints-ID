@@ -23,11 +23,10 @@ internal data class ApiFingerprintReference(
 internal fun List<Sample>.toFingerprintApi(encoder: EncodingUtils): ApiFingerprintReference? = if (isNotEmpty()) {
     ApiFingerprintReference(
         first().referenceId,
-        map {
-            ApiFingerprintTemplate(
-                encoder.byteArrayToBase64(it.template),
-                it.identifier.toApi(),
-            )
+        map { sample ->
+            sample.template.let {
+                ApiFingerprintTemplate(encoder.byteArrayToBase64(it.template), it.identifier.toApi())
+            }
         },
         first().format,
     )

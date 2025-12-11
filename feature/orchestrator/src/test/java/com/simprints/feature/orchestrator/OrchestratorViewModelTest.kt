@@ -7,6 +7,7 @@ import com.jraska.livedata.test
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.sample.CaptureIdentity
@@ -303,15 +304,19 @@ internal class OrchestratorViewModelTest {
         val sample1 = CaptureSample(
             captureEventId = GUID1,
             modality = Modality.FINGERPRINT,
-            identifier = TemplateIdentifier.LEFT_INDEX_FINGER,
-            template = ByteArray(0),
+            template = BiometricTemplate(
+                identifier = TemplateIdentifier.LEFT_INDEX_FINGER,
+                template = ByteArray(0),
+            ),
             format = format,
         )
         val sample2 = CaptureSample(
             captureEventId = GUID2,
             modality = Modality.FINGERPRINT,
-            identifier = TemplateIdentifier.LEFT_THUMB,
-            template = ByteArray(0),
+            template = BiometricTemplate(
+                identifier = TemplateIdentifier.LEFT_THUMB,
+                template = ByteArray(0),
+            ),
             format = format,
         )
 
@@ -442,15 +447,19 @@ internal class OrchestratorViewModelTest {
         val fingerprintSample1 = CaptureSample(
             captureEventId = GUID1,
             modality = Modality.FINGERPRINT,
-            identifier = fingerId1,
-            template = template1,
+            template = BiometricTemplate(
+                identifier = fingerId1,
+                template = template1,
+            ),
             format = format1,
         )
         val fingerprintSample2 = CaptureSample(
             captureEventId = GUID2,
             modality = Modality.FINGERPRINT,
-            identifier = fingerId2,
-            template = template2,
+            template = BiometricTemplate(
+                identifier = fingerId2,
+                template = template2,
+            ),
             format = format2,
         )
 
@@ -470,8 +479,8 @@ internal class OrchestratorViewModelTest {
         )
 
         val expectedFingerprintSamples = listOf(
-            CaptureSample(GUID1, Modality.FINGERPRINT, format1, template1, fingerId1),
-            CaptureSample(GUID2, Modality.FINGERPRINT, format2, template2, fingerId2),
+            CaptureSample(GUID1, Modality.FINGERPRINT, format1, BiometricTemplate(template1, fingerId1)),
+            CaptureSample(GUID2, Modality.FINGERPRINT, format2, BiometricTemplate(template2, fingerId2)),
         )
 
         verify {

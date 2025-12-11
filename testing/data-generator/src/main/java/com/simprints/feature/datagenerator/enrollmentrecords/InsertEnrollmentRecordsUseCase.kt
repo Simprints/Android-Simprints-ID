@@ -3,6 +3,7 @@ package com.simprints.feature.datagenerator.enrollmentrecords
 import android.os.Bundle
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
@@ -87,7 +88,9 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
             repeat(numSamples) {
                 faceSamples.add(
                     Sample(
-                        template = getTemplateForFormat(key),
+                        template = BiometricTemplate(
+                            template = getTemplateForFormat(key),
+                        ),
                         format = key,
                         referenceId = UUID.randomUUID().toString(),
                         id = UUID.randomUUID().toString(),
@@ -116,15 +119,17 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
             for (i in 0 until numSamples) {
                 fingerprintSamples.add(
                     Sample(
-                        template = getTemplateForFormat(key),
+                        template = BiometricTemplate(
+                            template = getTemplateForFormat(key),
+                            identifier = if (fingerIdentifiers.isNullOrEmpty()) {
+                                TemplateIdentifier.LEFT_THUMB
+                            } else {
+                                fingerIdentifiers[i % fingerIdentifiers.size].toFingerIdentifier()
+                            },
+                        ),
                         format = key,
                         referenceId = UUID.randomUUID().toString(),
                         id = UUID.randomUUID().toString(),
-                        identifier = if (fingerIdentifiers.isNullOrEmpty()) {
-                            TemplateIdentifier.LEFT_THUMB
-                        } else {
-                            fingerIdentifiers[i % fingerIdentifiers.size].toFingerIdentifier()
-                        },
                         modality = Modality.FINGERPRINT,
                     ),
                 )

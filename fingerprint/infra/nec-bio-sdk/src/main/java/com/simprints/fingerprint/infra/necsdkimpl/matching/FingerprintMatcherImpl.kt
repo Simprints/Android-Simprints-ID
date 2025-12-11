@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.infra.necsdkimpl.matching
 
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Identity
@@ -57,7 +58,7 @@ internal class FingerprintMatcherImpl @Inject constructor(
     ): MatchComparisonResult {
         var fingers = 0 // the number of fingers used in matching
         val total = probe.sumOf { fingerprint ->
-            candidate.templateForFinger(fingerprint.identifier)?.let { candidateTemplate ->
+            candidate.templateForFinger(fingerprint.template.identifier)?.let { candidateTemplate ->
                 fingers++
                 verify(fingerprint, candidateTemplate)
             } ?: 0.toDouble()
@@ -71,8 +72,8 @@ internal class FingerprintMatcherImpl @Inject constructor(
     ) = try {
         nec
             .match(
-                probe.toNecTemplate(),
-                candidate.toNecTemplate(),
+                probe.template.toNecTemplate(),
+                candidate.template.toNecTemplate(),
             ).toDouble()
     } catch (e: Exception) {
         throw BioSdkException.TemplateMatchingException(e)
@@ -99,11 +100,9 @@ internal class FingerprintMatcherImpl @Inject constructor(
         return MatchComparisonResult(candidate.subjectId, getOverallScore(total, fingers))
     }
 
-    private fun Identity.templateForFinger(fingerId: TemplateIdentifier) = samples.find { it.identifier == fingerId }
+    private fun Identity.templateForFinger(fingerId: TemplateIdentifier) = samples.find { it.template.identifier == fingerId }
 
-    private fun CaptureSample.toNecTemplate() = NECTemplate(template, 0) // Quality score not used
-
-    private fun Sample.toNecTemplate() = NECTemplate(template, 0) // Quality score not used
+    private fun BiometricTemplate.toNecTemplate() = NECTemplate(template, 0) // Quality score not used
 
     private fun getOverallScore(
         total: Double,

@@ -2,6 +2,7 @@ package com.simprints.infra.eventsync.sync.common
 
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -102,8 +103,10 @@ class SubjectFactory @Inject constructor(
 
     private fun extractCaptureSamples(response: CaptureIdentity) = response.samples.map { sample ->
         Sample(
-            identifier = sample.identifier,
-            template = sample.template,
+            template = BiometricTemplate(
+                identifier = sample.template.identifier,
+                template = sample.template.template,
+            ),
             format = sample.format,
             referenceId = response.referenceId,
             modality = sample.modality,
@@ -124,8 +127,10 @@ class SubjectFactory @Inject constructor(
         format: String,
         referenceId: String,
     ): Sample = Sample(
-        identifier = template.finger,
-        template = encodingUtils.base64ToBytes(template.template),
+        template = BiometricTemplate(
+            identifier = template.finger,
+            template = encodingUtils.base64ToBytes(template.template),
+        ),
         format = format,
         referenceId = referenceId,
         modality = Modality.FINGERPRINT,
@@ -136,7 +141,9 @@ class SubjectFactory @Inject constructor(
         format: String,
         referenceId: String,
     ) = Sample(
-        template = encodingUtils.base64ToBytes(template.template),
+        template = BiometricTemplate(
+            template = encodingUtils.base64ToBytes(template.template),
+        ),
         format = format,
         referenceId = referenceId,
         modality = Modality.FACE,

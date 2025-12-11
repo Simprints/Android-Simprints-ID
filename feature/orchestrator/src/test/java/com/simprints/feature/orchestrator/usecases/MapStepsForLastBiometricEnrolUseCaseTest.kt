@@ -2,6 +2,7 @@ package com.simprints.feature.orchestrator.usecases
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.sample.CaptureSample
@@ -53,10 +54,12 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
                     modality = Modality.FACE,
                     samples = listOf(
                         CaptureSample(
-                            captureEventId = GUID1,
+                            captureEventId = "captureId",
                             modality = Modality.FACE,
                             format = "format",
-                            template = byteArrayOf(),
+                            template = BiometricTemplate(
+                                template = byteArrayOf(),
+                            ),
                         ),
                     ),
                 ),
@@ -69,9 +72,11 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
                 results = listOf(
                     CaptureSample(
                         captureEventId = "captureId",
-                        template = byteArrayOf(),
-                        format = "format",
                         modality = Modality.FACE,
+                        format = "format",
+                        template = BiometricTemplate(
+                            template = byteArrayOf(),
+                        ),
                     ),
                 ),
             ),
@@ -100,11 +105,13 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
                     modality = Modality.FINGERPRINT,
                     samples = listOf(
                         CaptureSample(
-                            captureEventId = GUID1,
+                            captureEventId = "captureId",
                             modality = Modality.FINGERPRINT,
                             format = "format",
-                            template = byteArrayOf(),
-                            identifier = TemplateIdentifier.RIGHT_THUMB,
+                            template = BiometricTemplate(
+                                template = byteArrayOf(),
+                                identifier = TemplateIdentifier.RIGHT_THUMB,
+                            ),
                         ),
                     ),
                 ),
@@ -117,10 +124,12 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
                 results = listOf(
                     CaptureSample(
                         captureEventId = "captureId",
-                        template = byteArrayOf(),
-                        format = "format",
-                        identifier = TemplateIdentifier.RIGHT_THUMB,
                         modality = Modality.FINGERPRINT,
+                        format = "format",
+                        template = BiometricTemplate(
+                            template = byteArrayOf(),
+                            identifier = TemplateIdentifier.RIGHT_THUMB,
+                        ),
                     ),
                 ),
             ),

@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
@@ -557,7 +558,9 @@ class SimprintsEventDownSyncTaskTest {
                 moduleId = "attendantId".asTokenizableRaw(),
                 samples = listOf(
                     Sample(
-                        template = byteArrayOf(),
+                        template = BiometricTemplate(
+                            template = byteArrayOf(),
+                        ),
                         format = "format",
                         referenceId = "referenceId",
                         modality = Modality.FACE,

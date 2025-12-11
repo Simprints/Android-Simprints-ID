@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
@@ -502,7 +503,9 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     ) = Sample(
         id = id,
         referenceId = referenceId,
-        template = Random.nextBytes(64),
+        template = BiometricTemplate(
+            template = Random.nextBytes(64),
+        ),
         format = "faceTemplateFormat",
         modality = Modality.FACE,
     )
@@ -513,8 +516,10 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     ) = Sample(
         id = id,
         referenceId = referenceId,
-        identifier = TemplateIdentifier.LEFT_3RD_FINGER,
-        template = Random.nextBytes(64),
+        template = BiometricTemplate(
+            identifier = TemplateIdentifier.LEFT_3RD_FINGER,
+            template = Random.nextBytes(64),
+        ),
         format = "fingerprintTemplateFormat",
         modality = Modality.FINGERPRINT,
     )
