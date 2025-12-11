@@ -2,8 +2,8 @@ package com.simprints.infra.enrolment.records.repository.local.models
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.Sample
-import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.enrolment.records.realm.store.models.DbFaceSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbFingerprintSample
@@ -28,7 +28,7 @@ class DbSubjectTest {
     @Test
     fun fromDomainToDbModel() {
         val fingerprintSample = Sample(
-            identifier = SampleIdentifier.RIGHT_3RD_FINGER,
+            identifier = TemplateIdentifier.RIGHT_3RD_FINGER,
             template = Random.nextBytes(64),
             format = "NEC_1",
             referenceId = REFERENCE_ID,
@@ -70,7 +70,7 @@ class DbSubjectTest {
     @Test
     fun fromDbModelToDomain() {
         val fingerprintSample = DbFingerprintSample().apply {
-            fingerIdentifier = SampleIdentifier.RIGHT_3RD_FINGER.ordinal
+            fingerIdentifier = TemplateIdentifier.RIGHT_3RD_FINGER.ordinal
             template = Random.nextBytes(64)
             format = "NEC_1"
             referenceId = REFERENCE_ID

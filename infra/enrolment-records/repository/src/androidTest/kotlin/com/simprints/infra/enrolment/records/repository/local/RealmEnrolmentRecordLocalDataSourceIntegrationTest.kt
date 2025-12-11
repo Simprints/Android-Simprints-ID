@@ -5,8 +5,8 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.Sample
-import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
@@ -265,7 +265,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
                     template = byteArrayOf(4, 5, 6),
                     format = "ISO",
                     referenceId = "ref3",
-                    identifier = SampleIdentifier.LEFT_THUMB,
+                    identifier = TemplateIdentifier.LEFT_THUMB,
                     modality = Modality.FINGERPRINT,
                 ),
             ),
@@ -362,7 +362,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
                         template = byteArrayOf(i.toByte()),
                         format = "ISO",
                         referenceId = "ref$i",
-                        identifier = SampleIdentifier.LEFT_THUMB,
+                        identifier = TemplateIdentifier.LEFT_THUMB,
                         modality = Modality.FINGERPRINT,
                     ),
                 )

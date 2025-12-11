@@ -3,7 +3,7 @@ package com.simprints.infra.config.store.testtools
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.local.models.ProtoAllowedAgeRange
 import com.simprints.infra.config.store.local.models.ProtoConsentConfiguration
@@ -269,7 +269,7 @@ internal val apiFingerprintConfiguration = ApiFingerprintConfiguration(
 )
 
 internal val fingerprintSdkConfiguration = FingerprintConfiguration.FingerprintSdkConfiguration(
-    fingersToCapture = listOf(SampleIdentifier.LEFT_3RD_FINGER),
+    fingersToCapture = listOf(TemplateIdentifier.LEFT_3RD_FINGER),
     decisionPolicy = decisionPolicy,
     comparisonStrategyForVerification = FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
     vero1 = Vero1Configuration(qualityThreshold = 10),

@@ -5,10 +5,10 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.TemplateIdentifier.LEFT_INDEX_FINGER
+import com.simprints.core.domain.reference.TemplateIdentifier.LEFT_THUMB
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
-import com.simprints.core.domain.sample.SampleIdentifier.LEFT_INDEX_FINGER
-import com.simprints.core.domain.sample.SampleIdentifier.LEFT_THUMB
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper

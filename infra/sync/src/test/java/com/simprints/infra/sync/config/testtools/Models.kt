@@ -3,7 +3,7 @@ package com.simprints.infra.sync.config.testtools
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.models.ConsentConfiguration
 import com.simprints.infra.config.store.models.DecisionPolicy
@@ -68,7 +68,7 @@ internal val fingerprintConfiguration = FingerprintConfiguration(
     allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
     displayHandIcons = true,
     secugenSimMatcher = FingerprintConfiguration.FingerprintSdkConfiguration(
-        listOf(SampleIdentifier.LEFT_3RD_FINGER),
+        listOf(TemplateIdentifier.LEFT_3RD_FINGER),
         decisionPolicy,
         FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
         vero1 = Vero1Configuration(10),

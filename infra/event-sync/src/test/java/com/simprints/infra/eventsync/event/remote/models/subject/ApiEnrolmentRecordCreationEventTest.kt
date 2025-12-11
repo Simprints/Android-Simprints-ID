@@ -3,7 +3,7 @@ package com.simprints.infra.eventsync.event.remote.models.subject
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.remote.models.ApiExternalCredentialType
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
@@ -25,7 +25,7 @@ class ApiEnrolmentRecordCreationEventTest {
                 ApiFingerprintReference(
                     "fpRefId",
                     listOf(
-                        ApiFingerprintTemplate("template", SampleIdentifier.LEFT_THUMB),
+                        ApiFingerprintTemplate("template", TemplateIdentifier.LEFT_THUMB),
                     ),
                     "NEC_1",
                 ),
@@ -47,7 +47,7 @@ class ApiEnrolmentRecordCreationEventTest {
                 FingerprintReference(
                     "fpRefId",
                     listOf(
-                        FingerprintTemplate("template", SampleIdentifier.LEFT_THUMB),
+                        FingerprintTemplate("template", TemplateIdentifier.LEFT_THUMB),
                     ),
                     "NEC_1",
                 ),

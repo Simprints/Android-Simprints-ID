@@ -4,10 +4,10 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Sample
-import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
@@ -173,7 +173,7 @@ class SubjectFactoryTest {
                     templates = listOf(
                         FingerprintTemplate(
                             template = BASE_64_BYTES.toString(),
-                            finger = SampleIdentifier.LEFT_THUMB,
+                            finger = TemplateIdentifier.LEFT_THUMB,
                         ),
                     ),
                 ),
@@ -341,7 +341,7 @@ class SubjectFactoryTest {
         private const val TEMPLATE_NAME = "template"
         private val EXTERNAL_CREDENTIAL_VALUE = "value".asTokenizableEncrypted()
         private val EXTERNAL_CREDENTIAL_TYPE = ExternalCredentialType.NHISCard
-        private val IDENTIFIER = SampleIdentifier.LEFT_THUMB
+        private val IDENTIFIER = TemplateIdentifier.LEFT_THUMB
         private val FINGERPRINT_REFERENCE = FingerprintReference(
             id = REFERENCE_ID,
             format = REFERENCE_FORMAT,

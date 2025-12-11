@@ -3,11 +3,10 @@ package com.simprints.core.domain.sample
 import android.os.Parcelable
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.step.StepResult
 import kotlinx.parcelize.Parcelize
-import java.util.UUID
 
 @Parcelize
 @ExcludedFromGeneratedTestCoverageReports("Data class with generated code")
@@ -16,7 +15,7 @@ data class CaptureSample(
     val modality: Modality,
     val format: String,
     val template: ByteArray,
-    val identifier: SampleIdentifier = SampleIdentifier.NONE,
+    val identifier: TemplateIdentifier = TemplateIdentifier.NONE,
 ) : StepResult,
     StepParams,
     Parcelable {
