@@ -3,7 +3,7 @@ package com.simprints.feature.orchestrator.usecases
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.sample.CaptureIdentity
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.exitform.ExitFormOption
 import com.simprints.feature.exitform.ExitFormResult
@@ -62,7 +62,7 @@ class MapRefusalOrErrorResultUseCaseTest {
         listOf(
             FetchSubjectResult(found = true),
             SetupResult(isSuccess = true),
-            CaptureIdentity("", modality = Modality.FACE, emptyList()),
+            BiometricReferenceCapture("", modality = Modality.FACE, "format", emptyList()),
         ).forEach { result -> assertThat(useCase(result, mockk())).isNull() }
     }
 

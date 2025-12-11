@@ -5,9 +5,9 @@ import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.domain.common.AgeGroup
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.sample.CaptureIdentity
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.step.StepResult
@@ -60,8 +60,8 @@ import java.io.Serializable
     JsonSubTypes.Type(value = ExternalCredentialSearchResult::class, name = "ExternalCredentialSearchResult"),
     JsonSubTypes.Type(value = CredentialMatch::class, name = " CredentialMatch"),
     // Common data types
-    JsonSubTypes.Type(value = CaptureIdentity::class, name = "CaptureIdentity"),
-    JsonSubTypes.Type(value = CaptureSample::class, name = "CaptureSample"),
+    JsonSubTypes.Type(value = BiometricReferenceCapture::class, name = "BiometricReferenceCapture"),
+    JsonSubTypes.Type(value = BiometricTemplateCapture::class, name = "BiometricTemplateCapture"),
     JsonSubTypes.Type(value = BiometricTemplate::class, name = "BiometricTemplate"),
     JsonSubTypes.Type(value = MatchComparisonResult::class, name = "MatchComparisonResult"),
 )
@@ -97,7 +97,8 @@ abstract class StepResultMixin : StepResult
     ),
     JsonSubTypes.Type(value = ExternalCredentialParams::class, name = "ExternalCredentialParams"),
     // Additional types that are used in top-level params
-    JsonSubTypes.Type(value = CaptureSample::class, name = "CaptureSample"),
+    JsonSubTypes.Type(value = BiometricReferenceCapture::class, name = "BiometricReferenceCapture"),
+    JsonSubTypes.Type(value = BiometricTemplateCapture::class, name = "BiometricTemplateCapture"),
     JsonSubTypes.Type(value = BiometricTemplate::class, name = "BiometricTemplate"),
     JsonSubTypes.Type(value = MatchComparisonResult::class, name = "MatchComparisonResult"),
     JsonSubTypes.Type(value = BiometricDataSource::class, name = "BiometricDataSource"),

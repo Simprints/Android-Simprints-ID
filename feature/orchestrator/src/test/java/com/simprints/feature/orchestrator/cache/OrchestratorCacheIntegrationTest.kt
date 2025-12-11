@@ -7,11 +7,11 @@ import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
+import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.response.AppErrorReason
-import com.simprints.core.domain.sample.CaptureIdentity
-import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
@@ -127,16 +127,18 @@ class OrchestratorCacheIntegrationTest {
                     moduleId = TokenizableString.Raw("value"),
                     steps = listOf(
                         EnrolLastBiometricStepResult.CaptureResult(
-                            "referenceId",
-                            listOf(
-                                CaptureSample(
-                                    captureEventId = GUID1,
-                                    template = BiometricTemplate(
-                                        identifier = TemplateIdentifier.LEFT_THUMB,
-                                        template = byteArrayOf(1, 2, 3),
+                            BiometricReferenceCapture(
+                                referenceId = "referenceId",
+                                modality = Modality.FINGERPRINT,
+                                format = "format",
+                                templates = listOf(
+                                    BiometricTemplateCapture(
+                                        captureEventId = GUID1,
+                                        template = BiometricTemplate(
+                                            identifier = TemplateIdentifier.LEFT_THUMB,
+                                            template = byteArrayOf(1, 2, 3),
+                                        ),
                                     ),
-                                    modality = Modality.FINGERPRINT,
-                                    format = "format",
                                 ),
                             ),
                         ),
@@ -187,28 +189,32 @@ class OrchestratorCacheIntegrationTest {
                     subjectId = "subjectId",
                     flowType = FlowType.IDENTIFY,
                     ageGroup = AgeGroup(1, 2),
-                    probeReferenceId = "referenceId",
-                    samples = mapOf(
-                        Modality.FACE to listOf(
-                            CaptureSample(
-                                captureEventId = GUID1,
-                                template = BiometricTemplate(
-                                    identifier = TemplateIdentifier.LEFT_THUMB,
-                                    template = byteArrayOf(1, 2, 3),
+                    probeReferences = listOf(
+                        BiometricReferenceCapture(
+                            referenceId = "referenceId1",
+                            modality = Modality.FINGERPRINT,
+                            format = "format",
+                            templates = listOf(
+                                BiometricTemplateCapture(
+                                    captureEventId = "captureEvent1",
+                                    template = BiometricTemplate(
+                                        identifier = TemplateIdentifier.LEFT_THUMB,
+                                        template = byteArrayOf(1, 2, 3),
+                                    ),
                                 ),
-                                modality = Modality.FACE,
-                                format = "format",
                             ),
                         ),
-                        Modality.FINGERPRINT to listOf(
-                            CaptureSample(
-                                captureEventId = GUID1,
-                                template = BiometricTemplate(
-                                    identifier = TemplateIdentifier.LEFT_THUMB,
-                                    template = byteArrayOf(1, 2, 3),
+                        BiometricReferenceCapture(
+                            referenceId = "referenceId1",
+                            modality = Modality.FACE,
+                            format = "format2",
+                            templates = listOf(
+                                BiometricTemplateCapture(
+                                    captureEventId = "captureEvent2",
+                                    template = BiometricTemplate(
+                                        template = byteArrayOf(2, 3, 4),
+                                    ),
                                 ),
-                                modality = Modality.FINGERPRINT,
-                                format = "format",
                             ),
                         ),
                     ),
@@ -261,18 +267,17 @@ class OrchestratorCacheIntegrationTest {
                     fingerprintSDK = FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                 ),
                 status = StepStatus.COMPLETED,
-                result = CaptureIdentity(
+                result = BiometricReferenceCapture(
                     "",
                     modality = Modality.FINGERPRINT,
-                    samples = listOf(
-                        CaptureSample(
+                    format = "format",
+                    templates = listOf(
+                        BiometricTemplateCapture(
                             captureEventId = GUID1,
                             template = BiometricTemplate(
                                 identifier = TemplateIdentifier.LEFT_THUMB,
                                 template = byteArrayOf(1, 2, 3),
                             ),
-                            modality = Modality.FINGERPRINT,
-                            format = "format",
                         ),
                     ),
                 ),
@@ -282,20 +287,22 @@ class OrchestratorCacheIntegrationTest {
                 navigationActionId = 3,
                 destinationId = 4,
                 params = MatchParams(
-                    probeReferenceId = GUID1,
                     flowType = FlowType.IDENTIFY,
                     queryForCandidates = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.CommCare("name"),
                     bioSdk = FingerprintConfiguration.BioSdk.NEC,
-                    probeSamples = listOf(
-                        CaptureSample(
-                            captureEventId = GUID1,
-                            template = BiometricTemplate(
-                                identifier = TemplateIdentifier.LEFT_THUMB,
-                                template = byteArrayOf(1, 2, 3),
+                    probeReference = BiometricReferenceCapture(
+                        referenceId = GUID1,
+                        modality = Modality.FINGERPRINT,
+                        format = "format",
+                        templates = listOf(
+                            BiometricTemplateCapture(
+                                captureEventId = "captureEvent1",
+                                template = BiometricTemplate(
+                                    identifier = TemplateIdentifier.LEFT_THUMB,
+                                    template = byteArrayOf(1, 2, 3),
+                                ),
                             ),
-                            modality = Modality.FINGERPRINT,
-                            format = "format",
                         ),
                     ),
                 ),
@@ -325,17 +332,16 @@ class OrchestratorCacheIntegrationTest {
                 destinationId = 6,
                 params = FaceCaptureParams(3, FaceConfiguration.BioSdk.RANK_ONE),
                 status = StepStatus.COMPLETED,
-                result = CaptureIdentity(
+                result = BiometricReferenceCapture(
                     "",
                     modality = Modality.FACE,
-                    samples = listOf(
-                        CaptureSample(
+                    format = "ROC",
+                    templates = listOf(
+                        BiometricTemplateCapture(
                             captureEventId = GUID1,
                             template = BiometricTemplate(
                                 template = byteArrayOf(1, 2, 3),
                             ),
-                            modality = Modality.FACE,
-                            format = "ROC",
                         ),
                     ),
                 ),
@@ -345,19 +351,21 @@ class OrchestratorCacheIntegrationTest {
                 navigationActionId = 3,
                 destinationId = 4,
                 params = MatchParams(
-                    probeReferenceId = GUID1,
                     flowType = FlowType.IDENTIFY,
                     queryForCandidates = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
                     bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
-                    probeSamples = listOf(
-                        CaptureSample(
-                            captureEventId = GUID1,
-                            template = BiometricTemplate(
-                                template = byteArrayOf(1, 2, 3),
+                    probeReference = BiometricReferenceCapture(
+                        referenceId = GUID1,
+                        modality = Modality.FACE,
+                        format = "format",
+                        templates = listOf(
+                            BiometricTemplateCapture(
+                                captureEventId = "captureEvent1",
+                                template = BiometricTemplate(
+                                    template = byteArrayOf(1, 2, 3),
+                                ),
                             ),
-                            modality = Modality.FACE,
-                            format = "format",
                         ),
                     ),
                 ),

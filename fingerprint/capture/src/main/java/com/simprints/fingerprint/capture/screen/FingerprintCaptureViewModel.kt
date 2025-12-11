@@ -7,10 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
+import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.reference.TemplateIdentifier
-import com.simprints.core.domain.sample.CaptureIdentity
-import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
@@ -136,10 +136,10 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         get() = _invalidLicense
     private val _invalidLicense = MutableLiveData<LiveDataEvent>()
 
-    val finishWithFingerprints: LiveData<LiveDataEventWithContent<CaptureIdentity>>
+    val finishWithFingerprints: LiveData<LiveDataEventWithContent<BiometricReferenceCapture>>
         get() = _finishWithFingerprints
     private val _finishWithFingerprints =
-        MutableLiveData<LiveDataEventWithContent<CaptureIdentity>>()
+        MutableLiveData<LiveDataEventWithContent<BiometricReferenceCapture>>()
 
     private lateinit var originalFingerprintsToCapture: List<TemplateIdentifier>
     private val captureEventIds: MutableMap<CaptureId, String> = mutableMapOf()
@@ -671,10 +671,8 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         Simber.i("Finishing fingerprint capture", tag = FINGER_CAPTURE)
         val resultItems = collectedFingers.mapNotNull { (captureId, collectedFinger) ->
             captureEventIds[captureId]?.let { captureEventId ->
-                CaptureSample(
+                BiometricTemplateCapture(
                     captureEventId = captureEventId,
-                    modality = Modality.FINGERPRINT,
-                    format = collectedFinger.scanResult.templateFormat,
                     template = BiometricTemplate(
                         template = collectedFinger.scanResult.template,
                         identifier = captureId.finger,
@@ -682,10 +680,11 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 )
             }
         }
+        val format = bioSdkWrapper.supportedTemplateFormat
         val biometricReferenceId = UUID.randomUUID().toString()
         addBiometricReferenceCreationEvents(biometricReferenceId, resultItems.map { it.captureEventId })
 
-        _finishWithFingerprints.send(CaptureIdentity(biometricReferenceId, Modality.FINGERPRINT, resultItems))
+        _finishWithFingerprints.send(BiometricReferenceCapture(biometricReferenceId, Modality.FINGERPRINT, format, resultItems))
     }
 
     private suspend fun saveImageIfExists(

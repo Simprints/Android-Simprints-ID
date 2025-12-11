@@ -11,7 +11,9 @@ class RocV3BioSdkTest {
     fun createMatcher() {
         rocV3BioSdk = RocV3BioSdk(mockk(), mockk())
 
-        val matcher = rocV3BioSdk.createMatcher(emptyList())
+        val matcher = rocV3BioSdk.createMatcher(
+            mockk { every { templates } returns emptyList() },
+        )
 
         assertThat(matcher).isNotNull()
     }

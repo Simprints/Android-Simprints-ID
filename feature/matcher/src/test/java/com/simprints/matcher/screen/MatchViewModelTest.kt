@@ -5,9 +5,10 @@ import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
+import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.reference.TemplateIdentifier
-import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
@@ -105,8 +106,12 @@ internal class MatchViewModelTest {
         viewModel.matchState.test()
         viewModel.setupMatch(
             MatchParams(
-                probeReferenceId = "referenceId",
-                probeSamples = listOf(getFaceSample()),
+                probeReference = BiometricReferenceCapture(
+                    referenceId = "referenceId",
+                    modality = Modality.FACE,
+                    format = "ROCv1",
+                    templates = listOf(getFaceCapture()),
+                ),
                 bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
@@ -177,8 +182,12 @@ internal class MatchViewModelTest {
         val states = viewModel.matchState.test()
         viewModel.setupMatch(
             MatchParams(
-                probeReferenceId = "referenceId",
-                probeSamples = listOf(getFaceSample()),
+                probeReference = BiometricReferenceCapture(
+                    referenceId = "referenceId",
+                    modality = Modality.FACE,
+                    format = "ROCv1",
+                    templates = listOf(getFaceCapture()),
+                ),
                 bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
@@ -268,8 +277,12 @@ internal class MatchViewModelTest {
 
         viewModel.setupMatch(
             MatchParams(
-                probeReferenceId = "referenceId",
-                probeSamples = listOf(getFingerprintSample()),
+                probeReference = BiometricReferenceCapture(
+                    referenceId = "referenceId",
+                    modality = Modality.FINGERPRINT,
+                    format = "Secugen",
+                    templates = listOf(getFingerprintTemplate()),
+                ),
                 bioSdk = SECUGEN_SIM_MATCHER,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
@@ -333,8 +346,12 @@ internal class MatchViewModelTest {
         val states = viewModel.matchState.test()
         viewModel.setupMatch(
             MatchParams(
-                probeReferenceId = "referenceId",
-                probeSamples = listOf(getFaceSample()),
+                probeReference = BiometricReferenceCapture(
+                    referenceId = "referenceId",
+                    modality = Modality.FACE,
+                    format = "ROC",
+                    templates = listOf(getFaceCapture()),
+                ),
                 bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
@@ -372,8 +389,12 @@ internal class MatchViewModelTest {
 
         val states = viewModel.matchState.test()
         val matchParams = MatchParams(
-            probeReferenceId = "referenceId",
-            probeSamples = listOf(getFaceSample()),
+            probeReference = BiometricReferenceCapture(
+                referenceId = "referenceId",
+                modality = Modality.FACE,
+                format = "ROC",
+                templates = listOf(getFaceCapture()),
+            ),
             bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
             flowType = FlowType.ENROL,
             queryForCandidates = mockk {},
@@ -392,19 +413,15 @@ internal class MatchViewModelTest {
         assertThat(states.valueHistory()).hasSize(4)
     }
 
-    private fun getFaceSample(): CaptureSample = CaptureSample(
+    private fun getFaceCapture(): BiometricTemplateCapture = BiometricTemplateCapture(
         captureEventId = UUID.randomUUID().toString(),
-        modality = Modality.FACE,
         template = BiometricTemplate(
             template = Random.nextBytes(20),
         ),
-        format = "format",
     )
 
-    private fun getFingerprintSample(): CaptureSample = CaptureSample(
+    private fun getFingerprintTemplate(): BiometricTemplateCapture = BiometricTemplateCapture(
         captureEventId = UUID.randomUUID().toString(),
-        modality = Modality.FINGERPRINT,
-        format = "format",
         template = BiometricTemplate(
             template = Random.nextBytes(20),
             identifier = TemplateIdentifier.LEFT_3RD_FINGER,
