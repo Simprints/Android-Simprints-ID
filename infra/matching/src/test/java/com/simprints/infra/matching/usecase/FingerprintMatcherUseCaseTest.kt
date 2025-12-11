@@ -4,9 +4,10 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
+import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.reference.TemplateIdentifier
-import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.tools.time.TimeHelper
@@ -88,8 +89,12 @@ internal class FingerprintMatcherUseCaseTest {
         val results = useCase
             .invoke(
                 MatchParams(
-                    probeReferenceId = "referenceId",
-                    probeSamples = emptyList(),
+                    probeReference = BiometricReferenceCapture(
+                        referenceId = "referenceId",
+                        modality = Modality.FINGERPRINT,
+                        format = "format",
+                        templates = emptyList(),
+                    ),
                     bioSdk = SECUGEN_SIM_MATCHER,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = SubjectQuery(),
@@ -121,16 +126,18 @@ internal class FingerprintMatcherUseCaseTest {
         val results = useCase
             .invoke(
                 MatchParams(
-                    probeReferenceId = "referenceId",
-                    probeSamples = listOf(
-                        CaptureSample(
-                            captureEventId = "fingerprintId",
-                            template = BiometricTemplate(
-                                template = byteArrayOf(1, 2, 3),
-                                identifier = TemplateIdentifier.LEFT_3RD_FINGER,
+                    probeReference = BiometricReferenceCapture(
+                        referenceId = "referenceId",
+                        modality = Modality.FINGERPRINT,
+                        format = "format",
+                        templates = listOf(
+                            BiometricTemplateCapture(
+                                captureEventId = "fingerprintId",
+                                template = BiometricTemplate(
+                                    template = byteArrayOf(1, 2, 3),
+                                    identifier = TemplateIdentifier.LEFT_3RD_FINGER,
+                                ),
                             ),
-                            modality = Modality.FINGERPRINT,
-                            format = "format",
                         ),
                     ),
                     bioSdk = SECUGEN_SIM_MATCHER,
@@ -161,16 +168,18 @@ internal class FingerprintMatcherUseCaseTest {
         val results = useCase
             .invoke(
                 MatchParams(
-                    probeReferenceId = "referenceId",
-                    probeSamples = listOf(
-                        CaptureSample(
-                            captureEventId = "fingerprintId",
-                            template = BiometricTemplate(
-                                template = byteArrayOf(1, 2, 3),
-                                identifier = TemplateIdentifier.LEFT_3RD_FINGER,
+                    probeReference = BiometricReferenceCapture(
+                        referenceId = "referenceId",
+                        modality = Modality.FINGERPRINT,
+                        format = "format",
+                        templates = listOf(
+                            BiometricTemplateCapture(
+                                captureEventId = "fingerprintId",
+                                template = BiometricTemplate(
+                                    template = byteArrayOf(1, 2, 3),
+                                    identifier = TemplateIdentifier.LEFT_3RD_FINGER,
+                                ),
                             ),
-                            modality = Modality.FINGERPRINT,
-                            format = "format",
                         ),
                     ),
                     bioSdk = FaceConfiguration.BioSdk.RANK_ONE, // Wrong SDK type
@@ -239,16 +248,18 @@ internal class FingerprintMatcherUseCaseTest {
         useCase
             .invoke(
                 matchParams = MatchParams(
-                    probeReferenceId = "referenceId",
-                    probeSamples = listOf(
-                        CaptureSample(
-                            captureEventId = "fingerprintId",
-                            template = BiometricTemplate(
-                                template = byteArrayOf(1, 2, 3),
-                                identifier = TemplateIdentifier.LEFT_3RD_FINGER,
+                    probeReference = BiometricReferenceCapture(
+                        referenceId = "referenceId",
+                        modality = Modality.FINGERPRINT,
+                        format = "format",
+                        templates = listOf(
+                            BiometricTemplateCapture(
+                                captureEventId = "fingerprintId",
+                                template = BiometricTemplate(
+                                    template = byteArrayOf(1, 2, 3),
+                                    identifier = TemplateIdentifier.LEFT_3RD_FINGER,
+                                ),
                             ),
-                            modality = Modality.FINGERPRINT,
-                            format = "format",
                         ),
                     ),
                     bioSdk = SECUGEN_SIM_MATCHER,

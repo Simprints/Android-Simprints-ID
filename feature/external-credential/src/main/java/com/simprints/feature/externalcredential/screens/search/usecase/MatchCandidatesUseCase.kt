@@ -30,9 +30,8 @@ internal class MatchCandidatesUseCase @Inject constructor(
         val matchParams = createMatchParamsUseCase(
             candidateSubjectId = candidate.subjectId,
             flowType = externalCredentialParams.flowType,
-            probeReferenceId = externalCredentialParams.probeReferenceId,
             projectConfiguration = projectConfig,
-            samples = externalCredentialParams.samples,
+            probeReferences = externalCredentialParams.probeReferences,
             ageGroup = externalCredentialParams.ageGroup,
         )
         matchParams

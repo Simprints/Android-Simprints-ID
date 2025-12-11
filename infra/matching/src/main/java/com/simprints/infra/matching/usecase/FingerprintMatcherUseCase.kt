@@ -2,7 +2,7 @@ package com.simprints.infra.matching.usecase
 
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
@@ -52,10 +52,6 @@ class FingerprintMatcherUseCase @Inject constructor(
         }
         val bioSdkWrapper = resolveBioSdkWrapper(matchParams.bioSdk)
 
-        if (matchParams.probeSamples.isEmpty()) {
-            send(MatcherState.Success(emptyList(), emptyList(), 0, bioSdkWrapper.matcherName))
-            return@channelFlow
-        }
         // Only candidates with supported template format are considered
         val queryWithSupportedFormat =
             matchParams.queryForCandidates.copy(
@@ -91,7 +87,7 @@ class FingerprintMatcherUseCase @Inject constructor(
 
         val batchInfo = consumeAndMatch(
             channel = channel,
-            samples = matchParams.probeSamples,
+            probeReference = matchParams.probeReference,
             resultSet = resultSet,
             bioSdk = matchParams.bioSdk,
             bioSdkWrapper = bioSdkWrapper,
@@ -104,7 +100,7 @@ class FingerprintMatcherUseCase @Inject constructor(
 
     private suspend fun consumeAndMatch(
         channel: ReceiveChannel<IdentityBatch>,
-        samples: List<CaptureSample>,
+        probeReference: BiometricReferenceCapture,
         resultSet: MatchResultSet,
         bioSdk: FingerprintConfiguration.BioSdk,
         bioSdkWrapper: BioSdkWrapper,
@@ -115,7 +111,7 @@ class FingerprintMatcherUseCase @Inject constructor(
             val comparingStartTime = timeHelper.now()
             val matchResults =
                 match(
-                    probes = samples,
+                    probeReference = probeReference,
                     candidates = batch.identities,
                     flowType = flowType,
                     bioSdkWrapper = bioSdkWrapper,
@@ -137,13 +133,13 @@ class FingerprintMatcherUseCase @Inject constructor(
     }
 
     private suspend fun match(
-        probes: List<CaptureSample>,
+        probeReference: BiometricReferenceCapture,
         candidates: List<Identity>,
         flowType: FlowType,
         bioSdkWrapper: BioSdkWrapper,
         bioSdk: FingerprintConfiguration.BioSdk,
     ) = bioSdkWrapper.match(
-        probes,
+        probeReference,
         candidates,
         isCrossFingerMatchingEnabled(flowType, bioSdk),
     )

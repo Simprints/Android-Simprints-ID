@@ -18,7 +18,7 @@ class SimFaceSdkTest {
             simFace = mockk<SimFace>(relaxed = true),
         )
 
-        val matcher = bioSdk.createMatcher(emptyList())
+        val matcher = bioSdk.createMatcher(mockk())
 
         Truth.assertThat(matcher).isNotNull()
     }

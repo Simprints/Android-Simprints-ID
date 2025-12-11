@@ -7,11 +7,11 @@ import com.jraska.livedata.test
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
+import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.response.AppErrorReason
-import com.simprints.core.domain.sample.CaptureIdentity
-import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.consent.ConsentResult
@@ -230,7 +230,7 @@ internal class OrchestratorViewModelTest {
         coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
 
         viewModel.handleAction(mockk())
-        viewModel.handleResult(CaptureIdentity("", Modality.FACE, emptyList()))
+        viewModel.handleResult(BiometricReferenceCapture("", Modality.FACE, "format", emptyList()))
 
         viewModel.currentStep.test().value().peekContent()?.let { step ->
             assertThat(step.id).isEqualTo(StepId.FACE_MATCHER)
@@ -254,7 +254,7 @@ internal class OrchestratorViewModelTest {
         coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
 
         viewModel.handleAction(mockk())
-        viewModel.handleResult(CaptureIdentity("", Modality.FINGERPRINT, emptyList()))
+        viewModel.handleResult(BiometricReferenceCapture("", Modality.FINGERPRINT, "format", emptyList()))
 
         viewModel.currentStep.test().value().peekContent()?.let { step ->
             assertThat(step.id).isEqualTo(StepId.FINGERPRINT_MATCHER)
@@ -301,36 +301,31 @@ internal class OrchestratorViewModelTest {
         )
         coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
         val format = "SimMatcher"
-        val sample1 = CaptureSample(
+        val capture1 = BiometricTemplateCapture(
             captureEventId = GUID1,
-            modality = Modality.FINGERPRINT,
             template = BiometricTemplate(
                 identifier = TemplateIdentifier.LEFT_INDEX_FINGER,
                 template = ByteArray(0),
             ),
-            format = format,
         )
-        val sample2 = CaptureSample(
+        val capture2 = BiometricTemplateCapture(
             captureEventId = GUID2,
-            modality = Modality.FINGERPRINT,
             template = BiometricTemplate(
                 identifier = TemplateIdentifier.LEFT_THUMB,
                 template = ByteArray(0),
             ),
-            format = format,
         )
 
         viewModel.handleAction(mockk())
-        viewModel.handleResult(CaptureIdentity("", Modality.FINGERPRINT, listOf(sample1, sample2)))
+        viewModel.handleResult(BiometricReferenceCapture("", Modality.FINGERPRINT, format, listOf(capture1, capture2)))
 
         viewModel.currentStep.test().value().peekContent()?.let { step ->
             assertThat(step.id).isEqualTo(StepId.FINGERPRINT_MATCHER)
             val params = step.params?.let { it as? MatchParams }
             assertThat(params).isNotNull()
             assertThat(params?.bioSdk).isEqualTo(SECUGEN_SIM_MATCHER)
-            assertThat(params?.probeSamples?.size).isEqualTo(2)
-            assertThat(params?.probeSamples?.get(0)?.format).isEqualTo(format)
-            assertThat(params?.probeSamples?.get(1)?.format).isEqualTo(format)
+            assertThat(params?.probeReference?.templates?.size).isEqualTo(2)
+            assertThat(params?.probeReference?.format).isEqualTo(format)
         }
     }
 
@@ -427,7 +422,7 @@ internal class OrchestratorViewModelTest {
         )
 
         viewModel.handleAction(mockk())
-        viewModel.handleResult(CaptureIdentity("", Modality.FINGERPRINT, emptyList()))
+        viewModel.handleResult(BiometricReferenceCapture("", Modality.FINGERPRINT, "format", emptyList()))
 
         viewModel.currentStep.test().value().peekContent()?.let { step ->
             assertThat(step.params?.let { it as? EnrolLastBiometricParams }?.steps).containsExactly(mockEnrolLastStep)
@@ -444,27 +439,23 @@ internal class OrchestratorViewModelTest {
         val format1 = "format1"
         val format2 = "format2"
 
-        val fingerprintSample1 = CaptureSample(
+        val fingerprintCapture1 = BiometricTemplateCapture(
             captureEventId = GUID1,
-            modality = Modality.FINGERPRINT,
             template = BiometricTemplate(
                 identifier = fingerId1,
                 template = template1,
             ),
-            format = format1,
         )
-        val fingerprintSample2 = CaptureSample(
+        val fingerprintCapture2 = BiometricTemplateCapture(
             captureEventId = GUID2,
-            modality = Modality.FINGERPRINT,
             template = BiometricTemplate(
                 identifier = fingerId2,
                 template = template2,
             ),
-            format = format2,
         )
 
         val externalCredentialParams = mockk<ExternalCredentialParams>(relaxed = true) {
-            every { copy(probeReferenceId = any(), samples = any()) } returns this
+            every { copy(probeReferences = any()) } returns this
         }
 
         coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
@@ -475,18 +466,25 @@ internal class OrchestratorViewModelTest {
 
         viewModel.handleAction(mockk())
         viewModel.handleResult(
-            CaptureIdentity(fingerprintReferenceId, Modality.FINGERPRINT, listOf(fingerprintSample1, fingerprintSample2)),
+            BiometricReferenceCapture(
+                fingerprintReferenceId,
+                Modality.FINGERPRINT,
+                format1,
+                listOf(fingerprintCapture1, fingerprintCapture2),
+            ),
         )
 
-        val expectedFingerprintSamples = listOf(
-            CaptureSample(GUID1, Modality.FINGERPRINT, format1, BiometricTemplate(template1, fingerId1)),
-            CaptureSample(GUID2, Modality.FINGERPRINT, format2, BiometricTemplate(template2, fingerId2)),
-        )
+        val expectedFingerprintReference =
+            BiometricReferenceCapture(
+                fingerprintReferenceId,
+                Modality.FINGERPRINT,
+                format1,
+                listOf(fingerprintCapture1, fingerprintCapture2),
+            )
 
         verify {
             externalCredentialParams.copy(
-                probeReferenceId = fingerprintReferenceId,
-                samples = mapOf(Modality.FINGERPRINT to expectedFingerprintSamples),
+                probeReferences = listOf(expectedFingerprintReference),
             )
         }
     }

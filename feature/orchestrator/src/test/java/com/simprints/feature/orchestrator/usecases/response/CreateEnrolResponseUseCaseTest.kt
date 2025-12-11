@@ -3,7 +3,7 @@ package com.simprints.feature.orchestrator.usecases.response
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.core.domain.sample.CaptureIdentity
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
@@ -68,8 +68,8 @@ internal class CreateEnrolResponseUseCaseTest {
             useCase(
                 request = action,
                 results = listOf(
-                    CaptureIdentity("", Modality.FINGERPRINT, emptyList()),
-                    CaptureIdentity("", Modality.FACE, emptyList()),
+                    BiometricReferenceCapture("", Modality.FINGERPRINT, "", emptyList()),
+                    BiometricReferenceCapture("", Modality.FACE, "", emptyList()),
                     mockk(),
                 ),
                 project = project,
@@ -120,7 +120,7 @@ internal class CreateEnrolResponseUseCaseTest {
         useCase(
             request = action,
             results = listOf(
-                CaptureIdentity("", Modality.FINGERPRINT, emptyList()),
+                BiometricReferenceCapture("", Modality.FINGERPRINT, "", emptyList()),
                 credentialSearchResult,
             ),
             project = project,

@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.infra.basebiosdk.matching
 
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.MatchComparisonResult
 
@@ -12,7 +13,7 @@ interface FingerprintMatcher<MatcherSettings> {
      * @throws IllegalArgumentException if the TemplateFormats of the supplied [probe]
      */
     suspend fun match(
-        probe: List<CaptureSample>,
+        probeReference: BiometricReferenceCapture,
         candidates: List<Identity>,
         settings: MatcherSettings?,
     ): List<MatchComparisonResult>

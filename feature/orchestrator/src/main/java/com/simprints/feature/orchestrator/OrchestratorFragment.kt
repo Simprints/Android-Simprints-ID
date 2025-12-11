@@ -1,5 +1,6 @@
 package com.simprints.feature.orchestrator
 
+import android.app.ActivityManager
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -81,6 +82,8 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requireContext().getSystemService(ActivityManager::class.java)
+
         if (savedInstanceState != null) {
             orchestratorVm.isRequestProcessed = savedInstanceState.getBoolean(KEY_REQUEST_PROCESSED)
             savedInstanceState

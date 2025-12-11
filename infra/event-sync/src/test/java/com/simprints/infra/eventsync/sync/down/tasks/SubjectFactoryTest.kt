@@ -4,10 +4,10 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
+import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.reference.TemplateIdentifier
-import com.simprints.core.domain.sample.CaptureIdentity
-import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
@@ -290,32 +290,30 @@ class SubjectFactoryTest {
             attendantId = expected.attendantId,
             moduleId = expected.moduleId,
             captures = listOf(
-                CaptureIdentity(
-                    GUID1,
-                    Modality.FINGERPRINT,
-                    listOf(
-                        CaptureSample(
+                BiometricReferenceCapture(
+                    referenceId = GUID1,
+                    modality = Modality.FINGERPRINT,
+                    format = REFERENCE_FORMAT,
+                    templates = listOf(
+                        BiometricTemplateCapture(
                             captureEventId = GUID1,
                             template = BiometricTemplate(
                                 identifier = IDENTIFIER,
                                 template = BASE_64_BYTES,
                             ),
-                            format = REFERENCE_FORMAT,
-                            modality = Modality.FINGERPRINT,
                         ),
                     ),
                 ),
-                CaptureIdentity(
-                    GUID1,
-                    Modality.FACE,
-                    listOf(
-                        CaptureSample(
+                BiometricReferenceCapture(
+                    referenceId = GUID1,
+                    modality = Modality.FACE,
+                    format = REFERENCE_FORMAT,
+                    templates = listOf(
+                        BiometricTemplateCapture(
                             captureEventId = GUID1,
                             template = BiometricTemplate(
                                 template = BASE_64_BYTES,
                             ),
-                            format = REFERENCE_FORMAT,
-                            modality = Modality.FACE,
                         ),
                     ),
                 ),
