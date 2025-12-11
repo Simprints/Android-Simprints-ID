@@ -4,8 +4,9 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.domain.sample.Sample
@@ -77,11 +78,16 @@ internal class FaceMatcherUseCaseTest {
         val results = useCase
             .invoke(
                 MatchParams(
-                    probeReferenceId = "referenceId",
                     flowType = FlowType.VERIFY,
                     queryForCandidates = SubjectQuery(),
                     bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                     biometricDataSource = BiometricDataSource.Simprints,
+                    probeReference = BiometricReferenceCapture(
+                        referenceId = "referenceId",
+                        modality = Modality.FACE,
+                        format = "format",
+                        templates = emptyList(),
+                    ),
                 ),
                 project,
             ).toList()
@@ -105,15 +111,17 @@ internal class FaceMatcherUseCaseTest {
         val results = useCase
             .invoke(
                 MatchParams(
-                    probeReferenceId = "referenceId",
-                    probeSamples = listOf(
-                        CaptureSample(
-                            captureEventId = "faceId",
-                            template = BiometricTemplate(
-                                template = byteArrayOf(1, 2, 3),
+                    probeReference = BiometricReferenceCapture(
+                        referenceId = "referenceId",
+                        modality = Modality.FACE,
+                        format = "format",
+                        templates = listOf(
+                            BiometricTemplateCapture(
+                                captureEventId = "faceId",
+                                template = BiometricTemplate(
+                                    template = byteArrayOf(1, 2, 3),
+                                ),
                             ),
-                            modality = Modality.FACE,
-                            format = "format",
                         ),
                     ),
                     bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
@@ -144,15 +152,17 @@ internal class FaceMatcherUseCaseTest {
         val results = useCase
             .invoke(
                 MatchParams(
-                    probeReferenceId = "referenceId",
-                    probeSamples = listOf(
-                        CaptureSample(
-                            captureEventId = "faceId",
-                            template = BiometricTemplate(
-                                template = byteArrayOf(1, 2, 3),
+                    probeReference = BiometricReferenceCapture(
+                        referenceId = "referenceId",
+                        modality = Modality.FACE,
+                        format = "format",
+                        templates = listOf(
+                            BiometricTemplateCapture(
+                                captureEventId = "faceId",
+                                template = BiometricTemplate(
+                                    template = byteArrayOf(1, 2, 3),
+                                ),
                             ),
-                            modality = Modality.FACE,
-                            format = "format",
                         ),
                     ),
                     bioSdk = FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER, // Wrong SDK type
@@ -221,15 +231,17 @@ internal class FaceMatcherUseCaseTest {
         val results = useCase
             .invoke(
                 matchParams = MatchParams(
-                    probeReferenceId = "referenceId",
-                    probeSamples = listOf(
-                        CaptureSample(
-                            captureEventId = "faceId",
-                            template = BiometricTemplate(
-                                template = byteArrayOf(1, 2, 3),
+                    probeReference = BiometricReferenceCapture(
+                        referenceId = "referenceId",
+                        modality = Modality.FACE,
+                        format = "format",
+                        templates = listOf(
+                            BiometricTemplateCapture(
+                                captureEventId = "faceId",
+                                template = BiometricTemplate(
+                                    template = byteArrayOf(1, 2, 3),
+                                ),
                             ),
-                            modality = Modality.FACE,
-                            format = "format",
                         ),
                     ),
                     bioSdk = FaceConfiguration.BioSdk.RANK_ONE,

@@ -8,8 +8,8 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.response.AppErrorReason
-import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.step.StepResult
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
@@ -256,7 +256,7 @@ internal class OrchestratorViewModel @Inject constructor(
         currentStep: Step,
         result: Serializable,
     ) {
-        if (currentStep.id == StepId.FACE_CAPTURE && result is CaptureIdentity) {
+        if (currentStep.id == StepId.FACE_CAPTURE && result is BiometricReferenceCapture) {
             val captureParams = currentStep.params?.let { it as? FaceCaptureParams }
             val matchingStep = steps.firstOrNull { step ->
                 if (step.id != StepId.FACE_MATCHER) {
@@ -270,14 +270,14 @@ internal class OrchestratorViewModel @Inject constructor(
             if (matchingStep != null) {
                 val newPayload = matchingStep.params
                     ?.let { it as? MatchStepStubPayload }
-                    ?.toFaceStepArgs(result.referenceId, result.samples)
+                    ?.toFaceStepArgs(result)
 
                 if (newPayload != null) {
                     matchingStep.params = newPayload
                 }
             }
         }
-        if (currentStep.id == StepId.FINGERPRINT_CAPTURE && result is CaptureIdentity) {
+        if (currentStep.id == StepId.FINGERPRINT_CAPTURE && result is BiometricReferenceCapture) {
             val captureParams = currentStep.params?.let { it as? FingerprintCaptureParams }
             // Find the matching step for the same fingerprint SDK as there may be multiple match steps
             val matchingStep = steps.firstOrNull { step ->
@@ -292,7 +292,7 @@ internal class OrchestratorViewModel @Inject constructor(
             if (matchingStep != null) {
                 val newPayload = matchingStep.params
                     ?.let { it as? MatchStepStubPayload }
-                    ?.toFingerprintStepArgs(result.referenceId, result.samples)
+                    ?.toFingerprintStepArgs(result)
 
                 if (newPayload != null) {
                     matchingStep.params = newPayload
@@ -309,26 +309,11 @@ internal class OrchestratorViewModel @Inject constructor(
         result: StepResult,
     ) {
         if (currentStep.id !in listOf(StepId.FACE_CAPTURE, StepId.FINGERPRINT_CAPTURE)) return
+        if (result !is BiometricReferenceCapture) return
+
         val step = steps.firstOrNull { it.id == StepId.EXTERNAL_CREDENTIAL } ?: return
         val params = step.params as? ExternalCredentialParams ?: return
-        val updatedParams = when {
-            currentStep.id == StepId.FACE_CAPTURE && result is CaptureIdentity -> {
-                params.copy(
-                    probeReferenceId = result.referenceId,
-                    samples = params.samples + (Modality.FACE to result.samples),
-                )
-            }
-
-            currentStep.id == StepId.FINGERPRINT_CAPTURE && result is CaptureIdentity -> {
-                params.copy(
-                    probeReferenceId = result.referenceId,
-                    samples = params.samples + (Modality.FINGERPRINT to result.samples),
-                )
-            }
-
-            else -> params
-        }
-        step.params = updatedParams
+        step.params = params.copy(probeReferences = params.probeReferences + listOf(result))
     }
 
     fun setActionRequestFromJson(json: String) {

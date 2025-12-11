@@ -1,12 +1,11 @@
 package com.simprints.fingerprint.infra.biosdkimpl.matching
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.TemplateIdentifier
-import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.MatchComparisonResult
-import com.simprints.core.domain.sample.Sample
 import com.simprints.fingerprint.infra.simafiswrapper.JNILibAfisInterface
 import com.simprints.fingerprint.infra.simafiswrapper.models.SimAfisFingerIdentifier
 import com.simprints.fingerprint.infra.simafiswrapper.models.SimAfisFingerprint
@@ -27,23 +26,25 @@ internal class SimAfisMatcher @Inject constructor(
     private val jniLibAfis: JNILibAfisInterface,
 ) {
     fun match(
-        probe: List<CaptureSample>,
+        probeReference: BiometricReferenceCapture,
         candidates: List<Identity>,
         crossFingerComparison: Boolean,
     ): List<MatchComparisonResult> {
         // if probe template format is not supported by SimAfisMatcher, return empty list
-        if (probe.templateFormatNotSupportedBySimAfisMatcher()) {
+        if (probeReference.templateFormatNotSupportedBySimAfisMatcher()) {
             return emptyList()
         }
+        val probeTemplates = probeReference.templates.map { it.template }
+
         return if (crossFingerComparison) {
-            crossFingerMatch(probe, candidates)
+            crossFingerMatch(probeTemplates, candidates)
         } else {
-            match(probe, candidates)
+            match(probeTemplates, candidates)
         }
     }
 
     private fun match(
-        probe: List<CaptureSample>,
+        probe: List<BiometricTemplate>,
         candidates: List<Identity>,
     ): List<MatchComparisonResult> {
         val simAfisCandidates = candidates.map { it.toSimAfisPerson() }
@@ -63,7 +64,7 @@ internal class SimAfisMatcher @Inject constructor(
 
     private fun Identity.toSimAfisPerson(): SimAfisPerson = SimAfisPerson(subjectId, samples.map { it.template.toSimAfisFingerprint() })
 
-    private fun List<CaptureSample>.toSimAfisPerson(): SimAfisPerson = SimAfisPerson("", map { it.template.toSimAfisFingerprint() })
+    private fun List<BiometricTemplate>.toSimAfisPerson(): SimAfisPerson = SimAfisPerson("", map { it.toSimAfisFingerprint() })
 
     private fun BiometricTemplate.toSimAfisFingerprint(): SimAfisFingerprint =
         SimAfisFingerprint(identifier.toSimAfisFingerIdentifier(), template)
@@ -84,7 +85,7 @@ internal class SimAfisMatcher @Inject constructor(
     }
 
     private fun crossFingerMatch(
-        probe: List<CaptureSample>,
+        probe: List<BiometricTemplate>,
         candidates: List<Identity>,
     ) = candidates.map { crossFingerMatching(probe, it, jniLibAfis) }
 
@@ -97,7 +98,7 @@ internal class SimAfisMatcher @Inject constructor(
      * @return MatchResult
      */
     private fun crossFingerMatching(
-        probe: List<CaptureSample>,
+        probe: List<BiometricTemplate>,
         candidate: Identity,
         jniLibAfis: JNILibAfisInterface,
     ): MatchComparisonResult {
@@ -132,13 +133,13 @@ internal class SimAfisMatcher @Inject constructor(
     }
 }
 
-val List<CaptureSample>.fingerprintsTemplates
-    get() = map { it.template.template.toByteBuffer() }
+val List<BiometricTemplate>.fingerprintsTemplates
+    get() = map { it.template.toByteBuffer() }
 
 val Identity.fingerprintsTemplates
     get() = samples.map { it.template.template.toByteBuffer() }
 
 private fun ByteArray.toByteBuffer(): ByteBuffer = ByteBuffer.allocateDirect(size).put(this)
 
-fun List<CaptureSample>.templateFormatNotSupportedBySimAfisMatcher(): Boolean =
-    any { it.format != SimAfisMatcher.SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT }
+fun BiometricReferenceCapture.templateFormatNotSupportedBySimAfisMatcher(): Boolean =
+    format != SimAfisMatcher.SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT

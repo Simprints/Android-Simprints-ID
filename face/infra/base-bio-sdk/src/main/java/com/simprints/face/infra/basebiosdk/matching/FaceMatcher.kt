@@ -1,10 +1,10 @@
 package com.simprints.face.infra.basebiosdk.matching
 
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.sample.Identity
 
 abstract class FaceMatcher(
-    open val probeSamples: List<CaptureSample>,
+    open val probeReference: BiometricReferenceCapture,
 ) : AutoCloseable {
     /**
      * Get highest comparison score for matching candidate template against samples

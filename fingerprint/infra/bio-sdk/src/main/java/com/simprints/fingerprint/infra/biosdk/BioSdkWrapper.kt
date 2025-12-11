@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.infra.biosdk
 
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
@@ -26,7 +26,7 @@ interface BioSdkWrapper {
     suspend fun initialize()
 
     suspend fun match(
-        probe: List<CaptureSample>,
+        probeReference: BiometricReferenceCapture,
         candidates: List<Identity>,
         isCrossFingerMatchingEnabled: Boolean,
     ): List<MatchComparisonResult>

@@ -45,7 +45,7 @@ class SaveMatchEventUseCase @Inject constructor(
                     matchParams.bioSdk
                         .let { it as? FingerprintConfiguration.BioSdk }
                         ?.let { getFingerprintComparisonStrategy(it) },
-                    matchParams.probeReferenceId,
+                    matchParams.probeReference.referenceId,
                 )
             } else {
                 getOneToManyEvent(
@@ -55,7 +55,7 @@ class SaveMatchEventUseCase @Inject constructor(
                     matchParams.queryForCandidates,
                     candidatesCount,
                     matchEntries,
-                    matchParams.probeReferenceId,
+                    matchParams.probeReference.referenceId,
                     batches,
                 )
             }

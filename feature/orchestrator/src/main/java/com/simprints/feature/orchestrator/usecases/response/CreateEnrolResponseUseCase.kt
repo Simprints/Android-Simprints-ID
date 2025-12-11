@@ -1,7 +1,7 @@
 package com.simprints.feature.orchestrator.usecases.response
 
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.response.AppErrorReason
-import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
 import com.simprints.infra.config.store.models.Project
@@ -34,7 +34,7 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
                 projectId = request.projectId,
                 attendantId = request.userId,
                 moduleId = request.moduleId,
-                captures = results.filterIsInstance<CaptureIdentity>(),
+                captures = results.filterIsInstance<BiometricReferenceCapture>(),
                 externalCredential = externalCredential,
             )
             enrolSubject(subject, project)

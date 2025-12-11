@@ -2,9 +2,10 @@ package com.simprints.fingerprint.infra.necsdkimpl.matching
 
 import com.google.common.truth.*
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
+import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.reference.TemplateIdentifier
-import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
 import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
@@ -119,17 +120,20 @@ class FingerprintMatcherImplTest {
     private fun generateProbe(
         vararg fingers: TemplateIdentifier,
         format: String = NEC_TEMPLATE_FORMAT,
-    ) = fingers.map {
-        CaptureSample(
-            captureEventId = it.name,
-            modality = Modality.FINGERPRINT,
-            format = format,
-            template = BiometricTemplate(
-                template = ByteArray(0),
-                identifier = it,
-            ),
-        )
-    }
+    ) = BiometricReferenceCapture(
+        referenceId = "referenceId",
+        modality = Modality.FINGERPRINT,
+        format = format,
+        templates = fingers.map {
+            BiometricTemplateCapture(
+                captureEventId = it.name,
+                template = BiometricTemplate(
+                    template = ByteArray(0),
+                    identifier = it,
+                ),
+            )
+        },
+    )
 
     private fun generateIdentity(
         vararg fingers: TemplateIdentifier,

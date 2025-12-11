@@ -2,8 +2,8 @@ package com.simprints.infra.eventsync.sync.common
 
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.sample.CaptureIdentity
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
@@ -69,7 +69,7 @@ class SubjectFactory @Inject constructor(
         projectId: String,
         attendantId: TokenizableString,
         moduleId: TokenizableString,
-        captures: List<CaptureIdentity>,
+        captures: List<BiometricReferenceCapture>,
         externalCredential: ExternalCredential?,
     ): Subject = buildSubject(
         subjectId = subjectId,
@@ -101,15 +101,15 @@ class SubjectFactory @Inject constructor(
         externalCredentials = externalCredentials,
     )
 
-    private fun extractCaptureSamples(response: CaptureIdentity) = response.samples.map { sample ->
+    private fun extractCaptureSamples(response: BiometricReferenceCapture) = response.templates.map { templateCapture ->
         Sample(
             template = BiometricTemplate(
-                identifier = sample.template.identifier,
-                template = sample.template.template,
+                identifier = templateCapture.template.identifier,
+                template = templateCapture.template.template,
             ),
-            format = sample.format,
+            format = response.format,
             referenceId = response.referenceId,
-            modality = sample.modality,
+            modality = response.modality,
         )
     }
 

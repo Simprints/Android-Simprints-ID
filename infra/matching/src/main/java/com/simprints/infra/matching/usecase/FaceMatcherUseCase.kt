@@ -1,7 +1,7 @@
 package com.simprints.infra.matching.usecase
 
 import com.simprints.core.DispatcherBG
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.tools.time.TimeHelper
@@ -50,10 +50,6 @@ class FaceMatcherUseCase @Inject constructor(
         }
         val bioSdk = resolveFaceBioSdk(matchParams.bioSdk)
 
-        if (matchParams.probeSamples.isEmpty()) {
-            send(MatcherState.Success(emptyList(), emptyList(), 0, bioSdk.matcherName()))
-            return@channelFlow
-        }
         val queryWithSupportedFormat = matchParams.queryForCandidates.copy(
             format = bioSdk.templateFormat(),
         )
@@ -87,20 +83,20 @@ class FaceMatcherUseCase @Inject constructor(
                 this@channelFlow.send(MatcherState.CandidateLoaded)
             }
 
-        val batchInfo = consumeAndMatch(candidatesChannel, matchParams.probeSamples, resultSet, bioSdk)
+        val batchInfo = consumeAndMatch(candidatesChannel, matchParams.probeReference, resultSet, bioSdk)
         send(MatcherState.Success(resultSet.toList(), batchInfo, loadedCandidates.get(), bioSdk.matcherName()))
     }.flowOn(dispatcherBG)
 
     private suspend fun consumeAndMatch(
         candidatesChannel: ReceiveChannel<IdentityBatch>,
-        samples: List<CaptureSample>,
+        probeReference: BiometricReferenceCapture,
         resultSet: MatchResultSet,
         bioSdk: FaceBioSDK,
     ): List<MatchBatchInfo> {
         val matchBatches = mutableListOf<MatchBatchInfo>()
         for (batch in candidatesChannel) {
             val comparingStartTime = timeHelper.now()
-            val results = bioSdk.createMatcher(samples).use { matcher ->
+            val results = bioSdk.createMatcher(probeReference).use { matcher ->
                 match(matcher, batch.identities)
             }
             resultSet.addAll(results)

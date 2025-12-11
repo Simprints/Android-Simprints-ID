@@ -1,8 +1,8 @@
 package com.simprints.fingerprint.infra.necsdkimpl.matching
 
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.TemplateIdentifier
-import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.domain.sample.Sample
@@ -20,23 +20,25 @@ internal class FingerprintMatcherImpl @Inject constructor(
     override val matcherName: String = "NEC"
 
     override suspend fun match(
-        probe: List<CaptureSample>,
+        probeReference: BiometricReferenceCapture,
         candidates: List<Identity>,
         settings: NecMatchingSettings?,
     ): List<MatchComparisonResult> {
         // if probe template format is not supported by NEC matcher, return empty list
-        if (probe.templateFormatNotSupportedByNecMatcher()) {
+        if (probeReference.templateFormatNotSupportedByNecMatcher()) {
             return emptyList()
         }
+        val probeTemplates = probeReference.templates.map { it.template }
+
         return if (settings?.crossFingerComparison == true) {
-            crossFingerMatching(probe, candidates)
+            crossFingerMatching(probeTemplates, candidates)
         } else {
-            sameFingerMatching(probe, candidates)
+            sameFingerMatching(probeTemplates, candidates)
         }
     }
 
     private fun sameFingerMatching(
-        probe: List<CaptureSample>,
+        probe: List<BiometricTemplate>,
         candidates: List<Identity>,
     ) = candidates.map {
         sameFingerMatching(probe, it)
@@ -48,31 +50,31 @@ internal class FingerprintMatcherImpl @Inject constructor(
      * - Getting the matching score for each similar finger pairs using NEC SDK
      * - The overall score is the average of the individual finger match scores
      * - We ignore probe fingers that doesn't have matching candidate fingers
-     * @param probe
+     * @param probeTemplates
      * @param candidate
      * @return MatchResult
      */
     private fun sameFingerMatching(
-        probe: List<CaptureSample>,
+        probeTemplates: List<BiometricTemplate>,
         candidate: Identity,
     ): MatchComparisonResult {
         var fingers = 0 // the number of fingers used in matching
-        val total = probe.sumOf { fingerprint ->
-            candidate.templateForFinger(fingerprint.template.identifier)?.let { candidateTemplate ->
+        val total = probeTemplates.sumOf { template ->
+            candidate.templateForFinger(template.identifier)?.let { candidateTemplate ->
                 fingers++
-                verify(fingerprint, candidateTemplate)
+                verify(template, candidateTemplate)
             } ?: 0.toDouble()
         }
         return MatchComparisonResult(candidate.subjectId, getOverallScore(total, fingers))
     }
 
     private fun verify(
-        probe: CaptureSample,
+        probe: BiometricTemplate,
         candidate: Sample,
     ) = try {
         nec
             .match(
-                probe.template.toNecTemplate(),
+                probe.toNecTemplate(),
                 candidate.template.toNecTemplate(),
             ).toDouble()
     } catch (e: Exception) {
@@ -80,12 +82,12 @@ internal class FingerprintMatcherImpl @Inject constructor(
     }
 
     private fun crossFingerMatching(
-        probe: List<CaptureSample>,
+        probe: List<BiometricTemplate>,
         candidates: List<Identity>,
     ) = candidates.map { crossFingerMatching(probe, it) }
 
     private fun crossFingerMatching(
-        probe: List<CaptureSample>,
+        probe: List<BiometricTemplate>,
         candidate: Identity,
     ): MatchComparisonResult {
         // Number of fingers used in matching
@@ -114,4 +116,4 @@ internal class FingerprintMatcherImpl @Inject constructor(
     }
 }
 
-private fun List<CaptureSample>.templateFormatNotSupportedByNecMatcher(): Boolean = any { it.format != NEC_TEMPLATE_FORMAT }
+private fun BiometricReferenceCapture.templateFormatNotSupportedByNecMatcher(): Boolean = format != NEC_TEMPLATE_FORMAT

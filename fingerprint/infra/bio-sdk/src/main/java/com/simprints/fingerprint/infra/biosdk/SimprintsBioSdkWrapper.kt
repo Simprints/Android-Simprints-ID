@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.infra.biosdk
 
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.sample.Identity
 import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateResponse
@@ -36,10 +36,10 @@ class SimprintsBioSdkWrapper @Inject constructor(
     }
 
     override suspend fun match(
-        probe: List<CaptureSample>,
+        probeReference: BiometricReferenceCapture,
         candidates: List<Identity>,
         isCrossFingerMatchingEnabled: Boolean,
-    ) = bioSdk.match(probe, candidates, SimAfisMatcherSettings(isCrossFingerMatchingEnabled))
+    ) = bioSdk.match(probeReference, candidates, SimAfisMatcherSettings(isCrossFingerMatchingEnabled))
 
     override suspend fun acquireFingerprintTemplate(
         capturingResolution: Int?,

@@ -2,9 +2,10 @@ package com.simprints.fingerprint.infra.biosdkimpl.matching
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
+import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.reference.TemplateIdentifier
-import com.simprints.core.domain.sample.CaptureSample
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.byteArrayOf
@@ -33,15 +34,18 @@ class SimAfisMatcherTest {
     fun `test same finger match`() = runTest {
         every { jniLibAfis.identify(any(), any(), 1) } returns floatArrayOf(1F)
 
-        val probes = listOf(
-            CaptureSample(
-                captureEventId = "referenceId",
-                template = BiometricTemplate(
-                    identifier = TemplateIdentifier.RIGHT_THUMB,
-                    template = IsoFingerprintTemplateGenerator.generate(1),
+        val probes = BiometricReferenceCapture(
+            referenceId = "referenceId",
+            format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
+            modality = Modality.FINGERPRINT,
+            templates = listOf(
+                BiometricTemplateCapture(
+                    captureEventId = "referenceId",
+                    template = BiometricTemplate(
+                        identifier = TemplateIdentifier.RIGHT_THUMB,
+                        template = IsoFingerprintTemplateGenerator.generate(1),
+                    ),
                 ),
-                format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
-                modality = Modality.FINGERPRINT,
             ),
         )
         val candidate = Identity(
@@ -68,15 +72,18 @@ class SimAfisMatcherTest {
     @Test
     fun `test matching probe with other template format ignore candidate`() = runTest {
         every { jniLibAfis.identify(any(), any(), 1) } returns floatArrayOf(1F)
-        val probes = listOf(
-            CaptureSample(
-                captureEventId = "referenceId",
-                template = BiometricTemplate(
-                    identifier = TemplateIdentifier.RIGHT_3RD_FINGER,
-                    template = IsoFingerprintTemplateGenerator.generate(1),
+        val probes = BiometricReferenceCapture(
+            referenceId = "referenceId",
+            format = "NEC_1",
+            modality = Modality.FINGERPRINT,
+            templates = listOf(
+                BiometricTemplateCapture(
+                    captureEventId = "referenceId",
+                    template = BiometricTemplate(
+                        identifier = TemplateIdentifier.RIGHT_3RD_FINGER,
+                        template = IsoFingerprintTemplateGenerator.generate(1),
+                    ),
                 ),
-                format = "NEC_1",
-                modality = Modality.FINGERPRINT,
             ),
         )
         val candidate = Identity(
@@ -105,24 +112,25 @@ class SimAfisMatcherTest {
         val template2 = byteArrayOf(2)
         val template3 = byteArrayOf(3)
 
-        val probe = listOf(
-            CaptureSample(
-                captureEventId = "referenceId",
-                template = BiometricTemplate(
-                    identifier = TemplateIdentifier.RIGHT_THUMB,
-                    template = template1,
+        val probe = BiometricReferenceCapture(
+            referenceId = "referenceId",
+            format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
+            modality = Modality.FINGERPRINT,
+            templates = listOf(
+                BiometricTemplateCapture(
+                    captureEventId = "referenceId",
+                    template = BiometricTemplate(
+                        identifier = TemplateIdentifier.RIGHT_THUMB,
+                        template = template1,
+                    ),
                 ),
-                format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
-                modality = Modality.FINGERPRINT,
-            ),
-            CaptureSample(
-                captureEventId = "referenceId",
-                template = BiometricTemplate(
-                    identifier = TemplateIdentifier.LEFT_THUMB,
-                    template = template2,
+                BiometricTemplateCapture(
+                    captureEventId = "referenceId",
+                    template = BiometricTemplate(
+                        identifier = TemplateIdentifier.LEFT_THUMB,
+                        template = template2,
+                    ),
                 ),
-                format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
-                modality = Modality.FINGERPRINT,
             ),
         )
 
@@ -194,7 +202,12 @@ class SimAfisMatcherTest {
     fun `test crossFingerMatching zero fingers success`() {
         // Given
         every { jniLibAfis.verify(any(), any()) } returns 1F
-        val probes = listOf<CaptureSample>()
+        val probes = BiometricReferenceCapture(
+            referenceId = "referenceId",
+            format = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
+            modality = Modality.FINGERPRINT,
+            templates = emptyList(),
+        )
         val candidate = Identity(
             "candidate",
             listOf(

@@ -1,6 +1,6 @@
 package com.simprints.face.infra.biosdkresolver
 
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.basebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
@@ -15,5 +15,5 @@ interface FaceBioSDK {
 
     fun matcherName(): String
 
-    fun createMatcher(probeSamples: List<CaptureSample>): FaceMatcher
+    fun createMatcher(probeReference: BiometricReferenceCapture): FaceMatcher
 }

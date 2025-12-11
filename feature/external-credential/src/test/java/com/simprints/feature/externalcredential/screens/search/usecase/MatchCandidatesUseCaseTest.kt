@@ -3,8 +3,7 @@ package com.simprints.feature.externalcredential.screens.search.usecase
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
@@ -68,10 +67,10 @@ internal class MatchCandidatesUseCaseTest {
     private lateinit var matchParams: MatchParams
 
     @MockK
-    private lateinit var faceSample: CaptureSample
+    private lateinit var faceCapture: BiometricReferenceCapture
 
     @MockK
-    private lateinit var fingerprintSample: CaptureSample
+    private lateinit var fingerprintCapture: BiometricReferenceCapture
 
     @MockK
     private lateinit var ageGroup: AgeGroup
@@ -94,21 +93,16 @@ internal class MatchCandidatesUseCaseTest {
         )
 
         every { subject.subjectId } returns subjectId
-        every { externalCredentialParams.probeReferenceId } returns probeReferenceId
         every { externalCredentialParams.flowType } returns FlowType.VERIFY
-        every { externalCredentialParams.samples } returns mapOf(
-            Modality.FACE to listOf(faceSample),
-            Modality.FINGERPRINT to listOf(fingerprintSample),
-        )
+        every { externalCredentialParams.probeReferences } returns listOf(faceCapture, fingerprintCapture)
         every { externalCredentialParams.ageGroup } returns ageGroup
 
         coEvery {
             createMatchParamsUseCase(
                 candidateSubjectId = any(),
                 flowType = any(),
-                probeReferenceId = any(),
                 projectConfiguration = any(),
-                samples = any(),
+                probeReferences = any(),
                 ageGroup = any(),
             )
         } returns listOf(matchParams)
@@ -125,10 +119,10 @@ internal class MatchCandidatesUseCaseTest {
 
     private fun initMatchParams(isFace: Boolean) {
         if (isFace) {
-            every { matchParams.probeSamples } returns listOf(faceSample)
+            every { matchParams.probeReference } returns faceCapture
             every { matchParams.bioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
         } else {
-            every { matchParams.probeSamples } returns listOf(fingerprintSample)
+            every { matchParams.probeReference } returns fingerprintCapture
             every { matchParams.bioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
         }
     }

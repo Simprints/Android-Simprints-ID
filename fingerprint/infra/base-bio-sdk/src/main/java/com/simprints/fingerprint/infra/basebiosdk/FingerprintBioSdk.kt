@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.infra.basebiosdk
 
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.sample.Identity
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.FingerprintImageProvider
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.FingerprintTemplateProvider
@@ -25,10 +25,10 @@ class FingerprintBioSdk<SdkConfig, ImageRequestSettings, ImageResponseMetadata, 
         fingerprintTemplateProvider.acquireFingerprintTemplate(settings)
 
     suspend fun match(
-        probe: List<CaptureSample>,
+        probeReference: BiometricReferenceCapture,
         candidates: List<Identity>,
         matchingSettings: MatcherSettings?,
-    ) = fingerprintMatcher.match(probe, candidates, matchingSettings)
+    ) = fingerprintMatcher.match(probeReference, candidates, matchingSettings)
 
     val supportedTemplateFormat: String
         get() = fingerprintMatcher.supportedTemplateFormat

@@ -1,7 +1,8 @@
 package com.simprints.fingerprint.infra.biosdkimpl.matching
 
 import com.google.common.truth.*
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.MatchComparisonResult
 import io.mockk.*
@@ -15,7 +16,7 @@ class FingerprintMatcherImplTest {
     fun match() = runTest {
         // Given
         val matcher = FingerprintMatcherImpl(simAfisMatcher)
-        val probe = listOf(mockk<CaptureSample>())
+        val probe = mockk<BiometricReferenceCapture>()
         val candidates: List<Identity> = mockk()
         val simAfisMatcherSettings = SimAfisMatcherSettings()
         simAfisMatcherSettings.crossFingerComparison = false

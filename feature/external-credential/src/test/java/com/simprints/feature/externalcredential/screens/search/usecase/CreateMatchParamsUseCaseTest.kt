@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
@@ -25,10 +25,10 @@ internal class CreateMatchParamsUseCaseTest {
     private val ageGroup = AgeGroup(25, 30)
 
     @MockK
-    private lateinit var faceSample: CaptureSample
+    private lateinit var faceCapture: BiometricReferenceCapture
 
     @MockK
-    private lateinit var fingerprintSample: CaptureSample
+    private lateinit var fingerprintCapture: BiometricReferenceCapture
 
     @MockK
     private lateinit var generalConfiguration: GeneralConfiguration
@@ -40,6 +40,10 @@ internal class CreateMatchParamsUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         mockkStatic("com.simprints.infra.config.store.models.ProjectConfigurationKt")
+
+        every { faceCapture.modality } returns Modality.FACE
+        every { fingerprintCapture.modality } returns Modality.FINGERPRINT
+
         every { projectConfiguration.general } returns generalConfiguration
     }
 
@@ -54,19 +58,17 @@ internal class CreateMatchParamsUseCaseTest {
         val result = useCase(
             candidateSubjectId = subjectId,
             flowType = flowType,
-            probeReferenceId = probeReferenceId,
             projectConfiguration = projectConfiguration,
-            samples = mapOf(Modality.FACE to listOf(faceSample)),
+            probeReferences = listOf(faceCapture),
             ageGroup = ageGroup,
         )
 
         assertThat(result).hasSize(2)
         result.forEach { matchParams ->
-            assertThat(matchParams.probeReferenceId).isEqualTo(probeReferenceId)
             assertThat(matchParams.flowType).isEqualTo(flowType)
             assertThat(matchParams.queryForCandidates.subjectId).isEqualTo(subjectId)
             assertThat(matchParams.biometricDataSource).isEqualTo(BiometricDataSource.Simprints)
-            assertThat(matchParams.probeSamples).containsExactly(faceSample)
+            assertThat(matchParams.probeReference).isEqualTo(faceCapture)
             assertThat(matchParams.bioSdk).isNotNull()
         }
         assertThat(result[0].bioSdk).isEqualTo(FaceConfiguration.BioSdk.RANK_ONE)
@@ -84,19 +86,17 @@ internal class CreateMatchParamsUseCaseTest {
         val result = useCase(
             candidateSubjectId = subjectId,
             flowType = flowType,
-            probeReferenceId = probeReferenceId,
             projectConfiguration = projectConfiguration,
-            samples = mapOf(Modality.FINGERPRINT to listOf(fingerprintSample)),
+            probeReferences = listOf(fingerprintCapture),
             ageGroup = ageGroup,
         )
 
         assertThat(result).hasSize(2)
         result.forEach { matchParams ->
-            assertThat(matchParams.probeReferenceId).isEqualTo(probeReferenceId)
             assertThat(matchParams.flowType).isEqualTo(flowType)
             assertThat(matchParams.queryForCandidates.subjectId).isEqualTo(subjectId)
             assertThat(matchParams.biometricDataSource).isEqualTo(BiometricDataSource.Simprints)
-            assertThat(matchParams.probeSamples).containsExactly(fingerprintSample)
+            assertThat(matchParams.probeReference).isEqualTo(fingerprintCapture)
             assertThat(matchParams.bioSdk).isNotNull()
         }
         assertThat(result[0].bioSdk).isEqualTo(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
@@ -119,12 +119,8 @@ internal class CreateMatchParamsUseCaseTest {
         val result = useCase(
             candidateSubjectId = subjectId,
             flowType = flowType,
-            probeReferenceId = probeReferenceId,
             projectConfiguration = projectConfiguration,
-            samples = mapOf(
-                Modality.FINGERPRINT to listOf(fingerprintSample),
-                Modality.FACE to listOf(faceSample),
-            ),
+            probeReferences = listOf(fingerprintCapture, faceCapture),
             ageGroup = ageGroup,
         )
 
@@ -133,12 +129,12 @@ internal class CreateMatchParamsUseCaseTest {
         val faceMatch = result.find { it.bioSdk is FaceConfiguration.BioSdk }
         assertThat(faceMatch).isNotNull()
         assertThat(faceMatch?.bioSdk).isEqualTo(FaceConfiguration.BioSdk.RANK_ONE)
-        assertThat(faceMatch?.probeSamples).containsExactly(faceSample)
+        assertThat(faceMatch?.probeReference).isEqualTo(faceCapture)
 
         val fingerprintMatch = result.find { it.bioSdk is FingerprintConfiguration.BioSdk }
         assertThat(fingerprintMatch).isNotNull()
         assertThat(fingerprintMatch?.bioSdk).isEqualTo(FingerprintConfiguration.BioSdk.NEC)
-        assertThat(fingerprintMatch?.probeSamples).containsExactly(fingerprintSample)
+        assertThat(fingerprintMatch?.probeReference).isEqualTo(fingerprintCapture)
     }
 
     @Test
@@ -151,9 +147,8 @@ internal class CreateMatchParamsUseCaseTest {
         val result = useCase(
             candidateSubjectId = subjectId,
             flowType = flowType,
-            probeReferenceId = probeReferenceId,
             projectConfiguration = projectConfiguration,
-            samples = mapOf(Modality.FACE to listOf(faceSample)),
+            probeReferences = listOf(faceCapture),
             ageGroup = null,
         )
 
@@ -167,12 +162,8 @@ internal class CreateMatchParamsUseCaseTest {
         val result = useCase(
             candidateSubjectId = subjectId,
             flowType = flowType,
-            probeReferenceId = probeReferenceId,
             projectConfiguration = projectConfiguration,
-            samples = mapOf(
-                Modality.FINGERPRINT to listOf(fingerprintSample),
-                Modality.FACE to listOf(faceSample),
-            ),
+            probeReferences = listOf(fingerprintCapture, faceCapture),
             ageGroup = ageGroup,
         )
 
@@ -187,22 +178,20 @@ internal class CreateMatchParamsUseCaseTest {
         )
         every { generalConfiguration.matchingModalities } returns listOf(Modality.FACE)
 
-        val faceSamples = listOf(faceSample, mockk(relaxed = true))
+        val faceSamples = listOf(
+            faceCapture,
+            mockk { every { modality } returns Modality.FACE },
+        )
 
         val result = useCase(
             candidateSubjectId = subjectId,
             flowType = flowType,
-            probeReferenceId = probeReferenceId,
             projectConfiguration = projectConfiguration,
-            samples = mapOf(
-                Modality.FACE to faceSamples,
-            ),
+            probeReferences = faceSamples,
             ageGroup = ageGroup,
         )
 
-        assertThat(result).hasSize(2)
-        result.forEach { matchParams ->
-            assertThat(matchParams.probeSamples).hasSize(2)
-        }
+        // 2 captures * 2 sdks
+        assertThat(result).hasSize(4)
     }
 }

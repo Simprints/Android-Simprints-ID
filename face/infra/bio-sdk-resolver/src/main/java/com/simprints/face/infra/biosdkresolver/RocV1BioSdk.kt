@@ -1,6 +1,6 @@
 package com.simprints.face.infra.biosdkresolver
 
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.rocv1.detection.RocV1Detector
 import com.simprints.face.infra.rocv1.detection.RocV1Detector.Companion.RANK_ONE_TEMPLATE_FORMAT_1_23
@@ -20,5 +20,5 @@ class RocV1BioSdk @Inject constructor(
 
     override fun matcherName(): String = "RANK_ONE"
 
-    override fun createMatcher(probeSamples: List<CaptureSample>): FaceMatcher = RocV1Matcher(probeSamples)
+    override fun createMatcher(probeReference: BiometricReferenceCapture): FaceMatcher = RocV1Matcher(probeReference)
 }
