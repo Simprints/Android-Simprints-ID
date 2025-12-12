@@ -8,7 +8,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.samples.SampleUpSyncRequestEvent
+import com.simprints.infra.events.event.domain.models.SampleUpSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.images.local.ImageLocalDataSource

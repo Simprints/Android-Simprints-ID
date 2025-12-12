@@ -6,11 +6,11 @@ import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.remote.models.ApiExternalCredentialType
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordUpdateEvent
-import com.simprints.infra.events.event.domain.models.subject.FaceReference
-import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
-import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
-import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordUpdateEvent
+import com.simprints.infra.events.event.domain.models.FaceReference
+import com.simprints.infra.events.event.domain.models.FaceTemplate
+import com.simprints.infra.events.event.domain.models.FingerprintReference
+import com.simprints.infra.events.event.domain.models.FingerprintTemplate
 import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.face.ApiFaceReference
 import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.face.ApiFaceTemplate
 import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintReference

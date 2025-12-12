@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordCreationEvent
 import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.ApiBiometricReference
 import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.fromApiToDomain
 

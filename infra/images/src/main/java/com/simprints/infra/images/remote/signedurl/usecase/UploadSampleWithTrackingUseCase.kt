@@ -3,7 +3,7 @@ package com.simprints.infra.images.remote.signedurl.usecase
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.samples.SampleUpSyncRequestEvent
+import com.simprints.infra.events.event.domain.models.SampleUpSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.remote.signedurl.SampleUploadData

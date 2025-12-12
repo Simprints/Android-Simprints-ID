@@ -6,8 +6,8 @@ import com.simprints.feature.clientapi.mappers.request.requestFactories.RequestA
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.callback.CallbackComparisonScore
-import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
+import com.simprints.infra.events.event.domain.models.CallbackComparisonScore
+import com.simprints.infra.events.event.domain.models.IdentificationCallbackEvent
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery

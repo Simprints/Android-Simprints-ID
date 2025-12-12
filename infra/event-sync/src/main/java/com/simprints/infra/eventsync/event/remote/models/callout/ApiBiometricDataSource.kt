@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models.callout
 
 import androidx.annotation.Keep
-import com.simprints.infra.events.event.domain.models.callout.BiometricDataSource
+import com.simprints.infra.events.event.domain.models.BiometricDataSource
 
 @Keep
 internal enum class ApiBiometricDataSource {

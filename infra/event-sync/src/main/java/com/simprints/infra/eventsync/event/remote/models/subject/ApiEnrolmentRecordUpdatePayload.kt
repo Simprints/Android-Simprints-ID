@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models.subject
 
 import androidx.annotation.Keep
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordUpdateEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordUpdateEvent
 import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.ApiBiometricReference
 import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.fromApiToDomain
 

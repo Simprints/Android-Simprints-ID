@@ -19,13 +19,13 @@ import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
 import com.simprints.infra.events.event.domain.models.EnrolmentUpdateEvent
 import com.simprints.infra.events.event.domain.models.Event
+import com.simprints.infra.events.event.domain.models.EventUpSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
+import com.simprints.infra.events.event.domain.models.FaceCaptureBiometricsEvent
+import com.simprints.infra.events.event.domain.models.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
-import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
-import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
 import com.simprints.infra.eventsync.event.remote.ApiUploadEventsBody
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.event.remote.models.session.ApiEventScope
@@ -297,13 +297,18 @@ internal class EventUpSyncTask @Inject constructor(
     ) {
         var result: EventUpSyncResult? = null
         when (ex) {
-            is NetworkConnectionException -> Simber.i("Network connection error", ex, tag = SYNC)
+            is NetworkConnectionException -> {
+                Simber.i("Network connection error", ex, tag = SYNC)
+            }
+
             is HttpException -> {
                 Simber.i("Network HTTP request error", ex, tag = SYNC)
                 result = ex.response()?.let { EventUpSyncResult(it.code()) }
             }
 
-            is RemoteDbNotSignedInException -> throw ex
+            is RemoteDbNotSignedInException -> {
+                throw ex
+            }
 
             else -> {
                 Simber.e("Unexpected network error", ex, tag = SYNC)
@@ -369,7 +374,9 @@ internal class EventUpSyncTask @Inject constructor(
                 when (t) {
                     // We don't need to report http exceptions as cloud logs all of them.
                     is NetworkConnectionException, is HttpException -> Simber.i("Failed to upload invalid events", t, tag = SYNC)
+
                     is RemoteDbNotSignedInException -> throw t
+
                     else -> Simber.e("Unexpected error while uploading invalid events", t, tag = SYNC)
                 }
             }

@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models.subject
 
 import androidx.annotation.Keep
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordDeletionEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordDeletionEvent
 
 @Keep
 internal data class ApiEnrolmentRecordDeletionPayload(

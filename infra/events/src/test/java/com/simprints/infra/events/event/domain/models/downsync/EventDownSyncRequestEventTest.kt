@@ -3,8 +3,9 @@ package com.simprints.infra.events.event.domain.models.downsync
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventDownSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent.QueryParameters
+import com.simprints.infra.events.event.domain.models.EventDownSyncRequestEvent.QueryParameters
 import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Test

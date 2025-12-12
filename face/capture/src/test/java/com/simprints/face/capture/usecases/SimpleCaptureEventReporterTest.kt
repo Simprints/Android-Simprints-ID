@@ -9,11 +9,11 @@ import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent.BiometricReferenceCreationPayload
-import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
-import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent
-import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
-import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEvent
-import com.simprints.infra.events.event.domain.models.face.FaceOnboardingCompleteEvent
+import com.simprints.infra.events.event.domain.models.FaceCaptureBiometricsEvent
+import com.simprints.infra.events.event.domain.models.FaceCaptureConfirmationEvent
+import com.simprints.infra.events.event.domain.models.FaceCaptureEvent
+import com.simprints.infra.events.event.domain.models.FaceFallbackCaptureEvent
+import com.simprints.infra.events.event.domain.models.FaceOnboardingCompleteEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
