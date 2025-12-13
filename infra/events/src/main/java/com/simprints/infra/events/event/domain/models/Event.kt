@@ -126,7 +126,7 @@ import com.simprints.infra.events.event.domain.models.SampleUpSyncRequestEvent
     JsonSubTypes.Type(value = ExternalCredentialSearchEvent::class, name = EXTERNAL_CREDENTIAL_SEARCH_KEY),
     JsonSubTypes.Type(value = ExternalCredentialConfirmationEvent::class, name = EXTERNAL_CREDENTIAL_CONFIRMATION_KEY),
 )
-abstract class Event {
+sealed class Event {
     abstract val id: String
     abstract val type: EventType
     abstract val payload: EventPayload
