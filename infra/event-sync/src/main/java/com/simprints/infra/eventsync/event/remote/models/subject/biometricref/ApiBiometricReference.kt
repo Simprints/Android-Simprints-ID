@@ -5,14 +5,14 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.sample.SampleIdentifier
-import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
-import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
+import com.simprints.infra.events.event.domain.models.FaceTemplate
+import com.simprints.infra.events.event.domain.models.FingerprintTemplate
 import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.face.ApiFaceReference
 import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.face.ApiFaceTemplate
 import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintReference
 import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintTemplate
-import com.simprints.infra.events.event.domain.models.subject.FaceReference as DomainFaceReference
-import com.simprints.infra.events.event.domain.models.subject.FingerprintReference as DomainFingerprintReference
+import com.simprints.infra.events.event.domain.models.FaceReference as DomainFaceReference
+import com.simprints.infra.events.event.domain.models.FingerprintReference as DomainFingerprintReference
 
 private const val FACE_REFERENCE_KEY = "FaceReference"
 private const val FINGERPRINT_REFERENCE_KEY = "FingerprintReference"

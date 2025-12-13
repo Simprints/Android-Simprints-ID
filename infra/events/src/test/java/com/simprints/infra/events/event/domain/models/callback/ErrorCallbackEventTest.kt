@@ -2,11 +2,12 @@ package com.simprints.infra.events.event.domain.models.callback
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.infra.events.event.domain.models.ErrorCallbackEvent
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ERROR
-import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.Companion.fromAppResponseErrorReasonToEventReason
+import com.simprints.infra.events.event.domain.models.ErrorCallbackEvent.ErrorCallbackPayload.Reason.Companion.fromAppResponseErrorReasonToEventReason
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import org.junit.Test
-import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason as ErrorReason
+import com.simprints.infra.events.event.domain.models.ErrorCallbackEvent.ErrorCallbackPayload.Reason as ErrorReason
 
 class ErrorCallbackEventTest {
     @Test

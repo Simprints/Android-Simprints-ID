@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models.subject
 
 import androidx.annotation.Keep
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordEventType
 
 @Keep
 internal enum class ApiEnrolmentRecordPayloadType {

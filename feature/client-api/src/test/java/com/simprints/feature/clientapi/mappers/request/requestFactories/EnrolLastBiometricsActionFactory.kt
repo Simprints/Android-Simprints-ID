@@ -6,7 +6,7 @@ import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestE
 import com.simprints.feature.clientapi.mappers.request.extractors.EnrolLastBiometricsRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.EnrolLastBiometricsValidator
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
+import com.simprints.infra.events.event.domain.models.IdentificationCallbackEvent
 import com.simprints.infra.orchestration.data.ActionConstants
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier

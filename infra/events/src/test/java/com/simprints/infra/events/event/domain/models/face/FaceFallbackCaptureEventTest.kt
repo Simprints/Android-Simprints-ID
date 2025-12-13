@@ -3,7 +3,8 @@ package com.simprints.infra.events.event.domain.models.face
 import androidx.annotation.Keep
 import com.google.common.truth.Truth.*
 import com.simprints.infra.events.event.domain.models.EventType.FACE_FALLBACK_CAPTURE
-import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEvent.Companion.EVENT_VERSION
+import com.simprints.infra.events.event.domain.models.FaceFallbackCaptureEvent
+import com.simprints.infra.events.event.domain.models.FaceFallbackCaptureEvent.Companion.EVENT_VERSION
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
 import org.junit.Test

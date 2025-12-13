@@ -3,7 +3,8 @@ package com.simprints.infra.events.event.domain.models.face
 import androidx.annotation.Keep
 import com.google.common.truth.Truth.*
 import com.simprints.infra.events.event.domain.models.EventType.FACE_ONBOARDING_COMPLETE
-import com.simprints.infra.events.event.domain.models.face.FaceOnboardingCompleteEvent.Companion.EVENT_VERSION
+import com.simprints.infra.events.event.domain.models.FaceOnboardingCompleteEvent
+import com.simprints.infra.events.event.domain.models.FaceOnboardingCompleteEvent.Companion.EVENT_VERSION
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
 import org.junit.Test

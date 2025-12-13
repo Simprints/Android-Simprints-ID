@@ -2,7 +2,8 @@ package com.simprints.infra.events.event.domain.models.callback
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_REFUSAL
-import com.simprints.infra.events.event.domain.models.callback.RefusalCallbackEvent.Companion.EVENT_VERSION
+import com.simprints.infra.events.event.domain.models.RefusalCallbackEvent
+import com.simprints.infra.events.event.domain.models.RefusalCallbackEvent.Companion.EVENT_VERSION
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import org.junit.Test
 

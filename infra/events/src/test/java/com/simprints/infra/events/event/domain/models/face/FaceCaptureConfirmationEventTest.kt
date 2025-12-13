@@ -3,8 +3,9 @@ package com.simprints.infra.events.event.domain.models.face
 import androidx.annotation.Keep
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
-import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent.Companion.EVENT_VERSION
-import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.CONTINUE
+import com.simprints.infra.events.event.domain.models.FaceCaptureConfirmationEvent
+import com.simprints.infra.events.event.domain.models.FaceCaptureConfirmationEvent.Companion.EVENT_VERSION
+import com.simprints.infra.events.event.domain.models.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.CONTINUE
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
 import org.junit.Test

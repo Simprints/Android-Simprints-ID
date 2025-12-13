@@ -4,7 +4,7 @@ import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.mappers.request.extractors.EnrolLastBiometricsRequestExtractor
 import com.simprints.feature.clientapi.models.ClientApiError
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
+import com.simprints.infra.events.event.domain.models.IdentificationCallbackEvent
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SESSION
 import com.simprints.infra.logging.Simber
 

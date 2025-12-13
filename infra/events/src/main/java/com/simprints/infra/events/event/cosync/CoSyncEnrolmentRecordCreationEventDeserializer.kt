@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.infra.events.event.domain.models.subject.BiometricReference
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.infra.events.event.domain.models.BiometricReference
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordCreationEvent
 
 /**
  * Deserializer for [EnrolmentRecordCreationEvent] that reads the JSON node and constructs the

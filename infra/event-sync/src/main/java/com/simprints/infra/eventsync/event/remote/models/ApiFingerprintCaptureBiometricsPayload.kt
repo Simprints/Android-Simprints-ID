@@ -3,7 +3,7 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
+import com.simprints.infra.events.event.domain.models.FingerprintCaptureBiometricsEvent
 
 @Keep
 internal data class ApiFingerprintCaptureBiometricsPayload(

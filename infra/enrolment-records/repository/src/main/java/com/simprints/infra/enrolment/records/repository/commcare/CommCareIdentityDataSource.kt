@@ -27,9 +27,9 @@ import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQue
 import com.simprints.infra.enrolment.records.repository.usecases.CompareImplicitTokenizedStringsUseCase
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordCreationEventDeserializer
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.infra.events.event.domain.models.subject.FaceReference
-import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordCreationEvent
+import com.simprints.infra.events.event.domain.models.FaceReference
+import com.simprints.infra.events.event.domain.models.FingerprintReference
 import com.simprints.infra.logging.Simber
 import com.simprints.libsimprints.Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS
 import dagger.hilt.android.qualifiers.ApplicationContext
