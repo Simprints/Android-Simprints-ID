@@ -4,9 +4,14 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.EVENT_DOWN_SYNC_REQUEST_KEY
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(EVENT_DOWN_SYNC_REQUEST_KEY)
 data class EventDownSyncRequestEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: EventDownSyncRequestPayload,
@@ -47,14 +52,15 @@ data class EventDownSyncRequestEvent(
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>): Event = this
 
     @Keep
+    @Serializable
     data class EventDownSyncRequestPayload(
         override val createdAt: Timestamp,
         override val endedAt: Timestamp?,
         val requestId: String,
         val queryParameters: QueryParameters,
-        val responseStatus: Int?,
+        val responseStatus: Int? = null,
         val errorType: String?,
-        val msToFirstResponseByte: Long?,
+        val msToFirstResponseByte: Long? = null,
         val eventsRead: Int?,
         override val eventVersion: Int,
         override val type: EventType = EventType.EVENT_DOWN_SYNC_REQUEST,
@@ -64,6 +70,7 @@ data class EventDownSyncRequestEvent(
     }
 
     @Keep
+    @Serializable
     data class QueryParameters(
         val moduleId: String? = null,
         val attendantId: String? = null,

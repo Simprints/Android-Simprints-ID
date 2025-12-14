@@ -1,11 +1,10 @@
-package com.simprints.infra.events.event.domain.models.callout
+package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_IDENTIFICATION
-import com.simprints.infra.events.event.domain.models.IdentificationCalloutEventV2
-import com.simprints.infra.events.event.domain.models.IdentificationCalloutEventV2.Companion.EVENT_VERSION
+import com.simprints.infra.events.event.domain.models.EnrolmentCalloutEventV2.Companion.EVENT_VERSION
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_ENROLMENT
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -14,10 +13,10 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import org.junit.Test
 
 @Keep
-class IdentificationCalloutEventV2Test {
+class EnrolmentCalloutEventV2Test {
     @Test
-    fun create_IdentificationCalloutEvent() {
-        val event = IdentificationCalloutEventV2(
+    fun create_EnrolmentCalloutEvent() {
+        val event = EnrolmentCalloutEventV2(
             createdAt = CREATED_AT,
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID,
@@ -26,11 +25,11 @@ class IdentificationCalloutEventV2Test {
         )
 
         assertThat(event.id).isNotNull()
-        assertThat(event.type).isEqualTo(CALLOUT_IDENTIFICATION)
+        assertThat(event.type).isEqualTo(CALLOUT_ENROLMENT)
         with(event.payload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
-            assertThat(type).isEqualTo(CALLOUT_IDENTIFICATION)
+            assertThat(type).isEqualTo(CALLOUT_ENROLMENT)
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
             assertThat(userId).isEqualTo(DEFAULT_USER_ID)
             assertThat(moduleId).isEqualTo(DEFAULT_MODULE_ID)
@@ -40,7 +39,7 @@ class IdentificationCalloutEventV2Test {
 
     @Test
     fun getTokenizableFields_returnsMapWithAttendantAndModuleId() {
-        val event = IdentificationCalloutEventV2(
+        val event = EnrolmentCalloutEventV2(
             createdAt = CREATED_AT,
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID,

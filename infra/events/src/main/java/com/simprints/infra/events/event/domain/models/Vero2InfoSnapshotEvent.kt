@@ -1,19 +1,29 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.VERO_2_INFO_SNAPSHOT_KEY
 import com.simprints.infra.events.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.JsonContentPolymorphicSerializer
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(VERO_2_INFO_SNAPSHOT_KEY)
 data class Vero2InfoSnapshotEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: Vero2InfoSnapshotPayload,
-    override val type: EventType,
+    override val type: EventType = VERO_2_INFO_SNAPSHOT,
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
@@ -25,7 +35,6 @@ data class Vero2InfoSnapshotEvent(
         UUID.randomUUID().toString(),
         Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForNewApi(
             createdAt = createdAt,
-            eventVersion = NEW_EVENT_VERSION,
             battery = battery,
             version = version,
         ),
@@ -34,70 +43,45 @@ data class Vero2InfoSnapshotEvent(
 
     override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this
 
-    @JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "eventVersion",
-        visible = true,
-    )
-    @JsonSubTypes(
-        JsonSubTypes.Type(
-            value = Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForNewApi::class,
-            name = NEW_EVENT_VERSION.toString(),
-        ),
-        JsonSubTypes.Type(
-            value = Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForOldApi::class,
-            name = OLD_EVENT_VERSION.toString(),
-        ),
-    )
     @Keep
-    sealed class Vero2InfoSnapshotPayload(
-        override val createdAt: Timestamp,
-        override val eventVersion: Int,
-        open val battery: BatteryInfo,
-        open val version: Vero2Version,
-        override val endedAt: Timestamp? = null,
-        override val type: EventType = VERO_2_INFO_SNAPSHOT,
-    ) : EventPayload() {
-        override fun toSafeString(): String = "battery charge: ${battery.charge}, " +
-            version
-                .let { it as? Vero2Version.Vero2NewApiVersion }
-                ?.let {
-                    "hardware: ${it.hardwareRevision}, cypress: ${it.cypressApp},  stm: ${it.stmApp}, un20: ${it.un20App}"
-                }.orEmpty()
+    @Serializable(with = Vero2InfoSnapshotPayloadSerializer::class)
+    sealed class Vero2InfoSnapshotPayload : EventPayload() {
+        abstract override val type: EventType
+        abstract override val endedAt: Timestamp?
+
+        abstract val version: Vero2Version
+        abstract val battery: BatteryInfo
 
         @Keep
+        @Serializable
         data class Vero2InfoSnapshotPayloadForNewApi(
             override val createdAt: Timestamp,
-            override val eventVersion: Int,
             override val battery: BatteryInfo,
             override val version: Vero2Version.Vero2NewApiVersion,
-        ) : Vero2InfoSnapshotPayload(
-                createdAt,
-                eventVersion,
-                battery,
-                version,
-            )
+            override val eventVersion: Int = NEW_EVENT_VERSION,
+            override val type: EventType = VERO_2_INFO_SNAPSHOT,
+            override val endedAt: Timestamp? = null,
+        ) : Vero2InfoSnapshotPayload()
 
         @Deprecated(message = "Only used for backwards compatibility")
         @Keep
+        @Serializable
         data class Vero2InfoSnapshotPayloadForOldApi(
             override val createdAt: Timestamp,
-            override val eventVersion: Int,
             override val battery: BatteryInfo,
             override val version: Vero2Version.Vero2OldApiVersion,
-        ) : Vero2InfoSnapshotPayload(
-                createdAt,
-                eventVersion,
-                battery,
-                version,
-            )
+            override val eventVersion: Int = OLD_EVENT_VERSION,
+            override val type: EventType = VERO_2_INFO_SNAPSHOT,
+            override val endedAt: Timestamp? = null,
+        ) : Vero2InfoSnapshotPayload()
     }
 
+    @Serializable
     sealed class Vero2Version {
         @Keep
+        @Serializable
         data class Vero2NewApiVersion(
             val hardwareRevision: String,
             val cypressApp: String,
@@ -108,6 +92,7 @@ data class Vero2InfoSnapshotEvent(
 
         @Deprecated(message = "Only used for backwards compatibility")
         @Keep
+        @Serializable
         data class Vero2OldApiVersion(
             val cypressApp: String,
             val cypressApi: String,
@@ -120,6 +105,7 @@ data class Vero2InfoSnapshotEvent(
     }
 
     @Keep
+    @Serializable
     data class BatteryInfo(
         val charge: Int,
         val voltage: Int,
@@ -131,4 +117,25 @@ data class Vero2InfoSnapshotEvent(
         const val NEW_EVENT_VERSION = 3
         const val OLD_EVENT_VERSION = 2
     }
+}
+
+object Vero2InfoSnapshotPayloadSerializer : JsonContentPolymorphicSerializer<Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload>(
+    Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload::class,
+) {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload> =
+        when (val version = element.jsonObject["eventVersion"]?.jsonPrimitive?.intOrNull) {
+            Vero2InfoSnapshotEvent.NEW_EVENT_VERSION -> {
+                Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForNewApi
+                    .serializer()
+            }
+
+            Vero2InfoSnapshotEvent.OLD_EVENT_VERSION -> {
+                Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForOldApi
+                    .serializer()
+            }
+
+            else -> {
+                throw SerializationException("Unknown Vero2InfoSnapshotPayload eventVersion: $version")
+            }
+        }
 }

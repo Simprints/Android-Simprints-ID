@@ -5,9 +5,14 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_CONFIRMATION
+import com.simprints.infra.events.event.domain.models.EventType.Companion.CALLOUT_CONFIRMATION_KEY
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(CALLOUT_CONFIRMATION_KEY)
 @Deprecated("Replaced by v3 in 2025.2.0")
 data class ConfirmationCalloutEventV2(
     override val id: String = UUID.randomUUID().toString(),
@@ -30,7 +35,7 @@ data class ConfirmationCalloutEventV2(
             projectId = projectId,
             selectedGuid = selectedGuid,
             sessionId = sessionId,
-            metadata = metadata
+            metadata = metadata,
         ),
         CALLOUT_CONFIRMATION,
     )
@@ -40,13 +45,14 @@ data class ConfirmationCalloutEventV2(
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
+    @Serializable
     data class ConfirmationCalloutPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
         val projectId: String,
         val selectedGuid: String,
         val sessionId: String,
-        val metadata: String?,
+        val metadata: String? = null,
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLOUT_CONFIRMATION,
     ) : EventPayload() {

@@ -4,10 +4,16 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.FACE_CAPTURE_CONFIRMATION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
+import com.simprints.infra.events.event.domain.models.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(FACE_CAPTURE_CONFIRMATION_KEY)
 data class FaceCaptureConfirmationEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: FaceCaptureConfirmationPayload,
@@ -18,7 +24,7 @@ data class FaceCaptureConfirmationEvent(
     constructor(
         startTime: Timestamp,
         endTime: Timestamp,
-        result: FaceCaptureConfirmationPayload.Result,
+        result: Result,
     ) : this(
         UUID.randomUUID().toString(),
         FaceCaptureConfirmationPayload(startTime, endTime, EVENT_VERSION, result),
@@ -30,6 +36,7 @@ data class FaceCaptureConfirmationEvent(
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
+    @Serializable
     data class FaceCaptureConfirmationPayload(
         override val createdAt: Timestamp,
         override var endedAt: Timestamp?,

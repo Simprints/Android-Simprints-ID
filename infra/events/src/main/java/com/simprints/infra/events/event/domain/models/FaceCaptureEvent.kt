@@ -5,9 +5,15 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.FACE_CAPTURE_KEY
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE
+import com.simprints.infra.events.event.domain.models.FaceCaptureEvent.FaceCapturePayload.Face
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
+@SerialName(FACE_CAPTURE_KEY)
 data class FaceCaptureEvent(
     override val id: String = randomUUID(),
     override val payload: FaceCapturePayload,
@@ -23,7 +29,7 @@ data class FaceCaptureEvent(
         result: FaceCapturePayload.Result,
         isAutoCapture: Boolean,
         isFallback: Boolean,
-        face: FaceCapturePayload.Face?,
+        face: Face?,
         id: String = randomUUID(),
         payloadId: String = randomUUID(),
     ) : this(
@@ -48,6 +54,7 @@ data class FaceCaptureEvent(
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
+    @Serializable
     data class FaceCapturePayload(
         val id: String,
         override val createdAt: Timestamp,
@@ -56,15 +63,17 @@ data class FaceCaptureEvent(
         val attemptNb: Int,
         val qualityThreshold: Float,
         val result: Result,
-        val isAutoCapture: Boolean,
+        val isAutoCapture: Boolean = false,
         val isFallback: Boolean,
         val face: Face?,
         override val type: EventType = FACE_CAPTURE,
     ) : EventPayload() {
-        override fun toSafeString(): String = "result: $result, attempt nr: $attemptNb, auto-capture: $isAutoCapture, fallback: $isFallback, " +
-            "quality: ${face?.quality},  format: ${face?.format}"
+        override fun toSafeString(): String =
+            "result: $result, attempt nr: $attemptNb, auto-capture: $isAutoCapture, fallback: $isFallback, " +
+                "quality: ${face?.quality},  format: ${face?.format}"
 
         @Keep
+        @Serializable
         data class Face(
             val yaw: Float,
             var roll: Float,
@@ -72,6 +81,8 @@ data class FaceCaptureEvent(
             val format: String,
         )
 
+        @Keep
+        @Serializable
         enum class Result {
             VALID,
             INVALID,

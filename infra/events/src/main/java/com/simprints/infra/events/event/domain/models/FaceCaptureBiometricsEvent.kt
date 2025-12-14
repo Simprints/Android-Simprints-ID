@@ -5,8 +5,13 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.FACE_CAPTURE_BIOMETRICS_KEY
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
+@SerialName(FACE_CAPTURE_BIOMETRICS_KEY)
 data class FaceCaptureBiometricsEvent(
     override val id: String = randomUUID(),
     override val payload: FaceCaptureBiometricsPayload,
@@ -35,6 +40,7 @@ data class FaceCaptureBiometricsEvent(
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
+    @Serializable
     data class FaceCaptureBiometricsPayload(
         val id: String,
         override val createdAt: Timestamp,
@@ -46,6 +52,7 @@ data class FaceCaptureBiometricsEvent(
         override fun toSafeString(): String = "format: ${face.format}, quality: ${face.quality}"
 
         @Keep
+        @Serializable
         data class Face(
             val yaw: Float,
             var roll: Float,

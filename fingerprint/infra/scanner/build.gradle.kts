@@ -11,7 +11,6 @@ dependencies {
     implementation(libs.kotlin.reflect)
 
     implementation(libs.retrofit.core)
-    runtimeOnly(libs.jackson.core)
 
     implementation(project(":infra:config-store"))
     implementation(project(":infra:config-sync"))

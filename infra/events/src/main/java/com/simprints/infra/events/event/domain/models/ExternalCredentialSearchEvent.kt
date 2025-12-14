@@ -5,9 +5,14 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.EXTERNAL_CREDENTIAL_SEARCH_KEY
 import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_SEARCH
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
+@SerialName(EXTERNAL_CREDENTIAL_SEARCH_KEY)
 data class ExternalCredentialSearchEvent(
     override val id: String = randomUUID(),
     override val payload: ExternalCredentialSearchPayload,
@@ -37,10 +42,11 @@ data class ExternalCredentialSearchEvent(
     )
 
     @Keep
+    @Serializable
     data class ExternalCredentialSearchPayload(
         override val createdAt: Timestamp,
         override val endedAt: Timestamp? = null,
-        override val eventVersion: Int,
+        override val eventVersion: Int = EVENT_VERSION,
         val id: String,
         val probeExternalCredentialId: String,
         val result: ExternalCredentialSearchResult,
@@ -50,6 +56,7 @@ data class ExternalCredentialSearchEvent(
     }
 
     @Keep
+    @Serializable
     data class ExternalCredentialSearchResult(
         val candidateIds: List<String>,
     )

@@ -17,7 +17,7 @@ internal object ActionFactory {
         projectId = MOCK_PROJECT_ID,
         userId = MOCK_USER_ID,
         moduleId = MOCK_MODULE_ID,
-        unknownExtras = extras,
+        unknownExtras = extras.mapToStrings(),
         biometricDataSource = MOCK_BIOMETRIC_DATA_SOURCE,
         metadata = "",
     )
@@ -33,7 +33,7 @@ internal object ActionFactory {
         projectId = MOCK_PROJECT_ID,
         userId = MOCK_USER_ID,
         moduleId = MOCK_MODULE_ID,
-        unknownExtras = extras,
+        unknownExtras = extras.mapToStrings(),
         biometricDataSource = MOCK_BIOMETRIC_DATA_SOURCE,
         metadata = "",
     )
@@ -49,10 +49,10 @@ internal object ActionFactory {
         projectId = MOCK_PROJECT_ID,
         userId = MOCK_USER_ID,
         moduleId = MOCK_MODULE_ID,
-        unknownExtras = extras,
+        unknownExtras = extras.mapToStrings(),
         biometricDataSource = MOCK_BIOMETRIC_DATA_SOURCE,
         metadata = "",
-        verifyGuid = MOCK_GUID
+        verifyGuid = MOCK_GUID,
     )
 
     fun getEnrolLastRequest() = ActionRequest.EnrolLastBiometricActionRequest(
@@ -92,4 +92,8 @@ internal object ActionFactory {
     const val MOCK_PROJECT_ID = "projectId"
     private const val MOCK_BIOMETRIC_DATA_SOURCE = ""
     private const val MOCK_GUID = "123e4567-e89b-12d3-a456-426614174000"
+}
+
+private fun Map<String, Any>.mapToStrings(): Map<String, String?> = this.mapValues { entry ->
+    entry.value.toString()
 }

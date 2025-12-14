@@ -4,10 +4,15 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.INVALID_INTENT_KEY
 import com.simprints.infra.events.event.domain.models.EventType.INVALID_INTENT
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(INVALID_INTENT_KEY)
 data class InvalidIntentEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: InvalidIntentPayload,
@@ -18,7 +23,7 @@ data class InvalidIntentEvent(
     constructor(
         creationTime: Timestamp,
         action: String,
-        extras: Map<String, Any?>,
+        extras: Map<String, String?>,
     ) : this(
         UUID.randomUUID().toString(),
         InvalidIntentPayload(creationTime, EVENT_VERSION, action, extras),
@@ -30,11 +35,12 @@ data class InvalidIntentEvent(
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
+    @Serializable
     data class InvalidIntentPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
         val action: String,
-        val extras: Map<String, Any?>,
+        val extras: Map<String, String?>,
         override val endedAt: Timestamp? = null,
         override val type: EventType = INVALID_INTENT,
     ) : EventPayload() {

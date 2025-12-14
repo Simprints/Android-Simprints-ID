@@ -5,9 +5,14 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_VERIFICATION
+import com.simprints.infra.events.event.domain.models.EventType.Companion.CALLBACK_VERIFICATION_KEY
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(CALLBACK_VERIFICATION_KEY)
 data class VerificationCallbackEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: VerificationCallbackPayload,
@@ -29,6 +34,7 @@ data class VerificationCallbackEvent(
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
+    @Serializable
     data class VerificationCallbackPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
