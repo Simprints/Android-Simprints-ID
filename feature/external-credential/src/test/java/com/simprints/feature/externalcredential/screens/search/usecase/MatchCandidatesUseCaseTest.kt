@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.reference.BiometricReferenceCapture
-import com.simprints.core.domain.sample.MatchComparisonResult
+import com.simprints.core.domain.sample.ComparisonResult
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.infra.config.store.models.FaceConfiguration
@@ -61,7 +61,7 @@ internal class MatchCandidatesUseCaseTest {
     private lateinit var fingerprintSdkConfig: FingerprintConfiguration.FingerprintSdkConfiguration
 
     @MockK
-    private lateinit var matchResultItem: MatchComparisonResult
+    private lateinit var matchResultItem: ComparisonResult
 
     @MockK
     private lateinit var matchParams: MatchParams
@@ -140,7 +140,7 @@ internal class MatchCandidatesUseCaseTest {
 
         assertThat(result).hasSize(1)
         assertThat(result[0].credential).isEqualTo(credential)
-        assertThat(result[0].matchResult).isEqualTo(matchResultItem)
+        assertThat(result[0].comparisonResult).isEqualTo(matchResultItem)
         assertThat(result[0].verificationThreshold).isEqualTo(verificationMatchThreshold)
         assertThat(result[0].bioSdk).isEqualTo(FaceConfiguration.BioSdk.RANK_ONE)
     }
@@ -158,7 +158,7 @@ internal class MatchCandidatesUseCaseTest {
 
         assertThat(result).hasSize(1)
         assertThat(result[0].credential).isEqualTo(credential)
-        assertThat(result[0].matchResult).isEqualTo(matchResultItem)
+        assertThat(result[0].comparisonResult).isEqualTo(matchResultItem)
         assertThat(result[0].verificationThreshold).isEqualTo(verificationMatchThreshold)
         assertThat(result[0].bioSdk).isEqualTo(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
     }

@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.domain.sample.MatchComparisonResult
+import com.simprints.core.domain.sample.ComparisonResult
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
@@ -106,14 +106,14 @@ internal class MatchViewModel @Inject constructor(
 
     private fun setMatchState(
         candidatesMatched: Int,
-        results: List<MatchComparisonResult>,
+        results: List<ComparisonResult>,
         decisionPolicy: DecisionPolicy,
     ) {
-        val veryGoodMatches = results.count { decisionPolicy.high <= it.confidence }
+        val veryGoodMatches = results.count { decisionPolicy.high <= it.comparisonScore }
         val goodMatches =
-            results.count { decisionPolicy.medium <= it.confidence && it.confidence < decisionPolicy.high }
+            results.count { decisionPolicy.medium <= it.comparisonScore && it.comparisonScore < decisionPolicy.high }
         val fairMatches =
-            results.count { decisionPolicy.low <= it.confidence && it.confidence < decisionPolicy.medium }
+            results.count { decisionPolicy.low <= it.comparisonScore && it.comparisonScore < decisionPolicy.medium }
 
         _matchState.postValue(
             MatchState.Finished(

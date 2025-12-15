@@ -2,8 +2,8 @@ package com.simprints.infra.matching.usecase
 
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.sample.ComparisonResult
 import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.biosdkresolver.FaceBioSDK
@@ -119,7 +119,7 @@ class FaceMatcherUseCase @Inject constructor(
         batchCandidates: List<Identity>,
     ) = batchCandidates.fold(MatchResultSet()) { acc, candidate ->
         acc.add(
-            MatchComparisonResult(
+            ComparisonResult(
                 candidate.subjectId,
                 matcher.getHighestComparisonScoreForCandidate(candidate),
             ),

@@ -7,8 +7,8 @@ import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.BiometricTemplateCapture
+import com.simprints.core.domain.sample.ComparisonResult
 import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
@@ -260,7 +260,7 @@ internal class FaceMatcherUseCaseTest {
         assertThat(results[1]).isInstanceOf(MatcherUseCase.MatcherState.CandidateLoaded::class.java)
 
         val successState = results[2] as MatcherUseCase.MatcherState.Success
-        assertThat(successState.comparisonResults).containsExactly(MatchComparisonResult("subjectId", 42f))
+        assertThat(successState.comparisonResults).containsExactly(ComparisonResult("subjectId", 42f))
         assertThat(successState.totalCandidates).isEqualTo(totalCandidates)
         assertThat(successState.matcherName).isEqualTo("")
 

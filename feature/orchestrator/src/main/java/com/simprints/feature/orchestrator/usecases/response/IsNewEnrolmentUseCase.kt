@@ -48,5 +48,5 @@ internal class IsNewEnrolmentUseCase @Inject constructor() {
         ?.decisionPolicy
         ?.medium
         ?.toFloat()
-        ?.let { threshold -> matchResult.results.isNotEmpty() && matchResult.results.all { it.confidence < threshold } } != false
+        ?.let { threshold -> matchResult.results.isNotEmpty() && matchResult.results.all { it.comparisonScore < threshold } } != false
 }

@@ -8,7 +8,7 @@ import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.BiometricTemplateCapture
-import com.simprints.core.domain.sample.MatchComparisonResult
+import com.simprints.core.domain.sample.ComparisonResult
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.step.StepResult
 import com.simprints.face.capture.FaceCaptureParams
@@ -63,7 +63,7 @@ import java.io.Serializable
     JsonSubTypes.Type(value = BiometricReferenceCapture::class, name = "BiometricReferenceCapture"),
     JsonSubTypes.Type(value = BiometricTemplateCapture::class, name = "BiometricTemplateCapture"),
     JsonSubTypes.Type(value = BiometricTemplate::class, name = "BiometricTemplate"),
-    JsonSubTypes.Type(value = MatchComparisonResult::class, name = "MatchComparisonResult"),
+    JsonSubTypes.Type(value = ComparisonResult::class, name = "ComparisonResult"),
 )
 abstract class StepResultMixin : StepResult
 
@@ -100,7 +100,7 @@ abstract class StepResultMixin : StepResult
     JsonSubTypes.Type(value = BiometricReferenceCapture::class, name = "BiometricReferenceCapture"),
     JsonSubTypes.Type(value = BiometricTemplateCapture::class, name = "BiometricTemplateCapture"),
     JsonSubTypes.Type(value = BiometricTemplate::class, name = "BiometricTemplate"),
-    JsonSubTypes.Type(value = MatchComparisonResult::class, name = "MatchComparisonResult"),
+    JsonSubTypes.Type(value = ComparisonResult::class, name = "ComparisonResult"),
     JsonSubTypes.Type(value = BiometricDataSource::class, name = "BiometricDataSource"),
     JsonSubTypes.Type(value = BiometricDataSource.CommCare::class, name = "BiometricDataSource.CommCare"),
     JsonSubTypes.Type(value = BiometricDataSource.Simprints::class, name = "BiometricDataSource.Simprints"),

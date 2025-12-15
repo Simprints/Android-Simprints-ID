@@ -8,9 +8,9 @@ import kotlinx.parcelize.Parcelize
 
 @Keep
 @Parcelize
-data class MatchComparisonResult(
+data class ComparisonResult(
     val subjectId: String,
-    val confidence: Float,
+    val comparisonScore: Float,
 ) : StepParams,
     StepResult,
     Parcelable

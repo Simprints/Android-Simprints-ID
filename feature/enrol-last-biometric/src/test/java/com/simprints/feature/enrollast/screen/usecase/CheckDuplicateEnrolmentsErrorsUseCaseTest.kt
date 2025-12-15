@@ -1,7 +1,7 @@
 package com.simprints.feature.enrollast.screen.usecase
 
 import com.google.common.truth.Truth.*
-import com.simprints.core.domain.sample.MatchComparisonResult
+import com.simprints.core.domain.sample.ComparisonResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.screen.EnrolLastState
 import com.simprints.infra.config.store.models.DecisionPolicy
@@ -144,7 +144,7 @@ class CheckDuplicateEnrolmentsErrorsUseCaseTest {
         }
     }
 
-    private fun matchResult(confidence: Float) = MatchComparisonResult("subjectId", confidence)
+    private fun matchResult(confidence: Float) = ComparisonResult("subjectId", confidence)
 
     companion object {
         private const val LOW_CONFIDENCE = 50f
