@@ -5,9 +5,14 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_VERIFICATION_V3
+import com.simprints.infra.events.event.domain.models.EventType.Companion.CALLOUT_VERIFICATION_V3_KEY
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(CALLOUT_VERIFICATION_V3_KEY)
 data class VerificationCalloutEventV3(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: VerificationCalloutPayload,
@@ -51,6 +56,7 @@ data class VerificationCalloutEventV3(
     )
 
     @Keep
+    @Serializable
     data class VerificationCalloutPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
@@ -63,7 +69,8 @@ data class VerificationCalloutEventV3(
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLOUT_VERIFICATION_V3,
     ) : EventPayload() {
-        override fun toSafeString(): String = "module ID: $moduleId, guid: $verifyGuid, metadata: $metadata, biometricDataSource: $biometricDataSource"
+        override fun toSafeString(): String =
+            "module ID: $moduleId, guid: $verifyGuid, metadata: $metadata, biometricDataSource: $biometricDataSource"
     }
 
     companion object {

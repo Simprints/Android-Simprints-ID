@@ -1,8 +1,6 @@
-package com.simprints.infra.events.event.domain.models.face
+package com.simprints.infra.events.event.domain.models
 
-import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.FaceCaptureBiometricsEvent
+import com.google.common.truth.Truth.*
 import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
 import com.simprints.infra.events.sampledata.SampleDefaults
 import org.junit.Test

@@ -334,7 +334,11 @@ internal class EventLocalDataSourceTest {
     @Test
     fun saveEventScope() = runTest {
         mockkStatic("com.simprints.infra.events.event.local.models.DbEventScopeKt")
-        eventLocalDataSource.saveEventScope(mockk())
+        eventLocalDataSource.saveEventScope(
+            mockk {
+                every { fromDomainToDb(any()) } returns mockk()
+            },
+        )
 
         coVerify { scopeDao.insertOrUpdate(any()) }
     }

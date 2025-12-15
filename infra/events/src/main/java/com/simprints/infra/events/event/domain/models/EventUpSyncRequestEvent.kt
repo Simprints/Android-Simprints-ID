@@ -4,9 +4,14 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.EVENT_UP_SYNC_REQUEST_KEY
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(EVENT_UP_SYNC_REQUEST_KEY)
 data class EventUpSyncRequestEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: EventUpSyncRequestPayload,
@@ -36,13 +41,14 @@ data class EventUpSyncRequestEvent(
     )
 
     @Keep
+    @Serializable
     data class EventUpSyncRequestPayload(
         override val createdAt: Timestamp,
         override val endedAt: Timestamp?,
         val requestId: String,
         val content: UpSyncContent,
-        val responseStatus: Int?,
-        val errorType: String?,
+        val responseStatus: Int? = null,
+        val errorType: String? = null,
         override val eventVersion: Int,
         override val type: EventType = EventType.EVENT_UP_SYNC_REQUEST,
     ) : EventPayload() {
@@ -52,6 +58,7 @@ data class EventUpSyncRequestEvent(
     }
 
     @Keep
+    @Serializable
     data class UpSyncContent(
         val sessionCount: Int = 0,
         val eventUpSyncCount: Int = 0,

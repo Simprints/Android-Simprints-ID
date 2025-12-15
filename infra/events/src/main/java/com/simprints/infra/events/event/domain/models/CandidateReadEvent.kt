@@ -5,9 +5,14 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.CANDIDATE_READ
+import com.simprints.infra.events.event.domain.models.EventType.Companion.CANDIDATE_READ_KEY
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(CANDIDATE_READ_KEY)
 data class CandidateReadEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: CandidateReadPayload,
@@ -39,6 +44,7 @@ data class CandidateReadEvent(
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
+    @Serializable
     data class CandidateReadPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
@@ -51,12 +57,14 @@ data class CandidateReadEvent(
         override fun toSafeString(): String = "guid: $candidateId, local: $localResult, remote: $remoteResult"
 
         @Keep
+        @Serializable
         enum class LocalResult {
             FOUND,
             NOT_FOUND,
         }
 
         @Keep
+        @Serializable
         enum class RemoteResult {
             FOUND,
             NOT_FOUND,

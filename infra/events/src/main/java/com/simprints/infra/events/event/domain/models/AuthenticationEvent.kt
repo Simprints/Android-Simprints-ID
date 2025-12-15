@@ -7,9 +7,14 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.infra.events.event.domain.models.EventType.AUTHENTICATION
+import com.simprints.infra.events.event.domain.models.EventType.Companion.AUTHENTICATION_KEY
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(AUTHENTICATION_KEY)
 data class AuthenticationEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: AuthenticationPayload,
@@ -39,6 +44,7 @@ data class AuthenticationEvent(
     )
 
     @Keep
+    @Serializable
     data class AuthenticationPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
@@ -50,12 +56,14 @@ data class AuthenticationEvent(
         override fun toSafeString(): String = "result: $result"
 
         @Keep
+        @Serializable
         data class UserInfo(
             val projectId: String,
             val userId: TokenizableString,
         )
 
         @Keep
+        @Serializable
         enum class Result {
             AUTHENTICATED,
             BAD_CREDENTIALS,

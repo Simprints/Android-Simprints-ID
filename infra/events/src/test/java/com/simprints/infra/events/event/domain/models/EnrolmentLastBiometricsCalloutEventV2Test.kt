@@ -1,11 +1,10 @@
-package com.simprints.infra.events.event.domain.models.callout
+package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_VERIFICATION
-import com.simprints.infra.events.event.domain.models.VerificationCalloutEventV2
-import com.simprints.infra.events.event.domain.models.VerificationCalloutEventV2.Companion.EVENT_VERSION
+import com.simprints.infra.events.event.domain.models.EnrolmentLastBiometricsCalloutEventV2.Companion.EVENT_VERSION
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_LAST_BIOMETRICS
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -15,41 +14,40 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import org.junit.Test
 
 @Keep
-class VerificationCalloutEventV2Test {
+class EnrolmentLastBiometricsCalloutEventV2Test {
     @Test
-    fun create_VerificationCalloutEvent() {
-        val event = VerificationCalloutEventV2(
+    fun create_EnrolmentLastBiometricsCalloutEvent() {
+        val event = EnrolmentLastBiometricsCalloutEventV2(
             createdAt = CREATED_AT,
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID,
             moduleId = DEFAULT_MODULE_ID,
-            verifyGuid = GUID1,
             metadata = DEFAULT_METADATA,
+            sessionId = GUID1,
         )
 
         assertThat(event.id).isNotNull()
-        assertThat(event.type).isEqualTo(CALLOUT_VERIFICATION)
+        assertThat(event.type).isEqualTo(CALLOUT_LAST_BIOMETRICS)
         with(event.payload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
-            assertThat(type).isEqualTo(CALLOUT_VERIFICATION)
+            assertThat(type).isEqualTo(CALLOUT_LAST_BIOMETRICS)
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
             assertThat(userId).isEqualTo(DEFAULT_USER_ID)
             assertThat(moduleId).isEqualTo(DEFAULT_MODULE_ID)
-            assertThat(verifyGuid).isEqualTo(GUID1)
             assertThat(metadata).isEqualTo(DEFAULT_METADATA)
         }
     }
 
     @Test
     fun getTokenizableFields_returnsMapWithAttendantAndModuleId() {
-        val event = VerificationCalloutEventV2(
+        val event = EnrolmentLastBiometricsCalloutEventV2(
             createdAt = CREATED_AT,
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID,
             moduleId = DEFAULT_MODULE_ID,
-            verifyGuid = GUID1,
             metadata = DEFAULT_METADATA,
+            sessionId = GUID1,
         )
         val tokenizableFields = event.getTokenizableFields()
 

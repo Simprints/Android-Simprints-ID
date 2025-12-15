@@ -2,8 +2,10 @@ package com.simprints.infra.events.event.domain.models.scope
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.common.Modality
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 data class EventScopePayload(
     val endCause: EventScopeEndCause? = null,
     val sidVersion: String,

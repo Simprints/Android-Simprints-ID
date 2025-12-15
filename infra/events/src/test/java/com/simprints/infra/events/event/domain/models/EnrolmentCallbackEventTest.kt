@@ -1,9 +1,8 @@
-package com.simprints.infra.events.event.domain.models.callback
+package com.simprints.infra.events.event.domain.models
 
-import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.events.event.domain.models.EnrolmentCallbackEvent
-import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
+import com.google.common.truth.Truth.*
 import com.simprints.infra.events.event.domain.models.EnrolmentCallbackEvent.Companion.EVENT_VERSION
+import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import org.junit.Test

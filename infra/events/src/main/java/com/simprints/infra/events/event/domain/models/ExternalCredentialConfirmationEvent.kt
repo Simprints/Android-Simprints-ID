@@ -5,8 +5,13 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.EXTERNAL_CREDENTIAL_CONFIRMATION_KEY
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
+@SerialName(EXTERNAL_CREDENTIAL_CONFIRMATION_KEY)
 data class ExternalCredentialConfirmationEvent(
     override val id: String = randomUUID(),
     override val payload: ExternalCredentialConfirmationPayload,
@@ -32,10 +37,11 @@ data class ExternalCredentialConfirmationEvent(
     )
 
     @Keep
+    @Serializable
     data class ExternalCredentialConfirmationPayload(
         override val createdAt: Timestamp,
         override val endedAt: Timestamp? = null,
-        override val eventVersion: Int,
+        override val eventVersion: Int = EVENT_VERSION,
         val result: ExternalCredentialConfirmationResult,
         val userInteractedWithImage: Boolean?,
         override val type: EventType = EventType.EXTERNAL_CREDENTIAL_CONFIRMATION,
@@ -44,6 +50,7 @@ data class ExternalCredentialConfirmationEvent(
     }
 
     @Keep
+    @Serializable
     enum class ExternalCredentialConfirmationResult {
         CONTINUE,
         RECAPTURE,

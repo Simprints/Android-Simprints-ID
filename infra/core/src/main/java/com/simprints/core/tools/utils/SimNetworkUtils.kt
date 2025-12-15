@@ -1,6 +1,7 @@
 package com.simprints.core.tools.utils
 
 import androidx.annotation.Keep
+import kotlinx.serialization.Serializable
 
 @Keep
 interface SimNetworkUtils {
@@ -17,6 +18,7 @@ interface SimNetworkUtils {
     }
 
     @Keep
+    @Serializable
     data class Connection(
         val type: ConnectionType,
         val state: ConnectionState,

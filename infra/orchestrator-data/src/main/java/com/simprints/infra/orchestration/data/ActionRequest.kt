@@ -25,7 +25,7 @@ sealed class ActionRequest(
     open val projectId: String,
     open val userId: TokenizableString,
     open val metadata: String,
-    open val unknownExtras: Map<String, Any?>,
+    open val unknownExtras: Map<String, String?>,
 ) : Serializable {
     fun getSubjectAgeIfAvailable(): Int? = when (this) {
         is EnrolActionRequest -> subjectAge
@@ -43,7 +43,7 @@ sealed class ActionRequest(
         val biometricDataSource: String,
         val subjectAge: Int? = null,
         override val metadata: String,
-        override val unknownExtras: Map<String, Any?>,
+        override val unknownExtras: Map<String, String?>,
     ) : ActionRequest(actionIdentifier, projectId, userId, metadata, unknownExtras),
         FlowAction
 
@@ -56,7 +56,7 @@ sealed class ActionRequest(
         val biometricDataSource: String,
         val subjectAge: Int? = null,
         override val metadata: String,
-        override val unknownExtras: Map<String, Any?>,
+        override val unknownExtras: Map<String, String?>,
     ) : ActionRequest(actionIdentifier, projectId, userId, metadata, unknownExtras),
         FlowAction
 
@@ -70,7 +70,7 @@ sealed class ActionRequest(
         val subjectAge: Int? = null,
         val verifyGuid: String,
         override val metadata: String,
-        override val unknownExtras: Map<String, Any?>,
+        override val unknownExtras: Map<String, String?>,
     ) : ActionRequest(actionIdentifier, projectId, userId, metadata, unknownExtras),
         FlowAction
 
@@ -82,7 +82,7 @@ sealed class ActionRequest(
         val sessionId: String,
         val selectedGuid: String,
         override val metadata: String,
-        override val unknownExtras: Map<String, Any?>,
+        override val unknownExtras: Map<String, String?>,
     ) : ActionRequest(actionIdentifier, projectId, userId, metadata, unknownExtras),
         FollowUpAction
 
@@ -94,7 +94,7 @@ sealed class ActionRequest(
         val moduleId: TokenizableString,
         val sessionId: String,
         override val metadata: String,
-        override val unknownExtras: Map<String, Any?>,
+        override val unknownExtras: Map<String, String?>,
     ) : ActionRequest(actionIdentifier, projectId, userId, metadata, unknownExtras),
         FollowUpAction
 

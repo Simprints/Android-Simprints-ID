@@ -1,13 +1,10 @@
-package com.simprints.infra.events.event.domain.models.downsync
+package com.simprints.infra.events.event.domain.models
 
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.events.event.domain.models.EventDownSyncRequestEvent
-import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.EventDownSyncRequestEvent.QueryParameters
-import io.mockk.mockk
-import org.junit.Assert.assertEquals
+import io.mockk.*
+import org.junit.Assert
 import org.junit.Test
 
 class EventDownSyncRequestEventTest {
@@ -20,7 +17,7 @@ class EventDownSyncRequestEventTest {
 
         val result = event.getTokenizableFields()
 
-        assertEquals(emptyMap<TokenKeyType, TokenizableString>(), result)
+        Assert.assertEquals(emptyMap<TokenKeyType, TokenizableString>(), result)
     }
 
     @Test
@@ -32,7 +29,10 @@ class EventDownSyncRequestEventTest {
 
         val result = event.getTokenizableFields()
 
-        assertEquals(mapOf(TokenKeyType.AttendantId to TokenizableString.Tokenized("attendantId")), result)
+        Assert.assertEquals(
+            mapOf(TokenKeyType.AttendantId to TokenizableString.Tokenized("attendantId")),
+            result,
+        )
     }
 
     @Test
@@ -44,7 +44,10 @@ class EventDownSyncRequestEventTest {
 
         val result = event.getTokenizableFields()
 
-        assertEquals(mapOf(TokenKeyType.ModuleId to TokenizableString.Tokenized("moduleId")), result)
+        Assert.assertEquals(
+            mapOf(TokenKeyType.ModuleId to TokenizableString.Tokenized("moduleId")),
+            result,
+        )
     }
 
     @Test
@@ -56,7 +59,7 @@ class EventDownSyncRequestEventTest {
 
         val result = event.getTokenizableFields()
 
-        assertEquals(
+        Assert.assertEquals(
             mapOf(
                 TokenKeyType.AttendantId to TokenizableString.Tokenized("attendantId"),
                 TokenKeyType.ModuleId to TokenizableString.Tokenized("moduleId"),
@@ -73,7 +76,7 @@ class EventDownSyncRequestEventTest {
             createdAt = mockk<Timestamp>(),
             endedAt = mockk<Timestamp>(),
             requestId = "requestId",
-            queryParameters = QueryParameters(
+            queryParameters = EventDownSyncRequestEvent.QueryParameters(
                 moduleId = moduleId,
                 attendantId = attendantId,
             ),

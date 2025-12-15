@@ -31,11 +31,20 @@ class JsonHelperTest {
         val tokenizableRaw = "tokenizableRaw".asTokenizableRaw()
         val tokenizableEncrypted = "tokenizableEncrypted".asTokenizableEncrypted()
 
-        val resultRaw = JsonHelper.toJson(tokenizableRaw, tokenizableStringModule)
-        val resultEncrypted = JsonHelper.toJson(tokenizableEncrypted, tokenizableStringModule)
+        val resultRaw = JsonHelper.json.encodeToString(tokenizableRaw)
+        val resultEncrypted = JsonHelper.json.encodeToString(tokenizableEncrypted)
 
-        assertThat(resultRaw).isEqualTo("{\"className\":\"TokenizableString.Raw\",\"value\":\"${tokenizableRaw}\"}")
-        assertThat(resultEncrypted).isEqualTo("{\"className\":\"TokenizableString.Tokenized\",\"value\":\"${tokenizableEncrypted}\"}")
+        val expectedRaw = """{"className":"TokenizableString.Raw","value":"${tokenizableRaw.value}"}"""
+        val expectedEncrypted = """{"className":"TokenizableString.Tokenized","value":"${tokenizableEncrypted.value}"}"""
+
+        val actualRawJson = JsonHelper.json.parseToJsonElement(resultRaw)
+        val expectedRawJson = JsonHelper.json.parseToJsonElement(expectedRaw)
+
+        val actualEncryptedJson = JsonHelper.json.parseToJsonElement(resultEncrypted)
+        val expectedEncryptedJson = JsonHelper.json.parseToJsonElement(expectedEncrypted)
+
+        assertThat(actualRawJson).isEqualTo(expectedRawJson)
+        assertThat(actualEncryptedJson).isEqualTo(expectedEncryptedJson)
     }
 
     @Test
