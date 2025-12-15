@@ -34,7 +34,7 @@ jobs:
                     node-version: 'latest'
 
             -   name: Install Firebase Tools
-                run: npm install -g firebase-tools
+                run: npm install -g firebase-tools  --ignore-scripts
 
             -   name: Authenticate to Firebase
                 env:
