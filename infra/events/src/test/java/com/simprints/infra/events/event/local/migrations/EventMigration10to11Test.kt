@@ -5,16 +5,14 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
-import com.fasterxml.jackson.core.type.TypeReference
-import com.google.common.truth.Truth.assertThat
+import androidx.test.ext.junit.runners.*
+import androidx.test.platform.app.*
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.tools.extentions.getLongWithColumnName
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.scope.Device
@@ -221,11 +219,9 @@ class EventMigration10to11Test {
         sessionId: String,
         shouldHaveEnded: Boolean = false,
     ) {
-        val scopePayload = JsonHelper.fromJson(
+        val scopePayload = JsonHelper.json.decodeFromString<EventScopePayload>(
             scopeCursor.getStringWithColumnName("payloadJson").orEmpty(),
-            object : TypeReference<EventScopePayload>() {},
         )
-
         assertThat(scopeCursor.getStringWithColumnName("id")).isEqualTo(sessionId)
         assertThat(scopeCursor.getStringWithColumnName("projectId")).isEqualTo(PROJECT_ID)
         assertThat(scopeCursor.getLongWithColumnName("createdAt")).isEqualTo(CREATED_AT)

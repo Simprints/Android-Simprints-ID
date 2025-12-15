@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.Module
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import kotlinx.serialization.json.Json
 
 object JsonHelper {
     val jackson: ObjectMapper by lazy {
@@ -60,5 +61,10 @@ object JsonHelper {
 
     fun validateJsonOrThrow(json: String) {
         jackson.readTree(json)
+    }
+
+    val json = Json {
+        ignoreUnknownKeys = true
+        encodeDefaults = true
     }
 }

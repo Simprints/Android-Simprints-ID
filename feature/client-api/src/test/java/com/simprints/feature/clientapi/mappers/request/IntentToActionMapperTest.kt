@@ -1,13 +1,13 @@
 package com.simprints.feature.clientapi.mappers.request
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.models.ClientApiConstants
 import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
+import com.simprints.infra.events.event.domain.models.IdentificationCallbackEvent
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.libsimprints.Constants.SIMPRINTS_LIB_VERSION
 import com.simprints.libsimprints.Constants.SIMPRINTS_MODULE_ID
@@ -18,11 +18,8 @@ import com.simprints.libsimprints.Constants.SIMPRINTS_USER_ID
 import com.simprints.libsimprints.Constants.SIMPRINTS_VERIFY_GUID
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule

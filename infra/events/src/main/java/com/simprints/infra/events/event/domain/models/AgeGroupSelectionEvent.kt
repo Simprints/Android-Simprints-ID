@@ -5,9 +5,14 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.AGE_GROUP_SELECTION
+import com.simprints.infra.events.event.domain.models.EventType.Companion.AGE_GROUP_SELECTION_KEY
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(AGE_GROUP_SELECTION_KEY)
 data class AgeGroupSelectionEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: AgeGroupSelectionPayload,
@@ -30,6 +35,7 @@ data class AgeGroupSelectionEvent(
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
+    @Serializable
     data class AgeGroupSelectionPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
@@ -41,6 +47,7 @@ data class AgeGroupSelectionEvent(
     }
 
     @Keep
+    @Serializable
     data class AgeGroup(
         val startInclusive: Int,
         val endExclusive: Int?,

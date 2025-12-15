@@ -1,7 +1,7 @@
 package com.simprints.face.capture.usecases
 
 import android.graphics.Rect
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.EncodingUtils
@@ -9,18 +9,15 @@ import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent.BiometricReferenceCreationPayload
-import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
-import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent
-import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
-import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEvent
-import com.simprints.infra.events.event.domain.models.face.FaceOnboardingCompleteEvent
+import com.simprints.infra.events.event.domain.models.FaceCaptureBiometricsEvent
+import com.simprints.infra.events.event.domain.models.FaceCaptureConfirmationEvent
+import com.simprints.infra.events.event.domain.models.FaceCaptureEvent
+import com.simprints.infra.events.event.domain.models.FaceFallbackCaptureEvent
+import com.simprints.infra.events.event.domain.models.FaceOnboardingCompleteEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before

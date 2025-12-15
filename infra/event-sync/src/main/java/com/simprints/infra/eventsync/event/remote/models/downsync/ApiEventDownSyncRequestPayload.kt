@@ -2,7 +2,7 @@ package com.simprints.infra.eventsync.event.remote.models.downsync
 
 import androidx.annotation.Keep
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
+import com.simprints.infra.events.event.domain.models.EventDownSyncRequestEvent
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
