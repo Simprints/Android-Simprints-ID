@@ -11,7 +11,7 @@ class SimFaceMatcher(
 ) : FaceMatcher(probeReference) {
     override suspend fun getHighestComparisonScoreForCandidate(candidate: Identity): Float = probeReference
         .templates
-        .map { it.template.template }
+        .map { it.template }
         .flatMap { probeTemplate ->
             candidate.samples.map { face ->
                 val baseScore = simFace.verificationScore(probeTemplate, face.template.template)

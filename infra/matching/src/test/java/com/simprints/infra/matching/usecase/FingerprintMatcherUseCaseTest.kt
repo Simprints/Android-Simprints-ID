@@ -133,10 +133,8 @@ internal class FingerprintMatcherUseCaseTest {
                         templates = listOf(
                             BiometricTemplateCapture(
                                 captureEventId = "fingerprintId",
-                                template = BiometricTemplate(
-                                    template = byteArrayOf(1, 2, 3),
-                                    identifier = TemplateIdentifier.LEFT_3RD_FINGER,
-                                ),
+                                template = byteArrayOf(1, 2, 3),
+                                identifier = TemplateIdentifier.LEFT_3RD_FINGER,
                             ),
                         ),
                     ),
@@ -175,10 +173,8 @@ internal class FingerprintMatcherUseCaseTest {
                         templates = listOf(
                             BiometricTemplateCapture(
                                 captureEventId = "fingerprintId",
-                                template = BiometricTemplate(
-                                    template = byteArrayOf(1, 2, 3),
-                                    identifier = TemplateIdentifier.LEFT_3RD_FINGER,
-                                ),
+                                template = byteArrayOf(1, 2, 3),
+                                identifier = TemplateIdentifier.LEFT_3RD_FINGER,
                             ),
                         ),
                     ),
@@ -255,10 +251,8 @@ internal class FingerprintMatcherUseCaseTest {
                         templates = listOf(
                             BiometricTemplateCapture(
                                 captureEventId = "fingerprintId",
-                                template = BiometricTemplate(
-                                    template = byteArrayOf(1, 2, 3),
-                                    identifier = TemplateIdentifier.LEFT_3RD_FINGER,
-                                ),
+                                template = byteArrayOf(1, 2, 3),
+                                identifier = TemplateIdentifier.LEFT_3RD_FINGER,
                             ),
                         ),
                     ),

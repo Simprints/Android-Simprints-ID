@@ -41,10 +41,8 @@ class SimAfisMatcherTest {
             templates = listOf(
                 BiometricTemplateCapture(
                     captureEventId = "referenceId",
-                    template = BiometricTemplate(
-                        identifier = TemplateIdentifier.RIGHT_THUMB,
-                        template = IsoFingerprintTemplateGenerator.generate(1),
-                    ),
+                    identifier = TemplateIdentifier.RIGHT_THUMB,
+                    template = IsoFingerprintTemplateGenerator.generate(1),
                 ),
             ),
         )
@@ -79,10 +77,8 @@ class SimAfisMatcherTest {
             templates = listOf(
                 BiometricTemplateCapture(
                     captureEventId = "referenceId",
-                    template = BiometricTemplate(
-                        identifier = TemplateIdentifier.RIGHT_3RD_FINGER,
-                        template = IsoFingerprintTemplateGenerator.generate(1),
-                    ),
+                    identifier = TemplateIdentifier.RIGHT_3RD_FINGER,
+                    template = IsoFingerprintTemplateGenerator.generate(1),
                 ),
             ),
         )
@@ -119,17 +115,13 @@ class SimAfisMatcherTest {
             templates = listOf(
                 BiometricTemplateCapture(
                     captureEventId = "referenceId",
-                    template = BiometricTemplate(
-                        identifier = TemplateIdentifier.RIGHT_THUMB,
-                        template = template1,
-                    ),
+                    identifier = TemplateIdentifier.RIGHT_THUMB,
+                    template = template1,
                 ),
                 BiometricTemplateCapture(
                     captureEventId = "referenceId",
-                    template = BiometricTemplate(
-                        identifier = TemplateIdentifier.LEFT_THUMB,
-                        template = template2,
-                    ),
+                    identifier = TemplateIdentifier.LEFT_THUMB,
+                    template = template2,
                 ),
             ),
         )

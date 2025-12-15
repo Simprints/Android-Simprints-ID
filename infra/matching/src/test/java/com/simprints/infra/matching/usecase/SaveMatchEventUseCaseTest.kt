@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.reference.BiometricReferenceCapture
-import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.ComparisonResult
@@ -81,9 +80,7 @@ class SaveMatchEventUseCaseTest {
                     templates = listOf(
                         BiometricTemplateCapture(
                             captureEventId = "fingerprintId",
-                            template = BiometricTemplate(
-                                template = byteArrayOf(1, 2, 3),
-                            ),
+                            template = byteArrayOf(1, 2, 3),
                         ),
                     ),
                 ),
@@ -130,10 +127,8 @@ class SaveMatchEventUseCaseTest {
                     templates = listOf(
                         BiometricTemplateCapture(
                             captureEventId = "fingerprintId",
-                            template = BiometricTemplate(
-                                template = byteArrayOf(1, 2, 3),
-                                identifier = TemplateIdentifier.LEFT_3RD_FINGER,
-                            ),
+                            template = byteArrayOf(1, 2, 3),
+                            identifier = TemplateIdentifier.LEFT_3RD_FINGER,
                         ),
                     ),
                 ),

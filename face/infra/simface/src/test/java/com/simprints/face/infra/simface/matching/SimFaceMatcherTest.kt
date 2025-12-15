@@ -48,8 +48,8 @@ class SimFaceMatcherTest {
                 probeReference = mockk {
                     every { templates } returns listOf(
                         BiometricTemplateCapture(
-                            "captureId",
-                            BiometricTemplate(template = byteArrayOf(1)),
+                            captureEventId = "captureId",
+                            template = byteArrayOf(1),
                         ),
                     )
                 },
@@ -83,8 +83,8 @@ class SimFaceMatcherTest {
             probeReference = mockk {
                 every { templates } returns listOf(
                     BiometricTemplateCapture(
-                        "captureId",
-                        BiometricTemplate(template = byteArrayOf(1)),
+                        captureEventId = "captureId",
+                        template = byteArrayOf(1),
                     ),
                 )
             },

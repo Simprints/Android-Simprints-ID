@@ -297,10 +297,8 @@ class SubjectFactoryTest {
                     templates = listOf(
                         BiometricTemplateCapture(
                             captureEventId = GUID1,
-                            template = BiometricTemplate(
-                                identifier = IDENTIFIER,
-                                template = BASE_64_BYTES,
-                            ),
+                            identifier = IDENTIFIER,
+                            template = BASE_64_BYTES,
                         ),
                     ),
                 ),
@@ -311,9 +309,7 @@ class SubjectFactoryTest {
                     templates = listOf(
                         BiometricTemplateCapture(
                             captureEventId = GUID1,
-                            template = BiometricTemplate(
-                                template = BASE_64_BYTES,
-                            ),
+                            template = BASE_64_BYTES,
                         ),
                     ),
                 ),
