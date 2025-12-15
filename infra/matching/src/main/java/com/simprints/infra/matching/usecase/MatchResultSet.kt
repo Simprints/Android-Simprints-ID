@@ -1,6 +1,6 @@
 package com.simprints.infra.matching.usecase
 
-import com.simprints.core.domain.sample.MatchComparisonResult
+import com.simprints.core.domain.sample.ComparisonResult
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.locks.ReentrantLock
@@ -13,14 +13,14 @@ internal class MatchResultSet(
     private val lock = ReentrantLock()
 
     private val skipListSet = ConcurrentSkipListSet(
-        compareByDescending<MatchComparisonResult> { it.confidence }.thenByDescending { it.subjectId },
+        compareByDescending<ComparisonResult> { it.comparisonScore }.thenByDescending { it.subjectId },
     )
 
-    fun add(element: MatchComparisonResult): MatchResultSet {
+    fun add(element: ComparisonResult): MatchResultSet {
         // Use a lock to ensure thread safety during the entire add operation
         lock.withLock {
             // Only perform this optimization when we know the set is at max capacity
-            if (skipListSet.size >= maxSize && lowestConfidence.get() > element.confidence) {
+            if (skipListSet.size >= maxSize && lowestConfidence.get() > element.comparisonScore) {
                 // skip adding if the set is full and the last element has higher confidence than the current element
                 return this
             }
@@ -31,7 +31,7 @@ internal class MatchResultSet(
 
                 // Now that the set is full, we can skip adding elements
                 // with confidence lower than the current lowest
-                lowestConfidence.set(skipListSet.last().confidence)
+                lowestConfidence.set(skipListSet.last().comparisonScore)
             }
             return this
         }
@@ -42,7 +42,7 @@ internal class MatchResultSet(
         return this
     }
 
-    fun toList(): List<MatchComparisonResult> = skipListSet.toList()
+    fun toList(): List<ComparisonResult> = skipListSet.toList()
 
     companion object {
         /**

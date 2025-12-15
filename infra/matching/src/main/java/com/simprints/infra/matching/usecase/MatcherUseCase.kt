@@ -1,6 +1,6 @@
 package com.simprints.infra.matching.usecase
 
-import com.simprints.core.domain.sample.MatchComparisonResult
+import com.simprints.core.domain.sample.ComparisonResult
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.matching.MatchBatchInfo
@@ -23,7 +23,7 @@ interface MatcherUseCase {
         data object CandidateLoaded : MatcherState()
 
         data class Success(
-            val comparisonResults: List<MatchComparisonResult>,
+            val comparisonResults: List<ComparisonResult>,
             val matchBatches: List<MatchBatchInfo>,
             val totalCandidates: Int,
             val matcherName: String,

@@ -1,8 +1,8 @@
 package com.simprints.fingerprint.infra.biosdkimpl.matching
 
 import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.sample.ComparisonResult
 import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.fingerprint.infra.basebiosdk.matching.FingerprintMatcher
 import com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcher.Companion.SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT
 import javax.inject.Inject
@@ -17,7 +17,7 @@ internal class FingerprintMatcherImpl @Inject constructor(
         probeReference: BiometricReferenceCapture,
         candidates: List<Identity>,
         settings: SimAfisMatcherSettings?,
-    ): List<MatchComparisonResult> = simAfisMatcher.match(
+    ): List<ComparisonResult> = simAfisMatcher.match(
         probeReference = probeReference,
         candidates = candidates,
         crossFingerComparison = settings?.crossFingerComparison ?: false,

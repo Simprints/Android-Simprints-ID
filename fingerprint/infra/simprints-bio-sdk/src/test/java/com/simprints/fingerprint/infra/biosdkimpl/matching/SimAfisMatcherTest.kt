@@ -66,7 +66,7 @@ class SimAfisMatcherTest {
         val result = simAfisMatcher.match(probes, listOf(candidate), false).last()
         // Then
         verify { jniLibAfis.identify(any(), any(), any()) }
-        assertThat(result.confidence).isEqualTo(1)
+        assertThat(result.comparisonScore).isEqualTo(1)
     }
 
     @Test
@@ -190,8 +190,8 @@ class SimAfisMatcherTest {
             listOf(candidate1, candidate2),
             true,
         )
-        val maxScore = matchingResult.maxOf { it.confidence }
-        val minScore = matchingResult.minOf { it.confidence }
+        val maxScore = matchingResult.maxOf { it.comparisonScore }
+        val minScore = matchingResult.minOf { it.comparisonScore }
         // Then
         verify(exactly = 8) { jniLibAfis.verify(any(), any()) }
         assertThat(maxScore).isEqualTo(1)
@@ -236,7 +236,7 @@ class SimAfisMatcherTest {
         val result = simAfisMatcher.match(probes, listOf(candidate), true)
         // Then
         verify(exactly = 0) { jniLibAfis.verify(any(), any()) }
-        assertThat(result[0].confidence).isEqualTo(0)
+        assertThat(result[0].comparisonScore).isEqualTo(0)
     }
 
     companion object {

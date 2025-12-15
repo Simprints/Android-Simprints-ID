@@ -31,7 +31,9 @@ internal class CheckForDuplicateEnrolmentsUseCase @Inject constructor() {
                 EnrolLastState.ErrorType.DUPLICATE_ENROLMENTS
             }
 
-            else -> null
+            else -> {
+                null
+            }
         }
     }
 
@@ -48,7 +50,7 @@ internal class CheckForDuplicateEnrolmentsUseCase @Inject constructor() {
             ?.high
             ?.toFloat() ?: Float.MAX_VALUE
 
-        result.results.any { it.confidence >= threshold }
+        result.results.any { it.comparisonScore >= threshold }
     }
 
     private class MissingMatchResultException : IllegalStateException("No match response in duplicate check.")

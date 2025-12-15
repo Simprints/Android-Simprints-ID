@@ -43,7 +43,7 @@ class FingerprintMatcherImplTest {
         val result = matcher.match(probe, candidates, NecMatchingSettings(false))
         // Then
         Truth.assertThat(result.size).isEqualTo(3)
-        Truth.assertThat(result[0].confidence).isEqualTo(3)
+        Truth.assertThat(result[0].comparisonScore).isEqualTo(3)
     }
 
     @Test
@@ -56,7 +56,7 @@ class FingerprintMatcherImplTest {
         val result = matcher.match(probe, listOf(candidate), NecMatchingSettings(false))
         // Then
         Truth.assertThat(result.size).isEqualTo(1)
-        Truth.assertThat(result[0].confidence).isEqualTo(0)
+        Truth.assertThat(result[0].comparisonScore).isEqualTo(0)
     }
 
     @Test
@@ -69,7 +69,7 @@ class FingerprintMatcherImplTest {
         val result = matcher.match(probe, listOf(candidate), NecMatchingSettings(true))
         // Then
         Truth.assertThat(result.size).isEqualTo(1)
-        Truth.assertThat(result[0].confidence).isEqualTo(3)
+        Truth.assertThat(result[0].comparisonScore).isEqualTo(3)
     }
 
     @Test
@@ -82,7 +82,7 @@ class FingerprintMatcherImplTest {
         val result = matcher.match(probe, listOf(candidate), NecMatchingSettings(false))
         // Then
         Truth.assertThat(result.size).isEqualTo(1)
-        Truth.assertThat(result[0].confidence).isEqualTo(3)
+        Truth.assertThat(result[0].comparisonScore).isEqualTo(3)
     }
 
     @Test(expected = BioSdkException.TemplateMatchingException::class)

@@ -48,7 +48,7 @@ internal class MatchCandidatesUseCase @Inject constructor(
                 lastMatchSuccess?.comparisonResults?.map { result ->
                     CredentialMatch(
                         credential = credential,
-                        matchResult = result,
+                        comparisonResult = result,
                         verificationThreshold = matchThreshold,
                         bioSdk = matchParam.bioSdk,
                     )

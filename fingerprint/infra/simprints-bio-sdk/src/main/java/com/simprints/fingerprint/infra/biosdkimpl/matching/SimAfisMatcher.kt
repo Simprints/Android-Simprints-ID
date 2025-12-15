@@ -4,8 +4,8 @@ import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.sample.ComparisonResult
 import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.fingerprint.infra.simafiswrapper.JNILibAfisInterface
 import com.simprints.fingerprint.infra.simafiswrapper.models.SimAfisFingerIdentifier
 import com.simprints.fingerprint.infra.simafiswrapper.models.SimAfisFingerprint
@@ -29,7 +29,7 @@ internal class SimAfisMatcher @Inject constructor(
         probeReference: BiometricReferenceCapture,
         candidates: List<Identity>,
         crossFingerComparison: Boolean,
-    ): List<MatchComparisonResult> {
+    ): List<ComparisonResult> {
         // if probe template format is not supported by SimAfisMatcher, return empty list
         if (probeReference.templateFormatNotSupportedBySimAfisMatcher()) {
             return emptyList()
@@ -46,7 +46,7 @@ internal class SimAfisMatcher @Inject constructor(
     private fun match(
         probe: List<BiometricTemplate>,
         candidates: List<Identity>,
-    ): List<MatchComparisonResult> {
+    ): List<ComparisonResult> {
         val simAfisCandidates = candidates.map { it.toSimAfisPerson() }
 
         println("Matching ${simAfisCandidates.size} candidates using all ${jniLibAfis.getNbCores()} cores")
@@ -58,7 +58,7 @@ internal class SimAfisMatcher @Inject constructor(
         )
 
         return results.zip(simAfisCandidates).map { (score, candidate) ->
-            MatchComparisonResult(candidate.guid, score)
+            ComparisonResult(candidate.guid, score)
         }
     }
 
@@ -101,7 +101,7 @@ internal class SimAfisMatcher @Inject constructor(
         probe: List<BiometricTemplate>,
         candidate: Identity,
         jniLibAfis: JNILibAfisInterface,
-    ): MatchComparisonResult {
+    ): ComparisonResult {
         // Number of fingers used in matching
         val fingers = probe.fingerprintsTemplates.size
         // Sum of maximum matching score for each finger
@@ -116,7 +116,7 @@ internal class SimAfisMatcher @Inject constructor(
                     }.toDouble()
             }
         // Matching score  = total/number of fingers
-        return MatchComparisonResult(candidate.subjectId, getOverallScore(total, fingers))
+        return ComparisonResult(candidate.subjectId, getOverallScore(total, fingers))
     }
 
     private fun getOverallScore(

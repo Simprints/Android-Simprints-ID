@@ -1,7 +1,7 @@
 package com.simprints.feature.orchestrator.usecases
 
 import com.simprints.core.domain.reference.BiometricReferenceCapture
-import com.simprints.core.domain.sample.MatchComparisonResult
+import com.simprints.core.domain.sample.ComparisonResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.infra.matching.MatchResult
@@ -17,7 +17,7 @@ internal class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
             is BiometricReferenceCapture -> EnrolLastBiometricStepResult.CaptureResult(result)
 
             is MatchResult -> EnrolLastBiometricStepResult.MatchResult(
-                result.results.map { MatchComparisonResult(it.subjectId, it.confidence) },
+                result.results.map { ComparisonResult(it.subjectId, it.comparisonScore) },
                 result.sdk,
             )
 

@@ -7,7 +7,7 @@ import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.reference.TemplateIdentifier
-import com.simprints.core.domain.sample.MatchComparisonResult
+import com.simprints.core.domain.sample.ComparisonResult
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.FaceConfiguration
@@ -92,8 +92,8 @@ class SaveMatchEventUseCaseTest {
             2,
             "faceMatcherName",
             listOf(
-                MatchComparisonResult("guid1", 0.5f),
-                MatchComparisonResult("guid2", 0.1f),
+                ComparisonResult("guid1", 0.5f),
+                ComparisonResult("guid2", 0.1f),
             ),
             batches = emptyList(),
         )
@@ -143,8 +143,8 @@ class SaveMatchEventUseCaseTest {
             2,
             "faceMatcherName",
             listOf(
-                MatchComparisonResult("guid1", 0.5f),
-                MatchComparisonResult("guid2", 0.1f),
+                ComparisonResult("guid1", 0.5f),
+                ComparisonResult("guid2", 0.1f),
             ),
             batches = emptyList(),
         )
@@ -190,8 +190,8 @@ class SaveMatchEventUseCaseTest {
             candidatesCount = 2,
             matcherName = "faceMatcherName",
             results = listOf(
-                MatchComparisonResult("guid1", 0.5f),
-                MatchComparisonResult("guid2", 0.1f),
+                ComparisonResult("guid1", 0.5f),
+                ComparisonResult("guid2", 0.1f),
             ),
             batches = batches,
         )
@@ -254,7 +254,7 @@ class SaveMatchEventUseCaseTest {
             ),
             0,
             "faceMatcherName",
-            listOf(MatchComparisonResult("guid1", 0.5f)),
+            listOf(ComparisonResult("guid1", 0.5f)),
             batches = batches,
         )
 
