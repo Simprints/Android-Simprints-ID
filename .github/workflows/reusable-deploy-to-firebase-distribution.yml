@@ -34,7 +34,7 @@ jobs:
                     node-version: 'latest'
 
             -   name: Install Firebase Tools
-                run: npm install -g firebase-tools
+                run: npm install -g firebase-tools  --ignore-scripts
 
             -   name: Authenticate to Firebase
                 env:
@@ -44,7 +44,7 @@ jobs:
                     echo GOOGLE_APPLICATION_CREDENTIALS=$HOME/firebase-service-account.json >> $GITHUB_ENV
 
             -   name: Download APK artifact
-                uses: actions/download-artifact@v6
+                uses: actions/download-artifact@v7
                 with:
                     name: ${{ inputs.upload-artifact }}
 
