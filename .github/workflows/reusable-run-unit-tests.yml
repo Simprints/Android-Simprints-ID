@@ -31,7 +31,7 @@ jobs:
                     distribution: 'temurin'
 
             -   name: Restore gradle global directory
-                uses: actions/cache/restore@v4
+                uses: actions/cache/restore@v5
                 id: cache
                 with:
                     path: |
