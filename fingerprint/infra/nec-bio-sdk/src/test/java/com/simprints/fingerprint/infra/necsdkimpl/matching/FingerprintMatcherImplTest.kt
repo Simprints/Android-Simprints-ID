@@ -127,10 +127,8 @@ class FingerprintMatcherImplTest {
         templates = fingers.map {
             BiometricTemplateCapture(
                 captureEventId = it.name,
-                template = BiometricTemplate(
-                    template = ByteArray(0),
-                    identifier = it,
-                ),
+                template = ByteArray(0),
+                identifier = it,
             )
         },
     )

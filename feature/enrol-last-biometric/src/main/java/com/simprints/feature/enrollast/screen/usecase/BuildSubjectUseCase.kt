@@ -51,8 +51,8 @@ internal class BuildSubjectUseCase @Inject constructor(
     private fun BiometricReferenceCapture.toSamples() = templates.map { templateCapture ->
         Sample(
             template = BiometricTemplate(
-                identifier = templateCapture.template.identifier,
-                template = templateCapture.template.template,
+                identifier = templateCapture.identifier,
+                template = templateCapture.template,
             ),
             format = format,
             referenceId = referenceId,

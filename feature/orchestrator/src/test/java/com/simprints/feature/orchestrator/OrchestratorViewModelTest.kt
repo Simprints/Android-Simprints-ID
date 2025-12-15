@@ -8,7 +8,6 @@ import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.reference.BiometricReferenceCapture
-import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.response.AppErrorReason
@@ -303,17 +302,13 @@ internal class OrchestratorViewModelTest {
         val format = "SimMatcher"
         val capture1 = BiometricTemplateCapture(
             captureEventId = GUID1,
-            template = BiometricTemplate(
-                identifier = TemplateIdentifier.LEFT_INDEX_FINGER,
-                template = ByteArray(0),
-            ),
+            identifier = TemplateIdentifier.LEFT_INDEX_FINGER,
+            template = ByteArray(0),
         )
         val capture2 = BiometricTemplateCapture(
             captureEventId = GUID2,
-            template = BiometricTemplate(
-                identifier = TemplateIdentifier.LEFT_THUMB,
-                template = ByteArray(0),
-            ),
+            identifier = TemplateIdentifier.LEFT_THUMB,
+            template = ByteArray(0),
         )
 
         viewModel.handleAction(mockk())
@@ -441,17 +436,13 @@ internal class OrchestratorViewModelTest {
 
         val fingerprintCapture1 = BiometricTemplateCapture(
             captureEventId = GUID1,
-            template = BiometricTemplate(
-                identifier = fingerId1,
-                template = template1,
-            ),
+            identifier = fingerId1,
+            template = template1,
         )
         val fingerprintCapture2 = BiometricTemplateCapture(
             captureEventId = GUID2,
-            template = BiometricTemplate(
-                identifier = fingerId2,
-                template = template2,
-            ),
+            identifier = fingerId2,
+            template = template2,
         )
 
         val externalCredentialParams = mockk<ExternalCredentialParams>(relaxed = true) {

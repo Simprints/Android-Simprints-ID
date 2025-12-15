@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.reference.BiometricReferenceCapture
-import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -212,17 +211,13 @@ class BuildSubjectUseCaseTest {
 
     private fun mockFingerprintResults(finger: TemplateIdentifier) = BiometricTemplateCapture(
         captureEventId = "eventId",
-        template = BiometricTemplate(
-            identifier = finger,
-            template = byteArrayOf(),
-        ),
+        identifier = finger,
+        template = byteArrayOf(),
     )
 
     private fun mockFaceResults() = BiometricTemplateCapture(
         captureEventId = "eventId",
-        template = BiometricTemplate(
-            template = byteArrayOf(),
-        ),
+        template = byteArrayOf(),
     )
 
     companion object {

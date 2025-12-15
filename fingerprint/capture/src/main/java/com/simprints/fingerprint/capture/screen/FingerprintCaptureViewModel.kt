@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.reference.BiometricReferenceCapture
-import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.livedata.LiveDataEvent
@@ -673,10 +672,8 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             captureEventIds[captureId]?.let { captureEventId ->
                 BiometricTemplateCapture(
                     captureEventId = captureEventId,
-                    template = BiometricTemplate(
-                        template = collectedFinger.scanResult.template,
-                        identifier = captureId.finger,
-                    ),
+                    template = collectedFinger.scanResult.template,
+                    identifier = captureId.finger,
                 )
             }
         }

@@ -15,7 +15,7 @@ class RocV1Matcher(
     override val probeReference: BiometricReferenceCapture,
 ) : FaceMatcher(probeReference) {
     var nativeProbeTemplates: List<SWIGTYPE_p_unsigned_char> = probeReference.templates
-        .map { it.template.template }
+        .map { it.template }
         .map { probe ->
             val probeTemplate: SWIGTYPE_p_unsigned_char = roc.new_uint8_t_array(ROC_FAST_FV_SIZE.toInt())
             roc.memmove(roc.roc_cast(probeTemplate), probe)

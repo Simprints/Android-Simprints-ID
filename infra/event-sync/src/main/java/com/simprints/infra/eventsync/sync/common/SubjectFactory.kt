@@ -104,8 +104,8 @@ class SubjectFactory @Inject constructor(
     private fun extractCaptureSamples(response: BiometricReferenceCapture) = response.templates.map { templateCapture ->
         Sample(
             template = BiometricTemplate(
-                identifier = templateCapture.template.identifier,
-                template = templateCapture.template.template,
+                identifier = templateCapture.identifier,
+                template = templateCapture.template,
             ),
             format = response.format,
             referenceId = response.referenceId,

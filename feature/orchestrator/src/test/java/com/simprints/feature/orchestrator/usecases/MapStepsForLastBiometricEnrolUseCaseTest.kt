@@ -3,7 +3,6 @@ package com.simprints.feature.orchestrator.usecases
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.reference.BiometricReferenceCapture
-import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
@@ -55,7 +54,7 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
                     templates = listOf(
                         BiometricTemplateCapture(
                             captureEventId = "captureId",
-                            template = BiometricTemplate(byteArrayOf()),
+                            template = byteArrayOf(),
                         ),
                     ),
                 ),
@@ -71,7 +70,7 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
                     templates = listOf(
                         BiometricTemplateCapture(
                             captureEventId = "captureId",
-                            template = BiometricTemplate(byteArrayOf()),
+                            template = byteArrayOf(),
                         ),
                     ),
                 ),
@@ -103,10 +102,8 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
                     templates = listOf(
                         BiometricTemplateCapture(
                             captureEventId = "captureId",
-                            template = BiometricTemplate(
-                                template = byteArrayOf(),
-                                identifier = TemplateIdentifier.RIGHT_THUMB,
-                            ),
+                            template = byteArrayOf(),
+                            identifier = TemplateIdentifier.RIGHT_THUMB,
                         ),
                     ),
                 ),
@@ -122,10 +119,8 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
                     templates = listOf(
                         BiometricTemplateCapture(
                             captureEventId = "captureId",
-                            template = BiometricTemplate(
-                                template = byteArrayOf(),
-                                identifier = TemplateIdentifier.RIGHT_THUMB,
-                            ),
+                            template = byteArrayOf(),
+                            identifier = TemplateIdentifier.RIGHT_THUMB,
                         ),
                     ),
                 ),

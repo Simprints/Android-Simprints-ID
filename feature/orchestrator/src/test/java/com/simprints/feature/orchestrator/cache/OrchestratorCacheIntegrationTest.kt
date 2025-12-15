@@ -8,7 +8,6 @@ import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.reference.BiometricReferenceCapture
-import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.response.AppErrorReason
@@ -134,10 +133,8 @@ class OrchestratorCacheIntegrationTest {
                                 templates = listOf(
                                     BiometricTemplateCapture(
                                         captureEventId = GUID1,
-                                        template = BiometricTemplate(
-                                            identifier = TemplateIdentifier.LEFT_THUMB,
-                                            template = byteArrayOf(1, 2, 3),
-                                        ),
+                                        identifier = TemplateIdentifier.LEFT_THUMB,
+                                        template = byteArrayOf(1, 2, 3),
                                     ),
                                 ),
                             ),
@@ -197,10 +194,8 @@ class OrchestratorCacheIntegrationTest {
                             templates = listOf(
                                 BiometricTemplateCapture(
                                     captureEventId = "captureEvent1",
-                                    template = BiometricTemplate(
-                                        identifier = TemplateIdentifier.LEFT_THUMB,
-                                        template = byteArrayOf(1, 2, 3),
-                                    ),
+                                    identifier = TemplateIdentifier.LEFT_THUMB,
+                                    template = byteArrayOf(1, 2, 3),
                                 ),
                             ),
                         ),
@@ -211,9 +206,7 @@ class OrchestratorCacheIntegrationTest {
                             templates = listOf(
                                 BiometricTemplateCapture(
                                     captureEventId = "captureEvent2",
-                                    template = BiometricTemplate(
-                                        template = byteArrayOf(2, 3, 4),
-                                    ),
+                                    template = byteArrayOf(2, 3, 4),
                                 ),
                             ),
                         ),
@@ -274,10 +267,8 @@ class OrchestratorCacheIntegrationTest {
                     templates = listOf(
                         BiometricTemplateCapture(
                             captureEventId = GUID1,
-                            template = BiometricTemplate(
-                                identifier = TemplateIdentifier.LEFT_THUMB,
-                                template = byteArrayOf(1, 2, 3),
-                            ),
+                            identifier = TemplateIdentifier.LEFT_THUMB,
+                            template = byteArrayOf(1, 2, 3),
                         ),
                     ),
                 ),
@@ -298,10 +289,8 @@ class OrchestratorCacheIntegrationTest {
                         templates = listOf(
                             BiometricTemplateCapture(
                                 captureEventId = "captureEvent1",
-                                template = BiometricTemplate(
-                                    identifier = TemplateIdentifier.LEFT_THUMB,
-                                    template = byteArrayOf(1, 2, 3),
-                                ),
+                                identifier = TemplateIdentifier.LEFT_THUMB,
+                                template = byteArrayOf(1, 2, 3),
                             ),
                         ),
                     ),
@@ -339,9 +328,7 @@ class OrchestratorCacheIntegrationTest {
                     templates = listOf(
                         BiometricTemplateCapture(
                             captureEventId = GUID1,
-                            template = BiometricTemplate(
-                                template = byteArrayOf(1, 2, 3),
-                            ),
+                            template = byteArrayOf(1, 2, 3),
                         ),
                     ),
                 ),
@@ -362,9 +349,7 @@ class OrchestratorCacheIntegrationTest {
                         templates = listOf(
                             BiometricTemplateCapture(
                                 captureEventId = "captureEvent1",
-                                template = BiometricTemplate(
-                                    template = byteArrayOf(1, 2, 3),
-                                ),
+                                template = byteArrayOf(1, 2, 3),
                             ),
                         ),
                     ),

@@ -118,9 +118,7 @@ internal class FaceMatcherUseCaseTest {
                         templates = listOf(
                             BiometricTemplateCapture(
                                 captureEventId = "faceId",
-                                template = BiometricTemplate(
-                                    template = byteArrayOf(1, 2, 3),
-                                ),
+                                template = byteArrayOf(1, 2, 3),
                             ),
                         ),
                     ),
@@ -159,9 +157,7 @@ internal class FaceMatcherUseCaseTest {
                         templates = listOf(
                             BiometricTemplateCapture(
                                 captureEventId = "faceId",
-                                template = BiometricTemplate(
-                                    template = byteArrayOf(1, 2, 3),
-                                ),
+                                template = byteArrayOf(1, 2, 3),
                             ),
                         ),
                     ),
@@ -238,9 +234,7 @@ internal class FaceMatcherUseCaseTest {
                         templates = listOf(
                             BiometricTemplateCapture(
                                 captureEventId = "faceId",
-                                template = BiometricTemplate(
-                                    template = byteArrayOf(1, 2, 3),
-                                ),
+                                template = byteArrayOf(1, 2, 3),
                             ),
                         ),
                     ),
