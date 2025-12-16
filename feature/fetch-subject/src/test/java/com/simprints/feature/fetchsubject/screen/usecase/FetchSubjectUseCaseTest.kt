@@ -3,8 +3,8 @@ package com.simprints.feature.fetchsubject.screen.usecase
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.fetchsubject.screen.FetchSubjectState
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.network.ConnectivityTracker
 import io.mockk.MockKAnnotations
@@ -44,7 +44,7 @@ internal class FetchSubjectUseCaseTest {
 
         val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID, "")
 
-        coVerify { enrolmentRecordRepository.load(SubjectQuery(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)) }
+        coVerify { enrolmentRecordRepository.load(EnrolmentRecordQuery(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)) }
         assertThat(result).isInstanceOf(FetchSubjectState.FoundLocal::class.java)
     }
 
@@ -75,7 +75,7 @@ internal class FetchSubjectUseCaseTest {
 
         val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID, "")
 
-        coVerify(exactly = 2) { enrolmentRecordRepository.load(SubjectQuery(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)) }
+        coVerify(exactly = 2) { enrolmentRecordRepository.load(EnrolmentRecordQuery(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)) }
         assertThat(result).isInstanceOf(FetchSubjectState.FoundRemote::class.java)
     }
 

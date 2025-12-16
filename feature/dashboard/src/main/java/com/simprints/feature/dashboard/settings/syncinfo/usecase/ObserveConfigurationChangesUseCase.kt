@@ -8,7 +8,7 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 
@@ -37,7 +37,7 @@ internal class ObserveConfigurationChangesUseCase @Inject constructor(
                         )
                     }.value,
                     count = enrolmentRecordRepository.count(
-                        SubjectQuery(projectId = project.id, moduleId = moduleName),
+                        EnrolmentRecordQuery(projectId = project.id, moduleId = moduleName),
                     ),
                 )
             }

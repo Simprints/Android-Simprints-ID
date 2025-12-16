@@ -49,7 +49,7 @@ import com.simprints.fingerprint.capture.FingerprintCaptureParams
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.matching.MatchParams
 import com.simprints.infra.matching.MatchResult
@@ -166,7 +166,7 @@ class OrchestratorCacheIntegrationTest {
                 id = StepId.VALIDATE_ID_POOL,
                 navigationActionId = 5,
                 destinationId = 6,
-                params = ValidateSubjectPoolFragmentParams(SubjectQuery()),
+                params = ValidateSubjectPoolFragmentParams(EnrolmentRecordQuery()),
                 status = StepStatus.COMPLETED,
                 result = ValidateSubjectPoolResult(true),
             ),
@@ -279,7 +279,7 @@ class OrchestratorCacheIntegrationTest {
                 destinationId = 4,
                 params = MatchParams(
                     flowType = FlowType.IDENTIFY,
-                    queryForCandidates = SubjectQuery(),
+                    queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.CommCare("name"),
                     bioSdk = FingerprintConfiguration.BioSdk.NEC,
                     probeReference = BiometricReferenceCapture(
@@ -339,7 +339,7 @@ class OrchestratorCacheIntegrationTest {
                 destinationId = 4,
                 params = MatchParams(
                     flowType = FlowType.IDENTIFY,
-                    queryForCandidates = SubjectQuery(),
+                    queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
                     bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                     probeReference = BiometricReferenceCapture(

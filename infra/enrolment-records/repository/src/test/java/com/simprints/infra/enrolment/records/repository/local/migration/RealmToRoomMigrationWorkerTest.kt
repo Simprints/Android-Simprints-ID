@@ -6,8 +6,8 @@ import androidx.work.ListenableWorker.Result
 import androidx.work.WorkerParameters
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource
 import com.simprints.infra.enrolment.records.repository.local.RoomEnrolmentRecordLocalDataSource
 import io.mockk.MockKAnnotations
@@ -116,7 +116,7 @@ class RealmToRoomMigrationWorkerTest {
         coVerify(exactly = 1) {
             roomDataSource.performActions(
                 match { actions ->
-                    actions.all { it is SubjectAction.Creation } && actions.size == mockSubjectsBatch1.size
+                    actions.all { it is EnrolmentRecordAction.Creation } && actions.size == mockSubjectsBatch1.size
                 },
                 any(),
             )
@@ -124,7 +124,7 @@ class RealmToRoomMigrationWorkerTest {
         coVerify(exactly = 1) {
             roomDataSource.performActions(
                 match { actions ->
-                    actions.all { it is SubjectAction.Creation } && actions.size == mockSubjectsBatch2.size
+                    actions.all { it is EnrolmentRecordAction.Creation } && actions.size == mockSubjectsBatch2.size
                 },
                 any(),
             )

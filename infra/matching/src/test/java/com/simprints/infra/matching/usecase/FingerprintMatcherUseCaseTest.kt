@@ -21,7 +21,7 @@ import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.matching.MatchParams
@@ -97,7 +97,7 @@ internal class FingerprintMatcherUseCaseTest {
                     ),
                     bioSdk = SECUGEN_SIM_MATCHER,
                     flowType = FlowType.VERIFY,
-                    queryForCandidates = SubjectQuery(),
+                    queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
                 ),
                 project,
@@ -140,7 +140,7 @@ internal class FingerprintMatcherUseCaseTest {
                     ),
                     bioSdk = SECUGEN_SIM_MATCHER,
                     flowType = FlowType.VERIFY,
-                    queryForCandidates = SubjectQuery(),
+                    queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
                 ),
                 project,
@@ -180,7 +180,7 @@ internal class FingerprintMatcherUseCaseTest {
                     ),
                     bioSdk = FaceConfiguration.BioSdk.RANK_ONE, // Wrong SDK type
                     flowType = FlowType.VERIFY,
-                    queryForCandidates = SubjectQuery(),
+                    queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
                 ),
                 project,
@@ -258,7 +258,7 @@ internal class FingerprintMatcherUseCaseTest {
                     ),
                     bioSdk = SECUGEN_SIM_MATCHER,
                     flowType = FlowType.VERIFY,
-                    queryForCandidates = SubjectQuery(),
+                    queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
                 ),
                 project,

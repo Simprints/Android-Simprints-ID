@@ -20,9 +20,9 @@ import com.simprints.infra.enrolment.records.realm.store.RealmWrapperImpl
 import com.simprints.infra.enrolment.records.realm.store.config.RealmConfig
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
 import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.keyprovider.LocalDbKey
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -101,7 +101,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         // Given
         val subjectId = UUID.randomUUID().toString()
         val subject = createTestSubject(subjectId)
-        val creationAction = SubjectAction.Creation(subject)
+        val creationAction = EnrolmentRecordAction.Creation(subject)
         val project = mockk<Project>()
 
         // When
@@ -125,9 +125,9 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         // Given
         val subjectId = UUID.randomUUID().toString()
         val subject = createTestSubject(subjectId)
-        dataSource.performActions(listOf(SubjectAction.Creation(subject)), mockk())
+        dataSource.performActions(listOf(EnrolmentRecordAction.Creation(subject)), mockk())
 
-        val query = SubjectQuery(subjectId = subjectId)
+        val query = EnrolmentRecordQuery(subjectId = subjectId)
 
         // When
         val result = dataSource.load(query)
@@ -144,13 +144,13 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         val subject2 = createTestSubject(projectId = "other-project")
         dataSource.performActions(
             listOf(
-                SubjectAction.Creation(subject1),
-                SubjectAction.Creation(subject2),
+                EnrolmentRecordAction.Creation(subject1),
+                EnrolmentRecordAction.Creation(subject2),
             ),
             mockk(),
         )
         // Query to match only subject1
-        val query = SubjectQuery(projectId = subject1.projectId)
+        val query = EnrolmentRecordQuery(projectId = subject1.projectId)
 
         // When
         val count = dataSource.count(query, mockk())
@@ -164,19 +164,19 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         // Given
         val subjectId = UUID.randomUUID().toString()
         val subject = createTestSubject(subjectId)
-        dataSource.performActions(listOf(SubjectAction.Creation(subject)), mockk())
+        dataSource.performActions(listOf(EnrolmentRecordAction.Creation(subject)), mockk())
 
         // Verify it was created
-        var count = dataSource.count(SubjectQuery(subjectId = subjectId), mockk())
+        var count = dataSource.count(EnrolmentRecordQuery(subjectId = subjectId), mockk())
         assertThat(count).isEqualTo(1)
 
-        val deletionAction = SubjectAction.Deletion(subjectId)
+        val deletionAction = EnrolmentRecordAction.Deletion(subjectId)
 
         // When
         dataSource.performActions(listOf(deletionAction), mockk())
 
         // Then
-        count = dataSource.count(SubjectQuery(subjectId = subjectId), mockk())
+        count = dataSource.count(EnrolmentRecordQuery(subjectId = subjectId), mockk())
         assertThat(count).isEqualTo(0)
     }
 
@@ -188,23 +188,23 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         val subject3 = createTestSubject(projectId = "proj2")
         dataSource.performActions(
             listOf(
-                SubjectAction.Creation(subject1),
-                SubjectAction.Creation(subject2),
-                SubjectAction.Creation(subject3),
+                EnrolmentRecordAction.Creation(subject1),
+                EnrolmentRecordAction.Creation(subject2),
+                EnrolmentRecordAction.Creation(subject3),
             ),
             mockk(),
         )
 
-        val queryToDelete = SubjectQuery(projectId = "proj1")
+        val queryToDelete = EnrolmentRecordQuery(projectId = "proj1")
 
         // When
         dataSource.delete(listOf(queryToDelete))
 
         // Then
-        val remainingCount = dataSource.count(SubjectQuery(), mockk())
+        val remainingCount = dataSource.count(EnrolmentRecordQuery(), mockk())
         assertThat(remainingCount).isEqualTo(1)
 
-        val allSubjects = dataSource.load(SubjectQuery())
+        val allSubjects = dataSource.load(EnrolmentRecordQuery())
         assertThat(allSubjects.first().projectId).isEqualTo("proj2")
     }
 
@@ -215,8 +215,8 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         val subject2 = createTestSubject()
         dataSource.performActions(
             listOf(
-                SubjectAction.Creation(subject1),
-                SubjectAction.Creation(subject2),
+                EnrolmentRecordAction.Creation(subject1),
+                EnrolmentRecordAction.Creation(subject2),
             ),
             mockk(),
         )
@@ -225,7 +225,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         dataSource.deleteAll()
 
         // Then
-        val count = dataSource.count(SubjectQuery(), mockk())
+        val count = dataSource.count(EnrolmentRecordQuery(), mockk())
         assertThat(count).isEqualTo(0)
     }
 
@@ -255,9 +255,9 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
                 type = ExternalCredentialType.NHISCard,
             ),
         )
-        dataSource.performActions(listOf(SubjectAction.Creation(originalSubject)), mockk())
+        dataSource.performActions(listOf(EnrolmentRecordAction.Creation(originalSubject)), mockk())
 
-        val updateAction = SubjectAction.Update(
+        val updateAction = EnrolmentRecordAction.Update(
             subjectId,
             samplesToAdd = listOf(
                 BiometricReference(
@@ -338,11 +338,11 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
             }
         }
         dataSource.performActions(
-            subjects.map { SubjectAction.Creation(it) },
+            subjects.map { EnrolmentRecordAction.Creation(it) },
             mockk(),
         )
 
-        val query = SubjectQuery(format = "ISO")
+        val query = EnrolmentRecordQuery(format = "ISO")
         val ranges = listOf(0..2, 3..5, 6..9) // 3 batches
         val loadedCandidates = mutableListOf<Unit>()
 
@@ -390,11 +390,11 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
             }
         }
         dataSource.performActions(
-            subjects.map { SubjectAction.Creation(it) },
+            subjects.map { EnrolmentRecordAction.Creation(it) },
             mockk(),
         )
 
-        val query = SubjectQuery(format = "ISO")
+        val query = EnrolmentRecordQuery(format = "ISO")
         val ranges = listOf(0..2, 3..5, 6..9) // 3 batches
         val loadedCandidates = mutableListOf<Unit>()
 
@@ -428,7 +428,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
             createTestSubject(subjectId = UUID.randomUUID().toString())
         }
         dataSource.performActions(
-            subjects.map { SubjectAction.Creation(it) },
+            subjects.map { EnrolmentRecordAction.Creation(it) },
             mockk(),
         )
 

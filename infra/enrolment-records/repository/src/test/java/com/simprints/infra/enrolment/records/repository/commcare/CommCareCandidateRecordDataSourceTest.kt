@@ -19,7 +19,7 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.commcare.CommCareCandidateRecordDataSource.Companion.COLUMN_DATUM_ID
 import com.simprints.infra.enrolment.records.repository.commcare.CommCareCandidateRecordDataSource.Companion.COLUMN_VALUE
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.enrolment.records.repository.usecases.CompareImplicitTokenizedStringsUseCase
 import com.simprints.infra.logging.Simber
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -303,7 +303,7 @@ class CommCareCandidateRecordDataSourceTest {
 
         dataSource
             .loadCandidateRecords(
-                query = SubjectQuery(format = templateFormat),
+                query = EnrolmentRecordQuery(format = templateFormat),
                 ranges = listOf(0..expectedFingerprintCandidates.size),
                 project = project,
                 dataSource = commCareBiometricDataSource,
@@ -330,7 +330,7 @@ class CommCareCandidateRecordDataSourceTest {
 
         dataSource
             .loadCandidateRecords(
-                query = SubjectQuery(
+                query = EnrolmentRecordQuery(
                     format = templateFormat,
                     attendantId = TokenizableString.Tokenized("AdySMrjuy7uq0Dcxov3rUFIw66uXTFrKd0BnzSr9MYXl5maWEpyKQT8AUdcPuVHUWpOkO88="),
                     moduleId = TokenizableString.Tokenized("AWuA3H0WGtHI2uod+ePZ3yiWTt9etQ=="),
@@ -361,7 +361,7 @@ class CommCareCandidateRecordDataSourceTest {
 
         dataSource
             .loadCandidateRecords(
-                query = SubjectQuery(format = templateFormat),
+                query = EnrolmentRecordQuery(format = templateFormat),
                 ranges = listOf(0..expectedFingerprintCandidates.size),
                 project = project,
                 dataSource = commCareBiometricDataSource,
@@ -387,7 +387,7 @@ class CommCareCandidateRecordDataSourceTest {
 
         dataSource
             .loadCandidateRecords(
-                query = SubjectQuery(format = templateFormat),
+                query = EnrolmentRecordQuery(format = templateFormat),
                 ranges = listOf(0..expectedFaceCandidates.size),
                 project = project,
                 dataSource = commCareBiometricDataSource,
@@ -413,7 +413,7 @@ class CommCareCandidateRecordDataSourceTest {
 
         dataSource
             .loadCandidateRecords(
-                query = SubjectQuery(format = templateFormat),
+                query = EnrolmentRecordQuery(format = templateFormat),
                 ranges = listOf(0..expectedFingerprintCandidates.size),
                 project = project,
                 dataSource = commCareBiometricDataSource,
@@ -439,7 +439,7 @@ class CommCareCandidateRecordDataSourceTest {
 
         dataSource
             .loadCandidateRecords(
-                query = SubjectQuery(format = templateFormat),
+                query = EnrolmentRecordQuery(format = templateFormat),
                 ranges = listOf(0..expectedFaceCandidates.size),
                 project = project,
                 dataSource = commCareBiometricDataSource,
@@ -460,7 +460,7 @@ class CommCareCandidateRecordDataSourceTest {
         val expectedCount = 5
         every { mockMetadataCursor.count } returns expectedCount
 
-        val query = SubjectQuery()
+        val query = EnrolmentRecordQuery()
         val actualCount = dataSource.count(query)
 
         assertEquals(expectedCount, actualCount)
@@ -480,7 +480,7 @@ class CommCareCandidateRecordDataSourceTest {
             )
         } returns null
 
-        val query = SubjectQuery()
+        val query = EnrolmentRecordQuery()
         val range = 0..0
         val actualIdentities = mutableListOf<CandidateRecord>()
         dataSource
@@ -504,7 +504,7 @@ class CommCareCandidateRecordDataSourceTest {
     fun `test metadata cursor size below range's first`() = runTest {
         every { mockMetadataCursor.count } returns 1
 
-        val query = SubjectQuery()
+        val query = EnrolmentRecordQuery()
         val range = 2..3
         val actualIdentities = mutableListOf<CandidateRecord>()
         dataSource
@@ -535,7 +535,7 @@ class CommCareCandidateRecordDataSourceTest {
 
         dataSource
             .loadCandidateRecords(
-                query = SubjectQuery(format = templateFormat),
+                query = EnrolmentRecordQuery(format = templateFormat),
                 ranges = listOf(expectedFingerprintCandidates.indices),
                 project = project,
                 dataSource = commCareBiometricDataSource,
@@ -560,7 +560,7 @@ class CommCareCandidateRecordDataSourceTest {
         val actualIdentities = mutableListOf<CandidateRecord>()
         dataSource
             .loadCandidateRecords(
-                query = SubjectQuery(),
+                query = EnrolmentRecordQuery(),
                 ranges = listOf(0..2),
                 project = project,
                 dataSource = commCareBiometricDataSource,
@@ -582,7 +582,7 @@ class CommCareCandidateRecordDataSourceTest {
         val actualIdentities = mutableListOf<CandidateRecord>()
         dataSource
             .loadCandidateRecords(
-                query = SubjectQuery(),
+                query = EnrolmentRecordQuery(),
                 ranges = listOf(0..2),
                 project = project,
                 dataSource = commCareBiometricDataSource,
@@ -606,7 +606,7 @@ class CommCareCandidateRecordDataSourceTest {
         val actualIdentities = mutableListOf<CandidateRecord>()
         dataSource
             .loadCandidateRecords(
-                query = SubjectQuery(),
+                query = EnrolmentRecordQuery(),
                 ranges = listOf(0..2),
                 project = project,
                 dataSource = commCareBiometricDataSource,
@@ -633,7 +633,7 @@ class CommCareCandidateRecordDataSourceTest {
         val actualIdentities = mutableListOf<CandidateRecord>()
         dataSource
             .loadCandidateRecords(
-                query = SubjectQuery(),
+                query = EnrolmentRecordQuery(),
                 ranges = listOf(0..2),
                 project = project,
                 dataSource = commCareBiometricDataSource,
@@ -656,7 +656,7 @@ class CommCareCandidateRecordDataSourceTest {
         val actualIdentities = mutableListOf<CandidateRecord>()
         dataSource
             .loadCandidateRecords(
-                query = SubjectQuery(),
+                query = EnrolmentRecordQuery(),
                 ranges = listOf(0..2),
                 project = project,
                 dataSource = commCareBiometricDataSource,
@@ -684,7 +684,7 @@ class CommCareCandidateRecordDataSourceTest {
             )
         } returns null
 
-        val query = SubjectQuery()
+        val query = EnrolmentRecordQuery()
         val actualCount = dataSource.count(query)
 
         assertEquals(0, actualCount)
@@ -696,7 +696,7 @@ class CommCareCandidateRecordDataSourceTest {
         val testCaseId = "test-case-id"
         every { extractCommCareCaseIdUseCase.invoke(any()) } returns testCaseId
 
-        val query = SubjectQuery(metadata = "test-metadata")
+        val query = EnrolmentRecordQuery(metadata = "test-metadata")
         val actualCount = dataSource.count(query, commCareBiometricDataSource)
 
         assertEquals(1, actualCount)
@@ -710,7 +710,7 @@ class CommCareCandidateRecordDataSourceTest {
         every { extractCommCareCaseIdUseCase.invoke(any()) } returns null
         every { mockMetadataCursor.count } returns expectedCount
 
-        val query = SubjectQuery(metadata = "test-metadata")
+        val query = EnrolmentRecordQuery(metadata = "test-metadata")
         val actualCount = dataSource.count(query, commCareBiometricDataSource)
 
         assertEquals(expectedCount, actualCount)
@@ -728,7 +728,7 @@ class CommCareCandidateRecordDataSourceTest {
         every { mockDataCursor.getString(0) } returnsMany listOf("someOtherDatumId", "subjectActions")
         every { mockDataCursor.getString(1) } returns SUBJECT_ACTIONS_FINGERPRINT_1
 
-        val query = SubjectQuery(metadata = "test-metadata")
+        val query = EnrolmentRecordQuery(metadata = "test-metadata")
         dataSource
             .loadCandidateRecords(
                 query = query,

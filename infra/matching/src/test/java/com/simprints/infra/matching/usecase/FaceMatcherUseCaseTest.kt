@@ -18,7 +18,7 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.matching.MatchParams
@@ -79,7 +79,7 @@ internal class FaceMatcherUseCaseTest {
             .invoke(
                 MatchParams(
                     flowType = FlowType.VERIFY,
-                    queryForCandidates = SubjectQuery(),
+                    queryForCandidates = EnrolmentRecordQuery(),
                     bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                     biometricDataSource = BiometricDataSource.Simprints,
                     probeReference = BiometricReferenceCapture(
@@ -124,7 +124,7 @@ internal class FaceMatcherUseCaseTest {
                     ),
                     bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                     flowType = FlowType.VERIFY,
-                    queryForCandidates = SubjectQuery(),
+                    queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
                 ),
                 project,
@@ -163,7 +163,7 @@ internal class FaceMatcherUseCaseTest {
                     ),
                     bioSdk = FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER, // Wrong SDK type
                     flowType = FlowType.VERIFY,
-                    queryForCandidates = SubjectQuery(),
+                    queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
                 ),
                 project,
@@ -242,7 +242,7 @@ internal class FaceMatcherUseCaseTest {
                     ),
                     bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                     flowType = FlowType.VERIFY,
-                    queryForCandidates = SubjectQuery(),
+                    queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
                 ),
                 project,

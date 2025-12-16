@@ -11,9 +11,9 @@ import com.simprints.infra.enrolment.records.realm.store.RealmWrapper
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.local.models.toDomain
 import com.simprints.infra.enrolment.records.repository.local.models.toRealmDb
 import com.simprints.infra.enrolment.records.repository.local.models.toRealmFaceDb
@@ -61,7 +61,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         const val CHANNEL_CAPACITY = 4
     }
 
-    override suspend fun load(query: SubjectQuery): List<Subject> = realmWrapper.readRealm {
+    override suspend fun load(query: EnrolmentRecordQuery): List<Subject> = realmWrapper.readRealm {
         it
             .query(DbSubject::class)
             .buildRealmQueryForSubject(query)
@@ -70,7 +70,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
     }
 
     override suspend fun loadCandidateRecords(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
         project: Project,
@@ -104,7 +104,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
     }
 
     private suspend fun loadCandidatesRange(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         range: IntRange,
         mapper: (DbSubject) -> CandidateRecord,
         onCandidateLoaded: suspend () -> Unit,
@@ -121,7 +121,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
             }
     }
 
-    override suspend fun delete(queries: List<SubjectQuery>) {
+    override suspend fun delete(queries: List<EnrolmentRecordQuery>) {
         realmWrapper.writeRealm { realm ->
             queries.forEach {
                 realm.delete(realm.query(DbSubject::class).buildRealmQueryForSubject(it))
@@ -136,7 +136,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
     }
 
     override suspend fun count(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         dataSource: BiometricDataSource,
     ): Int = realmWrapper.readRealm { realm ->
         realm
@@ -148,7 +148,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
     }
 
     override suspend fun performActions(
-        actions: List<SubjectAction>,
+        actions: List<EnrolmentRecordAction>,
         project: Project,
     ) {
         // if there is no actions to perform return to avoid useless realm operations
@@ -160,7 +160,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         realmWrapper.writeRealm { realm ->
             actions.forEach { action ->
                 when (action) {
-                    is SubjectAction.Creation -> {
+                    is EnrolmentRecordAction.Creation -> {
                         val newSubject = action.subject
                             .copy(
                                 moduleId =
@@ -201,7 +201,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                         realm.copyToRealm(newSubject, updatePolicy = UpdatePolicy.ALL)
                     }
 
-                    is SubjectAction.Update -> {
+                    is EnrolmentRecordAction.Update -> {
                         val dbSubject: DbSubject? = realm.findSubject(RealmUUID.from(action.subjectId))
                         if (dbSubject != null) {
                             val referencesToDelete = action.referenceIdsToRemove.toSet() // to make lookup O(1)
@@ -236,11 +236,11 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                         }
                     }
 
-                    is SubjectAction.Deletion -> {
+                    is EnrolmentRecordAction.Deletion -> {
                         realm.delete(
                             realm
                                 .query(DbSubject::class)
-                                .buildRealmQueryForSubject(query = SubjectQuery(subjectId = action.subjectId))
+                                .buildRealmQueryForSubject(query = EnrolmentRecordQuery(subjectId = action.subjectId))
                                 .find(),
                         )
                     }
@@ -269,7 +269,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
     private fun MutableRealm.findSubject(subjectId: RealmUUID): DbSubject? =
         query(DbSubject::class).query("$SUBJECT_ID_FIELD == $0", subjectId).first().find()
 
-    private fun RealmQuery<DbSubject>.buildRealmQueryForSubject(query: SubjectQuery): RealmQuery<DbSubject> {
+    private fun RealmQuery<DbSubject>.buildRealmQueryForSubject(query: EnrolmentRecordQuery): RealmQuery<DbSubject> {
         var realmQuery = this
 
         if (query.projectId != null) {

@@ -3,7 +3,7 @@ package com.simprints.feature.orchestrator.usecases.steps
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.config.store.models.IdentificationConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.orchestration.data.ActionRequest
 import javax.inject.Inject
 
@@ -13,18 +13,18 @@ internal class BuildMatcherSubjectQueryUseCase @Inject constructor() {
         projectConfiguration: ProjectConfiguration,
         actionRequest: ActionRequest,
     ) = when (projectConfiguration.identification.poolType) {
-        IdentificationConfiguration.PoolType.PROJECT -> SubjectQuery(
+        IdentificationConfiguration.PoolType.PROJECT -> EnrolmentRecordQuery(
             projectId = actionRequest.projectId,
             metadata = actionRequest.metadata,
         )
 
-        IdentificationConfiguration.PoolType.USER -> SubjectQuery(
+        IdentificationConfiguration.PoolType.USER -> EnrolmentRecordQuery(
             projectId = actionRequest.projectId,
             attendantId = actionRequest.userId,
             metadata = actionRequest.metadata,
         )
 
-        IdentificationConfiguration.PoolType.MODULE -> SubjectQuery(
+        IdentificationConfiguration.PoolType.MODULE -> EnrolmentRecordQuery(
             projectId = actionRequest.projectId,
             moduleId = (actionRequest as ActionRequest.FlowAction).moduleId,
             metadata = actionRequest.metadata,

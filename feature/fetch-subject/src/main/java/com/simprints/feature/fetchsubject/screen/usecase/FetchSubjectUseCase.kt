@@ -2,7 +2,7 @@ package com.simprints.feature.fetchsubject.screen.usecase
 
 import com.simprints.feature.fetchsubject.screen.FetchSubjectState
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.ConnectivityTracker
@@ -47,7 +47,7 @@ internal class FetchSubjectUseCase @Inject constructor(
     private suspend fun loadFromDatabase(
         projectId: String,
         subjectId: String,
-    ) = enrolmentRecordRepository.load(SubjectQuery(projectId, subjectId)).firstOrNull()
+    ) = enrolmentRecordRepository.load(EnrolmentRecordQuery(projectId, subjectId)).firstOrNull()
 
     private fun notFoundState() = if (connectivityTracker.isConnected()) {
         FetchSubjectState.NotFound

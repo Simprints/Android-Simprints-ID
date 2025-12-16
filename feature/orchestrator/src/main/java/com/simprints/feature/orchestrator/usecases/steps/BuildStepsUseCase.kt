@@ -31,7 +31,7 @@ import com.simprints.infra.config.store.models.getSdkListForAgeGroup
 import com.simprints.infra.config.store.models.isAgeRestricted
 import com.simprints.infra.config.store.models.sortedUniqueAgeGroups
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.matcher.MatchContract
 import javax.inject.Inject
@@ -48,12 +48,14 @@ internal class BuildStepsUseCase @Inject constructor(
         enrolmentSubjectId: String,
         cachedScannedCredential: ScannedCredential?,
     ) = when (action) {
-        is ActionRequest.EnrolActionRequest -> listOf(
-            buildSetupStep(),
-            buildAgeSelectionStepIfNeeded(action, projectConfiguration),
-            buildConsentStepIfNeeded(ConsentType.ENROL, projectConfiguration),
-            buildCaptureAndMatchStepsForEnrol(action, projectConfiguration, enrolmentSubjectId = enrolmentSubjectId),
-        )
+        is ActionRequest.EnrolActionRequest -> {
+            listOf(
+                buildSetupStep(),
+                buildAgeSelectionStepIfNeeded(action, projectConfiguration),
+                buildConsentStepIfNeeded(ConsentType.ENROL, projectConfiguration),
+                buildCaptureAndMatchStepsForEnrol(action, projectConfiguration, enrolmentSubjectId = enrolmentSubjectId),
+            )
+        }
 
         is ActionRequest.IdentifyActionRequest -> {
             val subjectQuery = buildMatcherSubjectQuery(projectConfiguration, action)
@@ -61,7 +63,7 @@ internal class BuildStepsUseCase @Inject constructor(
             listOf(
                 buildSetupStep(),
                 buildValidateIdPoolStep(
-                    subjectQuery = subjectQuery,
+                    enrolmentRecordQuery = subjectQuery,
                     biometricDataSource = action.biometricDataSource,
                     callerPackageName = action.actionIdentifier.callerPackageName,
                     projectConfiguration = projectConfiguration,
@@ -71,33 +73,39 @@ internal class BuildStepsUseCase @Inject constructor(
                 buildCaptureAndMatchStepsForIdentify(
                     action = action,
                     projectConfiguration = projectConfiguration,
-                    subjectQuery = subjectQuery,
+                    enrolmentRecordQuery = subjectQuery,
                     enrolmentSubjectId = enrolmentSubjectId,
                 ),
             )
         }
 
-        is ActionRequest.VerifyActionRequest -> listOf(
-            buildSetupStep(),
-            buildAgeSelectionStepIfNeeded(action, projectConfiguration),
-            buildFetchGuidStepIfNeeded(
-                projectId = action.projectId,
-                subjectId = action.verifyGuid,
-                biometricDataSource = action.biometricDataSource,
-                callerPackageName = action.actionIdentifier.callerPackageName,
-                metadata = action.metadata,
-            ),
-            buildConsentStepIfNeeded(ConsentType.VERIFY, projectConfiguration),
-            buildCaptureAndMatchStepsForVerify(action, projectConfiguration),
-        )
+        is ActionRequest.VerifyActionRequest -> {
+            listOf(
+                buildSetupStep(),
+                buildAgeSelectionStepIfNeeded(action, projectConfiguration),
+                buildFetchGuidStepIfNeeded(
+                    projectId = action.projectId,
+                    subjectId = action.verifyGuid,
+                    biometricDataSource = action.biometricDataSource,
+                    callerPackageName = action.actionIdentifier.callerPackageName,
+                    metadata = action.metadata,
+                ),
+                buildConsentStepIfNeeded(ConsentType.VERIFY, projectConfiguration),
+                buildCaptureAndMatchStepsForVerify(action, projectConfiguration),
+            )
+        }
 
-        is ActionRequest.EnrolLastBiometricActionRequest -> listOf(
-            buildEnrolLastBiometricStep(action, projectConfiguration, cachedScannedCredential),
-        )
+        is ActionRequest.EnrolLastBiometricActionRequest -> {
+            listOf(
+                buildEnrolLastBiometricStep(action, projectConfiguration, cachedScannedCredential),
+            )
+        }
 
-        is ActionRequest.ConfirmIdentityActionRequest -> listOf(
-            buildConfirmIdentityStep(action, cachedScannedCredential),
-        )
+        is ActionRequest.ConfirmIdentityActionRequest -> {
+            listOf(
+                buildConfirmIdentityStep(action, cachedScannedCredential),
+            )
+        }
     }.flatten()
 
     suspend fun buildCaptureAndMatchStepsForAgeGroup(
@@ -117,7 +125,7 @@ internal class BuildStepsUseCase @Inject constructor(
             action = action,
             projectConfiguration = projectConfiguration,
             ageGroup = ageGroup,
-            subjectQuery = buildMatcherSubjectQuery(projectConfiguration, action),
+            enrolmentRecordQuery = buildMatcherSubjectQuery(projectConfiguration, action),
             enrolmentSubjectId = enrolmentSubjectId,
         )
 
@@ -155,7 +163,9 @@ internal class BuildStepsUseCase @Inject constructor(
                 )
             }
 
-            FlowType.VERIFY -> emptyList()
+            FlowType.VERIFY -> {
+                emptyList()
+            }
         }
     }
 
@@ -175,6 +185,7 @@ internal class BuildStepsUseCase @Inject constructor(
         )
         val externalCredentialStep = when {
             captureSteps.isEmpty() -> emptyList()
+
             else -> buildExternalCredentialStepIfNeeded(
                 ageGroup = ageGroup,
                 enrolmentSubjectId = enrolmentSubjectId,
@@ -203,7 +214,7 @@ internal class BuildStepsUseCase @Inject constructor(
         action: ActionRequest.IdentifyActionRequest,
         projectConfiguration: ProjectConfiguration,
         ageGroup: AgeGroup? = null,
-        subjectQuery: SubjectQuery,
+        enrolmentRecordQuery: EnrolmentRecordQuery,
         enrolmentSubjectId: String,
     ): List<Step> {
         val action = fallbackToCommCareDataSourceIfNeeded(action, projectConfiguration)
@@ -216,6 +227,7 @@ internal class BuildStepsUseCase @Inject constructor(
         )
         val externalCredentialStep = when {
             captureSteps.isEmpty() -> emptyList()
+
             else -> buildExternalCredentialStepIfNeeded(
                 ageGroup = ageGroup,
                 enrolmentSubjectId = enrolmentSubjectId,
@@ -227,7 +239,7 @@ internal class BuildStepsUseCase @Inject constructor(
             projectConfiguration,
             identifyFlowType,
             resolvedAgeGroup,
-            subjectQuery,
+            enrolmentRecordQuery,
             BiometricDataSource.fromString(
                 action.biometricDataSource,
                 action.actionIdentifier.callerPackageName,
@@ -253,7 +265,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 projectConfiguration,
                 FlowType.VERIFY,
                 resolvedAgeGroup,
-                SubjectQuery(subjectId = action.verifyGuid, metadata = action.metadata),
+                EnrolmentRecordQuery(subjectId = action.verifyGuid, metadata = action.metadata),
                 BiometricDataSource.fromString(
                     action.biometricDataSource,
                     action.actionIdentifier.callerPackageName,
@@ -333,7 +345,7 @@ internal class BuildStepsUseCase @Inject constructor(
     }
 
     private fun buildValidateIdPoolStep(
-        subjectQuery: SubjectQuery,
+        enrolmentRecordQuery: EnrolmentRecordQuery,
         biometricDataSource: String,
         callerPackageName: String,
         projectConfiguration: ProjectConfiguration,
@@ -349,7 +361,7 @@ internal class BuildStepsUseCase @Inject constructor(
                     id = StepId.VALIDATE_ID_POOL,
                     navigationActionId = R.id.action_orchestratorFragment_to_validateSubjectPool,
                     destinationId = ValidateSubjectPoolContract.DESTINATION,
-                    params = ValidateSubjectPoolContract.getParams(subjectQuery),
+                    params = ValidateSubjectPoolContract.getParams(enrolmentRecordQuery),
                 ),
             )
 
@@ -431,7 +443,9 @@ internal class BuildStepsUseCase @Inject constructor(
                 )
             }
 
-            else -> null
+            else -> {
+                null
+            }
         }
     }
 
@@ -445,14 +459,14 @@ internal class BuildStepsUseCase @Inject constructor(
         projectConfiguration: ProjectConfiguration,
         flowType: FlowType,
         ageGroup: AgeGroup?,
-        subjectQuery: SubjectQuery,
+        enrolmentRecordQuery: EnrolmentRecordQuery,
         biometricDataSource: BiometricDataSource,
     ): List<Step> = projectConfiguration.general.matchingModalities
         .flatMap { modality ->
-            buildMatcherStepsForModality(modality, projectConfiguration, ageGroup, flowType, subjectQuery, biometricDataSource)
+            buildMatcherStepsForModality(modality, projectConfiguration, ageGroup, flowType, enrolmentRecordQuery, biometricDataSource)
         }.ifEmpty {
             projectConfiguration.general.modalities.flatMap { modality ->
-                buildMatcherStepsForModality(modality, projectConfiguration, ageGroup, flowType, subjectQuery, biometricDataSource)
+                buildMatcherStepsForModality(modality, projectConfiguration, ageGroup, flowType, enrolmentRecordQuery, biometricDataSource)
             }
         }
 
@@ -461,12 +475,12 @@ internal class BuildStepsUseCase @Inject constructor(
         projectConfiguration: ProjectConfiguration,
         ageGroup: AgeGroup?,
         flowType: FlowType,
-        subjectQuery: SubjectQuery,
+        enrolmentRecordQuery: EnrolmentRecordQuery,
         biometricDataSource: BiometricDataSource,
     ): List<Step> = projectConfiguration.getSdkListForAgeGroup(modality, ageGroup).mapNotNull { bioSDK ->
         val paramStub = MatchStepStubPayload.getMatchStubParams(
             flowType = flowType,
-            subjectQuery = subjectQuery,
+            enrolmentRecordQuery = enrolmentRecordQuery,
             biometricDataSource = biometricDataSource,
             bioSdk = bioSDK,
         )

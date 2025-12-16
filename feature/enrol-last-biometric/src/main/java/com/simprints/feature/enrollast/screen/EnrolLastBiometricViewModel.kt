@@ -21,9 +21,9 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
@@ -103,7 +103,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
         try {
             val subject = buildSubject(params, isAddingCredential = isAddingCredential)
             registerEvent(subject)
-            enrolmentRecordRepository.performActions(listOf(SubjectAction.Creation(subject)), project)
+            enrolmentRecordRepository.performActions(listOf(EnrolmentRecordAction.Creation(subject)), project)
             _finish.send(EnrolLastState.Success(subject.subjectId, scannedCredential?.toExternalCredential(subject.subjectId)))
         } catch (t: Throwable) {
             Simber.e("Enrolment failed", t, tag = ENROLMENT)
@@ -130,7 +130,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
 
         return enrolmentRecordRepository
             .load(
-                SubjectQuery(
+                EnrolmentRecordQuery(
                     projectId = projectId,
                     externalCredential = scannedCredential.credential,
                 ),

@@ -5,7 +5,7 @@ import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.tokenization.TokenizableString
 
 @Keep
-data class SubjectQuery(
+data class EnrolmentRecordQuery(
     val projectId: String? = null,
     val subjectId: String? = null,
     val subjectIds: List<String>? = null,

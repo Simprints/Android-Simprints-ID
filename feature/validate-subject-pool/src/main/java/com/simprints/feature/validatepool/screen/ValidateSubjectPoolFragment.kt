@@ -39,13 +39,14 @@ internal class ValidateSubjectPoolFragment : Fragment(R.layout.fragment_validate
 
         binding.validationActionsClose.setOnClickListener { finishWithResult(false) }
         binding.validationActionsContinue.setOnClickListener { finishWithResult(true) }
-        binding.validationActionsSync.setOnClickListener { viewModel.syncAndRetry(params.subjectQuery) }
+        binding.validationActionsSync.setOnClickListener { viewModel.syncAndRetry(params.enrolmentRecordQuery) }
 
-        viewModel.checkIdentificationPool(params.subjectQuery)
+        viewModel.checkIdentificationPool(params.enrolmentRecordQuery)
     }
 
     private fun renderState(state: ValidateSubjectPoolState) = when (state) {
         ValidateSubjectPoolState.Success -> finishWithResult(true)
+
         ValidateSubjectPoolState.Validating -> setViews(
             titleRes = IDR.string.id_pool_validation_default_message,
         )

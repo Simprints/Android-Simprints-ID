@@ -10,7 +10,7 @@ import com.simprints.feature.datagenerator.enrollmentrecords.InsertEnrollmentRec
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -70,8 +70,8 @@ internal class InsertEnrollmentRecordsUseCaseTest {
     fun `invoke with less than batch size records should insert one batch`() = runTest {
         // Given
         val numRecords = 10
-        val subjectActionsSlot = slot<List<SubjectAction.Creation>>()
-        coEvery { enrolmentRecordRepository.performActions(capture(subjectActionsSlot), any()) } returns mockk()
+        val enrolmentRecordActionsSlot = slot<List<EnrolmentRecordAction.Creation>>()
+        coEvery { enrolmentRecordRepository.performActions(capture(enrolmentRecordActionsSlot), any()) } returns mockk()
 
         // When
         val result = useCase(
@@ -87,14 +87,14 @@ internal class InsertEnrollmentRecordsUseCaseTest {
         // Then
         assertThat(result).isEqualTo("Inserted $numRecords biometric records")
         coVerify(exactly = 1) { enrolmentRecordRepository.performActions(any(), any()) }
-        assertThat(subjectActionsSlot.captured).hasSize(numRecords)
+        assertThat(enrolmentRecordActionsSlot.captured).hasSize(numRecords)
     }
 
     @Test
     fun `invoke with exactly batch size records should insert one full batch`() = runTest {
         // Given
-        val subjectActionsSlot = slot<List<SubjectAction.Creation>>()
-        coEvery { enrolmentRecordRepository.performActions(capture(subjectActionsSlot), any()) } returns mockk()
+        val enrolmentRecordActionsSlot = slot<List<EnrolmentRecordAction.Creation>>()
+        coEvery { enrolmentRecordRepository.performActions(capture(enrolmentRecordActionsSlot), any()) } returns mockk()
 
         // When
         val result = useCase(
@@ -110,14 +110,14 @@ internal class InsertEnrollmentRecordsUseCaseTest {
         // Then
         assertThat(result).isEqualTo("Inserted $BATCH_SIZE biometric records")
         coVerify(exactly = 1) { enrolmentRecordRepository.performActions(any(), any()) }
-        assertThat(subjectActionsSlot.captured).hasSize(BATCH_SIZE)
+        assertThat(enrolmentRecordActionsSlot.captured).hasSize(BATCH_SIZE)
     }
 
     @Test
     fun `invoke with more than batch size records should insert multiple batches`() = runTest {
         // Given
         val numRecords = BATCH_SIZE + 10
-        val capturedActions = mutableListOf<List<SubjectAction.Creation>>()
+        val capturedActions = mutableListOf<List<EnrolmentRecordAction.Creation>>()
         coEvery { enrolmentRecordRepository.performActions(capture(capturedActions), any()) } returns mockk()
 
         // When
@@ -143,8 +143,8 @@ internal class InsertEnrollmentRecordsUseCaseTest {
         // Given
         val numRecords = 3
         val firstId = "test-subject-id-123"
-        val subjectActionsSlot = slot<List<SubjectAction.Creation>>()
-        coEvery { enrolmentRecordRepository.performActions(capture(subjectActionsSlot), any()) } returns mockk()
+        val enrolmentRecordActionsSlot = slot<List<EnrolmentRecordAction.Creation>>()
+        coEvery { enrolmentRecordRepository.performActions(capture(enrolmentRecordActionsSlot), any()) } returns mockk()
 
         // When
         useCase(
@@ -158,7 +158,7 @@ internal class InsertEnrollmentRecordsUseCaseTest {
         ).last()
 
         // Then
-        val subjects = subjectActionsSlot.captured.map { it.subject }
+        val subjects = enrolmentRecordActionsSlot.captured.map { it.subject }
         assertThat(subjects).hasSize(numRecords)
         assertThat(subjects[0].subjectId).isEqualTo(firstId)
         assertThat(subjects[1].subjectId).isNotEqualTo(firstId)
@@ -170,8 +170,8 @@ internal class InsertEnrollmentRecordsUseCaseTest {
     fun `invoke with blank firstSubjectId should generate random IDs for all records`() = runTest {
         // Given
         val numRecords = 3
-        val subjectActionsSlot = slot<List<SubjectAction.Creation>>()
-        coEvery { enrolmentRecordRepository.performActions(capture(subjectActionsSlot), any()) } returns mockk()
+        val enrolmentRecordActionsSlot = slot<List<EnrolmentRecordAction.Creation>>()
+        coEvery { enrolmentRecordRepository.performActions(capture(enrolmentRecordActionsSlot), any()) } returns mockk()
 
         // When
         useCase(
@@ -185,7 +185,7 @@ internal class InsertEnrollmentRecordsUseCaseTest {
         ).last()
 
         // Then
-        val subjects = subjectActionsSlot.captured.map { it.subject }
+        val subjects = enrolmentRecordActionsSlot.captured.map { it.subject }
         assertThat(subjects).hasSize(numRecords)
         assertThat(subjects[0].subjectId).isNotEmpty()
         assertThat(subjects[0].subjectId).isNotEqualTo(" ")
@@ -200,8 +200,8 @@ internal class InsertEnrollmentRecordsUseCaseTest {
             putInt("SIM_FACE_BASE_1", 2) // 2 face samples
             putInt("NEC_1_5", 6) // 6 fingerprint samples
         }
-        val subjectActionsSlot = slot<List<SubjectAction.Creation>>()
-        coEvery { enrolmentRecordRepository.performActions(capture(subjectActionsSlot), any()) } returns mockk()
+        val enrolmentRecordActionsSlot = slot<List<EnrolmentRecordAction.Creation>>()
+        coEvery { enrolmentRecordRepository.performActions(capture(enrolmentRecordActionsSlot), any()) } returns mockk()
 
         // When
         useCase(
@@ -218,7 +218,7 @@ internal class InsertEnrollmentRecordsUseCaseTest {
         ).last()
 
         // Then
-        val subject = subjectActionsSlot.captured.first().subject
+        val subject = enrolmentRecordActionsSlot.captured.first().subject
         assertThat(subject.references.size).isEqualTo(2)
         assertThat(
             subject.references
@@ -238,8 +238,8 @@ internal class InsertEnrollmentRecordsUseCaseTest {
         val templatesPerFormat = Bundle().apply {
             putInt("ISO_19794_2", 2)
         }
-        val subjectActionsSlot = slot<List<SubjectAction.Creation>>()
-        coEvery { enrolmentRecordRepository.performActions(capture(subjectActionsSlot), any()) } returns mockk()
+        val enrolmentRecordActionsSlot = slot<List<EnrolmentRecordAction.Creation>>()
+        coEvery { enrolmentRecordRepository.performActions(capture(enrolmentRecordActionsSlot), any()) } returns mockk()
 
         // When
         useCase(
@@ -253,7 +253,7 @@ internal class InsertEnrollmentRecordsUseCaseTest {
         ).last()
 
         // Then
-        val subject = subjectActionsSlot.captured.first().subject
+        val subject = enrolmentRecordActionsSlot.captured.first().subject
         assertThat(subject.references).hasSize(1)
         assertThat(subject.references[0].templates).hasSize(2)
         assertThat(
@@ -281,8 +281,8 @@ internal class InsertEnrollmentRecordsUseCaseTest {
             // 2 fingers, so it should cycle
             putString(format, "RIGHT_THUMB,RIGHT_INDEX_FINGER")
         }
-        val subjectActionsSlot = slot<List<SubjectAction.Creation>>()
-        coEvery { enrolmentRecordRepository.performActions(capture(subjectActionsSlot), any()) } returns mockk()
+        val enrolmentRecordActionsSlot = slot<List<EnrolmentRecordAction.Creation>>()
+        coEvery { enrolmentRecordRepository.performActions(capture(enrolmentRecordActionsSlot), any()) } returns mockk()
 
         // When
         useCase(
@@ -296,7 +296,7 @@ internal class InsertEnrollmentRecordsUseCaseTest {
         ).last()
 
         // Then
-        val subject = subjectActionsSlot.captured.first().subject
+        val subject = enrolmentRecordActionsSlot.captured.first().subject
         val fingers = subject.references
             .first()
             .templates

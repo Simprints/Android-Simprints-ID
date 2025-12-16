@@ -10,7 +10,7 @@ import com.simprints.feature.validatepool.usecase.HasRecordsUseCase
 import com.simprints.feature.validatepool.usecase.IsModuleIdNotSyncedUseCase
 import com.simprints.feature.validatepool.usecase.RunBlockingEventSyncUseCase
 import com.simprints.feature.validatepool.usecase.ShouldSuggestSyncUseCase
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,16 +27,16 @@ internal class ValidateSubjectPoolViewModel @Inject constructor(
     private var _state = MutableLiveData<LiveDataEventWithContent<ValidateSubjectPoolState>>()
     private var isSyncing: Boolean = false
 
-    fun checkIdentificationPool(subjectQuery: SubjectQuery) = viewModelScope.launch {
+    fun checkIdentificationPool(enrolmentRecordQuery: EnrolmentRecordQuery) = viewModelScope.launch {
         if (isSyncing) {
             return@launch
         }
         _state.send(ValidateSubjectPoolState.Validating)
 
         val validationState = when {
-            hasRecords(subjectQuery) -> ValidateSubjectPoolState.Success
-            subjectQuery.attendantId != null && hasRecords(SubjectQuery()) -> ValidateSubjectPoolState.UserMismatch
-            subjectQuery.moduleId?.let { isModuleIdNotSynced(it) } == true -> ValidateSubjectPoolState.ModuleMismatch
+            hasRecords(enrolmentRecordQuery) -> ValidateSubjectPoolState.Success
+            enrolmentRecordQuery.attendantId != null && hasRecords(EnrolmentRecordQuery()) -> ValidateSubjectPoolState.UserMismatch
+            enrolmentRecordQuery.moduleId?.let { isModuleIdNotSynced(it) } == true -> ValidateSubjectPoolState.ModuleMismatch
             shouldSuggestSync() -> ValidateSubjectPoolState.RequiresSync
             else -> ValidateSubjectPoolState.PoolEmpty
         }
@@ -44,11 +44,11 @@ internal class ValidateSubjectPoolViewModel @Inject constructor(
         _state.send(validationState)
     }
 
-    fun syncAndRetry(subjectQuery: SubjectQuery) = viewModelScope.launch {
+    fun syncAndRetry(enrolmentRecordQuery: EnrolmentRecordQuery) = viewModelScope.launch {
         _state.send(ValidateSubjectPoolState.SyncInProgress)
         isSyncing = true
         runBlockingSync()
         isSyncing = false
-        checkIdentificationPool(subjectQuery)
+        checkIdentificationPool(enrolmentRecordQuery)
     }
 }

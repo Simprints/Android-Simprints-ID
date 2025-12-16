@@ -4,7 +4,7 @@ import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.ModalitySdkType
 import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.matching.MatchParams
 
 object MatchContract {
@@ -14,13 +14,13 @@ object MatchContract {
         probeReference: BiometricReferenceCapture,
         bioSdk: ModalitySdkType,
         flowType: FlowType,
-        subjectQuery: SubjectQuery,
+        enrolmentRecordQuery: EnrolmentRecordQuery,
         biometricDataSource: BiometricDataSource,
     ) = MatchParams(
         bioSdk = bioSdk,
         probeReference = probeReference,
         flowType = flowType,
-        queryForCandidates = subjectQuery,
+        queryForCandidates = enrolmentRecordQuery,
         biometricDataSource = biometricDataSource,
     )
 }

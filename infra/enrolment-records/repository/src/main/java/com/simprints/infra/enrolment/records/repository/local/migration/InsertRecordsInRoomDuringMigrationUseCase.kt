@@ -1,7 +1,7 @@
 package com.simprints.infra.enrolment.records.repository.local.migration
 
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
 import com.simprints.infra.enrolment.records.repository.local.RoomEnrolmentRecordLocalDataSource
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.REALM_DB_MIGRATION
 import com.simprints.infra.logging.Simber
@@ -13,13 +13,13 @@ internal class InsertRecordsInRoomDuringMigrationUseCase @Inject constructor(
     private val roomEnrolmentRecordLocalDataSource: RoomEnrolmentRecordLocalDataSource,
 ) {
     suspend operator fun invoke(
-        actions: List<SubjectAction>,
+        actions: List<EnrolmentRecordAction>,
         project: Project,
     ) {
         // if the realm to room migration is in progress, we need to insert the records in the new db too
 
         if (realmToRoomMigrationFlagsStore.isMigrationInProgress()) {
-            actions.filterIsInstance<SubjectAction.Creation>().forEach {
+            actions.filterIsInstance<EnrolmentRecordAction.Creation>().forEach {
                 insertRecordInRoom(it, project)
             }
             logUpdatesDuringMigration(actions)
@@ -27,7 +27,7 @@ internal class InsertRecordsInRoomDuringMigrationUseCase @Inject constructor(
     }
 
     private suspend fun insertRecordInRoom(
-        creation: SubjectAction.Creation,
+        creation: EnrolmentRecordAction.Creation,
         project: Project,
     ) {
         roomEnrolmentRecordLocalDataSource.performActions(actions = listOf(creation), project)
@@ -37,8 +37,8 @@ internal class InsertRecordsInRoomDuringMigrationUseCase @Inject constructor(
         )
     }
 
-    private fun logUpdatesDuringMigration(actions: List<SubjectAction>) {
-        if (actions.any { it is SubjectAction.Update || it is SubjectAction.Deletion }) {
+    private fun logUpdatesDuringMigration(actions: List<EnrolmentRecordAction>) {
+        if (actions.any { it is EnrolmentRecordAction.Update || it is EnrolmentRecordAction.Deletion }) {
             // if actions contains any updates or deletes and the migration is in progress, log them as an error
             Simber.e(
                 "[EnrolmentRecordRepositoryImpl] Actions during migration: ${actions.joinToString(", ")}",

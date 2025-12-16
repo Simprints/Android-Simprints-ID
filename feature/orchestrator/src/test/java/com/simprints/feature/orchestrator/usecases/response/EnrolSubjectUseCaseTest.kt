@@ -6,8 +6,8 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent.BiometricReferenceCreationPayload
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
@@ -99,7 +99,7 @@ class EnrolSubjectUseCaseTest {
         coVerify {
             enrolmentRecordRepository.performActions(
                 withArg {
-                    assertThat(it.first()).isInstanceOf(SubjectAction.Creation::class.java)
+                    assertThat(it.first()).isInstanceOf(EnrolmentRecordAction.Creation::class.java)
                 },
                 project,
             )

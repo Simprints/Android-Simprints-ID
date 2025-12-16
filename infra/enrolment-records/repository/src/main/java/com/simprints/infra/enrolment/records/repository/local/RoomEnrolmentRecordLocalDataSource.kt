@@ -9,8 +9,8 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.enrolment.records.repository.local.models.toBiometricReferences
 import com.simprints.infra.enrolment.records.repository.local.models.toDomain
 import com.simprints.infra.enrolment.records.repository.local.models.toRoomDbCredentials
@@ -58,7 +58,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
      * Don't use this method if the query contains format fields (faceSampleFormat or fingerprintSampleFormat).
      * instead, use loadFaceIdentities or loadFingerprintIdentities methods.
      */
-    override suspend fun load(query: SubjectQuery): List<DomainSubject> = withContext(dispatcherIO) {
+    override suspend fun load(query: EnrolmentRecordQuery): List<DomainSubject> = withContext(dispatcherIO) {
         if (query.hasUntokenizedFields == true) {
             Simber.d(
                 "[load] Query has untokenized fields, returning empty list as all records are tokenized.",
@@ -73,7 +73,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
      * Counts subjects matching the given query.
      */
     override suspend fun count(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         dataSource: BiometricDataSource,
     ): Int = withContext(dispatcherIO) {
         subjectDao.countSubjects(queryBuilder.buildCountQuery(query))
@@ -83,7 +83,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
      * Loads identities in paged ranges.
      */
     override suspend fun loadCandidateRecords(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
         project: Project,
@@ -104,7 +104,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     )
 
     private fun loadBiometricIdentitiesPaged(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         ranges: List<IntRange>,
         format: String,
         createCandidateRecord: (String, List<DbBiometricTemplate>) -> CandidateRecord,
@@ -140,7 +140,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     }
 
     private suspend fun loadBiometricIdentities(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         pageSize: Int,
         format: String?,
         createCandidateRecord: (subjectId: String, samples: List<DbBiometricTemplate>) -> CandidateRecord,
@@ -155,7 +155,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             }
     }
 
-    override suspend fun delete(queries: List<SubjectQuery>): Unit = withContext(dispatcherIO) {
+    override suspend fun delete(queries: List<EnrolmentRecordQuery>): Unit = withContext(dispatcherIO) {
         Simber.i("[delete] Deleting subjects with queries: $queries", tag = ROOM_RECORDS_DB)
         database.withTransaction {
             queries.forEach { query ->
@@ -166,19 +166,19 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
 
     override suspend fun deleteAll(): Unit = withContext(dispatcherIO) {
         Simber.i("[deleteAll] Deleting all subjects.", tag = ROOM_RECORDS_DB)
-        subjectDao.deleteSubjects(queryBuilder.buildDeleteQuery(SubjectQuery()))
+        subjectDao.deleteSubjects(queryBuilder.buildDeleteQuery(EnrolmentRecordQuery()))
     }
 
     override suspend fun performActions(
-        actions: List<SubjectAction>,
+        actions: List<EnrolmentRecordAction>,
         project: Project,
     ) {
         database.withTransaction {
             actions.forEach { action ->
                 when (action) {
-                    is SubjectAction.Creation -> createSubject(action.subject, project)
-                    is SubjectAction.Update -> updateSubject(action)
-                    is SubjectAction.Deletion -> deleteSubject(action.subjectId)
+                    is EnrolmentRecordAction.Creation -> createSubject(action.subject, project)
+                    is EnrolmentRecordAction.Update -> updateSubject(action)
+                    is EnrolmentRecordAction.Deletion -> deleteSubject(action.subjectId)
                 }
             }
         }
@@ -191,7 +191,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             val dbPath = database.openHelper.readableDatabase.path
             val dbSize = getTotalRoomDbSizeBytes(dbPath!!)
             val isDBEncrypted = DB_ENCRYPTION
-            val subjectCount = subjectDao.countSubjects(queryBuilder.buildCountQuery(SubjectQuery()))
+            val subjectCount = subjectDao.countSubjects(queryBuilder.buildCountQuery(EnrolmentRecordQuery()))
             "Room DB Info:\n" +
                 "Database Name: ${database.openHelper.databaseName}\n" +
                 "Database Version: $dbVersion\n" +
@@ -253,7 +253,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         }
     }
 
-    private suspend fun updateSubject(action: SubjectAction.Update) {
+    private suspend fun updateSubject(action: EnrolmentRecordAction.Update) {
         val dbSubject = subjectDao.getSubject(action.subjectId)
         if (dbSubject != null) {
             val referencesToDelete = action.referenceIdsToRemove.toSet()

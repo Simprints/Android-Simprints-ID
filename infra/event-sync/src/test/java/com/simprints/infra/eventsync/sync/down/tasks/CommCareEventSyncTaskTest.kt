@@ -13,11 +13,11 @@ import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction.Creation
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction.Deletion
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction.Update
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Creation
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Deletion
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Update
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScope
@@ -355,7 +355,7 @@ class CommCareEventSyncTaskTest {
 
         coVerify {
             enrolmentRecordRepository.performActions(
-                match<List<SubjectAction>> { actions ->
+                match<List<EnrolmentRecordAction>> { actions ->
                     actions.size == 1 && actions.first() is Update
                 },
                 any(),

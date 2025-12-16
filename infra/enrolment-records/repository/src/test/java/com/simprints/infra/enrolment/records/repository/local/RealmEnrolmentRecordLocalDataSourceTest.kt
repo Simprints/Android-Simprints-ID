@@ -19,9 +19,9 @@ import com.simprints.infra.enrolment.records.realm.store.models.DbFaceSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbFingerprintSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource.Companion.EXTERNAL_CREDENTIAL_FIELD
 import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource.Companion.FACE_SAMPLES_FIELD
 import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource.Companion.FINGERPRINT_SAMPLES_FIELD
@@ -149,7 +149,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val candidates = mutableListOf<CandidateRecord>()
         enrolmentRecordLocalDataSource
             .loadCandidateRecords(
-                SubjectQuery(),
+                EnrolmentRecordQuery(),
                 listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
                 project,
@@ -168,7 +168,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
 
         enrolmentRecordLocalDataSource
             .loadCandidateRecords(
-                SubjectQuery(format = format),
+                EnrolmentRecordQuery(format = format),
                 listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
                 project,
@@ -192,7 +192,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val candidates = mutableListOf<CandidateRecord>()
         enrolmentRecordLocalDataSource
             .loadCandidateRecords(
-                SubjectQuery(),
+                EnrolmentRecordQuery(),
                 listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
                 project,
@@ -211,7 +211,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val fakePerson = getFakePerson()
         saveFakePerson(fakePerson)
 
-        val people = enrolmentRecordLocalDataSource.load(SubjectQuery()).toList()
+        val people = enrolmentRecordLocalDataSource.load(EnrolmentRecordQuery()).toList()
 
         listOf(fakePerson).zip(people).forEach { (dbSubject, subject) ->
             assertThat(dbSubject.deepEquals(subject.toRealmDb())).isTrue()
@@ -223,7 +223,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
         val fakePerson = savedPersons[0].toRealmDb()
 
-        val people = enrolmentRecordLocalDataSource.load(SubjectQuery(attendantId = savedPersons[0].attendantId)).toList()
+        val people = enrolmentRecordLocalDataSource.load(EnrolmentRecordQuery(attendantId = savedPersons[0].attendantId)).toList()
         listOf(fakePerson).zip(people).forEach { (dbSubject, subject) ->
             assertThat(dbSubject.deepEquals(subject.toRealmDb())).isTrue()
         }
@@ -234,7 +234,10 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
         val fakePerson = savedPersons[0].toRealmDb()
 
-        val people = enrolmentRecordLocalDataSource.load(SubjectQuery(moduleId = fakePerson.moduleId.asTokenizableEncrypted())).toList()
+        val people = enrolmentRecordLocalDataSource
+            .load(
+                EnrolmentRecordQuery(moduleId = fakePerson.moduleId.asTokenizableEncrypted()),
+            ).toList()
         listOf(fakePerson).zip(people).forEach { (dbSubject, subject) ->
             assertThat(dbSubject.deepEquals(subject.toRealmDb())).isTrue()
         }
@@ -246,7 +249,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         every { realmSingleQuery.find() } returns null
 
         enrolmentRecordLocalDataSource.performActions(
-            listOf(SubjectAction.Creation(subject.toDomain())),
+            listOf(EnrolmentRecordAction.Creation(subject.toDomain())),
             project,
         )
         val peopleCount = enrolmentRecordLocalDataSource.count()
@@ -269,7 +272,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val subject = getFakePerson()
 
         enrolmentRecordLocalDataSource.performActions(
-            listOf(SubjectAction.Creation(subject.toDomain())),
+            listOf(EnrolmentRecordAction.Creation(subject.toDomain())),
             project,
         )
 
@@ -299,7 +302,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
 
         enrolmentRecordLocalDataSource.performActions(
             listOf(
-                SubjectAction.Update(
+                EnrolmentRecordAction.Update(
                     subject.subjectId.toString(),
                     samplesToAdd = listOf(getRandomFaceReference(), getRandomFingerprintReference()),
                     referenceIdsToRemove = listOf(faceReferenceId, fingerReferenceId),
@@ -342,7 +345,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
 
         enrolmentRecordLocalDataSource.performActions(
             listOf(
-                SubjectAction.Update(
+                EnrolmentRecordAction.Update(
                     subject.subjectId.toString(),
                     samplesToAdd = listOf(),
                     referenceIdsToRemove = listOf(),
@@ -370,7 +373,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val subject = getFakePerson()
         saveFakePerson(subject)
         enrolmentRecordLocalDataSource.performActions(
-            listOf(SubjectAction.Deletion(subject.subjectId.toString())),
+            listOf(EnrolmentRecordAction.Deletion(subject.subjectId.toString())),
             project,
         )
         val peopleCount = enrolmentRecordLocalDataSource.count()
@@ -442,7 +445,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         )
 
         enrolmentRecordLocalDataSource.load(
-            SubjectQuery(externalCredential = credentialValue.asTokenizableEncrypted()),
+            EnrolmentRecordQuery(externalCredential = credentialValue.asTokenizableEncrypted()),
         )
 
         verify {

@@ -5,10 +5,10 @@ import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.reference.BiometricReference
 
 @Keep
-sealed class SubjectAction {
+sealed class EnrolmentRecordAction {
     data class Creation(
         val subject: Subject,
-    ) : SubjectAction()
+    ) : EnrolmentRecordAction()
 
     data class Update(
         val subjectId: String,
@@ -16,9 +16,9 @@ sealed class SubjectAction {
         val referenceIdsToRemove: List<String>,
         val externalCredentialsToAdd: List<ExternalCredential>,
         val externalCredentialIdsToRemove: List<String>,
-    ) : SubjectAction()
+    ) : EnrolmentRecordAction()
 
     data class Deletion(
         val subjectId: String,
-    ) : SubjectAction()
+    ) : EnrolmentRecordAction()
 }

@@ -10,9 +10,9 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSource
 import com.simprints.infra.enrolment.records.repository.local.SelectEnrolmentRecordLocalDataSourceUseCase
 import com.simprints.infra.enrolment.records.repository.local.migration.InsertRecordsInRoomDuringMigrationUseCase
@@ -92,9 +92,9 @@ class EnrolmentRecordRepositoryImplTest {
 
     @Test
     fun `should upload the records correctly when there is more than one batch`() = runTest {
-        val expectedSubjectQuery = SubjectQuery(sort = true)
+        val expectedEnrolmentRecordQuery = EnrolmentRecordQuery(sort = true)
         every { prefs.getString(any(), null) } returns null
-        coEvery { localDataSource.load(expectedSubjectQuery) } returns listOf(
+        coEvery { localDataSource.load(expectedEnrolmentRecordQuery) } returns listOf(
             SUBJECT_1,
             SUBJECT_2,
             SUBJECT_3,
@@ -110,9 +110,9 @@ class EnrolmentRecordRepositoryImplTest {
 
     @Test
     fun `should upload the records correctly when there is exactly one batch`() = runTest {
-        val expectedSubjectQuery = SubjectQuery(sort = true)
+        val expectedEnrolmentRecordQuery = EnrolmentRecordQuery(sort = true)
         every { prefs.getString(any(), null) } returns null
-        coEvery { localDataSource.load(expectedSubjectQuery) } returns listOf(
+        coEvery { localDataSource.load(expectedEnrolmentRecordQuery) } returns listOf(
             SUBJECT_1,
             SUBJECT_2,
         )
@@ -126,9 +126,9 @@ class EnrolmentRecordRepositoryImplTest {
 
     @Test
     fun `should upload the records correctly when there is more than two batches`() = runTest {
-        val expectedSubjectQuery = SubjectQuery(sort = true)
+        val expectedEnrolmentRecordQuery = EnrolmentRecordQuery(sort = true)
         every { prefs.getString(any(), null) } returns null
-        coEvery { localDataSource.load(expectedSubjectQuery) } returns listOf(
+        coEvery { localDataSource.load(expectedEnrolmentRecordQuery) } returns listOf(
             SUBJECT_1,
             SUBJECT_2,
             SUBJECT_3,
@@ -148,10 +148,10 @@ class EnrolmentRecordRepositoryImplTest {
 
     @Test
     fun `should upload the records correctly when some subject ids are specified`() = runTest {
-        val expectedSubjectQuery =
-            SubjectQuery(sort = true, subjectIds = listOf(SUBJECT_ID_1, SUBJECT_ID_2))
+        val expectedEnrolmentRecordQuery =
+            EnrolmentRecordQuery(sort = true, subjectIds = listOf(SUBJECT_ID_1, SUBJECT_ID_2))
         every { prefs.getString(any(), null) } returns null
-        coEvery { localDataSource.load(expectedSubjectQuery) } returns listOf(
+        coEvery { localDataSource.load(expectedEnrolmentRecordQuery) } returns listOf(
             SUBJECT_1,
             SUBJECT_2,
         )
@@ -165,12 +165,12 @@ class EnrolmentRecordRepositoryImplTest {
 
     @Test
     fun `should upload the records correctly when it has failed before`() = runTest {
-        val expectedSubjectQuery = SubjectQuery(
+        val expectedEnrolmentRecordQuery = EnrolmentRecordQuery(
             sort = true,
             afterSubjectId = SUBJECT_ID_3,
         )
         every { prefs.getString(any(), null) } returns SUBJECT_ID_3
-        coEvery { localDataSource.load(expectedSubjectQuery) } returns listOf(
+        coEvery { localDataSource.load(expectedEnrolmentRecordQuery) } returns listOf(
             SUBJECT_1,
             SUBJECT_2,
         )
@@ -222,8 +222,8 @@ class EnrolmentRecordRepositoryImplTest {
                 attendantId = attendantIdTokenized,
                 moduleId = moduleIdTokenized,
             )
-            val expectedSubjectActions = listOf(SubjectAction.Creation(expectedSubject))
-            coVerify { localDataSource.performActions(expectedSubjectActions, project) }
+            val expectedEnrolmentRecordActions = listOf(EnrolmentRecordAction.Creation(expectedSubject))
+            coVerify { localDataSource.performActions(expectedEnrolmentRecordActions, project) }
         }
 
     @Test
@@ -260,34 +260,34 @@ class EnrolmentRecordRepositoryImplTest {
 
     @Test
     fun `should return the correct count of subjects when dataSource is Simprints`() = runTest {
-        val expectedSubjectQuery = SubjectQuery()
-        coEvery { localDataSource.count(expectedSubjectQuery) } returns 5
+        val expectedEnrolmentRecordQuery = EnrolmentRecordQuery()
+        coEvery { localDataSource.count(expectedEnrolmentRecordQuery) } returns 5
 
-        val count = repository.count(query = expectedSubjectQuery, dataSource = BiometricDataSource.Simprints)
+        val count = repository.count(query = expectedEnrolmentRecordQuery, dataSource = BiometricDataSource.Simprints)
 
         assert(count == 5)
-        coVerify(exactly = 1) { localDataSource.count(expectedSubjectQuery) }
+        coVerify(exactly = 1) { localDataSource.count(expectedEnrolmentRecordQuery) }
     }
 
     @Test
     fun `should return the correct count of subjects when dataSource is CommCare`() = runTest {
-        val expectedSubjectQuery = SubjectQuery()
-        coEvery { commCareDataSource.count(expectedSubjectQuery, any()) } returns 5
+        val expectedEnrolmentRecordQuery = EnrolmentRecordQuery()
+        coEvery { commCareDataSource.count(expectedEnrolmentRecordQuery, any()) } returns 5
 
-        val count = repository.count(query = expectedSubjectQuery, dataSource = BiometricDataSource.CommCare(""))
+        val count = repository.count(query = expectedEnrolmentRecordQuery, dataSource = BiometricDataSource.CommCare(""))
 
         assert(count == 5)
-        coVerify(exactly = 1) { commCareDataSource.count(expectedSubjectQuery, any()) }
+        coVerify(exactly = 1) { commCareDataSource.count(expectedEnrolmentRecordQuery, any()) }
     }
 
     @Test
     fun `should forward the call to the local data source when loading fingerprint identities and dataSource is Simprints`() = runTest {
-        val expectedSubjectQuery = SubjectQuery()
+        val expectedEnrolmentRecordQuery = EnrolmentRecordQuery()
         val expectedRange = listOf(0..10)
         val expectedFingerprintIdentities = listOf<CandidateRecord>()
         coEvery {
             localDataSource.loadCandidateRecords(
-                expectedSubjectQuery,
+                expectedEnrolmentRecordQuery,
                 expectedRange,
                 any(),
                 project,
@@ -299,7 +299,7 @@ class EnrolmentRecordRepositoryImplTest {
         val fingerprintIdentities = mutableListOf<CandidateRecord>()
         repository
             .loadCandidateRecords(
-                query = expectedSubjectQuery,
+                query = expectedEnrolmentRecordQuery,
                 ranges = expectedRange,
                 dataSource = BiometricDataSource.Simprints,
                 project = project,
@@ -312,7 +312,7 @@ class EnrolmentRecordRepositoryImplTest {
         assert(fingerprintIdentities == expectedFingerprintIdentities)
         coVerify(exactly = 1) {
             localDataSource.loadCandidateRecords(
-                expectedSubjectQuery,
+                expectedEnrolmentRecordQuery,
                 expectedRange,
                 any(),
                 project,
@@ -324,12 +324,12 @@ class EnrolmentRecordRepositoryImplTest {
 
     @Test
     fun `should forward the call to the commcare data source when loading fingerprint identities and dataSource is CommCare`() = runTest {
-        val expectedSubjectQuery = SubjectQuery()
+        val expectedEnrolmentRecordQuery = EnrolmentRecordQuery()
         val expectedRange = listOf(0..10)
         val expectedFingerprintIdentities = listOf<CandidateRecord>()
         coEvery {
             commCareDataSource.loadCandidateRecords(
-                expectedSubjectQuery,
+                expectedEnrolmentRecordQuery,
                 expectedRange,
                 any(),
                 project,
@@ -340,7 +340,7 @@ class EnrolmentRecordRepositoryImplTest {
         val fingerprintIdentities = mutableListOf<CandidateRecord>()
         repository
             .loadCandidateRecords(
-                query = expectedSubjectQuery,
+                query = expectedEnrolmentRecordQuery,
                 ranges = expectedRange,
                 dataSource = BiometricDataSource.CommCare(""),
                 project = project,
@@ -353,7 +353,7 @@ class EnrolmentRecordRepositoryImplTest {
         assert(fingerprintIdentities == expectedFingerprintIdentities)
         coVerify(exactly = 1) {
             commCareDataSource.loadCandidateRecords(
-                expectedSubjectQuery,
+                expectedEnrolmentRecordQuery,
                 expectedRange,
                 any(),
                 project,
@@ -365,12 +365,12 @@ class EnrolmentRecordRepositoryImplTest {
 
     @Test
     fun `should forward the call to the local data source when loading face identities and dataSource is Simprints`() = runTest {
-        val expectedSubjectQuery = SubjectQuery()
+        val expectedEnrolmentRecordQuery = EnrolmentRecordQuery()
         val expectedRange = listOf(0..10)
         val expectedFaceIdentities = listOf<CandidateRecord>()
         coEvery {
             localDataSource.loadCandidateRecords(
-                expectedSubjectQuery,
+                expectedEnrolmentRecordQuery,
                 expectedRange,
                 any(),
                 project,
@@ -382,7 +382,7 @@ class EnrolmentRecordRepositoryImplTest {
         val faceIdentities = mutableListOf<CandidateRecord>()
         repository
             .loadCandidateRecords(
-                query = expectedSubjectQuery,
+                query = expectedEnrolmentRecordQuery,
                 ranges = expectedRange,
                 dataSource = BiometricDataSource.Simprints,
                 project = project,
@@ -395,7 +395,7 @@ class EnrolmentRecordRepositoryImplTest {
         assert(faceIdentities == expectedFaceIdentities)
         coVerify(exactly = 1) {
             localDataSource.loadCandidateRecords(
-                expectedSubjectQuery,
+                expectedEnrolmentRecordQuery,
                 expectedRange,
                 any(),
                 project,
@@ -407,12 +407,12 @@ class EnrolmentRecordRepositoryImplTest {
 
     @Test
     fun `should forward the call to the commcare data source when loading face identities and dataSource is CommCare`() = runTest {
-        val expectedSubjectQuery = SubjectQuery()
+        val expectedEnrolmentRecordQuery = EnrolmentRecordQuery()
         val expectedRange = listOf(0..10)
         val expectedFaceIdentities = listOf<CandidateRecord>()
         coEvery {
             commCareDataSource.loadCandidateRecords(
-                expectedSubjectQuery,
+                expectedEnrolmentRecordQuery,
                 expectedRange,
                 any(),
                 project,
@@ -425,7 +425,7 @@ class EnrolmentRecordRepositoryImplTest {
 
         repository
             .loadCandidateRecords(
-                query = expectedSubjectQuery,
+                query = expectedEnrolmentRecordQuery,
                 ranges = expectedRange,
                 dataSource = BiometricDataSource.CommCare(""),
                 project = project,
@@ -438,7 +438,7 @@ class EnrolmentRecordRepositoryImplTest {
         assert(faceIdentities == expectedFaceIdentities)
         coVerify(exactly = 1) {
             commCareDataSource.loadCandidateRecords(
-                expectedSubjectQuery,
+                expectedEnrolmentRecordQuery,
                 expectedRange,
                 any(),
                 project,
@@ -469,10 +469,10 @@ class EnrolmentRecordRepositoryImplTest {
     @Test
     fun `performActions should forward the subject creation calls to the insertRecordsDuringMigration`() = runTest {
         val actions = listOf(
-            mockk<SubjectAction.Creation>(),
-            mockk<SubjectAction.Deletion>(),
-            mockk<SubjectAction.Update>(),
-            mockk<SubjectAction.Creation>(),
+            mockk<EnrolmentRecordAction.Creation>(),
+            mockk<EnrolmentRecordAction.Deletion>(),
+            mockk<EnrolmentRecordAction.Update>(),
+            mockk<EnrolmentRecordAction.Creation>(),
         )
         coJustRun { insertRecordsDuringMigration.invoke(any(), any()) }
         repository.performActions(actions, mockk())

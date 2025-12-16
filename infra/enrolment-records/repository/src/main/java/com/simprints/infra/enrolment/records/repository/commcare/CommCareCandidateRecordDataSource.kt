@@ -23,7 +23,7 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.enrolment.records.repository.CandidateRecordDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.enrolment.records.repository.usecases.CompareImplicitTokenizedStringsUseCase
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordCreationEventDeserializer
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
@@ -61,7 +61,7 @@ internal class CommCareCandidateRecordDataSource @Inject constructor(
     private fun getCaseDataUri(packageName: String): Uri = "content://$packageName.case/casedb/data".toUri()
 
     override suspend fun loadCandidateRecords(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
         project: Project,
@@ -101,7 +101,7 @@ internal class CommCareCandidateRecordDataSource @Inject constructor(
     }
 
     private suspend fun loadIdentities(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
         project: Project,
@@ -147,7 +147,7 @@ internal class CommCareCandidateRecordDataSource @Inject constructor(
     private suspend fun loadEnrolmentRecordCreationEvents(
         range: IntRange,
         callerPackageName: String,
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         project: Project,
         onCandidateLoaded: suspend () -> Unit,
     ): List<EnrolmentRecordCreationEvent> {
@@ -187,7 +187,7 @@ internal class CommCareCandidateRecordDataSource @Inject constructor(
     private fun loadEnrolmentRecordCreationEvents(
         caseId: String,
         callerPackageName: String,
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         project: Project,
     ): List<EnrolmentRecordCreationEvent> {
         // Access Case Data Listing for the caseId
@@ -215,12 +215,12 @@ internal class CommCareCandidateRecordDataSource @Inject constructor(
     }
 
     private fun isSubjectIdNullOrMatching(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         event: EnrolmentRecordCreationEvent,
     ): Boolean = query.subjectId == null || query.subjectId == event.payload.subjectId
 
     private fun isAttendantIdNullOrMatching(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         event: EnrolmentRecordCreationEvent,
         project: Project,
     ): Boolean = query.attendantId == null ||
@@ -232,7 +232,7 @@ internal class CommCareCandidateRecordDataSource @Inject constructor(
         )
 
     private fun isModuleIdNullOrMatching(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         event: EnrolmentRecordCreationEvent,
         project: Project,
     ): Boolean = query.moduleId == null ||
@@ -282,7 +282,7 @@ internal class CommCareCandidateRecordDataSource @Inject constructor(
     }
 
     override suspend fun count(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         dataSource: BiometricDataSource,
     ): Int = withContext(dispatcher) {
         var count = 0

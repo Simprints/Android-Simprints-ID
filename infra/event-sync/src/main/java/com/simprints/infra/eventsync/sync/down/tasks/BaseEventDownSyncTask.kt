@@ -6,9 +6,9 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Creation
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Deletion
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction.Creation
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction.Deletion
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScope
@@ -200,7 +200,7 @@ internal abstract class BaseEventDownSyncTask(
         // Default implementation does nothing
     }
 
-    private fun handleSubjectCreationEvent(event: EnrolmentRecordCreationEvent): List<SubjectAction> {
+    private fun handleSubjectCreationEvent(event: EnrolmentRecordCreationEvent): List<EnrolmentRecordAction> {
         val subject = subjectFactory.buildSubjectFromCreationPayload(event.payload)
         return if (subject.references.isNotEmpty()) {
             listOf(Creation(subject))
@@ -212,11 +212,11 @@ internal abstract class BaseEventDownSyncTask(
     private suspend fun handleSubjectMoveEvent(
         operation: EventDownSyncOperation,
         event: EnrolmentRecordMoveEvent,
-    ): List<SubjectAction> {
+    ): List<EnrolmentRecordAction> {
         val enrolmentRecordDeletion = event.payload.enrolmentRecordDeletion
         val enrolmentRecordCreation = event.payload.enrolmentRecordCreation
 
-        val actions = mutableListOf<SubjectAction>()
+        val actions = mutableListOf<EnrolmentRecordAction>()
 
         actions.add(Deletion(enrolmentRecordDeletion.subjectId))
         if (shouldBeSynced(enrolmentRecordCreation, operation)) {
@@ -266,12 +266,12 @@ internal abstract class BaseEventDownSyncTask(
             }
         }
 
-    private fun handleSubjectDeletionEvent(event: EnrolmentRecordDeletionEvent): List<SubjectAction> =
+    private fun handleSubjectDeletionEvent(event: EnrolmentRecordDeletionEvent): List<EnrolmentRecordAction> =
         listOf(Deletion(event.payload.subjectId))
 
-    private fun handleSubjectUpdateEvent(event: EnrolmentRecordUpdateEvent): List<SubjectAction> = with(event.payload) {
+    private fun handleSubjectUpdateEvent(event: EnrolmentRecordUpdateEvent): List<EnrolmentRecordAction> = with(event.payload) {
         listOf(
-            SubjectAction.Update(
+            EnrolmentRecordAction.Update(
                 subjectId = subjectId,
                 samplesToAdd = subjectFactory.extractFromBiometricReferences(biometricReferencesAdded),
                 referenceIdsToRemove = biometricReferencesRemoved,

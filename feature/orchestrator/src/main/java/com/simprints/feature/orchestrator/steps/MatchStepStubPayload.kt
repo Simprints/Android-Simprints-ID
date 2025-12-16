@@ -5,7 +5,7 @@ import com.simprints.core.domain.common.ModalitySdkType
 import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.step.StepParams
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.matcher.MatchContract
 
 /**
@@ -16,7 +16,7 @@ import com.simprints.matcher.MatchContract
  */
 internal data class MatchStepStubPayload(
     val flowType: FlowType,
-    val subjectQuery: SubjectQuery,
+    val enrolmentRecordQuery: EnrolmentRecordQuery,
     val biometricDataSource: BiometricDataSource,
     val bioSdk: ModalitySdkType,
 ) : StepParams {
@@ -24,7 +24,7 @@ internal data class MatchStepStubPayload(
         probeReference = probeReference,
         bioSdk = bioSdk,
         flowType = flowType,
-        subjectQuery = subjectQuery,
+        enrolmentRecordQuery = enrolmentRecordQuery,
         biometricDataSource = biometricDataSource,
     )
 
@@ -32,7 +32,7 @@ internal data class MatchStepStubPayload(
         probeReference = probeReference,
         bioSdk = bioSdk,
         flowType = flowType,
-        subjectQuery = subjectQuery,
+        enrolmentRecordQuery = enrolmentRecordQuery,
         biometricDataSource = biometricDataSource,
     )
 
@@ -41,9 +41,9 @@ internal data class MatchStepStubPayload(
 
         fun getMatchStubParams(
             flowType: FlowType,
-            subjectQuery: SubjectQuery,
+            enrolmentRecordQuery: EnrolmentRecordQuery,
             biometricDataSource: BiometricDataSource,
             bioSdk: ModalitySdkType,
-        ) = MatchStepStubPayload(flowType, subjectQuery, biometricDataSource, bioSdk)
+        ) = MatchStepStubPayload(flowType, enrolmentRecordQuery, biometricDataSource, bioSdk)
     }
 }

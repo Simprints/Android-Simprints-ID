@@ -6,7 +6,7 @@ import com.simprints.core.domain.sample.ComparisonResult
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
 import com.simprints.infra.events.event.domain.models.MatchEntry
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
@@ -79,7 +79,7 @@ class SaveMatchEventUseCase @Inject constructor(
         startTime: Timestamp,
         endTime: Timestamp,
         matcherName: String,
-        queryForCandidates: SubjectQuery,
+        queryForCandidates: EnrolmentRecordQuery,
         matchEntry: MatchEntry?,
         fingerComparisonStrategy: FingerComparisonStrategy?,
         biometricReferenceId: String,
@@ -97,7 +97,7 @@ class SaveMatchEventUseCase @Inject constructor(
         startTime: Timestamp,
         endTime: Timestamp,
         matcherName: String,
-        queryForCandidates: SubjectQuery,
+        queryForCandidates: EnrolmentRecordQuery,
         candidatesCount: Int,
         matchEntries: List<MatchEntry>,
         biometricReferenceId: String,
@@ -123,7 +123,7 @@ class SaveMatchEventUseCase @Inject constructor(
         },
     )
 
-    private fun SubjectQuery.parseQueryAsCoreMatchPoolType(): OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType = when {
+    private fun EnrolmentRecordQuery.parseQueryAsCoreMatchPoolType(): OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType = when {
         this.attendantId != null -> OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.USER
         this.moduleId != null -> OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.MODULE
         else -> OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.PROJECT

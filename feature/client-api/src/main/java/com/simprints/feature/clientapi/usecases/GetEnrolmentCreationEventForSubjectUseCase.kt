@@ -10,8 +10,8 @@ import com.simprints.infra.config.store.models.canCoSyncAllData
 import com.simprints.infra.config.store.models.canCoSyncBiometricData
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.logging.Simber
@@ -34,7 +34,7 @@ internal class GetEnrolmentCreationEventForSubjectUseCase @Inject constructor(
         }
 
         val recordCreationEvent = enrolmentRecordRepository
-            .load(SubjectQuery(projectId = projectId, subjectId = subjectId))
+            .load(EnrolmentRecordQuery(projectId = projectId, subjectId = subjectId))
             .firstOrNull()
             ?.fromSubjectToEnrolmentCreationEvent()
 

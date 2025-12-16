@@ -4,7 +4,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteProgram
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate.Companion.FORMAT_COLUMN
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate.Companion.TEMPLATE_TABLE_NAME
 import com.simprints.infra.enrolment.records.room.store.models.DbExternalCredential.Companion.EXTERNAL_CREDENTIAL_TABLE_NAME
@@ -33,10 +33,10 @@ class RoomEnrolmentRecordQueryBuilderTest {
 
     @Test
     fun `buildSubjectQuery with empty query returns select all`() {
-        val subjectQuery = SubjectQuery()
+        val enrolmentRecordQuery = EnrolmentRecordQuery()
         val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S"
 
-        val resultQuery = queryBuilder.buildSubjectQuery(subjectQuery)
+        val resultQuery = queryBuilder.buildSubjectQuery(enrolmentRecordQuery)
 
         assertThat(resultQuery.sql.trim()).isEqualTo(expectedSql)
         assertThat(resultQuery.argCount).isEqualTo(0)
@@ -45,11 +45,11 @@ class RoomEnrolmentRecordQueryBuilderTest {
     @Test
     fun `buildSubjectQuery with subjectId`() {
         val subjectId = "test-subject-id"
-        val subjectQuery = SubjectQuery(subjectId = subjectId)
+        val enrolmentRecordQuery = EnrolmentRecordQuery(subjectId = subjectId)
         val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n\n" +
             "WHERE S.$SUBJECT_ID_COLUMN = ?"
 
-        val resultQuery = queryBuilder.buildSubjectQuery(subjectQuery)
+        val resultQuery = queryBuilder.buildSubjectQuery(enrolmentRecordQuery)
 
         assertThat(resultQuery.sql.trim()).isEqualTo(expectedSql.trim())
         assertThat(getArgs(resultQuery)).isEqualTo(arrayOf<Any?>(subjectId))
@@ -58,11 +58,11 @@ class RoomEnrolmentRecordQueryBuilderTest {
     @Test
     fun `buildSubjectQuery with subjectIds`() {
         val subjectIds = listOf("id1", "id2", "id3")
-        val subjectQuery = SubjectQuery(subjectIds = subjectIds)
+        val enrolmentRecordQuery = EnrolmentRecordQuery(subjectIds = subjectIds)
         val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n\n" +
             "WHERE S.$SUBJECT_ID_COLUMN IN (?,?,?)"
 
-        val resultQuery = queryBuilder.buildSubjectQuery(subjectQuery)
+        val resultQuery = queryBuilder.buildSubjectQuery(enrolmentRecordQuery)
 
         assertThat(resultQuery.sql.trim()).isEqualTo(expectedSql.trim())
         assertThat(getArgs(resultQuery)).isEqualTo(subjectIds.toTypedArray())
@@ -71,11 +71,11 @@ class RoomEnrolmentRecordQueryBuilderTest {
     @Test
     fun `buildSubjectQuery with afterSubjectId`() {
         val afterSubjectId = "last-subject-id"
-        val subjectQuery = SubjectQuery(afterSubjectId = afterSubjectId)
+        val enrolmentRecordQuery = EnrolmentRecordQuery(afterSubjectId = afterSubjectId)
         val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n\n" +
             "WHERE S.$SUBJECT_ID_COLUMN > ?"
 
-        val resultQuery = queryBuilder.buildSubjectQuery(subjectQuery)
+        val resultQuery = queryBuilder.buildSubjectQuery(enrolmentRecordQuery)
 
         assertThat(resultQuery.sql.trim()).isEqualTo(expectedSql.trim())
         assertThat(getArgs(resultQuery)).isEqualTo(arrayOf<Any?>(afterSubjectId))
@@ -84,11 +84,11 @@ class RoomEnrolmentRecordQueryBuilderTest {
     @Test
     fun `buildSubjectQuery with projectId`() {
         val projectId = "test-project-id"
-        val subjectQuery = SubjectQuery(projectId = projectId)
+        val enrolmentRecordQuery = EnrolmentRecordQuery(projectId = projectId)
         val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n\n" +
             "WHERE S.$PROJECT_ID_COLUMN = ?"
 
-        val resultQuery = queryBuilder.buildSubjectQuery(subjectQuery)
+        val resultQuery = queryBuilder.buildSubjectQuery(enrolmentRecordQuery)
 
         assertThat(resultQuery.sql.trim()).isEqualTo(expectedSql.trim())
         assertThat(getArgs(resultQuery)).isEqualTo(arrayOf<Any?>(projectId))
@@ -97,11 +97,11 @@ class RoomEnrolmentRecordQueryBuilderTest {
     @Test
     fun `buildSubjectQuery with attendantId`() {
         val attendantId = "test-attendant-id".asTokenizableEncrypted()
-        val subjectQuery = SubjectQuery(attendantId = attendantId)
+        val enrolmentRecordQuery = EnrolmentRecordQuery(attendantId = attendantId)
         val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n\n" +
             "WHERE S.$ATTENDANT_ID_COLUMN = ?"
 
-        val resultQuery = queryBuilder.buildSubjectQuery(subjectQuery)
+        val resultQuery = queryBuilder.buildSubjectQuery(enrolmentRecordQuery)
 
         assertThat(resultQuery.sql.trim()).isEqualTo(expectedSql.trim())
         assertThat(getArgs(resultQuery)).isEqualTo(arrayOf<Any?>(attendantId.value))
@@ -110,11 +110,11 @@ class RoomEnrolmentRecordQueryBuilderTest {
     @Test
     fun `buildSubjectQuery with moduleId`() {
         val moduleId = "test-module-id".asTokenizableEncrypted()
-        val subjectQuery = SubjectQuery(moduleId = moduleId)
+        val enrolmentRecordQuery = EnrolmentRecordQuery(moduleId = moduleId)
         val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n\n" +
             "WHERE S.$MODULE_ID_COLUMN = ?"
 
-        val resultQuery = queryBuilder.buildSubjectQuery(subjectQuery)
+        val resultQuery = queryBuilder.buildSubjectQuery(enrolmentRecordQuery)
 
         assertThat(resultQuery.sql.trim()).isEqualTo(expectedSql.trim())
         assertThat(getArgs(resultQuery)).isEqualTo(arrayOf<Any?>(moduleId.value))
@@ -122,7 +122,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
 
     @Test
     fun `buildSubjectQuery with sort true`() {
-        val subjectQuery = SubjectQuery(sort = true)
+        val enrolmentRecordQuery = EnrolmentRecordQuery(sort = true)
         val expectedSql =
             """
             SELECT * FROM $SUBJECT_TABLE_NAME S
@@ -131,7 +131,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
             ORDER BY S.$SUBJECT_ID_COLUMN ASC
             """.trimIndent()
 
-        val resultQuery = queryBuilder.buildSubjectQuery(subjectQuery)
+        val resultQuery = queryBuilder.buildSubjectQuery(enrolmentRecordQuery)
         assertThat(resultQuery.sql.trim()).isEqualTo(expectedSql.trim())
         assertThat(resultQuery.argCount).isEqualTo(0)
     }
@@ -140,12 +140,12 @@ class RoomEnrolmentRecordQueryBuilderTest {
     fun `buildSubjectQuery with multiple parameters and sort`() {
         val projectId = "proj1"
         val attendantId = "att1".asTokenizableEncrypted()
-        val subjectQuery = SubjectQuery(projectId = projectId, attendantId = attendantId, sort = true)
+        val enrolmentRecordQuery = EnrolmentRecordQuery(projectId = projectId, attendantId = attendantId, sort = true)
         val expectedSql = "SELECT * FROM $SUBJECT_TABLE_NAME S\n\n" +
             "WHERE S.$PROJECT_ID_COLUMN = ? AND S.$ATTENDANT_ID_COLUMN = ?\n" +
             "ORDER BY S.$SUBJECT_ID_COLUMN ASC"
 
-        val resultQuery = queryBuilder.buildSubjectQuery(subjectQuery)
+        val resultQuery = queryBuilder.buildSubjectQuery(enrolmentRecordQuery)
 
         assertThat(resultQuery.sql.trim()).isEqualTo(expectedSql.trim())
         assertThat(getArgs(resultQuery)).isEqualTo(arrayOf<Any?>(projectId, attendantId.value))
@@ -153,19 +153,19 @@ class RoomEnrolmentRecordQueryBuilderTest {
 
     @Test
     fun `buildSubjectQuery throws error if format is set`() {
-        val subjectQuery = SubjectQuery(format = "ISO_19794_2_2005")
+        val enrolmentRecordQuery = EnrolmentRecordQuery(format = "ISO_19794_2_2005")
         val exception = assertThrows<IllegalArgumentException> {
-            queryBuilder.buildSubjectQuery(subjectQuery)
+            queryBuilder.buildSubjectQuery(enrolmentRecordQuery)
         }
         assertThat(exception.message).isEqualTo("Cannot set format for subject query, use buildBiometricTemplatesQuery instead")
     }
 
     @Test
     fun `buildCountQuery with empty query`() {
-        val subjectQuery = SubjectQuery()
+        val enrolmentRecordQuery = EnrolmentRecordQuery()
         val expectedSql = "SELECT COUNT(DISTINCT S.$SUBJECT_ID_COLUMN) FROM $SUBJECT_TABLE_NAME S"
 
-        val resultQuery = queryBuilder.buildCountQuery(subjectQuery)
+        val resultQuery = queryBuilder.buildCountQuery(enrolmentRecordQuery)
 
         assertThat(resultQuery.sql.trim()).isEqualTo(expectedSql.trim())
         assertThat(resultQuery.argCount).isEqualTo(0)
@@ -174,11 +174,11 @@ class RoomEnrolmentRecordQueryBuilderTest {
     @Test
     fun `buildCountQuery with subjectId`() {
         val subjectId = "s1"
-        val subjectQuery = SubjectQuery(subjectId = subjectId)
+        val enrolmentRecordQuery = EnrolmentRecordQuery(subjectId = subjectId)
         val expectedSql =
             "SELECT COUNT(DISTINCT S.$SUBJECT_ID_COLUMN) FROM $SUBJECT_TABLE_NAME S WHERE S.$SUBJECT_ID_COLUMN = ?"
 
-        val resultQuery = queryBuilder.buildCountQuery(subjectQuery)
+        val resultQuery = queryBuilder.buildCountQuery(enrolmentRecordQuery)
 
         assertThat(resultQuery.sql).isEqualTo(expectedSql)
         assertThat(getArgs(resultQuery)).isEqualTo(arrayOf<Any?>(subjectId))
@@ -187,11 +187,11 @@ class RoomEnrolmentRecordQueryBuilderTest {
     @Test
     fun `buildCountQuery with projectId`() {
         val projectId = "p1"
-        val subjectQuery = SubjectQuery(projectId = projectId)
+        val enrolmentRecordQuery = EnrolmentRecordQuery(projectId = projectId)
         val expectedSql =
             "SELECT COUNT(DISTINCT S.$SUBJECT_ID_COLUMN) FROM $SUBJECT_TABLE_NAME S WHERE S.$PROJECT_ID_COLUMN = ?"
 
-        val resultQuery = queryBuilder.buildCountQuery(subjectQuery)
+        val resultQuery = queryBuilder.buildCountQuery(enrolmentRecordQuery)
 
         assertThat(resultQuery.sql).isEqualTo(expectedSql)
         assertThat(getArgs(resultQuery)).isEqualTo(arrayOf<Any?>(projectId))
@@ -200,12 +200,12 @@ class RoomEnrolmentRecordQueryBuilderTest {
     @Test
     fun `buildCountQuery with format`() {
         val format = "ISO_FP"
-        val subjectQuery = SubjectQuery(format = format)
+        val enrolmentRecordQuery = EnrolmentRecordQuery(format = format)
         val expectedSql =
             "SELECT COUNT(DISTINCT S.$SUBJECT_ID_COLUMN) FROM $SUBJECT_TABLE_NAME S  INNER JOIN  $TEMPLATE_TABLE_NAME T" +
                 " using(subjectId) WHERE T.$FORMAT_COLUMN = ?"
 
-        val resultQuery = queryBuilder.buildCountQuery(subjectQuery)
+        val resultQuery = queryBuilder.buildCountQuery(enrolmentRecordQuery)
 
         assertThat(resultQuery.sql).isEqualTo(expectedSql)
         assertThat(getArgs(resultQuery)).isEqualTo(arrayOf<Any?>(format))
@@ -215,12 +215,12 @@ class RoomEnrolmentRecordQueryBuilderTest {
     fun `buildCountQuery with projectId and format`() {
         val projectId = "p1"
         val format = "ISO_FP"
-        val subjectQuery = SubjectQuery(projectId = projectId, format = format)
+        val enrolmentRecordQuery = EnrolmentRecordQuery(projectId = projectId, format = format)
         val expectedSql =
             "SELECT COUNT(DISTINCT S.$SUBJECT_ID_COLUMN) FROM $SUBJECT_TABLE_NAME S  INNER JOIN  $TEMPLATE_TABLE_NAME T" +
                 " using(subjectId) WHERE S.$PROJECT_ID_COLUMN = ? AND T.$FORMAT_COLUMN = ?"
 
-        val resultQuery = queryBuilder.buildCountQuery(subjectQuery)
+        val resultQuery = queryBuilder.buildCountQuery(enrolmentRecordQuery)
 
         assertThat(resultQuery.sql).isEqualTo(expectedSql)
         assertThat(getArgs(resultQuery)).isEqualTo(arrayOf<Any?>(projectId, format))
@@ -228,10 +228,10 @@ class RoomEnrolmentRecordQueryBuilderTest {
 
     @Test
     fun `buildBiometricTemplatesQuery throws error if format is not set`() {
-        val subjectQuery = SubjectQuery()
+        val enrolmentRecordQuery = EnrolmentRecordQuery()
         val pageSize = 10
         val exception = assertThrows<IllegalArgumentException> {
-            queryBuilder.buildBiometricTemplatesQuery(subjectQuery, pageSize)
+            queryBuilder.buildBiometricTemplatesQuery(enrolmentRecordQuery, pageSize)
         }
         assertThat(
             exception.message,
@@ -242,7 +242,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
     fun `buildBiometricTemplatesQuery with format`() {
         val format = "ISO_FP_TEMPLATE"
         val pageSize = 10
-        val subjectQuery = SubjectQuery(format = format)
+        val enrolmentRecordQuery = EnrolmentRecordQuery(format = format)
         val expectedSql =
             """
             SELECT A.*
@@ -257,7 +257,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
             ) B USING(subjectId) where A.format ='$format'
             """.trimIndent()
 
-        val resultQuery = queryBuilder.buildBiometricTemplatesQuery(subjectQuery, pageSize)
+        val resultQuery = queryBuilder.buildBiometricTemplatesQuery(enrolmentRecordQuery, pageSize)
 
         assertThat(resultQuery.sql).isEqualTo(expectedSql)
         assertThat(getArgs(resultQuery)).isEqualTo(arrayOf<Any?>(format))
@@ -267,7 +267,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
     fun `buildBiometricTemplatesQuery uses sort true internally`() {
         val format = "ANY_FORMAT"
         val pageSize = 15
-        val subjectQuery = SubjectQuery(format = format, sort = false)
+        val enrolmentRecordQuery = EnrolmentRecordQuery(format = format, sort = false)
         val expectedSql =
             """
             SELECT A.*
@@ -282,7 +282,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
             ) B USING(subjectId) where A.format ='$format'
             """.trimIndent()
 
-        val resultQuery = queryBuilder.buildBiometricTemplatesQuery(subjectQuery, pageSize)
+        val resultQuery = queryBuilder.buildBiometricTemplatesQuery(enrolmentRecordQuery, pageSize)
 
         assertThat(resultQuery.sql).isEqualTo(expectedSql)
         assertThat(getArgs(resultQuery)).isEqualTo(arrayOf<Any?>(format))
@@ -290,19 +290,19 @@ class RoomEnrolmentRecordQueryBuilderTest {
 
     @Test
     fun `buildDeleteQuery throws error if format is set`() {
-        val subjectQuery = SubjectQuery(format = "ISO_19794_2_2005")
+        val enrolmentRecordQuery = EnrolmentRecordQuery(format = "ISO_19794_2_2005")
         val exception = assertThrows<IllegalArgumentException> {
-            queryBuilder.buildDeleteQuery(subjectQuery)
+            queryBuilder.buildDeleteQuery(enrolmentRecordQuery)
         }
         assertThat(exception.message).isEqualTo("format is not supported for deletion")
     }
 
     @Test
     fun `buildDeleteQuery with empty query`() {
-        val subjectQuery = SubjectQuery()
+        val enrolmentRecordQuery = EnrolmentRecordQuery()
         val expectedSql = "DELETE FROM DbSubject"
 
-        val resultQuery = queryBuilder.buildDeleteQuery(subjectQuery)
+        val resultQuery = queryBuilder.buildDeleteQuery(enrolmentRecordQuery)
 
         assertThat(resultQuery.sql.trim()).isEqualTo(expectedSql.trim())
         assertThat(resultQuery.argCount).isEqualTo(0)
@@ -311,10 +311,10 @@ class RoomEnrolmentRecordQueryBuilderTest {
     @Test
     fun `buildDeleteQuery with subjectId`() {
         val subjectId = "id-to-delete"
-        val subjectQuery = SubjectQuery(subjectId = subjectId)
+        val enrolmentRecordQuery = EnrolmentRecordQuery(subjectId = subjectId)
         val expectedSql = "DELETE FROM DbSubject WHERE $SUBJECT_ID_COLUMN = ?"
 
-        val resultQuery = queryBuilder.buildDeleteQuery(subjectQuery)
+        val resultQuery = queryBuilder.buildDeleteQuery(enrolmentRecordQuery)
 
         assertThat(resultQuery.sql).isEqualTo(expectedSql)
         assertThat(getArgs(resultQuery)).isEqualTo(arrayOf<Any?>(subjectId))
@@ -324,9 +324,9 @@ class RoomEnrolmentRecordQueryBuilderTest {
     fun `buildDeleteQuery with projectId and moduleId`() {
         val projectId = "proj-del"
         val moduleId = "mod-del".asTokenizableEncrypted()
-        val subjectQuery = SubjectQuery(projectId = projectId, moduleId = moduleId)
+        val enrolmentRecordQuery = EnrolmentRecordQuery(projectId = projectId, moduleId = moduleId)
         val expectedSql = "DELETE FROM DbSubject WHERE $PROJECT_ID_COLUMN = ? AND $MODULE_ID_COLUMN = ?"
-        val resultQuery = queryBuilder.buildDeleteQuery(subjectQuery)
+        val resultQuery = queryBuilder.buildDeleteQuery(enrolmentRecordQuery)
         assertThat(resultQuery.sql).isEqualTo(expectedSql)
         assertThat(getArgs(resultQuery)).isEqualTo(arrayOf<Any?>(projectId, moduleId.value))
     }
@@ -334,7 +334,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
     @Test
     fun `buildSubjectQuery includes credential join clause when externalCredential is provided`() {
         val credentialValue = "credentialValue"
-        val query = SubjectQuery(
+        val query = EnrolmentRecordQuery(
             projectId = "projectId",
             externalCredential = credentialValue.asTokenizableEncrypted(),
         )

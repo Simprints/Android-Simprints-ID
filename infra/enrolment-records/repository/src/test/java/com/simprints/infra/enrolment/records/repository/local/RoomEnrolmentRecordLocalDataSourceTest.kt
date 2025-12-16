@@ -13,9 +13,9 @@ import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource.Simprints
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.room.store.SubjectsDatabase
 import com.simprints.infra.enrolment.records.room.store.SubjectsDatabase.Companion.SUBJECT_DB_VERSION
 import com.simprints.infra.enrolment.records.room.store.SubjectsDatabaseFactory
@@ -249,12 +249,12 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     }
 
     private val initialData = listOf(
-        SubjectAction.Creation(subject1P1WithFace),
-        SubjectAction.Creation(subject2P1WithFinger),
-        SubjectAction.Creation(subject3P1WithBoth),
-        SubjectAction.Creation(subject4P2WithBoth),
-        SubjectAction.Creation(subject5P2WithFace),
-        SubjectAction.Creation(subject6P2WithFinger),
+        EnrolmentRecordAction.Creation(subject1P1WithFace),
+        EnrolmentRecordAction.Creation(subject2P1WithFinger),
+        EnrolmentRecordAction.Creation(subject3P1WithBoth),
+        EnrolmentRecordAction.Creation(subject4P2WithBoth),
+        EnrolmentRecordAction.Creation(subject5P2WithFace),
+        EnrolmentRecordAction.Creation(subject6P2WithFinger),
     )
 
     private fun getExternalCredential(subjectId: String) = ExternalCredential(
@@ -276,13 +276,13 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     @Test
     fun `performActions - Creation - should succeed with face sample`() = runTest {
         // Given
-        val action = SubjectAction.Creation(subject1P1WithFace)
+        val action = EnrolmentRecordAction.Creation(subject1P1WithFace)
 
         // When
         dataSource.performActions(listOf(action), project)
 
         // Then
-        val loaded = dataSource.load(SubjectQuery(subjectId = subject1P1WithFace.subjectId))
+        val loaded = dataSource.load(EnrolmentRecordQuery(subjectId = subject1P1WithFace.subjectId))
         assertThat(loaded).hasSize(1)
         val createdSubject = loaded[0]
         assertThat(createdSubject.subjectId).isEqualTo(subject1P1WithFace.subjectId)
@@ -295,13 +295,13 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     @Test
     fun `performActions - Creation - should succeed with fingerprint sample`() = runTest {
         // Given
-        val action = SubjectAction.Creation(subject2P1WithFinger)
+        val action = EnrolmentRecordAction.Creation(subject2P1WithFinger)
 
         // When
         dataSource.performActions(listOf(action), project)
 
         // Then
-        val loaded = dataSource.load(SubjectQuery(subjectId = subject2P1WithFinger.subjectId))
+        val loaded = dataSource.load(EnrolmentRecordQuery(subjectId = subject2P1WithFinger.subjectId))
         assertThat(loaded).hasSize(1)
         val createdSubject = loaded[0]
         assertThat(createdSubject.subjectId).isEqualTo(subject2P1WithFinger.subjectId)
@@ -314,13 +314,13 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     @Test
     fun `performActions - Creation - should succeed with both samples`() = runTest {
         // Given:
-        val action = SubjectAction.Creation(subject3P1WithBoth)
+        val action = EnrolmentRecordAction.Creation(subject3P1WithBoth)
 
         // When
         dataSource.performActions(listOf(action), project)
 
         // Then
-        val loaded = dataSource.load(SubjectQuery(subjectId = subject3P1WithBoth.subjectId))
+        val loaded = dataSource.load(EnrolmentRecordQuery(subjectId = subject3P1WithBoth.subjectId))
         assertThat(loaded).hasSize(1)
         val createdSubject = loaded[0]
         assertThat(createdSubject.subjectId).isEqualTo(subject3P1WithBoth.subjectId)
@@ -331,7 +331,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     @Test(expected = IllegalArgumentException::class) // Reverted to JUnit exception check
     fun `performActions - Creation - should fail without any samples`() = runTest {
         // Given
-        val action = SubjectAction.Creation(subjectInvalidNoSamples) // Subject without samples
+        val action = EnrolmentRecordAction.Creation(subjectInvalidNoSamples) // Subject without samples
 
         // When
         dataSource.performActions(listOf(action), project) // This line will throw
@@ -343,17 +343,17 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     fun `performActions - Creation - should create multiple valid subjects`() = runTest {
         // Given
         val actions = listOf(
-            SubjectAction.Creation(subject1P1WithFace),
-            SubjectAction.Creation(subject2P1WithFinger),
-            SubjectAction.Creation(subject4P2WithBoth), // Belongs to Project 2
+            EnrolmentRecordAction.Creation(subject1P1WithFace),
+            EnrolmentRecordAction.Creation(subject2P1WithFinger),
+            EnrolmentRecordAction.Creation(subject4P2WithBoth), // Belongs to Project 2
         )
 
         // When
         dataSource.performActions(actions, project)
 
         // Then
-        val loadedAllP1 = dataSource.load(SubjectQuery(projectId = PROJECT_1_ID, sort = true))
-        val loadedAllP2 = dataSource.load(SubjectQuery(projectId = PROJECT_2_ID, sort = true))
+        val loadedAllP1 = dataSource.load(EnrolmentRecordQuery(projectId = PROJECT_1_ID, sort = true))
+        val loadedAllP2 = dataSource.load(EnrolmentRecordQuery(projectId = PROJECT_2_ID, sort = true))
 
         assertThat(loadedAllP1).hasSize(2)
         assertThat(loadedAllP1.map { it.subjectId })
@@ -369,13 +369,13 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     @Test
     fun `performActions - Update - should add face and fingerprint samples`() = runTest {
         // Given: Create initial subject
-        dataSource.performActions(listOf(SubjectAction.Creation(subject1P1WithFace)), project)
+        dataSource.performActions(listOf(EnrolmentRecordAction.Creation(subject1P1WithFace)), project)
         val initialSubject =
-            dataSource.load(SubjectQuery(subjectId = subject1P1WithFace.subjectId)).first()
+            dataSource.load(EnrolmentRecordQuery(subjectId = subject1P1WithFace.subjectId)).first()
         assertThat(initialSubject.references).hasSize(1)
 
         // Original Update action instantiation style maintained
-        val updateAction = SubjectAction.Update(
+        val updateAction = EnrolmentRecordAction.Update(
             subjectId = subject1P1WithFace.subjectId,
             samplesToAdd = listOf(fingerprintSample1, faceSample2),
             referenceIdsToRemove = listOf(),
@@ -387,7 +387,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         dataSource.performActions(listOf(updateAction), project)
 
         // Then
-        val loaded = dataSource.load(SubjectQuery(subjectId = subject1P1WithFace.subjectId))
+        val loaded = dataSource.load(EnrolmentRecordQuery(subjectId = subject1P1WithFace.subjectId))
         assertThat(loaded).hasSize(1)
         val updatedSubject = loaded[0]
         assertThat(updatedSubject.references).hasSize(3)
@@ -398,13 +398,13 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     fun `performActions - Update - should remove face sample when fingerprint sample exists`() = runTest {
         // Given
         val subjectToUpdate = subject3P1WithBoth
-        dataSource.performActions(listOf(SubjectAction.Creation(subjectToUpdate)), project)
+        dataSource.performActions(listOf(EnrolmentRecordAction.Creation(subjectToUpdate)), project)
         val initial =
-            dataSource.load(SubjectQuery(subjectId = subjectToUpdate.subjectId)).first()
+            dataSource.load(EnrolmentRecordQuery(subjectId = subjectToUpdate.subjectId)).first()
         assertThat(initial.references).hasSize(2)
 
         // Original Update action instantiation style maintained
-        val updateAction = SubjectAction.Update(
+        val updateAction = EnrolmentRecordAction.Update(
             subjectId = subjectToUpdate.subjectId,
             samplesToAdd = listOf(), // Explicitly empty as in original
             referenceIdsToRemove = listOf(faceSample2.referenceId),
@@ -417,7 +417,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
         // Then
         val loaded =
-            dataSource.load(SubjectQuery(subjectId = subjectToUpdate.subjectId)).first()
+            dataSource.load(EnrolmentRecordQuery(subjectId = subjectToUpdate.subjectId)).first()
         assertThat(loaded.references).hasSize(1)
         assertThat(loaded.references).containsExactly(fingerprintSample2)
     }
@@ -426,13 +426,13 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     fun `performActions - Update - should remove fingerprint sample when face sample exists`() = runTest {
         // Given
         val subjectToUpdate = subject3P1WithBoth
-        dataSource.performActions(listOf(SubjectAction.Creation(subjectToUpdate)), project)
+        dataSource.performActions(listOf(EnrolmentRecordAction.Creation(subjectToUpdate)), project)
         val initial =
-            dataSource.load(SubjectQuery(subjectId = subjectToUpdate.subjectId)).first()
+            dataSource.load(EnrolmentRecordQuery(subjectId = subjectToUpdate.subjectId)).first()
         assertThat(initial.references).hasSize(2)
 
         // Original Update action instantiation style maintained
-        val updateAction = SubjectAction.Update(
+        val updateAction = EnrolmentRecordAction.Update(
             subjectId = subjectToUpdate.subjectId,
             samplesToAdd = listOf(),
             referenceIdsToRemove = listOf(fingerprintSample2.referenceId),
@@ -445,7 +445,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
         // Then
         val loaded =
-            dataSource.load(SubjectQuery(subjectId = subjectToUpdate.subjectId)).first()
+            dataSource.load(EnrolmentRecordQuery(subjectId = subjectToUpdate.subjectId)).first()
         assertThat(loaded.references).hasSize(1)
         assertThat(loaded.references).containsExactly(faceSample2)
     }
@@ -453,13 +453,13 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     @Test(expected = IllegalArgumentException::class) // Reverted to JUnit exception check
     fun `performActions - Update - should fail when removing last face sample`() = runTest {
         // Given: Subject with only a face sample
-        dataSource.performActions(listOf(SubjectAction.Creation(subject1P1WithFace)), project)
+        dataSource.performActions(listOf(EnrolmentRecordAction.Creation(subject1P1WithFace)), project)
         val initial =
-            dataSource.load(SubjectQuery(subjectId = subject1P1WithFace.subjectId)).first()
+            dataSource.load(EnrolmentRecordQuery(subjectId = subject1P1WithFace.subjectId)).first()
         assertThat(initial.references).hasSize(1)
 
         // Original Update action instantiation style maintained
-        val updateAction = SubjectAction.Update(
+        val updateAction = EnrolmentRecordAction.Update(
             subjectId = subject1P1WithFace.subjectId,
             samplesToAdd = listOf(),
             referenceIdsToRemove = listOf(faceSample1.referenceId),
@@ -476,12 +476,12 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     @Test(expected = IllegalArgumentException::class) // Reverted to JUnit exception check
     fun `performActions - Update - should fail when removing last fingerprint sample`() = runTest {
         // Given: Subject with only a fingerprint sample
-        dataSource.performActions(listOf(SubjectAction.Creation(subject2P1WithFinger)), project)
-        val initial = dataSource.load(SubjectQuery(subjectId = subject2P1WithFinger.subjectId)).first()
+        dataSource.performActions(listOf(EnrolmentRecordAction.Creation(subject2P1WithFinger)), project)
+        val initial = dataSource.load(EnrolmentRecordQuery(subjectId = subject2P1WithFinger.subjectId)).first()
         assertThat(initial.references).hasSize(1)
 
         // Original Update action instantiation style maintained
-        val updateAction = SubjectAction.Update(
+        val updateAction = EnrolmentRecordAction.Update(
             subjectId = subject2P1WithFinger.subjectId,
             samplesToAdd = listOf(),
             referenceIdsToRemove = listOf(fingerprintSample1.referenceId),
@@ -498,10 +498,10 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     @Test
     fun `performActions - Update - should not add duplicate samples based on ID`() = runTest {
         // Given: Subject already has faceSample1
-        dataSource.performActions(listOf(SubjectAction.Creation(subject1P1WithFace)), project)
+        dataSource.performActions(listOf(EnrolmentRecordAction.Creation(subject1P1WithFace)), project)
 
         // Original Update action instantiation style maintained
-        val updateAction = SubjectAction.Update(
+        val updateAction = EnrolmentRecordAction.Update(
             subjectId = subject1P1WithFace.subjectId,
             samplesToAdd = listOf(faceSample1, faceSample2, fingerprintSample1),
             referenceIdsToRemove = listOf(),
@@ -513,7 +513,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         dataSource.performActions(listOf(updateAction), project)
 
         // Then
-        val loaded = dataSource.load(SubjectQuery(subjectId = subject1P1WithFace.subjectId))
+        val loaded = dataSource.load(EnrolmentRecordQuery(subjectId = subject1P1WithFace.subjectId))
         assertThat(loaded).hasSize(1)
         val finalSubject = loaded[0]
 
@@ -528,7 +528,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         val initialCount = dataSource.count()
         val nonExistentSubjectId = "subj-does-not-exist"
 
-        val updateAction = SubjectAction.Update(
+        val updateAction = EnrolmentRecordAction.Update(
             subjectId = nonExistentSubjectId,
             samplesToAdd = listOf(faceSample1), // Try to add samples
             referenceIdsToRemove = listOf(),
@@ -545,7 +545,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         assertThat(finalCount).isEqualTo(initialCount) // Count should not change
 
         // Verify the subject was not created
-        val loaded = dataSource.load(SubjectQuery(subjectId = nonExistentSubjectId))
+        val loaded = dataSource.load(EnrolmentRecordQuery(subjectId = nonExistentSubjectId))
         assertThat(loaded).isEmpty()
     }
 
@@ -555,7 +555,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         setupInitialData()
 
         // When
-        val loaded = dataSource.load(SubjectQuery())
+        val loaded = dataSource.load(EnrolmentRecordQuery())
 
         // Then
         assertThat(loaded).hasSize(initialData.size)
@@ -567,7 +567,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         setupInitialData()
 
         // When
-        val loaded = dataSource.load(SubjectQuery(subjectId = subject1P1WithFace.subjectId))
+        val loaded = dataSource.load(EnrolmentRecordQuery(subjectId = subject1P1WithFace.subjectId))
 
         // Then
         assertThat(loaded).hasSize(1)
@@ -581,7 +581,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         setupInitialData()
 
         // When
-        val loaded = dataSource.load(SubjectQuery(hasUntokenizedFields = true))
+        val loaded = dataSource.load(EnrolmentRecordQuery(hasUntokenizedFields = true))
 
         // Then
         assertThat(loaded).isEmpty()
@@ -593,8 +593,8 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         setupInitialData()
 
         // When
-        val loadedP1 = dataSource.load(SubjectQuery(projectId = PROJECT_1_ID))
-        val loadedP2 = dataSource.load(SubjectQuery(projectId = PROJECT_2_ID))
+        val loadedP1 = dataSource.load(EnrolmentRecordQuery(projectId = PROJECT_1_ID))
+        val loadedP2 = dataSource.load(EnrolmentRecordQuery(projectId = PROJECT_2_ID))
 
         // Then
         assertThat(loadedP1).hasSize(3)
@@ -611,15 +611,15 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     fun `performActions - Deletion - should delete existing subject`() = runTest {
         // Given
         setupInitialData()
-        assertThat(dataSource.load(SubjectQuery(subjectId = subject1P1WithFace.subjectId))).isNotEmpty()
+        assertThat(dataSource.load(EnrolmentRecordQuery(subjectId = subject1P1WithFace.subjectId))).isNotEmpty()
 
-        val deleteAction = SubjectAction.Deletion(subjectId = subject1P1WithFace.subjectId)
+        val deleteAction = EnrolmentRecordAction.Deletion(subjectId = subject1P1WithFace.subjectId)
 
         // When
         dataSource.performActions(listOf(deleteAction), project)
 
         // Then
-        val loaded = dataSource.load(SubjectQuery(subjectId = subject1P1WithFace.subjectId))
+        val loaded = dataSource.load(EnrolmentRecordQuery(subjectId = subject1P1WithFace.subjectId))
         assertThat(loaded).isEmpty()
         assertThat(dataSource.count()).isEqualTo(initialData.size - 1)
     }
@@ -627,15 +627,15 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     @Test
     fun `combined actions - create, update, delete`() = runTest {
         // --- Create ---
-        val createAction = SubjectAction.Creation(subject1P1WithFace)
+        val createAction = EnrolmentRecordAction.Creation(subject1P1WithFace)
         dataSource.performActions(listOf(createAction), project)
         var loadedSubject =
-            dataSource.load(SubjectQuery(subjectId = subject1P1WithFace.subjectId)).firstOrNull()
+            dataSource.load(EnrolmentRecordQuery(subjectId = subject1P1WithFace.subjectId)).firstOrNull()
         assertThat(loadedSubject).isNotNull()
         assertThat(loadedSubject!!.references).hasSize(1)
 
         // --- Update (Original style maintained) ---
-        val updateAction = SubjectAction.Update(
+        val updateAction = EnrolmentRecordAction.Update(
             subjectId = subject1P1WithFace.subjectId,
             samplesToAdd = listOf(fingerprintSample1),
             referenceIdsToRemove = listOf(),
@@ -644,15 +644,15 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         )
         dataSource.performActions(listOf(updateAction), project)
         loadedSubject =
-            dataSource.load(SubjectQuery(subjectId = subject1P1WithFace.subjectId)).firstOrNull()
+            dataSource.load(EnrolmentRecordQuery(subjectId = subject1P1WithFace.subjectId)).firstOrNull()
         assertThat(loadedSubject).isNotNull()
         assertThat(loadedSubject!!.references).hasSize(2)
         assertThat(loadedSubject.references).containsExactly(fingerprintSample1, faceSample1)
 
         // --- Delete ---
-        val deleteAction = SubjectAction.Deletion(subjectId = subject1P1WithFace.subjectId)
+        val deleteAction = EnrolmentRecordAction.Deletion(subjectId = subject1P1WithFace.subjectId)
         dataSource.performActions(listOf(deleteAction), project)
-        val finalLoad = dataSource.load(SubjectQuery(subjectId = subject1P1WithFace.subjectId))
+        val finalLoad = dataSource.load(EnrolmentRecordQuery(subjectId = subject1P1WithFace.subjectId))
         assertThat(finalLoad).isEmpty()
     }
 
@@ -674,8 +674,8 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         setupInitialData()
 
         // When
-        val countP1 = dataSource.count(SubjectQuery(projectId = PROJECT_1_ID))
-        val countP2 = dataSource.count(SubjectQuery(projectId = PROJECT_2_ID))
+        val countP1 = dataSource.count(EnrolmentRecordQuery(projectId = PROJECT_1_ID))
+        val countP2 = dataSource.count(EnrolmentRecordQuery(projectId = PROJECT_2_ID))
 
         // Then
         assertThat(countP1).isEqualTo(3)
@@ -688,8 +688,8 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         setupInitialData()
 
         // When
-        val countAtt1 = dataSource.count(SubjectQuery(attendantId = ATTENDANT_1_ID))
-        val countAtt2 = dataSource.count(SubjectQuery(attendantId = ATTENDANT_2_ID))
+        val countAtt1 = dataSource.count(EnrolmentRecordQuery(attendantId = ATTENDANT_1_ID))
+        val countAtt2 = dataSource.count(EnrolmentRecordQuery(attendantId = ATTENDANT_2_ID))
 
         // Then
         assertThat(countAtt1).isEqualTo(4)
@@ -702,8 +702,8 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         setupInitialData()
 
         // When
-        val countModule1 = dataSource.count(SubjectQuery(moduleId = MODULE_1_ID))
-        val countModule2 = dataSource.count(SubjectQuery(moduleId = MODULE_2_ID))
+        val countModule1 = dataSource.count(EnrolmentRecordQuery(moduleId = MODULE_1_ID))
+        val countModule2 = dataSource.count(EnrolmentRecordQuery(moduleId = MODULE_2_ID))
 
         // Then
         assertThat(countModule1).isEqualTo(2)
@@ -717,24 +717,24 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
         // When
         val countRoc1P1 = dataSource.count(
-            SubjectQuery(
+            EnrolmentRecordQuery(
                 projectId = PROJECT_1_ID,
                 format = ROC_1_FORMAT,
             ),
         )
         val countRoc3P1 = dataSource.count(
-            SubjectQuery(
+            EnrolmentRecordQuery(
                 projectId = PROJECT_1_ID,
                 format = ROC_3_FORMAT,
             ),
         )
         val countRoc1P2 = dataSource.count(
-            SubjectQuery(
+            EnrolmentRecordQuery(
                 projectId = PROJECT_2_ID,
                 format = ROC_1_FORMAT,
             ),
         )
-        val countAllRoc1 = dataSource.count(SubjectQuery(format = ROC_1_FORMAT))
+        val countAllRoc1 = dataSource.count(EnrolmentRecordQuery(format = ROC_1_FORMAT))
 
         // Then
         assertThat(countRoc1P1).isEqualTo(1)
@@ -750,24 +750,24 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
         // When
         val countNecP1 = dataSource.count(
-            SubjectQuery(
+            EnrolmentRecordQuery(
                 projectId = PROJECT_1_ID,
                 format = NEC_FORMAT,
             ),
         )
         val countIsoP1 = dataSource.count(
-            SubjectQuery(
+            EnrolmentRecordQuery(
                 projectId = PROJECT_1_ID,
                 format = ISO_FORMAT,
             ),
         )
         val countNecP2 = dataSource.count(
-            SubjectQuery(
+            EnrolmentRecordQuery(
                 projectId = PROJECT_2_ID,
                 format = NEC_FORMAT,
             ),
         )
-        val countAllNec = dataSource.count(SubjectQuery(format = NEC_FORMAT))
+        val countAllNec = dataSource.count(EnrolmentRecordQuery(format = NEC_FORMAT))
 
         // Then
         assertThat(countNecP1).isEqualTo(1)
@@ -783,7 +783,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
         // When
         val count = dataSource.count(
-            SubjectQuery(
+            EnrolmentRecordQuery(
                 projectId = "non-existent-project",
                 moduleId = "non-existent-module".asTokenizableEncrypted(),
                 attendantId = "non-existent-attendant".asTokenizableEncrypted(),
@@ -798,7 +798,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     fun `loadIdentities - should throw exception if format is missing in query`() = runTest {
         // Given
         setupInitialData()
-        val queryWithoutFormat = SubjectQuery(projectId = PROJECT_1_ID)
+        val queryWithoutFormat = EnrolmentRecordQuery(projectId = PROJECT_1_ID)
 
         // When
         dataSource.loadCandidateRecords(
@@ -825,7 +825,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         // When - Query P1 for NEC
         val loadedP1Nec = dataSource
             .loadCandidateRecords(
-                query = SubjectQuery(
+                query = EnrolmentRecordQuery(
                     projectId = PROJECT_1_ID,
                     format = NEC_FORMAT,
                 ),
@@ -840,7 +840,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         // When - Query P1 for ISO
         val loadedP1Iso = dataSource
             .loadCandidateRecords(
-                query = SubjectQuery(
+                query = EnrolmentRecordQuery(
                     projectId = PROJECT_1_ID,
                     format = ISO_FORMAT,
                 ),
@@ -855,7 +855,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         // When - Query P2 for NEC
         val loadedP2Nec = dataSource
             .loadCandidateRecords(
-                query = SubjectQuery(
+                query = EnrolmentRecordQuery(
                     projectId = PROJECT_2_ID,
                     format = NEC_FORMAT,
                 ),
@@ -907,12 +907,12 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         setupInitialData()
         dataSource.performActions(
             listOf(
-                SubjectAction.Creation(subject5P1WithNec),
-                SubjectAction.Creation(subject6P1WithNec),
+                EnrolmentRecordAction.Creation(subject5P1WithNec),
+                EnrolmentRecordAction.Creation(subject6P1WithNec),
             ),
             project,
         )
-        val baseQuery = SubjectQuery(
+        val baseQuery = EnrolmentRecordQuery(
             projectId = PROJECT_1_ID,
             format = NEC_FORMAT,
         )
@@ -985,7 +985,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         // When
         val loadedIdentities = dataSource
             .loadCandidateRecords(
-                query = SubjectQuery(
+                query = EnrolmentRecordQuery(
                     projectId = PROJECT_1_ID,
                     format = UNUSED_FORMAT,
                 ),
@@ -1011,7 +1011,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         // When
         val loadedP1Roc1 = dataSource
             .loadCandidateRecords(
-                query = SubjectQuery(projectId = PROJECT_1_ID, format = ROC_1_FORMAT),
+                query = EnrolmentRecordQuery(projectId = PROJECT_1_ID, format = ROC_1_FORMAT),
                 ranges = listOf(0..10),
                 project = project,
                 dataSource = Simprints,
@@ -1022,7 +1022,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             .identities
         val loadedP1Roc3 = dataSource
             .loadCandidateRecords(
-                query = SubjectQuery(projectId = PROJECT_1_ID, format = ROC_3_FORMAT),
+                query = EnrolmentRecordQuery(projectId = PROJECT_1_ID, format = ROC_3_FORMAT),
                 ranges = listOf(0..10),
                 project = project,
                 dataSource = Simprints,
@@ -1033,7 +1033,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             .identities
         val loadedP2Roc1 = dataSource
             .loadCandidateRecords(
-                query = SubjectQuery(projectId = PROJECT_2_ID, format = ROC_1_FORMAT),
+                query = EnrolmentRecordQuery(projectId = PROJECT_2_ID, format = ROC_1_FORMAT),
                 ranges = listOf(0..10),
                 project = project,
                 dataSource = Simprints,
@@ -1080,13 +1080,13 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         setupInitialData()
         dataSource.performActions(
             listOf(
-                SubjectAction.Creation(subject5P1WithRoc1),
-                SubjectAction.Creation(subject6P1WithRoc1),
+                EnrolmentRecordAction.Creation(subject5P1WithRoc1),
+                EnrolmentRecordAction.Creation(subject6P1WithRoc1),
             ),
             project,
         )
         val baseQuery =
-            SubjectQuery(projectId = PROJECT_1_ID, format = ROC_1_FORMAT, sort = true)
+            EnrolmentRecordQuery(projectId = PROJECT_1_ID, format = ROC_1_FORMAT, sort = true)
         // When
         val loadedRanges =
             dataSource
@@ -1153,7 +1153,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         setupInitialData()
 
         // Query for Project 1, Attendant 1, Module 1, Format ROC_1
-        val queryP1A1M1Roc1 = SubjectQuery(
+        val queryP1A1M1Roc1 = EnrolmentRecordQuery(
             projectId = PROJECT_1_ID,
             attendantId = ATTENDANT_1_ID,
             moduleId = MODULE_1_ID,
@@ -1161,7 +1161,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         )
 
         // Query for Project 1, Attendant 1, Module 2, Format ROC_3
-        val queryP1A1M2Roc3 = SubjectQuery(
+        val queryP1A1M2Roc3 = EnrolmentRecordQuery(
             projectId = PROJECT_1_ID,
             attendantId = ATTENDANT_1_ID,
             moduleId = MODULE_2_ID,
@@ -1169,7 +1169,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         )
 
         // Query for Project 1, Attendant 1, Module 1, Format ROC_3 (should be empty)
-        val queryP1A1M1Roc3Empty = SubjectQuery(
+        val queryP1A1M1Roc3Empty = EnrolmentRecordQuery(
             projectId = PROJECT_1_ID,
             attendantId = ATTENDANT_1_ID,
             moduleId = MODULE_1_ID,
@@ -1234,7 +1234,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         setupInitialData()
 
         // Query for Project 1, Attendant 1, Module 1, Format NEC
-        val queryP1A1M1Nec = SubjectQuery(
+        val queryP1A1M1Nec = EnrolmentRecordQuery(
             projectId = PROJECT_1_ID,
             attendantId = ATTENDANT_1_ID,
             moduleId = MODULE_1_ID,
@@ -1242,7 +1242,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         )
 
         // Query for Project 1, Attendant 1, Module 3, Format NEC
-        val queryP1A1M3Nec = SubjectQuery(
+        val queryP1A1M3Nec = EnrolmentRecordQuery(
             projectId = PROJECT_1_ID,
             attendantId = ATTENDANT_1_ID,
             moduleId = MODULE_3_ID,
@@ -1250,7 +1250,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         )
 
         // Query for Project 1, Attendant 1, Module 2, Format ISO
-        val queryP1A1M2Iso = SubjectQuery(
+        val queryP1A1M2Iso = EnrolmentRecordQuery(
             projectId = PROJECT_1_ID,
             attendantId = ATTENDANT_1_ID,
             moduleId = MODULE_2_ID,
@@ -1258,7 +1258,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         )
 
         // Query for Project 1, Attendant 2, Module 1, Format NEC (should be empty)
-        val queryP1A2M1NecEmpty = SubjectQuery(
+        val queryP1A2M1NecEmpty = EnrolmentRecordQuery(
             projectId = PROJECT_1_ID,
             attendantId = ATTENDANT_2_ID,
             moduleId = MODULE_1_ID,
@@ -1340,28 +1340,28 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
         // When
         val loadedP1A1M1 = dataSource.load(
-            SubjectQuery(
+            EnrolmentRecordQuery(
                 projectId = PROJECT_1_ID,
                 attendantId = ATTENDANT_1_ID,
                 moduleId = MODULE_1_ID,
             ),
         )
         val loadedP1A1M2 = dataSource.load(
-            SubjectQuery(
+            EnrolmentRecordQuery(
                 projectId = PROJECT_1_ID,
                 attendantId = ATTENDANT_1_ID,
                 moduleId = MODULE_2_ID,
             ),
         )
         val loadedP1A2M1 = dataSource.load(
-            SubjectQuery(
+            EnrolmentRecordQuery(
                 projectId = PROJECT_1_ID,
                 attendantId = ATTENDANT_2_ID,
                 moduleId = MODULE_1_ID,
             ),
         )
         val loadedP2A2M2 = dataSource.load(
-            SubjectQuery(
+            EnrolmentRecordQuery(
                 projectId = PROJECT_2_ID,
                 attendantId = ATTENDANT_2_ID,
                 moduleId = MODULE_2_ID,
@@ -1396,7 +1396,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
         // When
         val loaded = dataSource.load(
-            SubjectQuery(
+            EnrolmentRecordQuery(
                 subjectIds = targetIds,
                 sort = true,
             ),
@@ -1432,7 +1432,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
         // When
         // Query for all subjects after subj-003, sorted by ID
-        val loaded = dataSource.load(SubjectQuery(afterSubjectId = afterId, sort = true))
+        val loaded = dataSource.load(EnrolmentRecordQuery(afterSubjectId = afterId, sort = true))
 
         // Then
         assertThat(loaded).hasSize(3) // subj-004, subj-005, subj-006 remain
@@ -1469,7 +1469,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         )
 
         // Query: Project 1, Attendant 1,  from the targetIds list, sorted
-        val query = SubjectQuery(
+        val query = EnrolmentRecordQuery(
             projectId = PROJECT_1_ID,
             attendantId = ATTENDANT_1_ID,
             subjectIds = targetIds,
@@ -1496,24 +1496,24 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         // Given
         setupInitialData()
         val initialCount = dataSource.count()
-        val countModule1Before = dataSource.count(SubjectQuery(moduleId = MODULE_1_ID))
-        val countModule2Before = dataSource.count(SubjectQuery(moduleId = MODULE_2_ID))
-        val countModule3Before = dataSource.count(SubjectQuery(moduleId = MODULE_3_ID))
+        val countModule1Before = dataSource.count(EnrolmentRecordQuery(moduleId = MODULE_1_ID))
+        val countModule2Before = dataSource.count(EnrolmentRecordQuery(moduleId = MODULE_2_ID))
+        val countModule3Before = dataSource.count(EnrolmentRecordQuery(moduleId = MODULE_3_ID))
 
         assertThat(countModule1Before).isEqualTo(2)
         assertThat(countModule2Before).isEqualTo(2)
         assertThat(countModule3Before).isEqualTo(2)
 
-        val queryToDeleteModule1 = SubjectQuery(moduleId = MODULE_1_ID)
+        val queryToDeleteModule1 = EnrolmentRecordQuery(moduleId = MODULE_1_ID)
 
         // When
         dataSource.delete(listOf(queryToDeleteModule1))
 
         // Then
         val finalCount = dataSource.count()
-        val countModule1After = dataSource.count(SubjectQuery(moduleId = MODULE_1_ID))
-        val countModule2After = dataSource.count(SubjectQuery(moduleId = MODULE_2_ID))
-        val countModule3After = dataSource.count(SubjectQuery(moduleId = MODULE_3_ID))
+        val countModule1After = dataSource.count(EnrolmentRecordQuery(moduleId = MODULE_1_ID))
+        val countModule2After = dataSource.count(EnrolmentRecordQuery(moduleId = MODULE_2_ID))
+        val countModule3After = dataSource.count(EnrolmentRecordQuery(moduleId = MODULE_3_ID))
 
         assertThat(countModule1After).isEqualTo(0) // All M1 deleted
         assertThat(countModule2After).isEqualTo(2) // M2 untouched
@@ -1521,19 +1521,19 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         assertThat(finalCount).isEqualTo(initialCount - countModule1Before) // Total count reduced correctly
 
         // Verify specific subjects are gone/remain
-        assertThat(dataSource.load(SubjectQuery(subjectId = subject1P1WithFace.subjectId))).isEmpty()
-        assertThat(dataSource.load(SubjectQuery(subjectId = subject2P1WithFinger.subjectId))).isEmpty()
-        assertThat(dataSource.load(SubjectQuery(subjectId = subject5P2WithFace.subjectId))).isNotEmpty()
-        assertThat(dataSource.load(SubjectQuery(subjectId = subject3P1WithBoth.subjectId))).isNotEmpty()
-        assertThat(dataSource.load(SubjectQuery(subjectId = subject4P2WithBoth.subjectId))).isNotEmpty()
-        assertThat(dataSource.load(SubjectQuery(subjectId = subject6P2WithFinger.subjectId))).isNotEmpty()
+        assertThat(dataSource.load(EnrolmentRecordQuery(subjectId = subject1P1WithFace.subjectId))).isEmpty()
+        assertThat(dataSource.load(EnrolmentRecordQuery(subjectId = subject2P1WithFinger.subjectId))).isEmpty()
+        assertThat(dataSource.load(EnrolmentRecordQuery(subjectId = subject5P2WithFace.subjectId))).isNotEmpty()
+        assertThat(dataSource.load(EnrolmentRecordQuery(subjectId = subject3P1WithBoth.subjectId))).isNotEmpty()
+        assertThat(dataSource.load(EnrolmentRecordQuery(subjectId = subject4P2WithBoth.subjectId))).isNotEmpty()
+        assertThat(dataSource.load(EnrolmentRecordQuery(subjectId = subject6P2WithFinger.subjectId))).isNotEmpty()
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `delete - by moduleId with format specified - should throw exception`() = runTest {
         // Given
         setupInitialData()
-        val queryToDeleteModule1WithFormat = SubjectQuery(
+        val queryToDeleteModule1WithFormat = EnrolmentRecordQuery(
             moduleId = MODULE_1_ID,
             format = ROC_1_FORMAT, // Adding format which is not allowed for delete
         )
@@ -1584,8 +1584,8 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
     @Test
     fun `performActions - Update - should succeed when removing all samples but adding external credentials`() = runTest {
-        dataSource.performActions(listOf(SubjectAction.Creation(subject3P1WithBoth)), project)
-        val initial = dataSource.load(SubjectQuery(subjectId = subject3P1WithBoth.subjectId)).first()
+        dataSource.performActions(listOf(EnrolmentRecordAction.Creation(subject3P1WithBoth)), project)
+        val initial = dataSource.load(EnrolmentRecordQuery(subjectId = subject3P1WithBoth.subjectId)).first()
         assertThat(initial.references).hasSize(2)
         assertThat(initial.externalCredentials).hasSize(1)
 
@@ -1596,7 +1596,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             type = ExternalCredentialType.NHISCard,
         )
 
-        val updateAction = SubjectAction.Update(
+        val updateAction = EnrolmentRecordAction.Update(
             subjectId = subject3P1WithBoth.subjectId,
             samplesToAdd = listOf(),
             referenceIdsToRemove = listOf(faceSample2.referenceId, fingerprintSample2.referenceId), // Remove all samples
@@ -1605,7 +1605,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         )
 
         dataSource.performActions(listOf(updateAction), project)
-        val loaded = dataSource.load(SubjectQuery(subjectId = subject3P1WithBoth.subjectId)).first()
+        val loaded = dataSource.load(EnrolmentRecordQuery(subjectId = subject3P1WithBoth.subjectId)).first()
         assertThat(loaded.references).isEmpty()
         assertThat(loaded.externalCredentials).hasSize(2)
         assertThat(loaded.externalCredentials).contains(newExternalCredential)
@@ -1629,9 +1629,9 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 ),
             ),
         )
-        dataSource.performActions(listOf(SubjectAction.Creation(subject)), project)
+        dataSource.performActions(listOf(EnrolmentRecordAction.Creation(subject)), project)
 
-        val updateAction = SubjectAction.Update(
+        val updateAction = EnrolmentRecordAction.Update(
             subjectId = subject3P1WithBoth.subjectId,
             samplesToAdd = listOf(),
             referenceIdsToRemove = listOf(),
@@ -1640,7 +1640,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         )
 
         dataSource.performActions(listOf(updateAction), project)
-        val loaded = dataSource.load(SubjectQuery(subjectId = subject3P1WithBoth.subjectId)).first()
+        val loaded = dataSource.load(EnrolmentRecordQuery(subjectId = subject3P1WithBoth.subjectId)).first()
         assertThat(loaded.externalCredentials).hasSize(1)
         assertThat(loaded.externalCredentials.map { it.id }).containsExactly("credential-id-2")
     }
