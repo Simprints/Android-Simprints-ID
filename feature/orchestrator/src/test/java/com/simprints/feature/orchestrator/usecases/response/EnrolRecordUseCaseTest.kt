@@ -6,8 +6,8 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent.BiometricReferenceCreationPayload
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
@@ -23,7 +23,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-class EnrolSubjectUseCaseTest {
+class EnrolRecordUseCaseTest {
     @MockK
     private lateinit var eventRepository: SessionEventRepository
 
@@ -36,7 +36,7 @@ class EnrolSubjectUseCaseTest {
     @MockK
     private lateinit var project: Project
 
-    private lateinit var useCase: EnrolSubjectUseCase
+    private lateinit var useCase: EnrolRecordUseCase
 
     @Before
     fun setUp() {
@@ -46,7 +46,7 @@ class EnrolSubjectUseCaseTest {
             every { id } returns "sessionId"
         }
 
-        useCase = EnrolSubjectUseCase(
+        useCase = EnrolRecordUseCase(
             eventRepository,
             timeHelper,
             enrolmentRecordRepository,
@@ -62,7 +62,7 @@ class EnrolSubjectUseCaseTest {
         )
 
         useCase.invoke(
-            Subject(
+            EnrolmentRecord(
                 subjectId = "subjectId",
                 projectId = "projectId",
                 attendantId = "moduleId".asTokenizableRaw(),
@@ -87,7 +87,7 @@ class EnrolSubjectUseCaseTest {
         )
 
         useCase.invoke(
-            Subject(
+            EnrolmentRecord(
                 subjectId = "subjectId",
                 projectId = "projectId",
                 attendantId = "moduleId".asTokenizableRaw(),
@@ -126,7 +126,7 @@ class EnrolSubjectUseCaseTest {
         )
 
         useCase.invoke(
-            Subject(
+            EnrolmentRecord(
                 subjectId = "subjectId",
                 projectId = "projectId",
                 attendantId = "moduleId".asTokenizableRaw(),

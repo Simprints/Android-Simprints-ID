@@ -8,20 +8,20 @@ import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.eventsync.sync.common.SubjectFactory
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
+import com.simprints.infra.eventsync.sync.common.EnrolmentRecordFactory
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
 
-internal class BuildSubjectUseCase @Inject constructor(
+internal class BuildRecordUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
-    private val subjectFactory: SubjectFactory,
+    private val enrolmentRecordFactory: EnrolmentRecordFactory,
 ) {
     operator fun invoke(
         params: EnrolLastBiometricParams,
         isAddingCredential: Boolean,
-    ): Subject {
+    ): EnrolmentRecord {
         val subjectId = UUID.randomUUID().toString()
         val externalCredentials = if (isAddingCredential) {
             getExternalCredentialResult(params.scannedCredential, subjectId)?.let(::listOf) ?: emptyList()
@@ -32,7 +32,7 @@ internal class BuildSubjectUseCase @Inject constructor(
             .filterIsInstance<EnrolLastBiometricStepResult.CaptureResult>()
             .map { result -> result.result.toBiometricReference() }
 
-        return subjectFactory.buildSubject(
+        return enrolmentRecordFactory.buildEnrolmentRecord(
             subjectId = subjectId,
             projectId = params.projectId,
             attendantId = params.userId,

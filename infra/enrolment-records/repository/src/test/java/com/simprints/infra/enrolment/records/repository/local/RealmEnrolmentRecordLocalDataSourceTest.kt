@@ -19,9 +19,9 @@ import com.simprints.infra.enrolment.records.realm.store.models.DbFaceSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbFingerprintSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource.Companion.EXTERNAL_CREDENTIAL_FIELD
 import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource.Companion.FACE_SAMPLES_FIELD
 import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource.Companion.FINGERPRINT_SAMPLES_FIELD
@@ -73,7 +73,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     private lateinit var blockCapture: CapturingSlot<suspend (Realm) -> Any>
     private lateinit var mutableBlockCapture: CapturingSlot<(MutableRealm) -> Any>
     private val onCandidateLoaded: suspend () -> Unit = {}
-    private var localSubjects: MutableList<Subject> = mutableListOf()
+    private var localEnrolmentRecords: MutableList<EnrolmentRecord> = mutableListOf()
 
     private lateinit var enrolmentRecordLocalDataSource: RealmEnrolmentRecordLocalDataSource
 
@@ -81,13 +81,13 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
-        localSubjects = mutableListOf()
+        localEnrolmentRecords = mutableListOf()
 
         val insertedSubject = slot<DbSubject>()
-        every { mutableRealm.delete(any()) } answers { localSubjects.clear() }
-        every { mutableRealm.deleteAll() } answers { localSubjects.clear() }
+        every { mutableRealm.delete(any()) } answers { localEnrolmentRecords.clear() }
+        every { mutableRealm.deleteAll() } answers { localEnrolmentRecords.clear() }
         every { mutableRealm.copyToRealm(capture(insertedSubject), any()) } answers {
-            localSubjects.add(insertedSubject.captured.toDomain())
+            localEnrolmentRecords.add(insertedSubject.captured.toDomain())
             insertedSubject.captured
         }
 
@@ -100,7 +100,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
             mutableBlockCapture.captured.invoke(mutableRealm)
         }
         every { realmQuery.count() } answers {
-            mockk { every { find() } returns localSubjects.size.toLong() }
+            mockk { every { find() } returns localEnrolmentRecords.size.toLong() }
         }
 
         every { realm.query(DbSubject::class) } returns realmQuery
@@ -458,9 +458,11 @@ class RealmEnrolmentRecordLocalDataSourceTest {
 
     private fun getFakePerson(): DbSubject = getRandomSubject().toRealmDb()
 
-    private fun saveFakePerson(fakeSubject: DbSubject): DbSubject = fakeSubject.also { localSubjects.add(it.toDomain()) }
+    private fun saveFakePerson(fakeSubject: DbSubject): DbSubject = fakeSubject.also { localEnrolmentRecords.add(it.toDomain()) }
 
-    private fun saveFakePeople(subjects: List<Subject>): List<Subject> = subjects.toMutableList().also { localSubjects.addAll(it) }
+    private fun saveFakePeople(enrolmentRecords: List<EnrolmentRecord>): List<EnrolmentRecord> = enrolmentRecords.toMutableList().also {
+        localEnrolmentRecords.addAll(it)
+    }
 
     private fun DbSubject.deepEquals(other: DbSubject): Boolean = when {
         this.subjectId != other.subjectId -> false
@@ -472,7 +474,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         else -> true
     }
 
-    private fun getRandomPeople(numberOfPeople: Int): ArrayList<Subject> = arrayListOf<Subject>().also { list ->
+    private fun getRandomPeople(numberOfPeople: Int): ArrayList<EnrolmentRecord> = arrayListOf<EnrolmentRecord>().also { list ->
         repeat(numberOfPeople) {
             list.add(getRandomSubject(UUID.randomUUID().toString()))
         }
@@ -491,7 +493,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         externalCredentials: List<ExternalCredential> = listOf(
             getRandomExternalCredential(),
         ),
-    ): Subject = Subject(
+    ): EnrolmentRecord = EnrolmentRecord(
         subjectId = patientId,
         projectId = projectId,
         attendantId = userId.asTokenizableRaw(),

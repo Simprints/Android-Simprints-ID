@@ -9,18 +9,18 @@ import com.simprints.core.domain.tokenization.isTokenized
 import com.simprints.infra.enrolment.records.realm.store.models.DbExternalCredential
 import com.simprints.infra.enrolment.records.realm.store.models.toDate
 import com.simprints.infra.enrolment.records.realm.store.models.toRealmInstant
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmUUID
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject as RealmSubject
 
-internal fun RealmSubject.toDomain(): Subject {
+internal fun RealmSubject.toDomain(): EnrolmentRecord {
     val attendantId =
         if (isAttendantIdTokenized) attendantId.asTokenizableEncrypted() else attendantId.asTokenizableRaw()
     val moduleId =
         if (isModuleIdTokenized) moduleId.asTokenizableEncrypted() else moduleId.asTokenizableRaw()
 
-    return Subject(
+    return EnrolmentRecord(
         subjectId = subjectId.toString(),
         projectId = projectId,
         attendantId = attendantId,
@@ -32,7 +32,7 @@ internal fun RealmSubject.toDomain(): Subject {
     )
 }
 
-internal fun Subject.toRealmDb(): RealmSubject = RealmSubject().also { subject ->
+internal fun EnrolmentRecord.toRealmDb(): RealmSubject = RealmSubject().also { subject ->
     subject.subjectId = RealmUUID.from(subjectId)
     subject.projectId = projectId
     subject.attendantId = attendantId.value

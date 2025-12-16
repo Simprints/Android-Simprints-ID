@@ -8,7 +8,7 @@ import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
-import com.simprints.infra.eventsync.sync.common.SubjectFactory
+import com.simprints.infra.eventsync.sync.common.EnrolmentRecordFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -17,20 +17,19 @@ import javax.inject.Inject
 internal class SimprintsEventDownSyncTask @Inject constructor(
     enrolmentRecordRepository: EnrolmentRecordRepository,
     eventDownSyncScopeRepository: EventDownSyncScopeRepository,
-    subjectFactory: SubjectFactory,
+    enrolmentRecordFactory: EnrolmentRecordFactory,
     configManager: ConfigManager,
     timeHelper: TimeHelper,
     eventRepository: EventRepository,
     private val eventRemoteDataSource: EventRemoteDataSource,
 ) : BaseEventDownSyncTask(
-    enrolmentRecordRepository,
-    eventDownSyncScopeRepository,
-    subjectFactory,
-    configManager,
-    timeHelper,
-    eventRepository,
-) {
-
+        enrolmentRecordRepository,
+        eventDownSyncScopeRepository,
+        enrolmentRecordFactory,
+        configManager,
+        timeHelper,
+        eventRepository,
+    ) {
     override suspend fun fetchEvents(
         operation: EventDownSyncOperation,
         scope: CoroutineScope,

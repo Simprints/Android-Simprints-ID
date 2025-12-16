@@ -10,14 +10,14 @@ import com.simprints.infra.config.store.models.canCoSyncAllData
 import com.simprints.infra.config.store.models.canCoSyncBiometricData
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
-internal class GetEnrolmentCreationEventForSubjectUseCase @Inject constructor(
+internal class GetEnrolmentCreationEventForRecordUseCase @Inject constructor(
     private val configManager: ConfigManager,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val encoder: EncodingUtils,
@@ -49,7 +49,7 @@ internal class GetEnrolmentCreationEventForSubjectUseCase @Inject constructor(
         return jsonHelper.toJson(CoSyncEnrolmentRecordEvents(listOf(recordCreationEvent)), coSyncSerializationModule)
     }
 
-    private fun Subject.fromSubjectToEnrolmentCreationEvent() = EnrolmentRecordCreationEvent(
+    private fun EnrolmentRecord.fromSubjectToEnrolmentCreationEvent() = EnrolmentRecordCreationEvent(
         subjectId = subjectId,
         projectId = projectId,
         moduleId = moduleId,

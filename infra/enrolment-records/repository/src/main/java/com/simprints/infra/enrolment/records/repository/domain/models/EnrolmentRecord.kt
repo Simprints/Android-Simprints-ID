@@ -8,7 +8,7 @@ import java.util.Date
 import com.simprints.core.domain.reference.BiometricReference as CoreBiometricReference
 
 @Parcelize
-data class Subject(
+data class EnrolmentRecord(
     val subjectId: String,
     val projectId: String,
     val attendantId: TokenizableString,

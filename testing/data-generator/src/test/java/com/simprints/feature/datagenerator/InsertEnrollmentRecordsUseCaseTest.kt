@@ -158,7 +158,7 @@ internal class InsertEnrollmentRecordsUseCaseTest {
         ).last()
 
         // Then
-        val subjects = enrolmentRecordActionsSlot.captured.map { it.subject }
+        val subjects = enrolmentRecordActionsSlot.captured.map { it.enrolmentRecord }
         assertThat(subjects).hasSize(numRecords)
         assertThat(subjects[0].subjectId).isEqualTo(firstId)
         assertThat(subjects[1].subjectId).isNotEqualTo(firstId)
@@ -185,7 +185,7 @@ internal class InsertEnrollmentRecordsUseCaseTest {
         ).last()
 
         // Then
-        val subjects = enrolmentRecordActionsSlot.captured.map { it.subject }
+        val subjects = enrolmentRecordActionsSlot.captured.map { it.enrolmentRecord }
         assertThat(subjects).hasSize(numRecords)
         assertThat(subjects[0].subjectId).isNotEmpty()
         assertThat(subjects[0].subjectId).isNotEqualTo(" ")
@@ -218,7 +218,7 @@ internal class InsertEnrollmentRecordsUseCaseTest {
         ).last()
 
         // Then
-        val subject = enrolmentRecordActionsSlot.captured.first().subject
+        val subject = enrolmentRecordActionsSlot.captured.first().enrolmentRecord
         assertThat(subject.references.size).isEqualTo(2)
         assertThat(
             subject.references
@@ -253,7 +253,7 @@ internal class InsertEnrollmentRecordsUseCaseTest {
         ).last()
 
         // Then
-        val subject = enrolmentRecordActionsSlot.captured.first().subject
+        val subject = enrolmentRecordActionsSlot.captured.first().enrolmentRecord
         assertThat(subject.references).hasSize(1)
         assertThat(subject.references[0].templates).hasSize(2)
         assertThat(
@@ -296,7 +296,7 @@ internal class InsertEnrollmentRecordsUseCaseTest {
         ).last()
 
         // Then
-        val subject = enrolmentRecordActionsSlot.captured.first().subject
+        val subject = enrolmentRecordActionsSlot.captured.first().enrolmentRecord
         val fingers = subject.references
             .first()
             .templates

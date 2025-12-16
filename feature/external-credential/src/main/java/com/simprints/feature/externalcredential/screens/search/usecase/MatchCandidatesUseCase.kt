@@ -8,7 +8,7 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.getModalitySdkConfig
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.matching.usecase.FaceMatcherUseCase
 import com.simprints.infra.matching.usecase.FingerprintMatcherUseCase
 import com.simprints.infra.matching.usecase.MatcherUseCase.MatcherState
@@ -21,7 +21,7 @@ internal class MatchCandidatesUseCase @Inject constructor(
     private val fingerprintMatcher: FingerprintMatcherUseCase,
 ) {
     suspend operator fun invoke(
-        candidates: List<Subject>,
+        candidates: List<EnrolmentRecord>,
         credential: TokenizableString.Tokenized,
         externalCredentialParams: ExternalCredentialParams,
         project: Project,

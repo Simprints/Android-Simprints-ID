@@ -20,9 +20,9 @@ import com.simprints.infra.enrolment.records.realm.store.RealmWrapperImpl
 import com.simprints.infra.enrolment.records.realm.store.config.RealmConfig
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
 import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.keyprovider.LocalDbKey
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -433,7 +433,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         )
 
         val batchSize = 4
-        val batches = mutableListOf<List<Subject>>()
+        val batches = mutableListOf<List<EnrolmentRecord>>()
 
         // When
         val flow = dataSource.loadAllSubjectsInBatches(batchSize)
@@ -454,7 +454,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         projectId: String = "test-project",
         attendantId: String = "test-attendant",
         moduleId: String = "test-module",
-    ): Subject = Subject(
+    ): EnrolmentRecord = EnrolmentRecord(
         subjectId = subjectId,
         projectId = projectId,
         attendantId = attendantId.asTokenizableRaw(),

@@ -10,7 +10,7 @@ import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.orchestrator.exceptions.MissingCaptureException
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.eventsync.sync.common.SubjectFactory
+import com.simprints.infra.eventsync.sync.common.EnrolmentRecordFactory
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
@@ -22,10 +22,10 @@ import org.junit.Test
 
 internal class CreateEnrolResponseUseCaseTest {
     @MockK
-    lateinit var subjectFactory: SubjectFactory
+    lateinit var enrolmentRecordFactory: EnrolmentRecordFactory
 
     @MockK
-    lateinit var enrolSubject: EnrolSubjectUseCase
+    lateinit var enrolRecord: EnrolRecordUseCase
 
     @MockK
     lateinit var project: Project
@@ -46,15 +46,15 @@ internal class CreateEnrolResponseUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coJustRun { enrolSubject.invoke(any(), any()) }
+        coJustRun { enrolRecord.invoke(any(), any()) }
 
-        useCase = CreateEnrolResponseUseCase(subjectFactory, enrolSubject)
+        useCase = CreateEnrolResponseUseCase(enrolmentRecordFactory, enrolRecord)
     }
 
     @Test
     fun `Converts correct results to response`() = runTest {
         every {
-            subjectFactory.buildSubjectFromCaptureResults(
+            enrolmentRecordFactory.buildFromCaptureResults(
                 subjectId = any(),
                 projectId = any(),
                 attendantId = any(),
@@ -81,7 +81,7 @@ internal class CreateEnrolResponseUseCaseTest {
     @Test
     fun `Returns error if no valid response`() = runTest {
         every {
-            subjectFactory.buildSubjectFromCaptureResults(
+            enrolmentRecordFactory.buildFromCaptureResults(
                 subjectId = any(),
                 projectId = any(),
                 attendantId = any(),
@@ -107,7 +107,7 @@ internal class CreateEnrolResponseUseCaseTest {
         }
 
         every {
-            subjectFactory.buildSubjectFromCaptureResults(
+            enrolmentRecordFactory.buildFromCaptureResults(
                 subjectId = any(),
                 projectId = any(),
                 attendantId = any(),
@@ -128,7 +128,7 @@ internal class CreateEnrolResponseUseCaseTest {
         )
 
         verify {
-            subjectFactory.buildSubjectFromCaptureResults(
+            enrolmentRecordFactory.buildFromCaptureResults(
                 subjectId = enrolmentSubjectId,
                 projectId = projectId,
                 attendantId = any(),

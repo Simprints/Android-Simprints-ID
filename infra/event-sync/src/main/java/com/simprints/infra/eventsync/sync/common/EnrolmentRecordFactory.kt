@@ -7,7 +7,7 @@ import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.events.event.domain.models.subject.BiometricReference
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
@@ -18,12 +18,12 @@ import java.util.Date
 import javax.inject.Inject
 import com.simprints.core.domain.reference.BiometricReference as CoreBiometricReference
 
-class SubjectFactory @Inject constructor(
+class EnrolmentRecordFactory @Inject constructor(
     private val encodingUtils: EncodingUtils,
     private val timeHelper: TimeHelper,
 ) {
-    fun buildSubjectFromCreationPayload(payload: EnrolmentRecordCreationPayload) = with(payload) {
-        buildSubject(
+    fun buildFromCreationPayload(payload: EnrolmentRecordCreationPayload) = with(payload) {
+        buildEnrolmentRecord(
             subjectId = subjectId,
             projectId = projectId,
             attendantId = attendantId,
@@ -33,8 +33,8 @@ class SubjectFactory @Inject constructor(
         )
     }
 
-    fun buildSubjectFromMovePayload(payload: EnrolmentRecordCreationInMove) = with(payload) {
-        buildSubject(
+    fun buildFromMovePayload(payload: EnrolmentRecordCreationInMove) = with(payload) {
+        buildEnrolmentRecord(
             subjectId = subjectId,
             projectId = projectId,
             attendantId = attendantId,
@@ -44,32 +44,32 @@ class SubjectFactory @Inject constructor(
         )
     }
 
-    fun buildSubjectFromUpdatePayload(
-        existingSubject: Subject,
+    fun buildFromUpdatePayload(
+        existingEnrolmentRecord: EnrolmentRecord,
         payload: EnrolmentRecordUpdatePayload,
-    ): Subject {
+    ): EnrolmentRecord {
         val removedBiometricReferences = payload.biometricReferencesRemoved.toSet() // to make lookup O(1)
         val addedSamples = extractFromBiometricReferences(payload.biometricReferencesAdded)
         val externalCredentialsAdded = payload.externalCredentialsAdded
 
-        return existingSubject.copy(
-            references = existingSubject.references
+        return existingEnrolmentRecord.copy(
+            references = existingEnrolmentRecord.references
                 .filterNot { it.referenceId in removedBiometricReferences }
                 .plus(addedSamples),
-            externalCredentials = existingSubject.externalCredentials
+            externalCredentials = existingEnrolmentRecord.externalCredentials
                 .plus(externalCredentialsAdded)
                 .distinctBy { it.value.value },
         )
     }
 
-    fun buildSubjectFromCaptureResults(
+    fun buildFromCaptureResults(
         subjectId: String,
         projectId: String,
         attendantId: TokenizableString,
         moduleId: TokenizableString,
         captures: List<BiometricReferenceCapture>,
         externalCredential: ExternalCredential?,
-    ): Subject = buildSubject(
+    ): EnrolmentRecord = buildEnrolmentRecord(
         subjectId = subjectId,
         projectId = projectId,
         attendantId = attendantId,
@@ -79,7 +79,7 @@ class SubjectFactory @Inject constructor(
         externalCredentials = externalCredential?.let { listOf(it) } ?: emptyList(),
     )
 
-    fun buildSubject(
+    fun buildEnrolmentRecord(
         subjectId: String,
         projectId: String,
         attendantId: TokenizableString,
@@ -88,7 +88,7 @@ class SubjectFactory @Inject constructor(
         updatedAt: Date? = null,
         references: List<CoreBiometricReference> = emptyList(),
         externalCredentials: List<ExternalCredential> = emptyList(),
-    ) = Subject(
+    ) = EnrolmentRecord(
         subjectId = subjectId,
         projectId = projectId,
         attendantId = attendantId,

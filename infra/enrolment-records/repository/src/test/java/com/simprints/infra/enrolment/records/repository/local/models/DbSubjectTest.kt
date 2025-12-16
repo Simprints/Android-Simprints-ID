@@ -9,7 +9,7 @@ import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.enrolment.records.realm.store.models.DbFaceSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbFingerprintSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmUUID
@@ -50,7 +50,7 @@ class DbSubjectTest {
             modality = Modality.FACE,
         )
 
-        val domainSubject = Subject(
+        val domainEnrolmentRecord = EnrolmentRecord(
             subjectId = GUID,
             projectId = PROJECT_ID,
             attendantId = ATTENDANT_ID,
@@ -60,7 +60,7 @@ class DbSubjectTest {
             references = listOf(fingerprintSample, faceSample),
         )
 
-        val dbSubject = domainSubject.toRealmDb()
+        val dbSubject = domainEnrolmentRecord.toRealmDb()
 
         with(dbSubject) {
             assertThat(subjectId).isEqualTo(RealmUUID.from(GUID))

@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject as DomainSubject
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord as DomainSubject
 
 /**
  * Local data source for enrolment records using Room.
@@ -176,7 +176,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         database.withTransaction {
             actions.forEach { action ->
                 when (action) {
-                    is EnrolmentRecordAction.Creation -> createSubject(action.subject, project)
+                    is EnrolmentRecordAction.Creation -> createSubject(action.enrolmentRecord, project)
                     is EnrolmentRecordAction.Update -> updateSubject(action)
                     is EnrolmentRecordAction.Deletion -> deleteSubject(action.subjectId)
                 }

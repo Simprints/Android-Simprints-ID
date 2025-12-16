@@ -18,7 +18,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class GetEnrolmentCreationEventForSubjectUseCaseTest {
+class GetEnrolmentCreationEventForRecordUseCaseTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -34,7 +34,7 @@ class GetEnrolmentCreationEventForSubjectUseCaseTest {
     @MockK
     private lateinit var jsonHelper: JsonHelper
 
-    private lateinit var useCase: GetEnrolmentCreationEventForSubjectUseCase
+    private lateinit var useCase: GetEnrolmentCreationEventForRecordUseCase
 
     @Before
     fun setUp() {
@@ -42,7 +42,7 @@ class GetEnrolmentCreationEventForSubjectUseCaseTest {
 
         every { jsonHelper.toJson(any()) } returns "json"
 
-        useCase = GetEnrolmentCreationEventForSubjectUseCase(
+        useCase = GetEnrolmentCreationEventForRecordUseCase(
             configManager,
             enrolmentRecordRepository,
             encoder,

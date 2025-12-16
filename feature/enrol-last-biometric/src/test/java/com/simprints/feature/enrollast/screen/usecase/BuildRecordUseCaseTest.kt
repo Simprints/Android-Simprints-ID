@@ -13,44 +13,44 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
-import com.simprints.infra.eventsync.sync.common.SubjectFactory
+import com.simprints.infra.eventsync.sync.common.EnrolmentRecordFactory
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import org.junit.Before
 import org.junit.Test
 
-class BuildSubjectUseCaseTest {
+class BuildRecordUseCaseTest {
     @MockK
     private lateinit var timeHelper: TimeHelper
 
     @MockK
     private lateinit var scannedCredential: ScannedCredential
 
-    private lateinit var useCase: BuildSubjectUseCase
+    private lateinit var useCase: BuildRecordUseCase
 
-    private lateinit var subjectFactory: SubjectFactory
+    private lateinit var enrolmentRecordFactory: EnrolmentRecordFactory
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         every { timeHelper.now() }.returns(Timestamp(1L))
-        subjectFactory = SubjectFactory(
+        enrolmentRecordFactory = EnrolmentRecordFactory(
             encodingUtils = EncodingUtilsImplForTests,
             timeHelper = timeHelper,
         )
-        useCase = BuildSubjectUseCase(timeHelper = timeHelper, subjectFactory = subjectFactory)
+        useCase = BuildRecordUseCase(timeHelper = timeHelper, enrolmentRecordFactory = enrolmentRecordFactory)
     }
 
     @Test
-    fun `has no samples if no steps provided`() {
+    fun `has no references if no steps provided`() {
         val result = useCase(createParams(steps = emptyList(), scannedCredential = scannedCredential), isAddingCredential = false)
 
         assertThat(result.references).isEmpty()
     }
 
     @Test
-    fun `has no samples if no valid steps provided`() {
+    fun `has no references if no valid steps provided`() {
         val result = useCase(
             createParams(
                 steps = listOf(

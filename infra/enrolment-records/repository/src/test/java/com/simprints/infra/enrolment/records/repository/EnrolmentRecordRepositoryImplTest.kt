@@ -10,9 +10,9 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSource
 import com.simprints.infra.enrolment.records.repository.local.SelectEnrolmentRecordLocalDataSourceUseCase
 import com.simprints.infra.enrolment.records.repository.local.migration.InsertRecordsInRoomDuringMigrationUseCase
@@ -38,19 +38,19 @@ class EnrolmentRecordRepositoryImplTest {
         private const val SUBJECT_ID_3 = "SUBJECT_ID_3"
         private const val SUBJECT_ID_4 = "SUBJECT_ID_4"
         private const val SUBJECT_ID_5 = "SUBJECT_ID_5"
-        private val SUBJECT_1 = mockk<Subject> {
+        private val ENROLMENT_RECORD_1 = mockk<EnrolmentRecord> {
             every { subjectId } returns SUBJECT_ID_1
         }
-        private val SUBJECT_2 = mockk<Subject> {
+        private val ENROLMENT_RECORD_2 = mockk<EnrolmentRecord> {
             every { subjectId } returns SUBJECT_ID_2
         }
-        private val SUBJECT_3 = mockk<Subject> {
+        private val ENROLMENT_RECORD_3 = mockk<EnrolmentRecord> {
             every { subjectId } returns SUBJECT_ID_3
         }
-        private val SUBJECT_4 = mockk<Subject> {
+        private val ENROLMENT_RECORD_4 = mockk<EnrolmentRecord> {
             every { subjectId } returns SUBJECT_ID_4
         }
-        private val SUBJECT_5 = mockk<Subject> {
+        private val ENROLMENT_RECORD_5 = mockk<EnrolmentRecord> {
             every { subjectId } returns SUBJECT_ID_5
         }
     }
@@ -95,15 +95,15 @@ class EnrolmentRecordRepositoryImplTest {
         val expectedEnrolmentRecordQuery = EnrolmentRecordQuery(sort = true)
         every { prefs.getString(any(), null) } returns null
         coEvery { localDataSource.load(expectedEnrolmentRecordQuery) } returns listOf(
-            SUBJECT_1,
-            SUBJECT_2,
-            SUBJECT_3,
+            ENROLMENT_RECORD_1,
+            ENROLMENT_RECORD_2,
+            ENROLMENT_RECORD_3,
         )
 
         repository.uploadRecords(listOf())
 
-        coVerify(exactly = 1) { remoteDataSource.uploadRecords(listOf(SUBJECT_1, SUBJECT_2)) }
-        coVerify(exactly = 1) { remoteDataSource.uploadRecords(listOf(SUBJECT_3)) }
+        coVerify(exactly = 1) { remoteDataSource.uploadRecords(listOf(ENROLMENT_RECORD_1, ENROLMENT_RECORD_2)) }
+        coVerify(exactly = 1) { remoteDataSource.uploadRecords(listOf(ENROLMENT_RECORD_3)) }
         coVerify(exactly = 1) { prefsEditor.putString(any(), SUBJECT_ID_2) }
         coVerify(exactly = 1) { prefsEditor.remove(any()) }
     }
@@ -113,13 +113,13 @@ class EnrolmentRecordRepositoryImplTest {
         val expectedEnrolmentRecordQuery = EnrolmentRecordQuery(sort = true)
         every { prefs.getString(any(), null) } returns null
         coEvery { localDataSource.load(expectedEnrolmentRecordQuery) } returns listOf(
-            SUBJECT_1,
-            SUBJECT_2,
+            ENROLMENT_RECORD_1,
+            ENROLMENT_RECORD_2,
         )
 
         repository.uploadRecords(listOf())
 
-        coVerify(exactly = 1) { remoteDataSource.uploadRecords(listOf(SUBJECT_1, SUBJECT_2)) }
+        coVerify(exactly = 1) { remoteDataSource.uploadRecords(listOf(ENROLMENT_RECORD_1, ENROLMENT_RECORD_2)) }
         coVerify(exactly = 1) { prefsEditor.putString(any(), SUBJECT_ID_2) }
         coVerify(exactly = 1) { prefsEditor.remove(any()) }
     }
@@ -129,18 +129,18 @@ class EnrolmentRecordRepositoryImplTest {
         val expectedEnrolmentRecordQuery = EnrolmentRecordQuery(sort = true)
         every { prefs.getString(any(), null) } returns null
         coEvery { localDataSource.load(expectedEnrolmentRecordQuery) } returns listOf(
-            SUBJECT_1,
-            SUBJECT_2,
-            SUBJECT_3,
-            SUBJECT_4,
-            SUBJECT_5,
+            ENROLMENT_RECORD_1,
+            ENROLMENT_RECORD_2,
+            ENROLMENT_RECORD_3,
+            ENROLMENT_RECORD_4,
+            ENROLMENT_RECORD_5,
         )
 
         repository.uploadRecords(listOf())
 
-        coVerify(exactly = 1) { remoteDataSource.uploadRecords(listOf(SUBJECT_1, SUBJECT_2)) }
-        coVerify(exactly = 1) { remoteDataSource.uploadRecords(listOf(SUBJECT_3, SUBJECT_4)) }
-        coVerify(exactly = 1) { remoteDataSource.uploadRecords(listOf(SUBJECT_5)) }
+        coVerify(exactly = 1) { remoteDataSource.uploadRecords(listOf(ENROLMENT_RECORD_1, ENROLMENT_RECORD_2)) }
+        coVerify(exactly = 1) { remoteDataSource.uploadRecords(listOf(ENROLMENT_RECORD_3, ENROLMENT_RECORD_4)) }
+        coVerify(exactly = 1) { remoteDataSource.uploadRecords(listOf(ENROLMENT_RECORD_5)) }
         coVerify(exactly = 1) { prefsEditor.putString(any(), SUBJECT_ID_2) }
         coVerify(exactly = 1) { prefsEditor.putString(any(), SUBJECT_ID_4) }
         coVerify(exactly = 1) { prefsEditor.remove(any()) }
@@ -152,13 +152,13 @@ class EnrolmentRecordRepositoryImplTest {
             EnrolmentRecordQuery(sort = true, subjectIds = listOf(SUBJECT_ID_1, SUBJECT_ID_2))
         every { prefs.getString(any(), null) } returns null
         coEvery { localDataSource.load(expectedEnrolmentRecordQuery) } returns listOf(
-            SUBJECT_1,
-            SUBJECT_2,
+            ENROLMENT_RECORD_1,
+            ENROLMENT_RECORD_2,
         )
 
         repository.uploadRecords(listOf(SUBJECT_ID_1, SUBJECT_ID_2))
 
-        coVerify(exactly = 1) { remoteDataSource.uploadRecords(listOf(SUBJECT_1, SUBJECT_2)) }
+        coVerify(exactly = 1) { remoteDataSource.uploadRecords(listOf(ENROLMENT_RECORD_1, ENROLMENT_RECORD_2)) }
         coVerify(exactly = 1) { prefsEditor.putString(any(), SUBJECT_ID_2) }
         coVerify(exactly = 1) { prefsEditor.remove(any()) }
     }
@@ -171,13 +171,13 @@ class EnrolmentRecordRepositoryImplTest {
         )
         every { prefs.getString(any(), null) } returns SUBJECT_ID_3
         coEvery { localDataSource.load(expectedEnrolmentRecordQuery) } returns listOf(
-            SUBJECT_1,
-            SUBJECT_2,
+            ENROLMENT_RECORD_1,
+            ENROLMENT_RECORD_2,
         )
 
         repository.uploadRecords(listOf())
 
-        coVerify(exactly = 1) { remoteDataSource.uploadRecords(listOf(SUBJECT_1, SUBJECT_2)) }
+        coVerify(exactly = 1) { remoteDataSource.uploadRecords(listOf(ENROLMENT_RECORD_1, ENROLMENT_RECORD_2)) }
         coVerify(exactly = 1) { prefsEditor.putString(any(), SUBJECT_ID_2) }
         coVerify(exactly = 1) { prefsEditor.remove(any()) }
     }
@@ -191,7 +191,7 @@ class EnrolmentRecordRepositoryImplTest {
             val attendantIdTokenized = "attendantId".asTokenizableEncrypted()
             val moduleIdTokenized = "moduleId".asTokenizableEncrypted()
             val project = mockk<Project>()
-            val subject = Subject(
+            val enrolmentRecord = EnrolmentRecord(
                 subjectId = "subjectId",
                 projectId = projectId,
                 attendantId = attendantIdRaw,
@@ -201,7 +201,7 @@ class EnrolmentRecordRepositoryImplTest {
                 references = emptyList(),
             )
             every { project.id } returns projectId
-            coEvery { localDataSource.load(any()) } returns listOf(subject)
+            coEvery { localDataSource.load(any()) } returns listOf(enrolmentRecord)
             every {
                 tokenizationProcessor.encrypt(
                     decrypted = attendantIdRaw,
@@ -218,7 +218,7 @@ class EnrolmentRecordRepositoryImplTest {
             } returns moduleIdTokenized
 
             repository.tokenizeExistingRecords(project)
-            val expectedSubject = subject.copy(
+            val expectedSubject = enrolmentRecord.copy(
                 attendantId = attendantIdTokenized,
                 moduleId = moduleIdTokenized,
             )
@@ -232,7 +232,7 @@ class EnrolmentRecordRepositoryImplTest {
         val attendantIdRaw = "attendantId".asTokenizableRaw()
         val moduleIdRaw = "moduleId".asTokenizableRaw()
         val project = mockk<Project>()
-        val subject = Subject(
+        val enrolmentRecord = EnrolmentRecord(
             subjectId = "subjectId",
             projectId = "another project id",
             attendantId = attendantIdRaw,
@@ -242,7 +242,7 @@ class EnrolmentRecordRepositoryImplTest {
             references = emptyList(),
         )
         every { project.id } returns projectId
-        coEvery { localDataSource.load(any()) } returns listOf(subject)
+        coEvery { localDataSource.load(any()) } returns listOf(enrolmentRecord)
 
         repository.tokenizeExistingRecords(project)
         coVerify { localDataSource.performActions(emptyList(), project) }

@@ -14,11 +14,11 @@ import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction.Creation
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction.Deletion
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction.Update
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScope
@@ -40,7 +40,7 @@ import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.D
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.FAILED
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.RUNNING
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
-import com.simprints.infra.eventsync.sync.common.SubjectFactory
+import com.simprints.infra.eventsync.sync.common.EnrolmentRecordFactory
 import com.simprints.infra.eventsync.sync.down.tasks.BaseEventDownSyncTask.Companion.EVENTS_BATCH_SIZE
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
@@ -188,7 +188,7 @@ class SimprintsEventDownSyncTaskTest {
     @MockK
     private lateinit var project: Project
 
-    private lateinit var subjectFactory: SubjectFactory
+    private lateinit var enrolmentRecordFactory: EnrolmentRecordFactory
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
@@ -197,14 +197,14 @@ class SimprintsEventDownSyncTaskTest {
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
 
-        subjectFactory = SubjectFactory(
+        enrolmentRecordFactory = EnrolmentRecordFactory(
             encodingUtils = EncodingUtilsImplForTests,
             timeHelper = timeHelper,
         )
         eventDownSyncTask = SimprintsEventDownSyncTask(
             enrolmentRecordRepository,
             eventDownSyncScopeRepository,
-            subjectFactory,
+            enrolmentRecordFactory,
             configManager,
             timeHelper,
             eventRepository,
@@ -306,7 +306,7 @@ class SimprintsEventDownSyncTaskTest {
             enrolmentRecordRepository.performActions(
                 listOf(
                     Creation(
-                        subjectFactory.buildSubjectFromCreationPayload(
+                        enrolmentRecordFactory.buildFromCreationPayload(
                             event.payload,
                         ),
                     ),
@@ -384,7 +384,7 @@ class SimprintsEventDownSyncTaskTest {
             enrolmentRecordRepository.performActions(
                 listOf(
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
-                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
+                    Creation(enrolmentRecordFactory.buildFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
                 project,
             )
@@ -412,7 +412,7 @@ class SimprintsEventDownSyncTaskTest {
             enrolmentRecordRepository.performActions(
                 listOf(
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
-                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
+                    Creation(enrolmentRecordFactory.buildFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
                 project,
             )
@@ -462,7 +462,7 @@ class SimprintsEventDownSyncTaskTest {
             enrolmentRecordRepository.performActions(
                 listOf(
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
-                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
+                    Creation(enrolmentRecordFactory.buildFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
                 project,
             )
@@ -490,7 +490,7 @@ class SimprintsEventDownSyncTaskTest {
             enrolmentRecordRepository.performActions(
                 listOf(
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
-                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
+                    Creation(enrolmentRecordFactory.buildFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
                 project,
             )
@@ -523,7 +523,7 @@ class SimprintsEventDownSyncTaskTest {
             enrolmentRecordRepository.performActions(
                 listOf(
                     Deletion(eventToMoveToAttendant2.payload.enrolmentRecordDeletion.subjectId),
-                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToAttendant2.payload.enrolmentRecordCreation)),
+                    Creation(enrolmentRecordFactory.buildFromMovePayload(eventToMoveToAttendant2.payload.enrolmentRecordCreation)),
                 ),
                 project,
             )
@@ -541,7 +541,7 @@ class SimprintsEventDownSyncTaskTest {
             enrolmentRecordRepository.performActions(
                 listOf(
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
-                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
+                    Creation(enrolmentRecordFactory.buildFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
                 project,
             )
@@ -551,7 +551,7 @@ class SimprintsEventDownSyncTaskTest {
     @Test
     fun downSync_shouldProcessRecordUpdateEvent_withUpdate() = runTest {
         coEvery { enrolmentRecordRepository.load(any()) } returns listOf(
-            Subject(
+            EnrolmentRecord(
                 subjectId = "subjectId",
                 projectId = "projectId",
                 attendantId = "moduleId".asTokenizableRaw(),

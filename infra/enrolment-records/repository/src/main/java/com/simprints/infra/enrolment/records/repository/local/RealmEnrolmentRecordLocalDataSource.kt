@@ -11,9 +11,9 @@ import com.simprints.infra.enrolment.records.realm.store.RealmWrapper
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.local.models.toDomain
 import com.simprints.infra.enrolment.records.repository.local.models.toRealmDb
 import com.simprints.infra.enrolment.records.repository.local.models.toRealmFaceDb
@@ -61,7 +61,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         const val CHANNEL_CAPACITY = 4
     }
 
-    override suspend fun load(query: EnrolmentRecordQuery): List<Subject> = realmWrapper.readRealm {
+    override suspend fun load(query: EnrolmentRecordQuery): List<EnrolmentRecord> = realmWrapper.readRealm {
         it
             .query(DbSubject::class)
             .buildRealmQueryForSubject(query)
@@ -161,16 +161,16 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
             actions.forEach { action ->
                 when (action) {
                     is EnrolmentRecordAction.Creation -> {
-                        val newSubject = action.subject
+                        val newSubject = action.enrolmentRecord
                             .copy(
                                 moduleId =
                                     tokenizationProcessor.tokenizeIfNecessary(
-                                        action.subject.moduleId,
+                                        action.enrolmentRecord.moduleId,
                                         TokenKeyType.ModuleId,
                                         project,
                                     ),
                                 attendantId = tokenizationProcessor.tokenizeIfNecessary(
-                                    action.subject.attendantId,
+                                    action.enrolmentRecord.attendantId,
                                     TokenKeyType.AttendantId,
                                     project,
                                 ),
@@ -328,7 +328,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
     /**
      * Loads all subjects in batches of the specified size.
      */
-    fun loadAllSubjectsInBatches(batchSize: Int): Flow<List<Subject>> = channelFlow {
+    fun loadAllSubjectsInBatches(batchSize: Int): Flow<List<EnrolmentRecord>> = channelFlow {
         require(batchSize > 0) {
             "Batch size must be greater than 0"
         }

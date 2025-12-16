@@ -2,12 +2,12 @@ package com.simprints.infra.enrolment.records.repository.local
 
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.CandidateRecordDataSource
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 
 interface EnrolmentRecordLocalDataSource : CandidateRecordDataSource {
-    suspend fun load(query: EnrolmentRecordQuery): List<Subject>
+    suspend fun load(query: EnrolmentRecordQuery): List<EnrolmentRecord>
 
     suspend fun delete(queries: List<EnrolmentRecordQuery>)
 

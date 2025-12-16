@@ -7,7 +7,7 @@ import com.simprints.core.domain.reference.BiometricReference
 @Keep
 sealed class EnrolmentRecordAction {
     data class Creation(
-        val subject: Subject,
+        val enrolmentRecord: EnrolmentRecord,
     ) : EnrolmentRecordAction()
 
     data class Update(

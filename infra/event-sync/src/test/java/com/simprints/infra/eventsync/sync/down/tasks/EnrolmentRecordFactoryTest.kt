@@ -13,7 +13,7 @@ import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordUpdateEvent.EnrolmentRecordUpdatePayload
@@ -22,7 +22,7 @@ import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
 import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.infra.eventsync.sync.common.SubjectFactory
+import com.simprints.infra.eventsync.sync.common.EnrolmentRecordFactory
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import org.junit.After
@@ -31,7 +31,7 @@ import org.junit.Test
 import java.util.Date
 import java.util.UUID
 
-class SubjectFactoryTest {
+class EnrolmentRecordFactoryTest {
     @MockK
     lateinit var encodingUtils: EncodingUtils
 
@@ -44,7 +44,7 @@ class SubjectFactoryTest {
         mockkStatic(UUID::class)
 
         every { encodingUtils.base64ToBytes(any()) } returns BASE_64_BYTES
-        factory = SubjectFactory(
+        factory = EnrolmentRecordFactory(
             encodingUtils = encodingUtils,
             timeHelper = timeHelper,
         )
@@ -56,7 +56,7 @@ class SubjectFactoryTest {
     }
 
     @Test
-    fun `when buildSubjectFromCreationPayload is called, correct samples are built`() {
+    fun `when buildFromCreationPayload is called, correct samples are built`() {
         val payload = EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload(
             subjectId = SUBJECT_ID,
             projectId = PROJECT_ID,
@@ -65,8 +65,8 @@ class SubjectFactoryTest {
             biometricReferences = listOf(FINGERPRINT_REFERENCE, faceReference),
             externalCredentials = emptyList(),
         )
-        val result = factory.buildSubjectFromCreationPayload(payload)
-        val expected = Subject(
+        val result = factory.buildFromCreationPayload(payload)
+        val expected = EnrolmentRecord(
             subjectId = SUBJECT_ID,
             projectId = PROJECT_ID,
             attendantId = ATTENDANT_ID,
@@ -99,7 +99,7 @@ class SubjectFactoryTest {
     }
 
     @Test
-    fun `when buildSubjectFromMovePayload is called, correct samples are built`() {
+    fun `when buildFromMovePayload is called, correct samples are built`() {
         val payload = EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove(
             subjectId = SUBJECT_ID,
             projectId = PROJECT_ID,
@@ -108,9 +108,9 @@ class SubjectFactoryTest {
             biometricReferences = listOf(FINGERPRINT_REFERENCE, faceReference),
             externalCredential = null,
         )
-        val result = factory.buildSubjectFromMovePayload(payload)
+        val result = factory.buildFromMovePayload(payload)
 
-        val expected = Subject(
+        val expected = EnrolmentRecord(
             subjectId = SUBJECT_ID,
             projectId = PROJECT_ID,
             attendantId = ATTENDANT_ID,
@@ -143,8 +143,8 @@ class SubjectFactoryTest {
     }
 
     @Test
-    fun `when buildSubjectFromUpdatePayload is called, correct samples list is created`() {
-        val subject = Subject(
+    fun `when buildFromUpdatePayload is called, correct samples list is created`() {
+        val enrolmentRecord = EnrolmentRecord(
             subjectId = SUBJECT_ID,
             projectId = PROJECT_ID,
             attendantId = ATTENDANT_ID,
@@ -218,9 +218,9 @@ class SubjectFactoryTest {
             ),
             externalCredentialsAdded = listOf(EXTERNAL_CREDENTIAL),
         )
-        val result = factory.buildSubjectFromUpdatePayload(subject, payload)
+        val result = factory.buildFromUpdatePayload(enrolmentRecord, payload)
 
-        val expected = Subject(
+        val expected = EnrolmentRecord(
             subjectId = SUBJECT_ID,
             projectId = PROJECT_ID,
             attendantId = ATTENDANT_ID,
@@ -277,11 +277,11 @@ class SubjectFactoryTest {
     }
 
     @Test
-    fun `when buildSubjectFromCaptureResults is called, correct subject is built`() {
+    fun `when buildFromCaptureResults is called, correct subject is built`() {
         val randomUUID = "5a95b24d-23c5-4d24-9277-0d3d2a287508" // "chosen by fair dice roll. guaranteed to be random" (c) xkcd
         every { UUID.randomUUID().toString() } returns randomUUID
 
-        val expected = Subject(
+        val expected = EnrolmentRecord(
             subjectId = randomUUID,
             projectId = PROJECT_ID,
             attendantId = ATTENDANT_ID,
@@ -315,7 +315,7 @@ class SubjectFactoryTest {
             externalCredentials = listOf(EXTERNAL_CREDENTIAL),
         )
 
-        val result = factory.buildSubjectFromCaptureResults(
+        val result = factory.buildFromCaptureResults(
             subjectId = expected.subjectId,
             projectId = expected.projectId,
             attendantId = expected.attendantId,
@@ -351,8 +351,8 @@ class SubjectFactoryTest {
     }
 
     @Test
-    fun `when buildSubject is called, correct subject is built`() {
-        val expected = Subject(
+    fun `when buildEnrolmentRecord is called, correct subject is built`() {
+        val expected = EnrolmentRecord(
             subjectId = SUBJECT_ID,
             projectId = PROJECT_ID,
             attendantId = ATTENDANT_ID,
@@ -383,7 +383,7 @@ class SubjectFactoryTest {
             externalCredentials = listOf(EXTERNAL_CREDENTIAL),
         )
 
-        val result = factory.buildSubject(
+        val result = factory.buildEnrolmentRecord(
             subjectId = expected.subjectId,
             projectId = expected.projectId,
             attendantId = expected.attendantId,
@@ -395,7 +395,7 @@ class SubjectFactoryTest {
     }
 
     companion object {
-        private lateinit var factory: SubjectFactory
+        private lateinit var factory: EnrolmentRecordFactory
         private const val PROJECT_ID = "projectId"
         private const val SUBJECT_ID = "subjectId"
         private const val EXTERNAL_CREDENTIAL_ID = "credentialId"

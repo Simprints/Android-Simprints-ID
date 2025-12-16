@@ -32,7 +32,7 @@ internal class InsertRecordsInRoomDuringMigrationUseCase @Inject constructor(
     ) {
         roomEnrolmentRecordLocalDataSource.performActions(actions = listOf(creation), project)
         Simber.i(
-            "[InsertRecordsInRoomDuringMigrationUseCase] Inserted subject ${creation.subject.subjectId} enrolled during migration",
+            "[InsertRecordsInRoomDuringMigrationUseCase] Inserted subject ${creation.enrolmentRecord.subjectId} enrolled during migration",
             tag = REALM_DB_MIGRATION,
         )
     }

@@ -16,7 +16,7 @@ import com.simprints.feature.clientapi.mappers.response.ActionToIntentMapper
 import com.simprints.feature.clientapi.usecases.CreateSessionIfRequiredUseCase
 import com.simprints.feature.clientapi.usecases.DeleteSessionEventsIfNeededUseCase
 import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
-import com.simprints.feature.clientapi.usecases.GetEnrolmentCreationEventForSubjectUseCase
+import com.simprints.feature.clientapi.usecases.GetEnrolmentCreationEventForRecordUseCase
 import com.simprints.feature.clientapi.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.usecases.SimpleEventReporter
 import com.simprints.infra.config.store.models.Project
@@ -61,7 +61,7 @@ internal class ClientApiViewModelTest {
     lateinit var createSessionIfRequiredUseCase: CreateSessionIfRequiredUseCase
 
     @MockK
-    lateinit var getEnrolmentCreationEventForSubject: GetEnrolmentCreationEventForSubjectUseCase
+    lateinit var getEnrolmentCreationEventForRecord: GetEnrolmentCreationEventForRecordUseCase
 
     @MockK
     lateinit var deleteSessionEventsIfNeeded: DeleteSessionEventsIfNeededUseCase
@@ -88,7 +88,7 @@ internal class ClientApiViewModelTest {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
         coEvery { getCurrentSessionId.invoke() } returns "sessionId"
-        coEvery { getEnrolmentCreationEventForSubject.invoke(any(), any()) } returns "recordsJson"
+        coEvery { getEnrolmentCreationEventForRecord.invoke(any(), any()) } returns "recordsJson"
         every { resultMapper.invoke(any()) } returns mockk()
         every { isFlowCompletedWithError.invoke(any()) } returns false
         coEvery { deleteSessionEventsIfNeeded.invoke(any()) } returns mockk()
@@ -101,7 +101,7 @@ internal class ClientApiViewModelTest {
             simpleEventReporter = simpleEventReporter,
             getCurrentSessionId = getCurrentSessionId,
             createSessionIfRequiredUseCase = createSessionIfRequiredUseCase,
-            getEnrolmentCreationEventForSubject = getEnrolmentCreationEventForSubject,
+            getEnrolmentCreationEventForRecord = getEnrolmentCreationEventForRecord,
             deleteSessionEventsIfNeeded = deleteSessionEventsIfNeeded,
             isFlowCompletedWithError = isFlowCompletedWithError,
             configManager = configManager,

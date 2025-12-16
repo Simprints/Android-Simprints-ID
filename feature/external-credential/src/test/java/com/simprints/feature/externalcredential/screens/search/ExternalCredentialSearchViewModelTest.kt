@@ -22,7 +22,7 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -55,7 +55,7 @@ internal class ExternalCredentialSearchViewModelTest {
     lateinit var projectConfig: ProjectConfiguration
 
     @MockK
-    lateinit var subject: Subject
+    lateinit var enrolmentRecord: EnrolmentRecord
 
     @MockK
     lateinit var candidateMatch: CredentialMatch
@@ -129,7 +129,7 @@ internal class ExternalCredentialSearchViewModelTest {
     fun `initial state searches and finds linked credential`() = runTest {
         val decryptedCredential = mockk<TokenizableString.Raw>()
         coEvery { tokenizationProcessor.decrypt(any(), TokenKeyType.ExternalCredential, project) } returns decryptedCredential
-        coEvery { enrolmentRecordRepository.load(any()) } returns listOf(subject)
+        coEvery { enrolmentRecordRepository.load(any()) } returns listOf(enrolmentRecord)
         coEvery {
             matchCandidatesUseCase(any(), any(), any(), any(), any())
         } returns listOf(candidateMatch)

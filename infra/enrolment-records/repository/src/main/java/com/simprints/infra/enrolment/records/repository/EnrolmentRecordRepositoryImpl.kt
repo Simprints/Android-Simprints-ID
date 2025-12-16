@@ -8,9 +8,9 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.realm.store.exceptions.RealmUninitialisedException
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.local.SelectEnrolmentRecordLocalDataSourceUseCase
 import com.simprints.infra.enrolment.records.repository.local.migration.InsertRecordsInRoomDuringMigrationUseCase
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSource
@@ -132,7 +132,7 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
         is BiometricDataSource.CommCare -> commCareDataSource
     }
 
-    override suspend fun load(query: EnrolmentRecordQuery): List<Subject> = selectEnrolmentRecordLocalDataSource().load(query)
+    override suspend fun load(query: EnrolmentRecordQuery): List<EnrolmentRecord> = selectEnrolmentRecordLocalDataSource().load(query)
 
     override suspend fun getAllSubjectIds(): List<String> = selectEnrolmentRecordLocalDataSource().getAllSubjectIds()
 

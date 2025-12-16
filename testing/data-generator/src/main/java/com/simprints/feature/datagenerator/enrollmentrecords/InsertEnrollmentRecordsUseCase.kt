@@ -10,8 +10,8 @@ import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.local.models.toDate
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -44,7 +44,7 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
         var subjectCreationActions = mutableListOf<EnrolmentRecordAction.Creation>()
         for (i in 0 until numRecords) {
             val subjectId = if (i == 0 && firstSubjectId.isNotBlank()) firstSubjectId else UUID.randomUUID().toString()
-            val subject = Subject(
+            val enrolmentRecord = EnrolmentRecord(
                 subjectId = subjectId,
                 projectId = projectId,
                 attendantId = tokenizedAttendantId,
@@ -58,7 +58,7 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
                     templatesPerFormat = templatesPerFormat,
                 ),
             )
-            subjectCreationActions.add(EnrolmentRecordAction.Creation(subject))
+            subjectCreationActions.add(EnrolmentRecordAction.Creation(enrolmentRecord))
             if (subjectCreationActions.size >= BATCH_SIZE) {
                 emit("Inserted ${i + 1} biometric records")
                 enrolmentRecordRepository.performActions(

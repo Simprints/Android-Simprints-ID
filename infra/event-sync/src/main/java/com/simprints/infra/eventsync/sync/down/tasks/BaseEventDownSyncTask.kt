@@ -24,8 +24,8 @@ import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.COMPLETE
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.FAILED
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.RUNNING
+import com.simprints.infra.eventsync.sync.common.EnrolmentRecordFactory
 import com.simprints.infra.eventsync.sync.common.EventDownSyncProgress
-import com.simprints.infra.eventsync.sync.common.SubjectFactory
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
@@ -37,7 +37,7 @@ import java.util.UUID
 internal abstract class BaseEventDownSyncTask(
     protected val enrolmentRecordRepository: EnrolmentRecordRepository,
     protected val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
-    protected val subjectFactory: SubjectFactory,
+    protected val enrolmentRecordFactory: EnrolmentRecordFactory,
     protected val configManager: ConfigManager,
     protected val timeHelper: TimeHelper,
     protected val eventRepository: EventRepository,
@@ -201,7 +201,7 @@ internal abstract class BaseEventDownSyncTask(
     }
 
     private fun handleSubjectCreationEvent(event: EnrolmentRecordCreationEvent): List<EnrolmentRecordAction> {
-        val subject = subjectFactory.buildSubjectFromCreationPayload(event.payload)
+        val subject = enrolmentRecordFactory.buildFromCreationPayload(event.payload)
         return if (subject.references.isNotEmpty()) {
             listOf(Creation(subject))
         } else {
@@ -258,7 +258,7 @@ internal abstract class BaseEventDownSyncTask(
 
     private fun createASubjectActionFromRecordCreation(enrolmentRecordCreation: EnrolmentRecordCreationInMove?): Creation? =
         enrolmentRecordCreation?.let {
-            val subject = subjectFactory.buildSubjectFromMovePayload(it)
+            val subject = enrolmentRecordFactory.buildFromMovePayload(it)
             if (subject.references.isNotEmpty()) {
                 Creation(subject)
             } else {
@@ -273,7 +273,7 @@ internal abstract class BaseEventDownSyncTask(
         listOf(
             EnrolmentRecordAction.Update(
                 subjectId = subjectId,
-                samplesToAdd = subjectFactory.extractFromBiometricReferences(biometricReferencesAdded),
+                samplesToAdd = enrolmentRecordFactory.extractFromBiometricReferences(biometricReferencesAdded),
                 referenceIdsToRemove = biometricReferencesRemoved,
                 externalCredentialsToAdd = externalCredentialsAdded,
                 externalCredentialIdsToRemove = emptyList(), // Only used locally to ensure a single credential is linked per session

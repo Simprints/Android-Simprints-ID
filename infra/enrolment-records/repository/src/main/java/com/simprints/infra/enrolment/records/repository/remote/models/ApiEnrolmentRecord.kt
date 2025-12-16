@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.remote.models.face.toFaceApi
 import com.simprints.infra.enrolment.records.repository.remote.models.fingerprint.toFingerprintApi
 
@@ -16,7 +16,7 @@ internal data class ApiEnrolmentRecord(
     val biometricReferences: List<ApiBiometricReference>,
 )
 
-internal fun Subject.toEnrolmentRecord(encoder: EncodingUtils): ApiEnrolmentRecord = ApiEnrolmentRecord(
+internal fun EnrolmentRecord.toEnrolmentRecord(encoder: EncodingUtils): ApiEnrolmentRecord = ApiEnrolmentRecord(
     subjectId,
     moduleId.value,
     attendantId.value,

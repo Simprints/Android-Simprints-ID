@@ -8,7 +8,7 @@ import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.remote.models.ApiEnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.remote.models.ApiEnrolmentRecords
 import com.simprints.infra.enrolment.records.repository.remote.models.face.ApiFaceReference
@@ -64,7 +64,7 @@ class EnrolmentRecordRemoteDataSourceImplTest {
 
     @Test
     fun `Upload successfully the records`() = runTest {
-        val subject = Subject(
+        val enrolmentRecord = EnrolmentRecord(
             subjectId = SUBJECT_ID,
             projectId = PROJECT_ID,
             moduleId = MODULE_ID,
@@ -115,7 +115,7 @@ class EnrolmentRecordRemoteDataSourceImplTest {
                 ),
             ),
         )
-        enrolmentRecordRemoteDataSourceImpl.uploadRecords(listOf(subject))
+        enrolmentRecordRemoteDataSourceImpl.uploadRecords(listOf(enrolmentRecord))
 
         coVerify(exactly = 1) {
             remoteInterface.uploadRecords(
