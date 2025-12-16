@@ -1,7 +1,7 @@
 package com.simprints.face.infra.simface.matching
 
 import com.simprints.biometrics.simface.SimFace
-import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 

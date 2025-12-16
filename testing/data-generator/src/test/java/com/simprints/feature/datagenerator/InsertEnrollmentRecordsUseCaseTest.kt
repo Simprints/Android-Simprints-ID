@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.feature.datagenerator.enrollmentrecords.InsertEnrollmentRecordsUseCase
 import com.simprints.feature.datagenerator.enrollmentrecords.InsertEnrollmentRecordsUseCase.Companion.BATCH_SIZE
 import com.simprints.infra.config.store.ConfigRepository

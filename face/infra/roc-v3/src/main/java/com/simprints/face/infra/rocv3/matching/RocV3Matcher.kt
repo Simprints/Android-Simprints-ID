@@ -4,7 +4,7 @@ import ai.roc.rocsdk.embedded.SWIGTYPE_p_unsigned_char
 import ai.roc.rocsdk.embedded.roc
 import ai.roc.rocsdk.embedded.rocConstants.ROC_FACE_FAST_FV_SIZE
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 

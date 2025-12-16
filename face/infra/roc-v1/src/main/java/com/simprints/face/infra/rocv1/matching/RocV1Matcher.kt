@@ -1,7 +1,7 @@
 package com.simprints.face.infra.rocv1.matching
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import io.rankone.rocsdk.embedded.SWIGTYPE_p_unsigned_char

@@ -3,11 +3,11 @@ package com.simprints.fingerprint.infra.necsdkimpl.matching
 import com.google.common.truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.reference.BiometricReference
-import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.reference.BiometricTemplateCapture
+import com.simprints.core.domain.capture.BiometricTemplateCapture
 import com.simprints.core.domain.reference.CandidateRecord
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.template.NEC_TEMPLATE_FORMAT
 import com.simprints.necwrapper.nec.NEC

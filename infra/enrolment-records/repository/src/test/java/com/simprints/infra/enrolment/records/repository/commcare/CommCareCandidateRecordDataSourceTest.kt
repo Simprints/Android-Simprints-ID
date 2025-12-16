@@ -8,8 +8,8 @@ import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.CandidateRecord
-import com.simprints.core.domain.reference.TemplateIdentifier.LEFT_INDEX_FINGER
-import com.simprints.core.domain.reference.TemplateIdentifier.LEFT_THUMB
+import com.simprints.core.domain.common.TemplateIdentifier.LEFT_INDEX_FINGER
+import com.simprints.core.domain.common.TemplateIdentifier.LEFT_THUMB
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper

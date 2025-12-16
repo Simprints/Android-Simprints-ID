@@ -1,8 +1,8 @@
 package com.simprints.fingerprint.infra.basebiosdk.matching
 
-import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricReferenceCapture
+import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.domain.reference.CandidateRecord
-import com.simprints.core.domain.sample.ComparisonResult
 
 interface FingerprintMatcher<MatcherSettings> {
     /**

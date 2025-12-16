@@ -2,7 +2,7 @@ package com.simprints.infra.config.store.local.models
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.AgeGroup
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.testtools.fingerprintConfiguration
 import com.simprints.infra.config.store.testtools.protoFingerprintConfiguration

@@ -1,6 +1,6 @@
 package com.simprints.feature.orchestrator.usecases.response
 
-import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential

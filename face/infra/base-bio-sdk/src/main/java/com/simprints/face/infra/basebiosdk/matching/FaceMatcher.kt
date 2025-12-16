@@ -1,6 +1,6 @@
 package com.simprints.face.infra.basebiosdk.matching
 
-import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.reference.CandidateRecord
 
 abstract class FaceMatcher(

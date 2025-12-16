@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.capture
 
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 
 object FingerprintCaptureContract {

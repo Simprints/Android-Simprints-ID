@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.capture.usecase
 
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 import javax.inject.Inject
 
 internal class GetNextFingerToAddUseCase @Inject constructor() {

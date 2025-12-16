@@ -2,7 +2,7 @@ package com.simprints.infra.events.sampledata
 
 import android.os.Build
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.reference.TemplateIdentifier.LEFT_THUMB
+import com.simprints.core.domain.common.TemplateIdentifier.LEFT_THUMB
 import com.simprints.core.domain.response.AppMatchConfidence.MEDIUM
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.SimNetworkUtils

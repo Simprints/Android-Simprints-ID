@@ -2,7 +2,7 @@ package com.simprints.infra.matching.usecase
 
 import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.sample.ComparisonResult
+import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager

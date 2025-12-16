@@ -2,7 +2,7 @@ package com.simprints.infra.config.store.local
 
 import androidx.datastore.core.DataStore
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.config.store.AbsolutePath

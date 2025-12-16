@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.infra.basebiosdk
 
-import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.FingerprintImageProvider
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.FingerprintTemplateProvider

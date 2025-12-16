@@ -1,9 +1,9 @@
 package com.simprints.fingerprint.infra.biosdkimpl.matching
 
 import com.google.common.truth.*
-import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricReferenceCapture
+import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.domain.reference.CandidateRecord
-import com.simprints.core.domain.sample.ComparisonResult
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Test

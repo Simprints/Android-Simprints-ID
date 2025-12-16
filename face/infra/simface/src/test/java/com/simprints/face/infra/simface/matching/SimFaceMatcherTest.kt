@@ -5,7 +5,7 @@ import com.simprints.biometrics.simface.SimFace
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.reference.BiometricTemplateCapture
+import com.simprints.core.domain.capture.BiometricTemplateCapture
 import com.simprints.core.domain.reference.CandidateRecord
 import io.mockk.*
 import kotlinx.coroutines.test.runTest

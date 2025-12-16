@@ -1,7 +1,7 @@
 package com.simprints.feature.enrollast.screen.usecase
 
 import com.simprints.core.domain.reference.BiometricReference
-import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.enrollast.EnrolLastBiometricParams

@@ -1,6 +1,6 @@
 package com.simprints.infra.matching.usecase
 
-import com.simprints.core.domain.sample.ComparisonResult
+import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.matching.MatchBatchInfo

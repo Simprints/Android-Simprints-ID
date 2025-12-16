@@ -2,7 +2,7 @@ package com.simprints.feature.orchestrator.steps
 
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.ModalitySdkType
-import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.step.StepParams
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery

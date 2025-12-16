@@ -1,6 +1,6 @@
 package com.simprints.face.infra.biosdkresolver
 
-import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.rocv3.detection.RocV3Detector
 import com.simprints.face.infra.rocv3.detection.RocV3Detector.Companion.RANK_ONE_TEMPLATE_FORMAT_3_1

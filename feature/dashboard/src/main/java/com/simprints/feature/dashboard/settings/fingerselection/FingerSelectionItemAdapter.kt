@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.feature.dashboard.databinding.HeaderSdkNameBinding
 import com.simprints.feature.dashboard.databinding.ItemFingerSelectionBinding
 import com.simprints.infra.resources.R as IDR

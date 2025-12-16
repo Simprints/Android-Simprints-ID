@@ -1,7 +1,7 @@
 package com.simprints.infra.events.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection

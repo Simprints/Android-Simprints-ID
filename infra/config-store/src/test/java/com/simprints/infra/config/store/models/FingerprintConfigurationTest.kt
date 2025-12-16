@@ -1,7 +1,7 @@
 package com.simprints.infra.config.store.models
 
 import com.google.common.truth.*
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 import org.junit.Test
 
 class FingerprintConfigurationTest {

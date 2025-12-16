@@ -1,7 +1,7 @@
 package com.simprints.infra.enrolment.records.repository.remote.models.fingerprint
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 
 @Keep
 internal enum class ApiFinger {

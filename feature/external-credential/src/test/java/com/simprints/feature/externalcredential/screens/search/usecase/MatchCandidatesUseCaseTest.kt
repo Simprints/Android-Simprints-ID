@@ -1,10 +1,10 @@
 package com.simprints.feature.externalcredential.screens.search.usecase
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.reference.BiometricReferenceCapture
-import com.simprints.core.domain.sample.ComparisonResult
+import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.infra.config.store.models.FaceConfiguration

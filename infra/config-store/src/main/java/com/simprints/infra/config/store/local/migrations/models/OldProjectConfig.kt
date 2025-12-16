@@ -3,7 +3,7 @@ package com.simprints.infra.config.store.local.migrations.models
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.models.ConsentConfiguration

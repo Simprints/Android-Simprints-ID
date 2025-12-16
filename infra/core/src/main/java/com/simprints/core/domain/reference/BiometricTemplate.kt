@@ -2,6 +2,7 @@ package com.simprints.core.domain.reference
 
 import android.os.Parcelable
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.step.StepResult
 import kotlinx.parcelize.Parcelize

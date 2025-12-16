@@ -2,7 +2,7 @@ package com.simprints.fingerprint.capture.usecase
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.ScanResult
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerInfo

@@ -1,6 +1,6 @@
 package com.simprints.infra.enrolment.records.repository.local.models
 
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 
 enum class DbTemplateIdentifier(
     val id: Int,
