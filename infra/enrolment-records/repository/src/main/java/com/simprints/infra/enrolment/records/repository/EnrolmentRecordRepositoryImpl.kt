@@ -25,7 +25,7 @@ import javax.inject.Singleton
 @Singleton
 internal class EnrolmentRecordRepositoryImpl @Inject constructor(
     private val remoteDataSource: EnrolmentRecordRemoteDataSource,
-    @CommCareDataSource private val commCareDataSource: IdentityDataSource,
+    @CommCareDataSource private val commCareDataSource: CandidateRecordDataSource,
     private val tokenizationProcessor: TokenizationProcessor,
     private val selectEnrolmentRecordLocalDataSource: SelectEnrolmentRecordLocalDataSourceUseCase,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
@@ -82,7 +82,9 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
             selectEnrolmentRecordLocalDataSource().performActions(tokenizedSubjectsCreateAction, project)
         } catch (e: Exception) {
             when (e) {
-                is RealmUninitialisedException -> Unit // AuthStore hasn't yet saved the project, no need to do anything
+                is RealmUninitialisedException -> Unit
+
+                // AuthStore hasn't yet saved the project, no need to do anything
                 else -> Simber.e("Failed to tokenize existing records", e)
             }
         }
@@ -94,6 +96,7 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
         project: Project,
     ) = when (value) {
         is TokenizableString.Tokenized -> value
+
         is TokenizableString.Raw -> tokenizationProcessor.encrypt(
             decrypted = value,
             tokenKeyType = tokenKeyType,
@@ -104,18 +107,18 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
     override suspend fun count(
         query: SubjectQuery,
         dataSource: BiometricDataSource,
-    ): Int = fromIdentityDataSource(dataSource).count(query, dataSource)
+    ): Int = fromCandidateDataSource(dataSource).count(query, dataSource)
 
     override suspend fun getLocalDBInfo(): String = selectEnrolmentRecordLocalDataSource().getLocalDBInfo()
 
-    override suspend fun loadIdentities(
+    override suspend fun loadCandidateRecords(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ) = fromIdentityDataSource(dataSource).loadIdentities(
+    ) = fromCandidateDataSource(dataSource).loadCandidateRecords(
         query = query,
         ranges = ranges,
         dataSource = dataSource,
@@ -124,7 +127,7 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
         onCandidateLoaded = onCandidateLoaded,
     )
 
-    private suspend fun fromIdentityDataSource(dataSource: BiometricDataSource) = when (dataSource) {
+    private suspend fun fromCandidateDataSource(dataSource: BiometricDataSource) = when (dataSource) {
         is BiometricDataSource.Simprints -> selectEnrolmentRecordLocalDataSource()
         is BiometricDataSource.CommCare -> commCareDataSource
     }

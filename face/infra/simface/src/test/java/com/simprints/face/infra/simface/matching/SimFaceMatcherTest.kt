@@ -6,7 +6,7 @@ import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.BiometricTemplateCapture
-import com.simprints.core.domain.sample.Identity
+import com.simprints.core.domain.reference.CandidateRecord
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -55,7 +55,7 @@ class SimFaceMatcherTest {
                 },
             )
             val result = matcher.getHighestComparisonScoreForCandidate(
-                candidate = Identity(
+                candidate = CandidateRecord(
                     subjectId = "id",
                     references = listOf(
                         BiometricReference(
@@ -92,7 +92,7 @@ class SimFaceMatcherTest {
             },
         )
         val result = matcher.getHighestComparisonScoreForCandidate(
-            candidate = Identity(
+            candidate = CandidateRecord(
                 subjectId = "id",
                 references = listOf(
                     BiometricReference(

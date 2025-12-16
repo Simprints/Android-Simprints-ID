@@ -2,14 +2,14 @@ package com.simprints.face.infra.simface.matching
 
 import com.simprints.biometrics.simface.SimFace
 import com.simprints.core.domain.reference.BiometricReferenceCapture
-import com.simprints.core.domain.sample.Identity
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 
 class SimFaceMatcher(
     private val simFace: SimFace,
     override val probeReference: BiometricReferenceCapture,
 ) : FaceMatcher(probeReference) {
-    override suspend fun getHighestComparisonScoreForCandidate(candidate: Identity): Float = probeReference
+    override suspend fun getHighestComparisonScoreForCandidate(candidate: CandidateRecord): Float = probeReference
         .templates
         .map { it.template }
         .flatMap { probeTemplate ->

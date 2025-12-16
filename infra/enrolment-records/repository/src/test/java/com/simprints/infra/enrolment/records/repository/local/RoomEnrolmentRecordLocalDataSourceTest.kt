@@ -801,7 +801,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         val queryWithoutFormat = SubjectQuery(projectId = PROJECT_1_ID)
 
         // When
-        dataSource.loadIdentities(
+        dataSource.loadCandidateRecords(
             // This call will throw
             query = queryWithoutFormat,
             ranges = listOf(0..10),
@@ -824,7 +824,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
         // When - Query P1 for NEC
         val loadedP1Nec = dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = SubjectQuery(
                     projectId = PROJECT_1_ID,
                     format = NEC_FORMAT,
@@ -839,7 +839,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             .identities
         // When - Query P1 for ISO
         val loadedP1Iso = dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = SubjectQuery(
                     projectId = PROJECT_1_ID,
                     format = ISO_FORMAT,
@@ -854,7 +854,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             .identities
         // When - Query P2 for NEC
         val loadedP2Nec = dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = SubjectQuery(
                     projectId = PROJECT_2_ID,
                     format = NEC_FORMAT,
@@ -919,7 +919,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         // When
         val loadedRanges =
             dataSource
-                .loadIdentities(
+                .loadCandidateRecords(
                     query = baseQuery,
                     ranges = listOf(
                         0..0,
@@ -933,7 +933,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
         val loadedFirstTwo =
             dataSource
-                .loadIdentities(
+                .loadCandidateRecords(
                     query = baseQuery,
                     ranges = listOf(
                         0..1,
@@ -947,7 +947,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 .identities
         val loadedAll =
             dataSource
-                .loadIdentities(
+                .loadCandidateRecords(
                     query = baseQuery,
                     ranges = listOf(0..10),
                     project = project,
@@ -984,7 +984,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
         // When
         val loadedIdentities = dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = SubjectQuery(
                     projectId = PROJECT_1_ID,
                     format = UNUSED_FORMAT,
@@ -1010,7 +1010,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
         // When
         val loadedP1Roc1 = dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = SubjectQuery(projectId = PROJECT_1_ID, format = ROC_1_FORMAT),
                 ranges = listOf(0..10),
                 project = project,
@@ -1021,7 +1021,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             .first()
             .identities
         val loadedP1Roc3 = dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = SubjectQuery(projectId = PROJECT_1_ID, format = ROC_3_FORMAT),
                 ranges = listOf(0..10),
                 project = project,
@@ -1032,7 +1032,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             .first()
             .identities
         val loadedP2Roc1 = dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = SubjectQuery(projectId = PROJECT_2_ID, format = ROC_1_FORMAT),
                 ranges = listOf(0..10),
                 project = project,
@@ -1090,7 +1090,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         // When
         val loadedRanges =
             dataSource
-                .loadIdentities(
+                .loadCandidateRecords(
                     query = baseQuery,
                     ranges = listOf(
                         0..0,
@@ -1104,7 +1104,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
         val loadedFirstTwo =
             dataSource
-                .loadIdentities(
+                .loadCandidateRecords(
                     query = baseQuery,
                     ranges = listOf(
                         0..1,
@@ -1117,7 +1117,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 .first()
                 .identities
         val loadedAll = dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = baseQuery,
                 ranges = listOf(0..10),
                 project = project,
@@ -1178,7 +1178,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
         // When
         val loadedP1A1M1Roc1 = dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 queryP1A1M1Roc1,
                 listOf(0..10),
                 project = project,
@@ -1189,7 +1189,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             .first()
             .identities
         val loadedP1A1M2Roc3 = dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 queryP1A1M2Roc3,
                 listOf(
                     0..10,
@@ -1203,7 +1203,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             .identities
         val loadedP1A1M1Roc3Empty =
             dataSource
-                .loadIdentities(
+                .loadCandidateRecords(
                     queryP1A1M1Roc3Empty,
                     listOf(
                         0..10,
@@ -1267,7 +1267,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
         // When
         val loadedP1A1M1Nec = dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 queryP1A1M1Nec,
                 listOf(
                     0..10,
@@ -1280,7 +1280,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             .first()
             .identities
         val loadedP1A1M3Nec = dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 queryP1A1M3Nec,
                 listOf(
                     0..10,
@@ -1293,7 +1293,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             .first()
             .identities
         val loadedP1A1M2Iso = dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 queryP1A1M2Iso,
                 listOf(
                     0..10,
@@ -1306,7 +1306,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             .first()
             .identities
         val loadedP1A2M1NecEmpty = dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 queryP1A2M1NecEmpty,
                 listOf(
                     0..10,

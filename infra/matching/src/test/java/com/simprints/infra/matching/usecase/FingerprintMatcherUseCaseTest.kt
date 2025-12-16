@@ -8,8 +8,8 @@ import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.BiometricTemplateCapture
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.domain.reference.TemplateIdentifier
-import com.simprints.core.domain.sample.Identity
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
@@ -20,7 +20,7 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
+import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
@@ -119,7 +119,7 @@ internal class FingerprintMatcherUseCaseTest {
     fun `Skips matching if there are no candidates`() = runTest {
         coEvery { enrolmentRecordRepository.count(any()) } returns 0
         coEvery {
-            enrolmentRecordRepository.loadIdentities(any(), any(), any(), project, any(), any())
+            enrolmentRecordRepository.loadCandidateRecords(any(), any(), any(), project, any(), any())
         } returns createTestChannel(emptyList())
         coEvery { bioSdkWrapper.match(any(), any(), any()) } returns listOf()
 
@@ -212,7 +212,7 @@ internal class FingerprintMatcherUseCaseTest {
         coEvery { enrolmentRecordRepository.count(any(), any()) } returns 100
         coEvery { createRangesUseCase(any()) } returns listOf(0..99)
         coEvery {
-            enrolmentRecordRepository.loadIdentities(
+            enrolmentRecordRepository.loadCandidateRecords(
                 any(),
                 any(),
                 any(),
@@ -222,7 +222,7 @@ internal class FingerprintMatcherUseCaseTest {
             )
         } returns createTestChannel(
             listOf(
-                Identity(
+                CandidateRecord(
                     "personId",
                     listOf(
                         fingerprintReference(TemplateIdentifier.RIGHT_5TH_FINGER),
@@ -279,13 +279,13 @@ internal class FingerprintMatcherUseCaseTest {
     )
 }
 
-fun createTestChannel(vararg lists: List<Identity>): ReceiveChannel<IdentityBatch> {
-    val channel = Channel<IdentityBatch>(lists.size)
+fun createTestChannel(vararg lists: List<CandidateRecord>): ReceiveChannel<CandidateRecordBatch> {
+    val channel = Channel<CandidateRecordBatch>(lists.size)
     runBlocking {
         var time = 0L
         for (list in lists) {
             channel.send(
-                IdentityBatch(
+                CandidateRecordBatch(
                     identities = list,
                     loadingStartTime = Timestamp(time++),
                     loadingEndTime = Timestamp(time++),

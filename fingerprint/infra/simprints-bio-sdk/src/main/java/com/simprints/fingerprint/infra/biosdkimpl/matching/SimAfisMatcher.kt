@@ -4,9 +4,9 @@ import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.BiometricTemplateCapture
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.ComparisonResult
-import com.simprints.core.domain.sample.Identity
 import com.simprints.fingerprint.infra.simafiswrapper.JNILibAfisInterface
 import com.simprints.fingerprint.infra.simafiswrapper.models.SimAfisFingerIdentifier
 import com.simprints.fingerprint.infra.simafiswrapper.models.SimAfisFingerprint
@@ -28,7 +28,7 @@ internal class SimAfisMatcher @Inject constructor(
 ) {
     fun match(
         probeReference: BiometricReferenceCapture,
-        candidates: List<Identity>,
+        candidates: List<CandidateRecord>,
         crossFingerComparison: Boolean,
     ): List<ComparisonResult> {
         // if probe template format is not supported by SimAfisMatcher, return empty list
@@ -46,7 +46,7 @@ internal class SimAfisMatcher @Inject constructor(
 
     private fun match(
         probe: List<BiometricTemplateCapture>,
-        candidates: List<Identity>,
+        candidates: List<CandidateRecord>,
     ): List<ComparisonResult> {
         val simAfisCandidates = candidates.map { it.toSimAfisPerson() }
 
@@ -63,7 +63,7 @@ internal class SimAfisMatcher @Inject constructor(
         }
     }
 
-    private fun Identity.toSimAfisPerson(): SimAfisPerson =
+    private fun CandidateRecord.toSimAfisPerson(): SimAfisPerson =
         SimAfisPerson(subjectId, references.flatMap { it.templates }.map { it.toSimAfisFingerprint() })
 
     private fun BiometricTemplate.toSimAfisFingerprint(): SimAfisFingerprint =
@@ -91,7 +91,7 @@ internal class SimAfisMatcher @Inject constructor(
 
     private fun crossFingerMatch(
         probe: List<BiometricTemplateCapture>,
-        candidates: List<Identity>,
+        candidates: List<CandidateRecord>,
     ) = candidates.map { crossFingerMatching(probe, it, jniLibAfis) }
 
     /**
@@ -104,7 +104,7 @@ internal class SimAfisMatcher @Inject constructor(
      */
     private fun crossFingerMatching(
         probe: List<BiometricTemplateCapture>,
-        candidate: Identity,
+        candidate: CandidateRecord,
         jniLibAfis: JNILibAfisInterface,
     ): ComparisonResult {
         // Fingers used in matching
@@ -141,7 +141,7 @@ internal class SimAfisMatcher @Inject constructor(
 val List<BiometricTemplateCapture>.fingerprintsTemplates
     get() = map { it.template.toByteBuffer() }
 
-val Identity.fingerprintsTemplates
+val CandidateRecord.fingerprintsTemplates
     get() = references.flatMap { it.templates }.map { it.template.toByteBuffer() }
 
 private fun ByteArray.toByteBuffer(): ByteBuffer = ByteBuffer.allocateDirect(size).put(this)

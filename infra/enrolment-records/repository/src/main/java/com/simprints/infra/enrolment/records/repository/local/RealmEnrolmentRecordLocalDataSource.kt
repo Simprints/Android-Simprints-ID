@@ -2,7 +2,7 @@ package com.simprints.infra.enrolment.records.repository.local
 
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.sample.Identity
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -10,7 +10,7 @@ import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.realm.store.RealmWrapper
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
+import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
@@ -69,23 +69,23 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
             .map { dbSubject -> dbSubject.toDomain() }
     }
 
-    override suspend fun loadIdentities(
+    override suspend fun loadCandidateRecords(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<IdentityBatch> {
-        val channel = Channel<IdentityBatch>(CHANNEL_CAPACITY)
+    ): ReceiveChannel<CandidateRecordBatch> {
+        val channel = Channel<CandidateRecordBatch>(CHANNEL_CAPACITY)
         scope.launch(dispatcherIO) {
             ranges.forEach { range ->
                 val startTime = timeHelper.now()
-                val identities = loadIdentitiesRange(
+                val candidates = loadCandidatesRange(
                     query = query,
                     range = range,
                     mapper = { dbSubject ->
-                        Identity(
+                        CandidateRecord(
                             subjectId = dbSubject.subjectId.toString(),
                             references = (
                                 dbSubject.faceSamples.toDomain() +
@@ -96,19 +96,19 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                     onCandidateLoaded = onCandidateLoaded,
                 )
                 val endTime = timeHelper.now()
-                channel.send(IdentityBatch(identities, startTime, endTime))
+                channel.send(CandidateRecordBatch(candidates, startTime, endTime))
             }
             channel.close()
         }
         return channel
     }
 
-    private suspend fun loadIdentitiesRange(
+    private suspend fun loadCandidatesRange(
         query: SubjectQuery,
         range: IntRange,
-        mapper: (DbSubject) -> Identity,
+        mapper: (DbSubject) -> CandidateRecord,
         onCandidateLoaded: suspend () -> Unit,
-    ): List<Identity> = realmWrapper.readRealm { realm ->
+    ): List<CandidateRecord> = realmWrapper.readRealm { realm ->
         realm
             .query(DbSubject::class)
             .buildRealmQueryForSubject(query)

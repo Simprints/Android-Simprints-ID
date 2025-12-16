@@ -7,17 +7,17 @@ import android.net.Uri
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricTemplate
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.domain.reference.TemplateIdentifier.LEFT_INDEX_FINGER
 import com.simprints.core.domain.reference.TemplateIdentifier.LEFT_THUMB
-import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.ExtractCommCareCaseIdUseCase
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.enrolment.records.repository.commcare.CommCareIdentityDataSource.Companion.COLUMN_DATUM_ID
-import com.simprints.infra.enrolment.records.repository.commcare.CommCareIdentityDataSource.Companion.COLUMN_VALUE
+import com.simprints.infra.enrolment.records.repository.commcare.CommCareCandidateRecordDataSource.Companion.COLUMN_DATUM_ID
+import com.simprints.infra.enrolment.records.repository.commcare.CommCareCandidateRecordDataSource.Companion.COLUMN_VALUE
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.usecases.CompareImplicitTokenizedStringsUseCase
@@ -35,8 +35,8 @@ import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 
-class CommCareIdentityDataSourceTest {
-    companion object {
+class CommCareCandidateRecordDataSourceTest {
+    companion object Companion {
         private const val SUBJECT_ACTIONS_FINGERPRINT_1 =
             """{"events":[{"id":"0dafcd03-96c4-4ca5-b802-292da6d4f799","payload":{"subjectId":"b26c91bc-b307-4131-80c3-55090ba5dbf2","projectId":"nXcj9neYhXP9rFp56uWk","moduleId":{"value":"AWuA3H0WGtHI2uod+ePZ3yiWTt9etQ=="},"attendantId":{"value":"AdySMrjuy7uq0Dcxov3rUFIw66uXTFrKd0BnzSr9MYXl5maWEpyKQT8AUdcPuVHUWpOkO88="},"biometricReferences":[{"id":"2b9b4991-29d7-3eee-ac02-191afaa0c1a2","templates":[{"quality":99,"template":"123","finger":"LEFT_THUMB"},{"quality":88,"template":"123","finger":"LEFT_INDEX_FINGER"}],"format":"ISO_19794_2","type":"FINGERPRINT_REFERENCE"}]},"type":"EnrolmentRecordCreation"}]}"""
         private const val SUBJECT_ACTIONS_FINGERPRINT_2 =
@@ -50,8 +50,8 @@ class CommCareIdentityDataSourceTest {
         private const val SUBJECT_ACTIONS_FINGERPRINT_AND_FACE_2 =
             """{"events":[{"id":"0dafcd03-96c4-4ca5-b802-292da6d4f799","payload":{"subjectId":"a961fcb4-8573-4270-a1b2-088e88275b00","projectId":"nXcj9neYhXP9rFp56uWk","moduleId":{"value":"AWuA3H0WGtHI2uod+ePZ3yiWTt9etQ=="},"attendantId":{"value":"AdySMrjuy7uq0Dcxov3rUFIw66uXTFrKd0BnzSr9MYXl5maWEpyKQT8AUdcPuVHUWpOkO88="},"biometricReferences":[{"id":"0e4b0028-be90-46f3-a5cb-5ea581478b24","templates":[{"quality":77,"template":"123","finger":"LEFT_THUMB"},{"quality":66,"template":"123","finger":"LEFT_INDEX_FINGER"}],"format":"NEC_1_5","type":"FINGERPRINT_REFERENCE"},{"id":"c7f4571f-2591-4c9d-bbd3-56dfdb82d206","templates":[{"template":"123"}],"format":"ROC_3","type":"FACE_REFERENCE"}]},"type":"EnrolmentRecordCreation"}]}"""
 
-        private val expectedFingerprintIdentities = listOf(
-            Identity(
+        private val expectedFingerprintCandidates = listOf(
+            CandidateRecord(
                 subjectId = "b26c91bc-b307-4131-80c3-55090ba5dbf2",
                 references = listOf(
                     BiometricReference(
@@ -71,7 +71,7 @@ class CommCareIdentityDataSourceTest {
                     ),
                 ),
             ),
-            Identity(
+            CandidateRecord(
                 subjectId = "a961fcb4-8573-4270-a1b2-088e88275b00",
                 references = listOf(
                     BiometricReference(
@@ -92,8 +92,8 @@ class CommCareIdentityDataSourceTest {
                 ),
             ),
         )
-        val expectedFaceIdentities = listOf(
-            Identity(
+        val expectedFaceCandidates = listOf(
+            CandidateRecord(
                 subjectId = "b26c91bc-b307-4131-80c3-55090ba5dbf2",
                 references = listOf(
                     BiometricReference(
@@ -108,7 +108,7 @@ class CommCareIdentityDataSourceTest {
                     ),
                 ),
             ),
-            Identity(
+            CandidateRecord(
                 subjectId = "a961fcb4-8573-4270-a1b2-088e88275b00",
                 references = listOf(
                     BiometricReference(
@@ -181,7 +181,7 @@ class CommCareIdentityDataSourceTest {
 
     private lateinit var mockDataCursor: Cursor
 
-    private lateinit var dataSource: CommCareIdentityDataSource
+    private lateinit var dataSource: CommCareCandidateRecordDataSource
 
     @MockK
     lateinit var project: Project
@@ -228,7 +228,7 @@ class CommCareIdentityDataSourceTest {
         every { useCase.invoke(any(), any(), any(), any()) } returns true
         every { extractCommCareCaseIdUseCase.invoke(any()) } returns null
 
-        dataSource = CommCareIdentityDataSource(
+        dataSource = CommCareCandidateRecordDataSource(
             timeHelper,
             encoder,
             JsonHelper,
@@ -259,13 +259,13 @@ class CommCareIdentityDataSourceTest {
         every { mockDataCursor.getString(1) } returnsMany subjectActionsData
     }
 
-    private fun assertFingerprintIdentitiesMatch(
-        expected: List<Identity>,
-        actual: List<Identity>,
+    private fun assertFingerprintCandidatesMatch(
+        expected: List<CandidateRecord>,
+        actual: List<CandidateRecord>,
         templateFormat: String,
     ) {
         val areContentsEqual = expected
-            .filter { identity -> identity.references.any { it.format == templateFormat } }
+            .filter { candidateRecord -> candidateRecord.references.any { it.format == templateFormat } }
             .zip(actual) { exp, act ->
                 exp.subjectId == act.subjectId &&
                     exp.references
@@ -276,13 +276,13 @@ class CommCareIdentityDataSourceTest {
         assertTrue(areContentsEqual)
     }
 
-    private fun assertFaceIdentitiesMatch(
-        expected: List<Identity>,
-        actual: List<Identity>,
+    private fun assertFaceCandidatesMatch(
+        expected: List<CandidateRecord>,
+        actual: List<CandidateRecord>,
         templateFormat: String,
     ) {
         val areContentsEqual = expected
-            .filter { identity -> identity.references.any { it.format == templateFormat } }
+            .filter { candidateRecord -> candidateRecord.references.any { it.format == templateFormat } }
             .zip(actual) { exp, act ->
                 exp.subjectId == act.subjectId &&
                     exp.references
@@ -294,75 +294,75 @@ class CommCareIdentityDataSourceTest {
     }
 
     @Test
-    fun `test loadIdentities with fingerprint records`() = runTest {
-        setupMetadataCursor(expectedFingerprintIdentities.size, listOf(true, false))
+    fun `test loadCandidateRecords with fingerprint records`() = runTest {
+        setupMetadataCursor(expectedFingerprintCandidates.size, listOf(true, false))
         setupDataCursor(listOf(SUBJECT_ACTIONS_FINGERPRINT_1, SUBJECT_ACTIONS_FINGERPRINT_2))
 
         val templateFormat = "ISO_19794_2"
-        val actualIdentities = mutableListOf<Identity>()
+        val actualCandidates = mutableListOf<CandidateRecord>()
 
         dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = SubjectQuery(format = templateFormat),
-                ranges = listOf(0..expectedFingerprintIdentities.size),
+                ranges = listOf(0..expectedFingerprintCandidates.size),
                 project = project,
                 dataSource = commCareBiometricDataSource,
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it.identities)
+                actualCandidates.addAll(it.identities)
             }
 
-        val expected = expectedFingerprintIdentities
-        assertEquals(1, actualIdentities.size)
-        assertFingerprintIdentitiesMatch(expected, actualIdentities, templateFormat)
+        val expected = expectedFingerprintCandidates
+        assertEquals(1, actualCandidates.size)
+        assertFingerprintCandidatesMatch(expected, actualCandidates, templateFormat)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
         coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
     }
 
     @Test
-    fun `test loadIdentities with face records`() = runTest {
-        setupMetadataCursor(expectedFaceIdentities.size, listOf(true, false))
+    fun `test loadCandidateRecords with face records`() = runTest {
+        setupMetadataCursor(expectedFaceCandidates.size, listOf(true, false))
         setupDataCursor(listOf(SUBJECT_ACTIONS_FACE_1, SUBJECT_ACTIONS_FACE_2))
 
         val templateFormat = "ROC_1_23"
-        val actualIdentities = mutableListOf<Identity>()
+        val actualCandidates = mutableListOf<CandidateRecord>()
 
         dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = SubjectQuery(
                     format = templateFormat,
                     attendantId = TokenizableString.Tokenized("AdySMrjuy7uq0Dcxov3rUFIw66uXTFrKd0BnzSr9MYXl5maWEpyKQT8AUdcPuVHUWpOkO88="),
                     moduleId = TokenizableString.Tokenized("AWuA3H0WGtHI2uod+ePZ3yiWTt9etQ=="),
                     subjectId = "b26c91bc-b307-4131-80c3-55090ba5dbf2",
                 ),
-                ranges = listOf(0..expectedFaceIdentities.size),
+                ranges = listOf(0..expectedFaceCandidates.size),
                 project = project,
                 dataSource = commCareBiometricDataSource,
                 scope = this,
                 onCandidateLoaded = {},
             ).consumeEach {
-                actualIdentities.addAll(it.identities)
+                actualCandidates.addAll(it.identities)
             }
 
-        assertEquals(1, actualIdentities.size)
-        assertFaceIdentitiesMatch(expectedFaceIdentities, actualIdentities, templateFormat)
+        assertEquals(1, actualCandidates.size)
+        assertFaceCandidatesMatch(expectedFaceCandidates, actualCandidates, templateFormat)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
         coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
     }
 
     @Test
-    fun `test loadIdentities returns only identities with fingerprint references`() = runTest {
-        setupMetadataCursor(expectedFingerprintIdentities.size + 1, listOf(true, true, false))
+    fun `test loadCandidateRecords returns only identities with fingerprint references`() = runTest {
+        setupMetadataCursor(expectedFingerprintCandidates.size + 1, listOf(true, true, false))
         setupDataCursor(listOf(SUBJECT_ACTIONS_FINGERPRINT_1, SUBJECT_ACTIONS_FINGERPRINT_2, SUBJECT_ACTIONS_FACE_1))
 
         val templateFormat = "NEC_1_5"
-        val actualIdentities = mutableListOf<Identity>()
+        val actualIdentities = mutableListOf<CandidateRecord>()
 
         dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = SubjectQuery(format = templateFormat),
-                ranges = listOf(0..expectedFingerprintIdentities.size),
+                ranges = listOf(0..expectedFingerprintCandidates.size),
                 project = project,
                 dataSource = commCareBiometricDataSource,
                 scope = this,
@@ -372,23 +372,23 @@ class CommCareIdentityDataSourceTest {
             }
 
         assertEquals(1, actualIdentities.size)
-        assertFingerprintIdentitiesMatch(expectedFingerprintIdentities, actualIdentities, templateFormat)
+        assertFingerprintCandidatesMatch(expectedFingerprintCandidates, actualIdentities, templateFormat)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
         coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
     }
 
     @Test
-    fun `test loadIdentities returns only identities with face references`() = runTest {
-        setupMetadataCursor(expectedFaceIdentities.size + 1, listOf(true, true, false))
+    fun `test loadCandidateRecords returns only identities with face references`() = runTest {
+        setupMetadataCursor(expectedFaceCandidates.size + 1, listOf(true, true, false))
         setupDataCursor(listOf(SUBJECT_ACTIONS_FACE_1, SUBJECT_ACTIONS_FACE_2, SUBJECT_ACTIONS_FINGERPRINT_1))
 
         val templateFormat = "ROC_1_23"
-        val actualIdentities = mutableListOf<Identity>()
+        val actualIdentities = mutableListOf<CandidateRecord>()
 
         dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = SubjectQuery(format = templateFormat),
-                ranges = listOf(0..expectedFaceIdentities.size),
+                ranges = listOf(0..expectedFaceCandidates.size),
                 project = project,
                 dataSource = commCareBiometricDataSource,
                 scope = this,
@@ -398,23 +398,23 @@ class CommCareIdentityDataSourceTest {
             }
 
         assertEquals(1, actualIdentities.size)
-        assertFaceIdentitiesMatch(expectedFaceIdentities, actualIdentities, templateFormat)
+        assertFaceCandidatesMatch(expectedFaceCandidates, actualIdentities, templateFormat)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
         coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
     }
 
     @Test
-    fun `test loadIdentities returns only fingerprint references for dual modality identities`() = runTest {
-        setupMetadataCursor(expectedFingerprintIdentities.size, listOf(true, false))
+    fun `test loadCandidateRecords returns only fingerprint references for dual modality identities`() = runTest {
+        setupMetadataCursor(expectedFingerprintCandidates.size, listOf(true, false))
         setupDataCursor(listOf(SUBJECT_ACTIONS_FINGERPRINT_AND_FACE_1, SUBJECT_ACTIONS_FINGERPRINT_AND_FACE_2))
 
         val templateFormat = "ISO_19794_2"
-        val actualIdentities = mutableListOf<Identity>()
+        val actualIdentities = mutableListOf<CandidateRecord>()
 
         dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = SubjectQuery(format = templateFormat),
-                ranges = listOf(0..expectedFingerprintIdentities.size),
+                ranges = listOf(0..expectedFingerprintCandidates.size),
                 project = project,
                 dataSource = commCareBiometricDataSource,
                 scope = this,
@@ -424,23 +424,23 @@ class CommCareIdentityDataSourceTest {
             }
 
         assertEquals(1, actualIdentities.size)
-        assertFingerprintIdentitiesMatch(expectedFingerprintIdentities, actualIdentities, templateFormat)
+        assertFingerprintCandidatesMatch(expectedFingerprintCandidates, actualIdentities, templateFormat)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
         coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
     }
 
     @Test
-    fun `test loadIdentities returns only face references for dual modality identities`() = runTest {
-        setupMetadataCursor(expectedFaceIdentities.size, listOf(true, false))
+    fun `test loadCandidateRecords returns only face references for dual modality identities`() = runTest {
+        setupMetadataCursor(expectedFaceCandidates.size, listOf(true, false))
         setupDataCursor(listOf(SUBJECT_ACTIONS_FINGERPRINT_AND_FACE_1, SUBJECT_ACTIONS_FINGERPRINT_AND_FACE_2))
 
         val templateFormat = "ROC_1_23"
-        val actualIdentities = mutableListOf<Identity>()
+        val actualIdentities = mutableListOf<CandidateRecord>()
 
         dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = SubjectQuery(format = templateFormat),
-                ranges = listOf(0..expectedFaceIdentities.size),
+                ranges = listOf(0..expectedFaceCandidates.size),
                 project = project,
                 dataSource = commCareBiometricDataSource,
                 scope = this,
@@ -450,7 +450,7 @@ class CommCareIdentityDataSourceTest {
             }
 
         assertEquals(1, actualIdentities.size)
-        assertFaceIdentitiesMatch(expectedFaceIdentities, actualIdentities, templateFormat)
+        assertFaceCandidatesMatch(expectedFaceCandidates, actualIdentities, templateFormat)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
         coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
     }
@@ -482,9 +482,9 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 0..0
-        val actualIdentities = mutableListOf<Identity>()
+        val actualIdentities = mutableListOf<CandidateRecord>()
         dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = query,
                 ranges = listOf(range),
                 project = project,
@@ -506,9 +506,9 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 2..3
-        val actualIdentities = mutableListOf<Identity>()
+        val actualIdentities = mutableListOf<CandidateRecord>()
         dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = query,
                 ranges = listOf(range),
                 project = project,
@@ -526,17 +526,17 @@ class CommCareIdentityDataSourceTest {
 
     @Test
     fun `test metadata cursor size bigger than range`() = runTest {
-        setupMetadataCursor(expectedFingerprintIdentities.size + 1, listOf(true, true))
+        setupMetadataCursor(expectedFingerprintCandidates.size + 1, listOf(true, true))
         every { mockMetadataCursor.position } returnsMany listOf(1, 2)
         setupDataCursor(listOf(SUBJECT_ACTIONS_FINGERPRINT_1, SUBJECT_ACTIONS_FINGERPRINT_2))
 
         val templateFormat = "ISO_19794_2"
-        val actualIdentities = mutableListOf<Identity>()
+        val actualIdentities = mutableListOf<CandidateRecord>()
 
         dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = SubjectQuery(format = templateFormat),
-                ranges = listOf(expectedFingerprintIdentities.indices),
+                ranges = listOf(expectedFingerprintCandidates.indices),
                 project = project,
                 dataSource = commCareBiometricDataSource,
                 scope = this,
@@ -546,7 +546,7 @@ class CommCareIdentityDataSourceTest {
             }
 
         assertEquals(1, actualIdentities.size)
-        assertFingerprintIdentitiesMatch(expectedFingerprintIdentities, actualIdentities, templateFormat)
+        assertFingerprintCandidatesMatch(expectedFingerprintCandidates, actualIdentities, templateFormat)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
         coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
     }
@@ -557,9 +557,9 @@ class CommCareIdentityDataSourceTest {
         every { mockDataCursor.moveToNext() } returns true
         every { mockMetadataCursor.getString(any()) } returns null
 
-        val actualIdentities = mutableListOf<Identity>()
+        val actualIdentities = mutableListOf<CandidateRecord>()
         dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = SubjectQuery(),
                 ranges = listOf(0..2),
                 project = project,
@@ -579,9 +579,9 @@ class CommCareIdentityDataSourceTest {
     fun `exception during metadata cursor access is reported`() = runTest {
         every { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) } throws RuntimeException("Some exception")
 
-        val actualIdentities = mutableListOf<Identity>()
+        val actualIdentities = mutableListOf<CandidateRecord>()
         dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = SubjectQuery(),
                 ranges = listOf(0..2),
                 project = project,
@@ -603,9 +603,9 @@ class CommCareIdentityDataSourceTest {
         setupMetadataCursor(2, listOf(true, false))
         every { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) } returns null
 
-        val actualIdentities = mutableListOf<Identity>()
+        val actualIdentities = mutableListOf<CandidateRecord>()
         dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = SubjectQuery(),
                 ranges = listOf(0..2),
                 project = project,
@@ -630,9 +630,9 @@ class CommCareIdentityDataSourceTest {
         every { mockDataCursor.getString(0) } returns "someKey"
         every { mockDataCursor.getString(1) } returns "someValue"
 
-        val actualIdentities = mutableListOf<Identity>()
+        val actualIdentities = mutableListOf<CandidateRecord>()
         dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = SubjectQuery(),
                 ranges = listOf(0..2),
                 project = project,
@@ -653,9 +653,9 @@ class CommCareIdentityDataSourceTest {
         setupMetadataCursor(2, listOf(true, false))
         setupDataCursor(listOf("invalid JSON 1", "invalid JSON 2"))
 
-        val actualIdentities = mutableListOf<Identity>()
+        val actualIdentities = mutableListOf<CandidateRecord>()
         dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = SubjectQuery(),
                 ranges = listOf(0..2),
                 project = project,
@@ -718,7 +718,7 @@ class CommCareIdentityDataSourceTest {
     }
 
     @Test
-    fun `loadIdentities with case ID calls onCandidateLoaded`() = runTest {
+    fun `loadCandidateRecords with case ID calls onCandidateLoaded`() = runTest {
         val testCaseId = "test-case-id"
         var onCandidateLoadedCalled = false
         every { extractCommCareCaseIdUseCase.invoke(any()) } returns testCaseId
@@ -730,7 +730,7 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery(metadata = "test-metadata")
         dataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = query,
                 ranges = listOf(0..1),
                 project = project,

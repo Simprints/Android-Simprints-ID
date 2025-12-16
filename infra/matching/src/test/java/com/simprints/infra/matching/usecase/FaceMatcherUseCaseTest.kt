@@ -8,8 +8,8 @@ import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.BiometricTemplateCapture
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.domain.sample.ComparisonResult
-import com.simprints.core.domain.sample.Identity
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
@@ -193,8 +193,8 @@ internal class FaceMatcherUseCaseTest {
     @Test
     fun `Correctly calls SDK matcher`() = runTest {
         val totalCandidates = 1
-        val faceIdentities = listOf(
-            Identity(
+        val faceCandidates = listOf(
+            CandidateRecord(
                 "subjectId",
                 listOf(
                     BiometricReference(
@@ -213,7 +213,7 @@ internal class FaceMatcherUseCaseTest {
         coEvery { enrolmentRecordRepository.count(any(), any()) } returns 1
         coEvery { createRangesUseCase(any()) } returns listOf(0..99)
         coEvery {
-            enrolmentRecordRepository.loadIdentities(any(), any(), any(), any(), any(), any())
+            enrolmentRecordRepository.loadCandidateRecords(any(), any(), any(), any(), any(), any())
         } answers {
             // Call the onCandidateLoaded callback (5th parameter)
             val onCandidateLoaded: suspend () -> Unit = arg(5)
@@ -222,7 +222,7 @@ internal class FaceMatcherUseCaseTest {
             }
 
             // Return the face identities
-            createTestChannel(faceIdentities)
+            createTestChannel(faceCandidates)
         }
         coEvery { faceMatcher.getHighestComparisonScoreForCandidate(any()) } returns 42f
 
@@ -262,6 +262,6 @@ internal class FaceMatcherUseCaseTest {
 
         // Verify only the size of matchBatches instead of exact content
         assertThat(successState.matchBatches).hasSize(1)
-        assertThat(successState.matchBatches[0].count).isEqualTo(faceIdentities.size)
+        assertThat(successState.matchBatches[0].count).isEqualTo(faceCandidates.size)
     }
 }

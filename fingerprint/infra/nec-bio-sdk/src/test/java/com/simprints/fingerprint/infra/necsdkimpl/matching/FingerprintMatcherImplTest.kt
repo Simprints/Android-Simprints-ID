@@ -6,8 +6,8 @@ import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.BiometricTemplateCapture
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.domain.reference.TemplateIdentifier
-import com.simprints.core.domain.sample.Identity
 import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.template.NEC_TEMPLATE_FORMAT
 import com.simprints.necwrapper.nec.NEC
@@ -136,7 +136,7 @@ class FingerprintMatcherImplTest {
     private fun generateIdentity(
         vararg fingers: TemplateIdentifier,
         format: String = NEC_TEMPLATE_FORMAT,
-    ) = Identity(
+    ) = CandidateRecord(
         subjectId = "id",
         references = fingers.map {
             BiometricReference(

@@ -2,13 +2,13 @@ package com.simprints.infra.enrolment.records.repository.local
 
 import androidx.room.withTransaction
 import com.simprints.core.DispatcherIO
-import com.simprints.core.domain.sample.Identity
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
+import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.local.models.toBiometricReferences
@@ -82,19 +82,19 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     /**
      * Loads identities in paged ranges.
      */
-    override suspend fun loadIdentities(
+    override suspend fun loadCandidateRecords(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<IdentityBatch> = loadBiometricIdentitiesPaged(
+    ): ReceiveChannel<CandidateRecordBatch> = loadBiometricIdentitiesPaged(
         query = query,
         ranges = ranges,
         format = requireNotNull(query.format) { "format required" },
-        createIdentity = { subjectId, templates ->
-            Identity(
+        createCandidateRecord = { subjectId, templates ->
+            CandidateRecord(
                 subjectId = subjectId,
                 references = templates.toBiometricReferences(),
             )
@@ -107,13 +107,13 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         query: SubjectQuery,
         ranges: List<IntRange>,
         format: String,
-        createIdentity: (String, List<DbBiometricTemplate>) -> Identity,
+        createCandidateRecord: (String, List<DbBiometricTemplate>) -> CandidateRecord,
         onCandidateLoaded: suspend () -> Unit,
         scope: CoroutineScope,
-    ): ReceiveChannel<IdentityBatch> {
+    ): ReceiveChannel<CandidateRecordBatch> {
         var afterSubjectId: String? = null
         var lastOffset = 0
-        val channel = Channel<IdentityBatch>(CHANNEL_CAPACITY)
+        val channel = Channel<CandidateRecordBatch>(CHANNEL_CAPACITY)
         scope.launch(dispatcherIO) {
             ranges
                 .forEach { range ->
@@ -126,13 +126,13 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                         query = query.copy(afterSubjectId = afterSubjectId), // update query with the last seen subject ID
                         pageSize = range.last - range.first + 1,
                         format = format,
-                        createIdentity = createIdentity,
+                        createCandidateRecord = createCandidateRecord,
                         onCandidateLoaded = onCandidateLoaded,
                     )
                     afterSubjectId = identities.lastOrNull()?.subjectId
                     lastOffset = range.last + 1
                     val endTime = timeHelper.now()
-                    channel.send(IdentityBatch(identities, startTime, endTime))
+                    channel.send(CandidateRecordBatch(identities, startTime, endTime))
                 }
             channel.close()
         }
@@ -143,15 +143,15 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         query: SubjectQuery,
         pageSize: Int,
         format: String?,
-        createIdentity: (subjectId: String, samples: List<DbBiometricTemplate>) -> Identity,
+        createCandidateRecord: (subjectId: String, samples: List<DbBiometricTemplate>) -> CandidateRecord,
         onCandidateLoaded: suspend () -> Unit,
-    ): List<Identity> = withContext(dispatcherIO) {
+    ): List<CandidateRecord> = withContext(dispatcherIO) {
         requireNotNull(format) { "Appropriate sampleFormat is required for loading biometric identities." }
         subjectDao
             .loadSamples(queryBuilder.buildBiometricTemplatesQuery(query, pageSize))
             .map { (subjectId, templates) ->
                 onCandidateLoaded()
-                createIdentity(subjectId, templates)
+                createCandidateRecord(subjectId, templates)
             }
     }
 

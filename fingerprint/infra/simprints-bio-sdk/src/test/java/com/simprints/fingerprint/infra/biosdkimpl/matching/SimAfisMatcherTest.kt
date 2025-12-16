@@ -6,8 +6,8 @@ import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.BiometricTemplateCapture
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.domain.reference.TemplateIdentifier
-import com.simprints.core.domain.sample.Identity
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.byteArrayOf
 import com.simprints.fingerprint.infra.simafiswrapper.JNILibAfisInterface
 import io.mockk.*
@@ -46,7 +46,7 @@ class SimAfisMatcherTest {
                 ),
             ),
         )
-        val candidate = Identity(
+        val candidate = CandidateRecord(
             "candidate",
             listOf(
                 BiometricReference(
@@ -84,7 +84,7 @@ class SimAfisMatcherTest {
                 ),
             ),
         )
-        val candidate = Identity(
+        val candidate = CandidateRecord(
             "candidate",
             listOf(
                 BiometricReference(
@@ -130,7 +130,7 @@ class SimAfisMatcherTest {
             ),
         )
 
-        val candidate1 = Identity(
+        val candidate1 = CandidateRecord(
             subjectId = "candidate1",
             references = listOf(
                 BiometricReference(
@@ -157,7 +157,7 @@ class SimAfisMatcherTest {
                 ),
             ),
         )
-        val candidate2 = Identity(
+        val candidate2 = CandidateRecord(
             subjectId = "candidate2",
             references = listOf(
                 BiometricReference(
@@ -212,7 +212,7 @@ class SimAfisMatcherTest {
             modality = Modality.FINGERPRINT,
             templates = emptyList(),
         )
-        val candidate = Identity(
+        val candidate = CandidateRecord(
             "candidate",
             listOf(
                 BiometricReference(

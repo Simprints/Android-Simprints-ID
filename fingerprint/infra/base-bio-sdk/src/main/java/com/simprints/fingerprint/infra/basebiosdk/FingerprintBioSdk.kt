@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.infra.basebiosdk
 
 import com.simprints.core.domain.reference.BiometricReferenceCapture
-import com.simprints.core.domain.sample.Identity
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.FingerprintImageProvider
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.FingerprintTemplateProvider
 import com.simprints.fingerprint.infra.basebiosdk.initialization.SdkInitializer
@@ -26,7 +26,7 @@ class FingerprintBioSdk<SdkConfig, ImageRequestSettings, ImageResponseMetadata, 
 
     suspend fun match(
         probeReference: BiometricReferenceCapture,
-        candidates: List<Identity>,
+        candidates: List<CandidateRecord>,
         matchingSettings: MatcherSettings?,
     ) = fingerprintMatcher.match(probeReference, candidates, matchingSettings)
 

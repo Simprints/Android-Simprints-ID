@@ -3,8 +3,8 @@ package com.simprints.fingerprint.infra.necsdkimpl.matching
 import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.BiometricTemplateCapture
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.domain.sample.ComparisonResult
-import com.simprints.core.domain.sample.Identity
 import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.fingerprint.infra.basebiosdk.matching.FingerprintMatcher
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.template.NEC_TEMPLATE_FORMAT
@@ -20,7 +20,7 @@ internal class FingerprintMatcherImpl @Inject constructor(
 
     override suspend fun match(
         probeReference: BiometricReferenceCapture,
-        candidates: List<Identity>,
+        candidates: List<CandidateRecord>,
         settings: NecMatchingSettings?,
     ): List<ComparisonResult> {
         // if probe template format is not supported by NEC matcher, return empty list
@@ -38,7 +38,7 @@ internal class FingerprintMatcherImpl @Inject constructor(
 
     private fun sameFingerMatching(
         probe: List<BiometricTemplateCapture>,
-        candidates: List<Identity>,
+        candidates: List<CandidateRecord>,
     ) = candidates.map {
         sameFingerMatching(probe, it)
     }
@@ -55,7 +55,7 @@ internal class FingerprintMatcherImpl @Inject constructor(
      */
     private fun sameFingerMatching(
         probeTemplates: List<BiometricTemplateCapture>,
-        candidate: Identity,
+        candidate: CandidateRecord,
     ): ComparisonResult {
         var fingers = 0 // the number of fingers used in matching
         val candidateTemplates = candidate.references.flatMap { it.templates }
@@ -84,12 +84,12 @@ internal class FingerprintMatcherImpl @Inject constructor(
 
     private fun crossFingerMatching(
         probe: List<BiometricTemplateCapture>,
-        candidates: List<Identity>,
+        candidates: List<CandidateRecord>,
     ) = candidates.map { crossFingerMatching(probe, it) }
 
     private fun crossFingerMatching(
         probe: List<BiometricTemplateCapture>,
-        candidate: Identity,
+        candidate: CandidateRecord,
     ): ComparisonResult {
         // Number of fingers used in matching
         val fingers = probe.size

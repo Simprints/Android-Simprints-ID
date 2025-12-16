@@ -19,7 +19,7 @@ import com.simprints.infra.enrolment.records.realm.store.RealmWrapper
 import com.simprints.infra.enrolment.records.realm.store.RealmWrapperImpl
 import com.simprints.infra.enrolment.records.realm.store.config.RealmConfig
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
-import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
+import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
@@ -319,7 +319,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
     }
 
     @Test
-    fun givenManySubjectsWithFaceSamples_whenLoadIdentitiesIsCalledWithRanges_thenReturnsBatchedIdentities() = runTest {
+    fun givenManySubjectsWithFaceSamples_whenLoadIdentitiesIsCalledWithRanges_thenReturnsBatchedCandidateRecords() = runTest {
         // Given
         val subjects = (1..10).map { i ->
             createTestSubject(subjectId = UUID.randomUUID().toString()).apply {
@@ -347,7 +347,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         val loadedCandidates = mutableListOf<Unit>()
 
         // When
-        val channel = dataSource.loadIdentities(
+        val channel = dataSource.loadCandidateRecords(
             query = query,
             ranges = ranges,
             dataSource = mockk(),
@@ -356,7 +356,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
             onCandidateLoaded = { loadedCandidates.add(Unit) },
         )
 
-        val results = mutableListOf<IdentityBatch>()
+        val results = mutableListOf<CandidateRecordBatch>()
         for (batch in channel) {
             results.add(batch)
         }
@@ -399,7 +399,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         val loadedCandidates = mutableListOf<Unit>()
 
         // When
-        val channel = dataSource.loadIdentities(
+        val channel = dataSource.loadCandidateRecords(
             query = query,
             ranges = ranges,
             dataSource = mockk(),
@@ -408,7 +408,7 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
             onCandidateLoaded = { loadedCandidates.add(Unit) },
         )
 
-        val results = mutableListOf<IdentityBatch>()
+        val results = mutableListOf<CandidateRecordBatch>()
         for (batch in channel) {
             results.add(batch)
         }

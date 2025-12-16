@@ -1,7 +1,7 @@
 package com.simprints.face.infra.basebiosdk.matching
 
 import com.simprints.core.domain.reference.BiometricReferenceCapture
-import com.simprints.core.domain.sample.Identity
+import com.simprints.core.domain.reference.CandidateRecord
 
 abstract class FaceMatcher(
     open val probeReference: BiometricReferenceCapture,
@@ -12,5 +12,5 @@ abstract class FaceMatcher(
      * @param candidate
      * @return the highest comparison score
      */
-    abstract suspend fun getHighestComparisonScoreForCandidate(candidate: Identity): Float
+    abstract suspend fun getHighestComparisonScoreForCandidate(candidate: CandidateRecord): Float
 }

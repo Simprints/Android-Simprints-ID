@@ -6,8 +6,8 @@ import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricTemplate
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.domain.reference.TemplateIdentifier
-import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
@@ -146,18 +146,18 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
         val fakePerson = savedPersons[0].toRealmDb()
 
-        val people = mutableListOf<Identity>()
+        val candidates = mutableListOf<CandidateRecord>()
         enrolmentRecordLocalDataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 SubjectQuery(),
                 listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
                 project,
                 this,
                 onCandidateLoaded,
-            ).consumeEach { people.addAll(it.identities) }
+            ).consumeEach { candidates.addAll(it.identities) }
 
-        listOf(fakePerson).zip(people).forEach { (subject, identity) ->
+        listOf(fakePerson).zip(candidates).forEach { (subject, identity) ->
             assertThat(subject.subjectId).isEqualTo(identity.subjectId)
         }
     }
@@ -167,7 +167,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val format = "SupportedFormat"
 
         enrolmentRecordLocalDataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 SubjectQuery(format = format),
                 listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
@@ -189,9 +189,9 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
         val fakePerson = savedPersons[0].toRealmDb()
 
-        val people = mutableListOf<Identity>()
+        val candidates = mutableListOf<CandidateRecord>()
         enrolmentRecordLocalDataSource
-            .loadIdentities(
+            .loadCandidateRecords(
                 SubjectQuery(),
                 listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
@@ -199,9 +199,9 @@ class RealmEnrolmentRecordLocalDataSourceTest {
                 this,
                 onCandidateLoaded,
             ).consumeEach {
-                people.addAll(it.identities)
+                candidates.addAll(it.identities)
             }
-        listOf(fakePerson).zip(people).forEach { (subject, identity) ->
+        listOf(fakePerson).zip(candidates).forEach { (subject, identity) ->
             assertThat(subject.subjectId).isEqualTo(identity.subjectId)
         }
     }

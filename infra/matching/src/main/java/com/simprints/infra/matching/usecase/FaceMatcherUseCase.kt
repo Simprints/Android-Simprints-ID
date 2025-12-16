@@ -2,8 +2,8 @@ package com.simprints.infra.matching.usecase
 
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.domain.sample.ComparisonResult
-import com.simprints.core.domain.sample.Identity
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.biosdkresolver.FaceBioSDK
@@ -11,7 +11,7 @@ import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
+import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.matching.MatchBatchInfo
@@ -76,7 +76,7 @@ class FaceMatcherUseCase @Inject constructor(
         val ranges = createRanges(expectedCandidates)
         val resultSet = MatchResultSet()
         val candidatesChannel = enrolmentRecordRepository
-            .loadIdentities(
+            .loadCandidateRecords(
                 query = queryWithSupportedFormat,
                 ranges = ranges,
                 dataSource = matchParams.biometricDataSource,
@@ -92,7 +92,7 @@ class FaceMatcherUseCase @Inject constructor(
     }.flowOn(dispatcherBG)
 
     private suspend fun consumeAndMatch(
-        candidatesChannel: ReceiveChannel<IdentityBatch>,
+        candidatesChannel: ReceiveChannel<CandidateRecordBatch>,
         probeReference: BiometricReferenceCapture,
         resultSet: MatchResultSet,
         bioSdk: FaceBioSDK,
@@ -120,7 +120,7 @@ class FaceMatcherUseCase @Inject constructor(
 
     private suspend fun match(
         matcher: FaceMatcher,
-        batchCandidates: List<Identity>,
+        batchCandidates: List<CandidateRecord>,
     ) = batchCandidates.fold(MatchResultSet()) { acc, candidate ->
         acc.add(
             ComparisonResult(

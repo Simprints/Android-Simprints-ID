@@ -5,7 +5,7 @@ import ai.roc.rocsdk.embedded.roc
 import ai.roc.rocsdk.embedded.rocConstants.ROC_FACE_FAST_FV_SIZE
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.reference.BiometricReferenceCapture
-import com.simprints.core.domain.sample.Identity
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 
 @ExcludedFromGeneratedTestCoverageReports(
@@ -22,7 +22,7 @@ class RocV3Matcher(
             probeTemplate
         }
 
-    override suspend fun getHighestComparisonScoreForCandidate(candidate: Identity): Float = nativeProbeTemplates
+    override suspend fun getHighestComparisonScoreForCandidate(candidate: CandidateRecord): Float = nativeProbeTemplates
         .flatMap { probeTemplate ->
             candidate.references.flatMap { it.templates }.map { face ->
                 getSimilarityScoreForCandidate(probeTemplate, face.template)

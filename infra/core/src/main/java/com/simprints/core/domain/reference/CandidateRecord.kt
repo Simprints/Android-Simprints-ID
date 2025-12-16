@@ -1,11 +1,10 @@
-package com.simprints.core.domain.sample
+package com.simprints.core.domain.reference
 
 import android.os.Parcelable
-import com.simprints.core.domain.reference.BiometricReference
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class Identity(
+class CandidateRecord(
     val subjectId: String,
     val references: List<BiometricReference>,
 ) : Parcelable

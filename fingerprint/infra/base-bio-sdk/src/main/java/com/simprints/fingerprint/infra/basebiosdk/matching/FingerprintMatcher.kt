@@ -1,8 +1,8 @@
 package com.simprints.fingerprint.infra.basebiosdk.matching
 
 import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.domain.sample.ComparisonResult
-import com.simprints.core.domain.sample.Identity
 
 interface FingerprintMatcher<MatcherSettings> {
     /**
@@ -13,7 +13,7 @@ interface FingerprintMatcher<MatcherSettings> {
      */
     suspend fun match(
         probeReference: BiometricReferenceCapture,
-        candidates: List<Identity>,
+        candidates: List<CandidateRecord>,
         settings: MatcherSettings?,
     ): List<ComparisonResult>
 
