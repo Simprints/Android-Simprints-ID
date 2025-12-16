@@ -2,9 +2,7 @@ package com.simprints.infra.enrolment.records.repository.local
 
 import androidx.room.withTransaction
 import com.simprints.core.DispatcherIO
-import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.Sample
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -13,17 +11,16 @@ import com.simprints.infra.enrolment.records.repository.domain.models.BiometricD
 import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.repository.local.models.DbTemplateIdentifier
+import com.simprints.infra.enrolment.records.repository.local.models.toBiometricReferences
 import com.simprints.infra.enrolment.records.repository.local.models.toDomain
-import com.simprints.infra.enrolment.records.repository.local.models.toRoomDb
+import com.simprints.infra.enrolment.records.repository.local.models.toRoomDbCredentials
+import com.simprints.infra.enrolment.records.repository.local.models.toRoomDbTemplate
 import com.simprints.infra.enrolment.records.room.store.BuildConfig.DB_ENCRYPTION
 import com.simprints.infra.enrolment.records.room.store.SubjectDao
 import com.simprints.infra.enrolment.records.room.store.SubjectsDatabase
 import com.simprints.infra.enrolment.records.room.store.SubjectsDatabaseFactory
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate
-import com.simprints.infra.enrolment.records.room.store.models.DbModality
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject
-import com.simprints.infra.enrolment.records.room.store.models.toDomain
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ROOM_RECORDS_DB
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
@@ -99,18 +96,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         createIdentity = { subjectId, templates ->
             Identity(
                 subjectId = subjectId,
-                samples = templates.map { sample ->
-                    Sample(
-                        id = sample.uuid,
-                        template = BiometricTemplate(
-                            template = sample.templateData,
-                            identifier = DbTemplateIdentifier.fromId(sample.identifier).toDomain(),
-                        ),
-                        format = sample.format,
-                        referenceId = sample.referenceId,
-                        modality = DbModality.fromId(sample.modality).toDomain(),
-                    )
-                },
+                references = templates.toBiometricReferences(),
             )
         },
         onCandidateLoaded = onCandidateLoaded,
@@ -230,7 +216,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         subject: DomainSubject,
         project: Project,
     ) {
-        require(subject.samples.isNotEmpty()) {
+        require(subject.references.isNotEmpty()) {
             val errorMsg = "Subject should include at least one sample"
             Simber.i(
                 "[createSubject] $errorMsg for subjectId: ${subject.subjectId}",
@@ -257,12 +243,12 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             updatedAt = subject.updatedAt?.time,
         )
         subjectDao.insertSubject(dbSubject)
-        subject.samples.takeIf { it.isNotEmpty() }?.let { samples ->
-            val dbSample = samples.map { it.toRoomDb(subject.subjectId) }
-            subjectDao.insertBiometricSamples(dbSample)
+        subject.references.takeIf { it.isNotEmpty() }?.map { reference ->
+            val dbBiometricTemplates = reference.toRoomDbTemplate(subject.subjectId)
+            subjectDao.insertBiometricSamples(dbBiometricTemplates)
         }
         subject.externalCredentials.takeIf { it.isNotEmpty() }?.let { credentials ->
-            val dbExternalCredentials = credentials.map { it.toRoomDb() }
+            val dbExternalCredentials = credentials.map { it.toRoomDbCredentials() }
             subjectDao.insertExternalCredentials(dbExternalCredentials)
         }
     }
@@ -284,7 +270,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             dbSubject.biometricTemplates.filter { it.referenceId in referencesToDelete }.forEach {
                 subjectDao.deleteBiometricSample(it.uuid)
             }
-            val templatesToAdd = action.samplesToAdd.map { it.toRoomDb(action.subjectId) }
+            val templatesToAdd = action.samplesToAdd.flatMap { it.toRoomDbTemplate(action.subjectId) }
             if (templatesToAdd.isNotEmpty()) {
                 subjectDao.insertBiometricSamples(templatesToAdd)
             }
@@ -292,7 +278,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                 subjectDao.deleteExternalCredentialById(it.id)
             }
             if (action.externalCredentialsToAdd.isNotEmpty()) {
-                subjectDao.insertExternalCredentials(action.externalCredentialsToAdd.map { it.toRoomDb() })
+                subjectDao.insertExternalCredentials(action.externalCredentialsToAdd.map { it.toRoomDbCredentials() })
             }
         } else {
             Simber.e(

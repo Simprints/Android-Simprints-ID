@@ -219,8 +219,17 @@ internal class InsertEnrollmentRecordsUseCaseTest {
 
         // Then
         val subject = subjectActionsSlot.captured.first().subject
-        assertThat(subject.samples.count { it.format == "SIM_FACE_BASE_1" }).isEqualTo(2)
-        assertThat(subject.samples.count { it.format == "NEC_1_5" }).isEqualTo(6)
+        assertThat(subject.references.size).isEqualTo(2)
+        assertThat(
+            subject.references
+                .find { it.format == "SIM_FACE_BASE_1" }
+                ?.templates,
+        ).hasSize(2)
+        assertThat(
+            subject.references
+                .find { it.format == "NEC_1_5" }
+                ?.templates,
+        ).hasSize(6)
     }
 
     @Test
@@ -245,9 +254,20 @@ internal class InsertEnrollmentRecordsUseCaseTest {
 
         // Then
         val subject = subjectActionsSlot.captured.first().subject
-        assertThat(subject.samples).hasSize(2)
-        assertThat(subject.samples[0].template.identifier).isEqualTo(TemplateIdentifier.LEFT_THUMB)
-        assertThat(subject.samples[1].template.identifier).isEqualTo(TemplateIdentifier.LEFT_THUMB)
+        assertThat(subject.references).hasSize(1)
+        assertThat(subject.references[0].templates).hasSize(2)
+        assertThat(
+            subject.references[0]
+                .templates
+                .first()
+                .identifier,
+        ).isEqualTo(TemplateIdentifier.LEFT_THUMB)
+        assertThat(
+            subject.references[0]
+                .templates
+                .last()
+                .identifier,
+        ).isEqualTo(TemplateIdentifier.LEFT_THUMB)
     }
 
     @Test
@@ -277,7 +297,10 @@ internal class InsertEnrollmentRecordsUseCaseTest {
 
         // Then
         val subject = subjectActionsSlot.captured.first().subject
-        val fingers = subject.samples.map { it.template.identifier }
+        val fingers = subject.references
+            .first()
+            .templates
+            .map { it.identifier }
         assertThat(fingers).hasSize(4)
         assertThat(fingers)
             .containsExactly(

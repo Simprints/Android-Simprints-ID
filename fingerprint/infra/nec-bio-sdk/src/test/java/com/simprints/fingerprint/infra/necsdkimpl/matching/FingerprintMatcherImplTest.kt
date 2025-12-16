@@ -2,12 +2,12 @@ package com.simprints.fingerprint.infra.necsdkimpl.matching
 
 import com.google.common.truth.*
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.Sample
 import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.template.NEC_TEMPLATE_FORMAT
 import com.simprints.necwrapper.nec.NEC
@@ -138,14 +138,16 @@ class FingerprintMatcherImplTest {
         format: String = NEC_TEMPLATE_FORMAT,
     ) = Identity(
         subjectId = "id",
-        samples = fingers.map {
-            Sample(
+        references = fingers.map {
+            BiometricReference(
                 referenceId = it.name,
                 modality = Modality.FINGERPRINT,
                 format = format,
-                template = BiometricTemplate(
-                    template = ByteArray(0),
-                    identifier = it,
+                templates = listOf(
+                    BiometricTemplate(
+                        template = ByteArray(0),
+                        identifier = it,
+                    ),
                 ),
             )
         },

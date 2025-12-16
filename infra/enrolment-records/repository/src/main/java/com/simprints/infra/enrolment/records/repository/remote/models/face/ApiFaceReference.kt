@@ -3,7 +3,7 @@ package com.simprints.infra.enrolment.records.repository.remote.models.face
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.core.domain.sample.Sample
+import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.repository.remote.models.ApiBiometricReference
 
@@ -20,11 +20,11 @@ internal data class ApiFaceReference(
     val metadata: HashMap<String, String>? = null,
 ) : ApiBiometricReference(ApiBiometricReferenceType.FaceReference)
 
-internal fun List<Sample>.toFaceApi(encoder: EncodingUtils): ApiFaceReference? = if (isNotEmpty()) {
+internal fun BiometricReference.toFaceApi(encoder: EncodingUtils): ApiFaceReference? = if (templates.isNotEmpty()) {
     ApiFaceReference(
-        first().referenceId,
-        map { ApiFaceTemplate(encoder.byteArrayToBase64(it.template.template)) },
-        first().format,
+        referenceId,
+        templates.map { ApiFaceTemplate(encoder.byteArrayToBase64(it.template)) },
+        format,
     )
 } else {
     null

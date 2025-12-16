@@ -4,11 +4,11 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.reference.TemplateIdentifier
-import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
@@ -71,19 +71,23 @@ class SubjectFactoryTest {
             projectId = PROJECT_ID,
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
-            samples = listOf(
-                Sample(
-                    template = BiometricTemplate(
-                        identifier = IDENTIFIER,
-                        template = BASE_64_BYTES,
+            references = listOf(
+                BiometricReference(
+                    templates = listOf(
+                        BiometricTemplate(
+                            identifier = IDENTIFIER,
+                            template = BASE_64_BYTES,
+                        ),
                     ),
                     format = REFERENCE_FORMAT,
                     referenceId = REFERENCE_ID,
                     modality = Modality.FINGERPRINT,
                 ),
-                Sample(
-                    template = BiometricTemplate(
-                        template = BASE_64_BYTES,
+                BiometricReference(
+                    templates = listOf(
+                        BiometricTemplate(
+                            template = BASE_64_BYTES,
+                        ),
                     ),
                     format = REFERENCE_FORMAT,
                     referenceId = REFERENCE_ID,
@@ -111,19 +115,23 @@ class SubjectFactoryTest {
             projectId = PROJECT_ID,
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
-            samples = listOf(
-                Sample(
-                    template = BiometricTemplate(
-                        identifier = IDENTIFIER,
-                        template = BASE_64_BYTES,
+            references = listOf(
+                BiometricReference(
+                    templates = listOf(
+                        BiometricTemplate(
+                            identifier = IDENTIFIER,
+                            template = BASE_64_BYTES,
+                        ),
                     ),
                     format = REFERENCE_FORMAT,
                     referenceId = REFERENCE_ID,
                     modality = Modality.FINGERPRINT,
                 ),
-                Sample(
-                    template = BiometricTemplate(
-                        template = BASE_64_BYTES,
+                BiometricReference(
+                    templates = listOf(
+                        BiometricTemplate(
+                            template = BASE_64_BYTES,
+                        ),
                     ),
                     format = REFERENCE_FORMAT,
                     referenceId = REFERENCE_ID,
@@ -141,36 +149,44 @@ class SubjectFactoryTest {
             projectId = PROJECT_ID,
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
-            samples = listOf(
-                Sample(
-                    template = BiometricTemplate(
-                        identifier = IDENTIFIER,
-                        template = BASE_64_BYTES,
+            references = listOf(
+                BiometricReference(
+                    templates = listOf(
+                        BiometricTemplate(
+                            identifier = IDENTIFIER,
+                            template = BASE_64_BYTES,
+                        ),
                     ),
                     format = REFERENCE_FORMAT,
                     referenceId = "referenceId-finger-1",
                     modality = Modality.FINGERPRINT,
                 ),
-                Sample(
-                    template = BiometricTemplate(
-                        identifier = IDENTIFIER,
-                        template = BASE_64_BYTES,
+                BiometricReference(
+                    templates = listOf(
+                        BiometricTemplate(
+                            identifier = IDENTIFIER,
+                            template = BASE_64_BYTES,
+                        ),
                     ),
                     format = REFERENCE_FORMAT,
                     referenceId = "referenceId-finger-2",
                     modality = Modality.FINGERPRINT,
                 ),
-                Sample(
-                    template = BiometricTemplate(
-                        template = BASE_64_BYTES,
+                BiometricReference(
+                    templates = listOf(
+                        BiometricTemplate(
+                            template = BASE_64_BYTES,
+                        ),
                     ),
                     format = REFERENCE_FORMAT,
                     referenceId = "referenceId-finger-3",
                     modality = Modality.FACE,
                 ),
-                Sample(
-                    template = BiometricTemplate(
-                        template = BASE_64_BYTES,
+                BiometricReference(
+                    templates = listOf(
+                        BiometricTemplate(
+                            template = BASE_64_BYTES,
+                        ),
                     ),
                     format = REFERENCE_FORMAT,
                     referenceId = "referenceId-finger-4",
@@ -209,36 +225,44 @@ class SubjectFactoryTest {
             projectId = PROJECT_ID,
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
-            samples = listOf(
-                Sample(
-                    template = BiometricTemplate(
-                        identifier = IDENTIFIER,
-                        template = BASE_64_BYTES,
+            references = listOf(
+                BiometricReference(
+                    templates = listOf(
+                        BiometricTemplate(
+                            identifier = IDENTIFIER,
+                            template = BASE_64_BYTES,
+                        ),
                     ),
                     format = REFERENCE_FORMAT,
                     referenceId = "referenceId-finger-1",
                     modality = Modality.FINGERPRINT,
                 ),
-                Sample(
-                    template = BiometricTemplate(
-                        identifier = IDENTIFIER,
-                        template = BASE_64_BYTES,
+                BiometricReference(
+                    templates = listOf(
+                        BiometricTemplate(
+                            identifier = IDENTIFIER,
+                            template = BASE_64_BYTES,
+                        ),
                     ),
                     format = REFERENCE_FORMAT,
                     referenceId = "referenceId-finger-5",
                     modality = Modality.FINGERPRINT,
                 ),
-                Sample(
-                    template = BiometricTemplate(
-                        template = BASE_64_BYTES,
+                BiometricReference(
+                    templates = listOf(
+                        BiometricTemplate(
+                            template = BASE_64_BYTES,
+                        ),
                     ),
                     format = REFERENCE_FORMAT,
                     referenceId = "referenceId-finger-4",
                     modality = Modality.FACE,
                 ),
-                Sample(
-                    template = BiometricTemplate(
-                        template = BASE_64_BYTES,
+                BiometricReference(
+                    templates = listOf(
+                        BiometricTemplate(
+                            template = BASE_64_BYTES,
+                        ),
                     ),
                     format = REFERENCE_FORMAT,
                     referenceId = "referenceId-finger-6",
@@ -248,33 +272,40 @@ class SubjectFactoryTest {
             externalCredentials = listOf(EXTERNAL_CREDENTIAL),
         )
         assertThat(result.subjectId).isEqualTo(expected.subjectId)
-        assertThat(result.samples.size).isEqualTo(expected.samples.size)
-        assertThat(result.samples).containsExactlyElementsIn(expected.samples)
+        assertThat(result.references.size).isEqualTo(expected.references.size)
+        assertThat(result.references).containsExactlyElementsIn(expected.references)
     }
 
     @Test
     fun `when buildSubjectFromCaptureResults is called, correct subject is built`() {
-        every { UUID.randomUUID().toString() } returns SUBJECT_ID
+        val randomUUID = "5a95b24d-23c5-4d24-9277-0d3d2a287508" // "chosen by fair dice roll. guaranteed to be random" (c) xkcd
+        every { UUID.randomUUID().toString() } returns randomUUID
 
         val expected = Subject(
-            subjectId = SUBJECT_ID,
+            subjectId = randomUUID,
             projectId = PROJECT_ID,
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
             createdAt = Date(0L),
-            samples = listOf(
-                Sample(
-                    template = BiometricTemplate(
-                        identifier = IDENTIFIER,
-                        template = BASE_64_BYTES,
+            references = listOf(
+                BiometricReference(
+                    templates = listOf(
+                        BiometricTemplate(
+                            id = randomUUID,
+                            identifier = IDENTIFIER,
+                            template = BASE_64_BYTES,
+                        ),
                     ),
                     format = REFERENCE_FORMAT,
                     referenceId = REFERENCE_ID,
                     modality = Modality.FINGERPRINT,
                 ),
-                Sample(
-                    template = BiometricTemplate(
-                        template = BASE_64_BYTES,
+                BiometricReference(
+                    templates = listOf(
+                        BiometricTemplate(
+                            id = randomUUID,
+                            template = BASE_64_BYTES,
+                        ),
                     ),
                     format = REFERENCE_FORMAT,
                     referenceId = REFERENCE_ID,
@@ -291,7 +322,7 @@ class SubjectFactoryTest {
             moduleId = expected.moduleId,
             captures = listOf(
                 BiometricReferenceCapture(
-                    referenceId = GUID1,
+                    referenceId = REFERENCE_ID,
                     modality = Modality.FINGERPRINT,
                     format = REFERENCE_FORMAT,
                     templates = listOf(
@@ -303,7 +334,7 @@ class SubjectFactoryTest {
                     ),
                 ),
                 BiometricReferenceCapture(
-                    referenceId = GUID1,
+                    referenceId = REFERENCE_ID,
                     modality = Modality.FACE,
                     format = REFERENCE_FORMAT,
                     templates = listOf(
@@ -326,19 +357,23 @@ class SubjectFactoryTest {
             projectId = PROJECT_ID,
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
-            samples = listOf(
-                Sample(
-                    template = BiometricTemplate(
-                        identifier = IDENTIFIER,
-                        template = BASE_64_BYTES,
+            references = listOf(
+                BiometricReference(
+                    templates = listOf(
+                        BiometricTemplate(
+                            identifier = IDENTIFIER,
+                            template = BASE_64_BYTES,
+                        ),
                     ),
                     format = REFERENCE_FORMAT,
                     referenceId = REFERENCE_ID,
                     modality = Modality.FINGERPRINT,
                 ),
-                Sample(
-                    template = BiometricTemplate(
-                        template = BASE_64_BYTES,
+                BiometricReference(
+                    templates = listOf(
+                        BiometricTemplate(
+                            template = BASE_64_BYTES,
+                        ),
                     ),
                     format = REFERENCE_FORMAT,
                     referenceId = REFERENCE_ID,
@@ -353,7 +388,7 @@ class SubjectFactoryTest {
             projectId = expected.projectId,
             attendantId = expected.attendantId,
             moduleId = expected.moduleId,
-            samples = expected.samples,
+            references = expected.references,
             externalCredentials = expected.externalCredentials,
         )
         assertThat(result).isEqualTo(expected)

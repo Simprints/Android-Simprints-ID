@@ -46,7 +46,7 @@ class BuildSubjectUseCaseTest {
     fun `has no samples if no steps provided`() {
         val result = useCase(createParams(steps = emptyList(), scannedCredential = scannedCredential), isAddingCredential = false)
 
-        assertThat(result.samples).isEmpty()
+        assertThat(result.references).isEmpty()
     }
 
     @Test
@@ -63,7 +63,7 @@ class BuildSubjectUseCaseTest {
             isAddingCredential = false,
         )
 
-        assertThat(result.samples).isEmpty()
+        assertThat(result.references).isEmpty()
     }
 
     @Test
@@ -94,11 +94,13 @@ class BuildSubjectUseCaseTest {
             isAddingCredential = false,
         )
 
-        assertThat(result.samples).isNotEmpty()
+        assertThat(result.references).isNotEmpty()
         assertThat(
-            result.samples
+            result.references
                 .first()
-                .template.identifier,
+                .templates
+                .first()
+                .identifier,
         ).isEqualTo(TemplateIdentifier.RIGHT_THUMB)
     }
 
@@ -132,8 +134,12 @@ class BuildSubjectUseCaseTest {
             isAddingCredential = false,
         )
 
-        assertThat(result.samples).isNotEmpty()
-        assertThat(result.samples.size).isEqualTo(10)
+        assertThat(result.references.size).isEqualTo(1)
+        assertThat(
+            result.references
+                .first()
+                .templates.size,
+        ).isEqualTo(10)
     }
 
     @Test
@@ -164,8 +170,8 @@ class BuildSubjectUseCaseTest {
             isAddingCredential = false,
         )
 
-        assertThat(result.samples).isNotEmpty()
-        assertThat(result.samples.first().format).isEqualTo("first")
+        assertThat(result.references).isNotEmpty()
+        assertThat(result.references.first().format).isEqualTo("first")
     }
 
     @Test

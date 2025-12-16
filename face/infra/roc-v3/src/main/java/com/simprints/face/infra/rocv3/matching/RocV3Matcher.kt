@@ -24,8 +24,8 @@ class RocV3Matcher(
 
     override suspend fun getHighestComparisonScoreForCandidate(candidate: Identity): Float = nativeProbeTemplates
         .flatMap { probeTemplate ->
-            candidate.samples.map { face ->
-                getSimilarityScoreForCandidate(probeTemplate, face.template.template)
+            candidate.references.flatMap { it.templates }.map { face ->
+                getSimilarityScoreForCandidate(probeTemplate, face.template)
             }
         }.max()
 

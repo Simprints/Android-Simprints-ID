@@ -54,7 +54,7 @@ internal class GetEnrolmentCreationEventForSubjectUseCase @Inject constructor(
         projectId = projectId,
         moduleId = moduleId,
         attendantId = attendantId,
-        biometricReferences = EnrolmentRecordCreationEvent.buildBiometricReferences(samples, encoder),
+        biometricReferences = EnrolmentRecordCreationEvent.buildBiometricReferences(references, encoder),
         externalCredentials = externalCredentials,
     )
 

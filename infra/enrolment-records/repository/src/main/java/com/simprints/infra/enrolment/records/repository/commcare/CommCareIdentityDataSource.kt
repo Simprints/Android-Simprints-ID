@@ -11,7 +11,6 @@ import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
@@ -45,6 +44,7 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import com.simprints.core.domain.reference.BiometricReference as CoreBiometricReference
 
 internal class CommCareIdentityDataSource @Inject constructor(
     private val timeHelper: TimeHelper,
@@ -111,37 +111,33 @@ internal class CommCareIdentityDataSource @Inject constructor(
         .map { erce ->
             Identity(
                 erce.payload.subjectId,
-                erce.payload.biometricReferences.flatMap { reference ->
-                    when (reference) {
-                        is FaceReference -> reference.templates.mapNotNull { faceTemplate ->
-                            if (reference.format != query.format) {
-                                null
-                            } else {
-                                Sample(
-                                    template = BiometricTemplate(
-                                        template = encoder.base64ToBytes(faceTemplate.template),
-                                    ),
-                                    format = reference.format,
-                                    referenceId = reference.id,
-                                    modality = Modality.FACE,
-                                )
-                            }
-                        }
+                erce.payload.biometricReferences.mapNotNull { reference ->
+                    if (reference.format != query.format) {
+                        null
+                    } else {
+                        when (reference) {
+                            is FaceReference -> CoreBiometricReference(
+                                referenceId = reference.id,
+                                format = reference.format,
+                                modality = Modality.FACE,
+                                templates = reference.templates.map {
+                                    BiometricTemplate(
+                                        template = encoder.base64ToBytes(it.template),
+                                    )
+                                },
+                            )
 
-                        is FingerprintReference -> reference.templates.mapNotNull { fingerprintTemplate ->
-                            if (reference.format != query.format) {
-                                null
-                            } else {
-                                Sample(
-                                    template = BiometricTemplate(
-                                        identifier = fingerprintTemplate.finger,
-                                        template = encoder.base64ToBytes(fingerprintTemplate.template),
-                                    ),
-                                    format = reference.format,
-                                    referenceId = reference.id,
-                                    modality = Modality.FINGERPRINT,
-                                )
-                            }
+                            is FingerprintReference -> CoreBiometricReference(
+                                referenceId = reference.id,
+                                format = reference.format,
+                                modality = Modality.FINGERPRINT,
+                                templates = reference.templates.map {
+                                    BiometricTemplate(
+                                        identifier = it.finger,
+                                        template = encoder.base64ToBytes(it.template),
+                                    )
+                                },
+                            )
                         }
                     }
                 },

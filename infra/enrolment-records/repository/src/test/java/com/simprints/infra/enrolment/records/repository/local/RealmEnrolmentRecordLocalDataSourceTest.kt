@@ -4,10 +4,10 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
@@ -259,10 +259,10 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val fingerReferenceId = "fingerToDelete"
         every { realmSingleQuery.find() } returns getRandomSubject(
             faceSamples = listOf(
-                getRandomFaceSample(referenceId = faceReferenceId),
+                getRandomFaceReference(referenceId = faceReferenceId),
             ),
             fingerprintSamples = listOf(
-                getRandomFingerprintSample(referenceId = fingerReferenceId),
+                getRandomFingerprintReference(referenceId = fingerReferenceId),
             ),
         ).toRealmDb()
 
@@ -288,12 +288,12 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val fingerReferenceId = "fingerToDelete"
         every { realmSingleQuery.find() } returns getRandomSubject(
             faceSamples = listOf(
-                getRandomFaceSample(referenceId = faceReferenceId),
-                getRandomFaceSample(),
+                getRandomFaceReference(referenceId = faceReferenceId),
+                getRandomFaceReference(),
             ),
             fingerprintSamples = listOf(
-                getRandomFingerprintSample(referenceId = fingerReferenceId),
-                getRandomFingerprintSample(),
+                getRandomFingerprintReference(referenceId = fingerReferenceId),
+                getRandomFingerprintReference(),
             ),
         ).toRealmDb()
 
@@ -301,7 +301,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
             listOf(
                 SubjectAction.Update(
                     subject.subjectId.toString(),
-                    samplesToAdd = listOf(getRandomFaceSample(), getRandomFingerprintSample()),
+                    samplesToAdd = listOf(getRandomFaceReference(), getRandomFingerprintReference()),
                     referenceIdsToRemove = listOf(faceReferenceId, fingerReferenceId),
                     externalCredentialsToAdd = listOf(),
                     externalCredentialIdsToRemove = listOf(),
@@ -332,8 +332,8 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     fun performSubjectUpdateExternalActions() = runTest {
         val subject = getFakePerson()
         every { realmSingleQuery.find() } returns getRandomSubject(
-            faceSamples = listOf(getRandomFaceSample()),
-            fingerprintSamples = listOf(getRandomFingerprintSample()),
+            faceSamples = listOf(getRandomFaceReference()),
+            fingerprintSamples = listOf(getRandomFingerprintReference()),
             externalCredentials = listOf(
                 getRandomExternalCredential("id1"),
                 getRandomExternalCredential("id2"),
@@ -480,11 +480,11 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         projectId: String = UUID.randomUUID().toString(),
         userId: String = UUID.randomUUID().toString(),
         moduleId: String = UUID.randomUUID().toString(),
-        faceSamples: List<Sample> = listOf(
-            getRandomFaceSample(),
-            getRandomFaceSample(),
+        faceSamples: List<BiometricReference> = listOf(
+            getRandomFaceReference(),
+            getRandomFaceReference(),
         ),
-        fingerprintSamples: List<Sample> = listOf(),
+        fingerprintSamples: List<BiometricReference> = listOf(),
         externalCredentials: List<ExternalCredential> = listOf(
             getRandomExternalCredential(),
         ),
@@ -493,32 +493,36 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         projectId = projectId,
         attendantId = userId.asTokenizableRaw(),
         moduleId = moduleId.asTokenizableRaw(),
-        samples = fingerprintSamples + faceSamples,
+        references = fingerprintSamples + faceSamples,
         externalCredentials = externalCredentials,
     )
 
-    private fun getRandomFaceSample(
+    private fun getRandomFaceReference(
         id: String = UUID.randomUUID().toString(),
         referenceId: String = "referenceId",
-    ) = Sample(
-        id = id,
+    ) = BiometricReference(
         referenceId = referenceId,
-        template = BiometricTemplate(
-            template = Random.nextBytes(64),
+        templates = listOf(
+            BiometricTemplate(
+                id = id,
+                template = Random.nextBytes(64),
+            ),
         ),
         format = "faceTemplateFormat",
         modality = Modality.FACE,
     )
 
-    private fun getRandomFingerprintSample(
+    private fun getRandomFingerprintReference(
         id: String = UUID.randomUUID().toString(),
         referenceId: String = "referenceId",
-    ) = Sample(
-        id = id,
+    ) = BiometricReference(
         referenceId = referenceId,
-        template = BiometricTemplate(
-            identifier = TemplateIdentifier.LEFT_3RD_FINGER,
-            template = Random.nextBytes(64),
+        templates = listOf(
+            BiometricTemplate(
+                id = id,
+                identifier = TemplateIdentifier.LEFT_3RD_FINGER,
+                template = Random.nextBytes(64),
+            ),
         ),
         format = "fingerprintTemplateFormat",
         modality = Modality.FINGERPRINT,

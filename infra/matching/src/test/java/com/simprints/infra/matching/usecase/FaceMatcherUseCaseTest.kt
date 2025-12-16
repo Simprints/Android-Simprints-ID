@@ -4,12 +4,12 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.sample.ComparisonResult
 import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.Sample
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
@@ -197,9 +197,11 @@ internal class FaceMatcherUseCaseTest {
             Identity(
                 "subjectId",
                 listOf(
-                    Sample(
-                        template = BiometricTemplate(
-                            template = byteArrayOf(1, 2, 3),
+                    BiometricReference(
+                        templates = listOf(
+                            BiometricTemplate(
+                                template = byteArrayOf(1, 2, 3),
+                            ),
                         ),
                         format = "format",
                         referenceId = "faceTemplate",

@@ -13,8 +13,8 @@ class SimFaceMatcher(
         .templates
         .map { it.template }
         .flatMap { probeTemplate ->
-            candidate.samples.map { face ->
-                val baseScore = simFace.verificationScore(probeTemplate, face.template.template)
+            candidate.references.flatMap { it.templates }.map { face ->
+                val baseScore = simFace.verificationScore(probeTemplate, face.template)
                 // TODO: remove the adjustment after we find out why the returned range is biased towards [0.5;1]
                 (baseScore - 0.5).coerceAtLeast(0.0).toFloat() * 200f
             }

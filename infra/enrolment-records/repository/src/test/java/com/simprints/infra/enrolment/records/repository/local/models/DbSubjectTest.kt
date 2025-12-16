@@ -2,9 +2,9 @@ package com.simprints.infra.enrolment.records.repository.local.models
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.TemplateIdentifier
-import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.enrolment.records.realm.store.models.DbFaceSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbFingerprintSample
@@ -28,18 +28,22 @@ class DbSubjectTest {
 
     @Test
     fun fromDomainToDbModel() {
-        val fingerprintSample = Sample(
-            template = BiometricTemplate(
-                identifier = TemplateIdentifier.RIGHT_3RD_FINGER,
-                template = Random.nextBytes(64),
+        val fingerprintSample = BiometricReference(
+            templates = listOf(
+                BiometricTemplate(
+                    identifier = TemplateIdentifier.RIGHT_3RD_FINGER,
+                    template = Random.nextBytes(64),
+                ),
             ),
             format = "NEC_1",
             referenceId = REFERENCE_ID,
             modality = Modality.FINGERPRINT,
         )
-        val faceSample = Sample(
-            template = BiometricTemplate(
-                template = Random.nextBytes(64),
+        val faceSample = BiometricReference(
+            templates = listOf(
+                BiometricTemplate(
+                    template = Random.nextBytes(64),
+                ),
             ),
             format = "RANK_ONE_1_23",
             referenceId = REFERENCE_ID,
@@ -53,7 +57,7 @@ class DbSubjectTest {
             moduleId = MODULE_ID,
             createdAt = Date(0),
             updatedAt = Date(1500),
-            samples = listOf(fingerprintSample, faceSample),
+            references = listOf(fingerprintSample, faceSample),
         )
 
         val dbSubject = domainSubject.toRealmDb()
@@ -65,9 +69,9 @@ class DbSubjectTest {
             assertThat(moduleId).isEqualTo(MODULE_ID.value)
             assertThat(createdAt).isEqualTo(RealmInstant.from(0, 0))
             assertThat(updatedAt).isEqualTo(RealmInstant.from(1, 500_000_000))
-            assertThat(fingerprintSamples.first().id).isEqualTo(fingerprintSample.id)
+            assertThat(fingerprintSamples.first().id).isEqualTo(fingerprintSample.templates.first().id)
             assertThat(fingerprintSamples.first().referenceId).isEqualTo(REFERENCE_ID)
-            assertThat(faceSamples.first().id).isEqualTo(faceSample.id)
+            assertThat(faceSamples.first().id).isEqualTo(faceSample.templates.first().id)
             assertThat(faceSamples.first().referenceId).isEqualTo(REFERENCE_ID)
         }
     }
@@ -108,9 +112,15 @@ class DbSubjectTest {
             assertThat(updatedAt).isEqualTo(Date(1500))
             assertThat(moduleId).isEqualTo(MODULE_ID)
             assertThat(projectId).isEqualTo(PROJECT_ID)
-            assertThat(samples.first { it.modality == Modality.FINGERPRINT }.id).isEqualTo(fingerprintSample.id)
-            assertThat(samples.first { it.modality == Modality.FINGERPRINT }.referenceId).isEqualTo(REFERENCE_ID)
-            assertThat(samples.first { it.modality == Modality.FACE }.referenceId).isEqualTo(REFERENCE_ID)
+            assertThat(
+                references
+                    .first { it.modality == Modality.FINGERPRINT }
+                    .templates
+                    .first()
+                    .id,
+            ).isEqualTo(fingerprintSample.id)
+            assertThat(references.first { it.modality == Modality.FINGERPRINT }.referenceId).isEqualTo(REFERENCE_ID)
+            assertThat(references.first { it.modality == Modality.FACE }.referenceId).isEqualTo(REFERENCE_ID)
         }
     }
 }

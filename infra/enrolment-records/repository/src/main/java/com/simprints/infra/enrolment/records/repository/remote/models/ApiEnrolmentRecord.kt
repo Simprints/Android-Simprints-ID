@@ -2,7 +2,7 @@ package com.simprints.infra.enrolment.records.repository.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.sample.Sample
+import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.remote.models.face.toFaceApi
@@ -20,15 +20,15 @@ internal fun Subject.toEnrolmentRecord(encoder: EncodingUtils): ApiEnrolmentReco
     subjectId,
     moduleId.value,
     attendantId.value,
-    buildBiometricReferences(samples, encoder),
+    buildBiometricReferences(references, encoder),
 )
 
 internal fun buildBiometricReferences(
-    samples: List<Sample>,
+    references: List<BiometricReference>,
     encoder: EncodingUtils,
-): List<ApiBiometricReference> = samples.groupBy { it.modality }.mapNotNull { (modality, modalitySamples) ->
-    when (modality) {
-        Modality.FINGERPRINT -> modalitySamples.toFingerprintApi(encoder)
-        Modality.FACE -> modalitySamples.toFaceApi(encoder)
+): List<ApiBiometricReference> = references.mapNotNull { reference ->
+    when (reference.modality) {
+        Modality.FINGERPRINT -> reference.toFingerprintApi(encoder)
+        Modality.FACE -> reference.toFaceApi(encoder)
     }
 }

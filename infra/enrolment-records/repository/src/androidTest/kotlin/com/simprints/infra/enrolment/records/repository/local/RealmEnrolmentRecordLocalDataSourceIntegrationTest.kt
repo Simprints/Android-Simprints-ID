@@ -5,9 +5,9 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.TemplateIdentifier
-import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
@@ -235,10 +235,12 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         // Given
         val subjectId = UUID.randomUUID().toString()
         val originalSubject = createTestSubject(subjectId)
-        originalSubject.samples = listOf(
-            Sample(
-                template = BiometricTemplate(
-                    template = byteArrayOf(),
+        originalSubject.references = listOf(
+            BiometricReference(
+                templates = listOf(
+                    BiometricTemplate(
+                        template = byteArrayOf(),
+                    ),
                 ),
                 format = "ISO",
                 referenceId = "ref1",
@@ -258,18 +260,22 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         val updateAction = SubjectAction.Update(
             subjectId,
             samplesToAdd = listOf(
-                Sample(
-                    template = BiometricTemplate(
-                        template = byteArrayOf(1, 2, 3),
+                BiometricReference(
+                    templates = listOf(
+                        BiometricTemplate(
+                            template = byteArrayOf(1, 2, 3),
+                        ),
                     ),
                     format = "ISO",
                     referenceId = "ref2",
                     modality = Modality.FACE,
                 ),
-                Sample(
-                    template = BiometricTemplate(
-                        template = byteArrayOf(4, 5, 6),
-                        identifier = TemplateIdentifier.LEFT_THUMB,
+                BiometricReference(
+                    templates = listOf(
+                        BiometricTemplate(
+                            template = byteArrayOf(4, 5, 6),
+                            identifier = TemplateIdentifier.LEFT_THUMB,
+                        ),
                     ),
                     format = "ISO",
                     referenceId = "ref3",
@@ -317,10 +323,12 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         // Given
         val subjects = (1..10).map { i ->
             createTestSubject(subjectId = UUID.randomUUID().toString()).apply {
-                samples = listOf(
-                    Sample(
-                        template = BiometricTemplate(
-                            template = byteArrayOf(i.toByte()),
+                references = listOf(
+                    BiometricReference(
+                        templates = listOf(
+                            BiometricTemplate(
+                                template = byteArrayOf(i.toByte()),
+                            ),
                         ),
                         format = "ISO",
                         referenceId = "ref$i",
@@ -366,11 +374,13 @@ class RealmEnrolmentRecordLocalDataSourceIntegrationTest {
         // Given
         val subjects = (1..10).map { i ->
             createTestSubject(subjectId = UUID.randomUUID().toString()).apply {
-                samples = listOf(
-                    Sample(
-                        template = BiometricTemplate(
-                            template = byteArrayOf(i.toByte()),
-                            identifier = TemplateIdentifier.LEFT_THUMB,
+                references = listOf(
+                    BiometricReference(
+                        templates = listOf(
+                            BiometricTemplate(
+                                template = byteArrayOf(i.toByte()),
+                                identifier = TemplateIdentifier.LEFT_THUMB,
+                            ),
                         ),
                         format = "ISO",
                         referenceId = "ref$i",

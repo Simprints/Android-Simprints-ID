@@ -87,9 +87,9 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                     mapper = { dbSubject ->
                         Identity(
                             subjectId = dbSubject.subjectId.toString(),
-                            samples = (
-                                dbSubject.faceSamples.map { it.toDomain() } +
-                                    dbSubject.fingerprintSamples.map { it.toDomain() }
+                            references = (
+                                dbSubject.faceSamples.toDomain() +
+                                    dbSubject.fingerprintSamples.toDomain()
                             ).filter { it.format == query.format },
                         )
                     },
@@ -218,12 +218,12 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                             dbSubject.faceSamples = (
                                 faceSamplesMap[false].orEmpty() + action.samplesToAdd
                                     .filter { it.modality == Modality.FACE }
-                                    .map { it.toRealmFaceDb() }
+                                    .flatMap { it.toRealmFaceDb() }
                             ).toRealmList()
                             dbSubject.fingerprintSamples = (
                                 fingerprintSamplesMap[false].orEmpty() + action.samplesToAdd
                                     .filter { it.modality == Modality.FINGERPRINT }
-                                    .map { it.toRealmFingerprintDb() }
+                                    .flatMap { it.toRealmFingerprintDb() }
                             ).toRealmList()
                             dbSubject.externalCredentials = allExternalCredentials.toRealmList()
 
@@ -236,12 +236,14 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                         }
                     }
 
-                    is SubjectAction.Deletion -> realm.delete(
-                        realm
-                            .query(DbSubject::class)
-                            .buildRealmQueryForSubject(query = SubjectQuery(subjectId = action.subjectId))
-                            .find(),
-                    )
+                    is SubjectAction.Deletion -> {
+                        realm.delete(
+                            realm
+                                .query(DbSubject::class)
+                                .buildRealmQueryForSubject(query = SubjectQuery(subjectId = action.subjectId))
+                                .find(),
+                        )
+                    }
                 }
             }
         }

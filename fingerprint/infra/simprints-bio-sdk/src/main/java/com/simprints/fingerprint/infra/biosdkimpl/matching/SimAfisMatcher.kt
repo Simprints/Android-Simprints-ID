@@ -63,7 +63,8 @@ internal class SimAfisMatcher @Inject constructor(
         }
     }
 
-    private fun Identity.toSimAfisPerson(): SimAfisPerson = SimAfisPerson(subjectId, samples.map { it.template.toSimAfisFingerprint() })
+    private fun Identity.toSimAfisPerson(): SimAfisPerson =
+        SimAfisPerson(subjectId, references.flatMap { it.templates }.map { it.toSimAfisFingerprint() })
 
     private fun BiometricTemplate.toSimAfisFingerprint(): SimAfisFingerprint =
         SimAfisFingerprint(identifier.toSimAfisFingerIdentifier(), template)
@@ -141,7 +142,7 @@ val List<BiometricTemplateCapture>.fingerprintsTemplates
     get() = map { it.template.toByteBuffer() }
 
 val Identity.fingerprintsTemplates
-    get() = samples.map { it.template.template.toByteBuffer() }
+    get() = references.flatMap { it.templates }.map { it.template.toByteBuffer() }
 
 private fun ByteArray.toByteBuffer(): ByteBuffer = ByteBuffer.allocateDirect(size).put(this)
 

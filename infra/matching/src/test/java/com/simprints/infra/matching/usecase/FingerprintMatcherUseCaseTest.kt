@@ -4,12 +4,12 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.Sample
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
@@ -225,16 +225,16 @@ internal class FingerprintMatcherUseCaseTest {
                 Identity(
                     "personId",
                     listOf(
-                        fingerprintSample(TemplateIdentifier.RIGHT_5TH_FINGER),
-                        fingerprintSample(TemplateIdentifier.RIGHT_4TH_FINGER),
-                        fingerprintSample(TemplateIdentifier.RIGHT_3RD_FINGER),
-                        fingerprintSample(TemplateIdentifier.RIGHT_INDEX_FINGER),
-                        fingerprintSample(TemplateIdentifier.RIGHT_THUMB),
-                        fingerprintSample(TemplateIdentifier.LEFT_THUMB),
-                        fingerprintSample(TemplateIdentifier.LEFT_INDEX_FINGER),
-                        fingerprintSample(TemplateIdentifier.LEFT_3RD_FINGER),
-                        fingerprintSample(TemplateIdentifier.LEFT_4TH_FINGER),
-                        fingerprintSample(TemplateIdentifier.LEFT_5TH_FINGER),
+                        fingerprintReference(TemplateIdentifier.RIGHT_5TH_FINGER),
+                        fingerprintReference(TemplateIdentifier.RIGHT_4TH_FINGER),
+                        fingerprintReference(TemplateIdentifier.RIGHT_3RD_FINGER),
+                        fingerprintReference(TemplateIdentifier.RIGHT_INDEX_FINGER),
+                        fingerprintReference(TemplateIdentifier.RIGHT_THUMB),
+                        fingerprintReference(TemplateIdentifier.LEFT_THUMB),
+                        fingerprintReference(TemplateIdentifier.LEFT_INDEX_FINGER),
+                        fingerprintReference(TemplateIdentifier.LEFT_3RD_FINGER),
+                        fingerprintReference(TemplateIdentifier.LEFT_4TH_FINGER),
+                        fingerprintReference(TemplateIdentifier.LEFT_5TH_FINGER),
                     ),
                 ),
             ),
@@ -266,10 +266,12 @@ internal class FingerprintMatcherUseCaseTest {
         coVerify { bioSdkWrapper.match(any(), any(), any()) }
     }
 
-    private fun fingerprintSample(finger: TemplateIdentifier) = Sample(
-        template = BiometricTemplate(
-            identifier = finger,
-            template = byteArrayOf(1),
+    private fun fingerprintReference(finger: TemplateIdentifier) = BiometricReference(
+        templates = listOf(
+            BiometricTemplate(
+                identifier = finger,
+                template = byteArrayOf(1),
+            ),
         ),
         format = "format",
         referenceId = "referenceId",

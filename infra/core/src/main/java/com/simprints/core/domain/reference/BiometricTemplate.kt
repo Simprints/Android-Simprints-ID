@@ -5,10 +5,12 @@ import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.step.StepResult
 import kotlinx.parcelize.Parcelize
+import java.util.UUID
 
 @Parcelize
 @ExcludedFromGeneratedTestCoverageReports("Data class with generated code")
 data class BiometricTemplate(
+    val id: String = UUID.randomUUID().toString(),
     val template: ByteArray,
     val identifier: TemplateIdentifier = TemplateIdentifier.NONE,
 ) : StepParams,
@@ -20,6 +22,7 @@ data class BiometricTemplate(
 
         other as BiometricTemplate
 
+        // ID is explicitly ignored in the equality check since it is randomly generated on creation and used only locally
         if (!template.contentEquals(other.template)) return false
         if (identifier != other.identifier) return false
 
