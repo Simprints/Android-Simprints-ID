@@ -2,6 +2,7 @@
 kotlin_version = "2.2.21"
 kotlin_coroutine_version = "1.10.2"
 ksp_version = "2.3.4"
+kotlin_serialization_version = "1.9.0"
 
 android_gradlePlugin_version = "8.13.2"
 androidx_version = "1.7.0"
@@ -47,7 +48,7 @@ firebase_crashlyticsPlugin_version = "3.0.6"
 firebase_perfPlugin_version = "2.0.2"
 
 # [MS-483] Newer versions of Retrofit (>=2.10.0) don't support android apis <=25 beacuse of the internal Jackson library
-retrofit_version = "2.9.0"
+retrofit_version = "3.0.0"
 okttp_version = "5.3.2"
 # Newer versions of Jackson don't support android apis <=25.Jackson shouldn't be updated as long as SID MIN supported APIs <=25
 jackson_version = "2.13.4"
@@ -95,6 +96,7 @@ desugar_jdk_libsVersion = "2.1.5"
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin_version" }
 kotlin-coroutinesAndroid = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlin_coroutine_version" }
 kotlin-coroutinesPlayServices = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlin_coroutine_version" }
+kotlin-serialization = {module="org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref ="kotlin_serialization_version"}
 
 #AndroidX
 androidX-core = { module = "androidx.core:core-ktx", version.ref = "androidx_core_version" }
@@ -168,6 +170,7 @@ retrofit-jackson = { module = "com.squareup.retrofit2:converter-jackson", versio
 retrofit-converterScalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit_version" }
 retrofit-logging = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okttp_version" }
 retrofit-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okttp_version" }
+retrofit_kotlin_serialization = { group = "com.squareup.retrofit2", name = "converter-kotlinx-serialization", version.ref = "retrofit_version" }
 
 #Chuck
 chuck-debug = { module = "com.github.chuckerteam.chucker:library", version.ref = "chuck_version" }
@@ -278,6 +281,7 @@ android-application = { id = "com.android.application", version.ref = "android_g
 android-library = { id = "com.android.library", version.ref = "android_gradlePlugin_version" }
 android-test = { id = "com.android.test", version.ref = "android_gradlePlugin_version" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin_version" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin_serialization_version" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp_version" }
 gms = { id = "com.google.gms.google-services", version.ref = "gsm_plugin_version" }
 firebase-perf = { id = "com.google.firebase.firebase-perf", version.ref = "firebase_perfPlugin_version" }

@@ -1,6 +1,5 @@
 package com.simprints.infra.network.apiclient
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.network.FakeRetrofitInterface
 import com.simprints.infra.network.exceptions.ApiError
@@ -8,6 +7,7 @@ import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.infra.network.httpclient.BuildOkHttpClientUseCase
+import com.simprints.infra.network.json.JsonHelper
 import com.simprints.logging.persistent.PersistentLogger
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
@@ -33,8 +33,8 @@ class SimApiClientImplTest {
     @MockK
     lateinit var persistentLogger: PersistentLogger
 
-    private val backendMaintenanceErrorBody =
-        jacksonObjectMapper().writeValueAsString(ApiError("002"))
+    private val backendMaintenanceErrorBody = JsonHelper().toJson((ApiError("002")))
+
     private lateinit var mockWebServer: MockWebServer
     private lateinit var simApiClientImpl: SimApiClientImpl<FakeRetrofitInterface>
 
@@ -68,19 +68,18 @@ class SimApiClientImplTest {
     }
 
     @Test
-    fun `should throw a backend maintenance exception without estimated outage when it's a maintenance error without header and not retry`() =
-        runTest {
-            val response = MockResponse()
-            response.setResponseCode(503)
-            response.setBody(backendMaintenanceErrorBody)
-            mockWebServer.enqueue(response)
-            mockWebServer.enqueue(response)
+    fun `throws a backend maintenance error without retry or outage`() = runTest {
+        val response = MockResponse()
+        response.setResponseCode(503)
+        response.setBody(backendMaintenanceErrorBody)
+        mockWebServer.enqueue(response)
+        mockWebServer.enqueue(response)
 
-            val exception = assertThrows<BackendMaintenanceException> {
-                simApiClientImpl.executeCall { it.get() }
-            }
-            assertThat(exception.estimatedOutage).isNull()
+        val exception = assertThrows<BackendMaintenanceException> {
+            simApiClientImpl.executeCall { it.get() }
         }
+        assertThat(exception.estimatedOutage).isNull()
+    }
 
     @Test
     fun `should throw a backend maintenance exception with estimated outage when it's a maintenance error with header and not retry`() =
@@ -88,7 +87,7 @@ class SimApiClientImplTest {
             val estimatedOutage = 4224
             val response = MockResponse()
             response.setResponseCode(503)
-            response.setBody(jacksonObjectMapper().writeValueAsString(ApiError("002")))
+            response.setBody(JsonHelper().toJson((ApiError("002"))))
             response.setHeader("Retry-After", estimatedOutage)
             mockWebServer.enqueue(response)
             mockWebServer.enqueue(response)
@@ -135,7 +134,7 @@ class SimApiClientImplTest {
     fun `should throw a sync cloud integration exception when the response code is 503 and retry`() = runTest {
         val response = MockResponse()
         response.setResponseCode(503)
-        response.setBody(jacksonObjectMapper().writeValueAsString(ApiError("001")))
+        response.setBody(JsonHelper().toJson((ApiError("001"))))
         mockWebServer.enqueue(response)
         mockWebServer.enqueue(response)
 
