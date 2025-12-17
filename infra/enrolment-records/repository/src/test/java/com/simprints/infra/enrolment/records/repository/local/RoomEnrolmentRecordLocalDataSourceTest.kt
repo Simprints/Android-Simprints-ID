@@ -5,8 +5,9 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.reference.BiometricTemplate
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.sample.Sample
-import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
@@ -73,45 +74,57 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
     // Samples defined first
     private val faceSample1 = Sample(
-        template = byteArrayOf(1, 2, 3),
+        template = BiometricTemplate(
+            template = byteArrayOf(1, 2, 3),
+        ),
         format = ROC_1_FORMAT,
         referenceId = "ref-face-1",
         id = "face-uuid-1",
         modality = Modality.FACE,
     )
     private val faceSample2 = Sample(
-        template = byteArrayOf(4, 5, 6),
+        template = BiometricTemplate(
+            template = byteArrayOf(4, 5, 6),
+        ),
         format = ROC_3_FORMAT,
         referenceId = "ref-face-2",
         id = "face-uuid-2",
         modality = Modality.FACE,
     )
     private val faceSample3 = Sample(
-        template = byteArrayOf(7, 8, 9),
+        template = BiometricTemplate(
+            template = byteArrayOf(7, 8, 9),
+        ),
         format = ROC_1_FORMAT,
         referenceId = "ref-face-3-p2",
         id = "face-uuid-3-p2",
         modality = Modality.FACE,
     )
     private val fingerprintSample1 = Sample(
-        identifier = SampleIdentifier.LEFT_THUMB,
-        template = byteArrayOf(10, 11),
+        template = BiometricTemplate(
+            identifier = TemplateIdentifier.LEFT_THUMB,
+            template = byteArrayOf(10, 11),
+        ),
         format = NEC_FORMAT,
         referenceId = "ref-fp-1",
         id = "fp-uuid-1",
         modality = Modality.FINGERPRINT,
     )
     private val fingerprintSample2 = Sample(
-        identifier = SampleIdentifier.RIGHT_THUMB,
-        template = byteArrayOf(12, 13),
+        template = BiometricTemplate(
+            identifier = TemplateIdentifier.RIGHT_THUMB,
+            template = byteArrayOf(12, 13),
+        ),
         format = ISO_FORMAT,
         referenceId = "ref-fp-2",
         id = "fp-uuid-2",
         modality = Modality.FINGERPRINT,
     )
     private val fingerprintSample3 = Sample(
-        identifier = SampleIdentifier.LEFT_INDEX_FINGER,
-        template = byteArrayOf(14, 15),
+        template = BiometricTemplate(
+            identifier = TemplateIdentifier.LEFT_INDEX_FINGER,
+            template = byteArrayOf(14, 15),
+        ),
         format = NEC_FORMAT,
         referenceId = "ref-fp-3-p2",
         id = "fp-uuid-3-p2",

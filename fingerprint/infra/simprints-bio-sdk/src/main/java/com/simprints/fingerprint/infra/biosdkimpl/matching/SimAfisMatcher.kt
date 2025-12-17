@@ -1,11 +1,12 @@
 package com.simprints.fingerprint.infra.biosdkimpl.matching
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.reference.BiometricTemplate
+import com.simprints.core.domain.reference.BiometricTemplateCapture
+import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.sample.ComparisonResult
 import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.MatchComparisonResult
-import com.simprints.core.domain.sample.Sample
-import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.fingerprint.infra.simafiswrapper.JNILibAfisInterface
 import com.simprints.fingerprint.infra.simafiswrapper.models.SimAfisFingerIdentifier
 import com.simprints.fingerprint.infra.simafiswrapper.models.SimAfisFingerprint
@@ -26,25 +27,27 @@ internal class SimAfisMatcher @Inject constructor(
     private val jniLibAfis: JNILibAfisInterface,
 ) {
     fun match(
-        probe: List<CaptureSample>,
+        probeReference: BiometricReferenceCapture,
         candidates: List<Identity>,
         crossFingerComparison: Boolean,
-    ): List<MatchComparisonResult> {
+    ): List<ComparisonResult> {
         // if probe template format is not supported by SimAfisMatcher, return empty list
-        if (probe.templateFormatNotSupportedBySimAfisMatcher()) {
+        if (probeReference.templateFormatNotSupportedBySimAfisMatcher()) {
             return emptyList()
         }
+        val probeTemplates = probeReference.templates
+
         return if (crossFingerComparison) {
-            crossFingerMatch(probe, candidates)
+            crossFingerMatch(probeTemplates, candidates)
         } else {
-            match(probe, candidates)
+            match(probeTemplates, candidates)
         }
     }
 
     private fun match(
-        probe: List<CaptureSample>,
+        probe: List<BiometricTemplateCapture>,
         candidates: List<Identity>,
-    ): List<MatchComparisonResult> {
+    ): List<ComparisonResult> {
         val simAfisCandidates = candidates.map { it.toSimAfisPerson() }
 
         println("Matching ${simAfisCandidates.size} candidates using all ${jniLibAfis.getNbCores()} cores")
@@ -56,36 +59,37 @@ internal class SimAfisMatcher @Inject constructor(
         )
 
         return results.zip(simAfisCandidates).map { (score, candidate) ->
-            MatchComparisonResult(candidate.guid, score)
+            ComparisonResult(candidate.guid, score)
         }
     }
 
-    private fun Identity.toSimAfisPerson(): SimAfisPerson = SimAfisPerson(subjectId, samples.map { it.toSimAfisFingerprint() })
+    private fun Identity.toSimAfisPerson(): SimAfisPerson = SimAfisPerson(subjectId, samples.map { it.template.toSimAfisFingerprint() })
 
-    private fun Sample.toSimAfisFingerprint(): SimAfisFingerprint = SimAfisFingerprint(identifier.toSimAfisFingerIdentifier(), template)
+    private fun BiometricTemplate.toSimAfisFingerprint(): SimAfisFingerprint =
+        SimAfisFingerprint(identifier.toSimAfisFingerIdentifier(), template)
 
-    private fun List<CaptureSample>.toSimAfisPerson(): SimAfisPerson = SimAfisPerson("", map { it.toSimAfisFingerprint() })
+    private fun List<BiometricTemplateCapture>.toSimAfisPerson(): SimAfisPerson = SimAfisPerson("", map { it.toSimAfisFingerprint() })
 
-    private fun CaptureSample.toSimAfisFingerprint(): SimAfisFingerprint =
+    private fun BiometricTemplateCapture.toSimAfisFingerprint(): SimAfisFingerprint =
         SimAfisFingerprint(identifier.toSimAfisFingerIdentifier(), template)
 
     @ExcludedFromGeneratedTestCoverageReports(reason = "This is just a mapping function")
-    private fun SampleIdentifier.toSimAfisFingerIdentifier(): SimAfisFingerIdentifier = when (this) {
-        SampleIdentifier.RIGHT_5TH_FINGER -> SimAfisFingerIdentifier.RIGHT_5TH_FINGER
-        SampleIdentifier.RIGHT_4TH_FINGER -> SimAfisFingerIdentifier.RIGHT_4TH_FINGER
-        SampleIdentifier.RIGHT_3RD_FINGER -> SimAfisFingerIdentifier.RIGHT_3RD_FINGER
-        SampleIdentifier.RIGHT_INDEX_FINGER -> SimAfisFingerIdentifier.RIGHT_INDEX_FINGER
-        SampleIdentifier.RIGHT_THUMB -> SimAfisFingerIdentifier.RIGHT_THUMB
-        SampleIdentifier.LEFT_THUMB -> SimAfisFingerIdentifier.LEFT_THUMB
-        SampleIdentifier.LEFT_INDEX_FINGER -> SimAfisFingerIdentifier.LEFT_INDEX_FINGER
-        SampleIdentifier.LEFT_3RD_FINGER -> SimAfisFingerIdentifier.LEFT_3RD_FINGER
-        SampleIdentifier.LEFT_4TH_FINGER -> SimAfisFingerIdentifier.LEFT_4TH_FINGER
-        SampleIdentifier.LEFT_5TH_FINGER -> SimAfisFingerIdentifier.LEFT_5TH_FINGER
-        SampleIdentifier.NONE -> throw IllegalArgumentException("Must be a finger sample identifier")
+    private fun TemplateIdentifier.toSimAfisFingerIdentifier(): SimAfisFingerIdentifier = when (this) {
+        TemplateIdentifier.RIGHT_5TH_FINGER -> SimAfisFingerIdentifier.RIGHT_5TH_FINGER
+        TemplateIdentifier.RIGHT_4TH_FINGER -> SimAfisFingerIdentifier.RIGHT_4TH_FINGER
+        TemplateIdentifier.RIGHT_3RD_FINGER -> SimAfisFingerIdentifier.RIGHT_3RD_FINGER
+        TemplateIdentifier.RIGHT_INDEX_FINGER -> SimAfisFingerIdentifier.RIGHT_INDEX_FINGER
+        TemplateIdentifier.RIGHT_THUMB -> SimAfisFingerIdentifier.RIGHT_THUMB
+        TemplateIdentifier.LEFT_THUMB -> SimAfisFingerIdentifier.LEFT_THUMB
+        TemplateIdentifier.LEFT_INDEX_FINGER -> SimAfisFingerIdentifier.LEFT_INDEX_FINGER
+        TemplateIdentifier.LEFT_3RD_FINGER -> SimAfisFingerIdentifier.LEFT_3RD_FINGER
+        TemplateIdentifier.LEFT_4TH_FINGER -> SimAfisFingerIdentifier.LEFT_4TH_FINGER
+        TemplateIdentifier.LEFT_5TH_FINGER -> SimAfisFingerIdentifier.LEFT_5TH_FINGER
+        TemplateIdentifier.NONE -> throw IllegalArgumentException("Must be a finger sample identifier")
     }
 
     private fun crossFingerMatch(
-        probe: List<CaptureSample>,
+        probe: List<BiometricTemplateCapture>,
         candidates: List<Identity>,
     ) = candidates.map { crossFingerMatching(probe, it, jniLibAfis) }
 
@@ -98,14 +102,14 @@ internal class SimAfisMatcher @Inject constructor(
      * @return MatchResult
      */
     private fun crossFingerMatching(
-        probe: List<CaptureSample>,
+        probe: List<BiometricTemplateCapture>,
         candidate: Identity,
         jniLibAfis: JNILibAfisInterface,
-    ): MatchComparisonResult {
-        // Number of fingers used in matching
-        val fingers = probe.fingerprintsTemplates.size
+    ): ComparisonResult {
+        // Fingers used in matching
+        val fingers = probe.fingerprintsTemplates
         // Sum of maximum matching score for each finger
-        val total = probe.fingerprintsTemplates
+        val total = fingers
             .sumOf { probeTemplate ->
                 candidate.fingerprintsTemplates
                     .maxOf { candidateTemplate ->
@@ -116,7 +120,7 @@ internal class SimAfisMatcher @Inject constructor(
                     }.toDouble()
             }
         // Matching score  = total/number of fingers
-        return MatchComparisonResult(candidate.subjectId, getOverallScore(total, fingers))
+        return ComparisonResult(candidate.subjectId, getOverallScore(total, fingers.size))
     }
 
     private fun getOverallScore(
@@ -133,13 +137,13 @@ internal class SimAfisMatcher @Inject constructor(
     }
 }
 
-val List<CaptureSample>.fingerprintsTemplates
+val List<BiometricTemplateCapture>.fingerprintsTemplates
     get() = map { it.template.toByteBuffer() }
 
 val Identity.fingerprintsTemplates
-    get() = samples.map { it.template.toByteBuffer() }
+    get() = samples.map { it.template.template.toByteBuffer() }
 
 private fun ByteArray.toByteBuffer(): ByteBuffer = ByteBuffer.allocateDirect(size).put(this)
 
-fun List<CaptureSample>.templateFormatNotSupportedBySimAfisMatcher(): Boolean =
-    any { it.format != SimAfisMatcher.SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT }
+fun BiometricReferenceCapture.templateFormatNotSupportedBySimAfisMatcher(): Boolean =
+    format != SimAfisMatcher.SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT

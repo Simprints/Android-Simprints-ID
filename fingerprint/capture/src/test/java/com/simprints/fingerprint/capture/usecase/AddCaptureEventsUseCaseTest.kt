@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.capture.usecase
 
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.EncodingUtils
@@ -43,7 +43,7 @@ internal class AddCaptureEventsUseCaseTest {
     fun `Saves only capture event when not collected state`() = runTest {
         useCase.invoke(
             Timestamp(1L),
-            FingerState(SampleIdentifier.LEFT_THUMB, listOf(CaptureState.NotCollected)),
+            FingerState(TemplateIdentifier.LEFT_THUMB, listOf(CaptureState.NotCollected)),
             10,
             false,
         )
@@ -57,7 +57,7 @@ internal class AddCaptureEventsUseCaseTest {
         useCase.invoke(
             Timestamp(1L),
             FingerState(
-                SampleIdentifier.LEFT_THUMB,
+                TemplateIdentifier.LEFT_THUMB,
                 listOf(
                     CaptureState.ScanProcess.Collected(
                         numberOfBadScans = 0,
@@ -79,7 +79,7 @@ internal class AddCaptureEventsUseCaseTest {
         useCase.invoke(
             Timestamp(1L),
             FingerState(
-                SampleIdentifier.LEFT_THUMB,
+                TemplateIdentifier.LEFT_THUMB,
                 listOf(
                     CaptureState.ScanProcess.Collected(
                         numberOfBadScans = 0,
@@ -103,7 +103,7 @@ internal class AddCaptureEventsUseCaseTest {
         useCase.invoke(
             Timestamp(1L),
             FingerState(
-                SampleIdentifier.LEFT_THUMB,
+                TemplateIdentifier.LEFT_THUMB,
                 listOf(
                     CaptureState.ScanProcess.Collected(
                         numberOfBadScans = 0,

@@ -3,8 +3,9 @@ package com.simprints.feature.enrollast.screen.usecase
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.core.domain.sample.CaptureSample
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.reference.BiometricTemplateCapture
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
@@ -68,16 +69,24 @@ class BuildSubjectUseCaseTest {
     @Test
     fun `maps first available fingerprint capture step results`() {
         val result = useCase(
-            createParams(
+            params = createParams(
                 steps = listOf(
                     EnrolLastBiometricStepResult.MatchResult(emptyList(), mockk()),
                     EnrolLastBiometricStepResult.CaptureResult(
-                        REFERENCE_ID,
-                        listOf(mockFingerprintResults(SampleIdentifier.RIGHT_THUMB)),
+                        BiometricReferenceCapture(
+                            referenceId = REFERENCE_ID,
+                            modality = Modality.FINGERPRINT,
+                            format = "ISO_19794_2",
+                            templates = listOf(mockFingerprintResults(TemplateIdentifier.RIGHT_THUMB)),
+                        ),
                     ),
                     EnrolLastBiometricStepResult.CaptureResult(
-                        REFERENCE_ID,
-                        listOf(mockFingerprintResults(SampleIdentifier.LEFT_THUMB)),
+                        BiometricReferenceCapture(
+                            referenceId = REFERENCE_ID,
+                            modality = Modality.FINGERPRINT,
+                            format = "ISO_19794_2",
+                            templates = listOf(mockFingerprintResults(TemplateIdentifier.LEFT_THUMB)),
+                        ),
                     ),
                 ),
                 scannedCredential = scannedCredential,
@@ -86,7 +95,11 @@ class BuildSubjectUseCaseTest {
         )
 
         assertThat(result.samples).isNotEmpty()
-        assertThat(result.samples.first().identifier).isEqualTo(SampleIdentifier.RIGHT_THUMB)
+        assertThat(
+            result.samples
+                .first()
+                .template.identifier,
+        ).isEqualTo(TemplateIdentifier.RIGHT_THUMB)
     }
 
     @Test
@@ -95,18 +108,22 @@ class BuildSubjectUseCaseTest {
             createParams(
                 steps = listOf(
                     EnrolLastBiometricStepResult.CaptureResult(
-                        REFERENCE_ID,
-                        listOf(
-                            mockFingerprintResults(SampleIdentifier.RIGHT_5TH_FINGER),
-                            mockFingerprintResults(SampleIdentifier.RIGHT_4TH_FINGER),
-                            mockFingerprintResults(SampleIdentifier.RIGHT_3RD_FINGER),
-                            mockFingerprintResults(SampleIdentifier.RIGHT_INDEX_FINGER),
-                            mockFingerprintResults(SampleIdentifier.RIGHT_THUMB),
-                            mockFingerprintResults(SampleIdentifier.LEFT_THUMB),
-                            mockFingerprintResults(SampleIdentifier.LEFT_INDEX_FINGER),
-                            mockFingerprintResults(SampleIdentifier.LEFT_3RD_FINGER),
-                            mockFingerprintResults(SampleIdentifier.LEFT_4TH_FINGER),
-                            mockFingerprintResults(SampleIdentifier.LEFT_5TH_FINGER),
+                        BiometricReferenceCapture(
+                            referenceId = REFERENCE_ID,
+                            modality = Modality.FINGERPRINT,
+                            format = "ISO_19794_2",
+                            templates = listOf(
+                                mockFingerprintResults(TemplateIdentifier.RIGHT_5TH_FINGER),
+                                mockFingerprintResults(TemplateIdentifier.RIGHT_4TH_FINGER),
+                                mockFingerprintResults(TemplateIdentifier.RIGHT_3RD_FINGER),
+                                mockFingerprintResults(TemplateIdentifier.RIGHT_INDEX_FINGER),
+                                mockFingerprintResults(TemplateIdentifier.RIGHT_THUMB),
+                                mockFingerprintResults(TemplateIdentifier.LEFT_THUMB),
+                                mockFingerprintResults(TemplateIdentifier.LEFT_INDEX_FINGER),
+                                mockFingerprintResults(TemplateIdentifier.LEFT_3RD_FINGER),
+                                mockFingerprintResults(TemplateIdentifier.LEFT_4TH_FINGER),
+                                mockFingerprintResults(TemplateIdentifier.LEFT_5TH_FINGER),
+                            ),
                         ),
                     ),
                 ),
@@ -125,8 +142,22 @@ class BuildSubjectUseCaseTest {
             params = createParams(
                 listOf(
                     EnrolLastBiometricStepResult.MatchResult(emptyList(), mockk()),
-                    EnrolLastBiometricStepResult.CaptureResult(REFERENCE_ID, listOf(mockFaceResults("first"))),
-                    EnrolLastBiometricStepResult.CaptureResult(REFERENCE_ID, listOf(mockFaceResults("second"))),
+                    EnrolLastBiometricStepResult.CaptureResult(
+                        BiometricReferenceCapture(
+                            referenceId = REFERENCE_ID,
+                            modality = Modality.FACE,
+                            format = "first",
+                            templates = listOf(mockFaceResults()),
+                        ),
+                    ),
+                    EnrolLastBiometricStepResult.CaptureResult(
+                        BiometricReferenceCapture(
+                            referenceId = REFERENCE_ID,
+                            modality = Modality.FACE,
+                            format = "second",
+                            templates = listOf(mockFaceResults()),
+                        ),
+                    ),
                 ),
                 scannedCredential = scannedCredential,
             ),
@@ -178,19 +209,15 @@ class BuildSubjectUseCaseTest {
         scannedCredential = scannedCredential,
     )
 
-    private fun mockFingerprintResults(finger: SampleIdentifier) = CaptureSample(
+    private fun mockFingerprintResults(finger: TemplateIdentifier) = BiometricTemplateCapture(
         captureEventId = "eventId",
         identifier = finger,
         template = byteArrayOf(),
-        format = "ISO_19794_2",
-        modality = Modality.FINGERPRINT,
     )
 
-    private fun mockFaceResults(format: String) = CaptureSample(
+    private fun mockFaceResults() = BiometricTemplateCapture(
         captureEventId = "eventId",
         template = byteArrayOf(),
-        format = format,
-        modality = Modality.FACE,
     )
 
     companion object {

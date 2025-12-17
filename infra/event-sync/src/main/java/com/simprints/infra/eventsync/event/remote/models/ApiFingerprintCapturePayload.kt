@@ -3,7 +3,7 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY
@@ -20,13 +20,13 @@ internal data class ApiFingerprintCapturePayload(
     override val startTime: ApiTimestamp,
     val endTime: ApiTimestamp?,
     val qualityThreshold: Int,
-    val finger: SampleIdentifier,
+    val finger: TemplateIdentifier,
     val result: ApiResult,
     val fingerprint: ApiFingerprint?,
 ) : ApiEventPayload(startTime) {
     @Keep
     data class ApiFingerprint(
-        val finger: SampleIdentifier,
+        val finger: TemplateIdentifier,
         val quality: Int,
         val format: String,
     ) {

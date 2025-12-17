@@ -1,6 +1,7 @@
 package com.simprints.feature.enrollast.screen.usecase
 
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
@@ -29,7 +30,7 @@ internal class BuildSubjectUseCase @Inject constructor(
         }
         val captureResult = params.steps
             .filterIsInstance<EnrolLastBiometricStepResult.CaptureResult>()
-            .flatMap { result -> result.results.map { toSample(result.referenceId, it) } }
+            .flatMap { result -> result.result.toSamples() }
 
         return subjectFactory.buildSubject(
             subjectId = subjectId,
@@ -47,14 +48,15 @@ internal class BuildSubjectUseCase @Inject constructor(
         subjectId: String,
     ) = credential?.toExternalCredential(subjectId)
 
-    private fun toSample(
-        referenceId: String,
-        result: CaptureSample,
-    ) = Sample(
-        identifier = result.identifier,
-        template = result.template,
-        format = result.format,
-        referenceId = referenceId,
-        modality = result.modality,
-    )
+    private fun BiometricReferenceCapture.toSamples() = templates.map { templateCapture ->
+        Sample(
+            template = BiometricTemplate(
+                identifier = templateCapture.identifier,
+                template = templateCapture.template,
+            ),
+            format = format,
+            referenceId = referenceId,
+            modality = modality,
+        )
+    }
 }

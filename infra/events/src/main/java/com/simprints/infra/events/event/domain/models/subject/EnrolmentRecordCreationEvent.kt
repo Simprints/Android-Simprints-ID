@@ -66,8 +66,8 @@ data class EnrolmentRecordCreationEvent(
             fingerprintSamples.first().referenceId,
             fingerprintSamples.map {
                 FingerprintTemplate(
-                    encoder.byteArrayToBase64(it.template),
-                    it.identifier,
+                    encoder.byteArrayToBase64(it.template.template),
+                    it.template.identifier,
                 )
             },
             fingerprintSamples.first().format,
@@ -80,7 +80,7 @@ data class EnrolmentRecordCreationEvent(
             faceSamples.first().referenceId,
             faceSamples.map {
                 FaceTemplate(
-                    encoder.byteArrayToBase64(it.template),
+                    encoder.byteArrayToBase64(it.template.template),
                 )
             },
             faceSamples.first().format,

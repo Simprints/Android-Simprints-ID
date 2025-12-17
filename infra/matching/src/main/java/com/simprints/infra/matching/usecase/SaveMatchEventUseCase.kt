@@ -2,7 +2,7 @@ package com.simprints.infra.matching.usecase
 
 import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.sample.MatchComparisonResult
+import com.simprints.core.domain.sample.ComparisonResult
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
@@ -30,11 +30,11 @@ class SaveMatchEventUseCase @Inject constructor(
         matchParams: MatchParams,
         candidatesCount: Int,
         matcherName: String,
-        results: List<MatchComparisonResult>,
+        results: List<ComparisonResult>,
         batches: List<MatchBatchInfo>,
     ) {
         sessionCoroutineScope.launch {
-            val matchEntries = results.map { MatchEntry(it.subjectId, it.confidence) }
+            val matchEntries = results.map { MatchEntry(it.subjectId, it.comparisonScore) }
             val event = if (matchParams.flowType == FlowType.VERIFY) {
                 getOneToOneEvent(
                     startTime,
@@ -45,7 +45,7 @@ class SaveMatchEventUseCase @Inject constructor(
                     matchParams.bioSdk
                         .let { it as? FingerprintConfiguration.BioSdk }
                         ?.let { getFingerprintComparisonStrategy(it) },
-                    matchParams.probeReferenceId,
+                    matchParams.probeReference.referenceId,
                 )
             } else {
                 getOneToManyEvent(
@@ -55,7 +55,7 @@ class SaveMatchEventUseCase @Inject constructor(
                     matchParams.queryForCandidates,
                     candidatesCount,
                     matchEntries,
-                    matchParams.probeReferenceId,
+                    matchParams.probeReference.referenceId,
                     batches,
                 )
             }

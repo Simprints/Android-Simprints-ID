@@ -7,9 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.sample.CaptureIdentity
-import com.simprints.core.domain.sample.CaptureSample
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.reference.BiometricTemplateCapture
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
@@ -135,12 +135,12 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         get() = _invalidLicense
     private val _invalidLicense = MutableLiveData<LiveDataEvent>()
 
-    val finishWithFingerprints: LiveData<LiveDataEventWithContent<CaptureIdentity>>
+    val finishWithFingerprints: LiveData<LiveDataEventWithContent<BiometricReferenceCapture>>
         get() = _finishWithFingerprints
     private val _finishWithFingerprints =
-        MutableLiveData<LiveDataEventWithContent<CaptureIdentity>>()
+        MutableLiveData<LiveDataEventWithContent<BiometricReferenceCapture>>()
 
-    private lateinit var originalFingerprintsToCapture: List<SampleIdentifier>
+    private lateinit var originalFingerprintsToCapture: List<TemplateIdentifier>
     private val captureEventIds: MutableMap<CaptureId, String> = mutableMapOf()
     private var lastCaptureStartedAt: Timestamp = Timestamp(0L)
     private var hasStarted: Boolean = false
@@ -166,7 +166,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     private fun start(
-        fingerprintsToCapture: List<SampleIdentifier>,
+        fingerprintsToCapture: List<TemplateIdentifier>,
         fingerprintSdk: FingerprintConfiguration.BioSdk,
     ) {
         if (!hasStarted) {
@@ -218,7 +218,9 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             when (it.currentCaptureState()) {
                 is CaptureState.ScanProcess.Scanning,
                 is CaptureState.ScanProcess.TransferringImage,
-                -> pauseLiveFeedback()
+                -> {
+                    pauseLiveFeedback()
+                }
 
                 CaptureState.NotCollected,
                 CaptureState.Skipped,
@@ -273,7 +275,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         }
     }
 
-    private fun setStartingState(fingerprintsToCapture: List<SampleIdentifier>) {
+    private fun setStartingState(fingerprintsToCapture: List<TemplateIdentifier>) {
         val initialState = CollectFingerprintsState.EMPTY.copy(
             fingerStates = getStartState(fingerprintsToCapture),
         )
@@ -329,7 +331,10 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private fun toggleScanning() {
         when (state.currentCaptureState()) {
-            is CaptureState.ScanProcess.Scanning -> cancelScanning()
+            is CaptureState.ScanProcess.Scanning -> {
+                cancelScanning()
+            }
+
             is CaptureState.ScanProcess.TransferringImage -> { // do nothing
             }
 
@@ -337,7 +342,9 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             is CaptureState.Skipped,
             is CaptureState.ScanProcess.NotDetected,
             is CaptureState.ScanProcess.Collected,
-            -> startScanning()
+            -> {
+                startScanning()
+            }
         }
     }
 
@@ -512,7 +519,10 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private fun handleAutoAddFinger() = updateState { state ->
         when (val nextPriorityFingerId = getNextFingerToAdd(state.fingerStates.map { it.id })) {
-            null -> state
+            null -> {
+                state
+            }
+
             else -> {
                 val newFingerState = FingerState(
                     id = nextPriorityFingerId,
@@ -660,19 +670,18 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         Simber.i("Finishing fingerprint capture", tag = FINGER_CAPTURE)
         val resultItems = collectedFingers.mapNotNull { (captureId, collectedFinger) ->
             captureEventIds[captureId]?.let { captureEventId ->
-                CaptureSample(
+                BiometricTemplateCapture(
                     captureEventId = captureEventId,
-                    identifier = captureId.finger,
-                    modality = Modality.FINGERPRINT,
-                    format = collectedFinger.scanResult.templateFormat,
                     template = collectedFinger.scanResult.template,
+                    identifier = captureId.finger,
                 )
             }
         }
+        val format = bioSdkWrapper.supportedTemplateFormat
         val biometricReferenceId = UUID.randomUUID().toString()
         addBiometricReferenceCreationEvents(biometricReferenceId, resultItems.map { it.captureEventId })
 
-        _finishWithFingerprints.send(CaptureIdentity(biometricReferenceId, Modality.FINGERPRINT, resultItems))
+        _finishWithFingerprints.send(BiometricReferenceCapture(biometricReferenceId, Modality.FINGERPRINT, format, resultItems))
     }
 
     private suspend fun saveImageIfExists(
@@ -695,7 +704,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     fun handleOnViewCreated(
-        fingerprintsToCapture: List<SampleIdentifier>,
+        fingerprintsToCapture: List<TemplateIdentifier>,
         fingerprintSdk: FingerprintConfiguration.BioSdk,
     ) {
         updateState {

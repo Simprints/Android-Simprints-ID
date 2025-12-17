@@ -5,10 +5,11 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricTemplate
+import com.simprints.core.domain.reference.TemplateIdentifier.LEFT_INDEX_FINGER
+import com.simprints.core.domain.reference.TemplateIdentifier.LEFT_THUMB
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
-import com.simprints.core.domain.sample.SampleIdentifier.LEFT_INDEX_FINGER
-import com.simprints.core.domain.sample.SampleIdentifier.LEFT_THUMB
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
@@ -54,15 +55,19 @@ class CommCareIdentityDataSourceTest {
                 subjectId = "b26c91bc-b307-4131-80c3-55090ba5dbf2",
                 samples = listOf(
                     Sample(
-                        identifier = LEFT_THUMB,
-                        template = byteArrayOf(),
+                        template = BiometricTemplate(
+                            identifier = LEFT_THUMB,
+                            template = byteArrayOf(),
+                        ),
                         format = "ISO_19794_2",
                         referenceId = "referenceId",
                         modality = Modality.FINGERPRINT,
                     ),
                     Sample(
-                        identifier = LEFT_INDEX_FINGER,
-                        template = byteArrayOf(),
+                        template = BiometricTemplate(
+                            identifier = LEFT_INDEX_FINGER,
+                            template = byteArrayOf(),
+                        ),
                         format = "ISO_19794_2",
                         referenceId = "referenceId",
                         modality = Modality.FINGERPRINT,
@@ -73,15 +78,19 @@ class CommCareIdentityDataSourceTest {
                 subjectId = "a961fcb4-8573-4270-a1b2-088e88275b00",
                 samples = listOf(
                     Sample(
-                        identifier = LEFT_THUMB,
-                        template = byteArrayOf(),
+                        template = BiometricTemplate(
+                            identifier = LEFT_THUMB,
+                            template = byteArrayOf(),
+                        ),
                         format = "ISO_19794_2",
                         referenceId = "referenceId",
                         modality = Modality.FINGERPRINT,
                     ),
                     Sample(
-                        identifier = LEFT_INDEX_FINGER,
-                        template = byteArrayOf(),
+                        template = BiometricTemplate(
+                            identifier = LEFT_INDEX_FINGER,
+                            template = byteArrayOf(),
+                        ),
                         format = "ISO_19794_2",
                         referenceId = "referenceId",
                         modality = Modality.FINGERPRINT,
@@ -94,7 +103,9 @@ class CommCareIdentityDataSourceTest {
                 subjectId = "b26c91bc-b307-4131-80c3-55090ba5dbf2",
                 samples = listOf(
                     Sample(
-                        template = byteArrayOf(),
+                        template = BiometricTemplate(
+                            template = byteArrayOf(),
+                        ),
                         format = "ROC_1_23",
                         referenceId = "referenceId",
                         modality = Modality.FACE,
@@ -105,7 +116,9 @@ class CommCareIdentityDataSourceTest {
                 subjectId = "a961fcb4-8573-4270-a1b2-088e88275b00",
                 samples = listOf(
                     Sample(
-                        template = byteArrayOf(),
+                        template = BiometricTemplate(
+                            template = byteArrayOf(),
+                        ),
                         format = "ROC_3",
                         referenceId = "referenceId",
                         modality = Modality.FACE,
@@ -259,8 +272,8 @@ class CommCareIdentityDataSourceTest {
                 exp.subjectId == act.subjectId &&
                     exp.samples
                         .zip(act.samples) { expSample, actSample ->
-                            expSample.identifier == actSample.identifier &&
-                                expSample.template.contentEquals(actSample.template) &&
+                            expSample.template.identifier == actSample.template.identifier &&
+                                expSample.template.template.contentEquals(actSample.template.template) &&
                                 expSample.format == actSample.format
                         }.all { it }
             }.all { it }
@@ -278,7 +291,7 @@ class CommCareIdentityDataSourceTest {
                 exp.subjectId == act.subjectId &&
                     exp.samples
                         .zip(act.samples) { expSample, actSample ->
-                            expSample.template.contentEquals(actSample.template) &&
+                            expSample.template.template.contentEquals(actSample.template.template) &&
                                 expSample.format == actSample.format
                         }.all { it }
             }.all { it }

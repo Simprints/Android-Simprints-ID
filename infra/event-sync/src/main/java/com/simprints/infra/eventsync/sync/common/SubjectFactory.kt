@@ -2,7 +2,8 @@ package com.simprints.infra.eventsync.sync.common
 
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
-import com.simprints.core.domain.sample.CaptureIdentity
+import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
@@ -68,7 +69,7 @@ class SubjectFactory @Inject constructor(
         projectId: String,
         attendantId: TokenizableString,
         moduleId: TokenizableString,
-        captures: List<CaptureIdentity>,
+        captures: List<BiometricReferenceCapture>,
         externalCredential: ExternalCredential?,
     ): Subject = buildSubject(
         subjectId = subjectId,
@@ -100,13 +101,15 @@ class SubjectFactory @Inject constructor(
         externalCredentials = externalCredentials,
     )
 
-    private fun extractCaptureSamples(response: CaptureIdentity) = response.samples.map { sample ->
+    private fun extractCaptureSamples(response: BiometricReferenceCapture) = response.templates.map { templateCapture ->
         Sample(
-            identifier = sample.identifier,
-            template = sample.template,
-            format = sample.format,
+            template = BiometricTemplate(
+                identifier = templateCapture.identifier,
+                template = templateCapture.template,
+            ),
+            format = response.format,
             referenceId = response.referenceId,
-            modality = sample.modality,
+            modality = response.modality,
         )
     }
 
@@ -124,8 +127,10 @@ class SubjectFactory @Inject constructor(
         format: String,
         referenceId: String,
     ): Sample = Sample(
-        identifier = template.finger,
-        template = encodingUtils.base64ToBytes(template.template),
+        template = BiometricTemplate(
+            identifier = template.finger,
+            template = encodingUtils.base64ToBytes(template.template),
+        ),
         format = format,
         referenceId = referenceId,
         modality = Modality.FINGERPRINT,
@@ -136,7 +141,9 @@ class SubjectFactory @Inject constructor(
         format: String,
         referenceId: String,
     ) = Sample(
-        template = encodingUtils.base64ToBytes(template.template),
+        template = BiometricTemplate(
+            template = encodingUtils.base64ToBytes(template.template),
+        ),
         format = format,
         referenceId = referenceId,
         modality = Modality.FACE,

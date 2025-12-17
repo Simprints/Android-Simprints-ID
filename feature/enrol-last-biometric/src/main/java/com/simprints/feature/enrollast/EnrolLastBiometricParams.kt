@@ -3,8 +3,8 @@ package com.simprints.feature.enrollast
 import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.common.ModalitySdkType
-import com.simprints.core.domain.sample.CaptureSample
-import com.simprints.core.domain.sample.MatchComparisonResult
+import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.sample.ComparisonResult
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
@@ -27,13 +27,12 @@ sealed class EnrolLastBiometricStepResult : StepParams {
 
     @Keep
     data class CaptureResult(
-        val referenceId: String,
-        val results: List<CaptureSample>,
+        val result: BiometricReferenceCapture,
     ) : EnrolLastBiometricStepResult()
 
     @Keep
     data class MatchResult(
-        val results: List<MatchComparisonResult>,
+        val results: List<ComparisonResult>,
         val sdk: ModalitySdkType,
     ) : EnrolLastBiometricStepResult()
 }

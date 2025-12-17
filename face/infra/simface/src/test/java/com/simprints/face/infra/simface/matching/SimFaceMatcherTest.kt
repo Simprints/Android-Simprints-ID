@@ -3,7 +3,8 @@ package com.simprints.face.infra.simface.matching
 import com.google.common.truth.Truth.*
 import com.simprints.biometrics.simface.SimFace
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricTemplate
+import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.domain.sample.Identity
 import com.simprints.core.domain.sample.Sample
 import io.mockk.*
@@ -14,7 +15,7 @@ import org.junit.Test
 class SimFaceMatcherTest {
     @Test
     fun getMatcherName() {
-        assertThat(SimFaceMatcher(mockk(relaxed = true), emptyList())).isNotNull()
+        assertThat(SimFaceMatcher(mockk(relaxed = true), mockk { })).isNotNull()
     }
 
     @Test
@@ -44,14 +45,14 @@ class SimFaceMatcherTest {
             }
             val matcher = SimFaceMatcher(
                 simFace = simFace,
-                probeSamples = listOf(
-                    CaptureSample(
-                        captureEventId = "id",
-                        modality = Modality.FACE,
-                        format = "ROC",
-                        template = byteArrayOf(1),
-                    ),
-                ),
+                probeReference = mockk {
+                    every { templates } returns listOf(
+                        BiometricTemplateCapture(
+                            captureEventId = "captureId",
+                            template = byteArrayOf(1),
+                        ),
+                    )
+                },
             )
             val result = matcher.getHighestComparisonScoreForCandidate(
                 candidate = Identity(
@@ -60,7 +61,9 @@ class SimFaceMatcherTest {
                         Sample(
                             referenceId = "id",
                             modality = Modality.FACE,
-                            template = byteArrayOf(1),
+                            template = BiometricTemplate(
+                                template = byteArrayOf(1),
+                            ),
                             format = "ROC",
                         ),
                     ),
@@ -77,14 +80,14 @@ class SimFaceMatcherTest {
         }
         val matcher = SimFaceMatcher(
             simFace = simFace,
-            probeSamples = listOf(
-                CaptureSample(
-                    captureEventId = "id",
-                    modality = Modality.FACE,
-                    format = "ROC",
-                    template = byteArrayOf(1),
-                ),
-            ),
+            probeReference = mockk {
+                every { templates } returns listOf(
+                    BiometricTemplateCapture(
+                        captureEventId = "captureId",
+                        template = byteArrayOf(1),
+                    ),
+                )
+            },
         )
         val result = matcher.getHighestComparisonScoreForCandidate(
             candidate = Identity(
@@ -93,7 +96,9 @@ class SimFaceMatcherTest {
                     Sample(
                         referenceId = "id",
                         modality = Modality.FACE,
-                        template = byteArrayOf(1),
+                        template = BiometricTemplate(
+                            template = byteArrayOf(1),
+                        ),
                         format = "ROC",
                     ),
                 ),

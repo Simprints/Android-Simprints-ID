@@ -1,21 +1,21 @@
 package com.simprints.fingerprint.infra.basebiosdk.matching
 
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.sample.ComparisonResult
 import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.MatchComparisonResult
 
 interface FingerprintMatcher<MatcherSettings> {
     /**
      * Matches a [probe] against the given flow of [candidates]
-     * producing a flow of [MatchComparisonResult].
+     * producing a flow of [ComparisonResult].
      *
      * @throws IllegalArgumentException if the TemplateFormats of the supplied [probe]
      */
     suspend fun match(
-        probe: List<CaptureSample>,
+        probeReference: BiometricReferenceCapture,
         candidates: List<Identity>,
         settings: MatcherSettings?,
-    ): List<MatchComparisonResult>
+    ): List<ComparisonResult>
 
     val supportedTemplateFormat: String
     val matcherName: String

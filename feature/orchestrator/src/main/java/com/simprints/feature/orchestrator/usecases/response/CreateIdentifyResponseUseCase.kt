@@ -70,9 +70,9 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
             credentialSearchResult.matchResults.mapNotNull { credentialMatchResult ->
                 val sdk = credentialMatchResult.bioSdk
                 val policy = projectConfiguration.getModalitySdkConfig(sdk)?.decisionPolicy ?: return@mapNotNull null
-                val matchResult = credentialMatchResult.matchResult
+                val matchResult = credentialMatchResult.comparisonResult
 
-                sdk to AppMatchResult(matchResult.subjectId, matchResult.confidence, policy, true)
+                sdk to AppMatchResult(matchResult.subjectId, matchResult.comparisonScore, policy, true)
             }
         }.groupDescendingResultsBySdk()
 
@@ -88,7 +88,7 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
                 ?: return@flatMap emptyList()
 
             matchResult.results.map {
-                matchResult.sdk to AppMatchResult(it.subjectId, it.confidence, policy, false)
+                matchResult.sdk to AppMatchResult(it.subjectId, it.comparisonScore, policy, false)
             }
         }.groupDescendingResultsBySdk()
 

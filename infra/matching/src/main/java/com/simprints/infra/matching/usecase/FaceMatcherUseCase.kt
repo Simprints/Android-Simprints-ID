@@ -1,9 +1,9 @@
 package com.simprints.infra.matching.usecase
 
 import com.simprints.core.DispatcherBG
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.sample.ComparisonResult
 import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.MatchComparisonResult
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.biosdkresolver.FaceBioSDK
@@ -49,11 +49,11 @@ class FaceMatcherUseCase @Inject constructor(
             return@channelFlow
         }
         val bioSdk = resolveFaceBioSdk(matchParams.bioSdk)
-
-        if (matchParams.probeSamples.isEmpty()) {
+        if (matchParams.probeReference.templates.isEmpty()) {
             send(MatcherState.Success(emptyList(), emptyList(), 0, bioSdk.matcherName()))
             return@channelFlow
         }
+
         val queryWithSupportedFormat = matchParams.queryForCandidates.copy(
             format = bioSdk.templateFormat(),
         )
@@ -87,20 +87,20 @@ class FaceMatcherUseCase @Inject constructor(
                 this@channelFlow.send(MatcherState.CandidateLoaded)
             }
 
-        val batchInfo = consumeAndMatch(candidatesChannel, matchParams.probeSamples, resultSet, bioSdk)
+        val batchInfo = consumeAndMatch(candidatesChannel, matchParams.probeReference, resultSet, bioSdk)
         send(MatcherState.Success(resultSet.toList(), batchInfo, loadedCandidates.get(), bioSdk.matcherName()))
     }.flowOn(dispatcherBG)
 
     private suspend fun consumeAndMatch(
         candidatesChannel: ReceiveChannel<IdentityBatch>,
-        samples: List<CaptureSample>,
+        probeReference: BiometricReferenceCapture,
         resultSet: MatchResultSet,
         bioSdk: FaceBioSDK,
     ): List<MatchBatchInfo> {
         val matchBatches = mutableListOf<MatchBatchInfo>()
         for (batch in candidatesChannel) {
             val comparingStartTime = timeHelper.now()
-            val results = bioSdk.createMatcher(samples).use { matcher ->
+            val results = bioSdk.createMatcher(probeReference).use { matcher ->
                 match(matcher, batch.identities)
             }
             resultSet.addAll(results)
@@ -123,7 +123,7 @@ class FaceMatcherUseCase @Inject constructor(
         batchCandidates: List<Identity>,
     ) = batchCandidates.fold(MatchResultSet()) { acc, candidate ->
         acc.add(
-            MatchComparisonResult(
+            ComparisonResult(
                 candidate.subjectId,
                 matcher.getHighestComparisonScoreForCandidate(candidate),
             ),

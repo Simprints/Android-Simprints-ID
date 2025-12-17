@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DeviceID
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.sample.CaptureIdentity
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.reference.BiometricTemplateCapture
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
@@ -79,9 +79,9 @@ internal class FaceCaptureViewModel @Inject constructor(
         get() = _unexpectedErrorEvent
     private val _unexpectedErrorEvent = MutableLiveData<LiveDataEvent>()
 
-    val finishFlowEvent: LiveData<LiveDataEventWithContent<CaptureIdentity>>
+    val finishFlowEvent: LiveData<LiveDataEventWithContent<BiometricReferenceCapture>>
         get() = _finishFlowEvent
-    private val _finishFlowEvent = MutableLiveData<LiveDataEventWithContent<CaptureIdentity>>()
+    private val _finishFlowEvent = MutableLiveData<LiveDataEventWithContent<BiometricReferenceCapture>>()
 
     val invalidLicense: LiveData<LiveDataEvent>
         get() = _invalidLicense
@@ -179,18 +179,21 @@ internal class FaceCaptureViewModel @Inject constructor(
                 saveFaceDetections()
             }
 
-            val items = faceDetections.mapIndexed { index, detection ->
-                CaptureSample(
+            val items = faceDetections.map { detection ->
+                BiometricTemplateCapture(
                     captureEventId = detection.id,
                     template = detection.face?.template ?: ByteArray(0),
-                    format = detection.face?.format ?: "",
-                    modality = Modality.FACE,
                 )
             }
             val referenceId = UUID.randomUUID().toString()
             eventReporter.addBiometricReferenceCreationEvents(referenceId, items.map { it.captureEventId })
 
-            _finishFlowEvent.send(CaptureIdentity(referenceId, Modality.FACE, items))
+            val format = faceDetections
+                .firstOrNull()
+                ?.face
+                ?.format
+                .orEmpty()
+            _finishFlowEvent.send(BiometricReferenceCapture(referenceId, Modality.FACE, format, items))
         }
     }
 

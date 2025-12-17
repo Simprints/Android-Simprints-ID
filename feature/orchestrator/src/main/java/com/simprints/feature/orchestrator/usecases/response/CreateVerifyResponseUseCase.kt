@@ -32,10 +32,10 @@ internal class CreateVerifyResponseUseCase @Inject constructor() {
         .filterIsInstance<MatchResult>()
         .mapNotNull { matchResult ->
             projectConfiguration.getModalitySdkConfig(matchResult.sdk)?.let { sdkConfiguration ->
-                matchResult.results.maxByOrNull { it.confidence }?.let {
+                matchResult.results.maxByOrNull { it.comparisonScore }?.let {
                     AppMatchResult(
                         guid = it.subjectId,
-                        confidenceScore = it.confidence,
+                        confidenceScore = it.comparisonScore,
                         decisionPolicy = sdkConfiguration.decisionPolicy,
                         verificationMatchThreshold = sdkConfiguration.verificationMatchThreshold,
                         isCredentialMatch = false,

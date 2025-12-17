@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.feature.datagenerator.enrollmentrecords.InsertEnrollmentRecordsUseCase
 import com.simprints.feature.datagenerator.enrollmentrecords.InsertEnrollmentRecordsUseCase.Companion.BATCH_SIZE
 import com.simprints.infra.config.store.ConfigRepository
@@ -246,8 +246,8 @@ internal class InsertEnrollmentRecordsUseCaseTest {
         // Then
         val subject = subjectActionsSlot.captured.first().subject
         assertThat(subject.samples).hasSize(2)
-        assertThat(subject.samples[0].identifier).isEqualTo(SampleIdentifier.LEFT_THUMB)
-        assertThat(subject.samples[1].identifier).isEqualTo(SampleIdentifier.LEFT_THUMB)
+        assertThat(subject.samples[0].template.identifier).isEqualTo(TemplateIdentifier.LEFT_THUMB)
+        assertThat(subject.samples[1].template.identifier).isEqualTo(TemplateIdentifier.LEFT_THUMB)
     }
 
     @Test
@@ -277,14 +277,14 @@ internal class InsertEnrollmentRecordsUseCaseTest {
 
         // Then
         val subject = subjectActionsSlot.captured.first().subject
-        val fingers = subject.samples.map { it.identifier }
+        val fingers = subject.samples.map { it.template.identifier }
         assertThat(fingers).hasSize(4)
         assertThat(fingers)
             .containsExactly(
-                SampleIdentifier.RIGHT_THUMB,
-                SampleIdentifier.RIGHT_INDEX_FINGER,
-                SampleIdentifier.RIGHT_THUMB, // cycles back
-                SampleIdentifier.RIGHT_INDEX_FINGER,
+                TemplateIdentifier.RIGHT_THUMB,
+                TemplateIdentifier.RIGHT_INDEX_FINGER,
+                TemplateIdentifier.RIGHT_THUMB, // cycles back
+                TemplateIdentifier.RIGHT_INDEX_FINGER,
             ).inOrder()
     }
 }

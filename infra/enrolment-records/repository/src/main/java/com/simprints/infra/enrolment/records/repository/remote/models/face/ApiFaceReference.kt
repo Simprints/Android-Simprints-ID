@@ -23,7 +23,7 @@ internal data class ApiFaceReference(
 internal fun List<Sample>.toFaceApi(encoder: EncodingUtils): ApiFaceReference? = if (isNotEmpty()) {
     ApiFaceReference(
         first().referenceId,
-        map { ApiFaceTemplate(encoder.byteArrayToBase64(it.template)) },
+        map { ApiFaceTemplate(encoder.byteArrayToBase64(it.template.template)) },
         first().format,
     )
 } else {

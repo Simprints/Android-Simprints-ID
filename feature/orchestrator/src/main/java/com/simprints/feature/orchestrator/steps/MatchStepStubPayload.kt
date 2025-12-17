@@ -2,11 +2,10 @@ package com.simprints.feature.orchestrator.steps
 
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.ModalitySdkType
-import com.simprints.core.domain.sample.CaptureSample
+import com.simprints.core.domain.reference.BiometricReferenceCapture
 import com.simprints.core.domain.step.StepParams
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.infra.matching.MatchParams
 import com.simprints.matcher.MatchContract
 
 /**
@@ -21,24 +20,16 @@ internal data class MatchStepStubPayload(
     val biometricDataSource: BiometricDataSource,
     val bioSdk: ModalitySdkType,
 ) : StepParams {
-    fun toFaceStepArgs(
-        referenceId: String,
-        samples: List<CaptureSample>,
-    ) = MatchContract.getParams(
-        referenceId = referenceId,
-        probeSamples = samples,
+    fun toFaceStepArgs(probeReference: BiometricReferenceCapture) = MatchContract.getParams(
+        probeReference = probeReference,
         bioSdk = bioSdk,
         flowType = flowType,
         subjectQuery = subjectQuery,
         biometricDataSource = biometricDataSource,
     )
 
-    fun toFingerprintStepArgs(
-        referenceId: String,
-        samples: List<CaptureSample>,
-    ) = MatchContract.getParams(
-        referenceId = referenceId,
-        probeSamples = samples,
+    fun toFingerprintStepArgs(probeReference: BiometricReferenceCapture) = MatchContract.getParams(
+        probeReference = probeReference,
         bioSdk = bioSdk,
         flowType = flowType,
         subjectQuery = subjectQuery,

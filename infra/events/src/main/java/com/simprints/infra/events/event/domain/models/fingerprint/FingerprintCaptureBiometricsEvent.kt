@@ -1,7 +1,7 @@
 package com.simprints.infra.events.event.domain.models.fingerprint
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
@@ -51,7 +51,7 @@ data class FingerprintCaptureBiometricsEvent(
 
         @Keep
         data class Fingerprint(
-            val finger: SampleIdentifier,
+            val finger: TemplateIdentifier,
             val template: String,
             val quality: Int,
             val format: String,

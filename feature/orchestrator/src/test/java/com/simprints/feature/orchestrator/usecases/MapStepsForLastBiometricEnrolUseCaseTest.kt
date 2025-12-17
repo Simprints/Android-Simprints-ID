@@ -2,14 +2,13 @@ package com.simprints.feature.orchestrator.usecases
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.sample.CaptureIdentity
-import com.simprints.core.domain.sample.CaptureSample
-import com.simprints.core.domain.sample.SampleIdentifier
+import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.reference.BiometricTemplateCapture
+import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.matching.MatchResult
 import org.junit.Before
 import org.junit.Test
@@ -45,17 +44,16 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
     }
 
     @Test
-    fun `maps face CaptureIdentity correctly`() {
+    fun `maps face BiometricReferenceCapture correctly`() {
         val result = useCase(
             listOf(
-                CaptureIdentity(
+                BiometricReferenceCapture(
                     "referenceId",
                     modality = Modality.FACE,
-                    samples = listOf(
-                        CaptureSample(
-                            captureEventId = GUID1,
-                            modality = Modality.FACE,
-                            format = "format",
+                    format = "format",
+                    templates = listOf(
+                        BiometricTemplateCapture(
+                            captureEventId = "captureId",
                             template = byteArrayOf(),
                         ),
                     ),
@@ -65,13 +63,15 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
 
         assertThat(result.first()).isEqualTo(
             EnrolLastBiometricStepResult.CaptureResult(
-                referenceId = "referenceId",
-                results = listOf(
-                    CaptureSample(
-                        captureEventId = "captureId",
-                        template = byteArrayOf(),
-                        format = "format",
-                        modality = Modality.FACE,
+                result = BiometricReferenceCapture(
+                    referenceId = "referenceId",
+                    modality = Modality.FACE,
+                    format = "format",
+                    templates = listOf(
+                        BiometricTemplateCapture(
+                            captureEventId = "captureId",
+                            template = byteArrayOf(),
+                        ),
                     ),
                 ),
             ),
@@ -95,16 +95,15 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
     fun `maps fingerprint CaptureIdentity correctly`() {
         val result = useCase(
             listOf(
-                CaptureIdentity(
+                BiometricReferenceCapture(
                     "referenceId",
                     modality = Modality.FINGERPRINT,
-                    samples = listOf(
-                        CaptureSample(
-                            captureEventId = GUID1,
-                            modality = Modality.FINGERPRINT,
-                            format = "format",
+                    format = "format",
+                    templates = listOf(
+                        BiometricTemplateCapture(
+                            captureEventId = "captureId",
                             template = byteArrayOf(),
-                            identifier = SampleIdentifier.RIGHT_THUMB,
+                            identifier = TemplateIdentifier.RIGHT_THUMB,
                         ),
                     ),
                 ),
@@ -113,14 +112,16 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
 
         assertThat(result.first()).isEqualTo(
             EnrolLastBiometricStepResult.CaptureResult(
-                referenceId = "referenceId",
-                results = listOf(
-                    CaptureSample(
-                        captureEventId = "captureId",
-                        template = byteArrayOf(),
-                        format = "format",
-                        identifier = SampleIdentifier.RIGHT_THUMB,
-                        modality = Modality.FINGERPRINT,
+                result = BiometricReferenceCapture(
+                    "referenceId",
+                    modality = Modality.FINGERPRINT,
+                    format = "format",
+                    templates = listOf(
+                        BiometricTemplateCapture(
+                            captureEventId = "captureId",
+                            template = byteArrayOf(),
+                            identifier = TemplateIdentifier.RIGHT_THUMB,
+                        ),
                     ),
                 ),
             ),
