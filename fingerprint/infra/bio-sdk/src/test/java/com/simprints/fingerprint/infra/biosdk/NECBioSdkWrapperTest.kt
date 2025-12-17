@@ -1,9 +1,8 @@
 package com.simprints.fingerprint.infra.biosdk
 
 import com.google.common.truth.Truth.*
-import com.simprints.core.domain.reference.BiometricReferenceCapture
-import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.sample.Identity
+import com.simprints.core.domain.capture.BiometricReferenceCapture
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.ImageResponse
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateResponse
@@ -71,7 +70,7 @@ class NECBioSdkWrapperTest {
     fun `calls match on bio sdk`() = runTest {
         // Given
         val probe = mockk<BiometricReferenceCapture>()
-        val candidates = listOf(mockk<Identity>())
+        val candidates = listOf(mockk<CandidateRecord>())
         val isCrossFingerMatchingEnabled = true
         val settings = NecMatchingSettings(isCrossFingerMatchingEnabled)
         // When

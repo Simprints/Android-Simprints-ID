@@ -3,7 +3,7 @@ package com.simprints.infra.sync.config.testtools
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.models.ConsentConfiguration
 import com.simprints.infra.config.store.models.DecisionPolicy

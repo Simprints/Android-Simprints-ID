@@ -2,7 +2,7 @@ package com.simprints.infra.config.store.remote.models
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.AgeGroup
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.MaxCaptureAttempts
 import com.simprints.infra.config.store.models.Vero1Configuration

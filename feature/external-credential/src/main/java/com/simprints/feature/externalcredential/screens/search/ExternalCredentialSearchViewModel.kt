@@ -23,7 +23,7 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirmationEvent.ExternalCredentialConfirmationResult
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -106,9 +106,14 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         searchState: SearchState,
         flowType: FlowType,
     ): Int? = when (searchState) {
-        SearchState.Searching -> null // button is not displayed during search
+        SearchState.Searching -> null
+
+        // button is not displayed during search
         is SearchState.CredentialLinked -> when (flowType) {
-            FlowType.ENROL -> IDR.string.mfid_action_enrol_anyway
+            FlowType.ENROL -> {
+                IDR.string.mfid_action_enrol_anyway
+            }
+
             else -> {
                 if (searchState.hasSuccessfulVerifications) {
                     IDR.string.mfid_action_go_to_record
@@ -141,7 +146,7 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         credential: TokenizableString.Tokenized,
     ) {
         updateState { it.copy(searchState = SearchState.Searching) }
-        val candidates = enrolmentRecordRepository.load(SubjectQuery(projectId = project.id, externalCredential = credential))
+        val candidates = enrolmentRecordRepository.load(EnrolmentRecordQuery(projectId = project.id, externalCredential = credential))
 
         val startTime = timeHelper.now()
         when {
@@ -165,8 +170,11 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
      * alpha-numeric, while the NHIS card memberships contain only digits.
      */
     fun getKeyBoardInputType() = when (scannedCredential.credentialType) {
-        ExternalCredentialType.NHISCard -> InputType.TYPE_CLASS_NUMBER // NHIS card membership contains only numbers
+        ExternalCredentialType.NHISCard -> InputType.TYPE_CLASS_NUMBER
+
+        // NHIS card membership contains only numbers
         ExternalCredentialType.GhanaIdCard -> InputType.TYPE_CLASS_TEXT
+
         ExternalCredentialType.QRCode -> InputType.TYPE_CLASS_TEXT
     }
 

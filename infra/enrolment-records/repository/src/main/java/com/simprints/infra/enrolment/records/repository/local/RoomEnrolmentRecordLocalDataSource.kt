@@ -2,28 +2,25 @@ package com.simprints.infra.enrolment.records.repository.local
 
 import androidx.room.withTransaction
 import com.simprints.core.DispatcherIO
-import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.Sample
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.repository.local.models.DbTemplateIdentifier
+import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
+import com.simprints.infra.enrolment.records.repository.local.models.toBiometricReferences
 import com.simprints.infra.enrolment.records.repository.local.models.toDomain
-import com.simprints.infra.enrolment.records.repository.local.models.toRoomDb
+import com.simprints.infra.enrolment.records.repository.local.models.toRoomDbCredentials
+import com.simprints.infra.enrolment.records.repository.local.models.toRoomDbTemplate
 import com.simprints.infra.enrolment.records.room.store.BuildConfig.DB_ENCRYPTION
 import com.simprints.infra.enrolment.records.room.store.SubjectDao
 import com.simprints.infra.enrolment.records.room.store.SubjectsDatabase
 import com.simprints.infra.enrolment.records.room.store.SubjectsDatabaseFactory
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate
-import com.simprints.infra.enrolment.records.room.store.models.DbModality
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject
-import com.simprints.infra.enrolment.records.room.store.models.toDomain
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ROOM_RECORDS_DB
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
@@ -35,7 +32,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject as DomainSubject
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord as DomainSubject
 
 /**
  * Local data source for enrolment records using Room.
@@ -61,7 +58,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
      * Don't use this method if the query contains format fields (faceSampleFormat or fingerprintSampleFormat).
      * instead, use loadFaceIdentities or loadFingerprintIdentities methods.
      */
-    override suspend fun load(query: SubjectQuery): List<DomainSubject> = withContext(dispatcherIO) {
+    override suspend fun load(query: EnrolmentRecordQuery): List<DomainSubject> = withContext(dispatcherIO) {
         if (query.hasUntokenizedFields == true) {
             Simber.d(
                 "[load] Query has untokenized fields, returning empty list as all records are tokenized.",
@@ -76,7 +73,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
      * Counts subjects matching the given query.
      */
     override suspend fun count(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         dataSource: BiometricDataSource,
     ): Int = withContext(dispatcherIO) {
         subjectDao.countSubjects(queryBuilder.buildCountQuery(query))
@@ -85,32 +82,21 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     /**
      * Loads identities in paged ranges.
      */
-    override suspend fun loadIdentities(
-        query: SubjectQuery,
+    override suspend fun loadCandidateRecords(
+        query: EnrolmentRecordQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<IdentityBatch> = loadBiometricIdentitiesPaged(
+    ): ReceiveChannel<CandidateRecordBatch> = loadBiometricIdentitiesPaged(
         query = query,
         ranges = ranges,
         format = requireNotNull(query.format) { "format required" },
-        createIdentity = { subjectId, templates ->
-            Identity(
+        createCandidateRecord = { subjectId, templates ->
+            CandidateRecord(
                 subjectId = subjectId,
-                samples = templates.map { sample ->
-                    Sample(
-                        id = sample.uuid,
-                        template = BiometricTemplate(
-                            template = sample.templateData,
-                            identifier = DbTemplateIdentifier.fromId(sample.identifier).toDomain(),
-                        ),
-                        format = sample.format,
-                        referenceId = sample.referenceId,
-                        modality = DbModality.fromId(sample.modality).toDomain(),
-                    )
-                },
+                references = templates.toBiometricReferences(),
             )
         },
         onCandidateLoaded = onCandidateLoaded,
@@ -118,16 +104,16 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     )
 
     private fun loadBiometricIdentitiesPaged(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         ranges: List<IntRange>,
         format: String,
-        createIdentity: (String, List<DbBiometricTemplate>) -> Identity,
+        createCandidateRecord: (String, List<DbBiometricTemplate>) -> CandidateRecord,
         onCandidateLoaded: suspend () -> Unit,
         scope: CoroutineScope,
-    ): ReceiveChannel<IdentityBatch> {
+    ): ReceiveChannel<CandidateRecordBatch> {
         var afterSubjectId: String? = null
         var lastOffset = 0
-        val channel = Channel<IdentityBatch>(CHANNEL_CAPACITY)
+        val channel = Channel<CandidateRecordBatch>(CHANNEL_CAPACITY)
         scope.launch(dispatcherIO) {
             ranges
                 .forEach { range ->
@@ -140,13 +126,13 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                         query = query.copy(afterSubjectId = afterSubjectId), // update query with the last seen subject ID
                         pageSize = range.last - range.first + 1,
                         format = format,
-                        createIdentity = createIdentity,
+                        createCandidateRecord = createCandidateRecord,
                         onCandidateLoaded = onCandidateLoaded,
                     )
                     afterSubjectId = identities.lastOrNull()?.subjectId
                     lastOffset = range.last + 1
                     val endTime = timeHelper.now()
-                    channel.send(IdentityBatch(identities, startTime, endTime))
+                    channel.send(CandidateRecordBatch(identities, startTime, endTime))
                 }
             channel.close()
         }
@@ -154,22 +140,22 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     }
 
     private suspend fun loadBiometricIdentities(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         pageSize: Int,
         format: String?,
-        createIdentity: (subjectId: String, samples: List<DbBiometricTemplate>) -> Identity,
+        createCandidateRecord: (subjectId: String, samples: List<DbBiometricTemplate>) -> CandidateRecord,
         onCandidateLoaded: suspend () -> Unit,
-    ): List<Identity> = withContext(dispatcherIO) {
+    ): List<CandidateRecord> = withContext(dispatcherIO) {
         requireNotNull(format) { "Appropriate sampleFormat is required for loading biometric identities." }
         subjectDao
             .loadSamples(queryBuilder.buildBiometricTemplatesQuery(query, pageSize))
             .map { (subjectId, templates) ->
                 onCandidateLoaded()
-                createIdentity(subjectId, templates)
+                createCandidateRecord(subjectId, templates)
             }
     }
 
-    override suspend fun delete(queries: List<SubjectQuery>): Unit = withContext(dispatcherIO) {
+    override suspend fun delete(queries: List<EnrolmentRecordQuery>): Unit = withContext(dispatcherIO) {
         Simber.i("[delete] Deleting subjects with queries: $queries", tag = ROOM_RECORDS_DB)
         database.withTransaction {
             queries.forEach { query ->
@@ -180,19 +166,19 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
 
     override suspend fun deleteAll(): Unit = withContext(dispatcherIO) {
         Simber.i("[deleteAll] Deleting all subjects.", tag = ROOM_RECORDS_DB)
-        subjectDao.deleteSubjects(queryBuilder.buildDeleteQuery(SubjectQuery()))
+        subjectDao.deleteSubjects(queryBuilder.buildDeleteQuery(EnrolmentRecordQuery()))
     }
 
     override suspend fun performActions(
-        actions: List<SubjectAction>,
+        actions: List<EnrolmentRecordAction>,
         project: Project,
     ) {
         database.withTransaction {
             actions.forEach { action ->
                 when (action) {
-                    is SubjectAction.Creation -> createSubject(action.subject, project)
-                    is SubjectAction.Update -> updateSubject(action)
-                    is SubjectAction.Deletion -> deleteSubject(action.subjectId)
+                    is EnrolmentRecordAction.Creation -> createSubject(action.enrolmentRecord, project)
+                    is EnrolmentRecordAction.Update -> updateSubject(action)
+                    is EnrolmentRecordAction.Deletion -> deleteSubject(action.subjectId)
                 }
             }
         }
@@ -205,7 +191,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             val dbPath = database.openHelper.readableDatabase.path
             val dbSize = getTotalRoomDbSizeBytes(dbPath!!)
             val isDBEncrypted = DB_ENCRYPTION
-            val subjectCount = subjectDao.countSubjects(queryBuilder.buildCountQuery(SubjectQuery()))
+            val subjectCount = subjectDao.countSubjects(queryBuilder.buildCountQuery(EnrolmentRecordQuery()))
             "Room DB Info:\n" +
                 "Database Name: ${database.openHelper.databaseName}\n" +
                 "Database Version: $dbVersion\n" +
@@ -230,7 +216,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         subject: DomainSubject,
         project: Project,
     ) {
-        require(subject.samples.isNotEmpty()) {
+        require(subject.references.isNotEmpty()) {
             val errorMsg = "Subject should include at least one sample"
             Simber.i(
                 "[createSubject] $errorMsg for subjectId: ${subject.subjectId}",
@@ -257,17 +243,17 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             updatedAt = subject.updatedAt?.time,
         )
         subjectDao.insertSubject(dbSubject)
-        subject.samples.takeIf { it.isNotEmpty() }?.let { samples ->
-            val dbSample = samples.map { it.toRoomDb(subject.subjectId) }
-            subjectDao.insertBiometricSamples(dbSample)
+        subject.references.takeIf { it.isNotEmpty() }?.map { reference ->
+            val dbBiometricTemplates = reference.toRoomDbTemplate(subject.subjectId)
+            subjectDao.insertBiometricSamples(dbBiometricTemplates)
         }
         subject.externalCredentials.takeIf { it.isNotEmpty() }?.let { credentials ->
-            val dbExternalCredentials = credentials.map { it.toRoomDb() }
+            val dbExternalCredentials = credentials.map { it.toRoomDbCredentials() }
             subjectDao.insertExternalCredentials(dbExternalCredentials)
         }
     }
 
-    private suspend fun updateSubject(action: SubjectAction.Update) {
+    private suspend fun updateSubject(action: EnrolmentRecordAction.Update) {
         val dbSubject = subjectDao.getSubject(action.subjectId)
         if (dbSubject != null) {
             val referencesToDelete = action.referenceIdsToRemove.toSet()
@@ -284,7 +270,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             dbSubject.biometricTemplates.filter { it.referenceId in referencesToDelete }.forEach {
                 subjectDao.deleteBiometricSample(it.uuid)
             }
-            val templatesToAdd = action.samplesToAdd.map { it.toRoomDb(action.subjectId) }
+            val templatesToAdd = action.samplesToAdd.flatMap { it.toRoomDbTemplate(action.subjectId) }
             if (templatesToAdd.isNotEmpty()) {
                 subjectDao.insertBiometricSamples(templatesToAdd)
             }
@@ -292,7 +278,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                 subjectDao.deleteExternalCredentialById(it.id)
             }
             if (action.externalCredentialsToAdd.isNotEmpty()) {
-                subjectDao.insertExternalCredentials(action.externalCredentialsToAdd.map { it.toRoomDb() })
+                subjectDao.insertExternalCredentials(action.externalCredentialsToAdd.map { it.toRoomDbCredentials() })
             }
         } else {
             Simber.e(

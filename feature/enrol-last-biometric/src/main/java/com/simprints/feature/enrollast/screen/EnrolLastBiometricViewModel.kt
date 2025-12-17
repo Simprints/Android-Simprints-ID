@@ -12,7 +12,7 @@ import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.GENERAL_ERROR
 import com.simprints.feature.enrollast.screen.model.CredentialDialogItem
-import com.simprints.feature.enrollast.screen.usecase.BuildSubjectUseCase
+import com.simprints.feature.enrollast.screen.usecase.BuildRecordUseCase
 import com.simprints.feature.enrollast.screen.usecase.CheckForDuplicateEnrolmentsUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
@@ -21,9 +21,9 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
@@ -42,7 +42,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val checkForDuplicateEnrolments: CheckForDuplicateEnrolmentsUseCase,
     private val tokenizationProcessor: TokenizationProcessor,
-    private val buildSubject: BuildSubjectUseCase,
+    private val buildSubject: BuildRecordUseCase,
     private val resetEnrolmentUpdateEventsFromSession: ResetExternalCredentialsInSessionUseCase,
 ) : ViewModel() {
     val finish: LiveData<LiveDataEventWithContent<EnrolLastState>>
@@ -103,7 +103,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
         try {
             val subject = buildSubject(params, isAddingCredential = isAddingCredential)
             registerEvent(subject)
-            enrolmentRecordRepository.performActions(listOf(SubjectAction.Creation(subject)), project)
+            enrolmentRecordRepository.performActions(listOf(EnrolmentRecordAction.Creation(subject)), project)
             _finish.send(EnrolLastState.Success(subject.subjectId, scannedCredential?.toExternalCredential(subject.subjectId)))
         } catch (t: Throwable) {
             Simber.e("Enrolment failed", t, tag = ENROLMENT)
@@ -130,7 +130,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
 
         return enrolmentRecordRepository
             .load(
-                SubjectQuery(
+                EnrolmentRecordQuery(
                     projectId = projectId,
                     externalCredential = scannedCredential.credential,
                 ),
@@ -140,7 +140,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
     private fun getPreviousEnrolmentResult(steps: List<EnrolLastBiometricStepResult>) =
         steps.filterIsInstance<EnrolLastBiometricStepResult.EnrolLastBiometricsResult>().firstOrNull()
 
-    private suspend fun registerEvent(subject: Subject) {
+    private suspend fun registerEvent(enrolmentRecord: EnrolmentRecord) {
         Simber.d("Register events for enrolments", tag = ENROLMENT)
         val events = eventRepository.getEventsInCurrentSession()
 
@@ -159,10 +159,10 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
         eventRepository.addOrUpdateEvent(
             EnrolmentEventV4(
                 createdAt = timeHelper.now(),
-                subjectId = subject.subjectId,
-                projectId = subject.projectId,
-                moduleId = subject.moduleId,
-                attendantId = subject.attendantId,
+                subjectId = enrolmentRecord.subjectId,
+                projectId = enrolmentRecord.projectId,
+                moduleId = enrolmentRecord.moduleId,
+                attendantId = enrolmentRecord.attendantId,
                 biometricReferenceIds = biometricReferenceIds,
                 externalCredentialIds = externalCredentialIds,
             ),

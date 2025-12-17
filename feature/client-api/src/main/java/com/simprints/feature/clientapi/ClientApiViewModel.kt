@@ -19,7 +19,7 @@ import com.simprints.feature.clientapi.models.ClientApiError
 import com.simprints.feature.clientapi.usecases.CreateSessionIfRequiredUseCase
 import com.simprints.feature.clientapi.usecases.DeleteSessionEventsIfNeededUseCase
 import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
-import com.simprints.feature.clientapi.usecases.GetEnrolmentCreationEventForSubjectUseCase
+import com.simprints.feature.clientapi.usecases.GetEnrolmentCreationEventForRecordUseCase
 import com.simprints.feature.clientapi.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.usecases.SimpleEventReporter
 import com.simprints.infra.config.store.models.Project
@@ -51,7 +51,7 @@ class ClientApiViewModel @Inject internal constructor(
     private val simpleEventReporter: SimpleEventReporter,
     private val getCurrentSessionId: GetCurrentSessionIdUseCase,
     private val createSessionIfRequiredUseCase: CreateSessionIfRequiredUseCase,
-    private val getEnrolmentCreationEventForSubject: GetEnrolmentCreationEventForSubjectUseCase,
+    private val getEnrolmentCreationEventForRecord: GetEnrolmentCreationEventForRecordUseCase,
     private val deleteSessionEventsIfNeeded: DeleteSessionEventsIfNeededUseCase,
     private val isFlowCompletedWithError: IsFlowCompletedWithErrorUseCase,
     private val configManager: ConfigManager,
@@ -107,7 +107,7 @@ class ClientApiViewModel @Inject internal constructor(
         simpleEventReporter.closeCurrentSessionNormally()
 
         val coSyncEnrolmentRecords =
-            getEnrolmentCreationEventForSubject(action.projectId, enrolResponse.guid)
+            getEnrolmentCreationEventForRecord(action.projectId, enrolResponse.guid)
 
         deleteSessionEventsIfNeeded(currentSessionId)
 

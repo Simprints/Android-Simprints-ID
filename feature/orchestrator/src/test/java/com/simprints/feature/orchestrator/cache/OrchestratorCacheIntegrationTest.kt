@@ -3,15 +3,15 @@ package com.simprints.feature.orchestrator.cache
 import android.content.SharedPreferences
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.capture.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricTemplateCapture
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.common.TemplateIdentifier
+import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.core.domain.reference.BiometricReferenceCapture
-import com.simprints.core.domain.reference.BiometricTemplateCapture
-import com.simprints.core.domain.reference.TemplateIdentifier
 import com.simprints.core.domain.response.AppErrorReason
-import com.simprints.core.domain.sample.ComparisonResult
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
@@ -49,7 +49,7 @@ import com.simprints.fingerprint.capture.FingerprintCaptureParams
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.matching.MatchParams
 import com.simprints.infra.matching.MatchResult
@@ -166,7 +166,7 @@ class OrchestratorCacheIntegrationTest {
                 id = StepId.VALIDATE_ID_POOL,
                 navigationActionId = 5,
                 destinationId = 6,
-                params = ValidateSubjectPoolFragmentParams(SubjectQuery()),
+                params = ValidateSubjectPoolFragmentParams(EnrolmentRecordQuery()),
                 status = StepStatus.COMPLETED,
                 result = ValidateSubjectPoolResult(true),
             ),
@@ -279,7 +279,7 @@ class OrchestratorCacheIntegrationTest {
                 destinationId = 4,
                 params = MatchParams(
                     flowType = FlowType.IDENTIFY,
-                    queryForCandidates = SubjectQuery(),
+                    queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.CommCare("name"),
                     bioSdk = FingerprintConfiguration.BioSdk.NEC,
                     probeReference = BiometricReferenceCapture(
@@ -339,7 +339,7 @@ class OrchestratorCacheIntegrationTest {
                 destinationId = 4,
                 params = MatchParams(
                     flowType = FlowType.IDENTIFY,
-                    queryForCandidates = SubjectQuery(),
+                    queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
                     bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                     probeReference = BiometricReferenceCapture(

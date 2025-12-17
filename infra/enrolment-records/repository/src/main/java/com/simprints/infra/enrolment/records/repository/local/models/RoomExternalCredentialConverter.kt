@@ -9,13 +9,12 @@ internal fun DbExternalCredential.toDomain(): ExternalCredential = ExternalCrede
     id = id,
     value = value.asTokenizableEncrypted(),
     subjectId = subjectId,
-    type = ExternalCredentialType.valueOf(type)
+    type = ExternalCredentialType.valueOf(type),
 )
 
-internal fun ExternalCredential.toRoomDb(): DbExternalCredential = DbExternalCredential(
+internal fun ExternalCredential.toRoomDbCredentials(): DbExternalCredential = DbExternalCredential(
     id = id,
     value = value.value,
     subjectId = subjectId,
-    type = type.name
+    type = type.name,
 )
-

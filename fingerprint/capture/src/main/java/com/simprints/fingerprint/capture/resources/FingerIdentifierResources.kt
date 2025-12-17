@@ -2,7 +2,7 @@ package com.simprints.fingerprint.capture.resources
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.fingerprint.capture.R
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.resources.R as IDR

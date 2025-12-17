@@ -1,7 +1,7 @@
 package com.simprints.infra.events.event.domain.models.fingerprint
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.sampledata.SampleDefaults
 import org.junit.Test

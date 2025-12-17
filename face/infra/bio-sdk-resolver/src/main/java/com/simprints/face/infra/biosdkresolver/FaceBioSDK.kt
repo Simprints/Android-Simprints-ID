@@ -1,6 +1,6 @@
 package com.simprints.face.infra.biosdkresolver
 
-import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.basebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher

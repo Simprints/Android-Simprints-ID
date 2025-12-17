@@ -21,7 +21,7 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.event.domain.models.EnrolmentUpdateEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent
@@ -101,7 +101,7 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
         val project = configManager.getProject() ?: return null
         val alreadyLinkedSubject = enrolmentRecordRepository
             .load(
-                SubjectQuery(
+                EnrolmentRecordQuery(
                     projectId = project.id,
                     subjectId = subjectId,
                     externalCredential = credential,

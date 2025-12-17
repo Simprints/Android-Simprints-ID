@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.capture.usecase
 
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.EncodingUtils

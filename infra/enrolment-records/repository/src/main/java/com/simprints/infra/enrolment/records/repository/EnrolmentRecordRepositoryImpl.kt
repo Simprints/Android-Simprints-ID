@@ -8,9 +8,9 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.realm.store.exceptions.RealmUninitialisedException
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.enrolment.records.repository.local.SelectEnrolmentRecordLocalDataSourceUseCase
 import com.simprints.infra.enrolment.records.repository.local.migration.InsertRecordsInRoomDuringMigrationUseCase
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSource
@@ -25,7 +25,7 @@ import javax.inject.Singleton
 @Singleton
 internal class EnrolmentRecordRepositoryImpl @Inject constructor(
     private val remoteDataSource: EnrolmentRecordRemoteDataSource,
-    @CommCareDataSource private val commCareDataSource: IdentityDataSource,
+    @CommCareDataSource private val commCareDataSource: CandidateRecordDataSource,
     private val tokenizationProcessor: TokenizationProcessor,
     private val selectEnrolmentRecordLocalDataSource: SelectEnrolmentRecordLocalDataSourceUseCase,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
@@ -42,9 +42,9 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
 
     override suspend fun uploadRecords(subjectIds: List<String>) = withContext(dispatcher) {
         val lastUploadedRecord = prefs.getString(PROGRESS_KEY, null)
-        var query = SubjectQuery(sort = true, afterSubjectId = lastUploadedRecord)
+        var query = EnrolmentRecordQuery(sort = true, afterSubjectId = lastUploadedRecord)
         if (subjectIds.isNotEmpty()) {
-            query = SubjectQuery(
+            query = EnrolmentRecordQuery(
                 subjectIds = subjectIds,
                 sort = true,
                 afterSubjectId = lastUploadedRecord,
@@ -62,7 +62,7 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
 
     override suspend fun tokenizeExistingRecords(project: Project) {
         try {
-            val query = SubjectQuery(projectId = project.id, hasUntokenizedFields = true)
+            val query = EnrolmentRecordQuery(projectId = project.id, hasUntokenizedFields = true)
             val tokenizedSubjectsCreateAction = selectEnrolmentRecordLocalDataSource()
                 .load(query)
                 .mapNotNull { subject ->
@@ -78,11 +78,13 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
                         project = project,
                     )
                     return@mapNotNull subject.copy(moduleId = moduleId, attendantId = attendantId)
-                }.map(SubjectAction::Creation)
+                }.map(EnrolmentRecordAction::Creation)
             selectEnrolmentRecordLocalDataSource().performActions(tokenizedSubjectsCreateAction, project)
         } catch (e: Exception) {
             when (e) {
-                is RealmUninitialisedException -> Unit // AuthStore hasn't yet saved the project, no need to do anything
+                is RealmUninitialisedException -> Unit
+
+                // AuthStore hasn't yet saved the project, no need to do anything
                 else -> Simber.e("Failed to tokenize existing records", e)
             }
         }
@@ -94,6 +96,7 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
         project: Project,
     ) = when (value) {
         is TokenizableString.Tokenized -> value
+
         is TokenizableString.Raw -> tokenizationProcessor.encrypt(
             decrypted = value,
             tokenKeyType = tokenKeyType,
@@ -102,20 +105,20 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
     }
 
     override suspend fun count(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         dataSource: BiometricDataSource,
-    ): Int = fromIdentityDataSource(dataSource).count(query, dataSource)
+    ): Int = fromCandidateDataSource(dataSource).count(query, dataSource)
 
     override suspend fun getLocalDBInfo(): String = selectEnrolmentRecordLocalDataSource().getLocalDBInfo()
 
-    override suspend fun loadIdentities(
-        query: SubjectQuery,
+    override suspend fun loadCandidateRecords(
+        query: EnrolmentRecordQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ) = fromIdentityDataSource(dataSource).loadIdentities(
+    ) = fromCandidateDataSource(dataSource).loadCandidateRecords(
         query = query,
         ranges = ranges,
         dataSource = dataSource,
@@ -124,21 +127,21 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
         onCandidateLoaded = onCandidateLoaded,
     )
 
-    private suspend fun fromIdentityDataSource(dataSource: BiometricDataSource) = when (dataSource) {
+    private suspend fun fromCandidateDataSource(dataSource: BiometricDataSource) = when (dataSource) {
         is BiometricDataSource.Simprints -> selectEnrolmentRecordLocalDataSource()
         is BiometricDataSource.CommCare -> commCareDataSource
     }
 
-    override suspend fun load(query: SubjectQuery): List<Subject> = selectEnrolmentRecordLocalDataSource().load(query)
+    override suspend fun load(query: EnrolmentRecordQuery): List<EnrolmentRecord> = selectEnrolmentRecordLocalDataSource().load(query)
 
     override suspend fun getAllSubjectIds(): List<String> = selectEnrolmentRecordLocalDataSource().getAllSubjectIds()
 
-    override suspend fun delete(queries: List<SubjectQuery>) = selectEnrolmentRecordLocalDataSource().delete(queries)
+    override suspend fun delete(queries: List<EnrolmentRecordQuery>) = selectEnrolmentRecordLocalDataSource().delete(queries)
 
     override suspend fun deleteAll() = selectEnrolmentRecordLocalDataSource().deleteAll()
 
     override suspend fun performActions(
-        actions: List<SubjectAction>,
+        actions: List<EnrolmentRecordAction>,
         project: Project,
     ) {
         insertRecordsInRoomDuringMigration(actions, project)

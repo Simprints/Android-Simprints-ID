@@ -1,4 +1,4 @@
-package com.simprints.core.domain.sample
+package com.simprints.core.domain.comparison
 
 import android.os.Parcelable
 import androidx.annotation.Keep

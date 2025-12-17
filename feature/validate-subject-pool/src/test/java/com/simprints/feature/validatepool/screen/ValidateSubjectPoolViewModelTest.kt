@@ -8,7 +8,7 @@ import com.simprints.feature.validatepool.usecase.HasRecordsUseCase
 import com.simprints.feature.validatepool.usecase.IsModuleIdNotSyncedUseCase
 import com.simprints.feature.validatepool.usecase.RunBlockingEventSyncUseCase
 import com.simprints.feature.validatepool.usecase.ShouldSuggestSyncUseCase
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -60,18 +60,18 @@ class ValidateSubjectPoolViewModelTest {
     fun `when subject pool not empty returns Success `() = runTest {
         coEvery { hasRecordsUseCase(any()) } returns true
 
-        viewModel.checkIdentificationPool(SubjectQuery())
+        viewModel.checkIdentificationPool(EnrolmentRecordQuery())
 
         assertThat(viewModel.state.value?.peekContent()).isEqualTo(ValidateSubjectPoolState.Success)
     }
 
     @Test
     fun `if ID by project when not synced recently returns RequiresSync`() = runTest {
-        val subjectQuery = SubjectQuery(projectId = "projectId")
+        val enrolmentRecordQuery = EnrolmentRecordQuery(projectId = "projectId")
         coEvery { hasRecordsUseCase(any()) } returns false
         coEvery { shouldSuggestSyncUseCase() } returns true
 
-        viewModel.checkIdentificationPool(subjectQuery)
+        viewModel.checkIdentificationPool(enrolmentRecordQuery)
 
         assertThat(viewModel.state.value?.peekContent()).isEqualTo(ValidateSubjectPoolState.RequiresSync)
         coVerify(exactly = 1) { hasRecordsUseCase(any()) }
@@ -80,22 +80,22 @@ class ValidateSubjectPoolViewModelTest {
 
     @Test
     fun `if ID by project when synced recently returns PoolEmpty`() = runTest {
-        val subjectQuery = SubjectQuery(projectId = "module1")
+        val enrolmentRecordQuery = EnrolmentRecordQuery(projectId = "module1")
         coEvery { hasRecordsUseCase(any()) } returns false
         coEvery { shouldSuggestSyncUseCase() } returns false
 
-        viewModel.checkIdentificationPool(subjectQuery)
+        viewModel.checkIdentificationPool(enrolmentRecordQuery)
 
         assertThat(viewModel.state.value?.peekContent()).isEqualTo(ValidateSubjectPoolState.PoolEmpty)
     }
 
     @Test
     fun `if ID by user when subjects enrolled under other attendant ID returns UserMismatch`() = runTest {
-        val subjectQuery = SubjectQuery(attendantId = "attendantId".asTokenizableEncrypted())
+        val enrolmentRecordQuery = EnrolmentRecordQuery(attendantId = "attendantId".asTokenizableEncrypted())
         coEvery { hasRecordsUseCase(any()) } returns true
-        coEvery { hasRecordsUseCase(subjectQuery) } returns false
+        coEvery { hasRecordsUseCase(enrolmentRecordQuery) } returns false
 
-        viewModel.checkIdentificationPool(subjectQuery)
+        viewModel.checkIdentificationPool(enrolmentRecordQuery)
 
         assertThat(viewModel.state.value?.peekContent()).isEqualTo(ValidateSubjectPoolState.UserMismatch)
         coVerify(exactly = 0) { isModuleIdNotSyncedUseCase(any()) }
@@ -104,11 +104,11 @@ class ValidateSubjectPoolViewModelTest {
 
     @Test
     fun `if ID by user when no subjects and should sync returns RequiredSync`() = runTest {
-        val subjectQuery = SubjectQuery(attendantId = "attendantId".asTokenizableEncrypted())
+        val enrolmentRecordQuery = EnrolmentRecordQuery(attendantId = "attendantId".asTokenizableEncrypted())
         coEvery { hasRecordsUseCase(any()) } returns false
         coEvery { shouldSuggestSyncUseCase() } returns true
 
-        viewModel.checkIdentificationPool(subjectQuery)
+        viewModel.checkIdentificationPool(enrolmentRecordQuery)
 
         assertThat(viewModel.state.value?.peekContent()).isEqualTo(ValidateSubjectPoolState.RequiresSync)
         coVerify(exactly = 0) { isModuleIdNotSyncedUseCase(any()) }
@@ -116,11 +116,11 @@ class ValidateSubjectPoolViewModelTest {
 
     @Test
     fun `if ID by user when no subjects and synced returns PoolEmpty`() = runTest {
-        val subjectQuery = SubjectQuery(attendantId = "attendantId".asTokenizableEncrypted())
+        val enrolmentRecordQuery = EnrolmentRecordQuery(attendantId = "attendantId".asTokenizableEncrypted())
         coEvery { hasRecordsUseCase(any()) } returns false
         coEvery { shouldSuggestSyncUseCase() } returns false
 
-        viewModel.checkIdentificationPool(subjectQuery)
+        viewModel.checkIdentificationPool(enrolmentRecordQuery)
 
         assertThat(viewModel.state.value?.peekContent()).isEqualTo(ValidateSubjectPoolState.PoolEmpty)
         coVerify(exactly = 0) { isModuleIdNotSyncedUseCase(any()) }
@@ -128,11 +128,11 @@ class ValidateSubjectPoolViewModelTest {
 
     @Test
     fun `if ID by module when module is not synced returns ModuleMismatch`() = runTest {
-        val subjectQuery = SubjectQuery(moduleId = "module1".asTokenizableEncrypted())
+        val enrolmentRecordQuery = EnrolmentRecordQuery(moduleId = "module1".asTokenizableEncrypted())
         coEvery { hasRecordsUseCase(any()) } returns false
         coEvery { isModuleIdNotSyncedUseCase(any()) } returns true
 
-        viewModel.checkIdentificationPool(subjectQuery)
+        viewModel.checkIdentificationPool(enrolmentRecordQuery)
 
         assertThat(viewModel.state.value?.peekContent()).isEqualTo(ValidateSubjectPoolState.ModuleMismatch)
         coVerify(exactly = 1) { hasRecordsUseCase(any()) }
@@ -141,38 +141,38 @@ class ValidateSubjectPoolViewModelTest {
 
     @Test
     fun `if ID by module when module is synced and not synced recently returns RequiresSync`() = runTest {
-        val subjectQuery = SubjectQuery(moduleId = "module1".asTokenizableEncrypted())
+        val enrolmentRecordQuery = EnrolmentRecordQuery(moduleId = "module1".asTokenizableEncrypted())
         coEvery { hasRecordsUseCase(any()) } returns false
         coEvery { isModuleIdNotSyncedUseCase(any()) } returns false
         coEvery { shouldSuggestSyncUseCase() } returns true
 
-        viewModel.checkIdentificationPool(subjectQuery)
+        viewModel.checkIdentificationPool(enrolmentRecordQuery)
 
         assertThat(viewModel.state.value?.peekContent()).isEqualTo(ValidateSubjectPoolState.RequiresSync)
     }
 
     @Test
     fun `if ID by module when module is synced and synced recently returns PoolEmpty`() = runTest {
-        val subjectQuery = SubjectQuery(moduleId = "module1".asTokenizableEncrypted())
+        val enrolmentRecordQuery = EnrolmentRecordQuery(moduleId = "module1".asTokenizableEncrypted())
         coEvery { hasRecordsUseCase(any()) } returns false
         coEvery { isModuleIdNotSyncedUseCase(any()) } returns false
         coEvery { shouldSuggestSyncUseCase() } returns false
 
-        viewModel.checkIdentificationPool(subjectQuery)
+        viewModel.checkIdentificationPool(enrolmentRecordQuery)
 
         assertThat(viewModel.state.value?.peekContent()).isEqualTo(ValidateSubjectPoolState.PoolEmpty)
     }
 
     @Test
     fun `runs sync and check`() = runTest {
-        val subjectQuery = SubjectQuery(projectId = "projectId")
+        val enrolmentRecordQuery = EnrolmentRecordQuery(projectId = "projectId")
 
         coEvery { hasRecordsUseCase(any()) } returnsMany listOf(true)
         coJustRun { runBlockingSync() }
 
         val result = viewModel.state.test()
 
-        viewModel.syncAndRetry(subjectQuery)
+        viewModel.syncAndRetry(enrolmentRecordQuery)
 
         assertThat(result.valueHistory().map { it.peekContent() }).containsExactly(
             ValidateSubjectPoolState.SyncInProgress,
@@ -185,14 +185,14 @@ class ValidateSubjectPoolViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `checkIdentificationPool not re-validating another time when sync in progress`() = runTest {
-        val subjectQuery = SubjectQuery(projectId = "projectId")
-        coEvery { hasRecordsUseCase(subjectQuery) } returns true
+        val enrolmentRecordQuery = EnrolmentRecordQuery(projectId = "projectId")
+        coEvery { hasRecordsUseCase(enrolmentRecordQuery) } returns true
         coEvery { runBlockingSync() } coAnswers {
             delay(1000)
         }
-        viewModel.syncAndRetry(subjectQuery)
+        viewModel.syncAndRetry(enrolmentRecordQuery)
 
-        viewModel.checkIdentificationPool(subjectQuery)
+        viewModel.checkIdentificationPool(enrolmentRecordQuery)
 
         advanceUntilIdle()
         coVerify(exactly = 1) { hasRecordsUseCase(any()) }

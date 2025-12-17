@@ -3,7 +3,7 @@ package com.simprints.infra.enrolment.records.repository.remote.models.fingerpri
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.core.domain.sample.Sample
+import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.repository.remote.models.ApiBiometricReference
 
@@ -20,15 +20,13 @@ internal data class ApiFingerprintReference(
     val metadata: HashMap<String, String>? = null,
 ) : ApiBiometricReference(ApiBiometricReferenceType.FingerprintReference)
 
-internal fun List<Sample>.toFingerprintApi(encoder: EncodingUtils): ApiFingerprintReference? = if (isNotEmpty()) {
+internal fun BiometricReference.toFingerprintApi(encoder: EncodingUtils): ApiFingerprintReference? = if (templates.isNotEmpty()) {
     ApiFingerprintReference(
-        first().referenceId,
-        map { sample ->
-            sample.template.let {
-                ApiFingerprintTemplate(encoder.byteArrayToBase64(it.template), it.identifier.toApi())
-            }
+        referenceId,
+        templates.map {
+            ApiFingerprintTemplate(encoder.byteArrayToBase64(it.template), it.identifier.toApi())
         },
-        first().format,
+        format,
     )
 } else {
     null

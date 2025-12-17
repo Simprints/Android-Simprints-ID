@@ -4,8 +4,8 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
@@ -13,11 +13,11 @@ import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Creation
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Deletion
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Update
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction.Creation
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction.Deletion
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction.Update
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScope
@@ -39,7 +39,7 @@ import com.simprints.infra.eventsync.status.down.domain.CommCareEventSyncResult
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.COMPLETE
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.FAILED
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.RUNNING
-import com.simprints.infra.eventsync.sync.common.SubjectFactory
+import com.simprints.infra.eventsync.sync.common.EnrolmentRecordFactory
 import com.simprints.infra.eventsync.sync.down.tasks.BaseEventDownSyncTask.Companion.EVENTS_BATCH_SIZE
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
@@ -163,7 +163,7 @@ class CommCareEventSyncTaskTest {
     @MockK
     private lateinit var project: Project
 
-    private lateinit var subjectFactory: SubjectFactory
+    private lateinit var enrolmentRecordFactory: EnrolmentRecordFactory
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
@@ -172,14 +172,14 @@ class CommCareEventSyncTaskTest {
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
 
-        subjectFactory = SubjectFactory(
+        enrolmentRecordFactory = EnrolmentRecordFactory(
             encodingUtils = EncodingUtilsImplForTests,
             timeHelper = timeHelper,
         )
         commCareEventSyncTask = CommCareEventSyncTask(
             enrolmentRecordRepository,
             eventDownSyncScopeRepository,
-            subjectFactory,
+            enrolmentRecordFactory,
             configManager,
             timeHelper,
             eventRepository,
@@ -287,7 +287,7 @@ class CommCareEventSyncTaskTest {
             enrolmentRecordRepository.performActions(
                 listOf(
                     Creation(
-                        subjectFactory.buildSubjectFromCreationPayload(
+                        enrolmentRecordFactory.buildFromCreationPayload(
                             event.payload,
                         ),
                     ),
@@ -328,15 +328,17 @@ class CommCareEventSyncTaskTest {
     @Test
     fun downSync_shouldProcessRecordUpdateEvent_withUpdate() = runTest {
         coEvery { enrolmentRecordRepository.load(any()) } returns listOf(
-            Subject(
+            EnrolmentRecord(
                 subjectId = "subjectId",
                 projectId = "projectId",
                 attendantId = "moduleId".asTokenizableRaw(),
                 moduleId = "attendantId".asTokenizableRaw(),
-                samples = listOf(
-                    Sample(
-                        template = BiometricTemplate(
-                            template = byteArrayOf(),
+                references = listOf(
+                    BiometricReference(
+                        templates = listOf(
+                            BiometricTemplate(
+                                template = byteArrayOf(),
+                            ),
                         ),
                         format = "format",
                         referenceId = "referenceId",
@@ -353,7 +355,7 @@ class CommCareEventSyncTaskTest {
 
         coVerify {
             enrolmentRecordRepository.performActions(
-                match<List<SubjectAction>> { actions ->
+                match<List<EnrolmentRecordAction>> { actions ->
                     actions.size == 1 && actions.first() is Update
                 },
                 any(),
@@ -388,7 +390,7 @@ class CommCareEventSyncTaskTest {
             enrolmentRecordRepository.performActions(
                 listOf(
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
-                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
+                    Creation(enrolmentRecordFactory.buildFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
                 project,
             )
@@ -426,7 +428,7 @@ class CommCareEventSyncTaskTest {
             enrolmentRecordRepository.performActions(
                 listOf(
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
-                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
+                    Creation(enrolmentRecordFactory.buildFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
                 project,
             )

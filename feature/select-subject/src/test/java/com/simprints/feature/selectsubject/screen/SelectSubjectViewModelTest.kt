@@ -18,7 +18,7 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.events.event.domain.models.EnrolmentUpdateEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
@@ -163,7 +163,7 @@ internal class SelectSubjectViewModelTest {
     fun `displays credential dialog when credential is scanned and linked to different subject`() = runTest {
         val scannedCredential = mockk<ScannedCredential>(relaxed = true)
         val displayedCredential = mockk<TokenizableString.Raw>(relaxed = true)
-        val repositoryResponse = listOf<Subject>(mockk { every { subjectId } returns "not_this_subject_id" })
+        val repositoryResponse = listOf<EnrolmentRecord>(mockk { every { subjectId } returns "not_this_subject_id" })
         setupCredentialState(displayedCredential, repositoryResponse = repositoryResponse)
 
         val viewModel = createViewModel(params = selectSubjectParams.copy(scannedCredential = scannedCredential))
@@ -185,7 +185,7 @@ internal class SelectSubjectViewModelTest {
             every { credentialType } returns type
         }
         val displayedCredential = mockk<TokenizableString.Raw>(relaxed = true)
-        val repositoryResponse = listOf<Subject>(mockk { every { subjectId } returns SUBJECT_ID })
+        val repositoryResponse = listOf<EnrolmentRecord>(mockk { every { subjectId } returns SUBJECT_ID })
         setupCredentialState(displayedCredential, repositoryResponse = repositoryResponse)
 
         val viewModel = createViewModel(params = selectSubjectParams.copy(scannedCredential = scannedCredential))
@@ -209,7 +209,7 @@ internal class SelectSubjectViewModelTest {
             every { credentialType } returns type
         }
         val displayedCredential = mockk<TokenizableString.Raw>(relaxed = true)
-        val repositoryResponse = listOf<Subject>(mockk { every { subjectId } returns SUBJECT_ID })
+        val repositoryResponse = listOf<EnrolmentRecord>(mockk { every { subjectId } returns SUBJECT_ID })
         setupCredentialState(displayedCredential, repositoryResponse = repositoryResponse)
 
         val viewModel = createViewModel(
@@ -230,7 +230,7 @@ internal class SelectSubjectViewModelTest {
     fun `does not display credential dialog when project not availalbe`() = runTest {
         val scannedCredential = mockk<ScannedCredential>(relaxed = true)
         val displayedCredential = mockk<TokenizableString.Raw>(relaxed = true)
-        val repositoryResponse = listOf<Subject>(mockk { every { subjectId } returns "not_this_subject_id" })
+        val repositoryResponse = listOf<EnrolmentRecord>(mockk { every { subjectId } returns "not_this_subject_id" })
         setupCredentialState(
             displayedCredential,
             repositoryResponse = repositoryResponse,
@@ -266,7 +266,7 @@ internal class SelectSubjectViewModelTest {
 
     private fun setupCredentialState(
         displayedCredential: TokenizableString.Raw,
-        repositoryResponse: List<Subject>,
+        repositoryResponse: List<EnrolmentRecord>,
         configuredProject: Project? = project,
     ) {
         coEvery { authStore.isProjectIdSignedIn(PROJECT_ID) } returns true

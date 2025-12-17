@@ -3,7 +3,7 @@ package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.reposi
 import com.simprints.core.domain.tokenization.values
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SETTINGS
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
@@ -18,7 +18,8 @@ internal class ModuleRepositoryImpl @Inject constructor(
 ) : ModuleRepository {
     override suspend fun getModules(): List<Module> = configManager
         .getProjectConfiguration()
-        .synchronization.down.simprints?.moduleOptions
+        .synchronization.down.simprints
+        ?.moduleOptions
         ?.map {
             Module(it, isModuleSelected(it.value))
         } ?: emptyList()
@@ -30,7 +31,8 @@ internal class ModuleRepositoryImpl @Inject constructor(
 
     override suspend fun getMaxNumberOfModules(): Int = configManager
         .getProjectConfiguration()
-        .synchronization.down.simprints?.maxNbOfModules ?: 0
+        .synchronization.down.simprints
+        ?.maxNbOfModules ?: 0
 
     private suspend fun isModuleSelected(moduleName: String): Boolean = configManager
         .getDeviceConfiguration()
@@ -50,7 +52,7 @@ internal class ModuleRepositoryImpl @Inject constructor(
 
     private suspend fun handleUnselectedModules(unselectedModules: List<Module>) {
         val queries = unselectedModules.map {
-            SubjectQuery(moduleId = it.name)
+            EnrolmentRecordQuery(moduleId = it.name)
         }
         enrolmentRecordRepository.delete(queries)
 

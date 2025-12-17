@@ -1,12 +1,10 @@
 package com.simprints.fingerprint.infra.necsdkimpl.matching
 
-import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricTemplateCapture
+import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.reference.BiometricTemplateCapture
-import com.simprints.core.domain.reference.TemplateIdentifier
-import com.simprints.core.domain.sample.ComparisonResult
-import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.Sample
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.fingerprint.infra.basebiosdk.matching.FingerprintMatcher
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.template.NEC_TEMPLATE_FORMAT
@@ -22,7 +20,7 @@ internal class FingerprintMatcherImpl @Inject constructor(
 
     override suspend fun match(
         probeReference: BiometricReferenceCapture,
-        candidates: List<Identity>,
+        candidates: List<CandidateRecord>,
         settings: NecMatchingSettings?,
     ): List<ComparisonResult> {
         // if probe template format is not supported by NEC matcher, return empty list
@@ -40,7 +38,7 @@ internal class FingerprintMatcherImpl @Inject constructor(
 
     private fun sameFingerMatching(
         probe: List<BiometricTemplateCapture>,
-        candidates: List<Identity>,
+        candidates: List<CandidateRecord>,
     ) = candidates.map {
         sameFingerMatching(probe, it)
     }
@@ -57,13 +55,15 @@ internal class FingerprintMatcherImpl @Inject constructor(
      */
     private fun sameFingerMatching(
         probeTemplates: List<BiometricTemplateCapture>,
-        candidate: Identity,
+        candidate: CandidateRecord,
     ): ComparisonResult {
         var fingers = 0 // the number of fingers used in matching
-        val total = probeTemplates.sumOf { template ->
-            candidate.templateForFinger(template.identifier)?.let { candidateTemplate ->
+        val candidateTemplates = candidate.references.flatMap { it.templates }
+
+        val total = probeTemplates.sumOf { probeTemplate ->
+            candidateTemplates.find { it.identifier == probeTemplate.identifier }?.let { candidateTemplate ->
                 fingers++
-                verify(template, candidateTemplate)
+                verify(probeTemplate, candidateTemplate)
             } ?: 0.toDouble()
         }
         return ComparisonResult(candidate.subjectId, getOverallScore(total, fingers))
@@ -71,12 +71,12 @@ internal class FingerprintMatcherImpl @Inject constructor(
 
     private fun verify(
         probe: BiometricTemplateCapture,
-        candidate: Sample,
+        candidate: BiometricTemplate,
     ) = try {
         nec
             .match(
                 probe.toNecTemplate(),
-                candidate.template.toNecTemplate(),
+                candidate.toNecTemplate(),
             ).toDouble()
     } catch (e: Exception) {
         throw BioSdkException.TemplateMatchingException(e)
@@ -84,26 +84,23 @@ internal class FingerprintMatcherImpl @Inject constructor(
 
     private fun crossFingerMatching(
         probe: List<BiometricTemplateCapture>,
-        candidates: List<Identity>,
+        candidates: List<CandidateRecord>,
     ) = candidates.map { crossFingerMatching(probe, it) }
 
     private fun crossFingerMatching(
         probe: List<BiometricTemplateCapture>,
-        candidate: Identity,
+        candidate: CandidateRecord,
     ): ComparisonResult {
         // Number of fingers used in matching
         val fingers = probe.size
+        val candidateTemplates = candidate.references.flatMap { it.templates }
         // Sum of maximum matching score for each finger
         val total = probe.sumOf { probeTemplate ->
-            candidate.samples.maxOf { candidateTemplate ->
-                verify(probeTemplate, candidateTemplate)
-            }
+            candidateTemplates.maxOf { candidateTemplate -> verify(probeTemplate, candidateTemplate) }
         }
         // Matching score  = total/number of fingers
         return ComparisonResult(candidate.subjectId, getOverallScore(total, fingers))
     }
-
-    private fun Identity.templateForFinger(fingerId: TemplateIdentifier) = samples.find { it.template.identifier == fingerId }
 
     private fun BiometricTemplate.toNecTemplate() = NECTemplate(template, 0) // Quality score not used
 

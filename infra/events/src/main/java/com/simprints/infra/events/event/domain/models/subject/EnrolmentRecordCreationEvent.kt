@@ -4,10 +4,10 @@ import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
-import com.simprints.core.domain.sample.Sample
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.utils.EncodingUtils
 import java.util.UUID
+import com.simprints.core.domain.reference.BiometricReference as CoreBiometricReference
 
 @Keep
 @ExcludedFromGeneratedTestCoverageReports("Data class")
@@ -46,13 +46,13 @@ data class EnrolmentRecordCreationEvent(
 
     companion object {
         fun buildBiometricReferences(
-            samples: List<Sample>,
+            references: List<CoreBiometricReference>,
             encoder: EncodingUtils,
-        ): List<BiometricReference> = samples.groupBy { it.modality }.mapNotNull { (modality, modalitySamples) ->
-            if (modalitySamples.isNotEmpty()) {
-                when (modality) {
-                    Modality.FACE -> buildFingerprintReference(modalitySamples, encoder)
-                    Modality.FINGERPRINT -> buildFaceReference(modalitySamples, encoder)
+        ): List<BiometricReference> = references.mapNotNull { reference ->
+            if (reference.templates.isNotEmpty()) {
+                when (reference.modality) {
+                    Modality.FACE -> buildFaceReference(reference, encoder)
+                    Modality.FINGERPRINT -> buildFingerprintReference(reference, encoder)
                 }
             } else {
                 null
@@ -60,30 +60,30 @@ data class EnrolmentRecordCreationEvent(
         }
 
         private fun buildFingerprintReference(
-            fingerprintSamples: List<Sample>,
+            reference: CoreBiometricReference,
             encoder: EncodingUtils,
         ) = FingerprintReference(
-            fingerprintSamples.first().referenceId,
-            fingerprintSamples.map {
+            id = reference.referenceId,
+            templates = reference.templates.map {
                 FingerprintTemplate(
-                    encoder.byteArrayToBase64(it.template.template),
-                    it.template.identifier,
+                    template = encoder.byteArrayToBase64(it.template),
+                    finger = it.identifier,
                 )
             },
-            fingerprintSamples.first().format,
+            format = reference.format,
         )
 
         private fun buildFaceReference(
-            faceSamples: List<Sample>,
+            reference: CoreBiometricReference,
             encoder: EncodingUtils,
         ) = FaceReference(
-            faceSamples.first().referenceId,
-            faceSamples.map {
+            id = reference.referenceId,
+            templates = reference.templates.map {
                 FaceTemplate(
-                    encoder.byteArrayToBase64(it.template.template),
+                    template = encoder.byteArrayToBase64(it.template),
                 )
             },
-            faceSamples.first().format,
+            format = reference.format,
         )
     }
 }

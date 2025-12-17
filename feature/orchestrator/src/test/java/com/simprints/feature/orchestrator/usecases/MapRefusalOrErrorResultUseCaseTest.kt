@@ -3,7 +3,7 @@ package com.simprints.feature.orchestrator.usecases
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.exitform.ExitFormOption
 import com.simprints.feature.exitform.ExitFormResult

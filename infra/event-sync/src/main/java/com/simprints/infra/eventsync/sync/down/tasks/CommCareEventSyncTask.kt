@@ -8,7 +8,7 @@ import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEve
 import com.simprints.infra.eventsync.event.commcare.CommCareEventDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
-import com.simprints.infra.eventsync.sync.common.SubjectFactory
+import com.simprints.infra.eventsync.sync.common.EnrolmentRecordFactory
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.COMMCARE_SYNC
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
@@ -17,7 +17,7 @@ import javax.inject.Inject
 internal class CommCareEventSyncTask @Inject constructor(
     enrolmentRecordRepository: EnrolmentRecordRepository,
     eventDownSyncScopeRepository: EventDownSyncScopeRepository,
-    subjectFactory: SubjectFactory,
+    enrolmentRecordFactory: EnrolmentRecordFactory,
     configManager: ConfigManager,
     timeHelper: TimeHelper,
     eventRepository: EventRepository,
@@ -25,7 +25,7 @@ internal class CommCareEventSyncTask @Inject constructor(
 ) : BaseEventDownSyncTask(
         enrolmentRecordRepository,
         eventDownSyncScopeRepository,
-        subjectFactory,
+        enrolmentRecordFactory,
         configManager,
         timeHelper,
         eventRepository,

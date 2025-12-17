@@ -1,10 +1,10 @@
 package com.simprints.feature.externalcredential.screens.search.usecase
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.reference.BiometricReferenceCapture
-import com.simprints.core.domain.sample.ComparisonResult
+import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.infra.config.store.models.FaceConfiguration
@@ -12,7 +12,7 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.getModalitySdkConfig
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.matching.MatchParams
 import com.simprints.infra.matching.usecase.FaceMatcherUseCase
 import com.simprints.infra.matching.usecase.FingerprintMatcherUseCase
@@ -37,7 +37,7 @@ internal class MatchCandidatesUseCaseTest {
     private lateinit var fingerprintMatcher: FingerprintMatcherUseCase
 
     @MockK
-    private lateinit var subject: Subject
+    private lateinit var enrolmentRecord: EnrolmentRecord
 
     @MockK
     private lateinit var project: Project
@@ -92,7 +92,7 @@ internal class MatchCandidatesUseCaseTest {
             fingerprintMatcher = fingerprintMatcher,
         )
 
-        every { subject.subjectId } returns subjectId
+        every { enrolmentRecord.subjectId } returns subjectId
         every { externalCredentialParams.flowType } returns FlowType.VERIFY
         every { externalCredentialParams.probeReferences } returns listOf(faceCapture, fingerprintCapture)
         every { externalCredentialParams.ageGroup } returns ageGroup
@@ -131,7 +131,7 @@ internal class MatchCandidatesUseCaseTest {
     fun `returns face matches when face samples present`() = runTest {
         initMatchParams(isFace = true)
         val result = useCase.invoke(
-            candidates = listOf(subject),
+            candidates = listOf(enrolmentRecord),
             credential = credential,
             externalCredentialParams = externalCredentialParams,
             project = project,
@@ -149,7 +149,7 @@ internal class MatchCandidatesUseCaseTest {
     fun `returns fingerprint matches when no face samples present`() = runTest {
         initMatchParams(isFace = false)
         val result = useCase.invoke(
-            candidates = listOf(subject),
+            candidates = listOf(enrolmentRecord),
             credential = credential,
             externalCredentialParams = externalCredentialParams,
             project = project,
@@ -182,7 +182,7 @@ internal class MatchCandidatesUseCaseTest {
         every { projectConfig.getModalitySdkConfig(FaceConfiguration.BioSdk.RANK_ONE) } returns null
 
         val result = useCase.invoke(
-            candidates = listOf(subject),
+            candidates = listOf(enrolmentRecord),
             credential = credential,
             externalCredentialParams = externalCredentialParams,
             project = project,
@@ -198,7 +198,7 @@ internal class MatchCandidatesUseCaseTest {
         every { projectConfig.getModalitySdkConfig(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER) } returns null
 
         val result = useCase.invoke(
-            candidates = listOf(subject),
+            candidates = listOf(enrolmentRecord),
             credential = credential,
             externalCredentialParams = externalCredentialParams,
             project = project,
@@ -213,7 +213,7 @@ internal class MatchCandidatesUseCaseTest {
         initMatchParams(isFace = true)
         every { faceSdkConfig.verificationMatchThreshold } returns null
         val result = useCase(
-            candidates = listOf(subject),
+            candidates = listOf(enrolmentRecord),
             credential = credential,
             externalCredentialParams = externalCredentialParams,
             project = project,
@@ -227,7 +227,7 @@ internal class MatchCandidatesUseCaseTest {
         initMatchParams(isFace = false)
         every { fingerprintSdkConfig.verificationMatchThreshold } returns null
         val result = useCase(
-            candidates = listOf(subject),
+            candidates = listOf(enrolmentRecord),
             credential = credential,
             externalCredentialParams = externalCredentialParams,
             project = project,

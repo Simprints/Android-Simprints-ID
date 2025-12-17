@@ -4,11 +4,11 @@ import androidx.annotation.IdRes
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.core.domain.capture.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricTemplateCapture
 import com.simprints.core.domain.common.AgeGroup
-import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.reference.BiometricTemplateCapture
-import com.simprints.core.domain.sample.ComparisonResult
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.step.StepResult
 import com.simprints.face.capture.FaceCaptureParams
@@ -38,7 +38,7 @@ import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.matching.MatchParams
 import com.simprints.infra.matching.MatchResult
 import java.io.Serializable
@@ -58,7 +58,7 @@ import java.io.Serializable
     JsonSubTypes.Type(value = ValidateSubjectPoolResult::class, name = "ValidateSubjectPoolResult"),
     JsonSubTypes.Type(value = SelectSubjectAgeGroupResult::class, name = "SelectSubjectAgeGroupResult"),
     JsonSubTypes.Type(value = ExternalCredentialSearchResult::class, name = "ExternalCredentialSearchResult"),
-    JsonSubTypes.Type(value = CredentialMatch::class, name = " CredentialMatch"),
+    JsonSubTypes.Type(value = CredentialMatch::class, name = "CredentialMatch"),
     // Common data types
     JsonSubTypes.Type(value = BiometricReferenceCapture::class, name = "BiometricReferenceCapture"),
     JsonSubTypes.Type(value = BiometricTemplateCapture::class, name = "BiometricTemplateCapture"),
@@ -104,7 +104,7 @@ abstract class StepResultMixin : StepResult
     JsonSubTypes.Type(value = BiometricDataSource::class, name = "BiometricDataSource"),
     JsonSubTypes.Type(value = BiometricDataSource.CommCare::class, name = "BiometricDataSource.CommCare"),
     JsonSubTypes.Type(value = BiometricDataSource.Simprints::class, name = "BiometricDataSource.Simprints"),
-    JsonSubTypes.Type(value = SubjectQuery::class, name = "SubjectQuery"),
+    JsonSubTypes.Type(value = EnrolmentRecordQuery::class, name = "EnrolmentRecordQuery"),
     JsonSubTypes.Type(value = AgeGroup::class, name = "AgeGroup"),
     JsonSubTypes.Type(value = FingerprintConfiguration.BioSdk::class, name = "FingerprintConfiguration.BioSdk"),
     JsonSubTypes.Type(value = FaceConfiguration.BioSdk::class, name = "FaceConfiguration.BioSdk"),

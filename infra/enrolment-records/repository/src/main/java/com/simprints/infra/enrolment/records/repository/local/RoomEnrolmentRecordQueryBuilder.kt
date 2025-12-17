@@ -1,7 +1,7 @@
 package com.simprints.infra.enrolment.records.repository.local
 
 import androidx.sqlite.db.SimpleSQLiteQuery
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate.Companion.FORMAT_COLUMN
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate.Companion.TEMPLATE_TABLE_NAME
 import com.simprints.infra.enrolment.records.room.store.models.DbExternalCredential.Companion.EXTERNAL_CREDENTIAL_TABLE_NAME
@@ -17,13 +17,13 @@ import javax.inject.Inject
 
 internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
     /**
-     * Builds a query to select subjects based on the provided [SubjectQuery].
+     * Builds a query to select subjects based on the provided [EnrolmentRecordQuery].
      * The query will be on the `SUBJECT_TABLE_NAME` table and will include filtering criteria
-     * Don't set the format in the [SubjectQuery] for this method instead use [buildBiometricTemplatesQuery].
-     * @param query The [SubjectQuery] containing the filtering criteria.
+     * Don't set the format in the [EnrolmentRecordQuery] for this method instead use [buildBiometricTemplatesQuery].
+     * @param query The [EnrolmentRecordQuery] containing the filtering criteria.
      * @return A [SimpleSQLiteQuery] that can be executed against the database.
      */
-    fun buildSubjectQuery(query: SubjectQuery): SimpleSQLiteQuery {
+    fun buildSubjectQuery(query: EnrolmentRecordQuery): SimpleSQLiteQuery {
         // require format not to be set for subject query and guide to use the buildBiometricTemplatesQuery instead
         require(query.format == null) {
             "Cannot set format for subject query, use buildBiometricTemplatesQuery instead"
@@ -41,7 +41,7 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
         return SimpleSQLiteQuery(sql, args.toTypedArray())
     }
 
-    fun buildCountQuery(query: SubjectQuery): SimpleSQLiteQuery {
+    fun buildCountQuery(query: EnrolmentRecordQuery): SimpleSQLiteQuery {
         val (whereClause, args) = buildWhereClause(query)
 
         val sql = if (query.format != null) {
@@ -54,7 +54,7 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
     }
 
     fun buildBiometricTemplatesQuery(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         pageSize: Int,
     ): SimpleSQLiteQuery {
         // require format to be set for biometric templates query
@@ -80,7 +80,7 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
         return SimpleSQLiteQuery(sql, args.toTypedArray())
     }
 
-    fun buildDeleteQuery(query: SubjectQuery): SimpleSQLiteQuery {
+    fun buildDeleteQuery(query: EnrolmentRecordQuery): SimpleSQLiteQuery {
         require(query.format == null) {
             val errorMsg = "format is not supported for deletion"
             Simber.i("[delete] $errorMsg", tag = ROOM_RECORDS_DB)
@@ -97,7 +97,7 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
     }
 
     private fun buildWhereClause(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         subjectAlias: String = "S.", // Default alias for subject table, dot included. Empty string for no alias.
         templateAlias: String = "T.", // Default alias for template table, dot included. Empty string for no alias.
         credentialAlias: String = "C.", // Default alias for credentials table, dot included. Empty string for no alias.
@@ -150,7 +150,7 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
     }
 
     private fun buildCredentialJoinClause(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         subjectAlias: String = "S",
         credentialAlias: String = "C",
     ): String = if (query.externalCredential != null) {
@@ -160,7 +160,7 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
     }
 
     private fun buildOrderByClause(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         subjectAlias: String = "S.",
     ) = if (query.sort) {
         "ORDER BY $subjectAlias$SUBJECT_ID_COLUMN ASC"

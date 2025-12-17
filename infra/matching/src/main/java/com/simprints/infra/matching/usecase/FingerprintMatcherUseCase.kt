@@ -2,8 +2,8 @@ package com.simprints.infra.matching.usecase
 
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.reference.BiometricReferenceCapture
-import com.simprints.core.domain.sample.Identity
+import com.simprints.core.domain.capture.BiometricReferenceCapture
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
@@ -12,7 +12,7 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerCo
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
+import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.matching.MatchBatchInfo
@@ -76,7 +76,7 @@ class FingerprintMatcherUseCase @Inject constructor(
         val loadedCandidates = AtomicInteger(0)
         val ranges = createRanges(expectedCandidates)
         // if number of ranges less than the number of cores then use the number of ranges
-        val channel = enrolmentRecordRepository.loadIdentities(
+        val channel = enrolmentRecordRepository.loadCandidateRecords(
             query = queryWithSupportedFormat,
             ranges = ranges,
             dataSource = matchParams.biometricDataSource,
@@ -103,7 +103,7 @@ class FingerprintMatcherUseCase @Inject constructor(
     }.flowOn(dispatcherBG)
 
     private suspend fun consumeAndMatch(
-        channel: ReceiveChannel<IdentityBatch>,
+        channel: ReceiveChannel<CandidateRecordBatch>,
         probeReference: BiometricReferenceCapture,
         resultSet: MatchResultSet,
         bioSdk: FingerprintConfiguration.BioSdk,
@@ -138,7 +138,7 @@ class FingerprintMatcherUseCase @Inject constructor(
 
     private suspend fun match(
         probeReference: BiometricReferenceCapture,
-        candidates: List<Identity>,
+        candidates: List<CandidateRecord>,
         flowType: FlowType,
         bioSdkWrapper: BioSdkWrapper,
         bioSdk: FingerprintConfiguration.BioSdk,

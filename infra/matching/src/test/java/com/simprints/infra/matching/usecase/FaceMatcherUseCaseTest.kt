@@ -2,14 +2,14 @@ package com.simprints.infra.matching.usecase
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.capture.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricTemplateCapture
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.comparison.ComparisonResult
+import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.reference.BiometricTemplateCapture
-import com.simprints.core.domain.sample.ComparisonResult
-import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.Sample
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
@@ -18,7 +18,7 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.matching.MatchParams
@@ -79,7 +79,7 @@ internal class FaceMatcherUseCaseTest {
             .invoke(
                 MatchParams(
                     flowType = FlowType.VERIFY,
-                    queryForCandidates = SubjectQuery(),
+                    queryForCandidates = EnrolmentRecordQuery(),
                     bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                     biometricDataSource = BiometricDataSource.Simprints,
                     probeReference = BiometricReferenceCapture(
@@ -124,7 +124,7 @@ internal class FaceMatcherUseCaseTest {
                     ),
                     bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                     flowType = FlowType.VERIFY,
-                    queryForCandidates = SubjectQuery(),
+                    queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
                 ),
                 project,
@@ -163,7 +163,7 @@ internal class FaceMatcherUseCaseTest {
                     ),
                     bioSdk = FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER, // Wrong SDK type
                     flowType = FlowType.VERIFY,
-                    queryForCandidates = SubjectQuery(),
+                    queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
                 ),
                 project,
@@ -193,13 +193,15 @@ internal class FaceMatcherUseCaseTest {
     @Test
     fun `Correctly calls SDK matcher`() = runTest {
         val totalCandidates = 1
-        val faceIdentities = listOf(
-            Identity(
+        val faceCandidates = listOf(
+            CandidateRecord(
                 "subjectId",
                 listOf(
-                    Sample(
-                        template = BiometricTemplate(
-                            template = byteArrayOf(1, 2, 3),
+                    BiometricReference(
+                        templates = listOf(
+                            BiometricTemplate(
+                                template = byteArrayOf(1, 2, 3),
+                            ),
                         ),
                         format = "format",
                         referenceId = "faceTemplate",
@@ -211,7 +213,7 @@ internal class FaceMatcherUseCaseTest {
         coEvery { enrolmentRecordRepository.count(any(), any()) } returns 1
         coEvery { createRangesUseCase(any()) } returns listOf(0..99)
         coEvery {
-            enrolmentRecordRepository.loadIdentities(any(), any(), any(), any(), any(), any())
+            enrolmentRecordRepository.loadCandidateRecords(any(), any(), any(), any(), any(), any())
         } answers {
             // Call the onCandidateLoaded callback (5th parameter)
             val onCandidateLoaded: suspend () -> Unit = arg(5)
@@ -220,7 +222,7 @@ internal class FaceMatcherUseCaseTest {
             }
 
             // Return the face identities
-            createTestChannel(faceIdentities)
+            createTestChannel(faceCandidates)
         }
         coEvery { faceMatcher.getHighestComparisonScoreForCandidate(any()) } returns 42f
 
@@ -240,7 +242,7 @@ internal class FaceMatcherUseCaseTest {
                     ),
                     bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                     flowType = FlowType.VERIFY,
-                    queryForCandidates = SubjectQuery(),
+                    queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
                 ),
                 project,
@@ -260,6 +262,6 @@ internal class FaceMatcherUseCaseTest {
 
         // Verify only the size of matchBatches instead of exact content
         assertThat(successState.matchBatches).hasSize(1)
-        assertThat(successState.matchBatches[0].count).isEqualTo(faceIdentities.size)
+        assertThat(successState.matchBatches[0].count).isEqualTo(faceCandidates.size)
     }
 }

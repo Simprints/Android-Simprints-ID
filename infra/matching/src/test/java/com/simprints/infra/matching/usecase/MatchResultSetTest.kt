@@ -1,7 +1,7 @@
 package com.simprints.infra.matching.usecase
 
 import com.google.common.truth.Truth.*
-import com.simprints.core.domain.sample.ComparisonResult
+import com.simprints.core.domain.comparison.ComparisonResult
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors

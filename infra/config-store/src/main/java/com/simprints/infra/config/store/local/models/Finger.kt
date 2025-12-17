@@ -1,6 +1,6 @@
 package com.simprints.infra.config.store.local.models
 
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 
 internal fun TemplateIdentifier.toProtoFinger(): ProtoFinger = when (this) {
     TemplateIdentifier.LEFT_THUMB -> ProtoFinger.LEFT_THUMB

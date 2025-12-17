@@ -1,6 +1,6 @@
 package com.simprints.infra.matching.usecase
 
-import com.simprints.core.domain.sample.ComparisonResult
+import com.simprints.core.domain.comparison.ComparisonResult
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.locks.ReentrantLock

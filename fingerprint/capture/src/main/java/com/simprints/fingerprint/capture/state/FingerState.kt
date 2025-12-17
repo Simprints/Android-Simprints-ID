@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.capture.state
 
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 
 internal data class FingerState(
     val id: TemplateIdentifier,

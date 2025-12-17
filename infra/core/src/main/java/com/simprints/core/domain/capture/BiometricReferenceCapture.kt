@@ -1,4 +1,4 @@
-package com.simprints.core.domain.reference
+package com.simprints.core.domain.capture
 
 import android.os.Parcelable
 import androidx.annotation.Keep

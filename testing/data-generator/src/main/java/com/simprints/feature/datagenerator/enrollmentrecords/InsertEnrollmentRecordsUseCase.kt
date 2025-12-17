@@ -3,15 +3,15 @@ package com.simprints.feature.datagenerator.enrollmentrecords
 import android.os.Bundle
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.reference.TemplateIdentifier
-import com.simprints.core.domain.sample.Sample
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
 import com.simprints.infra.enrolment.records.repository.local.models.toDate
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -41,24 +41,24 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
         val creationDate = timeHelper.now().ms.toDate()
         val updateDate = System.currentTimeMillis().toDate()
         // generate n records and insert them in the repo the first subjectId is used for only one record the rest are generated randomly
-        var subjectCreationActions = mutableListOf<SubjectAction.Creation>()
+        var subjectCreationActions = mutableListOf<EnrolmentRecordAction.Creation>()
         for (i in 0 until numRecords) {
             val subjectId = if (i == 0 && firstSubjectId.isNotBlank()) firstSubjectId else UUID.randomUUID().toString()
-            val subject = Subject(
+            val enrolmentRecord = EnrolmentRecord(
                 subjectId = subjectId,
                 projectId = projectId,
                 attendantId = tokenizedAttendantId,
                 moduleId = tokenizedModuleId,
                 createdAt = creationDate,
                 updatedAt = updateDate,
-                samples = generateFingerprintTemplates(
+                references = generateFingerprintReferences(
                     templatesPerFormat = templatesPerFormat,
                     fingerOrder = fingerOrder,
-                ) + generateFaceSamples(
+                ) + generateFaceReferences(
                     templatesPerFormat = templatesPerFormat,
                 ),
             )
-            subjectCreationActions.add(SubjectAction.Creation(subject))
+            subjectCreationActions.add(EnrolmentRecordAction.Creation(enrolmentRecord))
             if (subjectCreationActions.size >= BATCH_SIZE) {
                 emit("Inserted ${i + 1} biometric records")
                 enrolmentRecordRepository.performActions(
@@ -77,36 +77,37 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
         emit("Inserted $numRecords biometric records")
     }.flowOn(dispatcher)
 
-    private fun generateFaceSamples(templatesPerFormat: Bundle): List<Sample> {
-        val faceSamples = mutableListOf<Sample>()
+    private fun generateFaceReferences(templatesPerFormat: Bundle): List<BiometricReference> {
+        val faceReferences = mutableListOf<BiometricReference>()
         for (key in templatesPerFormat.keySet()) {
             if (FINGERPRINT_FORMATES.contains(key)) {
                 // Skip non-face formats
                 continue
             }
             val numSamples = templatesPerFormat.getInt(key, 0)
-            repeat(numSamples) {
-                faceSamples.add(
-                    Sample(
-                        template = BiometricTemplate(
+
+            faceReferences.add(
+                BiometricReference(
+                    templates = List(numSamples) { it }.map {
+                        BiometricTemplate(
+                            id = UUID.randomUUID().toString(),
                             template = getTemplateForFormat(key),
-                        ),
-                        format = key,
-                        referenceId = UUID.randomUUID().toString(),
-                        id = UUID.randomUUID().toString(),
-                        modality = Modality.FACE,
-                    ),
-                )
-            }
+                        )
+                    },
+                    format = key,
+                    referenceId = UUID.randomUUID().toString(),
+                    modality = Modality.FACE,
+                ),
+            )
         }
-        return faceSamples
+        return faceReferences
     }
 
-    private fun generateFingerprintTemplates(
+    private fun generateFingerprintReferences(
         templatesPerFormat: Bundle,
         fingerOrder: Bundle?,
-    ): List<Sample> {
-        val fingerprintSamples = mutableListOf<Sample>()
+    ): List<BiometricReference> {
+        val fingerprintReferences = mutableListOf<BiometricReference>()
 
         for (key in templatesPerFormat.keySet()) {
             if (FACE_FORMATES.contains(key)) {
@@ -116,26 +117,26 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
             // finger order is a comma separated string of finger identifiers
             val fingerIdentifiers = fingerOrder?.getString(key, "")?.split(",")
             val numSamples = templatesPerFormat.getInt(key, 0)
-            for (i in 0 until numSamples) {
-                fingerprintSamples.add(
-                    Sample(
-                        template = BiometricTemplate(
+
+            fingerprintReferences.add(
+                BiometricReference(
+                    referenceId = UUID.randomUUID().toString(),
+                    format = key,
+                    modality = Modality.FINGERPRINT,
+                    templates = List(numSamples) { it }.map { i ->
+                        BiometricTemplate(
                             template = getTemplateForFormat(key),
                             identifier = if (fingerIdentifiers.isNullOrEmpty()) {
                                 TemplateIdentifier.LEFT_THUMB
                             } else {
                                 fingerIdentifiers[i % fingerIdentifiers.size].toFingerIdentifier()
                             },
-                        ),
-                        format = key,
-                        referenceId = UUID.randomUUID().toString(),
-                        id = UUID.randomUUID().toString(),
-                        modality = Modality.FINGERPRINT,
-                    ),
-                )
-            }
+                        )
+                    },
+                ),
+            )
         }
-        return fingerprintSamples
+        return fingerprintReferences
     }
 
     private fun String.toFingerIdentifier() = when (this.uppercase()) {

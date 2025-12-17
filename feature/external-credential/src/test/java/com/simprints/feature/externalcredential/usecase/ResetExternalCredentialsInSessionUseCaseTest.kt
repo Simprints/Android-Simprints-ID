@@ -9,7 +9,7 @@ import com.simprints.feature.externalcredential.screens.search.model.ScannedCred
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
 import com.simprints.infra.events.event.domain.models.EnrolmentUpdateEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
 import com.simprints.infra.events.session.SessionEventRepository
@@ -68,12 +68,12 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
 
         useCase(scannedCredential, SUBJECT_ID)
 
-        val actionsSlot = slot<List<SubjectAction>>()
+        val actionsSlot = slot<List<EnrolmentRecordAction>>()
         coVerify { enrolmentRecordRepository.performActions(capture(actionsSlot), project) }
 
         val actions = actionsSlot.captured
         assertThat(actions).hasSize(1)
-        val updateAction = actions.first() as SubjectAction.Update
+        val updateAction = actions.first() as EnrolmentRecordAction.Update
         assertThat(updateAction.subjectId).isEqualTo(SUBJECT_ID)
         assertThat(updateAction.externalCredentialsToAdd).hasSize(1)
         assertThat(updateAction.samplesToAdd).isEmpty()
@@ -86,10 +86,10 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
 
         useCase(scannedCredential, SUBJECT_ID)
 
-        val actionsSlot = slot<List<SubjectAction>>()
+        val actionsSlot = slot<List<EnrolmentRecordAction>>()
         coVerify { enrolmentRecordRepository.performActions(capture(actionsSlot), project) }
 
-        val updateAction = actionsSlot.captured.first() as SubjectAction.Update
+        val updateAction = actionsSlot.captured.first() as EnrolmentRecordAction.Update
         val addedCredential = updateAction.externalCredentialsToAdd.first()
         assertThat(addedCredential.value).isEqualTo(CREDENTIAL)
         assertThat(addedCredential.type).isEqualTo(CREDENTIAL_TYE)
@@ -117,16 +117,16 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
             subjectId = SUBJECT_ID,
         )
 
-        val actionsSlot = slot<List<SubjectAction>>()
+        val actionsSlot = slot<List<EnrolmentRecordAction>>()
         coVerify { enrolmentRecordRepository.performActions(capture(actionsSlot), project) }
 
         // Remove actions come first
-        val removeAction = actionsSlot.captured.first() as SubjectAction.Update
+        val removeAction = actionsSlot.captured.first() as EnrolmentRecordAction.Update
         assertThat(removeAction.subjectId).isEqualTo("subject-1")
         assertThat(removeAction.externalCredentialsToAdd).isEmpty()
         assertThat(removeAction.externalCredentialIdsToRemove).containsExactly("credentia-1")
         // Additions come after
-        val addAction = actionsSlot.captured.last() as SubjectAction.Update
+        val addAction = actionsSlot.captured.last() as EnrolmentRecordAction.Update
         assertThat(addAction.externalCredentialsToAdd).isNotEmpty()
         assertThat(addAction.externalCredentialIdsToRemove).isEmpty()
     }
@@ -154,7 +154,7 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
             subjectId = "none_selected",
         )
 
-        val actionsSlot = slot<List<SubjectAction>>()
+        val actionsSlot = slot<List<EnrolmentRecordAction>>()
         coVerify { enrolmentRecordRepository.performActions(capture(actionsSlot), project) }
 
         assertThat(actionsSlot.captured).isEmpty()

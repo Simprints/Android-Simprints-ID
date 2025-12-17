@@ -6,7 +6,7 @@ import com.simprints.feature.externalcredential.screens.search.model.ScannedCred
 import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
 import com.simprints.infra.events.event.domain.models.EnrolmentUpdateEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import kotlinx.coroutines.CoroutineScope
@@ -29,7 +29,7 @@ class ResetExternalCredentialsInSessionUseCase @Inject() constructor(
         // Within a session the external credentials can be linked to a single subject only,
         // therefore we must ensure that on consecutive confirmation the previous links are reverted.
         val credentialsToRemove = enrolmentUpdateEvents.map {
-            SubjectAction.Update(
+            EnrolmentRecordAction.Update(
                 subjectId = it.payload.subjectId,
                 samplesToAdd = emptyList(),
                 referenceIdsToRemove = emptyList(),
@@ -41,7 +41,7 @@ class ResetExternalCredentialsInSessionUseCase @Inject() constructor(
         val validSubjectId = subjectId.takeIf { it.isValidGuid() }
         val credentialsToAdd = if (validSubjectId != null && scannedCredential != null) {
             listOf(
-                SubjectAction.Update(
+                EnrolmentRecordAction.Update(
                     subjectId = subjectId,
                     samplesToAdd = emptyList(),
                     referenceIdsToRemove = emptyList(),

@@ -2,11 +2,11 @@ package com.simprints.feature.externalcredential.screens.search.usecase
 
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.getSdkListForAgeGroup
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.matching.MatchParams
 import javax.inject.Inject
 
@@ -24,7 +24,7 @@ internal class CreateMatchParamsUseCase @Inject constructor() {
             sdksPerModality.map {
                 MatchParams(
                     flowType = flowType,
-                    queryForCandidates = SubjectQuery(subjectId = candidateSubjectId),
+                    queryForCandidates = EnrolmentRecordQuery(subjectId = candidateSubjectId),
                     bioSdk = it,
                     probeReference = probeReference,
                     biometricDataSource = BiometricDataSource.Simprints, // [MS-1167] No CoSync in initial MF-ID implementation

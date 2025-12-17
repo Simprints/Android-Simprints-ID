@@ -3,9 +3,9 @@ package com.simprints.feature.enrollast.screen.usecase
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.core.domain.reference.BiometricReferenceCapture
-import com.simprints.core.domain.reference.BiometricTemplateCapture
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.capture.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricTemplateCapture
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
@@ -13,44 +13,44 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
-import com.simprints.infra.eventsync.sync.common.SubjectFactory
+import com.simprints.infra.eventsync.sync.common.EnrolmentRecordFactory
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import org.junit.Before
 import org.junit.Test
 
-class BuildSubjectUseCaseTest {
+class BuildRecordUseCaseTest {
     @MockK
     private lateinit var timeHelper: TimeHelper
 
     @MockK
     private lateinit var scannedCredential: ScannedCredential
 
-    private lateinit var useCase: BuildSubjectUseCase
+    private lateinit var useCase: BuildRecordUseCase
 
-    private lateinit var subjectFactory: SubjectFactory
+    private lateinit var enrolmentRecordFactory: EnrolmentRecordFactory
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         every { timeHelper.now() }.returns(Timestamp(1L))
-        subjectFactory = SubjectFactory(
+        enrolmentRecordFactory = EnrolmentRecordFactory(
             encodingUtils = EncodingUtilsImplForTests,
             timeHelper = timeHelper,
         )
-        useCase = BuildSubjectUseCase(timeHelper = timeHelper, subjectFactory = subjectFactory)
+        useCase = BuildRecordUseCase(timeHelper = timeHelper, enrolmentRecordFactory = enrolmentRecordFactory)
     }
 
     @Test
-    fun `has no samples if no steps provided`() {
+    fun `has no references if no steps provided`() {
         val result = useCase(createParams(steps = emptyList(), scannedCredential = scannedCredential), isAddingCredential = false)
 
-        assertThat(result.samples).isEmpty()
+        assertThat(result.references).isEmpty()
     }
 
     @Test
-    fun `has no samples if no valid steps provided`() {
+    fun `has no references if no valid steps provided`() {
         val result = useCase(
             createParams(
                 steps = listOf(
@@ -63,7 +63,7 @@ class BuildSubjectUseCaseTest {
             isAddingCredential = false,
         )
 
-        assertThat(result.samples).isEmpty()
+        assertThat(result.references).isEmpty()
     }
 
     @Test
@@ -94,11 +94,13 @@ class BuildSubjectUseCaseTest {
             isAddingCredential = false,
         )
 
-        assertThat(result.samples).isNotEmpty()
+        assertThat(result.references).isNotEmpty()
         assertThat(
-            result.samples
+            result.references
                 .first()
-                .template.identifier,
+                .templates
+                .first()
+                .identifier,
         ).isEqualTo(TemplateIdentifier.RIGHT_THUMB)
     }
 
@@ -132,8 +134,12 @@ class BuildSubjectUseCaseTest {
             isAddingCredential = false,
         )
 
-        assertThat(result.samples).isNotEmpty()
-        assertThat(result.samples.size).isEqualTo(10)
+        assertThat(result.references.size).isEqualTo(1)
+        assertThat(
+            result.references
+                .first()
+                .templates.size,
+        ).isEqualTo(10)
     }
 
     @Test
@@ -164,8 +170,8 @@ class BuildSubjectUseCaseTest {
             isAddingCredential = false,
         )
 
-        assertThat(result.samples).isNotEmpty()
-        assertThat(result.samples.first().format).isEqualTo("first")
+        assertThat(result.references).isNotEmpty()
+        assertThat(result.references.first().format).isEqualTo("first")
     }
 
     @Test

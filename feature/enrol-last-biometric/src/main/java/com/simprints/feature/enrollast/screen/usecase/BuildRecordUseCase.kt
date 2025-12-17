@@ -1,27 +1,27 @@
 package com.simprints.feature.enrollast.screen.usecase
 
-import com.simprints.core.domain.reference.BiometricReferenceCapture
+import com.simprints.core.domain.reference.BiometricReference
+import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.sample.Sample
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.eventsync.sync.common.SubjectFactory
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
+import com.simprints.infra.eventsync.sync.common.EnrolmentRecordFactory
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
 
-internal class BuildSubjectUseCase @Inject constructor(
+internal class BuildRecordUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
-    private val subjectFactory: SubjectFactory,
+    private val enrolmentRecordFactory: EnrolmentRecordFactory,
 ) {
     operator fun invoke(
         params: EnrolLastBiometricParams,
         isAddingCredential: Boolean,
-    ): Subject {
+    ): EnrolmentRecord {
         val subjectId = UUID.randomUUID().toString()
         val externalCredentials = if (isAddingCredential) {
             getExternalCredentialResult(params.scannedCredential, subjectId)?.let(::listOf) ?: emptyList()
@@ -30,15 +30,15 @@ internal class BuildSubjectUseCase @Inject constructor(
         }
         val captureResult = params.steps
             .filterIsInstance<EnrolLastBiometricStepResult.CaptureResult>()
-            .flatMap { result -> result.result.toSamples() }
+            .map { result -> result.result.toBiometricReference() }
 
-        return subjectFactory.buildSubject(
+        return enrolmentRecordFactory.buildEnrolmentRecord(
             subjectId = subjectId,
             projectId = params.projectId,
             attendantId = params.userId,
             moduleId = params.moduleId,
             createdAt = Date(timeHelper.now().ms),
-            samples = captureResult,
+            references = captureResult,
             externalCredentials = externalCredentials,
         )
     }
@@ -48,15 +48,15 @@ internal class BuildSubjectUseCase @Inject constructor(
         subjectId: String,
     ) = credential?.toExternalCredential(subjectId)
 
-    private fun BiometricReferenceCapture.toSamples() = templates.map { templateCapture ->
-        Sample(
-            template = BiometricTemplate(
+    private fun BiometricReferenceCapture.toBiometricReference() = BiometricReference(
+        referenceId = referenceId,
+        modality = modality,
+        format = format,
+        templates = templates.map { templateCapture ->
+            BiometricTemplate(
                 identifier = templateCapture.identifier,
                 template = templateCapture.template,
-            ),
-            format = format,
-            referenceId = referenceId,
-            modality = modality,
-        )
-    }
+            )
+        },
+    )
 }

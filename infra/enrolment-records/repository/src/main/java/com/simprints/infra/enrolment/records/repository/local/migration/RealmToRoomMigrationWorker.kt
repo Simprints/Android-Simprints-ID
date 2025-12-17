@@ -6,8 +6,8 @@ import androidx.work.WorkerParameters
 import com.simprints.core.DispatcherIO
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource
 import com.simprints.infra.enrolment.records.repository.local.RoomEnrolmentRecordLocalDataSource
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.REALM_DB_MIGRATION
@@ -50,7 +50,7 @@ internal class RealmToRoomMigrationWorker @AssistedInject constructor(
 
             realmToRoomMigrationFlagsStore.updateStatus(MigrationStatus.IN_PROGRESS)
             // 2. Check if realm data source is empty
-            val recordsCount = realmDataSource.count(SubjectQuery())
+            val recordsCount = realmDataSource.count(EnrolmentRecordQuery())
             if (recordsCount > 0) {
                 // 3. empty the room database
                 roomDataSource.deleteAll()
@@ -91,7 +91,7 @@ internal class RealmToRoomMigrationWorker @AssistedInject constructor(
                 crashlyticsLog("[RealmToRoomMigrationWorker] Processing batch ${++index} ...")
                 try {
                     val subjectCreationActions = realmSubjectsBatch.map {
-                        SubjectAction.Creation(it)
+                        EnrolmentRecordAction.Creation(it)
                     }
                     roomDataSource.performActions(subjectCreationActions, project)
                 } catch (e: Exception) {
@@ -105,8 +105,8 @@ internal class RealmToRoomMigrationWorker @AssistedInject constructor(
     }
 
     private suspend fun validateRealmToRoomMigration() {
-        val realmCount = realmDataSource.count(SubjectQuery())
-        val roomCount = roomDataSource.count(SubjectQuery())
+        val realmCount = realmDataSource.count(EnrolmentRecordQuery())
+        val roomCount = roomDataSource.count(EnrolmentRecordQuery())
         if (realmCount != roomCount) {
             throw IllegalStateException(
                 "Migration validation failed: Realm count ($realmCount) does not match Room count ($roomCount).",

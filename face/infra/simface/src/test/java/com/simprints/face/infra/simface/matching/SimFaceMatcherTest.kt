@@ -3,10 +3,10 @@ package com.simprints.face.infra.simface.matching
 import com.google.common.truth.Truth.*
 import com.simprints.biometrics.simface.SimFace
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.reference.BiometricTemplateCapture
-import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.Sample
+import com.simprints.core.domain.capture.BiometricTemplateCapture
+import com.simprints.core.domain.reference.CandidateRecord
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -55,14 +55,16 @@ class SimFaceMatcherTest {
                 },
             )
             val result = matcher.getHighestComparisonScoreForCandidate(
-                candidate = Identity(
+                candidate = CandidateRecord(
                     subjectId = "id",
-                    samples = listOf(
-                        Sample(
+                    references = listOf(
+                        BiometricReference(
                             referenceId = "id",
                             modality = Modality.FACE,
-                            template = BiometricTemplate(
-                                template = byteArrayOf(1),
+                            templates = listOf(
+                                BiometricTemplate(
+                                    template = byteArrayOf(1),
+                                ),
                             ),
                             format = "ROC",
                         ),
@@ -90,14 +92,16 @@ class SimFaceMatcherTest {
             },
         )
         val result = matcher.getHighestComparisonScoreForCandidate(
-            candidate = Identity(
+            candidate = CandidateRecord(
                 subjectId = "id",
-                samples = listOf(
-                    Sample(
+                references = listOf(
+                    BiometricReference(
                         referenceId = "id",
                         modality = Modality.FACE,
-                        template = BiometricTemplate(
-                            template = byteArrayOf(1),
+                        templates = listOf(
+                            BiometricTemplate(
+                                template = byteArrayOf(1),
+                            ),
                         ),
                         format = "ROC",
                     ),

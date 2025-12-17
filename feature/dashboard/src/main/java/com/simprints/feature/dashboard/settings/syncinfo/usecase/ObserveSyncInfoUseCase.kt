@@ -22,7 +22,7 @@ import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSampleUploadEnabledInProject
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
@@ -193,7 +193,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             isEventSyncInProgress || projectId.isBlank() -> null
 
             // without project ID, repository access attempts will throw an exception
-            else -> enrolmentRecordRepository.count(SubjectQuery(projectId))
+            else -> enrolmentRecordRepository.count(EnrolmentRecordQuery(projectId))
         }
         val recordsToUpload = when {
             isEventSyncInProgress -> null

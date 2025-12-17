@@ -7,9 +7,9 @@ import com.jraska.livedata.test
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.reference.BiometricReferenceCapture
-import com.simprints.core.domain.reference.BiometricTemplateCapture
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.capture.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricTemplateCapture
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -40,7 +40,7 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.N
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import com.simprints.infra.matching.MatchParams
@@ -195,7 +195,7 @@ internal class OrchestratorViewModelTest {
                 StepId.FACE_MATCHER,
                 MatchStepStubPayload.getMatchStubParams(
                     FlowType.VERIFY,
-                    SubjectQuery(),
+                    EnrolmentRecordQuery(),
                     BiometricDataSource.Simprints,
                     FaceConfiguration.BioSdk.RANK_ONE,
                 ),
@@ -220,7 +220,7 @@ internal class OrchestratorViewModelTest {
                 StepId.FACE_MATCHER,
                 MatchStepStubPayload.getMatchStubParams(
                     FlowType.VERIFY,
-                    SubjectQuery(),
+                    EnrolmentRecordQuery(),
                     BiometricDataSource.Simprints,
                     FaceConfiguration.BioSdk.RANK_ONE,
                 ),
@@ -244,7 +244,7 @@ internal class OrchestratorViewModelTest {
                 StepId.FINGERPRINT_MATCHER,
                 MatchStepStubPayload.getMatchStubParams(
                     FlowType.VERIFY,
-                    SubjectQuery(),
+                    EnrolmentRecordQuery(),
                     BiometricDataSource.Simprints,
                     FaceConfiguration.BioSdk.RANK_ONE,
                 ),
@@ -275,7 +275,7 @@ internal class OrchestratorViewModelTest {
                 StepId.FINGERPRINT_MATCHER,
                 MatchStepStubPayload.getMatchStubParams(
                     flowType = FlowType.VERIFY,
-                    subjectQuery = SubjectQuery(),
+                    enrolmentRecordQuery = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
                     bioSdk = SECUGEN_SIM_MATCHER,
                 ),
@@ -292,7 +292,7 @@ internal class OrchestratorViewModelTest {
                 StepId.FINGERPRINT_MATCHER,
                 MatchStepStubPayload.getMatchStubParams(
                     flowType = FlowType.VERIFY,
-                    subjectQuery = SubjectQuery(),
+                    enrolmentRecordQuery = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
                     bioSdk = NEC,
                 ),

@@ -1,7 +1,7 @@
 package com.simprints.feature.orchestrator.usecases
 
-import com.simprints.core.domain.reference.BiometricReferenceCapture
-import com.simprints.core.domain.sample.ComparisonResult
+import com.simprints.core.domain.capture.BiometricReferenceCapture
+import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.infra.matching.MatchResult

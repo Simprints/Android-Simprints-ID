@@ -10,7 +10,7 @@ import com.simprints.feature.externalcredential.screens.search.model.toExternalC
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirmationEvent
@@ -31,7 +31,7 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
     suspend fun saveSearchEvent(
         startTime: Timestamp,
         externalCredentialId: String,
-        candidates: List<Subject>,
+        candidates: List<EnrolmentRecord>,
     ) {
         eventRepository.addOrUpdateEvent(
             ExternalCredentialSearchEvent(

@@ -2,7 +2,7 @@ package com.simprints.infra.enrolment.records.repository.local
 
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.sample.Identity
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -10,10 +10,10 @@ import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.realm.store.RealmWrapper
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.enrolment.records.repository.local.models.toDomain
 import com.simprints.infra.enrolment.records.repository.local.models.toRealmDb
 import com.simprints.infra.enrolment.records.repository.local.models.toRealmFaceDb
@@ -61,7 +61,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         const val CHANNEL_CAPACITY = 4
     }
 
-    override suspend fun load(query: SubjectQuery): List<Subject> = realmWrapper.readRealm {
+    override suspend fun load(query: EnrolmentRecordQuery): List<EnrolmentRecord> = realmWrapper.readRealm {
         it
             .query(DbSubject::class)
             .buildRealmQueryForSubject(query)
@@ -69,46 +69,46 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
             .map { dbSubject -> dbSubject.toDomain() }
     }
 
-    override suspend fun loadIdentities(
-        query: SubjectQuery,
+    override suspend fun loadCandidateRecords(
+        query: EnrolmentRecordQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<IdentityBatch> {
-        val channel = Channel<IdentityBatch>(CHANNEL_CAPACITY)
+    ): ReceiveChannel<CandidateRecordBatch> {
+        val channel = Channel<CandidateRecordBatch>(CHANNEL_CAPACITY)
         scope.launch(dispatcherIO) {
             ranges.forEach { range ->
                 val startTime = timeHelper.now()
-                val identities = loadIdentitiesRange(
+                val candidates = loadCandidatesRange(
                     query = query,
                     range = range,
                     mapper = { dbSubject ->
-                        Identity(
+                        CandidateRecord(
                             subjectId = dbSubject.subjectId.toString(),
-                            samples = (
-                                dbSubject.faceSamples.map { it.toDomain() } +
-                                    dbSubject.fingerprintSamples.map { it.toDomain() }
+                            references = (
+                                dbSubject.faceSamples.toDomain() +
+                                    dbSubject.fingerprintSamples.toDomain()
                             ).filter { it.format == query.format },
                         )
                     },
                     onCandidateLoaded = onCandidateLoaded,
                 )
                 val endTime = timeHelper.now()
-                channel.send(IdentityBatch(identities, startTime, endTime))
+                channel.send(CandidateRecordBatch(candidates, startTime, endTime))
             }
             channel.close()
         }
         return channel
     }
 
-    private suspend fun loadIdentitiesRange(
-        query: SubjectQuery,
+    private suspend fun loadCandidatesRange(
+        query: EnrolmentRecordQuery,
         range: IntRange,
-        mapper: (DbSubject) -> Identity,
+        mapper: (DbSubject) -> CandidateRecord,
         onCandidateLoaded: suspend () -> Unit,
-    ): List<Identity> = realmWrapper.readRealm { realm ->
+    ): List<CandidateRecord> = realmWrapper.readRealm { realm ->
         realm
             .query(DbSubject::class)
             .buildRealmQueryForSubject(query)
@@ -121,7 +121,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
             }
     }
 
-    override suspend fun delete(queries: List<SubjectQuery>) {
+    override suspend fun delete(queries: List<EnrolmentRecordQuery>) {
         realmWrapper.writeRealm { realm ->
             queries.forEach {
                 realm.delete(realm.query(DbSubject::class).buildRealmQueryForSubject(it))
@@ -136,7 +136,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
     }
 
     override suspend fun count(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         dataSource: BiometricDataSource,
     ): Int = realmWrapper.readRealm { realm ->
         realm
@@ -148,7 +148,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
     }
 
     override suspend fun performActions(
-        actions: List<SubjectAction>,
+        actions: List<EnrolmentRecordAction>,
         project: Project,
     ) {
         // if there is no actions to perform return to avoid useless realm operations
@@ -160,17 +160,17 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         realmWrapper.writeRealm { realm ->
             actions.forEach { action ->
                 when (action) {
-                    is SubjectAction.Creation -> {
-                        val newSubject = action.subject
+                    is EnrolmentRecordAction.Creation -> {
+                        val newSubject = action.enrolmentRecord
                             .copy(
                                 moduleId =
                                     tokenizationProcessor.tokenizeIfNecessary(
-                                        action.subject.moduleId,
+                                        action.enrolmentRecord.moduleId,
                                         TokenKeyType.ModuleId,
                                         project,
                                     ),
                                 attendantId = tokenizationProcessor.tokenizeIfNecessary(
-                                    action.subject.attendantId,
+                                    action.enrolmentRecord.attendantId,
                                     TokenKeyType.AttendantId,
                                     project,
                                 ),
@@ -201,7 +201,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                         realm.copyToRealm(newSubject, updatePolicy = UpdatePolicy.ALL)
                     }
 
-                    is SubjectAction.Update -> {
+                    is EnrolmentRecordAction.Update -> {
                         val dbSubject: DbSubject? = realm.findSubject(RealmUUID.from(action.subjectId))
                         if (dbSubject != null) {
                             val referencesToDelete = action.referenceIdsToRemove.toSet() // to make lookup O(1)
@@ -218,12 +218,12 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                             dbSubject.faceSamples = (
                                 faceSamplesMap[false].orEmpty() + action.samplesToAdd
                                     .filter { it.modality == Modality.FACE }
-                                    .map { it.toRealmFaceDb() }
+                                    .flatMap { it.toRealmFaceDb() }
                             ).toRealmList()
                             dbSubject.fingerprintSamples = (
                                 fingerprintSamplesMap[false].orEmpty() + action.samplesToAdd
                                     .filter { it.modality == Modality.FINGERPRINT }
-                                    .map { it.toRealmFingerprintDb() }
+                                    .flatMap { it.toRealmFingerprintDb() }
                             ).toRealmList()
                             dbSubject.externalCredentials = allExternalCredentials.toRealmList()
 
@@ -236,12 +236,14 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                         }
                     }
 
-                    is SubjectAction.Deletion -> realm.delete(
-                        realm
-                            .query(DbSubject::class)
-                            .buildRealmQueryForSubject(query = SubjectQuery(subjectId = action.subjectId))
-                            .find(),
-                    )
+                    is EnrolmentRecordAction.Deletion -> {
+                        realm.delete(
+                            realm
+                                .query(DbSubject::class)
+                                .buildRealmQueryForSubject(query = EnrolmentRecordQuery(subjectId = action.subjectId))
+                                .find(),
+                        )
+                    }
                 }
             }
         }
@@ -267,7 +269,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
     private fun MutableRealm.findSubject(subjectId: RealmUUID): DbSubject? =
         query(DbSubject::class).query("$SUBJECT_ID_FIELD == $0", subjectId).first().find()
 
-    private fun RealmQuery<DbSubject>.buildRealmQueryForSubject(query: SubjectQuery): RealmQuery<DbSubject> {
+    private fun RealmQuery<DbSubject>.buildRealmQueryForSubject(query: EnrolmentRecordQuery): RealmQuery<DbSubject> {
         var realmQuery = this
 
         if (query.projectId != null) {
@@ -326,7 +328,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
     /**
      * Loads all subjects in batches of the specified size.
      */
-    fun loadAllSubjectsInBatches(batchSize: Int): Flow<List<Subject>> = channelFlow {
+    fun loadAllSubjectsInBatches(batchSize: Int): Flow<List<EnrolmentRecord>> = channelFlow {
         require(batchSize > 0) {
             "Batch size must be greater than 0"
         }

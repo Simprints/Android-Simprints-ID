@@ -2,7 +2,7 @@ package com.simprints.feature.validatepool.usecase
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
@@ -26,12 +26,12 @@ class HasRecordsUseCaseTest {
     @Test
     fun `Returns false if there are no records`() = runTest {
         coEvery { repository.count(any()) }.returns(0)
-        assertThat(usecase(SubjectQuery())).isFalse()
+        assertThat(usecase(EnrolmentRecordQuery())).isFalse()
     }
 
     @Test
     fun `Returns true if there are records`() = runTest {
         coEvery { repository.count(any()) }.returns(1)
-        assertThat(usecase(SubjectQuery())).isTrue()
+        assertThat(usecase(EnrolmentRecordQuery())).isTrue()
     }
 }

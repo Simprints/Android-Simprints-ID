@@ -10,8 +10,7 @@ import com.simprints.core.AvailableProcessors
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.sample.Identity
-import com.simprints.core.domain.sample.Sample
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
@@ -21,10 +20,10 @@ import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.ExtractCommCareCaseIdUseCase
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.enrolment.records.repository.IdentityDataSource
+import com.simprints.infra.enrolment.records.repository.CandidateRecordDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.enrolment.records.repository.usecases.CompareImplicitTokenizedStringsUseCase
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordCreationEventDeserializer
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
@@ -45,8 +44,9 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import com.simprints.core.domain.reference.BiometricReference as CoreBiometricReference
 
-internal class CommCareIdentityDataSource @Inject constructor(
+internal class CommCareCandidateRecordDataSource @Inject constructor(
     private val timeHelper: TimeHelper,
     private val encoder: EncodingUtils,
     private val jsonHelper: JsonHelper,
@@ -55,19 +55,19 @@ internal class CommCareIdentityDataSource @Inject constructor(
     @AvailableProcessors private val availableProcessors: Int,
     @ApplicationContext private val context: Context,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
-) : IdentityDataSource {
+) : CandidateRecordDataSource {
     private fun getCaseMetadataUri(packageName: String): Uri = "content://$packageName.case/casedb/case".toUri()
 
     private fun getCaseDataUri(packageName: String): Uri = "content://$packageName.case/casedb/data".toUri()
 
-    override suspend fun loadIdentities(
-        query: SubjectQuery,
+    override suspend fun loadCandidateRecords(
+        query: EnrolmentRecordQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
-    ): ReceiveChannel<IdentityBatch> = loadIdentitiesConcurrently(
+    ): ReceiveChannel<CandidateRecordBatch> = loadIdentitiesConcurrently(
         ranges = ranges,
         scope = scope,
     ) { range ->
@@ -80,15 +80,15 @@ internal class CommCareIdentityDataSource @Inject constructor(
             onCandidateLoaded = onCandidateLoaded,
         )
         val endTime = timeHelper.now()
-        IdentityBatch(identities, startTime, endTime)
+        CandidateRecordBatch(identities, startTime, endTime)
     }
 
     private fun loadIdentitiesConcurrently(
         ranges: List<IntRange>,
         scope: CoroutineScope,
-        load: suspend (IntRange) -> IdentityBatch,
-    ): ReceiveChannel<IdentityBatch> {
-        val channel = Channel<IdentityBatch>(availableProcessors)
+        load: suspend (IntRange) -> CandidateRecordBatch,
+    ): ReceiveChannel<CandidateRecordBatch> {
+        val channel = Channel<CandidateRecordBatch>(availableProcessors)
         val semaphore = Semaphore(availableProcessors)
         scope.launch(dispatcher) {
             ranges
@@ -101,47 +101,43 @@ internal class CommCareIdentityDataSource @Inject constructor(
     }
 
     private suspend fun loadIdentities(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
         project: Project,
         onCandidateLoaded: suspend () -> Unit,
-    ): List<Identity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
+    ): List<CandidateRecord> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
         .filter { erce -> erce.payload.biometricReferences.any { it.format == query.format } }
         .map { erce ->
-            Identity(
+            CandidateRecord(
                 erce.payload.subjectId,
-                erce.payload.biometricReferences.flatMap { reference ->
-                    when (reference) {
-                        is FaceReference -> reference.templates.mapNotNull { faceTemplate ->
-                            if (reference.format != query.format) {
-                                null
-                            } else {
-                                Sample(
-                                    template = BiometricTemplate(
-                                        template = encoder.base64ToBytes(faceTemplate.template),
-                                    ),
-                                    format = reference.format,
-                                    referenceId = reference.id,
-                                    modality = Modality.FACE,
-                                )
-                            }
-                        }
+                erce.payload.biometricReferences.mapNotNull { reference ->
+                    if (reference.format != query.format) {
+                        null
+                    } else {
+                        when (reference) {
+                            is FaceReference -> CoreBiometricReference(
+                                referenceId = reference.id,
+                                format = reference.format,
+                                modality = Modality.FACE,
+                                templates = reference.templates.map {
+                                    BiometricTemplate(
+                                        template = encoder.base64ToBytes(it.template),
+                                    )
+                                },
+                            )
 
-                        is FingerprintReference -> reference.templates.mapNotNull { fingerprintTemplate ->
-                            if (reference.format != query.format) {
-                                null
-                            } else {
-                                Sample(
-                                    template = BiometricTemplate(
-                                        identifier = fingerprintTemplate.finger,
-                                        template = encoder.base64ToBytes(fingerprintTemplate.template),
-                                    ),
-                                    format = reference.format,
-                                    referenceId = reference.id,
-                                    modality = Modality.FINGERPRINT,
-                                )
-                            }
+                            is FingerprintReference -> CoreBiometricReference(
+                                referenceId = reference.id,
+                                format = reference.format,
+                                modality = Modality.FINGERPRINT,
+                                templates = reference.templates.map {
+                                    BiometricTemplate(
+                                        identifier = it.finger,
+                                        template = encoder.base64ToBytes(it.template),
+                                    )
+                                },
+                            )
                         }
                     }
                 },
@@ -151,7 +147,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
     private suspend fun loadEnrolmentRecordCreationEvents(
         range: IntRange,
         callerPackageName: String,
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         project: Project,
         onCandidateLoaded: suspend () -> Unit,
     ): List<EnrolmentRecordCreationEvent> {
@@ -191,7 +187,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
     private fun loadEnrolmentRecordCreationEvents(
         caseId: String,
         callerPackageName: String,
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         project: Project,
     ): List<EnrolmentRecordCreationEvent> {
         // Access Case Data Listing for the caseId
@@ -219,12 +215,12 @@ internal class CommCareIdentityDataSource @Inject constructor(
     }
 
     private fun isSubjectIdNullOrMatching(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         event: EnrolmentRecordCreationEvent,
     ): Boolean = query.subjectId == null || query.subjectId == event.payload.subjectId
 
     private fun isAttendantIdNullOrMatching(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         event: EnrolmentRecordCreationEvent,
         project: Project,
     ): Boolean = query.attendantId == null ||
@@ -236,7 +232,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
         )
 
     private fun isModuleIdNullOrMatching(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         event: EnrolmentRecordCreationEvent,
         project: Project,
     ): Boolean = query.moduleId == null ||
@@ -286,7 +282,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
     }
 
     override suspend fun count(
-        query: SubjectQuery,
+        query: EnrolmentRecordQuery,
         dataSource: BiometricDataSource,
     ): Int = withContext(dispatcher) {
         var count = 0

@@ -1,7 +1,7 @@
 package com.simprints.infra.events.event.domain.models.fingerprint
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.reference.TemplateIdentifier
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
