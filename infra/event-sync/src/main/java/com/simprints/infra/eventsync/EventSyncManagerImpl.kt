@@ -1,7 +1,5 @@
 package com.simprints.infra.eventsync
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.time.TimeHelper
@@ -33,6 +31,7 @@ import com.simprints.infra.eventsync.sync.down.tasks.SimprintsEventDownSyncTask
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -54,13 +53,11 @@ internal class EventSyncManagerImpl @Inject constructor(
 ) : EventSyncManager {
     override suspend fun getLastSyncTime(): Timestamp? = eventSyncCache.readLastSuccessfulSyncTime()
 
-    override fun getLastSyncState(useDefaultValue: Boolean): LiveData<EventSyncState> = MediatorLiveData<EventSyncState>().apply {
+    override fun getLastSyncState(useDefaultValue: Boolean): Flow<EventSyncState> = flow {
         if (useDefaultValue) {
-            value = EventSyncState(syncId = "", null, null, emptyList(), emptyList(), emptyList())
+            emit(EventSyncState(syncId = "", null, null, emptyList(), emptyList(), emptyList()))
         }
-        addSource(eventSyncStateProcessor.getLastSyncState()) { lastSyncState ->
-            value = lastSyncState
-        }
+        eventSyncStateProcessor.getLastSyncState().collect { emit(it) }
     }
 
     override fun getPeriodicWorkTags(): List<String> = listOf(

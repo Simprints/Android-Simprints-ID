@@ -7,7 +7,7 @@ import androidx.work.WorkInfo.State.FAILED
 import androidx.work.WorkInfo.State.RUNNING
 import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.workDataOf
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.Enqueued
@@ -57,25 +57,25 @@ fun EventSyncWorkerState.assertEqualToFailedState(e: Failed) {
 fun EventSyncState.assertConnectingSyncState() {
     assertProgressAndTotal(syncId, total, progress)
     assertThat(downSyncWorkersInfo.count { it.state is Enqueued }).isEqualTo(1)
-    upSyncWorkersInfo.all { it.state is Succeeded }
+    assertThat(upSyncWorkersInfo.all { it.state is Succeeded }).isTrue()
 }
 
 fun EventSyncState.assertFailingSyncState() {
     assertProgressAndTotal(syncId, total, progress)
     assertThat(downSyncWorkersInfo.count { it.state is Failed }).isEqualTo(1)
-    upSyncWorkersInfo.all { it.state is Succeeded }
+    assertThat(upSyncWorkersInfo.all { it.state is Succeeded }).isTrue()
 }
 
 fun EventSyncState.assertSuccessfulSyncState() {
     assertProgressAndTotal(syncId, total, progress)
-    downSyncWorkersInfo.all { it.state is Succeeded }
-    upSyncWorkersInfo.all { it.state is Succeeded }
+    assertThat(downSyncWorkersInfo.all { it.state is Succeeded }).isTrue()
+    assertThat(upSyncWorkersInfo.all { it.state is Succeeded }).isTrue()
 }
 
 fun EventSyncState.assertRunningSyncState() {
     assertProgressAndTotal(syncId, total, progress)
     assertThat(downSyncWorkersInfo.count { it.state is Running }).isEqualTo(1)
-    upSyncWorkersInfo.all { it.state is Succeeded }
+    assertThat(upSyncWorkersInfo.all { it.state is Succeeded }).isTrue()
 }
 
 fun EventSyncState.assertRunningSyncStateWithoutProgress() {
@@ -83,7 +83,7 @@ fun EventSyncState.assertRunningSyncStateWithoutProgress() {
     assertThat(total).isNull()
     assertThat(progress).isNull()
     assertThat(downSyncWorkersInfo.count { it.state is Running }).isEqualTo(1)
-    upSyncWorkersInfo.all { it.state is Succeeded }
+    assertThat(upSyncWorkersInfo.all { it.state is Succeeded }).isTrue()
 }
 
 private fun assertProgressAndTotal(

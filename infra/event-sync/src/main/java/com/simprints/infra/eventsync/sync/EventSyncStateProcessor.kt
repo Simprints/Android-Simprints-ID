@@ -1,9 +1,5 @@
 package com.simprints.infra.eventsync.sync
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.switchMap
 import androidx.work.WorkInfo
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncState.SyncWorkerInfo
@@ -15,7 +11,7 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.END_SYNC_
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.START_SYNC_REPORTER
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.UPLOADER
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
-import com.simprints.infra.eventsync.sync.common.SyncWorkersLiveDataProvider
+import com.simprints.infra.eventsync.sync.common.SyncWorkersInfoProvider
 import com.simprints.infra.eventsync.sync.common.didFailBecauseBackendMaintenance
 import com.simprints.infra.eventsync.sync.common.didFailBecauseCloudIntegration
 import com.simprints.infra.eventsync.sync.common.didFailBecauseCommCarePermissionMissing
@@ -31,15 +27,18 @@ import com.simprints.infra.eventsync.sync.up.workers.extractUpSyncMaxCount
 import com.simprints.infra.eventsync.sync.up.workers.extractUpSyncProgress
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 internal class EventSyncStateProcessor @Inject constructor(
     private val eventSyncCache: EventSyncCache,
-    private val syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider,
+    private val syncWorkersInfoProvider: SyncWorkersInfoProvider,
 ) {
-    fun getLastSyncState(): LiveData<EventSyncState> = observerForLastSyncId().switchMap { lastSyncId ->
-        observerForLastSyncIdWorkers(lastSyncId).switchMap { syncWorkers ->
-            liveData {
+    fun getLastSyncState(): Flow<EventSyncState> = observerForLastSyncId().flatMapLatest { lastSyncId ->
+        observerForLastSyncIdWorkers(lastSyncId).flatMapLatest { syncWorkers ->
+            flow {
                 val progress = calculateProgressForSync(syncWorkers)
                 val total = calculateTotalForSync(syncWorkers)
 
@@ -57,32 +56,32 @@ internal class EventSyncStateProcessor @Inject constructor(
                     syncReporterStates,
                 )
 
-                emit(syncState)
                 Simber.d("Emitting for sync state: $syncState", tag = SYNC)
+                emit(syncState)
             }
         }
     }
 
-    private fun observerForLastSyncId(): LiveData<String> = syncWorkersLiveDataProvider
-        .getStartSyncReportersLiveData()
-        .switchMap { startSyncReporters ->
+    private fun observerForLastSyncId(): Flow<String> = syncWorkersInfoProvider
+        .getStartSyncReporters()
+        .flatMapLatest { startSyncReporters ->
             Simber.d("Received updated from Master Scheduler", tag = SYNC)
 
             val completedSyncMaster = completedWorkers(startSyncReporters)
             val mostRecentSyncMaster = completedSyncMaster.sortByScheduledTime().lastOrNull()
 
-            MutableLiveData<String>().apply {
+            flow {
                 if (mostRecentSyncMaster != null) {
                     val lastSyncId = mostRecentSyncMaster.outputData.getString(SYNC_ID_STARTED)
                     if (!lastSyncId.isNullOrBlank()) {
                         Simber.d("Received sync id: $lastSyncId", tag = SYNC)
-                        this.postValue(lastSyncId)
+                        emit(lastSyncId)
                     }
                 }
             }
         }
 
-    private fun observerForLastSyncIdWorkers(lastSyncId: String) = syncWorkersLiveDataProvider.getSyncWorkersLiveData(lastSyncId)
+    private fun observerForLastSyncIdWorkers(lastSyncId: String) = syncWorkersInfoProvider.getSyncWorkerInfos(lastSyncId)
 
     private fun completedWorkers(workInfos: List<WorkInfo>) = workInfos.filter { it.state == WorkInfo.State.SUCCEEDED }
 

@@ -8,6 +8,7 @@ import android.text.style.ForegroundColorSpan
 import android.view.View
 import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import com.simprints.core.DispatcherIO
@@ -60,7 +61,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
         super.onViewCreated(view, savedInstanceState)
         applySystemBarInsets(view)
 
-        eventSyncManager.getLastSyncState().observe(viewLifecycleOwner) { state ->
+        eventSyncManager.getLastSyncState().asLiveData().observe(viewLifecycleOwner) { state ->
             val states =
                 (state.downSyncWorkersInfo.map { it.state } + state.upSyncWorkersInfo.map { it.state })
             val message =

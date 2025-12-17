@@ -1,9 +1,7 @@
 package com.simprints.feature.dashboard.logout
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.asFlow
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.ProjectConfiguration
@@ -15,13 +13,8 @@ import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.mockkStatic
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -152,10 +145,8 @@ internal class LogoutSyncViewModelTest {
         imageSyncStatus: ImageSyncStatus,
         projectConfig: ProjectConfiguration,
     ) {
-        mockkStatic("androidx.lifecycle.FlowLiveDataConversions")
-        val eventSyncLiveData = mockk<LiveData<EventSyncState>>(relaxed = true)
-        every { eventSyncLiveData.asFlow() } returns flowOf(eventSyncState)
-        every { eventSyncManager.getLastSyncState(useDefaultValue = true) } returns eventSyncLiveData
+        val eventSyncFlow = flowOf(eventSyncState)
+        every { eventSyncManager.getLastSyncState(useDefaultValue = true) } returns eventSyncFlow
         every { syncOrchestrator.observeImageSyncStatus() } returns flowOf(imageSyncStatus)
         every { configManager.observeProjectConfiguration() } returns flowOf(projectConfig)
     }

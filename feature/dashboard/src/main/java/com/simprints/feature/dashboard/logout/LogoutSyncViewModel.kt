@@ -2,7 +2,6 @@ package com.simprints.feature.dashboard.logout
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
@@ -39,7 +38,7 @@ internal class LogoutSyncViewModel @Inject constructor(
             .asLiveData(viewModelScope.coroutineContext)
 
     val isLogoutWithoutSyncVisibleLiveData: LiveData<Boolean> = combine(
-        eventSyncManager.getLastSyncState(useDefaultValue = true).asFlow(),
+        eventSyncManager.getLastSyncState(useDefaultValue = true),
         syncOrchestrator.observeImageSyncStatus(),
     ) { eventSyncState, imageSyncStatus ->
         !eventSyncState.isSyncCompleted() || imageSyncStatus.isSyncing
