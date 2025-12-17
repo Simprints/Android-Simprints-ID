@@ -62,7 +62,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
 
     // Since we are not using distinctUntilChanged any emission from combined flows will trigger the main flow as well
     private fun combinedRefreshSignals() = combine(
-        connectivityTracker.observeIsConnected().asFlow(),
+        connectivityTracker.observeIsConnected(),
         appForegroundStateTracker.observeAppInForeground().filter { it }, // only when going to foreground
         ticker.observeTicks(1.minutes),
     ) { isOnline, _, _ -> isOnline }

@@ -1,8 +1,6 @@
 package com.simprints.feature.dashboard.settings.syncinfo.usecase
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.lifecycle.AppForegroundStateTracker
@@ -120,9 +118,7 @@ internal class ObserveSyncInfoUseCaseTest {
     private fun setupDefaultMocks() {
         every { authStore.observeSignedInProjectId() } returns MutableStateFlow(TEST_PROJECT_ID)
 
-        val connectivityLiveData = MutableLiveData(true)
-        every { connectivityTracker.observeIsConnected() } returns connectivityLiveData
-        every { connectivityLiveData.asFlow() } returns flowOf(true)
+        every { connectivityTracker.observeIsConnected() } returns flowOf(true)
 
         val eventSyncLiveData = flowOf(mockEventSyncState)
         every { eventSyncManager.getLastSyncState() } returns eventSyncLiveData
@@ -255,7 +251,7 @@ internal class ObserveSyncInfoUseCaseTest {
             every { isSyncInProgress() } returns false
         }
         every { eventSyncManager.getLastSyncState(any()) } returns flowOf(mockOfflineEventSyncState)
-        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(false)
+        every { connectivityTracker.observeIsConnected() } returns flowOf(false)
         createUseCase()
 
         val result = useCase().first()
@@ -273,7 +269,7 @@ internal class ObserveSyncInfoUseCaseTest {
             every { isSyncFailed() } returns false
         }
         every { eventSyncManager.getLastSyncState(any()) } returns flowOf(mockNormalEventSyncState)
-        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(true)
+        every { connectivityTracker.observeIsConnected() } returns flowOf(true)
         createUseCase()
 
         val result = useCase().first()
@@ -306,7 +302,7 @@ internal class ObserveSyncInfoUseCaseTest {
             every { progress } returns null
         }
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockNotSyncingImageStatus)
-        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(false)
+        every { connectivityTracker.observeIsConnected() } returns flowOf(false)
         createUseCase()
 
         val result = useCase().first()
@@ -321,7 +317,7 @@ internal class ObserveSyncInfoUseCaseTest {
             every { isSyncFailedBecauseReloginRequired() } returns false
         }
         every { eventSyncManager.getLastSyncState(any()) } returns flowOf(mockNormalEventSyncState)
-        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(true)
+        every { connectivityTracker.observeIsConnected() } returns flowOf(true)
         createUseCase()
 
         val result = useCase().first()
@@ -737,7 +733,7 @@ internal class ObserveSyncInfoUseCaseTest {
     @Test
     fun `should handle network errors indication`() = runTest {
         val connectivityFlow = MutableStateFlow(false) // start offline
-        every { connectivityTracker.observeIsConnected().asFlow() } returns connectivityFlow
+        every { connectivityTracker.observeIsConnected() } returns connectivityFlow
         createUseCase()
 
         val offlineResult = useCase().first()
@@ -782,7 +778,7 @@ internal class ObserveSyncInfoUseCaseTest {
     @Test
     fun `should handle changes in connectivity stream`() = runTest {
         val connectivityFlow = MutableStateFlow(false) // started offline
-        every { connectivityTracker.observeIsConnected().asFlow() } returns connectivityFlow
+        every { connectivityTracker.observeIsConnected() } returns connectivityFlow
         createUseCase()
 
         val offlineResult = useCase().first()
@@ -982,7 +978,7 @@ internal class ObserveSyncInfoUseCaseTest {
             every { isSyncInProgress() } returns false
         }
         every { eventSyncManager.getLastSyncState(any()) } returns flowOf(mockFailedEventSyncState)
-        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(true)
+        every { connectivityTracker.observeIsConnected() } returns flowOf(true)
         every { mockProjectConfiguration.isCommCareEventDownSyncAllowed() } returns true
         every { commCarePermissionChecker.hasCommCarePermissions() } returns false // Permission still denied
         createUseCase()
@@ -1005,7 +1001,7 @@ internal class ObserveSyncInfoUseCaseTest {
             every { isSyncInProgress() } returns false
         }
         every { eventSyncManager.getLastSyncState(any()) } returns flowOf(mockNormalEventSyncState)
-        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(true)
+        every { connectivityTracker.observeIsConnected() } returns flowOf(true)
         createUseCase()
 
         val result = useCase().first()
@@ -1047,7 +1043,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
     @Test
     fun `sync button should be disabled when this is logout screen and offline`() = runTest {
-        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(false)
+        every { connectivityTracker.observeIsConnected() } returns flowOf(false)
         createUseCase()
 
         val result = useCase(isPreLogoutUpSync = true).first()
@@ -1057,7 +1053,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
     @Test
     fun `sync button should be enabled when online and there is sync to Simprints`() = runTest {
-        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(true)
+        every { connectivityTracker.observeIsConnected() } returns flowOf(true)
         every { any<ProjectConfiguration>().canSyncDataToSimprints() } returns true
         createUseCase()
 
@@ -1068,7 +1064,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
     @Test
     fun `sync button should be enabled when offline but CommCare down-sync allowed`() = runTest {
-        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(false)
+        every { connectivityTracker.observeIsConnected() } returns flowOf(false)
         every { any<ProjectConfiguration>().isCommCareEventDownSyncAllowed() } returns true
         createUseCase()
 
@@ -1236,7 +1232,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
     @Test
     fun `should show correct visibility states for offline instructions`() = runTest {
-        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(false)
+        every { connectivityTracker.observeIsConnected() } returns flowOf(false)
         createUseCase()
 
         val result = useCase().first()
@@ -1255,7 +1251,7 @@ internal class ObserveSyncInfoUseCaseTest {
             every { isSyncInProgress() } returns false
         }
         every { eventSyncManager.getLastSyncState(any()) } returns flowOf(mockFailedEventSyncState)
-        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(true)
+        every { connectivityTracker.observeIsConnected() } returns flowOf(true)
         createUseCase()
 
         val result = useCase().first()
@@ -1283,7 +1279,7 @@ internal class ObserveSyncInfoUseCaseTest {
         )
 
         every { eventSyncManager.getLastSyncState(any()) } returns flowOf(mockIdleEventSyncState)
-        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(true)
+        every { connectivityTracker.observeIsConnected() } returns flowOf(true)
         every { mockProjectConfigRequiringModules.isModuleSelectionAvailable() } returns true
         createUseCase()
 
@@ -1302,7 +1298,7 @@ internal class ObserveSyncInfoUseCaseTest {
             every { isSyncInProgress() } returns false
         }
         every { eventSyncManager.getLastSyncState(any()) } returns flowOf(mockIdleEventSyncState)
-        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(true)
+        every { connectivityTracker.observeIsConnected() } returns flowOf(true)
         createUseCase()
 
         val result = useCase().first()
@@ -1362,7 +1358,7 @@ internal class ObserveSyncInfoUseCaseTest {
             every { isSyncInProgress() } returns false
         }
         every { eventSyncManager.getLastSyncState(any()) } returns flowOf(mockNormalEventSyncState)
-        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(false)
+        every { connectivityTracker.observeIsConnected() } returns flowOf(false)
         createUseCase()
 
         val result = useCase().first()
@@ -1395,7 +1391,7 @@ internal class ObserveSyncInfoUseCaseTest {
             every { isSyncFailedBecauseCommCarePermissionIsMissing() } returns false
         }
         every { eventSyncManager.getLastSyncState(any()) } returns flowOf(mockNormalEventSyncState)
-        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(true)
+        every { connectivityTracker.observeIsConnected() } returns flowOf(true)
         createUseCase()
 
         val result = useCase().first()
