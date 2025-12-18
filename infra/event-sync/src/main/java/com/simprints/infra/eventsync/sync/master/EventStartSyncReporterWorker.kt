@@ -23,7 +23,7 @@ import kotlinx.coroutines.withContext
 internal class EventStartSyncReporterWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
-    @DispatcherBG private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(appContext, params) {
     override val tag: String = "EventStartSyncReporter"
 

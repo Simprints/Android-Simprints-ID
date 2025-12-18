@@ -12,7 +12,7 @@ internal class ProcessRawImageUseCase @Inject constructor(
     private val secugenImageCorrection: SecugenImageCorrection,
     private val acquireImageDistortionConfigurationUseCase: AcquireImageDistortionConfigurationUseCase,
     private val wsqConverter: WSQConverter,
-    @DispatcherBG private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) {
     suspend operator fun invoke(
         settings: FingerprintTemplateAcquisitionSettings,

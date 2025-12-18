@@ -47,7 +47,7 @@ internal class SyncInfoViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     observeSyncInfo: ObserveSyncInfoUseCase,
     private val logoutUseCase: LogoutUseCase,
-    @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
+    @param:DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     var isPreLogoutUpSync = false
 

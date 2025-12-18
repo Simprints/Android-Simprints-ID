@@ -55,7 +55,7 @@ internal class FaceCaptureViewModel @Inject constructor(
     private val resolveFaceBioSdk: ResolveFaceBioSdkUseCase,
     private val saveLicenseCheckEvent: SaveLicenseCheckEventUseCase,
     private val shouldShowInstructions: ShouldShowInstructionsScreenUseCase,
-    @DeviceID private val deviceID: String,
+    @param:DeviceID private val deviceID: String,
 ) : ViewModel() {
     // Updated in live feedback screen
     var attemptNumber: Int = 0

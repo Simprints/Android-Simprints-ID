@@ -24,8 +24,8 @@ import javax.inject.Inject
 
 internal class FirebaseAuthManager @Inject constructor(
     private val loginInfoStore: LoginInfoStore,
-    @ApplicationContext private val context: Context,
-    @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
+    @param:ApplicationContext private val context: Context,
+    @param:DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) {
     suspend fun signIn(token: Token) {
         cacheTokenClaims(token.value)

@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 internal class CalculateNecImageQualityUseCase @Inject constructor(
     private val necInstant: NEC,
-    @DispatcherBG private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) {
     suspend operator fun invoke(image: FingerprintImage): Int = withContext(dispatcher) {
         try {

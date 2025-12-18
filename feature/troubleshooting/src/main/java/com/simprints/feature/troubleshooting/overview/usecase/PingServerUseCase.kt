@@ -13,7 +13,7 @@ import javax.inject.Inject
 import kotlin.time.measureTimedValue
 
 internal class PingServerUseCase @Inject constructor(
-    @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
+    @param:DispatcherIO private val dispatcherIO: CoroutineDispatcher,
     private val baseUrlProvider: BaseUrlProvider,
     private val urlFactory: UrlFactory,
 ) {

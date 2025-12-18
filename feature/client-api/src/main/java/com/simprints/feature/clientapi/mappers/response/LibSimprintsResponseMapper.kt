@@ -25,8 +25,8 @@ import com.simprints.libsimprints.Tier as LegacyTier
 import com.simprints.libsimprints.Verification as LegacyVerification
 
 internal class LibSimprintsResponseMapper @Inject constructor(
-    @DeviceID private val deviceId: String,
-    @PackageVersionName private val appVersionName: String,
+    @param:DeviceID private val deviceId: String,
+    @param:PackageVersionName private val appVersionName: String,
 ) {
     operator fun invoke(response: ActionResponse): Bundle = when (response) {
         is ActionResponse.EnrolActionResponse -> bundleOf(

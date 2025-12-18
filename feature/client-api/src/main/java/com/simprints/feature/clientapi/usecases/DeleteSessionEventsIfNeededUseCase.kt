@@ -12,7 +12,7 @@ import javax.inject.Inject
 internal class DeleteSessionEventsIfNeededUseCase @Inject constructor(
     private val configManager: ConfigManager,
     private val eventRepository: EventRepository,
-    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
+    @param:SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
     operator fun invoke(sessionId: String) = sessionCoroutineScope.launch {
         val projectNotRunning = configManager.getProject()?.state != ProjectState.RUNNING

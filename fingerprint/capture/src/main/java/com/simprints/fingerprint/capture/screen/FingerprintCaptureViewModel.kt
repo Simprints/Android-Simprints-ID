@@ -79,7 +79,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private val addBiometricReferenceCreationEvents: AddBiometricReferenceCreationEventUseCase,
     private val tracker: FingerprintScanningStatusTracker,
     private val isNoFingerDetectedLimitReachedUseCase: IsNoFingerDetectedLimitReachedUseCase,
-    @ExternalScope private val externalScope: CoroutineScope,
+    @param:ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
     lateinit var configuration: FingerprintConfiguration
     private lateinit var bioSdkConfiguration: FingerprintConfiguration.FingerprintSdkConfiguration

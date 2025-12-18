@@ -19,7 +19,7 @@ class EnrolmentRecordWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val configManager: ConfigManager,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
     override val tag: String = "EnrolmentRecordWorker"
 

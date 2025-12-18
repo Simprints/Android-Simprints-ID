@@ -43,7 +43,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
     private val shouldScheduleFirmwareUpdate: ShouldScheduleFirmwareUpdateUseCase,
     private val cleanupDeprecatedWorkers: CleanupDeprecatedWorkersUseCase,
     private val imageSyncTimestampProvider: ImageSyncTimestampProvider,
-    @AppScope private val appScope: CoroutineScope,
+    @param:AppScope private val appScope: CoroutineScope,
 ) : SyncOrchestrator {
     init {
         appScope.launch {

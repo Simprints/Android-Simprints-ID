@@ -5,7 +5,7 @@ import javax.inject.Inject
 import kotlin.math.ceil
 
 class CreateRangesUseCase @Inject constructor(
-    @AvailableProcessors private val availableProcessors: Int,
+    @param:AvailableProcessors private val availableProcessors: Int,
 ) {
     /**
      * Creates a list of ranges to be used for batch processing.

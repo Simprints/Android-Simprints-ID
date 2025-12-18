@@ -32,7 +32,7 @@ import javax.inject.Inject
  */
 internal class ConnectionHelper @Inject constructor(
     private val bluetoothAdapter: ComponentBluetoothAdapter,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {
     private var socket: ComponentBluetoothSocket? = null
 

@@ -43,7 +43,7 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
     private val resetExternalCredentialsUseCase: ResetExternalCredentialsInSessionUseCase,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val tokenizationProcessor: TokenizationProcessor,
-    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
+    @param:SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) : ViewModel() {
     @AssistedFactory
     interface Factory {

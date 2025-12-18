@@ -27,7 +27,7 @@ internal class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constru
     @Assisted params: WorkerParameters,
     private val eventRepository: SessionEventRepository,
     private val locationManager: LocationManager,
-    @DispatcherMain private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherMain private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
     override val tag: String = "StoreUserLocationWorker"
 

@@ -26,7 +26,7 @@ internal class EventEndSyncReporterWorker @AssistedInject constructor(
     private val syncCache: EventSyncCache,
     private val eventRepository: EventRepository,
     private val timeHelper: TimeHelper,
-    @DispatcherBG private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(appContext, params) {
     override val tag: String = "EventEndSyncReporter"
 

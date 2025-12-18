@@ -43,7 +43,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     private val subjectsDatabaseFactory: SubjectsDatabaseFactory,
     private val tokenizationProcessor: TokenizationProcessor,
     private val queryBuilder: RoomEnrolmentRecordQueryBuilder,
-    @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
+    @param:DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) : EnrolmentRecordLocalDataSource {
     companion object {
         // Although batches are processed sequentially, we use a small channel capacity to prevent blocking and reduce the risk of out-of-memory errors.

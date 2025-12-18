@@ -13,8 +13,8 @@ import java.io.File
 import javax.inject.Inject
 
 class CredentialImageRepository @Inject constructor(
-    @ApplicationContext private val context: Context,
-    @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
+    @param:ApplicationContext private val context: Context,
+    @param:DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) {
     /**
      * Saves a bitmap to the application's cache directory as a JPEG file.

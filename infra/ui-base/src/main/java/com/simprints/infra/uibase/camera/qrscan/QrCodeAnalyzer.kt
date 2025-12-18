@@ -23,7 +23,7 @@ import kotlinx.coroutines.runBlocking
 
 class QrCodeAnalyzer @AssistedInject constructor(
     private val qrCodeDetectorFactory: QrCodeDetector.Factory,
-    @DispatcherBG private val bgDispatcher: CoroutineDispatcher,
+    @param:DispatcherBG private val bgDispatcher: CoroutineDispatcher,
     @Assisted private val cropConfig: CropConfig?,
     @Assisted private val crashReportTag: LoggingConstants.CrashReportTag,
     private val cropBitmapAreaForDetectionUseCase: CropBitmapAreaForDetectionUseCase

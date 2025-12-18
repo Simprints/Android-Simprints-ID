@@ -49,7 +49,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     private val zoomOntoCredentialUseCase: ZoomOntoCredentialUseCase,
     private val tokenizationProcessor: TokenizationProcessor,
     private val configManager: ConfigManager,
-    @DispatcherBG private val bgDispatcher: CoroutineDispatcher,
+    @param:DispatcherBG private val bgDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     @AssistedFactory
     fun interface Factory {

@@ -27,7 +27,7 @@ internal class ModuleSelectionViewModel @Inject constructor(
     private val syncOrchestrator: SyncOrchestrator,
     private val configManager: ConfigManager,
     private val tokenizationProcessor: TokenizationProcessor,
-    @ExternalScope private val externalScope: CoroutineScope,
+    @param:ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
     val modulesList: LiveData<List<Module>>
         get() = _modulesList

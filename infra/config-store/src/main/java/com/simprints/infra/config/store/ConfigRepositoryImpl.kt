@@ -33,7 +33,7 @@ internal class ConfigRepositoryImpl @Inject constructor(
     private val remoteDataSource: ConfigRemoteDataSource,
     private val simNetwork: SimNetwork,
     private val tokenizationProcessor: TokenizationProcessor,
-    @DeviceID private val deviceId: String,
+    @param:DeviceID private val deviceId: String,
 ) : ConfigRepository {
     companion object {
         @VisibleForTesting

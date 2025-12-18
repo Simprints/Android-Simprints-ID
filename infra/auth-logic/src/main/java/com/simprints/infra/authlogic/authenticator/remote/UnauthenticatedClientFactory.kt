@@ -9,8 +9,8 @@ import kotlin.reflect.KClass
 
 internal class UnauthenticatedClientFactory @Inject constructor(
     private val simNetwork: SimNetwork,
-    @DeviceID private val deviceId: String,
-    @PackageVersionName private val versionName: String,
+    @param:DeviceID private val deviceId: String,
+    @param:PackageVersionName private val versionName: String,
 ) {
     fun <T : SimRemoteInterface> build(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T> = simNetwork.getSimApiClient(
         remoteInterface,

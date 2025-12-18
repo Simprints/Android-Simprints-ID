@@ -17,7 +17,7 @@ import javax.inject.Singleton
 @Singleton
 class EventSyncCache @Inject constructor(
     securityManager: SecurityManager,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {
     private val sharedForCounts =
         securityManager.buildEncryptedSharedPreferences(FILENAME_FOR_DOWN_COUNTS_SHARED_PREFS)

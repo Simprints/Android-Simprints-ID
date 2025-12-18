@@ -14,7 +14,7 @@ internal class LogoutUseCase @Inject constructor(
     private val authManager: AuthManager,
     private val flagsStore: RealmToRoomMigrationFlagsStore,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
-    @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
+    @param:DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) {
     // To prevent a race between wiping data and navigation, this use case must block the executing thread
     operator fun invoke() = runBlocking(ioDispatcher) {

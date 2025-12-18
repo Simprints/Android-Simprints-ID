@@ -22,7 +22,7 @@ internal class SimpleCaptureEventReporter @Inject constructor(
     private val timeHelper: TimeHelper,
     private val eventRepository: SessionEventRepository,
     private val encodingUtils: EncodingUtils,
-    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
+    @param:SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
     fun addOnboardingCompleteEvent(startTime: Timestamp) = sessionCoroutineScope.launch {
         eventRepository.addOrUpdateEvent(FaceOnboardingCompleteEvent(startTime, timeHelper.now()))

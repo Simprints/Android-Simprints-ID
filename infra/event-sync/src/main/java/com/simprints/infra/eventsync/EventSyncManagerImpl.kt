@@ -50,7 +50,7 @@ internal class EventSyncManagerImpl @Inject constructor(
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val configRepository: ConfigRepository,
     private val extractCommCareCaseId: ExtractCommCareCaseIdUseCase,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : EventSyncManager {
     override suspend fun getLastSyncTime(): Timestamp? = eventSyncCache.readLastSuccessfulSyncTime()
 

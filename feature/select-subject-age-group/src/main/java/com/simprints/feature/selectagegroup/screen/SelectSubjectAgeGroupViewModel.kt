@@ -25,7 +25,7 @@ internal class SelectSubjectAgeGroupViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     private val eventRepository: SessionEventRepository,
     private val buildAgeGroups: BuildAgeGroupsUseCase,
-    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
+    @param:SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) : ViewModel() {
     val finish: LiveData<LiveDataEventWithContent<AgeGroup>>
         get() = _finish

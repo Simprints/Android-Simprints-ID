@@ -52,9 +52,9 @@ internal class CommCareCandidateRecordDataSource @Inject constructor(
     private val jsonHelper: JsonHelper,
     private val compareImplicitTokenizedStringsUseCase: CompareImplicitTokenizedStringsUseCase,
     private val extractCommCareCaseId: ExtractCommCareCaseIdUseCase,
-    @AvailableProcessors private val availableProcessors: Int,
-    @ApplicationContext private val context: Context,
-    @DispatcherBG private val dispatcher: CoroutineDispatcher,
+    @param:AvailableProcessors private val availableProcessors: Int,
+    @param:ApplicationContext private val context: Context,
+    @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : CandidateRecordDataSource {
     private fun getCaseMetadataUri(packageName: String): Uri = "content://$packageName.case/casedb/case".toUri()
 

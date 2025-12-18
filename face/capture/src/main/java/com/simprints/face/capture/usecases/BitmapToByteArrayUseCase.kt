@@ -9,7 +9,7 @@ import javax.inject.Inject
 import kotlin.math.max
 
 internal class BitmapToByteArrayUseCase @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ) {
     companion object {
         const val IMAGE_QUALITY = 100

@@ -5,7 +5,7 @@ import com.simprints.infra.authstore.AuthStore
 import javax.inject.Inject
 
 internal class CollectIdsUseCase @Inject constructor(
-    @DeviceID private val deviceID: String,
+    @param:DeviceID private val deviceID: String,
     private val authStore: AuthStore,
 ) {
     operator fun invoke() =

@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 @ExcludedFromGeneratedTestCoverageReports("Mostly system calls")
 internal class CollectNetworkInformationUseCase @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ) {
     operator fun invoke(): String {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

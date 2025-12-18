@@ -23,7 +23,7 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val simNetworkUtils: SimNetworkUtils,
     private val recentUserActivityManager: RecentUserActivityManager,
-    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
+    @param:SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
     suspend operator fun invoke(actionRequest: ActionRequest) {
         reportUnknownExtras(actionRequest)

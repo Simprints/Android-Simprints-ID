@@ -15,7 +15,7 @@ import javax.inject.Inject
 internal class FingerprintFileDownloader @Inject constructor(
     private val fingerprintApiClientFactory: FingerprintApiClientFactory,
     private val authStore: AuthStore,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {
     private val projectId by lazy {
         authStore.signedInProjectId

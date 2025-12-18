@@ -26,11 +26,11 @@ import javax.inject.Singleton
 
 @Singleton
 class RealmWrapperImpl @Inject constructor(
-    @ApplicationContext private val appContext: Context,
+    @param:ApplicationContext private val appContext: Context,
     private val configFactory: RealmConfig,
     private val securityManager: SecurityManager,
     private val authStore: AuthStore,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : RealmWrapper {
     // Kotlin-realm claims to be thread-safe and there is no need to handle closing manually
     // https://www.mongodb.com/docs/realm/sdk/kotlin/realm-database/frozen-arch/#thread-safe-realms
