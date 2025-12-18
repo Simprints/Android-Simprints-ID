@@ -2,8 +2,10 @@ package com.simprints.infra.authlogic.authenticator.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.infra.authstore.domain.models.AuthRequest
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiAuthRequestBody(
     var projectSecret: String = "",
     var integrityToken: String = "",
