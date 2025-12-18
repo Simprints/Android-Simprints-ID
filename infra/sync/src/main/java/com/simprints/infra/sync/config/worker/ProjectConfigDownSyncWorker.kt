@@ -26,7 +26,7 @@ internal class ProjectConfigDownSyncWorker @AssistedInject constructor(
     private val rescheduleWorkersIfConfigChanged: RescheduleWorkersIfConfigChangedUseCase,
     private val resetLocalRecordsIfConfigChanged: ResetLocalRecordsIfConfigChangedUseCase,
     private val realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler,
-    @DispatcherBG private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
     override val tag = "ProjectConfigDownSync"
 

@@ -27,7 +27,7 @@ internal class FileUpSyncWorker @AssistedInject constructor(
     private val imageDistortionConfigRepo: ImageDistortionConfigRepo,
     private val authStore: AuthStore,
     private val imageSyncTimestampProvider: ImageSyncTimestampProvider,
-    @DispatcherBG private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
     override val tag: String = "FileUpSyncWorker"
 

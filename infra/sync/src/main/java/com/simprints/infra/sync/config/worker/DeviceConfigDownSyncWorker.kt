@@ -20,7 +20,7 @@ internal class DeviceConfigDownSyncWorker @AssistedInject constructor(
     private val configManager: ConfigManager,
     private val logoutUseCase: LogoutUseCase,
     private val syncOrchestrator: SyncOrchestrator,
-    @DispatcherBG private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
     override val tag: String = "DeviceConfigDownSync"
 

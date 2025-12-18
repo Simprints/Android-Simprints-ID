@@ -15,7 +15,7 @@ import javax.inject.Singleton
 
 @Singleton
 class FingerprintScanningStatusTracker @Inject constructor(
-    @DispatcherBG private val dispatcherBG: CoroutineDispatcher,
+    @param:DispatcherBG private val dispatcherBG: CoroutineDispatcher,
 ) {
     private val coroutineScope = CoroutineScope(dispatcherBG)
     private val _state =

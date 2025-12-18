@@ -11,8 +11,8 @@ import java.io.File
 import javax.inject.Inject
 
 internal class EncryptedSharedPreferencesBuilderImpl @Inject constructor(
-    @ApplicationContext private val ctx: Context,
-    @BuildSdk private val buildSdk: Int,
+    @param:ApplicationContext private val ctx: Context,
+    @param:BuildSdk private val buildSdk: Int,
     private val masterKeyProvider: MasterKeyProvider,
     private val preferencesProvider: EncryptedSharedPreferencesProvider,
 ) : EncryptedSharedPreferencesBuilder {

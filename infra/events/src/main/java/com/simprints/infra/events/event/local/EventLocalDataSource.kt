@@ -30,8 +30,8 @@ import kotlin.coroutines.CoroutineContext
 internal open class EventLocalDataSource @Inject constructor(
     private val eventDatabaseFactory: EventDatabaseFactory,
     private val jsonHelper: JsonHelper,
-    @DispatcherIO private val readingDispatcher: CoroutineDispatcher,
-    @NonCancellableIO private val writingContext: CoroutineContext,
+    @param:DispatcherIO private val readingDispatcher: CoroutineDispatcher,
+    @param:NonCancellableIO private val writingContext: CoroutineContext,
 ) {
     private var eventDao: EventRoomDao = eventDatabaseFactory.get().eventDao
 

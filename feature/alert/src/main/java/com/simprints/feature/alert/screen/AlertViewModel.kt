@@ -15,11 +15,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class AlertViewModel @Inject constructor(
-    @DeviceID private val deviceId: String,
+    @param:DeviceID private val deviceId: String,
     private val timeHelper: TimeHelper,
     private val eventRepository: SessionEventRepository,
     private val authStore: AuthStore,
-    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
+    @param:SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) : ViewModel() {
     private lateinit var cachedAlertEvent: AlertScreenEvent
 

@@ -43,7 +43,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
     private val timeHelper: TimeHelper,
     private val realmWrapper: RealmWrapper,
     private val tokenizationProcessor: TokenizationProcessor,
-    @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
+    @param:DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) : EnrolmentRecordLocalDataSource {
     companion object {
         const val PROJECT_ID_FIELD = "projectId"

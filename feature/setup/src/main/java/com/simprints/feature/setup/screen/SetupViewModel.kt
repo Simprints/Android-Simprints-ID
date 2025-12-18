@@ -29,7 +29,7 @@ internal class SetupViewModel @Inject constructor(
     private val locationStore: LocationStore,
     private val configManager: ConfigManager,
     private val licenseRepository: LicenseRepository,
-    @DeviceID private val deviceID: String,
+    @param:DeviceID private val deviceID: String,
     private val authStore: AuthStore,
     private val saveLicenseCheckEvent: SaveLicenseCheckEventUseCase,
 ) : ViewModel() {

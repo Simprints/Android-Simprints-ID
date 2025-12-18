@@ -26,7 +26,7 @@ import javax.inject.Inject
 internal class AddCallbackEventUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
     private val timeHelper: TimeHelper,
-    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
+    @param:SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
     operator fun invoke(result: AppResponse) {
         val callbackEvent = when (result) {

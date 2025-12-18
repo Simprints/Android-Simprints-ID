@@ -28,9 +28,9 @@ import kotlin.time.measureTime
 
 @Singleton
 internal open class EventRepositoryImpl @Inject constructor(
-    @DeviceID private val deviceId: String,
-    @PackageVersionName private val appVersionName: String,
-    @LibSimprintsVersionName override val libSimprintsVersionName: String,
+    @param:DeviceID private val deviceId: String,
+    @param:PackageVersionName private val appVersionName: String,
+    @param:LibSimprintsVersionName override val libSimprintsVersionName: String,
     private val authStore: AuthStore,
     private val eventLocalDataSource: EventLocalDataSource,
     private val timeHelper: TimeHelper,

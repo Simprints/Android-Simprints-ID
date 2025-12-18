@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class LoginFormViewModel @Inject constructor(
-    @DeviceID private val deviceId: String,
+    @param:DeviceID private val deviceId: String,
     private val simNetwork: SimNetwork,
     private val authManager: AuthManager,
     private val jsonHelper: JsonHelper,

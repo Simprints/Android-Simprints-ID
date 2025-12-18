@@ -14,7 +14,7 @@ import kotlin.random.Random
 class InsertSessionEventsUseCase @Inject constructor(
     private val eventRepository: EventRepository,
     private val sessionGenerator: SessionGenerator,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {
     operator fun invoke(
         projectId: String,

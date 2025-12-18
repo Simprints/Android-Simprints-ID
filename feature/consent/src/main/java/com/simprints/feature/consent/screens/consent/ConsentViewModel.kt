@@ -29,7 +29,7 @@ internal class ConsentViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     private val configManager: ConfigManager,
     private val eventRepository: SessionEventRepository,
-    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
+    @param:SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) : ViewModel() {
     private val startConsentEventTime = timeHelper.now()
 

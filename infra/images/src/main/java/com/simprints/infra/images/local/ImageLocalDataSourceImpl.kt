@@ -15,9 +15,9 @@ import java.io.FileNotFoundException
 import javax.inject.Inject
 
 internal class ImageLocalDataSourceImpl @Inject constructor(
-    @ApplicationContext private val ctx: Context,
+    @param:ApplicationContext private val ctx: Context,
     private val keyHelper: SecurityManager,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : ImageLocalDataSource {
     private val imageRootPath = "${ctx.filesDir}/$IMAGES_FOLDER"
 

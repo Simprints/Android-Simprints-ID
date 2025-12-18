@@ -10,8 +10,8 @@ import kotlin.reflect.KClass
 
 internal class SimApiClientFactory @Inject constructor(
     private val simNetwork: SimNetwork,
-    @DeviceID private val deviceId: String,
-    @PackageVersionName private val versionName: String,
+    @param:DeviceID private val deviceId: String,
+    @param:PackageVersionName private val versionName: String,
     private val firebaseAuthManager: FirebaseAuthManager,
 ) {
     // Not using `inline fun <reified T : SimRemoteInterface>` because it's not possible to

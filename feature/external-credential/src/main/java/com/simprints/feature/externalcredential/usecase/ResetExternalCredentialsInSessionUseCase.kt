@@ -16,7 +16,7 @@ class ResetExternalCredentialsInSessionUseCase @Inject() constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val configManager: ConfigManager,
     private val eventRepository: SessionEventRepository,
-    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
+    @param:SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
     suspend operator fun invoke(
         scannedCredential: ScannedCredential? = null,

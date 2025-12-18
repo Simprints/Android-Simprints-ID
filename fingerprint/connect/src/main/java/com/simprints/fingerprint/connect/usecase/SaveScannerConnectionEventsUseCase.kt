@@ -16,7 +16,7 @@ internal class SaveScannerConnectionEventsUseCase @Inject constructor(
     private val scannerManager: ScannerManager,
     private val timeHelper: TimeHelper,
     private val eventRepository: SessionEventRepository,
-    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
+    @param:SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
     operator fun invoke() {
         sessionCoroutineScope.launch {

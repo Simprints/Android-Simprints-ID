@@ -8,7 +8,7 @@ import com.simprints.infra.orchestration.data.ActionRequest
 import javax.inject.Inject
 
 internal class ExtractParametersForAnalyticsUseCase @Inject constructor(
-    @DeviceID private val deviceId: String,
+    @param:DeviceID private val deviceId: String,
 ) {
     suspend operator fun invoke(action: ActionRequest) = with(action) {
         ignoreException {

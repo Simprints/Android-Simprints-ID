@@ -35,7 +35,7 @@ class ScannerFactory @Inject internal constructor(
     private val stmOtaHelper: StmOtaHelper,
     private val un20OtaHelper: Un20OtaHelper,
     private val fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory,
-    @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
+    @param:DispatcherIO private val ioDispatcher: CoroutineDispatcher,
     private val scannerInfo: ScannerInfo,
     private val scannerV2: ScannerV2,
 ) {

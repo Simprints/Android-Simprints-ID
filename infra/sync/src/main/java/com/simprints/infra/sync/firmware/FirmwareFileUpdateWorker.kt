@@ -23,7 +23,7 @@ class FirmwareFileUpdateWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val firmwareRepository: FirmwareRepository,
-    @DispatcherBG private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
     override val tag: String = "FirmwareFileUpdateWorker"
 

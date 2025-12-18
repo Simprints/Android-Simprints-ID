@@ -16,9 +16,9 @@ import java.io.File
 import javax.inject.Inject
 
 internal class LicenseLocalDataSourceImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val keyHelper: SecurityManager,
-    @DispatcherIO private val dispatcherIo: CoroutineDispatcher,
+    @param:DispatcherIO private val dispatcherIo: CoroutineDispatcher,
 ) : LicenseLocalDataSource {
     private val licenseDirectoryPath = "${context.filesDir}/${LICENSES_FOLDER}"
 

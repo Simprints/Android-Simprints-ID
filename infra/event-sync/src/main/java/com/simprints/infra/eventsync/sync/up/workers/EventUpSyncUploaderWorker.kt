@@ -44,7 +44,7 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
     private val authStore: AuthStore,
     private val jsonHelper: JsonHelper,
     private val eventRepository: EventRepository,
-    @DispatcherBG private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params),
     WorkerProgressCountReporter {
     override val tag: String = "EventUpSyncUploader"

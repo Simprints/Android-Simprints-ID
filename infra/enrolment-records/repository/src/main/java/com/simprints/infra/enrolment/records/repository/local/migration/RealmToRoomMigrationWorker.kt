@@ -27,7 +27,7 @@ internal class RealmToRoomMigrationWorker @AssistedInject constructor(
     private val roomDataSource: RoomEnrolmentRecordLocalDataSource,
     private val realmToRoomMigrationFlagsStore: RealmToRoomMigrationFlagsStore,
     private val configRepo: ConfigRepository,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(appContext, workerParams) {
     companion object {
         const val BATCH_SIZE = 500

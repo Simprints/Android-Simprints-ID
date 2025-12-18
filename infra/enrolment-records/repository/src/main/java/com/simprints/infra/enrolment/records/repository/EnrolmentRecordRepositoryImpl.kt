@@ -25,11 +25,11 @@ import javax.inject.Singleton
 @Singleton
 internal class EnrolmentRecordRepositoryImpl @Inject constructor(
     private val remoteDataSource: EnrolmentRecordRemoteDataSource,
-    @CommCareDataSource private val commCareDataSource: CandidateRecordDataSource,
+    @param:CommCareDataSource private val commCareDataSource: CandidateRecordDataSource,
     private val tokenizationProcessor: TokenizationProcessor,
     private val selectEnrolmentRecordLocalDataSource: SelectEnrolmentRecordLocalDataSourceUseCase,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
-    @EnrolmentBatchSize private val batchSize: Int,
+    @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @param:EnrolmentBatchSize private val batchSize: Int,
     private val insertRecordsInRoomDuringMigration: InsertRecordsInRoomDuringMigrationUseCase,
     securityManager: SecurityManager,
 ) : EnrolmentRecordRepository {

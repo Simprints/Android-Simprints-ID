@@ -13,7 +13,7 @@ import javax.inject.Inject
 internal class ReportFirmwareUpdateEventUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val eventRepository: SessionEventRepository,
-    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
+    @param:SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
     operator fun invoke(
         startTime: Timestamp,

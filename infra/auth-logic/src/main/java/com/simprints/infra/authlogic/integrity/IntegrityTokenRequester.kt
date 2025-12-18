@@ -27,7 +27,7 @@ import javax.inject.Inject
 
 internal class IntegrityTokenRequester @Inject constructor(
     private val integrityManager: IntegrityManager,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {
     /**
      * A method that gets the integrity service token, using a blocking [Tasks.await] method.

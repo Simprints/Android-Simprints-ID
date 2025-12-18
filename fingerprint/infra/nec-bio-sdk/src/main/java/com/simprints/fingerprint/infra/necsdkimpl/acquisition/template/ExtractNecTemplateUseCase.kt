@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 internal class ExtractNecTemplateUseCase @Inject constructor(
     private val nec: NEC,
-    @DispatcherBG private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) {
     suspend operator fun invoke(
         fingerprintImage: FingerprintImage,

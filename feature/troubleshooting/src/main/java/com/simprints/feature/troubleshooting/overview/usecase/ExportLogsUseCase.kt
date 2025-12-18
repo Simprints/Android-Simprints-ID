@@ -17,11 +17,11 @@ import java.util.Date
 import javax.inject.Inject
 
 internal class ExportLogsUseCase @Inject constructor(
-    @DeviceID private val deviceId: String,
-    @ApplicationContext private val context: Context,
+    @param:DeviceID private val deviceId: String,
+    @param:ApplicationContext private val context: Context,
     private val logDirectoryProvider: LogDirectoryProvider,
     private val configManager: ConfigManager,
-    @FileNameDateTimeFormatter private val dateFormatter: SimpleDateFormat,
+    @param:FileNameDateTimeFormatter private val dateFormatter: SimpleDateFormat,
 ) {
     operator fun invoke(): Flow<LogsExportResult> = flow {
         emit(LogsExportResult.InProgress)

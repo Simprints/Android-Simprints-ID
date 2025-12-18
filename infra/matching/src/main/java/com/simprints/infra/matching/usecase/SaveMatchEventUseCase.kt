@@ -22,7 +22,7 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerCo
 class SaveMatchEventUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
     private val configManager: ConfigManager,
-    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
+    @param:SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
     operator fun invoke(
         startTime: Timestamp,

@@ -12,7 +12,7 @@ import javax.inject.Inject
 internal class SimpleEventReporter @Inject constructor(
     private val coreEventRepository: SessionEventRepository,
     private val timeHelper: TimeHelper,
-    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
+    @param:SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
     fun addInvalidIntentEvent(
         action: String,

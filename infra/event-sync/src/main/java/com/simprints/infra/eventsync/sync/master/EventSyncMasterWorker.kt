@@ -45,7 +45,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
     private val eventRepository: EventRepository,
     private val eventSyncSubMasterWorkersBuilder: EventSyncSubMasterWorkersBuilder,
     private val timeHelper: TimeHelper,
-    @DispatcherBG private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
     private val securityManager: SecurityManager,
 ) : SimCoroutineWorker(appContext, params) {
     override val tag: String = "EventSyncMasterWorker"

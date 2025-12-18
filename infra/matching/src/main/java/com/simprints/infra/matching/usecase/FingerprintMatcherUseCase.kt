@@ -32,7 +32,7 @@ class FingerprintMatcherUseCase @Inject constructor(
     private val resolveBioSdkWrapper: ResolveBioSdkWrapperUseCase,
     private val configManager: ConfigManager,
     private val createRanges: CreateRangesUseCase,
-    @DispatcherBG private val dispatcherBG: CoroutineDispatcher,
+    @param:DispatcherBG private val dispatcherBG: CoroutineDispatcher,
 ) : MatcherUseCase {
     override val crashReportTag = LoggingConstants.CrashReportTag.FINGER_MATCHING
 

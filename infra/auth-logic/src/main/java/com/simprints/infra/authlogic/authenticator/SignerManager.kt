@@ -27,7 +27,7 @@ internal class SignerManager @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val licenseRepository: LicenseRepository,
     private val scannerManager: ScannerManager,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {
     val signedInProjectId: String
         get() = authStore.signedInProjectId

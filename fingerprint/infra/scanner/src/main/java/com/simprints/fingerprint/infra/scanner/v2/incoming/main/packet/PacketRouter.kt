@@ -24,7 +24,7 @@ class PacketRouter @Inject constructor(
     routes: List<Route>,
     private val packetRouteDesignator: Packet.() -> Byte,
     private val byteArrayToPacketAccumulator: ByteArrayToPacketAccumulator,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : IncomingConnectable {
     private val routeIdMap = routes.associateBy { it.id.value }
     private val internalPacketRoutes = routes.associateWith { MutableSharedFlow<Packet>() }

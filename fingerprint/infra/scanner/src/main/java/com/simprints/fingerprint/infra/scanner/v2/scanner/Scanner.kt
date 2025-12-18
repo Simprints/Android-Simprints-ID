@@ -99,7 +99,7 @@ class Scanner @Inject constructor(
     private val stmOtaController: StmOtaController,
     private val un20OtaController: Un20OtaController,
     private val scannerInfo: ScannerInfo,
-    @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
+    @param:DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) {
     private lateinit var outputStream: OutputStream
     private lateinit var inputStreamFlow: Flow<ByteArray>

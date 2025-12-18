@@ -24,7 +24,7 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val configRepository: ConfigRepository,
     private val timeHelper: TimeHelper,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {
     operator fun invoke(
         projectId: String,

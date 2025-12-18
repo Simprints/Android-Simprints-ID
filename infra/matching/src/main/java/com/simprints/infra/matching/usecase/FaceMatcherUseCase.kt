@@ -30,7 +30,7 @@ class FaceMatcherUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val resolveFaceBioSdk: ResolveFaceBioSdkUseCase,
     private val createRanges: CreateRangesUseCase,
-    @DispatcherBG private val dispatcherBG: CoroutineDispatcher,
+    @param:DispatcherBG private val dispatcherBG: CoroutineDispatcher,
 ) : MatcherUseCase {
     override val crashReportTag = LoggingConstants.CrashReportTag.FACE_MATCHING
 
