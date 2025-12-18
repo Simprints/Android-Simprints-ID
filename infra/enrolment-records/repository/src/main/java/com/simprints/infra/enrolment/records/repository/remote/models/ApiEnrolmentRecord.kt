@@ -7,8 +7,10 @@ import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.remote.models.face.toFaceApi
 import com.simprints.infra.enrolment.records.repository.remote.models.fingerprint.toFingerprintApi
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiEnrolmentRecord(
     val subjectId: String,
     val moduleId: String,
