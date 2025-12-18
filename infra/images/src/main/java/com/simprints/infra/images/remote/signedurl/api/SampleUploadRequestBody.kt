@@ -1,6 +1,7 @@
 package com.simprints.infra.images.remote.signedurl.api
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import kotlinx.serialization.Serializable
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
