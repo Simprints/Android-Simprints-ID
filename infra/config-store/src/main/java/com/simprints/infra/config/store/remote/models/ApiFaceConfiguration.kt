@@ -3,8 +3,10 @@ package com.simprints.infra.config.store.remote.models
 import androidx.annotation.Keep
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiFaceConfiguration(
     val allowedSDKs: List<BioSdk>,
     val rankOne: ApiFaceSdkConfiguration? = null,
@@ -17,13 +19,14 @@ internal data class ApiFaceConfiguration(
     )
 
     @Keep
+    @Serializable
     data class ApiFaceSdkConfiguration(
         val nbOfImagesToCapture: Int,
         val qualityThreshold: Float,
         val decisionPolicy: ApiDecisionPolicy,
         val imageSavingStrategy: ImageSavingStrategy,
-        val allowedAgeRange: ApiAllowedAgeRange?,
-        val verificationMatchThreshold: Float?,
+        val allowedAgeRange: ApiAllowedAgeRange? = null,
+        val verificationMatchThreshold: Float? = null,
         val version: String,
     ) {
         fun toDomain() = FaceConfiguration.FaceSdkConfiguration(

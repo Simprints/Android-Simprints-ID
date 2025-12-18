@@ -4,14 +4,16 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiFingerprintConfiguration(
     val allowedScanners: List<VeroGeneration>,
     val allowedSDKs: List<BioSdk>,
     val displayHandIcons: Boolean,
-    val secugenSimMatcher: ApiFingerprintSdkConfiguration?,
-    val nec: ApiFingerprintSdkConfiguration?,
+    val secugenSimMatcher: ApiFingerprintSdkConfiguration? = null,
+    val nec: ApiFingerprintSdkConfiguration? = null,
 ) {
     fun toDomain() = FingerprintConfiguration(
         allowedScanners.map { it.toDomain() },
@@ -22,6 +24,7 @@ internal data class ApiFingerprintConfiguration(
     )
 
     @Keep
+    @Serializable
     data class ApiFingerprintSdkConfiguration(
         val fingersToCapture: List<ApiFinger>,
         val decisionPolicy: ApiDecisionPolicy,

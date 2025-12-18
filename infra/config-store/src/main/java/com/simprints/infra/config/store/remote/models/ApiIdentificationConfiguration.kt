@@ -2,8 +2,10 @@ package com.simprints.infra.config.store.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.infra.config.store.models.IdentificationConfiguration
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiIdentificationConfiguration(
     val maxNbOfReturnedCandidates: Int,
     val poolType: PoolType,

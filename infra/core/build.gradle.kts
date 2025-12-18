@@ -2,6 +2,7 @@ plugins {
     id("simprints.android.library")
     id("simprints.library.hilt")
     id("kotlin-parcelize")
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -27,6 +28,7 @@ dependencies {
     runtimeOnly(libs.kotlin.coroutinesAndroid)
 
     implementation(libs.jackson.core)
+    implementation(libs.kotlin.serialization)
     implementation(libs.workManager.work)
     implementation(libs.kronos.kronos)
     implementation(libs.tink.core)

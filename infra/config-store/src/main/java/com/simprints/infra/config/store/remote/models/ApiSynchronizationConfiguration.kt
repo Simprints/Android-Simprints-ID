@@ -8,8 +8,10 @@ import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.SampleSynchronizationConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiSynchronizationConfiguration(
     val up: ApiUpSynchronizationConfiguration,
     val down: ApiDownSynchronizationConfiguration,
@@ -36,6 +38,7 @@ internal data class ApiSynchronizationConfiguration(
     }
 
     @Keep
+    @Serializable
     data class ApiUpSynchronizationConfiguration(
         val simprints: ApiSimprintsUpSynchronizationConfiguration,
         val coSync: ApiCoSyncUpSynchronizationConfiguration,
@@ -46,10 +49,11 @@ internal data class ApiSynchronizationConfiguration(
         )
 
         @Keep
+        @Serializable
         data class ApiSimprintsUpSynchronizationConfiguration(
             val kind: UpSynchronizationKind,
-            val batchSizes: ApiUpSyncBatchSizes?,
-            val imagesRequireUnmeteredConnection: Boolean?,
+            val batchSizes: ApiUpSyncBatchSizes? = null,
+            val imagesRequireUnmeteredConnection: Boolean? = null,
             val frequency: ApiSynchronizationFrequency,
         ) {
             fun toDomain(): UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration =
@@ -63,6 +67,7 @@ internal data class ApiSynchronizationConfiguration(
         }
 
         @Keep
+        @Serializable
         data class ApiCoSyncUpSynchronizationConfiguration(
             val kind: UpSynchronizationKind,
         ) {
@@ -71,6 +76,7 @@ internal data class ApiSynchronizationConfiguration(
         }
 
         @Keep
+        @Serializable
         enum class UpSynchronizationKind {
             NONE,
             ONLY_ANALYTICS,
@@ -87,6 +93,7 @@ internal data class ApiSynchronizationConfiguration(
         }
 
         @Keep
+        @Serializable
         data class ApiUpSyncBatchSizes(
             val sessions: Int,
             val eventUpSyncs: Int,
@@ -99,9 +106,10 @@ internal data class ApiSynchronizationConfiguration(
     }
 
     @Keep
+    @Serializable
     data class ApiDownSynchronizationConfiguration(
-        val simprints: ApiSimprintsDownSynchronizationConfiguration?,
-        val commcare: ApiCommCareDownSynchronizationConfiguration?,
+        val simprints: ApiSimprintsDownSynchronizationConfiguration? = null,
+        val commcare: ApiCommCareDownSynchronizationConfiguration? = null,
     ) {
         fun toDomain(): DownSynchronizationConfiguration = DownSynchronizationConfiguration(
             simprints?.toDomain(),
@@ -110,11 +118,12 @@ internal data class ApiSynchronizationConfiguration(
     }
 
     @Keep
+    @Serializable
     data class ApiSimprintsDownSynchronizationConfiguration(
         val partitionType: PartitionType,
         val maxNbOfModules: Int,
-        val moduleOptions: List<String>?,
-        val maxAge: String?,
+        val moduleOptions: List<String>? = null,
+        val maxAge: String? = null,
         val frequency: ApiSynchronizationFrequency,
     ) {
         fun toDomain() = DownSynchronizationConfiguration.SimprintsDownSynchronizationConfiguration(
@@ -141,11 +150,13 @@ internal data class ApiSynchronizationConfiguration(
     }
 
     @Keep
+    @Serializable
     class ApiCommCareDownSynchronizationConfiguration {
         fun toDomain() = DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration
     }
 
     @Keep
+    @Serializable
     data class ApiSampleSynchronizationConfiguration(
         val signedUrlBatchSize: Int,
     ) {

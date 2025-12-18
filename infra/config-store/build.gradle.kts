@@ -1,6 +1,7 @@
 plugins {
     id("simprints.infra")
     id("simprints.library.protobuf")
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
