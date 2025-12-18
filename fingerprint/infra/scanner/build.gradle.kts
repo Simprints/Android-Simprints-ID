@@ -1,5 +1,6 @@
 plugins {
     id("simprints.infra")
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -11,7 +12,7 @@ dependencies {
     implementation(libs.kotlin.reflect)
 
     implementation(libs.retrofit.core)
-    runtimeOnly(libs.jackson.core)
+    runtimeOnly(libs.kotlin.serialization)
 
     implementation(project(":infra:config-store"))
     implementation(project(":infra:auth-store"))
