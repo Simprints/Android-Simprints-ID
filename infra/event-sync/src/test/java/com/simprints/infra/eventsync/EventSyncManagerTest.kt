@@ -1,6 +1,5 @@
 package com.simprints.infra.eventsync
 
-import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.Partitioning
@@ -34,7 +33,11 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -130,25 +133,28 @@ internal class EventSyncManagerTest {
 
     @Test
     fun `getLastSyncState should call sync processor`() = runTest {
-        eventSyncManagerImpl.getLastSyncState()
+        every { eventSyncStateProcessor.getLastSyncState() } returns flowOf() // Simulate empty flow
+
+        eventSyncManagerImpl.getLastSyncState().firstOrNull()
+
         verify { eventSyncStateProcessor.getLastSyncState() }
     }
 
     @Test
     fun `getLastSyncState with useDefaultValue true should return an immediate default value`() = runTest {
-        every { eventSyncStateProcessor.getLastSyncState() } returns MutableLiveData(null)
+        every { eventSyncStateProcessor.getLastSyncState() } returns MutableSharedFlow()
         val defaultValue = EventSyncState(syncId = "", null, null, emptyList(), emptyList(), emptyList())
 
-        val result = eventSyncManagerImpl.getLastSyncState(true).value
+        val result = eventSyncManagerImpl.getLastSyncState(true).firstOrNull()
 
         assertThat(result).isEqualTo(defaultValue)
     }
 
     @Test
     fun `getLastSyncState with useDefaultValue false and no data emission should return null value`() = runTest {
-        every { eventSyncStateProcessor.getLastSyncState() } returns MutableLiveData(null)
+        every { eventSyncStateProcessor.getLastSyncState() } returns flowOf() // Simulate empty flow
 
-        val result = eventSyncManagerImpl.getLastSyncState(false).value
+        val result = eventSyncManagerImpl.getLastSyncState(false).firstOrNull()
 
         assertThat(result).isEqualTo(null)
     }

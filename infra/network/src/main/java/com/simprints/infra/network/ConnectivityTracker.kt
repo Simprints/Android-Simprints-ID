@@ -1,9 +1,9 @@
 package com.simprints.infra.network
 
-import androidx.lifecycle.LiveData
+import kotlinx.coroutines.flow.Flow
 
 interface ConnectivityTracker {
-    fun observeIsConnected(): LiveData<Boolean>
+    fun observeIsConnected(): Flow<Boolean>
 
     fun isConnected(): Boolean
 }

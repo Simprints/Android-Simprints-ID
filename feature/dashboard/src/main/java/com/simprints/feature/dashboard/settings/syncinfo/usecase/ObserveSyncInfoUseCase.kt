@@ -1,6 +1,5 @@
 package com.simprints.feature.dashboard.settings.syncinfo.usecase
 
-import androidx.lifecycle.asFlow
 import com.simprints.core.DispatcherBG
 import com.simprints.core.lifecycle.AppForegroundStateTracker
 import com.simprints.core.tools.extentions.onChange
@@ -58,13 +57,12 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
 ) {
     private val eventSyncStateFlow = eventSyncManager
         .getLastSyncState(useDefaultValue = true) // otherwise value not guaranteed
-        .asFlow()
 
     private val imageSyncStatusFlow = syncOrchestrator.observeImageSyncStatus()
 
     // Since we are not using distinctUntilChanged any emission from combined flows will trigger the main flow as well
     private fun combinedRefreshSignals() = combine(
-        connectivityTracker.observeIsConnected().asFlow(),
+        connectivityTracker.observeIsConnected(),
         appForegroundStateTracker.observeAppInForeground().filter { it }, // only when going to foreground
         ticker.observeTicks(1.minutes),
     ) { isOnline, _, _ -> isOnline }

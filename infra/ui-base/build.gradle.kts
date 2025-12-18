@@ -25,6 +25,7 @@ dependencies {
     api(libs.androidX.appcompat)
     api(libs.androidX.lifecycle)
     api(libs.androidX.lifecycle.scope)
+    api(libs.androidX.lifecycle.livedata.ktx)
 
     api(libs.support.material)
 

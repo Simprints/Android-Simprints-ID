@@ -13,6 +13,9 @@ interface CandidateRecordDataSource {
         dataSource: BiometricDataSource = BiometricDataSource.Simprints,
     ): Int
 
+    /**
+     * Loads records concurrently using the provided dispatcher and parallelism level.
+     */
     suspend fun loadCandidateRecords(
         query: EnrolmentRecordQuery,
         ranges: List<IntRange>,
@@ -21,9 +24,4 @@ interface CandidateRecordDataSource {
         scope: CoroutineScope,
         onCandidateLoaded: suspend () -> Unit,
     ): ReceiveChannel<CandidateRecordBatch>
-
-    /**
-     * Loads identities concurrently using the provided dispatcher and parallelism level.
-     *
-     */
 }

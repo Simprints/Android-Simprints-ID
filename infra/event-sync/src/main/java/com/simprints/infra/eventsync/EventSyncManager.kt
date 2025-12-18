@@ -1,6 +1,5 @@
 package com.simprints.infra.eventsync
 
-import androidx.lifecycle.LiveData
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
@@ -16,7 +15,7 @@ interface EventSyncManager {
 
     suspend fun getLastSyncTime(): Timestamp?
 
-    fun getLastSyncState(useDefaultValue: Boolean = false): LiveData<EventSyncState>
+    fun getLastSyncState(useDefaultValue: Boolean = false): Flow<EventSyncState>
 
     suspend fun countEventsToUpload(): Flow<Int>
 

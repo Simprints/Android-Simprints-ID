@@ -3,7 +3,6 @@ package com.simprints.feature.dashboard.settings.syncinfo
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DispatcherIO
@@ -59,7 +58,7 @@ internal class SyncInfoViewModel @Inject constructor(
         eventSyncManager
             .getLastSyncState(
                 useDefaultValue = true, // otherwise value not guaranteed
-            ).asFlow()
+            )
     private val imageSyncStatusFlow =
         syncOrchestrator.observeImageSyncStatus()
 
@@ -187,7 +186,7 @@ internal class SyncInfoViewModel @Inject constructor(
 
     private fun startInitialSyncIfRequired() {
         viewModelScope.launch {
-            val isRunning = eventSyncManager.getLastSyncState().value?.isSyncRunning() ?: false
+            val isRunning = eventSyncManager.getLastSyncState().firstOrNull()?.isSyncRunning() ?: false
             val lastUpdate = eventSyncManager.getLastSyncTime()
 
             val isForceEventSync = when {
