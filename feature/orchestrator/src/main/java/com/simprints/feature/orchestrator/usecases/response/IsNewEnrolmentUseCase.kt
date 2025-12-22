@@ -43,10 +43,10 @@ internal class IsNewEnrolmentUseCase @Inject constructor() {
     private fun isResultBelowMediumThreshold(
         projectConfiguration: ProjectConfiguration,
         matchResult: MatchResult,
-    ): Boolean = projectConfiguration
+    ): Boolean = matchResult.results.isEmpty() || projectConfiguration
         .getModalitySdkConfig(matchResult.sdk)
         ?.decisionPolicy
         ?.medium
         ?.toFloat()
-        ?.let { threshold -> matchResult.results.isNotEmpty() && matchResult.results.all { it.comparisonScore < threshold } } != false
+        ?.let { threshold -> matchResult.results.all { it.comparisonScore < threshold } } != false
 }

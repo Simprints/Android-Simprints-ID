@@ -45,6 +45,23 @@ internal class IsNewEnrolmentUseCaseTest {
     }
 
     @Test
+    fun `Results are new enrolment if all match result is empty`() {
+        every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
+
+        assertThat(
+            useCase(
+                projectConfiguration,
+                listOf(
+                    MatchResult(
+                        listOf(),
+                        FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
+                    ),
+                ),
+            ),
+        ).isTrue()
+    }
+
+    @Test
     fun `Results are new enrolment if fingerprint match results are of lower then medium confidence`() {
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
 
