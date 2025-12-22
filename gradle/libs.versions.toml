@@ -1,5 +1,5 @@
 [versions]
-kotlin_version = "2.2.21"
+kotlin_version = "2.3.0"
 kotlin_coroutine_version = "1.10.2"
 ksp_version = "2.3.3"
 
