@@ -35,7 +35,7 @@ jobs:
                 run: |
                     echo "Checking for merges to $TARGET_BRANCH in the last $DAYS_AGO days."
 
-                    cutoff_date_seconds=$(date -v -${DAYS_AGO}d +%s)
+                    cutoff_date_seconds=$(date --date "$DAYS_AGO days ago" +%s)
                     recent_merge_commit=$(git log $TARGET_BRANCH --merges --since="$DAYS_AGO days ago" --pretty=format:"%ct" -n 1)
 
                     if [[ -n "$recent_merge_commit" ]]; then
