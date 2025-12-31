@@ -67,7 +67,7 @@ object JsonHelper {
         Json {
             ignoreUnknownKeys = true
             explicitNulls = false
-            encodeDefaults = false
+            encodeDefaults = true
             coerceInputValues = true
         }
     }
