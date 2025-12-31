@@ -7,8 +7,10 @@ import com.simprints.infra.config.store.remote.models.fromDomainToApi
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent.SkipReason
 import com.simprints.infra.eventsync.event.remote.models.ApiExternalCredentialSelectionPayload.ApiExternalCredentialSkipReason
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiExternalCredentialSelectionPayload(
     override val startTime: ApiTimestamp,
     val endTime: ApiTimestamp?,
@@ -16,7 +18,7 @@ internal data class ApiExternalCredentialSelectionPayload(
     val credentialType: ApiExternalCredentialType?,
     val skipReason: ApiExternalCredentialSkipReason?,
     val skipOther: String?,
-) : ApiEventPayload(startTime) {
+) : ApiEventPayload() {
     constructor(domainPayload: ExternalCredentialSelectionEvent.ExternalCredentialSelectionPayload) : this(
         startTime = domainPayload.createdAt.fromDomainToApi(),
         endTime = domainPayload.endedAt?.fromDomainToApi(),
@@ -27,6 +29,7 @@ internal data class ApiExternalCredentialSelectionPayload(
     )
 
     @Keep
+    @Serializable
     enum class ApiExternalCredentialSkipReason {
         DOES_NOT_HAVE_ID,
         DID_NOT_BRING_ID,

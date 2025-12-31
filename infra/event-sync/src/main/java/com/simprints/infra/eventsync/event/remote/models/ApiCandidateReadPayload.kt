@@ -1,31 +1,32 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
 import com.simprints.infra.eventsync.event.remote.models.ApiCandidateReadPayload.ApiLocalResult
 import com.simprints.infra.eventsync.event.remote.models.ApiCandidateReadPayload.ApiRemoteResult
+import kotlinx.serialization.Serializable
 
 @Keep
-@JsonInclude(Include.NON_NULL)
+@Serializable
 internal data class ApiCandidateReadPayload(
     override val startTime: ApiTimestamp,
     val endTime: ApiTimestamp?,
     val candidateId: String,
     val localResult: ApiLocalResult,
     val remoteResult: ApiRemoteResult?,
-) : ApiEventPayload(startTime) {
+) : ApiEventPayload() {
     @Keep
+    @Serializable
     enum class ApiLocalResult {
         FOUND,
         NOT_FOUND,
     }
 
     @Keep
+    @Serializable
     enum class ApiRemoteResult {
         FOUND,
         NOT_FOUND,

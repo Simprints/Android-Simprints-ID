@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models.downsync
 
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.eventsync.event.remote.models.ApiEventDownSyncRequestPayload
 import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Test

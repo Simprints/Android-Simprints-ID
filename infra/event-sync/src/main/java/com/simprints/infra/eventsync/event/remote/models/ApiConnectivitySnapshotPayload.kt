@@ -4,13 +4,16 @@ import androidx.annotation.Keep
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiConnectivitySnapshotPayload(
     override val startTime: ApiTimestamp,
     val connections: List<ApiConnection>,
-) : ApiEventPayload(startTime) {
+) : ApiEventPayload() {
     @Keep
+    @Serializable
     class ApiConnection(
         val type: String,
         val state: String,

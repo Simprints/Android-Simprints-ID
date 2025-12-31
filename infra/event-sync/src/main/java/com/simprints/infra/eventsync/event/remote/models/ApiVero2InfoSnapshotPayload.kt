@@ -1,63 +1,52 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent
 import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.BatteryInfo
 import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload
 import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.Vero2Version
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.descriptors.buildSerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonClassDiscriminator
 
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    include = JsonTypeInfo.As.EXISTING_PROPERTY,
-    property = "version",
-    visible = true,
-)
-@JsonSubTypes(
-    JsonSubTypes.Type(
-        value = Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForNewApi::class,
-        name = Vero2InfoSnapshotEvent.NEW_EVENT_VERSION.toString(),
-    ),
-    JsonSubTypes.Type(
-        value = Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForOldApi::class,
-        name = Vero2InfoSnapshotEvent.OLD_EVENT_VERSION.toString(),
-    ),
-)
+@OptIn(ExperimentalSerializationApi::class)
 @Keep
-internal sealed class ApiVero2InfoSnapshotPayload(
-    override val startTime: ApiTimestamp,
-    open val scannerVersion: ApiVero2Version,
-    open val battery: ApiBatteryInfo,
-) : ApiEventPayload(startTime) {
+@Serializable
+@JsonClassDiscriminator("version")
+internal sealed class ApiVero2InfoSnapshotPayload : ApiEventPayload() {
+    @Serializable
+    @SerialName(Vero2InfoSnapshotEvent.NEW_EVENT_VERSION.toString())
     data class ApiVero2InfoSnapshotPayloadForNewApi(
         override val startTime: ApiTimestamp,
-        override val scannerVersion: ApiVero2Version,
-        override val battery: ApiBatteryInfo,
-    ) : ApiVero2InfoSnapshotPayload(
-            startTime,
-            scannerVersion,
-            battery,
-        ) {
+        val scannerVersion: ApiVero2Version,
+        val battery: ApiBatteryInfo,
+    ) : ApiVero2InfoSnapshotPayload() {
         override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
     }
 
     @Deprecated(message = "used only for backwards compatibility")
+    @Serializable
+    @SerialName(Vero2InfoSnapshotEvent.OLD_EVENT_VERSION.toString())
     data class ApiVero2InfoSnapshotPayloadForOldApi(
         override val startTime: ApiTimestamp,
-        override val scannerVersion: ApiVero2Version,
-        override val battery: ApiBatteryInfo,
-    ) : ApiVero2InfoSnapshotPayload(
-            startTime,
-            scannerVersion,
-            battery,
-        ) {
+        val scannerVersion: ApiVero2Version,
+        val battery: ApiBatteryInfo,
+    ) : ApiVero2InfoSnapshotPayload() {
         override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
     }
 
+    @Keep
+    @Serializable(with = ApiVero2VersionSerializer::class)
     sealed class ApiVero2Version {
         @Keep
+        @Serializable
         data class ApiNewVero2Version(
             val hardwareRevision: String,
             val cypressApp: String,
@@ -77,6 +66,7 @@ internal sealed class ApiVero2InfoSnapshotPayload(
 
         @Deprecated(message = "used only for backwards compatibility")
         @Keep
+        @Serializable
         data class ApiOldVero2Version(
             val master: Long,
             val cypressApp: String,
@@ -100,6 +90,7 @@ internal sealed class ApiVero2InfoSnapshotPayload(
     }
 
     @Keep
+    @Serializable
     data class ApiBatteryInfo(
         val charge: Int,
         val voltage: Int,
@@ -117,10 +108,13 @@ internal sealed class ApiVero2InfoSnapshotPayload(
 }
 
 private fun Vero2Version.toApiVero2Version() = when (this) {
-    is Vero2Version.Vero2OldApiVersion ->
+    is Vero2Version.Vero2OldApiVersion -> {
         ApiVero2InfoSnapshotPayload.ApiVero2Version.ApiOldVero2Version(this)
-    is Vero2Version.Vero2NewApiVersion ->
+    }
+
+    is Vero2Version.Vero2NewApiVersion -> {
         ApiVero2InfoSnapshotPayload.ApiVero2Version.ApiNewVero2Version(this)
+    }
 }
 
 internal fun toApiVero2InfoSnapshotPayload(domainPayload: Vero2InfoSnapshotPayload): ApiVero2InfoSnapshotPayload = when (domainPayload) {
@@ -131,11 +125,37 @@ internal fun toApiVero2InfoSnapshotPayload(domainPayload: Vero2InfoSnapshotPaylo
             ApiVero2InfoSnapshotPayload.ApiBatteryInfo(domainPayload.battery),
         )
     }
+
     is Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForOldApi -> {
         ApiVero2InfoSnapshotPayload.ApiVero2InfoSnapshotPayloadForOldApi(
             domainPayload.createdAt.fromDomainToApi(),
             domainPayload.version.toApiVero2Version(),
             ApiVero2InfoSnapshotPayload.ApiBatteryInfo(domainPayload.battery),
         )
+    }
+}
+
+internal object ApiVero2VersionSerializer : KSerializer<ApiVero2InfoSnapshotPayload.ApiVero2Version> {
+    override val descriptor = buildClassSerialDescriptor("ApiVero2Version")
+
+    override fun serialize(
+        encoder: Encoder,
+        value: ApiVero2InfoSnapshotPayload.ApiVero2Version,
+    ) {
+        when (value) {
+            is ApiVero2InfoSnapshotPayload.ApiVero2Version.ApiNewVero2Version -> encoder.encodeSerializableValue(
+                ApiVero2InfoSnapshotPayload.ApiVero2Version.ApiNewVero2Version.serializer(),
+                value,
+            )
+
+            is ApiVero2InfoSnapshotPayload.ApiVero2Version.ApiOldVero2Version -> encoder.encodeSerializableValue(
+                ApiVero2InfoSnapshotPayload.ApiVero2Version.ApiOldVero2Version.serializer(),
+                value,
+            )
+        }
+    }
+
+    override fun deserialize(decoder: Decoder): ApiVero2InfoSnapshotPayload.ApiVero2Version {
+        error("Deserialization without discriminator is not supported")
     }
 }

@@ -1,8 +1,6 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
@@ -12,9 +10,10 @@ import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCap
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.NO_FINGER_DETECTED
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.SKIPPED
 import com.simprints.infra.eventsync.event.remote.models.ApiFingerprintCapturePayload.ApiResult
+import kotlinx.serialization.Serializable
 
 @Keep
-@JsonInclude(Include.NON_NULL)
+@Serializable
 internal data class ApiFingerprintCapturePayload(
     val id: String,
     override val startTime: ApiTimestamp,
@@ -23,8 +22,9 @@ internal data class ApiFingerprintCapturePayload(
     val finger: TemplateIdentifier,
     val result: ApiResult,
     val fingerprint: ApiFingerprint?,
-) : ApiEventPayload(startTime) {
+) : ApiEventPayload() {
     @Keep
+    @Serializable
     data class ApiFingerprint(
         val finger: TemplateIdentifier,
         val quality: Int,
@@ -48,6 +48,7 @@ internal data class ApiFingerprintCapturePayload(
     )
 
     @Keep
+    @Serializable
     enum class ApiResult {
         GOOD_SCAN,
         BAD_QUALITY,

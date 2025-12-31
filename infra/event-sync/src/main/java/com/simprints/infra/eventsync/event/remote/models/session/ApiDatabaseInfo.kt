@@ -1,14 +1,13 @@
 package com.simprints.infra.eventsync.event.remote.models.session
 
 import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
+import kotlinx.serialization.Serializable
 
 @Keep
-@JsonInclude(Include.NON_NULL)
+@Serializable
 internal data class ApiDatabaseInfo(
-    var recordCount: Int?,
+    var recordCount: Int? = null,
     var sessionCount: Int = 0,
 )
 

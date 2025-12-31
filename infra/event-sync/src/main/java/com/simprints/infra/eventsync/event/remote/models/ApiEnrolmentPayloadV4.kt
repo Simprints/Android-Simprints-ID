@@ -4,8 +4,10 @@ import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 @ExcludedFromGeneratedTestCoverageReports("Data class")
 internal data class ApiEnrolmentPayloadV4(
     override val startTime: ApiTimestamp,
@@ -15,7 +17,7 @@ internal data class ApiEnrolmentPayloadV4(
     val attendantId: String,
     val biometricReferenceIds: List<String>,
     val externalCredentialIds: List<String>,
-) : ApiEventPayload(startTime) {
+) : ApiEventPayload() {
     constructor(domainPayload: EnrolmentEventV4.EnrolmentPayload) : this(
         startTime = domainPayload.createdAt.fromDomainToApi(),
         subjectId = domainPayload.subjectId,

@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.events.event.domain.models.subject.BiometricReferenceType.Companion.FACE_REFERENCE_KEY
 import com.simprints.infra.events.event.domain.models.subject.BiometricReferenceType.Companion.FINGERPRINT_REFERENCE_KEY
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @ExcludedFromGeneratedTestCoverageReports("Domain model")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
@@ -14,28 +16,40 @@ import com.simprints.infra.events.event.domain.models.subject.BiometricReference
     JsonSubTypes.Type(value = FingerprintReference::class, name = FINGERPRINT_REFERENCE_KEY),
 )
 @Keep
-sealed class BiometricReference(
-    open val id: String,
-    open val format: String,
-    val type: BiometricReferenceType,
-)
+@Serializable
+sealed class BiometricReference {
+    abstract val id: String
+    abstract val type: BiometricReferenceType
+    abstract val format: String
+}
 
 @ExcludedFromGeneratedTestCoverageReports("Domain model")
+@Serializable
+@SerialName(FACE_REFERENCE_KEY)
 data class FaceReference(
     override val id: String,
     val templates: List<FaceTemplate>,
     override val format: String,
     val metadata: Map<String, String>? = null,
-) : BiometricReference(id, format, BiometricReferenceType.FACE_REFERENCE)
+) : BiometricReference() {
+    override val type: BiometricReferenceType
+        get() = BiometricReferenceType.FACE_REFERENCE
+}
 
 @ExcludedFromGeneratedTestCoverageReports("Domain model")
+@Serializable
+@SerialName(FINGERPRINT_REFERENCE_KEY)
 data class FingerprintReference(
     override val id: String,
     val templates: List<FingerprintTemplate>,
     override val format: String,
     val metadata: Map<String, String>? = null,
-) : BiometricReference(id, format, BiometricReferenceType.FINGERPRINT_REFERENCE)
+) : BiometricReference() {
+    override val type: BiometricReferenceType
+        get() = BiometricReferenceType.FINGERPRINT_REFERENCE
+}
 
+@Serializable
 enum class BiometricReferenceType {
     // a constant key is required to serialise/deserialize
     // BiometricReference correctly with Jackson (see annotation in BiometricReference).

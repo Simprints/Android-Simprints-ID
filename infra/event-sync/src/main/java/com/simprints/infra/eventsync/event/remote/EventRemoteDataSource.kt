@@ -1,17 +1,11 @@
 package com.simprints.infra.eventsync.event.remote
 
 import androidx.annotation.VisibleForTesting
-import com.fasterxml.jackson.core.JsonFactory
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.core.JsonToken.START_ARRAY
-import com.fasterxml.jackson.core.JsonToken.START_OBJECT
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
-import com.simprints.infra.eventsync.event.remote.models.subject.ApiEnrolmentRecordEvent
-import com.simprints.infra.eventsync.event.remote.models.subject.fromApiToDomain
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncResult
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
@@ -21,6 +15,8 @@ import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.produce
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.decodeFromStream
 import retrofit2.Response
 import java.io.ByteArrayInputStream
 import java.io.InputStream
@@ -90,27 +86,24 @@ internal class EventRemoteDataSource @Inject constructor(
         }
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
     @VisibleForTesting
     suspend fun parseStreamAndEmitEvents(
         streaming: InputStream,
         channel: ProducerScope<EnrolmentRecordEvent>,
     ) {
-        val parser: JsonParser = JsonFactory().createParser(streaming)
-        check(parser.nextToken() == START_ARRAY) { "Expected an array" }
-
         try {
-            while (parser.nextToken() == START_OBJECT) {
-                val event =
-                    jsonHelper.jackson.readValue(parser, ApiEnrolmentRecordEvent::class.java)
+            val events = JsonHelper.json.decodeFromStream<List<ApiEnrolmentRecordEvent>>(streaming)
+            for (event in events) {
                 channel.send(event.fromApiToDomain())
             }
 
-            parser.close()
             channel.close()
         } catch (t: Throwable) {
             Simber.i("Event parsing stream failed", t, tag = SYNC)
-            parser.close()
             channel.close(t)
+        } finally {
+            streaming.close()
         }
     }
 

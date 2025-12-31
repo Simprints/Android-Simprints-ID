@@ -1,6 +1,7 @@
 plugins {
     id("simprints.infra")
     id("simprints.library.room")
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -13,6 +14,7 @@ dependencies {
     implementation(project(":infra:credential-store"))
 
     implementation(libs.jackson.core)
+    implementation(libs.kotlin.serialization)
 
     implementation(libs.workManager.work)
 

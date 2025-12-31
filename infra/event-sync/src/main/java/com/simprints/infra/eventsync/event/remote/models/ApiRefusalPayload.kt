@@ -14,15 +14,18 @@ import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayloa
 import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.UNCOOPERATIVE_CHILD
 import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.WRONG_AGE_GROUP_SELECTED
 import com.simprints.infra.eventsync.event.remote.models.ApiRefusalPayload.ApiAnswer
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiRefusalPayload(
     override val startTime: ApiTimestamp,
     val endTime: ApiTimestamp?,
     val reason: ApiAnswer,
     val otherText: String,
-) : ApiEventPayload(startTime) {
+) : ApiEventPayload() {
     @Keep
+    @Serializable
     enum class ApiAnswer {
         REFUSED_RELIGION,
         REFUSED_DATA_CONCERNS,

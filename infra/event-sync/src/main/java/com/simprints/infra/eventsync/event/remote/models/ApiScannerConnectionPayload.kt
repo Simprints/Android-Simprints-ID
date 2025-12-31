@@ -1,23 +1,22 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration.VERO_1
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration.VERO_2
 import com.simprints.infra.eventsync.event.remote.models.ApiScannerConnectionPayload.ApiScannerGeneration
+import kotlinx.serialization.Serializable
 
 @Keep
-@JsonInclude(Include.NON_NULL)
+@Serializable
 internal data class ApiScannerConnectionPayload(
     override val startTime: ApiTimestamp,
     val scannerInfo: ApiScannerInfo,
-) : ApiEventPayload(startTime) {
+) : ApiEventPayload() {
     @Keep
-    @JsonInclude(Include.NON_NULL)
+    @Serializable
     data class ApiScannerInfo(
         val scannerId: String,
         val macAddress: String,

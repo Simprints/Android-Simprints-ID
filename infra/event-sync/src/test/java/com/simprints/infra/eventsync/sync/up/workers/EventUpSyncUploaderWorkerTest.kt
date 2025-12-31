@@ -62,7 +62,7 @@ internal class EventUpSyncUploaderWorkerTest {
     @MockK
     lateinit var eventScope: EventScope
 
-    private val projectScope = JsonHelper.toJson(EventUpSyncScope.ProjectScope(PROJECT_ID))
+    private val projectScope = JsonHelper.json.encodeToString(EventUpSyncScope.ProjectScope(PROJECT_ID))
 
     @Before
     fun setUp() {

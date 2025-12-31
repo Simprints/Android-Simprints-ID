@@ -180,7 +180,7 @@ class CommCareEventSyncWorkersBuilderTest {
             assertThat(
                 downloaders.any {
                     it.workSpec.input == workDataOf(
-                        INPUT_DOWN_SYNC_OPS to jsonHelper.toJson(op),
+                        INPUT_DOWN_SYNC_OPS to jsonHelper.json.encodeToString(op),
                         INPUT_EVENT_DOWN_SYNC_SCOPE_ID to scopeId,
                     )
                 },

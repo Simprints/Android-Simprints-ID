@@ -10,21 +10,25 @@ import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayloa
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Type.PARENTAL
 import com.simprints.infra.eventsync.event.remote.models.ApiConsentPayload.ApiResult
 import com.simprints.infra.eventsync.event.remote.models.ApiConsentPayload.ApiType
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiConsentPayload(
     override val startTime: ApiTimestamp,
     var endTime: ApiTimestamp?,
     val consentType: ApiType,
     var result: ApiResult,
-) : ApiEventPayload(startTime) {
+) : ApiEventPayload() {
     @Keep
+    @Serializable
     enum class ApiType {
         INDIVIDUAL,
         PARENTAL,
     }
 
     @Keep
+    @Serializable
     enum class ApiResult {
         ACCEPTED,
         DECLINED,

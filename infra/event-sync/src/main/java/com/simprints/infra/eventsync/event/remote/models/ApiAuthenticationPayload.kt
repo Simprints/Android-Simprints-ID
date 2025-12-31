@@ -12,16 +12,21 @@ import com.simprints.infra.events.event.domain.models.AuthenticationEvent.Authen
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.OFFLINE
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.TECHNICAL_FAILURE
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN
+import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.event.remote.models.ApiAuthenticationPayload.ApiResult
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiAuthenticationPayload(
     override val startTime: ApiTimestamp,
     val endTime: ApiTimestamp?,
     val userInfo: ApiUserInfo,
     val result: ApiResult,
-) : ApiEventPayload(startTime) {
+) : ApiEventPayload() {
     @Keep
+    @Serializable
     data class ApiUserInfo(
         val projectId: String,
         val userId: String,
@@ -31,6 +36,7 @@ internal data class ApiAuthenticationPayload(
     }
 
     @Keep
+    @Serializable
     enum class ApiResult {
         AUTHENTICATED,
         BAD_CREDENTIALS,

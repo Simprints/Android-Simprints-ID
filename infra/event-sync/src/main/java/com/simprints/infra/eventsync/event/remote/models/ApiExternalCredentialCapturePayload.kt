@@ -3,8 +3,10 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent.ExternalCredentialCapturePayload
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiExternalCredentialCapturePayload(
     override val startTime: ApiTimestamp,
     val id: String,
@@ -15,7 +17,7 @@ internal data class ApiExternalCredentialCapturePayload(
     val capturedTextLength: Int,
     val credentialTextLength: Int,
     val selectionId: String,
-) : ApiEventPayload(startTime) {
+) : ApiEventPayload() {
     constructor(domainPayload: ExternalCredentialCapturePayload) : this(
         startTime = domainPayload.createdAt.fromDomainToApi(),
         endTime = domainPayload.endedAt?.fromDomainToApi(),

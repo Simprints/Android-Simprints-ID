@@ -4,9 +4,9 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.isValidGuid
 import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType
 import com.simprints.infra.eventsync.event.remote.models.ApiAuthenticationPayload
+import com.simprints.infra.eventsync.event.remote.models.ApiCallbackType
+import com.simprints.infra.eventsync.event.remote.models.ApiCalloutType
 import com.simprints.infra.eventsync.event.remote.models.ApiRefusalPayload
-import com.simprints.infra.eventsync.event.remote.models.callback.ApiCallbackType
-import com.simprints.infra.eventsync.event.remote.models.callout.ApiCalloutType
 import org.json.JSONObject
 
 private val fingerIdentifiers = listOf(
@@ -87,13 +87,22 @@ fun verifyCallbackIdentificationApiModel(
         assertThat(score.getString("confidence")).isNotNull()
 
         when (version) {
-            1 -> assertThat(score.getString("tier")).isNotNull()
+            1 -> {
+                assertThat(score.getString("tier")).isNotNull()
+            }
+
             else -> {}
         }
 
         when (version) {
-            2 -> assertThat(score.has("confidenceMatch")).isFalse()
-            3 -> assertThat(score.getString("confidenceMatch"))
+            2 -> {
+                assertThat(score.has("confidenceMatch")).isFalse()
+            }
+
+            3 -> {
+                assertThat(score.getString("confidenceMatch"))
+            }
+
             else -> {}
         }
     }
@@ -110,13 +119,22 @@ fun verifyCallbackVerificationApiModel(
         assertThat(score.getString("confidence")).isNotNull()
 
         when (version) {
-            1 -> assertThat(score.getString("tier")).isNotNull()
+            1 -> {
+                assertThat(score.getString("tier")).isNotNull()
+            }
+
             else -> {}
         }
 
         when (version) {
-            2 -> assertThat(score.has("confidenceMatch")).isFalse()
-            3 -> assertThat(score.getString("confidenceMatch"))
+            2 -> {
+                assertThat(score.has("confidenceMatch")).isFalse()
+            }
+
+            3 -> {
+                assertThat(score.getString("confidenceMatch"))
+            }
+
             else -> {}
         }
     }

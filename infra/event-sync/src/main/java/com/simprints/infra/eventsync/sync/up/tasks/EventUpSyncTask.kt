@@ -1,7 +1,5 @@
 package com.simprints.infra.eventsync.sync.up.tasks
 
-import com.fasterxml.jackson.core.JsonParseException
-import com.fasterxml.jackson.databind.JsonMappingException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
@@ -46,6 +44,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
+import kotlinx.serialization.SerializationException
 import retrofit2.HttpException
 import java.util.UUID
 import javax.inject.Inject
@@ -259,7 +258,7 @@ internal class EventUpSyncTask @Inject constructor(
                 .getEventsFromScope(it.id)
                 .also { listOfEvents -> emit(listOfEvents.size) }
         } catch (ex: Exception) {
-            if (ex is JsonParseException || ex is JsonMappingException) {
+            if (ex is SerializationException) {
                 Simber.e("Failed to un-marshal events", ex, tag = SYNC)
             } else {
                 throw ex
@@ -297,13 +296,18 @@ internal class EventUpSyncTask @Inject constructor(
     ) {
         var result: EventUpSyncResult? = null
         when (ex) {
-            is NetworkConnectionException -> Simber.i("Network connection error", ex, tag = SYNC)
+            is NetworkConnectionException -> {
+                Simber.i("Network connection error", ex, tag = SYNC)
+            }
+
             is HttpException -> {
                 Simber.i("Network HTTP request error", ex, tag = SYNC)
                 result = ex.response()?.let { EventUpSyncResult(it.code()) }
             }
 
-            is RemoteDbNotSignedInException -> throw ex
+            is RemoteDbNotSignedInException -> {
+                throw ex
+            }
 
             else -> {
                 Simber.e("Unexpected network error", ex, tag = SYNC)
@@ -356,7 +360,7 @@ internal class EventUpSyncTask @Inject constructor(
         corruptedScopes.forEach { scope ->
             try {
                 Simber.i("Uploading invalid events for session ${scope.id}", tag = SYNC)
-                val scopeString = jsonHelper.toJson(scope)
+                val scopeString = jsonHelper.json.encodeToString(scope)
                 val eventJsons = eventRepository.getEventsJsonFromScope(scope.id)
                 emit(eventJsons.size)
 
@@ -369,7 +373,9 @@ internal class EventUpSyncTask @Inject constructor(
                 when (t) {
                     // We don't need to report http exceptions as cloud logs all of them.
                     is NetworkConnectionException, is HttpException -> Simber.i("Failed to upload invalid events", t, tag = SYNC)
+
                     is RemoteDbNotSignedInException -> throw t
+
                     else -> Simber.e("Unexpected error while uploading invalid events", t, tag = SYNC)
                 }
             }

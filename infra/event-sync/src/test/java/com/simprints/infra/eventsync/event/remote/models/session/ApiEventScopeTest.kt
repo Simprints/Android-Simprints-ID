@@ -28,7 +28,7 @@ class ApiEventScopeTest {
         )
 
         // Act
-        val json = JsonHelper.toJson(apiEventScope)
+        val json = JsonHelper.json.encodeToString(apiEventScope)
 
         // Assert
         Truth.assertThat(json).doesNotContain("projectConfigurationUpdatedAt")
@@ -56,7 +56,7 @@ class ApiEventScopeTest {
         )
 
         // Act
-        val json = JsonHelper.toJson(apiEventScope)
+        val json = JsonHelper.json.encodeToString(apiEventScope)
 
         // Assert
         Truth.assertThat(json).contains("projectConfigurationUpdatedAt")

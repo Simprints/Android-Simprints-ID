@@ -1,6 +1,5 @@
 package com.simprints.infra.eventsync.sync.up.tasks
 
-import com.fasterxml.jackson.core.JsonParseException
 import com.google.common.truth.Truth.*
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
@@ -46,6 +45,7 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.SerializationException
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
@@ -448,7 +448,7 @@ internal class EventUpSyncTaskTest {
         coEvery { eventRepo.getClosedEventScopes(any(), any()) } returns listOf(createSessionScope(GUID1))
         coEvery {
             eventRepo.getEventsFromScope(GUID1)
-        } throws JsonParseException(mockk(relaxed = true), "")
+        } throws SerializationException("", mockk(relaxed = true))
 
         coEvery { eventRepo.getEventsJsonFromScope(GUID1) } returns listOf("{}")
 
@@ -470,7 +470,8 @@ internal class EventUpSyncTaskTest {
         coEvery { eventRepo.getClosedEventScopes(any(), any()) } returns listOf(createSessionScope(GUID1))
         coEvery {
             eventRepo.getEventsFromScope(GUID1)
-        } throws JsonParseException(mockk(relaxed = true), "")
+        } throws SerializationException("", mockk(relaxed = true))
+
         coEvery { eventRepo.getEventsJsonFromScope(GUID1) } returns listOf("{}")
         coEvery { eventRemoteDataSource.dumpInvalidEvents(any(), any()) } throws HttpException(
             Response.error<String>(503, "".toResponseBody(null)),

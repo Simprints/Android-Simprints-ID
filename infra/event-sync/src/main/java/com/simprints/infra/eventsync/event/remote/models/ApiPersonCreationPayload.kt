@@ -3,8 +3,10 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent.PersonCreationPayload
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 @Deprecated("Replaced by ApiBiometricReferenceCreationEvent in 2025.1.0")
 internal data class ApiPersonCreationPayload(
     override val startTime: ApiTimestamp,
@@ -12,7 +14,7 @@ internal data class ApiPersonCreationPayload(
     val fingerprintReferenceId: String?,
     val faceCaptureIds: List<String>?,
     val faceReferenceId: String?,
-) : ApiEventPayload(startTime) {
+) : ApiEventPayload() {
     constructor(domainPayload: PersonCreationPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.fingerprintCaptureIds,

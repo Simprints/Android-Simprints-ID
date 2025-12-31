@@ -1,23 +1,23 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.NOT_AUTHORIZED
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
 import com.simprints.infra.eventsync.event.remote.models.ApiAuthorizationPayload.ApiResult
+import kotlinx.serialization.Serializable
 
 @Keep
-@JsonInclude(Include.NON_NULL)
+@Serializable
 internal data class ApiAuthorizationPayload(
     override val startTime: ApiTimestamp,
     val result: ApiResult,
     val userInfo: ApiUserInfo?,
-) : ApiEventPayload(startTime) {
+) : ApiEventPayload() {
     @Keep
+    @Serializable
     data class ApiUserInfo(
         val projectId: String,
         val userId: String,
@@ -27,6 +27,7 @@ internal data class ApiAuthorizationPayload(
     }
 
     @Keep
+    @Serializable
     enum class ApiResult {
         AUTHORIZED,
         NOT_AUTHORIZED,

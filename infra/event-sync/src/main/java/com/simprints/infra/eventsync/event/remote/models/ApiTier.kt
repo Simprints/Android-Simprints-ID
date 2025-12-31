@@ -3,8 +3,10 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.response.AppMatchConfidence
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal enum class ApiTier {
     TIER_1,
     TIER_2,

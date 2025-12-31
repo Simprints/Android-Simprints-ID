@@ -8,18 +8,21 @@ import com.simprints.infra.events.event.domain.models.IntentParsingEvent.IntentP
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.ODK
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.STANDARD
 import com.simprints.infra.eventsync.event.remote.models.ApiIntentParsingPayload.ApiIntegrationInfo
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiIntentParsingPayload(
     override val startTime: ApiTimestamp,
     val integration: ApiIntegrationInfo,
-) : ApiEventPayload(startTime) {
+) : ApiEventPayload() {
     constructor(domainPayload: IntentParsingPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.integration.fromDomainToApi(),
     )
 
     @Keep
+    @Serializable
     enum class ApiIntegrationInfo {
         ODK,
         STANDARD,

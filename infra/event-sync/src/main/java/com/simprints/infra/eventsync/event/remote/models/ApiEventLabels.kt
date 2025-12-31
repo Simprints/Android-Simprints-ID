@@ -5,8 +5,10 @@ import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.eventsync.event.remote.models.ApiEventLabels.Companion.DEVICE_ID_LABEL_KEY
 import com.simprints.infra.eventsync.event.remote.models.ApiEventLabels.Companion.PROJECT_ID_LABEL_KEY
 import com.simprints.infra.eventsync.event.remote.models.ApiEventLabels.Companion.SESSION_ID_LABEL_KEY
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal class ApiEventLabels : HashMap<String, List<String>>() {
     companion object {
         const val PROJECT_ID_LABEL_KEY = "projectId"

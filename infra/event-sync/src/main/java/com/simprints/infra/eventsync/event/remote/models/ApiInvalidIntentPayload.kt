@@ -1,18 +1,19 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.simprints.core.tools.json.AnyPrimitiveSerializer
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.InvalidIntentEvent.InvalidIntentPayload
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Keep
-@JsonInclude(Include.NON_NULL)
+@Serializable
 internal data class ApiInvalidIntentPayload(
     override val startTime: ApiTimestamp,
     val action: String,
-    val extras: Map<String, Any?>,
-) : ApiEventPayload(startTime) {
+    val extras: Map<String, @Serializable(with = AnyPrimitiveSerializer::class) Any?>,
+) : ApiEventPayload() {
     constructor(domainPayload: InvalidIntentPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.action,

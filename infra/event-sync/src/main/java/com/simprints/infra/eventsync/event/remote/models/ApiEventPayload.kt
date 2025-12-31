@@ -113,22 +113,18 @@ import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCap
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.infra.events.event.domain.models.samples.SampleUpSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
-import com.simprints.infra.eventsync.event.remote.models.callback.ApiCallbackPayload
-import com.simprints.infra.eventsync.event.remote.models.callout.ApiCalloutPayloadV2
-import com.simprints.infra.eventsync.event.remote.models.callout.ApiCalloutPayloadV3
-import com.simprints.infra.eventsync.event.remote.models.downsync.ApiEventDownSyncRequestPayload
-import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCaptureBiometricsPayload
-import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCaptureConfirmationPayload
-import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload
-import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceFallbackCapturePayload
-import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceOnboardingCompletePayload
-import com.simprints.infra.eventsync.event.remote.models.samples.ApiEventSampleUpSyncRequestPayload
-import com.simprints.infra.eventsync.event.remote.models.upsync.ApiEventUpSyncRequestPayload
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 @Keep
-internal abstract class ApiEventPayload(
-    open val startTime: ApiTimestamp,
-) {
+@Serializable(with = ApiEventPayloadSerializer::class)
+internal sealed class ApiEventPayload {
+    abstract val startTime: ApiTimestamp
+
     abstract fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String?
 }
 
@@ -188,4 +184,200 @@ internal fun EventPayload.fromDomainToApi(): ApiEventPayload = when (this.type) 
     EXTERNAL_CREDENTIAL_CAPTURE_VALUE -> ApiExternalCredentialCaptureValuePayload(this as ExternalCredentialCaptureValuePayload)
     EXTERNAL_CREDENTIAL_SEARCH -> ApiExternalCredentialSearchPayload(this as ExternalCredentialSearchPayload)
     EXTERNAL_CREDENTIAL_CONFIRMATION -> ApiExternalCredentialConfirmationPayload(this as ExternalCredentialConfirmationPayload)
+}
+
+internal object ApiEventPayloadSerializer : KSerializer<ApiEventPayload> {
+    override val descriptor = buildClassSerialDescriptor("ApiEventPayload")
+
+    override fun serialize(
+        encoder: Encoder,
+        value: ApiEventPayload,
+    ) {
+        when (value) {
+            is ApiScannerConnectionPayload -> {
+                encoder.encodeSerializableValue(
+                    ApiScannerConnectionPayload.serializer(),
+                    value,
+                )
+            }
+
+            is ApiAgeGroupSelectionPayload -> {
+                encoder.encodeSerializableValue(
+                    ApiAgeGroupSelectionPayload.serializer(),
+                    value,
+                )
+            }
+
+            is ApiAlertScreenPayload -> {
+                encoder.encodeSerializableValue(
+                    ApiAlertScreenPayload.serializer(),
+                    value,
+                )
+            }
+
+            is ApiAuthenticationPayload -> {
+                encoder.encodeSerializableValue(ApiAuthenticationPayload.serializer(), value)
+            }
+
+            is ApiAuthorizationPayload -> {
+                encoder.encodeSerializableValue(ApiAuthorizationPayload.serializer(), value)
+            }
+
+            is ApiBiometricReferenceCreationPayload -> {
+                encoder.encodeSerializableValue(ApiBiometricReferenceCreationPayload.serializer(), value)
+            }
+
+            is ApiCallbackPayload -> {
+                encoder.encodeSerializableValue(ApiCallbackPayload.serializer(), value)
+            }
+
+            is ApiCalloutPayloadV2 -> {
+                encoder.encodeSerializableValue(ApiCalloutPayloadV2.serializer(), value)
+            }
+
+            is ApiCalloutPayloadV3 -> {
+                encoder.encodeSerializableValue(ApiCalloutPayloadV3.serializer(), value)
+            }
+
+            is ApiCandidateReadPayload -> {
+                encoder.encodeSerializableValue(ApiCandidateReadPayload.serializer(), value)
+            }
+
+            is ApiCompletionCheckPayload -> {
+                encoder.encodeSerializableValue(ApiCompletionCheckPayload.serializer(), value)
+            }
+
+            is ApiConnectivitySnapshotPayload -> {
+                encoder.encodeSerializableValue(ApiConnectivitySnapshotPayload.serializer(), value)
+            }
+
+            is ApiConsentPayload -> {
+                encoder.encodeSerializableValue(ApiConsentPayload.serializer(), value)
+            }
+
+            is ApiEnrolmentPayloadV2 -> {
+                encoder.encodeSerializableValue(ApiEnrolmentPayloadV2.serializer(), value)
+            }
+
+            is ApiEnrolmentPayloadV4 -> {
+                encoder.encodeSerializableValue(ApiEnrolmentPayloadV4.serializer(), value)
+            }
+
+            is ApiEnrolmentUpdatePayload -> {
+                encoder.encodeSerializableValue(ApiEnrolmentUpdatePayload.serializer(), value)
+            }
+
+            is ApiEventDownSyncRequestPayload -> {
+                encoder.encodeSerializableValue(ApiEventDownSyncRequestPayload.serializer(), value)
+            }
+
+            is ApiEventSampleUpSyncRequestPayload -> {
+                encoder.encodeSerializableValue(ApiEventSampleUpSyncRequestPayload.serializer(), value)
+            }
+
+            is ApiEventUpSyncRequestPayload -> {
+                encoder.encodeSerializableValue(ApiEventUpSyncRequestPayload.serializer(), value)
+            }
+
+            is ApiExternalCredentialCapturePayload -> {
+                encoder.encodeSerializableValue(ApiExternalCredentialCapturePayload.serializer(), value)
+            }
+
+            is ApiExternalCredentialCaptureValuePayload -> {
+                encoder.encodeSerializableValue(ApiExternalCredentialCaptureValuePayload.serializer(), value)
+            }
+
+            is ApiExternalCredentialConfirmationPayload -> {
+                encoder.encodeSerializableValue(ApiExternalCredentialConfirmationPayload.serializer(), value)
+            }
+
+            is ApiExternalCredentialSearchPayload -> {
+                encoder.encodeSerializableValue(ApiExternalCredentialSearchPayload.serializer(), value)
+            }
+
+            is ApiExternalCredentialSelectionPayload -> {
+                encoder.encodeSerializableValue(ApiExternalCredentialSelectionPayload.serializer(), value)
+            }
+
+            is ApiFaceCaptureBiometricsPayload -> {
+                encoder.encodeSerializableValue(ApiFaceCaptureBiometricsPayload.serializer(), value)
+            }
+
+            is ApiFaceCaptureConfirmationPayload -> {
+                encoder.encodeSerializableValue(ApiFaceCaptureConfirmationPayload.serializer(), value)
+            }
+
+            is ApiFaceCapturePayload -> {
+                encoder.encodeSerializableValue(ApiFaceCapturePayload.serializer(), value)
+            }
+
+            is ApiFaceFallbackCapturePayload -> {
+                encoder.encodeSerializableValue(ApiFaceFallbackCapturePayload.serializer(), value)
+            }
+
+            is ApiFaceOnboardingCompletePayload -> {
+                encoder.encodeSerializableValue(ApiFaceOnboardingCompletePayload.serializer(), value)
+            }
+
+            is ApiFingerprintCaptureBiometricsPayload -> {
+                encoder.encodeSerializableValue(ApiFingerprintCaptureBiometricsPayload.serializer(), value)
+            }
+
+            is ApiFingerprintCapturePayload -> {
+                encoder.encodeSerializableValue(ApiFingerprintCapturePayload.serializer(), value)
+            }
+
+            is ApiGuidSelectionPayload -> {
+                encoder.encodeSerializableValue(ApiGuidSelectionPayload.serializer(), value)
+            }
+
+            is ApiIntentParsingPayload -> {
+                encoder.encodeSerializableValue(ApiIntentParsingPayload.serializer(), value)
+            }
+
+            is ApiInvalidIntentPayload -> {
+                encoder.encodeSerializableValue(ApiInvalidIntentPayload.serializer(), value)
+            }
+
+            is ApiLicenseCheckEventPayload -> {
+                encoder.encodeSerializableValue(ApiLicenseCheckEventPayload.serializer(), value)
+            }
+
+            is ApiOneToManyMatchPayload -> {
+                encoder.encodeSerializableValue(ApiOneToManyMatchPayload.serializer(), value)
+            }
+
+            is ApiOneToOneMatchPayload -> {
+                encoder.encodeSerializableValue(ApiOneToOneMatchPayload.serializer(), value)
+            }
+
+            is ApiPersonCreationPayload -> {
+                encoder.encodeSerializableValue(ApiPersonCreationPayload.serializer(), value)
+            }
+
+            is ApiRefusalPayload -> {
+                encoder.encodeSerializableValue(ApiRefusalPayload.serializer(), value)
+            }
+
+            is ApiScannerFirmwareUpdatePayload -> {
+                encoder.encodeSerializableValue(ApiScannerFirmwareUpdatePayload.serializer(), value)
+            }
+
+            is ApiSuspiciousIntentPayload -> {
+                encoder.encodeSerializableValue(ApiSuspiciousIntentPayload.serializer(), value)
+            }
+
+            is ApiVero2InfoSnapshotPayload.ApiVero2InfoSnapshotPayloadForNewApi -> {
+                encoder.encodeSerializableValue(ApiVero2InfoSnapshotPayload.ApiVero2InfoSnapshotPayloadForNewApi.serializer(), value)
+            }
+
+            is ApiVero2InfoSnapshotPayload.ApiVero2InfoSnapshotPayloadForOldApi -> {
+                encoder.encodeSerializableValue(ApiVero2InfoSnapshotPayload.ApiVero2InfoSnapshotPayloadForOldApi.serializer(), value)
+            }
+        }
+    }
+
+    override fun deserialize(decoder: Decoder): ApiEventPayload {
+        error("Deserialization without discriminator is not supported")
+    }
 }
