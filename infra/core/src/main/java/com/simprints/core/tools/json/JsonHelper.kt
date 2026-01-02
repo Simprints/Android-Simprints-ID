@@ -63,6 +63,7 @@ object JsonHelper {
         jackson.readTree(json)
     }
 
+    // Todo will be replacing the above fromJson and toJson once completely removing jackson before the 2026.1.0 release
     val json: Json by lazy {
         Json {
             ignoreUnknownKeys = true

@@ -47,7 +47,6 @@ firebase_perf_version = "22.0.4"
 firebase_crashlyticsPlugin_version = "3.0.6"
 firebase_perfPlugin_version = "2.0.2"
 
-# [MS-483] Newer versions of Retrofit (>=2.10.0) don't support android apis <=25 beacuse of the internal Jackson library
 retrofit_version = "3.0.0"
 okttp_version = "5.3.2"
 # Newer versions of Jackson don't support android apis <=25.Jackson shouldn't be updated as long as SID MIN supported APIs <=25

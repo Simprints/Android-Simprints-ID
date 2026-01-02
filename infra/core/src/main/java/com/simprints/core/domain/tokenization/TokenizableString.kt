@@ -4,10 +4,9 @@ import android.os.Parcelable
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString.Raw
 import com.simprints.core.domain.tokenization.TokenizableString.Tokenized
-import com.simprints.core.domain.tokenization.serialization.TokenizableStringDefaultSerializer
+import com.simprints.core.domain.tokenization.serialization.TokenizableStringSerializer
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 
@@ -19,19 +18,18 @@ import kotlinx.serialization.json.JsonClassDiscriminator
  * Use [Raw] for the unencrypted values
  */
 
-@OptIn(ExperimentalSerializationApi::class)
-@Parcelize
 @Keep
-@Serializable(with = TokenizableStringDefaultSerializer::class)
-@SerialName("TokenizableString")
+@Parcelize
+@Serializable(with = TokenizableStringSerializer::class)
+@OptIn(ExperimentalSerializationApi::class)
 @JsonClassDiscriminator("className")
 sealed class TokenizableString : Parcelable {
     abstract val value: String
     abstract val className: String
 
+    @Keep
     @Parcelize
     @Serializable
-    @SerialName("TokenizableString.Tokenized")
     data class Tokenized(
         override val value: String,
         override val className: String = "TokenizableString.Tokenized",
@@ -43,8 +41,9 @@ sealed class TokenizableString : Parcelable {
         override fun toString() = super.toString()
     }
 
+    @Keep
+    @Parcelize
     @Serializable
-    @SerialName("TokenizableString.Raw")
     data class Raw(
         override val value: String,
         override val className: String = "TokenizableString.Raw",
