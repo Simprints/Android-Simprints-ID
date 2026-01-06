@@ -50,12 +50,4 @@ internal data class ApiCallbackPayload(
     )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
-
-    companion object {
-        const val CALLBACK_ENROLMENT_KEY = "ENROLMENT"
-        const val CALLBACK_IDENTIFICATION_KEY = "IDENTIFICATION"
-        const val CALLBACK_VERIFICATION_KEY = "VERIFICATION"
-        const val CALLBACK_CONFIRMATION_KEY = "CONFIRMATION"
-        const val CALLBACK_ERROR_KEY = "ERROR"
-    }
 }
