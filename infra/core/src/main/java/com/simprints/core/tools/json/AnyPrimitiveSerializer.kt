@@ -64,10 +64,12 @@ object AnyPrimitiveSerializer : KSerializer<Any> {
 
     private fun fromJsonElement(element: JsonElement): Any = when (element) {
         is JsonPrimitive -> {
-            if (element.isString) {
-                element.content
-            } else {
-                element.booleanOrNull ?: element.longOrNull ?: element.doubleOrNull ?: element.content
+            when {
+                element.isString -> element.content
+                element.booleanOrNull != null -> element.booleanOrNull!!
+                element.longOrNull != null -> element.longOrNull!!
+                element.doubleOrNull != null -> element.doubleOrNull!!
+                else -> element.content
             }
         }
 

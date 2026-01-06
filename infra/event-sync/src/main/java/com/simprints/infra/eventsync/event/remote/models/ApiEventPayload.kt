@@ -115,7 +115,6 @@ import com.simprints.infra.events.event.domain.models.samples.SampleUpSyncReques
 import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder

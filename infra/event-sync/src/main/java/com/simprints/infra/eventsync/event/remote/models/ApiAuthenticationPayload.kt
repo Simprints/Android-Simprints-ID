@@ -12,9 +12,7 @@ import com.simprints.infra.events.event.domain.models.AuthenticationEvent.Authen
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.OFFLINE
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.TECHNICAL_FAILURE
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN
-import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.event.remote.models.ApiAuthenticationPayload.ApiResult
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Keep

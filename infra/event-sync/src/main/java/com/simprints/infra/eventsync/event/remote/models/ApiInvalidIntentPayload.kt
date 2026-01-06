@@ -4,7 +4,6 @@ import androidx.annotation.Keep
 import com.simprints.core.tools.json.AnyPrimitiveSerializer
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.InvalidIntentEvent.InvalidIntentPayload
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Keep

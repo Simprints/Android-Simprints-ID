@@ -76,7 +76,7 @@ object TokenizableStringSerializer : KSerializer<TokenizableString> {
             }
 
             else -> {
-                throw IllegalStateException("Unexpected JSON element for TokenizableString")
+                error("Unexpected JSON element for TokenizableString")
             }
         }
     }

@@ -3,8 +3,6 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.CompletionCheckEvent.CompletionCheckPayload
-import com.simprints.infra.events.event.domain.models.EventType
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Keep
