@@ -32,9 +32,6 @@ class ConfigManagerTest {
     private lateinit var configRepository: ConfigRepository
 
     @MockK
-    private lateinit var configSyncCache: ConfigSyncCache
-
-    @MockK
     private lateinit var authStore: AuthStore
 
     @MockK
@@ -54,7 +51,6 @@ class ConfigManagerTest {
         MockKAnnotations.init(this, relaxed = true)
         configManager = ConfigManager(
             configRepository = configRepository,
-            configSyncCache = configSyncCache,
             authStore = authStore,
         )
     }
@@ -65,8 +61,6 @@ class ConfigManagerTest {
 
         val refreshedProject = configManager.refreshProject(PROJECT_ID)
         assertThat(refreshedProject).isEqualTo(projectWithConfig)
-
-        coVerify { configSyncCache.saveUpdateTime() }
     }
 
     @Test

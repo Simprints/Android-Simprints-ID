@@ -11,7 +11,9 @@ import kotlinx.coroutines.flow.Flow
 interface ConfigRepository {
     suspend fun refreshProject(projectId: String): ProjectWithConfig
 
-    suspend fun getProject(): Project
+    fun observeIsProjectRefreshing(): Flow<Boolean>
+
+    suspend fun getProject(): Project?
 
     suspend fun getProjectConfiguration(): ProjectConfiguration
 

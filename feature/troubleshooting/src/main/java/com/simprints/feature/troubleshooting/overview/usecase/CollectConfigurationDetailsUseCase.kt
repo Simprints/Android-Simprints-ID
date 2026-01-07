@@ -1,7 +1,7 @@
 package com.simprints.feature.troubleshooting.overview.usecase
 
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.sync.ConfigSyncCache
+import com.simprints.infra.config.store.ConfigSyncCache
 import javax.inject.Inject
 
 internal class CollectConfigurationDetailsUseCase @Inject constructor(

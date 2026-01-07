@@ -83,7 +83,7 @@ internal class RealmToRoomMigrationWorker @AssistedInject constructor(
     private suspend fun processRecords() {
         // log realm db info
         crashlyticsLog("[RealmToRoomMigrationWorker] ${realmDataSource.getLocalDBInfo()}")
-        val project = configRepo.getProject()
+        val project = configRepo.getProject() ?: return
         var index = 0
         realmDataSource
             .loadAllSubjectsInBatches(BATCH_SIZE)

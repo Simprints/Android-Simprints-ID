@@ -28,8 +28,8 @@ internal abstract class BaseEventDownSyncDownloaderWorker(
     protected val configRepository: ConfigRepository,
     private val dispatcher: CoroutineDispatcher,
     private val realmToRoomMigrationFlagsStore: RealmToRoomMigrationFlagsStore,
-) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
-
+) : SimCoroutineWorker(context, params),
+    WorkerProgressCountReporter {
     override val tag: String = "EventDownSyncDownloader"
 
     private val downSyncOperationInput by lazy {
@@ -73,22 +73,26 @@ internal abstract class BaseEventDownSyncDownloaderWorker(
             var max: Int? = syncCache.readMax(workerId)
             val project = configRepository.getProject()
 
-            createDownSyncTask().downSync(this, getDownSyncOperation(), getEventScope(), project).collect {
-                count = it.progress
-                max = it.maxProgress
-                syncCache.saveProgress(workerId, count)
-                syncCache.saveMax(workerId, max)
-                reportCount(count, max)
-            }
+            if (project == null) {
+                fail(IllegalStateException("User is not signed in"))
+            } else {
+                createDownSyncTask().downSync(this, getDownSyncOperation(), getEventScope(), project).collect {
+                    count = it.progress
+                    max = it.maxProgress
+                    syncCache.saveProgress(workerId, count)
+                    syncCache.saveMax(workerId, max)
+                    reportCount(count, max)
+                }
 
-            Simber.d("Downloaded events: $count", tag = tag)
-            success(
-                workDataOf(
-                    OUTPUT_DOWN_SYNC to count,
-                    OUTPUT_DOWN_MAX_SYNC to max,
-                ),
-                "Total downloaded: $count / $max",
-            )
+                Simber.d("Downloaded events: $count", tag = tag)
+                success(
+                    workDataOf(
+                        OUTPUT_DOWN_SYNC to count,
+                        OUTPUT_DOWN_MAX_SYNC to max,
+                    ),
+                    "Total downloaded: $count / $max",
+                )
+            }
         } catch (t: Throwable) {
             handleSyncException(t)
         }

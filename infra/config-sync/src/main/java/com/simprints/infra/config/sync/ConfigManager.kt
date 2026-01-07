@@ -18,7 +18,6 @@ import javax.inject.Singleton
 @Singleton
 class ConfigManager @Inject constructor(
     private val configRepository: ConfigRepository,
-    private val configSyncCache: ConfigSyncCache,
     private val authStore: AuthStore,
 ) {
     private val isProjectRefreshingFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -26,9 +25,7 @@ class ConfigManager @Inject constructor(
     suspend fun refreshProject(projectId: String): ProjectWithConfig {
         isProjectRefreshingFlow.tryEmit(true)
         try {
-            return configRepository.refreshProject(projectId).also {
-                configSyncCache.saveUpdateTime()
-            }
+            return configRepository.refreshProject(projectId)
         } finally {
             isProjectRefreshingFlow.tryEmit(false)
         }
