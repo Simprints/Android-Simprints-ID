@@ -11,6 +11,7 @@ import com.simprints.infra.enrolment.records.repository.local.migration.RealmToR
 import com.simprints.infra.sync.config.usecase.HandleProjectStateUseCase
 import com.simprints.infra.sync.config.usecase.RescheduleWorkersIfConfigChangedUseCase
 import com.simprints.infra.sync.config.usecase.ResetLocalRecordsIfConfigChangedUseCase
+import com.simprints.infra.sync.config.usecase.TokenizeRecordsIfKeysChangedUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -25,6 +26,7 @@ internal class ProjectConfigDownSyncWorker @AssistedInject constructor(
     private val handleProjectState: HandleProjectStateUseCase,
     private val rescheduleWorkersIfConfigChanged: RescheduleWorkersIfConfigChangedUseCase,
     private val resetLocalRecordsIfConfigChanged: ResetLocalRecordsIfConfigChangedUseCase,
+    private val tokenizeRecordsIfProjectChanged: TokenizeRecordsIfKeysChangedUseCase,
     private val realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler,
     @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
@@ -35,6 +37,7 @@ internal class ProjectConfigDownSyncWorker @AssistedInject constructor(
         crashlyticsLog("Started")
         try {
             val projectId = authStore.signedInProjectId
+            val oldProject = configManager.getProject()
             val oldConfig = configManager.getProjectConfiguration()
 
             // if the user is not signed in, we shouldn't try again
@@ -45,6 +48,10 @@ internal class ProjectConfigDownSyncWorker @AssistedInject constructor(
                 handleProjectState(project.state)
                 resetLocalRecordsIfConfigChanged(oldConfig, config)
                 realmToRoomMigrationScheduler.scheduleMigrationWorkerIfNeeded()
+
+                // Running potential tokenization after potential reset and room migration to avoid unnecessary work
+                tokenizeRecordsIfProjectChanged(oldProject, project)
+
                 rescheduleWorkersIfConfigChanged(oldConfig, config)
                 success()
             }

@@ -8,7 +8,6 @@ import com.simprints.infra.config.store.models.PrivacyNoticeResult
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectWithConfig
-import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +18,6 @@ import javax.inject.Singleton
 @Singleton
 class ConfigManager @Inject constructor(
     private val configRepository: ConfigRepository,
-    private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val configSyncCache: ConfigSyncCache,
     private val authStore: AuthStore,
 ) {
@@ -29,7 +27,6 @@ class ConfigManager @Inject constructor(
         isProjectRefreshingFlow.tryEmit(true)
         try {
             return configRepository.refreshProject(projectId).also {
-                enrolmentRecordRepository.tokenizeExistingRecords(it.project)
                 configSyncCache.saveUpdateTime()
             }
         } finally {

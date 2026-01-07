@@ -2,7 +2,7 @@ package com.simprints.infra.sync.config.worker
 
 import android.os.PowerManager
 import androidx.work.ListenableWorker
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.config.sync.ConfigManager
@@ -12,13 +12,10 @@ import com.simprints.infra.sync.config.testtools.projectConfiguration
 import com.simprints.infra.sync.config.usecase.HandleProjectStateUseCase
 import com.simprints.infra.sync.config.usecase.RescheduleWorkersIfConfigChangedUseCase
 import com.simprints.infra.sync.config.usecase.ResetLocalRecordsIfConfigChangedUseCase
+import com.simprints.infra.sync.config.usecase.TokenizeRecordsIfKeysChangedUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -44,6 +41,9 @@ class ProjectConfigDownSyncWorkerTest {
     private lateinit var resetLocalRecordsIfConfigChangedUseCase: ResetLocalRecordsIfConfigChangedUseCase
 
     @MockK
+    private lateinit var tokenizeRecordsIfProjectChanged: TokenizeRecordsIfKeysChangedUseCase
+
+    @MockK
     private lateinit var realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler
 
     private lateinit var projectConfigDownSyncWorker: ProjectConfigDownSyncWorker
@@ -64,6 +64,7 @@ class ProjectConfigDownSyncWorkerTest {
             handleProjectState = handleProjectStateUseCase,
             rescheduleWorkersIfConfigChanged = rescheduleWorkersIfConfigChangedUseCase,
             resetLocalRecordsIfConfigChanged = resetLocalRecordsIfConfigChangedUseCase,
+            tokenizeRecordsIfProjectChanged = tokenizeRecordsIfProjectChanged,
             realmToRoomMigrationScheduler = realmToRoomMigrationScheduler,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
@@ -102,6 +103,7 @@ class ProjectConfigDownSyncWorkerTest {
             resetLocalRecordsIfConfigChangedUseCase.invoke(any(), any())
             realmToRoomMigrationScheduler.scheduleMigrationWorkerIfNeeded()
             rescheduleWorkersIfConfigChangedUseCase.invoke(any(), any())
+            tokenizeRecordsIfProjectChanged.invoke(any(), any())
         }
     }
 
