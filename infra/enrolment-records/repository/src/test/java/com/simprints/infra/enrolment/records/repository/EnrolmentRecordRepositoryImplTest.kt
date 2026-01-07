@@ -203,15 +203,15 @@ class EnrolmentRecordRepositoryImplTest {
             every { project.id } returns projectId
             coEvery { localDataSource.load(any()) } returns listOf(enrolmentRecord)
             every {
-                tokenizationProcessor.encrypt(
-                    decrypted = attendantIdRaw,
+                tokenizationProcessor.tokenizeIfNecessary(
+                    tokenizableString = attendantIdRaw,
                     tokenKeyType = TokenKeyType.AttendantId,
                     project = project,
                 )
             } returns attendantIdTokenized
             every {
-                tokenizationProcessor.encrypt(
-                    decrypted = moduleIdRaw,
+                tokenizationProcessor.tokenizeIfNecessary(
+                    tokenizableString = moduleIdRaw,
                     tokenKeyType = TokenKeyType.ModuleId,
                     project = project,
                 )

@@ -2,7 +2,6 @@ package com.simprints.infra.enrolment.records.repository
 
 import androidx.core.content.edit
 import com.simprints.core.DispatcherIO
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
@@ -63,23 +62,23 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
     override suspend fun tokenizeExistingRecords(project: Project) {
         try {
             val query = EnrolmentRecordQuery(projectId = project.id, hasUntokenizedFields = true)
-            val tokenizedSubjectsCreateAction = selectEnrolmentRecordLocalDataSource()
+            val tokenizedRecordsCreateAction = selectEnrolmentRecordLocalDataSource()
                 .load(query)
-                .mapNotNull { subject ->
-                    if (subject.projectId != project.id) return@mapNotNull null
-                    val moduleId = tokenizeIfNecessary(
-                        value = subject.moduleId,
+                .mapNotNull { record ->
+                    if (record.projectId != project.id) return@mapNotNull null
+                    val moduleId = tokenizationProcessor.tokenizeIfNecessary(
+                        tokenizableString = record.moduleId,
                         tokenKeyType = TokenKeyType.ModuleId,
                         project = project,
                     )
-                    val attendantId = tokenizeIfNecessary(
-                        value = subject.attendantId,
+                    val attendantId = tokenizationProcessor.tokenizeIfNecessary(
+                        tokenizableString = record.attendantId,
                         tokenKeyType = TokenKeyType.AttendantId,
                         project = project,
                     )
-                    return@mapNotNull subject.copy(moduleId = moduleId, attendantId = attendantId)
+                    record.copy(moduleId = moduleId, attendantId = attendantId)
                 }.map(EnrolmentRecordAction::Creation)
-            selectEnrolmentRecordLocalDataSource().performActions(tokenizedSubjectsCreateAction, project)
+            selectEnrolmentRecordLocalDataSource().performActions(tokenizedRecordsCreateAction, project)
         } catch (e: Exception) {
             when (e) {
                 is RealmUninitialisedException -> Unit
@@ -88,20 +87,6 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
                 else -> Simber.e("Failed to tokenize existing records", e)
             }
         }
-    }
-
-    private fun tokenizeIfNecessary(
-        value: TokenizableString,
-        tokenKeyType: TokenKeyType,
-        project: Project,
-    ) = when (value) {
-        is TokenizableString.Tokenized -> value
-
-        is TokenizableString.Raw -> tokenizationProcessor.encrypt(
-            decrypted = value,
-            tokenKeyType = tokenKeyType,
-            project = project,
-        )
     }
 
     override suspend fun count(
