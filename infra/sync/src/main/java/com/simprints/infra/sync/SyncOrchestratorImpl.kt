@@ -98,10 +98,13 @@ internal class SyncOrchestratorImpl @Inject constructor(
         stopEventSync()
     }
 
-    override fun refreshConfiguration(): Flow<Unit> {
+    override fun startConfigSync() {
         workManager.startWorker<ProjectConfigDownSyncWorker>(SyncConstants.PROJECT_SYNC_WORK_NAME_ONE_TIME)
         workManager.startWorker<DeviceConfigDownSyncWorker>(SyncConstants.DEVICE_SYNC_WORK_NAME_ONE_TIME)
+    }
 
+    override fun refreshConfiguration(): Flow<Unit> {
+        startConfigSync()
         return workManager
             .getWorkInfosFlow(
                 WorkQuery.fromUniqueWorkNames(
