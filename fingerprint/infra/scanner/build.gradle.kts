@@ -14,7 +14,6 @@ dependencies {
     runtimeOnly(libs.jackson.core)
 
     implementation(project(":infra:config-store"))
-    implementation(project(":infra:config-sync"))
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:recent-user-activity"))
 

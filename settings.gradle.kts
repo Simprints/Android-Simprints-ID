@@ -131,7 +131,6 @@ include(
     ":infra:test-tools",
     ":infra:events",
     ":infra:config-store",
-    ":infra:config-sync",
     ":infra:credential-store",
     ":infra:enrolment-records:repository",
     ":infra:enrolment-records:realm-store",

@@ -35,7 +35,6 @@ jobs:
                 infra:enrolment-records:room-store
                 infra:recent-user-activity
                 infra:config-store
-                infra:config-sync
                 infra:credential-store
                 infra:sync
             reportsId: infra1
