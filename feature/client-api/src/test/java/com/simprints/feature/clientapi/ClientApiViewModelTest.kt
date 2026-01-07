@@ -19,10 +19,10 @@ import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
 import com.simprints.feature.clientapi.usecases.GetEnrolmentCreationEventForRecordUseCase
 import com.simprints.feature.clientapi.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.usecases.SimpleEventReporter
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import com.simprints.infra.orchestration.data.ActionResponse
@@ -70,7 +70,7 @@ internal class ClientApiViewModelTest {
     lateinit var isFlowCompletedWithError: IsFlowCompletedWithErrorUseCase
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var timeHelper: TimeHelper
@@ -104,7 +104,7 @@ internal class ClientApiViewModelTest {
             getEnrolmentCreationEventForRecord = getEnrolmentCreationEventForRecord,
             deleteSessionEventsIfNeeded = deleteSessionEventsIfNeeded,
             isFlowCompletedWithError = isFlowCompletedWithError,
-            configManager = configManager,
+            configRepository = configRepository,
             timeHelper = timeHelper,
             persistentLogger = persistentLogger,
             tokenizationProcessor = tokenizationProcessor,
@@ -318,7 +318,7 @@ internal class ClientApiViewModelTest {
         project: Project,
         returnValue: TokenizableString,
     ) {
-        coEvery { configManager.getProject() } returns project
+        coEvery { configRepository.getProject() } returns project
         every {
             tokenizationProcessor.decrypt(
                 encrypted = any(),

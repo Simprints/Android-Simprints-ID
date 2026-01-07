@@ -6,7 +6,9 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.models.ClientApiConstants
 import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.libsimprints.Constants.SIMPRINTS_LIB_VERSION
@@ -43,10 +45,10 @@ class IntentToActionMapperTest {
     private lateinit var timeHelper: TimeHelper
 
     @MockK
-    private lateinit var eventRepository: com.simprints.infra.events.EventRepository
+    private lateinit var eventRepository: EventRepository
 
     @MockK
-    private lateinit var configManager: com.simprints.infra.config.sync.ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     private lateinit var mapper: IntentToActionMapper
 
@@ -73,7 +75,7 @@ class IntentToActionMapperTest {
             tokenizationProcessor,
             timeHelper,
             eventRepository,
-            configManager,
+            configRepository,
         )
     }
 

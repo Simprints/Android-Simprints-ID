@@ -8,12 +8,12 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.ConfigSyncCache
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.experimental
-import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.config.sync.ConfigSyncCache
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SETTINGS
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.sync.SyncOrchestrator
@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class SettingsViewModel @Inject constructor(
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val syncOrchestrator: SyncOrchestrator,
     private val configSyncCache: ConfigSyncCache,
 ) : ViewModel() {
@@ -32,7 +32,8 @@ internal class SettingsViewModel @Inject constructor(
         get() = _generalConfiguration
     private val _generalConfiguration = MutableLiveData<GeneralConfiguration>()
 
-    val experimentalConfiguration = configManager.observeProjectConfiguration()
+    val experimentalConfiguration = configRepository
+        .observeProjectConfiguration()
         .map(ProjectConfiguration::experimental)
         .asLiveData(viewModelScope.coroutineContext)
 
@@ -58,17 +59,17 @@ internal class SettingsViewModel @Inject constructor(
 
     fun updateLanguagePreference(language: String) {
         viewModelScope.launch {
-            configManager.updateDeviceConfiguration { it.apply { it.language = language } }
+            configRepository.updateDeviceConfiguration { it.apply { it.language = language } }
             _languagePreference.postValue(language)
             Simber.i("Language set to $language", tag = SETTINGS)
         }
     }
 
     private fun load() = viewModelScope.launch {
-        val configuration = configManager.getProjectConfiguration().general
+        val configuration = configRepository.getProjectConfiguration().general
 
         _sinceConfigLastUpdated.send(configSyncCache.sinceLastUpdateTime())
-        _languagePreference.postValue(configManager.getDeviceConfiguration().language)
+        _languagePreference.postValue(configRepository.getDeviceConfiguration().language)
         _generalConfiguration.postValue(configuration)
         _settingsLocked.postValue(configuration.settingsPassword)
     }

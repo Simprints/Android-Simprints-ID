@@ -2,22 +2,22 @@ package com.simprints.infra.matching.usecase
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.capture.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricTemplateCapture
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.reference.BiometricReference
-import com.simprints.core.domain.capture.BiometricReferenceCapture
-import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.capture.BiometricTemplateCapture
-import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.domain.common.TemplateIdentifier
+import com.simprints.core.domain.reference.BiometricReference
+import com.simprints.core.domain.reference.BiometricTemplate
+import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
@@ -57,7 +57,7 @@ internal class FingerprintMatcherUseCaseTest {
     lateinit var resolveBioSdkWrapperUseCase: ResolveBioSdkWrapperUseCase
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var project: Project
@@ -71,14 +71,14 @@ internal class FingerprintMatcherUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
         coEvery { resolveBioSdkWrapperUseCase(any()) } returns bioSdkWrapper
         coEvery {
-            configManager.getProjectConfiguration().fingerprint?.allowedSDKs
+            configRepository.getProjectConfiguration().fingerprint?.allowedSDKs
         } returns listOf(SECUGEN_SIM_MATCHER)
 
         useCase = FingerprintMatcherUseCase(
             timeHelper,
             enrolmentRecordRepository,
             resolveBioSdkWrapperUseCase,
-            configManager,
+            configRepository,
             createRangesUseCase,
             testCoroutineRule.testCoroutineDispatcher,
         )

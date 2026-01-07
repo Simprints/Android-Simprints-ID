@@ -22,8 +22,8 @@ import com.simprints.feature.logincheck.usecases.StartBackgroundSyncUseCase
 import com.simprints.feature.logincheck.usecases.UpdateProjectInCurrentSessionUseCase
 import com.simprints.feature.logincheck.usecases.UpdateSessionScopePayloadUseCase
 import com.simprints.feature.logincheck.usecases.UpdateStoredUserIdUseCase
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectState
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationScheduler
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
 import com.simprints.infra.logging.Simber
@@ -46,7 +46,7 @@ class LoginCheckViewModel @Inject internal constructor(
     private val extractParametersForCrashReport: ExtractCrashKeysUseCase,
     private val addAuthorizationEvent: AddAuthorizationEventUseCase,
     private val isUserSignedIn: IsUserSignedInUseCase,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val startBackgroundSync: StartBackgroundSyncUseCase,
     private val syncOrchestrator: SyncOrchestrator,
     private val updateDatabaseCountsInCurrentSession: UpdateSessionScopePayloadUseCase,
@@ -136,7 +136,7 @@ class LoginCheckViewModel @Inject internal constructor(
     }
 
     private suspend fun validateProjectAndProceed(actionRequest: ActionRequest) {
-        when (configManager.getProject()?.state) {
+        when (configRepository.getProject()?.state) {
             null, ProjectState.PROJECT_ENDING -> _showAlert.send(LoginCheckError.PROJECT_ENDING)
             ProjectState.PROJECT_PAUSED -> _showAlert.send(LoginCheckError.PROJECT_PAUSED)
             ProjectState.PROJECT_ENDED -> startSignInAttempt(actionRequest)

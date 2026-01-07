@@ -4,12 +4,12 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -22,7 +22,7 @@ import org.junit.Test
 
 class ObserveConfigurationChangesUseCaseTest {
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var tokenizationProcessor: TokenizationProcessor
@@ -46,7 +46,7 @@ class ObserveConfigurationChangesUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
 
         useCase = ObserveConfigurationChangesUseCase(
-            configManager = configManager,
+            configRepository = configRepository,
             tokenizationProcessor = tokenizationProcessor,
             enrolmentRecordRepository = enrolmentRepository,
         )
@@ -54,10 +54,10 @@ class ObserveConfigurationChangesUseCaseTest {
 
     @Test
     fun `returns combined state`() = runTest {
-        coEvery { configManager.getProject() } returns null
-        every { configManager.observeIsProjectRefreshing() } returns flowOf(true)
-        every { configManager.observeProjectConfiguration() } returns flowOf(projectConfiguration)
-        every { configManager.observeDeviceConfiguration() } returns flowOf(deviceConfiguration)
+        coEvery { configRepository.getProject() } returns null
+        every { configRepository.observeIsProjectRefreshing() } returns flowOf(true)
+        every { configRepository.observeProjectConfiguration() } returns flowOf(projectConfiguration)
+        every { configRepository.observeDeviceConfiguration() } returns flowOf(deviceConfiguration)
 
         val result = useCase().first()
 
@@ -67,10 +67,10 @@ class ObserveConfigurationChangesUseCaseTest {
 
     @Test
     fun `returns combined state on multiple emissions of combined flow`() = runTest {
-        coEvery { configManager.getProject() } returns null
-        every { configManager.observeIsProjectRefreshing() } returns flowOf(true, false)
-        every { configManager.observeProjectConfiguration() } returns flowOf(projectConfiguration)
-        every { configManager.observeDeviceConfiguration() } returns flowOf(deviceConfiguration)
+        coEvery { configRepository.getProject() } returns null
+        every { configRepository.observeIsProjectRefreshing() } returns flowOf(true, false)
+        every { configRepository.observeProjectConfiguration() } returns flowOf(projectConfiguration)
+        every { configRepository.observeDeviceConfiguration() } returns flowOf(deviceConfiguration)
 
         val result = useCase().toList()
 
@@ -80,7 +80,7 @@ class ObserveConfigurationChangesUseCaseTest {
 
     @Test
     fun `invoke untokenized list of modules`() = runTest {
-        coEvery { configManager.getProject() } returns project
+        coEvery { configRepository.getProject() } returns project
         every { project.id } returns "projectId"
         every { project.state } returns ProjectState.RUNNING
         every { deviceConfiguration.selectedModules } returns listOf(
@@ -92,9 +92,9 @@ class ObserveConfigurationChangesUseCaseTest {
         } returns "moduleUntokenized".asTokenizableRaw()
         coEvery { enrolmentRepository.count(any(), any()) } returnsMany listOf(1, 2)
 
-        every { configManager.observeIsProjectRefreshing() } returns flowOf(true)
-        every { configManager.observeProjectConfiguration() } returns flowOf(projectConfiguration)
-        every { configManager.observeDeviceConfiguration() } returns flowOf(deviceConfiguration)
+        every { configRepository.observeIsProjectRefreshing() } returns flowOf(true)
+        every { configRepository.observeProjectConfiguration() } returns flowOf(projectConfiguration)
+        every { configRepository.observeDeviceConfiguration() } returns flowOf(deviceConfiguration)
 
         val result = useCase().first()
 

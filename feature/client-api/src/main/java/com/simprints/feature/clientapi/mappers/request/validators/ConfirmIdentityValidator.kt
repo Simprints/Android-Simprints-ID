@@ -3,8 +3,8 @@ package com.simprints.feature.clientapi.mappers.request.validators
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.mappers.request.extractors.ConfirmIdentityRequestExtractor
 import com.simprints.feature.clientapi.models.ClientApiError
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.experimental
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SESSION
@@ -14,7 +14,7 @@ internal class ConfirmIdentityValidator(
     private val extractor: ConfirmIdentityRequestExtractor,
     private val currentSessionId: String,
     private val eventRepository: EventRepository,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
 ) : RequestActionValidator(extractor) {
     private var identificationEvent: IdentificationCallbackEvent? = null
 
@@ -60,7 +60,7 @@ internal class ConfirmIdentityValidator(
         }
 
         // Skip further validation if skip flag is enabled
-        if (configManager.getProjectConfiguration().experimental().allowConfirmingGuidsNotInCallback) {
+        if (configRepository.getProjectConfiguration().experimental().allowConfirmingGuidsNotInCallback) {
             return
         }
 

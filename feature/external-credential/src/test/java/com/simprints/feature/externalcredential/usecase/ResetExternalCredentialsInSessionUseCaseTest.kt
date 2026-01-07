@@ -6,8 +6,8 @@ import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
 import com.simprints.infra.events.event.domain.models.EnrolmentUpdateEvent
@@ -33,7 +33,7 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
     lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var project: Project
@@ -50,11 +50,11 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { configManager.getProject() } returns project
+        coEvery { configRepository.getProject() } returns project
 
         useCase = ResetExternalCredentialsInSessionUseCase(
             enrolmentRecordRepository = enrolmentRecordRepository,
-            configManager = configManager,
+            configRepository = configRepository,
             eventRepository = eventRepository,
             sessionCoroutineScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
@@ -97,8 +97,8 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
 
     @Test
     fun `handles missing project`() = runTest {
-        clearMocks(configManager)
-        coEvery { configManager.getProject() } returns null
+        clearMocks(configRepository)
+        coEvery { configRepository.getProject() } returns null
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf()
 
         useCase(scannedCredential, SUBJECT_ID)
@@ -163,7 +163,7 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
     @Test
     fun `retrieves project using correct project id`() = runTest {
         useCase(scannedCredential, SUBJECT_ID)
-        coVerify { configManager.getProject() }
+        coVerify { configRepository.getProject() }
     }
 
     private fun enrolmentUpdateEvent(

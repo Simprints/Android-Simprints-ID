@@ -17,10 +17,10 @@ import com.simprints.feature.externalcredential.screens.search.model.SearchCrede
 import com.simprints.feature.externalcredential.screens.search.model.SearchState
 import com.simprints.feature.externalcredential.screens.search.usecase.MatchCandidatesUseCase
 import com.simprints.feature.externalcredential.usecase.ExternalCredentialEventTrackerUseCase
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -43,7 +43,7 @@ internal class ExternalCredentialSearchViewModelTest {
     lateinit var timeHelper: TimeHelper
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var matchCandidatesUseCase: MatchCandidatesUseCase
@@ -81,8 +81,8 @@ internal class ExternalCredentialSearchViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         every { timeHelper.now() } returns Timestamp(1L)
-        coEvery { configManager.getProject() } returns project
-        coEvery { configManager.getProjectConfiguration() } returns projectConfig
+        coEvery { configRepository.getProject() } returns project
+        coEvery { configRepository.getProjectConfiguration() } returns projectConfig
         coJustRun { eventsTracker.saveSearchEvent(any(), any(), any()) }
         coJustRun { eventsTracker.saveConfirmation(any(), any()) }
     }
@@ -91,7 +91,7 @@ internal class ExternalCredentialSearchViewModelTest {
         scannedCredential = mockScannedCredential,
         externalCredentialParams = externalCredentialParams,
         timeHelper = timeHelper,
-        configManager = configManager,
+        configRepository = configRepository,
         matchCandidatesUseCase = matchCandidatesUseCase,
         tokenizationProcessor = tokenizationProcessor,
         enrolmentRecordRepository = enrolmentRecordRepository,
@@ -100,8 +100,8 @@ internal class ExternalCredentialSearchViewModelTest {
 
     @Test
     fun `initial state handles missing project`() = runTest {
-        clearMocks(configManager)
-        coEvery { configManager.getProject() } returns null
+        clearMocks(configRepository)
+        coEvery { configRepository.getProject() } returns null
 
         viewModel = createViewModel()
 
@@ -159,8 +159,8 @@ internal class ExternalCredentialSearchViewModelTest {
 
     @Test
     fun `confirmCredentialUpdate handles missing project`() = runTest {
-        clearMocks(configManager) // reset default behaviour
-        coEvery { configManager.getProject() } returns null
+        clearMocks(configRepository) // reset default behaviour
+        coEvery { configRepository.getProject() } returns null
 
         viewModel = createViewModel()
         viewModel.confirmCredentialUpdate("".asTokenizableRaw())

@@ -1,7 +1,7 @@
 package com.simprints.feature.logincheck.usecases
 
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Frequency
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.sync.SyncOrchestrator
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -14,7 +14,7 @@ class StartBackgroundSyncUseCaseTest {
     lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     private lateinit var useCase: StartBackgroundSyncUseCase
 
@@ -24,14 +24,14 @@ class StartBackgroundSyncUseCaseTest {
 
         useCase = StartBackgroundSyncUseCase(
             syncOrchestrator,
-            configManager,
+            configRepository,
         )
     }
 
     @Test
     fun `Schedules all syncs when called`() = runTest {
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .synchronization.down.simprints?.frequency
         } returns
@@ -45,7 +45,7 @@ class StartBackgroundSyncUseCaseTest {
     @Test
     fun `Starts event sync on start if required`() = runTest {
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .synchronization.down.simprints?.frequency
         } returns
@@ -59,7 +59,7 @@ class StartBackgroundSyncUseCaseTest {
     @Test
     fun `Does not start event sync on start if not required`() = runTest {
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .synchronization.down.simprints?.frequency
         } returns
@@ -73,7 +73,7 @@ class StartBackgroundSyncUseCaseTest {
     @Test
     fun `Does not start event sync on start if not Simprints sync`() = runTest {
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .synchronization.down.simprints
         } returns null

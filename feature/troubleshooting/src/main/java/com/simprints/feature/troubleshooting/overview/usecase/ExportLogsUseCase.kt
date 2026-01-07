@@ -3,7 +3,7 @@ package com.simprints.feature.troubleshooting.overview.usecase
 import android.content.Context
 import com.simprints.core.DeviceID
 import com.simprints.feature.troubleshooting.FileNameDateTimeFormatter
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.logging.LogDirectoryProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -20,7 +20,7 @@ internal class ExportLogsUseCase @Inject constructor(
     @param:DeviceID private val deviceId: String,
     @param:ApplicationContext private val context: Context,
     private val logDirectoryProvider: LogDirectoryProvider,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     @param:FileNameDateTimeFormatter private val dateFormatter: SimpleDateFormat,
 ) {
     operator fun invoke(): Flow<LogsExportResult> = flow {
@@ -49,7 +49,7 @@ internal class ExportLogsUseCase @Inject constructor(
             it.mkdirs()
         }.let { File(it, "$name.zip") }
 
-    private suspend fun getPassword() = configManager
+    private suspend fun getPassword() = configRepository
         .getProjectConfiguration()
         .let { it.general.settingsPassword.getNullablePassword() ?: it.projectId }
         .toCharArray()

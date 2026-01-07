@@ -4,7 +4,7 @@ import androidx.work.Constraints
 import androidx.work.OneTimeWorkRequest
 import com.simprints.core.domain.common.Partitioning
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker
 import com.simprints.infra.eventsync.sync.down.workers.CommCareEventSyncDownloaderWorker
@@ -13,11 +13,11 @@ import javax.inject.Inject
 internal class CommCareEventSyncWorkersBuilder @Inject constructor(
     downSyncScopeRepository: EventDownSyncScopeRepository,
     jsonHelper: JsonHelper,
-    configManager: ConfigManager,
+    configRepository: ConfigRepository,
 ) : BaseEventDownSyncWorkersBuilder(
         downSyncScopeRepository,
         jsonHelper,
-        configManager,
+        configRepository,
     ) {
     override fun getWorkerClass(): Class<out BaseEventDownSyncDownloaderWorker> = CommCareEventSyncDownloaderWorker::class.java
 
@@ -29,7 +29,7 @@ internal class CommCareEventSyncWorkersBuilder @Inject constructor(
         uniqueSyncId: String,
         uniqueDownSyncId: String,
     ): List<OneTimeWorkRequest> {
-        val projectConfiguration = configManager.getProjectConfiguration()
+        val projectConfiguration = configRepository.getProjectConfiguration()
 
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
             modes = projectConfiguration.general.modalities,

@@ -1,14 +1,14 @@
 package com.simprints.feature.logincheck.usecases
 
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.session.SessionEventRepository
 import javax.inject.Inject
 
 internal class UpdateProjectInCurrentSessionUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
     private val authStore: AuthStore,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
 ) {
     suspend operator fun invoke() {
         val sessionScope = eventRepository.getCurrentSessionScope()
@@ -18,8 +18,8 @@ internal class UpdateProjectInCurrentSessionUseCase @Inject constructor(
             val updatedSessionScope = sessionScope.copy(
                 projectId = signedProjectId,
                 payload = sessionScope.payload.copy(
-                    modalities = configManager.getProjectConfiguration().general.modalities,
-                    language = configManager.getDeviceConfiguration().language,
+                    modalities = configRepository.getProjectConfiguration().general.modalities,
+                    language = configRepository.getDeviceConfiguration().language,
                 ),
             )
 

@@ -6,8 +6,8 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.common.Partitioning
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.SampleSyncScopes
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
@@ -34,7 +34,7 @@ class CommCareEventSyncWorkersBuilderTest {
     private lateinit var generalConfiguration: GeneralConfiguration
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
@@ -45,14 +45,14 @@ class CommCareEventSyncWorkersBuilderTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general } returns generalConfiguration
         }
 
         commCareEventSyncWorkersBuilder = CommCareEventSyncWorkersBuilder(
             eventDownSyncScopeRepository,
             JsonHelper,
-            configManager,
+            configRepository,
         )
     }
 

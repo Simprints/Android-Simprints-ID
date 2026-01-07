@@ -11,10 +11,10 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.excepti
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.TooManyModulesSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.ModuleRepository
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -25,7 +25,7 @@ import javax.inject.Inject
 internal class ModuleSelectionViewModel @Inject constructor(
     private val moduleRepository: ModuleRepository,
     private val syncOrchestrator: SyncOrchestrator,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val tokenizationProcessor: TokenizationProcessor,
     @param:ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
@@ -50,7 +50,8 @@ internal class ModuleSelectionViewModel @Inject constructor(
                 moduleRepository.getModules().map { module ->
                     val decryptedName = when (val name = module.name) {
                         is TokenizableString.Raw -> name
-                        is TokenizableString.Tokenized -> configManager.getProject()?.let {
+
+                        is TokenizableString.Tokenized -> configRepository.getProject()?.let {
                             tokenizationProcessor.decrypt(
                                 encrypted = name,
                                 tokenKeyType = TokenKeyType.ModuleId,
@@ -66,7 +67,7 @@ internal class ModuleSelectionViewModel @Inject constructor(
 
     fun loadPasswordSettings() {
         viewModelScope.launch {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .general
                 .settingsPassword
@@ -100,7 +101,7 @@ internal class ModuleSelectionViewModel @Inject constructor(
         externalScope.launch {
             val modules = modules.map { module ->
                 val encryptedName = when (val name = module.name) {
-                    is TokenizableString.Raw -> configManager.getProject()?.let { project ->
+                    is TokenizableString.Raw -> configRepository.getProject()?.let { project ->
                         tokenizationProcessor.encrypt(
                             decrypted = name,
                             tokenKeyType = TokenKeyType.ModuleId,

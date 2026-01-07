@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.sync.down.tasks
 
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
@@ -18,7 +18,7 @@ internal class CommCareEventSyncTask @Inject constructor(
     enrolmentRecordRepository: EnrolmentRecordRepository,
     eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     enrolmentRecordFactory: EnrolmentRecordFactory,
-    configManager: ConfigManager,
+    configRepository: ConfigRepository,
     timeHelper: TimeHelper,
     eventRepository: EventRepository,
     private val commCareEventDataSource: CommCareEventDataSource,
@@ -26,7 +26,7 @@ internal class CommCareEventSyncTask @Inject constructor(
         enrolmentRecordRepository,
         eventDownSyncScopeRepository,
         enrolmentRecordFactory,
-        configManager,
+        configRepository,
         timeHelper,
         eventRepository,
     ) {

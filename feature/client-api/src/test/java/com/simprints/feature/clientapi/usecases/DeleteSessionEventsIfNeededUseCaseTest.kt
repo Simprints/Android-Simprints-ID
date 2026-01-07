@@ -1,8 +1,8 @@
 package com.simprints.feature.clientapi.usecases
 
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -18,7 +18,7 @@ class DeleteSessionEventsIfNeededUseCaseTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var eventRepository: EventRepository
@@ -30,7 +30,7 @@ class DeleteSessionEventsIfNeededUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
 
         deleteUseCase = DeleteSessionEventsIfNeededUseCase(
-            configManager,
+            configRepository,
             eventRepository,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
@@ -38,9 +38,9 @@ class DeleteSessionEventsIfNeededUseCaseTest {
 
     @Test
     fun `deletes session events if project missing`() = runTest {
-        coEvery { configManager.getProject()?.state } returns null
+        coEvery { configRepository.getProject()?.state } returns null
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .synchronization.up.simprints.kind
         } returns UpSynchronizationConfiguration.UpSynchronizationKind.ALL
@@ -52,9 +52,9 @@ class DeleteSessionEventsIfNeededUseCaseTest {
 
     @Test
     fun `deletes session events if project paused`() = runTest {
-        coEvery { configManager.getProject()?.state } returns ProjectState.PROJECT_PAUSED
+        coEvery { configRepository.getProject()?.state } returns ProjectState.PROJECT_PAUSED
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .synchronization.up.simprints.kind
         } returns UpSynchronizationConfiguration.UpSynchronizationKind.ALL
@@ -66,9 +66,9 @@ class DeleteSessionEventsIfNeededUseCaseTest {
 
     @Test
     fun `deletes session events if project ending`() = runTest {
-        coEvery { configManager.getProject()?.state } returns ProjectState.PROJECT_ENDING
+        coEvery { configRepository.getProject()?.state } returns ProjectState.PROJECT_ENDING
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .synchronization.up.simprints.kind
         } returns UpSynchronizationConfiguration.UpSynchronizationKind.ALL
@@ -80,9 +80,9 @@ class DeleteSessionEventsIfNeededUseCaseTest {
 
     @Test
     fun `deletes session events if project ended`() = runTest {
-        coEvery { configManager.getProject()?.state } returns ProjectState.PROJECT_ENDED
+        coEvery { configRepository.getProject()?.state } returns ProjectState.PROJECT_ENDED
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .synchronization.up.simprints.kind
         } returns UpSynchronizationConfiguration.UpSynchronizationKind.ALL
@@ -94,9 +94,9 @@ class DeleteSessionEventsIfNeededUseCaseTest {
 
     @Test
     fun `deletes session events if data sync disabled in running project`() = runTest {
-        coEvery { configManager.getProject()?.state } returns ProjectState.RUNNING
+        coEvery { configRepository.getProject()?.state } returns ProjectState.RUNNING
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .synchronization.up.simprints.kind
         } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
@@ -108,9 +108,9 @@ class DeleteSessionEventsIfNeededUseCaseTest {
 
     @Test
     fun `does not delete session events if data sync enabled in running project`() = runTest {
-        coEvery { configManager.getProject()?.state } returns ProjectState.RUNNING
+        coEvery { configRepository.getProject()?.state } returns ProjectState.RUNNING
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .synchronization.up.simprints.kind
         } returns UpSynchronizationConfiguration.UpSynchronizationKind.ALL

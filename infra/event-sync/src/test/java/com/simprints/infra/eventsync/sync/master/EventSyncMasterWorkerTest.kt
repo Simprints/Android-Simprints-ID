@@ -1,7 +1,6 @@
 package com.simprints.infra.eventsync.sync.master
 
 import android.content.Context
-import android.os.PowerManager
 import androidx.test.core.app.ApplicationProvider.*
 import androidx.test.ext.junit.runners.*
 import androidx.work.Configuration
@@ -15,6 +14,7 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.*
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.Frequency.ONLY_PERIODICALLY_UP_SYNC
@@ -25,7 +25,6 @@ import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
@@ -104,7 +103,7 @@ internal class EventSyncMasterWorkerTest {
     lateinit var projectConfiguration: ProjectConfiguration
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var timeHelper: TimeHelper
@@ -145,7 +144,7 @@ internal class EventSyncMasterWorkerTest {
         every { synchronizationConfiguration.up.simprints } returns bfsidUpSynchronizationConfiguration
         every { projectConfiguration.projectId } returns "projectId"
         every { projectConfiguration.synchronization } returns synchronizationConfiguration
-        coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
+        coEvery { configRepository.getProjectConfiguration() } returns projectConfiguration
 
         masterWorker = spyk(
             EventSyncMasterWorker(
@@ -157,7 +156,7 @@ internal class EventSyncMasterWorkerTest {
                 simprintsDownSyncWorkerBuilder = simprintsDownSyncWorkerBuilder,
                 commCareDownSyncWorkerBuilder = commCareDownSyncWorkerBuilder,
                 upSyncWorkerBuilder = upSyncWorkerBuilder,
-                configManager = configManager,
+                configRepository = configRepository,
                 eventSyncCache = eventSyncCache,
                 eventSyncSubMasterWorkersBuilder = eventSyncSubMasterWorkersBuilder,
                 timeHelper = timeHelper,
@@ -323,7 +322,7 @@ internal class EventSyncMasterWorkerTest {
 
     @Test
     fun `doWork should fail if there is an exception`() = runTest {
-        coEvery { configManager.getProjectConfiguration() } throws Throwable()
+        coEvery { configRepository.getProjectConfiguration() } throws Throwable()
         val result = masterWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
@@ -353,8 +352,8 @@ internal class EventSyncMasterWorkerTest {
         projectState: ProjectState,
         syncConfig: Frequency,
     ): ListenableWorker.Result {
-        coEvery { configManager.getProject()?.state } returns projectState
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProject()?.state } returns projectState
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { projectId } returns "projectId"
             every { synchronization } returns mockk {
                 every { down.simprints?.frequency } returns syncConfig

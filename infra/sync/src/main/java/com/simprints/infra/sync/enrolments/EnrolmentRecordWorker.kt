@@ -5,7 +5,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
 import com.simprints.core.DispatcherIO
 import com.simprints.core.workers.SimCoroutineWorker
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.sync.SyncConstants
 import dagger.assisted.Assisted
@@ -18,7 +18,7 @@ class EnrolmentRecordWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
     override val tag: String = "EnrolmentRecordWorker"
@@ -36,7 +36,7 @@ class EnrolmentRecordWorker @AssistedInject constructor(
 
             enrolmentRecordRepository.uploadRecords(subjectIds.toList())
 
-            configManager.updateDeviceConfiguration {
+            configRepository.updateDeviceConfiguration {
                 it.apply { it.lastInstructionId = instructionId }
             }
 

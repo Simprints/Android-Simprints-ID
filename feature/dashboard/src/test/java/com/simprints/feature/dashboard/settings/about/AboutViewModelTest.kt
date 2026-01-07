@@ -1,31 +1,29 @@
 package com.simprints.feature.dashboard.settings.about
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.IdentificationConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
+import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -51,21 +49,31 @@ class AboutViewModelTest {
         verificationsToday = 30,
         lastActivityTime = 10000,
     )
-    private val eventSyncManager = mockk<EventSyncManager>()
 
-    private val configManager = mockk<ConfigManager> {
-        coEvery { getProjectConfiguration() } returns buildProjectConfigurationMock()
-    }
+    @MockK
+    lateinit var eventSyncManager: EventSyncManager
 
-    private val logoutUseCase = mockk<LogoutUseCase>(relaxed = true)
-    private val recentUserActivityManager = mockk<RecentUserActivityManager> {
-        coEvery { getRecentUserActivity() } returns recentUserActivity
+    @MockK
+    lateinit var configRepository: ConfigRepository
+
+    @MockK
+    internal lateinit var logoutUseCase: LogoutUseCase
+
+    @MockK
+    lateinit var recentUserActivityManager: RecentUserActivityManager
+
+    @Before
+    fun setUp() {
+        MockKAnnotations.init(this, relaxed = true)
+
+        coEvery { configRepository.getProjectConfiguration() } returns buildProjectConfigurationMock()
+        coEvery { recentUserActivityManager.getRecentUserActivity() } returns recentUserActivity
     }
 
     @Test
     fun `should initialize the live data correctly`() {
         val viewModel = AboutViewModel(
-            configManager = configManager,
+            configRepository = configRepository,
             eventSyncManager = eventSyncManager,
             recentUserActivityManager = recentUserActivityManager,
             logoutUseCase = logoutUseCase,
@@ -199,11 +207,11 @@ class AboutViewModelTest {
             false -> 0
         }
         coEvery { eventSyncManager.countEventsToUpload() } returns flowOf(countEventsToUpload)
-        coEvery { configManager.getProjectConfiguration() } returns buildProjectConfigurationMock(
+        coEvery { configRepository.getProjectConfiguration() } returns buildProjectConfigurationMock(
             upSyncKind,
         )
         return AboutViewModel(
-            configManager = configManager,
+            configRepository = configRepository,
             eventSyncManager = eventSyncManager,
             recentUserActivityManager = recentUserActivityManager,
             logoutUseCase = logoutUseCase,

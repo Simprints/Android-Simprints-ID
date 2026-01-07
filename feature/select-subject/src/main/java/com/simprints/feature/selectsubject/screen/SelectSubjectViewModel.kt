@@ -17,9 +17,9 @@ import com.simprints.feature.selectsubject.SelectSubjectParams
 import com.simprints.feature.selectsubject.SelectSubjectResult
 import com.simprints.feature.selectsubject.model.SelectSubjectState
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.event.domain.models.EnrolmentUpdateEvent
@@ -39,7 +39,7 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
     private val timeHelper: TimeHelper,
     private val authStore: AuthStore,
     private val eventRepository: SessionEventRepository,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val resetExternalCredentialsUseCase: ResetExternalCredentialsInSessionUseCase,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val tokenizationProcessor: TokenizationProcessor,
@@ -98,7 +98,7 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
     ): SelectSubjectState.CredentialDialogDisplayed? {
         if (scannedCredential == null) return null
         val credential = scannedCredential.credential
-        val project = configManager.getProject() ?: return null
+        val project = configRepository.getProject() ?: return null
         val alreadyLinkedSubject = enrolmentRecordRepository
             .load(
                 EnrolmentRecordQuery(

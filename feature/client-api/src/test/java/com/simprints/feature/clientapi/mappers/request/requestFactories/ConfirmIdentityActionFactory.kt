@@ -5,15 +5,13 @@ import com.simprints.feature.clientapi.mappers.request.builders.ConfirmIdentifyR
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.ConfirmIdentityRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.ConfirmIdentityValidator
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.infra.orchestration.data.ActionConstants
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
 
 internal object ConfirmIdentityActionFactory : RequestActionFactory() {
     override fun getIdentifier() = ActionRequestIdentifier(
@@ -49,13 +47,13 @@ internal object ConfirmIdentityActionFactory : RequestActionFactory() {
             },
         )
 
-        val mockConfigManager = mockk<ConfigManager>(relaxed = true)
+        val mockConfigRepository = mockk<ConfigRepository>(relaxed = true)
 
         return ConfirmIdentityValidator(
             extractor as ConfirmIdentityRequestExtractor,
             MOCK_SESSION_ID,
             mockEventRepository,
-            configManager = mockConfigManager,
+            configRepository = mockConfigRepository,
         )
     }
 

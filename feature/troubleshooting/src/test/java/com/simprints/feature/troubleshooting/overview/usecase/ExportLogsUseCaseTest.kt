@@ -2,8 +2,8 @@ package com.simprints.feature.troubleshooting.overview.usecase
 
 import android.content.Context
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LogDirectoryProvider
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -26,7 +26,7 @@ class ExportLogsUseCaseTest {
     private lateinit var logDirectoryProvider: LogDirectoryProvider
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var projectConfiguration: ProjectConfiguration
@@ -48,13 +48,13 @@ class ExportLogsUseCaseTest {
 
         every { context.cacheDir } returns cacheFileRoot
         every { dateFormatter.format(any()) } returns "fileName"
-        coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
+        coEvery { configRepository.getProjectConfiguration() } returns projectConfiguration
 
         exportLogsUseCase = ExportLogsUseCase(
             deviceId = "deviceId",
             context = context,
             logDirectoryProvider = logDirectoryProvider,
-            configManager = configManager,
+            configRepository = configRepository,
             dateFormatter = dateFormatter,
         )
     }

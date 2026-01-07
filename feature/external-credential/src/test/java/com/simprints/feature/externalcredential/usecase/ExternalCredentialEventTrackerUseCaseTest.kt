@@ -8,9 +8,9 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.CalculateLevenshteinDistanceUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirmationEvent
@@ -29,7 +29,7 @@ class ExternalCredentialEventTrackerUseCaseTest {
     private lateinit var timeHelper: TimeHelper
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var tokenizationProcessor: TokenizationProcessor
@@ -47,7 +47,7 @@ class ExternalCredentialEventTrackerUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
         useCase = ExternalCredentialEventTrackerUseCase(
             timeHelper = timeHelper,
-            configManager = configManager,
+            configRepository = configRepository,
             tokenizationProcessor = tokenizationProcessor,
             eventRepository = eventRepository,
             calculateDistance = calculateDistance,
@@ -55,7 +55,7 @@ class ExternalCredentialEventTrackerUseCaseTest {
 
         every { timeHelper.now() } returns END_TIME
 
-        coEvery { configManager.getProject() } returns mockk()
+        coEvery { configRepository.getProject() } returns mockk()
         coEvery {
             tokenizationProcessor.decrypt(any(), TokenKeyType.ExternalCredential, any())
         } returns RAW_SCANNED_VALUE.asTokenizableRaw()
@@ -90,8 +90,8 @@ class ExternalCredentialEventTrackerUseCaseTest {
 
     @Test
     fun `saveCaptureEvents should handle missing project in capture events`() = runTest {
-        clearMocks(configManager)
-        coEvery { configManager.getProject() } returns null
+        clearMocks(configRepository)
+        coEvery { configRepository.getProject() } returns null
 
         val scannedCredential = makeScannedCredential(ExternalCredentialType.QRCode)
         useCase.saveCaptureEvents(START_TIME, SUBJECT_ID, scannedCredential, SELECTION_ID)

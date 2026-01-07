@@ -6,9 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
+import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.step.StepResult
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -38,7 +38,7 @@ import com.simprints.feature.orchestrator.usecases.steps.BuildStepsUseCase
 import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.setup.LocationStore
 import com.simprints.fingerprint.capture.FingerprintCaptureParams
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
@@ -52,7 +52,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class OrchestratorViewModel @Inject constructor(
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val cache: OrchestratorCache,
     private val locationStore: LocationStore,
     private val stepsBuilder: BuildStepsUseCase,
@@ -79,7 +79,7 @@ internal class OrchestratorViewModel @Inject constructor(
     private val _appResponse = MutableLiveData<LiveDataEventWithContent<OrchestratorResult>>()
 
     fun handleAction(action: ActionRequest) = viewModelScope.launch {
-        val projectConfiguration = configManager.getProjectConfiguration()
+        val projectConfiguration = configRepository.getProjectConfiguration()
 
         modalities = projectConfiguration.general.modalities.toSet()
         actionRequest = action
@@ -118,7 +118,7 @@ internal class OrchestratorViewModel @Inject constructor(
         Simber.i("Handling step result: ${result.javaClass.simpleName}", tag = ORCHESTRATION)
         Simber.d(result.toString(), tag = ORCHESTRATION)
 
-        val projectConfiguration = configManager.getProjectConfiguration()
+        val projectConfiguration = configRepository.getProjectConfiguration()
         val errorResponse = mapRefusalOrErrorResult(result, projectConfiguration)
         if (errorResponse != null) {
             // Shortcut the flow execution if any refusal or error result is found
@@ -168,7 +168,7 @@ internal class OrchestratorViewModel @Inject constructor(
     fun restoreModalitiesIfNeeded() {
         viewModelScope.launch {
             if (modalities.isEmpty()) {
-                val projectConfiguration = configManager.getProjectConfiguration()
+                val projectConfiguration = configRepository.getProjectConfiguration()
                 modalities = projectConfiguration.general.modalities.toSet()
             }
         }
@@ -237,8 +237,8 @@ internal class OrchestratorViewModel @Inject constructor(
     }
 
     private fun buildAppResponse() = viewModelScope.launch {
-        val projectConfiguration = configManager.getProjectConfiguration()
-        val project = configManager.getProject() ?: return@launch
+        val projectConfiguration = configRepository.getProjectConfiguration()
+        val project = configRepository.getProject() ?: return@launch
         val appResponse = appResponseBuilder(
             projectConfiguration = projectConfiguration,
             request = actionRequest,

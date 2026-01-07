@@ -8,7 +8,7 @@ import com.simprints.infra.authlogic.model.NonceScope
 import com.simprints.infra.authstore.domain.models.AuthRequest
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.authstore.exceptions.AuthRequestInvalidCredentialsException
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.infra.security.SecurityManager
@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 internal class ProjectAuthenticator @Inject constructor(
     private val secureDataManager: SecurityManager,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val signerManager: SignerManager,
     private val authenticationRemoteDataSource: AuthenticationRemoteDataSource,
     private val integrityTokenRequester: IntegrityTokenRequester,
@@ -40,7 +40,7 @@ internal class ProjectAuthenticator @Inject constructor(
         makeAuthRequest(prepareAuthRequestParameters(nonceScope, projectSecret), nonceScope)
             .signIn(nonceScope.projectId)
 
-        val config = configManager.getProjectConfiguration()
+        val config = configRepository.getProjectConfiguration()
         fetchProjectLongConsentTexts(config.general.languageOptions, config.projectId)
 
         // This is safe to call even on face-only projects as it will do nothing in such cases
@@ -93,7 +93,7 @@ internal class ProjectAuthenticator @Inject constructor(
         projectId: String,
     ) {
         languages.forEach { language ->
-            configManager.getPrivacyNotice(projectId, language).collect()
+            configRepository.getPrivacyNotice(projectId, language).collect()
         }
     }
 }

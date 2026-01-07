@@ -1,13 +1,14 @@
 package com.simprints.infra.authlogic.authenticator
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.domain.models.Token
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.ProjectWithConfig
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
@@ -15,22 +16,26 @@ import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.verify
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class SignerManagerTest {
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var mockAuthStore: AuthStore
@@ -70,7 +75,7 @@ internal class SignerManagerTest {
         MockKAnnotations.init(this, relaxed = true)
 
         signerManager = SignerManager(
-            configManager,
+            configRepository,
             mockAuthStore,
             mockRecentUserActivityManager,
             mockSimNetwork,
@@ -79,12 +84,12 @@ internal class SignerManagerTest {
             mockEnrolmentRecordRepository,
             mockLicenseRepository,
             scannerManager,
-            UnconfinedTestDispatcher(),
+            testCoroutineRule.testCoroutineDispatcher,
         )
     }
 
     @Test
-    fun signIn_shouldSignInToRemoteDb() = runTest(UnconfinedTestDispatcher()) {
+    fun signIn_shouldSignInToRemoteDb() = runTest {
         mockRemoteSignedIn()
         mockFetchingProjectInfo()
 
@@ -94,14 +99,14 @@ internal class SignerManagerTest {
     }
 
     @Test
-    fun signInToRemoteFails_signInShouldFail() = runTest(UnconfinedTestDispatcher()) {
+    fun signInToRemoteFails_signInShouldFail() = runTest {
         mockRemoteSignedIn(true)
 
         assertThrows<Throwable> { signIn() }
     }
 
     @Test
-    fun signIn_shouldStoreCredentialsLocally() = runTest(UnconfinedTestDispatcher()) {
+    fun signIn_shouldStoreCredentialsLocally() = runTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo()
@@ -112,7 +117,7 @@ internal class SignerManagerTest {
     }
 
     @Test
-    fun storeCredentialsFails_signInShouldFail() = runTest(UnconfinedTestDispatcher()) {
+    fun storeCredentialsFails_signInShouldFail() = runTest {
         mockRemoteSignedIn()
         every { mockAuthStore.signedInProjectId = any() } throws Throwable("Failed to store credentials")
 
@@ -120,18 +125,18 @@ internal class SignerManagerTest {
     }
 
     @Test
-    fun signIn_shouldFetchProjectInfo() = runTest(UnconfinedTestDispatcher()) {
+    fun signIn_shouldFetchProjectInfo() = runTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo()
 
         signIn()
 
-        coVerify { configManager.refreshProject(DEFAULT_PROJECT_ID) }
+        coVerify { configRepository.refreshProject(DEFAULT_PROJECT_ID) }
     }
 
     @Test
-    fun refreshProjectInfoFails_signInShouldFail() = runTest(UnconfinedTestDispatcher()) {
+    fun refreshProjectInfoFails_signInShouldFail() = runTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo(true)
@@ -139,12 +144,12 @@ internal class SignerManagerTest {
         assertThrows<Throwable> { signIn() }
 
         verify { mockAuthStore.clearFirebaseToken() }
-        coVerify { configManager.clearData() }
+        coVerify { configRepository.clearData() }
         verify { mockAuthStore.cleanCredentials() }
     }
 
     @Test
-    fun signIn_shouldSucceed() = runTest(UnconfinedTestDispatcher()) {
+    fun signIn_shouldSucceed() = runTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo()
@@ -153,37 +158,37 @@ internal class SignerManagerTest {
     }
 
     @Test
-    fun signOut_shouldRemoveAnyState() = runTest(UnconfinedTestDispatcher()) {
+    fun signOut_shouldRemoveAnyState() = runTest {
         signerManager.signOut()
 
         verify { mockAuthStore.cleanCredentials() }
         verify { mockAuthStore.clearFirebaseToken() }
-        coVerify(exactly = 1) { configManager.clearData() }
+        coVerify(exactly = 1) { configRepository.clearData() }
     }
 
     @Test
-    fun signOut_apiBaseUrlIsReset() = runTest(UnconfinedTestDispatcher()) {
+    fun signOut_apiBaseUrlIsReset() = runTest {
         signerManager.signOut()
 
         verify { mockSimNetwork.resetApiBaseUrl() }
     }
 
     @Test
-    fun signOut_recentActivityIsCleared() = runTest(UnconfinedTestDispatcher()) {
+    fun signOut_recentActivityIsCleared() = runTest {
         signerManager.signOut()
 
         coVerify { mockRecentUserActivityManager.clearRecentActivity() }
     }
 
     @Test
-    fun signOut_clearConfiguration() = runTest(UnconfinedTestDispatcher()) {
+    fun signOut_clearConfiguration() = runTest {
         signerManager.signOut()
 
-        coVerify { configManager.clearData() }
+        coVerify { configRepository.clearData() }
     }
 
     @Test
-    fun signOut_shouldDeleteLocalData() = runTest(UnconfinedTestDispatcher()) {
+    fun signOut_shouldDeleteLocalData() = runTest {
         signerManager.signOut()
 
         coVerify { mockImageRepository.deleteStoredImages() }
@@ -212,7 +217,7 @@ internal class SignerManagerTest {
         }
     }
 
-    private fun mockFetchingProjectInfo(error: Boolean = false) = coEvery { configManager.refreshProject(any()) }.apply {
+    private fun mockFetchingProjectInfo(error: Boolean = false) = coEvery { configRepository.refreshProject(any()) }.apply {
         if (!error) {
             this.returns(
                 ProjectWithConfig(

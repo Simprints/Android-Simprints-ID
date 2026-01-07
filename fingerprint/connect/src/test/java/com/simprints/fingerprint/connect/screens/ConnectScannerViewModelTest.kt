@@ -26,9 +26,9 @@ import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerFactory
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.infra.scannermock.dummy.DummyBluetoothDevice
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -64,7 +64,7 @@ class ConnectScannerViewModelTest {
     private lateinit var fingerprintConfiguration: FingerprintConfiguration
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var bluetoothAdapter: ComponentBluetoothAdapter
@@ -93,7 +93,7 @@ class ConnectScannerViewModelTest {
             FingerprintConfiguration.VeroGeneration.VERO_1,
             FingerprintConfiguration.VeroGeneration.VERO_2,
         )
-        coEvery { configManager.getProjectConfiguration().fingerprint } returns fingerprintConfiguration
+        coEvery { configRepository.getProjectConfiguration().fingerprint } returns fingerprintConfiguration
         coJustRun { scannerFactory.initScannerOperationWrappers(any()) }
 
         scannerManager = ScannerManagerImpl(
@@ -104,7 +104,7 @@ class ConnectScannerViewModelTest {
             mockk(relaxed = true),
         )
         viewModel = ConnectScannerViewModel(
-            configManager,
+            configRepository,
             scannerManager,
             nfcManager,
             recentUserActivityManager,
@@ -212,7 +212,7 @@ class ConnectScannerViewModelTest {
     fun start_noScannersPairedWithoutFingerprintConfigAndNfc_sendsSerialEntryIssueEvent() = runTest {
         setupBluetooth(numberOfPairedScanners = 0)
         setupNfc(doesDeviceHaveNfcCapability = false, isEnabled = true)
-        coEvery { configManager.getProjectConfiguration().fingerprint } returns null
+        coEvery { configRepository.getProjectConfiguration().fingerprint } returns null
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 

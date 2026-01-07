@@ -9,10 +9,10 @@ import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
@@ -39,7 +39,7 @@ class SaveMatchEventUseCaseTest {
     private lateinit var eventRepository: SessionEventRepository
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     private lateinit var useCase: SaveMatchEventUseCase
 
@@ -50,7 +50,7 @@ class SaveMatchEventUseCaseTest {
         coEvery { eventRepository.addOrUpdateEvent(any()) } just Runs
 
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .fingerprint
                 ?.getSdkConfiguration(SECUGEN_SIM_MATCHER)
@@ -59,7 +59,7 @@ class SaveMatchEventUseCaseTest {
 
         useCase = SaveMatchEventUseCase(
             eventRepository,
-            configManager,
+            configRepository,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
     }

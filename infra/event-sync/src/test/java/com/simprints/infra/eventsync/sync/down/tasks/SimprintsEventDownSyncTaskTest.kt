@@ -10,9 +10,9 @@ import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
@@ -174,7 +174,7 @@ class SimprintsEventDownSyncTaskTest {
     private lateinit var timeHelper: TimeHelper
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var eventRemoteDataSource: EventRemoteDataSource
@@ -205,7 +205,7 @@ class SimprintsEventDownSyncTaskTest {
             enrolmentRecordRepository,
             eventDownSyncScopeRepository,
             enrolmentRecordFactory,
-            configManager,
+            configRepository,
             timeHelper,
             eventRepository,
             eventRemoteDataSource,
@@ -372,7 +372,7 @@ class SimprintsEventDownSyncTaskTest {
     fun moveSubjectFromModulesUnderSyncing_theOriginalModuleSyncShouldDoNothing() = runTest {
         val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE_MODULE
         mockProgressEmission(listOf(eventToMoveToModule2))
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
+        coEvery { configRepository.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
             "",
@@ -395,7 +395,7 @@ class SimprintsEventDownSyncTaskTest {
     fun moveSubjectFromModulesUnderSyncing_theDestinationModuleSyncShouldPerformCreation() = runTest {
         val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE_MODULE
         mockProgressEmission(listOf(eventToMoveToModule2))
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
+        coEvery { configRepository.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
             "",
@@ -423,7 +423,7 @@ class SimprintsEventDownSyncTaskTest {
     fun moveSubjectToAModuleNotUnderSyncing_shouldPerformDeletionOnly() = runTest {
         val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE_MODULE
         mockProgressEmission(listOf(eventToMoveToModule2))
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
+        coEvery { configRepository.getDeviceConfiguration() } returns DeviceConfiguration(
             language = "",
             selectedModules = listOf(DEFAULT_MODULE_ID),
             lastInstructionId = "",
@@ -445,7 +445,7 @@ class SimprintsEventDownSyncTaskTest {
     fun moveSubjectToAModuleUnderSyncing_shouldPerformCreation() = runTest {
         val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE_MODULE
         mockProgressEmission(listOf(eventToMoveToModule2))
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
+        coEvery { configRepository.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf(DEFAULT_MODULE_ID_2),
             "",
@@ -473,7 +473,7 @@ class SimprintsEventDownSyncTaskTest {
     fun moveSubjectToModule2_syncModule1_shouldPerformCreationInModule2() = runTest {
         val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE_MODULE
         mockProgressEmission(listOf(eventToMoveToModule2))
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
+        coEvery { configRepository.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
             "",

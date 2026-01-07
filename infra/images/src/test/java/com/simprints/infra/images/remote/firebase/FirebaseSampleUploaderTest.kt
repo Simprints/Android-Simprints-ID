@@ -7,8 +7,7 @@ import com.simprints.core.domain.common.Modality
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
@@ -34,7 +33,7 @@ class FirebaseSampleUploaderTest {
     private lateinit var timeHelper: TimeHelper
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var authStore: AuthStore
@@ -64,7 +63,7 @@ class FirebaseSampleUploaderTest {
 
         remoteDataSource = FirebaseSampleUploader(
             timeHelper = timeHelper,
-            configManager = configManager,
+            configRepository = configRepository,
             authStore = authStore,
             localDataSource = localDataSource,
             metadataStore = metadataStore,
@@ -111,7 +110,7 @@ class FirebaseSampleUploaderTest {
     @Test
     fun `null project returns failed upload`() = runTest {
         every { authStore.getLegacyAppFallback().options.projectId } returns "projectId"
-        coEvery { configManager.getProject() } returns null
+        coEvery { configRepository.getProject() } returns null
 
         val result = remoteDataSource.uploadAllSamples(PROJECT_ID)
 
@@ -217,7 +216,7 @@ class FirebaseSampleUploaderTest {
     }
 
     private fun setupProjectConfig() {
-        coEvery { configManager.getProject()?.imageBucket } returns "gs://`simprints-dev.appspot.com"
+        coEvery { configRepository.getProject()?.imageBucket } returns "gs://`simprints-dev.appspot.com"
         every { authStore.getLegacyAppFallback().options.projectId } returns "projectId"
         every { authStore.signedInProjectId } returns "projectId"
     }

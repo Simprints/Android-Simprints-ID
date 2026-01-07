@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.send
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class MainViewModel @Inject constructor(
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val securityManager: SecurityManager,
 ) : ViewModel() {
     val consentRequired: LiveData<Boolean>
@@ -32,7 +32,7 @@ internal class MainViewModel @Inject constructor(
     }
 
     private fun load() = viewModelScope.launch {
-        _consentRequired.postValue(configManager.getProjectConfiguration().consent.collectConsent)
+        _consentRequired.postValue(configRepository.getProjectConfiguration().consent.collectConsent)
         checkIfDeviceIsSafe()
     }
 

@@ -13,10 +13,10 @@ import com.simprints.feature.externalcredential.usecase.ResetExternalCredentials
 import com.simprints.feature.selectsubject.SelectSubjectParams
 import com.simprints.feature.selectsubject.model.SelectSubjectState
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.events.event.domain.models.EnrolmentUpdateEvent
@@ -49,7 +49,7 @@ internal class SelectSubjectViewModelTest {
     lateinit var eventRepository: SessionEventRepository
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var project: Project
@@ -79,7 +79,7 @@ internal class SelectSubjectViewModelTest {
             timeHelper = timeHelper,
             authStore = authStore,
             eventRepository = eventRepository,
-            configManager = configManager,
+            configRepository = configRepository,
             resetExternalCredentialsUseCase = resetScannedCredentialsInSession,
             enrolmentRecordRepository = enrolmentRecordRepository,
             tokenizationProcessor = tokenizationProcessor,
@@ -92,7 +92,7 @@ internal class SelectSubjectViewModelTest {
         timeHelper = timeHelper,
         authStore = authStore,
         eventRepository = eventRepository,
-        configManager = configManager,
+        configRepository = configRepository,
         resetExternalCredentialsUseCase = resetScannedCredentialsInSession,
         enrolmentRecordRepository = enrolmentRecordRepository,
         tokenizationProcessor = tokenizationProcessor,
@@ -272,7 +272,7 @@ internal class SelectSubjectViewModelTest {
         coEvery { authStore.isProjectIdSignedIn(PROJECT_ID) } returns true
         coEvery { authStore.signedInProjectId } returns PROJECT_ID
         every { project?.id } returns PROJECT_ID
-        coEvery { configManager.getProject() } returns configuredProject
+        coEvery { configRepository.getProject() } returns configuredProject
         coEvery { enrolmentRecordRepository.load(any()) } returns repositoryResponse
         coEvery {
             tokenizationProcessor.decrypt(

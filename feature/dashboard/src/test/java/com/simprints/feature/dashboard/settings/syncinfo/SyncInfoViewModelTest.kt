@@ -12,6 +12,7 @@ import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.feature.dashboard.settings.syncinfo.usecase.ObserveSyncInfoUseCase
 import com.simprints.feature.login.LoginResult
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.Project
@@ -19,7 +20,6 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.models.EventSyncState
@@ -30,6 +30,7 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import com.simprints.testtools.common.livedata.getOrAwaitValues
 import io.mockk.*
+import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,58 +51,74 @@ class SyncInfoViewModelTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val configManager = mockk<ConfigManager>()
-    private val authStore = mockk<AuthStore>()
-    private val eventSyncManager = mockk<EventSyncManager>()
-    private val syncOrchestrator = mockk<SyncOrchestrator>()
-    private val recentUserActivityManager = mockk<RecentUserActivityManager>()
-    private val timeHelper = mockk<TimeHelper>()
-    private val observeSyncInfo = mockk<ObserveSyncInfoUseCase>()
-    private val logoutUseCase = mockk<LogoutUseCase>(relaxed = true)
+    @MockK
+    private lateinit var configRepository: ConfigRepository
+
+    @MockK
+    private lateinit var authStore: AuthStore
+
+    @MockK
+    private lateinit var eventSyncManager: EventSyncManager
+
+    @MockK
+    private lateinit var syncOrchestrator: SyncOrchestrator
+
+    @MockK
+    private lateinit var recentUserActivityManager: RecentUserActivityManager
+
+    @MockK
+    private lateinit var timeHelper: TimeHelper
+
+    @MockK
+    private lateinit var observeSyncInfo: ObserveSyncInfoUseCase
+
+    @MockK
+    private lateinit var logoutUseCase: LogoutUseCase
+
+    @MockK
+    private lateinit var mockProjectConfiguration: ProjectConfiguration
+
+    @MockK
+    private lateinit var mockDeviceConfiguration: DeviceConfiguration
+
+    @MockK
+    private lateinit var mockProject: Project
+
+    @MockK
+    private lateinit var mockEventSyncState: EventSyncState
+
+    @MockK
+    private lateinit var mockImageSyncStatus: ImageSyncStatus
 
     private lateinit var viewModel: SyncInfoViewModel
-
-    private companion object {
-        const val TEST_PROJECT_ID = "test_project_id"
-        const val TEST_USER_ID = "test_user_id"
-        const val TEST_RECENT_USER_ID = "recent_user_id"
-        val TEST_TIMESTAMP = Timestamp(1000L)
-    }
-
-    private val mockProjectConfiguration = mockk<ProjectConfiguration>(relaxed = true) {
-        every { general } returns mockk<GeneralConfiguration>(relaxed = true) {
-            every { modalities } returns emptyList()
-        }
-    }
-    private val mockDeviceConfiguration = mockk<DeviceConfiguration>(relaxed = true) {
-        every { selectedModules } returns emptyList()
-    }
-    private val mockProject = mockk<Project>(relaxed = true) {
-        every { state } returns ProjectState.RUNNING
-    }
-    private val mockEventSyncState = mockk<EventSyncState>(relaxed = true) {
-        every { isSyncCompleted() } returns false
-        every { isSyncInProgress() } returns false
-        every { isSyncConnecting() } returns false
-        every { isSyncRunning() } returns false
-        every { isSyncFailed() } returns false
-        every { isSyncFailedBecauseReloginRequired() } returns false
-        every { isSyncFailedBecauseBackendMaintenance() } returns false
-        every { isSyncFailedBecauseTooManyRequests() } returns false
-        every { getEstimatedBackendMaintenanceOutage() } returns null
-        every { isThereNotSyncHistory() } returns false
-        every { progress } returns null
-        every { total } returns null
-    }
-    private val mockImageSyncStatus = mockk<ImageSyncStatus>(relaxed = true) {
-        every { isSyncing } returns false
-        every { progress } returns null
-        every { lastUpdateTimeMillis } returns null
-    }
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
+
+        every { mockProjectConfiguration.general } returns mockk<GeneralConfiguration>(relaxed = true) {
+            every { modalities } returns emptyList()
+        }
+        every { mockDeviceConfiguration.selectedModules } returns emptyList()
+        every { mockProject.state } returns ProjectState.RUNNING
+
+        every { mockEventSyncState.isSyncCompleted() } returns false
+        every { mockEventSyncState.isSyncInProgress() } returns false
+        every { mockEventSyncState.isSyncConnecting() } returns false
+        every { mockEventSyncState.isSyncRunning() } returns false
+        every { mockEventSyncState.isSyncFailed() } returns false
+        every { mockEventSyncState.isSyncFailedBecauseReloginRequired() } returns false
+        every { mockEventSyncState.isSyncFailedBecauseBackendMaintenance() } returns false
+        every { mockEventSyncState.isSyncFailedBecauseTooManyRequests() } returns false
+        every { mockEventSyncState.getEstimatedBackendMaintenanceOutage() } returns null
+        every { mockEventSyncState.isThereNotSyncHistory() } returns false
+        every { mockEventSyncState.progress } returns null
+        every { mockEventSyncState.total } returns null
+
+        every { mockImageSyncStatus.isSyncing } returns false
+        every { mockImageSyncStatus.progress } returns null
+        every { mockImageSyncStatus.lastUpdateTimeMillis } returns null
+
         mockkStatic("androidx.lifecycle.FlowLiveDataConversions")
         mockkStatic("com.simprints.infra.config.store.models.ProjectConfigurationKt")
         mockkStatic("com.simprints.core.tools.extentions.Flow_extKt")
@@ -117,12 +134,12 @@ class SyncInfoViewModelTest {
         val connectivityLiveData = MutableLiveData(true)
         every { connectivityLiveData.asFlow() } returns flowOf(true)
 
-        every { configManager.observeIsProjectRefreshing() } returns MutableStateFlow(false)
-        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfiguration)
-        every { configManager.observeDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfiguration)
-        coEvery { configManager.getProjectConfiguration() } returns mockProjectConfiguration
-        coEvery { configManager.getDeviceConfiguration() } returns mockDeviceConfiguration
-        coEvery { configManager.getProject() } returns mockProject
+        every { configRepository.observeIsProjectRefreshing() } returns MutableStateFlow(false)
+        every { configRepository.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfiguration)
+        every { configRepository.observeDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfiguration)
+        coEvery { configRepository.getProjectConfiguration() } returns mockProjectConfiguration
+        coEvery { configRepository.getDeviceConfiguration() } returns mockDeviceConfiguration
+        coEvery { configRepository.getProject() } returns mockProject
 
         val eventSyncFlow = flowOf(mockEventSyncState)
         every { eventSyncManager.getLastSyncState() } returns eventSyncFlow
@@ -153,7 +170,7 @@ class SyncInfoViewModelTest {
 
     private fun createViewModel() {
         viewModel = SyncInfoViewModel(
-            configManager = configManager,
+            configRepository = configRepository,
             authStore = authStore,
             eventSyncManager = eventSyncManager,
             syncOrchestrator = syncOrchestrator,
@@ -400,7 +417,7 @@ class SyncInfoViewModelTest {
         val mockPausedProject = mockk<Project> {
             every { state } returns ProjectState.PROJECT_PAUSED
         }
-        coEvery { configManager.getProject() } returns mockPausedProject
+        coEvery { configRepository.getProject() } returns mockPausedProject
         createViewModel()
         viewModel.isPreLogoutUpSync = false
 
@@ -415,7 +432,7 @@ class SyncInfoViewModelTest {
         val mockEndingProject = mockk<Project> {
             every { state } returns ProjectState.PROJECT_ENDING
         }
-        coEvery { configManager.getProject() } returns mockEndingProject
+        coEvery { configRepository.getProject() } returns mockEndingProject
         createViewModel()
         viewModel.isPreLogoutUpSync = false
 
@@ -427,7 +444,7 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `should start event sync with down sync disabled event sync when logged out`() = runTest {
-        coEvery { configManager.getProject() } returns null
+        coEvery { configRepository.getProject() } returns null
         createViewModel()
         viewModel.isPreLogoutUpSync = false
 
@@ -749,8 +766,8 @@ class SyncInfoViewModelTest {
         val mockEmptyDeviceConfig = mockk<DeviceConfiguration> {
             every { selectedModules } returns emptyList()
         }
-        coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigRequiringModules
-        coEvery { configManager.getDeviceConfiguration() } returns mockEmptyDeviceConfig
+        coEvery { configRepository.getProjectConfiguration() } returns mockProjectConfigRequiringModules
+        coEvery { configRepository.getDeviceConfiguration() } returns mockEmptyDeviceConfig
         every { mockProjectConfigRequiringModules.isModuleSelectionAvailable() } returns true
         coEvery { eventSyncManager.getLastSyncTime() } returns null
         createViewModel()
@@ -771,8 +788,8 @@ class SyncInfoViewModelTest {
         val mockEmptyDeviceConfig = mockk<DeviceConfiguration> {
             every { selectedModules } returns emptyList()
         }
-        coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigRequiringModules
-        coEvery { configManager.getDeviceConfiguration() } returns mockEmptyDeviceConfig
+        coEvery { configRepository.getProjectConfiguration() } returns mockProjectConfigRequiringModules
+        coEvery { configRepository.getDeviceConfiguration() } returns mockEmptyDeviceConfig
         every { mockProjectConfigRequiringModules.isModuleSelectionAvailable() } returns true
         coEvery { eventSyncManager.getLastSyncTime() } returns null
         createViewModel()
@@ -781,5 +798,12 @@ class SyncInfoViewModelTest {
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
         coVerify(exactly = 0) { syncOrchestrator.startEventSync(any()) }
+    }
+
+    private companion object {
+        const val TEST_PROJECT_ID = "test_project_id"
+        const val TEST_USER_ID = "test_user_id"
+        const val TEST_RECENT_USER_ID = "recent_user_id"
+        val TEST_TIMESTAMP = Timestamp(1000L)
     }
 }

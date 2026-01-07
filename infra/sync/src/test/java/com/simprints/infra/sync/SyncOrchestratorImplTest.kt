@@ -9,7 +9,7 @@ import androidx.work.WorkManager
 import com.google.common.truth.Truth.assertThat
 import com.google.common.util.concurrent.ListenableFuture
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.sync.master.EventSyncMasterWorker
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME
@@ -57,7 +57,7 @@ class SyncOrchestratorImplTest {
     private lateinit var authStore: AuthStore
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var eventSyncManager: EventSyncManager
@@ -111,7 +111,7 @@ class SyncOrchestratorImplTest {
     @Test
     fun `schedules images with any connection if not specified`() = runTest {
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .synchronization.up.simprints.imagesRequireUnmeteredConnection
         } returns false
@@ -131,7 +131,7 @@ class SyncOrchestratorImplTest {
     @Test
     fun `schedules images with unmetered constraint if requested`() = runTest {
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .synchronization.up.simprints.imagesRequireUnmeteredConnection
         } returns true
@@ -479,7 +479,7 @@ class SyncOrchestratorImplTest {
     private fun createSyncOrchestrator() = SyncOrchestratorImpl(
         workManager,
         authStore,
-        configManager,
+        configRepository,
         eventSyncManager,
         shouldScheduleFirmwareUpdate,
         cleanupDeprecatedWorkers,

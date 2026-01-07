@@ -4,7 +4,7 @@ import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.tools.extentions.isValidGuid
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
 import com.simprints.infra.events.event.domain.models.EnrolmentUpdateEvent
@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 class ResetExternalCredentialsInSessionUseCase @Inject() constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val eventRepository: SessionEventRepository,
     @param:SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
@@ -53,7 +53,7 @@ class ResetExternalCredentialsInSessionUseCase @Inject() constructor(
             emptyList()
         }
 
-        configManager.getProject()?.let { project ->
+        configRepository.getProject()?.let { project ->
             val updateActions = credentialsToRemove + credentialsToAdd
             enrolmentRecordRepository.performActions(updateActions, project)
         }

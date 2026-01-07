@@ -3,8 +3,8 @@ package com.simprints.infra.eventsync.sync.down.tasks
 import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction.Creation
@@ -38,7 +38,7 @@ internal abstract class BaseEventDownSyncTask(
     protected val enrolmentRecordRepository: EnrolmentRecordRepository,
     protected val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     protected val enrolmentRecordFactory: EnrolmentRecordFactory,
-    protected val configManager: ConfigManager,
+    protected val configRepository: ConfigRepository,
     protected val timeHelper: TimeHelper,
     protected val eventRepository: EventRepository,
 ) {
@@ -234,7 +234,7 @@ internal abstract class BaseEventDownSyncTask(
     ): Boolean = when {
         // When syncing by module, check whether record was moved in a module selected for syncing
         operation.isSyncingByModule() -> {
-            configManager
+            configRepository
                 .getDeviceConfiguration()
                 .selectedModules
                 .values()

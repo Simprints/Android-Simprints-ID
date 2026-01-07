@@ -7,7 +7,7 @@ import com.simprints.core.domain.common.Modality
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.exitform.ExitFormOption
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -26,7 +26,7 @@ internal class ExitFormViewModelTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var timeHelper: TimeHelper
@@ -43,7 +43,7 @@ internal class ExitFormViewModelTest {
         every { timeHelper.now() } returns Timestamp(1L)
 
         exitFormViewModel = ExitFormViewModel(
-            configManager,
+            configRepository,
             timeHelper,
             eventRepository,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
@@ -52,7 +52,7 @@ internal class ExitFormViewModelTest {
 
     @Test
     fun `show default options when configuration doesn't contain fingerprint`() = runTest {
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general.modalities } returns listOf(Modality.FACE)
         }
 
@@ -63,7 +63,7 @@ internal class ExitFormViewModelTest {
 
     @Test
     fun `show scanner options when configuration contains fingerprint`() = runTest {
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general.modalities } returns listOf(Modality.FINGERPRINT)
         }
 

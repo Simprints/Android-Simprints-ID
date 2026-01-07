@@ -5,9 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class ProjectDetailsViewModel @Inject constructor(
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val recentUserActivityManager: RecentUserActivityManager,
     private val tokenizationProcessor: TokenizationProcessor,
 ) : ViewModel() {
@@ -29,10 +29,11 @@ internal class ProjectDetailsViewModel @Inject constructor(
 
     fun load() = viewModelScope.launch {
         val state = try {
-            configManager.getProject()?.let { cachedProject ->
+            configRepository.getProject()?.let { cachedProject ->
                 val recentUserActivity = recentUserActivityManager.getRecentUserActivity()
                 val decryptedUserId = when (val userId = recentUserActivity.lastUserUsed) {
                     is TokenizableString.Raw -> userId
+
                     is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
                         encrypted = userId,
                         tokenKeyType = TokenKeyType.AttendantId,

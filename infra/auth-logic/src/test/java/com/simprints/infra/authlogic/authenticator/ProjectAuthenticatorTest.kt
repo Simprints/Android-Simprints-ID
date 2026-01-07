@@ -8,17 +8,14 @@ import com.simprints.infra.authlogic.integrity.exceptions.RequestingIntegrityTok
 import com.simprints.infra.authlogic.model.NonceScope
 import com.simprints.infra.authstore.domain.models.AuthenticationData
 import com.simprints.infra.authstore.domain.models.Token
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -28,7 +25,7 @@ import java.io.IOException
 
 class ProjectAuthenticatorTest {
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var secureDataManager: SecurityManager
@@ -54,7 +51,7 @@ class ProjectAuthenticatorTest {
 
         authenticator = ProjectAuthenticator(
             secureDataManager,
-            configManager,
+            configRepository,
             signerManager,
             authenticationRemoteDataSource,
             integrityTokenRequester,
@@ -132,8 +129,8 @@ class ProjectAuthenticatorTest {
     fun `authenticate should fetch the correct long consents`() = runTest(StandardTestDispatcher()) {
         authenticator.authenticate(NonceScope(PROJECT_ID, DEVICE_ID), PROJECT_SECRET)
 
-        coVerify(exactly = 1) { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE_1) }
-        coVerify(exactly = 1) { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE_2) }
+        coVerify(exactly = 1) { configRepository.getPrivacyNotice(PROJECT_ID, LANGUAGE_1) }
+        coVerify(exactly = 1) { configRepository.getPrivacyNotice(PROJECT_ID, LANGUAGE_2) }
     }
 
     @Test
@@ -163,7 +160,7 @@ class ProjectAuthenticatorTest {
             authenticationRemoteDataSource.requestAuthToken(PROJECT_ID, DEVICE_ID, any())
         } returns Token("", "", "", "")
 
-        coEvery { configManager.getProjectConfiguration() } returns ProjectConfiguration(
+        coEvery { configRepository.getProjectConfiguration() } returns ProjectConfiguration(
             id = "id",
             projectId = PROJECT_ID,
             updatedAt = "",
@@ -184,7 +181,7 @@ class ProjectAuthenticatorTest {
             multifactorId = mockk(),
             custom = mockk(),
         )
-        coEvery { configManager.getPrivacyNotice(any(), any()) } returns emptyFlow()
+        coEvery { configRepository.getPrivacyNotice(any(), any()) } returns emptyFlow()
 
         coEvery { integrityTokenRequester.getToken(any()) } returns "token"
     }

@@ -5,10 +5,10 @@ import com.jraska.livedata.test
 import com.simprints.core.domain.common.Modality
 import com.simprints.feature.setup.LocationStore
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
@@ -44,7 +44,7 @@ class SetupViewModelTest {
     @MockK
     private lateinit var saveLicenseCheckEvent: SaveLicenseCheckEventUseCase
 
-    private val configManager = mockk<ConfigManager>()
+    private val configRepository = mockk<ConfigRepository>()
     private lateinit var viewModel: SetupViewModel
 
     private val deviceID = "deviceID"
@@ -57,7 +57,7 @@ class SetupViewModelTest {
         viewModel =
             SetupViewModel(
                 locationStore,
-                configManager,
+                configRepository,
                 licenseRepository,
                 deviceID,
                 authStore,
@@ -68,7 +68,7 @@ class SetupViewModelTest {
     @Test
     fun `should request location permission if collectLocation is enabled`() = runTest {
         // Given
-        coEvery { configManager.getProjectConfiguration().general.collectLocation } returns true
+        coEvery { configRepository.getProjectConfiguration().general.collectLocation } returns true
 
         // When
         viewModel.start()
@@ -80,9 +80,9 @@ class SetupViewModelTest {
     @Test
     fun `should not request location permission if collectLocation is disabled`() = runTest {
         // Given
-        coEvery { configManager.getProjectConfiguration().general.collectLocation } returns false
+        coEvery { configRepository.getProjectConfiguration().general.collectLocation } returns false
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .synchronization.down.commCare
         } returns mockk()
@@ -98,9 +98,9 @@ class SetupViewModelTest {
     fun `should call locationStore collectLocationInBackground() if location permission is granted`() = runTest {
         // Given
         justRun { locationStore.collectLocationInBackground() }
-        coEvery { configManager.getProjectConfiguration() } returns mockk<ProjectConfiguration>()
+        coEvery { configRepository.getProjectConfiguration() } returns mockk<ProjectConfiguration>()
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .synchronization.down.commCare
         } returns mockk()
@@ -116,9 +116,9 @@ class SetupViewModelTest {
     fun `should not call locationStore collectLocationInBackground() if location permission is not granted`() = runTest {
         // Given
         justRun { locationStore.collectLocationInBackground() }
-        coEvery { configManager.getProjectConfiguration() } returns mockk<ProjectConfiguration>()
+        coEvery { configRepository.getProjectConfiguration() } returns mockk<ProjectConfiguration>()
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .synchronization.down.commCare
         } returns mockk()
@@ -135,7 +135,7 @@ class SetupViewModelTest {
         // Given
         justRun { locationStore.collectLocationInBackground() }
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .synchronization.down.commCare
         } returns mockk()
@@ -152,7 +152,7 @@ class SetupViewModelTest {
         // Given
         justRun { locationStore.collectLocationInBackground() }
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .synchronization.down.commCare
         } returns mockk()
@@ -167,7 +167,7 @@ class SetupViewModelTest {
     @Test
     fun `should download required licenses`() = runTest {
         // Given
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { modalities } returns listOf(
                     Modality.FINGERPRINT,
@@ -198,7 +198,7 @@ class SetupViewModelTest {
     @Test
     fun `should download required licenses with unlimited versions`() = runTest {
         // Given
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { modalities } returns listOf(
                     Modality.FINGERPRINT,
@@ -229,7 +229,7 @@ class SetupViewModelTest {
     @Test
     fun `should not download required licenses if there are no required licenses`() = runTest {
         // Given
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { modalities } returns listOf(
                     Modality.FINGERPRINT,
@@ -254,7 +254,7 @@ class SetupViewModelTest {
     @Test
     fun `should fail if any license fails`() = runTest {
         // Given
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { modalities } returns listOf(
                     Modality.FINGERPRINT,

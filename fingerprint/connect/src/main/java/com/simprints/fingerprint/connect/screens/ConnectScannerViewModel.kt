@@ -21,8 +21,8 @@ import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnect
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerLowBatteryException
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerNotPairedException
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnknownScannerIssueException
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
@@ -34,7 +34,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class ConnectScannerViewModel @Inject constructor(
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val scannerManager: ScannerManager,
     private val nfcManager: NfcManager,
     private val recentUserActivityManager: RecentUserActivityManager,
@@ -68,7 +68,7 @@ internal class ConnectScannerViewModel @Inject constructor(
 
     fun init(params: FingerprintConnectParams) = viewModelScope.launch {
         fingerprintSdk = params.fingerprintSDK
-        allowedGenerations = configManager
+        allowedGenerations = configRepository
             .getProjectConfiguration()
             .fingerprint
             ?.allowedScanners

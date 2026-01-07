@@ -3,8 +3,8 @@ package com.simprints.feature.dashboard.settings.fingerselection
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.TemplateIdentifier
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import org.junit.Rule
@@ -18,10 +18,10 @@ class FingerSelectionViewModelTest {
     val testCoroutineRule = TestCoroutineRule()
 
     private val fingerprintConfiguration = mockk<FingerprintConfiguration>()
-    private val configManager = mockk<ConfigManager>(relaxed = true) {
+    private val configRepository = mockk<ConfigRepository>(relaxed = true) {
         coEvery { getProjectConfiguration().fingerprint } returns fingerprintConfiguration
     }
-    private val viewModel = FingerSelectionViewModel(configManager)
+    private val viewModel = FingerSelectionViewModel(configRepository)
 
     @Test
     fun start_loadsSingleSdkFingerStatesCorrectly() {

@@ -1,18 +1,14 @@
 package com.simprints.feature.clientapi.usecases
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -23,7 +19,7 @@ class GetEnrolmentCreationEventForRecordUseCaseTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
@@ -43,7 +39,7 @@ class GetEnrolmentCreationEventForRecordUseCaseTest {
         every { jsonHelper.toJson(any()) } returns "json"
 
         useCase = GetEnrolmentCreationEventForRecordUseCase(
-            configManager,
+            configRepository,
             enrolmentRecordRepository,
             encoder,
             jsonHelper,
@@ -52,7 +48,7 @@ class GetEnrolmentCreationEventForRecordUseCaseTest {
 
     @Test
     fun `returns null if coSync disabled`() = runTest {
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { synchronization.up.coSync.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
         }
 
@@ -64,7 +60,7 @@ class GetEnrolmentCreationEventForRecordUseCaseTest {
 
     @Test
     fun `returns null if only analytics sync enabled`() = runTest {
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { synchronization.up.coSync.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
         }
 
@@ -76,7 +72,7 @@ class GetEnrolmentCreationEventForRecordUseCaseTest {
 
     @Test
     fun `returns null if no creation event`() = runTest {
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { synchronization.up.coSync.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
         }
 
@@ -89,7 +85,7 @@ class GetEnrolmentCreationEventForRecordUseCaseTest {
 
     @Test
     fun `returns event if biometrics coSync enabled`() = runTest {
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { synchronization.up.coSync.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
         }
 

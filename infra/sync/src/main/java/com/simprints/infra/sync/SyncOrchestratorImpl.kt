@@ -9,9 +9,9 @@ import androidx.work.WorkQuery
 import androidx.work.workDataOf
 import com.simprints.core.AppScope
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.imagesUploadRequiresUnmeteredConnection
 import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.sync.master.EventSyncMasterWorker
 import com.simprints.infra.sync.config.worker.DeviceConfigDownSyncWorker
@@ -38,7 +38,7 @@ import javax.inject.Singleton
 internal class SyncOrchestratorImpl @Inject constructor(
     private val workManager: WorkManager,
     private val authStore: AuthStore,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val eventSyncManager: EventSyncManager,
     private val shouldScheduleFirmwareUpdate: ShouldScheduleFirmwareUpdateUseCase,
     private val cleanupDeprecatedWorkers: CleanupDeprecatedWorkersUseCase,
@@ -238,7 +238,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
     }
 
     private suspend fun getImageUploadConstraints(): Constraints {
-        val networkType = configManager
+        val networkType = configRepository
             .getProjectConfiguration()
             .imagesUploadRequiresUnmeteredConnection()
             .let { if (it) NetworkType.UNMETERED else NetworkType.CONNECTED }
@@ -247,7 +247,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
 
     private suspend fun getEventSyncConstraints(): Constraints {
         // CommCare doesn't require network connection
-        val networkType = configManager
+        val networkType = configRepository
             .getProjectConfiguration()
             .isCommCareEventDownSyncAllowed()
             .let { if (it) NetworkType.NOT_REQUIRED else NetworkType.CONNECTED }

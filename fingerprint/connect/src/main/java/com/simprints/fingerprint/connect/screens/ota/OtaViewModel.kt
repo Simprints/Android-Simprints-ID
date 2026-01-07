@@ -18,8 +18,8 @@ import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy.HA
 import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy.SOFT_RESET
 import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy.SOFT_RESET_AFTER_DELAY
 import com.simprints.fingerprint.infra.scanner.domain.ota.OtaStep
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -39,7 +39,7 @@ internal class OtaViewModel @Inject constructor(
     private val reportFirmwareUpdate: ReportFirmwareUpdateEventUseCase,
     private val timeHelper: TimeHelper,
     private val recentUserActivityManager: RecentUserActivityManager,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
 ) : ViewModel() {
     val progress: LiveData<Float>
         get() = _progress
@@ -101,7 +101,7 @@ internal class OtaViewModel @Inject constructor(
     private suspend fun targetVersions(availableOta: AvailableOta): String {
         val scannerVersion = recentUserActivityManager.getRecentUserActivity().lastScannerVersion
         val availableFirmwareVersions =
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .fingerprint
                 ?.getSdkConfiguration(fingerprintSdk)

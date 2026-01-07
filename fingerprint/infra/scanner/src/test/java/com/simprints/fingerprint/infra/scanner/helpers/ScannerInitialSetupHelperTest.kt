@@ -14,9 +14,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.CypressFirm
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.ScannerInformation
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.UnifiedVersionInformation
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.store.models.Vero2Configuration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.coEvery
 import io.mockk.coJustRun
@@ -35,7 +35,7 @@ class ScannerInitialSetupHelperTest {
     private val connectionHelperMock = mockk<ConnectionHelper>()
     private val batteryLevelChecker = mockk<BatteryLevelChecker>()
     private val vero2Configuration = mockk<Vero2Configuration>()
-    private val configManager = mockk<ConfigManager> {
+    private val configRepository = mockk<ConfigRepository> {
         coEvery { getProjectConfiguration() } returns mockk {
             every { fingerprint?.getSdkConfiguration(SECUGEN_SIM_MATCHER)?.vero2 } returns vero2Configuration
         }
@@ -45,7 +45,7 @@ class ScannerInitialSetupHelperTest {
     private val scannerInitialSetupHelper = ScannerInitialSetupHelper(
         connectionHelperMock,
         batteryLevelChecker,
-        configManager,
+        configRepository,
         firmwareLocalDataSource,
     )
 

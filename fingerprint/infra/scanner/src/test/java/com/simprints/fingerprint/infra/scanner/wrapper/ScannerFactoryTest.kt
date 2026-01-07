@@ -8,8 +8,8 @@ import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerInfo
 import com.simprints.fingerprint.infra.scanner.v2.tools.ScannerUiHelper
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -26,7 +26,7 @@ class ScannerFactoryTest {
     private lateinit var componentBluetoothAdapter: ComponentBluetoothAdapter
 
     @MockK(relaxed = true)
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var scannerUiHelper: ScannerUiHelper
@@ -49,7 +49,7 @@ class ScannerFactoryTest {
         MockKAnnotations.init(this)
         scannerFactory = ScannerFactory(
             componentBluetoothAdapter,
-            configManager,
+            configRepository,
             scannerUiHelper,
             serialNumberConverter,
             scannerGenerationDeterminer,

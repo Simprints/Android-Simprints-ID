@@ -12,7 +12,7 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.externalcredential.usecase.ExternalCredentialEventTrackerUseCase
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -21,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class ExternalCredentialViewModel @Inject internal constructor(
     private val timeHelper: TimeHelper,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val eventsTracker: ExternalCredentialEventTrackerUseCase,
 ) : ViewModel() {
     private var isInitialized = false
@@ -50,7 +50,7 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
 
     init {
         viewModelScope.launch {
-            val config = configManager.getProjectConfiguration()
+            val config = configRepository.getProjectConfiguration()
             val allowedExternalCredentials = config.multifactorId?.allowedExternalCredentials.orEmpty()
             _externalCredentialTypes.postValue(allowedExternalCredentials)
         }

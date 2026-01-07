@@ -14,10 +14,10 @@ import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.experimental
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +33,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private val resolveFaceBioSdk: ResolveFaceBioSdkUseCase,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val eventReporter: SimpleCaptureEventReporter,
     private val timeHelper: TimeHelper,
     private val isUsingAutoCaptureUseCase: IsUsingAutoCaptureUseCase,
@@ -68,7 +68,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private lateinit var faceDetector: FaceDetector
 
     suspend fun initAutoCapture() {
-        val config = configManager.getProjectConfiguration()
+        val config = configRepository.getProjectConfiguration()
         isAutoCapture = isUsingAutoCaptureUseCase(config)
     }
 
@@ -83,7 +83,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         viewModelScope.launch {
             faceDetector = resolveFaceBioSdk(bioSdk).detector
 
-            val config = configManager.getProjectConfiguration()
+            val config = configRepository.getProjectConfiguration()
             qualityThreshold = config.face?.getSdkConfiguration(bioSdk)?.qualityThreshold ?: 0f
             singleQualityFallbackCaptureRequired = config.experimental().singleQualityFallbackRequired
             autoCaptureImagingDurationMillis = config.experimental().faceAutoCaptureImagingDurationMillis
