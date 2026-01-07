@@ -7,6 +7,7 @@ import com.simprints.feature.login.LoginError
 import com.simprints.feature.login.LoginResult
 import com.simprints.feature.logincheck.usecases.ActionFactory
 import com.simprints.feature.logincheck.usecases.AddAuthorizationEventUseCase
+import com.simprints.feature.logincheck.usecases.EnsureActionFieldsTokenizedUseCase
 import com.simprints.feature.logincheck.usecases.ExtractCrashKeysUseCase
 import com.simprints.feature.logincheck.usecases.ExtractParametersForAnalyticsUseCase
 import com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase
@@ -75,6 +76,9 @@ internal class LoginCheckViewModelTest {
     @MockK
     lateinit var realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler
 
+    @MockK
+    lateinit var ensureActionFieldsTokenizedUseCase: EnsureActionFieldsTokenizedUseCase
+
     private lateinit var viewModel: LoginCheckViewModel
 
     @Before
@@ -82,20 +86,23 @@ internal class LoginCheckViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
 
         viewModel = LoginCheckViewModel(
-            rootMatchers,
-            reportActionRequestEventsUseCase,
-            extractParametersForAnalyticsUseCase,
-            extractCrashKeysUseCase,
-            addAuthorizationEventUseCase,
-            isUserSignedInUseCase,
-            configManager,
-            startBackgroundSync,
-            syncOrchestrator,
-            updateSessionScopePayloadUseCase,
-            updateProjectStateUseCase,
-            updateStoredUserIdUseCase,
-            realmToRoomMigrationScheduler,
+            rootManager = rootMatchers,
+            reportActionRequestEvents = reportActionRequestEventsUseCase,
+            extractParametersForAnalytics = extractParametersForAnalyticsUseCase,
+            extractParametersForCrashReport = extractCrashKeysUseCase,
+            addAuthorizationEvent = addAuthorizationEventUseCase,
+            isUserSignedIn = isUserSignedInUseCase,
+            configManager = configManager,
+            startBackgroundSync = startBackgroundSync,
+            syncOrchestrator = syncOrchestrator,
+            updateDatabaseCountsInCurrentSession = updateSessionScopePayloadUseCase,
+            updateProjectInCurrentSession = updateProjectStateUseCase,
+            updateStoredUserId = updateStoredUserIdUseCase,
+            realmToRoomMigrationScheduler = realmToRoomMigrationScheduler,
+            ensureActionFieldsTokenizedUseCase = ensureActionFieldsTokenizedUseCase,
         )
+
+        coEvery { ensureActionFieldsTokenizedUseCase.invoke(any()) } answers { firstArg() }
     }
 
     @Test
@@ -337,6 +344,7 @@ internal class LoginCheckViewModelTest {
             addAuthorizationEventUseCase.invoke(any(), eq(true))
             extractCrashKeysUseCase.invoke(any())
             startBackgroundSync.invoke()
+            ensureActionFieldsTokenizedUseCase.invoke(any())
         }
 
         viewModel.proceedWithAction

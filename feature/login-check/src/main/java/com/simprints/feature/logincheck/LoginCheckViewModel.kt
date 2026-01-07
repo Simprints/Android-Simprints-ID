@@ -10,6 +10,7 @@ import com.simprints.core.livedata.send
 import com.simprints.feature.login.LoginError
 import com.simprints.feature.login.LoginResult
 import com.simprints.feature.logincheck.usecases.AddAuthorizationEventUseCase
+import com.simprints.feature.logincheck.usecases.EnsureActionFieldsTokenizedUseCase
 import com.simprints.feature.logincheck.usecases.ExtractCrashKeysUseCase
 import com.simprints.feature.logincheck.usecases.ExtractParametersForAnalyticsUseCase
 import com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase
@@ -52,6 +53,7 @@ class LoginCheckViewModel @Inject internal constructor(
     private val updateProjectInCurrentSession: UpdateProjectInCurrentSessionUseCase,
     private val updateStoredUserId: UpdateStoredUserIdUseCase,
     private val realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler,
+    private val ensureActionFieldsTokenizedUseCase: EnsureActionFieldsTokenizedUseCase,
 ) : ViewModel() {
     private var cachedRequest: ActionRequest? = null
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
@@ -138,7 +140,7 @@ class LoginCheckViewModel @Inject internal constructor(
             null, ProjectState.PROJECT_ENDING -> _showAlert.send(LoginCheckError.PROJECT_ENDING)
             ProjectState.PROJECT_PAUSED -> _showAlert.send(LoginCheckError.PROJECT_PAUSED)
             ProjectState.PROJECT_ENDED -> startSignInAttempt(actionRequest)
-            ProjectState.RUNNING -> proceedWithAction(actionRequest)
+            ProjectState.RUNNING -> proceedWithAction(ensureActionFieldsTokenizedUseCase(actionRequest))
         }
     }
 
