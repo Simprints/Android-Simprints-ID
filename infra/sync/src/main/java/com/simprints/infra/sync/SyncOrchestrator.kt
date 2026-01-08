@@ -7,6 +7,8 @@ interface SyncOrchestrator {
 
     suspend fun cancelBackgroundWork()
 
+    fun startConfigSync()
+
     /**
      * Trigger project and device configuration sync workers.
      * Emits value when both sync workers are done.

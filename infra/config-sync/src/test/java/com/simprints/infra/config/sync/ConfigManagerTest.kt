@@ -7,7 +7,6 @@ import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectWithConfig
-import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,9 +32,6 @@ class ConfigManagerTest {
     private lateinit var configRepository: ConfigRepository
 
     @MockK
-    private lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
-
-    @MockK
     private lateinit var configSyncCache: ConfigSyncCache
 
     @MockK
@@ -58,7 +54,6 @@ class ConfigManagerTest {
         MockKAnnotations.init(this, relaxed = true)
         configManager = ConfigManager(
             configRepository = configRepository,
-            enrolmentRecordRepository = enrolmentRecordRepository,
             configSyncCache = configSyncCache,
             authStore = authStore,
         )
