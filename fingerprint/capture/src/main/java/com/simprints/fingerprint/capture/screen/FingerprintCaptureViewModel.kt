@@ -6,9 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
-import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.capture.BiometricTemplateCapture
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
@@ -45,13 +45,13 @@ import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedE
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerOperationInterruptedException
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.EAGER
 import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.NEVER
 import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN
 import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
 import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.LIVE_QUALITY_FEEDBACK
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -69,7 +69,7 @@ import kotlin.math.min
 @HiltViewModel
 internal class FingerprintCaptureViewModel @Inject constructor(
     private val scannerManager: ScannerManager,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val timeHelper: TimeHelper,
     private val resolveBioSdkWrapperUseCase: ResolveBioSdkWrapperUseCase,
     private val saveImage: SaveFingerprintSampleUseCase,
@@ -175,7 +175,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             runBlocking {
                 // Configuration must be initialised when start returns for UI to be initialised correctly,
                 // and since fetching happens on IO thread execution must be suspended until it is available
-                configuration = configManager.getProjectConfiguration().fingerprint!!
+                configuration = configRepository.getProjectConfiguration().fingerprint!!
                 initBioSdk(fingerprintSdk)
             }
 

@@ -109,6 +109,7 @@ internal class EventSyncManagerImpl @Inject constructor(
         subjectId: String,
         metadata: String,
     ): Unit = withContext(dispatcher) {
+        val project = configRepository.getProject() ?: return@withContext
         val projectConfiguration = configRepository.getProjectConfiguration()
 
         val eventScope = eventRepository.createEventScope(EventScopeType.DOWN_SYNC)
@@ -120,7 +121,7 @@ internal class EventSyncManagerImpl @Inject constructor(
                     modes = getProjectModalities(projectConfiguration),
                 ),
             )
-            simprintsDownSyncTask.downSync(this, op, eventScope, configRepository.getProject()).toList()
+            simprintsDownSyncTask.downSync(this, op, eventScope, project).toList()
         } else if (projectConfiguration.synchronization.down.commCare != null) {
             val caseId = extractCommCareCaseId(metadata)
             val op = EventDownSyncOperation(
@@ -131,7 +132,7 @@ internal class EventSyncManagerImpl @Inject constructor(
                     modes = getProjectModalities(projectConfiguration),
                 ),
             )
-            commCareSyncTask.downSync(this, op, eventScope, configRepository.getProject()).toList()
+            commCareSyncTask.downSync(this, op, eventScope, project).toList()
         }
         eventRepository.closeEventScope(eventScope, EventScopeEndCause.WORKFLOW_ENDED)
     }

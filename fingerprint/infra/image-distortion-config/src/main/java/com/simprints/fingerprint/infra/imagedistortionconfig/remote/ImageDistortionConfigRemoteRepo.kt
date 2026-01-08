@@ -3,13 +3,13 @@ package com.simprints.fingerprint.infra.imagedistortionconfig.remote
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 internal class ImageDistortionConfigRemoteRepo @Inject constructor(
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val authStore: AuthStore,
 ) {
     /**
@@ -34,7 +34,7 @@ internal class ImageDistortionConfigRemoteRepo @Inject constructor(
             return false
         }
 
-        val bucketUrl = configManager.getProject()?.imageBucket
+        val bucketUrl = configRepository.getProject()?.imageBucket
         if (bucketUrl == null) {
             log("bucketUrl projectId is empty")
             return false

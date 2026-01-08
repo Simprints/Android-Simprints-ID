@@ -4,13 +4,13 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.Modality
+import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.ConfigSyncCache
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
-import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.config.sync.ConfigSyncCache
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -39,7 +39,7 @@ class SettingsViewModelTest {
     )
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var syncOrchestrator: SyncOrchestrator
@@ -53,15 +53,15 @@ class SettingsViewModelTest {
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { configManager.getProjectConfiguration().general } returns generalConfiguration
-        coEvery { configManager.getDeviceConfiguration().language } returns LANGUAGE
+        coEvery { configRepository.getProjectConfiguration().general } returns generalConfiguration
+        coEvery { configRepository.getDeviceConfiguration().language } returns LANGUAGE
 
         coEvery { configSyncCache.sinceLastUpdateTime() } returnsMany listOf(
             LAST_UPDATED,
             OTHER_LAST_UPDATED,
         )
 
-        viewModel = SettingsViewModel(configManager, syncOrchestrator, configSyncCache)
+        viewModel = SettingsViewModel(configRepository, syncOrchestrator, configSyncCache)
     }
 
     @Test
@@ -69,7 +69,7 @@ class SettingsViewModelTest {
         val experimentalConfig1 = mapOf("key1" to "value1")
         val experimentalConfig2 = mapOf("key2" to "value2")
 
-        coEvery { configManager.observeProjectConfiguration() } returns flowOf(
+        coEvery { configRepository.observeProjectConfiguration() } returns flowOf(
             mockk<ProjectConfiguration>(relaxed = true) {
                 every { custom } returns experimentalConfig1
             },
@@ -77,7 +77,7 @@ class SettingsViewModelTest {
                 every { custom } returns experimentalConfig2
             },
         )
-        viewModel = SettingsViewModel(configManager, syncOrchestrator, configSyncCache)
+        viewModel = SettingsViewModel(configRepository, syncOrchestrator, configSyncCache)
 
         assertThat(viewModel.experimentalConfiguration.test().valueHistory())
             .isEqualTo(
@@ -100,7 +100,7 @@ class SettingsViewModelTest {
     fun `updateLanguagePreference should update the language`() = runTest {
         val updatedLanguage = "en"
         val updateConfigFn = slot<suspend (DeviceConfiguration) -> DeviceConfiguration>()
-        coEvery { configManager.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
+        coEvery { configRepository.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
 
         viewModel.updateLanguagePreference(updatedLanguage)
 

@@ -14,7 +14,7 @@ import com.simprints.feature.externalcredential.model.BoundingBox
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.externalcredential.usecase.ExternalCredentialEventTrackerUseCase
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -38,14 +38,14 @@ internal class ExternalCredentialViewModelTest {
     lateinit var timeHelper: TimeHelper
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
     private lateinit var viewModel: ExternalCredentialViewModel
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         viewModel = ExternalCredentialViewModel(
-            configManager = configManager,
+            configRepository = configRepository,
             timeHelper = timeHelper,
             eventsTracker = eventsTracker,
         )
@@ -187,13 +187,13 @@ internal class ExternalCredentialViewModelTest {
     }
 
     private fun setupViewModel(allowedCredentials: List<ExternalCredentialType>): ExternalCredentialViewModel {
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { multifactorId } returns mockk {
                 every { allowedExternalCredentials } returns allowedCredentials
             }
         }
         return ExternalCredentialViewModel(
-            configManager = configManager,
+            configRepository = configRepository,
             timeHelper = timeHelper,
             eventsTracker = eventsTracker,
         )

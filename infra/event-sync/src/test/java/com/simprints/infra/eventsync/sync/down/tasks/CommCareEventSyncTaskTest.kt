@@ -9,9 +9,9 @@ import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
@@ -149,7 +149,7 @@ class CommCareEventSyncTaskTest {
     private lateinit var timeHelper: TimeHelper
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var commCareEventDataSource: CommCareEventDataSource
@@ -180,7 +180,7 @@ class CommCareEventSyncTaskTest {
             enrolmentRecordRepository,
             eventDownSyncScopeRepository,
             enrolmentRecordFactory,
-            configManager,
+            configRepository,
             timeHelper,
             eventRepository,
             commCareEventDataSource,
@@ -378,7 +378,7 @@ class CommCareEventSyncTaskTest {
     fun moveSubjectFromModulesUnderSyncing_shouldPerformBothActions() = runTest {
         val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE_MODULE
         mockCommCareDataSource(listOf(eventToMoveToModule2))
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
+        coEvery { configRepository.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
             "",

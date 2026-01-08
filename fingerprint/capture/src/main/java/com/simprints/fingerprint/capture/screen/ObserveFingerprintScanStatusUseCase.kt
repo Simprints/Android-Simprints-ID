@@ -5,11 +5,11 @@ import androidx.preference.PreferenceManager
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintScanState
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintScanningStatusTracker
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.BASIC
 import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.VISUAL_SCAN_FEEDBACK
-import com.simprints.infra.config.sync.ConfigManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -22,7 +22,7 @@ import javax.inject.Singleton
 class ObserveFingerprintScanStatusUseCase @Inject constructor(
     private val statusTracker: FingerprintScanningStatusTracker,
     private val playAudioBeep: PlayAudioBeepUseCase,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val scannerManager: ScannerManager,
     @ApplicationContext private val context: Context,
 ) {
@@ -36,7 +36,7 @@ class ObserveFingerprintScanStatusUseCase @Inject constructor(
     ) {
         stopObserving()
         observeJob = coroutineScope.launch {
-            ledsMode = configManager
+            ledsMode = configRepository
                 .getProjectConfiguration()
                 .fingerprint
                 ?.getSdkConfiguration(

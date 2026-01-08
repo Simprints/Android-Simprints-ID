@@ -23,10 +23,10 @@ import com.simprints.feature.externalcredential.screens.scanocr.usecase.KeepOnly
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.NormalizeBitmapToPreviewUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ZoomOntoCredentialUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.credential.store.CredentialImageRepository
 import com.simprints.infra.credential.store.model.CredentialScanImageType.ZoomedInCredential
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
@@ -48,7 +48,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     private val credentialImageRepository: CredentialImageRepository,
     private val zoomOntoCredentialUseCase: ZoomOntoCredentialUseCase,
     private val tokenizationProcessor: TokenizationProcessor,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     @param:DispatcherBG private val bgDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     @AssistedFactory
@@ -78,7 +78,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
-            ocrConfig = configManager.getProjectConfiguration().experimental().let { config ->
+            ocrConfig = configRepository.getProjectConfiguration().experimental().let { config ->
                 OcrConfig(
                     useHighRes = config.ocrUseHighRes,
                     capturesRequired = config.ocrCaptures.coerceIn(OCR_CAPTURE_MIN, OCR_CAPTURE_MAX),
@@ -136,7 +136,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
         updateState { ScanOcrState.Complete }
         viewModelScope.launch {
             // Missing project at this point is impossible, so no special handling required
-            val project = configManager.getProject() ?: return@launch
+            val project = configRepository.getProject() ?: return@launch
 
             val detectedBlock = keepOnlyBestDetectedBlockUseCase(detectedBlocks, ocrDocumentType)
             val credentialType = detectedBlock.documentType.asExternalCredentialType()

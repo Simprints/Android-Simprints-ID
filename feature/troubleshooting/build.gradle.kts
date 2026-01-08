@@ -11,7 +11,6 @@ dependencies {
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:events"))
     implementation(project(":infra:config-store"))
-    implementation(project(":infra:config-sync"))
     implementation(project(":infra:license"))
     implementation(project(":infra:network"))
     implementation(project(":infra:logging-persistent"))

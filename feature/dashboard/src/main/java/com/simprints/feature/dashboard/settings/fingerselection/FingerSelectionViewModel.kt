@@ -5,14 +5,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.common.TemplateIdentifier
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 internal class FingerSelectionViewModel @Inject constructor(
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
 ) : ViewModel() {
     val fingerSelections: LiveData<List<FingerSelectionSection>>
         get() = _fingerSelections
@@ -21,10 +21,10 @@ internal class FingerSelectionViewModel @Inject constructor(
     fun start() {
         viewModelScope.launch {
             val fingerSelections = mutableListOf<FingerSelectionSection>()
-            configManager.getProjectConfiguration().fingerprint?.secugenSimMatcher?.fingersToCapture?.let {
+            configRepository.getProjectConfiguration().fingerprint?.secugenSimMatcher?.fingersToCapture?.let {
                 fingerSelections.add(FingerSelectionSection("SimMatcher", it.toFingerSelectionItems()))
             }
-            configManager.getProjectConfiguration().fingerprint?.nec?.fingersToCapture?.let {
+            configRepository.getProjectConfiguration().fingerprint?.nec?.fingersToCapture?.let {
                 fingerSelections.add(FingerSelectionSection("NEC", it.toFingerSelectionItems()))
             }
             _fingerSelections.postValue(fingerSelections)

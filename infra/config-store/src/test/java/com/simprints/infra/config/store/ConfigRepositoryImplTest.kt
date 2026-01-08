@@ -1,6 +1,9 @@
 package com.simprints.infra.config.store
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepositoryImpl.Companion.PRIVACY_NOTICE_FILE
 import com.simprints.infra.config.store.local.ConfigLocalDataSource
 import com.simprints.infra.config.store.models.DeviceConfiguration
@@ -18,52 +21,62 @@ import com.simprints.infra.config.store.testtools.project
 import com.simprints.infra.config.store.testtools.projectConfiguration
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.logging.Simber
-import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
-import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.mockkStatic
-import io.mockk.unmockkStatic
-import okhttp3.ResponseBody.Companion.toResponseBody
-import retrofit2.HttpException
-import retrofit2.Response
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
+import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import retrofit2.HttpException
+import retrofit2.Response
 import java.net.HttpURLConnection
 
 class ConfigRepositoryImplTest {
-    companion object {
-        private const val PROJECT_ID = "projectId"
-        private const val DEVICE_ID = "deviceId"
-        private const val LANGUAGE = "fr"
-        private const val PRIVACY_NOTICE = "privacy notice"
-    }
+    @MockK
+    private lateinit var authStore: AuthStore
 
-    private val localDataSource = mockk<ConfigLocalDataSource>(relaxed = true)
-    private val remoteDataSource = mockk<ConfigRemoteDataSource>()
-    private val simNetwork = mockk<SimNetwork>(relaxed = true)
-    private val tokenizationProcessor = mockk<TokenizationProcessor>(relaxed = true)
+    @MockK
+    private lateinit var localDataSource: ConfigLocalDataSource
 
-    private lateinit var configServiceImpl: ConfigRepositoryImpl
+    @MockK
+    private lateinit var remoteDataSource: ConfigRemoteDataSource
+
+    @MockK
+    private lateinit var simNetwork: SimNetwork
+
+    @MockK
+    private lateinit var tokenizationProcessor: TokenizationProcessor
+
+    @MockK
+    private lateinit var configSyncCache: ConfigSyncCache
+
+    private lateinit var configRepository: ConfigRepositoryImpl
 
     @Before
     fun setup() {
+        MockKAnnotations.init(this, relaxed = true)
+
+        every { tokenizationProcessor.tokenizeIfNecessary(any(), any(), any()) } answers { firstArg() }
+
         mockkStatic(Simber::class)
-        configServiceImpl = ConfigRepositoryImpl(
-            localDataSource,
-            remoteDataSource,
-            simNetwork,
-            tokenizationProcessor,
-            DEVICE_ID,
+        configRepository = ConfigRepositoryImpl(
+            authStore = authStore,
+            localDataSource = localDataSource,
+            remoteDataSource = remoteDataSource,
+            simNetwork = simNetwork,
+            tokenizationProcessor = tokenizationProcessor,
+            configSyncCache = configSyncCache,
+            deviceId = DEVICE_ID,
         )
     }
 
@@ -73,27 +86,46 @@ class ConfigRepositoryImplTest {
     }
 
     @Test
-    fun `should get the project locally if available`() = runTest {
+    fun `getProject should get the project locally if available`() = runTest {
         coEvery { localDataSource.getProject() } returns project
 
-        val receivedProject = configServiceImpl.getProject()
+        val result = configRepository.getProject()
 
-        assertThat(receivedProject).isEqualTo(project)
+        assertThat(result).isEqualTo(project)
         coVerify(exactly = 1) { localDataSource.getProject() }
         coVerify(exactly = 0) { remoteDataSource.getProject(any()) }
     }
 
     @Test
-    fun `should throw the exception if there is an issue`() = runTest {
-        val exception = Exception("exception")
-        coEvery { localDataSource.getProject() } throws exception
+    fun `getProject should call the fetch method when cannot get local project`() = runTest {
+        coEvery { localDataSource.getProject() } throws NoSuchElementException()
+        every { authStore.signedInProjectId } returns PROJECT_ID
+        coEvery { remoteDataSource.getProject(any()) } returns ProjectWithConfig(project, projectConfiguration)
 
-        val receivedException = assertThrows<Exception> { configServiceImpl.getProject() }
+        configRepository.getProject()
+        coVerify(exactly = 1) { remoteDataSource.getProject(PROJECT_ID) }
+    }
 
-        assertThat(receivedException).isEqualTo(exception)
-        coVerify(exactly = 1) { localDataSource.getProject() }
+    @Test
+    fun `getProject should returns null when no project ID`() = runTest {
+        every { authStore.signedInProjectId } returns ""
+        coEvery { localDataSource.getProject() } throws NoSuchElementException()
+
+        val result = configRepository.getProject()
+        assertThat(result).isNull()
         coVerify(exactly = 0) { localDataSource.saveProject(project) }
         coVerify(exactly = 0) { remoteDataSource.getProject(PROJECT_ID) }
+    }
+
+    @Test
+    fun `getProject should returns null when fetch fails`() = runTest {
+        every { authStore.signedInProjectId } returns PROJECT_ID
+        coEvery { localDataSource.getProject() } throws NoSuchElementException()
+        coEvery { remoteDataSource.getProject(any()) } throws NoSuchElementException()
+
+        val result = configRepository.getProject()
+        assertThat(result).isNull()
+        coVerify(exactly = 0) { localDataSource.saveProject(project) }
     }
 
     @Test
@@ -101,11 +133,12 @@ class ConfigRepositoryImplTest {
         coEvery { localDataSource.saveProject(project) } returns Unit
         coEvery { remoteDataSource.getProject(PROJECT_ID) } returns ProjectWithConfig(project, projectConfiguration)
 
-        configServiceImpl.refreshProject(PROJECT_ID)
+        configRepository.refreshProject(PROJECT_ID)
         coVerify(exactly = 1) { localDataSource.saveProject(project) }
         coVerify(exactly = 1) { localDataSource.saveProjectConfiguration(projectConfiguration) }
         coVerify(exactly = 1) { remoteDataSource.getProject(PROJECT_ID) }
         coVerify(exactly = 1) { simNetwork.setApiBaseUrl(project.baseUrl) }
+        coVerify(exactly = 1) { configSyncCache.saveUpdateTime() }
     }
 
     @Test
@@ -123,10 +156,162 @@ class ConfigRepositoryImplTest {
         coEvery { localDataSource.saveProject(project) } returns Unit
         coEvery { remoteDataSource.getProject(PROJECT_ID) } returns ProjectWithConfig(project, projectConfiguration)
 
-        configServiceImpl.refreshProject(PROJECT_ID)
+        configRepository.refreshProject(PROJECT_ID)
         coVerify(exactly = 1) { localDataSource.saveProject(project) }
         coVerify(exactly = 1) { remoteDataSource.getProject(PROJECT_ID) }
         coVerify(exactly = 0) { simNetwork.setApiBaseUrl(project.baseUrl) }
+    }
+
+    @Test
+    fun `observeIsProjectRefreshing should initially emit false`() = runTest {
+        val isRefreshing = configRepository.observeIsProjectRefreshing().first()
+        assertThat(isRefreshing).isFalse()
+    }
+
+    @Test
+    fun `observeIsProjectRefreshing should emit false after refreshProject completes`() = runTest {
+        coEvery { configRepository.refreshProject(PROJECT_ID) } returns ProjectWithConfig(project, projectConfiguration)
+
+        configRepository.refreshProject(PROJECT_ID)
+        val isRefreshing = configRepository.observeIsProjectRefreshing().first()
+        assertThat(isRefreshing).isFalse()
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `observeIsProjectRefreshing should emit true during refreshProject and false when done`() = runTest {
+        coEvery { configRepository.refreshProject(PROJECT_ID) } coAnswers {
+            delay(1000)
+            ProjectWithConfig(project, projectConfiguration)
+        }
+
+        assertThat(configRepository.observeIsProjectRefreshing().first()).isFalse() // before
+
+        launch { configRepository.refreshProject(PROJECT_ID) }
+        advanceTimeBy(500)
+
+        assertThat(configRepository.observeIsProjectRefreshing().first()).isTrue() // during
+
+        advanceTimeBy(1000)
+
+        assertThat(configRepository.observeIsProjectRefreshing().first()).isFalse() // after
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `observeIsProjectRefreshing should emit false even when refreshProject fails`() = runTest {
+        coEvery { configRepository.refreshProject(PROJECT_ID) } coAnswers {
+            delay(500)
+            throw Exception("Test exception")
+        }
+
+        assertThat(configRepository.observeIsProjectRefreshing().first()).isFalse() // before
+
+        launch {
+            try {
+                configRepository.refreshProject(PROJECT_ID)
+            } catch (_: Exception) {
+                // Expected
+            }
+        }
+        advanceTimeBy(1000)
+
+        assertThat(configRepository.observeIsProjectRefreshing().first()).isFalse() // after failure
+    }
+
+    @Test
+    fun `getProjectConfiguration should get the config locally if available`() = runTest {
+        coEvery { localDataSource.getProjectConfiguration() } returns projectConfiguration
+
+        val result = configRepository.getProjectConfiguration()
+
+        assertThat(result).isEqualTo(projectConfiguration)
+        coVerify(exactly = 1) { localDataSource.getProject() }
+        coVerify(exactly = 0) { remoteDataSource.getProject(any()) }
+    }
+
+    @Test
+    fun `getProjectConfiguration should call the fetch method when default local configuration`() = runTest {
+        coEvery { localDataSource.getProjectConfiguration() } returns projectConfiguration.copy(projectId = "")
+        every { authStore.signedInProjectId } returns PROJECT_ID
+        coEvery { remoteDataSource.getProject(any()) } returns ProjectWithConfig(project, projectConfiguration)
+
+        configRepository.getProjectConfiguration()
+        coVerify(exactly = 1) { remoteDataSource.getProject(PROJECT_ID) }
+    }
+
+    @Test
+    fun `getProjectConfiguration should returns default configuration not logger in`() = runTest {
+        val defaultConfiguration = projectConfiguration.copy(projectId = "")
+        coEvery { localDataSource.getProjectConfiguration() } returns defaultConfiguration
+        every { authStore.signedInProjectId } returns ""
+
+        val result = configRepository.getProjectConfiguration()
+        assertThat(result).isEqualTo(defaultConfiguration)
+        coVerify(exactly = 0) { remoteDataSource.getProject(PROJECT_ID) }
+    }
+
+    @Test
+    fun `getProjectConfiguration should returns null when fetch fails`() = runTest {
+        every { authStore.signedInProjectId } returns PROJECT_ID
+        val defaultConfiguration = projectConfiguration.copy(projectId = "")
+        coEvery { localDataSource.getProjectConfiguration() } returns defaultConfiguration
+        coEvery { remoteDataSource.getProject(any()) } throws NoSuchElementException()
+
+        val result = configRepository.getProjectConfiguration()
+        assertThat(result).isEqualTo(defaultConfiguration)
+        coVerify(exactly = 0) { localDataSource.saveProject(project) }
+    }
+
+    @Test
+    fun `getProjectConfiguration tokenizes modules before returning`() = runTest {
+        coEvery { localDataSource.getProjectConfiguration() } returns projectConfiguration.copy(
+            synchronization = projectConfiguration.synchronization.copy(
+                down = projectConfiguration.synchronization.down.copy(
+                    simprints = projectConfiguration.synchronization.down.simprints?.copy(
+                        moduleOptions = listOf(
+                            "module1".asTokenizableRaw(),
+                            "module2".asTokenizableRaw(),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        configRepository.getProjectConfiguration()
+        coVerify(exactly = 2) { tokenizationProcessor.tokenizeIfNecessary(any(), any(), any()) }
+    }
+
+    @Test
+    fun `observeProjectConfiguration should emit values from the local data source`() = runTest {
+        val config1 = projectConfiguration.copy(projectId = "project1")
+        val config2 = projectConfiguration.copy(projectId = "project2")
+
+        coEvery { localDataSource.observeProjectConfiguration() } returns flow {
+            emit(config1)
+            emit(config2)
+        }
+
+        val emittedConfigs = configRepository.observeProjectConfiguration().toList()
+
+        assertThat(emittedConfigs).hasSize(2)
+        assertThat(emittedConfigs[0]).isEqualTo(config1)
+        assertThat(emittedConfigs[1]).isEqualTo(config2)
+        coVerify(exactly = 0) { remoteDataSource.getProject(any()) }
+    }
+
+    @Test
+    fun `observeProjectConfiguration should call getProjectConfiguration on start to invoke download if config empty`() = runTest {
+        coEvery { localDataSource.observeProjectConfiguration() } returns flow {
+            emit(projectConfiguration)
+        }
+
+        val emittedConfigs = configRepository.observeProjectConfiguration().toList()
+
+        coVerify(exactly = 1) { localDataSource.getProjectConfiguration() }
+
+        assertThat(emittedConfigs).hasSize(1)
+        assertThat(emittedConfigs[0]).isEqualTo(projectConfiguration)
     }
 
     @Test
@@ -135,7 +320,7 @@ class ConfigRepositoryImplTest {
         coEvery { localDataSource.getDeviceConfiguration() } returns deviceConfiguration
         coEvery { remoteDataSource.getDeviceState(any(), any(), any()) } returns deviceState
 
-        val result = configServiceImpl.getDeviceState()
+        val result = configRepository.getDeviceState()
         assertThat(result).isEqualTo(deviceState)
     }
 
@@ -143,7 +328,7 @@ class ConfigRepositoryImplTest {
     fun `getDeviceConfiguration should call the correct method`() = runTest {
         coEvery { localDataSource.getDeviceConfiguration() } returns deviceConfiguration
 
-        val gottenDeviceConfiguration = configServiceImpl.getDeviceConfiguration()
+        val gottenDeviceConfiguration = configRepository.getDeviceConfiguration()
         assertThat(gottenDeviceConfiguration).isEqualTo(deviceConfiguration)
     }
 
@@ -153,7 +338,7 @@ class ConfigRepositoryImplTest {
             it
         }
 
-        configServiceImpl.updateDeviceConfiguration(update)
+        configRepository.updateDeviceConfiguration(update)
         coVerify(exactly = 1) { localDataSource.updateDeviceConfiguration(update) }
     }
 
@@ -162,7 +347,7 @@ class ConfigRepositoryImplTest {
         every { localDataSource.hasPrivacyNoticeFor(PROJECT_ID, LANGUAGE) } returns true
         every { localDataSource.getPrivacyNotice(PROJECT_ID, LANGUAGE) } returns PRIVACY_NOTICE
 
-        val results = configServiceImpl.getPrivacyNotice(PROJECT_ID, LANGUAGE).toList()
+        val results = configRepository.getPrivacyNotice(PROJECT_ID, LANGUAGE).toList()
         assertThat(results).isEqualTo(listOf(Succeed(LANGUAGE, PRIVACY_NOTICE)))
     }
 
@@ -176,7 +361,7 @@ class ConfigRepositoryImplTest {
             )
         } returns PRIVACY_NOTICE
 
-        val results = configServiceImpl.getPrivacyNotice(PROJECT_ID, LANGUAGE).toList()
+        val results = configRepository.getPrivacyNotice(PROJECT_ID, LANGUAGE).toList()
 
         assertThat(results).isEqualTo(
             listOf(
@@ -205,7 +390,7 @@ class ConfigRepositoryImplTest {
                 )
             } throws exception
 
-            val results = configServiceImpl.getPrivacyNotice(PROJECT_ID, LANGUAGE).toList()
+            val results = configRepository.getPrivacyNotice(PROJECT_ID, LANGUAGE).toList()
 
             assertThat(results).isEqualTo(
                 listOf(
@@ -227,7 +412,7 @@ class ConfigRepositoryImplTest {
             )
         } throws exception
 
-        val results = configServiceImpl.getPrivacyNotice(PROJECT_ID, LANGUAGE).toList()
+        val results = configRepository.getPrivacyNotice(PROJECT_ID, LANGUAGE).toList()
 
         assertThat(results).isEqualTo(
             listOf(
@@ -240,7 +425,7 @@ class ConfigRepositoryImplTest {
 
     @Test
     fun `clearData should clear all the data`() = runTest {
-        configServiceImpl.clearData()
+        configRepository.clearData()
 
         coVerify(exactly = 1) { localDataSource.clearProject() }
         coVerify(exactly = 1) { localDataSource.clearProjectConfiguration() }
@@ -249,29 +434,11 @@ class ConfigRepositoryImplTest {
     }
 
     @Test
-    fun `observeProjectConfiguration should emit values from the local data source`() = runTest {
-        val config1 = projectConfiguration.copy(projectId = "project1")
-        val config2 = projectConfiguration.copy(projectId = "project2")
-
-        coEvery { localDataSource.observeProjectConfiguration() } returns flow {
-            emit(config1)
-            emit(config2)
-        }
-
-        val emittedConfigs = configServiceImpl.observeProjectConfiguration().toList()
-
-        assertThat(emittedConfigs).hasSize(2)
-        assertThat(emittedConfigs[0]).isEqualTo(config1)
-        assertThat(emittedConfigs[1]).isEqualTo(config2)
-        coVerify(exactly = 0) { remoteDataSource.getProject(any()) }
-    }
-
-    @Test
     fun `should return project config from local data source`() = runTest {
         val config = projectConfiguration.copy(projectId = "project1")
         coEvery { localDataSource.getProjectConfiguration() } returns config
 
-        val result = configServiceImpl.getProjectConfiguration()
+        val result = configRepository.getProjectConfiguration()
 
         assertThat(result).isEqualTo(config)
         coVerify { localDataSource.getProjectConfiguration() }
@@ -291,7 +458,7 @@ class ConfigRepositoryImplTest {
             )
         } throws exception
 
-        configServiceImpl.getPrivacyNotice(PROJECT_ID, LANGUAGE).toList()
+        configRepository.getPrivacyNotice(PROJECT_ID, LANGUAGE).toList()
 
         verify(exactly = 1) { Simber.i(eq("Failed to download privacy notice"), eq(exception)) }
     }
@@ -310,7 +477,7 @@ class ConfigRepositoryImplTest {
             )
         } throws exception
 
-        configServiceImpl.getPrivacyNotice(PROJECT_ID, LANGUAGE).toList()
+        configRepository.getPrivacyNotice(PROJECT_ID, LANGUAGE).toList()
 
         verify(exactly = 0) { Simber.i(any(), any()) }
     }
@@ -322,7 +489,7 @@ class ConfigRepositoryImplTest {
             selectedModules = listOf(
                 "module1".asTokenizableEncrypted(),
                 "module2".asTokenizableEncrypted(),
-            )
+            ),
         )
 
         coEvery { localDataSource.observeDeviceConfiguration() } returns flow {
@@ -330,11 +497,18 @@ class ConfigRepositoryImplTest {
             emit(config2)
         }
 
-        val emittedConfigs = configServiceImpl.observeDeviceConfiguration().toList()
+        val emittedConfigs = configRepository.observeDeviceConfiguration().toList()
 
         assertThat(emittedConfigs).hasSize(2)
         assertThat(emittedConfigs[0]).isEqualTo(config1)
         assertThat(emittedConfigs[1]).isEqualTo(config2)
         coVerify(exactly = 1) { localDataSource.observeDeviceConfiguration() }
+    }
+
+    companion object {
+        private const val PROJECT_ID = "projectId"
+        private const val DEVICE_ID = "deviceId"
+        private const val LANGUAGE = "fr"
+        private const val PRIVACY_NOTICE = "privacy notice"
     }
 }

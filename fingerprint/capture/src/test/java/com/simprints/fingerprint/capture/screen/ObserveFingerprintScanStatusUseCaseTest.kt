@@ -6,10 +6,10 @@ import android.media.MediaPlayer
 import androidx.preference.PreferenceManager
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintScanningStatusTracker
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.LIVE_QUALITY_FEEDBACK
 import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.VISUAL_SCAN_FEEDBACK
-import com.simprints.infra.config.sync.ConfigManager
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -32,7 +32,7 @@ class ObserveFingerprintScanStatusUseCaseTest {
     private lateinit var playAudioBeep: PlayAudioBeepUseCase
 
     @RelaxedMockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @RelaxedMockK
     private lateinit var scannerManager: ScannerManager
@@ -60,7 +60,7 @@ class ObserveFingerprintScanStatusUseCaseTest {
         observeFingerprintScanStatus = ObserveFingerprintScanStatusUseCase(
             tracker,
             playAudioBeep,
-            configManager,
+            configRepository,
             scannerManager,
             context,
         )
@@ -71,7 +71,7 @@ class ObserveFingerprintScanStatusUseCaseTest {
         // Given
         every { sharedPreferences.getBoolean(any(), any()) } returns true
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .fingerprint
                 ?.getSdkConfiguration(
@@ -154,7 +154,7 @@ class ObserveFingerprintScanStatusUseCaseTest {
         // Given
         every { sharedPreferences.getBoolean(any(), any()) } returns true
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .fingerprint
                 ?.getSdkConfiguration(
@@ -178,7 +178,7 @@ class ObserveFingerprintScanStatusUseCaseTest {
             // Given
             every { sharedPreferences.getBoolean(any(), any()) } returns true
             coEvery {
-                configManager
+                configRepository
                     .getProjectConfiguration()
                     .fingerprint
                     ?.getSdkConfiguration(

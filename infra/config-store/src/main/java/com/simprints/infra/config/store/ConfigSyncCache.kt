@@ -1,4 +1,4 @@
-package com.simprints.infra.config.sync
+package com.simprints.infra.config.store
 
 import androidx.core.content.edit
 import com.simprints.core.DispatcherIO

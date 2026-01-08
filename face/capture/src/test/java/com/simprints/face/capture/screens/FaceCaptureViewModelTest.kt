@@ -5,15 +5,14 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
-import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
 import com.simprints.face.capture.usecases.SaveFaceSampleUseCase
 import com.simprints.face.capture.usecases.ShouldShowInstructionsScreenUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FaceConfiguration.ImageSavingStrategy
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
@@ -44,7 +43,7 @@ class FaceCaptureViewModelTest {
     private lateinit var authStore: AuthStore
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var faceImageUseCase: SaveFaceSampleUseCase
@@ -85,7 +84,7 @@ class FaceCaptureViewModelTest {
 
         viewModel = FaceCaptureViewModel(
             authStore,
-            configManager,
+            configRepository,
             faceImageUseCase,
             eventReporter,
             bitmapToByteArrayUseCase,
@@ -102,7 +101,7 @@ class FaceCaptureViewModelTest {
     @Test
     fun `Save face detections should not be called when image saving strategy set to NEVER`() {
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .face
                 ?.getSdkConfiguration(any())
@@ -117,7 +116,7 @@ class FaceCaptureViewModelTest {
     @Test
     fun `Save face detections should be called when image saving strategy set to ONLY_GOOD_SCAN`() {
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .face
                 ?.getSdkConfiguration(any())

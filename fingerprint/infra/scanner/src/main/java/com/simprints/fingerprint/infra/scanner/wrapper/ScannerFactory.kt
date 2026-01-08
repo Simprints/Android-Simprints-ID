@@ -12,8 +12,8 @@ import com.simprints.fingerprint.infra.scanner.tools.ScannerGenerationDeterminer
 import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerInfo
 import com.simprints.fingerprint.infra.scanner.v2.tools.ScannerUiHelper
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
@@ -25,7 +25,7 @@ import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner as ScannerV2
 @Singleton
 class ScannerFactory @Inject internal constructor(
     private val bluetoothAdapter: ComponentBluetoothAdapter,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val scannerUiHelper: ScannerUiHelper,
     private val serialNumberConverter: SerialNumberConverter,
     private val scannerGenerationDeterminer: ScannerGenerationDeterminer,
@@ -45,7 +45,7 @@ class ScannerFactory @Inject internal constructor(
 
     suspend fun initScannerOperationWrappers(macAddress: String) {
         val availableScannerGenerations =
-            configManager.getProjectConfiguration().fingerprint?.allowedScanners ?: listOf()
+            configRepository.getProjectConfiguration().fingerprint?.allowedScanners ?: listOf()
         val scannerId = serialNumberConverter.convertMacAddressToSerialNumber(macAddress)
         val scannerGenerationToUse = when (availableScannerGenerations.size) {
             1 -> availableScannerGenerations.single()

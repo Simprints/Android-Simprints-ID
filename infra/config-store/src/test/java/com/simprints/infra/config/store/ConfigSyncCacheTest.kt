@@ -1,16 +1,13 @@
-package com.simprints.infra.config.sync
+package com.simprints.infra.config.store
 
 import android.content.SharedPreferences
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.*
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -64,7 +61,7 @@ class ConfigSyncCacheTest {
 
         verify { prefs.getLong(any(), any()) }
         verify { timeHelper.readableBetweenNowAndTime(Timestamp(1000L)) }
-        assertThat(result).isEqualTo("0 minutes")
+        Truth.assertThat(result).isEqualTo("0 minutes")
     }
 
     @Test
@@ -74,6 +71,6 @@ class ConfigSyncCacheTest {
         val result = configSyncCache.sinceLastUpdateTime()
 
         verify { prefs.getLong(any(), any()) }
-        assertThat(result).isEmpty()
+        Truth.assertThat(result).isEmpty()
     }
 }

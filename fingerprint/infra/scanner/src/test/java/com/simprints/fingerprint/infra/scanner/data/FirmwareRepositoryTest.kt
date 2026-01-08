@@ -4,9 +4,9 @@ import com.simprints.fingerprint.infra.scanner.data.local.FirmwareLocalDataSourc
 import com.simprints.fingerprint.infra.scanner.data.remote.FirmwareRemoteDataSource
 import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.infra.scanner.domain.versions.getMissingVersionsToDownload
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.config.store.models.Vero2Configuration.Vero2FirmwareVersions
-import com.simprints.infra.config.sync.ConfigManager
 import io.mockk.MockKAnnotations
 import io.mockk.Ordering
 import io.mockk.coEvery
@@ -29,7 +29,7 @@ class FirmwareRepositoryTest {
     private lateinit var vero2Configuration: Vero2Configuration
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     private lateinit var firmwareRepository: FirmwareRepository
 
@@ -38,7 +38,7 @@ class FirmwareRepositoryTest {
         MockKAnnotations.init(this, relaxed = true)
 
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .fingerprint
                 ?.secugenSimMatcher
@@ -56,7 +56,7 @@ class FirmwareRepositoryTest {
         firmwareRepository = FirmwareRepository(
             firmwareRemoteDataSourceMock,
             firmwareLocalDataSourceMock,
-            configManager,
+            configRepository,
         )
 
         mockkStatic("com.simprints.fingerprint.infra.scanner.domain.versions.ScannerHardwareRevisionsKt")

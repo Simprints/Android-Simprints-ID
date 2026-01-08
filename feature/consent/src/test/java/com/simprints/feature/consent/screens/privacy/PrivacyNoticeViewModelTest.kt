@@ -3,9 +3,9 @@ package com.simprints.feature.consent.screens.privacy
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.PrivacyNoticeResult
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
@@ -36,7 +36,7 @@ internal class PrivacyNoticeViewModelTest {
     lateinit var connectivityTracker: ConnectivityTracker
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var authStore: AuthStore
@@ -47,20 +47,20 @@ internal class PrivacyNoticeViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(DEVICE_LANGUAGE, listOf(), "")
-        coEvery { configManager.getProjectConfiguration().general.defaultLanguage } returns DEFAULT_LANGUAGE
+        coEvery { configRepository.getDeviceConfiguration() } returns DeviceConfiguration(DEVICE_LANGUAGE, listOf(), "")
+        coEvery { configRepository.getProjectConfiguration().general.defaultLanguage } returns DEFAULT_LANGUAGE
         every { authStore.signedInProjectId } returns PROJECT_ID
 
         privacyNoticeViewModel = PrivacyNoticeViewModel(
             connectivityTracker,
-            configManager,
+            configRepository,
             authStore,
         )
     }
 
     @Test
     fun `retrievePrivacyNotice should return DownloadInProgress when trying download`() = runTest {
-        coEvery { configManager.getPrivacyNotice(PROJECT_ID, DEVICE_LANGUAGE) } returns flowOf(
+        coEvery { configRepository.getPrivacyNotice(PROJECT_ID, DEVICE_LANGUAGE) } returns flowOf(
             PrivacyNoticeResult.InProgress(DEVICE_LANGUAGE),
         )
 
@@ -73,7 +73,7 @@ internal class PrivacyNoticeViewModelTest {
 
     @Test
     fun `retrievePrivacyNotice should return ContentAvailable when success received`() = runTest {
-        coEvery { configManager.getPrivacyNotice(PROJECT_ID, DEVICE_LANGUAGE) } returns flowOf(
+        coEvery { configRepository.getPrivacyNotice(PROJECT_ID, DEVICE_LANGUAGE) } returns flowOf(
             PrivacyNoticeResult.InProgress(DEVICE_LANGUAGE),
             PrivacyNoticeResult.Succeed(DEVICE_LANGUAGE, "some long consent"),
         )
@@ -87,11 +87,11 @@ internal class PrivacyNoticeViewModelTest {
 
     @Test
     fun `retrievePrivacyNotice should attempt default language when Failed received with initial`() = runTest {
-        coEvery { configManager.getPrivacyNotice(PROJECT_ID, DEVICE_LANGUAGE) } returns flowOf(
+        coEvery { configRepository.getPrivacyNotice(PROJECT_ID, DEVICE_LANGUAGE) } returns flowOf(
             PrivacyNoticeResult.InProgress(DEVICE_LANGUAGE),
             PrivacyNoticeResult.Failed(DEVICE_LANGUAGE, Throwable()),
         )
-        coEvery { configManager.getPrivacyNotice(PROJECT_ID, DEFAULT_LANGUAGE) } returns flowOf(
+        coEvery { configRepository.getPrivacyNotice(PROJECT_ID, DEFAULT_LANGUAGE) } returns flowOf(
             PrivacyNoticeResult.InProgress(DEFAULT_LANGUAGE),
             PrivacyNoticeResult.Succeed(DEFAULT_LANGUAGE, "some long consent"),
         )
@@ -105,7 +105,7 @@ internal class PrivacyNoticeViewModelTest {
 
     @Test
     fun `retrievePrivacyNotice should return BackendMaintenance when FailedBecauseBackendMaintenance received`() = runTest {
-        coEvery { configManager.getPrivacyNotice(PROJECT_ID, DEVICE_LANGUAGE) } returns flowOf(
+        coEvery { configRepository.getPrivacyNotice(PROJECT_ID, DEVICE_LANGUAGE) } returns flowOf(
             PrivacyNoticeResult.InProgress(DEVICE_LANGUAGE),
             PrivacyNoticeResult.FailedBecauseBackendMaintenance(DEVICE_LANGUAGE, Throwable()),
         )
@@ -120,11 +120,11 @@ internal class PrivacyNoticeViewModelTest {
     @Test
     fun `retrievePrivacyNotice should return BackendMaintenance when FailedBecauseBackendMaintenance receivedon default language`() =
         runTest {
-            coEvery { configManager.getPrivacyNotice(PROJECT_ID, DEVICE_LANGUAGE) } returns flowOf(
+            coEvery { configRepository.getPrivacyNotice(PROJECT_ID, DEVICE_LANGUAGE) } returns flowOf(
                 PrivacyNoticeResult.InProgress(DEVICE_LANGUAGE),
                 PrivacyNoticeResult.Failed(DEVICE_LANGUAGE, Throwable()),
             )
-            coEvery { configManager.getPrivacyNotice(PROJECT_ID, DEFAULT_LANGUAGE) } returns flowOf(
+            coEvery { configRepository.getPrivacyNotice(PROJECT_ID, DEFAULT_LANGUAGE) } returns flowOf(
                 PrivacyNoticeResult.InProgress(DEFAULT_LANGUAGE),
                 PrivacyNoticeResult.FailedBecauseBackendMaintenance(DEVICE_LANGUAGE, Throwable()),
             )
@@ -138,7 +138,7 @@ internal class PrivacyNoticeViewModelTest {
 
     @Test
     fun `retrievePrivacyNotice should return BackendMaintenance with estimation when FailedBecauseBackendMaintenance received`() = runTest {
-        coEvery { configManager.getPrivacyNotice(PROJECT_ID, DEVICE_LANGUAGE) } returns flowOf(
+        coEvery { configRepository.getPrivacyNotice(PROJECT_ID, DEVICE_LANGUAGE) } returns flowOf(
             PrivacyNoticeResult.InProgress(DEVICE_LANGUAGE),
             PrivacyNoticeResult.FailedBecauseBackendMaintenance(DEVICE_LANGUAGE, Throwable(), 1000L),
         )
@@ -154,7 +154,7 @@ internal class PrivacyNoticeViewModelTest {
     @Test
     fun `downloadPressed should retrieve notice when online`() = runTest {
         every { connectivityTracker.isConnected() } returns true
-        coEvery { configManager.getPrivacyNotice(PROJECT_ID, DEVICE_LANGUAGE) } returns flowOf(
+        coEvery { configRepository.getPrivacyNotice(PROJECT_ID, DEVICE_LANGUAGE) } returns flowOf(
             PrivacyNoticeResult.InProgress(
                 DEVICE_LANGUAGE,
             ),

@@ -9,10 +9,10 @@ import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.screens.scanqr.usecase.ExternalCredentialQrCodeValidatorUseCase
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -38,7 +38,7 @@ internal class ExternalCredentialScanQrViewModelTest {
     private lateinit var tokenizationProcessor: TokenizationProcessor
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     private lateinit var viewModel: ExternalCredentialScanQrViewModel
 
@@ -49,7 +49,7 @@ internal class ExternalCredentialScanQrViewModelTest {
             timeHelper = timeHelper,
             externalCredentialQrCodeValidator = validator,
             tokenizationProcessor = tokenizationProcessor,
-            configManager = configManager,
+            configRepository = configRepository,
         )
 
         every { timeHelper.now() } returns Timestamp(1L)
@@ -73,7 +73,7 @@ internal class ExternalCredentialScanQrViewModelTest {
         val observer = viewModel.stateLiveData.test()
         val value = "value"
 
-        coEvery { configManager.getProject() } returns null
+        coEvery { configRepository.getProject() } returns null
         viewModel.updateCapturedValue(value)
 
         assertThat(observer.value()).isEqualTo(ScanQrState.ReadyToScan)
@@ -86,7 +86,7 @@ internal class ExternalCredentialScanQrViewModelTest {
         val mockProject = mockk<Project>()
         val mockTokenizedCredential = mockk<TokenizableString.Tokenized>()
 
-        coEvery { configManager.getProject() } returns mockProject
+        coEvery { configRepository.getProject() } returns mockProject
         coEvery { tokenizationProcessor.encrypt(any(), TokenKeyType.ExternalCredential, mockProject) } returns mockTokenizedCredential
 
         viewModel.updateCameraPermissionStatus(permissionStatus = PermissionStatus.Granted) // inits the capture timing

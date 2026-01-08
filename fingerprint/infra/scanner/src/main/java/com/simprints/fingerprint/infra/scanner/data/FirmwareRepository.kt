@@ -5,8 +5,8 @@ import com.simprints.fingerprint.infra.scanner.data.remote.FirmwareRemoteDataSou
 import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVersion.Chip
 import com.simprints.fingerprint.infra.scanner.domain.versions.getMissingVersionsToDownload
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Vero2Configuration.Vero2FirmwareVersions
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
@@ -17,17 +17,17 @@ import javax.inject.Inject
 class FirmwareRepository @Inject internal constructor(
     private val firmwareRemoteDataSource: FirmwareRemoteDataSource,
     private val firmwareLocalDataSource: FirmwareLocalDataSource,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
 ) {
     /**
      * This method is responsible for updating the firmware versions stored locally on the phone. It
      * first checks the local version and matches that against the remote versions, then subsequently updating the local versions that need to be updated.
      */
     suspend fun updateStoredFirmwareFilesWithLatest() {
-        configManager.getProjectConfiguration().fingerprint?.secugenSimMatcher?.vero2?.firmwareVersions?.let {
+        configRepository.getProjectConfiguration().fingerprint?.secugenSimMatcher?.vero2?.firmwareVersions?.let {
             updateStoredFirmwareFilesWithLatest(it)
         }
-        configManager.getProjectConfiguration().fingerprint?.nec?.vero2?.firmwareVersions?.let {
+        configRepository.getProjectConfiguration().fingerprint?.nec?.vero2?.firmwareVersions?.let {
             updateStoredFirmwareFilesWithLatest(it)
         }
     }
@@ -82,14 +82,14 @@ class FirmwareRepository @Inject internal constructor(
         val stmOfficialVersions = mutableSetOf<String>()
         val un20OfficialVersions = mutableSetOf<String>()
 
-        val secuGenFirmwareVersions = configManager
+        val secuGenFirmwareVersions = configRepository
             .getProjectConfiguration()
             .fingerprint
             ?.secugenSimMatcher
             ?.vero2
             ?.firmwareVersions
             ?.entries
-        val necFirmwareVersions = configManager
+        val necFirmwareVersions = configRepository
             .getProjectConfiguration()
             .fingerprint
             ?.nec

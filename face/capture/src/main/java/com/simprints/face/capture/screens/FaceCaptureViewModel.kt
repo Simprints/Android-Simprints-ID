@@ -6,9 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DeviceID
-import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.capture.BiometricTemplateCapture
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
@@ -20,8 +20,8 @@ import com.simprints.face.capture.usecases.ShouldShowInstructionsScreenUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
@@ -47,7 +47,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class FaceCaptureViewModel @Inject constructor(
     private val authStore: AuthStore,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val saveFaceImage: SaveFaceSampleUseCase,
     private val eventReporter: SimpleCaptureEventReporter,
     private val bitmapToByteArray: BitmapToByteArrayUseCase,
@@ -117,7 +117,7 @@ internal class FaceCaptureViewModel @Inject constructor(
                     activity,
                     licenseVendor,
                     LicenseVersion(
-                        configManager
+                        configRepository
                             .getProjectConfiguration()
                             .face
                             ?.rankOne
@@ -174,7 +174,7 @@ internal class FaceCaptureViewModel @Inject constructor(
     fun flowFinished() {
         Simber.i("Finishing capture flow", tag = FACE_CAPTURE)
         viewModelScope.launch {
-            val faceConfiguration = configManager.getProjectConfiguration().face?.getSdkConfiguration(bioSDK)
+            val faceConfiguration = configRepository.getProjectConfiguration().face?.getSdkConfiguration(bioSDK)
             if (faceConfiguration?.imageSavingStrategy?.shouldSaveImage() == true) {
                 saveFaceDetections()
             }

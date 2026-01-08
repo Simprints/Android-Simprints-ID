@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import com.simprints.core.DispatcherBG
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationScheduler
 import com.simprints.infra.sync.config.usecase.HandleProjectStateUseCase
 import com.simprints.infra.sync.config.usecase.RescheduleWorkersIfConfigChangedUseCase
@@ -22,7 +22,7 @@ internal class ProjectConfigDownSyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val authStore: AuthStore,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val handleProjectState: HandleProjectStateUseCase,
     private val rescheduleWorkersIfConfigChanged: RescheduleWorkersIfConfigChangedUseCase,
     private val resetLocalRecordsIfConfigChanged: ResetLocalRecordsIfConfigChangedUseCase,
@@ -37,14 +37,14 @@ internal class ProjectConfigDownSyncWorker @AssistedInject constructor(
         crashlyticsLog("Started")
         try {
             val projectId = authStore.signedInProjectId
-            val oldProject = configManager.getProject()
-            val oldConfig = configManager.getProjectConfiguration()
+            val oldProject = configRepository.getProject()
+            val oldConfig = configRepository.getProjectConfiguration()
 
             // if the user is not signed in, we shouldn't try again
             if (projectId.isEmpty()) {
                 fail(IllegalStateException("User is not signed in"))
             } else {
-                val (project, config) = configManager.refreshProject(projectId)
+                val (project, config) = configRepository.refreshProject(projectId)
                 handleProjectState(project.state)
                 resetLocalRecordsIfConfigChanged(oldConfig, config)
                 realmToRoomMigrationScheduler.scheduleMigrationWorkerIfNeeded()

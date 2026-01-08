@@ -8,8 +8,8 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.exitform.ExitFormResult
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.event.domain.models.ConsentEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -33,7 +33,7 @@ class ConsentViewModelTest {
     private lateinit var timeHelper: TimeHelper
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var projectConfig: ProjectConfiguration
@@ -48,13 +48,13 @@ class ConsentViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        coEvery { configManager.getProjectConfiguration() } returns projectConfig
+        coEvery { configRepository.getProjectConfiguration() } returns projectConfig
         every { projectConfig.consent } returns mockk()
         every { timeHelper.now() } returns TIMESTAMP
 
         vm = ConsentViewModel(
             timeHelper,
-            configManager,
+            configRepository,
             eventRepository,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
@@ -69,7 +69,7 @@ class ConsentViewModelTest {
         vm.loadConfiguration(ConsentType.ENROL)
         val state = vm.viewState.getOrAwaitValue()
 
-        coVerify { configManager.getProjectConfiguration() }
+        coVerify { configRepository.getProjectConfiguration() }
 
         assertThat(state.showLogo).isEqualTo(false)
         assertThat(state.consentTextBuilder).isNotNull()

@@ -13,9 +13,9 @@ import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.experimental
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.*
@@ -48,7 +48,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     lateinit var previewFrame: Bitmap
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var eventReporter: SimpleCaptureEventReporter
@@ -66,7 +66,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
 
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .face
                 ?.getSdkConfiguration(any())
@@ -74,7 +74,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         } returns QUALITY_THRESHOLD
         every { isUsingAutoCapture.invoke(any()) } returns true
         coEvery {
-            configManager.getProjectConfiguration().experimental().singleQualityFallbackRequired
+            configRepository.getProjectConfiguration().experimental().singleQualityFallbackRequired
         } returns false
         every { timeHelper.now() } returnsMany (0..100L).map { Timestamp(it) }
         justRun { previewFrame.recycle() }
@@ -86,7 +86,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
 
         viewModel = LiveFeedbackFragmentViewModel(
             resolveFaceBioSdkUseCase,
-            configManager,
+            configRepository,
             eventReporter,
             timeHelper,
             isUsingAutoCapture,
@@ -294,7 +294,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         val badQuality: Face = getFace(quality = -2f)
 
         coEvery {
-            configManager.getProjectConfiguration().experimental().singleQualityFallbackRequired
+            configRepository.getProjectConfiguration().experimental().singleQualityFallbackRequired
         } returns true
 
         every { faceDetector.analyze(frame) } returnsMany listOf(
@@ -325,7 +325,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     fun `Use default imaging duration when not configured`() = runTest {
         coEvery { faceDetector.analyze(frame) } returns getFace()
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .experimental()
                 .faceAutoCaptureImagingDurationMillis
@@ -352,7 +352,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         val configDuration = 5000L
         coEvery { faceDetector.analyze(frame) } returns getFace()
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .experimental()
                 .faceAutoCaptureImagingDurationMillis

@@ -6,9 +6,9 @@ import com.simprints.core.domain.tokenization.serialization.TokenizationClassNam
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.canCoSyncAllData
 import com.simprints.infra.config.store.models.canCoSyncBiometricData
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
@@ -18,7 +18,7 @@ import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
 internal class GetEnrolmentCreationEventForRecordUseCase @Inject constructor(
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val encoder: EncodingUtils,
     private val jsonHelper: JsonHelper,
@@ -27,7 +27,7 @@ internal class GetEnrolmentCreationEventForRecordUseCase @Inject constructor(
         projectId: String,
         subjectId: String,
     ): String? {
-        val config = configManager.getProjectConfiguration()
+        val config = configRepository.getProjectConfiguration()
 
         if (!config.canCoSyncAllData() && !config.canCoSyncBiometricData()) {
             return null

@@ -10,11 +10,11 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.excepti
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.TooManyModulesSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.ModuleRepository
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
@@ -42,7 +42,7 @@ class ModuleSelectionViewModelTest {
     private lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var tokenizationProcessor: TokenizationProcessor
@@ -64,10 +64,10 @@ class ModuleSelectionViewModelTest {
         )
         coEvery { repository.getModules() } returns modulesDefault
         coEvery { repository.getMaxNumberOfModules() } returns 2
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general.settingsPassword } returns SettingsPasswordConfig.Locked("1234")
         }
-        coEvery { configManager.getProject() } returns project
+        coEvery { configRepository.getProject() } returns project
         modulesDefault.forEach {
             coEvery {
                 tokenizationProcessor.decrypt(
@@ -81,7 +81,7 @@ class ModuleSelectionViewModelTest {
         viewModel = ModuleSelectionViewModel(
             moduleRepository = repository,
             syncOrchestrator = syncOrchestrator,
-            configManager = configManager,
+            configRepository = configRepository,
             tokenizationProcessor = tokenizationProcessor,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
@@ -106,7 +106,7 @@ class ModuleSelectionViewModelTest {
     }
 
     @Test
-    fun `updateModuleSelection should throw a TooManyModulesSelectedException if trying to select more than the maximum number of modules`() {
+    fun `updateModuleSelection should throw a TooManyModulesSelectedException if trying to select more than the maximum modules`() {
         viewModel.updateModuleSelection(Module("b".asTokenizableRaw(), false))
 
         val exception = assertThrows<TooManyModulesSelectedException> {

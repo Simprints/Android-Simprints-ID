@@ -4,9 +4,9 @@ import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.common.Partitioning
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.exceptions.MissingArgumentForDownSyncScopeException
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
@@ -22,7 +22,7 @@ internal class EventDownSyncScopeRepository @Inject constructor(
     private val authStore: AuthStore,
     private val recentUserActivityManager: RecentUserActivityManager,
     private val downSyncOperationOperationDao: DbEventDownSyncOperationStateDao,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val tokenizationProcessor: TokenizationProcessor,
 ) {
     suspend fun getDownSyncScope(
@@ -59,7 +59,7 @@ internal class EventDownSyncScopeRepository @Inject constructor(
             throw MissingArgumentForDownSyncScopeException("UserId required")
         }
         return when (possibleUserId) {
-            is TokenizableString.Raw -> configManager.getProject()?.let { project ->
+            is TokenizableString.Raw -> configRepository.getProject()?.let { project ->
                 tokenizationProcessor
                     .encrypt(decrypted = possibleUserId, tokenKeyType = TokenKeyType.AttendantId, project = project)
                     .value

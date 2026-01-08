@@ -4,9 +4,9 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.sync.ImageSyncStatus
@@ -27,7 +27,7 @@ internal class LogoutSyncViewModelTest {
     lateinit var logoutUseCase: LogoutUseCase
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var eventSyncManager: EventSyncManager
@@ -63,7 +63,7 @@ internal class LogoutSyncViewModelTest {
     @Test
     fun `password config should be fetched after initialization`() {
         val config = SettingsPasswordConfig.Locked(password = "123")
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { settingsPassword } returns config
             }
@@ -148,11 +148,11 @@ internal class LogoutSyncViewModelTest {
         val eventSyncFlow = flowOf(eventSyncState)
         every { eventSyncManager.getLastSyncState(useDefaultValue = true) } returns eventSyncFlow
         every { syncOrchestrator.observeImageSyncStatus() } returns flowOf(imageSyncStatus)
-        every { configManager.observeProjectConfiguration() } returns flowOf(projectConfig)
+        every { configRepository.observeProjectConfiguration() } returns flowOf(projectConfig)
     }
 
     private fun createViewModel() = LogoutSyncViewModel(
-        configManager = configManager,
+        configRepository = configRepository,
         eventSyncManager = eventSyncManager,
         syncOrchestrator = syncOrchestrator,
         authStore = authStore,

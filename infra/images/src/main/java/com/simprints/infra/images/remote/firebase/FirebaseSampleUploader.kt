@@ -6,7 +6,7 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.samples.SampleUpSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 internal class FirebaseSampleUploader @Inject constructor(
     private val timeHelper: TimeHelper,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val authStore: AuthStore,
     private val localDataSource: ImageLocalDataSource,
     private val metadataStore: ImageMetadataStore,
@@ -43,7 +43,7 @@ internal class FirebaseSampleUploader @Inject constructor(
         var allImagesUploaded = true
 
         Simber.i("Starting sample upload to Firebase storage", tag = SAMPLE_UPLOAD)
-        val bucketUrl = configManager.getProject()?.imageBucket
+        val bucketUrl = configRepository.getProject()?.imageBucket
         if (bucketUrl == null) {
             Simber.i("Bucket url is null", tag = SAMPLE_UPLOAD)
             return false

@@ -8,12 +8,12 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.scope.EventScope
@@ -86,7 +86,7 @@ internal class EventUpSyncTaskTest {
     private lateinit var project: Project
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var eventScope: EventScope
@@ -107,11 +107,11 @@ internal class EventUpSyncTaskTest {
             eventDownSyncs = 10,
             sampleUpSyncs = 10,
         )
-        coEvery { configManager.refreshProject(any()) } returns projectWithConfig
+        coEvery { configRepository.refreshProject(any()) } returns projectWithConfig
         every { projectWithConfig.project } returns project
         every { projectWithConfig.configuration } returns projectConfiguration
         every { projectConfiguration.synchronization } returns synchronizationConfiguration
-        coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
+        coEvery { configRepository.getProjectConfiguration() } returns projectConfiguration
 
         eventUpSyncTask = EventUpSyncTask(
             authStore = authStore,
@@ -119,7 +119,7 @@ internal class EventUpSyncTaskTest {
             eventRepository = eventRepo,
             eventRemoteDataSource = eventRemoteDataSource,
             timeHelper = timeHelper,
-            configManager = configManager,
+            configRepository = configRepository,
             jsonHelper = JsonHelper,
             mapDomainEventScopeToApiUseCase = mapDomainEventScopeToApiUseCase,
         )
@@ -330,7 +330,7 @@ internal class EventUpSyncTaskTest {
 
     @Test(expected = IllegalStateException::class)
     fun `should not upload sessions if missing project`() = runTest {
-        coEvery { configManager.getProject() } returns null
+        coEvery { configRepository.getProject() } returns null
         eventUpSyncTask.upSync(operation, eventScope).toList()
     }
 

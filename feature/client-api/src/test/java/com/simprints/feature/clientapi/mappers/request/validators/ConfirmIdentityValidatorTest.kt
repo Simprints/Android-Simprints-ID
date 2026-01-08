@@ -3,8 +3,8 @@ package com.simprints.feature.clientapi.mappers.request.validators
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.mappers.request.requestFactories.ConfirmIdentityActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.RequestActionFactory
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.callback.CallbackComparisonScore
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
@@ -37,7 +37,7 @@ internal class ConfirmIdentityValidatorTest : ActionRequestValidatorTest(Confirm
     private lateinit var mockProjectConfig: ProjectConfiguration
 
     @MockK(relaxed = true)
-    private lateinit var mockConfigManager: ConfigManager
+    private lateinit var mockConfigRepository: ConfigRepository
 
     @Before
     fun setUp() {
@@ -80,7 +80,7 @@ internal class ConfirmIdentityValidatorTest : ActionRequestValidatorTest(Confirm
             extractor,
             RequestActionFactory.MOCK_SESSION_ID,
             mockEventRepository,
-            configManager = mockConfigManager,
+            configRepository = mockConfigRepository,
         )
         assertThrows<InvalidRequestException> {
             validator.validate()
@@ -95,7 +95,7 @@ internal class ConfirmIdentityValidatorTest : ActionRequestValidatorTest(Confirm
             extractor,
             "anotherSessionID",
             mockEventRepository,
-            configManager = mockConfigManager,
+            configRepository = mockConfigRepository,
         )
         assertThrows<InvalidRequestException> {
             validator.validate()
@@ -118,7 +118,7 @@ internal class ConfirmIdentityValidatorTest : ActionRequestValidatorTest(Confirm
             extractor,
             RequestActionFactory.MOCK_SESSION_ID,
             mockEventRepository,
-            configManager = mockConfigManager,
+            configRepository = mockConfigRepository,
         )
 
         // Should not throw
@@ -141,7 +141,7 @@ internal class ConfirmIdentityValidatorTest : ActionRequestValidatorTest(Confirm
             extractor,
             RequestActionFactory.MOCK_SESSION_ID,
             mockEventRepository,
-            configManager = mockConfigManager,
+            configRepository = mockConfigRepository,
         )
 
         assertThrows<InvalidRequestException> {
@@ -163,7 +163,7 @@ internal class ConfirmIdentityValidatorTest : ActionRequestValidatorTest(Confirm
             extractor,
             RequestActionFactory.MOCK_SESSION_ID,
             mockEventRepository,
-            configManager = mockConfigManager,
+            configRepository = mockConfigRepository,
         )
 
         assertThrows<InvalidRequestException> {
@@ -182,7 +182,7 @@ internal class ConfirmIdentityValidatorTest : ActionRequestValidatorTest(Confirm
             extractor,
             RequestActionFactory.MOCK_SESSION_ID,
             mockEventRepository,
-            configManager = mockConfigManager,
+            configRepository = mockConfigRepository,
         )
         // Should not throw
         validator.validate()
@@ -200,13 +200,13 @@ internal class ConfirmIdentityValidatorTest : ActionRequestValidatorTest(Confirm
 
         // Mock ConfigManager with feature flag enabled
         every { mockProjectConfig.custom } returns mapOf("allowConfirmingGuidsNotInCallback" to true)
-        coEvery { mockConfigManager.getProjectConfiguration() } returns mockProjectConfig
+        coEvery { mockConfigRepository.getProjectConfiguration() } returns mockProjectConfig
 
         val validator = ConfirmIdentityValidator(
             extractor,
             RequestActionFactory.MOCK_SESSION_ID,
             mockEventRepository,
-            mockConfigManager,
+            mockConfigRepository,
         )
 
         // Should not throw despite GUID not being in results
@@ -225,13 +225,13 @@ internal class ConfirmIdentityValidatorTest : ActionRequestValidatorTest(Confirm
 
         // Mock ConfigManager with feature flag disabled
         every { mockProjectConfig.custom } returns mapOf("allowConfirmingGuidsNotInCallback" to false)
-        coEvery { mockConfigManager.getProjectConfiguration() } returns mockProjectConfig
+        coEvery { mockConfigRepository.getProjectConfiguration() } returns mockProjectConfig
 
         val validator = ConfirmIdentityValidator(
             extractor,
             RequestActionFactory.MOCK_SESSION_ID,
             mockEventRepository,
-            mockConfigManager,
+            mockConfigRepository,
         )
 
         // Should throw because GUID is not in results and flag is disabled

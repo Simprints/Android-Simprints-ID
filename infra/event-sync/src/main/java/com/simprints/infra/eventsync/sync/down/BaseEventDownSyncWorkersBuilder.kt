@@ -6,7 +6,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkRequest
 import androidx.work.workDataOf
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.sync.MIN_BACKOFF_SECS
@@ -24,9 +24,8 @@ import java.util.concurrent.TimeUnit
 internal abstract class BaseEventDownSyncWorkersBuilder(
     protected val downSyncScopeRepository: EventDownSyncScopeRepository,
     protected val jsonHelper: JsonHelper,
-    protected val configManager: ConfigManager,
+    protected val configRepository: ConfigRepository,
 ) {
-
     abstract fun getWorkerClass(): Class<out BaseEventDownSyncDownloaderWorker>
 
     abstract fun getDownSyncWorkerConstraints(): Constraints

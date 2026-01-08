@@ -2,16 +2,16 @@ package com.simprints.infra.eventsync.sync.down
 
 import androidx.work.WorkRequest
 import androidx.work.workDataOf
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.common.Partitioning
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.SampleSyncScopes
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
@@ -24,11 +24,8 @@ import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.INPUT_EVENT_DOWN_SYNC_SCOPE_ID
 import com.simprints.infra.eventsync.sync.down.workers.SimprintsEventDownSyncDownloaderWorker
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -45,7 +42,7 @@ class SimprintsEventDownSyncWorkersBuilderTest {
     private lateinit var downSyncConfiguration: DownSynchronizationConfiguration
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
@@ -56,12 +53,12 @@ class SimprintsEventDownSyncWorkersBuilderTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
+        coEvery { configRepository.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             SELECTED_MODULE,
             "",
         )
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general } returns generalConfiguration
             every { synchronization } returns mockk {
                 every { down } returns downSyncConfiguration
@@ -71,7 +68,7 @@ class SimprintsEventDownSyncWorkersBuilderTest {
         eventDownSyncWorkersBuilder = SimprintsEventDownSyncWorkersBuilder(
             eventDownSyncScopeRepository,
             JsonHelper,
-            configManager,
+            configRepository,
         )
     }
 

@@ -9,11 +9,11 @@ import com.simprints.core.DeviceID
 import com.simprints.core.domain.common.Modality
 import com.simprints.feature.setup.LocationStore
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
@@ -27,7 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class SetupViewModel @Inject constructor(
     private val locationStore: LocationStore,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val licenseRepository: LicenseRepository,
     @param:DeviceID private val deviceID: String,
     private val authStore: AuthStore,
@@ -112,7 +112,7 @@ internal class SetupViewModel @Inject constructor(
 
     private fun downloadRequiredLicenses() {
         viewModelScope.launch {
-            requiredLicenses = configManager.getProjectConfiguration().requiredLicenses
+            requiredLicenses = configRepository.getProjectConfiguration().requiredLicenses
 
             // if there are no required licenses, then the setup is complete
             if (requiredLicenses.isEmpty()) {
@@ -144,9 +144,9 @@ internal class SetupViewModel @Inject constructor(
         }
     }
 
-    private suspend fun shouldCollectLocation() = configManager.getProjectConfiguration().general.collectLocation
+    private suspend fun shouldCollectLocation() = configRepository.getProjectConfiguration().general.collectLocation
 
-    private suspend fun shouldRequestCommCarePermission() = configManager.getProjectConfiguration().isCommCareEventDownSyncAllowed()
+    private suspend fun shouldRequestCommCarePermission() = configRepository.getProjectConfiguration().isCommCareEventDownSyncAllowed()
 
     private fun shouldRequestNotificationPermission() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
 }

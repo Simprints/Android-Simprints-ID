@@ -4,11 +4,11 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -27,7 +27,7 @@ class ProjectDetailsViewModelTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var tokenizationProcessor: TokenizationProcessor
@@ -46,7 +46,7 @@ class ProjectDetailsViewModelTest {
 
     @Test
     fun `should initialize the live data correctly`() = runTest {
-        coEvery { configManager.getProject() } returns PROJECT
+        coEvery { configRepository.getProject() } returns PROJECT
         every {
             tokenizationProcessor.decrypt(
                 RECENT_USER_ACTIVITY.lastUserUsed as TokenizableString.Tokenized,
@@ -56,7 +56,7 @@ class ProjectDetailsViewModelTest {
         } returns RECENT_USER_ACTIVITY.lastUserUsed
 
         viewModel = ProjectDetailsViewModel(
-            configManager = configManager,
+            configRepository = configRepository,
             recentUserActivityManager = recentUserActivityManager,
             tokenizationProcessor = tokenizationProcessor,
         )
@@ -67,10 +67,10 @@ class ProjectDetailsViewModelTest {
 
     @Test
     fun `Should handle exception by producing correct state`() = runTest {
-        coEvery { configManager.getProject() } returns null
+        coEvery { configRepository.getProject() } returns null
 
         viewModel = ProjectDetailsViewModel(
-            configManager = configManager,
+            configRepository = configRepository,
             recentUserActivityManager = recentUserActivityManager,
             tokenizationProcessor = tokenizationProcessor,
         )

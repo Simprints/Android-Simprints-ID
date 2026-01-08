@@ -8,10 +8,10 @@ import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.getModalitySdkConfig
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.matching.MatchParams
 import com.simprints.infra.matching.MatchResult
 import com.simprints.infra.matching.usecase.FaceMatcherUseCase
@@ -28,7 +28,7 @@ internal class MatchViewModel @Inject constructor(
     private val faceMatcher: FaceMatcherUseCase,
     private val fingerprintMatcher: FingerprintMatcherUseCase,
     private val saveMatchEvent: SaveMatchEventUseCase,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val timeHelper: TimeHelper,
 ) : ViewModel() {
     var isMatcherRunning = false
@@ -57,7 +57,7 @@ internal class MatchViewModel @Inject constructor(
             is FaceConfiguration.BioSdk -> faceMatcher
             else -> fingerprintMatcher
         }
-        val project = configManager.getProject() ?: return@launch
+        val project = configRepository.getProject() ?: return@launch
         val decisionPolicy = getDecisionPolicy(params)
 
         candidatesLoaded = 0
@@ -98,7 +98,7 @@ internal class MatchViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getDecisionPolicy(params: MatchParams): DecisionPolicy = configManager
+    private suspend fun getDecisionPolicy(params: MatchParams): DecisionPolicy = configRepository
         .getProjectConfiguration()
         .getModalitySdkConfig(params.bioSdk)
         ?.decisionPolicy

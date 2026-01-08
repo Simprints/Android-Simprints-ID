@@ -2,7 +2,7 @@ package com.simprints.feature.troubleshooting.overview.usecase
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.sync.ConfigSyncCache
+import com.simprints.infra.config.store.ConfigSyncCache
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every

@@ -6,8 +6,8 @@ import com.simprints.core.domain.common.Partitioning
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODES
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULES
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -60,7 +60,7 @@ internal class EventDownSyncScopeRepositoryTest {
     lateinit var downSyncOperationOperationDao: DbEventDownSyncOperationStateDao
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var tokenizationProcessor: TokenizationProcessor
@@ -78,7 +78,7 @@ internal class EventDownSyncScopeRepositoryTest {
                 authStore,
                 recentUserActivityManager,
                 downSyncOperationOperationDao,
-                configManager,
+                configRepository,
                 tokenizationProcessor,
             )
 

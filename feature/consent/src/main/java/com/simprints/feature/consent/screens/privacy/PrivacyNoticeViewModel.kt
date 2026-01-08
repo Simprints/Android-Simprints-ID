@@ -8,12 +8,12 @@ import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.utils.TimeUtils
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.PrivacyNoticeResult
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.Failed
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.FailedBecauseBackendMaintenance
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.InProgress
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.Succeed
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.ConnectivityTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class PrivacyNoticeViewModel @Inject constructor(
     private val connectivityTracker: ConnectivityTracker,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val authStore: AuthStore,
 ) : ViewModel() {
     private val _viewState = MutableLiveData<PrivacyNoticeState>()
@@ -49,8 +49,8 @@ internal class PrivacyNoticeViewModel @Inject constructor(
 
     fun retrievePrivacyNotice() = viewModelScope.launch {
         val projectId = authStore.signedInProjectId
-        val deviceLanguage = configManager.getDeviceConfiguration().language
-        val defaultLanguage = configManager.getProjectConfiguration().general.defaultLanguage
+        val deviceLanguage = configRepository.getDeviceConfiguration().language
+        val defaultLanguage = configRepository.getProjectConfiguration().general.defaultLanguage
 
         attemptDownloadingLanguage(projectId, deviceLanguage)
             .flatMapLatest {
@@ -71,7 +71,7 @@ internal class PrivacyNoticeViewModel @Inject constructor(
     private fun attemptDownloadingLanguage(
         projectId: String,
         deviceLanguage: String,
-    ): Flow<PrivacyNoticeState> = configManager.getPrivacyNotice(projectId, deviceLanguage).map { it.toPrivacyNoticeViewState() }
+    ): Flow<PrivacyNoticeState> = configRepository.getPrivacyNotice(projectId, deviceLanguage).map { it.toPrivacyNoticeViewState() }
 
     private fun PrivacyNoticeResult.toPrivacyNoticeViewState(): PrivacyNoticeState = when (this) {
         is Succeed -> PrivacyNoticeState.ConsentAvailable(consent)

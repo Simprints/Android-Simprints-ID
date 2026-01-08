@@ -4,11 +4,11 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
+import com.simprints.core.domain.capture.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricTemplateCapture
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.capture.BiometricReferenceCapture
-import com.simprints.core.domain.capture.BiometricTemplateCapture
 import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.step.StepParams
@@ -35,10 +35,10 @@ import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.setup.LocationStore
 import com.simprints.feature.setup.SetupResult
 import com.simprints.fingerprint.capture.FingerprintCaptureContract
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.NEC
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
@@ -63,7 +63,7 @@ internal class OrchestratorViewModelTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var cache: OrchestratorCache
@@ -96,7 +96,7 @@ internal class OrchestratorViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
 
         viewModel = OrchestratorViewModel(
-            configManager,
+            configRepository,
             cache,
             locationStore,
             stepsBuilder,
@@ -364,16 +364,16 @@ internal class OrchestratorViewModelTest {
             mockk(),
         )
         val id = "projectId"
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { projectId } returns id
             every { general.modalities } returns emptyList() andThen projectModalities
         }
-        coEvery { configManager.getProject() } returns mockk()
+        coEvery { configRepository.getProject() } returns mockk()
 
         viewModel.handleAction(mockk())
         viewModel.restoreModalitiesIfNeeded()
 
-        coVerify(exactly = 3) { configManager.getProjectConfiguration() }
+        coVerify(exactly = 3) { configRepository.getProjectConfiguration() }
     }
 
     @Test
@@ -383,16 +383,16 @@ internal class OrchestratorViewModelTest {
             mockk(),
         )
         val id = "projectId"
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { projectId } returns id
             every { general.modalities } returns projectModalities
         }
-        coEvery { configManager.getProject() } returns mockk()
+        coEvery { configRepository.getProject() } returns mockk()
 
         viewModel.handleAction(mockk())
         viewModel.restoreModalitiesIfNeeded()
 
-        coVerify(exactly = 2) { configManager.getProjectConfiguration() }
+        coVerify(exactly = 2) { configRepository.getProjectConfiguration() }
     }
 
     @Test

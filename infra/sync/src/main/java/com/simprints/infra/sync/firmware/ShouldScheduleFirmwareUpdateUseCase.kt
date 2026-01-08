@@ -1,13 +1,13 @@
 package com.simprints.infra.sync.firmware
 
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import javax.inject.Inject
 
 class ShouldScheduleFirmwareUpdateUseCase @Inject constructor(
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
 ) {
-    suspend operator fun invoke(): Boolean = configManager
+    suspend operator fun invoke(): Boolean = configRepository
         .getProjectConfiguration()
         .fingerprint
         ?.allowedScanners

@@ -4,8 +4,8 @@ import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
 import com.simprints.infra.events.event.domain.models.MatchEntry
@@ -21,7 +21,7 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerCo
 
 class SaveMatchEventUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     @param:SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
     operator fun invoke(
@@ -63,7 +63,7 @@ class SaveMatchEventUseCase @Inject constructor(
         }
     }
 
-    private suspend fun getFingerprintComparisonStrategy(bioSdk: FingerprintConfiguration.BioSdk) = configManager
+    private suspend fun getFingerprintComparisonStrategy(bioSdk: FingerprintConfiguration.BioSdk) = configRepository
         .getProjectConfiguration()
         .fingerprint
         ?.getSdkConfiguration(bioSdk)

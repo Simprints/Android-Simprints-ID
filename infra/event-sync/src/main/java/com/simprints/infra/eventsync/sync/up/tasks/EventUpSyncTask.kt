@@ -7,12 +7,12 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.canSyncAllDataToSimprints
 import com.simprints.infra.config.store.models.canSyncAnalyticsDataToSimprints
 import com.simprints.infra.config.store.models.canSyncBiometricDataToSimprints
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
@@ -57,7 +57,7 @@ internal class EventUpSyncTask @Inject constructor(
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val mapDomainEventScopeToApiUseCase: MapDomainEventScopeToApiUseCase,
     private val timeHelper: TimeHelper,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val jsonHelper: JsonHelper,
 ) {
     fun upSync(
@@ -70,8 +70,8 @@ internal class EventUpSyncTask @Inject constructor(
             }
         }
 
-        val project = configManager.getProject() ?: throw IllegalStateException("Project is missing")
-        val config = configManager.getProjectConfiguration()
+        val project = configRepository.getProject() ?: throw IllegalStateException("Project is missing")
+        val config = configRepository.getProjectConfiguration()
         var lastOperation = operation.copy()
         var isUsefulUpload = false
 

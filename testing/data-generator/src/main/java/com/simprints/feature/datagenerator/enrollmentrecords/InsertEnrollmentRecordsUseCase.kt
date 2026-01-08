@@ -3,9 +3,9 @@ package com.simprints.feature.datagenerator.enrollmentrecords
 import android.os.Bundle
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.ConfigRepository
@@ -35,7 +35,7 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
         firstSubjectId: String,
         fingerOrder: Bundle?,
     ): Flow<String> = flow {
-        val project = configRepository.getProject()
+        val project = configRepository.getProject() ?: return@flow
         val tokenizedModuleId = moduleId.asTokenizableEncrypted()
         val tokenizedAttendantId = attendantId.asTokenizableEncrypted()
         val creationDate = timeHelper.now().ms.toDate()

@@ -16,8 +16,8 @@ import com.simprints.feature.logincheck.usecases.StartBackgroundSyncUseCase
 import com.simprints.feature.logincheck.usecases.UpdateProjectInCurrentSessionUseCase
 import com.simprints.feature.logincheck.usecases.UpdateSessionScopePayloadUseCase
 import com.simprints.feature.logincheck.usecases.UpdateStoredUserIdUseCase
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectState
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationScheduler
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
@@ -56,7 +56,7 @@ internal class LoginCheckViewModelTest {
     lateinit var isUserSignedInUseCase: IsUserSignedInUseCase
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var startBackgroundSync: StartBackgroundSyncUseCase
@@ -92,7 +92,7 @@ internal class LoginCheckViewModelTest {
             extractParametersForCrashReport = extractCrashKeysUseCase,
             addAuthorizationEvent = addAuthorizationEventUseCase,
             isUserSignedIn = isUserSignedInUseCase,
-            configManager = configManager,
+            configRepository = configRepository,
             startBackgroundSync = startBackgroundSync,
             syncOrchestrator = syncOrchestrator,
             updateDatabaseCountsInCurrentSession = updateSessionScopePayloadUseCase,
@@ -269,7 +269,7 @@ internal class LoginCheckViewModelTest {
         viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
         viewModel.handleLoginResult(LoginResult(true, null))
 
-        coVerify { configManager.getProject() }
+        coVerify { configRepository.getProject() }
     }
 
     @Test
@@ -278,13 +278,13 @@ internal class LoginCheckViewModelTest {
 
         viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
 
-        coVerify { configManager.getProject() }
+        coVerify { configRepository.getProject() }
     }
 
     @Test
     fun `Triggers alert if project is paused`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
-        coEvery { configManager.getProject()?.state } returns ProjectState.PROJECT_PAUSED
+        coEvery { configRepository.getProject()?.state } returns ProjectState.PROJECT_PAUSED
 
         viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
 
@@ -295,7 +295,7 @@ internal class LoginCheckViewModelTest {
 
     @Test
     fun `Triggers alert if project is not available`() = runTest {
-        coEvery { configManager.getProject() } returns null
+        coEvery { configRepository.getProject() } returns null
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
 
         viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
@@ -308,7 +308,7 @@ internal class LoginCheckViewModelTest {
     @Test
     fun `Triggers alert if project is ending`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
-        coEvery { configManager.getProject()?.state } returns ProjectState.PROJECT_ENDING
+        coEvery { configRepository.getProject()?.state } returns ProjectState.PROJECT_ENDING
 
         viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
 
@@ -320,7 +320,7 @@ internal class LoginCheckViewModelTest {
     @Test
     fun `Triggers login attempt if project has ended`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
-        coEvery { configManager.getProject()?.state } returns ProjectState.PROJECT_ENDED
+        coEvery { configRepository.getProject()?.state } returns ProjectState.PROJECT_ENDED
 
         viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
 
@@ -332,7 +332,7 @@ internal class LoginCheckViewModelTest {
     @Test
     fun `Correctly handles if user signed in active project`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
-        coEvery { configManager.getProject()?.state } returns ProjectState.RUNNING
+        coEvery { configRepository.getProject()?.state } returns ProjectState.RUNNING
 
         viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
 

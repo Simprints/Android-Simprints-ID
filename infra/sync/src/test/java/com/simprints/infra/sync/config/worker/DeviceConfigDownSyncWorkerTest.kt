@@ -3,9 +3,9 @@ package com.simprints.infra.sync.config.worker
 import android.os.PowerManager
 import androidx.work.ListenableWorker
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceState
 import com.simprints.infra.config.store.models.UpSyncEnrolmentRecords
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.config.usecase.LogoutUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -23,7 +23,7 @@ import org.junit.Test
 
 class DeviceConfigDownSyncWorkerTest {
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var logoutUseCase: LogoutUseCase
@@ -47,7 +47,7 @@ class DeviceConfigDownSyncWorkerTest {
                 }
             },
             params = mockk(relaxed = true),
-            configManager = configManager,
+            configRepository = configRepository,
             logoutUseCase = logoutUseCase,
             syncOrchestrator = syncOrchestrator,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,
@@ -56,7 +56,7 @@ class DeviceConfigDownSyncWorkerTest {
 
     @Test
     fun `Should succeed if not compromised`() = runTest {
-        coEvery { configManager.getDeviceState() } returns DeviceState(
+        coEvery { configRepository.getDeviceState() } returns DeviceState(
             "deviceId",
             false,
         )
@@ -70,7 +70,7 @@ class DeviceConfigDownSyncWorkerTest {
 
     @Test
     fun `Should log out if compromised`() = runTest {
-        coEvery { configManager.getDeviceState() } returns DeviceState(
+        coEvery { configRepository.getDeviceState() } returns DeviceState(
             "deviceId",
             true,
             UpSyncEnrolmentRecords("id", listOf("subjectId")),
@@ -85,7 +85,7 @@ class DeviceConfigDownSyncWorkerTest {
 
     @Test
     fun `Should schedule record upload if not compromised`() = runTest {
-        coEvery { configManager.getDeviceState() } returns DeviceState(
+        coEvery { configRepository.getDeviceState() } returns DeviceState(
             "deviceId",
             false,
             UpSyncEnrolmentRecords("id", listOf("subjectId")),

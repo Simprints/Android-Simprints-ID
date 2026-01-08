@@ -12,9 +12,9 @@ import com.simprints.feature.dashboard.settings.syncinfo.usecase.ObserveSyncInfo
 import com.simprints.feature.login.LoginParams
 import com.simprints.feature.login.LoginResult
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.sync.SyncOrchestrator
@@ -38,7 +38,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class SyncInfoViewModel @Inject constructor(
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val authStore: AuthStore,
     private val eventSyncManager: EventSyncManager,
     private val syncOrchestrator: SyncOrchestrator,
@@ -144,7 +144,7 @@ internal class SyncInfoViewModel @Inject constructor(
 
             syncOrchestrator.stopEventSync()
 
-            val isDownSyncAllowed = !isPreLogoutUpSync && configManager.getProject()?.state == ProjectState.RUNNING
+            val isDownSyncAllowed = !isPreLogoutUpSync && configRepository.getProject()?.state == ProjectState.RUNNING
             syncOrchestrator.startEventSync(isDownSyncAllowed)
         }
     }
@@ -191,7 +191,7 @@ internal class SyncInfoViewModel @Inject constructor(
 
             val isForceEventSync = when {
                 isPreLogoutUpSync -> true
-                configManager.isModuleSelectionRequired() -> false
+                configRepository.isModuleSelectionRequired() -> false
                 isRunning -> false
                 lastUpdate == null -> true
                 timeHelper.msBetweenNowAndTime(lastUpdate) > RE_SYNC_TIMEOUT_MILLIS -> true
@@ -244,7 +244,7 @@ internal class SyncInfoViewModel @Inject constructor(
         ),
     )
 
-    private suspend fun ConfigManager.isModuleSelectionRequired() =
+    private suspend fun ConfigRepository.isModuleSelectionRequired() =
         getProjectConfiguration().isModuleSelectionAvailable() && getDeviceConfiguration().selectedModules.isEmpty()
 
     private companion object {

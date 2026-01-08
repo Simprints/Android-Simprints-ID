@@ -16,10 +16,10 @@ import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetCrede
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.KeepOnlyBestDetectedBlockUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.NormalizeBitmapToPreviewUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ZoomOntoCredentialUseCase
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.credential.store.CredentialImageRepository
 import com.simprints.infra.resources.R
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -62,7 +62,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
     private lateinit var tokenizationProcessor: TokenizationProcessor
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var bitmap: Bitmap
@@ -93,7 +93,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
         credentialImageRepository = credentialImageRepository,
         bgDispatcher = testCoroutineRule.testCoroutineDispatcher,
         tokenizationProcessor = tokenizationProcessor,
-        configManager = configManager,
+        configRepository = configRepository,
     )
 
     @Test
@@ -143,7 +143,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
             every { this@mockk.readoutValue } returns readoutValue
         }
 
-        coEvery { configManager.getProject() } returns mockProject
+        coEvery { configRepository.getProject() } returns mockProject
         coEvery { keepOnlyBestDetectedBlockUseCase(any(), documentType) } returns mockBestBlock
         coEvery { tokenizationProcessor.encrypt(any(), TokenKeyType.ExternalCredential, mockProject) } returns mockTokenizedCredential
         coEvery { zoomOntoCredentialUseCase(detectedBlockImagePath, mockBoundingBox) } returns mockBitmap
@@ -179,7 +179,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
             every { this@mockk.readoutValue } returns readoutValue
         }
 
-        coEvery { configManager.getProject() } returns mockProject
+        coEvery { configRepository.getProject() } returns mockProject
         coEvery { keepOnlyBestDetectedBlockUseCase(any(), documentType) } returns mockBestBlock
         coEvery { tokenizationProcessor.encrypt(any(), TokenKeyType.ExternalCredential, mockProject) } returns mockTokenizedCredential
         coEvery { zoomOntoCredentialUseCase(detectedBlockImagePath, mockBoundingBox) } throws Exception("Zoom failed")

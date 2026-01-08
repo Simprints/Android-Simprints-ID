@@ -14,8 +14,8 @@ import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.consent.screens.consent.helpers.GeneralConsentTextHelper
 import com.simprints.feature.consent.screens.consent.helpers.ParentalConsentTextHelper
 import com.simprints.feature.exitform.ExitFormResult
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.event.domain.models.ConsentEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class ConsentViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val eventRepository: SessionEventRepository,
     @param:SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) : ViewModel() {
@@ -48,7 +48,7 @@ internal class ConsentViewModel @Inject constructor(
 
     fun loadConfiguration(consentType: ConsentType) {
         viewModelScope.launch {
-            val projectConfig = configManager.getProjectConfiguration()
+            val projectConfig = configRepository.getProjectConfiguration()
             _viewState.postValue(
                 mapConfigToViewState(
                     projectConfig = projectConfig,

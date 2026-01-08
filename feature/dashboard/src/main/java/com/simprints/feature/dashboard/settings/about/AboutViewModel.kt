@@ -10,9 +10,9 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.feature.troubleshooting.AutoResettingClickCounter
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class AboutViewModel @Inject constructor(
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val logoutUseCase: LogoutUseCase,
     private val eventSyncManager: EventSyncManager,
     private val recentUserActivityManager: RecentUserActivityManager,
@@ -80,10 +80,10 @@ internal class AboutViewModel @Inject constructor(
 
     private suspend fun hasEventsToUpload(): Boolean = eventSyncManager.countEventsToUpload().first() > 0
 
-    private suspend fun canSyncDataToSimprints(): Boolean = configManager.getProjectConfiguration().canSyncDataToSimprints()
+    private suspend fun canSyncDataToSimprints(): Boolean = configRepository.getProjectConfiguration().canSyncDataToSimprints()
 
     private fun load() = viewModelScope.launch {
-        val configuration = configManager.getProjectConfiguration()
+        val configuration = configRepository.getProjectConfiguration()
         val syncAndSearchConfig = SyncAndSearchConfig(
             configuration.synchronization.down.simprints
                 ?.partitionType

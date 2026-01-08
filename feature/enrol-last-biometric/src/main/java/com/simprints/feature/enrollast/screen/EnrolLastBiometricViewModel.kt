@@ -17,9 +17,9 @@ import com.simprints.feature.enrollast.screen.usecase.CheckForDuplicateEnrolment
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
 import com.simprints.feature.externalcredential.usecase.ResetExternalCredentialsInSessionUseCase
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
@@ -37,7 +37,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class EnrolLastBiometricViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val eventRepository: SessionEventRepository,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val checkForDuplicateEnrolments: CheckForDuplicateEnrolmentsUseCase,
@@ -76,8 +76,8 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
     ) = viewModelScope.launch {
         enrolWasAttempted = true
 
-        val projectConfig = configManager.getProjectConfiguration()
-        val project = configManager.getProject()
+        val projectConfig = configRepository.getProjectConfiguration()
+        val project = configRepository.getProject()
         if (project == null) {
             _finish.send(EnrolLastState.Failed(GENERAL_ERROR, emptyList()))
             return@launch
@@ -112,7 +112,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
     }
 
     private suspend fun displayAddCredentialDialog(scannedCredential: ScannedCredential) {
-        val project = configManager.getProject() ?: return
+        val project = configRepository.getProject() ?: return
         val decrypted = tokenizationProcessor.decrypt(
             encrypted = scannedCredential.credential,
             tokenKeyType = TokenKeyType.ExternalCredential,

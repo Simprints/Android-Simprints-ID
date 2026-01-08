@@ -11,10 +11,10 @@ import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.matching.MatchBatchInfo
 import com.simprints.infra.matching.MatchParams
@@ -58,7 +58,7 @@ internal class MatchViewModelTest {
     lateinit var timeHelper: TimeHelper
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     private lateinit var cb1: CapturingSlot<(Int) -> Unit>
     private lateinit var viewModel: MatchViewModel
@@ -75,7 +75,7 @@ internal class MatchViewModelTest {
             faceMatcherUseCase,
             fingerprintMatcherUseCase,
             saveMatchEvent,
-            configManager,
+            configRepository,
             timeHelper,
         )
     }
@@ -131,7 +131,7 @@ internal class MatchViewModelTest {
     @Test
     fun `Handle face match request correctly`() = runTest {
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .face
                 ?.rankOne
@@ -224,7 +224,7 @@ internal class MatchViewModelTest {
     @Test
     fun `Handle fingerprint match request correctly`() = runTest {
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .fingerprint
                 ?.secugenSimMatcher
@@ -319,7 +319,7 @@ internal class MatchViewModelTest {
     @Test
     fun `Handle missing decision policy`() = runTest {
         coEvery {
-            configManager
+            configRepository
                 .getProjectConfiguration()
                 .face
                 ?.rankOne

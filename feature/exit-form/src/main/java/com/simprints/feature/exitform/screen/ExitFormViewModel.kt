@@ -12,8 +12,7 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.exitform.ExitFormOption
-import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.event.domain.models.RefusalEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.logging.Simber
@@ -24,7 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class ExitFormViewModel @Inject constructor(
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val timeHelper: TimeHelper,
     private val eventRepository: SessionEventRepository,
     @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
@@ -75,7 +74,7 @@ internal class ExitFormViewModel @Inject constructor(
 
     fun start() {
         viewModelScope.launch {
-            val projectConfig = configManager.getProjectConfiguration()
+            val projectConfig = configRepository.getProjectConfiguration()
             if (projectConfig.general.modalities.contains(Modality.FINGERPRINT)) {
                 val options = DEFAULT_OPTIONS.toMutableSet()
                 options.remove(ExitFormOption.AppNotWorking)
