@@ -3,6 +3,8 @@ package com.simprints.feature.externalcredential.screens.search.usecase
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
@@ -15,6 +17,7 @@ import com.simprints.infra.matching.MatchResultItem
 import com.simprints.infra.matching.usecase.FaceMatcherUseCase
 import com.simprints.infra.matching.usecase.FingerprintMatcherUseCase
 import com.simprints.infra.matching.usecase.MatcherUseCase.MatcherState
+import com.simprints.infra.matching.usecase.SaveMatchEventUseCase
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.flowOf
@@ -33,6 +36,12 @@ internal class MatchCandidatesUseCaseTest {
 
     @MockK
     private lateinit var fingerprintMatcher: FingerprintMatcherUseCase
+
+    @MockK
+    private lateinit var saveMatchEvent: SaveMatchEventUseCase
+
+    @MockK
+    private lateinit var timeHelper: TimeHelper
 
     @MockK
     private lateinit var subject: Subject
@@ -88,7 +97,11 @@ internal class MatchCandidatesUseCaseTest {
             createMatchParamsUseCase = createMatchParamsUseCase,
             faceMatcher = faceMatcher,
             fingerprintMatcher = fingerprintMatcher,
+            saveMatchEvent = saveMatchEvent,
+            timeHelper = timeHelper,
         )
+
+        every { timeHelper.now() } returns Timestamp(1L)
 
         every { subject.subjectId } returns subjectId
         every { externalCredentialParams.probeReferenceId } returns probeReferenceId
@@ -274,5 +287,76 @@ internal class MatchCandidatesUseCaseTest {
             projectConfig = projectConfig,
         )
         assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun `track match events when comparing fingerprint candidates`() = runTest {
+        initMatchParams(isFace = false)
+        useCase.invoke(
+            candidates = listOf(subject),
+            credential = credential,
+            externalCredentialParams = externalCredentialParams,
+            project = project,
+            projectConfig = projectConfig,
+        )
+
+        coVerify(exactly = 1) {
+            saveMatchEvent.invoke(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+            )
+        }
+    }
+
+    @Test
+    fun `track match events when comparing face candidates`() = runTest {
+        initMatchParams(isFace = true)
+        useCase.invoke(
+            candidates = listOf(subject),
+            credential = credential,
+            externalCredentialParams = externalCredentialParams,
+            project = project,
+            projectConfig = projectConfig,
+        )
+
+        coVerify(exactly = 1) {
+            saveMatchEvent.invoke(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+            )
+        }
+    }
+
+    @Test
+    fun `does not track match events when no candidates`() = runTest {
+        useCase.invoke(
+            candidates = emptyList(),
+            credential = credential,
+            externalCredentialParams = externalCredentialParams,
+            project = project,
+            projectConfig = projectConfig,
+        )
+
+        coVerify(exactly = 0) {
+            saveMatchEvent.invoke(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+            )
+        }
     }
 }

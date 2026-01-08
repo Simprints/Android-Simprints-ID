@@ -1,6 +1,7 @@
 package com.simprints.feature.externalcredential.screens.search.usecase
 
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.infra.config.store.models.Project
@@ -9,6 +10,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.matching.usecase.FaceMatcherUseCase
 import com.simprints.infra.matching.usecase.FingerprintMatcherUseCase
 import com.simprints.infra.matching.usecase.MatcherUseCase.MatcherState
+import com.simprints.infra.matching.usecase.SaveMatchEventUseCase
 import kotlinx.coroutines.flow.last
 import javax.inject.Inject
 
@@ -16,6 +18,8 @@ internal class MatchCandidatesUseCase @Inject constructor(
     private val createMatchParamsUseCase: CreateMatchParamsUseCase,
     private val faceMatcher: FaceMatcherUseCase,
     private val fingerprintMatcher: FingerprintMatcherUseCase,
+    private val saveMatchEvent: SaveMatchEventUseCase,
+    private val timeHelper: TimeHelper,
 ) {
     suspend operator fun invoke(
         candidates: List<Subject>,
@@ -35,40 +39,66 @@ internal class MatchCandidatesUseCase @Inject constructor(
         )
         matchParams
             .mapNotNull { matchParams ->
+
+                val startTime = timeHelper.now()
                 when {
                     matchParams.probeFaceSamples.isNotEmpty() -> {
                         val faceSdk = matchParams.faceSDK ?: return@mapNotNull null
                         projectConfig.face?.getSdkConfiguration(faceSdk)?.verificationMatchThreshold?.let { matchThreshold ->
-                            (faceMatcher(matchParams, project).last() as? MatcherState.Success)
-                                ?.matchResultItems
-                                .orEmpty()
-                                .map { result ->
-                                    CredentialMatch(
-                                        credential = credential,
-                                        matchResult = result,
-                                        verificationThreshold = matchThreshold,
-                                        faceBioSdk = faceSdk,
-                                        fingerprintBioSdk = null,
-                                    )
-                                }
+                            (faceMatcher(matchParams, project).last() as? MatcherState.Success)?.let { lastMatchSuccess ->
+                                val endTime = timeHelper.now()
+                                saveMatchEvent(
+                                    startTime,
+                                    endTime,
+                                    matchParams,
+                                    lastMatchSuccess.totalCandidates,
+                                    lastMatchSuccess.matcherName,
+                                    lastMatchSuccess.matchResultItems,
+                                    lastMatchSuccess.matchBatches,
+                                )
+
+                                lastMatchSuccess
+                                    .matchResultItems
+                                    .map { result ->
+                                        CredentialMatch(
+                                            credential = credential,
+                                            matchResult = result,
+                                            verificationThreshold = matchThreshold,
+                                            faceBioSdk = faceSdk,
+                                            fingerprintBioSdk = null,
+                                        )
+                                    }
+                            }
                         }
                     }
 
                     else -> {
                         val fingerprintSdk = matchParams.fingerprintSDK ?: return@mapNotNull null
                         projectConfig.fingerprint?.getSdkConfiguration(fingerprintSdk)?.verificationMatchThreshold?.let { matchThreshold ->
-                            (fingerprintMatcher(matchParams, project).last() as? MatcherState.Success)
-                                ?.matchResultItems
-                                .orEmpty()
-                                .map { result ->
-                                    CredentialMatch(
-                                        credential = credential,
-                                        matchResult = result,
-                                        verificationThreshold = matchThreshold,
-                                        faceBioSdk = null,
-                                        fingerprintBioSdk = fingerprintSdk,
-                                    )
-                                }
+                            (fingerprintMatcher(matchParams, project).last() as? MatcherState.Success)?.let { lastMatchSuccess ->
+                                val endTime = timeHelper.now()
+                                saveMatchEvent(
+                                    startTime,
+                                    endTime,
+                                    matchParams,
+                                    lastMatchSuccess.totalCandidates,
+                                    lastMatchSuccess.matcherName,
+                                    lastMatchSuccess.matchResultItems,
+                                    lastMatchSuccess.matchBatches,
+                                )
+
+                                lastMatchSuccess
+                                    .matchResultItems
+                                    .map { result ->
+                                        CredentialMatch(
+                                            credential = credential,
+                                            matchResult = result,
+                                            verificationThreshold = matchThreshold,
+                                            faceBioSdk = null,
+                                            fingerprintBioSdk = fingerprintSdk,
+                                        )
+                                    }
+                            }
                         }
                     }
                 }
