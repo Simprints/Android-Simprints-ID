@@ -50,6 +50,6 @@ internal object ApiCalloutSerializer : KSerializer<ApiCallout> {
     }
 
     override fun deserialize(decoder: Decoder): ApiCallout {
-        TODO("Not yet implemented")
+        error("Deserialization without discriminator is not supported")
     }
 }

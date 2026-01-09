@@ -65,13 +65,14 @@ object TokenizableStringSerializer : KSerializer<TokenizableString> {
             }
 
             is JsonObject -> {
-                val className = element["className"]?.jsonPrimitive?.content ?: ""
-                val value = element["value"]?.jsonPrimitive?.content
+                val className = element[FIELD_CLASS_NAME]?.jsonPrimitive?.content.orEmpty()
+                val value = element[FIELD_VALUE]?.jsonPrimitive?.content
                     ?: throw IllegalStateException("Missing 'value' field in TokenizableString")
 
-                when (className) {
-                    "TokenizableString.Tokenized" -> TokenizableString.Tokenized(value)
-                    else -> TokenizableString.Raw(value)
+                if (className == TOKENIZED) {
+                    TokenizableString.Tokenized(value)
+                } else {
+                    TokenizableString.Raw(value)
                 }
             }
 

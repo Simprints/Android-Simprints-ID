@@ -64,13 +64,10 @@ object AnyPrimitiveSerializer : KSerializer<Any> {
 
     private fun fromJsonElement(element: JsonElement): Any = when (element) {
         is JsonPrimitive -> {
-            when {
-                element.isString -> element.content
-                element.booleanOrNull != null -> element.booleanOrNull!!
-                element.longOrNull != null -> element.longOrNull!!
-                element.doubleOrNull != null -> element.doubleOrNull!!
-                else -> element.content
-            }
+            element.booleanOrNull?.let { return it }
+            element.longOrNull?.let { return it }
+            element.doubleOrNull?.let { return it }
+            element.content
         }
 
         is JsonArray -> {

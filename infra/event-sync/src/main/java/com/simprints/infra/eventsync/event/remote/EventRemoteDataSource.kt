@@ -13,10 +13,10 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork.SimApiClient
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.ProducerScope
+import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.produce
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.decodeFromStream
+import kotlinx.serialization.json.decodeToSequence
 import retrofit2.Response
 import java.io.ByteArrayInputStream
 import java.io.InputStream
@@ -90,14 +90,14 @@ internal class EventRemoteDataSource @Inject constructor(
     @VisibleForTesting
     suspend fun parseStreamAndEmitEvents(
         streaming: InputStream,
-        channel: ProducerScope<EnrolmentRecordEvent>,
+        channel: SendChannel<EnrolmentRecordEvent>,
     ) {
         try {
-            val events = JsonHelper.json.decodeFromStream<List<ApiEnrolmentRecordEvent>>(streaming)
-            for (event in events) {
-                channel.send(event.fromApiToDomain())
-            }
-
+            jsonHelper.json
+                .decodeToSequence<ApiEnrolmentRecordEvent>(streaming)
+                .forEach { apiEvent ->
+                    channel.send(apiEvent.fromApiToDomain())
+                }
             channel.close()
         } catch (t: Throwable) {
             Simber.i("Event parsing stream failed", t, tag = SYNC)

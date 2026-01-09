@@ -280,7 +280,7 @@ android-application = { id = "com.android.application", version.ref = "android_g
 android-library = { id = "com.android.library", version.ref = "android_gradlePlugin_version" }
 android-test = { id = "com.android.test", version.ref = "android_gradlePlugin_version" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin_version" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin_serialization_version" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin_version" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp_version" }
 gms = { id = "com.google.gms.google-services", version.ref = "gsm_plugin_version" }
 firebase-perf = { id = "com.google.firebase.firebase-perf", version.ref = "firebase_perfPlugin_version" }

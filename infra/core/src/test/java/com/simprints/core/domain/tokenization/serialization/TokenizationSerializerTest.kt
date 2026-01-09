@@ -38,19 +38,6 @@ class TokenizationSerializerTest {
         assertThat(rawFromJson).isEqualTo(raw)
     }
 
-    @Ignore("Not implemented anymore to serialize the value only to plain text ")
-    @Test
-    fun `string tokenization serialization should produce plain string`() {
-        val encrypted = "encrypted".asTokenizableEncrypted()
-        val raw = "raw".asTokenizableRaw()
-
-        val encryptedJson = json.encodeToString(encrypted)
-        val rawJson = json.encodeToString(raw)
-
-        assertThat(encryptedJson).isEqualTo("\"${encrypted.value}\"")
-        assertThat(rawJson).isEqualTo("\"${raw.value}\"")
-    }
-
     @Test
     fun `serialize Raw produces className Raw and value`() {
         val raw = TokenizableString.Raw("person")
