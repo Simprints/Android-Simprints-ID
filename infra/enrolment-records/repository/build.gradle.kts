@@ -2,7 +2,7 @@ plugins {
     id("simprints.infra")
     id("kotlin-parcelize")
     id("simprints.testing.android")
-    alias(libs.plugins.kotlin.serialization)
+    id("simprints.library.kotlinSerialization")
 }
 
 android {
@@ -22,6 +22,5 @@ dependencies {
     implementation(libs.libsimprints)
     implementation(libs.retrofit.core)
     implementation(libs.jackson.core)
-    implementation(libs.kotlin.serialization)
     implementation(libs.testing.androidX.room)
 }

@@ -76,6 +76,10 @@ gradlePlugin {
             id = "simprints.library.protobuf"
             implementationClass = "LibraryProtobufConventionPlugin"
         }
+        register("libraryKotlinSerialization") {
+            id = "simprints.library.kotlinSerialization"
+            implementationClass = "LibraryKotlinSerializationConventionPlugin"
+        }
 
         // Testing setup plugins
         register("testingUnit") {

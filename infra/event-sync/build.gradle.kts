@@ -2,7 +2,7 @@ plugins {
     id("simprints.infra")
     id("simprints.library.room")
     id("simprints.testing.android")
-    alias(libs.plugins.kotlin.serialization)
+    id("simprints.library.kotlinSerialization")
 }
 
 android {
@@ -36,5 +36,4 @@ dependencies {
     implementation(libs.libsimprints)
     implementation(libs.workManager.work)
     implementation(libs.retrofit.core)
-    implementation(libs.kotlin.serialization)
 }

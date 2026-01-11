@@ -12,7 +12,9 @@ import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonEncoder
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
 
 object TokenizableStringSerializer : KSerializer<TokenizableString> {
     private const val TOKENIZED = "TokenizableString.Tokenized"
@@ -30,26 +32,13 @@ object TokenizableStringSerializer : KSerializer<TokenizableString> {
         encoder: Encoder,
         value: TokenizableString,
     ) {
-        require(encoder is JsonEncoder) {
-            "TokenizableString can only be serialized to JSON"
-        }
+        require(encoder is JsonEncoder) { "TokenizableString can only be serialized to JSON" }
 
-        val className = when (value) {
-            is TokenizableString.Raw -> RAW
-            is TokenizableString.Tokenized -> TOKENIZED
+        val className = if (value is TokenizableString.Raw) RAW else TOKENIZED
+        val jsonObject = buildJsonObject {
+            put(FIELD_CLASS_NAME, className)
+            put(FIELD_VALUE, value.value)
         }
-
-        val jsonObject = JsonObject(
-            mapOf(
-                FIELD_CLASS_NAME to JsonPrimitive(className),
-                FIELD_VALUE to JsonPrimitive(
-                    when (value) {
-                        is TokenizableString.Raw -> value.value
-                        is TokenizableString.Tokenized -> value.value
-                    },
-                ),
-            ),
-        )
 
         encoder.encodeJsonElement(jsonObject)
     }

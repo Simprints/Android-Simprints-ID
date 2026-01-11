@@ -165,7 +165,6 @@ realm_base = { module = "com.simprints.realm.kotlin:library-base", version.ref =
 
 #Retrofit
 retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit_version" }
-retrofit-jackson = { module = "com.squareup.retrofit2:converter-jackson", version.ref = "retrofit_version" }
 retrofit-converterScalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit_version" }
 retrofit-logging = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okttp_version" }
 retrofit-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okttp_version" }

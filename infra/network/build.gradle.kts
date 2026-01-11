@@ -2,7 +2,7 @@ plugins {
     id("simprints.android.library")
     id("simprints.library.hilt")
     id("simprints.config.network")
-    alias(libs.plugins.kotlin.serialization)
+    id("simprints.library.kotlinSerialization")
 }
 
 android {
@@ -26,8 +26,6 @@ dependencies {
         exclude("androidx.lifecycle", "lifecycle-viewmodel-ktx")
     }
     implementation(libs.chuck.release)
-
-    implementation(libs.kotlin.serialization)
 
     runtimeOnly(libs.kotlin.coroutinesAndroid)
 

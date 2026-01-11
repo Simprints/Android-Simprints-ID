@@ -1,7 +1,7 @@
 plugins {
     id("simprints.infra")
     id("simprints.config.cloud")
-    alias(libs.plugins.kotlin.serialization)
+    id("simprints.library.kotlinSerialization")
 }
 
 android {

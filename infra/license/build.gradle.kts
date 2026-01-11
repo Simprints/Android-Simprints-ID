@@ -1,7 +1,7 @@
 plugins {
     id("simprints.infra")
     id("simprints.testing.android")
-    alias(libs.plugins.kotlin.serialization)
+    id("simprints.library.kotlinSerialization")
 }
 
 android {
@@ -13,6 +13,5 @@ dependencies {
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:events"))
     implementation(libs.retrofit.core)
-    implementation(libs.kotlin.serialization)
     implementation(libs.androidX.security)
 }

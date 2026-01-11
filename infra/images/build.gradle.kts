@@ -3,7 +3,7 @@ plugins {
     id("simprints.library.room")
     id("kotlin-parcelize")
     id("simprints.testing.android")
-    alias(libs.plugins.kotlin.serialization)
+    id("simprints.library.kotlinSerialization")
 }
 
 android {
@@ -21,7 +21,6 @@ dependencies {
 
     implementation(libs.androidX.security)
     implementation(libs.kotlin.coroutinesPlayServices)
-    implementation(libs.kotlin.serialization)
 
     implementation(libs.retrofit.core)
 }
