@@ -34,7 +34,7 @@ object TokenizableStringSerializer : KSerializer<TokenizableString> {
     ) {
         require(encoder is JsonEncoder) { "TokenizableString can only be serialized to JSON" }
 
-        val className = if (value is TokenizableString.Raw) RAW else TOKENIZED
+        val className = if (value is TokenizableString.Tokenized) TOKENIZED else RAW
         val jsonObject = buildJsonObject {
             put(FIELD_CLASS_NAME, className)
             put(FIELD_VALUE, value.value)
