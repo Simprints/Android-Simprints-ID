@@ -62,13 +62,21 @@ internal class LoginFormViewModel @Inject constructor(
 
     private fun mapAuthDataResult(result: AuthenticateDataResult): SignInState = when (result) {
         AuthenticateDataResult.Authenticated -> SignInState.Success
+
         AuthenticateDataResult.BadCredentials -> SignInState.BadCredentials
+
         AuthenticateDataResult.IntegrityException -> SignInState.IntegrityException
+
         AuthenticateDataResult.IntegrityServiceTemporaryDown -> SignInState.IntegrityServiceTemporaryDown
+
         AuthenticateDataResult.MissingOrOutdatedGooglePlayStoreApp -> SignInState.MissingOrOutdatedGooglePlayStoreApp
+
         AuthenticateDataResult.Offline -> SignInState.Offline
+
         AuthenticateDataResult.TechnicalFailure -> SignInState.TechnicalFailure
+
         AuthenticateDataResult.Unknown -> SignInState.Unknown
+
         is AuthenticateDataResult.BackendMaintenanceError -> SignInState.BackendMaintenanceError(
             result.estimatedOutage?.let { TimeUtils.getFormattedEstimatedOutage(it) },
         )
@@ -88,7 +96,7 @@ internal class LoginFormViewModel @Inject constructor(
             _signInState.send(mapQrError(result.error))
         } else if (!result.content.isNullOrEmpty()) {
             try {
-                val qrContent = jsonHelper.fromJson<QrCodeContent>(result.content)
+                val qrContent = jsonHelper.json.decodeFromString<QrCodeContent>(result.content)
                 Simber.i("QR scanning successful", tag = LOGIN)
 
                 if (projectId != qrContent.projectId) {

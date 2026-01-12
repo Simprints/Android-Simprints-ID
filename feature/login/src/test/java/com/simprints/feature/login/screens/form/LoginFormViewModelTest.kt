@@ -2,11 +2,10 @@ package com.simprints.feature.login.screens.form
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.feature.login.LoginParams
-import com.simprints.feature.login.screens.qrscanner.QrCodeContent
 import com.simprints.feature.login.screens.qrscanner.QrScannerResult
 import com.simprints.feature.login.screens.qrscanner.QrScannerResult.QrScannerError
 import com.simprints.infra.authlogic.AuthManager
@@ -14,14 +13,8 @@ import com.simprints.infra.authlogic.model.AuthenticateDataResult
 import com.simprints.infra.network.SimNetwork
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
-import io.mockk.MockKAnnotations
-import io.mockk.clearMocks
-import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.slot
-import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -40,9 +33,6 @@ internal class LoginFormViewModelTest {
     @MockK
     private lateinit var authManager: AuthManager
 
-    @MockK
-    private lateinit var jsonHelper: JsonHelper
-
     private lateinit var viewModel: LoginFormViewModel
 
     @Before
@@ -53,7 +43,7 @@ internal class LoginFormViewModelTest {
             DEVICE_ID,
             simNetwork,
             authManager,
-            jsonHelper,
+            JsonHelper,
         )
     }
 
@@ -170,9 +160,7 @@ internal class LoginFormViewModelTest {
 
     @Test
     fun `returns correct SignInState when QR code parsing fails`() {
-        every { jsonHelper.fromJson<QrCodeContent>(any()) } throws RuntimeException("parsing fail")
-
-        viewModel.handleQrResult(PROJECT_ID, QrScannerResult(QR_CONTENT, null))
+        viewModel.handleQrResult(PROJECT_ID, QrScannerResult("Invalid json", null))
         val result = viewModel.signInState.getOrAwaitValue()
 
         assertThat(result.getContentIfNotHandled()).isInstanceOf(SignInState.QrInvalidCode::class.java)
@@ -180,9 +168,15 @@ internal class LoginFormViewModelTest {
 
     @Test
     fun `returns correct SignInState when QR contains wrong project ID`() {
-        every { jsonHelper.fromJson<QrCodeContent>(eq(QR_CONTENT)) } returns QrCodeContent("differentProjectId", PROJECT_SECRET)
-
-        viewModel.handleQrResult(PROJECT_ID, QrScannerResult(QR_CONTENT, null))
+        val qrContent =
+            """
+            {
+              "projectId": "differentProjectId",
+              "projectSecret": "$PROJECT_SECRET",
+              "backend": "$URL"
+            }
+            """.trimIndent()
+        viewModel.handleQrResult(PROJECT_ID, QrScannerResult(qrContent, null))
         val result = viewModel.signInState.getOrAwaitValue()
 
         assertThat(result.getContentIfNotHandled()).isInstanceOf(SignInState.ProjectIdMismatch::class.java)
@@ -190,9 +184,15 @@ internal class LoginFormViewModelTest {
 
     @Test
     fun `returns correct SignInState when QR code parsing success`() {
-        every { jsonHelper.fromJson<QrCodeContent>(eq(QR_CONTENT)) } returns QrCodeContent(PROJECT_ID, PROJECT_SECRET)
-
-        viewModel.handleQrResult(PROJECT_ID, QrScannerResult(QR_CONTENT, null))
+        val qrContent =
+            """
+            {
+              "projectId": "$PROJECT_ID",
+              "projectSecret": "$PROJECT_SECRET",
+              "backend": "$URL"
+            }
+            """.trimIndent()
+        viewModel.handleQrResult(PROJECT_ID, QrScannerResult(qrContent, null))
         val result = viewModel.signInState.getOrAwaitValue()
 
         assertThat(result.getContentIfNotHandled()).isInstanceOf(SignInState.QrCodeValid::class.java)
@@ -202,9 +202,15 @@ internal class LoginFormViewModelTest {
 
     @Test
     fun `updates base API url when QR code parsing success`() {
-        every { jsonHelper.fromJson<QrCodeContent>(eq(QR_CONTENT)) } returns QrCodeContent(PROJECT_ID, PROJECT_SECRET, URL)
-
-        viewModel.handleQrResult(PROJECT_ID, QrScannerResult(QR_CONTENT, null))
+        val qrContent =
+            """
+            {
+              "projectId": "$PROJECT_ID",
+              "projectSecret": "$PROJECT_SECRET",
+              "backend": "$URL"
+            }
+            """.trimIndent()
+        viewModel.handleQrResult(PROJECT_ID, QrScannerResult(qrContent, null))
 
         verify { simNetwork.setApiBaseUrl(eq(URL)) }
     }
@@ -236,7 +242,6 @@ internal class LoginFormViewModelTest {
         private const val PROJECT_ID = "projectId"
         private val USER_ID = "userId".asTokenizableRaw()
 
-        private const val QR_CONTENT = "qrCodeContents"
         private const val PROJECT_SECRET = "projectSecret"
         private const val URL = "projectUrl"
     }

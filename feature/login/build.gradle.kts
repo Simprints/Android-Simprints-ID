@@ -1,6 +1,7 @@
 plugins {
     id("simprints.feature")
     id("kotlin-parcelize")
+    id("simprints.library.kotlinSerialization")
 }
 
 android {
@@ -19,6 +20,5 @@ dependencies {
     implementation(libs.androidX.cameraX.core)
     implementation(libs.androidX.cameraX.lifecycle)
     implementation(libs.androidX.cameraX.view)
-    implementation(libs.jackson.core)
     implementation(libs.playServices.barcode)
 }
