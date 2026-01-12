@@ -1,8 +1,10 @@
 package com.simprints.infra.images.remote.signedurl.api
 
 import androidx.annotation.Keep
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiSampleUploadUrlRequest(
     val sampleId: String,
     val sessionId: String,

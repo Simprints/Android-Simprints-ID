@@ -3,15 +3,17 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSearchEvent
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiExternalCredentialSearchPayload(
     override val startTime: ApiTimestamp,
     val endTime: ApiTimestamp?,
     val id: String,
     val probeExternalCredentialId: String,
     val result: ApiExternalCredentialSearchResult,
-) : ApiEventPayload(startTime) {
+) : ApiEventPayload() {
     constructor(domainPayload: ExternalCredentialSearchEvent.ExternalCredentialSearchPayload) : this(
         startTime = domainPayload.createdAt.fromDomainToApi(),
         endTime = domainPayload.endedAt?.fromDomainToApi(),
@@ -23,6 +25,7 @@ internal data class ApiExternalCredentialSearchPayload(
     )
 
     @Keep
+    @Serializable
     data class ApiExternalCredentialSearchResult(
         val candidateIds: List<String>,
     )

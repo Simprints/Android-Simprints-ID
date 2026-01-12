@@ -2,6 +2,8 @@ package com.simprints.infra.eventsync.event.remote.models.subject
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordDeletionEvent
+import com.simprints.infra.eventsync.event.remote.models.ApiEnrolmentRecordDeletionPayload
+import com.simprints.infra.eventsync.event.remote.models.fromApiToDomain
 import org.junit.Test
 
 class ApiEnrolmentRecordDeletionEventTest {

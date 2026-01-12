@@ -4,8 +4,10 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.common.Modality
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiGeneralConfiguration(
     val modalities: List<ApiModality>,
     val matchingModalities: List<ApiModality>,
@@ -13,7 +15,7 @@ internal data class ApiGeneralConfiguration(
     val defaultLanguage: String,
     val collectLocation: Boolean,
     val duplicateBiometricEnrolmentCheck: Boolean,
-    val settingsPassword: String?,
+    val settingsPassword: String? = null,
 ) {
     fun toDomain(): GeneralConfiguration = GeneralConfiguration(
         modalities.map { it.toDomain() },

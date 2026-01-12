@@ -2,16 +2,18 @@ package com.simprints.infra.config.store.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.infra.config.store.models.ConsentConfiguration
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiConsentConfiguration(
     val programName: String,
     val organizationName: String,
     val collectConsent: Boolean,
     val displaySimprintsLogo: Boolean,
     val allowParentalConsent: Boolean,
-    val generalPrompt: ConsentPromptConfiguration?,
-    val parentalPrompt: ConsentPromptConfiguration?,
+    val generalPrompt: ConsentPromptConfiguration? = null,
+    val parentalPrompt: ConsentPromptConfiguration? = null,
 ) {
     fun toDomain(): ConsentConfiguration = ConsentConfiguration(
         programName,
@@ -24,6 +26,7 @@ internal data class ApiConsentConfiguration(
     )
 
     @Keep
+    @Serializable
     data class ConsentPromptConfiguration(
         val enrolmentVariant: ConsentEnrolmentVariant,
         val dataSharedWithPartner: Boolean,

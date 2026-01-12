@@ -2,8 +2,10 @@ package com.simprints.infra.eventsync.event.remote.models.session
 
 import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal enum class ApiEventScopeEndCause {
     WORKFLOW_ENDED,
     NEW_SESSION,

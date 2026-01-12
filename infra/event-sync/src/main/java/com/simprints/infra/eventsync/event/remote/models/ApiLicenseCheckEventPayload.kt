@@ -3,13 +3,15 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.LicenseCheckEvent
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiLicenseCheckEventPayload(
     override val startTime: ApiTimestamp,
     val status: LicenseCheckEvent.LicenseStatus,
     val vendor: String,
-) : ApiEventPayload(startTime) {
+) : ApiEventPayload() {
     constructor(domainPayload: LicenseCheckEvent.LicenseCheckEventPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.status,

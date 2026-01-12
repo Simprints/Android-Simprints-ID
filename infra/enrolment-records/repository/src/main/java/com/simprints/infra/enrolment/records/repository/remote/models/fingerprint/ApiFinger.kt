@@ -2,8 +2,10 @@ package com.simprints.infra.enrolment.records.repository.remote.models.fingerpri
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.common.TemplateIdentifier
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal enum class ApiFinger {
     RIGHT_5TH_FINGER,
     RIGHT_4TH_FINGER,

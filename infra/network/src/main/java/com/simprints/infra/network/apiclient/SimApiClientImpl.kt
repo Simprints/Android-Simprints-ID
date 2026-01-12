@@ -13,9 +13,10 @@ import com.simprints.infra.network.httpclient.BuildOkHttpClientUseCase
 import com.simprints.infra.network.json.JsonHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.HttpException
 import retrofit2.Retrofit
-import retrofit2.converter.jackson.JacksonConverterFactory
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import kotlin.reflect.KClass
 
@@ -45,10 +46,11 @@ internal class SimApiClientImpl<T : SimRemoteInterface>(
     }
 
     private val retrofit: Retrofit by lazy {
+        val contentType = "application/json".toMediaType()
         Retrofit
             .Builder()
             .addConverterFactory(ScalarsConverterFactory.create())
-            .addConverterFactory(JacksonConverterFactory.create(JsonHelper.jackson))
+            .addConverterFactory(JsonHelper().json.asConverterFactory(contentType))
             .baseUrl(url)
             .client(buildOkHttpClient(authToken, deviceId, versionName))
             .build()
@@ -81,22 +83,32 @@ internal class SimApiClientImpl<T : SimRemoteInterface>(
                 e.isBackendMaintenanceError() -> BackendMaintenanceException(
                     estimatedOutage = e.parseEstimatedOutage(),
                 )
+
                 HTTP_CODES_FOR_RETRYABLE_ERROR.contains(e.code()) -> RetryableCloudException(
                     cause = e,
                 )
+
                 else -> SyncCloudIntegrationException(cause = e)
             }
         }
-        e.isCausedFromBadNetworkConnection() -> NetworkConnectionException(cause = e)
-        else -> e
+
+        e.isCausedFromBadNetworkConnection() -> {
+            NetworkConnectionException(cause = e)
+        }
+
+        else -> {
+            e
+        }
     }
 
     private fun HttpException.isBackendMaintenanceError(): Boolean {
         if (code() != 503) {
             return false
         }
-        val apiError = response()?.errorBody()?.string()?.let { JsonHelper.fromJson<ApiError>(it) }
-        return apiError?.error == BACKEND_MAINTENANCE_ERROR_STRING
+        val errorBody = response()?.errorBody()?.string() ?: return false
+
+        val apiError = JsonHelper().fromJson<ApiError>(errorBody)
+        return apiError.error == BACKEND_MAINTENANCE_ERROR_STRING
     }
 
     private fun HttpException.parseEstimatedOutage(): Long? = try {

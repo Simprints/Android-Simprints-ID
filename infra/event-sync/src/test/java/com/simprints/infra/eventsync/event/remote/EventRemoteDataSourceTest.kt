@@ -26,8 +26,9 @@ import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.ProducerScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import okhttp3.Headers.Companion.toHeaders
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -36,6 +37,7 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
+import kotlin.test.assertEquals
 
 class EventRemoteDataSourceTest {
     @MockK
@@ -127,19 +129,22 @@ class EventRemoteDataSourceTest {
     }
 
     @Test
-    fun downloadEvents_shouldParseStreamAndEmitBatches() = runTest {
-        val responseStreamWith6Events =
-            this.javaClass.classLoader?.getResourceAsStream("responses/down_sync_8events.json")!!
-        val channel = mockk<ProducerScope<EnrolmentRecordEvent>>(relaxed = true)
-        excludeRecords { channel.isClosedForSend }
+    fun downloadEvents_shouldParseStreamAndEmitEventsIncrementally() = runTest {
+        val stream =
+            javaClass.classLoader!!
+                .getResourceAsStream("responses/down_sync_8events.json")
 
-        eventRemoteDataSource.parseStreamAndEmitEvents(
-            responseStreamWith6Events,
-            channel,
-        )
+        val channel = Channel<EnrolmentRecordEvent>(Channel.RENDEZVOUS)
+        val received = mutableListOf<EnrolmentRecordEvent>()
 
-        verifySequenceOfEventsEmitted(
-            channel,
+        val collector = launch {
+            for (event in channel) {
+                received += event
+            }
+        }
+        eventRemoteDataSource.parseStreamAndEmitEvents(stream, channel)
+        collector.join()
+        assertEquals(
             listOf(
                 EnrolmentRecordEventType.EnrolmentRecordCreation,
                 EnrolmentRecordEventType.EnrolmentRecordDeletion,
@@ -150,23 +155,8 @@ class EventRemoteDataSourceTest {
                 EnrolmentRecordEventType.EnrolmentRecordMove,
                 EnrolmentRecordEventType.EnrolmentRecordUpdate,
             ),
+            received.map { it.type },
         )
-    }
-
-    private fun verifySequenceOfEventsEmitted(
-        channel: ProducerScope<EnrolmentRecordEvent>,
-        eventTypes: List<EnrolmentRecordEventType>,
-    ) {
-        coVerifySequence {
-            eventTypes.forEach { eventType ->
-                channel.send(
-                    match {
-                        it.type == eventType
-                    },
-                )
-            }
-            channel.close(null)
-        }
     }
 
     @Test

@@ -43,7 +43,7 @@ internal abstract class BaseEventDownSyncWorkersBuilder(
         .Builder(getWorkerClass())
         .setInputData(
             workDataOf(
-                INPUT_DOWN_SYNC_OPS to jsonHelper.toJson(downSyncOperation),
+                INPUT_DOWN_SYNC_OPS to jsonHelper.json.encodeToString(downSyncOperation),
                 INPUT_EVENT_DOWN_SYNC_SCOPE_ID to uniqueDownSyncID,
             ),
         ).setDownSyncWorker(uniqueSyncID, uniqueDownSyncID, getDownSyncWorkerConstraints())

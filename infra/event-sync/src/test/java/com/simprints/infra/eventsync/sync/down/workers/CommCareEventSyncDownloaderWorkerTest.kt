@@ -72,7 +72,7 @@ internal class CommCareEventSyncDownloaderWorkerTest {
             },
             mockk(relaxed = true) {
                 every { inputData } returns workDataOf(
-                    INPUT_DOWN_SYNC_OPS to JsonHelper.toJson(projectDownSyncScope.operations.first()),
+                    INPUT_DOWN_SYNC_OPS to JsonHelper.json.encodeToString(projectDownSyncScope.operations.first()),
                     INPUT_EVENT_DOWN_SYNC_SCOPE_ID to "eventScopeId",
                 )
             },

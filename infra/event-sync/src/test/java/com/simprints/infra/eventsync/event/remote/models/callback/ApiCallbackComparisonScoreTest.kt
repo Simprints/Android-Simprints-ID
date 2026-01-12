@@ -3,8 +3,10 @@ package com.simprints.infra.eventsync.event.remote.models.callback
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.infra.events.event.domain.models.callback.CallbackComparisonScore
+import com.simprints.infra.eventsync.event.remote.models.ApiCallbackComparisonScore
 import com.simprints.infra.eventsync.event.remote.models.ApiConfidenceMatch
 import com.simprints.infra.eventsync.event.remote.models.ApiTier
+import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 import org.junit.Test
 
 class ApiCallbackComparisonScoreTest {

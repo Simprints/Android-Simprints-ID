@@ -2,8 +2,10 @@ package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal enum class ApiFingerComparisonStrategy {
     SAME_FINGER,
     CROSS_FINGER_USING_MEAN_OF_MAX,

@@ -3,14 +3,8 @@ package com.simprints.infra.eventsync.event.commcare
 import android.content.Context
 import android.database.Cursor
 import androidx.core.net.toUri
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.module.SimpleModule
-import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
-import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.LastCallingPackageStore
-import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordCreationEventDeserializer
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordDeletionEvent
@@ -145,7 +139,9 @@ internal class CommCareEventDataSource @Inject constructor(
                 val casesToRemove = previouslySyncedCasesMap.values.filterNot { (it.caseId in caseIdsPresentInCommCare) }
                 Simber.i("Generating deletion events for ${casesToRemove.size} cases no longer in CommCare.", tag = COMMCARE_SYNC)
                 casesToRemove.forEach { case ->
-                    generateEnrolmentRecordDeletionEvent(case).collect { emit(it) }
+                    generateEnrolmentRecordDeletionEvent(case).collect {
+                        emit(it)
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -228,11 +224,7 @@ internal class CommCareEventDataSource @Inject constructor(
 
     private fun parseRecordEvents(subjectActions: String) = subjectActions.takeIf(String::isNotEmpty)?.let {
         try {
-            jsonHelper.fromJson<CoSyncEnrolmentRecordEvents>(
-                json = it,
-                module = coSyncSerializationModule,
-                type = object : TypeReference<CoSyncEnrolmentRecordEvents>() {},
-            )
+            jsonHelper.json.decodeFromString<CoSyncEnrolmentRecordEvents>(it)
         } catch (e: Exception) {
             Simber.e("Error while parsing subjectActions", e)
             null
@@ -271,8 +263,14 @@ internal class CommCareEventDataSource @Inject constructor(
 
         events.forEach { event ->
             when (event) {
-                is EnrolmentRecordCreationEvent -> creationSubjectIds.add(event.payload.subjectId)
-                is EnrolmentRecordDeletionEvent -> deletionSubjectIds.add(event.payload.subjectId)
+                is EnrolmentRecordCreationEvent -> {
+                    creationSubjectIds.add(event.payload.subjectId)
+                }
+
+                is EnrolmentRecordDeletionEvent -> {
+                    deletionSubjectIds.add(event.payload.subjectId)
+                }
+
                 else -> { /* Ignore other event types */ }
             }
         }
@@ -286,6 +284,7 @@ internal class CommCareEventDataSource @Inject constructor(
                     Simber.d("Added case ${case.caseId} with simprintsId ${case.simprintsId} to CommCareSyncCache", tag = COMMCARE_SYNC)
                     pendingCasesToRemove.add(case)
                 }
+
                 in deletionSubjectIds -> {
                     commCareSyncCache.removeSyncedCase(case.caseId)
                     Simber.d("Removed case ${case.caseId} with simprintsId ${case.simprintsId} from CommCareSyncCache", tag = COMMCARE_SYNC)
@@ -296,21 +295,6 @@ internal class CommCareEventDataSource @Inject constructor(
 
         // Remove processed cases from pendingSyncedCases
         pendingSyncedCases.removeAll(pendingCasesToRemove)
-    }
-
-    private val coSyncSerializationModule = SimpleModule().apply {
-        addSerializer(
-            TokenizableString::class.java,
-            TokenizationClassNameSerializer(),
-        )
-        addDeserializer(
-            TokenizableString::class.java,
-            TokenizationClassNameDeserializer(),
-        )
-        addDeserializer(
-            EnrolmentRecordCreationEvent::class.java,
-            CoSyncEnrolmentRecordCreationEventDeserializer(),
-        )
     }
 
     companion object {

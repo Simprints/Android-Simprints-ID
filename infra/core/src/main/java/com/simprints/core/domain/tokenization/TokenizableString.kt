@@ -1,9 +1,14 @@
 package com.simprints.core.domain.tokenization
 
+import android.os.Parcelable
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString.Raw
 import com.simprints.core.domain.tokenization.TokenizableString.Tokenized
-import java.io.Serializable
+import com.simprints.core.domain.tokenization.serialization.TokenizableStringSerializer
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 
 /**
  * Sealed class for values that might be tokenized (symmetrically encrypted). Use this wrapping
@@ -14,11 +19,20 @@ import java.io.Serializable
  */
 
 @Keep
-sealed class TokenizableString : Serializable {
+@Parcelize
+@Serializable(with = TokenizableStringSerializer::class)
+@OptIn(ExperimentalSerializationApi::class)
+@JsonClassDiscriminator("className")
+sealed class TokenizableString : Parcelable {
     abstract val value: String
+    abstract val className: String
 
+    @Keep
+    @Parcelize
+    @Serializable
     data class Tokenized(
         override val value: String,
+        override val className: String = "TokenizableString.Tokenized",
     ) : TokenizableString() {
         override fun hashCode() = super.hashCode()
 
@@ -27,8 +41,12 @@ sealed class TokenizableString : Serializable {
         override fun toString() = super.toString()
     }
 
+    @Keep
+    @Parcelize
+    @Serializable
     data class Raw(
         override val value: String,
+        override val className: String = "TokenizableString.Raw",
     ) : TokenizableString() {
         override fun hashCode() = super.hashCode()
 

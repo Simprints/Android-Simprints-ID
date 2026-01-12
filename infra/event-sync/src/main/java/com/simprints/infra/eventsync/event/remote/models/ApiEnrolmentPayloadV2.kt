@@ -3,8 +3,10 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiEnrolmentPayloadV2(
     override val startTime: ApiTimestamp,
     val subjectId: String,
@@ -12,7 +14,7 @@ internal data class ApiEnrolmentPayloadV2(
     val moduleId: String,
     val attendantId: String,
     val personCreationEventId: String,
-) : ApiEventPayload(startTime) {
+) : ApiEventPayload() {
     constructor(domainPayload: EnrolmentEventV2.EnrolmentPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.subjectId,

@@ -1,17 +1,17 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.simprints.core.tools.json.AnyPrimitiveSerializer
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent.SuspiciousIntentPayload
+import kotlinx.serialization.Serializable
 
 @Keep
-@JsonInclude(Include.NON_NULL)
+@Serializable
 internal data class ApiSuspiciousIntentPayload(
     override val startTime: ApiTimestamp,
-    val unexpectedExtras: Map<String, Any?>,
-) : ApiEventPayload(startTime) {
+    val unexpectedExtras: Map<String, @Serializable(with = AnyPrimitiveSerializer::class) Any?>,
+) : ApiEventPayload() {
     constructor(domainPayload: SuspiciousIntentPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.unexpectedExtras,

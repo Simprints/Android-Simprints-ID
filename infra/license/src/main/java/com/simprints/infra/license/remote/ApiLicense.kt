@@ -3,11 +3,16 @@ package com.simprints.infra.license.remote
 import androidx.annotation.Keep
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.license.models.Vendor
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
 
 /**
  * ApiLicense only populates some fields, based on which vendor was asked when retrieving the license.
  */
 @Keep
+@Serializable
 internal data class ApiLicense(
     val licenses: Map<Vendor, LicenseValue> = emptyMap(),
 ) {
@@ -15,8 +20,9 @@ internal data class ApiLicense(
 }
 
 @Keep
+@Serializable
 internal data class LicenseValue(
-    val expiration: String?,
+    val expiration: String? = null,
     val data: String,
     val version: String,
 )
@@ -53,13 +59,12 @@ internal data class ApiLicenseError(
  *    ```
  * @return ApiLicense
  */
-internal fun String.parseApiLicense(): ApiLicense = JsonHelper.jackson.readTree(this).let {
-    return ApiLicense(
-        licenses = it
-            .fields()
-            .asSequence()
-            .map { entry ->
-                Vendor.fromKey(entry.key) to JsonHelper.jackson.treeToValue(entry.value, LicenseValue::class.java)
-            }.toMap(),
-    )
+internal fun String.parseApiLicense(apiJson: Json = JsonHelper.json): ApiLicense {
+    val jsonObject = apiJson.decodeFromString<JsonObject>(this)
+
+    val licenses = jsonObject.entries.associate { (key, value) ->
+        Vendor.fromKey(key) to apiJson.decodeFromJsonElement<LicenseValue>(value)
+    }
+
+    return ApiLicense(licenses = licenses)
 }

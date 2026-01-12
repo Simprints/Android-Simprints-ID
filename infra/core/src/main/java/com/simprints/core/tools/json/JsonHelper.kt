@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.Module
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import kotlinx.serialization.json.Json
 
 object JsonHelper {
     val jackson: ObjectMapper by lazy {
@@ -60,5 +61,15 @@ object JsonHelper {
 
     fun validateJsonOrThrow(json: String) {
         jackson.readTree(json)
+    }
+
+    // Todo will be replacing the above fromJson and toJson once completely removing jackson before the 2026.1.0 release
+    val json: Json by lazy {
+        Json {
+            ignoreUnknownKeys = true
+            explicitNulls = false
+            encodeDefaults = true
+            coerceInputValues = true
+        }
     }
 }

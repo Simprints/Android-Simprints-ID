@@ -42,18 +42,21 @@ import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.A
 import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.PROJECT_PAUSED
 import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.SERIAL_ENTRY_PAIR
 import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.UNEXPECTED_ERROR
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiAlertScreenPayload(
     override val startTime: ApiTimestamp,
     val alertType: ApiAlertScreenEventType,
-) : ApiEventPayload(startTime) {
+) : ApiEventPayload() {
     constructor(domainPayload: AlertScreenPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.alertType.fromDomainToApi(),
     )
 
     @Keep
+    @Serializable
     enum class ApiAlertScreenEventType {
         DIFFERENT_PROJECT_ID,
         DIFFERENT_USER_ID,

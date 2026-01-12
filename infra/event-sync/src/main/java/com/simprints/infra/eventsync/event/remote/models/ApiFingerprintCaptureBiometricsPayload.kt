@@ -4,14 +4,17 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiFingerprintCaptureBiometricsPayload(
     override val startTime: ApiTimestamp,
     val fingerprint: Fingerprint,
     val id: String,
-) : ApiEventPayload(startTime) {
+) : ApiEventPayload() {
     @Keep
+    @Serializable
     data class Fingerprint(
         val finger: TemplateIdentifier,
         val template: String,

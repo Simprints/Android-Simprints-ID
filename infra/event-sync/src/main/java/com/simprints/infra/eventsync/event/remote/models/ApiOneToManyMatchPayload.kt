@@ -2,11 +2,16 @@ package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
 import com.simprints.infra.eventsync.event.remote.models.ApiOneToManyMatchPayload.ApiOneToManyBatch
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
+@SerialName(EventType.ONE_TO_MANY_MATCH_KEY)
 internal data class ApiOneToManyMatchPayload(
     override val startTime: ApiTimestamp,
     val endTime: ApiTimestamp?,
@@ -15,8 +20,9 @@ internal data class ApiOneToManyMatchPayload(
     val result: List<ApiMatchEntry>?,
     val probeBiometricReferenceId: String? = null,
     val batches: List<ApiOneToManyBatch>? = null,
-) : ApiEventPayload(startTime) {
+) : ApiEventPayload() {
     @Keep
+    @Serializable
     data class ApiMatchPool(
         val type: ApiMatchPoolType,
         val count: Int,
@@ -26,6 +32,7 @@ internal data class ApiOneToManyMatchPayload(
     }
 
     @Keep
+    @Serializable
     enum class ApiMatchPoolType {
         USER,
         MODULE,
@@ -33,6 +40,7 @@ internal data class ApiOneToManyMatchPayload(
     }
 
     @Keep
+    @Serializable
     data class ApiOneToManyBatch(
         val loadingStartTime: ApiTimestamp,
         val loadingEndTime: ApiTimestamp,
@@ -51,7 +59,7 @@ internal data class ApiOneToManyMatchPayload(
             is OneToManyMatchPayload.OneToManyMatchPayloadV2 -> null
             is OneToManyMatchPayload.OneToManyMatchPayloadV3 -> domainPayload.probeBiometricReferenceId
         },
-        batches = when(domainPayload) {
+        batches = when (domainPayload) {
             is OneToManyMatchPayload.OneToManyMatchPayloadV2 -> null
             is OneToManyMatchPayload.OneToManyMatchPayloadV3 -> domainPayload.batches?.map { it.fromDomainToApi() }
         },

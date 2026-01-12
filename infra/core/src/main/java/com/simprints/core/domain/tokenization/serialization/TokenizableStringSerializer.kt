@@ -1,0 +1,73 @@
+package com.simprints.core.domain.tokenization.serialization
+
+import com.simprints.core.domain.tokenization.TokenizableString
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonDecoder
+import kotlinx.serialization.json.JsonEncoder
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+
+object TokenizableStringSerializer : KSerializer<TokenizableString> {
+    private const val TOKENIZED = "TokenizableString.Tokenized"
+    private const val RAW = "TokenizableString.Raw"
+    private const val FIELD_CLASS_NAME = "className"
+    private const val FIELD_VALUE = "value"
+
+    override val descriptor: SerialDescriptor =
+        buildClassSerialDescriptor("TokenizableString") {
+            element(FIELD_CLASS_NAME, PrimitiveSerialDescriptor(FIELD_CLASS_NAME, PrimitiveKind.STRING))
+            element(FIELD_VALUE, PrimitiveSerialDescriptor(FIELD_VALUE, PrimitiveKind.STRING))
+        }
+
+    override fun serialize(
+        encoder: Encoder,
+        value: TokenizableString,
+    ) {
+        require(encoder is JsonEncoder) { "TokenizableString can only be serialized to JSON" }
+
+        val className = if (value is TokenizableString.Tokenized) TOKENIZED else RAW
+        val jsonObject = buildJsonObject {
+            put(FIELD_CLASS_NAME, className)
+            put(FIELD_VALUE, value.value)
+        }
+
+        encoder.encodeJsonElement(jsonObject)
+    }
+
+    override fun deserialize(decoder: Decoder): TokenizableString {
+        val jsonDecoder = decoder as? JsonDecoder
+            ?: error("This serializer only works with Json format")
+
+        return when (val element = jsonDecoder.decodeJsonElement()) {
+            is JsonPrimitive -> {
+                // Plain string case: treat as Raw
+                TokenizableString.Raw(element.content)
+            }
+
+            is JsonObject -> {
+                val className = element[FIELD_CLASS_NAME]?.jsonPrimitive?.content.orEmpty()
+                val value = element[FIELD_VALUE]?.jsonPrimitive?.content
+                    ?: throw IllegalStateException("Missing 'value' field in TokenizableString")
+
+                if (className == TOKENIZED) {
+                    TokenizableString.Tokenized(value)
+                } else {
+                    TokenizableString.Raw(value)
+                }
+            }
+
+            else -> {
+                error("Unexpected JSON element for TokenizableString")
+            }
+        }
+    }
+}

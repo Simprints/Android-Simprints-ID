@@ -57,8 +57,10 @@ import com.simprints.infra.events.event.domain.models.EventType.SCANNER_CONNECTI
 import com.simprints.infra.events.event.domain.models.EventType.SCANNER_FIRMWARE_UPDATE
 import com.simprints.infra.events.event.domain.models.EventType.SUSPICIOUS_INTENT
 import com.simprints.infra.events.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal enum class ApiEventPayloadType {
     Callout,
     Callback,
@@ -104,22 +106,39 @@ internal enum class ApiEventPayloadType {
 
 internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     AUTHENTICATION -> ApiEventPayloadType.Authentication
+
     CONSENT -> ApiEventPayloadType.Consent
+
     ENROLMENT_V2, ENROLMENT_V4 -> ApiEventPayloadType.Enrolment
+
     AUTHORIZATION -> ApiEventPayloadType.Authorization
+
     FINGERPRINT_CAPTURE -> ApiEventPayloadType.FingerprintCapture
+
     ONE_TO_ONE_MATCH -> ApiEventPayloadType.OneToOneMatch
+
     ONE_TO_MANY_MATCH -> ApiEventPayloadType.OneToManyMatch
+
     PERSON_CREATION -> ApiEventPayloadType.PersonCreation
+
     ALERT_SCREEN -> ApiEventPayloadType.AlertScreen
+
     GUID_SELECTION -> ApiEventPayloadType.GuidSelection
+
     CONNECTIVITY_SNAPSHOT -> ApiEventPayloadType.ConnectivitySnapshot
+
     REFUSAL -> ApiEventPayloadType.Refusal
+
     CANDIDATE_READ -> ApiEventPayloadType.CandidateRead
+
     SCANNER_CONNECTION -> ApiEventPayloadType.ScannerConnection
+
     VERO_2_INFO_SNAPSHOT -> ApiEventPayloadType.Vero2InfoSnapshot
+
     SCANNER_FIRMWARE_UPDATE -> ApiEventPayloadType.ScannerFirmwareUpdate
+
     INVALID_INTENT -> ApiEventPayloadType.InvalidIntent
+
     CALLOUT_CONFIRMATION,
     CALLOUT_CONFIRMATION_V3,
     CALLOUT_IDENTIFICATION,
@@ -141,25 +160,45 @@ internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     -> ApiEventPayloadType.Callback
 
     SUSPICIOUS_INTENT -> ApiEventPayloadType.SuspiciousIntent
+
     INTENT_PARSING -> ApiEventPayloadType.IntentParsing
+
     COMPLETION_CHECK -> ApiEventPayloadType.CompletionCheck
+
     FACE_ONBOARDING_COMPLETE -> ApiEventPayloadType.FaceOnboardingComplete
+
     FACE_FALLBACK_CAPTURE -> ApiEventPayloadType.FaceFallbackCapture
+
     FACE_CAPTURE -> ApiEventPayloadType.FaceCapture
+
     FACE_CAPTURE_CONFIRMATION -> ApiEventPayloadType.FaceCaptureConfirmation
+
     FINGERPRINT_CAPTURE_BIOMETRICS -> ApiEventPayloadType.FingerprintCaptureBiometrics
+
     FACE_CAPTURE_BIOMETRICS -> ApiEventPayloadType.FaceCaptureBiometrics
+
     EVENT_DOWN_SYNC_REQUEST -> ApiEventPayloadType.EventDownSyncRequest
+
     EVENT_UP_SYNC_REQUEST -> ApiEventPayloadType.EventUpSyncRequest
+
     SAMPLE_UP_SYNC_REQUEST -> ApiEventPayloadType.SampleUpSyncRequest
+
     LICENSE_CHECK -> ApiEventPayloadType.LicenseCheck
+
     AGE_GROUP_SELECTION -> ApiEventPayloadType.AgeGroupSelection
+
     BIOMETRIC_REFERENCE_CREATION -> ApiEventPayloadType.BiometricReferenceCreation
+
     ENROLMENT_UPDATE -> ApiEventPayloadType.EnrolmentUpdate
+
     EXTERNAL_CREDENTIAL_SELECTION -> ApiEventPayloadType.ExternalCredentialSelection
+
     EXTERNAL_CREDENTIAL_CAPTURE_VALUE -> ApiEventPayloadType.ExternalCredentialCaptureValue
+
     EXTERNAL_CREDENTIAL_CAPTURE -> ApiEventPayloadType.ExternalCredentialCapture
+
     EXTERNAL_CREDENTIAL_SEARCH -> ApiEventPayloadType.ExternalCredentialSearch
+
     EXTERNAL_CREDENTIAL_CONFIRMATION -> ApiEventPayloadType.ExternalCredentialConfirmation
 }
 

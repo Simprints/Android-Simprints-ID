@@ -1,10 +1,10 @@
 package com.simprints.infra.eventsync.event.remote.events.callback
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.eventsync.event.remote.models.callback.ApiErrorCallback
-import com.simprints.infra.eventsync.event.remote.models.callback.ApiErrorCallback.ApiReason.SCANNER_LOW_BATTERY
-import com.simprints.infra.eventsync.event.remote.models.callback.fromApiToDomain
-import com.simprints.infra.eventsync.event.remote.models.callback.fromDomainToApi
+import com.simprints.infra.eventsync.event.remote.models.ApiErrorCallback
+import com.simprints.infra.eventsync.event.remote.models.ApiErrorCallback.ApiReason.SCANNER_LOW_BATTERY
+import com.simprints.infra.eventsync.event.remote.models.fromApiToDomain
+import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 import org.junit.Test
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason as ErrorReason
 

@@ -1,6 +1,7 @@
 plugins {
     id("simprints.infra")
     id("simprints.library.room")
+    id("simprints.library.kotlinSerialization")
 }
 
 android {

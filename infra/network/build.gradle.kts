@@ -2,6 +2,7 @@ plugins {
     id("simprints.android.library")
     id("simprints.library.hilt")
     id("simprints.config.network")
+    id("simprints.library.kotlinSerialization")
 }
 
 android {
@@ -26,13 +27,11 @@ dependencies {
     }
     implementation(libs.chuck.release)
 
-    implementation(libs.jackson.core)
-
     runtimeOnly(libs.kotlin.coroutinesAndroid)
 
     implementation(libs.retrofit.converterScalars)
     implementation(libs.retrofit.core)
-    implementation(libs.retrofit.jackson)
+    implementation(libs.retrofit.kotlin.serialization)
     implementation(libs.retrofit.logging)
     implementation(libs.retrofit.okhttp)
 

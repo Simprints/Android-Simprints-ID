@@ -5,8 +5,6 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.fasterxml.jackson.core.JsonParseException
-import com.fasterxml.jackson.databind.JsonMappingException
 import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.workers.SimCoroutineWorker
@@ -34,6 +32,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerializationException
 
 @HiltWorker
 internal class EventUpSyncUploaderWorker @AssistedInject constructor(
@@ -55,9 +54,9 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
                 ?: throw IllegalArgumentException("input required")
             Simber.d("Received $jsonInput", tag = tag)
 
-            jsonHelper.fromJson(jsonInput)
+            jsonHelper.json.decodeFromString(jsonInput)
         } catch (t: Throwable) {
-            if (t is JsonParseException || t is JsonMappingException) {
+            if (t is SerializationException) {
                 EventUpSyncScope.ProjectScope(authStore.signedInProjectId)
             } else {
                 throw MalformedSyncOperationException(t.message ?: "")
@@ -101,7 +100,10 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
     }
 
     private fun retryOrFailIfCloudIntegrationOrBackendMaintenanceError(t: Throwable) = when (t) {
-        is IllegalArgumentException -> fail(t, t.message)
+        is IllegalArgumentException -> {
+            fail(t, t.message)
+        }
+
         is BackendMaintenanceException -> {
             fail(
                 t,

@@ -35,7 +35,7 @@ internal abstract class BaseEventDownSyncDownloaderWorker(
     private val downSyncOperationInput by lazy {
         val jsonInput = inputData.getString(INPUT_DOWN_SYNC_OPS)
             ?: throw IllegalArgumentException("input required")
-        jsonHelper.fromJson<EventDownSyncOperation>(jsonInput)
+        jsonHelper.json.decodeFromString<EventDownSyncOperation>(jsonInput)
     }
 
     private suspend fun getEventScope() = inputData

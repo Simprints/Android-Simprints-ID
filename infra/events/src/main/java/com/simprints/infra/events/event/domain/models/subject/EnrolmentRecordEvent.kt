@@ -3,6 +3,7 @@ package com.simprints.infra.events.event.domain.models.subject
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import kotlinx.serialization.Serializable
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -16,7 +17,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
     JsonSubTypes.Type(value = EnrolmentRecordUpdateEvent::class, name = "EnrolmentRecordUpdate"),
 )
 @Keep
-sealed class EnrolmentRecordEvent(
-    open val id: String,
-    val type: EnrolmentRecordEventType,
-)
+@Serializable
+sealed class EnrolmentRecordEvent {
+    abstract val id: String
+    abstract val type: EnrolmentRecordEventType
+}

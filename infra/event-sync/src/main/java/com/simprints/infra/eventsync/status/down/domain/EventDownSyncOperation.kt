@@ -1,9 +1,11 @@
 package com.simprints.infra.eventsync.status.down.domain
 
 import androidx.annotation.Keep
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
 internal data class EventDownSyncOperation(
     val queryEvent: RemoteEventQuery,
     val state: DownSyncState? = null,
@@ -11,6 +13,7 @@ internal data class EventDownSyncOperation(
     val lastSyncTime: Long? = null,
 ) {
     @Keep
+    @Serializable
     enum class DownSyncState {
         RUNNING,
         COMPLETE,

@@ -2,17 +2,21 @@ package com.simprints.infra.license.models
 
 import com.simprints.infra.license.models.comparators.DefaultVersionComparator
 import com.simprints.infra.license.models.comparators.SemanticVersionComparator
+import kotlinx.serialization.Serializable
 
+@Serializable
 sealed class Vendor(
     val value: String,
 ) {
     abstract val versionComparator: Comparator<String>
 
+    @Serializable
     data object RankOne : Vendor("RANK_ONE_FACE") {
         override val versionComparator: Comparator<String>
             get() = SemanticVersionComparator()
     }
 
+    @Serializable
     data object Nec : Vendor("NEC_FINGERPRINT") {
         override val versionComparator: Comparator<String>
             get() = DefaultVersionComparator()

@@ -3,6 +3,7 @@ plugins {
     id("simprints.library.room")
     id("kotlin-parcelize")
     id("simprints.testing.android")
+    id("simprints.library.kotlinSerialization")
 }
 
 android {

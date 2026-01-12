@@ -6,8 +6,10 @@ import com.simprints.infra.config.store.models.MultiFactorIdConfiguration
 import com.simprints.infra.config.store.remote.models.ApiExternalCredentialType.GHANA_CARD
 import com.simprints.infra.config.store.remote.models.ApiExternalCredentialType.NHIS_CARD
 import com.simprints.infra.config.store.remote.models.ApiExternalCredentialType.QR_CODE
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 internal data class ApiMultiFactorIdConfiguration(
     val allowedExternalCredentials: List<ApiExternalCredentialType>,
 ) {

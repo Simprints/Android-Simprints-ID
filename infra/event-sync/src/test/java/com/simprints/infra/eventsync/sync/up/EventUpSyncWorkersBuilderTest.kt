@@ -128,7 +128,7 @@ class EventUpSyncWorkersBuilderTest {
         assertThat(
             uploaders.any {
                 it.workSpec.input == workDataOf(
-                    INPUT_UP_SYNC to jsonHelper.toJson(upSyncScope),
+                    INPUT_UP_SYNC to jsonHelper.json.encodeToString(upSyncScope),
                     INPUT_EVENT_UP_SYNC_SCOPE_ID to "scopeId",
                 )
             },

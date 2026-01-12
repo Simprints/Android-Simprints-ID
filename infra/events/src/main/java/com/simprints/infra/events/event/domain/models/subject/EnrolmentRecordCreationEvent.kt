@@ -6,15 +6,22 @@ import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.utils.EncodingUtils
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 import com.simprints.core.domain.reference.BiometricReference as CoreBiometricReference
 
 @Keep
 @ExcludedFromGeneratedTestCoverageReports("Data class")
+@Serializable
+@SerialName("EnrolmentRecordCreation")
 data class EnrolmentRecordCreationEvent(
     override val id: String,
     val payload: EnrolmentRecordCreationPayload,
-) : EnrolmentRecordEvent(id, EnrolmentRecordEventType.EnrolmentRecordCreation) {
+) : EnrolmentRecordEvent() {
+    override val type: EnrolmentRecordEventType
+        get() = EnrolmentRecordEventType.EnrolmentRecordCreation
+
     constructor(
         subjectId: String,
         projectId: String,
@@ -35,13 +42,14 @@ data class EnrolmentRecordCreationEvent(
     )
 
     @Keep
+    @Serializable
     data class EnrolmentRecordCreationPayload(
         val subjectId: String,
         val projectId: String,
         val moduleId: TokenizableString,
         val attendantId: TokenizableString,
-        val biometricReferences: List<BiometricReference>,
-        val externalCredentials: List<ExternalCredential>,
+        val biometricReferences: List<BiometricReference> = emptyList(),
+        val externalCredentials: List<ExternalCredential> = emptyList(),
     )
 
     companion object {

@@ -2,8 +2,10 @@ package com.simprints.infra.config.store.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.infra.config.store.models.ProjectState
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 enum class ApiProjectState {
     RUNNING,
     PAUSED,

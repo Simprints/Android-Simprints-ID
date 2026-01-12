@@ -1,13 +1,12 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent.OneToOneMatchPayload
+import kotlinx.serialization.Serializable
 
 @Keep
-@JsonInclude(Include.NON_NULL)
+@Serializable
 internal data class ApiOneToOneMatchPayload(
     override val startTime: ApiTimestamp,
     val endTime: ApiTimestamp?,
@@ -16,7 +15,7 @@ internal data class ApiOneToOneMatchPayload(
     val result: ApiMatchEntry?,
     val fingerComparisonStrategy: ApiFingerComparisonStrategy?,
     val probeBiometricReferenceId: String? = null,
-) : ApiEventPayload(startTime) {
+) : ApiEventPayload() {
     constructor(domainPayload: OneToOneMatchPayload) : this(
         startTime = domainPayload.createdAt.fromDomainToApi(),
         endTime = domainPayload.endedAt?.fromDomainToApi(),
