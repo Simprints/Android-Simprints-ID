@@ -39,7 +39,6 @@ dependencies {
     api(libs.androidX.cameraX.core)
     api(libs.androidX.cameraX.lifecycle)
     api(libs.androidX.cameraX.view)
-    api(libs.jackson.core)
     api(libs.playServices.barcode)
 
     testImplementation(project(":infra:test-tools"))
