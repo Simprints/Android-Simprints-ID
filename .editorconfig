@@ -32,3 +32,6 @@ ktlint_function_signature_body_expression_wrapping = default
 
 # In tests star imports are fine since there could be lots helper functions
 ij_kotlin_packages_to_use_import_on_demand=androidx.test.**,io.mockk.**,com.google.common.truth.**
+
+# Backticked function names are only used in tests and those names can be very long
+ktlint_ignore_back_ticked_identifier=true
