@@ -6,6 +6,7 @@ import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -94,7 +95,7 @@ class GetEnrolmentCreationEventForRecordUseCaseTest {
         val result = useCase("projectId", "subjectId")
 
         coVerify { enrolmentRecordRepository.load(any()) }
-        coVerify { jsonHelper.toJson(any(), any()) }
+        coVerify { jsonHelper.json.encodeToString(any<CoSyncEnrolmentRecordEvents>()) }
         assertThat(result).isNotNull()
     }
 }

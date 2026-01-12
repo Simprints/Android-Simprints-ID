@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.Module
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 
 object JsonHelper {
@@ -59,8 +60,11 @@ object JsonHelper {
 
     inline fun <reified T> fromJson(json: String): T = jackson.readValue(json, T::class.java)
 
-    fun validateJsonOrThrow(json: String) {
-        jackson.readTree(json)
+    /**
+     * @throws SerializationException if the JSON is not valid
+     */
+    fun validateJsonOrThrow(jsonString: String) {
+        json.parseToJsonElement(jsonString)
     }
 
     // Todo will be replacing the above fromJson and toJson once completely removing jackson before the 2026.1.0 release
