@@ -35,3 +35,6 @@ ij_kotlin_packages_to_use_import_on_demand=androidx.test.**,io.mockk.**,com.goog
 
 # Backticked function names are only used in tests and those names can be very long
 ktlint_ignore_back_ticked_identifier=true
+
+# Unused import deletion is disabled by default due to a issue with
+ktlint_standard_no-unused-imports = enabled
