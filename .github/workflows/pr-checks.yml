@@ -8,6 +8,11 @@ on: # this checks should be triggered on pull request, before deployments, and m
     workflow_call:
     workflow_dispatch:
 
+# Cancel in-progress runs when a new commit is pushed to the PR
+concurrency:
+    group: pr-checks-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
+
 jobs:
     core-unit-tests:
         name: Core Unit Tests
