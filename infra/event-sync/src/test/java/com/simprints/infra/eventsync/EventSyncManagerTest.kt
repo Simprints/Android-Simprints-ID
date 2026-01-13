@@ -19,9 +19,7 @@ import com.simprints.infra.eventsync.event.commcare.cache.CommCareSyncCache
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
-import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
-import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.down.tasks.CommCareEventSyncTask
 import com.simprints.infra.eventsync.sync.down.tasks.SimprintsEventDownSyncTask
@@ -32,12 +30,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import io.mockk.verify
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -52,9 +45,6 @@ internal class EventSyncManagerTest {
 
     @MockK
     lateinit var timeHelper: TimeHelper
-
-    @MockK
-    lateinit var eventSyncStateProcessor: EventSyncStateProcessor
 
     @MockK
     lateinit var eventUpSyncScopeRepository: EventUpSyncScopeRepository
@@ -110,7 +100,6 @@ internal class EventSyncManagerTest {
 
         eventSyncManagerImpl = EventSyncManagerImpl(
             timeHelper = timeHelper,
-            eventSyncStateProcessor = eventSyncStateProcessor,
             downSyncScopeRepository = eventDownSyncScopeRepository,
             eventRepository = eventRepository,
             upSyncScopeRepo = eventUpSyncScopeRepository,
@@ -129,34 +118,6 @@ internal class EventSyncManagerTest {
     fun `getLastSyncTime should call sync cache`() = runTest {
         eventSyncManagerImpl.getLastSyncTime()
         coVerify { eventSyncCache.readLastSuccessfulSyncTime() }
-    }
-
-    @Test
-    fun `getLastSyncState should call sync processor`() = runTest {
-        every { eventSyncStateProcessor.getLastSyncState() } returns flowOf() // Simulate empty flow
-
-        eventSyncManagerImpl.getLastSyncState().firstOrNull()
-
-        verify { eventSyncStateProcessor.getLastSyncState() }
-    }
-
-    @Test
-    fun `getLastSyncState with useDefaultValue true should return an immediate default value`() = runTest {
-        every { eventSyncStateProcessor.getLastSyncState() } returns MutableSharedFlow()
-        val defaultValue = EventSyncState(syncId = "", null, null, emptyList(), emptyList(), emptyList())
-
-        val result = eventSyncManagerImpl.getLastSyncState(true).firstOrNull()
-
-        assertThat(result).isEqualTo(defaultValue)
-    }
-
-    @Test
-    fun `getLastSyncState with useDefaultValue false and no data emission should return null value`() = runTest {
-        every { eventSyncStateProcessor.getLastSyncState() } returns flowOf() // Simulate empty flow
-
-        val result = eventSyncManagerImpl.getLastSyncState(false).firstOrNull()
-
-        assertThat(result).isEqualTo(null)
     }
 
     @Test
