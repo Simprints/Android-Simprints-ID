@@ -5,6 +5,14 @@ on: # this checks should be triggered on pull request, before deployments, and m
     pull_request:
         paths-ignore:
             - 'infra/resources/src/main/res/**'
+            - '**.md'
+        types:
+            # Default types of PR triggers
+            - opened
+            - reopened
+            - synchronize
+            # Ensures that Sonar check are run once PR is ready
+            - ready_for_review
     workflow_call:
     workflow_dispatch:
 
