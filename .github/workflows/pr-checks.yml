@@ -159,3 +159,5 @@ jobs:
                  fingerprint-unit-tests,
                  testing-tools ]
         uses: ./.github/workflows/reusable-sonar-scan.yml
+        # Only run if the PR ready for review or triggered manually
+        if: github.event.pull_request.draft == false || github.event_name == 'workflow_dispatch'
