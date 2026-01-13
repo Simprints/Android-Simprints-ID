@@ -17,7 +17,9 @@ import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import com.simprints.infra.sync.SyncCommand
 import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.sync.usecase.SyncUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -45,6 +47,7 @@ internal class SyncInfoViewModel @Inject constructor(
     private val recentUserActivityManager: RecentUserActivityManager,
     private val timeHelper: TimeHelper,
     observeSyncInfo: ObserveSyncInfoUseCase,
+    private val sync: SyncUseCase,
     private val logoutUseCase: LogoutUseCase,
     @param:DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -55,12 +58,9 @@ internal class SyncInfoViewModel @Inject constructor(
     private val _loginNavigationEventLiveData = MutableLiveData<LoginParams>()
 
     private val eventSyncStateFlow =
-        eventSyncManager
-            .getLastSyncState(
-                useDefaultValue = true, // otherwise value not guaranteed
-            )
+        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.eventSyncState }
     private val imageSyncStatusFlow =
-        syncOrchestrator.observeImageSyncStatus()
+        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.imageSyncStatus }
 
     private val eventSyncButtonClickFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val imageSyncButtonClickFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
@@ -186,7 +186,7 @@ internal class SyncInfoViewModel @Inject constructor(
 
     private fun startInitialSyncIfRequired() {
         viewModelScope.launch {
-            val isRunning = eventSyncManager.getLastSyncState().firstOrNull()?.isSyncRunning() ?: false
+            val isRunning = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.eventSyncState }.firstOrNull()?.isSyncRunning() ?: false
             val lastUpdate = eventSyncManager.getLastSyncTime()
 
             val isForceEventSync = when {

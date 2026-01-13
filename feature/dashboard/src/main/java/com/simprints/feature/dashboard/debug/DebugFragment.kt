@@ -19,11 +19,14 @@ import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepositor
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
+import com.simprints.infra.sync.SyncCommand
 import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.sync.usecase.SyncUseCase
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -31,6 +34,9 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 internal class DebugFragment : Fragment(R.layout.fragment_debug) {
+    @Inject
+    lateinit var sync: SyncUseCase
+
     @Inject
     lateinit var eventSyncManager: EventSyncManager
 
@@ -61,7 +67,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
         super.onViewCreated(view, savedInstanceState)
         applySystemBarInsets(view)
 
-        eventSyncManager.getLastSyncState().asLiveData().observe(viewLifecycleOwner) { state ->
+        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.eventSyncState }.asLiveData().observe(viewLifecycleOwner) { state ->
             val states =
                 (state.downSyncWorkersInfo.map { it.state } + state.upSyncWorkersInfo.map { it.state })
             val message =

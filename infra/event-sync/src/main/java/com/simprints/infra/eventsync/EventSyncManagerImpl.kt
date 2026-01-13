@@ -17,9 +17,7 @@ import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.status.down.domain.RemoteEventQuery
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
-import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
-import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.MASTER_SYNC_SCHEDULERS
 import com.simprints.infra.eventsync.sync.common.MASTER_SYNC_SCHEDULER_ONE_TIME
@@ -31,14 +29,12 @@ import com.simprints.infra.eventsync.sync.down.tasks.SimprintsEventDownSyncTask
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 internal class EventSyncManagerImpl @Inject constructor(
     private val timeHelper: TimeHelper,
-    private val eventSyncStateProcessor: EventSyncStateProcessor,
     private val downSyncScopeRepository: EventDownSyncScopeRepository,
     private val eventRepository: EventRepository,
     private val upSyncScopeRepo: EventUpSyncScopeRepository,
@@ -52,13 +48,6 @@ internal class EventSyncManagerImpl @Inject constructor(
     @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : EventSyncManager {
     override suspend fun getLastSyncTime(): Timestamp? = eventSyncCache.readLastSuccessfulSyncTime()
-
-    override fun getLastSyncState(useDefaultValue: Boolean): Flow<EventSyncState> = flow {
-        if (useDefaultValue) {
-            emit(EventSyncState(syncId = "", null, null, emptyList(), emptyList(), emptyList()))
-        }
-        eventSyncStateProcessor.getLastSyncState().collect { emit(it) }
-    }
 
     override fun getPeriodicWorkTags(): List<String> = listOf(
         MASTER_SYNC_SCHEDULERS,

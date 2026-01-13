@@ -9,7 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-internal class SyncWorkersInfoProvider @Inject constructor(
+class SyncWorkersInfoProvider @Inject constructor(
     @ApplicationContext ctx: Context,
 ) {
     private val wm = WorkManager.getInstance(ctx)

@@ -10,8 +10,8 @@ import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
-import com.simprints.infra.eventsync.EventSyncManager
-import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.sync.SyncCommand
+import com.simprints.infra.sync.usecase.SyncUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -23,8 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class LogoutSyncViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
-    eventSyncManager: EventSyncManager,
-    syncOrchestrator: SyncOrchestrator,
+    sync: SyncUseCase,
     authStore: AuthStore,
     private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
@@ -38,8 +37,8 @@ internal class LogoutSyncViewModel @Inject constructor(
             .asLiveData(viewModelScope.coroutineContext)
 
     val isLogoutWithoutSyncVisibleLiveData: LiveData<Boolean> = combine(
-        eventSyncManager.getLastSyncState(useDefaultValue = true),
-        syncOrchestrator.observeImageSyncStatus(),
+        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.eventSyncState },
+        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.imageSyncStatus },
     ) { eventSyncState, imageSyncStatus ->
         !eventSyncState.isSyncCompleted() || imageSyncStatus.isSyncing
     }.debounce(timeoutMillis = ANTI_JITTER_DELAY_MILLIS).asLiveData(viewModelScope.coroutineContext)

@@ -28,7 +28,8 @@ import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.network.ConnectivityTracker
-import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.sync.SyncCommand
+import com.simprints.infra.sync.usecase.SyncUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -36,6 +37,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 import kotlin.math.roundToInt
@@ -47,18 +49,17 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     private val authStore: AuthStore,
     private val imageRepository: ImageRepository,
     private val eventSyncManager: EventSyncManager,
-    syncOrchestrator: SyncOrchestrator,
     private val timeHelper: TimeHelper,
     private val ticker: Ticker,
     private val appForegroundStateTracker: AppForegroundStateTracker,
     private val commCarePermissionChecker: CommCarePermissionChecker,
     private val observeConfigurationFlow: ObserveConfigurationChangesUseCase,
+    sync: SyncUseCase,
     @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) {
-    private val eventSyncStateFlow = eventSyncManager
-        .getLastSyncState(useDefaultValue = true) // otherwise value not guaranteed
+    private val eventSyncStateFlow = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.eventSyncState }
 
-    private val imageSyncStatusFlow = syncOrchestrator.observeImageSyncStatus()
+    private val imageSyncStatusFlow = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.imageSyncStatus }
 
     // Since we are not using distinctUntilChanged any emission from combined flows will trigger the main flow as well
     private fun combinedRefreshSignals() = combine(

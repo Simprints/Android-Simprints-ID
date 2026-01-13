@@ -3,7 +3,6 @@ package com.simprints.infra.eventsync
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
-import com.simprints.infra.eventsync.status.models.EventSyncState
 import kotlinx.coroutines.flow.Flow
 
 interface EventSyncManager {
@@ -14,8 +13,6 @@ interface EventSyncManager {
     fun getAllWorkerTag(): String
 
     suspend fun getLastSyncTime(): Timestamp?
-
-    fun getLastSyncState(useDefaultValue: Boolean = false): Flow<EventSyncState>
 
     suspend fun countEventsToUpload(): Flow<Int>
 
