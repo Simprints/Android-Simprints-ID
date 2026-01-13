@@ -15,7 +15,6 @@ import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.experimental
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.*
@@ -23,6 +22,7 @@ import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -74,8 +74,8 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         } returns QUALITY_THRESHOLD
         every { isUsingAutoCapture.invoke(any()) } returns true
         coEvery {
-            configRepository.getProjectConfiguration().experimental().singleQualityFallbackRequired
-        } returns false
+            configRepository.getProjectConfiguration().custom
+        } returns mapOf("singleQualityFallbackRequired" to JsonPrimitive(false))
         every { timeHelper.now() } returnsMany (0..100L).map { Timestamp(it) }
         justRun { previewFrame.recycle() }
         val resolveFaceBioSdkUseCase = mockk<ResolveFaceBioSdkUseCase> {
@@ -294,8 +294,8 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         val badQuality: Face = getFace(quality = -2f)
 
         coEvery {
-            configRepository.getProjectConfiguration().experimental().singleQualityFallbackRequired
-        } returns true
+            configRepository.getProjectConfiguration().custom
+        } returns mapOf("singleQualityFallbackRequired" to JsonPrimitive(true))
 
         every { faceDetector.analyze(frame) } returnsMany listOf(
             badQuality, // not a fallback image due to bad quality
@@ -325,11 +325,9 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     fun `Use default imaging duration when not configured`() = runTest {
         coEvery { faceDetector.analyze(frame) } returns getFace()
         coEvery {
-            configRepository
-                .getProjectConfiguration()
-                .experimental()
-                .faceAutoCaptureImagingDurationMillis
-        } returns AUTO_CAPTURE_IMAGING_DURATION_MS
+            configRepository.getProjectConfiguration().custom
+        } returns mapOf("faceAutoCaptureImagingDurationMillis" to JsonPrimitive(AUTO_CAPTURE_IMAGING_DURATION_MS))
+
         val capturingState = viewModel.capturingState.testObserver()
 
         viewModel.initAutoCapture()
@@ -351,12 +349,12 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     fun `Use custom imaging duration when provided in config`() = runTest {
         val configDuration = 5000L
         coEvery { faceDetector.analyze(frame) } returns getFace()
-        coEvery {
-            configRepository
-                .getProjectConfiguration()
-                .experimental()
-                .faceAutoCaptureImagingDurationMillis
-        } returns configDuration
+        coEvery { configRepository.getProjectConfiguration().custom } returns
+            mapOf(
+                "faceAutoCaptureImagingDurationMillis" to JsonPrimitive(configDuration.toInt()),
+                "singleQualityFallbackRequired" to JsonPrimitive(false),
+            )
+
         val capturingState = viewModel.capturingState.testObserver()
 
         viewModel.initAutoCapture()
@@ -367,8 +365,8 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         Truth
             .assertThat(capturingState.observedValues.last())
             .isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.CAPTURING)
-
-        advanceTimeBy(configDuration / 2)
+        // Add 1ms to account for json deserialization delay
+        advanceTimeBy((configDuration / 2) + 1)
         Truth
             .assertThat(capturingState.observedValues.last())
             .isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.FINISHED)
@@ -386,7 +384,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, samplesToKeep, 0)
         viewModel.process(frame) // won't be observed during the preparation phase
         viewModel.startCapture()
-        (1..100).forEach {
+        repeat(100) {
             viewModel.process(frame)
         }
         advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS + 1)

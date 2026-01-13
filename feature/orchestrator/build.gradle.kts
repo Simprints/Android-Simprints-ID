@@ -1,6 +1,7 @@
 plugins {
     id("simprints.feature")
     id("kotlin-parcelize")
+    id("simprints.library.kotlinSerialization")
 }
 
 android {

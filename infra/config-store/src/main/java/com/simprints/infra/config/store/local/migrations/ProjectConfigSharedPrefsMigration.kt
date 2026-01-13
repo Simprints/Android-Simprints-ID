@@ -3,7 +3,6 @@ package com.simprints.infra.config.store.local.migrations
 import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.datastore.core.DataMigration
-import com.fasterxml.jackson.core.JacksonException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.local.migrations.models.OldProjectConfig
@@ -12,6 +11,7 @@ import com.simprints.infra.config.store.local.models.toProto
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.serialization.SerializationException
 import javax.inject.Inject
 
 /**
@@ -37,12 +37,12 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
         if (projectSettingsJson.isNullOrEmpty()) return currentData
 
         return try {
-            JsonHelper
-                .fromJson<OldProjectConfig>(projectSettingsJson)
+            JsonHelper.json
+                .decodeFromString<OldProjectConfig>(projectSettingsJson)
                 .toDomain(authStore.signedInProjectId)
                 .toProto()
         } catch (e: Exception) {
-            if (e is JacksonException) {
+            if (e is SerializationException) {
                 // Return default value
                 Simber.i("Invalid old configuration for project ${authStore.signedInProjectId}", e, tag = MIGRATION)
                 ProtoProjectConfiguration.getDefaultInstance()

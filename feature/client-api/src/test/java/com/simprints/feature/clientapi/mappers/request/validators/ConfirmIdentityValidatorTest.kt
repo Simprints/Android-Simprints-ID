@@ -14,6 +14,7 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Before
 import org.junit.Test
 
@@ -199,7 +200,7 @@ internal class ConfirmIdentityValidatorTest : ActionRequestValidatorTest(Confirm
         coEvery { mockEventRepository.getEventsFromScope(any()) } returns listOf(mockCallback)
 
         // Mock ConfigManager with feature flag enabled
-        every { mockProjectConfig.custom } returns mapOf("allowConfirmingGuidsNotInCallback" to true)
+        every { mockProjectConfig.custom } returns mapOf("allowConfirmingGuidsNotInCallback" to JsonPrimitive(true))
         coEvery { mockConfigRepository.getProjectConfiguration() } returns mockProjectConfig
 
         val validator = ConfirmIdentityValidator(
@@ -224,7 +225,7 @@ internal class ConfirmIdentityValidatorTest : ActionRequestValidatorTest(Confirm
         coEvery { mockEventRepository.getEventsFromScope(any()) } returns listOf(mockCallback)
 
         // Mock ConfigManager with feature flag disabled
-        every { mockProjectConfig.custom } returns mapOf("allowConfirmingGuidsNotInCallback" to false)
+        every { mockProjectConfig.custom } returns mapOf("allowConfirmingGuidsNotInCallback" to JsonPrimitive(false))
         coEvery { mockConfigRepository.getProjectConfiguration() } returns mockProjectConfig
 
         val validator = ConfirmIdentityValidator(

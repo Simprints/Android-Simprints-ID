@@ -25,6 +25,7 @@ dependencies {
     debugImplementation(project(":testing:data-generator"))
 
     implementation(libs.fuzzywuzzy.core)
+    implementation(libs.kotlin.serialization)
 
     // UI
     implementation(libs.androidX.ui.preference)

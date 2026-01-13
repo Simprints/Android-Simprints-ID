@@ -17,7 +17,7 @@ data class SuspiciousIntentEvent(
 ) : Event() {
     constructor(
         createdAt: Timestamp,
-        unexpectedExtras: Map<String, Any?>,
+        unexpectedExtras: Map<String, String?>,
     ) : this(
         UUID.randomUUID().toString(),
         SuspiciousIntentPayload(createdAt, EVENT_VERSION, unexpectedExtras),
@@ -32,7 +32,7 @@ data class SuspiciousIntentEvent(
     data class SuspiciousIntentPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
-        val unexpectedExtras: Map<String, Any?>,
+        val unexpectedExtras: Map<String, String?>,
         override val endedAt: Timestamp? = null,
         override val type: EventType = SUSPICIOUS_INTENT,
     ) : EventPayload() {

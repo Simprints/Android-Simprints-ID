@@ -18,7 +18,7 @@ data class InvalidIntentEvent(
     constructor(
         creationTime: Timestamp,
         action: String,
-        extras: Map<String, Any?>,
+        extras: Map<String, String?>,
     ) : this(
         UUID.randomUUID().toString(),
         InvalidIntentPayload(creationTime, EVENT_VERSION, action, extras),
@@ -34,7 +34,7 @@ data class InvalidIntentEvent(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
         val action: String,
-        val extras: Map<String, Any?>,
+        val extras: Map<String, String?>,
         override val endedAt: Timestamp? = null,
         override val type: EventType = INVALID_INTENT,
     ) : EventPayload() {

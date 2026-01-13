@@ -77,7 +77,7 @@ class ClientApiViewModel @Inject internal constructor(
         action: String,
         extras: Bundle,
     ): ActionRequest? {
-        val extrasMap = extras.toMap()
+        val extrasMap: Map<String, String> = extras.toMap().mapValues { it.value.toString() }
         return try {
             // Session must be created to be able to report invalid intents if mapping fails
             if (createSessionIfRequiredUseCase(action)) {

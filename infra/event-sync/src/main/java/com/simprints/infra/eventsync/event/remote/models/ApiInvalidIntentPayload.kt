@@ -1,7 +1,6 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.core.tools.json.AnyPrimitiveSerializer
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.InvalidIntentEvent.InvalidIntentPayload
 import kotlinx.serialization.Serializable
@@ -11,7 +10,7 @@ import kotlinx.serialization.Serializable
 internal data class ApiInvalidIntentPayload(
     override val startTime: ApiTimestamp,
     val action: String,
-    val extras: Map<String, @Serializable(with = AnyPrimitiveSerializer::class) Any?>,
+    val extras: Map<String, String?>,
 ) : ApiEventPayload() {
     constructor(domainPayload: InvalidIntentPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),

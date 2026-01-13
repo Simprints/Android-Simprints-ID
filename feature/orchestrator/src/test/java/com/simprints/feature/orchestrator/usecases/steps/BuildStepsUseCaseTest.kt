@@ -3,8 +3,8 @@ package com.simprints.feature.orchestrator.usecases.steps
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.common.TemplateIdentifier
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
@@ -17,12 +17,12 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.NEC
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.orchestration.data.ActionRequest
 import io.mockk.*
 import io.mockk.impl.annotations.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Before
@@ -240,7 +240,8 @@ class BuildStepsUseCaseTest {
 
         val action = mockk<ActionRequest.IdentifyActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns null
-        every { projectConfiguration.experimental().idPoolValidationEnabled } returns true
+        every { projectConfiguration.custom } returns
+            mapOf("validateIdentificationPool" to JsonPrimitive(true))
 
         val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
 

@@ -14,6 +14,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -44,7 +45,8 @@ class FallbackToCommCareDataSourceIfNeededUseCaseTest {
 
         return mockk<ProjectConfiguration>(relaxed = true) {
             every { synchronization } returns syncConfig
-            every { custom } returns mapOf("fallbackToCommCareThresholdDays" to thresholdDays)
+            every { custom } returns
+                mapOf("fallbackToCommCareThresholdDays" to JsonPrimitive(thresholdDays))
         }
     }
 

@@ -1,8 +1,10 @@
 package com.simprints.infra.config.store.models
 
 import androidx.annotation.Keep
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 data class Vero2Configuration(
     val qualityThreshold: Int,
     val imageSavingStrategy: ImageSavingStrategy,
@@ -10,6 +12,8 @@ data class Vero2Configuration(
     val ledsMode: LedsMode,
     val firmwareVersions: Map<String, Vero2FirmwareVersions>,
 ) {
+    @Keep
+    @Serializable
     enum class ImageSavingStrategy {
         NEVER,
         ONLY_GOOD_SCAN,
@@ -17,6 +21,8 @@ data class Vero2Configuration(
         EAGER,
     }
 
+    @Keep
+    @Serializable
     enum class CaptureStrategy {
         SECUGEN_ISO_500_DPI,
         SECUGEN_ISO_1000_DPI,
@@ -24,6 +30,8 @@ data class Vero2Configuration(
         SECUGEN_ISO_1700_DPI,
     }
 
+    @Keep
+    @Serializable
     enum class LedsMode {
         BASIC,
         LIVE_QUALITY_FEEDBACK,
@@ -31,6 +39,7 @@ data class Vero2Configuration(
     }
 
     @Keep
+    @Serializable
     data class Vero2FirmwareVersions(
         val cypress: String = "",
         val stm: String = "",
