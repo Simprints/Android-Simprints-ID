@@ -1,5 +1,6 @@
 package com.simprints.feature.dashboard.main
 
+import android.content.Context
 import androidx.lifecycle.Observer
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openContextualActionModeOverflowMenu
@@ -8,7 +9,10 @@ import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.work.Configuration
+import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.main.dailyactivity.DailyActivityViewModel
@@ -21,6 +25,7 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.every
 import io.mockk.mockk
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,6 +53,13 @@ class MainFragmentTest {
     internal val dailyActivityViewModel = mockk<DailyActivityViewModel>(relaxed = true)
 
     private val navController = testNavController(R.navigation.graph_dashboard, R.id.mainFragment)
+
+    @Before
+    fun setUp() {
+        hiltRule.inject()
+        val ctx: Context = getApplicationContext()
+        WorkManagerTestInitHelper.initializeTestWorkManager(ctx, Configuration.Builder().build())
+    }
 
     @Test
     fun `should hide the privacy notice menu if the consent is not required`() {

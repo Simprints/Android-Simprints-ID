@@ -25,7 +25,10 @@ import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.sync.ImageSyncStatus
+import com.simprints.infra.sync.LegacySyncStates
 import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.sync.SyncStatus
+import com.simprints.infra.sync.usecase.SyncUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import com.simprints.testtools.common.livedata.getOrAwaitValues
@@ -73,6 +76,9 @@ class SyncInfoViewModelTest {
     private lateinit var observeSyncInfo: ObserveSyncInfoUseCase
 
     @MockK
+    private lateinit var sync: SyncUseCase
+
+    @MockK
     private lateinit var logoutUseCase: LogoutUseCase
 
     @MockK
@@ -89,6 +95,8 @@ class SyncInfoViewModelTest {
 
     @MockK
     private lateinit var mockImageSyncStatus: ImageSyncStatus
+
+    private lateinit var syncStatusFlow: MutableStateFlow<SyncStatus>
 
     private lateinit var viewModel: SyncInfoViewModel
 
@@ -141,15 +149,14 @@ class SyncInfoViewModelTest {
         coEvery { configRepository.getDeviceConfiguration() } returns mockDeviceConfiguration
         coEvery { configRepository.getProject() } returns mockProject
 
-        val eventSyncFlow = flowOf(mockEventSyncState)
-        every { eventSyncManager.getLastSyncState() } returns eventSyncFlow
-        every { eventSyncManager.getLastSyncState(any()) } returns eventSyncFlow
-
         coEvery { eventSyncManager.getLastSyncTime() } returns TEST_TIMESTAMP
         coEvery { eventSyncManager.countEventsToUpload(any()) } returns flowOf(0)
         coEvery { eventSyncManager.countEventsToDownload() } returns DownSyncCounts(0, isLowerBound = false)
 
-        every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockImageSyncStatus)
+        syncStatusFlow = MutableStateFlow(
+            SyncStatus(LegacySyncStates(eventSyncState = mockEventSyncState, imageSyncStatus = mockImageSyncStatus)),
+        )
+        every { sync.invoke(any(), any()) } returns syncStatusFlow
         coEvery { syncOrchestrator.startEventSync(any()) } returns Unit
         coEvery { syncOrchestrator.stopEventSync() } returns Unit
         coEvery { syncOrchestrator.startImageSync() } returns Unit
@@ -177,6 +184,7 @@ class SyncInfoViewModelTest {
             recentUserActivityManager = recentUserActivityManager,
             timeHelper = timeHelper,
             observeSyncInfo = observeSyncInfo,
+            sync = sync,
             logoutUseCase = logoutUseCase,
             ioDispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
@@ -251,8 +259,9 @@ class SyncInfoViewModelTest {
             every { progress } returns null
             every { lastUpdateTimeMillis } returns 0
         }
-        every { eventSyncManager.getLastSyncState(any()) } returns flowOf(mockCompletedEventSyncState)
-        every { syncOrchestrator.observeImageSyncStatus() } returns flowOf(mockNotSyncingImageStatus)
+        syncStatusFlow.value = SyncStatus(
+            LegacySyncStates(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockNotSyncingImageStatus),
+        )
         createViewModel()
         viewModel.isPreLogoutUpSync = true
 
@@ -277,8 +286,9 @@ class SyncInfoViewModelTest {
             every { progress } returns null
             every { lastUpdateTimeMillis } returns 0
         }
-        every { eventSyncManager.getLastSyncState(any()) } returns flowOf(mockCompletedEventSyncState)
-        every { syncOrchestrator.observeImageSyncStatus() } returns flowOf(mockNotSyncingImageStatus)
+        syncStatusFlow.value = SyncStatus(
+            LegacySyncStates(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockNotSyncingImageStatus),
+        )
         createViewModel()
         viewModel.isPreLogoutUpSync = true
 
@@ -324,8 +334,9 @@ class SyncInfoViewModelTest {
             every { progress } returns null
             every { lastUpdateTimeMillis } returns 0
         }
-        every { eventSyncManager.getLastSyncState(any()) } returns flowOf(mockCompletedEventSyncState)
-        every { syncOrchestrator.observeImageSyncStatus() } returns flowOf(mockNotSyncingImageStatus)
+        syncStatusFlow.value = SyncStatus(
+            LegacySyncStates(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockNotSyncingImageStatus),
+        )
         createViewModel()
         viewModel.isPreLogoutUpSync = false
 
@@ -350,8 +361,9 @@ class SyncInfoViewModelTest {
             every { progress } returns null
             every { lastUpdateTimeMillis } returns 0
         }
-        every { eventSyncManager.getLastSyncState(any()) } returns flowOf(mockInProgressEventSyncState)
-        every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockNotSyncingImageStatus)
+        syncStatusFlow.value = SyncStatus(
+            LegacySyncStates(eventSyncState = mockInProgressEventSyncState, imageSyncStatus = mockNotSyncingImageStatus),
+        )
         createViewModel()
         viewModel.isPreLogoutUpSync = true
 
@@ -375,8 +387,9 @@ class SyncInfoViewModelTest {
             every { progress } returns Pair(1, 2)
             every { lastUpdateTimeMillis } returns null
         }
-        every { eventSyncManager.getLastSyncState(any()) } returns flowOf(mockCompletedEventSyncState)
-        every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockSyncingImageStatus)
+        syncStatusFlow.value = SyncStatus(
+            LegacySyncStates(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockSyncingImageStatus),
+        )
         createViewModel()
         viewModel.isPreLogoutUpSync = true
 
@@ -469,7 +482,9 @@ class SyncInfoViewModelTest {
         val mockNotSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
             every { isSyncing } returns false
         }
-        every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockNotSyncingImageStatus)
+        syncStatusFlow.value = SyncStatus(
+            LegacySyncStates(eventSyncState = mockEventSyncState, imageSyncStatus = mockNotSyncingImageStatus),
+        )
         createViewModel()
 
         viewModel.toggleImageSync()
@@ -483,7 +498,9 @@ class SyncInfoViewModelTest {
         val mockSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
             every { isSyncing } returns true
         }
-        every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockSyncingImageStatus)
+        syncStatusFlow.value = SyncStatus(
+            LegacySyncStates(eventSyncState = mockEventSyncState, imageSyncStatus = mockSyncingImageStatus),
+        )
         createViewModel()
 
         viewModel.toggleImageSync()
@@ -578,7 +595,9 @@ class SyncInfoViewModelTest {
         val mockInProgressEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncInProgress() } returns true
         }
-        every { eventSyncManager.getLastSyncState(any()) } returns flowOf(mockInProgressEventSyncState)
+        syncStatusFlow.value = SyncStatus(
+            LegacySyncStates(eventSyncState = mockInProgressEventSyncState, imageSyncStatus = mockImageSyncStatus),
+        )
         createViewModel()
 
         val values = viewModel.syncInfoLiveData.getOrAwaitValues(number = 1) {
@@ -594,7 +613,9 @@ class SyncInfoViewModelTest {
         val mockNotSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
             every { isSyncing } returns false
         }
-        every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockNotSyncingImageStatus)
+        syncStatusFlow.value = SyncStatus(
+            LegacySyncStates(eventSyncState = mockEventSyncState, imageSyncStatus = mockNotSyncingImageStatus),
+        )
         createViewModel()
 
         val values = viewModel.syncInfoLiveData.getOrAwaitValues(number = 2) {
@@ -612,7 +633,9 @@ class SyncInfoViewModelTest {
         val mockSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
             every { isSyncing } returns true
         }
-        every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockSyncingImageStatus)
+        syncStatusFlow.value = SyncStatus(
+            LegacySyncStates(eventSyncState = mockEventSyncState, imageSyncStatus = mockSyncingImageStatus),
+        )
         createViewModel()
 
         val values = viewModel.syncInfoLiveData.getOrAwaitValues(number = 1) {
@@ -684,7 +707,9 @@ class SyncInfoViewModelTest {
         val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncRunning() } returns false
         }
-        every { eventSyncManager.getLastSyncState() } returns flowOf(mockIdleEventSyncState)
+        syncStatusFlow.value = SyncStatus(
+            LegacySyncStates(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus),
+        )
         coEvery { eventSyncManager.getLastSyncTime() } returns null
         createViewModel()
 
@@ -699,7 +724,9 @@ class SyncInfoViewModelTest {
         val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncRunning() } returns false
         }
-        every { eventSyncManager.getLastSyncState() } returns flowOf(mockIdleEventSyncState)
+        syncStatusFlow.value = SyncStatus(
+            LegacySyncStates(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus),
+        )
         coEvery { eventSyncManager.getLastSyncTime() } returns oldTimestamp
         every { timeHelper.msBetweenNowAndTime(oldTimestamp) } returns 600000L // 10 minutes
         createViewModel()
@@ -715,7 +742,9 @@ class SyncInfoViewModelTest {
         val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncRunning() } returns false
         }
-        every { eventSyncManager.getLastSyncState() } returns flowOf(mockIdleEventSyncState)
+        syncStatusFlow.value = SyncStatus(
+            LegacySyncStates(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus),
+        )
         coEvery { eventSyncManager.getLastSyncTime() } returns recentTimestamp
         every { timeHelper.msBetweenNowAndTime(recentTimestamp) } returns 60000L // 1 minute
         createViewModel()
@@ -730,7 +759,9 @@ class SyncInfoViewModelTest {
         val mockRunningSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncRunning() } returns true
         }
-        every { eventSyncManager.getLastSyncState() } returns flowOf(mockRunningSyncState)
+        syncStatusFlow.value = SyncStatus(
+            LegacySyncStates(eventSyncState = mockRunningSyncState, imageSyncStatus = mockImageSyncStatus),
+        )
         coEvery { eventSyncManager.getLastSyncTime() } returns null
         createViewModel()
 
@@ -745,7 +776,9 @@ class SyncInfoViewModelTest {
         val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncRunning() } returns false
         }
-        every { eventSyncManager.getLastSyncState() } returns flowOf(mockIdleEventSyncState)
+        syncStatusFlow.value = SyncStatus(
+            LegacySyncStates(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus),
+        )
         coEvery { eventSyncManager.getLastSyncTime() } returns recentTimestamp
         every { timeHelper.msBetweenNowAndTime(recentTimestamp) } returns 60000L // 1 minute
         createViewModel()
