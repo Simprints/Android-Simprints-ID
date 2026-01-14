@@ -2,8 +2,8 @@ package com.simprints.infra.config.store.testtools
 
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.common.TemplateIdentifier
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.local.models.ProtoAllowedAgeRange
 import com.simprints.infra.config.store.local.models.ProtoConsentConfiguration
@@ -68,6 +68,8 @@ import com.simprints.infra.config.store.remote.models.ApiProjectState
 import com.simprints.infra.config.store.remote.models.ApiSynchronizationConfiguration
 import com.simprints.infra.config.store.remote.models.ApiVero1Configuration
 import com.simprints.infra.config.store.remote.models.ApiVero2Configuration
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
 
 internal val apiConsentConfiguration = ApiConsentConfiguration(
     programName = "programName",
@@ -478,11 +480,11 @@ internal val apiMultiFactorIdConfiguration = ApiMultiFactorIdConfiguration(
     allowedExternalCredentials = listOf(apiAllowedExternalCredential),
 )
 
-internal val customKeyMap: Map<String, Any>? = mapOf(
-    "key1" to 7,
-    "key2" to 4.2,
-    "key3" to false,
-    "key4" to "test",
+internal val customKeyMap: Map<String, JsonElement> = mapOf(
+    "key1" to JsonPrimitive(7),
+    "key2" to JsonPrimitive(4.2),
+    "key3" to JsonPrimitive(false),
+    "key4" to JsonPrimitive("test"),
 )
 internal const val PROTO_CUSTOM_KEY_MAP_JSON = "{\"key1\":7,\"key2\":4.2,\"key3\":false,\"key4\":\"test\"}"
 

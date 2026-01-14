@@ -3,6 +3,7 @@ package com.simprints.infra.config.store.models
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.common.ModalitySdkType
+import kotlinx.serialization.json.JsonElement
 
 data class ProjectConfiguration(
     val id: String,
@@ -15,7 +16,7 @@ data class ProjectConfiguration(
     val identification: IdentificationConfiguration,
     val synchronization: SynchronizationConfiguration,
     val multifactorId: MultiFactorIdConfiguration?,
-    val custom: Map<String, Any>?,
+    val custom: Map<String, JsonElement>?,
 )
 
 fun ProjectConfiguration.canCoSyncAllData(): Boolean =

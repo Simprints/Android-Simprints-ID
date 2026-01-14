@@ -4,10 +4,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.store.models.experimental
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -38,7 +38,8 @@ class IsUsingAutoCaptureUseCaseTest {
         featureEnabled: Boolean,
         preferenceEnabled: Boolean,
     ) {
-        coEvery { projectConfiguration.experimental().faceAutoCaptureEnabled } returns featureEnabled
+        coEvery { projectConfiguration.custom } returns
+            mapOf("faceAutoCaptureEnabled" to JsonPrimitive(featureEnabled))
         every { sharedPreferences.getBoolean("preference_enable_face_auto_capture", true) } returns preferenceEnabled
     }
 

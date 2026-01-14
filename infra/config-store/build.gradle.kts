@@ -11,9 +11,6 @@ android {
 dependencies {
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:enrolment-records:realm-store"))
-
     implementation(libs.datastore)
-
     implementation(libs.retrofit.core)
-    implementation(libs.jackson.core)
 }

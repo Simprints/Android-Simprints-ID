@@ -40,7 +40,12 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
     private fun reportUnknownExtras(actionRequest: ActionRequest) {
         if (actionRequest.unknownExtras.isNotEmpty()) {
             sessionCoroutineScope.launch {
-                sessionEventRepository.addOrUpdateEvent(SuspiciousIntentEvent(timeHelper.now(), actionRequest.unknownExtras))
+                sessionEventRepository.addOrUpdateEvent(
+                    SuspiciousIntentEvent(
+                        timeHelper.now(),
+                        actionRequest.unknownExtras.mapValues { it.value.toString() },
+                    ),
+                )
             }
         }
     }
@@ -61,6 +66,7 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
                     metadata,
                     BiometricDataSource.fromString(biometricDataSource),
                 )
+
                 is ActionRequest.IdentifyActionRequest -> IdentificationCalloutEventV3(
                     startTime,
                     projectId,
@@ -69,6 +75,7 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
                     metadata,
                     BiometricDataSource.fromString(biometricDataSource),
                 )
+
                 is ActionRequest.VerifyActionRequest -> VerificationCalloutEventV3(
                     startTime,
                     projectId,
@@ -78,6 +85,7 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
                     metadata,
                     BiometricDataSource.fromString(biometricDataSource),
                 )
+
                 is ActionRequest.ConfirmIdentityActionRequest -> ConfirmationCalloutEventV3(
                     startTime,
                     projectId,
@@ -85,6 +93,7 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
                     sessionId,
                     metadata,
                 )
+
                 is ActionRequest.EnrolLastBiometricActionRequest -> EnrolmentLastBiometricsCalloutEventV3(
                     startTime,
                     projectId,
