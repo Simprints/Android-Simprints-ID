@@ -104,9 +104,14 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         searchState: SearchState,
         flowType: FlowType,
     ): Int? = when (searchState) {
-        SearchState.Searching -> null // button is not displayed during search
+        SearchState.Searching -> null
+
+        // button is not displayed during search
         is SearchState.CredentialLinked -> when (flowType) {
-            FlowType.ENROL -> IDR.string.mfid_action_enrol_anyway
+            FlowType.ENROL -> {
+                IDR.string.mfid_action_enrol_anyway
+            }
+
             else -> {
                 if (searchState.hasSuccessfulVerifications) {
                     IDR.string.mfid_action_go_to_record
@@ -148,6 +153,9 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
                 val projectConfig = configManager.getProjectConfiguration()
                 val matches = matchCandidatesUseCase(candidates, credential, externalCredentialParams, project, projectConfig)
                 eventsTracker.saveSearchEvent(startTime, scannedCredential.credentialScanId, candidates)
+                matches.forEach { match ->
+                    eventsTracker.saveMatchEvent(startTime, match)
+                }
 
                 updateState { state -> state.copy(searchState = SearchState.CredentialLinked(matchResults = matches)) }
             }
@@ -159,8 +167,11 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
      * alpha-numeric, while the NHIS card memberships contain only digits.
      */
     fun getKeyBoardInputType() = when (scannedCredential.credentialType) {
-        ExternalCredentialType.NHISCard -> InputType.TYPE_CLASS_NUMBER // NHIS card membership contains only numbers
+        ExternalCredentialType.NHISCard -> InputType.TYPE_CLASS_NUMBER
+
+        // NHIS card membership contains only numbers
         ExternalCredentialType.GhanaIdCard -> InputType.TYPE_CLASS_TEXT
+
         ExternalCredentialType.QRCode -> InputType.TYPE_CLASS_TEXT
     }
 

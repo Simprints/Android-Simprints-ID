@@ -13,9 +13,11 @@ import com.simprints.infra.matching.MatchResultItem
 data class CredentialMatch(
     val credential: TokenizableString.Tokenized,
     val matchResult: MatchResultItem,
+    val probeReferenceId: String?,
     val verificationThreshold: Float,
     val faceBioSdk: FaceConfiguration.BioSdk?,
     val fingerprintBioSdk: FingerprintConfiguration.BioSdk?,
 ) : StepResult {
     val isVerificationSuccessful = matchResult.confidence >= verificationThreshold
+    val isFaceMatch = faceBioSdk != null
 }

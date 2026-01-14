@@ -4,10 +4,12 @@ import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.CalculateLevenshteinDistanceUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
@@ -18,9 +20,13 @@ import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirma
 import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirmationEvent.ExternalCredentialConfirmationResult
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSearchEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
+import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
+import com.simprints.infra.events.event.domain.models.MatchEntry
+import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
+import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy as ConfigFingerComparisonStrategy
 
 internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
@@ -30,6 +36,25 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
     private val calculateDistance: CalculateLevenshteinDistanceUseCase,
 ) {
+    suspend fun saveMatchEvent(
+        startTime: Timestamp,
+        match: CredentialMatch,
+    ) {
+        eventRepository.addOrUpdateEvent(
+            OneToOneMatchEvent(
+                createdAt = startTime,
+                endTime = timeHelper.now(),
+                candidateId = match.matchResult.subjectId,
+                matcher = match.faceBioSdk?.name ?: match.fingerprintBioSdk?.name!!,
+                result = with(match.matchResult) {
+                    MatchEntry(subjectId, confidence)
+                },
+                fingerComparisonStrategy = if (match.isFaceMatch) null else getFingerprintComparisonStrategy(match.fingerprintBioSdk!!),
+                probeBiometricReferenceId = match.probeReferenceId.orEmpty(),
+            ),
+        )
+    }
+
     suspend fun saveSearchEvent(
         startTime: Timestamp,
         externalCredentialId: String,
@@ -129,6 +154,18 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
             ),
         )
     }
+
+    private suspend fun getFingerprintComparisonStrategy(bioSdk: FingerprintConfiguration.BioSdk) = configManager
+        .getProjectConfiguration()
+        .fingerprint
+        ?.getSdkConfiguration(bioSdk)
+        ?.comparisonStrategyForVerification
+        ?.let {
+            when (it) {
+                ConfigFingerComparisonStrategy.SAME_FINGER -> FingerComparisonStrategy.SAME_FINGER
+                ConfigFingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX -> FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
+            }
+        }
 
     companion object Companion {
         private const val NHIS_CARD_ID_LENGTH = 8

@@ -150,6 +150,7 @@ internal class MatchCandidatesUseCaseTest {
         assertThat(result[0].verificationThreshold).isEqualTo(verificationMatchThreshold)
         assertThat(result[0].faceBioSdk).isEqualTo(FaceConfiguration.BioSdk.RANK_ONE)
         assertThat(result[0].fingerprintBioSdk).isNull()
+        assertThat(result[0].probeReferenceId).isEqualTo("probeReferenceId")
     }
 
     @Test
@@ -169,6 +170,7 @@ internal class MatchCandidatesUseCaseTest {
         assertThat(result[0].verificationThreshold).isEqualTo(verificationMatchThreshold)
         assertThat(result[0].faceBioSdk).isNull()
         assertThat(result[0].fingerprintBioSdk).isEqualTo(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
+        assertThat(result[0].probeReferenceId).isEqualTo("probeReferenceId")
     }
 
     @Test

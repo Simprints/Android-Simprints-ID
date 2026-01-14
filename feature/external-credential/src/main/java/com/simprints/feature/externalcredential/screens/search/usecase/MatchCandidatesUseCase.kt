@@ -24,10 +24,11 @@ internal class MatchCandidatesUseCase @Inject constructor(
         project: Project,
         projectConfig: ProjectConfiguration,
     ): List<CredentialMatch> = candidates.flatMap { candidate ->
+        val probeReferenceId = externalCredentialParams.probeReferenceId
         val matchParams = createMatchParamsUseCase(
             candidateSubjectId = candidate.subjectId,
             flowType = externalCredentialParams.flowType,
-            probeReferenceId = externalCredentialParams.probeReferenceId,
+            probeReferenceId = probeReferenceId,
             projectConfiguration = projectConfig,
             faceSamples = externalCredentialParams.faceSamples,
             fingerprintSamples = externalCredentialParams.fingerprintSamples,
@@ -46,6 +47,7 @@ internal class MatchCandidatesUseCase @Inject constructor(
                                     CredentialMatch(
                                         credential = credential,
                                         matchResult = result,
+                                        probeReferenceId = probeReferenceId,
                                         verificationThreshold = matchThreshold,
                                         faceBioSdk = faceSdk,
                                         fingerprintBioSdk = null,
@@ -64,6 +66,7 @@ internal class MatchCandidatesUseCase @Inject constructor(
                                     CredentialMatch(
                                         credential = credential,
                                         matchResult = result,
+                                        probeReferenceId = probeReferenceId,
                                         verificationThreshold = matchThreshold,
                                         faceBioSdk = null,
                                         fingerprintBioSdk = fingerprintSdk,
