@@ -47,6 +47,8 @@ class EventSyncStateProcessor @Inject constructor(
 
                 val syncReporterStates = syncStartReporterStates(syncWorkers) + syncEndReporterStates(syncWorkers)
 
+                val lastSyncTime = eventSyncCache.readLastSuccessfulSyncTime()
+
                 val syncState = EventSyncState(
                     lastSyncId,
                     progress,
@@ -54,6 +56,7 @@ class EventSyncStateProcessor @Inject constructor(
                     upSyncStates,
                     downSyncStates,
                     syncReporterStates,
+                    lastSyncTime,
                 )
 
                 Simber.d("Emitting for sync state: $syncState", tag = SYNC)

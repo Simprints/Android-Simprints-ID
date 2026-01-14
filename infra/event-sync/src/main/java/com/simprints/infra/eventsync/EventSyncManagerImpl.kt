@@ -3,7 +3,6 @@ package com.simprints.infra.eventsync
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.ExtractCommCareCaseIdUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
@@ -47,8 +46,6 @@ internal class EventSyncManagerImpl @Inject constructor(
     private val extractCommCareCaseId: ExtractCommCareCaseIdUseCase,
     @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : EventSyncManager {
-    override suspend fun getLastSyncTime(): Timestamp? = eventSyncCache.readLastSuccessfulSyncTime()
-
     override fun getPeriodicWorkTags(): List<String> = listOf(
         MASTER_SYNC_SCHEDULERS,
         MASTER_SYNC_SCHEDULER_PERIODIC_TIME,

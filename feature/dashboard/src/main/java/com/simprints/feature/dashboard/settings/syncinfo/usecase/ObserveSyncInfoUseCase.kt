@@ -54,7 +54,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     private val appForegroundStateTracker: AppForegroundStateTracker,
     private val commCarePermissionChecker: CommCarePermissionChecker,
     private val observeConfigurationFlow: ObserveConfigurationChangesUseCase,
-    sync: SyncUseCase,
+    private val sync: SyncUseCase,
     @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) {
     private val eventSyncStateFlow = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.eventSyncState }
@@ -145,7 +145,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             SyncInfoProgress()
         }
 
-        val eventLastSyncTimestamp = eventSyncManager.getLastSyncTime() ?: Timestamp(-1)
+        val eventLastSyncTimestamp = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.eventSyncState }.firstOrNull()?.lastSyncTime ?: Timestamp(-1)
         val imageLastSyncTimestamp = Timestamp(imageSyncStatus.lastUpdateTimeMillis ?: -1)
 
         val isReLoginRequired = eventSyncState.isSyncFailedBecauseReloginRequired()

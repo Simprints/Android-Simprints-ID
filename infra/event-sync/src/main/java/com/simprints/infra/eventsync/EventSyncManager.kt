@@ -12,8 +12,6 @@ interface EventSyncManager {
 
     fun getAllWorkerTag(): String
 
-    suspend fun getLastSyncTime(): Timestamp?
-
     suspend fun countEventsToUpload(): Flow<Int>
 
     suspend fun countEventsToUpload(types: List<EventType>): Flow<Int>

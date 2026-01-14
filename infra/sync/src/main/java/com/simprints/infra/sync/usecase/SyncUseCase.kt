@@ -29,6 +29,7 @@ class SyncUseCase @Inject constructor(
         upSyncWorkersInfo = emptyList(),
         downSyncWorkersInfo = emptyList(),
         reporterStates = emptyList(),
+        lastSyncTime = null,
     )
     private val defaultImage = ImageSyncStatus(
         isSyncing = false,

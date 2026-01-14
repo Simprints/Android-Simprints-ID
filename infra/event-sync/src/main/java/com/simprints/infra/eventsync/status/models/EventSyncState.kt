@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.status.models
 
 import androidx.annotation.Keep
+import com.simprints.core.tools.time.Timestamp
 
 @Keep
 data class EventSyncState(
@@ -10,6 +11,7 @@ data class EventSyncState(
     val upSyncWorkersInfo: List<SyncWorkerInfo>,
     val downSyncWorkersInfo: List<SyncWorkerInfo>,
     val reporterStates: List<SyncWorkerInfo>,
+    val lastSyncTime: Timestamp?,
 ) {
     data class SyncWorkerInfo(
         val type: EventSyncWorkerType,

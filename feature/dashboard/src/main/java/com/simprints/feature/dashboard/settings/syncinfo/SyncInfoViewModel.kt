@@ -15,7 +15,6 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
-import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.sync.SyncCommand
 import com.simprints.infra.sync.SyncOrchestrator
@@ -42,7 +41,6 @@ import javax.inject.Inject
 internal class SyncInfoViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
     private val authStore: AuthStore,
-    private val eventSyncManager: EventSyncManager,
     private val syncOrchestrator: SyncOrchestrator,
     private val recentUserActivityManager: RecentUserActivityManager,
     private val timeHelper: TimeHelper,
@@ -187,7 +185,7 @@ internal class SyncInfoViewModel @Inject constructor(
     private fun startInitialSyncIfRequired() {
         viewModelScope.launch {
             val isRunning = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.eventSyncState }.firstOrNull()?.isSyncRunning() ?: false
-            val lastUpdate = eventSyncManager.getLastSyncTime()
+            val lastUpdate = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.eventSyncState }.firstOrNull()?.lastSyncTime
 
             val isForceEventSync = when {
                 isPreLogoutUpSync -> true
