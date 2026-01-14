@@ -12,17 +12,24 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * Combines syncable entities together in a reactive way.
+ *
+ * Because sync state is extensively used throughout the project, including synchronously,
+ * it is an app-scoped StateFlow. An up-to-date sync state value can be accessed synchronously.
+ */
 @Singleton
 class SyncUseCase @Inject constructor(
     eventSync: EventSyncUseCase,
     imageSync: ImageSyncUseCase,
     @param:AppScope private val appScope: CoroutineScope,
 ) {
-    private val defaultEvent = EventSyncState(
+    private val defaultEventSyncState = EventSyncState(
         syncId = "",
         progress = null,
         total = null,
@@ -31,22 +38,25 @@ class SyncUseCase @Inject constructor(
         reporterStates = emptyList(),
         lastSyncTime = null,
     )
-    private val defaultImage = ImageSyncStatus(
+    private val defaultImageSyncStatus = ImageSyncStatus(
         isSyncing = false,
         progress = null,
         lastUpdateTimeMillis = -1L,
     )
+    private val defaultSyncStatus = SyncStatus(
+        legacySyncStates = LegacySyncStates(defaultEventSyncState, defaultImageSyncStatus),
+    )
 
     private val sharedSyncStatus: StateFlow<SyncStatus> by lazy {
         combine(
-            eventSync(),
-            imageSync(),
+            eventSync().onStart { emit(defaultEventSyncState) },
+            imageSync().onStart { emit(defaultImageSyncStatus) },
         ) { eventSyncState, imageSyncStatus ->
             SyncStatus(LegacySyncStates(eventSyncState, imageSyncStatus))
         }.stateIn(
             appScope,
             SharingStarted.Eagerly,
-            SyncStatus(LegacySyncStates(defaultEvent, defaultImage)),
+            defaultSyncStatus,
         )
     }
 

@@ -100,6 +100,60 @@ class SyncUseCaseTest {
     }
 
     @Test
+    fun `updates SyncStatus when event emits even if image never emits`() = runTest {
+        val event = EventSyncState(
+            syncId = "sync-1",
+            progress = 1,
+            total = 10,
+            upSyncWorkersInfo = emptyList(),
+            downSyncWorkersInfo = emptyList(),
+            reporterStates = emptyList(),
+            lastSyncTime = null,
+        )
+        val useCase = SyncUseCase(eventSync, imageSync, appScope = backgroundScope)
+
+        val resultFlow = useCase(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY)
+
+        runCurrent()
+        val expected = with(resultFlow.value) {
+            copy(
+                legacySyncStates = legacySyncStates.copy(
+                    eventSyncState = event,
+                ),
+            )
+        }
+        eventSyncStatusFlow.emit(event)
+        runCurrent()
+
+        assertThat(resultFlow.value).isEqualTo(expected)
+    }
+
+    @Test
+    fun `updates SyncStatus when image emits even if event never emits`() = runTest {
+        val image = ImageSyncStatus(
+            isSyncing = true,
+            progress = 2 to 5,
+            lastUpdateTimeMillis = 123L,
+        )
+        val useCase = SyncUseCase(eventSync, imageSync, appScope = backgroundScope)
+
+        val resultFlow = useCase(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY)
+
+        runCurrent()
+        val expected = with(resultFlow.value) {
+            copy(
+                legacySyncStates = legacySyncStates.copy(
+                    imageSyncStatus = image,
+                ),
+            )
+        }
+        imageSyncStatusFlow.emit(image)
+        runCurrent()
+
+        assertThat(resultFlow.value).isEqualTo(expected)
+    }
+
+    @Test
     fun `updates SyncStatus when event sync state changes`() = runTest {
         val event1 = EventSyncState(
             syncId = "sync-1",
