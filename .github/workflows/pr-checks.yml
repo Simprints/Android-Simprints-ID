@@ -5,8 +5,21 @@ on: # this checks should be triggered on pull request, before deployments, and m
     pull_request:
         paths-ignore:
             - 'infra/resources/src/main/res/**'
+            - '**.md'
+        types:
+            # Default types of PR triggers
+            - opened
+            - reopened
+            - synchronize
+            # Ensures that Sonar check are run once PR is ready
+            - ready_for_review
     workflow_call:
     workflow_dispatch:
+
+# Cancel in-progress runs when a new commit is pushed to the PR
+concurrency:
+    group: pr-checks-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
 
 jobs:
     core-unit-tests:
@@ -146,3 +159,5 @@ jobs:
                  fingerprint-unit-tests,
                  testing-tools ]
         uses: ./.github/workflows/reusable-sonar-scan.yml
+        # Only run if the PR ready for review or triggered manually
+        if: github.event.pull_request.draft == false || github.event_name == 'workflow_dispatch'

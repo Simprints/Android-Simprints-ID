@@ -60,20 +60,23 @@ jobs:
             -   name: Run tests
                 run: |
                     # Get the modules array from the previous step
-                    modules_array=("${{ steps.create-modules-array.outputs.modules_array}}")
-                    modules_array=(${modules_array// / })
-                    # Iterate over the array
+                    modules_array=(${{ steps.create-modules-array.outputs.modules_array }})
+                    # Transform input list into a single string of gradle tasks
+                    TASKS=""
                     for module in "${modules_array[@]}"; do
-                        echo -e "\n\n"
-                        echo "=========================================="
-                        echo "=========================================="
-                        echo "              Test $module"
-                        echo "=========================================="
-                        echo "=========================================="
-                        echo -e "\n\n"
-                        ./gradlew $module:jacocoTestReport
+                        if [ -n "$module" ]; then
+                            TASKS="$TASKS $module:jacocoTestReport"
+                        fi
                     done
 
+                    echo -e "\n\n"
+                    echo "=========================================="
+                    echo "=========================================="
+                    echo "Executing Gradle tasks: $TASKS"
+                    echo "=========================================="
+                    echo "=========================================="
+                    echo -e "\n\n"
+                    ./gradlew $TASKS --continue --no-daemon
             -   name: Upload Folders
                 uses: actions/upload-artifact@v6
                 with:
