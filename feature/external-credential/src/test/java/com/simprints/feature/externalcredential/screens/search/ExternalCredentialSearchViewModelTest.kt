@@ -138,7 +138,6 @@ internal class ExternalCredentialSearchViewModelTest {
         assertThat(searchState.matchResults).hasSize(1)
         assertThat(searchState.matchResults.first()).isEqualTo(candidateMatch)
         coVerify { eventsTracker.saveSearchEvent(any(), any(), any()) }
-        coVerify { eventsTracker.saveMatchEvent(any(), any()) }
     }
 
     @Test

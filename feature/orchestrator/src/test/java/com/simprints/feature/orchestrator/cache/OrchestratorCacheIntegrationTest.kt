@@ -230,6 +230,7 @@ class OrchestratorCacheIntegrationTest {
                             verificationThreshold = 55f,
                             faceBioSdk = FaceConfiguration.BioSdk.RANK_ONE,
                             fingerprintBioSdk = FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
+                            probeReferenceId = "probeReferenceId",
                         ),
                     ),
                 ),
