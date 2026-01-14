@@ -3,7 +3,9 @@ package com.simprints.feature.externalcredential.screens.search.usecase
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.feature.externalcredential.usecase.ExternalCredentialEventTrackerUseCase
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
@@ -76,6 +78,11 @@ internal class MatchCandidatesUseCaseTest {
     @MockK
     private lateinit var matcherSuccess: MatcherState.Success
 
+    @MockK
+    private lateinit var timeHelper: TimeHelper
+
+    @MockK
+    lateinit var eventsTracker: ExternalCredentialEventTrackerUseCase
     private val credential = "credential".asTokenizableEncrypted()
     private val subjectId = "subjectId"
     private val probeReferenceId = "probeReferenceId"
@@ -88,6 +95,8 @@ internal class MatchCandidatesUseCaseTest {
             createMatchParamsUseCase = createMatchParamsUseCase,
             faceMatcher = faceMatcher,
             fingerprintMatcher = fingerprintMatcher,
+            timeHelper = timeHelper,
+            eventsTracker = eventsTracker,
         )
 
         every { subject.subjectId } returns subjectId
@@ -150,6 +159,8 @@ internal class MatchCandidatesUseCaseTest {
         assertThat(result[0].verificationThreshold).isEqualTo(verificationMatchThreshold)
         assertThat(result[0].faceBioSdk).isEqualTo(FaceConfiguration.BioSdk.RANK_ONE)
         assertThat(result[0].fingerprintBioSdk).isNull()
+        assertThat(result[0].probeReferenceId).isEqualTo("probeReferenceId")
+        coVerify { eventsTracker.saveMatchEvent(any(), any()) }
     }
 
     @Test
@@ -169,6 +180,8 @@ internal class MatchCandidatesUseCaseTest {
         assertThat(result[0].verificationThreshold).isEqualTo(verificationMatchThreshold)
         assertThat(result[0].faceBioSdk).isNull()
         assertThat(result[0].fingerprintBioSdk).isEqualTo(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
+        assertThat(result[0].probeReferenceId).isEqualTo("probeReferenceId")
+        coVerify { eventsTracker.saveMatchEvent(any(), any()) }
     }
 
     @Test

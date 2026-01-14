@@ -6,9 +6,13 @@ import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.CalculateLevenshteinDistanceUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
@@ -18,6 +22,8 @@ import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirma
 import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirmationEvent.ExternalCredentialConfirmationResult
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent.SkipReason
+import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
+import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -167,6 +173,49 @@ class ExternalCredentialEventTrackerUseCaseTest {
         }
     }
 
+    @Test
+    fun `saveMatchEvent should save match event for face SDK`() = runTest {
+        val match = makeCredentialMatch(
+            faceSdk = FACE_SDK,
+            fingerprintSdk = null,
+        )
+
+        useCase.saveMatchEvent(START_TIME, match)
+
+        verifyMatchEvent(
+            expectedMatcher = FACE_SDK.name,
+            expectedFingerStrategy = null,
+        )
+    }
+
+    @Test
+    fun `saveMatchEvent should save match event for fingerprint SDK`() = runTest {
+        val fingerprintConfig = mockk<FingerprintConfiguration.FingerprintSdkConfiguration> {
+            every { comparisonStrategyForVerification } returns
+                FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER
+        }
+
+        val projectConfig = mockk<ProjectConfiguration> {
+            every { fingerprint } returns mockk {
+                every { getSdkConfiguration(FINGERPRINT_SDK) } returns fingerprintConfig
+            }
+        }
+
+        coEvery { configManager.getProjectConfiguration() } returns projectConfig
+
+        val match = makeCredentialMatch(
+            faceSdk = null,
+            fingerprintSdk = FINGERPRINT_SDK,
+        )
+
+        useCase.saveMatchEvent(START_TIME, match)
+
+        verifyMatchEvent(
+            expectedMatcher = FINGERPRINT_SDK.name,
+            expectedFingerStrategy = FingerComparisonStrategy.SAME_FINGER,
+        )
+    }
+
     private fun makeScannedCredential(type: ExternalCredentialType) = ScannedCredential(
         credentialScanId = "test-scan-id",
         credential = RAW_SCANNED_VALUE.asTokenizableEncrypted(),
@@ -179,6 +228,43 @@ class ExternalCredentialEventTrackerUseCaseTest {
         scannedValue = RAW_SCANNED_VALUE.asTokenizableRaw(),
     )
 
+    private fun makeCredentialMatch(
+        faceSdk: FaceConfiguration.BioSdk?,
+        fingerprintSdk: FingerprintConfiguration.BioSdk?,
+    ): CredentialMatch {
+        val matchResult = mockk<com.simprints.infra.matching.MatchResultItem> {
+            every { subjectId } returns SUBJECT_ID
+            every { confidence } returns CONFIDENCE
+        }
+
+        return CredentialMatch(
+            credential = RAW_SCANNED_VALUE.asTokenizableEncrypted(),
+            matchResult = matchResult,
+            probeReferenceId = PROBE_REFERENCE_ID,
+            verificationThreshold = 0.5f,
+            faceBioSdk = faceSdk,
+            fingerprintBioSdk = fingerprintSdk,
+        )
+    }
+
+    private fun verifyMatchEvent(
+        expectedMatcher: String,
+        expectedFingerStrategy: FingerComparisonStrategy?,
+    ) {
+        val slot = slot<OneToOneMatchEvent>()
+        coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(slot)) }
+
+        with(slot.captured.payload as OneToOneMatchEvent.OneToOneMatchPayload.OneToOneMatchPayloadV4) {
+            assertThat(createdAt).isEqualTo(START_TIME)
+            assertThat(endedAt).isEqualTo(END_TIME)
+            assertThat(candidateId).isEqualTo(SUBJECT_ID)
+            assertThat(matcher).isEqualTo(expectedMatcher)
+            assertThat(result?.score).isEqualTo(CONFIDENCE)
+            assertThat(fingerComparisonStrategy).isEqualTo(expectedFingerStrategy)
+            assertThat(probeBiometricReferenceId).isEqualTo(PROBE_REFERENCE_ID)
+        }
+    }
+
     companion object Companion {
         private val START_TIME = Timestamp(0L)
         private val SCAN_START_TIME = Timestamp(3L)
@@ -189,5 +275,9 @@ class ExternalCredentialEventTrackerUseCaseTest {
         private const val RAW_SCANNED_VALUE = "scanned-value"
         private const val DEFAULT_DISTANCE = 7
         private const val SELECTION_ID = "selection_id"
+        private const val CONFIDENCE = 0.9f
+        private const val PROBE_REFERENCE_ID = "probe-ref-id"
+        private val FACE_SDK = FaceConfiguration.BioSdk.RANK_ONE
+        private val FINGERPRINT_SDK = FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
     }
 }

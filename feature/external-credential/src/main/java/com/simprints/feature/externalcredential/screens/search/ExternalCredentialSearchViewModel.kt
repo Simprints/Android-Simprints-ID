@@ -104,9 +104,14 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         searchState: SearchState,
         flowType: FlowType,
     ): Int? = when (searchState) {
-        SearchState.Searching -> null // button is not displayed during search
+        // button is not displayed during search
+        SearchState.Searching -> null
+
         is SearchState.CredentialLinked -> when (flowType) {
-            FlowType.ENROL -> IDR.string.mfid_action_enrol_anyway
+            FlowType.ENROL -> {
+                IDR.string.mfid_action_enrol_anyway
+            }
+
             else -> {
                 if (searchState.hasSuccessfulVerifications) {
                     IDR.string.mfid_action_go_to_record
@@ -135,19 +140,18 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
     private suspend fun searchSubjectsLinkedToCredential(credential: TokenizableString.Tokenized) {
         updateState { it.copy(searchState = SearchState.Searching) }
         val project = configManager.getProject(authStore.signedInProjectId)
+        val searchStartTime = timeHelper.now()
         val candidates = enrolmentRecordRepository.load(SubjectQuery(projectId = project.id, externalCredential = credential))
+        eventsTracker.saveSearchEvent(searchStartTime, scannedCredential.credentialScanId, candidates)
 
-        val startTime = timeHelper.now()
         when {
             candidates.isEmpty() -> {
-                eventsTracker.saveSearchEvent(startTime, scannedCredential.credentialScanId, emptyList())
                 updateState { it.copy(searchState = SearchState.CredentialNotFound) }
             }
 
             else -> {
                 val projectConfig = configManager.getProjectConfiguration()
                 val matches = matchCandidatesUseCase(candidates, credential, externalCredentialParams, project, projectConfig)
-                eventsTracker.saveSearchEvent(startTime, scannedCredential.credentialScanId, candidates)
 
                 updateState { state -> state.copy(searchState = SearchState.CredentialLinked(matchResults = matches)) }
             }
@@ -159,8 +163,11 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
      * alpha-numeric, while the NHIS card memberships contain only digits.
      */
     fun getKeyBoardInputType() = when (scannedCredential.credentialType) {
-        ExternalCredentialType.NHISCard -> InputType.TYPE_CLASS_NUMBER // NHIS card membership contains only numbers
+        // NHIS card membership contains only numbers
+        ExternalCredentialType.NHISCard -> InputType.TYPE_CLASS_NUMBER
+
         ExternalCredentialType.GhanaIdCard -> InputType.TYPE_CLASS_TEXT
+
         ExternalCredentialType.QRCode -> InputType.TYPE_CLASS_TEXT
     }
 

@@ -1,8 +1,10 @@
 package com.simprints.feature.externalcredential.screens.search.usecase
 
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.feature.externalcredential.usecase.ExternalCredentialEventTrackerUseCase
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
@@ -16,6 +18,8 @@ internal class MatchCandidatesUseCase @Inject constructor(
     private val createMatchParamsUseCase: CreateMatchParamsUseCase,
     private val faceMatcher: FaceMatcherUseCase,
     private val fingerprintMatcher: FingerprintMatcherUseCase,
+    private val eventsTracker: ExternalCredentialEventTrackerUseCase,
+    private val timeHelper: TimeHelper,
 ) {
     suspend operator fun invoke(
         candidates: List<Subject>,
@@ -24,10 +28,11 @@ internal class MatchCandidatesUseCase @Inject constructor(
         project: Project,
         projectConfig: ProjectConfiguration,
     ): List<CredentialMatch> = candidates.flatMap { candidate ->
+        val probeReferenceId = externalCredentialParams.probeReferenceId
         val matchParams = createMatchParamsUseCase(
             candidateSubjectId = candidate.subjectId,
             flowType = externalCredentialParams.flowType,
-            probeReferenceId = externalCredentialParams.probeReferenceId,
+            probeReferenceId = probeReferenceId,
             projectConfiguration = projectConfig,
             faceSamples = externalCredentialParams.faceSamples,
             fingerprintSamples = externalCredentialParams.fingerprintSamples,
@@ -39,17 +44,21 @@ internal class MatchCandidatesUseCase @Inject constructor(
                     matchParams.probeFaceSamples.isNotEmpty() -> {
                         val faceSdk = matchParams.faceSDK ?: return@mapNotNull null
                         projectConfig.face?.getSdkConfiguration(faceSdk)?.verificationMatchThreshold?.let { matchThreshold ->
+                            val startTime = timeHelper.now()
                             (faceMatcher(matchParams, project).last() as? MatcherState.Success)
                                 ?.matchResultItems
                                 .orEmpty()
                                 .map { result ->
-                                    CredentialMatch(
+                                    val match = CredentialMatch(
                                         credential = credential,
                                         matchResult = result,
+                                        probeReferenceId = probeReferenceId,
                                         verificationThreshold = matchThreshold,
                                         faceBioSdk = faceSdk,
                                         fingerprintBioSdk = null,
                                     )
+                                    eventsTracker.saveMatchEvent(startTime, match)
+                                    return@map match
                                 }
                         }
                     }
@@ -57,17 +66,21 @@ internal class MatchCandidatesUseCase @Inject constructor(
                     else -> {
                         val fingerprintSdk = matchParams.fingerprintSDK ?: return@mapNotNull null
                         projectConfig.fingerprint?.getSdkConfiguration(fingerprintSdk)?.verificationMatchThreshold?.let { matchThreshold ->
+                            val startTime = timeHelper.now()
                             (fingerprintMatcher(matchParams, project).last() as? MatcherState.Success)
                                 ?.matchResultItems
                                 .orEmpty()
                                 .map { result ->
-                                    CredentialMatch(
+                                    val match = CredentialMatch(
                                         credential = credential,
                                         matchResult = result,
+                                        probeReferenceId = probeReferenceId,
                                         verificationThreshold = matchThreshold,
                                         faceBioSdk = null,
                                         fingerprintBioSdk = fingerprintSdk,
                                     )
+                                    eventsTracker.saveMatchEvent(startTime, match)
+                                    return@map match
                                 }
                         }
                     }
