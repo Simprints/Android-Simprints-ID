@@ -130,7 +130,7 @@ internal class ObserveSyncInfoUseCaseTest {
         )
         every { sync.invoke(any(), any()) } returns syncStatusFlow
 
-        coEvery { eventSyncManager.getLastSyncTime() } returns TEST_TIMESTAMP
+        every { mockEventSyncState.lastSyncTime } returns TEST_TIMESTAMP
         coEvery { eventSyncManager.countEventsToUpload(any()) } returns flowOf(0)
         coEvery { eventSyncManager.countEventsToDownload() } returns DownSyncCounts(0, isLowerBound = false)
 
@@ -293,11 +293,11 @@ internal class ObserveSyncInfoUseCaseTest {
     fun `should emit SyncInfo with correct syncInfoSectionRecords footer states`() = runTest {
         val mockCompletedEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncInProgress() } returns false
+            every { lastSyncTime } returns TEST_TIMESTAMP
         }
         syncStatusFlow.value = SyncStatus(
             LegacySyncStates(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockImageSyncStatus),
         )
-        coEvery { eventSyncManager.getLastSyncTime() } returns TEST_TIMESTAMP
         createUseCase()
 
         val result = useCase().first()
@@ -1002,11 +1002,11 @@ internal class ObserveSyncInfoUseCaseTest {
     fun `should handle changes in time pacing stream`() = runTest {
         val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncRunning() } returns false
+            every { lastSyncTime } returns TEST_TIMESTAMP
         }
         syncStatusFlow.value = SyncStatus(
             LegacySyncStates(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus),
         )
-        coEvery { eventSyncManager.getLastSyncTime() } returns TEST_TIMESTAMP
         every { timeHelper.now() } returnsMany listOf(TEST_TIMESTAMP, Timestamp(TEST_TIMESTAMP.ms + 60_000))
         every { timeHelper.readableBetweenNowAndTime(any()) } returnsMany listOf("0 minutes ago", "1 minute ago")
         // MutableStateFlow of Unit won't emit another (identical) Unit, so we'll count minutes and map to Units
@@ -1236,7 +1236,7 @@ internal class ObserveSyncInfoUseCaseTest {
     @Test
     fun `should calculate correct record last sync time when sync time available`() = runTest {
         val timestamp = Timestamp(0L)
-        coEvery { eventSyncManager.getLastSyncTime() } returns timestamp
+        every { mockEventSyncState.lastSyncTime } returns timestamp
         every { timeHelper.readableBetweenNowAndTime(timestamp) } returns "5 minutes ago"
         createUseCase()
 
@@ -1248,7 +1248,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
     @Test
     fun `should have hidden record last sync time footer when no sync history`() = runTest {
-        coEvery { eventSyncManager.getLastSyncTime() } returns null
+        every { mockEventSyncState.lastSyncTime } returns null
         createUseCase()
 
         val result = useCase().first()

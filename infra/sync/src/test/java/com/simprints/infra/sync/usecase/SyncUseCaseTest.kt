@@ -54,6 +54,7 @@ class SyncUseCaseTest {
                     upSyncWorkersInfo = emptyList(),
                     downSyncWorkersInfo = emptyList(),
                     reporterStates = emptyList(),
+                    lastSyncTime = null,
                 ),
                 imageSyncStatus = ImageSyncStatus(
                     isSyncing = false,
@@ -78,6 +79,7 @@ class SyncUseCaseTest {
             upSyncWorkersInfo = emptyList(),
             downSyncWorkersInfo = emptyList(),
             reporterStates = emptyList(),
+            lastSyncTime = null,
         )
         val image = ImageSyncStatus(
             isSyncing = true,
@@ -106,6 +108,7 @@ class SyncUseCaseTest {
             upSyncWorkersInfo = emptyList(),
             downSyncWorkersInfo = emptyList(),
             reporterStates = emptyList(),
+            lastSyncTime = null,
         )
         val event2 = event1.copy(
             progress = 5,
@@ -143,6 +146,7 @@ class SyncUseCaseTest {
             upSyncWorkersInfo = emptyList(),
             downSyncWorkersInfo = emptyList(),
             reporterStates = emptyList(),
+            lastSyncTime = null,
         )
         val image1 = ImageSyncStatus(
             isSyncing = true,
@@ -180,6 +184,7 @@ class SyncUseCaseTest {
             upSyncWorkersInfo = emptyList(),
             downSyncWorkersInfo = emptyList(),
             reporterStates = emptyList(),
+            lastSyncTime = null,
         )
         val image1 = ImageSyncStatus(
             isSyncing = true,

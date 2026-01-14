@@ -394,7 +394,7 @@ class EventSyncStateTest {
         up: List<SyncWorkerInfo>,
         down: List<SyncWorkerInfo>,
         reporters: List<SyncWorkerInfo>,
-    ) = EventSyncState("id", 0, 0, up, down, reporters)
+    ) = EventSyncState("id", 0, 0, up, down, reporters, null)
 
     private fun createWorker(state: EventSyncWorkerState) = SyncWorkerInfo(type = EventSyncWorkerType.DOWNLOADER, state = state)
 }

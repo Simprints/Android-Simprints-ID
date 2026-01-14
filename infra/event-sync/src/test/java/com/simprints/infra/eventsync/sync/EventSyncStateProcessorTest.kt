@@ -6,6 +6,8 @@ import androidx.work.WorkInfo
 import androidx.work.WorkInfo.State.FAILED
 import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.workDataOf
+import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.START_SYNC_REPORTER
@@ -82,6 +84,19 @@ internal class EventSyncStateProcessorTest {
         eventSyncStateProcessor.getLastSyncState().first()
 
         verify { syncWorkersInfoProvider.getSyncWorkerInfos(UNIQUE_SYNC_ID) }
+    }
+
+    @Test
+    fun getLastSyncState_shouldIncludeLastSyncTime() = runTest {
+        val expectedTimestamp = Timestamp(123L)
+        coEvery { eventSyncCache.readLastSuccessfulSyncTime() } returns expectedTimestamp
+        startSyncReporterWorker.emit(successfulMasterWorkers)
+        syncWorkersFlow.emit(createWorkInfosHistoryForSuccessfulSync())
+
+        val syncState = eventSyncStateProcessor.getLastSyncState().first()
+
+        coVerify(exactly = 1) { eventSyncCache.readLastSuccessfulSyncTime() }
+        assertThat(syncState.lastSyncTime).isEqualTo(expectedTimestamp)
     }
 
     @Test(expected = TimeoutCancellationException::class)

@@ -115,12 +115,6 @@ internal class EventSyncManagerTest {
     }
 
     @Test
-    fun `getLastSyncTime should call sync cache`() = runTest {
-        eventSyncManagerImpl.getLastSyncTime()
-        coVerify { eventSyncCache.readLastSuccessfulSyncTime() }
-    }
-
-    @Test
     fun `countEventsToUpload without types should call event repo`() = runTest {
         eventSyncManagerImpl.countEventsToUpload().toList()
 

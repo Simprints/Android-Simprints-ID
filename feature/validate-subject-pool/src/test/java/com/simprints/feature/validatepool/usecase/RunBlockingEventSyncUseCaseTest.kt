@@ -108,6 +108,7 @@ class RunBlockingEventSyncUseCaseTest {
                     endReporterState,
                 ),
             ),
+            null,
         )
         return SyncStatus(
             LegacySyncStates(

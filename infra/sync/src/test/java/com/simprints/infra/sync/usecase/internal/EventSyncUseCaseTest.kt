@@ -26,7 +26,7 @@ class EventSyncUseCaseTest {
     }
 
     @Test
-    fun `getLastSyncState should call sync processor`() = runTest {
+    fun `invocation should call sync processor`() = runTest {
         val expected = EventSyncState(
             syncId = "",
             progress = null,
@@ -34,6 +34,7 @@ class EventSyncUseCaseTest {
             upSyncWorkersInfo = emptyList(),
             downSyncWorkersInfo = emptyList(),
             reporterStates = emptyList(),
+            lastSyncTime = null,
         )
         every { eventSyncStateProcessor.getLastSyncState() } returns flowOf(expected)
 

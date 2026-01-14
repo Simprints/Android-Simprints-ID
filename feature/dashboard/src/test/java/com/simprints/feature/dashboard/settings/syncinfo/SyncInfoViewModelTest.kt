@@ -20,8 +20,6 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
-import com.simprints.infra.eventsync.EventSyncManager
-import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.sync.ImageSyncStatus
@@ -59,9 +57,6 @@ class SyncInfoViewModelTest {
 
     @MockK
     private lateinit var authStore: AuthStore
-
-    @MockK
-    private lateinit var eventSyncManager: EventSyncManager
 
     @MockK
     private lateinit var syncOrchestrator: SyncOrchestrator
@@ -122,6 +117,7 @@ class SyncInfoViewModelTest {
         every { mockEventSyncState.isThereNotSyncHistory() } returns false
         every { mockEventSyncState.progress } returns null
         every { mockEventSyncState.total } returns null
+        every { mockEventSyncState.lastSyncTime } returns TEST_TIMESTAMP
 
         every { mockImageSyncStatus.isSyncing } returns false
         every { mockImageSyncStatus.progress } returns null
@@ -149,10 +145,6 @@ class SyncInfoViewModelTest {
         coEvery { configRepository.getDeviceConfiguration() } returns mockDeviceConfiguration
         coEvery { configRepository.getProject() } returns mockProject
 
-        coEvery { eventSyncManager.getLastSyncTime() } returns TEST_TIMESTAMP
-        coEvery { eventSyncManager.countEventsToUpload(any()) } returns flowOf(0)
-        coEvery { eventSyncManager.countEventsToDownload() } returns DownSyncCounts(0, isLowerBound = false)
-
         syncStatusFlow = MutableStateFlow(
             SyncStatus(LegacySyncStates(eventSyncState = mockEventSyncState, imageSyncStatus = mockImageSyncStatus)),
         )
@@ -179,7 +171,6 @@ class SyncInfoViewModelTest {
         viewModel = SyncInfoViewModel(
             configRepository = configRepository,
             authStore = authStore,
-            eventSyncManager = eventSyncManager,
             syncOrchestrator = syncOrchestrator,
             recentUserActivityManager = recentUserActivityManager,
             timeHelper = timeHelper,
@@ -706,11 +697,11 @@ class SyncInfoViewModelTest {
     fun `should trigger initial sync when no previous sync history`() = runTest {
         val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncRunning() } returns false
+            every { lastSyncTime } returns null
         }
         syncStatusFlow.value = SyncStatus(
             LegacySyncStates(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus),
         )
-        coEvery { eventSyncManager.getLastSyncTime() } returns null
         createViewModel()
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
@@ -723,11 +714,11 @@ class SyncInfoViewModelTest {
         val oldTimestamp = Timestamp(TEST_TIMESTAMP.ms - 600000) // 10 minutes ago, over threshold of 5
         val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncRunning() } returns false
+            every { lastSyncTime } returns oldTimestamp
         }
         syncStatusFlow.value = SyncStatus(
             LegacySyncStates(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus),
         )
-        coEvery { eventSyncManager.getLastSyncTime() } returns oldTimestamp
         every { timeHelper.msBetweenNowAndTime(oldTimestamp) } returns 600000L // 10 minutes
         createViewModel()
 
@@ -741,11 +732,11 @@ class SyncInfoViewModelTest {
         val recentTimestamp = Timestamp(TEST_TIMESTAMP.ms - 60000) // 1 minute ago, under threshold of 5
         val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncRunning() } returns false
+            every { lastSyncTime } returns recentTimestamp
         }
         syncStatusFlow.value = SyncStatus(
             LegacySyncStates(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus),
         )
-        coEvery { eventSyncManager.getLastSyncTime() } returns recentTimestamp
         every { timeHelper.msBetweenNowAndTime(recentTimestamp) } returns 60000L // 1 minute
         createViewModel()
 
@@ -758,11 +749,11 @@ class SyncInfoViewModelTest {
     fun `should not trigger initial sync when sync already running`() = runTest {
         val mockRunningSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncRunning() } returns true
+            every { lastSyncTime } returns null
         }
         syncStatusFlow.value = SyncStatus(
             LegacySyncStates(eventSyncState = mockRunningSyncState, imageSyncStatus = mockImageSyncStatus),
         )
-        coEvery { eventSyncManager.getLastSyncTime() } returns null
         createViewModel()
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
@@ -775,11 +766,11 @@ class SyncInfoViewModelTest {
         val recentTimestamp = Timestamp(TEST_TIMESTAMP.ms - 60000) // 1 minute ago, under threshold of 5
         val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncRunning() } returns false
+            every { lastSyncTime } returns recentTimestamp
         }
         syncStatusFlow.value = SyncStatus(
             LegacySyncStates(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus),
         )
-        coEvery { eventSyncManager.getLastSyncTime() } returns recentTimestamp
         every { timeHelper.msBetweenNowAndTime(recentTimestamp) } returns 60000L // 1 minute
         createViewModel()
         viewModel.isPreLogoutUpSync = true
@@ -802,7 +793,6 @@ class SyncInfoViewModelTest {
         coEvery { configRepository.getProjectConfiguration() } returns mockProjectConfigRequiringModules
         coEvery { configRepository.getDeviceConfiguration() } returns mockEmptyDeviceConfig
         every { mockProjectConfigRequiringModules.isModuleSelectionAvailable() } returns true
-        coEvery { eventSyncManager.getLastSyncTime() } returns null
         createViewModel()
         viewModel.isPreLogoutUpSync = true
 
@@ -824,7 +814,6 @@ class SyncInfoViewModelTest {
         coEvery { configRepository.getProjectConfiguration() } returns mockProjectConfigRequiringModules
         coEvery { configRepository.getDeviceConfiguration() } returns mockEmptyDeviceConfig
         every { mockProjectConfigRequiringModules.isModuleSelectionAvailable() } returns true
-        coEvery { eventSyncManager.getLastSyncTime() } returns null
         createViewModel()
         viewModel.isPreLogoutUpSync = false
 

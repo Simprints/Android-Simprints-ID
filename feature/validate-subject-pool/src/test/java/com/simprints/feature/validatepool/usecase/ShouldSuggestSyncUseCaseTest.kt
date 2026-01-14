@@ -4,10 +4,16 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.infra.sync.ImageSyncStatus
+import com.simprints.infra.sync.LegacySyncStates
+import com.simprints.infra.sync.SyncStatus
+import com.simprints.infra.sync.usecase.SyncUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -17,30 +23,34 @@ class ShouldSuggestSyncUseCaseTest {
     lateinit var timeHelper: TimeHelper
 
     @MockK
-    lateinit var syncManager: EventSyncManager
+    lateinit var sync: SyncUseCase
 
     @MockK
     lateinit var configRepository: ConfigRepository
 
     private lateinit var usecase: ShouldSuggestSyncUseCase
+    private lateinit var syncStatusFlow: MutableStateFlow<SyncStatus>
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
 
-        usecase = ShouldSuggestSyncUseCase(timeHelper, syncManager, configRepository)
+        syncStatusFlow = MutableStateFlow(createSyncStatus(lastSyncTime = null))
+        every { sync.invoke(any(), any()) } returns syncStatusFlow
+
+        usecase = ShouldSuggestSyncUseCase(timeHelper, sync, configRepository)
     }
 
     @Test
     fun `returns true if not synced ever`() = runTest {
-        coEvery { syncManager.getLastSyncTime() } returns null
+        syncStatusFlow.value = createSyncStatus(lastSyncTime = null)
 
         assertThat(usecase()).isTrue()
     }
 
     @Test
     fun `returns true if not synced recently`() = runTest {
-        coEvery { syncManager.getLastSyncTime() } returns Timestamp(0)
+        syncStatusFlow.value = createSyncStatus(lastSyncTime = Timestamp(0))
         coEvery { timeHelper.msBetweenNowAndTime(any()) } returns WEEK_MS
         coEvery {
             configRepository
@@ -53,7 +63,7 @@ class ShouldSuggestSyncUseCaseTest {
 
     @Test
     fun `returns true if not synced recently with non ISO max age`() = runTest {
-        coEvery { syncManager.getLastSyncTime() } returns Timestamp(0)
+        syncStatusFlow.value = createSyncStatus(lastSyncTime = Timestamp(0))
         coEvery { timeHelper.msBetweenNowAndTime(any()) } returns WEEK_MS
         coEvery {
             configRepository
@@ -66,7 +76,7 @@ class ShouldSuggestSyncUseCaseTest {
 
     @Test
     fun `returns false if synced recently`() = runTest {
-        coEvery { syncManager.getLastSyncTime() } returns Timestamp(0)
+        syncStatusFlow.value = createSyncStatus(lastSyncTime = Timestamp(0))
         coEvery { timeHelper.msBetweenNowAndTime(any()) } returns HOUR_MS
         coEvery {
             configRepository
@@ -79,7 +89,7 @@ class ShouldSuggestSyncUseCaseTest {
 
     @Test
     fun `returns false if not Simprints sync`() = runTest {
-        coEvery { syncManager.getLastSyncTime() } returns Timestamp(0)
+        syncStatusFlow.value = createSyncStatus(lastSyncTime = Timestamp(0))
         coEvery { timeHelper.msBetweenNowAndTime(any()) } returns HOUR_MS
         coEvery {
             configRepository
@@ -88,6 +98,27 @@ class ShouldSuggestSyncUseCaseTest {
         } returns null
 
         assertThat(usecase()).isFalse()
+    }
+
+    private fun createSyncStatus(lastSyncTime: Timestamp?): SyncStatus {
+        return SyncStatus(
+            LegacySyncStates(
+                eventSyncState = EventSyncState(
+                    syncId = "",
+                    progress = null,
+                    total = null,
+                    upSyncWorkersInfo = emptyList(),
+                    downSyncWorkersInfo = emptyList(),
+                    reporterStates = emptyList(),
+                    lastSyncTime = lastSyncTime,
+                ),
+                imageSyncStatus = ImageSyncStatus(
+                    isSyncing = false,
+                    progress = null,
+                    lastUpdateTimeMillis = null,
+                ),
+            ),
+        )
     }
 
     companion object {
