@@ -2,20 +2,20 @@ package com.simprints.infra.eventsync
 
 import android.content.Context
 import androidx.room.Room
-import com.simprints.core.DispatcherIO
 import com.simprints.infra.eventsync.event.commcare.cache.CommCareSyncCache
 import com.simprints.infra.eventsync.event.commcare.cache.CommCareSyncDao
 import com.simprints.infra.eventsync.event.commcare.cache.CommCareSyncDatabase
 import com.simprints.infra.eventsync.status.EventSyncStatusDatabase
 import com.simprints.infra.eventsync.status.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.infra.eventsync.status.up.local.DbEventUpSyncOperationStateDao
+import com.simprints.infra.eventsync.sync.down.EventDownSyncCountsRepository
+import com.simprints.infra.eventsync.sync.down.EventDownSyncCountsRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Singleton
 
 @Module(
@@ -27,6 +27,11 @@ import javax.inject.Singleton
 abstract class EventSyncModule {
     @Binds
     internal abstract fun provideEventSyncManager(impl: EventSyncManagerImpl): EventSyncManager
+
+    @Binds
+    internal abstract fun provideEventDownSyncCountsRepository(
+        impl: EventDownSyncCountsRepositoryImpl,
+    ): EventDownSyncCountsRepository
 }
 
 @Module
