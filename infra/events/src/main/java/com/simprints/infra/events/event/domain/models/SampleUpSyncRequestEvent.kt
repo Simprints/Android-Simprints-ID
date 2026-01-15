@@ -4,9 +4,14 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.SAMPLE_UP_SYNC_REQUEST_KEY
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(SAMPLE_UP_SYNC_REQUEST_KEY)
 class SampleUpSyncRequestEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: SampleUpSyncRequestPayload,
@@ -36,6 +41,7 @@ class SampleUpSyncRequestEvent(
     )
 
     @Keep
+    @Serializable
     data class SampleUpSyncRequestPayload(
         override val createdAt: Timestamp,
         override val endedAt: Timestamp?,

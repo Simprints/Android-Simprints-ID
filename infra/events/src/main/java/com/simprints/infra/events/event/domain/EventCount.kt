@@ -1,8 +1,10 @@
 package com.simprints.infra.events.event.domain
 
 import androidx.annotation.Keep
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 data class EventCount(
     val count: Int,
     val isLowerBound: Boolean,

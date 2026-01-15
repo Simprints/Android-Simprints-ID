@@ -6,10 +6,15 @@ import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.EXTERNAL_CREDENTIAL_CAPTURE_VALUE_KEY
 import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_CAPTURE_VALUE
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(EXTERNAL_CREDENTIAL_CAPTURE_VALUE_KEY)
 @ExcludedFromGeneratedTestCoverageReports("Data struct")
 data class ExternalCredentialCaptureValueEvent(
     override val id: String = UUID.randomUUID().toString(),
@@ -47,10 +52,11 @@ data class ExternalCredentialCaptureValueEvent(
     )
 
     @Keep
+    @Serializable
     @ExcludedFromGeneratedTestCoverageReports("Data struct")
     data class ExternalCredentialCaptureValuePayload(
         override val createdAt: Timestamp,
-        override val eventVersion: Int,
+        override val eventVersion: Int = EVENT_VERSION,
         val id: String,
         val credential: ExternalCredential,
         override val endedAt: Timestamp? = null,

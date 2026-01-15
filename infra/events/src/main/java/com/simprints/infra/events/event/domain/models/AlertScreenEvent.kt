@@ -5,9 +5,14 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.ALERT_SCREEN
+import com.simprints.infra.events.event.domain.models.EventType.Companion.ALERT_SCREEN_KEY
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(ALERT_SCREEN_KEY)
 data class AlertScreenEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: AlertScreenPayload,
@@ -29,6 +34,7 @@ data class AlertScreenEvent(
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
+    @Serializable
     data class AlertScreenPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,

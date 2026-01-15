@@ -5,9 +5,14 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_IDENTIFICATION_V3
+import com.simprints.infra.events.event.domain.models.EventType.Companion.CALLOUT_IDENTIFICATION_V3_KEY
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(CALLOUT_IDENTIFICATION_V3_KEY)
 data class IdentificationCalloutEventV3(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: IdentificationCalloutPayload,
@@ -49,6 +54,7 @@ data class IdentificationCalloutEventV3(
     )
 
     @Keep
+    @Serializable
     data class IdentificationCalloutPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
