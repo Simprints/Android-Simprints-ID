@@ -6,7 +6,6 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.sync.ImageSyncStatus
-import com.simprints.infra.sync.LegacySyncStates
 import com.simprints.infra.sync.SyncStatus
 import com.simprints.infra.sync.usecase.SyncUseCase
 import io.mockk.MockKAnnotations
@@ -102,21 +101,19 @@ class ShouldSuggestSyncUseCaseTest {
 
     private fun createSyncStatus(lastSyncTime: Timestamp?): SyncStatus {
         return SyncStatus(
-            LegacySyncStates(
-                eventSyncState = EventSyncState(
-                    syncId = "",
-                    progress = null,
-                    total = null,
-                    upSyncWorkersInfo = emptyList(),
-                    downSyncWorkersInfo = emptyList(),
-                    reporterStates = emptyList(),
-                    lastSyncTime = lastSyncTime,
-                ),
-                imageSyncStatus = ImageSyncStatus(
-                    isSyncing = false,
-                    progress = null,
-                    lastUpdateTimeMillis = null,
-                ),
+            eventSyncState = EventSyncState(
+                syncId = "",
+                progress = null,
+                total = null,
+                upSyncWorkersInfo = emptyList(),
+                downSyncWorkersInfo = emptyList(),
+                reporterStates = emptyList(),
+                lastSyncTime = lastSyncTime,
+            ),
+            imageSyncStatus = ImageSyncStatus(
+                isSyncing = false,
+                progress = null,
+                lastUpdateTimeMillis = null,
             ),
         )
     }

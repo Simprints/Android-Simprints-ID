@@ -67,7 +67,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
         super.onViewCreated(view, savedInstanceState)
         applySystemBarInsets(view)
 
-        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.eventSyncState }.asLiveData().observe(viewLifecycleOwner) { state ->
+        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.eventSyncState }.asLiveData().observe(viewLifecycleOwner) { state ->
             val states =
                 (state.downSyncWorkersInfo.map { it.state } + state.upSyncWorkersInfo.map { it.state })
             val message =

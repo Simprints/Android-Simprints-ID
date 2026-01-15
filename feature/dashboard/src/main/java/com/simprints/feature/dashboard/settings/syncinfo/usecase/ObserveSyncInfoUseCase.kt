@@ -56,9 +56,9 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     private val sync: SyncUseCase,
     @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) {
-    private val eventSyncStateFlow = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.eventSyncState }
+    private val eventSyncStateFlow = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.eventSyncState }
 
-    private val imageSyncStatusFlow = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.imageSyncStatus }
+    private val imageSyncStatusFlow = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.imageSyncStatus }
 
     // Since we are not using distinctUntilChanged any emission from combined flows will trigger the main flow as well
     private fun combinedRefreshSignals() = combine(
@@ -144,7 +144,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             SyncInfoProgress()
         }
 
-        val eventLastSyncTimestamp = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.eventSyncState }.firstOrNull()?.lastSyncTime ?: Timestamp(-1)
+        val eventLastSyncTimestamp = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.eventSyncState }.firstOrNull()?.lastSyncTime ?: Timestamp(-1)
         val imageLastSyncTimestamp = Timestamp(imageSyncStatus.lastUpdateTimeMillis ?: -1)
 
         val isReLoginRequired = eventSyncState.isSyncFailedBecauseReloginRequired()

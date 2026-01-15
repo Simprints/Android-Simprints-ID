@@ -8,7 +8,6 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.sync.ImageSyncStatus
-import com.simprints.infra.sync.LegacySyncStates
 import com.simprints.infra.sync.SyncStatus
 import com.simprints.infra.sync.usecase.SyncUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -140,9 +139,7 @@ internal class LogoutSyncViewModelTest {
         eventSyncState: EventSyncState,
         imageSyncStatus: ImageSyncStatus,
     ) {
-        val statusFlow = MutableStateFlow(
-            SyncStatus(LegacySyncStates(eventSyncState = eventSyncState, imageSyncStatus = imageSyncStatus)),
-        )
+        val statusFlow = MutableStateFlow(SyncStatus(eventSyncState = eventSyncState, imageSyncStatus = imageSyncStatus))
         every { sync.invoke(any(), any()) } returns statusFlow
     }
 

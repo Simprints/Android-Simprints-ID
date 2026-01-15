@@ -4,7 +4,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.sync.ImageSyncStatus
-import com.simprints.infra.sync.LegacySyncStates
 import com.simprints.infra.sync.SyncCommand
 import com.simprints.infra.sync.SyncStatus
 import com.simprints.infra.sync.usecase.internal.EventSyncUseCase
@@ -46,21 +45,19 @@ class SyncUseCaseTest {
     @Test
     fun `returns default SyncStatus before upstream flows emit`() = runTest {
         val expected = SyncStatus(
-            LegacySyncStates(
-                eventSyncState = EventSyncState(
-                    syncId = "",
-                    progress = null,
-                    total = null,
-                    upSyncWorkersInfo = emptyList(),
-                    downSyncWorkersInfo = emptyList(),
-                    reporterStates = emptyList(),
-                    lastSyncTime = null,
-                ),
-                imageSyncStatus = ImageSyncStatus(
-                    isSyncing = false,
-                    progress = null,
-                    lastUpdateTimeMillis = -1L,
-                ),
+            eventSyncState = EventSyncState(
+                syncId = "",
+                progress = null,
+                total = null,
+                upSyncWorkersInfo = emptyList(),
+                downSyncWorkersInfo = emptyList(),
+                reporterStates = emptyList(),
+                lastSyncTime = null,
+            ),
+            imageSyncStatus = ImageSyncStatus(
+                isSyncing = false,
+                progress = null,
+                lastUpdateTimeMillis = -1L,
             ),
         )
         val useCase = SyncUseCase(eventSync, imageSync, appScope = backgroundScope)
@@ -86,7 +83,7 @@ class SyncUseCaseTest {
             progress = 2 to 5,
             lastUpdateTimeMillis = 123L,
         )
-        val expected = SyncStatus(LegacySyncStates(event, image))
+        val expected = SyncStatus(event, image)
         val useCase = SyncUseCase(eventSync, imageSync, appScope = backgroundScope)
 
         val resultFlow = useCase(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY)
@@ -116,11 +113,7 @@ class SyncUseCaseTest {
 
         runCurrent()
         val expected = with(resultFlow.value) {
-            copy(
-                legacySyncStates = legacySyncStates.copy(
-                    eventSyncState = event,
-                ),
-            )
+            copy(eventSyncState = event)
         }
         eventSyncStatusFlow.emit(event)
         runCurrent()
@@ -141,11 +134,7 @@ class SyncUseCaseTest {
 
         runCurrent()
         val expected = with(resultFlow.value) {
-            copy(
-                legacySyncStates = legacySyncStates.copy(
-                    imageSyncStatus = image,
-                ),
-            )
+            copy(imageSyncStatus = image)
         }
         imageSyncStatusFlow.emit(image)
         runCurrent()
@@ -172,8 +161,8 @@ class SyncUseCaseTest {
             progress = 2 to 5,
             lastUpdateTimeMillis = 123L,
         )
-        val expected1 = SyncStatus(LegacySyncStates(event1, image))
-        val expected2 = SyncStatus(LegacySyncStates(event2, image))
+        val expected1 = SyncStatus(event1, image)
+        val expected2 = SyncStatus(event2, image)
         val useCase = SyncUseCase(eventSync, imageSync, appScope = backgroundScope)
 
         val resultFlow = useCase(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY)
@@ -210,8 +199,8 @@ class SyncUseCaseTest {
         val image2 = image1.copy(
             isSyncing = false,
         )
-        val expected1 = SyncStatus(LegacySyncStates(event, image1))
-        val expected2 = SyncStatus(LegacySyncStates(event, image2))
+        val expected1 = SyncStatus(event, image1)
+        val expected2 = SyncStatus(event, image2)
         val useCase = SyncUseCase(eventSync, imageSync, appScope = backgroundScope)
 
         val resultFlow = useCase(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY)

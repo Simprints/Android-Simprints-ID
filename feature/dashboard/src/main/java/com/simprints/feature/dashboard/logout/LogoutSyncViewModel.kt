@@ -37,8 +37,8 @@ internal class LogoutSyncViewModel @Inject constructor(
             .asLiveData(viewModelScope.coroutineContext)
 
     val isLogoutWithoutSyncVisibleLiveData: LiveData<Boolean> = combine(
-        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.eventSyncState },
-        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.imageSyncStatus },
+        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.eventSyncState },
+        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.imageSyncStatus },
     ) { eventSyncState, imageSyncStatus ->
         !eventSyncState.isSyncCompleted() || imageSyncStatus.isSyncing
     }.debounce(timeoutMillis = ANTI_JITTER_DELAY_MILLIS).asLiveData(viewModelScope.coroutineContext)

@@ -56,9 +56,9 @@ internal class SyncInfoViewModel @Inject constructor(
     private val _loginNavigationEventLiveData = MutableLiveData<LoginParams>()
 
     private val eventSyncStateFlow =
-        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.eventSyncState }
+        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.eventSyncState }
     private val imageSyncStatusFlow =
-        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.imageSyncStatus }
+        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.imageSyncStatus }
 
     private val eventSyncButtonClickFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val imageSyncButtonClickFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
@@ -184,8 +184,11 @@ internal class SyncInfoViewModel @Inject constructor(
 
     private fun startInitialSyncIfRequired() {
         viewModelScope.launch {
-            val isRunning = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.eventSyncState }.firstOrNull()?.isSyncRunning() ?: false
-            val lastUpdate = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.legacySyncStates.eventSyncState }.firstOrNull()?.lastSyncTime
+            val isRunning =
+                sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.eventSyncState }.firstOrNull()
+                    ?.isSyncRunning() ?: false
+            val lastUpdate = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.eventSyncState }
+                .firstOrNull()?.lastSyncTime
 
             val isForceEventSync = when {
                 isPreLogoutUpSync -> true

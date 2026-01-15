@@ -3,7 +3,6 @@ package com.simprints.infra.sync.usecase
 import com.simprints.core.AppScope
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.sync.ImageSyncStatus
-import com.simprints.infra.sync.LegacySyncStates
 import com.simprints.infra.sync.SyncCommand
 import com.simprints.infra.sync.SyncStatus
 import com.simprints.infra.sync.usecase.internal.EventSyncUseCase
@@ -43,16 +42,14 @@ class SyncUseCase @Inject constructor(
         progress = null,
         lastUpdateTimeMillis = -1L,
     )
-    private val defaultSyncStatus = SyncStatus(
-        legacySyncStates = LegacySyncStates(defaultEventSyncState, defaultImageSyncStatus),
-    )
+    private val defaultSyncStatus = SyncStatus(defaultEventSyncState, defaultImageSyncStatus)
 
     private val sharedSyncStatus: StateFlow<SyncStatus> by lazy {
         combine(
             eventSync().onStart { emit(defaultEventSyncState) },
             imageSync().onStart { emit(defaultImageSyncStatus) },
         ) { eventSyncState, imageSyncStatus ->
-            SyncStatus(LegacySyncStates(eventSyncState, imageSyncStatus))
+            SyncStatus(eventSyncState, imageSyncStatus)
         }.stateIn(
             appScope,
             SharingStarted.Eagerly,
