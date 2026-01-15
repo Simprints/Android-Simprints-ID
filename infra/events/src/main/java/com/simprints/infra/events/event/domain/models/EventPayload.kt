@@ -118,7 +118,7 @@ import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.Ver
     JsonSubTypes.Type(value = ExternalCredentialSearchPayload::class, name = Companion.EXTERNAL_CREDENTIAL_SEARCH_KEY),
     JsonSubTypes.Type(value = ExternalCredentialConfirmationPayload::class, name = Companion.EXTERNAL_CREDENTIAL_CONFIRMATION_KEY),
 )
-abstract class EventPayload {
+sealed class EventPayload {
     abstract val type: EventType
     abstract val eventVersion: Int
     abstract val createdAt: Timestamp
