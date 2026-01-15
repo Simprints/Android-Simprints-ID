@@ -35,8 +35,10 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -46,6 +48,11 @@ import java.util.UUID
 import kotlin.random.Random
 
 class RealmEnrolmentRecordLocalDataSourceTest {
+    companion object {
+        private const val PROJECT_ID = "projectId"
+        private const val OTHER_PROJECT_ID = "otherProjectId"
+    }
+
     @MockK
     private lateinit var timeHelper: TimeHelper
 
@@ -108,6 +115,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
 
         every { realmQuery.query(any(), any()) } returns realmQuery
         every { realmQuery.first() } returns realmSingleQuery
+        every { realmSingleQuery.find() } returns null
 
         enrolmentRecordLocalDataSource = RealmEnrolmentRecordLocalDataSource(
             timeHelper,
@@ -454,6 +462,142 @@ class RealmEnrolmentRecordLocalDataSourceTest {
                 credentialValue.asTokenizableEncrypted().value,
             )
         }
+    }
+
+    @Test
+    fun `observeCount emits an initial 0 if no records`() = runTest {
+        val channel = Channel<Int>(Channel.UNLIMITED)
+
+        val collectJob = launch {
+            enrolmentRecordLocalDataSource.observeCount(EnrolmentRecordQuery())
+                .collect { channel.trySend(it) }
+        }
+
+        val firstEmission = channel.receive()
+        collectJob.cancel()
+        assertThat(firstEmission).isEqualTo(0)
+    }
+
+    @Test
+    fun `observeCount emits updated count after performActions creation`() = runTest {
+        val channel = Channel<Int>(Channel.UNLIMITED)
+
+        val collectJob = launch {
+            enrolmentRecordLocalDataSource.observeCount(EnrolmentRecordQuery())
+                .collect { channel.trySend(it) }
+        }
+
+        val initial = channel.receive()
+        enrolmentRecordLocalDataSource.performActions(
+            actions = listOf(EnrolmentRecordAction.Creation(getRandomSubject(projectId = PROJECT_ID))),
+            project = project,
+        )
+
+        var updated: Int
+        do {
+            updated = channel.receive()
+        } while (updated != 1)
+        collectJob.cancel()
+        assertThat(initial).isEqualTo(0)
+        assertThat(updated).isEqualTo(1)
+    }
+
+    @Test
+    fun `observeCount emits updated count after delete`() = runTest {
+        val createdSubject = getRandomSubject(projectId = PROJECT_ID)
+        enrolmentRecordLocalDataSource.performActions(
+            actions = listOf(EnrolmentRecordAction.Creation(createdSubject)),
+            project = project,
+        )
+        val channel = Channel<Int>(Channel.UNLIMITED)
+
+        val collectJob = launch {
+            enrolmentRecordLocalDataSource.observeCount()
+                .collect { channel.trySend(it) }
+        }
+
+        val initial = channel.receive()
+
+        enrolmentRecordLocalDataSource.delete(listOf(EnrolmentRecordQuery(subjectId = createdSubject.subjectId)))
+
+        var afterDelete: Int
+        do {
+            afterDelete = channel.receive()
+        } while (afterDelete != 0)
+        collectJob.cancel()
+        assertThat(initial).isEqualTo(1)
+        assertThat(afterDelete).isEqualTo(0)
+    }
+
+    @Test
+    fun `observeCount emits updated count after deleteAll`() = runTest {
+        enrolmentRecordLocalDataSource.performActions(
+            actions = listOf(EnrolmentRecordAction.Creation(getRandomSubject(projectId = PROJECT_ID))),
+            project = project,
+        )
+        val channel = Channel<Int>(Channel.UNLIMITED)
+
+        val collectJob = launch {
+            enrolmentRecordLocalDataSource.observeCount()
+                .collect { channel.trySend(it) }
+        }
+
+        val initial = channel.receive()
+
+        enrolmentRecordLocalDataSource.deleteAll()
+
+        var afterDelete: Int
+        do {
+            afterDelete = channel.receive()
+        } while (afterDelete != 0)
+        collectJob.cancel()
+        assertThat(initial).isEqualTo(1)
+        assertThat(afterDelete).isEqualTo(0)
+    }
+
+    @Test
+    fun `observeCount does not include records from other projects`() = runTest {
+        val project1RealmQuery = mockk<RealmQuery<DbSubject>>(relaxed = true)
+        val project2RealmQuery = mockk<RealmQuery<DbSubject>>(relaxed = true)
+        every { realmQuery.query("projectId == $0", PROJECT_ID) } returns project1RealmQuery
+        every { realmQuery.query("projectId == $0", OTHER_PROJECT_ID) } returns project2RealmQuery
+        every { project1RealmQuery.count() } answers {
+            mockk { every { find() } returns localEnrolmentRecords.count { it.projectId == PROJECT_ID }.toLong() }
+        }
+        every { project2RealmQuery.count() } answers {
+            mockk { every { find() } returns localEnrolmentRecords.count { it.projectId == OTHER_PROJECT_ID }.toLong() }
+        }
+        val project1Channel = Channel<Int>(Channel.UNLIMITED)
+        val project2Channel = Channel<Int>(Channel.UNLIMITED)
+        
+        val project1CollectJob = launch {
+            enrolmentRecordLocalDataSource.observeCount(EnrolmentRecordQuery(projectId = PROJECT_ID))
+                .collect { project1Channel.trySend(it) }
+        }
+        val project2CollectJob = launch {
+            enrolmentRecordLocalDataSource.observeCount(EnrolmentRecordQuery(projectId = OTHER_PROJECT_ID))
+                .collect { project2Channel.trySend(it) }
+        }
+
+        val project1Initial = project1Channel.receive()
+        val project2Initial = project2Channel.receive()
+
+        enrolmentRecordLocalDataSource.performActions(
+            actions = listOf(EnrolmentRecordAction.Creation(getRandomSubject(projectId = PROJECT_ID))),
+            project = project,
+        )
+
+        var project1AfterCreate: Int
+        do {
+            project1AfterCreate = project1Channel.receive()
+        } while (project1AfterCreate != 1)
+        val project2AfterInvalidation = project2Channel.receive()
+        project1CollectJob.cancel()
+        project2CollectJob.cancel()
+        assertThat(project1Initial).isEqualTo(0)
+        assertThat(project2Initial).isEqualTo(0)
+        assertThat(project1AfterCreate).isEqualTo(1)
+        assertThat(project2AfterInvalidation).isEqualTo(0)
     }
 
     private fun getFakePerson(): DbSubject = getRandomSubject().toRealmDb()

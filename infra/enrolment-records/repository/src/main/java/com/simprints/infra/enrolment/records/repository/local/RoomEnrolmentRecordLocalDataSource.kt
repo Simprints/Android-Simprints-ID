@@ -28,6 +28,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -53,6 +56,8 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
 
     private val database: SubjectsDatabase by lazy { subjectsDatabaseFactory.get() }
     private val subjectDao: SubjectDao by lazy { database.subjectDao }
+
+    private val observedCountInvalidation = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     /**
      * Loads subjects matching the given query.
@@ -87,7 +92,8 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         query: EnrolmentRecordQuery,
         dataSource: BiometricDataSource,
     ): Flow<Int> {
-        TODO("MS-1278 Not yet implemented")
+        return observedCountInvalidation.onStart { emit(Unit) } // initial count
+            .mapLatest { count(query, dataSource) }
     }
 
     /**
@@ -173,11 +179,13 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                 subjectDao.deleteSubjects(queryBuilder.buildDeleteQuery(query))
             }
         }
+        observedCountInvalidation.tryEmit(Unit)
     }
 
     override suspend fun deleteAll(): Unit = withContext(dispatcherIO) {
         Simber.i("[deleteAll] Deleting all subjects.", tag = ROOM_RECORDS_DB)
         subjectDao.deleteSubjects(queryBuilder.buildDeleteQuery(EnrolmentRecordQuery()))
+        observedCountInvalidation.tryEmit(Unit)
     }
 
     override suspend fun performActions(
@@ -193,6 +201,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                 }
             }
         }
+        observedCountInvalidation.tryEmit(Unit)
     }
 
     override suspend fun getLocalDBInfo(): String {
