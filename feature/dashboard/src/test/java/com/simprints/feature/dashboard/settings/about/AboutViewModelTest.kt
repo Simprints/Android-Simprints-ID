@@ -220,6 +220,7 @@ class AboutViewModelTest {
                 eventsToUpload = countEventsToUpload,
                 eventsToUploadEnrolmentV2 = 0,
                 eventsToUploadEnrolmentV4 = 0,
+                imagesToUpload = 0,
             ),
         )
         coEvery { configRepository.getProjectConfiguration() } returns buildProjectConfigurationMock(

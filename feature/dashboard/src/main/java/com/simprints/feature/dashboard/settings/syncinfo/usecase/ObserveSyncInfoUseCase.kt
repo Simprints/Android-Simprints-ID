@@ -24,7 +24,6 @@ import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepositor
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
-import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.sync.SyncCommand
 import com.simprints.infra.sync.usecase.CountSyncableUseCase
@@ -46,7 +45,6 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     private val connectivityTracker: ConnectivityTracker,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val authStore: AuthStore,
-    private val imageRepository: ImageRepository,
     private val timeHelper: TimeHelper,
     private val ticker: Ticker,
     private val appForegroundStateTracker: AppForegroundStateTracker,
@@ -103,7 +101,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         val imagesToUpload = if (imageSyncStatus.isSyncing) {
             null
         } else {
-            imageRepository.getNumberOfImagesToUpload(projectId = projectId)
+            countSyncable().first().imagesToUpload
         }
 
         val eventSyncProgressPart = SyncInfoProgressPart(

@@ -6,5 +6,6 @@ data class SyncableCounts(
     val eventsToUpload: Int,
     val eventsToUploadEnrolmentV2: Int,
     val eventsToUploadEnrolmentV4: Int,
+    val imagesToUpload: Int,
 )
 

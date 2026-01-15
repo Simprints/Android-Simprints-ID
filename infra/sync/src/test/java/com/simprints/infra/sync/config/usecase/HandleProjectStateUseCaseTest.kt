@@ -40,6 +40,7 @@ internal class HandleProjectStateUseCaseTest {
                 eventsToUpload = 0,
                 eventsToUploadEnrolmentV2 = 0,
                 eventsToUploadEnrolmentV4 = 0,
+                imagesToUpload = 0,
             ),
         )
 
@@ -57,6 +58,7 @@ internal class HandleProjectStateUseCaseTest {
                 eventsToUpload = 0,
                 eventsToUploadEnrolmentV2 = 0,
                 eventsToUploadEnrolmentV4 = 0,
+                imagesToUpload = 0,
             ),
         )
 
@@ -74,6 +76,7 @@ internal class HandleProjectStateUseCaseTest {
                 eventsToUpload = 5,
                 eventsToUploadEnrolmentV2 = 0,
                 eventsToUploadEnrolmentV4 = 0,
+                imagesToUpload = 0,
             ),
         )
 
@@ -91,6 +94,7 @@ internal class HandleProjectStateUseCaseTest {
                 eventsToUpload = 0,
                 eventsToUploadEnrolmentV2 = 0,
                 eventsToUploadEnrolmentV4 = 0,
+                imagesToUpload = 0,
             ),
         )
 

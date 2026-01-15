@@ -6,6 +6,7 @@ import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.sync.down.EventDownSyncPeriodicCountUseCase
 import com.simprints.infra.sync.SyncableCounts
+import com.simprints.infra.sync.usecase.internal.CountImagesToUploadUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
@@ -22,6 +23,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class CountSyncableUseCase @Inject constructor(
+    private val countImagesToUpload: CountImagesToUploadUseCase,
     private val eventDownSyncCount: EventDownSyncPeriodicCountUseCase,
     private val eventRepository: EventRepository,
     @param:AppScope private val appScope: CoroutineScope,
@@ -32,9 +34,17 @@ class CountSyncableUseCase @Inject constructor(
             uploadEventCountFlow(null),
             uploadEventCountFlow(EventType.ENROLMENT_V2),
             uploadEventCountFlow(EventType.ENROLMENT_V4),
-        ) { downloadSyncCounts, upload, uploadEnrolmentV2, uploadEnrolmentV4 ->
+            uploadImageCountFlow(),
+        ) { downloadSyncCounts, upload, uploadEnrolmentV2, uploadEnrolmentV4, uploadImages ->
             val (download, isDownloadLowerBound) = downloadSyncCounts
-            SyncableCounts(download, isDownloadLowerBound, upload, uploadEnrolmentV2, uploadEnrolmentV4)
+            SyncableCounts(
+                download,
+                isDownloadLowerBound,
+                upload,
+                uploadEnrolmentV2,
+                uploadEnrolmentV4,
+                uploadImages,
+            )
         }.shareIn(
             appScope,
             SharingStarted.WhileSubscribed(),
@@ -49,6 +59,10 @@ class CountSyncableUseCase @Inject constructor(
 
     private fun uploadEventCountFlow(type: EventType?): Flow<Int> = flow {
         emitAll(eventRepository.observeEventCount(type))
+    }
+
+    private fun uploadImageCountFlow(): Flow<Int> = flow {
+        emitAll(countImagesToUpload())
     }
 
 }

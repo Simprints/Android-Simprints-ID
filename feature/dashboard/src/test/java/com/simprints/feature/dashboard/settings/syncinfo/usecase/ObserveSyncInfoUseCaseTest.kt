@@ -22,7 +22,6 @@ import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
 import com.simprints.infra.eventsync.status.models.EventSyncState
-import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.sync.SyncableCounts
 import com.simprints.infra.sync.ImageSyncStatus
@@ -50,7 +49,6 @@ internal class ObserveSyncInfoUseCaseTest {
     private val connectivityTracker = mockk<ConnectivityTracker>()
     private val enrolmentRecordRepository = mockk<EnrolmentRecordRepository>()
     private val authStore = mockk<AuthStore>()
-    private val imageRepository = mockk<ImageRepository>()
     private val countSyncable = mockk<CountSyncableUseCase>()
     private val sync = mockk<SyncUseCase>()
     private val timeHelper = mockk<TimeHelper>()
@@ -69,6 +67,7 @@ internal class ObserveSyncInfoUseCaseTest {
             eventsToUpload = 0,
             eventsToUploadEnrolmentV2 = 0,
             eventsToUploadEnrolmentV4 = 0,
+            imagesToUpload = 0,
         ),
     )
 
@@ -143,10 +142,10 @@ internal class ObserveSyncInfoUseCaseTest {
             eventsToUpload = 0,
             eventsToUploadEnrolmentV2 = 0,
             eventsToUploadEnrolmentV4 = 0,
+            imagesToUpload = 0,
         )
         every { countSyncable.invoke() } returns syncableCountsFlow
 
-        coEvery { imageRepository.getNumberOfImagesToUpload(any()) } returns 0
         coEvery { enrolmentRecordRepository.count(any()) } returns 0
 
         every { ticker.observeTicks(any()) } returns MutableStateFlow(Unit)
@@ -170,7 +169,6 @@ internal class ObserveSyncInfoUseCaseTest {
             connectivityTracker = connectivityTracker,
             enrolmentRecordRepository = enrolmentRecordRepository,
             authStore = authStore,
-            imageRepository = imageRepository,
             timeHelper = timeHelper,
             ticker = ticker,
             appForegroundStateTracker = appForegroundStateTracker,
@@ -504,7 +502,6 @@ internal class ObserveSyncInfoUseCaseTest {
             every { progress } returns null
         }
         syncStatusFlow.value = SyncStatus(eventSyncState = mockEventSyncState, imageSyncStatus = mockNotSyncingImageStatus)
-        coEvery { imageRepository.getNumberOfImagesToUpload(any()) } returns 0
         createUseCase()
 
         val result = useCase().first()
@@ -529,6 +526,7 @@ internal class ObserveSyncInfoUseCaseTest {
             eventsToUpload = 0,
             eventsToUploadEnrolmentV2 = 2,
             eventsToUploadEnrolmentV4 = 3,
+            imagesToUpload = 0,
         )
         createUseCase()
 
@@ -579,7 +577,14 @@ internal class ObserveSyncInfoUseCaseTest {
             every { progress } returns null
         }
         syncStatusFlow.value = SyncStatus(eventSyncState = mockEventSyncState, imageSyncStatus = mockNotSyncingImageStatus)
-        coEvery { imageRepository.getNumberOfImagesToUpload(any()) } returns 15
+        syncableCountsFlow.value = SyncableCounts(
+            eventsToDownload = 0,
+            isEventsToDownloadLowerBound = false,
+            eventsToUpload = 0,
+            eventsToUploadEnrolmentV2 = 0,
+            eventsToUploadEnrolmentV4 = 0,
+            imagesToUpload = 15,
+        )
         createUseCase()
 
         val result = useCase().first()
@@ -679,6 +684,7 @@ internal class ObserveSyncInfoUseCaseTest {
             eventsToUpload = 0,
             eventsToUploadEnrolmentV2 = 0,
             eventsToUploadEnrolmentV4 = 0,
+            imagesToUpload = 0,
         )
         every { mockProjectConfigWithDownSync.isSimprintsEventDownSyncAllowed() } returns true
         every { mockProjectConfigWithDownSync.isModuleSelectionAvailable() } returns false
