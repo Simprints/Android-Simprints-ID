@@ -1,7 +1,6 @@
 package com.simprints.infra.eventsync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.Partitioning
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
@@ -9,16 +8,10 @@ import com.simprints.core.tools.utils.ExtractCommCareCaseIdUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.EventCount
-import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.scope.EventScope
-import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
-import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.eventsync.event.commcare.cache.CommCareSyncCache
-import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
-import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.down.tasks.CommCareEventSyncTask
@@ -31,7 +24,6 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -68,9 +60,6 @@ internal class EventSyncManagerTest {
     lateinit var commCareDownSyncTask: CommCareEventSyncTask
 
     @MockK
-    lateinit var eventRemoteDataSource: EventRemoteDataSource
-
-    @MockK
     lateinit var configRepository: ConfigRepository
 
     @MockK
@@ -89,6 +78,7 @@ internal class EventSyncManagerTest {
         MockKAnnotations.init(this, relaxed = true)
 
         every { timeHelper.now() } returns Timestamp(1)
+        coEvery { configRepository.getProject() } returns project
         coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general.modalities } returns listOf()
             every {
@@ -107,44 +97,10 @@ internal class EventSyncManagerTest {
             commCareSyncCache = commCareSyncCache,
             simprintsDownSyncTask = simprintsDownSyncTask,
             commCareSyncTask = commCareDownSyncTask,
-            eventRemoteDataSource = eventRemoteDataSource,
             configRepository = configRepository,
             extractCommCareCaseId = extractCommCareCaseIdUseCase,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
-    }
-
-    @Test
-    fun `countEventsToUpload without types should call event repo`() = runTest {
-        eventSyncManagerImpl.countEventsToUpload().toList()
-
-        coVerify { eventRepository.observeEventCount(null) }
-    }
-
-    @Test
-    fun `countEventsToUpload with types should call event repo per type`() = runTest {
-        eventSyncManagerImpl.countEventsToUpload(listOf(EventType.ENROLMENT_V2, EventType.EVENT_UP_SYNC_REQUEST)).toList()
-
-        coVerify(exactly = 2) { eventRepository.observeEventCount(any<EventType>()) }
-    }
-
-    @Test
-    fun `countEventsToDownload correctly counts sync events`() = runTest {
-        coEvery {
-            eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any())
-        } returns SampleSyncScopes.modulesDownSyncScope
-
-        coEvery { eventRemoteDataSource.count(any()) } returnsMany listOf(
-            EventCount(8, false),
-            EventCount(18, true),
-        )
-        coEvery { configRepository.getDeviceConfiguration() } returns mockk {
-            every { selectedModules } returns listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
-        }
-
-        val result = eventSyncManagerImpl.countEventsToDownload()
-
-        assertThat(result).isEqualTo(DownSyncCounts(26, isLowerBound = true))
     }
 
     @Test

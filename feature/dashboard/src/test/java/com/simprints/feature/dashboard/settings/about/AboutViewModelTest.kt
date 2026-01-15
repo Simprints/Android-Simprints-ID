@@ -12,21 +12,28 @@ import com.simprints.infra.config.store.models.IdentificationConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
-import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
+import com.simprints.infra.sync.EventCounts
+import com.simprints.infra.sync.usecase.CountEventsUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AboutViewModelTest {
     companion object {
         private val MODALITIES = listOf(Modality.FINGERPRINT)
@@ -39,6 +46,7 @@ class AboutViewModelTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
+    private val testDispatcher = testCoroutineRule.testCoroutineDispatcher
 
     private val recentUserActivity = RecentUserActivity(
         lastScannerVersion = "version",
@@ -51,7 +59,7 @@ class AboutViewModelTest {
     )
 
     @MockK
-    lateinit var eventSyncManager: EventSyncManager
+    lateinit var countEvents: CountEventsUseCase
 
     @MockK
     lateinit var configRepository: ConfigRepository
@@ -71,111 +79,110 @@ class AboutViewModelTest {
     }
 
     @Test
-    fun `should initialize the live data correctly`() {
+    fun `should initialize the live data correctly`() = runTest(testDispatcher) {
         val viewModel = AboutViewModel(
             configRepository = configRepository,
-            eventSyncManager = eventSyncManager,
+            countEvents = countEvents,
             recentUserActivityManager = recentUserActivityManager,
             logoutUseCase = logoutUseCase,
         )
 
-        assertThat(viewModel.modalities.value).isEqualTo(MODALITIES)
-        assertThat(viewModel.syncAndSearchConfig.value).isEqualTo(
+        advanceUntilIdle()
+        assertThat(viewModel.modalities.getOrAwaitValue()).isEqualTo(MODALITIES)
+        assertThat(viewModel.syncAndSearchConfig.getOrAwaitValue()).isEqualTo(
             SyncAndSearchConfig(PARTITION_TYPE.name, POOL_TYPE.name),
         )
-        assertThat(viewModel.recentUserActivity.value).isEqualTo(recentUserActivity)
-        assertThat(viewModel.settingsLocked.value).isEqualTo(SettingsPasswordConfig.Locked("1234"))
+        assertThat(viewModel.recentUserActivity.getOrAwaitValue()).isEqualTo(recentUserActivity)
+        assertThat(viewModel.settingsLocked.getOrAwaitValue()).isEqualTo(SettingsPasswordConfig.Locked("1234"))
     }
 
     @Test
-    fun `should sign out from signer manager when cannot sync data to simprints`() {
+    fun `should sign out from signer manager when cannot sync data to simprints`() = runTest(testDispatcher) {
         val viewModel =
             buildAboutViewModel(canSyncDataToSimprints = false, hasEventsToUpload = true)
-        runTest {
-            viewModel.processLogoutRequest()
-            coVerify(exactly = 1) { logoutUseCase.invoke() }
-        }
+        advanceUntilIdle()
+        viewModel.processLogoutRequest()
+        advanceUntilIdle()
+        coVerify(exactly = 1) { logoutUseCase.invoke() }
     }
 
     @Test
-    fun `should sign out from signer manager when can sync data to simprints but there are no events to upload`() {
-        val viewModel =
-            buildAboutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = false)
-        runTest {
+    fun `should sign out from signer manager when can sync data to simprints but there are no events to upload`() =
+        runTest(testDispatcher) {
+            val viewModel =
+                buildAboutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = false)
+            advanceUntilIdle()
             viewModel.processLogoutRequest()
+            advanceUntilIdle()
             coVerify(exactly = 1) { logoutUseCase.invoke() }
         }
-    }
 
     @Test
-    fun `should not sign out from signer manager when can sync data to simprints and there are events to upload`() {
-        val viewModel =
-            buildAboutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = true)
-        runTest {
+    fun `should not sign out from signer manager when can sync data to simprints and there are events to upload`() =
+        runTest(testDispatcher) {
+            val viewModel =
+                buildAboutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = true)
+            advanceUntilIdle()
             viewModel.processLogoutRequest()
+            advanceUntilIdle()
             coVerify(exactly = 0) { logoutUseCase.invoke() }
         }
-    }
 
     @Test
-    fun `should emit LogoutDestination_LogoutDataSyncScreen when can sync data to simprints and there are events to upload`() {
-        val viewModel =
-            buildAboutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = true)
-        runTest {
+    fun `should emit LogoutDestination_LogoutDataSyncScreen when can sync data to simprints and there are events to upload`() =
+        runTest(testDispatcher) {
+            val viewModel =
+                buildAboutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = true)
+            advanceUntilIdle()
             viewModel.processLogoutRequest()
             assertThat(viewModel.logoutDestinationEvent.getOrAwaitValue().peekContent()).isEqualTo(
                 LogoutDestination.LogoutDataSyncScreen,
             )
         }
-    }
 
     @Test
-    fun `should emit LogoutDestination_LoginScreen when can sync data to simprints but there are no events to upload`() {
-        val viewModel =
-            buildAboutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = false)
-        runTest {
+    fun `should emit LogoutDestination_LoginScreen when can sync data to simprints but there are no events to upload`() =
+        runTest(testDispatcher) {
+            val viewModel =
+                buildAboutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = false)
+            advanceUntilIdle()
             viewModel.processLogoutRequest()
             assertThat(viewModel.logoutDestinationEvent.getOrAwaitValue().peekContent()).isEqualTo(
                 LogoutDestination.LoginScreen,
             )
         }
-    }
 
     @Test
-    fun `should emit LogoutDestination_LoginScreen when cannot sync data to simprints`() {
+    fun `should emit LogoutDestination_LoginScreen when cannot sync data to simprints`() = runTest(testDispatcher) {
         val viewModel =
             buildAboutViewModel(canSyncDataToSimprints = false, hasEventsToUpload = true)
-        runTest {
-            viewModel.processLogoutRequest()
-            assertThat(viewModel.logoutDestinationEvent.getOrAwaitValue().peekContent()).isEqualTo(
-                LogoutDestination.LoginScreen,
-            )
-        }
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `should emit reset troubleshooting counter`() {
-        val viewModel = buildAboutViewModel(canSyncDataToSimprints = false, hasEventsToUpload = true)
-        runTest {
-            val navigationEvent = viewModel.openTroubleshooting.test()
-            repeat(3) { viewModel.troubleshootingClick() }
-            advanceTimeBy(5000L)
-            repeat(2) { viewModel.troubleshootingClick() }
-            navigationEvent.assertNoValue()
-            repeat(3) { viewModel.troubleshootingClick() }
-            navigationEvent.assertHasValue()
-        }
+        advanceUntilIdle()
+        viewModel.processLogoutRequest()
+        assertThat(viewModel.logoutDestinationEvent.getOrAwaitValue().peekContent()).isEqualTo(
+            LogoutDestination.LoginScreen,
+        )
     }
 
     @Test
-    fun `mark settings as unlocked when called`() {
+    fun `should emit reset troubleshooting counter`() = runTest(testDispatcher) {
         val viewModel = buildAboutViewModel(canSyncDataToSimprints = false, hasEventsToUpload = true)
-        runTest {
-            assertThat(viewModel.settingsLocked.value).isEqualTo(SettingsPasswordConfig.Locked("1234"))
-            viewModel.unlockSettings()
-            assertThat(viewModel.settingsLocked.value).isEqualTo(SettingsPasswordConfig.Unlocked)
-        }
+        advanceUntilIdle()
+        val navigationEvent = viewModel.openTroubleshooting.test()
+        repeat(3) { viewModel.troubleshootingClick() }
+        advanceTimeBy(5000L)
+        repeat(2) { viewModel.troubleshootingClick() }
+        navigationEvent.assertNoValue()
+        repeat(3) { viewModel.troubleshootingClick() }
+        navigationEvent.assertHasValue()
+    }
+
+    @Test
+    fun `mark settings as unlocked when called`() = runTest(testDispatcher) {
+        val viewModel = buildAboutViewModel(canSyncDataToSimprints = false, hasEventsToUpload = true)
+        advanceUntilIdle()
+        assertThat(viewModel.settingsLocked.getOrAwaitValue()).isEqualTo(SettingsPasswordConfig.Locked("1234"))
+        viewModel.unlockSettings()
+        assertThat(viewModel.settingsLocked.getOrAwaitValue()).isEqualTo(SettingsPasswordConfig.Unlocked)
     }
 
     private fun buildProjectConfigurationMock(
@@ -206,13 +213,21 @@ class AboutViewModelTest {
             true -> 1
             false -> 0
         }
-        coEvery { eventSyncManager.countEventsToUpload() } returns flowOf(countEventsToUpload)
+        every { countEvents.invoke() } returns flowOf(
+            EventCounts(
+                download = 0,
+                isDownloadLowerBound = false,
+                upload = countEventsToUpload,
+                uploadEnrolmentV2 = 0,
+                uploadEnrolmentV4 = 0,
+            ),
+        )
         coEvery { configRepository.getProjectConfiguration() } returns buildProjectConfigurationMock(
             upSyncKind,
         )
         return AboutViewModel(
             configRepository = configRepository,
-            eventSyncManager = eventSyncManager,
+            countEvents = countEvents,
             recentUserActivityManager = recentUserActivityManager,
             logoutUseCase = logoutUseCase,
         )

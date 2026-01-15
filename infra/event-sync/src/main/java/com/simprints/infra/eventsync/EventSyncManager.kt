@@ -1,22 +1,11 @@
 package com.simprints.infra.eventsync
 
-import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.eventsync.status.models.DownSyncCounts
-import kotlinx.coroutines.flow.Flow
-
 interface EventSyncManager {
     fun getPeriodicWorkTags(): List<String>
 
     fun getOneTimeWorkTags(): List<String>
 
     fun getAllWorkerTag(): String
-
-    suspend fun countEventsToUpload(): Flow<Int>
-
-    suspend fun countEventsToUpload(types: List<EventType>): Flow<Int>
-
-    suspend fun countEventsToDownload(): DownSyncCounts
 
     suspend fun downSyncSubject(
         projectId: String,

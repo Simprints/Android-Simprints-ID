@@ -22,23 +22,22 @@ import com.simprints.infra.config.store.models.isSampleUploadEnabledInProject
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
-import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.sync.SyncCommand
+import com.simprints.infra.sync.usecase.CountEventsUseCase
 import com.simprints.infra.sync.usecase.SyncUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.minutes
@@ -48,12 +47,12 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val authStore: AuthStore,
     private val imageRepository: ImageRepository,
-    private val eventSyncManager: EventSyncManager,
     private val timeHelper: TimeHelper,
     private val ticker: Ticker,
     private val appForegroundStateTracker: AppForegroundStateTracker,
     private val commCarePermissionChecker: CommCarePermissionChecker,
     private val observeConfigurationFlow: ObserveConfigurationChangesUseCase,
+    private val countEvents: CountEventsUseCase,
     private val sync: SyncUseCase,
     @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) {
@@ -196,11 +195,11 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         }
         val recordsToUpload = when {
             isEventSyncInProgress -> null
-            else -> eventSyncManager.countEventsToUpload(listOf(EventType.ENROLMENT_V2, EventType.ENROLMENT_V4)).firstOrNull() ?: 0
+            else -> countEvents().firstOrNull()?.run { uploadEnrolmentV2 + uploadEnrolmentV4 } ?: 0
         }
         val recordsToDownload = when {
             isEventSyncInProgress || isPreLogoutUpSync -> null
-            projectConfig.isSimprintsEventDownSyncAllowed() -> countEventsToDownloadWithCaching()
+            projectConfig.isSimprintsEventDownSyncAllowed() -> countEvents().first().run { DownSyncCounts(download, isDownloadLowerBound) }
             else -> DownSyncCounts(0, isLowerBound = false)
         }?.let { "${it.count}${if (it.isLowerBound) "+" else ""}" }.orEmpty()
 
@@ -290,36 +289,8 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         action,
     )
 
-    // caching eventSyncManager.countEventsToDownload to avoid network-based delays on frequent calls
-
-    private var cachedEventCountToDownload: DownSyncCounts? = null
-    private var cachedEventCountToDownloadTimestamp: Long = 0
-
-    private suspend fun countEventsToDownloadWithCaching(): DownSyncCounts {
-        val timeNowMs = timeHelper.now().ms
-        val timeSinceLastDownload = timeNowMs - cachedEventCountToDownloadTimestamp
-        val cached = cachedEventCountToDownload // for smart-cast
-
-        if (cached == null || timeSinceLastDownload > COUNT_EVENTS_CACHE_LIFESPAN_MILLIS) {
-            val result = try {
-                withTimeout(COUNT_EVENTS_TIMEOUT_MILLIS) {
-                    eventSyncManager.countEventsToDownload()
-                }
-            } catch (_: Throwable) {
-                DownSyncCounts(0, isLowerBound = false)
-            }
-            cachedEventCountToDownload = result
-            cachedEventCountToDownloadTimestamp = timeNowMs
-            return result
-        }
-
-        return cached
-    }
-
     private companion object {
         private const val SYNC_COMPLETION_HOLD_MILLIS = 1000L
-        private const val COUNT_EVENTS_TIMEOUT_MILLIS = 10 * 1000L
-        private const val COUNT_EVENTS_CACHE_LIFESPAN_MILLIS = 10 * 1000L
     }
 }
 
