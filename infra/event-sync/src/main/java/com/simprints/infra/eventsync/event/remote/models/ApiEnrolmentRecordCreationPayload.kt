@@ -2,7 +2,7 @@ package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordCreationEvent
 import com.simprints.infra.eventsync.event.remote.ApiEnrolmentRecordPayloadType
 import com.simprints.infra.eventsync.event.remote.ApiExternalCredential
 import com.simprints.infra.eventsync.event.remote.fromApiToDomain

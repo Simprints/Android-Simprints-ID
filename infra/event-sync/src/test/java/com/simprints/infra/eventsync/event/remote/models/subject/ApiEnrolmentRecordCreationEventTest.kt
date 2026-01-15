@@ -6,9 +6,9 @@ import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.remote.models.ApiExternalCredentialType
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
-import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordCreationEvent
+import com.simprints.infra.events.event.domain.models.FingerprintReference
+import com.simprints.infra.events.event.domain.models.FingerprintTemplate
 import com.simprints.infra.eventsync.event.remote.ApiExternalCredential
 import com.simprints.infra.eventsync.event.remote.ApiFingerprintTemplate
 import com.simprints.infra.eventsync.event.remote.models.ApiEnrolmentRecordCreationPayload

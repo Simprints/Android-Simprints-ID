@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.infra.events.event.domain.models.callout.BiometricDataSource
+import com.simprints.infra.events.event.domain.models.BiometricDataSource
 import kotlinx.serialization.Serializable
 
 @Keep

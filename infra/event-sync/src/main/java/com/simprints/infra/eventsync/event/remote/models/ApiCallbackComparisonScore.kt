@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.infra.events.event.domain.models.callback.CallbackComparisonScore
+import com.simprints.infra.events.event.domain.models.CallbackComparisonScore
 import kotlinx.serialization.Serializable
 
 @Keep

@@ -60,32 +60,8 @@ import com.simprints.infra.events.event.domain.models.EventType.Companion.SCANNE
 import com.simprints.infra.events.event.domain.models.EventType.Companion.SCANNER_FIRMWARE_UPDATE_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.SUSPICIOUS_INTENT_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.VERO_2_INFO_SNAPSHOT_KEY
-import com.simprints.infra.events.event.domain.models.callback.ConfirmationCallbackEvent
-import com.simprints.infra.events.event.domain.models.callback.EnrolmentCallbackEvent
-import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent
-import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
-import com.simprints.infra.events.event.domain.models.callback.RefusalCallbackEvent
-import com.simprints.infra.events.event.domain.models.callback.VerificationCallbackEvent
-import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEventV2
-import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEventV3
-import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEventV2
-import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEventV3
-import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEventV2
-import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEventV3
-import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEventV2
-import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEventV3
-import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEventV2
-import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEventV3
-import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
-import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
-import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent
-import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
-import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEvent
-import com.simprints.infra.events.event.domain.models.face.FaceOnboardingCompleteEvent
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
-import com.simprints.infra.events.event.domain.models.samples.SampleUpSyncRequestEvent
-import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
+import com.simprints.infra.events.event.domain.models.EventUpSyncRequestEvent
+import com.simprints.infra.events.event.domain.models.SampleUpSyncRequestEvent
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,

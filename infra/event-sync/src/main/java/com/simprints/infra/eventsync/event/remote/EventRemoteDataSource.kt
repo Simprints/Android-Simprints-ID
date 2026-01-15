@@ -4,7 +4,7 @@ import androidx.annotation.VisibleForTesting
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.event.domain.EventCount
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordEvent
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncResult

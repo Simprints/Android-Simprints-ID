@@ -1,11 +1,11 @@
 package com.simprints.infra.eventsync.event.remote
 
 import androidx.annotation.Keep
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordDeletionEvent
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordUpdateEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordCreationEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordDeletionEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordMoveEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordUpdateEvent
 import com.simprints.infra.eventsync.event.remote.models.ApiEnrolmentRecordCreationPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEnrolmentRecordDeletionPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEnrolmentRecordEventPayload
