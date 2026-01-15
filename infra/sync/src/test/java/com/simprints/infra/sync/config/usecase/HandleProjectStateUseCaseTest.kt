@@ -1,8 +1,8 @@
 package com.simprints.infra.sync.config.usecase
 
 import com.simprints.infra.config.store.models.ProjectState
-import com.simprints.infra.sync.EventCounts
-import com.simprints.infra.sync.usecase.CountEventsUseCase
+import com.simprints.infra.sync.SyncableCounts
+import com.simprints.infra.sync.usecase.CountSyncableUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.every
@@ -14,7 +14,7 @@ import org.junit.Test
 
 internal class HandleProjectStateUseCaseTest {
     @MockK
-    private lateinit var countEvents: CountEventsUseCase
+    private lateinit var countSyncable: CountSyncableUseCase
 
     @MockK
     private lateinit var logoutUseCase: LogoutUseCase
@@ -26,20 +26,20 @@ internal class HandleProjectStateUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
 
         useCase = HandleProjectStateUseCase(
-            countEvents = countEvents,
+            countSyncable = countSyncable,
             logoutUseCase = logoutUseCase,
         )
     }
 
     @Test
     fun `Fully logs out when project has ended`() = runTest {
-        every { countEvents.invoke() } returns flowOf(
-            EventCounts(
-                download = 0,
-                isDownloadLowerBound = false,
-                upload = 0,
-                uploadEnrolmentV2 = 0,
-                uploadEnrolmentV4 = 0,
+        every { countSyncable.invoke() } returns flowOf(
+            SyncableCounts(
+                eventsToDownload = 0,
+                isEventsToDownloadLowerBound = false,
+                eventsToUpload = 0,
+                eventsToUploadEnrolmentV2 = 0,
+                eventsToUploadEnrolmentV4 = 0,
             ),
         )
 
@@ -50,13 +50,13 @@ internal class HandleProjectStateUseCaseTest {
 
     @Test
     fun `Logs out when project has ending and no items to upload`() = runTest {
-        every { countEvents.invoke() } returns flowOf(
-            EventCounts(
-                download = 0,
-                isDownloadLowerBound = false,
-                upload = 0,
-                uploadEnrolmentV2 = 0,
-                uploadEnrolmentV4 = 0,
+        every { countSyncable.invoke() } returns flowOf(
+            SyncableCounts(
+                eventsToDownload = 0,
+                isEventsToDownloadLowerBound = false,
+                eventsToUpload = 0,
+                eventsToUploadEnrolmentV2 = 0,
+                eventsToUploadEnrolmentV4 = 0,
             ),
         )
 
@@ -67,13 +67,13 @@ internal class HandleProjectStateUseCaseTest {
 
     @Test
     fun `Does not logs out when project has ending and has items to upload`() = runTest {
-        every { countEvents.invoke() } returns flowOf(
-            EventCounts(
-                download = 0,
-                isDownloadLowerBound = false,
-                upload = 5,
-                uploadEnrolmentV2 = 0,
-                uploadEnrolmentV4 = 0,
+        every { countSyncable.invoke() } returns flowOf(
+            SyncableCounts(
+                eventsToDownload = 0,
+                isEventsToDownloadLowerBound = false,
+                eventsToUpload = 5,
+                eventsToUploadEnrolmentV2 = 0,
+                eventsToUploadEnrolmentV4 = 0,
             ),
         )
 
@@ -84,13 +84,13 @@ internal class HandleProjectStateUseCaseTest {
 
     @Test
     fun `Does not logs out when project is running`() = runTest {
-        every { countEvents.invoke() } returns flowOf(
-            EventCounts(
-                download = 0,
-                isDownloadLowerBound = false,
-                upload = 0,
-                uploadEnrolmentV2 = 0,
-                uploadEnrolmentV4 = 0,
+        every { countSyncable.invoke() } returns flowOf(
+            SyncableCounts(
+                eventsToDownload = 0,
+                isEventsToDownloadLowerBound = false,
+                eventsToUpload = 0,
+                eventsToUploadEnrolmentV2 = 0,
+                eventsToUploadEnrolmentV4 = 0,
             ),
         )
 

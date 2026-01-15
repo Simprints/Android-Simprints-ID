@@ -15,7 +15,7 @@ import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
-import com.simprints.infra.sync.usecase.CountEventsUseCase
+import com.simprints.infra.sync.usecase.CountSyncableUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -24,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class AboutViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
-    private val countEvents: CountEventsUseCase,
+    private val countSyncable: CountSyncableUseCase,
     private val logoutUseCase: LogoutUseCase,
     private val recentUserActivityManager: RecentUserActivityManager,
 ) : ViewModel() {
@@ -78,7 +78,7 @@ internal class AboutViewModel @Inject constructor(
         }
     }
 
-    private suspend fun hasEventsToUpload(): Boolean = countEvents().first().upload > 0
+    private suspend fun hasEventsToUpload(): Boolean = countSyncable().first().eventsToUpload > 0
 
     private suspend fun canSyncDataToSimprints(): Boolean = configRepository.getProjectConfiguration().canSyncDataToSimprints()
 

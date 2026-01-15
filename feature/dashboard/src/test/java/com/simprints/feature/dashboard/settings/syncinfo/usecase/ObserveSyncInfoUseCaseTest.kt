@@ -24,11 +24,11 @@ import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.network.ConnectivityTracker
-import com.simprints.infra.sync.EventCounts
+import com.simprints.infra.sync.SyncableCounts
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.LegacySyncStates
 import com.simprints.infra.sync.SyncStatus
-import com.simprints.infra.sync.usecase.CountEventsUseCase
+import com.simprints.infra.sync.usecase.CountSyncableUseCase
 import com.simprints.infra.sync.usecase.SyncUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -52,7 +52,7 @@ internal class ObserveSyncInfoUseCaseTest {
     private val enrolmentRecordRepository = mockk<EnrolmentRecordRepository>()
     private val authStore = mockk<AuthStore>()
     private val imageRepository = mockk<ImageRepository>()
-    private val countEvents = mockk<CountEventsUseCase>()
+    private val countSyncable = mockk<CountSyncableUseCase>()
     private val sync = mockk<SyncUseCase>()
     private val timeHelper = mockk<TimeHelper>()
     private val ticker = mockk<Ticker>()
@@ -63,13 +63,13 @@ internal class ObserveSyncInfoUseCaseTest {
     private val syncStatusFlow = MutableStateFlow(
         SyncStatus(LegacySyncStates(eventSyncState = mockk(relaxed = true), imageSyncStatus = mockk(relaxed = true))),
     )
-    private val eventCountsFlow = MutableStateFlow(
-        EventCounts(
-            download = 0,
-            isDownloadLowerBound = false,
-            upload = 0,
-            uploadEnrolmentV2 = 0,
-            uploadEnrolmentV4 = 0,
+    private val syncableCountsFlow = MutableStateFlow(
+        SyncableCounts(
+            eventsToDownload = 0,
+            isEventsToDownloadLowerBound = false,
+            eventsToUpload = 0,
+            eventsToUploadEnrolmentV2 = 0,
+            eventsToUploadEnrolmentV4 = 0,
         ),
     )
 
@@ -140,14 +140,14 @@ internal class ObserveSyncInfoUseCaseTest {
         every { sync.invoke(any(), any()) } returns syncStatusFlow
 
         every { mockEventSyncState.lastSyncTime } returns TEST_TIMESTAMP
-        eventCountsFlow.value = EventCounts(
-            download = 0,
-            isDownloadLowerBound = false,
-            upload = 0,
-            uploadEnrolmentV2 = 0,
-            uploadEnrolmentV4 = 0,
+        syncableCountsFlow.value = SyncableCounts(
+            eventsToDownload = 0,
+            isEventsToDownloadLowerBound = false,
+            eventsToUpload = 0,
+            eventsToUploadEnrolmentV2 = 0,
+            eventsToUploadEnrolmentV4 = 0,
         )
-        every { countEvents.invoke() } returns eventCountsFlow
+        every { countSyncable.invoke() } returns syncableCountsFlow
 
         coEvery { imageRepository.getNumberOfImagesToUpload(any()) } returns 0
         coEvery { enrolmentRecordRepository.count(any()) } returns 0
@@ -179,7 +179,7 @@ internal class ObserveSyncInfoUseCaseTest {
             appForegroundStateTracker = appForegroundStateTracker,
             commCarePermissionChecker = commCarePermissionChecker,
             observeConfigurationFlow = observeConfigurationFlow,
-            countEvents = countEvents,
+            countSyncable = countSyncable,
             sync = sync,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
@@ -562,12 +562,12 @@ internal class ObserveSyncInfoUseCaseTest {
             LegacySyncStates(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus),
         )
         coEvery { enrolmentRecordRepository.count(any()) } returns 25
-        eventCountsFlow.value = EventCounts(
-            download = 8,
-            isDownloadLowerBound = false,
-            upload = 0,
-            uploadEnrolmentV2 = 2,
-            uploadEnrolmentV4 = 3,
+        syncableCountsFlow.value = SyncableCounts(
+            eventsToDownload = 8,
+            isEventsToDownloadLowerBound = false,
+            eventsToUpload = 0,
+            eventsToUploadEnrolmentV2 = 2,
+            eventsToUploadEnrolmentV4 = 3,
         )
         createUseCase()
 
@@ -722,12 +722,12 @@ internal class ObserveSyncInfoUseCaseTest {
         syncStatusFlow.value = SyncStatus(
             LegacySyncStates(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus),
         )
-        eventCountsFlow.value = EventCounts(
-            download = 42,
-            isDownloadLowerBound = false,
-            upload = 0,
-            uploadEnrolmentV2 = 0,
-            uploadEnrolmentV4 = 0,
+        syncableCountsFlow.value = SyncableCounts(
+            eventsToDownload = 42,
+            isEventsToDownloadLowerBound = false,
+            eventsToUpload = 0,
+            eventsToUploadEnrolmentV2 = 0,
+            eventsToUploadEnrolmentV4 = 0,
         )
         every { mockProjectConfigWithDownSync.isSimprintsEventDownSyncAllowed() } returns true
         every { mockProjectConfigWithDownSync.isModuleSelectionAvailable() } returns false

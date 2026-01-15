@@ -9,7 +9,7 @@ import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.sync.down.EventDownSyncCountsRepository
 import com.simprints.infra.eventsync.sync.down.EventDownSyncPeriodicCountUseCase
-import com.simprints.infra.sync.EventCounts
+import com.simprints.infra.sync.SyncableCounts
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -56,18 +56,18 @@ class CountEventsUseCaseTest {
         coEvery { eventRepository.observeEventCount(null) } returns uploadFlowAll
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns uploadFlowEnrolmentV2
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns uploadFlowEnrolmentV4
-        val useCase = CountEventsUseCase(eventDownSyncCount, eventRepository, appScope = backgroundScope)
-        val emitted = mutableListOf<EventCounts>()
+        val useCase = CountSyncableUseCase(eventDownSyncCount, eventRepository, appScope = backgroundScope)
+        val emitted = mutableListOf<SyncableCounts>()
 
         val collectJob = launch { useCase().take(1).toList(emitted) }
 
         runCurrent() // ensure upstream flows are collected before emitting
-        val expected = EventCounts(
-            download = 10,
-            isDownloadLowerBound = true,
-            upload = 1,
-            uploadEnrolmentV2 = 2,
-            uploadEnrolmentV4 = 3,
+        val expected = SyncableCounts(
+            eventsToDownload = 10,
+            isEventsToDownloadLowerBound = true,
+            eventsToUpload = 1,
+            eventsToUploadEnrolmentV2 = 2,
+            eventsToUploadEnrolmentV4 = 3,
         )
         downSyncCountsFlow.emit(DownSyncCounts(count = 10, isLowerBound = true))
         uploadFlowAll.emit(1)
@@ -94,7 +94,7 @@ class CountEventsUseCaseTest {
         coEvery { eventRepository.observeEventCount(null) } returns uploadFlowAll
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns uploadFlowEnrolmentV2
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns uploadFlowEnrolmentV4
-        val useCase = CountEventsUseCase(eventDownSyncCount, eventRepository, appScope = backgroundScope)
+        val useCase = CountSyncableUseCase(eventDownSyncCount, eventRepository, appScope = backgroundScope)
 
         val flow1 = useCase()
 
@@ -124,7 +124,7 @@ class CountEventsUseCaseTest {
         coEvery { eventRepository.observeEventCount(null) } returns uploadFlowAll
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns uploadFlowEnrolmentV2
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns uploadFlowEnrolmentV4
-        val useCase = CountEventsUseCase(eventDownSyncCount, eventRepository, appScope = backgroundScope)
+        val useCase = CountSyncableUseCase(eventDownSyncCount, eventRepository, appScope = backgroundScope)
 
         val sharedFlow = useCase()
         runCurrent()
@@ -164,7 +164,7 @@ class CountEventsUseCaseTest {
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns uploadFlowEnrolmentV2
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns uploadFlowEnrolmentV4
 
-        val useCase = CountEventsUseCase(eventDownSyncCount, eventRepository, appScope = backgroundScope)
+        val useCase = CountSyncableUseCase(eventDownSyncCount, eventRepository, appScope = backgroundScope)
 
         val collectJob = launch { useCase().collect { } }
         runCurrent()

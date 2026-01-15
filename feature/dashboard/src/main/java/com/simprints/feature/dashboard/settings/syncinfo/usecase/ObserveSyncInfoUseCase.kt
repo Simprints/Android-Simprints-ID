@@ -27,7 +27,7 @@ import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.sync.SyncCommand
-import com.simprints.infra.sync.usecase.CountEventsUseCase
+import com.simprints.infra.sync.usecase.CountSyncableUseCase
 import com.simprints.infra.sync.usecase.SyncUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -52,7 +52,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     private val appForegroundStateTracker: AppForegroundStateTracker,
     private val commCarePermissionChecker: CommCarePermissionChecker,
     private val observeConfigurationFlow: ObserveConfigurationChangesUseCase,
-    private val countEvents: CountEventsUseCase,
+    private val countSyncable: CountSyncableUseCase,
     private val sync: SyncUseCase,
     @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) {
@@ -195,11 +195,11 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         }
         val recordsToUpload = when {
             isEventSyncInProgress -> null
-            else -> countEvents().firstOrNull()?.run { uploadEnrolmentV2 + uploadEnrolmentV4 } ?: 0
+            else -> countSyncable().firstOrNull()?.run { eventsToUploadEnrolmentV2 + eventsToUploadEnrolmentV4 } ?: 0
         }
         val recordsToDownload = when {
             isEventSyncInProgress || isPreLogoutUpSync -> null
-            projectConfig.isSimprintsEventDownSyncAllowed() -> countEvents().first().run { DownSyncCounts(download, isDownloadLowerBound) }
+            projectConfig.isSimprintsEventDownSyncAllowed() -> countSyncable().first().run { DownSyncCounts(eventsToDownload, isEventsToDownloadLowerBound) }
             else -> DownSyncCounts(0, isLowerBound = false)
         }?.let { "${it.count}${if (it.isLowerBound) "+" else ""}" }.orEmpty()
 

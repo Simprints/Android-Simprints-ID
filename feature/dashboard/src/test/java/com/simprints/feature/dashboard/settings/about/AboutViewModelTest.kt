@@ -14,8 +14,8 @@ import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
-import com.simprints.infra.sync.EventCounts
-import com.simprints.infra.sync.usecase.CountEventsUseCase
+import com.simprints.infra.sync.SyncableCounts
+import com.simprints.infra.sync.usecase.CountSyncableUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
@@ -59,7 +59,7 @@ class AboutViewModelTest {
     )
 
     @MockK
-    lateinit var countEvents: CountEventsUseCase
+    lateinit var countSyncable: CountSyncableUseCase
 
     @MockK
     lateinit var configRepository: ConfigRepository
@@ -82,7 +82,7 @@ class AboutViewModelTest {
     fun `should initialize the live data correctly`() = runTest(testDispatcher) {
         val viewModel = AboutViewModel(
             configRepository = configRepository,
-            countEvents = countEvents,
+            countSyncable = countSyncable,
             recentUserActivityManager = recentUserActivityManager,
             logoutUseCase = logoutUseCase,
         )
@@ -213,13 +213,13 @@ class AboutViewModelTest {
             true -> 1
             false -> 0
         }
-        every { countEvents.invoke() } returns flowOf(
-            EventCounts(
-                download = 0,
-                isDownloadLowerBound = false,
-                upload = countEventsToUpload,
-                uploadEnrolmentV2 = 0,
-                uploadEnrolmentV4 = 0,
+        every { countSyncable.invoke() } returns flowOf(
+            SyncableCounts(
+                eventsToDownload = 0,
+                isEventsToDownloadLowerBound = false,
+                eventsToUpload = countEventsToUpload,
+                eventsToUploadEnrolmentV2 = 0,
+                eventsToUploadEnrolmentV4 = 0,
             ),
         )
         coEvery { configRepository.getProjectConfiguration() } returns buildProjectConfigurationMock(
@@ -227,7 +227,7 @@ class AboutViewModelTest {
         )
         return AboutViewModel(
             configRepository = configRepository,
-            countEvents = countEvents,
+            countSyncable = countSyncable,
             recentUserActivityManager = recentUserActivityManager,
             logoutUseCase = logoutUseCase,
         )
