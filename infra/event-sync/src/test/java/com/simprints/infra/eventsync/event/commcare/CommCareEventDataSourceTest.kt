@@ -6,8 +6,8 @@ import android.database.Cursor
 import android.net.Uri
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.LastCallingPackageStore
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordDeletionEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordCreationEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordDeletionEvent
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.eventsync.event.commcare.CommCareEventDataSource.Companion.BATCH_SIZE
 import com.simprints.infra.eventsync.event.commcare.CommCareEventDataSource.Companion.COLUMN_CASE_ID

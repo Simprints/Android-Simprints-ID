@@ -2,8 +2,9 @@ package com.simprints.infra.events.event.domain.models.callout
 
 import androidx.annotation.Keep
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.events.event.domain.models.ConfirmationCalloutEventV2
+import com.simprints.infra.events.event.domain.models.ConfirmationCalloutEventV2.Companion.EVENT_VERSION
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_CONFIRMATION
-import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEventV2.Companion.EVENT_VERSION
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID

@@ -2,12 +2,12 @@ package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.events.event.domain.models.callback.ConfirmationCallbackEvent
-import com.simprints.infra.events.event.domain.models.callback.EnrolmentCallbackEvent
-import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent
-import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
-import com.simprints.infra.events.event.domain.models.callback.RefusalCallbackEvent
-import com.simprints.infra.events.event.domain.models.callback.VerificationCallbackEvent
+import com.simprints.infra.events.event.domain.models.ConfirmationCallbackEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentCallbackEvent
+import com.simprints.infra.events.event.domain.models.ErrorCallbackEvent
+import com.simprints.infra.events.event.domain.models.IdentificationCallbackEvent
+import com.simprints.infra.events.event.domain.models.RefusalCallbackEvent
+import com.simprints.infra.events.event.domain.models.VerificationCallbackEvent
 import kotlinx.serialization.Serializable
 
 @Keep

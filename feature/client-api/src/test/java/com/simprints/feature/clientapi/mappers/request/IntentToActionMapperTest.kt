@@ -9,7 +9,7 @@ import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
+import com.simprints.infra.events.event.domain.models.IdentificationCallbackEvent
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.libsimprints.Constants.SIMPRINTS_LIB_VERSION
 import com.simprints.libsimprints.Constants.SIMPRINTS_MODULE_ID

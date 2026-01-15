@@ -3,12 +3,12 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.common.TemplateIdentifier
-import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
-import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
+import com.simprints.infra.events.event.domain.models.FaceTemplate
+import com.simprints.infra.events.event.domain.models.FingerprintTemplate
 import com.simprints.infra.eventsync.event.remote.ApiFingerprintTemplate
 import kotlinx.serialization.Serializable
-import com.simprints.infra.events.event.domain.models.subject.FaceReference as DomainFaceReference
-import com.simprints.infra.events.event.domain.models.subject.FingerprintReference as DomainFingerprintReference
+import com.simprints.infra.events.event.domain.models.FaceReference as DomainFaceReference
+import com.simprints.infra.events.event.domain.models.FingerprintReference as DomainFingerprintReference
 
 @ExcludedFromGeneratedTestCoverageReports("API model")
 @Serializable

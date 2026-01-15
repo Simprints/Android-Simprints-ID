@@ -4,7 +4,8 @@ import androidx.annotation.Keep
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_IDENTIFICATION
-import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEventV2.Companion.EVENT_VERSION
+import com.simprints.infra.events.event.domain.models.IdentificationCalloutEventV2
+import com.simprints.infra.events.event.domain.models.IdentificationCalloutEventV2.Companion.EVENT_VERSION
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID

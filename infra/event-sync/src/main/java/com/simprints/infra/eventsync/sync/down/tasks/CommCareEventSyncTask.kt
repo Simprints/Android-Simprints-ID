@@ -4,7 +4,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordEvent
 import com.simprints.infra.eventsync.event.commcare.CommCareEventDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation

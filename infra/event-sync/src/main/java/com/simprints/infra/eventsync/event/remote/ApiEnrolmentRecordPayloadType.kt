@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.event.remote
 
 import androidx.annotation.Keep
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordEventType
 import kotlinx.serialization.Serializable
 
 @Keep

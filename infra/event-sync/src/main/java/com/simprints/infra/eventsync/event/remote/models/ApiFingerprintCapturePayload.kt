@@ -3,12 +3,12 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.FAILURE_TO_ACQUIRE
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.GOOD_SCAN
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.NO_FINGER_DETECTED
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.SKIPPED
+import com.simprints.infra.events.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload
+import com.simprints.infra.events.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY
+import com.simprints.infra.events.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload.Result.FAILURE_TO_ACQUIRE
+import com.simprints.infra.events.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload.Result.GOOD_SCAN
+import com.simprints.infra.events.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload.Result.NO_FINGER_DETECTED
+import com.simprints.infra.events.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload.Result.SKIPPED
 import com.simprints.infra.eventsync.event.remote.models.ApiFingerprintCapturePayload.ApiResult
 import kotlinx.serialization.Serializable
 
