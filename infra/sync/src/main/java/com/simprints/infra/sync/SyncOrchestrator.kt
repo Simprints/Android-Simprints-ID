@@ -2,6 +2,7 @@ package com.simprints.infra.sync
 
 import kotlinx.coroutines.flow.Flow
 
+// todo MS-1278 move sync controls into SyncUseCase & its helper usecases, disband the rest into new other usecases
 interface SyncOrchestrator {
     suspend fun scheduleBackgroundWork(withDelay: Boolean = false)
 

@@ -18,7 +18,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Combines syncable entities together in a reactive way.
+ * Combines statuses of syncable entities together in a reactive way.
  *
  * Because sync state is extensively used throughout the project, including synchronously,
  * it is an app-scoped StateFlow. An up-to-date sync state value can be accessed synchronously.
@@ -61,5 +61,6 @@ class SyncUseCase @Inject constructor(
     }
 
     operator fun invoke(eventSync: SyncCommand, imageSync: SyncCommand): StateFlow<SyncStatus> = sharedSyncStatus
+    // todo MS-1278 move sync commands here from SyncOrchestrator (use helper usecases if needed), add to SyncCommand, and implement them
 
 }

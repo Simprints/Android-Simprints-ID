@@ -1,5 +1,6 @@
 package com.simprints.infra.eventsync
 
+// todo MS-1278 disband into usecases
 interface EventSyncManager {
     fun getPeriodicWorkTags(): List<String>
 
