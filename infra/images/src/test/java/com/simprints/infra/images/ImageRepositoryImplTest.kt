@@ -12,11 +12,18 @@ import com.simprints.infra.images.usecase.SamplePathConverter
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class ImageRepositoryImplTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
@@ -165,6 +172,25 @@ internal class ImageRepositoryImplTest {
         val imageCount = repository.getNumberOfImagesToUpload(PROJECT_ID)
 
         assertThat(imageCount).isEqualTo(5)
+    }
+
+    @Test
+    fun `observeNumberOfImagesToUpload maps observed images to their count`() = runTest {
+        val imagesFlow = MutableSharedFlow<List<SecuredImageRef>>()
+        coEvery { localDataSource.observeImages(PROJECT_ID) } returns imagesFlow
+        val emitted = mutableListOf<Int>()
+
+        val collectJob = launch {
+            repository.observeNumberOfImagesToUpload(PROJECT_ID).take(2).toList(emitted)
+        }
+
+        runCurrent() // ensure upstream flow is collected before emitting
+        imagesFlow.emit(emptyList())
+        imagesFlow.emit(List(5) { mockValidImage() })
+        runCurrent()
+        collectJob.join()
+        assertThat(emitted).containsExactly(0, 5).inOrder()
+        coVerify(exactly = 1) { localDataSource.observeImages(PROJECT_ID) }
     }
 
     private fun configureLocalImageFiles(numberOfValidFiles: Int) {

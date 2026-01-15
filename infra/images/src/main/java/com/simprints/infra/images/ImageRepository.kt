@@ -2,6 +2,7 @@ package com.simprints.infra.images
 
 import com.simprints.core.domain.common.Modality
 import com.simprints.infra.images.model.SecuredImageRef
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Repository for handling local and remote image file operations
@@ -45,4 +46,6 @@ interface ImageRepository {
     suspend fun deleteStoredImages()
 
     suspend fun getNumberOfImagesToUpload(projectId: String): Int
+
+    suspend fun observeNumberOfImagesToUpload(projectId: String): Flow<Int>
 }

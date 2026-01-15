@@ -2,6 +2,7 @@ package com.simprints.infra.images.local
 
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
+import kotlinx.coroutines.flow.Flow
 import java.io.FileInputStream
 
 /**
@@ -42,6 +43,13 @@ internal interface ImageLocalDataSource {
      * @return all image files found
      */
     suspend fun listImages(projectId: String?): List<SecuredImageRef>
+
+    /**
+     * Observes recursively listed all images contained in the project images folder
+     *
+     * @return flow of all image files found
+     */
+    suspend fun observeImages(projectId: String): Flow<List<SecuredImageRef>>
 
     /**
      * Deletes an image

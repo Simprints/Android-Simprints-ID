@@ -8,18 +8,26 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 internal class ImageLocalDataSourceImpl @Inject constructor(
     @param:ApplicationContext private val ctx: Context,
     private val keyHelper: SecurityManager,
     @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : ImageLocalDataSource {
     private val imageRootPath = "${ctx.filesDir}/$IMAGES_FOLDER"
+
+    private val observedImageRefListInvalidation = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     init {
         createDirectoryIfNonExistent(imageRootPath)
@@ -37,7 +45,7 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
         val file = File(fullPath)
         Simber.d(file.absoluteFile.toString())
 
-        try {
+        val storedImageRef = try {
             if (relativePath.compose().isEmpty()) {
                 throw FileNotFoundException()
             }
@@ -52,6 +60,8 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
             t.printStackTrace()
             null
         }
+        observedImageRefListInvalidation.tryEmit(Unit)
+        storedImageRef
     }
 
     override suspend fun decryptImage(image: SecuredImageRef): FileInputStream? = withContext(dispatcher) {
@@ -80,10 +90,15 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
             }.toList()
     }
 
+    override suspend fun observeImages(projectId: String): Flow<List<SecuredImageRef>> {
+        return observedImageRefListInvalidation.onStart { emit(Unit) } // initial listing
+            .mapLatest { listImages(projectId) }
+    }
+
     override suspend fun deleteImage(image: SecuredImageRef): Boolean = withContext(dispatcher) {
         val absolutePath = buildAbsolutePath(image.relativePath)
         val file = File(absolutePath)
-        file.delete()
+        file.delete().also { observedImageRefListInvalidation.tryEmit(Unit) }
     }
 
     private fun createDirectoryIfNonExistent(path: String) {
