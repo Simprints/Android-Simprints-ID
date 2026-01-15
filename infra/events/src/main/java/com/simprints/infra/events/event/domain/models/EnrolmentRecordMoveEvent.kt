@@ -1,6 +1,7 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.tokenization.TokenizableString
 import kotlinx.serialization.SerialName
@@ -10,6 +11,7 @@ import java.util.UUID
 @Keep
 @Serializable
 @SerialName("EnrolmentRecordMove")
+@ExcludedFromGeneratedTestCoverageReports("Data class")
 data class EnrolmentRecordMoveEvent(
     override val id: String,
     val payload: EnrolmentRecordMovePayload,

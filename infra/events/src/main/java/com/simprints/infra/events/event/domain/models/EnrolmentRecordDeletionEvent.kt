@@ -1,6 +1,7 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.util.UUID
@@ -8,6 +9,7 @@ import java.util.UUID
 @Keep
 @Serializable
 @SerialName("EnrolmentRecordDeletion")
+@ExcludedFromGeneratedTestCoverageReports("Data class")
 data class EnrolmentRecordDeletionEvent(
     override val id: String,
     val payload: EnrolmentRecordDeletionPayload,
