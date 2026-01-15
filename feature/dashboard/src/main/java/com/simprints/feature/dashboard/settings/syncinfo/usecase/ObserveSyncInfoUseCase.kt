@@ -20,8 +20,6 @@ import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSampleUploadEnabledInProject
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
-import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.network.ConnectivityTracker
@@ -43,7 +41,6 @@ import kotlin.time.Duration.Companion.minutes
 
 internal class ObserveSyncInfoUseCase @Inject constructor(
     private val connectivityTracker: ConnectivityTracker,
-    private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val authStore: AuthStore,
     private val timeHelper: TimeHelper,
     private val ticker: Ticker,
@@ -188,8 +185,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         val recordsTotal = when {
             isEventSyncInProgress || projectId.isBlank() -> null
 
-            // without project ID, repository access attempts will throw an exception
-            else -> enrolmentRecordRepository.count(EnrolmentRecordQuery(projectId))
+            else -> countSyncable().first().recordsTotal
         }
         val recordsToUpload = when {
             isEventSyncInProgress -> null

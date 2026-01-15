@@ -147,6 +147,13 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
             .toInt()
     }
 
+    override suspend fun observeCount(
+        query: EnrolmentRecordQuery,
+        dataSource: BiometricDataSource,
+    ): Flow<Int> {
+        TODO("MS-1278 Not yet implemented")
+    }
+
     override suspend fun performActions(
         actions: List<EnrolmentRecordAction>,
         project: Project,

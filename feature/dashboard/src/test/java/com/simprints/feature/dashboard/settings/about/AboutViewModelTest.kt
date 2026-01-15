@@ -215,6 +215,7 @@ class AboutViewModelTest {
         }
         every { countSyncable.invoke() } returns flowOf(
             SyncableCounts(
+                recordsTotal = 0,
                 eventsToDownload = 0,
                 isEventsToDownloadLowerBound = false,
                 eventsToUpload = countEventsToUpload,

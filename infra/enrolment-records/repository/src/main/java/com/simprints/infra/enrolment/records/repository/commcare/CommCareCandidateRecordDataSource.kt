@@ -38,6 +38,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
@@ -300,6 +301,13 @@ internal class CommCareCandidateRecordDataSource @Inject constructor(
                 )?.use { caseMetadataCursor -> count = caseMetadataCursor.count }
         }
         count
+    }
+
+    override suspend fun observeCount(
+        query: EnrolmentRecordQuery,
+        dataSource: BiometricDataSource,
+    ): Flow<Int> {
+        TODO("MS-1278 Not yet implemented")
     }
 
     companion object {

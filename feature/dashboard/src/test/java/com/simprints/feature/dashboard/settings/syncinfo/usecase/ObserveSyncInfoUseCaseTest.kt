@@ -19,7 +19,6 @@ import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSampleUploadEnabledInProject
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
-import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.network.ConnectivityTracker
@@ -47,7 +46,6 @@ internal class ObserveSyncInfoUseCaseTest {
     val testCoroutineRule = TestCoroutineRule()
 
     private val connectivityTracker = mockk<ConnectivityTracker>()
-    private val enrolmentRecordRepository = mockk<EnrolmentRecordRepository>()
     private val authStore = mockk<AuthStore>()
     private val countSyncable = mockk<CountSyncableUseCase>()
     private val sync = mockk<SyncUseCase>()
@@ -62,6 +60,7 @@ internal class ObserveSyncInfoUseCaseTest {
     )
     private val syncableCountsFlow = MutableStateFlow(
         SyncableCounts(
+            recordsTotal = 0,
             eventsToDownload = 0,
             isEventsToDownloadLowerBound = false,
             eventsToUpload = 0,
@@ -137,6 +136,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
         every { mockEventSyncState.lastSyncTime } returns TEST_TIMESTAMP
         syncableCountsFlow.value = SyncableCounts(
+            recordsTotal = 0,
             eventsToDownload = 0,
             isEventsToDownloadLowerBound = false,
             eventsToUpload = 0,
@@ -145,8 +145,6 @@ internal class ObserveSyncInfoUseCaseTest {
             imagesToUpload = 0,
         )
         every { countSyncable.invoke() } returns syncableCountsFlow
-
-        coEvery { enrolmentRecordRepository.count(any()) } returns 0
 
         every { ticker.observeTicks(any()) } returns MutableStateFlow(Unit)
         every { timeHelper.now() } returns TEST_TIMESTAMP
@@ -167,7 +165,6 @@ internal class ObserveSyncInfoUseCaseTest {
     private fun createUseCase() {
         useCase = ObserveSyncInfoUseCase(
             connectivityTracker = connectivityTracker,
-            enrolmentRecordRepository = enrolmentRecordRepository,
             authStore = authStore,
             timeHelper = timeHelper,
             ticker = ticker,
@@ -519,8 +516,8 @@ internal class ObserveSyncInfoUseCaseTest {
             every { isSyncRunning() } returns false
         }
         syncStatusFlow.value = SyncStatus(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus)
-        coEvery { enrolmentRecordRepository.count(any()) } returns 25
         syncableCountsFlow.value = SyncableCounts(
+            recordsTotal = 25,
             eventsToDownload = 8,
             isEventsToDownloadLowerBound = false,
             eventsToUpload = 0,
@@ -546,13 +543,11 @@ internal class ObserveSyncInfoUseCaseTest {
             every { isSyncRunning() } returns false
         }
         syncStatusFlow.value = SyncStatus(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus)
-        coEvery { enrolmentRecordRepository.count(any()) } returns 123
         createUseCase()
 
         val result = useCase().first()
 
         assertThat(result.syncInfoSectionRecords.counterTotalRecords).isEmpty()
-        coVerify(exactly = 0) { enrolmentRecordRepository.count(any()) }
     }
 
     @Test
@@ -578,6 +573,7 @@ internal class ObserveSyncInfoUseCaseTest {
         }
         syncStatusFlow.value = SyncStatus(eventSyncState = mockEventSyncState, imageSyncStatus = mockNotSyncingImageStatus)
         syncableCountsFlow.value = SyncableCounts(
+            recordsTotal = 0,
             eventsToDownload = 0,
             isEventsToDownloadLowerBound = false,
             eventsToUpload = 0,
@@ -679,6 +675,7 @@ internal class ObserveSyncInfoUseCaseTest {
         every { observeConfigurationFlow.invoke() } returns flowOf(createConfigurationState(projectConfig = mockProjectConfigWithDownSync))
         syncStatusFlow.value = SyncStatus(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus)
         syncableCountsFlow.value = SyncableCounts(
+            recordsTotal = 0,
             eventsToDownload = 42,
             isEventsToDownloadLowerBound = false,
             eventsToUpload = 0,
