@@ -1,7 +1,6 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.ErrorCallbackEvent.ErrorCallbackPayload.Reason
 import com.simprints.infra.events.event.domain.models.ErrorCallbackEvent.ErrorCallbackPayload.Reason.AGE_GROUP_NOT_SUPPORTED
 import com.simprints.infra.events.event.domain.models.ErrorCallbackEvent.ErrorCallbackPayload.Reason.BACKEND_MAINTENANCE_ERROR
@@ -20,6 +19,7 @@ import com.simprints.infra.events.event.domain.models.ErrorCallbackEvent.ErrorCa
 import com.simprints.infra.events.event.domain.models.ErrorCallbackEvent.ErrorCallbackPayload.Reason.PROJECT_ENDING
 import com.simprints.infra.events.event.domain.models.ErrorCallbackEvent.ErrorCallbackPayload.Reason.PROJECT_PAUSED
 import com.simprints.infra.events.event.domain.models.ErrorCallbackEvent.ErrorCallbackPayload.Reason.UNEXPECTED_ERROR
+import com.simprints.infra.events.event.domain.models.EventType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

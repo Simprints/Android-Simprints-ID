@@ -6,7 +6,6 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE
-import com.simprints.infra.events.event.domain.models.FaceCaptureEvent.FaceCapturePayload.Face
 
 @Keep
 data class FaceCaptureEvent(
@@ -24,7 +23,7 @@ data class FaceCaptureEvent(
         result: FaceCapturePayload.Result,
         isAutoCapture: Boolean,
         isFallback: Boolean,
-        face: Face?,
+        face: FaceCapturePayload.Face?,
         id: String = randomUUID(),
         payloadId: String = randomUUID(),
     ) : this(
@@ -62,8 +61,9 @@ data class FaceCaptureEvent(
         val face: Face?,
         override val type: EventType = FACE_CAPTURE,
     ) : EventPayload() {
-        override fun toSafeString(): String = "result: $result, attempt nr: $attemptNb, auto-capture: $isAutoCapture, fallback: $isFallback, " +
-            "quality: ${face?.quality},  format: ${face?.format}"
+        override fun toSafeString(): String =
+            "result: $result, attempt nr: $attemptNb, auto-capture: $isAutoCapture, fallback: $isFallback, " +
+                "quality: ${face?.quality},  format: ${face?.format}"
 
         @Keep
         data class Face(

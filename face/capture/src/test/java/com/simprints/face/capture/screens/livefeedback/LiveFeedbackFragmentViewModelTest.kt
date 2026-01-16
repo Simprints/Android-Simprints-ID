@@ -15,12 +15,12 @@ import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.experimental
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -69,7 +69,8 @@ internal class LiveFeedbackFragmentViewModelTest {
                 ?.qualityThreshold
         } returns QUALITY_THRESHOLD
         every { isUsingAutoCapture.invoke(any()) } returns false
-        coEvery { configRepository.getProjectConfiguration().experimental().singleQualityFallbackRequired } returns false
+        coEvery { configRepository.getProjectConfiguration().custom } returns
+            mapOf("singleQualityFallbackRequired" to JsonPrimitive(false))
         every { timeHelper.now() } returnsMany (0..100L).map { Timestamp(it) }
         justRun { previewFrame.recycle() }
         val resolveFaceBioSdkUseCase = mockk<ResolveFaceBioSdkUseCase> {
@@ -163,7 +164,8 @@ internal class LiveFeedbackFragmentViewModelTest {
         val validFace: Face = getFace()
         val badQuality: Face = getFace(quality = -2f)
 
-        coEvery { configRepository.getProjectConfiguration().experimental().singleQualityFallbackRequired } returns true
+        coEvery { configRepository.getProjectConfiguration().custom } returns
+            mapOf("singleQualityFallbackRequired" to JsonPrimitive(true))
 
         every { faceDetector.analyze(frame) } returnsMany listOf(
             badQuality,

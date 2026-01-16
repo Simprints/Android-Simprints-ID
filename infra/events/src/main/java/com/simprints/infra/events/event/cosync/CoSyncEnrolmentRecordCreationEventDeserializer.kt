@@ -56,7 +56,7 @@ class CoSyncEnrolmentRecordCreationEventDeserializer :
                 attendantId = attendantId,
                 biometricReferences = biometricReferences,
                 // TODO [CORE-3421] Update when CoSync supports external credentials (MfID)
-                externalCredentials = emptyList()
+                externalCredentials = emptyList(),
             ),
         )
     }

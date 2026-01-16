@@ -63,7 +63,8 @@ data class VerificationCalloutEventV3(
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLOUT_VERIFICATION_V3,
     ) : EventPayload() {
-        override fun toSafeString(): String = "module ID: $moduleId, guid: $verifyGuid, metadata: $metadata, biometricDataSource: $biometricDataSource"
+        override fun toSafeString(): String =
+            "module ID: $moduleId, guid: $verifyGuid, metadata: $metadata, biometricDataSource: $biometricDataSource"
     }
 
     companion object {

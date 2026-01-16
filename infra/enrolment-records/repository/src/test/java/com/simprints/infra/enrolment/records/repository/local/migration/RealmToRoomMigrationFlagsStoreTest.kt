@@ -9,6 +9,8 @@ import com.simprints.infra.security.SecurityManager
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Before
 import org.junit.Test
 
@@ -30,7 +32,7 @@ class RealmToRoomMigrationFlagsStoreTest {
 
     private lateinit var store: RealmToRoomMigrationFlagsStore
 
-    private val experimentalFeaturesMap = mutableMapOf<String, Any>()
+    private val experimentalFeaturesMap = mutableMapOf<String, JsonElement>()
 
     @Before
     fun setUp() {
@@ -206,7 +208,7 @@ class RealmToRoomMigrationFlagsStoreTest {
     fun `canRetry should return true when retries are less than max`() = runTest {
         // Given
         val maxRetries = 5
-        experimentalFeaturesMap[RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES] = maxRetries
+        experimentalFeaturesMap[RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES] = JsonPrimitive(maxRetries)
         val currentRetries = maxRetries - 1
         every { sharedPreferences.getInt(RealmToRoomMigrationFlagsStore.KEY_MIGRATION_RETRIES, 0) } returns currentRetries
 
@@ -221,7 +223,7 @@ class RealmToRoomMigrationFlagsStoreTest {
     fun `canRetry should return false when retries reach max`() = runTest {
         // Given
         val maxRetries = 5
-        experimentalFeaturesMap[RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES] = maxRetries
+        experimentalFeaturesMap[RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES] = JsonPrimitive(maxRetries)
 
         val currentRetries = maxRetries
         every { sharedPreferences.getInt(RealmToRoomMigrationFlagsStore.KEY_MIGRATION_RETRIES, 0) } returns currentRetries
@@ -237,7 +239,7 @@ class RealmToRoomMigrationFlagsStoreTest {
     fun `canRetry should return false when retries exceed max`() = runTest {
         // Given
         val maxRetries = 5
-        experimentalFeaturesMap[RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES] = maxRetries
+        experimentalFeaturesMap[RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES] = JsonPrimitive(maxRetries)
 
         val currentRetries = maxRetries + 1
         every { sharedPreferences.getInt(RealmToRoomMigrationFlagsStore.KEY_MIGRATION_RETRIES, 0) } returns currentRetries

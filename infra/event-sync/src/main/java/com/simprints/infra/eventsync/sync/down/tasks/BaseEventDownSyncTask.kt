@@ -10,8 +10,6 @@ import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentR
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction.Creation
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction.Deletion
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.EventDownSyncRequestEvent
-import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordDeletionEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordEvent
@@ -19,6 +17,8 @@ import com.simprints.infra.events.event.domain.models.EnrolmentRecordEventType
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordMoveEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordUpdateEvent
+import com.simprints.infra.events.event.domain.models.EventDownSyncRequestEvent
+import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.COMPLETE

@@ -16,7 +16,7 @@ internal class SimpleEventReporter @Inject constructor(
 ) {
     fun addInvalidIntentEvent(
         action: String,
-        extras: Map<String, Any>,
+        extras: Map<String, String>,
     ) {
         sessionCoroutineScope.launch {
             coreEventRepository.addOrUpdateEvent(InvalidIntentEvent(timeHelper.now(), action, extras))

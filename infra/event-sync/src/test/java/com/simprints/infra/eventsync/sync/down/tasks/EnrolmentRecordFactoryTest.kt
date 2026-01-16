@@ -1,14 +1,14 @@
 package com.simprints.infra.eventsync.sync.down.tasks
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.capture.BiometricReferenceCapture
+import com.simprints.core.domain.capture.BiometricTemplateCapture
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.reference.BiometricReference
-import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.capture.BiometricTemplateCapture
-import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper

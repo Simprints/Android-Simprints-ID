@@ -1,19 +1,21 @@
 package com.simprints.infra.config.store.local.migrations.models
 
 import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.simprints.infra.config.store.models.ConsentConfiguration
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 data class GeneralConsentOptions(
-    @JsonProperty("consent_enrol_only") var consentEnrolOnly: Boolean = false,
-    @JsonProperty("consent_enrol") var consentEnrol: Boolean = true,
-    @JsonProperty("consent_id_verify") var consentIdVerify: Boolean = true,
-    @JsonProperty("consent_share_data_no") var consentShareDataNo: Boolean = true,
-    @JsonProperty("consent_share_data_yes") var consentShareDataYes: Boolean = false,
-    @JsonProperty("consent_collect_yes") var consentCollectYes: Boolean = false,
-    @JsonProperty("consent_privacy_rights") var consentPrivacyRights: Boolean = true,
-    @JsonProperty("consent_confirmation") var consentConfirmation: Boolean = true,
+    @SerialName("consent_enrol_only") var consentEnrolOnly: Boolean = false,
+    @SerialName("consent_enrol") var consentEnrol: Boolean = true,
+    @SerialName("consent_id_verify") var consentIdVerify: Boolean = true,
+    @SerialName("consent_share_data_no") var consentShareDataNo: Boolean = true,
+    @SerialName("consent_share_data_yes") var consentShareDataYes: Boolean = false,
+    @SerialName("consent_collect_yes") var consentCollectYes: Boolean = false,
+    @SerialName("consent_privacy_rights") var consentPrivacyRights: Boolean = true,
+    @SerialName("consent_confirmation") var consentConfirmation: Boolean = true,
 ) {
     fun toDomain(): ConsentConfiguration.ConsentPromptConfiguration = ConsentConfiguration.ConsentPromptConfiguration(
         enrolmentVariant = if (consentEnrol) {

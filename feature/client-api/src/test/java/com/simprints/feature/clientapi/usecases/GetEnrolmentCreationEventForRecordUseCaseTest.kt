@@ -37,8 +37,6 @@ class GetEnrolmentCreationEventForRecordUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        every { jsonHelper.toJson(any()) } returns "json"
-
         useCase = GetEnrolmentCreationEventForRecordUseCase(
             configRepository,
             enrolmentRecordRepository,

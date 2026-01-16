@@ -60,6 +60,8 @@ import com.simprints.infra.events.event.domain.models.EventType.Companion.SCANNE
 import com.simprints.infra.events.event.domain.models.EventType.Companion.SCANNER_FIRMWARE_UPDATE_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.SUSPICIOUS_INTENT_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.VERO_2_INFO_SNAPSHOT_KEY
+import com.simprints.infra.events.event.domain.models.EventUpSyncRequestEvent
+import com.simprints.infra.events.event.domain.models.SampleUpSyncRequestEvent
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -124,7 +126,7 @@ import com.simprints.infra.events.event.domain.models.EventType.Companion.VERO_2
     JsonSubTypes.Type(value = ExternalCredentialSearchEvent::class, name = EXTERNAL_CREDENTIAL_SEARCH_KEY),
     JsonSubTypes.Type(value = ExternalCredentialConfirmationEvent::class, name = EXTERNAL_CREDENTIAL_CONFIRMATION_KEY),
 )
-abstract class Event {
+sealed class Event {
     abstract val id: String
     abstract val type: EventType
     abstract val payload: EventPayload
@@ -133,11 +135,11 @@ abstract class Event {
     abstract var projectId: String?
 
     @JsonIgnore
-    abstract fun getTokenizableFields(): Map<TokenKeyType, TokenizableString>
+    open fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
     abstract fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>): Event
 
-    override fun equals(other: Any?): Boolean = other is Event && other.id == id
+    final override fun equals(other: Any?): Boolean = other is Event && other.id == id
 
-    override fun hashCode(): Int = id.hashCode()
+    final override fun hashCode(): Int = id.hashCode()
 }

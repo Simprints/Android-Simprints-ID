@@ -19,7 +19,7 @@ internal fun ProjectConfiguration.toProto(): ProtoProjectConfiguration = ProtoPr
     }.also {
         if (custom != null) {
             try {
-                val customJson = JsonHelper.toJson(custom)
+                val customJson = JsonHelper.json.encodeToString(custom)
                 it.setCustomJson(customJson)
             } catch (_: Exception) {
                 // It is safer to not have custom config, than broken one
@@ -41,8 +41,8 @@ internal fun ProtoProjectConfiguration.toDomain(): ProjectConfiguration = Projec
     multifactorId = multiFactorId?.toDomain(),
     custom = customJson?.takeIf { it.isNotBlank() }?.let {
         try {
-            JsonHelper.fromJson(it)
-        } catch (_: Exception) {
+            JsonHelper.json.decodeFromString(it)
+        } catch (e: Exception) {
             // It is safer to not have custom config, than broken one
             null
         }

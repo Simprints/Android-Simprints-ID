@@ -20,15 +20,15 @@ import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentR
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction.Deletion
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction.Update
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.EventDownSyncRequestEvent
-import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordDeletionEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordMoveEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordUpdateEvent
+import com.simprints.infra.events.event.domain.models.EventDownSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.FaceReference
 import com.simprints.infra.events.event.domain.models.FaceTemplate
+import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID

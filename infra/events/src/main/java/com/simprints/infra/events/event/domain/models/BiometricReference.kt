@@ -4,16 +4,14 @@ import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.infra.events.event.domain.models.BiometricReferenceType.Companion.FACE_REFERENCE_KEY
-import com.simprints.infra.events.event.domain.models.BiometricReferenceType.Companion.FINGERPRINT_REFERENCE_KEY
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @ExcludedFromGeneratedTestCoverageReports("Domain model")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
 @JsonSubTypes(
-    JsonSubTypes.Type(value = FaceReference::class, name = FACE_REFERENCE_KEY),
-    JsonSubTypes.Type(value = FingerprintReference::class, name = FINGERPRINT_REFERENCE_KEY),
+    JsonSubTypes.Type(value = FaceReference::class, name = BiometricReferenceType.Companion.FACE_REFERENCE_KEY),
+    JsonSubTypes.Type(value = FingerprintReference::class, name = BiometricReferenceType.Companion.FINGERPRINT_REFERENCE_KEY),
 )
 @Keep
 @Serializable
@@ -25,7 +23,7 @@ sealed class BiometricReference {
 
 @ExcludedFromGeneratedTestCoverageReports("Domain model")
 @Serializable
-@SerialName(FACE_REFERENCE_KEY)
+@SerialName(BiometricReferenceType.Companion.FACE_REFERENCE_KEY)
 data class FaceReference(
     override val id: String,
     val templates: List<FaceTemplate>,
@@ -38,7 +36,7 @@ data class FaceReference(
 
 @ExcludedFromGeneratedTestCoverageReports("Domain model")
 @Serializable
-@SerialName(FINGERPRINT_REFERENCE_KEY)
+@SerialName(BiometricReferenceType.Companion.FINGERPRINT_REFERENCE_KEY)
 data class FingerprintReference(
     override val id: String,
     val templates: List<FingerprintTemplate>,

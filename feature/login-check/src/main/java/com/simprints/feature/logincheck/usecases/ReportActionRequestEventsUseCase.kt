@@ -3,13 +3,13 @@ package com.simprints.feature.logincheck.usecases
 import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
-import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent
-import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent
 import com.simprints.infra.events.event.domain.models.BiometricDataSource
 import com.simprints.infra.events.event.domain.models.ConfirmationCalloutEventV3
+import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentCalloutEventV3
 import com.simprints.infra.events.event.domain.models.EnrolmentLastBiometricsCalloutEventV3
 import com.simprints.infra.events.event.domain.models.IdentificationCalloutEventV3
+import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent
 import com.simprints.infra.events.event.domain.models.VerificationCalloutEventV3
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.orchestration.data.ActionRequest
@@ -40,7 +40,12 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
     private fun reportUnknownExtras(actionRequest: ActionRequest) {
         if (actionRequest.unknownExtras.isNotEmpty()) {
             sessionCoroutineScope.launch {
-                sessionEventRepository.addOrUpdateEvent(SuspiciousIntentEvent(timeHelper.now(), actionRequest.unknownExtras))
+                sessionEventRepository.addOrUpdateEvent(
+                    SuspiciousIntentEvent(
+                        timeHelper.now(),
+                        actionRequest.unknownExtras.mapValues { it.value.toString() },
+                    ),
+                )
             }
         }
     }
@@ -61,6 +66,7 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
                     metadata,
                     BiometricDataSource.fromString(biometricDataSource),
                 )
+
                 is ActionRequest.IdentifyActionRequest -> IdentificationCalloutEventV3(
                     startTime,
                     projectId,
@@ -69,6 +75,7 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
                     metadata,
                     BiometricDataSource.fromString(biometricDataSource),
                 )
+
                 is ActionRequest.VerifyActionRequest -> VerificationCalloutEventV3(
                     startTime,
                     projectId,
@@ -78,6 +85,7 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
                     metadata,
                     BiometricDataSource.fromString(biometricDataSource),
                 )
+
                 is ActionRequest.ConfirmIdentityActionRequest -> ConfirmationCalloutEventV3(
                     startTime,
                     projectId,
@@ -85,6 +93,7 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
                     sessionId,
                     metadata,
                 )
+
                 is ActionRequest.EnrolLastBiometricActionRequest -> EnrolmentLastBiometricsCalloutEventV3(
                     startTime,
                     projectId,

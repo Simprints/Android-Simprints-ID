@@ -1,8 +1,8 @@
 package com.simprints.infra.eventsync.sync.common
 
+import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredential
-import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper

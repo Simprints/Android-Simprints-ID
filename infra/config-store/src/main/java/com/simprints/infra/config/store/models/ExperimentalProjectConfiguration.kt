@@ -1,84 +1,101 @@
 package com.simprints.infra.config.store.models
 
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.longOrNull
+
 /**
  * Thin wrapper around custom project configuration to keep all the experimental
  * feature definitions in a single place and make calls explicit and type-safe.
  */
 data class ExperimentalProjectConfiguration(
-    private val customConfig: Map<String, Any>?,
+    private val customConfig: Map<String, JsonElement>?,
 ) {
     val idPoolValidationEnabled: Boolean
         get() = customConfig
             ?.get(ENABLE_ID_POOL_VALIDATION)
-            ?.let { it as? Boolean }
+            ?.jsonPrimitive
+            ?.booleanOrNull
             .let { it == true }
 
     val singleQualityFallbackRequired: Boolean
         get() = customConfig
             ?.get(SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED)
-            ?.let { it as? Boolean }
+            ?.jsonPrimitive
+            ?.booleanOrNull
             .let { it == true }
 
     val faceAutoCaptureEnabled: Boolean
         get() = customConfig
             ?.get(FACE_AUTO_CAPTURE_ENABLED)
-            ?.let { it as? Boolean }
+            ?.jsonPrimitive
+            ?.booleanOrNull
             .let { it == true }
 
     val faceAutoCaptureImagingDurationMillis: Long
         get() = customConfig
             ?.get(FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS)
-            ?.let { it as? Int }
-            ?.toLong()
+            ?.jsonPrimitive
+            ?.longOrNull
             ?.coerceIn(FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MIN, FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MAX)
             ?: FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
 
     val recordsDbMigrationFromRealmEnabled: Boolean
         get() = customConfig
             ?.get(RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_ENABLED)
-            ?.let { it as? Boolean }
+            ?.jsonPrimitive
+            ?.booleanOrNull
             .let { it == true }
 
     val recordsDbMigrationFromRealmMaxRetries: Int
-        get() = customConfig?.get(RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES).let {
-            (it as? Int) ?: RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_DEFAULT_MAX_RETRIES
-        }
+        get() = customConfig
+            ?.get(RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES)
+            ?.jsonPrimitive
+            ?.intOrNull
+            ?: RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_DEFAULT_MAX_RETRIES
 
     val sampleUploadWithSignedUrlEnabled: Boolean
         get() = customConfig
             ?.get(SAMPLE_UPLOAD_WITH_URL_ENABLED)
-            ?.let { it as? Boolean }
+            ?.jsonPrimitive
+            ?.booleanOrNull
             .let { it == true }
 
     val displayCameraFlashToggle: Boolean
         get() = customConfig
             ?.get(CAMERA_FLASH_CONTROLS_ENABLED)
-            ?.let { it as? Boolean }
+            ?.jsonPrimitive
+            ?.booleanOrNull
             .let { it == true }
 
     val fallbackToCommCareThresholdDays: Long
         get() = customConfig
             ?.get(FALLBACK_TO_COMMCARE_THRESHOLD_DAYS)
-            ?.let { it as? Int }
-            ?.toLong()
+            ?.jsonPrimitive
+            ?.longOrNull
             ?: FALLBACK_TO_COMMCARE_THRESHOLD_DAYS_DEFAULT
 
     val ocrUseHighRes: Boolean
         get() = customConfig
             ?.get(OCR_USE_HIGH_RES)
-            ?.let { it as? Boolean }
+            ?.jsonPrimitive
+            ?.booleanOrNull
             ?: OCR_USE_HIGH_RES_DEFAULT
 
     val ocrCaptures: Int
         get() = customConfig
             ?.get(OCR_CAPTURES)
-            ?.let { it as? Int }
+            ?.jsonPrimitive
+            ?.intOrNull
             ?: OCR_CAPTURES_DEFAULT
 
     val allowConfirmingGuidsNotInCallback: Boolean
         get() = customConfig
             ?.get(ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK)
-            ?.let { it as? Boolean }
+            ?.jsonPrimitive
+            ?.booleanOrNull
             .let { it == true }
 
     companion object {

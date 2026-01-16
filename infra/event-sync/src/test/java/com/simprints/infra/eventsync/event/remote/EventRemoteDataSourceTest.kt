@@ -5,9 +5,9 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.events.event.domain.EventCount
-import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordEventType
+import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID

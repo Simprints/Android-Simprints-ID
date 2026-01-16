@@ -5,7 +5,6 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
-import com.simprints.infra.events.event.domain.models.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result
 import java.util.UUID
 
 @Keep
@@ -19,7 +18,7 @@ data class FaceCaptureConfirmationEvent(
     constructor(
         startTime: Timestamp,
         endTime: Timestamp,
-        result: Result,
+        result: FaceCaptureConfirmationPayload.Result,
     ) : this(
         UUID.randomUUID().toString(),
         FaceCaptureConfirmationPayload(startTime, endTime, EVENT_VERSION, result),

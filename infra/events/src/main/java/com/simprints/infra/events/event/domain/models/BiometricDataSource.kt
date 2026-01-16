@@ -5,13 +5,13 @@ import androidx.annotation.Keep
 @Keep
 enum class BiometricDataSource {
     SIMPRINTS,
-    COMMCARE;
+    COMMCARE,
+    ;
 
     companion object {
-        fun fromString(value: String) =
-            when (value.uppercase()) {
-                "COMMCARE" -> COMMCARE
-                else -> SIMPRINTS
-            }
+        fun fromString(value: String) = when (value.uppercase()) {
+            "COMMCARE" -> COMMCARE
+            else -> SIMPRINTS
+        }
     }
 }

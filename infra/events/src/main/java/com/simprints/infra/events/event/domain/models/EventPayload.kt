@@ -10,34 +10,20 @@ import com.simprints.infra.events.event.domain.models.AuthorizationEvent.Authori
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent.BiometricReferenceCreationPayload
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload
 import com.simprints.infra.events.event.domain.models.CompletionCheckEvent.CompletionCheckPayload
+import com.simprints.infra.events.event.domain.models.ConfirmationCallbackEvent.ConfirmationCallbackPayload
 import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload
+import com.simprints.infra.events.event.domain.models.EnrolmentCallbackEvent.EnrolmentCallbackPayload
 import com.simprints.infra.events.event.domain.models.EnrolmentUpdateEvent.EnrolmentUpdatePayload
+import com.simprints.infra.events.event.domain.models.ErrorCallbackEvent.ErrorCallbackPayload
+import com.simprints.infra.events.event.domain.models.EventDownSyncRequestEvent.EventDownSyncRequestPayload
 import com.simprints.infra.events.event.domain.models.EventType.Companion
+import com.simprints.infra.events.event.domain.models.EventUpSyncRequestEvent.EventUpSyncRequestPayload
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent.ExternalCredentialCapturePayload
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent.ExternalCredentialCaptureValuePayload
 import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirmationEvent.*
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSearchEvent.*
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent.*
-import com.simprints.infra.events.event.domain.models.GuidSelectionEvent.GuidSelectionPayload
-import com.simprints.infra.events.event.domain.models.IntentParsingEvent.IntentParsingPayload
-import com.simprints.infra.events.event.domain.models.InvalidIntentEvent.InvalidIntentPayload
-import com.simprints.infra.events.event.domain.models.LicenseCheckEvent.LicenseCheckEventPayload
-import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload
-import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent.OneToOneMatchPayload
-import com.simprints.infra.events.event.domain.models.PersonCreationEvent.PersonCreationPayload
-import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload
-import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload
-import com.simprints.infra.events.event.domain.models.ScannerFirmwareUpdateEvent.ScannerFirmwareUpdatePayload
-import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent.SuspiciousIntentPayload
-import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload
-import com.simprints.infra.events.event.domain.models.ConfirmationCallbackEvent.ConfirmationCallbackPayload
-import com.simprints.infra.events.event.domain.models.EnrolmentCallbackEvent.EnrolmentCallbackPayload
-import com.simprints.infra.events.event.domain.models.ErrorCallbackEvent.ErrorCallbackPayload
-import com.simprints.infra.events.event.domain.models.IdentificationCallbackEvent.IdentificationCallbackPayload
-import com.simprints.infra.events.event.domain.models.RefusalCallbackEvent.RefusalCallbackPayload
-import com.simprints.infra.events.event.domain.models.VerificationCallbackEvent.VerificationCallbackPayload
-import com.simprints.infra.events.event.domain.models.EventDownSyncRequestEvent.EventDownSyncRequestPayload
 import com.simprints.infra.events.event.domain.models.FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload
 import com.simprints.infra.events.event.domain.models.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
 import com.simprints.infra.events.event.domain.models.FaceCaptureEvent.FaceCapturePayload
@@ -45,8 +31,22 @@ import com.simprints.infra.events.event.domain.models.FaceFallbackCaptureEvent.F
 import com.simprints.infra.events.event.domain.models.FaceOnboardingCompleteEvent.FaceOnboardingCompletePayload
 import com.simprints.infra.events.event.domain.models.FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload
 import com.simprints.infra.events.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload
+import com.simprints.infra.events.event.domain.models.GuidSelectionEvent.GuidSelectionPayload
+import com.simprints.infra.events.event.domain.models.IdentificationCallbackEvent.IdentificationCallbackPayload
+import com.simprints.infra.events.event.domain.models.IntentParsingEvent.IntentParsingPayload
+import com.simprints.infra.events.event.domain.models.InvalidIntentEvent.InvalidIntentPayload
+import com.simprints.infra.events.event.domain.models.LicenseCheckEvent.LicenseCheckEventPayload
+import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload
+import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent.OneToOneMatchPayload
+import com.simprints.infra.events.event.domain.models.PersonCreationEvent.PersonCreationPayload
+import com.simprints.infra.events.event.domain.models.RefusalCallbackEvent.RefusalCallbackPayload
+import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload
 import com.simprints.infra.events.event.domain.models.SampleUpSyncRequestEvent.SampleUpSyncRequestPayload
-import com.simprints.infra.events.event.domain.models.EventUpSyncRequestEvent.EventUpSyncRequestPayload
+import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload
+import com.simprints.infra.events.event.domain.models.ScannerFirmwareUpdateEvent.ScannerFirmwareUpdatePayload
+import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent.SuspiciousIntentPayload
+import com.simprints.infra.events.event.domain.models.VerificationCallbackEvent.VerificationCallbackPayload
+import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
 @JsonSubTypes(
@@ -118,7 +118,7 @@ import com.simprints.infra.events.event.domain.models.EventUpSyncRequestEvent.Ev
     JsonSubTypes.Type(value = ExternalCredentialSearchPayload::class, name = Companion.EXTERNAL_CREDENTIAL_SEARCH_KEY),
     JsonSubTypes.Type(value = ExternalCredentialConfirmationPayload::class, name = Companion.EXTERNAL_CREDENTIAL_CONFIRMATION_KEY),
 )
-abstract class EventPayload {
+sealed class EventPayload {
     abstract val type: EventType
     abstract val eventVersion: Int
     abstract val createdAt: Timestamp

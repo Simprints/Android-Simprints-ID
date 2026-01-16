@@ -75,7 +75,8 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
         return ApiLicenseResult.Error(errorCode)
     }
 
-    private fun getLicenseErrorCode(errorBody: ResponseBody): String = jsonHelper.fromJson<ApiLicenseError>(errorBody.string()).error
+    private fun getLicenseErrorCode(errorBody: ResponseBody): String =
+        jsonHelper.json.decodeFromString<ApiLicenseError>(errorBody.string()).error
 
     private suspend fun getProjectApiClient(): SimNetwork.SimApiClient<LicenseRemoteInterface> =
         authStore.buildClient(LicenseRemoteInterface::class)

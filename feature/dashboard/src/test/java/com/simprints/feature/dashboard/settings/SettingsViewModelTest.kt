@@ -17,6 +17,7 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -66,8 +67,8 @@ class SettingsViewModelTest {
 
     @Test
     fun `experimentalConfiguration live data should follow the project experimental configuration`() = runTest {
-        val experimentalConfig1 = mapOf("key1" to "value1")
-        val experimentalConfig2 = mapOf("key2" to "value2")
+        val experimentalConfig1 = mapOf("key1" to JsonPrimitive("value1"))
+        val experimentalConfig2 = mapOf("key2" to JsonPrimitive("value2"))
 
         coEvery { configRepository.observeProjectConfiguration() } returns flowOf(
             mockk<ProjectConfiguration>(relaxed = true) {

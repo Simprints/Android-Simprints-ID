@@ -30,7 +30,7 @@ data class ConfirmationCalloutEventV2(
             projectId = projectId,
             selectedGuid = selectedGuid,
             sessionId = sessionId,
-            metadata = metadata
+            metadata = metadata,
         ),
         CALLOUT_CONFIRMATION,
     )

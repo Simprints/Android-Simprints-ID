@@ -34,6 +34,7 @@ internal data class LicenseValue(
  * ```
  */
 @Keep
+@Serializable
 internal data class ApiLicenseError(
     val error: String,
 )

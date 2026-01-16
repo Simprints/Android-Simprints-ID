@@ -1,9 +1,9 @@
 package com.simprints.infra.config.store.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.core.tools.json.AnyPrimitiveSerializer
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 @Keep
 @Serializable
@@ -18,7 +18,7 @@ internal data class ApiProjectConfiguration(
     val identification: ApiIdentificationConfiguration,
     val synchronization: ApiSynchronizationConfiguration,
     val multiFactorId: ApiMultiFactorIdConfiguration? = null,
-    val custom: Map<String, @Serializable(with = AnyPrimitiveSerializer::class) Any>? = null,
+    val custom: Map<String, JsonElement>? = null,
 ) {
     fun toDomain(): ProjectConfiguration = ProjectConfiguration(
         id = id,
