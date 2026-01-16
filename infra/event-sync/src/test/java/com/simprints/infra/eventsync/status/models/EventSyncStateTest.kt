@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.status.models
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.eventsync.status.models.EventSyncState.SyncWorkerInfo
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.Blocked
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.Cancelled
@@ -114,6 +115,17 @@ class EventSyncStateTest {
                 reporters = emptyList(),
             ).isSyncCompleted(),
         ).isTrue()
+    }
+
+    @Test
+    fun `isSyncCompleted() is false when there are no workers`() {
+        assertThat(
+            createState(
+                up = emptyList(),
+                down = emptyList(),
+                reporters = emptyList(),
+            ).isSyncCompleted(),
+        ).isFalse()
     }
 
     @Test
@@ -347,6 +359,17 @@ class EventSyncStateTest {
     }
 
     @Test
+    fun `isSyncReporterCompleted() is false when there are no reporter workers`() {
+        assertThat(
+            createState(
+                up = emptyList(),
+                down = emptyList(),
+                reporters = emptyList(),
+            ).isSyncReporterCompleted(),
+        ).isFalse()
+    }
+
+    @Test
     fun `isSyncReporterCompleted() is false when there are enqueued workers`() {
         assertThat(
             createState(
@@ -390,11 +413,85 @@ class EventSyncStateTest {
         ).isTrue()
     }
 
+    @Test
+    fun `isUninitialized() is true when all values are blank or empty`() {
+        assertThat(
+            createUninitializedState()
+                .isUninitialized(),
+        ).isTrue()
+    }
+
+    @Test
+    fun `isUninitialized() is false when syncId is not blank`() {
+        assertThat(
+            createUninitializedState().copy(syncId = "id")
+                .isUninitialized(),
+        ).isFalse()
+    }
+
+    @Test
+    fun `isUninitialized() is false when progress is set`() {
+        assertThat(
+            createUninitializedState().copy(progress = 0)
+                .isUninitialized(),
+        ).isFalse()
+    }
+
+    @Test
+    fun `isUninitialized() is false when total is set`() {
+        assertThat(
+            createUninitializedState().copy(total = 0)
+                .isUninitialized(),
+        ).isFalse()
+    }
+
+    @Test
+    fun `isUninitialized() is false when up workers are present`() {
+        assertThat(
+            createUninitializedState().copy(upSyncWorkersInfo = listOf(createWorker(Succeeded)))
+                .isUninitialized(),
+        ).isFalse()
+    }
+
+    @Test
+    fun `isUninitialized() is false when down workers are present`() {
+        assertThat(
+            createUninitializedState().copy(downSyncWorkersInfo = listOf(createWorker(Succeeded)))
+                .isUninitialized(),
+        ).isFalse()
+    }
+
+    @Test
+    fun `isUninitialized() is false when reporter workers are present`() {
+        assertThat(
+            createUninitializedState().copy(reporterStates = listOf(createWorker(Succeeded)))
+                .isUninitialized(),
+        ).isFalse()
+    }
+
+    @Test
+    fun `isUninitialized() is false when lastSyncTime is set`() {
+        assertThat(
+            createUninitializedState().copy(lastSyncTime = Timestamp(ms = 0L))
+                .isUninitialized(),
+        ).isFalse()
+    }
+
     private fun createState(
         up: List<SyncWorkerInfo>,
         down: List<SyncWorkerInfo>,
         reporters: List<SyncWorkerInfo>,
     ) = EventSyncState("id", 0, 0, up, down, reporters, null)
+
+    private fun createUninitializedState() = EventSyncState(
+        syncId = "",
+        progress = null,
+        total = null,
+        upSyncWorkersInfo = emptyList(),
+        downSyncWorkersInfo = emptyList(),
+        reporterStates = emptyList(),
+        lastSyncTime = null,
+    )
 
     private fun createWorker(state: EventSyncWorkerState) = SyncWorkerInfo(type = EventSyncWorkerType.DOWNLOADER, state = state)
 }

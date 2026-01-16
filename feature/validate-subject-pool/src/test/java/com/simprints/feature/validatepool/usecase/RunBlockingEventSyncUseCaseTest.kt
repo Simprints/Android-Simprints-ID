@@ -91,21 +91,39 @@ class RunBlockingEventSyncUseCaseTest {
         verify(exactly = 2) { sync.invoke(SyncCommand.OBSERVE_ONLY, SyncCommand.OBSERVE_ONLY) }
     }
 
+    @Test
+    fun `does not start sync early when initial default state is emitted before last completed sync`() = runTest {
+        val syncFlow = MutableStateFlow(createPlaceholderSyncStatus())
+        every { sync.invoke(any(), any()) } returns syncFlow
+
+        val job = launch { usecase.invoke() }
+        testScheduler.advanceUntilIdle()
+
+        coVerify(exactly = 0) { syncOrchestrator.startEventSync(any()) }
+
+        syncFlow.value = createSyncStatus("sync", EventSyncWorkerState.Succeeded)
+        testScheduler.advanceUntilIdle()
+
+        coVerify(exactly = 1) { syncOrchestrator.startEventSync(any()) }
+        job.cancel()
+    }
+
     private fun createSyncStatus(
         syncId: String,
-        endReporterState: EventSyncWorkerState,
+        endReporterState: EventSyncWorkerState?,
+        progress: Int? = 0,
+        total: Int? = 0,
     ): SyncStatus {
         val eventSyncState = EventSyncState(
             syncId,
-            0,
-            0,
+            progress,
+            total,
             emptyList(),
             emptyList(),
-            listOf(
-                EventSyncState.SyncWorkerInfo(
-                    EventSyncWorkerType.END_SYNC_REPORTER,
-                    endReporterState,
-                ),
+            listOfNotNull(
+                endReporterState?.let {
+                    EventSyncState.SyncWorkerInfo(EventSyncWorkerType.END_SYNC_REPORTER, it)
+                },
             ),
             null,
         )
@@ -114,4 +132,6 @@ class RunBlockingEventSyncUseCaseTest {
             imageSyncStatus = ImageSyncStatus(isSyncing = false, progress = null, lastUpdateTimeMillis = null),
         )
     }
+
+    private fun createPlaceholderSyncStatus(): SyncStatus = createSyncStatus("", null, null, null)
 }

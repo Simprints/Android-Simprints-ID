@@ -24,6 +24,7 @@ import javax.inject.Singleton
 /**
  * Down-syncable event counting relies on non-reactive (by design) call to EventDownSyncCountsRepository.
  * To wrap it in a quasi-reactive way, that call is triggered
+ * on instantiation (for a "pre-warmed" count), and
  * every 5 minutes while there are subscribers to invoke(), and no less than 10 seconds apart.
  */
 @Singleton

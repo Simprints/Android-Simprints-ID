@@ -27,8 +27,8 @@ data class EventSyncState(
     fun isSyncRunning() = syncWorkersInfo
         .any { it.state is EventSyncWorkerState.Running || it.state is EventSyncWorkerState.Enqueued }
 
-    fun isSyncCompleted() = syncWorkersInfo
-        .all { it.state is EventSyncWorkerState.Succeeded }
+    fun isSyncCompleted() = !isThereNotSyncHistory()
+        && syncWorkersInfo.all { it.state is EventSyncWorkerState.Succeeded }
 
     fun isSyncInProgress() = syncWorkersInfo
         .any { it.state is EventSyncWorkerState.Running }
@@ -63,10 +63,19 @@ data class EventSyncState(
                 it.state is EventSyncWorkerState.Cancelled
         }
 
-    fun isSyncReporterCompleted() = reporterStates
-        .all {
+    fun isSyncReporterCompleted() = reporterStates.isNotEmpty()
+        && reporterStates.all {
             it.state !is EventSyncWorkerState.Running &&
                 it.state !is EventSyncWorkerState.Enqueued &&
                 it.state !is EventSyncWorkerState.Blocked
         }
+
+    fun isUninitialized() : Boolean =
+        syncId.isBlank() &&
+            progress == null &&
+            total == null &&
+            upSyncWorkersInfo.isEmpty() &&
+            downSyncWorkersInfo.isEmpty() &&
+            reporterStates.isEmpty() &&
+            lastSyncTime == null
 }
