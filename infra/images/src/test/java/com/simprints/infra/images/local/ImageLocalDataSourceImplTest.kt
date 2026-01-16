@@ -13,6 +13,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.io.File
@@ -249,11 +250,12 @@ class ImageLocalDataSourceImplTest {
             do {
                 mainProjectAfterStore = mainProjectChannel.receive()
             } while (!mainProjectAfterStore.contains(storedImage))
-            val otherProjectAfterInvalidation = otherProjectChannel.receive()
+            advanceUntilIdle()
+            val otherProjectAfterInvalidation = otherProjectChannel.tryReceive().getOrNull()
             otherProjectCollectJob.cancel()
             mainProjectCollectJob.cancel()
             assertThat(otherProjectInitial).isEmpty()
-            assertThat(otherProjectAfterInvalidation).isEmpty()
+            assertThat(otherProjectAfterInvalidation).isNull() // same value not re-emitted
             assertThat(mainProjectAfterStore).contains(storedImage)
         } finally {
             rootDir.deleteRecursively()

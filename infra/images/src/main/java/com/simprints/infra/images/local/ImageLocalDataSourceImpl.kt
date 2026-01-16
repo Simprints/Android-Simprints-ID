@@ -10,6 +10,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
@@ -93,6 +94,7 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
     override suspend fun observeImages(projectId: String): Flow<List<SecuredImageRef>> {
         return observedImageRefListInvalidation.onStart { emit(Unit) } // initial listing
             .mapLatest { listImages(projectId) }
+            .distinctUntilChanged()
     }
 
     override suspend fun deleteImage(image: SecuredImageRef): Boolean = withContext(dispatcher) {

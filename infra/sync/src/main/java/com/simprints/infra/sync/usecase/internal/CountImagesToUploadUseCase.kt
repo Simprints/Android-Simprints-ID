@@ -3,6 +3,7 @@ package com.simprints.infra.sync.usecase.internal
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.images.ImageRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -18,5 +19,6 @@ class CountImagesToUploadUseCase @Inject constructor(
         configRepository.observeProjectConfiguration()
             .map { it.projectId }
             .flatMapLatest(imageRepository::observeNumberOfImagesToUpload)
+            .distinctUntilChanged()
 
 }

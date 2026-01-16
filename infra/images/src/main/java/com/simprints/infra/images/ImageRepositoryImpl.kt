@@ -10,6 +10,7 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -55,7 +56,7 @@ internal class ImageRepositoryImpl @Inject internal constructor(
     override suspend fun getNumberOfImagesToUpload(projectId: String): Int = localDataSource.listImages(projectId).count()
 
     override suspend fun observeNumberOfImagesToUpload(projectId: String): Flow<Int> =
-        localDataSource.observeImages(projectId).map { it.count() }
+        localDataSource.observeImages(projectId).map { it.count() }.distinctUntilChanged()
 
     override suspend fun uploadStoredImagesAndDelete(
         projectId: String,

@@ -7,6 +7,7 @@ import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.ImageSyncTimestampProvider
 import com.simprints.infra.sync.SyncConstants
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transformLatest
 import javax.inject.Inject
@@ -35,7 +36,7 @@ class ImageSyncUseCase @Inject constructor(
                 ?.takeIf { it >= 1 }
             val progress = totalCount?.let { currentIndex to totalCount }
             ImageSyncStatus(isSyncing, progress, lastUpdateTimestamp)
-        }
+        }.distinctUntilChanged()
 
     /**
      * Converts the flow of WorkInfo in the receiver into a flow of WorkInfo paired to whether sync is ongoing or not.

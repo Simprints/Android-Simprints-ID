@@ -41,6 +41,7 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -591,13 +592,14 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         do {
             project1AfterCreate = project1Channel.receive()
         } while (project1AfterCreate != 1)
-        val project2AfterInvalidation = project2Channel.receive()
+        advanceUntilIdle()
+        val project2AfterInvalidation = project2Channel.tryReceive().getOrNull()
         project1CollectJob.cancel()
         project2CollectJob.cancel()
         assertThat(project1Initial).isEqualTo(0)
         assertThat(project2Initial).isEqualTo(0)
         assertThat(project1AfterCreate).isEqualTo(1)
-        assertThat(project2AfterInvalidation).isEqualTo(0)
+        assertThat(project2AfterInvalidation).isNull() // same value not re-emitted
     }
 
     private fun getFakePerson(): DbSubject = getRandomSubject().toRealmDb()

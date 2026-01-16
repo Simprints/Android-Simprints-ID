@@ -4,6 +4,7 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -22,6 +23,6 @@ class CountEnrolmentRecordsUseCase @Inject constructor(
                 enrolmentRecordRepository.observeCount(
                     EnrolmentRecordQuery(projectId)
                 )
-            }
+            }.distinctUntilChanged()
 
 }

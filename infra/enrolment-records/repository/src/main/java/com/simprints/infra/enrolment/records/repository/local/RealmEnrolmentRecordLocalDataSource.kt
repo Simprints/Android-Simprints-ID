@@ -34,6 +34,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -160,6 +161,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
     ): Flow<Int> {
         return observedCountInvalidation.onStart { emit(Unit) } // initial count
             .mapLatest { count(query, dataSource) }
+            .distinctUntilChanged()
     }
 
     override suspend fun performActions(
