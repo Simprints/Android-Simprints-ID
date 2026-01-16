@@ -15,6 +15,7 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
+import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.sync.SyncCommand
 import com.simprints.infra.sync.SyncOrchestrator
@@ -191,7 +192,9 @@ internal class SyncInfoViewModel @Inject constructor(
 
     private fun startInitialSyncIfRequired() {
         viewModelScope.launch {
-            val eventSyncState = eventSyncStateFlow.firstOrNull()
+            val eventSyncState = eventSyncStateFlow
+                .dropWhile { it.isUninitialized() }
+                .firstOrNull()
             val isRunning = eventSyncState?.isSyncRunning() ?: false
             val lastUpdate = eventSyncState?.lastSyncTime
 
@@ -252,6 +255,15 @@ internal class SyncInfoViewModel @Inject constructor(
 
     private suspend fun ConfigRepository.isModuleSelectionRequired() =
         getProjectConfiguration().isModuleSelectionAvailable() && getDeviceConfiguration().selectedModules.isEmpty()
+
+    private fun EventSyncState.isUninitialized(): Boolean =
+        syncId.isBlank() &&
+            progress == null &&
+            total == null &&
+            upSyncWorkersInfo.isEmpty() &&
+            downSyncWorkersInfo.isEmpty() &&
+            reporterStates.isEmpty() &&
+            lastSyncTime == null
 
     private companion object {
         private const val RE_SYNC_TIMEOUT_MILLIS = 5 * 60 * 1000L
