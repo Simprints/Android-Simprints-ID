@@ -37,6 +37,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.awaitClose
@@ -44,7 +45,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
@@ -322,8 +325,7 @@ internal class CommCareCandidateRecordDataSource @Inject constructor(
              * However, those are the only providers calling notifyChange.
              *
              * CaseDataContentProvider doesn't call notifyChange at least yet in the revision as linked above,
-             * so only the initial count will be returned on each subscription.
-             * TODO MS-1278 consider a decision to get this wrapped in a periodic updater usecase to overcome that.
+             * so in addition to observing notifyChange, we also poll periodically as a fallback.
              *
              * This implementation still provisions the use of notifyChange in CaseDataContentProvider in CommCare.
              */
@@ -338,6 +340,16 @@ internal class CommCareCandidateRecordDataSource @Inject constructor(
         )
         trySend(Unit) // initial count
         awaitClose { context.contentResolver.unregisterContentObserver(observer) }
+    }.let { contentObserverFlow ->
+        merge(
+            contentObserverFlow,
+            flow {
+                while (true) {
+                    delay(CASE_COUNT_FALLBACK_POLL_INTERVAL_MILLIS)
+                    emit(Unit)
+                }
+            },
+        )
     }.conflate().mapLatest {
         count(query, dataSource)
     }.distinctUntilChanged()
@@ -346,5 +358,7 @@ internal class CommCareCandidateRecordDataSource @Inject constructor(
         const val COLUMN_CASE_ID = "case_id"
         const val COLUMN_DATUM_ID = "datum_id"
         const val COLUMN_VALUE = "value"
+
+        internal const val CASE_COUNT_FALLBACK_POLL_INTERVAL_MILLIS = 300_000L
     }
 }
