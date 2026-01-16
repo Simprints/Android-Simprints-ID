@@ -31,10 +31,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.minutes
@@ -51,10 +48,6 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     private val sync: SyncUseCase,
     @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) {
-    private val eventSyncStateFlow = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.eventSyncState }
-
-    private val imageSyncStatusFlow = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.imageSyncStatus }
-
     // Since we are not using distinctUntilChanged any emission from combined flows will trigger the main flow as well
     private fun combinedRefreshSignals() = combine(
         connectivityTracker.observeIsConnected(),
@@ -65,10 +58,10 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     operator fun invoke(isPreLogoutUpSync: Boolean = false): Flow<SyncInfo> = combine(
         combinedRefreshSignals(),
         authStore.observeSignedInProjectId(),
-        eventSyncStateFlow,
-        imageSyncStatusFlow,
+        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY),
+        countSyncable(),
         observeConfigurationFlow(),
-    ) { isOnline, projectId, eventSyncState, imageSyncStatus, (isRefreshing, isProjectRunning, moduleCounts, projectConfig) ->
+    ) { isOnline, projectId, (eventSyncState, imageSyncStatus), counts, (isRefreshing, isProjectRunning, moduleCounts, projectConfig) ->
         val currentEvents = eventSyncState.progress?.coerceAtLeast(0) ?: 0
         val totalEvents = eventSyncState.total?.coerceAtLeast(0) ?: 0
         val currentImages = imageSyncStatus.progress?.first?.coerceAtLeast(0) ?: 0
@@ -98,7 +91,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         val imagesToUpload = if (imageSyncStatus.isSyncing) {
             null
         } else {
-            countSyncable().first().imagesToUpload
+            counts.imagesToUpload
         }
 
         val eventSyncProgressPart = SyncInfoProgressPart(
@@ -139,7 +132,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             SyncInfoProgress()
         }
 
-        val eventLastSyncTimestamp = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.eventSyncState }.firstOrNull()?.lastSyncTime ?: Timestamp(-1)
+        val eventLastSyncTimestamp = eventSyncState.lastSyncTime ?: Timestamp(-1)
         val imageLastSyncTimestamp = Timestamp(imageSyncStatus.lastUpdateTimeMillis ?: -1)
 
         val isReLoginRequired = eventSyncState.isSyncFailedBecauseReloginRequired()
@@ -184,16 +177,17 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
 
         val recordsTotal = when {
             isEventSyncInProgress || projectId.isBlank() -> null
-
-            else -> countSyncable().first().recordsTotal
+            else -> counts.recordsTotal
         }
         val recordsToUpload = when {
             isEventSyncInProgress -> null
-            else -> countSyncable().firstOrNull()?.run { eventsToUploadEnrolmentV2 + eventsToUploadEnrolmentV4 } ?: 0
+            else -> with(counts) { eventsToUploadEnrolmentV2 + eventsToUploadEnrolmentV4 }
         }
         val recordsToDownload = when {
             isEventSyncInProgress || isPreLogoutUpSync -> null
-            projectConfig.isSimprintsEventDownSyncAllowed() -> countSyncable().first().run { DownSyncCounts(eventsToDownload, isEventsToDownloadLowerBound) }
+            projectConfig.isSimprintsEventDownSyncAllowed() -> with(counts) {
+                DownSyncCounts(eventsToDownload, isEventsToDownloadLowerBound)
+            }
             else -> DownSyncCounts(0, isLowerBound = false)
         }?.let { "${it.count}${if (it.isLowerBound) "+" else ""}" }.orEmpty()
 
