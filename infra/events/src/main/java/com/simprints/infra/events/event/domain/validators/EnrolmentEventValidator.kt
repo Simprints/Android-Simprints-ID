@@ -3,8 +3,8 @@ package com.simprints.infra.events.event.domain.validators
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
 import com.simprints.infra.events.event.domain.models.Event
-import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.infra.events.event.domain.models.FaceCaptureEvent
+import com.simprints.infra.events.event.domain.models.FingerprintCaptureEvent
 import com.simprints.infra.events.exceptions.validator.EnrolmentEventValidatorException
 
 internal class EnrolmentEventValidator : EventValidator {

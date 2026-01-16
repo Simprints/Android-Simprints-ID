@@ -6,7 +6,7 @@ import com.simprints.infra.eventsync.event.remote.models.ApiErrorCallback.ApiRea
 import com.simprints.infra.eventsync.event.remote.models.fromApiToDomain
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 import org.junit.Test
-import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason as ErrorReason
+import com.simprints.infra.events.event.domain.models.ErrorCallbackEvent.ErrorCallbackPayload.Reason as ErrorReason
 
 class ApiErrorCallbackTest {
     @Test

@@ -2,7 +2,7 @@ package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
+import com.simprints.infra.events.event.domain.models.FaceCaptureEvent.FaceCapturePayload
 import com.simprints.infra.eventsync.event.remote.models.ApiFaceCapturePayload.ApiFace
 import com.simprints.infra.eventsync.event.remote.models.ApiFaceCapturePayload.ApiResult.BAD_QUALITY
 import com.simprints.infra.eventsync.event.remote.models.ApiFaceCapturePayload.ApiResult.INVALID

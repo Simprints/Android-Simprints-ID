@@ -2,7 +2,6 @@ package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.infra.events.event.domain.models.subject.BiometricReferenceType.Companion.FINGERPRINT_REFERENCE_KEY
 import com.simprints.infra.eventsync.event.remote.ApiFingerprintTemplate
 import com.simprints.infra.eventsync.event.remote.models.ApiBiometricReferenceType.FingerprintReference
 import kotlinx.serialization.SerialName

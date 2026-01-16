@@ -2,8 +2,10 @@ package com.simprints.infra.events.event.domain.models.callback
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.response.AppMatchConfidence
+import com.simprints.infra.events.event.domain.models.CallbackComparisonScore
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_VERIFICATION
-import com.simprints.infra.events.event.domain.models.callback.VerificationCallbackEvent.Companion.EVENT_VERSION
+import com.simprints.infra.events.event.domain.models.VerificationCallbackEvent
+import com.simprints.infra.events.event.domain.models.VerificationCallbackEvent.Companion.EVENT_VERSION
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import org.junit.Test

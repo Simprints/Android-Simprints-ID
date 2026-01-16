@@ -3,11 +3,11 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEventV2
-import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEventV2
-import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEventV2
-import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEventV2
-import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEventV2
+import com.simprints.infra.events.event.domain.models.ConfirmationCalloutEventV2
+import com.simprints.infra.events.event.domain.models.EnrolmentCalloutEventV2
+import com.simprints.infra.events.event.domain.models.EnrolmentLastBiometricsCalloutEventV2
+import com.simprints.infra.events.event.domain.models.IdentificationCalloutEventV2
+import com.simprints.infra.events.event.domain.models.VerificationCalloutEventV2
 import kotlinx.serialization.Serializable
 
 @Keep

@@ -8,12 +8,12 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
-import com.simprints.infra.events.event.domain.models.subject.BiometricReference
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordUpdateEvent.EnrolmentRecordUpdatePayload
-import com.simprints.infra.events.event.domain.models.subject.FaceReference
-import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
+import com.simprints.infra.events.event.domain.models.BiometricReference
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordUpdateEvent.EnrolmentRecordUpdatePayload
+import com.simprints.infra.events.event.domain.models.FaceReference
+import com.simprints.infra.events.event.domain.models.FingerprintReference
 import java.util.Date
 import javax.inject.Inject
 import com.simprints.core.domain.reference.BiometricReference as CoreBiometricReference

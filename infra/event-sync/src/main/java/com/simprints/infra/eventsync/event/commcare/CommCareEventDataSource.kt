@@ -6,9 +6,9 @@ import androidx.core.net.toUri
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.LastCallingPackageStore
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordDeletionEvent
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordCreationEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordDeletionEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordEvent
 import com.simprints.infra.eventsync.event.commcare.cache.CommCareSyncCache
 import com.simprints.infra.eventsync.event.commcare.cache.SyncedCaseEntity
 import com.simprints.infra.eventsync.status.down.domain.CommCareEventSyncResult
