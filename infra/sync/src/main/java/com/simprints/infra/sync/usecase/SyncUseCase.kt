@@ -57,6 +57,13 @@ class SyncUseCase @Inject constructor(
         )
     }
 
+    /**
+     * Takes sync control commands (incl. no action) for syncable entities, and returns their combined sync status,
+     * with a .value also available to the callers synchronously.
+     *
+     * Sync commands intentionally do not have default values,
+     * to prevent a `sync()` usage from being interpreted as a command to start syncing.
+     */
     operator fun invoke(eventSync: SyncCommand, imageSync: SyncCommand): StateFlow<SyncStatus> = sharedSyncStatus
     // todo MS-1278 move sync commands here from SyncOrchestrator (use helper usecases if needed), add to SyncCommand, and implement them
 
