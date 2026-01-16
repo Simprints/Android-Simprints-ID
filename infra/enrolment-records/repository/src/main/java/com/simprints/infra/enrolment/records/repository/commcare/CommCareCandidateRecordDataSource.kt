@@ -1,6 +1,7 @@
 package com.simprints.infra.enrolment.records.repository.commcare
 
 import android.content.Context
+import android.database.ContentObserver
 import android.database.Cursor
 import android.net.Uri
 import androidx.core.net.toUri
@@ -38,7 +39,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
@@ -306,9 +312,35 @@ internal class CommCareCandidateRecordDataSource @Inject constructor(
     override suspend fun observeCount(
         query: EnrolmentRecordQuery,
         dataSource: BiometricDataSource,
-    ): Flow<Int> {
-        TODO("MS-1278 Not yet implemented")
-    }
+    ): Flow<Int> = callbackFlow {
+        val observer = object : ContentObserver(null) {
+            /**
+             * This relies on CommCare to call notifyChange,
+             * like it does
+             * for InstanceProvider at https://github.com/dimagi/commcare-android/blob/8f3c950f9de61e4e328989327fbfc015e39c14b0/app/src/org/commcare/provider/InstanceProvider.java#L173
+             * and for FormsProvider at https://github.com/dimagi/commcare-android/blob/8f3c950f9de61e4e328989327fbfc015e39c14b0/app/src/org/commcare/provider/FormsProvider.java#L167
+             * However, those are the only providers calling notifyChange.
+             *
+             * CaseDataContentProvider doesn't call notifyChange at least yet in the revision as linked above,
+             * so only the initial count will be returned on each subscription.
+             * TODO MS-1278 consider a decision to get this wrapped in a periodic updater usecase to overcome that.
+             *
+             * This implementation still provisions the use of notifyChange in CaseDataContentProvider in CommCare.
+             */
+            override fun onChange(selfChange: Boolean) {
+                trySend(Unit)
+            }
+        }
+        context.contentResolver.registerContentObserver(
+            getCaseMetadataUri(dataSource.callerPackageName()),
+            true, // notify for descendants
+            observer,
+        )
+        trySend(Unit) // initial count
+        awaitClose { context.contentResolver.unregisterContentObserver(observer) }
+    }.conflate().mapLatest {
+        count(query, dataSource)
+    }.distinctUntilChanged()
 
     companion object {
         const val COLUMN_CASE_ID = "case_id"
