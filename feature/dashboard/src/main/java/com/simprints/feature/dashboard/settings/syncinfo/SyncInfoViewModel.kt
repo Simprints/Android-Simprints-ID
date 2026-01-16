@@ -57,19 +57,19 @@ internal class SyncInfoViewModel @Inject constructor(
         get() = _loginNavigationEventLiveData
     private val _loginNavigationEventLiveData = MutableLiveData<LoginParams>()
 
+    private val syncStatusFlow = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY)
     private val eventSyncStateFlow =
-        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.eventSyncState }
+        syncStatusFlow.map { it.eventSyncState }
     private val imageSyncStatusFlow =
-        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.imageSyncStatus }
+        syncStatusFlow.map { it.imageSyncStatus }
 
     private val eventSyncButtonClickFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val imageSyncButtonClickFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     val logoutEventFlow: Flow<LogoutActionReason?> = combine(
         authStore.observeSignedInProjectId(),
-        eventSyncStateFlow,
-        imageSyncStatusFlow,
-    ) { projectId, eventSyncState, imageSyncStatus ->
+        syncStatusFlow,
+    ) { projectId, (eventSyncState, imageSyncStatus) ->
         when {
             projectId.isEmpty() -> LogoutActionReason.PROJECT_ENDING_OR_DEVICE_COMPROMISED
             isPreLogoutUpSync && eventSyncState.isSyncCompleted() && !imageSyncStatus.isSyncing -> LogoutActionReason.USER_ACTION
@@ -191,11 +191,9 @@ internal class SyncInfoViewModel @Inject constructor(
 
     private fun startInitialSyncIfRequired() {
         viewModelScope.launch {
-            val isRunning =
-                sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.eventSyncState }.firstOrNull()
-                    ?.isSyncRunning() ?: false
-            val lastUpdate = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.eventSyncState }
-                .firstOrNull()?.lastSyncTime
+            val eventSyncState = eventSyncStateFlow.firstOrNull()
+            val isRunning = eventSyncState?.isSyncRunning() ?: false
+            val lastUpdate = eventSyncState?.lastSyncTime
 
             val isForceEventSync = when {
                 isPreLogoutUpSync -> true
