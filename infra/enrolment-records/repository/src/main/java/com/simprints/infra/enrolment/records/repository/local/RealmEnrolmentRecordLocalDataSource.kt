@@ -158,11 +158,10 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
     override fun observeCount(
         query: EnrolmentRecordQuery,
         dataSource: BiometricDataSource,
-    ): Flow<Int> {
-        return observedCountInvalidation.onStart { emit(Unit) } // initial count
-            .mapLatest { count(query, dataSource) }
-            .distinctUntilChanged()
-    }
+    ): Flow<Int> = observedCountInvalidation
+        .onStart { emit(Unit) } // initial count
+        .mapLatest { count(query, dataSource) }
+        .distinctUntilChanged()
 
     override suspend fun performActions(
         actions: List<EnrolmentRecordAction>,

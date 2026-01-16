@@ -84,8 +84,7 @@ internal class SyncInfoViewModel @Inject constructor(
             .onStart {
                 startInitialSyncIfRequired()
                 syncImagesAfterEventsWhenRequired()
-            }
-            .shareIn(
+            }.shareIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(),
                 replay = 1,

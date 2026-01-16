@@ -424,7 +424,8 @@ class EventSyncStateTest {
     @Test
     fun `isUninitialized() is false when syncId is not blank`() {
         assertThat(
-            createUninitializedState().copy(syncId = "id")
+            createUninitializedState()
+                .copy(syncId = "id")
                 .isUninitialized(),
         ).isFalse()
     }
@@ -432,7 +433,8 @@ class EventSyncStateTest {
     @Test
     fun `isUninitialized() is false when progress is set`() {
         assertThat(
-            createUninitializedState().copy(progress = 0)
+            createUninitializedState()
+                .copy(progress = 0)
                 .isUninitialized(),
         ).isFalse()
     }
@@ -440,7 +442,8 @@ class EventSyncStateTest {
     @Test
     fun `isUninitialized() is false when total is set`() {
         assertThat(
-            createUninitializedState().copy(total = 0)
+            createUninitializedState()
+                .copy(total = 0)
                 .isUninitialized(),
         ).isFalse()
     }
@@ -448,7 +451,8 @@ class EventSyncStateTest {
     @Test
     fun `isUninitialized() is false when up workers are present`() {
         assertThat(
-            createUninitializedState().copy(upSyncWorkersInfo = listOf(createWorker(Succeeded)))
+            createUninitializedState()
+                .copy(upSyncWorkersInfo = listOf(createWorker(Succeeded)))
                 .isUninitialized(),
         ).isFalse()
     }
@@ -456,7 +460,8 @@ class EventSyncStateTest {
     @Test
     fun `isUninitialized() is false when down workers are present`() {
         assertThat(
-            createUninitializedState().copy(downSyncWorkersInfo = listOf(createWorker(Succeeded)))
+            createUninitializedState()
+                .copy(downSyncWorkersInfo = listOf(createWorker(Succeeded)))
                 .isUninitialized(),
         ).isFalse()
     }
@@ -464,7 +469,8 @@ class EventSyncStateTest {
     @Test
     fun `isUninitialized() is false when reporter workers are present`() {
         assertThat(
-            createUninitializedState().copy(reporterStates = listOf(createWorker(Succeeded)))
+            createUninitializedState()
+                .copy(reporterStates = listOf(createWorker(Succeeded)))
                 .isUninitialized(),
         ).isFalse()
     }
@@ -472,7 +478,8 @@ class EventSyncStateTest {
     @Test
     fun `isUninitialized() is false when lastSyncTime is set`() {
         assertThat(
-            createUninitializedState().copy(lastSyncTime = Timestamp(ms = 0L))
+            createUninitializedState()
+                .copy(lastSyncTime = Timestamp(ms = 0L))
                 .isUninitialized(),
         ).isFalse()
     }

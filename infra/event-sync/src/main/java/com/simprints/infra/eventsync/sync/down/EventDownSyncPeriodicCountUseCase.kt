@@ -34,18 +34,19 @@ class EventDownSyncPeriodicCountUseCase @Inject constructor(
     @param:AppScope private val appScope: CoroutineScope,
 ) {
     private var lastCountTimestamp: Long = 0
-    private val sharedDownSyncCounts: SharedFlow<DownSyncCounts> = MutableSharedFlow<DownSyncCounts>(replay = 1).apply {
-        appScope.launch {
-            tryCountEventsAndEmit() // "pre-warmed" count for immediate display as an initial estimate
-            subscriptionCount.map { it > 0 }.distinctUntilChanged().collectLatest { hasSubscribers ->
-                while (hasSubscribers && isActive) {
-                    delay(timeUntilDebounceTimeoutMillis())
-                    tryCountEventsAndEmit()
-                    delay(DOWN_SYNC_COUNT_INTERVAL_MILLIS)
+    private val sharedDownSyncCounts: SharedFlow<DownSyncCounts> = MutableSharedFlow<DownSyncCounts>(replay = 1)
+        .apply {
+            appScope.launch {
+                tryCountEventsAndEmit() // "pre-warmed" count for immediate display as an initial estimate
+                subscriptionCount.map { it > 0 }.distinctUntilChanged().collectLatest { hasSubscribers ->
+                    while (hasSubscribers && isActive) {
+                        delay(timeUntilDebounceTimeoutMillis())
+                        tryCountEventsAndEmit()
+                        delay(DOWN_SYNC_COUNT_INTERVAL_MILLIS)
+                    }
                 }
             }
-        }
-    }.asSharedFlow()
+        }.asSharedFlow()
 
     operator fun invoke(): Flow<DownSyncCounts> = sharedDownSyncCounts
 

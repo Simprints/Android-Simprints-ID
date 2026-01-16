@@ -6,11 +6,11 @@ import android.database.ContentObserver
 import android.database.Cursor
 import android.net.Uri
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.common.TemplateIdentifier.LEFT_INDEX_FINGER
+import com.simprints.core.domain.common.TemplateIdentifier.LEFT_THUMB
 import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.CandidateRecord
-import com.simprints.core.domain.common.TemplateIdentifier.LEFT_INDEX_FINGER
-import com.simprints.core.domain.common.TemplateIdentifier.LEFT_THUMB
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
@@ -484,7 +484,8 @@ class CommCareCandidateRecordDataSourceTest {
         val channel = Channel<Int>(Channel.UNLIMITED)
 
         val collectJob = launch {
-            dataSource.observeCount(EnrolmentRecordQuery(), commCareBiometricDataSource)
+            dataSource
+                .observeCount(EnrolmentRecordQuery(), commCareBiometricDataSource)
                 .collect { channel.trySend(it) }
         }
 
@@ -503,7 +504,8 @@ class CommCareCandidateRecordDataSourceTest {
         val channel = Channel<Int>(Channel.UNLIMITED)
 
         val collectJob = launch {
-            dataSource.observeCount(EnrolmentRecordQuery(), commCareBiometricDataSource)
+            dataSource
+                .observeCount(EnrolmentRecordQuery(), commCareBiometricDataSource)
                 .collect { channel.trySend(it) }
         }
 
@@ -531,7 +533,8 @@ class CommCareCandidateRecordDataSourceTest {
         val channel = Channel<Int>(Channel.UNLIMITED)
 
         val collectJob = launch {
-            dataSource.observeCount(EnrolmentRecordQuery(), commCareBiometricDataSource)
+            dataSource
+                .observeCount(EnrolmentRecordQuery(), commCareBiometricDataSource)
                 .collect { channel.trySend(it) }
         }
 

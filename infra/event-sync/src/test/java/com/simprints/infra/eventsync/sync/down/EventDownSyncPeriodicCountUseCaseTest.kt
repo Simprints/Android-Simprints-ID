@@ -24,7 +24,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class EventDownSyncPeriodicCountUseCaseTest {
-
     @MockK
     private lateinit var repository: EventDownSyncCountsRepository
 
@@ -261,5 +260,4 @@ internal class EventDownSyncPeriodicCountUseCaseTest {
 
         activeSubscriberJob.cancel()
     }
-
 }

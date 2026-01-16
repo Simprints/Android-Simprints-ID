@@ -22,9 +22,9 @@ import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.network.ConnectivityTracker
-import com.simprints.infra.sync.SyncableCounts
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncStatus
+import com.simprints.infra.sync.SyncableCounts
 import com.simprints.infra.sync.usecase.CountSyncableUseCase
 import com.simprints.infra.sync.usecase.SyncUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule

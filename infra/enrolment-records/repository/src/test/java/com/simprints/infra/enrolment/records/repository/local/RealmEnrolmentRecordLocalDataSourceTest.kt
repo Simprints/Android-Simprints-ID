@@ -2,12 +2,12 @@ package com.simprints.infra.enrolment.records.repository.local
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.CandidateRecord
-import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
@@ -470,7 +470,8 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val channel = Channel<Int>(Channel.UNLIMITED)
 
         val collectJob = launch {
-            enrolmentRecordLocalDataSource.observeCount(EnrolmentRecordQuery())
+            enrolmentRecordLocalDataSource
+                .observeCount(EnrolmentRecordQuery())
                 .collect { channel.trySend(it) }
         }
 
@@ -484,7 +485,8 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val channel = Channel<Int>(Channel.UNLIMITED)
 
         val collectJob = launch {
-            enrolmentRecordLocalDataSource.observeCount(EnrolmentRecordQuery())
+            enrolmentRecordLocalDataSource
+                .observeCount(EnrolmentRecordQuery())
                 .collect { channel.trySend(it) }
         }
 
@@ -513,7 +515,8 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val channel = Channel<Int>(Channel.UNLIMITED)
 
         val collectJob = launch {
-            enrolmentRecordLocalDataSource.observeCount()
+            enrolmentRecordLocalDataSource
+                .observeCount()
                 .collect { channel.trySend(it) }
         }
 
@@ -539,7 +542,8 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val channel = Channel<Int>(Channel.UNLIMITED)
 
         val collectJob = launch {
-            enrolmentRecordLocalDataSource.observeCount()
+            enrolmentRecordLocalDataSource
+                .observeCount()
                 .collect { channel.trySend(it) }
         }
 
@@ -570,13 +574,15 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         }
         val project1Channel = Channel<Int>(Channel.UNLIMITED)
         val project2Channel = Channel<Int>(Channel.UNLIMITED)
-        
+
         val project1CollectJob = launch {
-            enrolmentRecordLocalDataSource.observeCount(EnrolmentRecordQuery(projectId = PROJECT_ID))
+            enrolmentRecordLocalDataSource
+                .observeCount(EnrolmentRecordQuery(projectId = PROJECT_ID))
                 .collect { project1Channel.trySend(it) }
         }
         val project2CollectJob = launch {
-            enrolmentRecordLocalDataSource.observeCount(EnrolmentRecordQuery(projectId = OTHER_PROJECT_ID))
+            enrolmentRecordLocalDataSource
+                .observeCount(EnrolmentRecordQuery(projectId = OTHER_PROJECT_ID))
                 .collect { project2Channel.trySend(it) }
         }
 

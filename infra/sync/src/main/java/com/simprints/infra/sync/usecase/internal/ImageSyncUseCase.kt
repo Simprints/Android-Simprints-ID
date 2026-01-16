@@ -18,7 +18,6 @@ class ImageSyncUseCase @Inject constructor(
     private val workManager: WorkManager,
     private val imageSyncTimestampProvider: ImageSyncTimestampProvider,
 ) {
-
     internal operator fun invoke(): Flow<ImageSyncStatus> = workManager
         .getWorkInfosFlow(WorkQuery.fromUniqueWorkNames(SyncConstants.FILE_UP_SYNC_WORK_NAME))
         .associateWithIfSyncing()

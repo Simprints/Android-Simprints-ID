@@ -15,7 +15,6 @@ internal class EventDownSyncCountsRepositoryImpl @Inject constructor(
     private val downSyncScopeRepository: EventDownSyncScopeRepository,
     private val eventRemoteDataSource: EventRemoteDataSource,
 ) : EventDownSyncCountsRepository {
-
     override suspend fun countEventsToDownload(): DownSyncCounts {
         val projectConfig = configRepository.getProjectConfiguration()
         val simprintsDownConfig = projectConfig.synchronization.down.simprints
@@ -41,5 +40,4 @@ internal class EventDownSyncCountsRepositoryImpl @Inject constructor(
     }
 
     private fun getProjectModalities(projectConfiguration: ProjectConfiguration) = projectConfiguration.general.modalities
-
 }

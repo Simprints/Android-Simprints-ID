@@ -29,9 +29,7 @@ abstract class EventSyncModule {
     internal abstract fun provideEventSyncManager(impl: EventSyncManagerImpl): EventSyncManager
 
     @Binds
-    internal abstract fun provideEventDownSyncCountsRepository(
-        impl: EventDownSyncCountsRepositoryImpl,
-    ): EventDownSyncCountsRepository
+    internal abstract fun provideEventDownSyncCountsRepository(impl: EventDownSyncCountsRepositoryImpl): EventDownSyncCountsRepository
 }
 
 @Module
@@ -55,25 +53,20 @@ internal class EventSyncProvider {
 
     @Provides
     @Singleton
-    fun provideCommCareSyncDatabase(@ApplicationContext context: Context): CommCareSyncDatabase {
-        return Room.databaseBuilder(
+    fun provideCommCareSyncDatabase(
+        @ApplicationContext context: Context,
+    ): CommCareSyncDatabase = Room
+        .databaseBuilder(
             context.applicationContext,
             CommCareSyncDatabase::class.java,
-            CommCareSyncDatabase.DATABASE_NAME
+            CommCareSyncDatabase.DATABASE_NAME,
         ).build()
-    }
 
     @Provides
     @Singleton
-    fun provideCommCareSyncDao(database: CommCareSyncDatabase): CommCareSyncDao {
-        return database.commCareSyncDao()
-    }
+    fun provideCommCareSyncDao(database: CommCareSyncDatabase): CommCareSyncDao = database.commCareSyncDao()
 
     @Provides
     @Singleton
-    fun provideCommCareSyncCache(
-        commCareSyncDao: CommCareSyncDao,
-    ): CommCareSyncCache {
-        return CommCareSyncCache(commCareSyncDao)
-    }
+    fun provideCommCareSyncCache(commCareSyncDao: CommCareSyncDao): CommCareSyncCache = CommCareSyncCache(commCareSyncDao)
 }

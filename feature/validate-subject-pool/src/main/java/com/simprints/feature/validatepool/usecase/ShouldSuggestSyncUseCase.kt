@@ -14,7 +14,9 @@ internal class ShouldSuggestSyncUseCase @Inject constructor(
     private val sync: SyncUseCase,
     private val configRepository: ConfigRepository,
 ) {
-    suspend operator fun invoke(): Boolean = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.eventSyncState }.firstOrNull()
+    suspend operator fun invoke(): Boolean = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY)
+        .map { it.eventSyncState }
+        .firstOrNull()
         ?.lastSyncTime
         ?.let {
             val simprintsDownSyncConfig = configRepository

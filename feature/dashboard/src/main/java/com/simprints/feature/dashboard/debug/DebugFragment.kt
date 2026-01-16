@@ -67,23 +67,27 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
         super.onViewCreated(view, savedInstanceState)
         applySystemBarInsets(view)
 
-        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY).map { it.eventSyncState }.asLiveData().observe(viewLifecycleOwner) { state ->
-            val states =
-                (state.downSyncWorkersInfo.map { it.state } + state.upSyncWorkersInfo.map { it.state })
-            val message =
-                "${state.syncId.takeLast(5)} - " +
-                    "${states.toDebugActivitySyncState().name} - " +
-                    "${state.progress}/${state.total}"
+        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY)
+            .map {
+                it.eventSyncState
+            }.asLiveData()
+            .observe(viewLifecycleOwner) { state ->
+                val states =
+                    (state.downSyncWorkersInfo.map { it.state } + state.upSyncWorkersInfo.map { it.state })
+                val message =
+                    "${state.syncId.takeLast(5)} - " +
+                        "${states.toDebugActivitySyncState().name} - " +
+                        "${state.progress}/${state.total}"
 
-            val ssb = SpannableStringBuilder(
-                coloredText(
-                    "\n$message",
-                    getRandomColor().toColorInt(),
-                ),
-            )
+                val ssb = SpannableStringBuilder(
+                    coloredText(
+                        "\n$message",
+                        getRandomColor().toColorInt(),
+                    ),
+                )
 
-            binding.logs.append(ssb)
-        }
+                binding.logs.append(ssb)
+            }
 
         binding.syncStart.setOnClickListener {
             lifecycleScope.launch(dispatcher) {

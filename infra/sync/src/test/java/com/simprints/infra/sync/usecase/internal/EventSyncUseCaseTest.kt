@@ -43,5 +43,4 @@ class EventSyncUseCaseTest {
         verify(exactly = 1) { eventSyncStateProcessor.getLastSyncState() }
         assertThat(result).isEqualTo(expected)
     }
-
 }

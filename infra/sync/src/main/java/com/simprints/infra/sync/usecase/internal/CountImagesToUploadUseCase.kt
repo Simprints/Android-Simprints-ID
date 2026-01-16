@@ -14,11 +14,9 @@ class CountImagesToUploadUseCase @Inject constructor(
     private val configRepository: ConfigRepository,
     private val imageRepository: ImageRepository,
 ) {
-
-    internal operator fun invoke(): Flow<Int> =
-        configRepository.observeProjectConfiguration()
-            .map { it.projectId }
-            .flatMapLatest(imageRepository::observeNumberOfImagesToUpload)
-            .distinctUntilChanged()
-
+    internal operator fun invoke(): Flow<Int> = configRepository
+        .observeProjectConfiguration()
+        .map { it.projectId }
+        .flatMapLatest(imageRepository::observeNumberOfImagesToUpload)
+        .distinctUntilChanged()
 }

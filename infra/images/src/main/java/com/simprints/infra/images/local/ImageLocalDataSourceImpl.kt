@@ -91,11 +91,12 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
             }.toList()
     }
 
-    override suspend fun observeImages(projectId: String): Flow<List<SecuredImageRef>> {
-        return observedImageRefListInvalidation.onStart { emit(Unit) } // initial listing
-            .mapLatest { listImages(projectId) }
-            .distinctUntilChanged()
-    }
+    override suspend fun observeImages(projectId: String): Flow<List<SecuredImageRef>> = observedImageRefListInvalidation
+        .onStart {
+            emit(Unit)
+        } // initial listing
+        .mapLatest { listImages(projectId) }
+        .distinctUntilChanged()
 
     override suspend fun deleteImage(image: SecuredImageRef): Boolean = withContext(dispatcher) {
         val absolutePath = buildAbsolutePath(image.relativePath)

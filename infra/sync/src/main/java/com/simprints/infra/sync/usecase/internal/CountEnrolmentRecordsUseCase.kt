@@ -15,14 +15,12 @@ class CountEnrolmentRecordsUseCase @Inject constructor(
     private val configRepository: ConfigRepository,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
 ) {
-
-    internal operator fun invoke(): Flow<Int> =
-        configRepository.observeProjectConfiguration()
-            .map { it.projectId }
-            .flatMapLatest { projectId ->
-                enrolmentRecordRepository.observeCount(
-                    EnrolmentRecordQuery(projectId)
-                )
-            }.distinctUntilChanged()
-
+    internal operator fun invoke(): Flow<Int> = configRepository
+        .observeProjectConfiguration()
+        .map { it.projectId }
+        .flatMapLatest { projectId ->
+            enrolmentRecordRepository.observeCount(
+                EnrolmentRecordQuery(projectId),
+            )
+        }.distinctUntilChanged()
 }

@@ -39,7 +39,8 @@ internal class LogoutSyncViewModel @Inject constructor(
         sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY)
             .map { syncStatus ->
                 !syncStatus.eventSyncState.isSyncCompleted() || syncStatus.imageSyncStatus.isSyncing
-            }.debounce(timeoutMillis = ANTI_JITTER_DELAY_MILLIS).asLiveData(viewModelScope.coroutineContext)
+            }.debounce(timeoutMillis = ANTI_JITTER_DELAY_MILLIS)
+            .asLiveData(viewModelScope.coroutineContext)
 
     val settingsLocked: LiveData<LiveDataEventWithContent<SettingsPasswordConfig>>
         get() = liveData(context = viewModelScope.coroutineContext) {

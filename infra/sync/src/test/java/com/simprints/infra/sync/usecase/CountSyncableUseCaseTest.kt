@@ -32,7 +32,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CountSyncableUseCaseTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -64,7 +63,14 @@ class CountSyncableUseCaseTest {
         coEvery { eventRepository.observeEventCount(null) } returns uploadFlowAll
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns uploadFlowEnrolmentV2
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns uploadFlowEnrolmentV4
-        val useCase = CountSyncableUseCase(countEnrolmentRecords, countImagesToUpload, eventDownSyncCount, eventRepository, appScope = backgroundScope)
+        val useCase =
+            CountSyncableUseCase(
+                countEnrolmentRecords,
+                countImagesToUpload,
+                eventDownSyncCount,
+                eventRepository,
+                appScope = backgroundScope,
+            )
         val emitted = mutableListOf<SyncableCounts>()
 
         val collectJob = launch { useCase().take(1).toList(emitted) }
@@ -114,7 +120,14 @@ class CountSyncableUseCaseTest {
         coEvery { eventRepository.observeEventCount(null) } returns uploadFlowAll
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns uploadFlowEnrolmentV2
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns uploadFlowEnrolmentV4
-        val useCase = CountSyncableUseCase(countEnrolmentRecords, countImagesToUpload, eventDownSyncCount, eventRepository, appScope = backgroundScope)
+        val useCase =
+            CountSyncableUseCase(
+                countEnrolmentRecords,
+                countImagesToUpload,
+                eventDownSyncCount,
+                eventRepository,
+                appScope = backgroundScope,
+            )
 
         val flow1 = useCase()
 
@@ -152,7 +165,14 @@ class CountSyncableUseCaseTest {
         coEvery { eventRepository.observeEventCount(null) } returns uploadFlowAll
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns uploadFlowEnrolmentV2
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns uploadFlowEnrolmentV4
-        val useCase = CountSyncableUseCase(countEnrolmentRecords, countImagesToUpload, eventDownSyncCount, eventRepository, appScope = backgroundScope)
+        val useCase =
+            CountSyncableUseCase(
+                countEnrolmentRecords,
+                countImagesToUpload,
+                eventDownSyncCount,
+                eventRepository,
+                appScope = backgroundScope,
+            )
 
         val sharedFlow = useCase()
         runCurrent()
@@ -198,7 +218,14 @@ class CountSyncableUseCaseTest {
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns uploadFlowEnrolmentV2
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns uploadFlowEnrolmentV4
 
-        val useCase = CountSyncableUseCase(countEnrolmentRecords, countImagesToUpload, eventDownSyncCount, eventRepository, appScope = backgroundScope)
+        val useCase =
+            CountSyncableUseCase(
+                countEnrolmentRecords,
+                countImagesToUpload,
+                eventDownSyncCount,
+                eventRepository,
+                appScope = backgroundScope,
+            )
 
         val collectJob = launch { useCase().collect { } }
         runCurrent()

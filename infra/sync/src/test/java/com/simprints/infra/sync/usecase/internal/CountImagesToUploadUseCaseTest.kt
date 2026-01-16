@@ -23,7 +23,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CountImagesToUploadUseCaseTest {
-
     @MockK
     private lateinit var configRepository: ConfigRepository
 
@@ -98,4 +97,3 @@ class CountImagesToUploadUseCaseTest {
         private const val PROJECT_ID_2 = "project-id-2"
     }
 }
-

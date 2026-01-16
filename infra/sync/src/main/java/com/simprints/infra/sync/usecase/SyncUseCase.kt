@@ -64,7 +64,9 @@ class SyncUseCase @Inject constructor(
      * Sync commands intentionally do not have default values,
      * to prevent a `sync()` usage from being interpreted as a command to start syncing.
      */
-    operator fun invoke(eventSync: SyncCommand, imageSync: SyncCommand): StateFlow<SyncStatus> = sharedSyncStatus
+    operator fun invoke(
+        eventSync: SyncCommand,
+        imageSync: SyncCommand,
+    ): StateFlow<SyncStatus> = sharedSyncStatus
     // todo MS-1278 move sync commands here from SyncOrchestrator (use helper usecases if needed), add to SyncCommand, and implement them
-
 }

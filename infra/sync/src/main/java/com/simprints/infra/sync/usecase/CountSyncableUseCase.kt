@@ -78,5 +78,4 @@ class CountSyncableUseCase @Inject constructor(
     private fun uploadImageCountFlow(): Flow<Int> = flow {
         emitAll(countImagesToUpload())
     }
-
 }

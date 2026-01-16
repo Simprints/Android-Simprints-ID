@@ -54,7 +54,8 @@ class ShouldSuggestSyncUseCaseTest {
         coEvery {
             configRepository
                 .getProjectConfiguration()
-                .synchronization.down.simprints?.maxAge
+                .synchronization.down.simprints
+                ?.maxAge
         } returns "PT24H"
 
         assertThat(usecase()).isTrue()
@@ -67,7 +68,8 @@ class ShouldSuggestSyncUseCaseTest {
         coEvery {
             configRepository
                 .getProjectConfiguration()
-                .synchronization.down.simprints?.maxAge
+                .synchronization.down.simprints
+                ?.maxAge
         } returns "24h0m0s"
 
         assertThat(usecase()).isTrue()
@@ -80,7 +82,8 @@ class ShouldSuggestSyncUseCaseTest {
         coEvery {
             configRepository
                 .getProjectConfiguration()
-                .synchronization.down.simprints?.maxAge
+                .synchronization.down.simprints
+                ?.maxAge
         } returns "PT24H"
 
         assertThat(usecase()).isFalse()
@@ -99,24 +102,22 @@ class ShouldSuggestSyncUseCaseTest {
         assertThat(usecase()).isFalse()
     }
 
-    private fun createSyncStatus(lastSyncTime: Timestamp?): SyncStatus {
-        return SyncStatus(
-            eventSyncState = EventSyncState(
-                syncId = "",
-                progress = null,
-                total = null,
-                upSyncWorkersInfo = emptyList(),
-                downSyncWorkersInfo = emptyList(),
-                reporterStates = emptyList(),
-                lastSyncTime = lastSyncTime,
-            ),
-            imageSyncStatus = ImageSyncStatus(
-                isSyncing = false,
-                progress = null,
-                lastUpdateTimeMillis = null,
-            ),
-        )
-    }
+    private fun createSyncStatus(lastSyncTime: Timestamp?): SyncStatus = SyncStatus(
+        eventSyncState = EventSyncState(
+            syncId = "",
+            progress = null,
+            total = null,
+            upSyncWorkersInfo = emptyList(),
+            downSyncWorkersInfo = emptyList(),
+            reporterStates = emptyList(),
+            lastSyncTime = lastSyncTime,
+        ),
+        imageSyncStatus = ImageSyncStatus(
+            isSyncing = false,
+            progress = null,
+            lastUpdateTimeMillis = null,
+        ),
+    )
 
     companion object {
         private const val HOUR_MS = 60 * 60 * 1000L

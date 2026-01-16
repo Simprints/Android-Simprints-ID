@@ -37,10 +37,10 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.conflate
@@ -350,9 +350,10 @@ internal class CommCareCandidateRecordDataSource @Inject constructor(
                 }
             },
         )
-    }.conflate().mapLatest {
-        count(query, dataSource)
-    }.distinctUntilChanged()
+    }.conflate()
+        .mapLatest {
+            count(query, dataSource)
+        }.distinctUntilChanged()
 
     companion object {
         const val COLUMN_CASE_ID = "case_id"

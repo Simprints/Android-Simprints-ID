@@ -46,13 +46,14 @@ internal class EventDownSyncCountsRepositoryImplTest {
         MockKAnnotations.init(this, relaxed = true)
 
         every { generalConfiguration.modalities } returns emptyList()
-        every { downSynchronizationConfiguration.simprints } returns DownSynchronizationConfiguration.SimprintsDownSynchronizationConfiguration(
-            partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
-            maxNbOfModules = 0,
-            moduleOptions = emptyList(),
-            maxAge = DownSynchronizationConfiguration.DEFAULT_DOWN_SYNC_MAX_AGE,
-            frequency = Frequency.PERIODICALLY,
-        )
+        every { downSynchronizationConfiguration.simprints } returns
+            DownSynchronizationConfiguration.SimprintsDownSynchronizationConfiguration(
+                partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                maxNbOfModules = 0,
+                moduleOptions = emptyList(),
+                maxAge = DownSynchronizationConfiguration.DEFAULT_DOWN_SYNC_MAX_AGE,
+                frequency = Frequency.PERIODICALLY,
+            )
         coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general } returns generalConfiguration
             every { synchronization } returns mockk {
@@ -107,4 +108,3 @@ internal class EventDownSyncCountsRepositoryImplTest {
         coVerify(exactly = 0) { eventRemoteDataSource.count(any()) }
     }
 }
-

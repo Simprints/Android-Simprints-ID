@@ -24,7 +24,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CountEnrolmentRecordsUseCaseTest {
-
     @MockK
     private lateinit var configRepository: ConfigRepository
 
@@ -99,4 +98,3 @@ class CountEnrolmentRecordsUseCaseTest {
         private const val PROJECT_ID_2 = "project-id-2"
     }
 }
-

@@ -11,7 +11,5 @@ import javax.inject.Singleton
 class EventSyncUseCase @Inject constructor(
     private val eventSyncStateProcessor: EventSyncStateProcessor,
 ) {
-
-    internal operator fun invoke(): Flow<EventSyncState> =
-        eventSyncStateProcessor.getLastSyncState().distinctUntilChanged()
+    internal operator fun invoke(): Flow<EventSyncState> = eventSyncStateProcessor.getLastSyncState().distinctUntilChanged()
 }
