@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -36,10 +36,9 @@ class EventDownSyncPeriodicCountUseCase @Inject constructor(
     private val sharedDownSyncCounts: SharedFlow<DownSyncCounts> = MutableSharedFlow<DownSyncCounts>(replay = 1).apply {
         appScope.launch {
             tryCountEventsAndEmit() // initial count
-            subscriptionCount.map { it > 0}.distinctUntilChanged().collectLatest { hasSubscribers ->
-                val isEligibleToPeriodicCounting =
-                    hasSubscribers && isDebounceTimeOut() && isActive
-                while (isEligibleToPeriodicCounting) {
+            subscriptionCount.map { it > 0 }.distinctUntilChanged().collectLatest { hasSubscribers ->
+                while (hasSubscribers && isActive) {
+                    delay(timeUntilDebounceTimeoutMillis())
                     tryCountEventsAndEmit()
                     delay(DOWN_SYNC_COUNT_INTERVAL_MILLIS)
                 }
@@ -50,20 +49,26 @@ class EventDownSyncPeriodicCountUseCase @Inject constructor(
     operator fun invoke(): Flow<DownSyncCounts> = sharedDownSyncCounts
 
     private suspend fun MutableSharedFlow<DownSyncCounts>.tryCountEventsAndEmit() {
-        lastCountTimestamp = timeHelper.now().ms
-        try {
-            withTimeout(DOWN_SYNC_COUNT_DEBOUNCE_MILLIS) {
-                emit(eventDownSyncCountsRepository.countEventsToDownload())
-            }
+        val fallbackDefaultCounts = DownSyncCounts(count = 0, isLowerBound = false)
+        val counts = try {
+            lastCountTimestamp = timeHelper.now().ms
+            withTimeoutOrNull(DOWN_SYNC_COUNT_DEBOUNCE_MILLIS) {
+                eventDownSyncCountsRepository.countEventsToDownload()
+            } ?: fallbackDefaultCounts
         } catch (cancellationException: CancellationException) {
             throw cancellationException
         } catch (t: Throwable) {
             Simber.i("Events to download counting error", t, tag = SYNC)
+            fallbackDefaultCounts
         }
+        emit(counts)
     }
 
-    private fun isDebounceTimeOut(): Boolean =
-        timeHelper.now().ms - lastCountTimestamp > DOWN_SYNC_COUNT_DEBOUNCE_MILLIS
+    private fun timeUntilDebounceTimeoutMillis(): Long {
+        val now = timeHelper.now().ms
+        val nextAllowed = lastCountTimestamp + DOWN_SYNC_COUNT_DEBOUNCE_MILLIS
+        return (nextAllowed - now).coerceAtLeast(0L)
+    }
 
     companion object {
         internal const val DOWN_SYNC_COUNT_DEBOUNCE_MILLIS = 10_000L
