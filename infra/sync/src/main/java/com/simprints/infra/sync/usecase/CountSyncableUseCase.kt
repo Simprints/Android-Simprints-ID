@@ -57,6 +57,7 @@ class CountSyncableUseCase @Inject constructor(
         }.shareIn(
             appScope,
             SharingStarted.WhileSubscribed(),
+            replay = 1,
         )
     }
 
