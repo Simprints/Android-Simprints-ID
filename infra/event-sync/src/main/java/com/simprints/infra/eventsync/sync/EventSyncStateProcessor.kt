@@ -74,13 +74,11 @@ class EventSyncStateProcessor @Inject constructor(
             val mostRecentSyncMaster = completedSyncMaster.sortByScheduledTime().lastOrNull()
 
             flow {
-                if (mostRecentSyncMaster != null) {
-                    val lastSyncId = mostRecentSyncMaster.outputData.getString(SYNC_ID_STARTED)
-                    if (!lastSyncId.isNullOrBlank()) {
-                        Simber.d("Received sync id: $lastSyncId", tag = SYNC)
-                        emit(lastSyncId)
-                    }
+                val lastSyncId = mostRecentSyncMaster?.outputData?.getString(SYNC_ID_STARTED).orEmpty()
+                if (lastSyncId.isNotBlank()) {
+                    Simber.d("Received sync id: $lastSyncId", tag = SYNC)
                 }
+                emit(lastSyncId)
             }
         }
 

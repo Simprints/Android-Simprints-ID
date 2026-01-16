@@ -20,18 +20,14 @@ import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
 import com.simprints.infra.eventsync.sync.master.EventStartSyncReporterWorker.Companion.SYNC_ID_STARTED
 import io.mockk.*
 import io.mockk.impl.annotations.*
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.timeout
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.Date
-import kotlin.time.Duration.Companion.seconds
 
 @RunWith(AndroidJUnit4::class)
 internal class EventSyncStateProcessorTest {
@@ -99,13 +95,17 @@ internal class EventSyncStateProcessorTest {
         assertThat(syncState.lastSyncTime).isEqualTo(expectedTimestamp)
     }
 
-    @Test(expected = TimeoutCancellationException::class)
-    fun processor_masterWorkerFails_shouldNotExtractTheUniqueSyncId() = runTest {
+    @Test
+    fun processor_masterWorkerFails_shouldStillEmitState() = runTest {
+        syncWorkersFlow.emit(emptyList())
+        val expectedTimestamp = Timestamp(123L)
+        coEvery { eventSyncCache.readLastSuccessfulSyncTime() } returns expectedTimestamp
         startSyncReporterWorker.emit(failedMasterWorkers)
 
-        eventSyncStateProcessor.getLastSyncState().timeout(1.seconds).firstOrNull()
+        val syncState = eventSyncStateProcessor.getLastSyncState().first()
 
-        // flow will never complete since it the worker flow is not executed
+        assertThat(syncState.syncId).isEmpty()
+        assertThat(syncState.lastSyncTime).isEqualTo(expectedTimestamp)
     }
 
     @Test
