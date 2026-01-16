@@ -312,7 +312,7 @@ internal class CommCareCandidateRecordDataSource @Inject constructor(
         count
     }
 
-    override suspend fun observeCount(
+    override fun observeCount(
         query: EnrolmentRecordQuery,
         dataSource: BiometricDataSource,
     ): Flow<Int> = callbackFlow {

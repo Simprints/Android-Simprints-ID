@@ -89,7 +89,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     /**
      * Observes counts for subjects matching the given query.
      */
-    override suspend fun observeCount(
+    override fun observeCount(
         query: EnrolmentRecordQuery,
         dataSource: BiometricDataSource,
     ): Flow<Int> {

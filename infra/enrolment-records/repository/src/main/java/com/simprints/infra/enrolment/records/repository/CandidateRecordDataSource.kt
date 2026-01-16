@@ -14,7 +14,7 @@ interface CandidateRecordDataSource {
         dataSource: BiometricDataSource = BiometricDataSource.Simprints,
     ): Int
 
-    suspend fun observeCount(
+    fun observeCount(
         query: EnrolmentRecordQuery = EnrolmentRecordQuery(),
         dataSource: BiometricDataSource = BiometricDataSource.Simprints,
     ): Flow<Int>

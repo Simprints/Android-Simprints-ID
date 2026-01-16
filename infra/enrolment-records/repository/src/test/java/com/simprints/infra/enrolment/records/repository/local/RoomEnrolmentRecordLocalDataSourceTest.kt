@@ -23,10 +23,12 @@ import com.simprints.infra.security.keyprovider.LocalDbKey
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -888,6 +890,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     }
 
     @Test
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun `observeCount does not include records from other projects`() = runTest {
         val project1Channel = Channel<Int>(Channel.UNLIMITED)
         val project2Channel = Channel<Int>(Channel.UNLIMITED)
@@ -913,13 +916,14 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         do {
             project1AfterCreate = project1Channel.receive()
         } while (project1AfterCreate != 1)
-        val project2AfterInvalidation = project2Channel.receive()
+        advanceUntilIdle()
+        val project2AfterInvalidation = project2Channel.tryReceive().getOrNull()
         project1CollectJob.cancel()
         project2CollectJob.cancel()
         assertThat(project1Initial).isEqualTo(0)
         assertThat(project2Initial).isEqualTo(0)
         assertThat(project1AfterCreate).isEqualTo(1)
-        assertThat(project2AfterInvalidation).isEqualTo(0)
+        assertThat(project2AfterInvalidation).isNull() // same value not re-emitted
     }
 
     @Test(expected = IllegalArgumentException::class) // Reverted to JUnit exception check

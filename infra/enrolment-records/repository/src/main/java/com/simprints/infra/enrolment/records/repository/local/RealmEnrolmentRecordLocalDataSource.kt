@@ -155,7 +155,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
             .toInt()
     }
 
-    override suspend fun observeCount(
+    override fun observeCount(
         query: EnrolmentRecordQuery,
         dataSource: BiometricDataSource,
     ): Flow<Int> {
