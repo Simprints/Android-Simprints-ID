@@ -77,7 +77,7 @@ class ClientApiViewModel @Inject internal constructor(
         action: String,
         extras: Bundle,
     ): ActionRequest? {
-        val extrasMap: Map<String, String> = extras.toMap().mapValues { it.value.toString() }
+        val extrasMap = extras.toMap()
         return try {
             // Session must be created to be able to report invalid intents if mapping fails
             if (createSessionIfRequiredUseCase(action)) {
@@ -86,7 +86,7 @@ class ClientApiViewModel @Inject internal constructor(
             intentMapper(action = action, extras = extrasMap, project = getProject())
         } catch (validationException: InvalidRequestException) {
             Simber.e("Cannot parse intent data", validationException, tag = ORCHESTRATION)
-            simpleEventReporter.addInvalidIntentEvent(action, extrasMap)
+            simpleEventReporter.addInvalidIntentEvent(action, extrasMap.mapValues { it.value.toString() })
             _showAlert.send(validationException.error)
             null
         }
