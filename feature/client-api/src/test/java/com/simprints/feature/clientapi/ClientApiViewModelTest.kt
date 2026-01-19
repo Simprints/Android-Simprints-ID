@@ -2,6 +2,7 @@ package com.simprints.feature.clientapi
 
 import android.os.Bundle
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.core.os.bundleOf
 import androidx.test.ext.junit.runners.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.externalcredential.ExternalCredential
@@ -129,6 +130,22 @@ internal class ClientApiViewModelTest {
     }
 
     @Test
+    fun `handleIntent ensures that contract version is preserved`() = runTest {
+        coEvery { createSessionIfRequiredUseCase.invoke(any()) } returns true
+        coEvery {
+            intentMapper.invoke(
+                action = any(),
+                extras = any(),
+                project = any(),
+            )
+        } returns mockk()
+
+        viewModel.handleIntent("action", bundleOf("contractVersion" to 42))
+
+        coVerify { intentMapper.invoke(any(), match { it["contractVersion"] == 42 }, any()) }
+    }
+
+    @Test
     fun `handleIntent handles invalid intent`() = runTest {
         coEvery { createSessionIfRequiredUseCase.invoke(any()) } returns false
         coEvery {
@@ -139,9 +156,9 @@ internal class ClientApiViewModelTest {
             )
         } throws InvalidRequestException("Invalid intent")
 
-        viewModel.handleIntent("action", Bundle())
+        viewModel.handleIntent("action", bundleOf("contractVersion" to 42))
 
-        verify { simpleEventReporter.addInvalidIntentEvent("action", any()) }
+        verify { simpleEventReporter.addInvalidIntentEvent("action", any<Map<String, String>>()) }
         viewModel.showAlert.test().assertHasValue()
     }
 
