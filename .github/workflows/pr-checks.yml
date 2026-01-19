@@ -255,10 +255,13 @@ jobs:
                  fingerprint-unit-tests,
                  testing-tools ]
         uses: ./.github/workflows/reusable-sonar-scan.yml
-        # Only run if the PR ready for review or triggered manually, and if tests passed or matched 'skipped' status (due to smart filter)
-        # always() calls is required to prevent a hidden success() check being added
+        # Only run if the PR ready for review or triggered manually, and if tests passed or matched 'skipped' status (due to smart filter).
+        # always() calls is required to prevent a hidden success() check being added.
+        # Skipping any PRs made by bots.
         if: >
             always() &&
             (github.event.pull_request.draft == false || github.event_name == 'workflow_dispatch') &&
+            !startsWith(github.head_ref, 'dependabot') &&
+            !contains(github.actor, '[bot]') &&
             !contains(needs.*.result, 'failure') &&
             !contains(needs.*.result, 'cancelled')
