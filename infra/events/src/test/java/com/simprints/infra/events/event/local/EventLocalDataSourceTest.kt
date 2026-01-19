@@ -16,6 +16,7 @@ import com.simprints.infra.events.event.local.models.DbEventScope
 import com.simprints.infra.events.event.local.models.fromDbToDomain
 import com.simprints.infra.events.event.local.models.fromDomainToDb
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
+import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import dagger.hilt.android.testing.HiltTestApplication
@@ -334,11 +335,7 @@ internal class EventLocalDataSourceTest {
     @Test
     fun saveEventScope() = runTest {
         mockkStatic("com.simprints.infra.events.event.local.models.DbEventScopeKt")
-        eventLocalDataSource.saveEventScope(
-            mockk {
-                every { fromDomainToDb(any()) } returns mockk()
-            },
-        )
+        eventLocalDataSource.saveEventScope(createSessionScope("123"))
 
         coVerify { scopeDao.insertOrUpdate(any()) }
     }

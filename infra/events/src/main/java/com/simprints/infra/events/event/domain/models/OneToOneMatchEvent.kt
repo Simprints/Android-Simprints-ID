@@ -64,7 +64,8 @@ data class OneToOneMatchEvent(
         abstract val result: MatchEntry?
         abstract val fingerComparisonStrategy: FingerComparisonStrategy?
 
-        override fun toSafeString(): String = "matcher: $matcher, candidate ID: $candidateId..."
+        override fun toSafeString(): String = "matcher: $matcher, candidate ID: $candidateId, " +
+            "result: ${result?.score}, finger strategy: $fingerComparisonStrategy"
 
         @Keep
         @Serializable

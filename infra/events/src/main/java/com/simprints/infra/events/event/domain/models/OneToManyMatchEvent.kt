@@ -20,7 +20,7 @@ import java.util.UUID
 @Keep
 @Serializable
 @SerialName(ONE_TO_MANY_MATCH_KEY)
-class OneToManyMatchEvent(
+data class OneToManyMatchEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: OneToManyMatchPayload,
     override val type: EventType,

@@ -7,7 +7,6 @@ import com.simprints.infra.events.event.domain.models.ConsentEvent.Companion.EVE
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
 import com.simprints.infra.events.event.domain.models.EventType.CONSENT
-import com.simprints.infra.events.event.local.models.fromDomainToDb
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
 import org.junit.Test
@@ -43,8 +42,6 @@ class ConsentEventTest {
 
         val json = JsonHelper.json.encodeToString(event)
         // When
-        val dbEvent = event.fromDomainToDb()
-        print(dbEvent.eventJson)
         val decoded = JsonHelper.json.decodeFromString<ConsentEvent>(json)
 
         // Then
