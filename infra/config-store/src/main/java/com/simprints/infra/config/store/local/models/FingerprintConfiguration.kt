@@ -5,11 +5,12 @@ import com.simprints.infra.config.store.exceptions.InvalidProtobufEnumException
 import com.simprints.infra.config.store.local.models.ProtoFingerprintConfiguration.ProtoMaxCaptureAttempts
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.MaxCaptureAttempts
+import com.simprints.infra.config.store.models.ModalitySdkType
 
 internal fun FingerprintConfiguration.toProto(): ProtoFingerprintConfiguration = ProtoFingerprintConfiguration
     .newBuilder()
     .addAllAllowedScanners(allowedScanners.map { it.toProto() })
-    .addAllAllowedSdks(allowedSDKs.map { it.toProto() })
+    .addAllAllowedSdks(allowedSDKs.map { it.toProtoFingerprintConfiguration() })
     .setDisplayHandIcons(displayHandIcons)
     .also {
         if (secugenSimMatcher != null) it.secugenSimMatcher = secugenSimMatcher.toProto()
@@ -34,9 +35,16 @@ internal fun FingerprintConfiguration.VeroGeneration.toProto() = when (this) {
     FingerprintConfiguration.VeroGeneration.VERO_2 -> ProtoFingerprintConfiguration.VeroGeneration.VERO_2
 }
 
-internal fun FingerprintConfiguration.BioSdk.toProto() = when (this) {
-    FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER -> ProtoFingerprintConfiguration.ProtoBioSdk.SECUGEN_SIM_MATCHER
-    FingerprintConfiguration.BioSdk.NEC -> ProtoFingerprintConfiguration.ProtoBioSdk.NEC
+internal fun ModalitySdkType.toProtoFingerprintConfiguration() = when (this) {
+    ModalitySdkType.SECUGEN_SIM_MATCHER -> ProtoFingerprintConfiguration.ProtoBioSdk.SECUGEN_SIM_MATCHER
+    ModalitySdkType.NEC -> ProtoFingerprintConfiguration.ProtoBioSdk.NEC
+    else -> ProtoFingerprintConfiguration.ProtoBioSdk.SECUGEN_SIM_MATCHER
+}
+
+internal fun ModalitySdkType.toProtoFaceConfiguration() = when (this) {
+    ModalitySdkType.RANK_ONE -> ProtoFaceConfiguration.ProtoBioSdk.RANK_ONE
+    ModalitySdkType.SIM_FACE -> ProtoFaceConfiguration.ProtoBioSdk.SIM_FACE
+    else -> ProtoFaceConfiguration.ProtoBioSdk.RANK_ONE
 }
 
 internal fun FingerprintConfiguration.FingerComparisonStrategy.toProto() = when (this) {
@@ -56,7 +64,7 @@ internal fun ProtoFingerprintConfiguration.toDomain() = // if has nec or sim mat
 
 internal fun ProtoFingerprintConfiguration.toDomainOld() = FingerprintConfiguration(
     allowedScanners = allowedVeroGenerationsList.map { it.toDomain() },
-    allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
+    allowedSDKs = listOf(ModalitySdkType.SECUGEN_SIM_MATCHER),
     secugenSimMatcher = FingerprintConfiguration.FingerprintSdkConfiguration(
         fingersToCapture = fingersToCaptureList.map { it.toDomain() },
         decisionPolicy = decisionPolicy.toDomain(),
@@ -79,9 +87,9 @@ internal fun ProtoFingerprintConfiguration.toDomainNew() = FingerprintConfigurat
 )
 
 internal fun ProtoFingerprintConfiguration.ProtoBioSdk.toDomain() = when (this) {
-    ProtoFingerprintConfiguration.ProtoBioSdk.SECUGEN_SIM_MATCHER -> FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
-    ProtoFingerprintConfiguration.ProtoBioSdk.NEC -> FingerprintConfiguration.BioSdk.NEC
-    ProtoFingerprintConfiguration.ProtoBioSdk.UNRECOGNIZED -> FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+    ProtoFingerprintConfiguration.ProtoBioSdk.SECUGEN_SIM_MATCHER -> ModalitySdkType.SECUGEN_SIM_MATCHER
+    ProtoFingerprintConfiguration.ProtoBioSdk.NEC -> ModalitySdkType.NEC
+    ProtoFingerprintConfiguration.ProtoBioSdk.UNRECOGNIZED -> ModalitySdkType.SECUGEN_SIM_MATCHER
 }
 
 internal fun ProtoFingerprintConfiguration.ProtoFingerprintSdkConfiguration.toDomain() =
@@ -111,7 +119,8 @@ internal fun ProtoFingerprintConfiguration.VeroGeneration.toDomain() = when (thi
 
 internal fun ProtoFingerprintConfiguration.FingerComparisonStrategy.toDomain() = when (this) {
     ProtoFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER -> FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER
-    ProtoFingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX -> FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
+    ProtoFingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX ->
+        FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
     ProtoFingerprintConfiguration.FingerComparisonStrategy.UNRECOGNIZED -> throw InvalidProtobufEnumException(
         "invalid FingerComparisonStrategy $name",
     )

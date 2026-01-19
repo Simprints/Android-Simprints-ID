@@ -1,7 +1,7 @@
 package com.simprints.face.infra.biosdkresolver
 
 import com.google.common.truth.Truth.*
-import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
@@ -38,11 +38,11 @@ class ResolveFaceBioSdkUseCaseTest {
 
     @Test
     fun `return SimFace SDK when requested`() = runTest {
-        assertThat(resolveFaceBioSdkUseCase.invoke(FaceConfiguration.BioSdk.SIM_FACE)).isEqualTo(simFaceBioSdk)
+        assertThat(resolveFaceBioSdkUseCase.invoke(ModalitySdkType.SIM_FACE)).isEqualTo(simFaceBioSdk)
     }
 
     @Test
     fun `return RankOne SDK when requested`() = runTest {
-        assertThat(resolveFaceBioSdkUseCase.invoke(FaceConfiguration.BioSdk.RANK_ONE)).isEqualTo(rocBioSdk)
+        assertThat(resolveFaceBioSdkUseCase.invoke(ModalitySdkType.RANK_ONE)).isEqualTo(rocBioSdk)
     }
 }

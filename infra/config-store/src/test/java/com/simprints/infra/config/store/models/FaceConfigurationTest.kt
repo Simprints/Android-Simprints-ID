@@ -8,7 +8,7 @@ class FaceConfigurationTest {
     fun `should retrieve Rank One configuration when RANK_ONE is requested `() {
         val faceConfiguration = createConfiguration()
         Truth
-            .assertThat(faceConfiguration.getSdkConfiguration(FaceConfiguration.BioSdk.RANK_ONE))
+            .assertThat(faceConfiguration.getSdkConfiguration(ModalitySdkType.RANK_ONE))
             .isEqualTo(faceConfiguration.rankOne)
     }
 
@@ -16,12 +16,12 @@ class FaceConfigurationTest {
     fun `should retrieve SimFace configuration when SIM_FACE is requested `() {
         val faceConfiguration = createConfiguration()
         Truth
-            .assertThat(faceConfiguration.getSdkConfiguration(FaceConfiguration.BioSdk.SIM_FACE))
+            .assertThat(faceConfiguration.getSdkConfiguration(ModalitySdkType.SIM_FACE))
             .isEqualTo(faceConfiguration.simFace)
     }
 
     private fun createConfiguration(): FaceConfiguration = FaceConfiguration(
-        allowedSDKs = listOf(FaceConfiguration.BioSdk.RANK_ONE),
+        allowedSDKs = listOf(ModalitySdkType.RANK_ONE),
         rankOne = FaceConfiguration.FaceSdkConfiguration(
             nbOfImagesToCapture = 2,
             qualityThreshold = 0.5f,

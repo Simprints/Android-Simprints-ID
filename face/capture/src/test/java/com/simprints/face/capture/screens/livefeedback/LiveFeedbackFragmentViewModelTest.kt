@@ -14,7 +14,7 @@ import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.*
@@ -93,7 +93,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         coEvery { faceDetector.analyze(frame) } returns getFace()
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
         viewModel.process(frame)
 
         val currentDetection = viewModel.currentDetection.testObserver()
@@ -107,7 +107,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         coEvery { faceDetector.analyze(frame) } returns getFace()
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
         viewModel.process(frame)
         viewModel.startCapture()
         viewModel.process(frame)
@@ -138,7 +138,7 @@ internal class LiveFeedbackFragmentViewModelTest {
 
         val detections = viewModel.currentDetection.testObserver()
         viewModel.initAutoCapture()
-        viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 2, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2, 0)
 
         viewModel.process(frame)
         viewModel.process(frame)
@@ -175,7 +175,7 @@ internal class LiveFeedbackFragmentViewModelTest {
 
         val detections = viewModel.currentDetection.testObserver()
         viewModel.initAutoCapture()
-        viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
         viewModel.process(frame)
         viewModel.process(frame)
         viewModel.process(frame)
@@ -196,7 +196,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
         val capturingStateObserver = viewModel.capturingState.testObserver()
         viewModel.initAutoCapture()
-        viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 2, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2, 0)
         viewModel.process(frame)
         viewModel.startCapture()
         viewModel.process(frame)

@@ -1,14 +1,13 @@
 package com.simprints.feature.orchestrator.usecases
 
 import com.google.common.truth.Truth.*
-import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.capture.BiometricTemplateCapture
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.matching.MatchResult
 import org.junit.Before
 import org.junit.Test
@@ -36,11 +35,11 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
     fun `maps FaceMatchResult correctly`() {
         val result = useCase(
             listOf(
-                MatchResult(emptyList(), FaceConfiguration.BioSdk.RANK_ONE),
+                MatchResult(emptyList(), ModalitySdkType.RANK_ONE),
             ),
         )
 
-        assertThat(result.first()).isEqualTo(EnrolLastBiometricStepResult.MatchResult(emptyList(), FaceConfiguration.BioSdk.RANK_ONE))
+        assertThat(result.first()).isEqualTo(EnrolLastBiometricStepResult.MatchResult(emptyList(), ModalitySdkType.RANK_ONE))
     }
 
     @Test
@@ -82,13 +81,13 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
     fun `maps FingerprintMatchResult correctly`() {
         val result = useCase(
             listOf(
-                MatchResult(emptyList(), FingerprintConfiguration.BioSdk.NEC),
+                MatchResult(emptyList(), ModalitySdkType.NEC),
             ),
         )
 
         assertThat(
             result.first(),
-        ).isEqualTo(EnrolLastBiometricStepResult.MatchResult(emptyList(), FingerprintConfiguration.BioSdk.NEC))
+        ).isEqualTo(EnrolLastBiometricStepResult.MatchResult(emptyList(), ModalitySdkType.NEC))
     }
 
     @Test

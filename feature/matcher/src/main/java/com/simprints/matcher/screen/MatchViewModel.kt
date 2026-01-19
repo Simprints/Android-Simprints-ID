@@ -4,13 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DecisionPolicy
-import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.getModalitySdkConfig
 import com.simprints.infra.matching.MatchParams
 import com.simprints.infra.matching.MatchResult
@@ -53,9 +53,9 @@ internal class MatchViewModel @Inject constructor(
         isInitialized = true
         val startTime = timeHelper.now()
 
-        val matcherUseCase = when (params.bioSdk) {
-            is FaceConfiguration.BioSdk -> faceMatcher
-            else -> fingerprintMatcher
+        val matcherUseCase = when (params.bioSdk.modality()) {
+            Modality.FACE -> faceMatcher
+            Modality.FINGERPRINT -> fingerprintMatcher
         }
         val project = configRepository.getProject() ?: return@launch
         val decisionPolicy = getDecisionPolicy(params)

@@ -10,8 +10,7 @@ import com.simprints.core.domain.common.Modality
 import com.simprints.feature.setup.LocationStore
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.license.LicenseRepository
@@ -166,6 +165,6 @@ private val ProjectConfiguration.requiredLicenses: List<Pair<Vendor, LicenseVers
         }
     }
 
-private fun ProjectConfiguration.shouldIncludeNec() = fingerprint?.allowedSDKs?.contains(FingerprintConfiguration.BioSdk.NEC) == true
+private fun ProjectConfiguration.shouldIncludeNec() = fingerprint?.allowedSDKs?.contains(ModalitySdkType.NEC) == true
 
-private fun ProjectConfiguration.shouldIncludeRankOne() = face?.allowedSDKs?.contains(FaceConfiguration.BioSdk.RANK_ONE) == true
+private fun ProjectConfiguration.shouldIncludeRankOne() = face?.allowedSDKs?.contains(ModalitySdkType.RANK_ONE) == true

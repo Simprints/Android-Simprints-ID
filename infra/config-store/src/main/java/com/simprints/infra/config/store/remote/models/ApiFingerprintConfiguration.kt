@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import kotlinx.serialization.Serializable
 
 @Keep
@@ -94,8 +95,8 @@ internal data class ApiFingerprintConfiguration(
         ;
 
         fun toDomain() = when (this) {
-            SECUGEN_SIM_MATCHER -> FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
-            NEC -> FingerprintConfiguration.BioSdk.NEC
+            SECUGEN_SIM_MATCHER -> ModalitySdkType.SECUGEN_SIM_MATCHER
+            NEC -> ModalitySdkType.NEC
         }
     }
 

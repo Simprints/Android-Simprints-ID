@@ -19,7 +19,7 @@ import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy.SO
 import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy.SOFT_RESET_AFTER_DELAY
 import com.simprints.fingerprint.infra.scanner.domain.ota.OtaStep
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -59,11 +59,11 @@ internal class OtaViewModel @Inject constructor(
 
     private var currentStep: OtaStep? = null
     private val remainingOtas = mutableListOf<AvailableOta>()
-    private lateinit var fingerprintSdk: FingerprintConfiguration.BioSdk
+    private lateinit var fingerprintSdk: ModalitySdkType
 
     @SuppressLint("CheckResult")
     fun startOta(
-        fingerprintSdk: FingerprintConfiguration.BioSdk,
+        fingerprintSdk: ModalitySdkType,
         availableOtas: List<AvailableOta>,
         currentRetryAttempt: Int,
     ) {

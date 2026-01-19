@@ -35,8 +35,7 @@ import com.simprints.feature.validatepool.ValidateSubjectPoolResult
 import com.simprints.fingerprint.capture.FingerprintCaptureParams
 import com.simprints.fingerprint.connect.FingerprintConnectParams
 import com.simprints.fingerprint.connect.FingerprintConnectResult
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.matching.MatchParams
@@ -106,8 +105,7 @@ abstract class StepResultMixin : StepResult
     JsonSubTypes.Type(value = BiometricDataSource.Simprints::class, name = "BiometricDataSource.Simprints"),
     JsonSubTypes.Type(value = EnrolmentRecordQuery::class, name = "EnrolmentRecordQuery"),
     JsonSubTypes.Type(value = AgeGroup::class, name = "AgeGroup"),
-    JsonSubTypes.Type(value = FingerprintConfiguration.BioSdk::class, name = "FingerprintConfiguration.BioSdk"),
-    JsonSubTypes.Type(value = FaceConfiguration.BioSdk::class, name = "FaceConfiguration.BioSdk"),
+    JsonSubTypes.Type(value = ModalitySdkType::class, name = "ModalitySdkType"),
 )
 abstract class StepParamsMixin : StepParams
 

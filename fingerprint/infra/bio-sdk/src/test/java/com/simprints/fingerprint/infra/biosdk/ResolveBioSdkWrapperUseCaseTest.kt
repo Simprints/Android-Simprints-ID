@@ -1,8 +1,7 @@
 package com.simprints.fingerprint.infra.biosdk
 
 import com.google.common.truth.Truth
-import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.NEC
-import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+import com.simprints.infra.config.store.models.ModalitySdkType
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
@@ -26,13 +25,13 @@ class ResolveBioSdkWrapperUseCaseTest {
 
     @Test
     fun `test  with simprints sdk`() = runTest {
-        val result = bioSdkResolverUseCase(SECUGEN_SIM_MATCHER)
+        val result = bioSdkResolverUseCase(ModalitySdkType.SECUGEN_SIM_MATCHER)
         Truth.assertThat(simprintsBioSdkWrapper).isEqualTo(result)
     }
 
     @Test
     fun `test  with nec sdk`() = runTest {
-        val result = bioSdkResolverUseCase(NEC)
+        val result = bioSdkResolverUseCase(ModalitySdkType.NEC)
         Truth.assertThat(necBioSdkWrapper).isEqualTo(result)
     }
 }

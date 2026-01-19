@@ -14,6 +14,7 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.IdentificationConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SampleSynchronizationConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
@@ -104,7 +105,7 @@ internal data class OldProjectConfig(
         null
     } else {
         FaceConfiguration(
-            allowedSDKs = listOf(FaceConfiguration.BioSdk.RANK_ONE),
+            allowedSDKs = listOf(ModalitySdkType.RANK_ONE),
             rankOne = FaceConfiguration.FaceSdkConfiguration(
                 nbOfImagesToCapture = faceNbOfFramesCaptured?.toIntOrNull() ?: DEFAULT_FACE_FRAMES_TO_CAPTURE,
                 qualityThreshold = faceQualityThreshold.toFloat(),
@@ -124,7 +125,7 @@ internal data class OldProjectConfig(
         null
     } else {
         FingerprintConfiguration(
-            allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
+            allowedSDKs = listOf(ModalitySdkType.SECUGEN_SIM_MATCHER),
             displayHandIcons = fingerImagesExist.toBoolean(),
             allowedScanners = scannerGenerations?.split(",")?.map {
                 FingerprintConfiguration.VeroGeneration.valueOf(

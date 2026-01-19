@@ -12,10 +12,8 @@ import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.usecases.MapStepsForLastBiometricEnrolUseCase
 import com.simprints.feature.selectsubject.SelectSubjectParams
-import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.NEC
-import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.orchestration.data.ActionRequest
 import io.mockk.*
@@ -70,8 +68,8 @@ class BuildStepsUseCaseTest {
         every { projectConfiguration.general.matchingModalities } returns listOf(Modality.FINGERPRINT, Modality.FACE)
         every { projectConfiguration.consent.collectConsent } returns true
         every { projectConfiguration.fingerprint?.allowedSDKs } returns listOf(
-            SECUGEN_SIM_MATCHER,
-            NEC,
+            ModalitySdkType.SECUGEN_SIM_MATCHER,
+            ModalitySdkType.NEC,
         )
 
         every { secugenSimMatcher.fingersToCapture } returns listOf(
@@ -80,7 +78,7 @@ class BuildStepsUseCaseTest {
         )
         every { secugenSimMatcher.allowedAgeRange } returns AgeGroup(0, null)
         every { projectConfiguration.fingerprint?.secugenSimMatcher } returns secugenSimMatcher
-        every { projectConfiguration.fingerprint?.getSdkConfiguration(SECUGEN_SIM_MATCHER) } returns secugenSimMatcher
+        every { projectConfiguration.fingerprint?.getSdkConfiguration(ModalitySdkType.SECUGEN_SIM_MATCHER) } returns secugenSimMatcher
 
         every { nec.fingersToCapture } returns listOf(
             TemplateIdentifier.LEFT_INDEX_FINGER,
@@ -88,9 +86,9 @@ class BuildStepsUseCaseTest {
         )
         every { nec.allowedAgeRange } returns AgeGroup(0, null)
         every { projectConfiguration.fingerprint?.nec } returns nec
-        every { projectConfiguration.fingerprint?.getSdkConfiguration(NEC) } returns nec
+        every { projectConfiguration.fingerprint?.getSdkConfiguration(ModalitySdkType.NEC) } returns nec
 
-        every { projectConfiguration.face?.allowedSDKs } returns listOf(FaceConfiguration.BioSdk.RANK_ONE)
+        every { projectConfiguration.face?.allowedSDKs } returns listOf(ModalitySdkType.RANK_ONE)
         every { projectConfiguration.face?.rankOne?.nbOfImagesToCapture } returns 3
         every { projectConfiguration.face?.rankOne?.allowedAgeRange } returns null
         every { projectConfiguration.face?.simFace?.allowedAgeRange } returns null

@@ -2,10 +2,10 @@ package com.simprints.feature.externalcredential.model
 
 import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.core.domain.common.ModalitySdkType
 import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.domain.step.StepResult
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.infra.config.store.models.ModalitySdkType
 
 @Keep
 @ExcludedFromGeneratedTestCoverageReports("Data class")

@@ -22,8 +22,6 @@ import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.setup.SetupContract
 import com.simprints.feature.validatepool.ValidateSubjectPoolContract
 import com.simprints.fingerprint.capture.FingerprintCaptureContract
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.allowedAgeRanges
 import com.simprints.infra.config.store.models.experimental
@@ -412,9 +410,9 @@ internal class BuildStepsUseCase @Inject constructor(
         projectConfiguration: ProjectConfiguration,
         ageGroup: AgeGroup?,
         flowType: FlowType,
-    ): List<Step> = projectConfiguration.getSdkListForAgeGroup(modality, ageGroup).mapNotNull { bioSDK ->
-        when (bioSDK) {
-            is FingerprintConfiguration.BioSdk -> {
+    ): List<Step> = projectConfiguration.getSdkListForAgeGroup(modality, ageGroup).map { bioSDK ->
+        when (bioSDK.modality()) {
+            Modality.FINGERPRINT -> {
                 val sdkConfiguration = projectConfiguration.fingerprint?.getSdkConfiguration(bioSDK)
 
                 // TODO: fingersToCollect can be read directly from FingerprintCapture
@@ -430,7 +428,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 )
             }
 
-            is FaceConfiguration.BioSdk -> {
+            Modality.FACE -> {
                 val sdkConfiguration = projectConfiguration.face?.getSdkConfiguration(bioSDK)
 
                 // TODO: samplesToCapture can be read directly from FaceCapture
@@ -443,9 +441,6 @@ internal class BuildStepsUseCase @Inject constructor(
                 )
             }
 
-            else -> {
-                null
-            }
         }
     }
 
@@ -485,15 +480,15 @@ internal class BuildStepsUseCase @Inject constructor(
             bioSdk = bioSDK,
         )
 
-        when (bioSDK) {
-            is FingerprintConfiguration.BioSdk -> Step(
+        when (bioSDK.modality()){
+            Modality.FINGERPRINT -> Step(
                 id = StepId.FINGERPRINT_MATCHER,
                 navigationActionId = R.id.action_orchestratorFragment_to_matcher,
                 destinationId = MatchContract.DESTINATION,
                 params = paramStub,
             )
 
-            is FaceConfiguration.BioSdk -> Step(
+            Modality.FACE -> Step(
                 id = StepId.FACE_MATCHER,
                 navigationActionId = R.id.action_orchestratorFragment_to_matcher,
                 destinationId = MatchContract.DESTINATION,

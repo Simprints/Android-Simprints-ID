@@ -3,18 +3,14 @@ package com.simprints.infra.config.store.local.models
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.infra.config.store.exceptions.InvalidProtobufEnumException
 import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 
 internal fun FaceConfiguration.toProto(): ProtoFaceConfiguration = ProtoFaceConfiguration
     .newBuilder()
-    .addAllAllowedSdks(allowedSDKs.map { it.toProto() })
+    .addAllAllowedSdks(allowedSDKs.map { it.toProtoFaceConfiguration() })
     .also { if (rankOne != null) it.rankOne = rankOne.toProto() }
     .also { if (simFace != null) it.simFace = simFace.toProto() }
     .build()
-
-internal fun FaceConfiguration.BioSdk.toProto() = when (this) {
-    FaceConfiguration.BioSdk.RANK_ONE -> ProtoFaceConfiguration.ProtoBioSdk.RANK_ONE
-    FaceConfiguration.BioSdk.SIM_FACE -> ProtoFaceConfiguration.ProtoBioSdk.SIM_FACE
-}
 
 internal fun FaceConfiguration.FaceSdkConfiguration.toProto() = ProtoFaceConfiguration.ProtoFaceSdkConfiguration
     .newBuilder()
@@ -42,9 +38,9 @@ internal fun ProtoFaceConfiguration.toDomain(): FaceConfiguration = FaceConfigur
 
 @Suppress("SameReturnValue")
 internal fun ProtoFaceConfiguration.ProtoBioSdk.toDomain() = when (this) {
-    ProtoFaceConfiguration.ProtoBioSdk.RANK_ONE -> FaceConfiguration.BioSdk.RANK_ONE
-    ProtoFaceConfiguration.ProtoBioSdk.SIM_FACE -> FaceConfiguration.BioSdk.SIM_FACE
-    ProtoFaceConfiguration.ProtoBioSdk.UNRECOGNIZED -> FaceConfiguration.BioSdk.RANK_ONE
+    ProtoFaceConfiguration.ProtoBioSdk.RANK_ONE -> ModalitySdkType.RANK_ONE
+    ProtoFaceConfiguration.ProtoBioSdk.SIM_FACE -> ModalitySdkType.SIM_FACE
+    ProtoFaceConfiguration.ProtoBioSdk.UNRECOGNIZED -> ModalitySdkType.RANK_ONE
 }
 
 internal fun ProtoFaceConfiguration.ProtoFaceSdkConfiguration.toDomain() = FaceConfiguration.FaceSdkConfiguration(

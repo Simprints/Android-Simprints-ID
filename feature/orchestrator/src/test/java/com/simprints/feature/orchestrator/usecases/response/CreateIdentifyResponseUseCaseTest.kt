@@ -5,8 +5,7 @@ import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.infra.config.store.models.DecisionPolicy
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.matching.MatchResult
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
@@ -211,14 +210,14 @@ class CreateIdentifyResponseUseCaseTest {
                     subjectId = faceSmallConfidence,
                     comparisonScore = smallConfidence,
                 )
-                every { bioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
+                every { bioSdk } returns ModalitySdkType.RANK_ONE
             },
             mockk {
                 every { comparisonResult } returns ComparisonResult(
                     subjectId = faceBigConfidence,
                     comparisonScore = bigConfidence,
                 )
-                every { bioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
+                every { bioSdk } returns ModalitySdkType.RANK_ONE
             },
         )
 
@@ -228,7 +227,7 @@ class CreateIdentifyResponseUseCaseTest {
                     subjectId = "fingerprintSubjectId",
                     comparisonScore = 90f,
                 )
-                every { bioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+                every { bioSdk } returns ModalitySdkType.SECUGEN_SIM_MATCHER
             },
         )
 
@@ -264,14 +263,14 @@ class CreateIdentifyResponseUseCaseTest {
                     subjectId = fingerprintSmallConfidence,
                     comparisonScore = smallConfidence,
                 )
-                every { bioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+                every { bioSdk } returns ModalitySdkType.SECUGEN_SIM_MATCHER
             },
             mockk {
                 every { comparisonResult } returns ComparisonResult(
                     subjectId = fingerprintBigConfidence,
                     comparisonScore = bigConfidence,
                 )
-                every { bioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+                every { bioSdk } returns ModalitySdkType.SECUGEN_SIM_MATCHER
             },
         )
 
@@ -281,7 +280,7 @@ class CreateIdentifyResponseUseCaseTest {
                     subjectId = "faceSubjectId",
                     comparisonScore = 90f,
                 )
-                every { bioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
+                every { bioSdk } returns ModalitySdkType.RANK_ONE
             },
         )
 
@@ -318,7 +317,7 @@ class CreateIdentifyResponseUseCaseTest {
                     subjectId = sharedGuid,
                     comparisonScore = credentialConfidence,
                 )
-                every { bioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
+                every { bioSdk } returns ModalitySdkType.RANK_ONE
             },
         )
 
@@ -336,7 +335,7 @@ class CreateIdentifyResponseUseCaseTest {
                 },
                 MatchResult(
                     listOf(ComparisonResult(subjectId = sharedGuid, comparisonScore = faceConfidence)),
-                    FaceConfiguration.BioSdk.RANK_ONE,
+                    ModalitySdkType.RANK_ONE,
                 ),
             ),
         )
@@ -359,7 +358,7 @@ class CreateIdentifyResponseUseCaseTest {
                     subjectId = sharedGuid,
                     comparisonScore = credentialConfidence,
                 )
-                every { bioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+                every { bioSdk } returns ModalitySdkType.SECUGEN_SIM_MATCHER
             },
         )
 
@@ -377,7 +376,7 @@ class CreateIdentifyResponseUseCaseTest {
                 },
                 MatchResult(
                     listOf(ComparisonResult(subjectId = sharedGuid, comparisonScore = fingerprintConfidence)),
-                    FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
+                    ModalitySdkType.SECUGEN_SIM_MATCHER,
                 ),
             ),
         )
@@ -389,11 +388,11 @@ class CreateIdentifyResponseUseCaseTest {
 
     private fun createFaceMatchResult(vararg confidences: Float): Serializable = MatchResult(
         confidences.mapIndexed { i, confidence -> ComparisonResult(subjectId = "$i", comparisonScore = confidence) },
-        FaceConfiguration.BioSdk.RANK_ONE,
+        ModalitySdkType.RANK_ONE,
     )
 
     private fun createFingerprintMatchResult(vararg confidences: Float): Serializable = MatchResult(
         confidences.mapIndexed { i, confidence -> ComparisonResult(subjectId = "$i", comparisonScore = confidence) },
-        FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
+        ModalitySdkType.SECUGEN_SIM_MATCHER,
     )
 }

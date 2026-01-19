@@ -18,7 +18,7 @@ import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerExtendedInfoRea
 import com.simprints.fingerprint.infra.scanner.v2.tools.ScannerUiHelper
 import com.simprints.fingerprint.infra.scanner.v2.tools.mapPotentialErrorFromScanner
 import com.simprints.fingerprint.infra.scanner.v2.tools.runWithErrorWrapping
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -70,7 +70,7 @@ internal class ScannerWrapperV2(
      * @throws UnexpectedScannerException
      * @throws OtaFailedException
      */
-    override suspend fun setScannerInfoAndCheckAvailableOta(fingerprintSdk: FingerprintConfiguration.BioSdk) = runWithErrorWrapping {
+    override suspend fun setScannerInfoAndCheckAvailableOta(fingerprintSdk: ModalitySdkType) = runWithErrorWrapping {
         scannerInitialSetupHelper.setupScannerWithOtaCheck(
             fingerprintSdk,
             scannerV2,

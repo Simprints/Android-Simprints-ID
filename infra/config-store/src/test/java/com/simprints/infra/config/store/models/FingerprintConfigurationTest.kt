@@ -9,7 +9,7 @@ class FingerprintConfigurationTest {
     fun `should retrieve SecugenSimMatcher's configuration  when SECUGEN_SIM_MATCHER is requested `() {
         val fingerprintConfiguration = FingerprintConfiguration(
             allowedScanners = listOf(FingerprintConfiguration.VeroGeneration.VERO_1),
-            allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
+            allowedSDKs = listOf(ModalitySdkType.SECUGEN_SIM_MATCHER),
             displayHandIcons = true,
             secugenSimMatcher = FingerprintConfiguration.FingerprintSdkConfiguration(
                 fingersToCapture = listOf(TemplateIdentifier.LEFT_THUMB),
@@ -22,7 +22,7 @@ class FingerprintConfigurationTest {
             nec = null,
         )
         Truth
-            .assertThat(fingerprintConfiguration.getSdkConfiguration(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER))
+            .assertThat(fingerprintConfiguration.getSdkConfiguration(ModalitySdkType.SECUGEN_SIM_MATCHER))
             .isEqualTo(fingerprintConfiguration.secugenSimMatcher)
     }
 
@@ -30,7 +30,7 @@ class FingerprintConfigurationTest {
     fun `should retrieve NEC's configuration  when NEC is requested `() {
         val fingerprintConfiguration = FingerprintConfiguration(
             allowedScanners = listOf(FingerprintConfiguration.VeroGeneration.VERO_1),
-            allowedSDKs = listOf(FingerprintConfiguration.BioSdk.NEC),
+            allowedSDKs = listOf(ModalitySdkType.NEC),
             displayHandIcons = true,
             secugenSimMatcher = null,
             nec = FingerprintConfiguration.FingerprintSdkConfiguration(
@@ -43,7 +43,7 @@ class FingerprintConfigurationTest {
             ),
         )
         Truth
-            .assertThat(fingerprintConfiguration.getSdkConfiguration(FingerprintConfiguration.BioSdk.NEC))
+            .assertThat(fingerprintConfiguration.getSdkConfiguration(ModalitySdkType.NEC))
             .isEqualTo(fingerprintConfiguration.nec)
     }
 }

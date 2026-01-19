@@ -5,8 +5,7 @@ import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.screen.EnrolLastState
 import com.simprints.infra.config.store.models.DecisionPolicy
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import io.mockk.*
 import org.junit.Before
@@ -37,7 +36,7 @@ class CheckDuplicateEnrolmentsErrorsUseCaseTest {
             steps = listOf(
                 EnrolLastBiometricStepResult.MatchResult(
                     listOf(matchResult(LOW_CONFIDENCE)),
-                    FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
+                    ModalitySdkType.SECUGEN_SIM_MATCHER,
                 ),
             ),
         )
@@ -52,7 +51,7 @@ class CheckDuplicateEnrolmentsErrorsUseCaseTest {
             steps = listOf(
                 EnrolLastBiometricStepResult.MatchResult(
                     listOf(matchResult(LOW_CONFIDENCE)),
-                    FaceConfiguration.BioSdk.RANK_ONE,
+                    ModalitySdkType.RANK_ONE,
                 ),
             ),
         )
@@ -67,7 +66,7 @@ class CheckDuplicateEnrolmentsErrorsUseCaseTest {
             steps = listOf(
                 EnrolLastBiometricStepResult.MatchResult(
                     listOf(matchResult(HIGH_CONFIDENCE)),
-                    FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
+                    ModalitySdkType.SECUGEN_SIM_MATCHER,
                 ),
             ),
         )
@@ -82,7 +81,7 @@ class CheckDuplicateEnrolmentsErrorsUseCaseTest {
             steps = listOf(
                 EnrolLastBiometricStepResult.MatchResult(
                     listOf(matchResult(HIGH_CONFIDENCE)),
-                    FaceConfiguration.BioSdk.RANK_ONE,
+                    ModalitySdkType.RANK_ONE,
                 ),
             ),
         )
@@ -107,7 +106,7 @@ class CheckDuplicateEnrolmentsErrorsUseCaseTest {
             steps = listOf(
                 EnrolLastBiometricStepResult.MatchResult(
                     listOf(matchResult(HIGH_CONFIDENCE)),
-                    FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
+                    ModalitySdkType.SECUGEN_SIM_MATCHER,
                 ),
             ),
         )
@@ -122,7 +121,7 @@ class CheckDuplicateEnrolmentsErrorsUseCaseTest {
             steps = listOf(
                 EnrolLastBiometricStepResult.MatchResult(
                     listOf(matchResult(HIGH_CONFIDENCE)),
-                    FaceConfiguration.BioSdk.RANK_ONE,
+                    ModalitySdkType.RANK_ONE,
                 ),
             ),
         )

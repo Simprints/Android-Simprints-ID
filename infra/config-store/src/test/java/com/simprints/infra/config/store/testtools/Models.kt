@@ -39,6 +39,7 @@ import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.IdentificationConfiguration
 import com.simprints.infra.config.store.models.MaxCaptureAttempts
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.MultiFactorIdConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
@@ -191,7 +192,7 @@ internal val apiFaceConfiguration = ApiFaceConfiguration(
     ),
 )
 internal val faceConfiguration = FaceConfiguration(
-    allowedSDKs = listOf(FaceConfiguration.BioSdk.RANK_ONE),
+    allowedSDKs = listOf(ModalitySdkType.RANK_ONE),
     rankOne = faceSdkConfiguration,
     simFace = faceSdkConfiguration,
 )
@@ -283,7 +284,7 @@ internal val fingerprintSdkConfiguration = FingerprintConfiguration.FingerprintS
 
 internal val fingerprintConfiguration = FingerprintConfiguration(
     allowedScanners = listOf(FingerprintConfiguration.VeroGeneration.VERO_2),
-    allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
+    allowedSDKs = listOf(ModalitySdkType.SECUGEN_SIM_MATCHER),
     displayHandIcons = true,
     secugenSimMatcher = fingerprintSdkConfiguration,
     nec = null,

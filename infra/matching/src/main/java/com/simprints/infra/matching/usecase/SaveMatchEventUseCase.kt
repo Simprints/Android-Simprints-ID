@@ -2,10 +2,11 @@ package com.simprints.infra.matching.usecase
 
 import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
 import com.simprints.infra.events.event.domain.models.MatchEntry
@@ -43,7 +44,7 @@ class SaveMatchEventUseCase @Inject constructor(
                     matchParams.queryForCandidates,
                     matchEntries.firstOrNull(),
                     matchParams.bioSdk
-                        .let { it as? FingerprintConfiguration.BioSdk }
+                        .takeIf { it.modality() == Modality.FINGERPRINT }
                         ?.let { getFingerprintComparisonStrategy(it) },
                     matchParams.probeReference.referenceId,
                 )
@@ -63,7 +64,7 @@ class SaveMatchEventUseCase @Inject constructor(
         }
     }
 
-    private suspend fun getFingerprintComparisonStrategy(bioSdk: FingerprintConfiguration.BioSdk) = configRepository
+    private suspend fun getFingerprintComparisonStrategy(bioSdk: ModalitySdkType) = configRepository
         .getProjectConfiguration()
         .fingerprint
         ?.getSdkConfiguration(bioSdk)

@@ -1,12 +1,11 @@
 package com.simprints.infra.config.store.models
 
 import com.simprints.core.domain.common.AgeGroup
-import com.simprints.core.domain.common.ModalitySdkType
 import com.simprints.core.domain.common.TemplateIdentifier
 
 data class FingerprintConfiguration(
     val allowedScanners: List<VeroGeneration>,
-    val allowedSDKs: List<BioSdk>,
+    val allowedSDKs: List<ModalitySdkType>,
     val displayHandIcons: Boolean,
     val secugenSimMatcher: FingerprintSdkConfiguration?,
     val nec: FingerprintSdkConfiguration?,
@@ -31,19 +30,14 @@ data class FingerprintConfiguration(
         VERO_2,
     }
 
-    enum class BioSdk : ModalitySdkType {
-        SECUGEN_SIM_MATCHER,
-        NEC,
-    }
-
     enum class FingerComparisonStrategy {
         SAME_FINGER,
         CROSS_FINGER_USING_MEAN_OF_MAX,
     }
 
     fun getSdkConfiguration(sdk: ModalitySdkType): FingerprintSdkConfiguration? = when (sdk) {
-        BioSdk.SECUGEN_SIM_MATCHER -> secugenSimMatcher
-        BioSdk.NEC -> nec
+        ModalitySdkType.SECUGEN_SIM_MATCHER -> secugenSimMatcher
+        ModalitySdkType.NEC -> nec
         else -> null
     }
 }

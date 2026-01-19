@@ -1,13 +1,12 @@
 package com.simprints.feature.externalcredential.screens.search.usecase
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.capture.BiometricReferenceCapture
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.getSdkListForAgeGroup
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
@@ -50,8 +49,8 @@ internal class CreateMatchParamsUseCaseTest {
     @Test
     fun `creates correct MatchParams for face modality`() {
         every { projectConfiguration.getSdkListForAgeGroup(Modality.FACE, ageGroup) } returns listOf(
-            FaceConfiguration.BioSdk.RANK_ONE,
-            FaceConfiguration.BioSdk.SIM_FACE,
+            ModalitySdkType.RANK_ONE,
+            ModalitySdkType.SIM_FACE,
         )
         every { generalConfiguration.matchingModalities } returns listOf(Modality.FACE)
 
@@ -71,15 +70,15 @@ internal class CreateMatchParamsUseCaseTest {
             assertThat(matchParams.probeReference).isEqualTo(faceCapture)
             assertThat(matchParams.bioSdk).isNotNull()
         }
-        assertThat(result[0].bioSdk).isEqualTo(FaceConfiguration.BioSdk.RANK_ONE)
-        assertThat(result[1].bioSdk).isEqualTo(FaceConfiguration.BioSdk.SIM_FACE)
+        assertThat(result[0].bioSdk).isEqualTo(ModalitySdkType.RANK_ONE)
+        assertThat(result[1].bioSdk).isEqualTo(ModalitySdkType.SIM_FACE)
     }
 
     @Test
     fun `creates correct  MatchParams for fingerprint modality`() {
         every { projectConfiguration.getSdkListForAgeGroup(Modality.FINGERPRINT, ageGroup) } returns listOf(
-            FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
-            FingerprintConfiguration.BioSdk.NEC,
+            ModalitySdkType.SECUGEN_SIM_MATCHER,
+            ModalitySdkType.NEC,
         )
         every { generalConfiguration.matchingModalities } returns listOf(Modality.FINGERPRINT)
 
@@ -99,8 +98,8 @@ internal class CreateMatchParamsUseCaseTest {
             assertThat(matchParams.probeReference).isEqualTo(fingerprintCapture)
             assertThat(matchParams.bioSdk).isNotNull()
         }
-        assertThat(result[0].bioSdk).isEqualTo(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
-        assertThat(result[1].bioSdk).isEqualTo(FingerprintConfiguration.BioSdk.NEC)
+        assertThat(result[0].bioSdk).isEqualTo(ModalitySdkType.SECUGEN_SIM_MATCHER)
+        assertThat(result[1].bioSdk).isEqualTo(ModalitySdkType.NEC)
     }
 
     @Test
@@ -110,10 +109,10 @@ internal class CreateMatchParamsUseCaseTest {
             Modality.FINGERPRINT,
         )
         every { projectConfiguration.getSdkListForAgeGroup(Modality.FACE, ageGroup) } returns listOf(
-            FaceConfiguration.BioSdk.RANK_ONE,
+            ModalitySdkType.RANK_ONE,
         )
         every { projectConfiguration.getSdkListForAgeGroup(Modality.FINGERPRINT, ageGroup) } returns listOf(
-            FingerprintConfiguration.BioSdk.NEC,
+            ModalitySdkType.NEC,
         )
 
         val result = useCase(
@@ -126,21 +125,21 @@ internal class CreateMatchParamsUseCaseTest {
 
         assertThat(result).hasSize(2)
 
-        val faceMatch = result.find { it.bioSdk is FaceConfiguration.BioSdk }
+        val faceMatch = result.find { it.bioSdk.modality() == Modality.FACE }
         assertThat(faceMatch).isNotNull()
-        assertThat(faceMatch?.bioSdk).isEqualTo(FaceConfiguration.BioSdk.RANK_ONE)
+        assertThat(faceMatch?.bioSdk).isEqualTo(ModalitySdkType.RANK_ONE)
         assertThat(faceMatch?.probeReference).isEqualTo(faceCapture)
 
-        val fingerprintMatch = result.find { it.bioSdk is FingerprintConfiguration.BioSdk }
+        val fingerprintMatch = result.find { it.bioSdk.modality() == Modality.FINGERPRINT }
         assertThat(fingerprintMatch).isNotNull()
-        assertThat(fingerprintMatch?.bioSdk).isEqualTo(FingerprintConfiguration.BioSdk.NEC)
+        assertThat(fingerprintMatch?.bioSdk).isEqualTo(ModalitySdkType.NEC)
         assertThat(fingerprintMatch?.probeReference).isEqualTo(fingerprintCapture)
     }
 
     @Test
     fun `handles null ageGroup`() {
         every { projectConfiguration.getSdkListForAgeGroup(Modality.FACE, null) } returns listOf(
-            FaceConfiguration.BioSdk.RANK_ONE,
+            ModalitySdkType.RANK_ONE,
         )
         every { generalConfiguration.matchingModalities } returns listOf(Modality.FACE)
 
@@ -173,8 +172,8 @@ internal class CreateMatchParamsUseCaseTest {
     @Test
     fun `creates multiple MatchParams for multiple face SDKs`() {
         every { projectConfiguration.getSdkListForAgeGroup(Modality.FACE, ageGroup) } returns listOf(
-            FaceConfiguration.BioSdk.RANK_ONE,
-            FaceConfiguration.BioSdk.SIM_FACE,
+            ModalitySdkType.RANK_ONE,
+            ModalitySdkType.SIM_FACE,
         )
         every { generalConfiguration.matchingModalities } returns listOf(Modality.FACE)
 

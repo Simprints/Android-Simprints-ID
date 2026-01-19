@@ -46,8 +46,7 @@ import com.simprints.feature.setup.SetupResult
 import com.simprints.feature.validatepool.ValidateSubjectPoolFragmentParams
 import com.simprints.feature.validatepool.ValidateSubjectPoolResult
 import com.simprints.fingerprint.capture.FingerprintCaptureParams
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
@@ -141,11 +140,11 @@ class OrchestratorCacheIntegrationTest {
                         ),
                         EnrolLastBiometricStepResult.MatchResult(
                             listOf(ComparisonResult("subjectId", 0.5f)),
-                            FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
+                            ModalitySdkType.SECUGEN_SIM_MATCHER,
                         ),
                         EnrolLastBiometricStepResult.MatchResult(
                             listOf(ComparisonResult("subjectId", 0.5f)),
-                            FaceConfiguration.BioSdk.RANK_ONE,
+                            ModalitySdkType.RANK_ONE,
                         ),
                         EnrolLastBiometricStepResult.EnrolLastBiometricsResult("subjectId"),
                     ),
@@ -231,7 +230,7 @@ class OrchestratorCacheIntegrationTest {
                             credential = "credential".asTokenizableEncrypted(),
                             comparisonResult = ComparisonResult("subjectId", 0.5f),
                             verificationThreshold = 55f,
-                            bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
+                            bioSdk = ModalitySdkType.RANK_ONE,
                         ),
                     ),
                 ),
@@ -257,7 +256,7 @@ class OrchestratorCacheIntegrationTest {
                 params = FingerprintCaptureParams(
                     flowType = FlowType.ENROL,
                     fingerprintsToCapture = listOf(TemplateIdentifier.LEFT_4TH_FINGER),
-                    fingerprintSDK = FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
+                    fingerprintSDK = ModalitySdkType.SECUGEN_SIM_MATCHER,
                 ),
                 status = StepStatus.COMPLETED,
                 result = BiometricReferenceCapture(
@@ -281,7 +280,7 @@ class OrchestratorCacheIntegrationTest {
                     flowType = FlowType.IDENTIFY,
                     queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.CommCare("name"),
-                    bioSdk = FingerprintConfiguration.BioSdk.NEC,
+                    bioSdk = ModalitySdkType.NEC,
                     probeReference = BiometricReferenceCapture(
                         referenceId = GUID1,
                         modality = Modality.FINGERPRINT,
@@ -298,7 +297,7 @@ class OrchestratorCacheIntegrationTest {
                 status = StepStatus.COMPLETED,
                 result = MatchResult(
                     listOf(ComparisonResult("subjectId", 0.5f)),
-                    FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
+                    ModalitySdkType.SECUGEN_SIM_MATCHER,
                 ),
             ),
         )
@@ -319,7 +318,7 @@ class OrchestratorCacheIntegrationTest {
                 id = StepId.FACE_CAPTURE,
                 navigationActionId = 5,
                 destinationId = 6,
-                params = FaceCaptureParams(3, FaceConfiguration.BioSdk.RANK_ONE),
+                params = FaceCaptureParams(3, ModalitySdkType.RANK_ONE),
                 status = StepStatus.COMPLETED,
                 result = BiometricReferenceCapture(
                     "",
@@ -341,7 +340,7 @@ class OrchestratorCacheIntegrationTest {
                     flowType = FlowType.IDENTIFY,
                     queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
-                    bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
+                    bioSdk = ModalitySdkType.RANK_ONE,
                     probeReference = BiometricReferenceCapture(
                         referenceId = GUID1,
                         modality = Modality.FACE,
@@ -357,7 +356,7 @@ class OrchestratorCacheIntegrationTest {
                 status = StepStatus.COMPLETED,
                 result = MatchResult(
                     listOf(ComparisonResult("subjectId", 0.5f)),
-                    FaceConfiguration.BioSdk.RANK_ONE,
+                    ModalitySdkType.RANK_ONE,
                 ),
             ),
         )

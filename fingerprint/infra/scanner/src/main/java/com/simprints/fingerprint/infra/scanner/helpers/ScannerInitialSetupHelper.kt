@@ -10,7 +10,7 @@ import com.simprints.fingerprint.infra.scanner.exceptions.safe.OtaAvailableExcep
 import com.simprints.fingerprint.infra.scanner.tools.BatteryLevelChecker
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.Vero2Configuration
 import kotlinx.coroutines.delay
 import javax.inject.Inject
@@ -39,7 +39,7 @@ internal class ScannerInitialSetupHelper @Inject constructor(
      * @throws OtaAvailableException If an OTA update is available and the battery is sufficiently charged.
      */
     suspend fun setupScannerWithOtaCheck(
-        fingerprintSdk: FingerprintConfiguration.BioSdk,
+        fingerprintSdk: ModalitySdkType,
         scanner: Scanner,
         macAddress: String,
         withScannerVersion: (ScannerVersion) -> Unit,
@@ -84,7 +84,7 @@ internal class ScannerInitialSetupHelper @Inject constructor(
     }
 
     private suspend fun ifAvailableOtasPrepareScannerThenThrow(
-        fingerprintSdk: FingerprintConfiguration.BioSdk,
+        fingerprintSdk: ModalitySdkType,
         hardwareVersion: String,
         scanner: Scanner,
         macAddress: String,
