@@ -6,9 +6,11 @@ import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.step.StepResult
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 @Keep
 @Parcelize
+@Serializable
 data class BiometricReferenceCapture(
     val referenceId: String,
     val modality: Modality,

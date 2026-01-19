@@ -17,7 +17,6 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
-import java.io.Serializable
 
 /**
  * Add lifecycle aware fragment result listener for a provided destination ID for the navigation host controller.
@@ -28,7 +27,7 @@ import java.io.Serializable
  * Handler will be invoked when the result is set in the calling fragment.
  */
 @ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
-fun <T : Serializable> FragmentContainerView.handleResult(
+fun <T> FragmentContainerView.handleResult(
     lifecycleOwner: LifecycleOwner,
     @IdRes targetDestinationId: Int,
     handler: (T) -> Unit,
@@ -46,7 +45,7 @@ fun <T : Serializable> FragmentContainerView.handleResult(
  * This function should be used only in fragment tests to verify correct results are being returned.
  */
 @ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
-fun <T : Serializable> Fragment.handleResultDirectly(
+fun <T> Fragment.handleResultDirectly(
     @IdRes targetDestinationId: Int,
     handler: (T) -> Unit,
 ) {
@@ -66,7 +65,7 @@ fun <T : Serializable> Fragment.handleResultDirectly(
  */
 @Suppress("UsePropertyAccessSyntax") // compiler is confused by `lifecycle` getter
 @ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
-fun <T : Serializable> NavController.handleResult(
+fun <T> NavController.handleResult(
     lifecycleOwner: LifecycleOwner,
     @IdRes currentDestinationId: Int,
     @IdRes targetDestinationId: Int,
@@ -100,7 +99,7 @@ fun <T : Serializable> NavController.handleResult(
     )
 }
 
-private fun <T : Serializable> handleResultFromChild(
+private fun <T> handleResultFromChild(
     expectedResultKey: String,
     currentEntry: NavBackStackEntry,
     handler: (T) -> Unit,
@@ -206,7 +205,7 @@ private fun NavController.canNavigate(currentFragment: Fragment?): Boolean {
  * within and outside of the navigation graph.
  */
 @ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
-fun <T : Serializable> NavController.setResult(
+fun <T> NavController.setResult(
     fragment: Fragment,
     result: T,
 ) {
@@ -227,7 +226,7 @@ fun <T : Serializable> NavController.setResult(
  * @return true if the stack was popped at least once
  */
 @ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
-fun <T : Serializable> NavController.finishWithResult(
+fun <T> NavController.finishWithResult(
     fragment: Fragment,
     result: T,
 ): Boolean {

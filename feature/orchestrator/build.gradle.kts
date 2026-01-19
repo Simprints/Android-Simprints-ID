@@ -39,6 +39,5 @@ dependencies {
     implementation(project(":infra:images"))
     implementation(project(":infra:matching"))
 
-    implementation(libs.jackson.core)
     implementation(libs.androidX.ui.preference)
 }

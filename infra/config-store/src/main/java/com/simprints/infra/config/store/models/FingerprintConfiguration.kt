@@ -2,6 +2,7 @@ package com.simprints.infra.config.store.models
 
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.TemplateIdentifier
+import com.simprints.infra.config.store.models.ModalitySdkType
 
 data class FingerprintConfiguration(
     val allowedScanners: List<VeroGeneration>,

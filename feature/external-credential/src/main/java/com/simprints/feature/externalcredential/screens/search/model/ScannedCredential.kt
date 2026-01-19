@@ -8,9 +8,12 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.feature.externalcredential.model.BoundingBox
-import java.io.Serializable
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
+@SerialName("ScannedCredential")
 data class ScannedCredential(
     val credentialScanId: String = randomUUID(),
     val credential: TokenizableString.Tokenized,

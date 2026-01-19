@@ -1,5 +1,6 @@
 package com.simprints.feature.orchestrator
 
+import com.simprints.feature.orchestrator.tools.OrcJsonHelper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,4 +19,8 @@ internal object OrchestratorModule {
     @Singleton
     @ExecutorLockTimeoutSec
     fun provideExecutorLockTimeout(): Int = 60
+
+    @Provides
+    @Singleton
+    fun provideOrcJsonHelper(): OrcJsonHelper = OrcJsonHelper
 }

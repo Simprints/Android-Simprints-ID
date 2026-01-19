@@ -7,8 +7,10 @@ import com.simprints.core.domain.step.StepParams
 import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 data class MatchParams(
     val bioSdk: ModalitySdkType,
     val probeReference: BiometricReferenceCapture,

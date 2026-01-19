@@ -6,8 +6,12 @@ import androidx.annotation.StringRes
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.step.StepParams
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
+@SerialName("AlertConfiguration")
 data class AlertConfiguration(
     val color: AlertColor,
     val title: String?,

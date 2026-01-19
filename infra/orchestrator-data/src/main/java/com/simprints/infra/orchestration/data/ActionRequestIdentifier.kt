@@ -2,8 +2,10 @@ package com.simprints.infra.orchestration.data
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 @Parcelize
+@Serializable
 data class ActionRequestIdentifier(
     val actionName: String,
     val packageName: String,

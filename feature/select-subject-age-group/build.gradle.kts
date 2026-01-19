@@ -1,6 +1,7 @@
 plugins {
     id("simprints.feature")
     id("kotlin-parcelize")
+    id("simprints.library.kotlinSerialization")
 }
 
 android {
@@ -13,5 +14,4 @@ dependencies {
     implementation(project(":infra:logging"))
     implementation(project(":infra:config-store"))
     implementation(project(":feature:exit-form"))
-
 }

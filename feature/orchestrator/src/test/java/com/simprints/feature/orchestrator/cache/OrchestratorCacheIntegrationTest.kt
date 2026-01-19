@@ -15,7 +15,6 @@ import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.FaceCaptureParams
 import com.simprints.feature.alert.AlertResult
@@ -39,6 +38,7 @@ import com.simprints.feature.login.LoginResult
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.steps.StepStatus
+import com.simprints.feature.orchestrator.tools.OrcJsonHelper
 import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.selectsubject.SelectSubjectParams
 import com.simprints.feature.selectsubject.SelectSubjectResult
@@ -67,7 +67,7 @@ class OrchestratorCacheIntegrationTest {
     @MockK
     private lateinit var prefs: SharedPreferences
 
-    private var jsonHelper = JsonHelper
+    private var jsonHelper = OrcJsonHelper
 
     private lateinit var cache: OrchestratorCache
 
@@ -116,7 +116,7 @@ class OrchestratorCacheIntegrationTest {
                 id = StepId.CONSENT,
                 navigationActionId = 5,
                 destinationId = 6,
-                params = ConsentParams(type = ConsentType.ENROL),
+                params = ConsentParams(consentType = ConsentType.ENROL),
                 status = StepStatus.COMPLETED,
                 result = ConsentResult(true),
             ),
@@ -444,7 +444,7 @@ class OrchestratorCacheIntegrationTest {
                     flowType = FlowType.IDENTIFY,
                     queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints, // Test Simprints variant
-                    bioSdk = FingerprintConfiguration.BioSdk.NEC,
+                    bioSdk = ModalitySdkType.NEC,
                     probeReference = BiometricReferenceCapture(
                         referenceId = "complex_id",
                         modality = Modality.FINGERPRINT,
@@ -463,7 +463,7 @@ class OrchestratorCacheIntegrationTest {
                     ),
                 ),
                 status = StepStatus.COMPLETED,
-                result = MatchResult(emptyList(), FingerprintConfiguration.BioSdk.NEC),
+                result = MatchResult(emptyList(), ModalitySdkType.NEC),
             ),
         )
 
