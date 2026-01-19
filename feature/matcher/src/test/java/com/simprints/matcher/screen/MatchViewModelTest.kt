@@ -13,8 +13,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DecisionPolicy
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.matching.MatchBatchInfo
 import com.simprints.infra.matching.MatchParams
@@ -111,7 +110,7 @@ internal class MatchViewModelTest {
                     format = "ROCv1",
                     templates = listOf(getFaceCapture()),
                 ),
-                bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
+                bioSdk = ModalitySdkType.RANK_ONE,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -187,7 +186,7 @@ internal class MatchViewModelTest {
                     format = "ROCv1",
                     templates = listOf(getFaceCapture()),
                 ),
-                bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
+                bioSdk = ModalitySdkType.RANK_ONE,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -205,7 +204,7 @@ internal class MatchViewModelTest {
             ),
         )
         assertThat(viewModel.matchResponse.getOrAwaitValue().peekContent()).isEqualTo(
-            MatchResult(responseItems, FaceConfiguration.BioSdk.RANK_ONE),
+            MatchResult(responseItems, ModalitySdkType.RANK_ONE),
         )
 
         verify {
@@ -282,7 +281,7 @@ internal class MatchViewModelTest {
                     format = "Secugen",
                     templates = listOf(getFingerprintTemplate()),
                 ),
-                bioSdk = SECUGEN_SIM_MATCHER,
+                bioSdk = ModalitySdkType.SECUGEN_SIM_MATCHER,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -300,7 +299,7 @@ internal class MatchViewModelTest {
             ),
         )
         assertThat(viewModel.matchResponse.getOrAwaitValue().peekContent()).isEqualTo(
-            MatchResult(responseItems, SECUGEN_SIM_MATCHER),
+            MatchResult(responseItems, ModalitySdkType.SECUGEN_SIM_MATCHER),
         )
 
         verify {
@@ -351,7 +350,7 @@ internal class MatchViewModelTest {
                     format = "ROC",
                     templates = listOf(getFaceCapture()),
                 ),
-                bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
+                bioSdk = ModalitySdkType.RANK_ONE,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -394,7 +393,7 @@ internal class MatchViewModelTest {
                 format = "ROC",
                 templates = listOf(getFaceCapture()),
             ),
-            bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
+            bioSdk = ModalitySdkType.RANK_ONE,
             flowType = FlowType.ENROL,
             queryForCandidates = mockk {},
             biometricDataSource = BiometricDataSource.Simprints,

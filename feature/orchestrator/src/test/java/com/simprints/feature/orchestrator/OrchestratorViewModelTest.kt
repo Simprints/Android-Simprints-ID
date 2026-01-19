@@ -36,9 +36,7 @@ import com.simprints.feature.setup.LocationStore
 import com.simprints.feature.setup.SetupResult
 import com.simprints.fingerprint.capture.FingerprintCaptureContract
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.NEC
-import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
@@ -197,7 +195,7 @@ internal class OrchestratorViewModelTest {
                     FlowType.VERIFY,
                     EnrolmentRecordQuery(),
                     BiometricDataSource.Simprints,
-                    FaceConfiguration.BioSdk.RANK_ONE,
+                    ModalitySdkType.RANK_ONE,
                 ),
             ),
         )
@@ -222,7 +220,7 @@ internal class OrchestratorViewModelTest {
                     FlowType.VERIFY,
                     EnrolmentRecordQuery(),
                     BiometricDataSource.Simprints,
-                    FaceConfiguration.BioSdk.RANK_ONE,
+                    ModalitySdkType.RANK_ONE,
                 ),
             ),
         )
@@ -246,7 +244,7 @@ internal class OrchestratorViewModelTest {
                     FlowType.VERIFY,
                     EnrolmentRecordQuery(),
                     BiometricDataSource.Simprints,
-                    FaceConfiguration.BioSdk.RANK_ONE,
+                    ModalitySdkType.RANK_ONE,
                 ),
             ),
         )
@@ -268,7 +266,7 @@ internal class OrchestratorViewModelTest {
                 FingerprintCaptureContract.getParams(
                     flowType = FlowType.VERIFY,
                     fingers = emptyList(),
-                    fingerprintSDK = SECUGEN_SIM_MATCHER,
+                    fingerprintSDK = ModalitySdkType.SECUGEN_SIM_MATCHER,
                 ),
             ),
             createMockStep(
@@ -277,7 +275,7 @@ internal class OrchestratorViewModelTest {
                     flowType = FlowType.VERIFY,
                     enrolmentRecordQuery = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
-                    bioSdk = SECUGEN_SIM_MATCHER,
+                    bioSdk = ModalitySdkType.SECUGEN_SIM_MATCHER,
                 ),
             ),
             createMockStep(
@@ -285,7 +283,7 @@ internal class OrchestratorViewModelTest {
                 FingerprintCaptureContract.getParams(
                     flowType = FlowType.VERIFY,
                     fingers = emptyList(),
-                    fingerprintSDK = NEC,
+                    fingerprintSDK = ModalitySdkType.NEC,
                 ),
             ),
             createMockStep(
@@ -294,7 +292,7 @@ internal class OrchestratorViewModelTest {
                     flowType = FlowType.VERIFY,
                     enrolmentRecordQuery = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
-                    bioSdk = NEC,
+                    bioSdk = ModalitySdkType.NEC,
                 ),
             ),
         )
@@ -318,7 +316,7 @@ internal class OrchestratorViewModelTest {
             assertThat(step.id).isEqualTo(StepId.FINGERPRINT_MATCHER)
             val params = step.params?.let { it as? MatchParams }
             assertThat(params).isNotNull()
-            assertThat(params?.bioSdk).isEqualTo(SECUGEN_SIM_MATCHER)
+            assertThat(params?.bioSdk).isEqualTo(ModalitySdkType.SECUGEN_SIM_MATCHER)
             assertThat(params?.probeReference?.templates?.size).isEqualTo(2)
             assertThat(params?.probeReference?.format).isEqualTo(format)
         }
@@ -432,7 +430,6 @@ internal class OrchestratorViewModelTest {
         val template1 = ByteArray(10)
         val template2 = ByteArray(20)
         val format1 = "format1"
-        val format2 = "format2"
 
         val fingerprintCapture1 = BiometricTemplateCapture(
             captureEventId = GUID1,

@@ -3,11 +3,11 @@ package com.simprints.feature.enrollast
 import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.capture.BiometricReferenceCapture
-import com.simprints.core.domain.common.ModalitySdkType
 import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.infra.config.store.models.ModalitySdkType
 
 @Keep
 @ExcludedFromGeneratedTestCoverageReports("Data class")

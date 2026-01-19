@@ -2,13 +2,13 @@ package com.simprints.infra.matching.usecase
 
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.capture.BiometricReferenceCapture
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.biosdkresolver.FaceBioSDK
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
-import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
@@ -39,7 +39,7 @@ class FaceMatcherUseCase @Inject constructor(
         project: Project,
     ): Flow<MatcherState> = channelFlow {
         Simber.i("Initialising matcher", tag = crashReportTag)
-        if (matchParams.bioSdk !is FaceConfiguration.BioSdk) {
+        if (matchParams.bioSdk.modality() == Modality.FINGERPRINT) {
             Simber.w(
                 message = "Face SDK was not provided",
                 t = IllegalArgumentException("Face SDK was not provided"),

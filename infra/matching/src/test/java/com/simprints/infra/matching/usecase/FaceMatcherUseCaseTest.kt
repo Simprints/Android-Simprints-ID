@@ -13,8 +13,7 @@ import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
@@ -80,7 +79,7 @@ internal class FaceMatcherUseCaseTest {
                 MatchParams(
                     flowType = FlowType.VERIFY,
                     queryForCandidates = EnrolmentRecordQuery(),
-                    bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
+                    bioSdk = ModalitySdkType.RANK_ONE,
                     biometricDataSource = BiometricDataSource.Simprints,
                     probeReference = BiometricReferenceCapture(
                         referenceId = "referenceId",
@@ -122,7 +121,7 @@ internal class FaceMatcherUseCaseTest {
                             ),
                         ),
                     ),
-                    bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
+                    bioSdk = ModalitySdkType.RANK_ONE,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
@@ -161,7 +160,7 @@ internal class FaceMatcherUseCaseTest {
                             ),
                         ),
                     ),
-                    bioSdk = FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER, // Wrong SDK type
+                    bioSdk = ModalitySdkType.SECUGEN_SIM_MATCHER, // Wrong SDK type
                     flowType = FlowType.VERIFY,
                     queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
@@ -240,7 +239,7 @@ internal class FaceMatcherUseCaseTest {
                             ),
                         ),
                     ),
-                    bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
+                    bioSdk = ModalitySdkType.RANK_ONE,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,

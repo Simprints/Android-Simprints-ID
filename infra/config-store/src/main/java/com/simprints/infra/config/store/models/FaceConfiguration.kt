@@ -1,10 +1,9 @@
 package com.simprints.infra.config.store.models
 
 import com.simprints.core.domain.common.AgeGroup
-import com.simprints.core.domain.common.ModalitySdkType
 
 data class FaceConfiguration(
-    val allowedSDKs: List<BioSdk>,
+    val allowedSDKs: List<ModalitySdkType>,
     val rankOne: FaceSdkConfiguration?,
     val simFace: FaceSdkConfiguration?,
 ) {
@@ -19,14 +18,9 @@ data class FaceConfiguration(
     ) : ModalitySdkConfiguration
 
     fun getSdkConfiguration(sdk: ModalitySdkType): FaceSdkConfiguration? = when (sdk) {
-        BioSdk.RANK_ONE -> rankOne
-        BioSdk.SIM_FACE -> simFace
+        ModalitySdkType.RANK_ONE -> rankOne
+        ModalitySdkType.SIM_FACE -> simFace
         else -> null
-    }
-
-    enum class BioSdk : ModalitySdkType {
-        RANK_ONE,
-        SIM_FACE,
     }
 
     enum class ImageSavingStrategy {

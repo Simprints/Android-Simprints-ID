@@ -10,9 +10,8 @@ import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
@@ -53,7 +52,7 @@ class SaveMatchEventUseCaseTest {
             configRepository
                 .getProjectConfiguration()
                 .fingerprint
-                ?.getSdkConfiguration(SECUGEN_SIM_MATCHER)
+                ?.getSdkConfiguration(ModalitySdkType.SECUGEN_SIM_MATCHER)
                 ?.comparisonStrategyForVerification
         } returns FingerComparisonStrategy.SAME_FINGER
 
@@ -71,7 +70,7 @@ class SaveMatchEventUseCaseTest {
             Timestamp(2L),
             MatchParams(
                 flowType = FlowType.VERIFY,
-                bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
+                bioSdk = ModalitySdkType.RANK_ONE,
                 queryForCandidates = EnrolmentRecordQuery(subjectId = "subjectId"),
                 probeReference = BiometricReferenceCapture(
                     referenceId = "referenceId",
@@ -132,7 +131,7 @@ class SaveMatchEventUseCaseTest {
                         ),
                     ),
                 ),
-                bioSdk = SECUGEN_SIM_MATCHER,
+                bioSdk = ModalitySdkType.SECUGEN_SIM_MATCHER,
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
             2,
@@ -177,7 +176,7 @@ class SaveMatchEventUseCaseTest {
                     format = "format",
                     templates = emptyList(),
                 ),
-                bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
+                bioSdk = ModalitySdkType.RANK_ONE,
                 flowType = FlowType.IDENTIFY,
                 queryForCandidates = EnrolmentRecordQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -243,7 +242,7 @@ class SaveMatchEventUseCaseTest {
                     templates = emptyList(),
                 ),
                 flowType = FlowType.IDENTIFY,
-                bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
+                bioSdk = ModalitySdkType.RANK_ONE,
                 queryForCandidates = EnrolmentRecordQuery(attendantId = "userId".asTokenizableEncrypted()),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
@@ -286,7 +285,7 @@ class SaveMatchEventUseCaseTest {
                     templates = emptyList(),
                 ),
                 flowType = FlowType.IDENTIFY,
-                bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
+                bioSdk = ModalitySdkType.RANK_ONE,
                 queryForCandidates = EnrolmentRecordQuery(moduleId = "moduleId".asTokenizableEncrypted()),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
@@ -328,7 +327,7 @@ class SaveMatchEventUseCaseTest {
                     format = "format",
                     templates = emptyList(),
                 ),
-                bioSdk = FaceConfiguration.BioSdk.RANK_ONE,
+                bioSdk = ModalitySdkType.RANK_ONE,
                 flowType = FlowType.IDENTIFY,
                 queryForCandidates = EnrolmentRecordQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,

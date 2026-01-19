@@ -3,7 +3,7 @@ package com.simprints.infra.config.store.models
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.common.ModalitySdkType
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
@@ -707,7 +707,7 @@ class ProjectConfigurationTest {
     fun `determineFaceSDKs returns all allowed SDKs when not age restricted`() {
         val config = createAgeUnrestrictedFaceConfig()
         val result = config.getSdkListForAgeGroup(Modality.FACE, AgeGroup(25, 30))
-        assertThat(result).containsExactly(FaceConfiguration.BioSdk.RANK_ONE, FaceConfiguration.BioSdk.SIM_FACE)
+        assertThat(result).containsExactly(ModalitySdkType.RANK_ONE, ModalitySdkType.SIM_FACE)
     }
 
     @Test
@@ -733,7 +733,7 @@ class ProjectConfigurationTest {
             simFaceRange = AgeGroup(20, 30),
         )
         val result = config.getSdkListForAgeGroup(Modality.FACE, AgeGroup(10, 20))
-        assertThat(result).containsExactly(FaceConfiguration.BioSdk.RANK_ONE)
+        assertThat(result).containsExactly(ModalitySdkType.RANK_ONE)
     }
 
     @Test
@@ -746,7 +746,7 @@ class ProjectConfigurationTest {
             simFaceRange = AgeGroup(20, 30),
         )
         val result = config.getSdkListForAgeGroup(Modality.FACE, AgeGroup(20, 30))
-        assertThat(result).containsExactly(FaceConfiguration.BioSdk.SIM_FACE)
+        assertThat(result).containsExactly(ModalitySdkType.SIM_FACE)
     }
 
     @Test
@@ -759,7 +759,7 @@ class ProjectConfigurationTest {
             simFaceRange = AgeGroup(15, 25),
         )
         val result = config.getSdkListForAgeGroup(Modality.FACE, AgeGroup(15, 25))
-        assertThat(result).containsExactly(FaceConfiguration.BioSdk.RANK_ONE, FaceConfiguration.BioSdk.SIM_FACE)
+        assertThat(result).containsExactly(ModalitySdkType.RANK_ONE, ModalitySdkType.SIM_FACE)
     }
 
     @Test
@@ -779,7 +779,7 @@ class ProjectConfigurationTest {
     fun `determineFingerprintSDKs returns all allowed SDKs when not age restricted`() {
         val config = createAgeUnrestrictedFingerprintConfig()
         val result = config.getSdkListForAgeGroup(Modality.FINGERPRINT, AgeGroup(25, 30))
-        assertThat(result).containsExactly(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER, FingerprintConfiguration.BioSdk.NEC)
+        assertThat(result).containsExactly(ModalitySdkType.SECUGEN_SIM_MATCHER, ModalitySdkType.NEC)
     }
 
     @Test
@@ -805,7 +805,7 @@ class ProjectConfigurationTest {
             necRange = AgeGroup(20, 30),
         )
         val result = config.getSdkListForAgeGroup(Modality.FINGERPRINT, AgeGroup(10, 20))
-        assertThat(result).containsExactly(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
+        assertThat(result).containsExactly(ModalitySdkType.SECUGEN_SIM_MATCHER)
     }
 
     @Test
@@ -823,7 +823,7 @@ class ProjectConfigurationTest {
 
     private fun createAgeUnrestrictedFaceConfig() = projectConfiguration.copy(
         face = faceConfiguration.copy(
-            allowedSDKs = listOf(FaceConfiguration.BioSdk.RANK_ONE, FaceConfiguration.BioSdk.SIM_FACE),
+            allowedSDKs = listOf(ModalitySdkType.RANK_ONE, ModalitySdkType.SIM_FACE),
             rankOne = faceSdkConfiguration.copy(allowedAgeRange = AgeGroup(0, null)),
             simFace = faceSdkConfiguration.copy(allowedAgeRange = AgeGroup(0, null)),
         ),
@@ -841,7 +841,7 @@ class ProjectConfigurationTest {
 
     private fun createAgeUnrestrictedFingerprintConfig() = projectConfiguration.copy(
         fingerprint = fingerprintConfiguration.copy(
-            allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER, FingerprintConfiguration.BioSdk.NEC),
+            allowedSDKs = listOf(ModalitySdkType.SECUGEN_SIM_MATCHER, ModalitySdkType.NEC),
             secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(
                 allowedAgeRange = AgeGroup(
                     0,
@@ -877,10 +877,10 @@ class ProjectConfigurationTest {
         )
 
         mapOf<ModalitySdkType, Float>(
-            FaceConfiguration.BioSdk.SIM_FACE to 5f,
-            FaceConfiguration.BioSdk.RANK_ONE to 1f,
-            FingerprintConfiguration.BioSdk.NEC to 30f,
-            FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER to 20f,
+            ModalitySdkType.SIM_FACE to 5f,
+            ModalitySdkType.RANK_ONE to 1f,
+            ModalitySdkType.NEC to 30f,
+            ModalitySdkType.SECUGEN_SIM_MATCHER to 20f,
         ).forEach { (type, expected) ->
             assertThat(config.getModalitySdkConfig(type)?.verificationMatchThreshold).isEqualTo(expected)
         }

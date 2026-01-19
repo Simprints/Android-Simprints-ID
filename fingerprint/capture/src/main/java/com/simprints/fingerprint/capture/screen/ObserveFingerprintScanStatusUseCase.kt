@@ -6,7 +6,7 @@ import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintScanState
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintScanningStatusTracker
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.BASIC
 import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.VISUAL_SCAN_FEEDBACK
@@ -32,7 +32,7 @@ class ObserveFingerprintScanStatusUseCase @Inject constructor(
 
     operator fun invoke(
         coroutineScope: CoroutineScope,
-        fingerprintSdk: FingerprintConfiguration.BioSdk,
+        fingerprintSdk: ModalitySdkType,
     ) {
         stopObserving()
         observeJob = coroutineScope.launch {

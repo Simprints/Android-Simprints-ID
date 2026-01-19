@@ -2,8 +2,8 @@ package com.simprints.infra.sync.config.testtools
 
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.common.TemplateIdentifier
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.models.ConsentConfiguration
 import com.simprints.infra.config.store.models.DecisionPolicy
@@ -14,6 +14,7 @@ import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.IdentificationConfiguration
 import com.simprints.infra.config.store.models.MaxCaptureAttempts
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.MultiFactorIdConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
@@ -46,7 +47,7 @@ internal val vero2Configuration = Vero2Configuration(
 )
 internal val faceConfiguration =
     FaceConfiguration(
-        allowedSDKs = listOf(FaceConfiguration.BioSdk.RANK_ONE),
+        allowedSDKs = listOf(ModalitySdkType.RANK_ONE),
         rankOne = FaceConfiguration.FaceSdkConfiguration(
             nbOfImagesToCapture = 2,
             qualityThreshold = -1f,
@@ -65,7 +66,7 @@ internal val faceConfiguration =
 
 internal val fingerprintConfiguration = FingerprintConfiguration(
     allowedScanners = listOf(FingerprintConfiguration.VeroGeneration.VERO_2),
-    allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
+    allowedSDKs = listOf(ModalitySdkType.SECUGEN_SIM_MATCHER),
     displayHandIcons = true,
     secugenSimMatcher = FingerprintConfiguration.FingerprintSdkConfiguration(
         listOf(TemplateIdentifier.LEFT_3RD_FINGER),

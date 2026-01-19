@@ -5,6 +5,7 @@ import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.MaxCaptureAttempts
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.Vero1Configuration
 import com.simprints.infra.config.store.testtools.apiDecisionPolicy
 import com.simprints.infra.config.store.testtools.apiFingerprintConfiguration
@@ -53,7 +54,7 @@ class ApiFingerprintConfigurationTest {
         )
         val fingerprintConfiguration = FingerprintConfiguration(
             listOf(FingerprintConfiguration.VeroGeneration.VERO_2),
-            listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
+            listOf(ModalitySdkType.SECUGEN_SIM_MATCHER),
             true,
             FingerprintConfiguration.FingerprintSdkConfiguration(
                 fingersToCapture = listOf(TemplateIdentifier.LEFT_3RD_FINGER),
@@ -90,7 +91,7 @@ class ApiFingerprintConfigurationTest {
         )
         val fingerprintConfiguration = FingerprintConfiguration(
             listOf(FingerprintConfiguration.VeroGeneration.VERO_1),
-            listOf(FingerprintConfiguration.BioSdk.NEC),
+            listOf(ModalitySdkType.NEC),
             true,
             null,
             FingerprintConfiguration.FingerprintSdkConfiguration(

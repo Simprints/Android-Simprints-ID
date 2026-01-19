@@ -1,12 +1,12 @@
 package com.simprints.face.capture
 
-import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 
 object FaceCaptureContract {
     val DESTINATION = R.id.faceCaptureControllerFragment
 
     fun getParams(
         samplesToCapture: Int,
-        faceSDK: FaceConfiguration.BioSdk,
+        faceSDK: ModalitySdkType,
     ) = FaceCaptureParams(samplesToCapture, faceSDK)
 }

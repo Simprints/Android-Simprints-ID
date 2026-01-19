@@ -21,7 +21,7 @@ import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
@@ -61,7 +61,7 @@ internal class FaceCaptureViewModel @Inject constructor(
     var attemptNumber: Int = 0
     var samplesToCapture = 1
     var initialised = false
-    lateinit var bioSDK: FaceConfiguration.BioSdk
+    lateinit var bioSDK: ModalitySdkType
 
     var shouldCheckCameraPermissions = AtomicBoolean(true)
 
@@ -93,7 +93,7 @@ internal class FaceCaptureViewModel @Inject constructor(
 
     fun initFaceBioSdk(
         activity: Activity,
-        sdk: FaceConfiguration.BioSdk,
+        sdk: ModalitySdkType,
     ) = viewModelScope.launch {
         if (initialised) {
             Simber.i("Face bio SDK already initialised", tag = FACE_CAPTURE)
@@ -102,7 +102,7 @@ internal class FaceCaptureViewModel @Inject constructor(
         this@FaceCaptureViewModel.bioSDK = sdk
 
         Simber.i("Starting face capture flow", tag = FACE_CAPTURE)
-        if (sdk == FaceConfiguration.BioSdk.RANK_ONE) {
+        if (sdk == ModalitySdkType.RANK_ONE) {
             val licenseVendor = Vendor.RankOne
             val license = licenseRepository.getCachedLicense(licenseVendor)
             var licenseStatus = license.determineLicenseStatus()

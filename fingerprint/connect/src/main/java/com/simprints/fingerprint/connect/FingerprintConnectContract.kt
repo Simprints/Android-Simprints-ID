@@ -1,9 +1,9 @@
 package com.simprints.fingerprint.connect
 
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 
 object FingerprintConnectContract {
     val DESTINATION = R.id.connectScannerControllerFragment
 
-    fun getParams(fingerprintSDK: FingerprintConfiguration.BioSdk) = FingerprintConnectParams(fingerprintSDK)
+    fun getParams(fingerprintSDK: ModalitySdkType) = FingerprintConnectParams(fingerprintSDK)
 }

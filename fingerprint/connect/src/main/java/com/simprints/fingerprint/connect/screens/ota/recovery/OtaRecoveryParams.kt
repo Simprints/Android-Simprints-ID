@@ -4,13 +4,13 @@ import android.os.Parcelable
 import androidx.annotation.Keep
 import com.simprints.fingerprint.infra.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @Keep
 data class OtaRecoveryParams(
-    val fingerprintSDK: FingerprintConfiguration.BioSdk,
+    val fingerprintSDK: ModalitySdkType,
     val remainingOtas: List<AvailableOta>,
     val currentRetryAttempt: Int,
     val recoveryStrategy: OtaRecoveryStrategy,
