@@ -22,27 +22,27 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class CountImagesToUploadUseCaseTest {
+class CountSamplesToUploadUseCaseTest {
     @MockK
     private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var imageRepository: ImageRepository
 
-    private lateinit var useCase: CountImagesToUploadUseCase
+    private lateinit var useCase: CountSamplesToUploadUseCase
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        useCase = CountImagesToUploadUseCase(configRepository, imageRepository)
+        useCase = CountSamplesToUploadUseCase(configRepository, imageRepository)
     }
 
     @Test
-    fun `maps project id to observed image upload count`() = runTest {
+    fun `maps project id to observed sample upload count`() = runTest {
         val configFlow = MutableSharedFlow<ProjectConfiguration>()
-        val imageCountFlow = MutableSharedFlow<Int>()
+        val sampleCountFlow = MutableSharedFlow<Int>()
         every { configRepository.observeProjectConfiguration() } returns configFlow
-        coEvery { imageRepository.observeNumberOfImagesToUpload(PROJECT_ID) } returns imageCountFlow
+        coEvery { imageRepository.observeNumberOfImagesToUpload(PROJECT_ID) } returns sampleCountFlow
         val emitted = mutableListOf<Int>()
 
         val collectJob = launch { useCase().take(2).toList(emitted) }
@@ -50,8 +50,8 @@ class CountImagesToUploadUseCaseTest {
         runCurrent()
         configFlow.emit(projectConfiguration.copy(projectId = PROJECT_ID))
         runCurrent()
-        imageCountFlow.emit(0)
-        imageCountFlow.emit(5)
+        sampleCountFlow.emit(0)
+        sampleCountFlow.emit(5)
         runCurrent()
         collectJob.join()
         assertThat(emitted).containsExactly(0, 5).inOrder()
@@ -60,13 +60,13 @@ class CountImagesToUploadUseCaseTest {
     }
 
     @Test
-    fun `switches to latest project image count flow when project id changes`() = runTest {
+    fun `switches to latest project sample count flow when project id changes`() = runTest {
         val configFlow = MutableSharedFlow<ProjectConfiguration>()
-        val imageCountFlow1 = MutableSharedFlow<Int>()
-        val imageCountFlow2 = MutableSharedFlow<Int>()
+        val sampleCountFlow1 = MutableSharedFlow<Int>()
+        val sampleCountFlow2 = MutableSharedFlow<Int>()
         every { configRepository.observeProjectConfiguration() } returns configFlow
-        coEvery { imageRepository.observeNumberOfImagesToUpload(PROJECT_ID_1) } returns imageCountFlow1
-        coEvery { imageRepository.observeNumberOfImagesToUpload(PROJECT_ID_2) } returns imageCountFlow2
+        coEvery { imageRepository.observeNumberOfImagesToUpload(PROJECT_ID_1) } returns sampleCountFlow1
+        coEvery { imageRepository.observeNumberOfImagesToUpload(PROJECT_ID_2) } returns sampleCountFlow2
         val emitted = mutableListOf<Int>()
 
         val collectJob = launch { useCase().take(2).toList(emitted) }
@@ -75,14 +75,14 @@ class CountImagesToUploadUseCaseTest {
         configFlow.emit(projectConfiguration.copy(projectId = PROJECT_ID_1))
         runCurrent()
 
-        imageCountFlow1.emit(1)
+        sampleCountFlow1.emit(1)
         runCurrent()
 
         configFlow.emit(projectConfiguration.copy(projectId = PROJECT_ID_2))
         runCurrent()
 
-        imageCountFlow1.emit(2) // should be ignored due to flatMapLatest
-        imageCountFlow2.emit(3)
+        sampleCountFlow1.emit(2) // should be ignored due to flatMapLatest
+        sampleCountFlow2.emit(3)
         runCurrent()
 
         collectJob.join()

@@ -11,7 +11,7 @@ import com.simprints.infra.eventsync.sync.down.EventDownSyncCountsRepository
 import com.simprints.infra.eventsync.sync.down.EventDownSyncPeriodicCountUseCase
 import com.simprints.infra.sync.SyncableCounts
 import com.simprints.infra.sync.usecase.internal.CountEnrolmentRecordsUseCase
-import com.simprints.infra.sync.usecase.internal.CountImagesToUploadUseCase
+import com.simprints.infra.sync.usecase.internal.CountSamplesToUploadUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -48,25 +48,25 @@ class CountSyncableUseCaseTest {
 
     @Test
     fun `combines latest download and upload counts into EventCounts`() = runTest {
-        val recordsTotalFlow = MutableSharedFlow<Int>()
-        val downSyncCountsFlow = MutableSharedFlow<DownSyncCounts>()
-        val uploadFlowAll = MutableSharedFlow<Int>()
-        val uploadFlowEnrolmentV2 = MutableSharedFlow<Int>()
-        val uploadFlowEnrolmentV4 = MutableSharedFlow<Int>()
-        val uploadImagesFlow = MutableSharedFlow<Int>()
+        val totalRecordsCountFlow = MutableSharedFlow<Int>()
+        val recordEventsToDownloadCountFlow = MutableSharedFlow<DownSyncCounts>()
+        val eventsToUploadCountFlow = MutableSharedFlow<Int>()
+        val enrolmentsToUploadCountFlowV2 = MutableSharedFlow<Int>()
+        val enrolmentsToUploadCountFlowV4 = MutableSharedFlow<Int>()
+        val samplesToUploadCountFlow = MutableSharedFlow<Int>()
         val eventDownSyncCount = io.mockk.mockk<EventDownSyncPeriodicCountUseCase>()
         val countEnrolmentRecords = io.mockk.mockk<CountEnrolmentRecordsUseCase>()
-        val countImagesToUpload = io.mockk.mockk<CountImagesToUploadUseCase>()
-        every { eventDownSyncCount.invoke() } returns downSyncCountsFlow
-        every { countEnrolmentRecords.invoke() } returns recordsTotalFlow
-        every { countImagesToUpload.invoke() } returns uploadImagesFlow
-        coEvery { eventRepository.observeEventCount(null) } returns uploadFlowAll
-        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns uploadFlowEnrolmentV2
-        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns uploadFlowEnrolmentV4
+        val countSamplesToUpload = io.mockk.mockk<CountSamplesToUploadUseCase>()
+        every { eventDownSyncCount.invoke() } returns recordEventsToDownloadCountFlow
+        every { countEnrolmentRecords.invoke() } returns totalRecordsCountFlow
+        every { countSamplesToUpload.invoke() } returns samplesToUploadCountFlow
+        coEvery { eventRepository.observeEventCount(null) } returns eventsToUploadCountFlow
+        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns enrolmentsToUploadCountFlowV2
+        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns enrolmentsToUploadCountFlowV4
         val useCase =
             CountSyncableUseCase(
                 countEnrolmentRecords,
-                countImagesToUpload,
+                countSamplesToUpload,
                 eventDownSyncCount,
                 eventRepository,
                 appScope = backgroundScope,
@@ -77,20 +77,20 @@ class CountSyncableUseCaseTest {
 
         runCurrent() // ensure upstream flows are collected before emitting
         val expected = SyncableCounts(
-            recordsTotal = 5,
-            eventsToDownload = 10,
-            isEventsToDownloadLowerBound = true,
+            totalRecords = 5,
+            recordEventsToDownload = 10,
+            isRecordEventsToDownloadLowerBound = true,
             eventsToUpload = 1,
-            eventsToUploadEnrolmentV2 = 2,
-            eventsToUploadEnrolmentV4 = 3,
-            imagesToUpload = 4,
+            enrolmentsToUploadV2 = 2,
+            enrolmentsToUploadV4 = 3,
+            samplesToUpload = 4,
         )
-        recordsTotalFlow.emit(5)
-        downSyncCountsFlow.emit(DownSyncCounts(count = 10, isLowerBound = true))
-        uploadFlowAll.emit(1)
-        uploadFlowEnrolmentV2.emit(2)
-        uploadFlowEnrolmentV4.emit(3)
-        uploadImagesFlow.emit(4)
+        totalRecordsCountFlow.emit(5)
+        recordEventsToDownloadCountFlow.emit(DownSyncCounts(count = 10, isLowerBound = true))
+        eventsToUploadCountFlow.emit(1)
+        enrolmentsToUploadCountFlowV2.emit(2)
+        enrolmentsToUploadCountFlowV4.emit(3)
+        samplesToUploadCountFlow.emit(4)
         runCurrent()
         collectJob.join()
 
@@ -99,31 +99,31 @@ class CountSyncableUseCaseTest {
 
     @Test
     fun `returns the same shared Flow across invocations`() = runTest {
-        val recordsTotalFlow = MutableSharedFlow<Int>(replay = 1)
-        val downSyncCountsFlow = MutableSharedFlow<DownSyncCounts>(replay = 1)
-        val uploadFlowAll = MutableSharedFlow<Int>(replay = 1)
-        val uploadFlowEnrolmentV2 = MutableSharedFlow<Int>(replay = 1)
-        val uploadFlowEnrolmentV4 = MutableSharedFlow<Int>(replay = 1)
-        val uploadImagesFlow = MutableSharedFlow<Int>(replay = 1)
-        recordsTotalFlow.tryEmit(0)
-        downSyncCountsFlow.tryEmit(DownSyncCounts(count = 0, isLowerBound = false))
-        uploadFlowAll.tryEmit(0)
-        uploadFlowEnrolmentV2.tryEmit(0)
-        uploadFlowEnrolmentV4.tryEmit(0)
-        uploadImagesFlow.tryEmit(0)
+        val totalRecordsCountFlow = MutableSharedFlow<Int>(replay = 1)
+        val recordEventsToDownloadCountFlow = MutableSharedFlow<DownSyncCounts>(replay = 1)
+        val eventsToUploadCountFlow = MutableSharedFlow<Int>(replay = 1)
+        val enrolmentsToUploadCountFlowV2 = MutableSharedFlow<Int>(replay = 1)
+        val enrolmentsToUploadCountFlowV4 = MutableSharedFlow<Int>(replay = 1)
+        val samplesToUploadCountFlow = MutableSharedFlow<Int>(replay = 1)
+        totalRecordsCountFlow.tryEmit(0)
+        recordEventsToDownloadCountFlow.tryEmit(DownSyncCounts(count = 0, isLowerBound = false))
+        eventsToUploadCountFlow.tryEmit(0)
+        enrolmentsToUploadCountFlowV2.tryEmit(0)
+        enrolmentsToUploadCountFlowV4.tryEmit(0)
+        samplesToUploadCountFlow.tryEmit(0)
         val eventDownSyncCount = io.mockk.mockk<EventDownSyncPeriodicCountUseCase>()
         val countEnrolmentRecords = io.mockk.mockk<CountEnrolmentRecordsUseCase>()
-        val countImagesToUpload = io.mockk.mockk<CountImagesToUploadUseCase>()
-        every { eventDownSyncCount.invoke() } returns downSyncCountsFlow
-        every { countEnrolmentRecords.invoke() } returns recordsTotalFlow
-        every { countImagesToUpload.invoke() } returns uploadImagesFlow
-        coEvery { eventRepository.observeEventCount(null) } returns uploadFlowAll
-        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns uploadFlowEnrolmentV2
-        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns uploadFlowEnrolmentV4
+        val countSamplesToUpload = io.mockk.mockk<CountSamplesToUploadUseCase>()
+        every { eventDownSyncCount.invoke() } returns recordEventsToDownloadCountFlow
+        every { countEnrolmentRecords.invoke() } returns totalRecordsCountFlow
+        every { countSamplesToUpload.invoke() } returns samplesToUploadCountFlow
+        coEvery { eventRepository.observeEventCount(null) } returns eventsToUploadCountFlow
+        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns enrolmentsToUploadCountFlowV2
+        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns enrolmentsToUploadCountFlowV4
         val useCase =
             CountSyncableUseCase(
                 countEnrolmentRecords,
-                countImagesToUpload,
+                countSamplesToUpload,
                 eventDownSyncCount,
                 eventRepository,
                 appScope = backgroundScope,
@@ -139,7 +139,7 @@ class CountSyncableUseCaseTest {
         assertThat(flow1).isSameInstanceAs(flow2)
         verify(exactly = 1) { eventDownSyncCount() }
         verify(exactly = 1) { countEnrolmentRecords() }
-        verify(exactly = 1) { countImagesToUpload() }
+        verify(exactly = 1) { countSamplesToUpload() }
         coVerify(exactly = 1) { eventRepository.observeEventCount(null) }
         coVerify(exactly = 1) { eventRepository.observeEventCount(EventType.ENROLMENT_V2) }
         coVerify(exactly = 1) { eventRepository.observeEventCount(EventType.ENROLMENT_V4) }
@@ -148,27 +148,27 @@ class CountSyncableUseCaseTest {
 
     @Test
     fun `subscribes to down-sync counts only while collected`() = runTest {
-        val recordsTotalFlow = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
-        val downSyncCountsFlow = MutableSharedFlow<DownSyncCounts>(replay = 1).apply {
+        val totalRecordsCountFlow = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
+        val recordEventsToDownloadCountFlow = MutableSharedFlow<DownSyncCounts>(replay = 1).apply {
             tryEmit(DownSyncCounts(count = 0, isLowerBound = false))
         }
-        val uploadFlowAll = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
-        val uploadFlowEnrolmentV2 = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
-        val uploadFlowEnrolmentV4 = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
-        val uploadImagesFlow = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
+        val eventsToUploadCountFlow = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
+        val enrolmentsToUploadCountFlowV2 = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
+        val enrolmentsToUploadCountFlowV4 = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
+        val samplesToUploadCountFlow = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
         val eventDownSyncCount = io.mockk.mockk<EventDownSyncPeriodicCountUseCase>()
         val countEnrolmentRecords = io.mockk.mockk<CountEnrolmentRecordsUseCase>()
-        val countImagesToUpload = io.mockk.mockk<CountImagesToUploadUseCase>()
-        every { eventDownSyncCount.invoke() } returns downSyncCountsFlow
-        every { countEnrolmentRecords.invoke() } returns recordsTotalFlow
-        every { countImagesToUpload.invoke() } returns uploadImagesFlow
-        coEvery { eventRepository.observeEventCount(null) } returns uploadFlowAll
-        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns uploadFlowEnrolmentV2
-        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns uploadFlowEnrolmentV4
+        val countSamplesToUpload = io.mockk.mockk<CountSamplesToUploadUseCase>()
+        every { eventDownSyncCount.invoke() } returns recordEventsToDownloadCountFlow
+        every { countEnrolmentRecords.invoke() } returns totalRecordsCountFlow
+        every { countSamplesToUpload.invoke() } returns samplesToUploadCountFlow
+        coEvery { eventRepository.observeEventCount(null) } returns eventsToUploadCountFlow
+        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns enrolmentsToUploadCountFlowV2
+        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns enrolmentsToUploadCountFlowV4
         val useCase =
             CountSyncableUseCase(
                 countEnrolmentRecords,
-                countImagesToUpload,
+                countSamplesToUpload,
                 eventDownSyncCount,
                 eventRepository,
                 appScope = backgroundScope,
@@ -176,19 +176,19 @@ class CountSyncableUseCaseTest {
 
         val sharedFlow = useCase()
         runCurrent()
-        assertThat(downSyncCountsFlow.subscriptionCount.value).isEqualTo(0)
+        assertThat(recordEventsToDownloadCountFlow.subscriptionCount.value).isEqualTo(0)
 
         val collectJob = launch { sharedFlow.collect { } }
         runCurrent()
-        assertThat(downSyncCountsFlow.subscriptionCount.value).isEqualTo(1)
+        assertThat(recordEventsToDownloadCountFlow.subscriptionCount.value).isEqualTo(1)
 
         collectJob.cancel()
         runCurrent()
-        assertThat(downSyncCountsFlow.subscriptionCount.value).isEqualTo(0)
+        assertThat(recordEventsToDownloadCountFlow.subscriptionCount.value).isEqualTo(0)
     }
 
     @Test
-    fun `stops down-sync periodic counting when CountEventsUseCase unsubscribed`() = runTest {
+    fun `stops down-sync periodic counting when downstream unsubscribed`() = runTest {
         // integration test case with DownSyncCountsRepository, to check for its accidental overuse
         coEvery { downSyncCountsRepository.countEventsToDownload() } returnsMany listOf(
             DownSyncCounts(count = 1, isLowerBound = false), // initial
@@ -205,23 +205,23 @@ class CountSyncableUseCaseTest {
         runCurrent()
         advanceTimeBy(10_000L + 1) // debounce time, from EventDownSyncPeriodicCountUseCase
         runCurrent()
-        val recordsTotalFlow = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
-        val uploadFlowAll = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
-        val uploadFlowEnrolmentV2 = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
-        val uploadFlowEnrolmentV4 = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
-        val uploadImagesFlow = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
+        val totalRecordsCountFlow = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
+        val eventsToUploadCountFlow = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
+        val enrolmentsToUploadCountFlowV2 = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
+        val enrolmentsToUploadCountFlowV4 = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
+        val samplesToUploadCountFlow = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
         val countEnrolmentRecords = io.mockk.mockk<CountEnrolmentRecordsUseCase>()
-        val countImagesToUpload = io.mockk.mockk<CountImagesToUploadUseCase>()
-        every { countEnrolmentRecords.invoke() } returns recordsTotalFlow
-        every { countImagesToUpload.invoke() } returns uploadImagesFlow
-        coEvery { eventRepository.observeEventCount(null) } returns uploadFlowAll
-        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns uploadFlowEnrolmentV2
-        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns uploadFlowEnrolmentV4
+        val countSamplesToUpload = io.mockk.mockk<CountSamplesToUploadUseCase>()
+        every { countEnrolmentRecords.invoke() } returns totalRecordsCountFlow
+        every { countSamplesToUpload.invoke() } returns samplesToUploadCountFlow
+        coEvery { eventRepository.observeEventCount(null) } returns eventsToUploadCountFlow
+        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns enrolmentsToUploadCountFlowV2
+        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns enrolmentsToUploadCountFlowV4
 
         val useCase =
             CountSyncableUseCase(
                 countEnrolmentRecords,
-                countImagesToUpload,
+                countSamplesToUpload,
                 eventDownSyncCount,
                 eventRepository,
                 appScope = backgroundScope,

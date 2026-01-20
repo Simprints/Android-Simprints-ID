@@ -60,13 +60,13 @@ internal class ObserveSyncInfoUseCaseTest {
     )
     private val syncableCountsFlow = MutableStateFlow(
         SyncableCounts(
-            recordsTotal = 0,
-            eventsToDownload = 0,
-            isEventsToDownloadLowerBound = false,
+            totalRecords = 0,
+            recordEventsToDownload = 0,
+            isRecordEventsToDownloadLowerBound = false,
             eventsToUpload = 0,
-            eventsToUploadEnrolmentV2 = 0,
-            eventsToUploadEnrolmentV4 = 0,
-            imagesToUpload = 0,
+            enrolmentsToUploadV2 = 0,
+            enrolmentsToUploadV4 = 0,
+            samplesToUpload = 0,
         ),
     )
 
@@ -136,13 +136,13 @@ internal class ObserveSyncInfoUseCaseTest {
 
         every { mockEventSyncState.lastSyncTime } returns TEST_TIMESTAMP
         syncableCountsFlow.value = SyncableCounts(
-            recordsTotal = 0,
-            eventsToDownload = 0,
-            isEventsToDownloadLowerBound = false,
+            totalRecords = 0,
+            recordEventsToDownload = 0,
+            isRecordEventsToDownloadLowerBound = false,
             eventsToUpload = 0,
-            eventsToUploadEnrolmentV2 = 0,
-            eventsToUploadEnrolmentV4 = 0,
-            imagesToUpload = 0,
+            enrolmentsToUploadV2 = 0,
+            enrolmentsToUploadV4 = 0,
+            samplesToUpload = 0,
         )
         every { countSyncable.invoke() } returns syncableCountsFlow
 
@@ -517,13 +517,13 @@ internal class ObserveSyncInfoUseCaseTest {
         }
         syncStatusFlow.value = SyncStatus(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus)
         syncableCountsFlow.value = SyncableCounts(
-            recordsTotal = 25,
-            eventsToDownload = 8,
-            isEventsToDownloadLowerBound = false,
+            totalRecords = 25,
+            recordEventsToDownload = 8,
+            isRecordEventsToDownloadLowerBound = false,
             eventsToUpload = 0,
-            eventsToUploadEnrolmentV2 = 2,
-            eventsToUploadEnrolmentV4 = 3,
-            imagesToUpload = 0,
+            enrolmentsToUploadV2 = 2,
+            enrolmentsToUploadV4 = 3,
+            samplesToUpload = 0,
         )
         createUseCase()
 
@@ -573,13 +573,13 @@ internal class ObserveSyncInfoUseCaseTest {
         }
         syncStatusFlow.value = SyncStatus(eventSyncState = mockEventSyncState, imageSyncStatus = mockNotSyncingImageStatus)
         syncableCountsFlow.value = SyncableCounts(
-            recordsTotal = 0,
-            eventsToDownload = 0,
-            isEventsToDownloadLowerBound = false,
+            totalRecords = 0,
+            recordEventsToDownload = 0,
+            isRecordEventsToDownloadLowerBound = false,
             eventsToUpload = 0,
-            eventsToUploadEnrolmentV2 = 0,
-            eventsToUploadEnrolmentV4 = 0,
-            imagesToUpload = 15,
+            enrolmentsToUploadV2 = 0,
+            enrolmentsToUploadV4 = 0,
+            samplesToUpload = 15,
         )
         createUseCase()
 
@@ -675,13 +675,13 @@ internal class ObserveSyncInfoUseCaseTest {
         every { observeConfigurationFlow.invoke() } returns flowOf(createConfigurationState(projectConfig = mockProjectConfigWithDownSync))
         syncStatusFlow.value = SyncStatus(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus)
         syncableCountsFlow.value = SyncableCounts(
-            recordsTotal = 0,
-            eventsToDownload = 42,
-            isEventsToDownloadLowerBound = false,
+            totalRecords = 0,
+            recordEventsToDownload = 42,
+            isRecordEventsToDownloadLowerBound = false,
             eventsToUpload = 0,
-            eventsToUploadEnrolmentV2 = 0,
-            eventsToUploadEnrolmentV4 = 0,
-            imagesToUpload = 0,
+            enrolmentsToUploadV2 = 0,
+            enrolmentsToUploadV4 = 0,
+            samplesToUpload = 0,
         )
         every { mockProjectConfigWithDownSync.isSimprintsEventDownSyncAllowed() } returns true
         every { mockProjectConfigWithDownSync.isModuleSelectionAvailable() } returns false

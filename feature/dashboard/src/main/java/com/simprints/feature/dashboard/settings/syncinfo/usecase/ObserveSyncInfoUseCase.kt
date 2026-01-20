@@ -91,7 +91,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         val imagesToUpload = if (imageSyncStatus.isSyncing) {
             null
         } else {
-            counts.imagesToUpload
+            counts.samplesToUpload // internal term is sample, user-facing (within sync info) term is image
         }
 
         val eventSyncProgressPart = SyncInfoProgressPart(
@@ -177,16 +177,16 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
 
         val recordsTotal = when {
             isEventSyncInProgress || projectId.isBlank() -> null
-            else -> counts.recordsTotal
+            else -> counts.totalRecords
         }
         val recordsToUpload = when {
             isEventSyncInProgress -> null
-            else -> with(counts) { eventsToUploadEnrolmentV2 + eventsToUploadEnrolmentV4 }
+            else -> with(counts) { enrolmentsToUploadV2 + enrolmentsToUploadV4 }
         }
         val recordsToDownload = when {
             isEventSyncInProgress || isPreLogoutUpSync -> null
             projectConfig.isSimprintsEventDownSyncAllowed() -> with(counts) {
-                DownSyncCounts(eventsToDownload, isEventsToDownloadLowerBound)
+                DownSyncCounts(recordEventsToDownload, isRecordEventsToDownloadLowerBound)
             }
             else -> DownSyncCounts(0, isLowerBound = false)
         }?.let { "${it.count}${if (it.isLowerBound) "+" else ""}" }.orEmpty()

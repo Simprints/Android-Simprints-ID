@@ -35,13 +35,13 @@ internal class HandleProjectStateUseCaseTest {
     fun `Fully logs out when project has ended`() = runTest {
         every { countSyncable.invoke() } returns flowOf(
             SyncableCounts(
-                recordsTotal = 0,
-                eventsToDownload = 0,
-                isEventsToDownloadLowerBound = false,
+                totalRecords = 0,
+                recordEventsToDownload = 0,
+                isRecordEventsToDownloadLowerBound = false,
                 eventsToUpload = 0,
-                eventsToUploadEnrolmentV2 = 0,
-                eventsToUploadEnrolmentV4 = 0,
-                imagesToUpload = 0,
+                enrolmentsToUploadV2 = 0,
+                enrolmentsToUploadV4 = 0,
+                samplesToUpload = 0,
             ),
         )
 
@@ -54,13 +54,13 @@ internal class HandleProjectStateUseCaseTest {
     fun `Logs out when project has ending and no items to upload`() = runTest {
         every { countSyncable.invoke() } returns flowOf(
             SyncableCounts(
-                recordsTotal = 0,
-                eventsToDownload = 0,
-                isEventsToDownloadLowerBound = false,
+                totalRecords = 0,
+                recordEventsToDownload = 0,
+                isRecordEventsToDownloadLowerBound = false,
                 eventsToUpload = 0,
-                eventsToUploadEnrolmentV2 = 0,
-                eventsToUploadEnrolmentV4 = 0,
-                imagesToUpload = 0,
+                enrolmentsToUploadV2 = 0,
+                enrolmentsToUploadV4 = 0,
+                samplesToUpload = 0,
             ),
         )
 
@@ -73,13 +73,13 @@ internal class HandleProjectStateUseCaseTest {
     fun `Does not logs out when project has ending and has items to upload`() = runTest {
         every { countSyncable.invoke() } returns flowOf(
             SyncableCounts(
-                recordsTotal = 0,
-                eventsToDownload = 0,
-                isEventsToDownloadLowerBound = false,
+                totalRecords = 0,
+                recordEventsToDownload = 0,
+                isRecordEventsToDownloadLowerBound = false,
                 eventsToUpload = 5,
-                eventsToUploadEnrolmentV2 = 0,
-                eventsToUploadEnrolmentV4 = 0,
-                imagesToUpload = 0,
+                enrolmentsToUploadV2 = 0,
+                enrolmentsToUploadV4 = 0,
+                samplesToUpload = 0,
             ),
         )
 
@@ -92,13 +92,13 @@ internal class HandleProjectStateUseCaseTest {
     fun `Does not logs out when project is running`() = runTest {
         every { countSyncable.invoke() } returns flowOf(
             SyncableCounts(
-                recordsTotal = 0,
-                eventsToDownload = 0,
-                isEventsToDownloadLowerBound = false,
+                totalRecords = 0,
+                recordEventsToDownload = 0,
+                isRecordEventsToDownloadLowerBound = false,
                 eventsToUpload = 0,
-                eventsToUploadEnrolmentV2 = 0,
-                eventsToUploadEnrolmentV4 = 0,
-                imagesToUpload = 0,
+                enrolmentsToUploadV2 = 0,
+                enrolmentsToUploadV4 = 0,
+                samplesToUpload = 0,
             ),
         )
 

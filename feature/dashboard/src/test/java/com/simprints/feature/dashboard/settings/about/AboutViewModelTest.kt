@@ -215,13 +215,13 @@ class AboutViewModelTest {
         }
         every { countSyncable.invoke() } returns flowOf(
             SyncableCounts(
-                recordsTotal = 0,
-                eventsToDownload = 0,
-                isEventsToDownloadLowerBound = false,
+                totalRecords = 0,
+                recordEventsToDownload = 0,
+                isRecordEventsToDownloadLowerBound = false,
                 eventsToUpload = countEventsToUpload,
-                eventsToUploadEnrolmentV2 = 0,
-                eventsToUploadEnrolmentV4 = 0,
-                imagesToUpload = 0,
+                enrolmentsToUploadV2 = 0,
+                enrolmentsToUploadV4 = 0,
+                samplesToUpload = 0,
             ),
         )
         coEvery { configRepository.getProjectConfiguration() } returns buildProjectConfigurationMock(

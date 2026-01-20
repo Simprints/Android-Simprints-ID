@@ -8,13 +8,21 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-internal class CountImagesToUploadUseCase @Inject constructor(
+/**
+ * Observes sample count to upload, while tracking the project ID changes.
+ *
+ * Note: CountSamplesToUploadUseCase bridges
+ * the older term of "image" in its dependencies
+ * with
+ * the newer term "sample" that the use case exposes.
+ */
+internal class CountSamplesToUploadUseCase @Inject constructor(
     private val configRepository: ConfigRepository,
     private val imageRepository: ImageRepository,
 ) {
     internal operator fun invoke(): Flow<Int> = configRepository
         .observeProjectConfiguration()
         .map { it.projectId }
-        .flatMapLatest(imageRepository::observeNumberOfImagesToUpload)
+        .flatMapLatest(imageRepository::observeNumberOfImagesToUpload) // images are samples in renewed terms
         .distinctUntilChanged()
 }
