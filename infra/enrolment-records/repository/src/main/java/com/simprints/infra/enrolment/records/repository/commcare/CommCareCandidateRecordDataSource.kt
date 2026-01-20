@@ -360,6 +360,9 @@ internal class CommCareCandidateRecordDataSource @Inject constructor(
         const val COLUMN_DATUM_ID = "datum_id"
         const val COLUMN_VALUE = "value"
 
+        // Fallback polling interval useful when CaseDataContentProvider does not call notifyChange.
+        // A conservative value that avoids excessive load on CommCare
+        // while still allowing infrequent visual updates.
         internal const val CASE_COUNT_FALLBACK_POLL_INTERVAL_MILLIS = 300_000L
     }
 }
