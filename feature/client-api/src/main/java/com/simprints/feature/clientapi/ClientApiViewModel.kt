@@ -10,6 +10,7 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.core.tools.extentions.toJsonElementMap
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.extensions.toMap
@@ -86,7 +87,7 @@ class ClientApiViewModel @Inject internal constructor(
             intentMapper(action = action, extras = extrasMap, project = getProject())
         } catch (validationException: InvalidRequestException) {
             Simber.e("Cannot parse intent data", validationException, tag = ORCHESTRATION)
-            simpleEventReporter.addInvalidIntentEvent(action, extrasMap.mapValues { it.value.toString() })
+            simpleEventReporter.addInvalidIntentEvent(action, extrasMap.toJsonElementMap())
             _showAlert.send(validationException.error)
             null
         }

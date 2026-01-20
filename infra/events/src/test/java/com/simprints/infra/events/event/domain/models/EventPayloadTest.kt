@@ -32,6 +32,7 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
+import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Test
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo as AuthenticationUserInfo
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo as AuthorizationUserInfo
@@ -202,7 +203,7 @@ class EventPayloadTest {
         ),
         GuidSelectionEvent(CREATED_AT, GUID1),
         IntentParsingEvent(CREATED_AT, COMMCARE),
-        InvalidIntentEvent(CREATED_AT, "REGISTER", mapOf("extra_key" to "value")),
+        InvalidIntentEvent(CREATED_AT, "REGISTER", extras = mapOf("extra_key" to JsonPrimitive("value"))),
         OneToManyMatchEvent(
             createdAt = CREATED_AT,
             endTime = ENDED_AT,
@@ -238,6 +239,6 @@ class EventPayloadTest {
             ),
         ),
         ScannerFirmwareUpdateEvent(CREATED_AT, ENDED_AT, "chip", "v1", "error"),
-        SuspiciousIntentEvent(CREATED_AT, mapOf("extra_key" to "value")),
+        SuspiciousIntentEvent(CREATED_AT, mapOf("extra_key" to JsonPrimitive("value"))),
     )
 }

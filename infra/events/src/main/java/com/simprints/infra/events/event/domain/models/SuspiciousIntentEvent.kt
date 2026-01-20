@@ -8,6 +8,7 @@ import com.simprints.infra.events.event.domain.models.EventType.Companion.SUSPIC
 import com.simprints.infra.events.event.domain.models.EventType.SUSPICIOUS_INTENT
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 import java.util.UUID
 
 @Keep
@@ -22,7 +23,7 @@ data class SuspiciousIntentEvent(
 ) : Event() {
     constructor(
         createdAt: Timestamp,
-        unexpectedExtras: Map<String, String?>,
+        unexpectedExtras: Map<String, JsonElement?>,
     ) : this(
         UUID.randomUUID().toString(),
         SuspiciousIntentPayload(createdAt, EVENT_VERSION, unexpectedExtras),
@@ -38,7 +39,7 @@ data class SuspiciousIntentEvent(
     data class SuspiciousIntentPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
-        val unexpectedExtras: Map<String, String?>,
+        val unexpectedExtras: Map<String, JsonElement?>,
         override val endedAt: Timestamp? = null,
         override val type: EventType = SUSPICIOUS_INTENT,
     ) : EventPayload() {

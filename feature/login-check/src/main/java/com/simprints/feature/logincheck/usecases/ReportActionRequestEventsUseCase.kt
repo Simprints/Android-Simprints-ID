@@ -1,6 +1,7 @@
 package com.simprints.feature.logincheck.usecases
 
 import com.simprints.core.SessionCoroutineScope
+import com.simprints.core.tools.extentions.toJsonElementMap
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.infra.events.event.domain.models.BiometricDataSource
@@ -43,7 +44,7 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
                 sessionEventRepository.addOrUpdateEvent(
                     SuspiciousIntentEvent(
                         timeHelper.now(),
-                        actionRequest.unknownExtras.mapValues { it.value.toString() },
+                        actionRequest.unknownExtras.toJsonElementMap(),
                     ),
                 )
             }
