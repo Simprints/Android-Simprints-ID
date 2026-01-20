@@ -64,8 +64,7 @@ internal class ObserveSyncInfoUseCaseTest {
             recordEventsToDownload = 0,
             isRecordEventsToDownloadLowerBound = false,
             eventsToUpload = 0,
-            enrolmentsToUploadV2 = 0,
-            enrolmentsToUploadV4 = 0,
+            enrolmentsToUpload = 0,
             samplesToUpload = 0,
         ),
     )
@@ -140,8 +139,7 @@ internal class ObserveSyncInfoUseCaseTest {
             recordEventsToDownload = 0,
             isRecordEventsToDownloadLowerBound = false,
             eventsToUpload = 0,
-            enrolmentsToUploadV2 = 0,
-            enrolmentsToUploadV4 = 0,
+            enrolmentsToUpload = 0,
             samplesToUpload = 0,
         )
         every { countSyncable.invoke() } returns syncableCountsFlow
@@ -521,8 +519,7 @@ internal class ObserveSyncInfoUseCaseTest {
             recordEventsToDownload = 8,
             isRecordEventsToDownloadLowerBound = false,
             eventsToUpload = 0,
-            enrolmentsToUploadV2 = 2,
-            enrolmentsToUploadV4 = 3,
+            enrolmentsToUpload = 5,
             samplesToUpload = 0,
         )
         createUseCase()
@@ -577,8 +574,7 @@ internal class ObserveSyncInfoUseCaseTest {
             recordEventsToDownload = 0,
             isRecordEventsToDownloadLowerBound = false,
             eventsToUpload = 0,
-            enrolmentsToUploadV2 = 0,
-            enrolmentsToUploadV4 = 0,
+            enrolmentsToUpload = 0,
             samplesToUpload = 15,
         )
         createUseCase()
@@ -679,8 +675,7 @@ internal class ObserveSyncInfoUseCaseTest {
             recordEventsToDownload = 42,
             isRecordEventsToDownloadLowerBound = false,
             eventsToUpload = 0,
-            enrolmentsToUploadV2 = 0,
-            enrolmentsToUploadV4 = 0,
+            enrolmentsToUpload = 0,
             samplesToUpload = 0,
         )
         every { mockProjectConfigWithDownSync.isSimprintsEventDownSyncAllowed() } returns true

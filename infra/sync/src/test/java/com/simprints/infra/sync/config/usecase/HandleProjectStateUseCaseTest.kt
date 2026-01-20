@@ -39,8 +39,7 @@ internal class HandleProjectStateUseCaseTest {
                 recordEventsToDownload = 0,
                 isRecordEventsToDownloadLowerBound = false,
                 eventsToUpload = 0,
-                enrolmentsToUploadV2 = 0,
-                enrolmentsToUploadV4 = 0,
+                enrolmentsToUpload = 0,
                 samplesToUpload = 0,
             ),
         )
@@ -58,8 +57,7 @@ internal class HandleProjectStateUseCaseTest {
                 recordEventsToDownload = 0,
                 isRecordEventsToDownloadLowerBound = false,
                 eventsToUpload = 0,
-                enrolmentsToUploadV2 = 0,
-                enrolmentsToUploadV4 = 0,
+                enrolmentsToUpload = 0,
                 samplesToUpload = 0,
             ),
         )
@@ -77,8 +75,7 @@ internal class HandleProjectStateUseCaseTest {
                 recordEventsToDownload = 0,
                 isRecordEventsToDownloadLowerBound = false,
                 eventsToUpload = 5,
-                enrolmentsToUploadV2 = 0,
-                enrolmentsToUploadV4 = 0,
+                enrolmentsToUpload = 0,
                 samplesToUpload = 0,
             ),
         )
@@ -96,8 +93,7 @@ internal class HandleProjectStateUseCaseTest {
                 recordEventsToDownload = 0,
                 isRecordEventsToDownloadLowerBound = false,
                 eventsToUpload = 0,
-                enrolmentsToUploadV2 = 0,
-                enrolmentsToUploadV4 = 0,
+                enrolmentsToUpload = 0,
                 samplesToUpload = 0,
             ),
         )

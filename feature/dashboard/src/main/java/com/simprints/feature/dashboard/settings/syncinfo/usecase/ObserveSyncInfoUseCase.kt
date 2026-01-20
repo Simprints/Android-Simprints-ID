@@ -181,7 +181,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         }
         val recordsToUpload = when {
             isEventSyncInProgress -> null
-            else -> with(counts) { enrolmentsToUploadV2 + enrolmentsToUploadV4 }
+            else -> counts.enrolmentsToUpload
         }
         val recordsToDownload = when {
             isEventSyncInProgress || isPreLogoutUpSync -> null

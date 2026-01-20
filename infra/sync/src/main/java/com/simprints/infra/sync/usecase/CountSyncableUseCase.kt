@@ -35,23 +35,17 @@ class CountSyncableUseCase @Inject internal constructor(
         combine(
             totalRecordsCountFlow(),
             recordEventsToDownloadCountFlow(),
-            combine( // nested combine, to stay within flow library standard combine limit of 5
-                eventsToUploadCountFlow(),
-                enrolmentsToUploadCountFlow(EventType.ENROLMENT_V2),
-                enrolmentsToUploadCountFlow(EventType.ENROLMENT_V4),
-            ) { eventsToUpload, enrolmentsToUploadV2, enrolmentsToUploadV4 ->
-                Triple(eventsToUpload, enrolmentsToUploadV2, enrolmentsToUploadV4)
-            },
+            eventsToUploadCountFlow(),
+            enrolmentsToUploadCountFlow(),
             samplesToUploadCountFlow(),
-        ) { totalRecords, recordEventsToDownload, (eventsToUpload, enrolmentsToUploadV2, enrolmentsToUploadV4), samplesToUpload ->
+        ) { totalRecords, recordEventsToDownload, eventsToUpload, enrolmentsToUpload, samplesToUpload ->
             val (recordEventsToDownloadCount, isRecordEventsToDownloadLowerBound) = recordEventsToDownload
             SyncableCounts(
                 totalRecords,
                 recordEventsToDownload = recordEventsToDownloadCount,
                 isRecordEventsToDownloadLowerBound,
                 eventsToUpload,
-                enrolmentsToUploadV2,
-                enrolmentsToUploadV4,
+                enrolmentsToUpload,
                 samplesToUpload,
             )
         }.shareIn(
@@ -75,8 +69,15 @@ class CountSyncableUseCase @Inject internal constructor(
         emitAll(eventRepository.observeEventCount(type = null))
     }
 
-    private fun enrolmentsToUploadCountFlow(type: EventType?): Flow<Int> = flow {
-        emitAll(eventRepository.observeEventCount(type))
+    private fun enrolmentsToUploadCountFlow(): Flow<Int> = flow {
+        emitAll(
+            combine(
+                eventRepository.observeEventCount(EventType.ENROLMENT_V2),
+                eventRepository.observeEventCount(EventType.ENROLMENT_V4),
+            ) { countV2, countV4 ->
+                countV2 + countV4
+            }
+        )
     }
 
     private fun samplesToUploadCountFlow(): Flow<Int> = flow {

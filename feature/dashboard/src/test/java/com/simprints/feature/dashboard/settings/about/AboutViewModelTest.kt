@@ -219,8 +219,7 @@ class AboutViewModelTest {
                 recordEventsToDownload = 0,
                 isRecordEventsToDownloadLowerBound = false,
                 eventsToUpload = countEventsToUpload,
-                enrolmentsToUploadV2 = 0,
-                enrolmentsToUploadV4 = 0,
+                enrolmentsToUpload = 0,
                 samplesToUpload = 0,
             ),
         )

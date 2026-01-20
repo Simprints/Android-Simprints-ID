@@ -8,7 +8,6 @@ data class SyncableCounts(
     val recordEventsToDownload: Int,
     val isRecordEventsToDownloadLowerBound: Boolean,
     val eventsToUpload: Int,
-    val enrolmentsToUploadV2: Int,
-    val enrolmentsToUploadV4: Int,
+    val enrolmentsToUpload: Int,
     val samplesToUpload: Int,
 )

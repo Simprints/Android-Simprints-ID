@@ -81,8 +81,7 @@ class CountSyncableUseCaseTest {
             recordEventsToDownload = 10,
             isRecordEventsToDownloadLowerBound = true,
             eventsToUpload = 1,
-            enrolmentsToUploadV2 = 2,
-            enrolmentsToUploadV4 = 3,
+            enrolmentsToUpload = 5, // 2 of V2 + 3 of V4
             samplesToUpload = 4,
         )
         totalRecordsCountFlow.emit(5)
