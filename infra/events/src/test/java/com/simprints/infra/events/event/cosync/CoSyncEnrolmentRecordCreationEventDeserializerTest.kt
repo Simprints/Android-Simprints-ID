@@ -8,8 +8,6 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 class CoSyncEnrolmentRecordCreationEventDeserializerTest {
-    // Configure Json to be lenient if necessary, though strict is better for validation.
-    // 'ignoreUnknownKeys' helps if the JSON contains fields not in the model.
     private val json = JsonHelper.json
 
     @Test
@@ -79,8 +77,10 @@ class CoSyncEnrolmentRecordCreationEventDeserializerTest {
         // Assuming the fallback logic wraps the JSON string:
         assert(result.payload.moduleId is TokenizableString.Raw)
         assert(result.payload.attendantId is TokenizableString.Raw)
+        assertEquals(TokenizableString.Raw(ENCRYPTED_MODULE), result.payload.moduleId)
+        assertEquals(TokenizableString.Raw(UNENCRYPTED_ATTENDANT), result.payload.attendantId)
 
-        assertEquals(emptyList<BiometricReference>(), result.payload.biometricReferences)
+        assertEquals(emptyList(), result.payload.biometricReferences)
     }
 
     companion object {
@@ -92,7 +92,6 @@ class CoSyncEnrolmentRecordCreationEventDeserializerTest {
         const val ENCRYPTED_MODULE = "encrypted-module-1"
         const val UNENCRYPTED_ATTENDANT = "unencrypted-attendant-1"
 
-        // The template remains the same, assuming it represents the actual contract
         const val JSON_TEMPLATE = """
         {
             "id": "$EVENT_ID",
@@ -110,9 +109,6 @@ class CoSyncEnrolmentRecordCreationEventDeserializerTest {
         const val PLAIN_ATTENDANT = """
             "attendantId": "$ATTENDANT_ID""""
 
-        // Note: Verify if "className" is the correct discriminator for your KSerializer config.
-        // Standard KSerialization uses "type". If your data uses "className",
-        // TokenizableString must be annotated with @JsonClassDiscriminator("className")
         const val TOKENIZED_MODULE = """
             "moduleId": {
                 "className": "TokenizableString.Tokenized",

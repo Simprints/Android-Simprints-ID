@@ -53,7 +53,6 @@ data class OneToManyMatchEvent(
 
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this
 
-    // FIX 2: Apply Custom Serializer
     @Serializable(with = OneToManyMatchPayloadSerializer::class)
     sealed class OneToManyMatchPayload : EventPayload() {
         abstract override val type: EventType
