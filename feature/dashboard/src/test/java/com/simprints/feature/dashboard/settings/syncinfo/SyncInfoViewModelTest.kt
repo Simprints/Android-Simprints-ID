@@ -113,7 +113,7 @@ class SyncInfoViewModelTest {
         every { mockEventSyncState.isSyncFailedBecauseBackendMaintenance() } returns false
         every { mockEventSyncState.isSyncFailedBecauseTooManyRequests() } returns false
         every { mockEventSyncState.getEstimatedBackendMaintenanceOutage() } returns null
-        every { mockEventSyncState.isThereNotSyncHistory() } returns false
+        every { mockEventSyncState.hasSyncHistory() } returns true
         every { mockEventSyncState.progress } returns null
         every { mockEventSyncState.total } returns null
         every { mockEventSyncState.lastSyncTime } returns TEST_TIMESTAMP

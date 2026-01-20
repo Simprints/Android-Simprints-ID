@@ -81,7 +81,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             eventSyncState.isSyncInProgress() && totalEvents > 0 -> eventProgressProportion
 
             // Sync hasn't started
-            eventSyncState.isSyncConnecting() || eventSyncState.isThereNotSyncHistory() -> 0f
+            eventSyncState.isSyncConnecting() || !eventSyncState.hasSyncHistory() -> 0f
 
             // Sync done
             else -> 1f
@@ -95,7 +95,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         }
 
         val eventSyncProgressPart = SyncInfoProgressPart(
-            isPending = eventSyncState.isSyncConnecting() || eventSyncState.isThereNotSyncHistory(),
+            isPending = eventSyncState.isSyncConnecting() || !eventSyncState.hasSyncHistory(),
             isDone = eventSyncState.isSyncCompleted(),
             areNumbersVisible = eventSyncState.isSyncInProgress() && totalEvents > 0,
             currentNumber = currentEvents,

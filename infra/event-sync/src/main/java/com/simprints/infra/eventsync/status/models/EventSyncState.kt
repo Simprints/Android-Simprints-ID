@@ -21,13 +21,13 @@ data class EventSyncState(
     private val syncWorkersInfo: List<SyncWorkerInfo>
         get() = upSyncWorkersInfo + downSyncWorkersInfo
 
-    fun isThereNotSyncHistory() = syncWorkersInfo
-        .isEmpty()
+    fun hasSyncHistory() = syncWorkersInfo
+        .isNotEmpty()
 
     fun isSyncRunning() = syncWorkersInfo
         .any { it.state is EventSyncWorkerState.Running || it.state is EventSyncWorkerState.Enqueued }
 
-    fun isSyncCompleted() = !isThereNotSyncHistory() &&
+    fun isSyncCompleted() = hasSyncHistory() &&
         syncWorkersInfo.all { it.state is EventSyncWorkerState.Succeeded }
 
     fun isSyncInProgress() = syncWorkersInfo

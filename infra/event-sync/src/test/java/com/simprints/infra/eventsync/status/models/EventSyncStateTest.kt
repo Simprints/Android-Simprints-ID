@@ -13,25 +13,25 @@ import org.junit.Test
 
 class EventSyncStateTest {
     @Test
-    fun `isThereNotSyncHistory() is true when there are no workers`() {
+    fun `hasSyncHistory() is false when there are no workers`() {
         assertThat(
             createState(
                 up = emptyList(),
                 down = emptyList(),
                 reporters = emptyList(),
-            ).isThereNotSyncHistory(),
-        ).isTrue()
+            ).hasSyncHistory(),
+        ).isFalse()
     }
 
     @Test
-    fun `isThereNotSyncHistory() is false when there are workers`() {
+    fun `hasSyncHistory() is true when there are workers`() {
         assertThat(
             createState(
                 up = listOf(createWorker(Succeeded)),
                 down = emptyList(),
                 reporters = emptyList(),
-            ).isThereNotSyncHistory(),
-        ).isFalse()
+            ).hasSyncHistory(),
+        ).isTrue()
     }
 
     @Test

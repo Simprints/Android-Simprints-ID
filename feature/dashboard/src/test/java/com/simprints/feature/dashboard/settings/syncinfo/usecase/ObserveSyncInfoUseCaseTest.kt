@@ -107,7 +107,7 @@ internal class ObserveSyncInfoUseCaseTest {
         every { isSyncFailedBecauseBackendMaintenance() } returns false
         every { isSyncFailedBecauseTooManyRequests() } returns false
         every { getEstimatedBackendMaintenanceOutage() } returns null
-        every { isThereNotSyncHistory() } returns false
+        every { hasSyncHistory() } returns true
         every { progress } returns null
         every { total } returns null
     }
@@ -399,7 +399,7 @@ internal class ObserveSyncInfoUseCaseTest {
             every { isSyncConnecting() } returns true
             every { isSyncInProgress() } returns false
             every { isSyncCompleted() } returns false
-            every { isThereNotSyncHistory() } returns false
+            every { hasSyncHistory() } returns true
         }
         syncStatusFlow.value = SyncStatus(eventSyncState = mockConnectingEventSyncState, imageSyncStatus = mockImageSyncStatus)
         createUseCase()
