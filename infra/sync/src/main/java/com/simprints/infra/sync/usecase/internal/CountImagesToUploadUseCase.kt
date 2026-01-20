@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class CountImagesToUploadUseCase @Inject constructor(
+internal class CountImagesToUploadUseCase @Inject constructor(
     private val configRepository: ConfigRepository,
     private val imageRepository: ImageRepository,
 ) {

@@ -23,7 +23,7 @@ import javax.inject.Singleton
  * it is an app-scoped StateFlow. An up-to-date sync state value can be accessed synchronously.
  */
 @Singleton
-class SyncUseCase @Inject constructor(
+class SyncUseCase @Inject internal constructor(
     eventSync: EventSyncUseCase,
     imageSync: ImageSyncUseCase,
     @param:AppScope private val appScope: CoroutineScope,

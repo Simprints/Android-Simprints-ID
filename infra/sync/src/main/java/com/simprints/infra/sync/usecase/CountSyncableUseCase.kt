@@ -24,7 +24,7 @@ import javax.inject.Singleton
  * together in a reactive way.
  */
 @Singleton
-class CountSyncableUseCase @Inject constructor(
+class CountSyncableUseCase @Inject internal constructor(
     private val countEnrolmentRecords: CountEnrolmentRecordsUseCase,
     private val countImagesToUpload: CountImagesToUploadUseCase,
     private val eventDownSyncCount: EventDownSyncPeriodicCountUseCase,

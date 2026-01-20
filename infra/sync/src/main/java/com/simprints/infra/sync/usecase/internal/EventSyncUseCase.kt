@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import javax.inject.Inject
 
-class EventSyncUseCase @Inject constructor(
+internal class EventSyncUseCase @Inject constructor(
     private val eventSyncStateProcessor: EventSyncStateProcessor,
 ) {
     internal operator fun invoke(): Flow<EventSyncState> = eventSyncStateProcessor.getLastSyncState().distinctUntilChanged()
