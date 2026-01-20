@@ -11,6 +11,7 @@ import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTempla
 import com.simprints.infra.enrolment.records.room.store.models.DbExternalCredential
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject
 import com.simprints.infra.enrolment.records.room.store.models.SubjectBiometrics
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SubjectDao {
@@ -49,6 +50,14 @@ interface SubjectDao {
 
     @RawQuery
     suspend fun countSubjects(query: SupportSQLiteQuery): Int
+
+    @RawQuery(
+        observedEntities = [
+            DbSubject::class,
+            DbBiometricTemplate::class,
+        ],
+    )
+    fun observeSubjectCounts(query: SupportSQLiteQuery): Flow<Int>
 
     @RawQuery
     suspend fun loadSamples(query: SupportSQLiteQuery): Map<@MapColumn(DbSubject.SUBJECT_ID_COLUMN) String, List<DbBiometricTemplate>>

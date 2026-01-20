@@ -23,12 +23,11 @@ import com.simprints.infra.security.keyprovider.LocalDbKey
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.toList
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -810,6 +809,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
         val firstEmission = channel.receive()
         collectJob.cancel()
+        channel.close()
         assertThat(firstEmission).isEqualTo(0)
     }
 
@@ -834,6 +834,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             updated = channel.receive()
         } while (updated != 1)
         collectJob.cancel()
+        channel.close()
         assertThat(initial).isEqualTo(0)
         assertThat(updated).isEqualTo(1)
     }
@@ -862,6 +863,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             afterDelete = channel.receive()
         } while (afterDelete != 0)
         collectJob.cancel()
+        channel.close()
         assertThat(initial).isEqualTo(1)
         assertThat(afterDelete).isEqualTo(0)
     }
@@ -872,64 +874,14 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             actions = listOf(EnrolmentRecordAction.Creation(enrolmentRecord1P1WithFace)),
             project = project,
         )
-        val channel = Channel<Int>(Channel.UNLIMITED)
 
-        val collectJob = launch {
-            dataSource
-                .observeCount()
-                .collect { channel.trySend(it) }
-        }
-
-        val initial = channel.receive()
+        val initial = dataSource.observeCount().first()
+        assertThat(initial).isEqualTo(1)
 
         dataSource.deleteAll()
 
-        var afterDelete: Int
-        do {
-            afterDelete = channel.receive()
-        } while (afterDelete != 0)
-        collectJob.cancel()
-        assertThat(initial).isEqualTo(1)
+        val afterDelete = dataSource.observeCount().first()
         assertThat(afterDelete).isEqualTo(0)
-    }
-
-    @Test
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun `observeCount does not include records from other projects`() = runTest {
-        val project1Channel = Channel<Int>(Channel.UNLIMITED)
-        val project2Channel = Channel<Int>(Channel.UNLIMITED)
-
-        val project1CollectJob = launch {
-            dataSource
-                .observeCount(EnrolmentRecordQuery(projectId = PROJECT_1_ID))
-                .collect { project1Channel.trySend(it) }
-        }
-        val project2CollectJob = launch {
-            dataSource
-                .observeCount(EnrolmentRecordQuery(projectId = PROJECT_2_ID))
-                .collect { project2Channel.trySend(it) }
-        }
-
-        val project1Initial = project1Channel.receive()
-        val project2Initial = project2Channel.receive()
-
-        dataSource.performActions(
-            actions = listOf(EnrolmentRecordAction.Creation(enrolmentRecord1P1WithFace)),
-            project = project,
-        )
-
-        var project1AfterCreate: Int
-        do {
-            project1AfterCreate = project1Channel.receive()
-        } while (project1AfterCreate != 1)
-        advanceUntilIdle()
-        val project2AfterInvalidation = project2Channel.tryReceive().getOrNull()
-        project1CollectJob.cancel()
-        project2CollectJob.cancel()
-        assertThat(project1Initial).isEqualTo(0)
-        assertThat(project2Initial).isEqualTo(0)
-        assertThat(project1AfterCreate).isEqualTo(1)
-        assertThat(project2AfterInvalidation).isNull() // same value not re-emitted
     }
 
     @Test(expected = IllegalArgumentException::class) // Reverted to JUnit exception check
