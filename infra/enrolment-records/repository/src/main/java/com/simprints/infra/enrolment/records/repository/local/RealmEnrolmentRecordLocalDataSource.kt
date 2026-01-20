@@ -32,11 +32,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -64,8 +64,6 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         // Although batches are processed sequentially, we use a small channel capacity to prevent blocking and reduce the risk of out-of-memory errors.
         const val CHANNEL_CAPACITY = 4
     }
-
-    private val observedCountInvalidation = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     override suspend fun load(query: EnrolmentRecordQuery): List<EnrolmentRecord> = realmWrapper.readRealm {
         it
@@ -96,7 +94,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                             references = (
                                 dbSubject.faceSamples.toDomain() +
                                     dbSubject.fingerprintSamples.toDomain()
-                            ).filter { it.format == query.format },
+                                ).filter { it.format == query.format },
                         )
                     },
                     onCandidateLoaded = onCandidateLoaded,
@@ -133,14 +131,12 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                 realm.delete(realm.query(DbSubject::class).buildRealmQueryForSubject(it))
             }
         }
-        observedCountInvalidation.tryEmit(Unit)
     }
 
     override suspend fun deleteAll() {
         realmWrapper.writeRealm { realm ->
             realm.deleteAll()
         }
-        observedCountInvalidation.tryEmit(Unit)
     }
 
     override suspend fun count(
@@ -158,9 +154,18 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
     override fun observeCount(
         query: EnrolmentRecordQuery,
         dataSource: BiometricDataSource,
-    ): Flow<Int> = observedCountInvalidation
-        .onStart { emit(Unit) } // initial count
-        .mapLatest { count(query, dataSource) }
+    ): Flow<Int> = flow {
+        emitAll(
+            realmWrapper.readRealm { realm ->
+                realm
+                    .query(DbSubject::class)
+                    .buildRealmQueryForSubject(query)
+                    .count()
+                    .asFlow()
+            }
+        )
+    }
+        .map { it.toInt() }
         .distinctUntilChanged()
 
     override suspend fun performActions(
@@ -235,12 +240,12 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                                 faceSamplesMap[false].orEmpty() + action.samplesToAdd
                                     .filter { it.modality == Modality.FACE }
                                     .flatMap { it.toRealmFaceDb() }
-                            ).toRealmList()
+                                ).toRealmList()
                             dbSubject.fingerprintSamples = (
                                 fingerprintSamplesMap[false].orEmpty() + action.samplesToAdd
                                     .filter { it.modality == Modality.FINGERPRINT }
                                     .flatMap { it.toRealmFingerprintDb() }
-                            ).toRealmList()
+                                ).toRealmList()
                             dbSubject.externalCredentials = allExternalCredentials.toRealmList()
 
                             faceSamplesMap[true]?.forEach { realm.delete(it) }
@@ -263,7 +268,6 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                 }
             }
         }
-        observedCountInvalidation.tryEmit(Unit)
     }
 
     override suspend fun getLocalDBInfo() = realmWrapper.readRealm { realm ->

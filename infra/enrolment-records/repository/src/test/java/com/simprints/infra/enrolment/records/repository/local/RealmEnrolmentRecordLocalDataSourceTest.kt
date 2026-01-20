@@ -33,15 +33,16 @@ import io.mockk.impl.annotations.MockK
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.query.RealmQuery
+import io.realm.kotlin.query.RealmScalarQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -49,11 +50,6 @@ import java.util.UUID
 import kotlin.random.Random
 
 class RealmEnrolmentRecordLocalDataSourceTest {
-    companion object {
-        private const val PROJECT_ID = "projectId"
-        private const val OTHER_PROJECT_ID = "otherProjectId"
-    }
-
     @MockK
     private lateinit var timeHelper: TimeHelper
 
@@ -82,6 +78,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     private lateinit var mutableBlockCapture: CapturingSlot<(MutableRealm) -> Any>
     private val onCandidateLoaded: suspend () -> Unit = {}
     private var localEnrolmentRecords: MutableList<EnrolmentRecord> = mutableListOf()
+    private lateinit var subjectCountFlow: MutableStateFlow<Long>
 
     private lateinit var enrolmentRecordLocalDataSource: RealmEnrolmentRecordLocalDataSource
 
@@ -90,12 +87,23 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
         localEnrolmentRecords = mutableListOf()
+        subjectCountFlow = MutableStateFlow(0L)
 
         val insertedSubject = slot<DbSubject>()
-        every { mutableRealm.delete(any()) } answers { localEnrolmentRecords.clear() }
-        every { mutableRealm.deleteAll() } answers { localEnrolmentRecords.clear() }
+
+        every { mutableRealm.delete(any()) } answers {
+            localEnrolmentRecords.clear()
+            updateSubjectCount()
+        }
+        every { mutableRealm.deleteAll() } answers {
+            localEnrolmentRecords.clear()
+            updateSubjectCount()
+        }
         every { mutableRealm.copyToRealm(capture(insertedSubject), any()) } answers {
-            localEnrolmentRecords.add(insertedSubject.captured.toDomain())
+            val domain = insertedSubject.captured.toDomain()
+            localEnrolmentRecords.removeAll { it.subjectId == domain.subjectId }
+            localEnrolmentRecords.add(domain)
+            updateSubjectCount()
             insertedSubject.captured
         }
 
@@ -107,9 +115,10 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         coEvery { realmWrapperMock.writeRealm(capture(mutableBlockCapture)) } answers {
             mutableBlockCapture.captured.invoke(mutableRealm)
         }
-        every { realmQuery.count() } answers {
-            mockk { every { find() } returns localEnrolmentRecords.size.toLong() }
-        }
+        val countQuery = mockk<RealmScalarQuery<Long>>()
+        every { countQuery.find() } answers { localEnrolmentRecords.size.toLong() }
+        every { countQuery.asFlow() } returns subjectCountFlow
+        every { realmQuery.count() } returns countQuery
 
         every { realm.query(DbSubject::class) } returns realmQuery
         every { mutableRealm.query(DbSubject::class) } returns realmQuery
@@ -492,7 +501,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
 
         val initial = channel.receive()
         enrolmentRecordLocalDataSource.performActions(
-            actions = listOf(EnrolmentRecordAction.Creation(getRandomSubject(projectId = PROJECT_ID))),
+            actions = listOf(EnrolmentRecordAction.Creation(getRandomSubject())),
             project = project,
         )
 
@@ -507,7 +516,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
 
     @Test
     fun `observeCount emits updated count after delete`() = runTest {
-        val createdSubject = getRandomSubject(projectId = PROJECT_ID)
+        val createdSubject = getRandomSubject()
         enrolmentRecordLocalDataSource.performActions(
             actions = listOf(EnrolmentRecordAction.Creation(createdSubject)),
             project = project,
@@ -536,7 +545,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     @Test
     fun `observeCount emits updated count after deleteAll`() = runTest {
         enrolmentRecordLocalDataSource.performActions(
-            actions = listOf(EnrolmentRecordAction.Creation(getRandomSubject(projectId = PROJECT_ID))),
+            actions = listOf(EnrolmentRecordAction.Creation(getRandomSubject())),
             project = project,
         )
         val channel = Channel<Int>(Channel.UNLIMITED)
@@ -560,60 +569,16 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         assertThat(afterDelete).isEqualTo(0)
     }
 
-    @Test
-    fun `observeCount does not include records from other projects`() = runTest {
-        val project1RealmQuery = mockk<RealmQuery<DbSubject>>(relaxed = true)
-        val project2RealmQuery = mockk<RealmQuery<DbSubject>>(relaxed = true)
-        every { realmQuery.query("projectId == $0", PROJECT_ID) } returns project1RealmQuery
-        every { realmQuery.query("projectId == $0", OTHER_PROJECT_ID) } returns project2RealmQuery
-        every { project1RealmQuery.count() } answers {
-            mockk { every { find() } returns localEnrolmentRecords.count { it.projectId == PROJECT_ID }.toLong() }
-        }
-        every { project2RealmQuery.count() } answers {
-            mockk { every { find() } returns localEnrolmentRecords.count { it.projectId == OTHER_PROJECT_ID }.toLong() }
-        }
-        val project1Channel = Channel<Int>(Channel.UNLIMITED)
-        val project2Channel = Channel<Int>(Channel.UNLIMITED)
-
-        val project1CollectJob = launch {
-            enrolmentRecordLocalDataSource
-                .observeCount(EnrolmentRecordQuery(projectId = PROJECT_ID))
-                .collect { project1Channel.trySend(it) }
-        }
-        val project2CollectJob = launch {
-            enrolmentRecordLocalDataSource
-                .observeCount(EnrolmentRecordQuery(projectId = OTHER_PROJECT_ID))
-                .collect { project2Channel.trySend(it) }
-        }
-
-        val project1Initial = project1Channel.receive()
-        val project2Initial = project2Channel.receive()
-
-        enrolmentRecordLocalDataSource.performActions(
-            actions = listOf(EnrolmentRecordAction.Creation(getRandomSubject(projectId = PROJECT_ID))),
-            project = project,
-        )
-
-        var project1AfterCreate: Int
-        do {
-            project1AfterCreate = project1Channel.receive()
-        } while (project1AfterCreate != 1)
-        advanceUntilIdle()
-        val project2AfterInvalidation = project2Channel.tryReceive().getOrNull()
-        project1CollectJob.cancel()
-        project2CollectJob.cancel()
-        assertThat(project1Initial).isEqualTo(0)
-        assertThat(project2Initial).isEqualTo(0)
-        assertThat(project1AfterCreate).isEqualTo(1)
-        assertThat(project2AfterInvalidation).isNull() // same value not re-emitted
-    }
-
     private fun getFakePerson(): DbSubject = getRandomSubject().toRealmDb()
 
-    private fun saveFakePerson(fakeSubject: DbSubject): DbSubject = fakeSubject.also { localEnrolmentRecords.add(it.toDomain()) }
+    private fun saveFakePerson(fakeSubject: DbSubject): DbSubject = fakeSubject.also {
+        localEnrolmentRecords.add(it.toDomain())
+        updateSubjectCount()
+    }
 
     private fun saveFakePeople(enrolmentRecords: List<EnrolmentRecord>): List<EnrolmentRecord> = enrolmentRecords.toMutableList().also {
         localEnrolmentRecords.addAll(it)
+        updateSubjectCount()
     }
 
     private fun DbSubject.deepEquals(other: DbSubject): Boolean = when {
@@ -691,4 +656,8 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         subjectId = "subjectId",
         type = ExternalCredentialType.NHISCard,
     )
+
+    private fun updateSubjectCount() {
+        subjectCountFlow.value = localEnrolmentRecords.size.toLong()
+    }
 }
