@@ -65,8 +65,8 @@ class SyncUseCase @Inject constructor(
      * to prevent a `sync()` usage from being interpreted as a command to start syncing.
      */
     operator fun invoke(
-        eventSync: SyncCommand,
-        imageSync: SyncCommand,
+        eventSync: SyncCommand, // todo MS-1299 finalize the signature of sync controls
+        imageSync: SyncCommand, // todo MS-1299 finalize the signature of sync controls
     ): StateFlow<SyncStatus> = sharedSyncStatus
-    // todo MS-1278 move sync commands here from SyncOrchestrator (use helper usecases if needed), add to SyncCommand, and implement them
+    // todo MS-1299 move sync commands here from SyncOrchestrator (use helper usecases if needed), add to SyncCommand, and implement them
 }
