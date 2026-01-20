@@ -2,7 +2,6 @@ package com.simprints.infra.eventsync.sync.down
 
 import com.simprints.core.domain.tokenization.values
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
@@ -25,7 +24,7 @@ internal class EventDownSyncCountsRepositoryImpl @Inject constructor(
         val deviceConfig = configRepository.getDeviceConfiguration()
 
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
-            modes = getProjectModalities(projectConfig),
+            modes = projectConfig.general.modalities,
             selectedModuleIDs = deviceConfig.selectedModules.values(),
             syncPartitioning = simprintsDownConfig.partitionType.toDomain(),
         )
@@ -38,6 +37,4 @@ internal class EventDownSyncCountsRepositoryImpl @Inject constructor(
             isLowerBound = counts.any { it.isLowerBound },
         )
     }
-
-    private fun getProjectModalities(projectConfiguration: ProjectConfiguration) = projectConfiguration.general.modalities
 }
