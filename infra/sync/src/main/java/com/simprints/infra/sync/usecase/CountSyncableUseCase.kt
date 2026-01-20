@@ -3,7 +3,6 @@ package com.simprints.infra.sync.usecase
 import com.simprints.core.AppScope
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.sync.down.EventDownSyncPeriodicCountUseCase
 import com.simprints.infra.sync.SyncableCounts
 import com.simprints.infra.sync.usecase.internal.CountEnrolmentRecordsUseCase
@@ -33,11 +32,22 @@ class CountSyncableUseCase @Inject internal constructor(
 ) {
     private val sharedSyncableCounts: SharedFlow<SyncableCounts> by lazy {
         combine(
-            totalRecordsCountFlow(),
-            recordEventsToDownloadCountFlow(),
-            eventsToUploadCountFlow(),
-            enrolmentsToUploadCountFlow(),
-            samplesToUploadCountFlow(),
+            countEnrolmentRecords(),
+            eventDownSyncCount(),
+            flow { // recordEventsToDownload
+                emitAll(eventRepository.observeEventCount(type = null))
+            },
+            flow { // eventsToUpload
+                emitAll(
+                    combine(
+                        eventRepository.observeEventCount(EventType.ENROLMENT_V2),
+                        eventRepository.observeEventCount(EventType.ENROLMENT_V4),
+                    ) { countV2, countV4 ->
+                        countV2 + countV4
+                    }
+                )
+            },
+            countSamplesToUpload(),
         ) { totalRecords, recordEventsToDownload, eventsToUpload, enrolmentsToUpload, samplesToUpload ->
             val (recordEventsToDownloadCount, isRecordEventsToDownloadLowerBound) = recordEventsToDownload
             SyncableCounts(
@@ -57,30 +67,4 @@ class CountSyncableUseCase @Inject internal constructor(
 
     operator fun invoke(): Flow<SyncableCounts> = sharedSyncableCounts
 
-    private fun totalRecordsCountFlow(): Flow<Int> = flow {
-        emitAll(countEnrolmentRecords())
-    }
-
-    private fun recordEventsToDownloadCountFlow(): Flow<DownSyncCounts> = flow {
-        emitAll(eventDownSyncCount())
-    }
-
-    private fun eventsToUploadCountFlow(): Flow<Int> = flow {
-        emitAll(eventRepository.observeEventCount(type = null))
-    }
-
-    private fun enrolmentsToUploadCountFlow(): Flow<Int> = flow {
-        emitAll(
-            combine(
-                eventRepository.observeEventCount(EventType.ENROLMENT_V2),
-                eventRepository.observeEventCount(EventType.ENROLMENT_V4),
-            ) { countV2, countV4 ->
-                countV2 + countV4
-            }
-        )
-    }
-
-    private fun samplesToUploadCountFlow(): Flow<Int> = flow {
-        emitAll(countSamplesToUpload())
-    }
 }
