@@ -5,9 +5,14 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.CONSENT
+import com.simprints.infra.events.event.domain.models.EventType.Companion.CONSENT_KEY
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(CONSENT_KEY)
 data class ConsentEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: ConsentPayload,
@@ -31,6 +36,7 @@ data class ConsentEvent(
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
+    @Serializable
     data class ConsentPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
@@ -42,12 +48,14 @@ data class ConsentEvent(
         override fun toSafeString(): String = "consent: $consentType, result: $result"
 
         @Keep
+        @Serializable
         enum class Type {
             INDIVIDUAL,
             PARENTAL,
         }
 
         @Keep
+        @Serializable
         enum class Result {
             ACCEPTED,
             DECLINED,

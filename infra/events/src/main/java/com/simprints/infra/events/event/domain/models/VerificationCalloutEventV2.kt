@@ -5,9 +5,14 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_VERIFICATION
+import com.simprints.infra.events.event.domain.models.EventType.Companion.CALLOUT_VERIFICATION_KEY
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(CALLOUT_VERIFICATION_KEY)
 @Deprecated("Replaced by v3 in 2025.2.0")
 data class VerificationCalloutEventV2(
     override val id: String = UUID.randomUUID().toString(),
@@ -50,6 +55,7 @@ data class VerificationCalloutEventV2(
     )
 
     @Keep
+    @Serializable
     data class VerificationCalloutPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,

@@ -6,9 +6,14 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ERROR
+import com.simprints.infra.events.event.domain.models.EventType.Companion.CALLBACK_ERROR_KEY
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(CALLBACK_ERROR_KEY)
 data class ErrorCallbackEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: ErrorCallbackPayload,
@@ -30,6 +35,7 @@ data class ErrorCallbackEvent(
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
+    @Serializable
     data class ErrorCallbackPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
@@ -40,6 +46,7 @@ data class ErrorCallbackEvent(
         override fun toSafeString(): String = "reason: $reason"
 
         @Keep
+        @Serializable
         enum class Reason {
             DIFFERENT_PROJECT_ID_SIGNED_IN,
             DIFFERENT_USER_ID_SIGNED_IN,

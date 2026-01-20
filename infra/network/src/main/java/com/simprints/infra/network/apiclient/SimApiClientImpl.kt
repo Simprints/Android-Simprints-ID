@@ -107,7 +107,7 @@ internal class SimApiClientImpl<T : SimRemoteInterface>(
         }
         val errorBody = response()?.errorBody()?.string() ?: return false
 
-        val apiError = JsonHelper().fromJson<ApiError>(errorBody)
+        val apiError = JsonHelper().json.decodeFromString<ApiError>(errorBody)
         return apiError.error == BACKEND_MAINTENANCE_ERROR_STRING
     }
 

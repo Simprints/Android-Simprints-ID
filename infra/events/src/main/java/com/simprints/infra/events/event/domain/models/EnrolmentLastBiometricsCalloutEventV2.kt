@@ -5,9 +5,14 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_LAST_BIOMETRICS
+import com.simprints.infra.events.event.domain.models.EventType.Companion.CALLOUT_LAST_BIOMETRICS_KEY
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(CALLOUT_LAST_BIOMETRICS_KEY)
 @Deprecated("Replaced by v3 in 2025.2.0")
 data class EnrolmentLastBiometricsCalloutEventV2(
     override val id: String = UUID.randomUUID().toString(),
@@ -50,6 +55,7 @@ data class EnrolmentLastBiometricsCalloutEventV2(
     )
 
     @Keep
+    @Serializable
     data class EnrolmentLastBiometricsCalloutPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,

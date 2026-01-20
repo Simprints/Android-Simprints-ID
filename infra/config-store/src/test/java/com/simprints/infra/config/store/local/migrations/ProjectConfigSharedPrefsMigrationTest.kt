@@ -711,9 +711,22 @@ class ProjectConfigSharedPrefsMigrationTest {
                 "{\"FaceQualityThreshold\":\"-1\"}",
             )
         private val JSON_FACE_CONFIGURATION_WITH_UNEXPECTED_FIELD =
-            JsonHelper.fromJson<Map<String, JsonElement>>(
-                "{\"FaceMatchThreshold\":30, \"FaceConfidenceThresholds\":\"{\\\"LOW\\\":\\\"1\\\",\\\"MEDIUM\\\":\\\"20\\\",\\\"HIGH\\\":\\\"100\\\"}\",\"FaceNbOfFramesCaptured\":\"2\",\"FaceQualityThreshold\":\"-1\",\"SaveFaceImages\":\"true\"}",
+            JsonHelper.json.decodeFromString<Map<String, JsonElement>>(
+                """
+                {
+                  "FaceMatchThreshold": 30,
+                  "FaceConfidenceThresholds": {
+                    "LOW": 1,
+                    "MEDIUM": 20,
+                    "HIGH": 100
+                  },
+                  "FaceNbOfFramesCaptured": 2,
+                  "FaceQualityThreshold": -1,
+                  "SaveFaceImages": true
+                }
+                """.trimIndent(),
             )
+
         private val PROTO_FACE_CONFIGURATION = ProtoFaceConfiguration
             .newBuilder()
             .addAllowedSdks(ProtoFaceConfiguration.ProtoBioSdk.RANK_ONE)

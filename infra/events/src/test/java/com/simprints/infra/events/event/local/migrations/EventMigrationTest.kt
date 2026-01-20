@@ -3,13 +3,8 @@ package com.simprints.infra.events.event.local.migrations
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase.CONFLICT_NONE
 import androidx.room.testing.MigrationTestHelper
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.module.SimpleModule
-import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
-import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
+import androidx.test.ext.junit.runners.*
+import androidx.test.platform.app.*
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.Event
@@ -51,11 +46,7 @@ class EventMigrationTest {
         db.query("SELECT * FROM $TABLE_NAME").use { cursor ->
             while (cursor.moveToNext()) {
                 val eventJson = cursor.getStringWithColumnName("eventJson")!!
-                JsonHelper.fromJson(
-                    json = eventJson,
-                    type = object : TypeReference<Event>() {},
-                    module = tokenizeSerializationModule,
-                )
+                JsonHelper.json.decodeFromString<Event>(eventJson)
             }
         }
         helper.closeWhenFinished(db)
@@ -115,9 +106,5 @@ class EventMigrationTest {
             EventMigration15to16(),
             EventMigration16to17(),
         )
-        val tokenizeSerializationModule = SimpleModule().apply {
-            addSerializer(TokenizableString::class.java, TokenizationClassNameSerializer())
-            addDeserializer(TokenizableString::class.java, TokenizationClassNameDeserializer())
-        }
     }
 }

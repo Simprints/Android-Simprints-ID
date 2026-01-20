@@ -1,6 +1,5 @@
 package com.simprints.infra.events.event.domain.models
 
-import com.fasterxml.jackson.core.type.TypeReference
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
@@ -44,7 +43,6 @@ class Vero2InfoSnapshotEventTest {
         val payload =
             Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForNewApi(
                 CREATED_AT,
-                NEW_EVENT_VERSION,
                 batteryArg,
                 versionArg,
             )
@@ -52,12 +50,10 @@ class Vero2InfoSnapshotEventTest {
             id = "5bc59283-a448-4911-a21a-5d39b0e346a7",
             scopeId = "af4eca90-c599-4323-97c7-c70e490c5568",
             payload = payload,
-            type = VERO_2_INFO_SNAPSHOT,
         )
 
         val eventAsString = Vero2InfoSnapshotEventSample.newApiJsonEventString
-        val actualEvent = JsonHelper.fromJson(eventAsString, object : TypeReference<Event>() {})
-
+        val actualEvent = JsonHelper.json.decodeFromString<Event>(eventAsString)
         assertThat(expectedEvent).isEqualTo(actualEvent)
     }
 
@@ -73,22 +69,20 @@ class Vero2InfoSnapshotEventTest {
             master = 10129,
         )
         val batteryArg = Vero2InfoSnapshotEvent.BatteryInfo(0, 1, 2, 3)
-        val payload = Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForOldApi(
-            CREATED_AT,
-            Vero2InfoSnapshotEvent.OLD_EVENT_VERSION,
-            batteryArg,
-            versionArg,
-        )
+        val payload: Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload = Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload
+            .Vero2InfoSnapshotPayloadForOldApi(
+                CREATED_AT,
+                batteryArg,
+                versionArg,
+            )
         val expectedEvent = Vero2InfoSnapshotEvent(
             id = "3afb1b9e-b263-4073-b773-6e1dac20d72f",
             scopeId = "6dcb3810-4789-4149-8fea-473ffb520958",
             payload = payload,
-            type = VERO_2_INFO_SNAPSHOT,
         )
 
         val eventAsString = Vero2InfoSnapshotEventSample.oldApiJsonEventString
-        val actualEvent = JsonHelper.fromJson(eventAsString, object : TypeReference<Event>() {})
-
+        val actualEvent = JsonHelper.json.decodeFromString<Event>(eventAsString)
         assertThat(expectedEvent).isEqualTo(actualEvent)
     }
 }

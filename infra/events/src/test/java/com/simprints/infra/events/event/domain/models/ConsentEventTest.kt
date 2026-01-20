@@ -1,6 +1,8 @@
 package com.simprints.infra.events.event.domain.models
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
+import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.event.domain.models.ConsentEvent.Companion.EVENT_VERSION
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
@@ -24,5 +26,39 @@ class ConsentEventTest {
             assertThat(consentType).isEqualTo(INDIVIDUAL)
             assertThat(result).isEqualTo(ACCEPTED)
         }
+    }
+
+    @Test
+    fun serialize_and_deserialize_ConsentEvent() {
+        // Given
+        val createdAt = Timestamp(0)
+        val endedAt = Timestamp(0)
+        val event = ConsentEvent(
+            createdAt = createdAt,
+            endTime = endedAt,
+            consentType = INDIVIDUAL,
+            result = ACCEPTED,
+        )
+
+        val json = JsonHelper.json.encodeToString(event)
+        // When
+        val decoded = JsonHelper.json.decodeFromString<ConsentEvent>(json)
+
+        // Then
+        assertThat(decoded.id).isEqualTo(event.id)
+        assertThat(decoded.type).isEqualTo(event.type)
+        assertThat(decoded.scopeId).isEqualTo(event.scopeId)
+        assertThat(decoded.projectId).isEqualTo(event.projectId)
+
+        // Payload assertions
+        val expectedPayload = event.payload
+        val decodedPayload = decoded.payload
+
+        assertThat(decodedPayload.createdAt).isEqualTo(expectedPayload.createdAt)
+        assertThat(decodedPayload.endedAt).isEqualTo(expectedPayload.endedAt)
+        assertThat(decodedPayload.eventVersion).isEqualTo(expectedPayload.eventVersion)
+        assertThat(decodedPayload.consentType).isEqualTo(expectedPayload.consentType)
+        assertThat(decodedPayload.result).isEqualTo(expectedPayload.result)
+        assertThat(decodedPayload.type).isEqualTo(expectedPayload.type)
     }
 }

@@ -4,10 +4,15 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.FACE_ONBOARDING_COMPLETE_KEY
 import com.simprints.infra.events.event.domain.models.EventType.FACE_ONBOARDING_COMPLETE
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(FACE_ONBOARDING_COMPLETE_KEY)
 data class FaceOnboardingCompleteEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: FaceOnboardingCompletePayload,
@@ -29,6 +34,7 @@ data class FaceOnboardingCompleteEvent(
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
+    @Serializable
     data class FaceOnboardingCompletePayload(
         override val createdAt: Timestamp,
         override var endedAt: Timestamp?,
