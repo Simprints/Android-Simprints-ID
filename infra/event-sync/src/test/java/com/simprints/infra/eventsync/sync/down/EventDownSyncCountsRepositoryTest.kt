@@ -23,7 +23,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-internal class EventDownSyncCountsRepositoryImplTest {
+internal class EventDownSyncCountsRepositoryTest {
     @MockK
     private lateinit var configRepository: ConfigRepository
 
@@ -61,7 +61,7 @@ internal class EventDownSyncCountsRepositoryImplTest {
             }
         }
 
-        repository = EventDownSyncCountsRepositoryImpl(
+        repository = EventDownSyncCountsRepository(
             configRepository = configRepository,
             downSyncScopeRepository = downSyncScopeRepository,
             eventRemoteDataSource = eventRemoteDataSource,

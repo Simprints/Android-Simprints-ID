@@ -9,7 +9,6 @@ import com.simprints.infra.eventsync.status.EventSyncStatusDatabase
 import com.simprints.infra.eventsync.status.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.infra.eventsync.status.up.local.DbEventUpSyncOperationStateDao
 import com.simprints.infra.eventsync.sync.down.EventDownSyncCountsRepository
-import com.simprints.infra.eventsync.sync.down.EventDownSyncCountsRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -29,7 +28,7 @@ abstract class EventSyncModule {
     internal abstract fun provideEventSyncManager(impl: EventSyncManagerImpl): EventSyncManager
 
     @Binds
-    internal abstract fun provideEventDownSyncCountsRepository(impl: EventDownSyncCountsRepositoryImpl): EventDownSyncCountsRepository
+    internal abstract fun provideEventDownSyncCountsRepository(impl: EventDownSyncCountsRepository): EventDownSyncCountsRepository
 }
 
 @Module

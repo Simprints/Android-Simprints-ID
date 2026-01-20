@@ -2,8 +2,6 @@ package com.simprints.infra.sync.usecase
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.time.TimeHelper
-import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
@@ -194,11 +192,8 @@ class CountSyncableUseCaseTest {
             DownSyncCounts(count = 2, isLowerBound = false), // immediate periodic on subscribe
             DownSyncCounts(count = 3, isLowerBound = false), // would be after interval if still subscribed
         )
-        val timeHelper = io.mockk.mockk<TimeHelper>()
-        every { timeHelper.now() } answers { Timestamp(testScheduler.currentTime) }
         val eventDownSyncCount = EventDownSyncPeriodicCountUseCase(
             downSyncCountsRepository,
-            timeHelper = timeHelper,
             appScope = backgroundScope,
         )
         runCurrent()
