@@ -56,7 +56,7 @@ internal class ImageRepositoryImpl @Inject internal constructor(
     override suspend fun getNumberOfImagesToUpload(projectId: String): Int = localDataSource.listImages(projectId).count()
 
     override suspend fun observeNumberOfImagesToUpload(projectId: String): Flow<Int> =
-        localDataSource.observeImages(projectId).map { it.count() }.distinctUntilChanged()
+        localDataSource.observeImageCounts(projectId).distinctUntilChanged()
 
     override suspend fun uploadStoredImagesAndDelete(
         projectId: String,

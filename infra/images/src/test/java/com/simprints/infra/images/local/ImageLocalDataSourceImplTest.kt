@@ -130,24 +130,24 @@ class ImageLocalDataSourceImplTest {
     }
 
     @Test
-    fun `observeImages emits an initial empty list if no image files`() = runTest {
+    fun `observeImageCounts emits an initial 0 if no image files`() = runTest {
         val rootDir = Files.createTempDirectory("ImageLocalDataSourceImplTest").toFile()
         try {
             val localSource = createLocalSource(rootDir, UnconfinedTestDispatcher(testScheduler))
-            val channel = Channel<List<SecuredImageRef>>(Channel.UNLIMITED)
+            val channel = Channel<Int>(Channel.UNLIMITED)
 
-            val collectJob = launch { localSource.observeImages(PROJECT_ID).collect { channel.trySend(it) } }
+            val collectJob = launch { localSource.observeImageCounts(PROJECT_ID).collect { channel.trySend(it) } }
 
             val firstEmission = channel.receive()
             collectJob.cancel()
-            assertThat(firstEmission).isEmpty()
+            assertThat(firstEmission).isEqualTo(0)
         } finally {
             rootDir.deleteRecursively()
         }
     }
 
     @Test
-    fun `observeImages emits updated list after encryptAndStoreImage`() = runTest {
+    fun `observeImageCounts emits updated count after encryptAndStoreImage`() = runTest {
         val rootDir = Files.createTempDirectory("ImageLocalDataSourceImplTest").toFile()
         try {
             val localSource = createLocalSource(
@@ -155,9 +155,9 @@ class ImageLocalDataSourceImplTest {
                 UnconfinedTestDispatcher(testScheduler),
                 securityManager = securityManagerWritingPlainFiles(),
             )
-            val channel = Channel<List<SecuredImageRef>>(Channel.UNLIMITED)
+            val channel = Channel<Int>(Channel.UNLIMITED)
 
-            val collectJob = launch { localSource.observeImages(PROJECT_ID).collect { channel.trySend(it) } }
+            val collectJob = launch { localSource.observeImageCounts(PROJECT_ID).collect { channel.trySend(it) } }
 
             val initial = channel.receive()
 
@@ -168,20 +168,20 @@ class ImageLocalDataSourceImplTest {
             )
 
             require(storedImage != null)
-            var updated: List<SecuredImageRef>
+            var updated: Int
             do {
                 updated = channel.receive()
-            } while (!updated.contains(storedImage))
+            } while (updated == 0)
             collectJob.cancel()
-            assertThat(initial).isEmpty()
-            assertThat(updated).contains(storedImage)
+            assertThat(initial).isEqualTo(0)
+            assertThat(updated).isEqualTo(1)
         } finally {
             rootDir.deleteRecursively()
         }
     }
 
     @Test
-    fun `observeImages emits updated list after deleteImage`() = runTest {
+    fun `observeImageCounts emits updated count after deleteImage`() = runTest {
         val rootDir = Files.createTempDirectory("ImageLocalDataSourceImplTest").toFile()
         try {
             val localSource = createLocalSource(
@@ -189,9 +189,9 @@ class ImageLocalDataSourceImplTest {
                 UnconfinedTestDispatcher(testScheduler),
                 securityManager = securityManagerWritingPlainFiles(),
             )
-            val channel = Channel<List<SecuredImageRef>>(Channel.UNLIMITED)
+            val channel = Channel<Int>(Channel.UNLIMITED)
 
-            val collectJob = launch { localSource.observeImages(PROJECT_ID).collect { channel.trySend(it) } }
+            val collectJob = launch { localSource.observeImageCounts(PROJECT_ID).collect { channel.trySend(it) } }
 
             channel.receive() // initial listing
             val storedImage = localSource.encryptAndStoreImage(
@@ -200,27 +200,27 @@ class ImageLocalDataSourceImplTest {
                 relativePath = Path("subdir/file.png"),
             )
             require(storedImage != null)
-            var afterStore: List<SecuredImageRef>
+            var afterStore: Int
             do {
                 afterStore = channel.receive()
-            } while (!afterStore.contains(storedImage))
+            } while (afterStore == 0)
 
             localSource.deleteImage(storedImage)
 
-            var afterDelete: List<SecuredImageRef>
+            var afterDelete: Int
             do {
                 afterDelete = channel.receive()
-            } while (afterDelete.contains(storedImage))
+            } while (afterDelete != 0)
             collectJob.cancel()
-            assertThat(afterStore).contains(storedImage)
-            assertThat(afterDelete).doesNotContain(storedImage)
+            assertThat(afterStore).isEqualTo(1)
+            assertThat(afterDelete).isEqualTo(0)
         } finally {
             rootDir.deleteRecursively()
         }
     }
 
     @Test
-    fun `observeImages does not include images from other projects`() = runTest {
+    fun `observeImageCounts does not include count from other projects`() = runTest {
         val rootDir = Files.createTempDirectory("ImageLocalDataSourceImplTest").toFile()
         try {
             val localSource = createLocalSource(
@@ -228,13 +228,13 @@ class ImageLocalDataSourceImplTest {
                 UnconfinedTestDispatcher(testScheduler),
                 securityManager = securityManagerWritingPlainFiles(),
             )
-            val otherProjectChannel = Channel<List<SecuredImageRef>>(Channel.UNLIMITED)
-            val mainProjectChannel = Channel<List<SecuredImageRef>>(Channel.UNLIMITED)
+            val otherProjectChannel = Channel<Int>(Channel.UNLIMITED)
+            val mainProjectChannel = Channel<Int>(Channel.UNLIMITED)
 
             val otherProjectCollectJob =
-                launch { localSource.observeImages(OTHER_PROJECT_ID).collect { otherProjectChannel.trySend(it) } }
+                launch { localSource.observeImageCounts(OTHER_PROJECT_ID).collect { otherProjectChannel.trySend(it) } }
             val mainProjectCollectJob =
-                launch { localSource.observeImages(PROJECT_ID).collect { mainProjectChannel.trySend(it) } }
+                launch { localSource.observeImageCounts(PROJECT_ID).collect { mainProjectChannel.trySend(it) } }
 
             val otherProjectInitial = otherProjectChannel.receive()
             mainProjectChannel.receive() // initial listing
@@ -246,17 +246,17 @@ class ImageLocalDataSourceImplTest {
             )
 
             require(storedImage != null)
-            var mainProjectAfterStore: List<SecuredImageRef>
+            var mainProjectAfterStore: Int
             do {
                 mainProjectAfterStore = mainProjectChannel.receive()
-            } while (!mainProjectAfterStore.contains(storedImage))
+            } while (mainProjectAfterStore == 0)
             advanceUntilIdle()
             val otherProjectAfterInvalidation = otherProjectChannel.tryReceive().getOrNull()
             otherProjectCollectJob.cancel()
             mainProjectCollectJob.cancel()
-            assertThat(otherProjectInitial).isEmpty()
+            assertThat(otherProjectInitial).isEqualTo(0)
             assertThat(otherProjectAfterInvalidation).isNull() // same value not re-emitted
-            assertThat(mainProjectAfterStore).contains(storedImage)
+            assertThat(mainProjectAfterStore).isEqualTo(1)
         } finally {
             rootDir.deleteRecursively()
         }

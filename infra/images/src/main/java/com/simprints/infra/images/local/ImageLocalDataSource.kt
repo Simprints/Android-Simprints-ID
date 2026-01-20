@@ -45,11 +45,11 @@ internal interface ImageLocalDataSource {
     suspend fun listImages(projectId: String?): List<SecuredImageRef>
 
     /**
-     * Observes recursively listed all images contained in the project images folder
+     * Observes counts of images recursively contained in the project images folder
      *
-     * @return flow of all image files found
+     * @return flow of counts of image files found
      */
-    suspend fun observeImages(projectId: String): Flow<List<SecuredImageRef>>
+    suspend fun observeImageCounts(projectId: String): Flow<Int>
 
     /**
      * Deletes an image

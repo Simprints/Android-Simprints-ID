@@ -176,8 +176,8 @@ internal class ImageRepositoryImplTest {
 
     @Test
     fun `observeNumberOfImagesToUpload maps observed images to their count`() = runTest {
-        val imagesFlow = MutableSharedFlow<List<SecuredImageRef>>()
-        coEvery { localDataSource.observeImages(PROJECT_ID) } returns imagesFlow
+        val imagesFlow = MutableSharedFlow<Int>()
+        coEvery { localDataSource.observeImageCounts(PROJECT_ID) } returns imagesFlow
         val emitted = mutableListOf<Int>()
 
         val collectJob = launch {
@@ -185,12 +185,12 @@ internal class ImageRepositoryImplTest {
         }
 
         runCurrent() // ensure upstream flow is collected before emitting
-        imagesFlow.emit(emptyList())
-        imagesFlow.emit(List(5) { mockValidImage() })
+        imagesFlow.emit(0)
+        imagesFlow.emit(5)
         runCurrent()
         collectJob.join()
         assertThat(emitted).containsExactly(0, 5).inOrder()
-        coVerify(exactly = 1) { localDataSource.observeImages(PROJECT_ID) }
+        coVerify(exactly = 1) { localDataSource.observeImageCounts(PROJECT_ID) }
     }
 
     private fun configureLocalImageFiles(numberOfValidFiles: Int) {

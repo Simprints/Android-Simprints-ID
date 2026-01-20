@@ -91,11 +91,11 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
             }.toList()
     }
 
-    override suspend fun observeImages(projectId: String): Flow<List<SecuredImageRef>> = observedImageRefListInvalidation
+    override suspend fun observeImageCounts(projectId: String): Flow<Int> = observedImageRefListInvalidation
         .onStart {
             emit(Unit)
         } // initial listing
-        .mapLatest { listImages(projectId) }
+        .mapLatest { listImages(projectId).size }
         .distinctUntilChanged()
 
     override suspend fun deleteImage(image: SecuredImageRef): Boolean = withContext(dispatcher) {
