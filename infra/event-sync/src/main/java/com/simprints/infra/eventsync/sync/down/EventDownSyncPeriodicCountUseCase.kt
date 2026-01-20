@@ -25,22 +25,19 @@ import javax.inject.Singleton
  * Down-syncable event counting relies on non-reactive (by design) call to EventDownSyncCountsRepository.
  * To wrap it in a quasi-reactive way, that call is triggered
  * on instantiation (for a "pre-warmed" count), and
- * every 5 minutes while there are subscribers to invoke(), and no less than 10 seconds apart.
+ * every 5 minutes while there are subscribers to invoke().
  */
 @Singleton
 class EventDownSyncPeriodicCountUseCase @Inject constructor(
     private val eventDownSyncCountsRepository: EventDownSyncCountsRepository,
-    private val timeHelper: TimeHelper,
     @param:AppScope private val appScope: CoroutineScope,
 ) {
-    private var lastCountTimestamp: Long = 0
     private val sharedDownSyncCounts: SharedFlow<DownSyncCounts> = MutableSharedFlow<DownSyncCounts>(replay = 1)
         .apply {
             appScope.launch {
                 tryCountEventsAndEmit() // "pre-warmed" count for immediate display as an initial estimate
                 subscriptionCount.map { it > 0 }.distinctUntilChanged().collectLatest { hasSubscribers ->
                     while (hasSubscribers && isActive) {
-                        delay(timeUntilDebounceTimeoutMillis())
                         tryCountEventsAndEmit()
                         delay(DOWN_SYNC_COUNT_INTERVAL_MILLIS)
                     }
@@ -53,8 +50,7 @@ class EventDownSyncPeriodicCountUseCase @Inject constructor(
     private suspend fun MutableSharedFlow<DownSyncCounts>.tryCountEventsAndEmit() {
         val fallbackDefaultCounts = DownSyncCounts(count = 0, isLowerBound = false)
         val counts = try {
-            lastCountTimestamp = timeHelper.now().ms
-            withTimeoutOrNull(DOWN_SYNC_COUNT_DEBOUNCE_MILLIS) {
+            withTimeoutOrNull(DOWN_SYNC_COUNT_TIMEOUT_MILLIS) {
                 eventDownSyncCountsRepository.countEventsToDownload()
             } ?: fallbackDefaultCounts
         } catch (cancellationException: CancellationException) {
@@ -66,14 +62,8 @@ class EventDownSyncPeriodicCountUseCase @Inject constructor(
         emit(counts)
     }
 
-    private fun timeUntilDebounceTimeoutMillis(): Long {
-        val now = timeHelper.now().ms
-        val nextAllowed = lastCountTimestamp + DOWN_SYNC_COUNT_DEBOUNCE_MILLIS
-        return (nextAllowed - now).coerceAtLeast(0L)
-    }
-
     companion object {
-        internal const val DOWN_SYNC_COUNT_DEBOUNCE_MILLIS = 10_000L
+        private const val DOWN_SYNC_COUNT_TIMEOUT_MILLIS = 10_000L
         internal const val DOWN_SYNC_COUNT_INTERVAL_MILLIS = 300_000L
     }
 }
