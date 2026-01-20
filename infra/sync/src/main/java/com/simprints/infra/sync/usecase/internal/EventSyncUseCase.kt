@@ -5,9 +5,7 @@ import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 class EventSyncUseCase @Inject constructor(
     private val eventSyncStateProcessor: EventSyncStateProcessor,
 ) {

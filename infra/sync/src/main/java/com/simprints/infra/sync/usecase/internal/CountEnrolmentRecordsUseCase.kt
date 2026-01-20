@@ -8,9 +8,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 class CountEnrolmentRecordsUseCase @Inject constructor(
     private val configRepository: ConfigRepository,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,

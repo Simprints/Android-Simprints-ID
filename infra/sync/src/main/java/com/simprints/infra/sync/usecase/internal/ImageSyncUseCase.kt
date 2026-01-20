@@ -11,9 +11,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transformLatest
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 class ImageSyncUseCase @Inject constructor(
     private val workManager: WorkManager,
     private val imageSyncTimestampProvider: ImageSyncTimestampProvider,
