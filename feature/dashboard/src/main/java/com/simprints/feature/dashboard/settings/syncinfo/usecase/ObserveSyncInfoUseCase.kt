@@ -58,7 +58,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     operator fun invoke(isPreLogoutUpSync: Boolean = false): Flow<SyncInfo> = combine(
         combinedRefreshSignals(),
         authStore.observeSignedInProjectId(),
-        sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY),
+        sync(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly),
         countSyncable(),
         observeConfigurationFlow(),
     ) { isOnline, projectId, (eventSyncState, imageSyncStatus), counts, (isRefreshing, isProjectRunning, moduleCounts, projectConfig) ->

@@ -58,7 +58,7 @@ class RunBlockingEventSyncUseCaseTest {
         testScheduler.advanceUntilIdle()
 
         coVerify { syncOrchestrator.startEventSync(any()) }
-        verify(exactly = 2) { sync.invoke(SyncCommand.OBSERVE_ONLY, SyncCommand.OBSERVE_ONLY) }
+        verify(exactly = 2) { sync.invoke(SyncCommand.ObserveOnly, SyncCommand.ObserveOnly) }
     }
 
     @Test
@@ -73,7 +73,7 @@ class RunBlockingEventSyncUseCaseTest {
         testScheduler.advanceUntilIdle()
 
         coVerify { syncOrchestrator.startEventSync(any()) }
-        verify(exactly = 2) { sync.invoke(SyncCommand.OBSERVE_ONLY, SyncCommand.OBSERVE_ONLY) }
+        verify(exactly = 2) { sync.invoke(SyncCommand.ObserveOnly, SyncCommand.ObserveOnly) }
     }
 
     @Test
@@ -88,7 +88,7 @@ class RunBlockingEventSyncUseCaseTest {
         testScheduler.advanceUntilIdle()
 
         coVerify { syncOrchestrator.startEventSync(any()) }
-        verify(exactly = 2) { sync.invoke(SyncCommand.OBSERVE_ONLY, SyncCommand.OBSERVE_ONLY) }
+        verify(exactly = 2) { sync.invoke(SyncCommand.ObserveOnly, SyncCommand.ObserveOnly) }
     }
 
     @Test

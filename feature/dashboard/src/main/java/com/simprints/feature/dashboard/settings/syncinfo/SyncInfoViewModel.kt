@@ -57,7 +57,7 @@ internal class SyncInfoViewModel @Inject constructor(
         get() = _loginNavigationEventLiveData
     private val _loginNavigationEventLiveData = MutableLiveData<LoginParams>()
 
-    private val syncStatusFlow = sync(eventSync = SyncCommand.OBSERVE_ONLY, imageSync = SyncCommand.OBSERVE_ONLY)
+    private val syncStatusFlow = sync(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
     private val eventSyncStateFlow =
         syncStatusFlow.map { it.eventSyncState }
     private val imageSyncStatusFlow =
