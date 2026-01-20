@@ -6,9 +6,14 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.FINGERPRINT_CAPTURE_KEY
 import com.simprints.infra.events.event.domain.models.EventType.FINGERPRINT_CAPTURE
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
+@SerialName(FINGERPRINT_CAPTURE_KEY)
 data class FingerprintCaptureEvent(
     override val id: String = randomUUID(),
     override val payload: FingerprintCapturePayload,
@@ -45,6 +50,7 @@ data class FingerprintCaptureEvent(
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
+    @Serializable
     data class FingerprintCapturePayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
@@ -60,6 +66,7 @@ data class FingerprintCaptureEvent(
             "quality: ${fingerprint?.quality}, format: ${fingerprint?.format}"
 
         @Keep
+        @Serializable
         data class Fingerprint(
             val finger: TemplateIdentifier,
             val quality: Int,
@@ -67,6 +74,7 @@ data class FingerprintCaptureEvent(
         )
 
         @Keep
+        @Serializable
         enum class Result {
             GOOD_SCAN,
             BAD_QUALITY,

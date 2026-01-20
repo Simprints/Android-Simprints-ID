@@ -47,23 +47,30 @@ jobs:
                     path: test-reports
 
             # Move all reports to the root directory
-            # Use -f to force the move and || true to prevent failure if the file doesn't exist
-            -   name: Move reports
+            -   name: Collect test reports (skip missing)
+                shell: bash
                 run: |
-                    rsync -arv test-reports/core/* .  || true
-                    rsync -arv test-reports/infra1/* .  || true
-                    rsync -arv test-reports/infra2/* .  || true
-                    rsync -arv test-reports/feature1/* .  || true
-                    rsync -arv test-reports/feature2/* .  || true
-                    rsync -arv test-reports/dashboard/* .  || true
-                    rsync -arv test-reports/face/* .  || true
-                    rsync -arv test-reports/fingerprint/* .  || true
-                    rsync -arv test-reports/testing-tools/* .  || true
-
-            # list all reports for Id module
-            -   name: list reports
-                run: |
-                    ls -l id
+                    set -euo pipefail
+                    shopt -s nullglob
+                    
+                    ALL_SKIPPED=true
+                    echo "Copying artefact contents to workspace root"
+                    
+                    # Each artefact is expected to be a subfolder under test-reports/
+                    for ARTEFACT_DIR in test-reports/*; do
+                      echo "Copying the contents of ${ARTEFACT_DIR}"
+                      
+                      [[ -d "ARTEFACT_DIR" ]] || continue
+                      ALL_SKIPPED=false
+                    
+                      # Copy the contents of each artefact folder into the workspace root
+                      rsync -arv "${ARTEFACT_DIR}" . || true
+                    done
+                    
+                    if [[ "$ALL_SKIPPED" == "true" ]]; then
+                      echo "No artefact subfolders found, attempting test-reports root contents"
+                      rsync -arv test-reports/* . || true
+                    fi
 
             -   name: run sonar
                 env:

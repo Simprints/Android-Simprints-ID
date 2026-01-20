@@ -4,10 +4,8 @@ import androidx.annotation.Keep
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.scope.EventScope
-import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 
 @Keep
@@ -29,7 +27,7 @@ internal fun EventScope.fromDomainToDb(jsonHelper: JsonHelper): DbEventScope = D
     type = type,
     createdAt = createdAt.fromDomainToDb(),
     endedAt = endedAt?.fromDomainToDb(),
-    payloadJson = jsonHelper.toJson(payload),
+    payloadJson = jsonHelper.json.encodeToString(payload),
 )
 
 internal fun DbEventScope.fromDbToDomain(jsonHelper: JsonHelper): EventScope = EventScope(
@@ -38,5 +36,5 @@ internal fun DbEventScope.fromDbToDomain(jsonHelper: JsonHelper): EventScope = E
     type = type,
     createdAt = createdAt.fromDbToDomain(),
     endedAt = endedAt?.fromDbToDomain(),
-    payload = jsonHelper.fromJson(payloadJson, object : TypeReference<EventScopePayload>() {}),
+    payload = jsonHelper.json.decodeFromString(payloadJson),
 )

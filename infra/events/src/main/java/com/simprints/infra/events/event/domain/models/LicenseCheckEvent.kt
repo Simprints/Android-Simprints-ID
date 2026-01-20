@@ -4,10 +4,15 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.LICENSE_CHECK_KEY
 import com.simprints.infra.events.event.domain.models.EventType.LICENSE_CHECK
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(LICENSE_CHECK_KEY)
 data class LicenseCheckEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: LicenseCheckEventPayload,
@@ -43,6 +48,7 @@ data class LicenseCheckEvent(
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
+    @Serializable
     data class LicenseCheckEventPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,

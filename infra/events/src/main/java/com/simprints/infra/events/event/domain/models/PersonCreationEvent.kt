@@ -4,10 +4,15 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.events.event.domain.models.EventType.Companion.PERSON_CREATION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.PERSON_CREATION
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Keep
+@Serializable
+@SerialName(PERSON_CREATION_KEY)
 @Deprecated("Replaced by BiometricReferenceCreationEvent in 2025.1.0")
 data class PersonCreationEvent(
     override val id: String = UUID.randomUUID().toString(),
@@ -41,6 +46,7 @@ data class PersonCreationEvent(
 
     // At the end of the sequence of capture, we build a Person object used either for enrolment, verification or identification
     @Keep
+    @Serializable
     @Deprecated("Replaced by BiometricReferenceCreationEvent")
     data class PersonCreationPayload(
         override val createdAt: Timestamp,

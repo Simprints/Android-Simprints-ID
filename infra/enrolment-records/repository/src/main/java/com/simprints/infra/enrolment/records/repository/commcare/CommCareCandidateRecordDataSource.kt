@@ -5,16 +5,11 @@ import android.database.ContentObserver
 import android.database.Cursor
 import android.net.Uri
 import androidx.core.net.toUri
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.AvailableProcessors
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.CandidateRecord
-import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
-import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
@@ -26,7 +21,6 @@ import com.simprints.infra.enrolment.records.repository.domain.models.BiometricD
 import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.enrolment.records.repository.usecases.CompareImplicitTokenizedStringsUseCase
-import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordCreationEventDeserializer
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.FaceReference
@@ -265,30 +259,11 @@ internal class CommCareCandidateRecordDataSource @Inject constructor(
 
     private fun parseRecordEvents(subjectActions: String) = subjectActions.takeIf(String::isNotEmpty)?.let {
         try {
-            jsonHelper.fromJson<CoSyncEnrolmentRecordEvents>(
-                json = it,
-                module = coSyncSerializationModule,
-                type = object : TypeReference<CoSyncEnrolmentRecordEvents>() {},
-            )
+            jsonHelper.json.decodeFromString<CoSyncEnrolmentRecordEvents>(it)
         } catch (e: Exception) {
             Simber.e("Error while parsing subjectActions", e)
             null
         }
-    }
-
-    private val coSyncSerializationModule = SimpleModule().apply {
-        addSerializer(
-            TokenizableString::class.java,
-            TokenizationClassNameSerializer(),
-        )
-        addDeserializer(
-            TokenizableString::class.java,
-            TokenizationClassNameDeserializer(),
-        )
-        addDeserializer(
-            EnrolmentRecordCreationEvent::class.java,
-            CoSyncEnrolmentRecordCreationEventDeserializer(),
-        )
     }
 
     override suspend fun count(

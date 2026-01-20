@@ -1,8 +1,10 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 enum class EventType {
     // a constant key is required to serialise/deserialize
     // events correctly with Jackson (see annotation in Event).
@@ -220,7 +222,7 @@ enum class EventType {
         const val VERO_2_INFO_SNAPSHOT_KEY = "VERO_2_INFO_SNAPSHOT"
         const val EVENT_DOWN_SYNC_REQUEST_KEY = "EVENT_DOWN_SYNC_REQUEST"
         const val EVENT_UP_SYNC_REQUEST_KEY = "EVENT_UP_SYNC_REQUEST"
-        const val SAMPLE_UP_SYNC_REQUEST = "SAMPLE_UP_SYNC_REQUEST"
+        const val SAMPLE_UP_SYNC_REQUEST_KEY = "SAMPLE_UP_SYNC_REQUEST"
         const val LICENSE_CHECK_KEY = "LICENSE_CHECK"
         const val AGE_GROUP_SELECTION_KEY = "AGE_GROUP_SELECTION"
         const val BIOMETRIC_REFERENCE_CREATION_KEY = "BIOMETRIC_REFERENCE_CREATION"
