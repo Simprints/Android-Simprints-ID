@@ -3,8 +3,10 @@ package com.simprints.infra.enrolment.records.repository.domain.models
 import androidx.annotation.Keep
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.tokenization.TokenizableString
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 data class EnrolmentRecordQuery(
     val projectId: String? = null,
     val subjectId: String? = null,

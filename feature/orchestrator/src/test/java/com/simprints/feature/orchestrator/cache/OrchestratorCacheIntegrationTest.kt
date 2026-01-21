@@ -15,7 +15,6 @@ import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.FaceCaptureParams
 import com.simprints.feature.alert.AlertResult
@@ -39,6 +38,7 @@ import com.simprints.feature.login.LoginResult
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.steps.StepStatus
+import com.simprints.feature.orchestrator.tools.OrchestrationJsonHelper
 import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.selectsubject.SelectSubjectParams
 import com.simprints.feature.selectsubject.SelectSubjectResult
@@ -67,25 +67,30 @@ class OrchestratorCacheIntegrationTest {
     @MockK
     private lateinit var prefs: SharedPreferences
 
-    private var jsonHelper = JsonHelper
+    private var jsonHelper = OrchestrationJsonHelper()
 
     private lateinit var cache: OrchestratorCache
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-
         every { securityManager.buildEncryptedSharedPreferences(any()) } returns prefs
+        val storage = mutableMapOf<String, String?>()
+        val editor = mockk<SharedPreferences.Editor>(relaxed = true)
+        every { prefs.edit() } returns editor
+        every { editor.putString(any(), any()) } answers {
+            storage[it.invocation.args[0] as String] = it.invocation.args[1] as String?
+            editor
+        }
+        every { editor.remove(any()) } answers {
+            storage.remove(it.invocation.args[0] as String)
+            editor
+        }
 
-        // Mock prefs set and get behaviour
-        val stringSlot = slot<String>()
-        justRun { prefs.edit().putString(any(), capture(stringSlot)).commit() }
-        every { prefs.getString(any(), any()) } answers { stringSlot.captured }
-
-        cache = OrchestratorCache(
-            securityManager,
-            jsonHelper,
-        )
+        every { prefs.getString(any(), any()) } answers {
+            storage[it.invocation.args[0] as String] ?: it.invocation.args[1] as String?
+        }
+        cache = OrchestratorCache(securityManager, jsonHelper)
     }
 
     @Test
@@ -111,7 +116,7 @@ class OrchestratorCacheIntegrationTest {
                 id = StepId.CONSENT,
                 navigationActionId = 5,
                 destinationId = 6,
-                params = ConsentParams(type = ConsentType.ENROL),
+                params = ConsentParams(consentType = ConsentType.ENROL),
                 status = StepStatus.COMPLETED,
                 result = ConsentResult(true),
             ),
@@ -404,6 +409,67 @@ class OrchestratorCacheIntegrationTest {
         for (i in expected.indices) {
             compareStubs(expected[i], actual[i])
         }
+    }
+
+    @Test
+    fun `Persistence survives cache re-instantiation`() {
+        // 1. Setup first cache and save data
+        val step = Step(
+            id = StepId.SETUP,
+            navigationActionId = 1,
+            destinationId = 2,
+            status = StepStatus.COMPLETED,
+            result = SetupResult(true),
+        )
+        cache.steps = listOf(step)
+        cache.ageGroup = AgeGroup(20, 30)
+
+        // 2. Create a new cache instance pointing to the same (mocked) prefs
+        val secondaryCache = OrchestratorCache(securityManager, jsonHelper)
+
+        // 3. Verify data is still there
+        assertThat(secondaryCache.steps).hasSize(1)
+        assertThat(secondaryCache.steps[0].id).isEqualTo(StepId.SETUP)
+        assertThat(secondaryCache.ageGroup).isEqualTo(AgeGroup(20, 30))
+    }
+
+    @Test
+    fun `Stores and restores complex MatchParams with BiometricDataSource`() {
+        val expected = listOf(
+            Step(
+                id = StepId.FINGERPRINT_MATCHER,
+                navigationActionId = 10,
+                destinationId = 11,
+                params = MatchParams(
+                    flowType = FlowType.IDENTIFY,
+                    queryForCandidates = EnrolmentRecordQuery(),
+                    biometricDataSource = BiometricDataSource.Simprints, // Test Simprints variant
+                    bioSdk = ModalitySdkType.NEC,
+                    probeReference = BiometricReferenceCapture(
+                        referenceId = "complex_id",
+                        modality = Modality.FINGERPRINT,
+                        format = "ANSI",
+                        templates = listOf(
+                            BiometricTemplateCapture(
+                                captureEventId = "captureEvent1",
+                                identifier = TemplateIdentifier.LEFT_THUMB,
+                                template = byteArrayOf(1, 2, 3),
+                            ),
+                            BiometricTemplateCapture(
+                                captureEventId = "captureEvent2",
+                                template = byteArrayOf(1, 2, 3),
+                            ),
+                        ),
+                    ),
+                ),
+                status = StepStatus.COMPLETED,
+                result = MatchResult(emptyList(), ModalitySdkType.NEC),
+            ),
+        )
+
+        cache.steps = expected
+        val actual = cache.steps
+        compareStubs(expected[0], actual[0])
     }
 
     private fun compareStubs(

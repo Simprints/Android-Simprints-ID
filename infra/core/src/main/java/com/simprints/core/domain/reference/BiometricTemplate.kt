@@ -6,10 +6,14 @@ import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.step.StepResult
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Parcelize
 @ExcludedFromGeneratedTestCoverageReports("Data class with generated code")
+@Serializable
+@SerialName("BiometricTemplate")
 data class BiometricTemplate(
     val id: String = UUID.randomUUID().toString(),
     val template: ByteArray,

@@ -440,7 +440,6 @@ internal class BuildStepsUseCase @Inject constructor(
                     params = FaceCaptureContract.getParams(samplesToCapture, bioSDK),
                 )
             }
-
         }
     }
 
@@ -480,7 +479,7 @@ internal class BuildStepsUseCase @Inject constructor(
             bioSdk = bioSDK,
         )
 
-        when (bioSDK.modality()){
+        when (bioSDK.modality()) {
             Modality.FINGERPRINT -> Step(
                 id = StepId.FINGERPRINT_MATCHER,
                 navigationActionId = R.id.action_orchestratorFragment_to_matcher,
@@ -494,8 +493,6 @@ internal class BuildStepsUseCase @Inject constructor(
                 destinationId = MatchContract.DESTINATION,
                 params = paramStub,
             )
-
-            else -> null
         }
     }
 

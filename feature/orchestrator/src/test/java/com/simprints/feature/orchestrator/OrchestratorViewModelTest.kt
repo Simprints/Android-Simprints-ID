@@ -25,6 +25,7 @@ import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.steps.StepStatus
+import com.simprints.feature.orchestrator.tools.OrchestrationJsonHelper
 import com.simprints.feature.orchestrator.usecases.AddCallbackEventUseCase
 import com.simprints.feature.orchestrator.usecases.MapRefusalOrErrorResultUseCase
 import com.simprints.feature.orchestrator.usecases.MapStepsForLastBiometricEnrolUseCase
@@ -103,6 +104,7 @@ internal class OrchestratorViewModelTest {
             addCallbackEvent,
             dailyActivityUseCase,
             mapStepsForLastBiometricEnrolUseCase,
+            OrchestrationJsonHelper(),
         )
     }
 
@@ -555,6 +557,85 @@ internal class OrchestratorViewModelTest {
                 cachedScannedCredential = mockScannedCredential,
             )
         }
+    }
+
+    @Test
+    fun `Cancels location collection when all steps complete`() = runTest {
+        coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
+            createMockStep(StepId.SETUP).apply { status = StepStatus.IN_PROGRESS },
+        )
+        coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
+        coEvery { appResponseBuilder(any(), any(), any(), any(), any()) } returns mockk()
+        coJustRun { dailyActivityUseCase(any()) }
+        justRun { addCallbackEvent(any()) }
+        justRun { locationStore.cancelLocationCollection() }
+
+        viewModel.handleAction(mockk())
+        viewModel.handleResult(SetupResult(true))
+
+        verify(exactly = 1) { locationStore.cancelLocationCollection() }
+    }
+
+    @Test
+    fun `Combines cached steps with newly built steps in handleAction`() = runTest {
+        // 1. Cached step is already completed
+        val cachedStep = createMockStep(StepId.SETUP).apply { status = StepStatus.COMPLETED }
+        // 2. New step is ready to start
+        val newStep = createMockStep(StepId.CONSENT)
+
+        every { cache.steps } returns listOf(cachedStep)
+        coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(newStep)
+
+        viewModel.handleAction(mockk())
+
+        // The ViewModel should skip the completed cached step and serve the new step
+        viewModel.currentStep.test().assertValue {
+            it.peekContent()?.id == StepId.CONSENT
+        }
+
+        verify(exactly = 1) { cache.steps }
+    }
+
+    @Test
+    fun `Ignores external credential update if external credential step is missing`() = runTest {
+        // Setup: A flow that captures biometrics but DOES NOT have an External Credential step
+        coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
+            createMockStep(StepId.FINGERPRINT_CAPTURE),
+        )
+        coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
+
+        viewModel.handleAction(mockk())
+
+        // Action: Return a result that would normally trigger an update
+        val bioResult = BiometricReferenceCapture("ref", Modality.FINGERPRINT, "fmt", emptyList())
+
+        // Assert: execution completes without exception
+        viewModel.handleResult(bioResult)
+
+        // Verify we proceeded (flow finished in this case as it was the only step)
+        viewModel.appResponse.test().assertHasValue()
+    }
+
+    @Test
+    fun `Ignores matcher update if matcher step is missing`() = runTest {
+        // Setup: A flow with Capture but NO Matcher
+        coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
+            createMockStep(StepId.FACE_CAPTURE),
+        )
+        coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
+
+        viewModel.handleAction(mockk())
+
+        // Action: Return a capture result
+        val bioResult = BiometricReferenceCapture("ref", Modality.FACE, "fmt", emptyList())
+
+        // Assert: execution completes without exception
+        viewModel.handleResult(bioResult)
+    }
+
+    @Test
+    fun `Handles malformed JSON in setActionRequestFromJson gracefully`() {
+        viewModel.setActionRequestFromJson("{ invalid_json }") // // test fails automatically if an exception is thrown
     }
 
     private fun createMockStep(

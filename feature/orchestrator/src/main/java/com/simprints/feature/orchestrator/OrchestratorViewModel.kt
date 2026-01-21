@@ -4,19 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.step.StepResult
-import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
-import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.face.capture.FaceCaptureParams
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
@@ -29,6 +23,7 @@ import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.steps.StepStatus
+import com.simprints.feature.orchestrator.tools.OrchestrationJsonHelper
 import com.simprints.feature.orchestrator.usecases.AddCallbackEventUseCase
 import com.simprints.feature.orchestrator.usecases.MapRefusalOrErrorResultUseCase
 import com.simprints.feature.orchestrator.usecases.MapStepsForLastBiometricEnrolUseCase
@@ -46,7 +41,6 @@ import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.io.Serializable
 import java.util.UUID
 import javax.inject.Inject
 
@@ -61,6 +55,7 @@ internal class OrchestratorViewModel @Inject constructor(
     private val addCallbackEvent: AddCallbackEventUseCase,
     private val updateDailyActivity: UpdateDailyActivityUseCase,
     private val mapStepsForLastBiometrics: MapStepsForLastBiometricEnrolUseCase,
+    private val orchestrationJsonHelper: OrchestrationJsonHelper,
 ) : ViewModel() {
     var isRequestProcessed = false
 
@@ -254,7 +249,7 @@ internal class OrchestratorViewModel @Inject constructor(
 
     private fun updateMatcherStepPayload(
         currentStep: Step,
-        result: Serializable,
+        result: Any,
     ) {
         if (currentStep.id == StepId.FACE_CAPTURE && result is BiometricReferenceCapture) {
             val captureParams = currentStep.params?.let { it as? FaceCaptureParams }
@@ -318,11 +313,7 @@ internal class OrchestratorViewModel @Inject constructor(
 
     fun setActionRequestFromJson(json: String) {
         try {
-            actionRequest = JsonHelper.fromJson(
-                json = json,
-                module = dbSerializationModule,
-                type = object : TypeReference<ActionRequest>() {},
-            )
+            actionRequest = orchestrationJsonHelper.decodeFromString(json)
         } catch (e: Exception) {
             Simber.e("Action request deserialization failed", e, tag = ORCHESTRATION)
         }
@@ -330,17 +321,10 @@ internal class OrchestratorViewModel @Inject constructor(
 
     fun getActionRequestJson(): String? = try {
         actionRequest?.let {
-            JsonHelper.toJson(it, dbSerializationModule)
+            orchestrationJsonHelper.encodeToString(it)
         }
     } catch (e: Exception) {
         Simber.e("Action request serialization failed", e, tag = ORCHESTRATION)
         null
-    }
-
-    companion object {
-        val dbSerializationModule = SimpleModule().apply {
-            addSerializer(TokenizableString::class.java, TokenizationClassNameSerializer())
-            addDeserializer(TokenizableString::class.java, TokenizationClassNameDeserializer())
-        }
     }
 }

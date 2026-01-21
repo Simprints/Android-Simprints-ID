@@ -6,6 +6,8 @@ import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.step.StepResult
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
  * Results of the external credential 1:L match (where L is '1' or really close to 1).
@@ -16,6 +18,8 @@ import com.simprints.feature.externalcredential.screens.search.model.ScannedCred
  * during the flow, and probes linked to the [scannedCredential]
  */
 @Keep
+@Serializable
+@SerialName("ExternalCredentialSearchResult")
 @ExcludedFromGeneratedTestCoverageReports("Data class")
 data class ExternalCredentialSearchResult(
     val flowType: FlowType,

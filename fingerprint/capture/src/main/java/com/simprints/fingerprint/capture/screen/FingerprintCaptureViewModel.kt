@@ -193,7 +193,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             bioSdkWrapper.initialize()
             bioSdkConfiguration = configuration.getSdkConfiguration(fingerprintSdk)!!
         } catch (e: BioSdkException.BioSdkInitializationException) {
-            Simber.e("Failed to initialise bio sdk: ${fingerprintSdk.name}", e, tag = FINGER_CAPTURE)
+            Simber.e("Failed to initialise bio sdk: $fingerprintSdk", e, tag = FINGER_CAPTURE)
             _invalidLicense.send()
         }
     }

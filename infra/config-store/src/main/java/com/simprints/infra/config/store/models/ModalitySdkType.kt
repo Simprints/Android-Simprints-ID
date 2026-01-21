@@ -1,9 +1,10 @@
 package com.simprints.infra.config.store.models
 
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.step.StepParams
+import kotlinx.serialization.Serializable
 
-enum class ModalitySdkType : StepParams {
+@Serializable
+enum class ModalitySdkType {
     RANK_ONE,
     SIM_FACE,
     SECUGEN_SIM_MATCHER,

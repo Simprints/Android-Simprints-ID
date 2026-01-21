@@ -1,32 +1,23 @@
 package com.simprints.infra.orchestration.data
 
+import android.os.Parcelable
 import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.tokenization.TokenizableString
-import java.io.Serializable
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @ExcludedFromGeneratedTestCoverageReports("This is a simple data class")
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    include = JsonTypeInfo.As.PROPERTY,
-    property = "type",
-)
-@JsonSubTypes(
-    JsonSubTypes.Type(value = ActionRequest.EnrolActionRequest::class, name = "EnrolActionRequest"),
-    JsonSubTypes.Type(value = ActionRequest.IdentifyActionRequest::class, name = "IdentifyActionRequest"),
-    JsonSubTypes.Type(value = ActionRequest.VerifyActionRequest::class, name = "VerifyActionRequest"),
-    JsonSubTypes.Type(value = ActionRequest.ConfirmIdentityActionRequest::class, name = "ConfirmIdentityActionRequest"),
-    JsonSubTypes.Type(value = ActionRequest.EnrolLastBiometricActionRequest::class, name = "EnrolLastBiometricActionRequest"),
-)
-sealed class ActionRequest(
-    open val actionIdentifier: ActionRequestIdentifier,
-    open val projectId: String,
-    open val userId: TokenizableString,
-    open val metadata: String,
-    open val unknownExtras: Map<String, Any?>,
-) : Serializable {
+@Serializable
+@Parcelize
+sealed class ActionRequest : Parcelable {
+    abstract val actionIdentifier: ActionRequestIdentifier
+    abstract val projectId: String
+    abstract val userId: TokenizableString
+    abstract val metadata: String
+    abstract val unknownExtras: Map<String, String?>
+
     fun getSubjectAgeIfAvailable(): Int? = when (this) {
         is EnrolActionRequest -> subjectAge
         is IdentifyActionRequest -> subjectAge
@@ -35,6 +26,8 @@ sealed class ActionRequest(
     }
 
     @Keep
+    @Serializable
+    @SerialName("EnrolActionRequest")
     data class EnrolActionRequest(
         override val actionIdentifier: ActionRequestIdentifier,
         override val projectId: String,
@@ -43,11 +36,13 @@ sealed class ActionRequest(
         val biometricDataSource: String,
         val subjectAge: Int? = null,
         override val metadata: String,
-        override val unknownExtras: Map<String, Any?>,
-    ) : ActionRequest(actionIdentifier, projectId, userId, metadata, unknownExtras),
+        override val unknownExtras: Map<String, String?>,
+    ) : ActionRequest(),
         FlowAction
 
     @Keep
+    @Serializable
+    @SerialName("IdentifyActionRequest")
     data class IdentifyActionRequest(
         override val actionIdentifier: ActionRequestIdentifier,
         override val projectId: String,
@@ -56,11 +51,13 @@ sealed class ActionRequest(
         val biometricDataSource: String,
         val subjectAge: Int? = null,
         override val metadata: String,
-        override val unknownExtras: Map<String, Any?>,
-    ) : ActionRequest(actionIdentifier, projectId, userId, metadata, unknownExtras),
+        override val unknownExtras: Map<String, String?>,
+    ) : ActionRequest(),
         FlowAction
 
     @Keep
+    @Serializable
+    @SerialName("VerifyActionRequest")
     data class VerifyActionRequest(
         override val actionIdentifier: ActionRequestIdentifier,
         override val projectId: String,
@@ -70,11 +67,13 @@ sealed class ActionRequest(
         val subjectAge: Int? = null,
         val verifyGuid: String,
         override val metadata: String,
-        override val unknownExtras: Map<String, Any?>,
-    ) : ActionRequest(actionIdentifier, projectId, userId, metadata, unknownExtras),
+        override val unknownExtras: Map<String, String?>,
+    ) : ActionRequest(),
         FlowAction
 
     @Keep
+    @Serializable
+    @SerialName("ConfirmIdentityActionRequest")
     data class ConfirmIdentityActionRequest(
         override val actionIdentifier: ActionRequestIdentifier,
         override val projectId: String,
@@ -82,11 +81,13 @@ sealed class ActionRequest(
         val sessionId: String,
         val selectedGuid: String,
         override val metadata: String,
-        override val unknownExtras: Map<String, Any?>,
-    ) : ActionRequest(actionIdentifier, projectId, userId, metadata, unknownExtras),
+        override val unknownExtras: Map<String, String?>,
+    ) : ActionRequest(),
         FollowUpAction
 
     @Keep
+    @Serializable
+    @SerialName("EnrolLastBiometricActionRequest")
     data class EnrolLastBiometricActionRequest(
         override val actionIdentifier: ActionRequestIdentifier,
         override val projectId: String,
@@ -94,8 +95,8 @@ sealed class ActionRequest(
         val moduleId: TokenizableString,
         val sessionId: String,
         override val metadata: String,
-        override val unknownExtras: Map<String, Any?>,
-    ) : ActionRequest(actionIdentifier, projectId, userId, metadata, unknownExtras),
+        override val unknownExtras: Map<String, String?>,
+    ) : ActionRequest(),
         FollowUpAction
 
     interface FlowAction {

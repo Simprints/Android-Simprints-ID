@@ -151,5 +151,4 @@ fun ProjectConfiguration.getModalitySdkConfig(bioSdk: ModalitySdkType): Modality
     ModalitySdkType.SIM_FACE -> face?.simFace
     ModalitySdkType.SECUGEN_SIM_MATCHER -> fingerprint?.secugenSimMatcher
     ModalitySdkType.NEC -> fingerprint?.nec
-    else -> null
 }

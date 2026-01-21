@@ -2,6 +2,7 @@ plugins {
     id("simprints.feature")
     id("simprints.testing.android")
     id("kotlin-parcelize")
+    id("simprints.library.kotlinSerialization")
 }
 
 android {
@@ -33,6 +34,7 @@ dependencies {
 
     // Kotlin
     runtimeOnly(libs.kotlin.reflect)
+    runtimeOnly(libs.kotlin.serialization)
 
     // Android X
     implementation(libs.androidX.ui.viewpager2)

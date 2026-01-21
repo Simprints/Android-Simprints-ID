@@ -54,7 +54,7 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
             ExitFormContract.DESTINATION,
         ) { viewModel.handleExitFormResponse(it) }
 
-        viewModel.loadConfiguration(args.type)
+        viewModel.loadConfiguration(args.consentType)
     }
 
     private fun handleClicks() {

@@ -2,6 +2,7 @@ plugins {
     id("simprints.infra")
     id("simprints.library.protobuf")
     id("simprints.library.kotlinSerialization")
+    id("kotlin-parcelize")
 }
 
 android {
