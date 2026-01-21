@@ -4,7 +4,6 @@ import androidx.core.content.edit
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.tools.OrchestrationJsonHelper
-import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,8 +24,8 @@ internal class OrchestratorCache @Inject constructor(
         get() = (
             prefs
                 .getString(KEY_STEPS, null)
+                ?.takeIf { it.isNotBlank() }
                 ?.let { jsonArray ->
-                    Simber.i(tag = "orchestrator", message = "Loaded steps from cache $jsonArray")
                     orchestrationJsonHelper.decodeFromString<List<Step>>(jsonArray)
                 }
                 ?: emptyList()
@@ -37,12 +36,22 @@ internal class OrchestratorCache @Inject constructor(
     var ageGroup: AgeGroup?
         set(value) {
             prefs.edit(commit = true) {
-                putString(KEY_AGE_GROUP, value?.let { orchestrationJsonHelper.encodeToString<AgeGroup>(it) })
+                if (value == null) {
+                    remove(KEY_AGE_GROUP)
+                } else {
+                    putString(
+                        KEY_AGE_GROUP,
+                        orchestrationJsonHelper.encodeToString(value),
+                    )
+                }
             }
         }
-        get() = prefs.getString(KEY_AGE_GROUP, null)?.let {
-            orchestrationJsonHelper.decodeFromString<AgeGroup>(it)
-        }
+        get() = prefs
+            .getString(KEY_AGE_GROUP, null)
+            ?.takeIf { it.isNotBlank() }
+            ?.let {
+                orchestrationJsonHelper.decodeFromString<AgeGroup>(it)
+            }
 
     fun clearCache() {
         prefs.edit(commit = true) {

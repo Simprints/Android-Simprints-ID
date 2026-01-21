@@ -52,7 +52,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.test.DefaultAsserter.fail
 
 @RunWith(AndroidJUnit4::class)
 internal class OrchestratorViewModelTest {
@@ -611,11 +610,7 @@ internal class OrchestratorViewModelTest {
         val bioResult = BiometricReferenceCapture("ref", Modality.FINGERPRINT, "fmt", emptyList())
 
         // Assert: execution completes without exception
-        try {
-            viewModel.handleResult(bioResult)
-        } catch (_: Exception) {
-            fail("Should not throw exception when External Credential step is missing")
-        }
+        viewModel.handleResult(bioResult)
 
         // Verify we proceeded (flow finished in this case as it was the only step)
         viewModel.appResponse.test().assertHasValue()
@@ -635,21 +630,12 @@ internal class OrchestratorViewModelTest {
         val bioResult = BiometricReferenceCapture("ref", Modality.FACE, "fmt", emptyList())
 
         // Assert: execution completes without exception
-        try {
-            viewModel.handleResult(bioResult)
-        } catch (_: Exception) {
-            fail("Should not throw exception when Matcher step is missing")
-        }
+        viewModel.handleResult(bioResult)
     }
 
     @Test
     fun `Handles malformed JSON in setActionRequestFromJson gracefully`() {
-        // Should catch exception internally and log it, not crash
-        try {
-            viewModel.setActionRequestFromJson("{ invalid_json }")
-        } catch (_: Exception) {
-            fail("ViewModel should catch JSON deserialization exceptions internally")
-        }
+        viewModel.setActionRequestFromJson("{ invalid_json }") // // test fails automatically if an exception is thrown
     }
 
     private fun createMockStep(

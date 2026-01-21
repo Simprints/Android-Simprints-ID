@@ -52,6 +52,16 @@ class OrchestratorCacheTest {
     }
 
     @Test
+    fun `Stores empty list of steps if passed value`() {
+        val steps: List<Step> = emptyList()
+        val stepsResultJson = orchestrationJsonHelper.encodeToString<List<Step>>(steps)
+        cache.steps = steps
+        verify {
+            prefs.edit().putString(any(), eq(stepsResultJson))
+        }
+    }
+
+    @Test
     fun `Restores steps if stored`() {
         val stepsList = listOf(
             Step(id = StepId.SETUP, navigationActionId = 0, destinationId = 0),
@@ -103,6 +113,8 @@ class OrchestratorCacheTest {
 
         verify(exactly = 1) { prefs.edit().remove("steps") }
         verify(exactly = 1) { prefs.edit().remove("age_group") }
+        val steps = cache.steps
+        assertThat(steps).isEmpty()
     }
 
     @Test
@@ -120,5 +132,12 @@ class OrchestratorCacheTest {
         val jsonString = "{\"type\":\"AgeGroup\",\"startInclusive\":0,\"endExclusive\":1}"
         val result = orchestrationJsonHelper.decodeFromString<AgeGroup>(jsonString)
         assertThat(result).isEqualTo(originalAgeGroup)
+    }
+
+    @Test
+    fun `AgeGroup is deserialized correctly when null`() {
+        cache.ageGroup = null
+        val result = cache.ageGroup
+        assertThat(result).isNull()
     }
 }

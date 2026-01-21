@@ -32,7 +32,6 @@ import com.simprints.feature.validatepool.ValidateSubjectPoolResult
 import com.simprints.fingerprint.capture.FingerprintCaptureParams
 import com.simprints.fingerprint.connect.FingerprintConnectParams
 import com.simprints.fingerprint.connect.FingerprintConnectResult
-import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.matching.MatchParams
@@ -107,10 +106,6 @@ val orchestratorSerializersModule = SerializersModule {
         subclass(EnrolLastBiometricStepResult.MatchResult::class)
         subclass(EnrolLastBiometricStepResult.CaptureResult::class)
         subclass(ExternalCredentialParams::class)
-
-        // Types previously listed in paramsType but might be nested objects rather than direct StepParams
-        // If these implement StepParams, keep them here. If they are just nested fields,
-        // they don't need top-level registration unless they are used polymorphically.
         subclass(BiometricReferenceCapture::class)
         subclass(BiometricTemplateCapture::class)
         subclass(ComparisonResult::class)

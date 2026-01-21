@@ -1,9 +1,9 @@
 package com.simprints.feature.orchestrator.tools
 
 import com.simprints.feature.orchestrator.steps.orchestratorSerializersModule
-import jakarta.inject.Inject
-import jakarta.inject.Singleton
 import kotlinx.serialization.json.Json
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class OrchestrationJsonHelper @Inject constructor() {
