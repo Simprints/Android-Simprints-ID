@@ -47,7 +47,6 @@ class TokenizationClassNameSerializer : StdSerializer<TokenizableString>(Tokeniz
  * JSON deserializer for the [TokenizableString] that takes the JSON node with an explicit
  * specification of the child class. Any json object without the explicit className specification
  * will be resolved as [TokenizableString.Raw].
- * Use [TokenizationClassNameSerializer] to deserialize the object.
  *
  * Examples:
  * { "className": "TokenizableString.Raw", "value": "person" }

@@ -1,10 +1,13 @@
 package com.simprints.feature.orchestrator.tools
 
 import com.simprints.feature.orchestrator.steps.orchestratorSerializersModule
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 import kotlinx.serialization.json.Json
 
-object OrcJsonHelper {
-    val json: Json by lazy {
+@Singleton
+internal class OrchestrationJsonHelper @Inject constructor() {
+    private val json: Json by lazy {
         Json {
             ignoreUnknownKeys = true
             explicitNulls = false
@@ -13,4 +16,8 @@ object OrcJsonHelper {
             serializersModule = orchestratorSerializersModule
         }
     }
+
+    inline fun <reified T> encodeToString(value: T): String = json.encodeToString(value)
+
+    inline fun <reified T> decodeFromString(string: String): T = json.decodeFromString(string)
 }

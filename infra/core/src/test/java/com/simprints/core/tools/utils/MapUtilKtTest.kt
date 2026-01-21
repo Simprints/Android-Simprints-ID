@@ -63,7 +63,7 @@ class MapUtilKtTest {
     }
 
     @Test
-    fun `toStringMap null JsonElement is converted to string null`() {
+    fun `toStringMap null JsonElement is converted to empty string`() {
         val input = mapOf(
             "key" to null,
         )
@@ -121,7 +121,7 @@ class MapUtilKtTest {
     }
 
     @Test
-    fun `toJsonElementMap null value is converted to JsonPrimitive string null`() {
+    fun `toJsonElementMap null value is converted to JsonPrimitive empty string`() {
         val input = mapOf(
             "key" to null,
         )

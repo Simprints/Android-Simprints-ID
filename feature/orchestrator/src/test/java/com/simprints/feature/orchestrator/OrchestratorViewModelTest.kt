@@ -25,6 +25,7 @@ import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.steps.StepStatus
+import com.simprints.feature.orchestrator.tools.OrchestrationJsonHelper
 import com.simprints.feature.orchestrator.usecases.AddCallbackEventUseCase
 import com.simprints.feature.orchestrator.usecases.MapRefusalOrErrorResultUseCase
 import com.simprints.feature.orchestrator.usecases.MapStepsForLastBiometricEnrolUseCase
@@ -104,6 +105,7 @@ internal class OrchestratorViewModelTest {
             addCallbackEvent,
             dailyActivityUseCase,
             mapStepsForLastBiometricEnrolUseCase,
+            OrchestrationJsonHelper(),
         )
     }
 

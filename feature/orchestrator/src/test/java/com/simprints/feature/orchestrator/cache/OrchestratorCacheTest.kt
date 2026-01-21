@@ -6,11 +6,10 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
-import com.simprints.feature.orchestrator.tools.OrcJsonHelper
+import com.simprints.feature.orchestrator.tools.OrchestrationJsonHelper
 import com.simprints.infra.security.SecurityManager
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import kotlinx.serialization.json.Json
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,9 +22,8 @@ class OrchestratorCacheTest {
     @MockK
     private lateinit var prefs: SharedPreferences
 
-    private val jsonHelper: OrcJsonHelper = OrcJsonHelper
+    private val orchestrationJsonHelper: OrchestrationJsonHelper = OrchestrationJsonHelper()
 
-    private val json: Json = jsonHelper.json
     private lateinit var cache: OrchestratorCache
 
     @Before
@@ -35,7 +33,7 @@ class OrchestratorCacheTest {
 
         cache = OrchestratorCache(
             securityManager,
-            jsonHelper,
+            orchestrationJsonHelper,
         )
     }
 
@@ -45,7 +43,7 @@ class OrchestratorCacheTest {
             Step(id = StepId.SETUP, navigationActionId = 0, destinationId = 0),
             Step(id = StepId.CONSENT, navigationActionId = 0, destinationId = 0),
         )
-        val stepsResultJson = json.encodeToString<List<Step>>(steps)
+        val stepsResultJson = orchestrationJsonHelper.encodeToString<List<Step>>(steps)
         cache.steps = steps
 
         verify {
@@ -59,7 +57,7 @@ class OrchestratorCacheTest {
             Step(id = StepId.SETUP, navigationActionId = 0, destinationId = 0),
             Step(id = StepId.CONSENT, navigationActionId = 0, destinationId = 0),
         )
-        val jsonString = jsonHelper.json.encodeToString(stepsList)
+        val jsonString = orchestrationJsonHelper.encodeToString(stepsList)
 
         every { prefs.getString(any(), any()) } returns jsonString
 
@@ -82,7 +80,7 @@ class OrchestratorCacheTest {
     @Test
     fun `Stores age group if passed value`() {
         val ageGroup = AgeGroup(1, 2)
-        val jsonString = jsonHelper.json.encodeToString(ageGroup)
+        val jsonString = orchestrationJsonHelper.encodeToString(ageGroup)
 
         cache.ageGroup = ageGroup
         verify(exactly = 1) { prefs.edit().putString(any(), jsonString) }
@@ -90,7 +88,7 @@ class OrchestratorCacheTest {
 
     @Test
     fun `Restores age group if stored`() {
-        val json = json.encodeToString(AgeGroup(1, 2))
+        val json = orchestrationJsonHelper.encodeToString(AgeGroup(1, 2))
         every { prefs.getString(any(), any()) } returns json
 
         val result = cache.ageGroup
@@ -108,25 +106,19 @@ class OrchestratorCacheTest {
     }
 
     @Test
-    fun `AgeGroup is serialized by Jackson without addition of phantom attributes`() {
-        // see Jackson unwanted attribute serialization bug https://stackoverflow.com/questions/69616587/why-does-jackson-add-an-empty-false-into-the-json
-        val realJsonHelper = OrcJsonHelper
+    fun `AgeGroup is serialized without addition of phantom attributes`() {
         val originalAgeGroup = AgeGroup(startInclusive = 0, endExclusive = 1)
 
-        val jsonString = realJsonHelper.json.encodeToString(originalAgeGroup)
+        val jsonString = orchestrationJsonHelper.encodeToString(originalAgeGroup)
 
         assertThat(jsonString).isEqualTo("{\"startInclusive\":0,\"endExclusive\":1}")
     }
 
     @Test
-    fun `AgeGroup is deserialized correctly by Jackson`() {
-        val realJsonHelper = OrcJsonHelper
+    fun `AgeGroup is deserialized correctly `() {
         val originalAgeGroup = AgeGroup(startInclusive = 0, endExclusive = 1)
-
         val jsonString = "{\"type\":\"AgeGroup\",\"startInclusive\":0,\"endExclusive\":1}"
-
-        val result = realJsonHelper.json.decodeFromString<AgeGroup>(jsonString)
-
+        val result = orchestrationJsonHelper.decodeFromString<AgeGroup>(jsonString)
         assertThat(result).isEqualTo(originalAgeGroup)
     }
 }

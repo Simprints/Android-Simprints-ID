@@ -23,7 +23,7 @@ import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.steps.StepStatus
-import com.simprints.feature.orchestrator.tools.OrcJsonHelper
+import com.simprints.feature.orchestrator.tools.OrchestrationJsonHelper
 import com.simprints.feature.orchestrator.usecases.AddCallbackEventUseCase
 import com.simprints.feature.orchestrator.usecases.MapRefusalOrErrorResultUseCase
 import com.simprints.feature.orchestrator.usecases.MapStepsForLastBiometricEnrolUseCase
@@ -55,6 +55,7 @@ internal class OrchestratorViewModel @Inject constructor(
     private val addCallbackEvent: AddCallbackEventUseCase,
     private val updateDailyActivity: UpdateDailyActivityUseCase,
     private val mapStepsForLastBiometrics: MapStepsForLastBiometricEnrolUseCase,
+    private val orchestrationJsonHelper: OrchestrationJsonHelper,
 ) : ViewModel() {
     var isRequestProcessed = false
 
@@ -312,7 +313,7 @@ internal class OrchestratorViewModel @Inject constructor(
 
     fun setActionRequestFromJson(json: String) {
         try {
-            actionRequest = OrcJsonHelper.json.decodeFromString(json)
+            actionRequest = orchestrationJsonHelper.decodeFromString(json)
         } catch (e: Exception) {
             Simber.e("Action request deserialization failed", e, tag = ORCHESTRATION)
         }
@@ -320,7 +321,7 @@ internal class OrchestratorViewModel @Inject constructor(
 
     fun getActionRequestJson(): String? = try {
         actionRequest?.let {
-            OrcJsonHelper.json.encodeToString(it)
+            orchestrationJsonHelper.encodeToString(it)
         }
     } catch (e: Exception) {
         Simber.e("Action request serialization failed", e, tag = ORCHESTRATION)

@@ -3,7 +3,7 @@ package com.simprints.feature.orchestrator.cache
 import androidx.core.content.edit
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.feature.orchestrator.steps.Step
-import com.simprints.feature.orchestrator.tools.OrcJsonHelper
+import com.simprints.feature.orchestrator.tools.OrchestrationJsonHelper
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import javax.inject.Inject
@@ -12,20 +12,14 @@ import javax.inject.Singleton
 @Singleton
 internal class OrchestratorCache @Inject constructor(
     securityManager: SecurityManager,
-    private val jsonHelper: OrcJsonHelper,
+    private val orchestrationJsonHelper: OrchestrationJsonHelper,
 ) {
     private val prefs = securityManager.buildEncryptedSharedPreferences(ORCHESTRATION_CACHE)
-
-    private fun List<Step>.asJsonArray(): String = joinToString(separator = ",") {
-        jsonHelper.json.encodeToString(it)
-    }.let { "[$it]" }.also {
-        Simber.i(tag = "orchestrator", message = "Saved steps in cache $it")
-    }
 
     var steps: List<Step>
         set(value) {
             prefs.edit(commit = true) {
-                putString(KEY_STEPS, value.asJsonArray())
+                putString(KEY_STEPS, orchestrationJsonHelper.encodeToString(value))
             }
         }
         get() = (
@@ -33,7 +27,7 @@ internal class OrchestratorCache @Inject constructor(
                 .getString(KEY_STEPS, null)
                 ?.let { jsonArray ->
                     Simber.i(tag = "orchestrator", message = "Loaded steps from cache $jsonArray")
-                    jsonHelper.json.decodeFromString<List<Step>>(jsonArray)
+                    orchestrationJsonHelper.decodeFromString<List<Step>>(jsonArray)
                 }
                 ?: emptyList()
         )
@@ -43,11 +37,11 @@ internal class OrchestratorCache @Inject constructor(
     var ageGroup: AgeGroup?
         set(value) {
             prefs.edit(commit = true) {
-                putString(KEY_AGE_GROUP, value?.let { jsonHelper.json.encodeToString<AgeGroup>(it) })
+                putString(KEY_AGE_GROUP, value?.let { orchestrationJsonHelper.encodeToString<AgeGroup>(it) })
             }
         }
         get() = prefs.getString(KEY_AGE_GROUP, null)?.let {
-            jsonHelper.json.decodeFromString<AgeGroup>(it)
+            orchestrationJsonHelper.decodeFromString<AgeGroup>(it)
         }
 
     fun clearCache() {

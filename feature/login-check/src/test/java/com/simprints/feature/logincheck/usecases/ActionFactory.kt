@@ -6,7 +6,7 @@ import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 
 internal object ActionFactory {
-    fun getEnrolRequest(extras: Map<String, String> = emptyMap()) = ActionRequest.EnrolActionRequest(
+    fun getEnrolRequest(unknownExtras: Map<String, String> = emptyMap()) = ActionRequest.EnrolActionRequest(
         actionIdentifier = ActionRequestIdentifier(
             packageName = "com.simprints.id",
             actionName = ActionConstants.ACTION_ENROL,
@@ -17,7 +17,7 @@ internal object ActionFactory {
         projectId = MOCK_PROJECT_ID,
         userId = MOCK_USER_ID,
         moduleId = MOCK_MODULE_ID,
-        unknownExtras = extras,
+        unknownExtras = unknownExtras,
         biometricDataSource = MOCK_BIOMETRIC_DATA_SOURCE,
         metadata = "",
     )

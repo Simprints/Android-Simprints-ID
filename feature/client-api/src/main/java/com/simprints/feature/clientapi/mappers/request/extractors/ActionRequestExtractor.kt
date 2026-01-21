@@ -43,5 +43,5 @@ internal abstract class ActionRequestExtractor(
     }
 
     open fun getUnknownExtras(): Map<String, String?> =
-        extras.filter { it.key.isNotBlank() && !expectedKeys.contains(it.key) }.mapValues { it.toString() }
+        extras.filter { it.key.isNotBlank() && !expectedKeys.contains(it.key) }.mapValues { (_, value) -> value.toString() }
 }

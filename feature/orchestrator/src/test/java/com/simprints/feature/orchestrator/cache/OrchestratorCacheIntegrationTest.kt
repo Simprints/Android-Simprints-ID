@@ -38,7 +38,7 @@ import com.simprints.feature.login.LoginResult
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.steps.StepStatus
-import com.simprints.feature.orchestrator.tools.OrcJsonHelper
+import com.simprints.feature.orchestrator.tools.OrchestrationJsonHelper
 import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.selectsubject.SelectSubjectParams
 import com.simprints.feature.selectsubject.SelectSubjectResult
@@ -67,7 +67,7 @@ class OrchestratorCacheIntegrationTest {
     @MockK
     private lateinit var prefs: SharedPreferences
 
-    private var jsonHelper = OrcJsonHelper
+    private var jsonHelper = OrchestrationJsonHelper()
 
     private lateinit var cache: OrchestratorCache
 
