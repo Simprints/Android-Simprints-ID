@@ -402,7 +402,7 @@ class ProjectConfigSharedPrefsMigrationTest {
     }
 
     @Test
-    fun `migrate should throw an exception if there is an issue that is not related to jackson`() = runTest {
+    fun `migrate should throw an exception if there is an issue that is not related to serialization`() = runTest {
         val json = concatMapsAsString(
             JSON_GENERAL_CONFIGURATION,
             JSON_CONSENT_CONFIGURATION,

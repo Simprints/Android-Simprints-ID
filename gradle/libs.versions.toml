@@ -49,8 +49,6 @@ firebase_perfPlugin_version = "2.0.2"
 
 retrofit_version = "3.0.0"
 okttp_version = "5.3.2"
-# Newer versions of Jackson don't support android apis <=25.Jackson shouldn't be updated as long as SID MIN supported APIs <=25
-jackson_version = "2.13.4"
 chuck_version = "4.3.0"
 
 sqlCipher_version = "4.13.0"
@@ -174,8 +172,6 @@ retrofit_kotlin_serialization = { group = "com.squareup.retrofit2", name = "conv
 chuck-debug = { module = "com.github.chuckerteam.chucker:library", version.ref = "chuck_version" }
 chuck-release = { module = "com.github.chuckerteam.chucker:library-no-op", version.ref = "chuck_version" }
 
-#Jackson
-jackson-core = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson_version" }
 
 #Fuzzywuzzy
 fuzzywuzzy-core = { module = "me.xdrop:fuzzywuzzy", version.ref = "fuzzywuzzy_version" }

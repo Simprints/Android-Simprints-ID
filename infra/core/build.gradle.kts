@@ -27,7 +27,6 @@ dependencies {
 
     runtimeOnly(libs.kotlin.coroutinesAndroid)
 
-    implementation(libs.jackson.core)
     implementation(libs.workManager.work)
     implementation(libs.kronos.kronos)
     implementation(libs.tink.core)
