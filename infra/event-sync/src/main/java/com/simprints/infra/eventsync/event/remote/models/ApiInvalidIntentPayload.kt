@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
+import com.simprints.core.tools.extentions.toStringMap
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.InvalidIntentEvent.InvalidIntentPayload
 import kotlinx.serialization.Serializable
@@ -15,7 +16,7 @@ internal data class ApiInvalidIntentPayload(
     constructor(domainPayload: InvalidIntentPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.action,
-        domainPayload.extras,
+        domainPayload.extras.toStringMap(),
     )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields

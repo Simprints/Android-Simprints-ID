@@ -60,11 +60,11 @@ jobs:
                     for ARTEFACT_DIR in test-reports/*; do
                       echo "Copying the contents of ${ARTEFACT_DIR}"
                       
-                      [[ -d "ARTEFACT_DIR" ]] || continue
+                      [[ -d "$ARTEFACT_DIR" ]] || continue
                       ALL_SKIPPED=false
                     
                       # Copy the contents of each artefact folder into the workspace root
-                      rsync -arv "${ARTEFACT_DIR}" . || true
+                      rsync -arv "${ARTEFACT_DIR}"/* . || true
                     done
                     
                     if [[ "$ALL_SKIPPED" == "true" ]]; then

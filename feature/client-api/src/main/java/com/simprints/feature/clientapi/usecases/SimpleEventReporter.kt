@@ -7,6 +7,7 @@ import com.simprints.infra.events.event.domain.models.InvalidIntentEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonElement
 import javax.inject.Inject
 
 internal class SimpleEventReporter @Inject constructor(
@@ -16,7 +17,7 @@ internal class SimpleEventReporter @Inject constructor(
 ) {
     fun addInvalidIntentEvent(
         action: String,
-        extras: Map<String, String>,
+        extras: Map<String, JsonElement?>,
     ) {
         sessionCoroutineScope.launch {
             coreEventRepository.addOrUpdateEvent(InvalidIntentEvent(timeHelper.now(), action, extras))
