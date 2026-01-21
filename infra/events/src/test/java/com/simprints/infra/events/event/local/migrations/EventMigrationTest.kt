@@ -6,10 +6,10 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.test.ext.junit.runners.*
 import androidx.test.platform.app.*
 import com.simprints.core.tools.extentions.getStringWithColumnName
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.local.EventRoomDatabase
+import com.simprints.infra.serialization.SimJson
 import org.json.JSONObject
 import org.junit.Rule
 import org.junit.Test
@@ -46,7 +46,7 @@ class EventMigrationTest {
         db.query("SELECT * FROM $TABLE_NAME").use { cursor ->
             while (cursor.moveToNext()) {
                 val eventJson = cursor.getStringWithColumnName("eventJson")!!
-                JsonHelper.json.decodeFromString<Event>(eventJson)
+                SimJson.decodeFromString<Event>(eventJson)
             }
         }
         helper.closeWhenFinished(db)

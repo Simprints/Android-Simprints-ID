@@ -1,15 +1,13 @@
 package com.simprints.infra.events.event.cosync
 
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.BiometricReference
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordCreationEvent
+import com.simprints.infra.serialization.SimJson
 import org.junit.Test
 import kotlin.test.assertEquals
 
 class CoSyncEnrolmentRecordCreationEventDeserializerTest {
-    private val json = JsonHelper.json
-
     @Test
     fun `deserialize handles old format with plain strings`() {
         // Arrange
@@ -17,7 +15,7 @@ class CoSyncEnrolmentRecordCreationEventDeserializerTest {
 
         // Act
         // We explicitly use the custom serializer we created in the previous step
-        val result = json.decodeFromString<EnrolmentRecordCreationEvent>(jsonString)
+        val result = SimJson.decodeFromString<EnrolmentRecordCreationEvent>(jsonString)
 
         // Assert
         assertEquals(EVENT_ID, result.id)
@@ -37,7 +35,7 @@ class CoSyncEnrolmentRecordCreationEventDeserializerTest {
         val jsonString = JSON_TEMPLATE.format(TOKENIZED_MODULE, RAW_ATTENDANT)
 
         // Act
-        val result = json.decodeFromString<EnrolmentRecordCreationEvent>(jsonString)
+        val result = SimJson.decodeFromString<EnrolmentRecordCreationEvent>(jsonString)
 
         // Assert
         assertEquals(EVENT_ID, result.id)
@@ -59,7 +57,7 @@ class CoSyncEnrolmentRecordCreationEventDeserializerTest {
         val jsonString = JSON_TEMPLATE.format(TOKENIZED_MODULE_NO_CLASS, RAW_ATTENDANT_NO_CLASS)
 
         // Act
-        val result = json.decodeFromString<EnrolmentRecordCreationEvent>(jsonString)
+        val result = SimJson.decodeFromString<EnrolmentRecordCreationEvent>(jsonString)
 
         // Assert
         assertEquals(EVENT_ID, result.id)

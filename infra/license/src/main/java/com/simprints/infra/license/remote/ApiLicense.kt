@@ -1,8 +1,8 @@
 package com.simprints.infra.license.remote
 
 import androidx.annotation.Keep
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.license.models.Vendor
+import com.simprints.infra.serialization.SimJson
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -60,7 +60,7 @@ internal data class ApiLicenseError(
  *    ```
  * @return ApiLicense
  */
-internal fun String.parseApiLicense(apiJson: Json = JsonHelper.json): ApiLicense {
+internal fun String.parseApiLicense(apiJson: Json = SimJson): ApiLicense {
     val jsonObject = apiJson.decodeFromString<JsonObject>(this)
 
     val licenses = jsonObject.entries.associate { (key, value) ->

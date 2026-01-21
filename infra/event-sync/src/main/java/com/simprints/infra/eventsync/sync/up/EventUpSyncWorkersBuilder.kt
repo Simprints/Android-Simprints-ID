@@ -6,7 +6,6 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkRequest
 import androidx.work.workDataOf
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope
 import com.simprints.infra.eventsync.sync.MIN_BACKOFF_SECS
@@ -19,12 +18,12 @@ import com.simprints.infra.eventsync.sync.common.addTagForScheduledAtNow
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_EVENT_UP_SYNC_SCOPE_ID
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_UP_SYNC
+import com.simprints.infra.serialization.SimJson
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 internal class EventUpSyncWorkersBuilder @Inject constructor(
     private val upSyncScopeRepository: EventUpSyncScopeRepository,
-    private val jsonHelper: JsonHelper,
 ) {
     suspend fun buildUpSyncWorkerChain(
         uniqueSyncId: String,
@@ -43,7 +42,7 @@ internal class EventUpSyncWorkersBuilder @Inject constructor(
         .Builder(EventUpSyncUploaderWorker::class.java)
         .setInputData(
             workDataOf(
-                INPUT_UP_SYNC to jsonHelper.json.encodeToString(upSyncScope),
+                INPUT_UP_SYNC to SimJson.encodeToString(upSyncScope),
                 INPUT_EVENT_UP_SYNC_SCOPE_ID to uniqueUpSyncId,
             ),
         ).upSyncWorker(uniqueSyncID, uniqueUpSyncId, getUpSyncWorkerConstraints())

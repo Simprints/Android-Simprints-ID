@@ -8,7 +8,6 @@ import androidx.work.WorkInfo.State.RUNNING
 import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationFlagsStore
@@ -30,6 +29,7 @@ import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownload
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
+import com.simprints.infra.serialization.SimJson
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -83,13 +83,12 @@ internal class SimprintsEventDownSyncDownloaderWorkerTest {
             },
             mockk(relaxed = true) {
                 every { inputData } returns workDataOf(
-                    INPUT_DOWN_SYNC_OPS to JsonHelper.json.encodeToString(projectDownSyncScope.operations.first()),
+                    INPUT_DOWN_SYNC_OPS to SimJson.encodeToString(projectDownSyncScope.operations.first()),
                     INPUT_EVENT_DOWN_SYNC_SCOPE_ID to "eventScopeId",
                 )
             },
             eventDownSyncScopeRepository,
             syncCache,
-            JsonHelper,
             eventRepository,
             configRepository,
             testCoroutineRule.testCoroutineDispatcher,

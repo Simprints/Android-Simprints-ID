@@ -3,7 +3,6 @@ package com.simprints.infra.network
 import com.simprints.infra.network.apiclient.SimApiClientImpl
 import com.simprints.infra.network.httpclient.BuildOkHttpClientUseCase
 import com.simprints.infra.network.url.BaseUrlProvider
-import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.reflect.KClass
@@ -12,7 +11,6 @@ import kotlin.reflect.KClass
 internal class SimNetworkImpl @Inject constructor(
     private val baseUrlProvider: BaseUrlProvider,
     private val buildOkHttpClient: BuildOkHttpClientUseCase,
-    private val json: Json,
 ) : SimNetwork {
     override fun <T : SimRemoteInterface> getSimApiClient(
         remoteInterface: KClass<T>,
@@ -26,7 +24,6 @@ internal class SimNetworkImpl @Inject constructor(
         deviceId,
         versionName,
         authToken,
-        json = json,
     )
 
     override fun getApiBaseUrl(): String = baseUrlProvider.getApiBaseUrl()

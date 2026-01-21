@@ -3,7 +3,6 @@ package com.simprints.infra.eventsync.event.commcare
 import android.content.Context
 import android.database.Cursor
 import androidx.core.net.toUri
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.LastCallingPackageStore
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordCreationEvent
@@ -15,6 +14,7 @@ import com.simprints.infra.eventsync.status.down.domain.CommCareEventSyncResult
 import com.simprints.infra.eventsync.status.down.domain.RemoteEventQuery
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.COMMCARE_SYNC
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.serialization.SimJson
 import com.simprints.libsimprints.Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -25,7 +25,6 @@ import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
 internal class CommCareEventDataSource @Inject constructor(
-    private val jsonHelper: JsonHelper,
     private val commCareSyncCache: CommCareSyncCache,
     private val lastCallingPackageStore: LastCallingPackageStore,
     @ApplicationContext private val context: Context,
@@ -224,7 +223,7 @@ internal class CommCareEventDataSource @Inject constructor(
 
     private fun parseRecordEvents(subjectActions: String) = subjectActions.takeIf(String::isNotEmpty)?.let {
         try {
-            jsonHelper.json.decodeFromString<CoSyncEnrolmentRecordEvents>(it)
+            SimJson.decodeFromString<CoSyncEnrolmentRecordEvents>(it)
         } catch (e: Exception) {
             Simber.e("Error while parsing subjectActions", e)
             null

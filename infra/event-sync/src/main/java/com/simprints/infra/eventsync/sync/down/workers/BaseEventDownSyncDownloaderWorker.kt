@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationFlagsStore
@@ -15,6 +14,7 @@ import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.WorkerProgressCountReporter
 import com.simprints.infra.eventsync.sync.down.tasks.BaseEventDownSyncTask
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.serialization.SimJson
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
@@ -23,7 +23,6 @@ internal abstract class BaseEventDownSyncDownloaderWorker(
     params: WorkerParameters,
     protected val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val syncCache: EventSyncCache,
-    protected val jsonHelper: JsonHelper,
     protected val eventRepository: EventRepository,
     protected val configRepository: ConfigRepository,
     private val dispatcher: CoroutineDispatcher,
@@ -35,7 +34,7 @@ internal abstract class BaseEventDownSyncDownloaderWorker(
     private val downSyncOperationInput by lazy {
         val jsonInput = inputData.getString(INPUT_DOWN_SYNC_OPS)
             ?: throw IllegalArgumentException("input required")
-        jsonHelper.json.decodeFromString<EventDownSyncOperation>(jsonInput)
+        SimJson.decodeFromString<EventDownSyncOperation>(jsonInput)
     }
 
     private suspend fun getEventScope() = inputData

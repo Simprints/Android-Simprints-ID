@@ -3,7 +3,6 @@ package com.simprints.infra.enrolment.records.repository
 import android.content.Context
 import com.simprints.core.AvailableProcessors
 import com.simprints.core.DispatcherIO
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.ExtractCommCareCaseIdUseCase
@@ -42,7 +41,6 @@ class IdentityDataSourceModule {
     fun provideCommCareIdentityDataSource(
         timeHelper: TimeHelper,
         encoder: EncodingUtils,
-        jsonHelper: JsonHelper,
         compareImplicitTokenizedStringsUseCase: CompareImplicitTokenizedStringsUseCase,
         extractCommCareCaseIdUseCase: ExtractCommCareCaseIdUseCase,
         @AvailableProcessors availableProcessors: Int,
@@ -51,7 +49,6 @@ class IdentityDataSourceModule {
     ): CandidateRecordDataSource = CommCareCandidateRecordDataSource(
         timeHelper = timeHelper,
         encoder = encoder,
-        jsonHelper = jsonHelper,
         compareImplicitTokenizedStringsUseCase = compareImplicitTokenizedStringsUseCase,
         extractCommCareCaseId = extractCommCareCaseIdUseCase,
         availableProcessors = availableProcessors,

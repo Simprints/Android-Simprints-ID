@@ -1,7 +1,6 @@
 package com.simprints.infra.events.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.EventType.ONE_TO_MANY_MATCH
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.Companion.EVENT_VERSION
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
@@ -11,6 +10,7 @@ import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToM
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
+import com.simprints.infra.serialization.SimJson
 import org.junit.Test
 
 class OneToManyMatchEventTest {
@@ -36,7 +36,7 @@ class OneToManyMatchEventTest {
 
     @Test
     fun shouldParse_v2Event_successfully() {
-        val actualEvent = JsonHelper.json.decodeFromString<Event>(oldApiJsonEventString)
+        val actualEvent = SimJson.decodeFromString<Event>(oldApiJsonEventString)
         assertThat(actualEvent.id).isEqualTo("3afb1b9e-b263-4073-b773-6e1dac20d72f")
         assertThat(actualEvent.payload.eventVersion).isEqualTo(2)
         assertThat(actualEvent.payload).isInstanceOf(OneToManyMatchPayloadV2::class.java)
@@ -44,7 +44,7 @@ class OneToManyMatchEventTest {
 
     @Test
     fun shouldParse_v3Event_successfully() {
-        val actualEvent = JsonHelper.json.decodeFromString<Event>(newApiJsonEventString)
+        val actualEvent = SimJson.decodeFromString<Event>(newApiJsonEventString)
         assertThat(actualEvent.id).isEqualTo("3afb1b9e-b263-4073-b773-6e1dac20d72f")
         assertThat(actualEvent.payload.eventVersion).isEqualTo(3)
         assertThat(actualEvent.payload).isInstanceOf(OneToManyMatchPayloadV3::class.java)

@@ -6,7 +6,6 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.extentions.safeSealedWhens
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.StringTokenizer
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectState
@@ -111,6 +110,7 @@ import com.simprints.infra.eventsync.event.validateScannerFirmwareUpdateEventApi
 import com.simprints.infra.eventsync.event.validateSuspiciousIntentEventApiModel
 import com.simprints.infra.eventsync.event.validateUpSyncRequestEventApiModel
 import com.simprints.infra.eventsync.event.validateVero2InfoSnapshotEventApiModel
+import com.simprints.infra.serialization.SimJson
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import org.json.JSONObject
 import org.junit.Test
@@ -137,7 +137,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_alertScreenEventApiModel() {
         val event = createAlertScreenEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateAlertScreenEventApiModel(json)
     }
@@ -146,7 +146,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_IntentParsingEventApiModel() {
         val event = createIntentParsingEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateIntentParsingEventApiModel(json)
     }
@@ -155,7 +155,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_authenticationEventApiModel() {
         val event = createAuthenticationEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateAuthenticationEventApiModel(json)
     }
@@ -164,7 +164,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_authorizationEventApiModel() {
         val event = createAuthorizationEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateAuthorizationEventApiModel(json)
     }
@@ -173,7 +173,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_calloutEventForVerificationApiModelV2() {
         val event = createVerificationCalloutEventV2()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateCalloutEventApiModelV2(json)
     }
@@ -182,7 +182,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_calloutEventForVerificationApiModelV3() {
         val event = createVerificationCalloutEventV3()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateCalloutEventApiModelV3(json)
     }
@@ -191,7 +191,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_calloutEventForIdentificationApiModelV2() {
         val event = createIdentificationCalloutEventV2()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateCalloutEventApiModelV2(json)
     }
@@ -200,7 +200,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_calloutEventForIdentificationApiModelV3() {
         val event = createIdentificationCalloutEventV3()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateCalloutEventApiModelV3(json)
     }
@@ -209,7 +209,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_calloutEventForEnrolLastBiometricsModelV2() {
         val event = createLastBiometricsEnrolmentCalloutEventV2()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateCalloutEventApiModelV2(json)
     }
@@ -218,7 +218,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_calloutEventForEnrolLastBiometricsModelV3() {
         val event = createLastBiometricsEnrolmentCalloutEventV3()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateCalloutEventApiModelV3(json)
     }
@@ -227,7 +227,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_calloutEventForConfirmationApiModelV2() {
         val event = createConfirmationCalloutEventV2()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateCalloutEventApiModelV2(json)
     }
@@ -236,7 +236,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_calloutEventForConfirmationApiModelV3() {
         val event = createConfirmationCalloutEventV3()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateCalloutEventApiModelV3(json)
     }
@@ -245,7 +245,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_calloutEventForEnrolmentApiModelV2() {
         val event = createEnrolmentCalloutEventV2()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateCalloutEventApiModelV2(json)
     }
@@ -254,7 +254,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_calloutEventForEnrolmentApiModelV3() {
         val event = createEnrolmentCalloutEventV3()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateCalloutEventApiModelV3(json)
     }
@@ -263,7 +263,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_callbackEventForEnrolmentApiModel() {
         val event = createEnrolmentCallbackEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateCallbackV1EventApiModel(json)
     }
@@ -272,7 +272,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_callbackEventForErrorApiModel() {
         val event = createEnrolmentCallbackEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateCallbackV1EventApiModel(json)
     }
@@ -281,7 +281,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_callbackEventForIdentificationApiV2Model() {
         val event = createIdentificationCallbackEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateCallbackV2EventApiModel(json)
     }
@@ -290,7 +290,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_callbackEventForVerificationV1ApiModel() {
         val event = createVerificationCallbackEventV1()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateCallbackV1EventApiModel(json)
     }
@@ -299,7 +299,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_callbackEventForVerificationV2ApiModel() {
         val event = createVerificationCallbackEventV2()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateCallbackV2EventApiModel(json)
     }
@@ -308,7 +308,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_callbackEventForRefusalApiModel() {
         val event = createRefusalCallbackEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateCallbackV1EventApiModel(json)
     }
@@ -317,7 +317,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_callbackEventForConfirmationApiModel() {
         val event = createConfirmationCallbackEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateCallbackV1EventApiModel(json)
     }
@@ -326,7 +326,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_candidateReadEventApiModel() {
         val event = createCandidateReadEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateCandidateReadEventApiModel(json)
     }
@@ -335,7 +335,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_connectivitySnapshotEventApiModel() {
         val event = createConnectivitySnapshotEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateConnectivitySnapshotEventApiModel(json)
     }
@@ -344,7 +344,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_consentEventApiModel() {
         val event = createConsentEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateConsentEventApiModel(json)
     }
@@ -353,7 +353,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validateEnrolmentV2_enrolmentEventApiModel() {
         val event = createEnrolmentEventV2()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateEnrolmentEventV2ApiModel(json)
     }
@@ -362,7 +362,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validateEnrolmentV4_enrolmentEventApiModel() {
         val event = createEnrolmentEventV4()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateEnrolmentEventV4ApiModel(json)
     }
@@ -371,7 +371,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_completionCheckEventApiModel() {
         val event = createCompletionCheckEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateCompletionCheckEventApiModel(json)
     }
@@ -380,7 +380,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_fingerprintCaptureEventApiModel() {
         val event = createFingerprintCaptureEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateFingerprintCaptureEventApiModel(json)
     }
@@ -389,7 +389,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_guidSelectionEventApiModel() {
         val event = createGuidSelectionEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateGuidSelectionEventApiModel(json)
     }
@@ -398,7 +398,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_oneToManyMatchEventApiModel() {
         val event = createOneToManyMatchEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateOneToManyMatchEventApiModel(json)
     }
@@ -407,7 +407,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_oneToOneMatchEventApiModel() {
         val event = createOneToOneMatchEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateOneToOneMatchEventApiModel(json)
     }
@@ -416,7 +416,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_personCreationEventApiModel() {
         val event = createPersonCreationEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validatePersonCreationEvent(json)
     }
@@ -425,7 +425,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_refusalEventApiModel() {
         val event = createRefusalEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateRefusalEventApiModel(json)
     }
@@ -434,7 +434,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_suspiciousIntentEventApiModel() {
         val event = createSuspiciousIntentEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateSuspiciousIntentEventApiModel(json)
     }
@@ -443,7 +443,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_scannerConnectionEventApiModel() {
         val event = createScannerConnectionEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateScannerConnectionEventApiModel(json)
     }
@@ -452,7 +452,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_vero2InfoSnapshotEvent() {
         val event = createVero2InfoSnapshotEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateVero2InfoSnapshotEventApiModel(json)
     }
@@ -461,7 +461,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_scannerFirmwareUpdateEvent() {
         val event = createScannerFirmwareUpdateEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateScannerFirmwareUpdateEventApiModel(json)
     }
@@ -470,7 +470,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_invalidEventApiModel() {
         val event = createInvalidIntentEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateInvalidEventApiModel(json)
     }
@@ -479,7 +479,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_FaceOnboardingCompleteEventApiModel() {
         val event = createFaceOnboardingCompleteEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateFaceOnboardingCompleteEventApiModel(json)
     }
@@ -488,7 +488,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_FaceFallbackCaptureEventApiModel() {
         val event = createFaceFallbackCaptureEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateFaceFallbackCaptureEventApiModel(json)
     }
@@ -497,7 +497,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_FaceCaptureEventApiModel() {
         val event = createFaceCaptureEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateFaceCaptureEventApiModel(json)
     }
@@ -506,7 +506,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_FaceCaptureConfirmationEventApiModel() {
         val event = createFaceCaptureConfirmationEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateFaceCaptureConfirmationEventApiModel(json)
     }
@@ -515,7 +515,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_FaceCaptureBiometricsEventApiModel() {
         val event = createFaceCaptureBiometricsEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateFaceCaptureBiometricsEventApiModel(json)
     }
@@ -524,7 +524,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_FingerprintCaptureBiometricsEventApiModel() {
         val event = createFingerprintCaptureBiometricsEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateFingerprintCaptureBiometricsEventApiModel(json)
     }
@@ -533,7 +533,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_DownSyncRequestEventApiModel() {
         val event = createEventDownSyncRequestEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateDownSyncRequestEventApiModel(json)
     }
@@ -542,7 +542,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_UpSyncRequestEventApiModel() {
         val event = createEventUpSyncRequestEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateUpSyncRequestEventApiModel(json)
     }
@@ -551,7 +551,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_SampleUpSyncRequestEventApiModel() {
         val event = createSampleUpSyncRequestEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateSampleUpSyncRequestEventApiModel(json)
     }
@@ -560,7 +560,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_ageGroupSelectionEventApiModel() {
         val event = createAgeGroupSelectionEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateAgeGroupSelectionEventApiModel(json)
     }
@@ -569,7 +569,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_biometricReferenceCreationEventApiModel() {
         val event = createBiometricReferenceCreationEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateBiometricReferenceCreationEventApiModel(json)
     }
@@ -578,7 +578,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_enrolmentUpdateEventApiModel() {
         val event = createEnrolmentUpdateEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateEnrolmentUpdateEventApiModel(json)
     }
@@ -587,7 +587,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_externalCredentialSelectionEventApiModel() {
         val event = createExternalCredentialSelectionEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateExternalCredentialSelectionEventApiModel(json)
     }
@@ -596,7 +596,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_externalCredentialCaptureValueEventApiModel() {
         val event = createExternalCredentialCaptureValueEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateExternalCredentialCaptureValueEventApiModel(json)
     }
@@ -605,7 +605,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_externalCredentialCaptureEventApiModel() {
         val event = createExternalCredentialCaptureEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateExternalCredentialCaptureEventApiModel(json)
     }
@@ -614,7 +614,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_externalCredentialSearchEventApiModel() {
         val event = createExternalCredentialSearchEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateExternalCredentialSearchApiModel(json)
     }
@@ -623,7 +623,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_externalCredentialConfirmationEventApiModel() {
         val event = createExternalCredentialConfirmationEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateExternalCredentialConfirmationApiModel(json)
     }
@@ -652,7 +652,7 @@ internal class MapDomainEventToApiUseCaseTest {
     fun validate_licenseCheckEventApiModel() {
         val event = createLicenseCheckEvent()
         val apiEvent = useCase(event, project)
-        val json = JSONObject(JsonHelper.json.encodeToString(apiEvent))
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
 
         validateLicenseCheckEventApiModel(json)
     }

@@ -7,7 +7,6 @@ import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.serialization.json.Json
 import org.junit.Before
 import org.junit.Test
 
@@ -17,7 +16,6 @@ class SimNetworkImplTest {
 
     @MockK
     private lateinit var okHttpClientBuilder: BuildOkHttpClientUseCase
-    private val json = Json
 
     @Before
     fun setUp() {
@@ -26,7 +24,7 @@ class SimNetworkImplTest {
 
     @Test
     fun `calling get base url should call the url provider`() {
-        val network = SimNetworkImpl(baseUrlProvider, okHttpClientBuilder, json)
+        val network = SimNetworkImpl(baseUrlProvider, okHttpClientBuilder)
 
         network.getApiBaseUrl()
 
@@ -35,7 +33,7 @@ class SimNetworkImplTest {
 
     @Test
     fun `calling reset base url should call the url provider`() {
-        val network = SimNetworkImpl(baseUrlProvider, okHttpClientBuilder, json)
+        val network = SimNetworkImpl(baseUrlProvider, okHttpClientBuilder)
 
         network.resetApiBaseUrl()
 
@@ -44,7 +42,7 @@ class SimNetworkImplTest {
 
     @Test
     fun `calling set base url should call the url provider`() {
-        val network = SimNetworkImpl(baseUrlProvider, okHttpClientBuilder, json)
+        val network = SimNetworkImpl(baseUrlProvider, okHttpClientBuilder)
 
         val baseUrl = "FAKE_BASE_URL"
 
@@ -55,7 +53,7 @@ class SimNetworkImplTest {
 
     @Test
     fun `calling get api client should return the api client`() {
-        val network = SimNetworkImpl(baseUrlProvider, okHttpClientBuilder, json)
+        val network = SimNetworkImpl(baseUrlProvider, okHttpClientBuilder)
 
         val clientApi = network.getSimApiClient<SimRemoteInterface>(
             mockk(),
@@ -69,7 +67,7 @@ class SimNetworkImplTest {
 
     @Test
     fun `calling get api client with no token should return the api client`() {
-        val network = SimNetworkImpl(baseUrlProvider, okHttpClientBuilder, json)
+        val network = SimNetworkImpl(baseUrlProvider, okHttpClientBuilder)
 
         val clientApi = network.getSimApiClient<SimRemoteInterface>(
             mockk(),

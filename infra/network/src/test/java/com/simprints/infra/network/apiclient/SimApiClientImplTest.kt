@@ -7,13 +7,13 @@ import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.infra.network.httpclient.BuildOkHttpClientUseCase
+import com.simprints.infra.serialization.SimJson
 import com.simprints.logging.persistent.PersistentLogger
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.Json
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.SocketPolicy
@@ -32,8 +32,7 @@ class SimApiClientImplTest {
     @MockK
     lateinit var persistentLogger: PersistentLogger
 
-    private val json = Json
-    private val backendMaintenanceErrorBody = json.encodeToString((ApiError("002")))
+    private val backendMaintenanceErrorBody = SimJson.encodeToString((ApiError("002")))
 
     private lateinit var mockWebServer: MockWebServer
     private lateinit var simApiClientImpl: SimApiClientImpl<FakeRetrofitInterface>
@@ -59,7 +58,6 @@ class SimApiClientImplTest {
             "",
             "",
             attempts = 2,
-            json = json,
         )
     }
 
@@ -88,7 +86,7 @@ class SimApiClientImplTest {
             val estimatedOutage = 4224
             val response = MockResponse()
             response.setResponseCode(503)
-            response.setBody(json.encodeToString((ApiError("002"))))
+            response.setBody(SimJson.encodeToString((ApiError("002"))))
             response.setHeader("Retry-After", estimatedOutage)
             mockWebServer.enqueue(response)
             mockWebServer.enqueue(response)
@@ -135,7 +133,7 @@ class SimApiClientImplTest {
     fun `should throw a sync cloud integration exception when the response code is 503 and retry`() = runTest {
         val response = MockResponse()
         response.setResponseCode(503)
-        response.setBody(json.encodeToString((ApiError("001"))))
+        response.setBody(SimJson.encodeToString((ApiError("001"))))
         mockWebServer.enqueue(response)
         mockWebServer.enqueue(response)
 

@@ -4,7 +4,6 @@ import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.LastCallingPackageStore
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordDeletionEvent
@@ -176,7 +175,6 @@ class CommCareEventDataSourceTest {
         } returns mockMetadataCursor
 
         dataSource = CommCareEventDataSource(
-            JsonHelper,
             mockCommCareSyncCache,
             mockLastCallingPackageStore,
             context,

@@ -11,7 +11,6 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.tools.extentions.getLongWithColumnName
 import com.simprints.core.tools.extentions.getStringWithColumnName
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
@@ -20,6 +19,7 @@ import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
 import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
 import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.events.event.local.EventRoomDatabase
+import com.simprints.infra.serialization.SimJson
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -219,7 +219,7 @@ class EventMigration10to11Test {
         sessionId: String,
         shouldHaveEnded: Boolean = false,
     ) {
-        val scopePayload = JsonHelper.json.decodeFromString<EventScopePayload>(
+        val scopePayload = SimJson.decodeFromString<EventScopePayload>(
             scopeCursor.getStringWithColumnName("payloadJson").orEmpty(),
         )
         assertThat(scopeCursor.getStringWithColumnName("id")).isEqualTo(sessionId)

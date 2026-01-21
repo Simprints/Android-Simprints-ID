@@ -6,7 +6,6 @@ import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.core.DispatcherBG
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
@@ -27,6 +26,7 @@ import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.C
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
+import com.simprints.infra.serialization.SimJson
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -41,7 +41,6 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
     private val upSyncTask: EventUpSyncTask,
     private val eventSyncCache: EventSyncCache,
     private val authStore: AuthStore,
-    private val jsonHelper: JsonHelper,
     private val eventRepository: EventRepository,
     @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params),
@@ -53,8 +52,7 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
             val jsonInput = inputData.getString(INPUT_UP_SYNC)
                 ?: throw IllegalArgumentException("input required")
             Simber.d("Received $jsonInput", tag = tag)
-
-            jsonHelper.json.decodeFromString(jsonInput)
+            SimJson.decodeFromString(jsonInput)
         } catch (t: Throwable) {
             if (t is SerializationException) {
                 EventUpSyncScope.ProjectScope(authStore.signedInProjectId)

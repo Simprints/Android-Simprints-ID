@@ -1,6 +1,5 @@
 package com.simprints.infra.eventsync.sync.up.tasks
 
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
@@ -39,6 +38,7 @@ import com.simprints.infra.eventsync.sync.up.EventUpSyncProgress
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.NetworkConnectionException
+import com.simprints.infra.serialization.SimJson
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -57,7 +57,6 @@ internal class EventUpSyncTask @Inject constructor(
     private val mapDomainEventScopeToApiUseCase: MapDomainEventScopeToApiUseCase,
     private val timeHelper: TimeHelper,
     private val configRepository: ConfigRepository,
-    private val jsonHelper: JsonHelper,
 ) {
     fun upSync(
         operation: EventUpSyncOperation,
@@ -360,7 +359,7 @@ internal class EventUpSyncTask @Inject constructor(
         corruptedScopes.forEach { scope ->
             try {
                 Simber.i("Uploading invalid events for session ${scope.id}", tag = SYNC)
-                val scopeString = jsonHelper.json.encodeToString(scope)
+                val scopeString = SimJson.encodeToString(scope)
                 val eventJsons = eventRepository.getEventsJsonFromScope(scope.id)
                 emit(eventJsons.size)
 

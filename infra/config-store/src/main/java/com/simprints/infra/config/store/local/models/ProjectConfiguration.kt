@@ -1,7 +1,7 @@
 package com.simprints.infra.config.store.local.models
 
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.serialization.SimJson
 
 internal fun ProjectConfiguration.toProto(): ProtoProjectConfiguration = ProtoProjectConfiguration
     .newBuilder()
@@ -19,7 +19,7 @@ internal fun ProjectConfiguration.toProto(): ProtoProjectConfiguration = ProtoPr
     }.also {
         if (custom != null) {
             try {
-                val customJson = JsonHelper.json.encodeToString(custom)
+                val customJson = SimJson.encodeToString(custom)
                 it.setCustomJson(customJson)
             } catch (_: Exception) {
                 // It is safer to not have custom config, than broken one
@@ -41,7 +41,7 @@ internal fun ProtoProjectConfiguration.toDomain(): ProjectConfiguration = Projec
     multifactorId = multiFactorId?.toDomain(),
     custom = customJson?.takeIf { it.isNotBlank() }?.let {
         try {
-            JsonHelper.json.decodeFromString(it)
+            SimJson.decodeFromString(it)
         } catch (e: Exception) {
             // It is safer to not have custom config, than broken one
             null

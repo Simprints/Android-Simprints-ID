@@ -1,7 +1,6 @@
 package com.simprints.infra.events.event.domain.models
 
 import com.google.common.truth.Truth.*
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.event.domain.models.ConsentEvent.Companion.EVENT_VERSION
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
@@ -9,6 +8,7 @@ import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayloa
 import com.simprints.infra.events.event.domain.models.EventType.CONSENT
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
+import com.simprints.infra.serialization.SimJson
 import org.junit.Test
 
 class ConsentEventTest {
@@ -40,9 +40,9 @@ class ConsentEventTest {
             result = ACCEPTED,
         )
 
-        val json = JsonHelper.json.encodeToString(event)
+        val json = SimJson.encodeToString(event)
         // When
-        val decoded = JsonHelper.json.decodeFromString<ConsentEvent>(json)
+        val decoded = SimJson.decodeFromString<ConsentEvent>(json)
 
         // Then
         assertThat(decoded.id).isEqualTo(event.id)

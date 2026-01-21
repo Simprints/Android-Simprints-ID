@@ -7,7 +7,6 @@ import androidx.room.Room
 import androidx.test.core.app.*
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
@@ -65,7 +64,6 @@ internal class EventLocalDataSourceTest {
 
         eventLocalDataSource = EventLocalDataSource(
             eventDatabaseFactory,
-            JsonHelper,
             UnconfinedTestDispatcher(),
             UnconfinedTestDispatcher(),
         )
@@ -344,39 +342,39 @@ internal class EventLocalDataSourceTest {
     fun loadOpenedEventScope() = runTest {
         mockkStatic("com.simprints.infra.events.event.local.models.DbEventScopeKt")
         val dbSessionCaptureEvent = mockk<DbEventScope> {
-            every { fromDbToDomain(any()) } returns mockk()
+            every { fromDbToDomain() } returns mockk()
         }
         coEvery { scopeDao.loadOpen(EventScopeType.SESSION) } returns listOf(dbSessionCaptureEvent)
         eventLocalDataSource.loadOpenedScopes(EventScopeType.SESSION)
 
         coVerify { scopeDao.loadOpen(any()) }
-        verify { dbSessionCaptureEvent.fromDbToDomain(any()) }
+        verify { dbSessionCaptureEvent.fromDbToDomain() }
     }
 
     @Test
     fun loadClosedEventScope() = runTest {
         mockkStatic("com.simprints.infra.events.event.local.models.DbEventScopeKt")
         val dbSessionCaptureEvent = mockk<DbEventScope> {
-            every { fromDbToDomain(any()) } returns mockk()
+            every { fromDbToDomain() } returns mockk()
         }
         coEvery { scopeDao.loadClosed(EventScopeType.SESSION, limit = 10) } returns listOf(dbSessionCaptureEvent)
         eventLocalDataSource.loadClosedScopes(EventScopeType.SESSION, limit = 10)
 
         coVerify { scopeDao.loadClosed(EventScopeType.SESSION, limit = 10) }
-        verify { dbSessionCaptureEvent.fromDbToDomain(any()) }
+        verify { dbSessionCaptureEvent.fromDbToDomain() }
     }
 
     @Test
     fun loadEventScope() = runTest {
         mockkStatic("com.simprints.infra.events.event.local.models.DbEventScopeKt")
         val dbSessionCaptureEvent = mockk<DbEventScope> {
-            every { fromDbToDomain(any()) } returns mockk()
+            every { fromDbToDomain() } returns mockk()
         }
         coEvery { scopeDao.loadScope(GUID1) } returns dbSessionCaptureEvent
         eventLocalDataSource.loadEventScope(GUID1)
 
         coVerify { scopeDao.loadScope(any()) }
-        verify { dbSessionCaptureEvent.fromDbToDomain(any()) }
+        verify { dbSessionCaptureEvent.fromDbToDomain() }
     }
 
     @Test

@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.DeviceID
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.TimeUtils
 import com.simprints.feature.login.LoginParams
 import com.simprints.feature.login.screens.qrscanner.QrCodeContent
@@ -18,6 +17,7 @@ import com.simprints.infra.authlogic.model.AuthenticateDataResult
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
+import com.simprints.infra.serialization.SimJson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,7 +27,6 @@ internal class LoginFormViewModel @Inject constructor(
     @param:DeviceID private val deviceId: String,
     private val simNetwork: SimNetwork,
     private val authManager: AuthManager,
-    private val jsonHelper: JsonHelper,
 ) : ViewModel() {
     val isProcessingSignIn: LiveData<Boolean>
         get() = _isProcessingSignIn
@@ -96,7 +95,7 @@ internal class LoginFormViewModel @Inject constructor(
             _signInState.send(mapQrError(result.error))
         } else if (!result.content.isNullOrEmpty()) {
             try {
-                val qrContent = jsonHelper.json.decodeFromString<QrCodeContent>(result.content)
+                val qrContent = SimJson.decodeFromString<QrCodeContent>(result.content)
                 Simber.i("QR scanning successful", tag = LOGIN)
 
                 if (projectId != qrContent.projectId) {

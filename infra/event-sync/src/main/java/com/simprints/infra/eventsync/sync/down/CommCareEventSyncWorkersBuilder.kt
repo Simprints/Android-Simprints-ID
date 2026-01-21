@@ -3,7 +3,6 @@ package com.simprints.infra.eventsync.sync.down
 import androidx.work.Constraints
 import androidx.work.OneTimeWorkRequest
 import com.simprints.core.domain.common.Partitioning
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker
@@ -12,11 +11,9 @@ import javax.inject.Inject
 
 internal class CommCareEventSyncWorkersBuilder @Inject constructor(
     downSyncScopeRepository: EventDownSyncScopeRepository,
-    jsonHelper: JsonHelper,
     configRepository: ConfigRepository,
 ) : BaseEventDownSyncWorkersBuilder(
         downSyncScopeRepository,
-        jsonHelper,
         configRepository,
     ) {
     override fun getWorkerClass(): Class<out BaseEventDownSyncDownloaderWorker> = CommCareEventSyncDownloaderWorker::class.java

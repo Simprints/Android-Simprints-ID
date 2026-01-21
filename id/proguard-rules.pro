@@ -60,3 +60,4 @@
 #keep everything for realm
 -keep class io.realm.** { *; }
 -keepnames class io.realm.** { *; }
+-dontwarn lombok.Generated

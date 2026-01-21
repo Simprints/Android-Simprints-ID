@@ -2,9 +2,9 @@ package com.simprints.infra.events.event.local.migrations
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.simprints.core.domain.tokenization.serialization.FIELD_CLASS_NAME
-import com.simprints.core.domain.tokenization.serialization.FIELD_VALUE
-import com.simprints.core.domain.tokenization.serialization.RAW
+import com.simprints.core.domain.tokenization.serialization.TokenizableStringSerializer.FIELD_CLASS_NAME
+import com.simprints.core.domain.tokenization.serialization.TokenizableStringSerializer.FIELD_VALUE
+import com.simprints.core.domain.tokenization.serialization.TokenizableStringSerializer.RAW
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber

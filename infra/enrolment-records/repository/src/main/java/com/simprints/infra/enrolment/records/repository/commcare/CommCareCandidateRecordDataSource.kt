@@ -9,7 +9,6 @@ import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.CandidateRecord
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.ExtractCommCareCaseIdUseCase
@@ -25,6 +24,7 @@ import com.simprints.infra.events.event.domain.models.EnrolmentRecordCreationEve
 import com.simprints.infra.events.event.domain.models.FaceReference
 import com.simprints.infra.events.event.domain.models.FingerprintReference
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.serialization.SimJson
 import com.simprints.libsimprints.Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
@@ -43,7 +43,6 @@ import com.simprints.core.domain.reference.BiometricReference as CoreBiometricRe
 internal class CommCareCandidateRecordDataSource @Inject constructor(
     private val timeHelper: TimeHelper,
     private val encoder: EncodingUtils,
-    private val jsonHelper: JsonHelper,
     private val compareImplicitTokenizedStringsUseCase: CompareImplicitTokenizedStringsUseCase,
     private val extractCommCareCaseId: ExtractCommCareCaseIdUseCase,
     @param:AvailableProcessors private val availableProcessors: Int,
@@ -249,7 +248,7 @@ internal class CommCareCandidateRecordDataSource @Inject constructor(
 
     private fun parseRecordEvents(subjectActions: String) = subjectActions.takeIf(String::isNotEmpty)?.let {
         try {
-            jsonHelper.json.decodeFromString<CoSyncEnrolmentRecordEvents>(it)
+            SimJson.decodeFromString<CoSyncEnrolmentRecordEvents>(it)
         } catch (e: Exception) {
             Simber.e("Error while parsing subjectActions", e)
             null

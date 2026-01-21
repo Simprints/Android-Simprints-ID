@@ -5,7 +5,6 @@ import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableRaw
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.models.ConsentConfiguration
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
@@ -24,6 +23,7 @@ import com.simprints.infra.config.store.models.Vero1Configuration
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.BASIC
 import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.LIVE_QUALITY_FEEDBACK
+import com.simprints.infra.serialization.SimJson
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.MapSerializer
@@ -168,7 +168,7 @@ internal data class OldProjectConfig(
                 emptyMap()
             } else {
                 // Construct a JavaType instance for Map<String, Vero2FirmwareVersions>
-                JsonHelper.json.decodeFromString(
+                SimJson.decodeFromString(
                     MapSerializer(
                         String.serializer(),
                         Vero2Configuration.Vero2FirmwareVersions.serializer(),
@@ -185,8 +185,8 @@ internal data class OldProjectConfig(
         collectConsent = consentRequired.toBoolean(),
         displaySimprintsLogo = logoExists.toBoolean(),
         allowParentalConsent = consentParentalExists.toBoolean(),
-        generalPrompt = JsonHelper.json.decodeFromString<GeneralConsentOptions>(consentGeneralOptions).toDomain(),
-        parentalPrompt = JsonHelper.json.decodeFromString<ParentalConsentOptions>(consentParentalOptions).toDomain(),
+        generalPrompt = SimJson.decodeFromString<GeneralConsentOptions>(consentGeneralOptions).toDomain(),
+        parentalPrompt = SimJson.decodeFromString<ParentalConsentOptions>(consentParentalOptions).toDomain(),
     )
 
     private fun identificationConfiguration(): IdentificationConfiguration = IdentificationConfiguration(
