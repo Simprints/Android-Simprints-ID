@@ -10,6 +10,7 @@ android {
 }
 
 dependencies {
+    api(project(":infra:serialization"))
     api(project(":infra:logging"))
     api(project(":infra:network"))
     api(project(":infra:resources"))

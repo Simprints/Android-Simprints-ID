@@ -127,6 +127,7 @@ include(
 
 // Infra modules
 include(
+    ":infra:serialization",
     ":infra:core",
     ":infra:test-tools",
     ":infra:events",

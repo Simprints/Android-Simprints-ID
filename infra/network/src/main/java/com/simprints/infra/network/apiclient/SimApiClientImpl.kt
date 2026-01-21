@@ -10,9 +10,9 @@ import com.simprints.infra.network.exceptions.RetryableCloudException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.infra.network.exceptions.isCausedFromBadNetworkConnection
 import com.simprints.infra.network.httpclient.BuildOkHttpClientUseCase
-import com.simprints.infra.network.json.JsonHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.HttpException
 import retrofit2.Retrofit
@@ -33,6 +33,7 @@ internal class SimApiClientImpl<T : SimRemoteInterface>(
     private val versionName: String,
     private val authToken: String? = null,
     private val attempts: Int = ATTEMPTS_FOR_NETWORK_CALLS,
+    private val json: Json,
 ) : SimNetwork.SimApiClient<T> {
     companion object {
         private const val BACKEND_MAINTENANCE_ERROR_STRING = "002"
@@ -50,7 +51,7 @@ internal class SimApiClientImpl<T : SimRemoteInterface>(
         Retrofit
             .Builder()
             .addConverterFactory(ScalarsConverterFactory.create())
-            .addConverterFactory(JsonHelper().json.asConverterFactory(contentType))
+            .addConverterFactory(json.asConverterFactory(contentType))
             .baseUrl(url)
             .client(buildOkHttpClient(authToken, deviceId, versionName))
             .build()
@@ -107,7 +108,7 @@ internal class SimApiClientImpl<T : SimRemoteInterface>(
         }
         val errorBody = response()?.errorBody()?.string() ?: return false
 
-        val apiError = JsonHelper().json.decodeFromString<ApiError>(errorBody)
+        val apiError = json.decodeFromString<ApiError>(errorBody)
         return apiError.error == BACKEND_MAINTENANCE_ERROR_STRING
     }
 
