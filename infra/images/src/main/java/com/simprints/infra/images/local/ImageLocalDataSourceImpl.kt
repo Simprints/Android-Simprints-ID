@@ -28,7 +28,7 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
 ) : ImageLocalDataSource {
     private val imageRootPath = "${ctx.filesDir}/$IMAGES_FOLDER"
 
-    private val observedImageRefListInvalidation = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private val imageRefChanges = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     init {
         createDirectoryIfNonExistent(imageRootPath)
@@ -61,7 +61,7 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
             t.printStackTrace()
             null
         }
-        observedImageRefListInvalidation.tryEmit(Unit)
+        imageRefChanges.tryEmit(Unit)
         storedImageRef
     }
 
@@ -91,7 +91,7 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
             }.toList()
     }
 
-    override suspend fun observeImageCounts(projectId: String): Flow<Int> = observedImageRefListInvalidation
+    override suspend fun observeImageCounts(projectId: String): Flow<Int> = imageRefChanges
         .onStart {
             emit(Unit)
         } // initial listing
@@ -101,7 +101,7 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
     override suspend fun deleteImage(image: SecuredImageRef): Boolean = withContext(dispatcher) {
         val absolutePath = buildAbsolutePath(image.relativePath)
         val file = File(absolutePath)
-        file.delete().also { observedImageRefListInvalidation.tryEmit(Unit) }
+        file.delete().also { imageRefChanges.tryEmit(Unit) }
     }
 
     private fun createDirectoryIfNonExistent(path: String) {
