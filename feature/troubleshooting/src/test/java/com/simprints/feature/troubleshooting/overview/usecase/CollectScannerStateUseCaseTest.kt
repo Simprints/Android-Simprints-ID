@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk
+import com.simprints.infra.config.store.models.ModalitySdkType
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coJustRun
@@ -51,7 +51,7 @@ class CollectScannerStateUseCaseTest {
     fun `connects and disconnects to scanner`() = runTest {
         coEvery {
             configRepository.getProjectConfiguration().fingerprint?.allowedSDKs
-        } returns listOf(BioSdk.SECUGEN_SIM_MATCHER)
+        } returns listOf(ModalitySdkType.SECUGEN_SIM_MATCHER)
         coJustRun { scannerManager.initScanner() }
         every { scannerManager.scanner } returns scanner
         every { scanner.versionInformation() } returns mockk(relaxed = true)
@@ -69,7 +69,7 @@ class CollectScannerStateUseCaseTest {
     fun `handles connection exceptions`() = runTest {
         coEvery {
             configRepository.getProjectConfiguration().fingerprint?.allowedSDKs
-        } returns listOf(BioSdk.SECUGEN_SIM_MATCHER)
+        } returns listOf(ModalitySdkType.SECUGEN_SIM_MATCHER)
         coEvery { scannerManager.initScanner() } throws RuntimeException("test")
 
         assertThat(useCase()).isNotEmpty()

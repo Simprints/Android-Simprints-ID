@@ -1,8 +1,8 @@
 package com.simprints.feature.orchestrator.usecases.response
 
-import com.simprints.core.domain.common.ModalitySdkType
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.getModalitySdkConfig
 import com.simprints.infra.events.session.SessionEventRepository

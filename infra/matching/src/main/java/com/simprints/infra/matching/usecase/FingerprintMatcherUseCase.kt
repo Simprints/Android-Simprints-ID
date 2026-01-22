@@ -3,13 +3,14 @@ package com.simprints.infra.matching.usecase
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.reference.CandidateRecord
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.CandidateRecordBatch
@@ -41,7 +42,7 @@ class FingerprintMatcherUseCase @Inject constructor(
         project: Project,
     ): Flow<MatcherState> = channelFlow {
         Simber.i("Initialising matcher", tag = crashReportTag)
-        if (matchParams.bioSdk !is FingerprintConfiguration.BioSdk) {
+        if (matchParams.bioSdk.modality() == Modality.FACE) {
             Simber.w(
                 message = "Fingerprint SDK was not provided",
                 t = IllegalArgumentException("Fingerprint SDK was not provided"),
@@ -106,7 +107,7 @@ class FingerprintMatcherUseCase @Inject constructor(
         channel: ReceiveChannel<CandidateRecordBatch>,
         probeReference: BiometricReferenceCapture,
         resultSet: MatchResultSet,
-        bioSdk: FingerprintConfiguration.BioSdk,
+        bioSdk: ModalitySdkType,
         bioSdkWrapper: BioSdkWrapper,
         flowType: FlowType,
     ): List<MatchBatchInfo> {
@@ -141,7 +142,7 @@ class FingerprintMatcherUseCase @Inject constructor(
         candidates: List<CandidateRecord>,
         flowType: FlowType,
         bioSdkWrapper: BioSdkWrapper,
-        bioSdk: FingerprintConfiguration.BioSdk,
+        bioSdk: ModalitySdkType,
     ) = bioSdkWrapper.match(
         probeReference,
         candidates,
@@ -150,7 +151,7 @@ class FingerprintMatcherUseCase @Inject constructor(
 
     private suspend fun isCrossFingerMatchingEnabled(
         flowType: FlowType,
-        bioSdk: FingerprintConfiguration.BioSdk,
+        bioSdk: ModalitySdkType,
     ): Boolean = configRepository
         .takeIf { flowType == FlowType.VERIFY }
         ?.getProjectConfiguration()

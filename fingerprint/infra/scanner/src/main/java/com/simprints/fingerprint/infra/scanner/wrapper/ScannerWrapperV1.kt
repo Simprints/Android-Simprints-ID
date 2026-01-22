@@ -20,7 +20,7 @@ import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.BUSY
 import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.IO_ERROR
 import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.SCANNER_UNBONDED
 import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.UN20_LOW_VOLTAGE
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
@@ -88,7 +88,7 @@ internal class ScannerWrapperV1(
     /**
      * This function does nothing because vero 1 scanner doesn't support firmware updates
      */
-    override suspend fun setScannerInfoAndCheckAvailableOta(fingerprintSdk: FingerprintConfiguration.BioSdk) = withContext(ioDispatcher) {
+    override suspend fun setScannerInfoAndCheckAvailableOta(fingerprintSdk: ModalitySdkType) = withContext(ioDispatcher) {
         // Not implemented
     }
 

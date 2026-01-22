@@ -20,6 +20,7 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.IdentificationConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SampleSynchronizationConfiguration
@@ -182,7 +183,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                 fingerprint = FingerprintConfiguration(
                     allowedScanners = listOf(FingerprintConfiguration.VeroGeneration.VERO_1),
                     displayHandIcons = true,
-                    allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
+                    allowedSDKs = listOf(ModalitySdkType.SECUGEN_SIM_MATCHER),
                     secugenSimMatcher = FingerprintConfiguration.FingerprintSdkConfiguration(
                         fingersToCapture = listOf(
                             TemplateIdentifier.LEFT_THUMB,

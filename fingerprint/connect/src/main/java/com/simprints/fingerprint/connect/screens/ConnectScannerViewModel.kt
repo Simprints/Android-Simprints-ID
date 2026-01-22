@@ -23,6 +23,7 @@ import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerNotPairedE
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
@@ -40,7 +41,7 @@ internal class ConnectScannerViewModel @Inject constructor(
     private val recentUserActivityManager: RecentUserActivityManager,
     private val saveScannerConnectionEvents: SaveScannerConnectionEventsUseCase,
 ) : ViewModel() {
-    private lateinit var fingerprintSdk: FingerprintConfiguration.BioSdk
+    private lateinit var fingerprintSdk: ModalitySdkType
     private var allowedGenerations: List<FingerprintConfiguration.VeroGeneration> = emptyList()
     private var remainingConnectionAttempts = 0
 

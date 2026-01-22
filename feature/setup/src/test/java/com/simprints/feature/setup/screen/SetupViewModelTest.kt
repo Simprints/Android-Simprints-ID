@@ -6,8 +6,7 @@ import com.simprints.core.domain.common.Modality
 import com.simprints.feature.setup.LocationStore
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
@@ -175,11 +174,11 @@ class SetupViewModelTest {
                 )
             }
             every { fingerprint } returns mockk {
-                every { allowedSDKs } returns listOf(FingerprintConfiguration.BioSdk.NEC)
+                every { allowedSDKs } returns listOf(ModalitySdkType.NEC)
                 every { nec?.version } returns "1"
             }
             every { face } returns mockk {
-                every { allowedSDKs } returns listOf(FaceConfiguration.BioSdk.RANK_ONE)
+                every { allowedSDKs } returns listOf(ModalitySdkType.RANK_ONE)
                 every { rankOne?.version } returns "1"
             }
         }
@@ -205,11 +204,11 @@ class SetupViewModelTest {
                     Modality.FACE,
                 )
                 every { fingerprint } returns mockk {
-                    every { allowedSDKs } returns listOf(FingerprintConfiguration.BioSdk.NEC)
+                    every { allowedSDKs } returns listOf(ModalitySdkType.NEC)
                     every { nec?.version } returns null
                 }
                 every { face } returns mockk {
-                    every { allowedSDKs } returns listOf(FaceConfiguration.BioSdk.RANK_ONE)
+                    every { allowedSDKs } returns listOf(ModalitySdkType.RANK_ONE)
                     every { rankOne?.version } returns null
                 }
             }
@@ -236,10 +235,10 @@ class SetupViewModelTest {
                     Modality.FACE,
                 )
                 every { fingerprint } returns mockk {
-                    every { allowedSDKs } returns listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
+                    every { allowedSDKs } returns listOf(ModalitySdkType.SECUGEN_SIM_MATCHER)
                 }
                 every { face } returns mockk {
-                    every { allowedSDKs } returns listOf(FaceConfiguration.BioSdk.SIM_FACE)
+                    every { allowedSDKs } returns listOf(ModalitySdkType.SIM_FACE)
                 }
             }
         }
@@ -262,11 +261,11 @@ class SetupViewModelTest {
                 )
             }
             every { fingerprint } returns mockk {
-                every { allowedSDKs } returns listOf(FingerprintConfiguration.BioSdk.NEC)
+                every { allowedSDKs } returns listOf(ModalitySdkType.NEC)
                 every { nec?.version } returns ""
             }
             every { face } returns mockk {
-                every { allowedSDKs } returns listOf(FaceConfiguration.BioSdk.RANK_ONE)
+                every { allowedSDKs } returns listOf(ModalitySdkType.RANK_ONE)
                 every { rankOne?.version } returns ""
             }
         }

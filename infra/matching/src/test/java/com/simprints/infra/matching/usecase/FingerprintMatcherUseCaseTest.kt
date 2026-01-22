@@ -15,8 +15,7 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
@@ -72,7 +71,7 @@ internal class FingerprintMatcherUseCaseTest {
         coEvery { resolveBioSdkWrapperUseCase(any()) } returns bioSdkWrapper
         coEvery {
             configRepository.getProjectConfiguration().fingerprint?.allowedSDKs
-        } returns listOf(SECUGEN_SIM_MATCHER)
+        } returns listOf(ModalitySdkType.SECUGEN_SIM_MATCHER)
 
         useCase = FingerprintMatcherUseCase(
             timeHelper,
@@ -95,7 +94,7 @@ internal class FingerprintMatcherUseCaseTest {
                         format = "format",
                         templates = emptyList(),
                     ),
-                    bioSdk = SECUGEN_SIM_MATCHER,
+                    bioSdk = ModalitySdkType.SECUGEN_SIM_MATCHER,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
@@ -138,7 +137,7 @@ internal class FingerprintMatcherUseCaseTest {
                             ),
                         ),
                     ),
-                    bioSdk = SECUGEN_SIM_MATCHER,
+                    bioSdk = ModalitySdkType.SECUGEN_SIM_MATCHER,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
@@ -178,7 +177,7 @@ internal class FingerprintMatcherUseCaseTest {
                             ),
                         ),
                     ),
-                    bioSdk = FaceConfiguration.BioSdk.RANK_ONE, // Wrong SDK type
+                    bioSdk = ModalitySdkType.RANK_ONE, // Wrong SDK type
                     flowType = FlowType.VERIFY,
                     queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
@@ -256,7 +255,7 @@ internal class FingerprintMatcherUseCaseTest {
                             ),
                         ),
                     ),
-                    bioSdk = SECUGEN_SIM_MATCHER,
+                    bioSdk = ModalitySdkType.SECUGEN_SIM_MATCHER,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = EnrolmentRecordQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,

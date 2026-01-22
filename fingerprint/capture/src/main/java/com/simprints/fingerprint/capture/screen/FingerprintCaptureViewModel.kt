@@ -47,6 +47,7 @@ import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerOperationI
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.EAGER
 import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.NEVER
 import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN
@@ -167,7 +168,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private fun start(
         fingerprintsToCapture: List<TemplateIdentifier>,
-        fingerprintSdk: FingerprintConfiguration.BioSdk,
+        fingerprintSdk: ModalitySdkType,
     ) {
         if (!hasStarted) {
             hasStarted = true
@@ -186,13 +187,13 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         }
     }
 
-    private suspend fun initBioSdk(fingerprintSdk: FingerprintConfiguration.BioSdk) {
+    private suspend fun initBioSdk(fingerprintSdk: ModalitySdkType) {
         try {
             bioSdkWrapper = resolveBioSdkWrapperUseCase(fingerprintSdk)
             bioSdkWrapper.initialize()
             bioSdkConfiguration = configuration.getSdkConfiguration(fingerprintSdk)!!
         } catch (e: BioSdkException.BioSdkInitializationException) {
-            Simber.e("Failed to initialise bio sdk: ${fingerprintSdk.name}", e, tag = FINGER_CAPTURE)
+            Simber.e("Failed to initialise bio sdk: $fingerprintSdk", e, tag = FINGER_CAPTURE)
             _invalidLicense.send()
         }
     }
@@ -705,7 +706,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     fun handleOnViewCreated(
         fingerprintsToCapture: List<TemplateIdentifier>,
-        fingerprintSdk: FingerprintConfiguration.BioSdk,
+        fingerprintSdk: ModalitySdkType,
     ) {
         updateState {
             it.copy(isShowingConnectionScreen = false)

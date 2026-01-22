@@ -2,9 +2,11 @@ package com.simprints.fingerprint.connect
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.step.StepParams
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 data class FingerprintConnectParams(
-    val fingerprintSDK: FingerprintConfiguration.BioSdk,
+    val fingerprintSDK: ModalitySdkType,
 ) : StepParams

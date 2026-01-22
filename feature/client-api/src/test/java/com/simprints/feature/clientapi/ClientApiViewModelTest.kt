@@ -33,6 +33,7 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonElement
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -158,7 +159,7 @@ internal class ClientApiViewModelTest {
 
         viewModel.handleIntent("action", bundleOf("contractVersion" to 42))
 
-        verify { simpleEventReporter.addInvalidIntentEvent("action", any<Map<String, String>>()) }
+        verify { simpleEventReporter.addInvalidIntentEvent("action", any<Map<String, JsonElement>>()) }
         viewModel.showAlert.test().assertHasValue()
     }
 

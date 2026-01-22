@@ -8,6 +8,7 @@ import com.simprints.infra.events.event.domain.models.EventType.Companion.INVALI
 import com.simprints.infra.events.event.domain.models.EventType.INVALID_INTENT
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 import java.util.UUID
 
 @Keep
@@ -23,7 +24,7 @@ data class InvalidIntentEvent(
     constructor(
         creationTime: Timestamp,
         action: String,
-        extras: Map<String, String?>,
+        extras: Map<String, JsonElement?>,
     ) : this(
         UUID.randomUUID().toString(),
         InvalidIntentPayload(creationTime, EVENT_VERSION, action, extras),
@@ -40,7 +41,7 @@ data class InvalidIntentEvent(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
         val action: String,
-        val extras: Map<String, String?>,
+        val extras: Map<String, JsonElement?>,
         override val endedAt: Timestamp? = null,
         override val type: EventType = INVALID_INTENT,
     ) : EventPayload() {

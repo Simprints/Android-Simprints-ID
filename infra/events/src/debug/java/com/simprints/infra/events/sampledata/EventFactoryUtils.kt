@@ -104,6 +104,7 @@ import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.EXTERNAL_CREDENTIAL
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
+import kotlinx.serialization.json.JsonPrimitive
 
 fun createSessionScope(
     id: String = GUID1,
@@ -422,7 +423,7 @@ fun createIntentParsingEvent() = IntentParsingEvent(CREATED_AT, COMMCARE)
 fun createInvalidIntentEvent() = InvalidIntentEvent(
     CREATED_AT,
     "action",
-    mapOf("extra_key" to "extra_value"),
+    mapOf("extra_key" to JsonPrimitive("extra_value")),
 )
 
 fun createOneToManyMatchEvent() = OneToManyMatchEvent(
@@ -474,7 +475,7 @@ fun createScannerFirmwareUpdateEvent() = ScannerFirmwareUpdateEvent(
 
 fun createSuspiciousIntentEvent() = SuspiciousIntentEvent(
     CREATED_AT,
-    mapOf("extra_key" to "extra_value"),
+    mapOf("extra_key" to JsonPrimitive("extra_value")),
 )
 
 fun createVero2InfoSnapshotEvent() = Vero2InfoSnapshotEvent(

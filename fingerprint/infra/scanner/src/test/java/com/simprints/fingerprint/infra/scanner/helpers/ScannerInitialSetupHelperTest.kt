@@ -15,7 +15,7 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.ScannerInfo
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.UnifiedVersionInformation
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+import com.simprints.infra.config.store.models.ModalitySdkType.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.coEvery

@@ -9,6 +9,7 @@ import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.getModalitySdkConfig
@@ -108,9 +109,9 @@ internal class MatchCandidatesUseCaseTest {
         } returns listOf(matchParams)
         every { projectConfig.face } returns faceConfig
         every { projectConfig.fingerprint } returns fingerprintConfig
-        every { projectConfig.getModalitySdkConfig(FaceConfiguration.BioSdk.RANK_ONE) } returns faceSdkConfig
+        every { projectConfig.getModalitySdkConfig(ModalitySdkType.RANK_ONE) } returns faceSdkConfig
         every { faceSdkConfig.verificationMatchThreshold } returns verificationMatchThreshold
-        every { projectConfig.getModalitySdkConfig(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER) } returns fingerprintSdkConfig
+        every { projectConfig.getModalitySdkConfig(ModalitySdkType.SECUGEN_SIM_MATCHER) } returns fingerprintSdkConfig
         every { fingerprintSdkConfig.verificationMatchThreshold } returns verificationMatchThreshold
         every { matcherSuccess.comparisonResults } returns listOf(matchResultItem)
         coEvery { faceMatcher(matchParams, project) } returns flowOf(matcherSuccess)
@@ -120,10 +121,10 @@ internal class MatchCandidatesUseCaseTest {
     private fun initMatchParams(isFace: Boolean) {
         if (isFace) {
             every { matchParams.probeReference } returns faceCapture
-            every { matchParams.bioSdk } returns FaceConfiguration.BioSdk.RANK_ONE
+            every { matchParams.bioSdk } returns ModalitySdkType.RANK_ONE
         } else {
             every { matchParams.probeReference } returns fingerprintCapture
-            every { matchParams.bioSdk } returns FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+            every { matchParams.bioSdk } returns ModalitySdkType.SECUGEN_SIM_MATCHER
         }
     }
 
@@ -142,7 +143,7 @@ internal class MatchCandidatesUseCaseTest {
         assertThat(result[0].credential).isEqualTo(credential)
         assertThat(result[0].comparisonResult).isEqualTo(matchResultItem)
         assertThat(result[0].verificationThreshold).isEqualTo(verificationMatchThreshold)
-        assertThat(result[0].bioSdk).isEqualTo(FaceConfiguration.BioSdk.RANK_ONE)
+        assertThat(result[0].bioSdk).isEqualTo(ModalitySdkType.RANK_ONE)
     }
 
     @Test
@@ -160,7 +161,7 @@ internal class MatchCandidatesUseCaseTest {
         assertThat(result[0].credential).isEqualTo(credential)
         assertThat(result[0].comparisonResult).isEqualTo(matchResultItem)
         assertThat(result[0].verificationThreshold).isEqualTo(verificationMatchThreshold)
-        assertThat(result[0].bioSdk).isEqualTo(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
+        assertThat(result[0].bioSdk).isEqualTo(ModalitySdkType.SECUGEN_SIM_MATCHER)
     }
 
     @Test
@@ -179,7 +180,7 @@ internal class MatchCandidatesUseCaseTest {
     @Test
     fun `returns empty list when face SDK configuration is null`() = runTest {
         initMatchParams(isFace = true)
-        every { projectConfig.getModalitySdkConfig(FaceConfiguration.BioSdk.RANK_ONE) } returns null
+        every { projectConfig.getModalitySdkConfig(ModalitySdkType.RANK_ONE) } returns null
 
         val result = useCase.invoke(
             candidates = listOf(enrolmentRecord),
@@ -195,7 +196,7 @@ internal class MatchCandidatesUseCaseTest {
     @Test
     fun `returns empty list when fingerprint SDK configuration is null`() = runTest {
         initMatchParams(isFace = false)
-        every { projectConfig.getModalitySdkConfig(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER) } returns null
+        every { projectConfig.getModalitySdkConfig(ModalitySdkType.SECUGEN_SIM_MATCHER) } returns null
 
         val result = useCase.invoke(
             candidates = listOf(enrolmentRecord),

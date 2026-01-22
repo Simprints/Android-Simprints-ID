@@ -2,7 +2,6 @@ package com.simprints.infra.config.store.models
 
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.common.ModalitySdkType
 import kotlinx.serialization.json.JsonElement
 
 data class ProjectConfiguration(
@@ -127,19 +126,19 @@ fun ProjectConfiguration.getSdkListForAgeGroup(
             when (modality) {
                 Modality.FACE -> {
                     if (face?.rankOne?.allowedAgeRange?.contains(age) == true) {
-                        add(FaceConfiguration.BioSdk.RANK_ONE)
+                        add(ModalitySdkType.RANK_ONE)
                     }
                     if (face?.simFace?.allowedAgeRange?.contains(age) == true) {
-                        add(FaceConfiguration.BioSdk.SIM_FACE)
+                        add(ModalitySdkType.SIM_FACE)
                     }
                 }
 
                 Modality.FINGERPRINT -> {
                     if (fingerprint?.secugenSimMatcher?.allowedAgeRange?.contains(age) == true) {
-                        add(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
+                        add(ModalitySdkType.SECUGEN_SIM_MATCHER)
                     }
                     if (fingerprint?.nec?.allowedAgeRange?.contains(age) == true) {
-                        add(FingerprintConfiguration.BioSdk.NEC)
+                        add(ModalitySdkType.NEC)
                     }
                 }
             }
@@ -148,9 +147,8 @@ fun ProjectConfiguration.getSdkListForAgeGroup(
 }
 
 fun ProjectConfiguration.getModalitySdkConfig(bioSdk: ModalitySdkType): ModalitySdkConfiguration? = when (bioSdk) {
-    FaceConfiguration.BioSdk.RANK_ONE -> face?.rankOne
-    FaceConfiguration.BioSdk.SIM_FACE -> face?.simFace
-    FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER -> fingerprint?.secugenSimMatcher
-    FingerprintConfiguration.BioSdk.NEC -> fingerprint?.nec
-    else -> null
+    ModalitySdkType.RANK_ONE -> face?.rankOne
+    ModalitySdkType.SIM_FACE -> face?.simFace
+    ModalitySdkType.SECUGEN_SIM_MATCHER -> fingerprint?.secugenSimMatcher
+    ModalitySdkType.NEC -> fingerprint?.nec
 }

@@ -1,12 +1,13 @@
 package com.simprints.feature.orchestrator.steps
 
-import com.simprints.core.domain.common.FlowType
-import com.simprints.core.domain.common.ModalitySdkType
 import com.simprints.core.domain.capture.BiometricReferenceCapture
+import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.step.StepParams
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.matcher.MatchContract
+import kotlinx.serialization.Serializable
 
 /**
  * Actual matching step payload is based on capture step results, so until the it is done we are storing
@@ -14,6 +15,7 @@ import com.simprints.matcher.MatchContract
  *
  * This also means that capture step MUST always strictly precede matching step.
  */
+@Serializable
 internal data class MatchStepStubPayload(
     val flowType: FlowType,
     val enrolmentRecordQuery: EnrolmentRecordQuery,

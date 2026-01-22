@@ -1,20 +1,20 @@
 package com.simprints.feature.orchestrator.cache
 
 import android.content.SharedPreferences
-import com.fasterxml.jackson.core.type.TypeReference
-import com.google.common.truth.Truth.assertThat
+import androidx.test.ext.junit.runners.*
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.AgeGroup
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.feature.orchestrator.steps.Step
+import com.simprints.feature.orchestrator.steps.StepId
+import com.simprints.feature.orchestrator.tools.OrchestrationJsonHelper
 import com.simprints.infra.security.SecurityManager
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class OrchestratorCacheTest {
     @MockK
     private lateinit var securityManager: SecurityManager
@@ -22,50 +22,60 @@ class OrchestratorCacheTest {
     @MockK
     private lateinit var prefs: SharedPreferences
 
-    @MockK
-    private lateinit var jsonHelper: JsonHelper
+    private val orchestrationJsonHelper: OrchestrationJsonHelper = OrchestrationJsonHelper()
 
     private lateinit var cache: OrchestratorCache
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-
         every { securityManager.buildEncryptedSharedPreferences(any()) } returns prefs
 
         cache = OrchestratorCache(
             securityManager,
-            jsonHelper,
+            orchestrationJsonHelper,
         )
     }
 
     @Test
     fun `Stores steps if passed value`() {
-        val json = "[]"
-        every { jsonHelper.toJson(any(), any()) } returns json
-
-        val steps: List<Step> = listOf(mockk(), mockk())
+        val steps: List<Step> = listOf(
+            Step(id = StepId.SETUP, navigationActionId = 0, destinationId = 0),
+            Step(id = StepId.CONSENT, navigationActionId = 0, destinationId = 0),
+        )
+        val stepsResultJson = orchestrationJsonHelper.encodeToString<List<Step>>(steps)
         cache.steps = steps
 
-        val stepsResultJson = steps.joinToString(separator = ",") { json }
         verify {
-            jsonHelper.toJson(any(), any())
-            prefs.edit().putString(any(), eq("[$stepsResultJson]"))
+            prefs.edit().putString(any(), eq(stepsResultJson))
+        }
+    }
+
+    @Test
+    fun `Stores empty list of steps if passed value`() {
+        val steps: List<Step> = emptyList()
+        val stepsResultJson = orchestrationJsonHelper.encodeToString<List<Step>>(steps)
+        cache.steps = steps
+        verify {
+            prefs.edit().putString(any(), eq(stepsResultJson))
         }
     }
 
     @Test
     fun `Restores steps if stored`() {
-        val json = "[]"
-        every { prefs.getString(any(), any()) } returns json
-        every { jsonHelper.fromJson<List<Step>>(any(), any(), any()) } returns emptyList()
+        val stepsList = listOf(
+            Step(id = StepId.SETUP, navigationActionId = 0, destinationId = 0),
+            Step(id = StepId.CONSENT, navigationActionId = 0, destinationId = 0),
+        )
+        val jsonString = orchestrationJsonHelper.encodeToString(stepsList)
+
+        every { prefs.getString(any(), any()) } returns jsonString
 
         val result = cache.steps
 
-        verify {
-            jsonHelper.fromJson<List<Step>>(any(), any(), any())
-            prefs.getString(any(), any())
-        }
+        assertThat(result).isEqualTo(stepsList)
+
+        verify(exactly = 1) { prefs.getString(any(), any()) }
     }
 
     @Test
@@ -74,30 +84,27 @@ class OrchestratorCacheTest {
 
         val result = cache.steps
 
-        verify(exactly = 0) {
-            jsonHelper.fromJson<List<String>>(any())
-        }
+        assertThat(result).isEmpty()
     }
 
     @Test
     fun `Stores age group if passed value`() {
-        val json = "[1,2]"
-        every { jsonHelper.toJson(any()) } returns json
+        val ageGroup = AgeGroup(1, 2)
+        val jsonString = orchestrationJsonHelper.encodeToString(ageGroup)
 
-        cache.ageGroup = AgeGroup(1, 2)
-
-        verify(exactly = 1) { prefs.edit().putString(any(), json) }
+        cache.ageGroup = ageGroup
+        verify(exactly = 1) { prefs.edit().putString(any(), jsonString) }
     }
 
     @Test
     fun `Restores age group if stored`() {
-        val json = "[1,2]"
+        val json = orchestrationJsonHelper.encodeToString(AgeGroup(1, 2))
         every { prefs.getString(any(), any()) } returns json
-        every { jsonHelper.fromJson<AgeGroup>(any(), any<TypeReference<AgeGroup>>()) } returns AgeGroup(1, 2)
 
         val result = cache.ageGroup
 
         verify(exactly = 1) { prefs.getString(any(), any()) }
+        assertThat(result).isEqualTo(AgeGroup(1, 2))
     }
 
     @Test
@@ -106,28 +113,31 @@ class OrchestratorCacheTest {
 
         verify(exactly = 1) { prefs.edit().remove("steps") }
         verify(exactly = 1) { prefs.edit().remove("age_group") }
+        val steps = cache.steps
+        assertThat(steps).isEmpty()
     }
 
     @Test
-    fun `AgeGroup is serialized by Jackson without addition of phantom attributes`() {
-        // see Jackson unwanted attribute serialization bug https://stackoverflow.com/questions/69616587/why-does-jackson-add-an-empty-false-into-the-json
-        val realJsonHelper = JsonHelper
+    fun `AgeGroup is serialized without addition of phantom attributes`() {
         val originalAgeGroup = AgeGroup(startInclusive = 0, endExclusive = 1)
 
-        val json = realJsonHelper.toJson(originalAgeGroup)
+        val jsonString = orchestrationJsonHelper.encodeToString(originalAgeGroup)
 
-        assertThat(json).isEqualTo("{\"type\":\"AgeGroup\",\"startInclusive\":0,\"endExclusive\":1}")
+        assertThat(jsonString).isEqualTo("{\"startInclusive\":0,\"endExclusive\":1}")
     }
 
     @Test
-    fun `AgeGroup is deserialized correctly by Jackson`() {
-        val realJsonHelper = JsonHelper
+    fun `AgeGroup is deserialized correctly `() {
         val originalAgeGroup = AgeGroup(startInclusive = 0, endExclusive = 1)
-
-        val json = "{\"type\":\"AgeGroup\",\"startInclusive\":0,\"endExclusive\":1}"
-
-        val result = realJsonHelper.fromJson(json, object : TypeReference<AgeGroup>() {})
-
+        val jsonString = "{\"type\":\"AgeGroup\",\"startInclusive\":0,\"endExclusive\":1}"
+        val result = orchestrationJsonHelper.decodeFromString<AgeGroup>(jsonString)
         assertThat(result).isEqualTo(originalAgeGroup)
+    }
+
+    @Test
+    fun `AgeGroup is deserialized correctly when null`() {
+        cache.ageGroup = null
+        val result = cache.ageGroup
+        assertThat(result).isNull()
     }
 }

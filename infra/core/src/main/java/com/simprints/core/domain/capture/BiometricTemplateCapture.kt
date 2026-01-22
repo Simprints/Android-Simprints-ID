@@ -6,9 +6,11 @@ import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.step.StepResult
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 @Parcelize
 @ExcludedFromGeneratedTestCoverageReports("Data class with generated code")
+@Serializable
 data class BiometricTemplateCapture(
     val captureEventId: String,
     val template: ByteArray,

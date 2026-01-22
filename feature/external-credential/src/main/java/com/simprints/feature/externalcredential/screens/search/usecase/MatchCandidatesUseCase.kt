@@ -1,10 +1,9 @@
 package com.simprints.feature.externalcredential.screens.search.usecase
 
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.getModalitySdkConfig
@@ -40,10 +39,9 @@ internal class MatchCandidatesUseCase @Inject constructor(
                     .getModalitySdkConfig(matchParam.bioSdk)
                     ?.verificationMatchThreshold
                     ?: return@mapNotNull null
-                val lastMatchSuccess = when (matchParam.bioSdk) {
-                    is FaceConfiguration.BioSdk -> faceMatcher(matchParam, project).lastOrNull() as? MatcherState.Success
-                    is FingerprintConfiguration.BioSdk -> fingerprintMatcher(matchParam, project).lastOrNull() as? MatcherState.Success
-                    else -> null
+                val lastMatchSuccess = when (matchParam.bioSdk.modality()) {
+                    Modality.FACE -> faceMatcher(matchParam, project).lastOrNull() as? MatcherState.Success
+                    Modality.FINGERPRINT -> fingerprintMatcher(matchParam, project).lastOrNull() as? MatcherState.Success
                 }
                 lastMatchSuccess?.comparisonResults?.map { result ->
                     CredentialMatch(

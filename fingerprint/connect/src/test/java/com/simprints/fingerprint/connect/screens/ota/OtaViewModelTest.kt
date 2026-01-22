@@ -15,7 +15,7 @@ import com.simprints.fingerprint.infra.scanner.domain.ota.Un20OtaStep
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerOtaOperationsWrapper
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+import com.simprints.infra.config.store.models.ModalitySdkType.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager

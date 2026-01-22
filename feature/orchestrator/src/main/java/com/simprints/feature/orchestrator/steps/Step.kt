@@ -2,13 +2,10 @@ package com.simprints.feature.orchestrator.steps
 
 import androidx.annotation.IdRes
 import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.capture.BiometricTemplateCapture
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.comparison.ComparisonResult
-import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.step.StepResult
 import com.simprints.face.capture.FaceCaptureParams
@@ -35,115 +32,86 @@ import com.simprints.feature.validatepool.ValidateSubjectPoolResult
 import com.simprints.fingerprint.capture.FingerprintCaptureParams
 import com.simprints.fingerprint.connect.FingerprintConnectParams
 import com.simprints.fingerprint.connect.FingerprintConnectResult
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.matching.MatchParams
 import com.simprints.infra.matching.MatchResult
-import java.io.Serializable
-
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "resultType")
-@JsonSubTypes(
-    JsonSubTypes.Type(value = LoginResult::class, name = "LoginResult"),
-    JsonSubTypes.Type(value = SetupResult::class, name = "SetupResult"),
-    JsonSubTypes.Type(value = ConsentResult::class, name = "ConsentResult"),
-    JsonSubTypes.Type(value = FingerprintConnectResult::class, name = "FingerprintConnectResult"),
-    JsonSubTypes.Type(value = MatchResult::class, name = "MatchResult"),
-    JsonSubTypes.Type(value = EnrolLastBiometricResult::class, name = "EnrolLastBiometricResult"),
-    JsonSubTypes.Type(value = FetchSubjectResult::class, name = "FetchSubjectResult"),
-    JsonSubTypes.Type(value = SelectSubjectResult::class, name = "SelectSubjectResult"),
-    JsonSubTypes.Type(value = AlertResult::class, name = "AlertResult"),
-    JsonSubTypes.Type(value = ExitFormResult::class, name = "ExitFormResult"),
-    JsonSubTypes.Type(value = ValidateSubjectPoolResult::class, name = "ValidateSubjectPoolResult"),
-    JsonSubTypes.Type(value = SelectSubjectAgeGroupResult::class, name = "SelectSubjectAgeGroupResult"),
-    JsonSubTypes.Type(value = ExternalCredentialSearchResult::class, name = "ExternalCredentialSearchResult"),
-    JsonSubTypes.Type(value = CredentialMatch::class, name = "CredentialMatch"),
-    // Common data types
-    JsonSubTypes.Type(value = BiometricReferenceCapture::class, name = "BiometricReferenceCapture"),
-    JsonSubTypes.Type(value = BiometricTemplateCapture::class, name = "BiometricTemplateCapture"),
-    JsonSubTypes.Type(value = BiometricTemplate::class, name = "BiometricTemplate"),
-    JsonSubTypes.Type(value = ComparisonResult::class, name = "ComparisonResult"),
-)
-abstract class StepResultMixin : StepResult
-
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "paramsType")
-@JsonSubTypes(
-    JsonSubTypes.Type(value = LoginParams::class, name = "LoginParams"),
-    JsonSubTypes.Type(value = ConsentParams::class, name = "ConsentParams"),
-    JsonSubTypes.Type(value = FetchSubjectParams::class, name = "FetchSubjectParams"),
-    JsonSubTypes.Type(value = SelectSubjectParams::class, name = "SelectSubjectParams"),
-    JsonSubTypes.Type(value = ValidateSubjectPoolFragmentParams::class, name = "ValidateSubjectPoolFragmentParams"),
-    JsonSubTypes.Type(value = FaceCaptureParams::class, name = "FaceCaptureParams"),
-    JsonSubTypes.Type(value = FingerprintConnectParams::class, name = "FingerprintConnectParams"),
-    JsonSubTypes.Type(value = FingerprintCaptureParams::class, name = "FingerprintCaptureParams"),
-    // Match params are updated after capture steps
-    JsonSubTypes.Type(value = MatchStepStubPayload::class, name = "MatchStepStubPayload"),
-    JsonSubTypes.Type(value = MatchParams::class, name = "MatchParams"),
-    // Below are subclasses of enrol-last step that takes results of other steps as parameters
-    JsonSubTypes.Type(value = EnrolLastBiometricParams::class, name = "EnrolLastBiometricParams"),
-    JsonSubTypes.Type(value = EnrolLastBiometricStepResult::class, name = "EnrolLastBiometricStepResult"),
-    JsonSubTypes.Type(
-        value = EnrolLastBiometricStepResult.EnrolLastBiometricsResult::class,
-        name = "EnrolLastBiometricStepResult.EnrolLastBiometricsResult",
-    ),
-    JsonSubTypes.Type(
-        value = EnrolLastBiometricStepResult.MatchResult::class,
-        name = "EnrolLastBiometricStepResult.MatchResult",
-    ),
-    JsonSubTypes.Type(
-        value = EnrolLastBiometricStepResult.CaptureResult::class,
-        name = "EnrolLastBiometricStepResult.CaptureResult",
-    ),
-    JsonSubTypes.Type(value = ExternalCredentialParams::class, name = "ExternalCredentialParams"),
-    // Additional types that are used in top-level params
-    JsonSubTypes.Type(value = BiometricReferenceCapture::class, name = "BiometricReferenceCapture"),
-    JsonSubTypes.Type(value = BiometricTemplateCapture::class, name = "BiometricTemplateCapture"),
-    JsonSubTypes.Type(value = BiometricTemplate::class, name = "BiometricTemplate"),
-    JsonSubTypes.Type(value = ComparisonResult::class, name = "ComparisonResult"),
-    JsonSubTypes.Type(value = BiometricDataSource::class, name = "BiometricDataSource"),
-    JsonSubTypes.Type(value = BiometricDataSource.CommCare::class, name = "BiometricDataSource.CommCare"),
-    JsonSubTypes.Type(value = BiometricDataSource.Simprints::class, name = "BiometricDataSource.Simprints"),
-    JsonSubTypes.Type(value = EnrolmentRecordQuery::class, name = "EnrolmentRecordQuery"),
-    JsonSubTypes.Type(value = AgeGroup::class, name = "AgeGroup"),
-    JsonSubTypes.Type(value = FingerprintConfiguration.BioSdk::class, name = "FingerprintConfiguration.BioSdk"),
-    JsonSubTypes.Type(value = FaceConfiguration.BioSdk::class, name = "FaceConfiguration.BioSdk"),
-)
-abstract class StepParamsMixin : StepParams
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
+import kotlinx.serialization.modules.subclass
 
 /**
  * Step contains all of the information required to execute an orchestration step and the result of the execution.
- *
- * All classes used in the params structure must implement [StepParams] interface and added to [StepParamsMixin].
- * All classes used in the result structure must implement [StepResult] interface and added to [StepResultMixin].
- *
- * Additionally, [StepParams] and [StepResult] subclasses can only have fields of primitives, enums and serializeables classes.
  */
 @Keep
-internal data class Step(
+@Serializable
+data class Step(
     val id: Int,
     @IdRes val navigationActionId: Int,
     @IdRes val destinationId: Int,
     var params: StepParams? = null,
     var status: StepStatus = StepStatus.NOT_STARTED,
     var result: StepResult? = null,
-) : Serializable {
-    // Do not remove.
-    // Even though it may be marked as unused by IDE, it is referenced in the JsonTypeInfo annotation
-    @Suppress("unused")
-    val paramsType: String
-        get() = this::class.java.simpleName
-
-    // Do not remove.
-    // Even though it may be marked as unused by IDE, it is referenced in the JsonTypeInfo annotation
-    @Suppress("unused")
-    val resultType: String
-        get() = this::class.java.simpleName
-}
+)
 
 @Keep
+@Serializable
 enum class StepStatus {
     NOT_STARTED,
     IN_PROGRESS,
     COMPLETED,
+}
+
+/**
+ * This module replaces the Jackson Mixins.
+ */
+val orchestratorSerializersModule = SerializersModule {
+
+    // Register all StepResult subclasses
+    polymorphic(StepResult::class) {
+        subclass(LoginResult::class)
+        subclass(SetupResult::class)
+        subclass(ConsentResult::class)
+        subclass(FingerprintConnectResult::class)
+        subclass(MatchResult::class)
+        subclass(EnrolLastBiometricResult::class)
+        subclass(FetchSubjectResult::class)
+        subclass(SelectSubjectResult::class)
+        subclass(AlertResult::class)
+        subclass(ExitFormResult::class)
+        subclass(ValidateSubjectPoolResult::class)
+        subclass(SelectSubjectAgeGroupResult::class)
+        subclass(ExternalCredentialSearchResult::class)
+        subclass(CredentialMatch::class)
+        subclass(BiometricTemplateCapture::class)
+        subclass(BiometricReferenceCapture::class)
+        subclass(ComparisonResult::class)
+    }
+
+    // Register all StepParams subclasses
+    polymorphic(StepParams::class) {
+        subclass(LoginParams::class)
+        subclass(ConsentParams::class)
+        subclass(FetchSubjectParams::class)
+        subclass(SelectSubjectParams::class)
+        subclass(ValidateSubjectPoolFragmentParams::class)
+        subclass(FaceCaptureParams::class)
+        subclass(FingerprintConnectParams::class)
+        subclass(FingerprintCaptureParams::class)
+        subclass(MatchStepStubPayload::class)
+        subclass(MatchParams::class)
+        subclass(EnrolLastBiometricParams::class)
+        subclass(EnrolLastBiometricStepResult.EnrolLastBiometricsResult::class)
+        subclass(EnrolLastBiometricStepResult.MatchResult::class)
+        subclass(EnrolLastBiometricStepResult.CaptureResult::class)
+        subclass(ExternalCredentialParams::class)
+        subclass(BiometricReferenceCapture::class)
+        subclass(BiometricTemplateCapture::class)
+        subclass(ComparisonResult::class)
+        subclass(BiometricDataSource.CommCare::class)
+        subclass(BiometricDataSource.Simprints::class)
+        subclass(EnrolmentRecordQuery::class)
+        subclass(AgeGroup::class)
+    }
 }

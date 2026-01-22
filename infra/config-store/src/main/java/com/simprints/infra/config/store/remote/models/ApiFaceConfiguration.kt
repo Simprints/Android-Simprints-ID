@@ -3,6 +3,7 @@ package com.simprints.infra.config.store.remote.models
 import androidx.annotation.Keep
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import kotlinx.serialization.Serializable
 
 @Keep
@@ -47,8 +48,8 @@ internal data class ApiFaceConfiguration(
         ;
 
         fun toDomain() = when (this) {
-            RANK_ONE -> FaceConfiguration.BioSdk.RANK_ONE
-            SIM_FACE -> FaceConfiguration.BioSdk.SIM_FACE
+            RANK_ONE -> ModalitySdkType.RANK_ONE
+            SIM_FACE -> ModalitySdkType.SIM_FACE
         }
     }
 

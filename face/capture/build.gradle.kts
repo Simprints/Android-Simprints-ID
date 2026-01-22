@@ -2,6 +2,7 @@ plugins {
     id("simprints.feature")
     id("simprints.testing.android")
     id("kotlin-parcelize")
+    id("simprints.library.kotlinSerialization")
 }
 
 sonarqube {

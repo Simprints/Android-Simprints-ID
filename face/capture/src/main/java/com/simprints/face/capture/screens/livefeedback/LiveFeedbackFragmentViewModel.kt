@@ -16,7 +16,7 @@ import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
-import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
 import com.simprints.infra.logging.Simber
@@ -73,7 +73,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     }
 
     fun initCapture(
-        bioSdk: FaceConfiguration.BioSdk,
+        bioSdk: ModalitySdkType,
         samplesToCapture: Int,
         attemptNumber: Int,
     ) {

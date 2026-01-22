@@ -46,7 +46,6 @@ import com.simprints.infra.uibase.navigation.toBundle
 import com.simprints.matcher.MatchContract
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.io.Serializable
 import javax.inject.Inject
 
 /**
@@ -130,7 +129,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         handleResult(ExternalCredentialContract.DESTINATION, orchestratorVm::handleResult)
     }
 
-    private fun <T : Serializable> handleResult(
+    private fun <T> handleResult(
         destination: Int,
         block: (T) -> Unit,
     ) {

@@ -52,13 +52,12 @@ data class OneToOneMatchEvent(
 
     override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this
 
     @Keep
-    @Serializable(with = OneToOneMatchPayloadSerializer::class) // Now this works!
+    @Serializable(with = OneToOneMatchPayloadSerializer::class)
     sealed class OneToOneMatchPayload : EventPayload() {
-        abstract override val type: EventType // This caused the conflict, now it's just a property
-
+        abstract override val type: EventType
         abstract val candidateId: String
         abstract val matcher: String
         abstract val result: MatchEntry?
