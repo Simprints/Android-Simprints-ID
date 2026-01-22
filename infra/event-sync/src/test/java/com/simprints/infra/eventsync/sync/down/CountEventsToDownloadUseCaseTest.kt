@@ -23,7 +23,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-internal class EventDownSyncCountsRepositoryTest {
+internal class CountEventsToDownloadUseCaseTest {
     @MockK
     private lateinit var configRepository: ConfigRepository
 
@@ -39,7 +39,7 @@ internal class EventDownSyncCountsRepositoryTest {
     @MockK
     private lateinit var downSynchronizationConfiguration: DownSynchronizationConfiguration
 
-    private lateinit var repository: EventDownSyncCountsRepository
+    private lateinit var useCase: CountEventsToDownloadUseCase
 
     @Before
     fun setUp() {
@@ -61,7 +61,7 @@ internal class EventDownSyncCountsRepositoryTest {
             }
         }
 
-        repository = EventDownSyncCountsRepository(
+        useCase = CountEventsToDownloadUseCase(
             configRepository = configRepository,
             downSyncScopeRepository = downSyncScopeRepository,
             eventRemoteDataSource = eventRemoteDataSource,
@@ -84,7 +84,7 @@ internal class EventDownSyncCountsRepositoryTest {
             lastInstructionId = "",
         )
 
-        val result = repository.countEventsToDownload()
+        val result = useCase()
 
         assertThat(result).isEqualTo(DownSyncCounts(26, isLowerBound = true))
     }
@@ -100,7 +100,7 @@ internal class EventDownSyncCountsRepositoryTest {
             }
         }
 
-        val result = repository.countEventsToDownload()
+        val result = useCase()
 
         assertThat(result).isEqualTo(DownSyncCounts(count = 0, isLowerBound = false))
         coVerify(exactly = 0) { configRepository.getDeviceConfiguration() }

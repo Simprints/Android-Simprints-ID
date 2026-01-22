@@ -24,7 +24,7 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class EventDownSyncPeriodicCountUseCaseTest {
     @MockK
-    private lateinit var repository: EventDownSyncCountsRepository
+    private lateinit var countEventsToDownload: CountEventsToDownloadUseCase
 
     @MockK
     private lateinit var timeHelper: TimeHelper
@@ -41,9 +41,9 @@ internal class EventDownSyncPeriodicCountUseCaseTest {
             DownSyncCounts(1, isLowerBound = false),
             DownSyncCounts(2, isLowerBound = true),
         )
-        coEvery { repository.countEventsToDownload() } returnsMany expected
+        coEvery { countEventsToDownload() } returnsMany expected
 
-        val useCase = EventDownSyncPeriodicCountUseCase(repository, appScope = backgroundScope)
+        val useCase = EventDownSyncPeriodicCountUseCase(countEventsToDownload, appScope = backgroundScope)
         runCurrent()
 
         val emitted = mutableListOf<DownSyncCounts>()
@@ -58,47 +58,47 @@ internal class EventDownSyncPeriodicCountUseCaseTest {
     @Test
     fun `counts once on initialisation`() = runTest {
         every { timeHelper.now() } answers { Timestamp(testScheduler.currentTime) }
-        coEvery { repository.countEventsToDownload() } returns DownSyncCounts(1, isLowerBound = false)
+        coEvery { countEventsToDownload() } returns DownSyncCounts(1, isLowerBound = false)
 
-        EventDownSyncPeriodicCountUseCase(repository, appScope = backgroundScope)
+        EventDownSyncPeriodicCountUseCase(countEventsToDownload, appScope = backgroundScope)
         runCurrent()
 
-        coVerify(exactly = 1) { repository.countEventsToDownload() }
+        coVerify(exactly = 1) { countEventsToDownload() }
     }
 
     @Test
     fun `does not count periodically without subscribers`() = runTest {
         every { timeHelper.now() } answers { Timestamp(testScheduler.currentTime) }
-        coEvery { repository.countEventsToDownload() } returns DownSyncCounts(1, isLowerBound = false)
+        coEvery { countEventsToDownload() } returns DownSyncCounts(1, isLowerBound = false)
 
-        EventDownSyncPeriodicCountUseCase(repository, appScope = backgroundScope)
+        EventDownSyncPeriodicCountUseCase(countEventsToDownload, appScope = backgroundScope)
         runCurrent()
 
         advanceTimeBy(DOWN_SYNC_COUNT_INTERVAL_MILLIS * 2)
         runCurrent()
-        coVerify(exactly = 1) { repository.countEventsToDownload() }
+        coVerify(exactly = 1) { countEventsToDownload() }
     }
 
     @Test
     fun `counts immediately and every interval while subscribed`() = runTest {
         every { timeHelper.now() } answers { Timestamp(testScheduler.currentTime) }
-        coEvery { repository.countEventsToDownload() } returnsMany listOf(
+        coEvery { countEventsToDownload() } returnsMany listOf(
             DownSyncCounts(1, isLowerBound = false), // initial
             DownSyncCounts(2, isLowerBound = false), // immediate periodic
             DownSyncCounts(3, isLowerBound = false), // after interval
         )
-        val useCase = EventDownSyncPeriodicCountUseCase(repository, appScope = backgroundScope)
+        val useCase = EventDownSyncPeriodicCountUseCase(countEventsToDownload, appScope = backgroundScope)
         runCurrent()
 
         val collectJob = launch { useCase().collect { } }
         runCurrent()
 
-        coVerify(exactly = 2) { repository.countEventsToDownload() }
+        coVerify(exactly = 2) { countEventsToDownload() }
 
         advanceTimeBy(DOWN_SYNC_COUNT_INTERVAL_MILLIS)
         runCurrent()
 
-        coVerify(exactly = 3) { repository.countEventsToDownload() }
+        coVerify(exactly = 3) { countEventsToDownload() }
 
         collectJob.cancel()
     }
@@ -106,17 +106,17 @@ internal class EventDownSyncPeriodicCountUseCaseTest {
     @Test
     fun `stops counting when unsubscribed and resumes on resubscribe`() = runTest {
         every { timeHelper.now() } answers { Timestamp(testScheduler.currentTime) }
-        coEvery { repository.countEventsToDownload() } returnsMany listOf(
+        coEvery { countEventsToDownload() } returnsMany listOf(
             DownSyncCounts(1, isLowerBound = false), // initial
             DownSyncCounts(2, isLowerBound = false), // immediate periodic on first sub
             DownSyncCounts(3, isLowerBound = false), // immediate periodic on second sub
         )
-        val useCase = EventDownSyncPeriodicCountUseCase(repository, appScope = backgroundScope)
+        val useCase = EventDownSyncPeriodicCountUseCase(countEventsToDownload, appScope = backgroundScope)
         runCurrent()
 
         val firstJob = launch { useCase().collect { } }
         runCurrent()
-        coVerify(exactly = 2) { repository.countEventsToDownload() }
+        coVerify(exactly = 2) { countEventsToDownload() }
 
         firstJob.cancel()
         runCurrent()
@@ -124,12 +124,12 @@ internal class EventDownSyncPeriodicCountUseCaseTest {
         advanceTimeBy(DOWN_SYNC_COUNT_INTERVAL_MILLIS)
         runCurrent()
 
-        coVerify(exactly = 2) { repository.countEventsToDownload() }
+        coVerify(exactly = 2) { countEventsToDownload() }
 
         val secondJob = launch { useCase().collect { } }
         runCurrent()
 
-        coVerify(exactly = 3) { repository.countEventsToDownload() }
+        coVerify(exactly = 3) { countEventsToDownload() }
 
         secondJob.cancel()
     }
@@ -137,33 +137,33 @@ internal class EventDownSyncPeriodicCountUseCaseTest {
     @Test
     fun `resumes paused periodic counting when resubscribed`() = runTest {
         every { timeHelper.now() } answers { Timestamp(testScheduler.currentTime) }
-        coEvery { repository.countEventsToDownload() } returnsMany listOf(
+        coEvery { countEventsToDownload() } returnsMany listOf(
             DownSyncCounts(1, isLowerBound = false), // initial
             DownSyncCounts(2, isLowerBound = false), // immediate periodic on first sub
             DownSyncCounts(3, isLowerBound = false), // immediate periodic on second sub
             DownSyncCounts(4, isLowerBound = false), // after interval on second sub
         )
-        val useCase = EventDownSyncPeriodicCountUseCase(repository, appScope = backgroundScope)
+        val useCase = EventDownSyncPeriodicCountUseCase(countEventsToDownload, appScope = backgroundScope)
         runCurrent()
 
         val firstJob = launch { useCase().collect { } }
         runCurrent()
-        coVerify(exactly = 2) { repository.countEventsToDownload() }
+        coVerify(exactly = 2) { countEventsToDownload() }
 
         firstJob.cancel()
         runCurrent()
 
         advanceTimeBy(DOWN_SYNC_COUNT_INTERVAL_MILLIS * 2)
         runCurrent()
-        coVerify(exactly = 2) { repository.countEventsToDownload() }
+        coVerify(exactly = 2) { countEventsToDownload() }
 
         val secondJob = launch { useCase().collect { } }
         runCurrent()
-        coVerify(exactly = 3) { repository.countEventsToDownload() }
+        coVerify(exactly = 3) { countEventsToDownload() }
 
         advanceTimeBy(DOWN_SYNC_COUNT_INTERVAL_MILLIS)
         runCurrent()
-        coVerify(exactly = 4) { repository.countEventsToDownload() }
+        coVerify(exactly = 4) { countEventsToDownload() }
         secondJob.cancel()
     }
 
@@ -173,9 +173,9 @@ internal class EventDownSyncPeriodicCountUseCaseTest {
         val initial = DownSyncCounts(1, isLowerBound = false)
         val immediate = DownSyncCounts(2, isLowerBound = false)
         val afterInterval = DownSyncCounts(3, isLowerBound = true)
-        coEvery { repository.countEventsToDownload() } returnsMany listOf(initial, immediate, afterInterval)
+        coEvery { countEventsToDownload() } returnsMany listOf(initial, immediate, afterInterval)
 
-        val useCase = EventDownSyncPeriodicCountUseCase(repository, appScope = backgroundScope)
+        val useCase = EventDownSyncPeriodicCountUseCase(countEventsToDownload, appScope = backgroundScope)
         runCurrent()
 
         val activeSubscriberJob = launch { useCase().collect { } }
@@ -184,12 +184,12 @@ internal class EventDownSyncPeriodicCountUseCaseTest {
         advanceTimeBy(DOWN_SYNC_COUNT_INTERVAL_MILLIS)
         runCurrent()
 
-        coVerify(exactly = 3) { repository.countEventsToDownload() }
+        coVerify(exactly = 3) { countEventsToDownload() }
 
         val replayedValue = useCase().first()
 
         assertThat(replayedValue).isEqualTo(afterInterval)
-        coVerify(exactly = 3) { repository.countEventsToDownload() }
+        coVerify(exactly = 3) { countEventsToDownload() }
 
         activeSubscriberJob.cancel()
     }

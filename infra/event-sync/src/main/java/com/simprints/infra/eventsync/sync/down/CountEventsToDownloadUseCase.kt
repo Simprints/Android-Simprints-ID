@@ -6,10 +6,8 @@ import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class EventDownSyncCountsRepository @Inject internal constructor(
+class CountEventsToDownloadUseCase @Inject internal constructor(
     private val configRepository: ConfigRepository,
     private val downSyncScopeRepository: EventDownSyncScopeRepository,
     private val eventRemoteDataSource: EventRemoteDataSource,
@@ -17,7 +15,7 @@ class EventDownSyncCountsRepository @Inject internal constructor(
     /**
      * Non-reactive by design: the return value has no source that is directly trackable reactively.
      */
-    suspend fun countEventsToDownload(): DownSyncCounts {
+    suspend operator fun invoke(): DownSyncCounts {
         val projectConfig = configRepository.getProjectConfiguration()
         val simprintsDownConfig = projectConfig.synchronization.down.simprints
         // For CommCare there's no easy way to count the number of events to download

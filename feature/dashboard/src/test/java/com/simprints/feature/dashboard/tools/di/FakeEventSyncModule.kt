@@ -2,7 +2,6 @@ package com.simprints.feature.dashboard.tools.di
 
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.EventSyncModule
-import com.simprints.infra.eventsync.sync.down.EventDownSyncCountsRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
@@ -19,8 +18,4 @@ object FakeEventSyncModule {
     @Provides
     @Singleton
     fun provideEventSyncManager(): EventSyncManager = mockk(relaxed = true)
-
-    @Provides
-    @Singleton
-    fun provideEventDownSyncCountsRepository(): EventDownSyncCountsRepository = mockk(relaxed = true)
 }

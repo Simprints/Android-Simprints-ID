@@ -5,7 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
-import com.simprints.infra.eventsync.sync.down.EventDownSyncCountsRepository
+import com.simprints.infra.eventsync.sync.down.CountEventsToDownloadUseCase
 import com.simprints.infra.eventsync.sync.down.EventDownSyncPeriodicCountUseCase
 import com.simprints.infra.sync.SyncableCounts
 import com.simprints.infra.sync.usecase.internal.ObserveEnrolmentRecordsCountUseCase
@@ -37,7 +37,7 @@ class CountSyncableUseCaseTest {
     private lateinit var eventRepository: EventRepository
 
     @MockK
-    private lateinit var downSyncCountsRepository: EventDownSyncCountsRepository
+    private lateinit var countEventsToDownload: CountEventsToDownloadUseCase
 
     @Before
     fun setup() {
@@ -187,13 +187,13 @@ class CountSyncableUseCaseTest {
     @Test
     fun `stops down-sync periodic counting when downstream unsubscribed`() = runTest {
         // integration test case with DownSyncCountsRepository, to check for its accidental overuse
-        coEvery { downSyncCountsRepository.countEventsToDownload() } returnsMany listOf(
+        coEvery { countEventsToDownload() } returnsMany listOf(
             DownSyncCounts(count = 1, isLowerBound = false), // initial
             DownSyncCounts(count = 2, isLowerBound = false), // immediate periodic on subscribe
             DownSyncCounts(count = 3, isLowerBound = false), // would be after interval if still subscribed
         )
         val eventDownSyncCount = EventDownSyncPeriodicCountUseCase(
-            downSyncCountsRepository,
+            countEventsToDownload,
             appScope = backgroundScope,
         )
         runCurrent()
@@ -223,13 +223,13 @@ class CountSyncableUseCaseTest {
 
         val collectJob = launch { useCase().collect { } }
         runCurrent()
-        coVerify(exactly = 2) { downSyncCountsRepository.countEventsToDownload() }
+        coVerify(exactly = 2) { countEventsToDownload() }
 
         collectJob.cancel()
         runCurrent()
         val downSyncIntervalMillis = 300_000L // from EventDownSyncPeriodicCountUseCase
         advanceTimeBy(downSyncIntervalMillis * 2)
         runCurrent()
-        coVerify(exactly = 2) { downSyncCountsRepository.countEventsToDownload() }
+        coVerify(exactly = 2) { countEventsToDownload() }
     }
 }

@@ -1,7 +1,6 @@
 package com.simprints.infra.eventsync.sync.down
 
 import com.simprints.core.AppScope
-import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
@@ -29,7 +28,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class EventDownSyncPeriodicCountUseCase @Inject constructor(
-    private val eventDownSyncCountsRepository: EventDownSyncCountsRepository,
+    private val countEventsToDownload: CountEventsToDownloadUseCase,
     @param:AppScope private val appScope: CoroutineScope,
 ) {
     private val sharedDownSyncCounts: SharedFlow<DownSyncCounts> = MutableSharedFlow<DownSyncCounts>(replay = 1)
@@ -51,7 +50,7 @@ class EventDownSyncPeriodicCountUseCase @Inject constructor(
         val fallbackDefaultCounts = DownSyncCounts(count = 0, isLowerBound = false)
         val counts = try {
             withTimeoutOrNull(DOWN_SYNC_COUNT_TIMEOUT_MILLIS) {
-                eventDownSyncCountsRepository.countEventsToDownload()
+                countEventsToDownload()
             } ?: fallbackDefaultCounts
         } catch (cancellationException: CancellationException) {
             throw cancellationException
