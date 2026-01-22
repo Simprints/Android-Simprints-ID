@@ -2,7 +2,7 @@ package com.simprints.infra.sync.config.usecase
 
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.sync.SyncableCounts
-import com.simprints.infra.sync.usecase.CountSyncableUseCase
+import com.simprints.infra.sync.usecase.ObserveSyncableCountsUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.every
@@ -14,7 +14,7 @@ import org.junit.Test
 
 internal class HandleProjectStateUseCaseTest {
     @MockK
-    private lateinit var countSyncable: CountSyncableUseCase
+    private lateinit var observeSyncableCounts: ObserveSyncableCountsUseCase
 
     @MockK
     private lateinit var logoutUseCase: LogoutUseCase
@@ -26,14 +26,14 @@ internal class HandleProjectStateUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
 
         useCase = HandleProjectStateUseCase(
-            countSyncable = countSyncable,
+            observeSyncableCounts = observeSyncableCounts,
             logoutUseCase = logoutUseCase,
         )
     }
 
     @Test
     fun `Fully logs out when project has ended`() = runTest {
-        every { countSyncable.invoke() } returns flowOf(
+        every { observeSyncableCounts.invoke() } returns flowOf(
             SyncableCounts(
                 totalRecords = 0,
                 recordEventsToDownload = 0,
@@ -51,7 +51,7 @@ internal class HandleProjectStateUseCaseTest {
 
     @Test
     fun `Logs out when project has ending and no items to upload`() = runTest {
-        every { countSyncable.invoke() } returns flowOf(
+        every { observeSyncableCounts.invoke() } returns flowOf(
             SyncableCounts(
                 totalRecords = 0,
                 recordEventsToDownload = 0,
@@ -69,7 +69,7 @@ internal class HandleProjectStateUseCaseTest {
 
     @Test
     fun `Does not logs out when project has ending and has items to upload`() = runTest {
-        every { countSyncable.invoke() } returns flowOf(
+        every { observeSyncableCounts.invoke() } returns flowOf(
             SyncableCounts(
                 totalRecords = 0,
                 recordEventsToDownload = 0,
@@ -87,7 +87,7 @@ internal class HandleProjectStateUseCaseTest {
 
     @Test
     fun `Does not logs out when project is running`() = runTest {
-        every { countSyncable.invoke() } returns flowOf(
+        every { observeSyncableCounts.invoke() } returns flowOf(
             SyncableCounts(
                 totalRecords = 0,
                 recordEventsToDownload = 0,

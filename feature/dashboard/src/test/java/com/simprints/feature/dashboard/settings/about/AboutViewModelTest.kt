@@ -15,7 +15,7 @@ import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.infra.sync.SyncableCounts
-import com.simprints.infra.sync.usecase.CountSyncableUseCase
+import com.simprints.infra.sync.usecase.ObserveSyncableCountsUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
@@ -59,7 +59,7 @@ class AboutViewModelTest {
     )
 
     @MockK
-    lateinit var countSyncable: CountSyncableUseCase
+    lateinit var observeSyncableCounts: ObserveSyncableCountsUseCase
 
     @MockK
     lateinit var configRepository: ConfigRepository
@@ -82,7 +82,7 @@ class AboutViewModelTest {
     fun `should initialize the live data correctly`() = runTest(testDispatcher) {
         val viewModel = AboutViewModel(
             configRepository = configRepository,
-            countSyncable = countSyncable,
+            observeSyncableCounts = observeSyncableCounts,
             recentUserActivityManager = recentUserActivityManager,
             logoutUseCase = logoutUseCase,
         )
@@ -213,7 +213,7 @@ class AboutViewModelTest {
             true -> 1
             false -> 0
         }
-        every { countSyncable.invoke() } returns flowOf(
+        every { observeSyncableCounts.invoke() } returns flowOf(
             SyncableCounts(
                 totalRecords = 0,
                 recordEventsToDownload = 0,
@@ -228,7 +228,7 @@ class AboutViewModelTest {
         )
         return AboutViewModel(
             configRepository = configRepository,
-            countSyncable = countSyncable,
+            observeSyncableCounts = observeSyncableCounts,
             recentUserActivityManager = recentUserActivityManager,
             logoutUseCase = logoutUseCase,
         )

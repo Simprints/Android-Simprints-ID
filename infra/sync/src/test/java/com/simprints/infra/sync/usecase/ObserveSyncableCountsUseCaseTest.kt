@@ -29,7 +29,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class CountSyncableUseCaseTest {
+class ObserveSyncableCountsUseCaseTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -62,7 +62,7 @@ class CountSyncableUseCaseTest {
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns enrolmentsToUploadCountFlowV2
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns enrolmentsToUploadCountFlowV4
         val useCase =
-            CountSyncableUseCase(
+            ObserveSyncableCountsUseCase(
                 countEnrolmentRecords,
                 countSamplesToUpload,
                 eventDownSyncCount,
@@ -118,7 +118,7 @@ class CountSyncableUseCaseTest {
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns enrolmentsToUploadCountFlowV2
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns enrolmentsToUploadCountFlowV4
         val useCase =
-            CountSyncableUseCase(
+            ObserveSyncableCountsUseCase(
                 countEnrolmentRecords,
                 countSamplesToUpload,
                 eventDownSyncCount,
@@ -163,7 +163,7 @@ class CountSyncableUseCaseTest {
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns enrolmentsToUploadCountFlowV2
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns enrolmentsToUploadCountFlowV4
         val useCase =
-            CountSyncableUseCase(
+            ObserveSyncableCountsUseCase(
                 countEnrolmentRecords,
                 countSamplesToUpload,
                 eventDownSyncCount,
@@ -213,7 +213,7 @@ class CountSyncableUseCaseTest {
         coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns enrolmentsToUploadCountFlowV4
 
         val useCase =
-            CountSyncableUseCase(
+            ObserveSyncableCountsUseCase(
                 countEnrolmentRecords,
                 countSamplesToUpload,
                 eventDownSyncCount,

@@ -24,7 +24,7 @@ import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.sync.SyncCommand
-import com.simprints.infra.sync.usecase.CountSyncableUseCase
+import com.simprints.infra.sync.usecase.ObserveSyncableCountsUseCase
 import com.simprints.infra.sync.usecase.SyncUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -44,7 +44,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     private val appForegroundStateTracker: AppForegroundStateTracker,
     private val commCarePermissionChecker: CommCarePermissionChecker,
     private val observeConfigurationFlow: ObserveConfigurationChangesUseCase,
-    private val countSyncable: CountSyncableUseCase,
+    private val observeSyncableCounts: ObserveSyncableCountsUseCase,
     private val sync: SyncUseCase,
     @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) {
@@ -59,7 +59,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         combinedRefreshSignals(),
         authStore.observeSignedInProjectId(),
         sync(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly),
-        countSyncable(),
+        observeSyncableCounts(),
         observeConfigurationFlow(),
     ) { isOnline, projectId, (eventSyncState, imageSyncStatus), counts, (isRefreshing, isProjectRunning, moduleCounts, projectConfig) ->
         val currentEvents = eventSyncState.progress?.coerceAtLeast(0) ?: 0

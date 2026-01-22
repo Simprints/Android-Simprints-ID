@@ -23,16 +23,16 @@ import javax.inject.Singleton
  * together in a reactive way.
  */
 @Singleton
-class CountSyncableUseCase @Inject internal constructor(
-    private val countEnrolmentRecords: ObserveEnrolmentRecordsCountUseCase,
-    private val countSamplesToUpload: ObserveSamplesToUploadCountUseCase,
+class ObserveSyncableCountsUseCase @Inject internal constructor(
+    private val observeEnrolmentRecordsCount: ObserveEnrolmentRecordsCountUseCase,
+    private val observeSamplesToUploadCount: ObserveSamplesToUploadCountUseCase,
     private val eventDownSyncCount: EventDownSyncPeriodicCountUseCase,
     private val eventRepository: EventRepository,
     @param:AppScope private val appScope: CoroutineScope,
 ) {
     private val sharedSyncableCounts: SharedFlow<SyncableCounts> by lazy {
         combine(
-            countEnrolmentRecords(),
+            observeEnrolmentRecordsCount(),
             eventDownSyncCount(),
             flow { // recordEventsToDownload
                 emitAll(eventRepository.observeEventCount(type = null))
@@ -47,7 +47,7 @@ class CountSyncableUseCase @Inject internal constructor(
                     }
                 )
             },
-            countSamplesToUpload(),
+            observeSamplesToUploadCount(),
         ) { totalRecords, recordEventsToDownload, eventsToUpload, enrolmentsToUpload, samplesToUpload ->
             val (recordEventsToDownloadCount, isRecordEventsToDownloadLowerBound) = recordEventsToDownload
             SyncableCounts(

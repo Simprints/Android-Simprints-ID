@@ -25,7 +25,7 @@ import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncStatus
 import com.simprints.infra.sync.SyncableCounts
-import com.simprints.infra.sync.usecase.CountSyncableUseCase
+import com.simprints.infra.sync.usecase.ObserveSyncableCountsUseCase
 import com.simprints.infra.sync.usecase.SyncUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -47,7 +47,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
     private val connectivityTracker = mockk<ConnectivityTracker>()
     private val authStore = mockk<AuthStore>()
-    private val countSyncable = mockk<CountSyncableUseCase>()
+    private val observeSyncableCounts = mockk<ObserveSyncableCountsUseCase>()
     private val sync = mockk<SyncUseCase>()
     private val timeHelper = mockk<TimeHelper>()
     private val ticker = mockk<Ticker>()
@@ -142,7 +142,7 @@ internal class ObserveSyncInfoUseCaseTest {
             enrolmentsToUpload = 0,
             samplesToUpload = 0,
         )
-        every { countSyncable.invoke() } returns syncableCountsFlow
+        every { observeSyncableCounts.invoke() } returns syncableCountsFlow
 
         every { ticker.observeTicks(any()) } returns MutableStateFlow(Unit)
         every { timeHelper.now() } returns TEST_TIMESTAMP
@@ -169,7 +169,7 @@ internal class ObserveSyncInfoUseCaseTest {
             appForegroundStateTracker = appForegroundStateTracker,
             commCarePermissionChecker = commCarePermissionChecker,
             observeConfigurationFlow = observeConfigurationFlow,
-            countSyncable = countSyncable,
+            observeSyncableCounts = observeSyncableCounts,
             sync = sync,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
