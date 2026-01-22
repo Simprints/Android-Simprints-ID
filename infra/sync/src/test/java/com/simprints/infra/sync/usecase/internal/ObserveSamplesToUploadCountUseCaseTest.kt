@@ -22,19 +22,19 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class CountSamplesToUploadUseCaseTest {
+class ObserveSamplesToUploadCountUseCaseTest {
     @MockK
     private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var imageRepository: ImageRepository
 
-    private lateinit var useCase: CountSamplesToUploadUseCase
+    private lateinit var useCase: ObserveSamplesToUploadCountUseCase
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        useCase = CountSamplesToUploadUseCase(configRepository, imageRepository)
+        useCase = ObserveSamplesToUploadCountUseCase(configRepository, imageRepository)
     }
 
     @Test

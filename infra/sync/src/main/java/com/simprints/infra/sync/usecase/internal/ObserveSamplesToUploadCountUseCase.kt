@@ -11,12 +11,12 @@ import javax.inject.Inject
 /**
  * Observes sample count to upload, while tracking the project ID changes.
  *
- * Note: CountSamplesToUploadUseCase bridges
+ * Note: ObserveSamplesToUploadCountUseCase bridges
  * the older term of "image" in its dependencies
  * with
  * the newer term "sample" that the use case exposes.
  */
-internal class CountSamplesToUploadUseCase @Inject constructor(
+internal class ObserveSamplesToUploadCountUseCase @Inject constructor(
     private val configRepository: ConfigRepository,
     private val imageRepository: ImageRepository,
 ) {

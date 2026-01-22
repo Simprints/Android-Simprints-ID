@@ -6,7 +6,7 @@ import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.sync.down.EventDownSyncPeriodicCountUseCase
 import com.simprints.infra.sync.SyncableCounts
 import com.simprints.infra.sync.usecase.internal.ObserveEnrolmentRecordsCountUseCase
-import com.simprints.infra.sync.usecase.internal.CountSamplesToUploadUseCase
+import com.simprints.infra.sync.usecase.internal.ObserveSamplesToUploadCountUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
@@ -25,7 +25,7 @@ import javax.inject.Singleton
 @Singleton
 class CountSyncableUseCase @Inject internal constructor(
     private val countEnrolmentRecords: ObserveEnrolmentRecordsCountUseCase,
-    private val countSamplesToUpload: CountSamplesToUploadUseCase,
+    private val countSamplesToUpload: ObserveSamplesToUploadCountUseCase,
     private val eventDownSyncCount: EventDownSyncPeriodicCountUseCase,
     private val eventRepository: EventRepository,
     @param:AppScope private val appScope: CoroutineScope,
