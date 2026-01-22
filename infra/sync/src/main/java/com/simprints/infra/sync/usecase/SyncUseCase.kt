@@ -2,10 +2,10 @@ package com.simprints.infra.sync.usecase
 
 import com.simprints.core.AppScope
 import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncCommand
 import com.simprints.infra.sync.SyncStatus
-import com.simprints.infra.sync.usecase.internal.EventSyncUseCase
 import com.simprints.infra.sync.usecase.internal.ImageSyncUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,7 +24,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class SyncUseCase @Inject internal constructor(
-    eventSync: EventSyncUseCase,
+    eventSyncStateProcessor: EventSyncStateProcessor,
     imageSync: ImageSyncUseCase,
     @param:AppScope private val appScope: CoroutineScope,
 ) {
@@ -46,7 +46,7 @@ class SyncUseCase @Inject internal constructor(
 
     private val sharedSyncStatus: StateFlow<SyncStatus> by lazy {
         combine(
-            eventSync().onStart { emit(defaultEventSyncState) },
+            eventSyncStateProcessor.getLastSyncState().onStart { emit(defaultEventSyncState) },
             imageSync().onStart { emit(defaultImageSyncStatus) },
         ) { eventSyncState, imageSyncStatus ->
             SyncStatus(eventSyncState, imageSyncStatus)

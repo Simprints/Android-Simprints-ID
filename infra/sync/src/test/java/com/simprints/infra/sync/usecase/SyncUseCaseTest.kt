@@ -3,10 +3,10 @@ package com.simprints.infra.sync.usecase
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncCommand
 import com.simprints.infra.sync.SyncStatus
-import com.simprints.infra.sync.usecase.internal.EventSyncUseCase
 import com.simprints.infra.sync.usecase.internal.ImageSyncUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -26,7 +26,7 @@ class SyncUseCaseTest {
     val rule = InstantTaskExecutorRule()
 
     @MockK
-    private lateinit var eventSync: EventSyncUseCase
+    private lateinit var eventSyncStateProcessor: EventSyncStateProcessor
 
     @MockK
     private lateinit var imageSync: ImageSyncUseCase
@@ -37,7 +37,7 @@ class SyncUseCaseTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
-        every { eventSync.invoke() } returns eventSyncStatusFlow
+        every { eventSyncStateProcessor.getLastSyncState() } returns eventSyncStatusFlow
         every { imageSync.invoke() } returns imageSyncStatusFlow
     }
 
@@ -59,7 +59,7 @@ class SyncUseCaseTest {
                 lastUpdateTimeMillis = -1L,
             ),
         )
-        val useCase = SyncUseCase(eventSync, imageSync, appScope = backgroundScope)
+        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
 
         val resultFlow = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
 
@@ -83,7 +83,7 @@ class SyncUseCaseTest {
             lastUpdateTimeMillis = 123L,
         )
         val expected = SyncStatus(event, image)
-        val useCase = SyncUseCase(eventSync, imageSync, appScope = backgroundScope)
+        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
 
         val resultFlow = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
 
@@ -106,7 +106,7 @@ class SyncUseCaseTest {
             reporterStates = emptyList(),
             lastSyncTime = null,
         )
-        val useCase = SyncUseCase(eventSync, imageSync, appScope = backgroundScope)
+        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
 
         val resultFlow = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
 
@@ -127,7 +127,7 @@ class SyncUseCaseTest {
             progress = 2 to 5,
             lastUpdateTimeMillis = 123L,
         )
-        val useCase = SyncUseCase(eventSync, imageSync, appScope = backgroundScope)
+        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
 
         val resultFlow = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
 
@@ -162,7 +162,7 @@ class SyncUseCaseTest {
         )
         val expected1 = SyncStatus(event1, image)
         val expected2 = SyncStatus(event2, image)
-        val useCase = SyncUseCase(eventSync, imageSync, appScope = backgroundScope)
+        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
 
         val resultFlow = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
 
@@ -200,7 +200,7 @@ class SyncUseCaseTest {
         )
         val expected1 = SyncStatus(event, image1)
         val expected2 = SyncStatus(event, image2)
-        val useCase = SyncUseCase(eventSync, imageSync, appScope = backgroundScope)
+        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
 
         val resultFlow = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
 
@@ -236,7 +236,7 @@ class SyncUseCaseTest {
         val image2 = image1.copy(
             isSyncing = false,
         )
-        val useCase = SyncUseCase(eventSync, imageSync, appScope = backgroundScope)
+        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
 
         val resultFlow1 = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
 
@@ -251,7 +251,7 @@ class SyncUseCaseTest {
         val resultFlow2 = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
 
         assertThat(resultFlow1).isSameInstanceAs(resultFlow2)
-        verify(exactly = 1) { eventSync() }
+        verify(exactly = 1) { eventSyncStateProcessor.getLastSyncState() }
         verify(exactly = 1) { imageSync() }
     }
 }
