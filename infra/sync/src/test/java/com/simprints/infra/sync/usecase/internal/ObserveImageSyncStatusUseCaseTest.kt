@@ -18,19 +18,19 @@ import org.junit.Before
 import org.junit.Test
 import java.util.UUID
 
-class ImageSyncUseCaseTest {
+class ObserveImageSyncStatusUseCaseTest {
     @MockK
     private lateinit var workManager: WorkManager
 
     @MockK
     private lateinit var imageSyncTimestampProvider: ImageSyncTimestampProvider
 
-    private lateinit var useCase: ImageSyncUseCase
+    private lateinit var useCase: ObserveImageSyncStatusUseCase
 
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
-        useCase = ImageSyncUseCase(
+        useCase = ObserveImageSyncStatusUseCase(
             workManager = workManager,
             imageSyncTimestampProvider = imageSyncTimestampProvider,
         )

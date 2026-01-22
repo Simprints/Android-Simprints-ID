@@ -7,7 +7,7 @@ import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncCommand
 import com.simprints.infra.sync.SyncStatus
-import com.simprints.infra.sync.usecase.internal.ImageSyncUseCase
+import com.simprints.infra.sync.usecase.internal.ObserveImageSyncStatusUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -29,7 +29,7 @@ class SyncUseCaseTest {
     private lateinit var eventSyncStateProcessor: EventSyncStateProcessor
 
     @MockK
-    private lateinit var imageSync: ImageSyncUseCase
+    private lateinit var imageSync: ObserveImageSyncStatusUseCase
 
     private val eventSyncStatusFlow = MutableSharedFlow<EventSyncState>()
     private val imageSyncStatusFlow = MutableSharedFlow<ImageSyncStatus>()

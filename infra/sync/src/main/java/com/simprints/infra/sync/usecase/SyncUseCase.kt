@@ -6,7 +6,7 @@ import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncCommand
 import com.simprints.infra.sync.SyncStatus
-import com.simprints.infra.sync.usecase.internal.ImageSyncUseCase
+import com.simprints.infra.sync.usecase.internal.ObserveImageSyncStatusUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -25,7 +25,7 @@ import javax.inject.Singleton
 @Singleton
 class SyncUseCase @Inject internal constructor(
     eventSyncStateProcessor: EventSyncStateProcessor,
-    imageSync: ImageSyncUseCase,
+    imageSync: ObserveImageSyncStatusUseCase,
     @param:AppScope private val appScope: CoroutineScope,
 ) {
     private val defaultEventSyncState = EventSyncState(
