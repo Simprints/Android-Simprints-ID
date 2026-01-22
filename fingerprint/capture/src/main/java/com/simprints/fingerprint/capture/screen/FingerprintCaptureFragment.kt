@@ -311,6 +311,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             )
         } catch (e: Exception) {
             Simber.i("Error launching scanner connection screen", e, tag = FINGER_CAPTURE)
+            vm.handleReconnectionNavigationFailed()
         }
     }
 

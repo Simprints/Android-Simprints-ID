@@ -731,6 +731,13 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         }
     }
 
+    fun handleReconnectionNavigationFailed() {
+        // Reset the flag so that reconnection can be attempted again
+        updateState {
+            it.copy(isShowingConnectionScreen = false)
+        }
+    }
+
     fun handleOnBackPressed() {
         if (state.currentCaptureState().isCommunicating()) {
             cancelScanning()
