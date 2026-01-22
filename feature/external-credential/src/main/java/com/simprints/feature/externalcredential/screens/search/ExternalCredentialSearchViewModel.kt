@@ -106,9 +106,9 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         searchState: SearchState,
         flowType: FlowType,
     ): Int? = when (searchState) {
+        // button is not displayed during search
         SearchState.Searching -> null
 
-        // button is not displayed during search
         is SearchState.CredentialLinked -> when (flowType) {
             FlowType.ENROL -> {
                 IDR.string.mfid_action_enrol_anyway
@@ -146,19 +146,18 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         credential: TokenizableString.Tokenized,
     ) {
         updateState { it.copy(searchState = SearchState.Searching) }
+        val searchStartTime = timeHelper.now()
         val candidates = enrolmentRecordRepository.load(EnrolmentRecordQuery(projectId = project.id, externalCredential = credential))
+        eventsTracker.saveSearchEvent(searchStartTime, scannedCredential.credentialScanId, candidates)
 
-        val startTime = timeHelper.now()
         when {
             candidates.isEmpty() -> {
-                eventsTracker.saveSearchEvent(startTime, scannedCredential.credentialScanId, emptyList())
                 updateState { it.copy(searchState = SearchState.CredentialNotFound) }
             }
 
             else -> {
                 val projectConfig = configRepository.getProjectConfiguration()
                 val matches = matchCandidatesUseCase(candidates, credential, externalCredentialParams, project, projectConfig)
-                eventsTracker.saveSearchEvent(startTime, scannedCredential.credentialScanId, candidates)
 
                 updateState { state -> state.copy(searchState = SearchState.CredentialLinked(matchResults = matches)) }
             }
@@ -170,11 +169,9 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
      * alpha-numeric, while the NHIS card memberships contain only digits.
      */
     fun getKeyBoardInputType() = when (scannedCredential.credentialType) {
-        ExternalCredentialType.NHISCard -> InputType.TYPE_CLASS_NUMBER
-
         // NHIS card membership contains only numbers
+        ExternalCredentialType.NHISCard -> InputType.TYPE_CLASS_NUMBER
         ExternalCredentialType.GhanaIdCard -> InputType.TYPE_CLASS_TEXT
-
         ExternalCredentialType.QRCode -> InputType.TYPE_CLASS_TEXT
     }
 

@@ -46,19 +46,41 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
         val matchResultResultsDescending = mapMatchResultsPerSdk(results, projectConfiguration)
 
         return (credentialResultsDescending.keys + matchResultResultsDescending.keys)
-            .associateWith { credentialResultsDescending[it].orEmpty() + matchResultResultsDescending[it].orEmpty() }
-            .filterValues { it.isNotEmpty() }
-            .maxByOrNull { (_, values) -> values.maxOfOrNull { it.confidenceScore } ?: 0 }
-            ?.let { (_, results) ->
-                val goodResults = results.filter { it.matchConfidence != AppMatchConfidence.NONE }
+            .map {
+                ResultsPerSdk(
+                    it,
+                    credentialResultsDescending[it].orEmpty(),
+                    matchResultResultsDescending[it].orEmpty(),
+                )
+            }.filter { it.credentialResults.isNotEmpty() || it.matchResults.isNotEmpty() }
+            .maxByOrNull { (_, credentialsResults, matchResults) ->
+                val maxByCredentials = credentialsResults.maxOfOrNull { it.confidenceScore } ?: 0
+                val maxByMatches = matchResults.maxOfOrNull { it.confidenceScore } ?: 0
+                maxOf(maxByCredentials, maxByMatches)
+            }?.let { (_, credentialsResults, matchResults) ->
                 // Attempt to include only high confidence matches
-                goodResults
-                    .filter { it.matchConfidence == AppMatchConfidence.HIGH }
-                    .ifEmpty { goodResults }
+                val goodResults = matchResults
+                    .filter { it.matchConfidence != AppMatchConfidence.NONE }
+                    .let { goodResults ->
+                        goodResults
+                            .filter { it.matchConfidence == AppMatchConfidence.HIGH }
+                            .ifEmpty { goodResults }
+                    }
+
+                // Credential matches are returned regardless of confidence score
+                val results = credentialsResults + goodResults
+
+                results
                     .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
                     .distinctBy(AppMatchResult::guid)
             }.orEmpty()
     }
+
+    private data class ResultsPerSdk(
+        val sdkType: ModalitySdkType,
+        val credentialResults: List<AppMatchResult>,
+        val matchResults: List<AppMatchResult>,
+    )
 
     private fun mapCredentialSearchResultsPerSdk(
         results: List<Serializable>,
