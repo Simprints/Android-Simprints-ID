@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-internal class CountEnrolmentRecordsUseCase @Inject constructor(
+internal class ObserveEnrolmentRecordsCountUseCase @Inject constructor(
     private val configRepository: ConfigRepository,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
 ) {

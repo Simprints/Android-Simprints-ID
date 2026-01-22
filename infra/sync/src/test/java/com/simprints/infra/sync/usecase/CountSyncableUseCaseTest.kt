@@ -8,7 +8,7 @@ import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.sync.down.EventDownSyncCountsRepository
 import com.simprints.infra.eventsync.sync.down.EventDownSyncPeriodicCountUseCase
 import com.simprints.infra.sync.SyncableCounts
-import com.simprints.infra.sync.usecase.internal.CountEnrolmentRecordsUseCase
+import com.simprints.infra.sync.usecase.internal.ObserveEnrolmentRecordsCountUseCase
 import com.simprints.infra.sync.usecase.internal.CountSamplesToUploadUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -53,7 +53,7 @@ class CountSyncableUseCaseTest {
         val enrolmentsToUploadCountFlowV4 = MutableSharedFlow<Int>()
         val samplesToUploadCountFlow = MutableSharedFlow<Int>()
         val eventDownSyncCount = io.mockk.mockk<EventDownSyncPeriodicCountUseCase>()
-        val countEnrolmentRecords = io.mockk.mockk<CountEnrolmentRecordsUseCase>()
+        val countEnrolmentRecords = io.mockk.mockk<ObserveEnrolmentRecordsCountUseCase>()
         val countSamplesToUpload = io.mockk.mockk<CountSamplesToUploadUseCase>()
         every { eventDownSyncCount.invoke() } returns recordEventsToDownloadCountFlow
         every { countEnrolmentRecords.invoke() } returns totalRecordsCountFlow
@@ -109,7 +109,7 @@ class CountSyncableUseCaseTest {
         enrolmentsToUploadCountFlowV4.tryEmit(0)
         samplesToUploadCountFlow.tryEmit(0)
         val eventDownSyncCount = io.mockk.mockk<EventDownSyncPeriodicCountUseCase>()
-        val countEnrolmentRecords = io.mockk.mockk<CountEnrolmentRecordsUseCase>()
+        val countEnrolmentRecords = io.mockk.mockk<ObserveEnrolmentRecordsCountUseCase>()
         val countSamplesToUpload = io.mockk.mockk<CountSamplesToUploadUseCase>()
         every { eventDownSyncCount.invoke() } returns recordEventsToDownloadCountFlow
         every { countEnrolmentRecords.invoke() } returns totalRecordsCountFlow
@@ -154,7 +154,7 @@ class CountSyncableUseCaseTest {
         val enrolmentsToUploadCountFlowV4 = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
         val samplesToUploadCountFlow = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
         val eventDownSyncCount = io.mockk.mockk<EventDownSyncPeriodicCountUseCase>()
-        val countEnrolmentRecords = io.mockk.mockk<CountEnrolmentRecordsUseCase>()
+        val countEnrolmentRecords = io.mockk.mockk<ObserveEnrolmentRecordsCountUseCase>()
         val countSamplesToUpload = io.mockk.mockk<CountSamplesToUploadUseCase>()
         every { eventDownSyncCount.invoke() } returns recordEventsToDownloadCountFlow
         every { countEnrolmentRecords.invoke() } returns totalRecordsCountFlow
@@ -204,7 +204,7 @@ class CountSyncableUseCaseTest {
         val enrolmentsToUploadCountFlowV2 = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
         val enrolmentsToUploadCountFlowV4 = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
         val samplesToUploadCountFlow = MutableSharedFlow<Int>(replay = 1).apply { tryEmit(0) }
-        val countEnrolmentRecords = io.mockk.mockk<CountEnrolmentRecordsUseCase>()
+        val countEnrolmentRecords = io.mockk.mockk<ObserveEnrolmentRecordsCountUseCase>()
         val countSamplesToUpload = io.mockk.mockk<CountSamplesToUploadUseCase>()
         every { countEnrolmentRecords.invoke() } returns totalRecordsCountFlow
         every { countSamplesToUpload.invoke() } returns samplesToUploadCountFlow

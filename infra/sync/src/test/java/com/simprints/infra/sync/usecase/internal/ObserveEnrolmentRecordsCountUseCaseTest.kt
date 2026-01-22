@@ -23,19 +23,19 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class CountEnrolmentRecordsUseCaseTest {
+class ObserveEnrolmentRecordsCountUseCaseTest {
     @MockK
     private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
-    private lateinit var useCase: CountEnrolmentRecordsUseCase
+    private lateinit var useCase: ObserveEnrolmentRecordsCountUseCase
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        useCase = CountEnrolmentRecordsUseCase(configRepository, enrolmentRecordRepository)
+        useCase = ObserveEnrolmentRecordsCountUseCase(configRepository, enrolmentRecordRepository)
     }
 
     @Test
