@@ -2,8 +2,10 @@ package com.simprints.feature.externalcredential.screens.search.usecase
 
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.feature.externalcredential.usecase.ExternalCredentialEventTrackerUseCase
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.getModalitySdkConfig
@@ -18,6 +20,8 @@ internal class MatchCandidatesUseCase @Inject constructor(
     private val createMatchParamsUseCase: CreateMatchParamsUseCase,
     private val faceMatcher: FaceMatcherUseCase,
     private val fingerprintMatcher: FingerprintMatcherUseCase,
+    private val eventsTracker: ExternalCredentialEventTrackerUseCase,
+    private val timeHelper: TimeHelper,
 ) {
     suspend operator fun invoke(
         candidates: List<EnrolmentRecord>,
@@ -39,6 +43,7 @@ internal class MatchCandidatesUseCase @Inject constructor(
                     .getModalitySdkConfig(matchParam.bioSdk)
                     ?.verificationMatchThreshold
                     ?: return@mapNotNull null
+                val startTime = timeHelper.now()
                 val lastMatchSuccess = when (matchParam.bioSdk.modality()) {
                     Modality.FACE -> faceMatcher(matchParam, project).lastOrNull() as? MatcherState.Success
                     Modality.FINGERPRINT -> fingerprintMatcher(matchParam, project).lastOrNull() as? MatcherState.Success
@@ -49,7 +54,11 @@ internal class MatchCandidatesUseCase @Inject constructor(
                         comparisonResult = result,
                         verificationThreshold = matchThreshold,
                         bioSdk = matchParam.bioSdk,
-                    )
+                        probeReferenceId = matchParam.probeReference.referenceId,
+                        matcherName = lastMatchSuccess.matcherName,
+                    ).also { match ->
+                        eventsTracker.saveMatchEvent(startTime, match)
+                    }
                 }
             }.flatten()
     }

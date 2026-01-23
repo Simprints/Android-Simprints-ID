@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -70,6 +71,9 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
                 },
                 onCancel = ::dismissDialog,
             )
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            binding.skipScanning.performClick()
         }
     }
 

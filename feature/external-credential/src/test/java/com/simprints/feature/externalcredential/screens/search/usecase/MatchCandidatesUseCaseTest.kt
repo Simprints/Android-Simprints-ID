@@ -6,7 +6,9 @@ import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.feature.externalcredential.usecase.ExternalCredentialEventTrackerUseCase
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.ModalitySdkType
@@ -79,6 +81,11 @@ internal class MatchCandidatesUseCaseTest {
     @MockK
     private lateinit var matcherSuccess: MatcherState.Success
 
+    @MockK
+    private lateinit var timeHelper: TimeHelper
+
+    @MockK
+    lateinit var eventsTracker: ExternalCredentialEventTrackerUseCase
     private val credential = "credential".asTokenizableEncrypted()
     private val subjectId = "subjectId"
     private val probeReferenceId = "probeReferenceId"
@@ -91,6 +98,8 @@ internal class MatchCandidatesUseCaseTest {
             createMatchParamsUseCase = createMatchParamsUseCase,
             faceMatcher = faceMatcher,
             fingerprintMatcher = fingerprintMatcher,
+            timeHelper = timeHelper,
+            eventsTracker = eventsTracker,
         )
 
         every { enrolmentRecord.subjectId } returns subjectId
@@ -122,9 +131,11 @@ internal class MatchCandidatesUseCaseTest {
         if (isFace) {
             every { matchParams.probeReference } returns faceCapture
             every { matchParams.bioSdk } returns ModalitySdkType.RANK_ONE
+            every { faceCapture.referenceId } returns probeReferenceId
         } else {
             every { matchParams.probeReference } returns fingerprintCapture
             every { matchParams.bioSdk } returns ModalitySdkType.SECUGEN_SIM_MATCHER
+            every { fingerprintCapture.referenceId } returns probeReferenceId
         }
     }
 
@@ -144,6 +155,8 @@ internal class MatchCandidatesUseCaseTest {
         assertThat(result[0].comparisonResult).isEqualTo(matchResultItem)
         assertThat(result[0].verificationThreshold).isEqualTo(verificationMatchThreshold)
         assertThat(result[0].bioSdk).isEqualTo(ModalitySdkType.RANK_ONE)
+        assertThat(result[0].probeReferenceId).isEqualTo(probeReferenceId)
+        coVerify { eventsTracker.saveMatchEvent(any(), any()) }
     }
 
     @Test
@@ -162,6 +175,8 @@ internal class MatchCandidatesUseCaseTest {
         assertThat(result[0].comparisonResult).isEqualTo(matchResultItem)
         assertThat(result[0].verificationThreshold).isEqualTo(verificationMatchThreshold)
         assertThat(result[0].bioSdk).isEqualTo(ModalitySdkType.SECUGEN_SIM_MATCHER)
+        assertThat(result[0].probeReferenceId).isEqualTo(probeReferenceId)
+        coVerify { eventsTracker.saveMatchEvent(any(), any()) }
     }
 
     @Test

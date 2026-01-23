@@ -236,6 +236,8 @@ class OrchestratorCacheIntegrationTest {
                             comparisonResult = ComparisonResult("subjectId", 0.5f),
                             verificationThreshold = 55f,
                             bioSdk = ModalitySdkType.RANK_ONE,
+                            probeReferenceId = "probeReferenceId",
+                            matcherName = "rankOne",
                         ),
                     ),
                 ),

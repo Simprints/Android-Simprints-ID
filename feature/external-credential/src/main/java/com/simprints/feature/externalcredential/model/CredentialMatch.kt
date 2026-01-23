@@ -16,6 +16,8 @@ import kotlinx.serialization.Serializable
 data class CredentialMatch(
     val credential: TokenizableString.Tokenized,
     val comparisonResult: ComparisonResult,
+    val probeReferenceId: String?,
+    val matcherName: String,
     val verificationThreshold: Float,
     val bioSdk: ModalitySdkType,
 ) : StepResult {
