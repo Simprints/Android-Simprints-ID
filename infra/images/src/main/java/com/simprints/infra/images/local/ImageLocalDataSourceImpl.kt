@@ -91,7 +91,7 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
             }.toList()
     }
 
-    override suspend fun observeImageCounts(projectId: String): Flow<Int> = imageRefChanges
+    override fun observeImageCounts(projectId: String): Flow<Int> = imageRefChanges
         .onStart {
             emit(Unit)
         } // initial listing

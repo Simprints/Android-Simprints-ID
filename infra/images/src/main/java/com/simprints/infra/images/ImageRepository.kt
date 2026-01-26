@@ -47,5 +47,5 @@ interface ImageRepository {
 
     suspend fun getNumberOfImagesToUpload(projectId: String): Int
 
-    suspend fun observeNumberOfImagesToUpload(projectId: String): Flow<Int>
+    fun observeNumberOfImagesToUpload(projectId: String): Flow<Int>
 }

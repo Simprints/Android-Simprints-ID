@@ -49,7 +49,7 @@ internal interface ImageLocalDataSource {
      *
      * @return flow of counts of image files found
      */
-    suspend fun observeImageCounts(projectId: String): Flow<Int>
+    fun observeImageCounts(projectId: String): Flow<Int>
 
     /**
      * Deletes an image
