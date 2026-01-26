@@ -40,6 +40,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
+import java.io.Serializable as JavaSerializable
 
 /**
  * Step contains all of the information required to execute an orchestration step and the result of the execution.
@@ -53,7 +54,7 @@ data class Step(
     var params: StepParams? = null,
     var status: StepStatus = StepStatus.NOT_STARTED,
     var result: StepResult? = null,
-)
+) : JavaSerializable
 
 @Keep
 @Serializable

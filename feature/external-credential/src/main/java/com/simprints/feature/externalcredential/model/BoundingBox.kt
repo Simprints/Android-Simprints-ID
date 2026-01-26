@@ -3,6 +3,7 @@ package com.simprints.feature.externalcredential.model
 import android.graphics.Rect
 import androidx.annotation.Keep
 import kotlinx.serialization.Serializable
+import java.io.Serializable as JavaSerializable
 
 /**
  * A serializable substitute for Android's Rect class, which is not serializable.
@@ -15,7 +16,7 @@ data class BoundingBox(
     val top: Int,
     val right: Int,
     val bottom: Int,
-)
+) : JavaSerializable
 
 fun Rect.toBoundingBox(): BoundingBox = BoundingBox(left, top, right, bottom)
 

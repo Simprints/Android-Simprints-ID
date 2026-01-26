@@ -9,6 +9,7 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+import java.io.Serializable as JavaSerializable
 
 /**
  * Sealed class for values that might be tokenized (symmetrically encrypted). Use this wrapping
@@ -23,7 +24,9 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 @Serializable(with = TokenizableStringSerializer::class)
 @OptIn(ExperimentalSerializationApi::class)
 @JsonClassDiscriminator("className")
-sealed class TokenizableString : Parcelable {
+sealed class TokenizableString :
+    Parcelable,
+    JavaSerializable {
     abstract val value: String
     abstract val className: String
 
