@@ -1,4 +1,4 @@
-package com.simprints.infra.enrolment.records.repository.remote.models.fingerprint
+package com.simprints.infra.enrolment.records.repository.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.common.TemplateIdentifier

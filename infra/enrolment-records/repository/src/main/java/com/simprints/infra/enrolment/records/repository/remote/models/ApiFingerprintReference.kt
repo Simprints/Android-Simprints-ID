@@ -1,10 +1,9 @@
-package com.simprints.infra.enrolment.records.repository.remote.models.fingerprint
+package com.simprints.infra.enrolment.records.repository.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.infra.enrolment.records.repository.remote.models.ApiBiometricReference
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -17,7 +16,8 @@ internal data class ApiFingerprintReference(
     val templates: List<ApiFingerprintTemplate>,
     val format: String,
     val metadata: HashMap<String, String>? = null,
-) : ApiBiometricReference(ApiBiometricReferenceType.FingerprintReference)
+    override val type: ApiBiometricReferenceType = ApiBiometricReferenceType.FingerprintReference,
+) : ApiBiometricReference()
 
 internal fun BiometricReference.toFingerprintApi(encoder: EncodingUtils): ApiFingerprintReference? = if (templates.isNotEmpty()) {
     ApiFingerprintReference(
