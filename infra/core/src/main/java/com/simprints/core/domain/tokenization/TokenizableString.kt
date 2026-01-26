@@ -1,11 +1,9 @@
 package com.simprints.core.domain.tokenization
 
-import android.os.Parcelable
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString.Raw
 import com.simprints.core.domain.tokenization.TokenizableString.Tokenized
 import com.simprints.core.domain.tokenization.serialization.TokenizableStringSerializer
-import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
@@ -20,18 +18,14 @@ import java.io.Serializable as JavaSerializable
  */
 
 @Keep
-@Parcelize
 @Serializable(with = TokenizableStringSerializer::class)
 @OptIn(ExperimentalSerializationApi::class)
 @JsonClassDiscriminator("className")
-sealed class TokenizableString :
-    Parcelable,
-    JavaSerializable {
+sealed class TokenizableString : JavaSerializable {
     abstract val value: String
     abstract val className: String
 
     @Keep
-    @Parcelize
     @Serializable
     data class Tokenized(
         override val value: String,
@@ -45,7 +39,6 @@ sealed class TokenizableString :
     }
 
     @Keep
-    @Parcelize
     @Serializable
     data class Raw(
         override val value: String,

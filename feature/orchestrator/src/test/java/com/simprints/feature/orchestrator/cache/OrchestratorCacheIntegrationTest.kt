@@ -60,7 +60,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.NotSerializableException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
@@ -101,7 +100,7 @@ class OrchestratorCacheIntegrationTest {
 
     @Test
     fun `Stores and restores common steps via cache`() {
-        val expected = createTestSteps()
+        val expected = createCommonTestSteps()
 
         cache.steps = expected
         val actual = cache.steps
@@ -113,77 +112,8 @@ class OrchestratorCacheIntegrationTest {
     }
 
     @Test
-    fun `Steps are fully java serializable for Android state saving`() {
-        val expected = ArrayList(createTestSteps())
-
-        val restored = try {
-            expected.roundTripSerialize()
-        } catch (e: NotSerializableException) {
-            e.printStackTrace()
-            throw AssertionError("Serialization failed. Ensure all Params and Results implement Serializable: ${e.message}", e)
-        }
-
-        assertThat(restored).hasSize(expected.size)
-        for (i in expected.indices) {
-            compareStubs(expected[i], restored[i])
-        }
-    }
-
-    @Test
     fun `Stores and restores fingerprint modality steps`() {
-        val expected = listOf(
-            Step(
-                id = StepId.FINGERPRINT_CAPTURE,
-                navigationActionId = 3,
-                destinationId = 4,
-                params = FingerprintCaptureParams(
-                    flowType = FlowType.ENROL,
-                    fingerprintsToCapture = listOf(TemplateIdentifier.LEFT_4TH_FINGER),
-                    fingerprintSDK = ModalitySdkType.SECUGEN_SIM_MATCHER,
-                ),
-                status = StepStatus.COMPLETED,
-                result = BiometricReferenceCapture(
-                    "",
-                    modality = Modality.FINGERPRINT,
-                    format = "format",
-                    templates = listOf(
-                        BiometricTemplateCapture(
-                            captureEventId = GUID1,
-                            identifier = TemplateIdentifier.LEFT_THUMB,
-                            template = byteArrayOf(1, 2, 3),
-                        ),
-                    ),
-                ),
-            ),
-            Step(
-                id = StepId.FINGERPRINT_MATCHER,
-                navigationActionId = 3,
-                destinationId = 4,
-                params = MatchParams(
-                    flowType = FlowType.IDENTIFY,
-                    queryForCandidates = EnrolmentRecordQuery(),
-                    biometricDataSource = BiometricDataSource.CommCare("name"),
-                    bioSdk = ModalitySdkType.NEC,
-                    probeReference = BiometricReferenceCapture(
-                        referenceId = GUID1,
-                        modality = Modality.FINGERPRINT,
-                        format = "format",
-                        templates = listOf(
-                            BiometricTemplateCapture(
-                                captureEventId = "captureEvent1",
-                                identifier = TemplateIdentifier.LEFT_THUMB,
-                                template = byteArrayOf(1, 2, 3),
-                            ),
-                        ),
-                    ),
-                ),
-                status = StepStatus.COMPLETED,
-                result = MatchResult(
-                    listOf(ComparisonResult("subjectId", 0.5f)),
-                    ModalitySdkType.SECUGEN_SIM_MATCHER,
-                ),
-            ),
-        )
+        val expected = createFingerprintTestSteps()
 
         cache.steps = expected
         val actual = cache.steps
@@ -196,53 +126,7 @@ class OrchestratorCacheIntegrationTest {
 
     @Test
     fun `Stores and restores face modality steps`() {
-        val expected = listOf(
-            Step(
-                id = StepId.FACE_CAPTURE,
-                navigationActionId = 5,
-                destinationId = 6,
-                params = FaceCaptureParams(3, ModalitySdkType.RANK_ONE),
-                status = StepStatus.COMPLETED,
-                result = BiometricReferenceCapture(
-                    "",
-                    modality = Modality.FACE,
-                    format = "ROC",
-                    templates = listOf(
-                        BiometricTemplateCapture(
-                            captureEventId = GUID1,
-                            template = byteArrayOf(1, 2, 3),
-                        ),
-                    ),
-                ),
-            ),
-            Step(
-                id = StepId.FACE_MATCHER,
-                navigationActionId = 3,
-                destinationId = 4,
-                params = MatchParams(
-                    flowType = FlowType.IDENTIFY,
-                    queryForCandidates = EnrolmentRecordQuery(),
-                    biometricDataSource = BiometricDataSource.Simprints,
-                    bioSdk = ModalitySdkType.RANK_ONE,
-                    probeReference = BiometricReferenceCapture(
-                        referenceId = GUID1,
-                        modality = Modality.FACE,
-                        format = "format",
-                        templates = listOf(
-                            BiometricTemplateCapture(
-                                captureEventId = "captureEvent1",
-                                template = byteArrayOf(1, 2, 3),
-                            ),
-                        ),
-                    ),
-                ),
-                status = StepStatus.COMPLETED,
-                result = MatchResult(
-                    listOf(ComparisonResult("subjectId", 0.5f)),
-                    ModalitySdkType.RANK_ONE,
-                ),
-            ),
-        )
+        val expected = createFaceTestSteps()
 
         cache.steps = expected
         val actual = cache.steps
@@ -254,31 +138,24 @@ class OrchestratorCacheIntegrationTest {
     }
 
     @Test
+    fun `Steps are fully java serializable for Android state saving`() {
+        val allSteps = createCommonTestSteps() +
+            createFingerprintTestSteps() +
+            createFaceTestSteps() +
+            createExceptionTestSteps()
+
+        val expected = ArrayList(allSteps)
+        val restored = expected.roundTripSerialize()
+
+        assertThat(restored).hasSize(expected.size)
+        for (i in expected.indices) {
+            compareStubs(expected[i], restored[i])
+        }
+    }
+
+    @Test
     fun `Stores and restores exception steps`() {
-        val expected = listOf(
-            Step(
-                id = 1,
-                navigationActionId = 5,
-                destinationId = 6,
-                params = LoginParams("projectId", TokenizableString.Tokenized("value")),
-                status = StepStatus.NOT_STARTED,
-                result = LoginResult(false, LoginError.LoginNotCompleted),
-            ),
-            Step(
-                id = 2,
-                navigationActionId = 5,
-                destinationId = 6,
-                status = StepStatus.NOT_STARTED,
-                result = AlertResult("key", AppErrorReason.UNEXPECTED_ERROR),
-            ),
-            Step(
-                id = 3,
-                navigationActionId = 5,
-                destinationId = 6,
-                status = StepStatus.NOT_STARTED,
-                result = ExitFormResult(true, ExitFormOption.DataConcerns),
-            ),
-        )
+        val expected = createExceptionTestSteps()
 
         cache.steps = expected
         val actual = cache.steps
@@ -291,7 +168,6 @@ class OrchestratorCacheIntegrationTest {
 
     @Test
     fun `Persistence survives cache re-instantiation`() {
-        // 1. Setup first cache and save data
         val step = Step(
             id = StepId.SETUP,
             navigationActionId = 1,
@@ -302,10 +178,8 @@ class OrchestratorCacheIntegrationTest {
         cache.steps = listOf(step)
         cache.ageGroup = AgeGroup(20, 30)
 
-        // 2. Create a new cache instance pointing to the same (mocked) prefs
         val secondaryCache = OrchestratorCache(securityManager, jsonHelper)
 
-        // 3. Verify data is still there
         assertThat(secondaryCache.steps).hasSize(1)
         assertThat(secondaryCache.steps[0].id).isEqualTo(StepId.SETUP)
         assertThat(secondaryCache.ageGroup).isEqualTo(AgeGroup(20, 30))
@@ -321,7 +195,7 @@ class OrchestratorCacheIntegrationTest {
                 params = MatchParams(
                     flowType = FlowType.IDENTIFY,
                     queryForCandidates = EnrolmentRecordQuery(),
-                    biometricDataSource = BiometricDataSource.Simprints, // Test Simprints variant
+                    biometricDataSource = BiometricDataSource.Simprints,
                     bioSdk = ModalitySdkType.NEC,
                     probeReference = BiometricReferenceCapture(
                         referenceId = "complex_id",
@@ -371,7 +245,7 @@ class OrchestratorCacheIntegrationTest {
         return ObjectInputStream(inputStream).use { it.readObject() as T }
     }
 
-    private fun createTestSteps(): List<Step> = listOf(
+    private fun createCommonTestSteps(): List<Step> = listOf(
         Step(
             id = StepId.SETUP,
             navigationActionId = 5,
@@ -517,6 +391,133 @@ class OrchestratorCacheIntegrationTest {
                     ),
                 ),
             ),
+        ),
+    )
+
+    private fun createFingerprintTestSteps(): List<Step> = listOf(
+        Step(
+            id = StepId.FINGERPRINT_CAPTURE,
+            navigationActionId = 3,
+            destinationId = 4,
+            params = FingerprintCaptureParams(
+                flowType = FlowType.ENROL,
+                fingerprintsToCapture = listOf(TemplateIdentifier.LEFT_4TH_FINGER),
+                fingerprintSDK = ModalitySdkType.SECUGEN_SIM_MATCHER,
+            ),
+            status = StepStatus.COMPLETED,
+            result = BiometricReferenceCapture(
+                "",
+                modality = Modality.FINGERPRINT,
+                format = "format",
+                templates = listOf(
+                    BiometricTemplateCapture(
+                        captureEventId = GUID1,
+                        identifier = TemplateIdentifier.LEFT_THUMB,
+                        template = byteArrayOf(1, 2, 3),
+                    ),
+                ),
+            ),
+        ),
+        Step(
+            id = StepId.FINGERPRINT_MATCHER,
+            navigationActionId = 3,
+            destinationId = 4,
+            params = MatchParams(
+                flowType = FlowType.IDENTIFY,
+                queryForCandidates = EnrolmentRecordQuery(),
+                biometricDataSource = BiometricDataSource.CommCare("name"),
+                bioSdk = ModalitySdkType.NEC,
+                probeReference = BiometricReferenceCapture(
+                    referenceId = GUID1,
+                    modality = Modality.FINGERPRINT,
+                    format = "format",
+                    templates = listOf(
+                        BiometricTemplateCapture(
+                            captureEventId = "captureEvent1",
+                            identifier = TemplateIdentifier.LEFT_THUMB,
+                            template = byteArrayOf(1, 2, 3),
+                        ),
+                    ),
+                ),
+            ),
+            status = StepStatus.COMPLETED,
+            result = MatchResult(
+                listOf(ComparisonResult("subjectId", 0.5f)),
+                ModalitySdkType.SECUGEN_SIM_MATCHER,
+            ),
+        ),
+    )
+
+    private fun createFaceTestSteps(): List<Step> = listOf(
+        Step(
+            id = StepId.FACE_CAPTURE,
+            navigationActionId = 5,
+            destinationId = 6,
+            params = FaceCaptureParams(3, ModalitySdkType.RANK_ONE),
+            status = StepStatus.COMPLETED,
+            result = BiometricReferenceCapture(
+                "",
+                modality = Modality.FACE,
+                format = "ROC",
+                templates = listOf(
+                    BiometricTemplateCapture(
+                        captureEventId = GUID1,
+                        template = byteArrayOf(1, 2, 3),
+                    ),
+                ),
+            ),
+        ),
+        Step(
+            id = StepId.FACE_MATCHER,
+            navigationActionId = 3,
+            destinationId = 4,
+            params = MatchParams(
+                flowType = FlowType.IDENTIFY,
+                queryForCandidates = EnrolmentRecordQuery(),
+                biometricDataSource = BiometricDataSource.Simprints,
+                bioSdk = ModalitySdkType.RANK_ONE,
+                probeReference = BiometricReferenceCapture(
+                    referenceId = GUID1,
+                    modality = Modality.FACE,
+                    format = "format",
+                    templates = listOf(
+                        BiometricTemplateCapture(
+                            captureEventId = "captureEvent1",
+                            template = byteArrayOf(1, 2, 3),
+                        ),
+                    ),
+                ),
+            ),
+            status = StepStatus.COMPLETED,
+            result = MatchResult(
+                listOf(ComparisonResult("subjectId", 0.5f)),
+                ModalitySdkType.RANK_ONE,
+            ),
+        ),
+    )
+
+    private fun createExceptionTestSteps(): List<Step> = listOf(
+        Step(
+            id = 1,
+            navigationActionId = 5,
+            destinationId = 6,
+            params = LoginParams("projectId", TokenizableString.Tokenized("value")),
+            status = StepStatus.NOT_STARTED,
+            result = LoginResult(false, LoginError.LoginNotCompleted),
+        ),
+        Step(
+            id = 2,
+            navigationActionId = 5,
+            destinationId = 6,
+            status = StepStatus.NOT_STARTED,
+            result = AlertResult("key", AppErrorReason.UNEXPECTED_ERROR),
+        ),
+        Step(
+            id = 3,
+            navigationActionId = 5,
+            destinationId = 6,
+            status = StepStatus.NOT_STARTED,
+            result = ExitFormResult(true, ExitFormOption.DataConcerns),
         ),
     )
 }
