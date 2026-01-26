@@ -1,7 +1,7 @@
 package com.simprints.infra.images.remote.signedurl.usecase
 
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.SampleUpSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScope
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 internal class UploadSampleWithTrackingUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
-    private val authStore: AuthStore,
+    private val backendApiClient: BackendApiClient,
     private val localDataSource: ImageLocalDataSource,
     private val eventRepository: EventRepository,
 ) {
@@ -48,15 +48,11 @@ internal class UploadSampleWithTrackingUseCase @Inject constructor(
         url: String,
         sampleData: SampleUploadData,
     ): String? {
-        val fileStream = localDataSource.decryptImage(sampleData.imageRef)
-        if (fileStream == null) {
-            return "Image decryption failed"
-        }
+        val fileStream = localDataSource.decryptImage(sampleData.imageRef) ?: return "Image decryption failed"
 
         return fileStream.use { stream ->
             try {
-                val client = authStore.buildClient(SampleUploadApiInterface::class)
-                val response = client.executeCall { api ->
+                val response = backendApiClient.executeCall(SampleUploadApiInterface::class) { api ->
                     api.uploadFile(
                         uploadUrl = url,
                         requestId = requestId,

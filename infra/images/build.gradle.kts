@@ -4,6 +4,7 @@ plugins {
     id("kotlin-parcelize")
     id("simprints.testing.android")
     id("simprints.library.kotlinSerialization")
+    id("simprints.library.backendApi")
 }
 
 android {
@@ -21,6 +22,4 @@ dependencies {
 
     implementation(libs.androidX.security)
     implementation(libs.kotlin.coroutinesPlayServices)
-
-    implementation(libs.retrofit.core)
 }

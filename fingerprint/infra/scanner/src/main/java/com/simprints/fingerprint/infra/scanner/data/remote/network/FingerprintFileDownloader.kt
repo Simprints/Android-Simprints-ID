@@ -2,6 +2,7 @@ package com.simprints.fingerprint.infra.scanner.data.remote.network
 
 import com.simprints.core.DispatcherIO
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -13,7 +14,7 @@ import javax.inject.Inject
  * This class is responsible for downloading the firmware updates.
  */
 internal class FingerprintFileDownloader @Inject constructor(
-    private val fingerprintApiClientFactory: FingerprintApiClientFactory,
+    private val backendApiClient: BackendApiClient,
     private val authStore: AuthStore,
     @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {
@@ -36,11 +37,7 @@ internal class FingerprintFileDownloader @Inject constructor(
         URL(url).readBytes()
     }
 
-    suspend fun getFileUrl(fileId: String): String {
-        val fileUrlRemoteApi = getFileUrlRemoteApi().api
-        return fileUrlRemoteApi.getFileUrl(projectId, fileId).url
+    suspend fun getFileUrl(fileId: String): String = backendApiClient.executeCall(FileUrlRemoteInterface::class) { api ->
+        api.getFileUrl(projectId, fileId).url
     }
-
-    private suspend fun getFileUrlRemoteApi(): FingerprintApiClient<FileUrlRemoteInterface> =
-        fingerprintApiClientFactory.buildClient(FileUrlRemoteInterface::class)
 }

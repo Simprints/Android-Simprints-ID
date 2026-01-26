@@ -1,13 +1,13 @@
 package com.simprints.infra.images.remote.signedurl.usecase
 
-import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.infra.images.remote.signedurl.SampleUploadData
 import com.simprints.infra.images.remote.signedurl.api.ApiSampleUploadUrlRequest
 import com.simprints.infra.images.remote.signedurl.api.SampleUploadApiInterface
 import javax.inject.Inject
 
 internal class FetchUploadUrlsPerSampleUseCase @Inject constructor(
-    private val authStore: AuthStore,
+    private val backendApiClient: BackendApiClient,
 ) {
     suspend operator fun invoke(
         projectId: String,
@@ -23,9 +23,9 @@ internal class FetchUploadUrlsPerSampleUseCase @Inject constructor(
             )
         }.let { batch ->
             try {
-                authStore
-                    .buildClient(SampleUploadApiInterface::class)
-                    .executeCall { api -> api.getSampleUploadUrl(projectId, batch) }
+                backendApiClient.executeCall(SampleUploadApiInterface::class) { api ->
+                    api.getSampleUploadUrl(projectId, batch)
+                }
             } catch (_: Exception) {
                 emptyList()
             }

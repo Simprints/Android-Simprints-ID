@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.event.remote
 
 import com.google.common.truth.Truth.*
-import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordEvent
@@ -17,10 +17,8 @@ import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.event.remote.models.session.ApiEventScope
 import com.simprints.infra.eventsync.event.usecases.MapDomainEventScopeToApiUseCase
-import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
-import com.simprints.testtools.common.alias.InterfaceInvocation
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -40,10 +38,7 @@ import kotlin.test.assertEquals
 
 class EventRemoteDataSourceTest {
     @MockK
-    lateinit var authStore: AuthStore
-
-    @MockK
-    private lateinit var simApiClient: SimNetwork.SimApiClient<EventRemoteInterface>
+    lateinit var backendApiClient: BackendApiClient
 
     @MockK
     private lateinit var eventRemoteInterface: EventRemoteInterface
@@ -71,15 +66,12 @@ class EventRemoteDataSourceTest {
         MockKAnnotations.init(this, relaxed = true)
         mockkStatic("kotlinx.coroutines.channels.ProduceKt")
 
-        coEvery { simApiClient.executeCall<Int>(any()) } coAnswers {
-            val args = this.args
-            @Suppress("UNCHECKED_CAST")
-            (args[0] as InterfaceInvocation<EventRemoteInterface, Int>).invoke(eventRemoteInterface)
+        coEvery { backendApiClient.executeCall<EventRemoteInterface, Any>(any(), any()) } coAnswers {
+            secondArg<suspend (EventRemoteInterface) -> Any>()(eventRemoteInterface)
         }
 
-        coEvery { authStore.buildClient(EventRemoteInterface::class) } returns simApiClient
         every { mapDomainEventScopeToApiUseCase(any(), any(), any()) } returns apiEventScope
-        eventRemoteDataSource = EventRemoteDataSource(authStore)
+        eventRemoteDataSource = EventRemoteDataSource(backendApiClient)
     }
 
     @After

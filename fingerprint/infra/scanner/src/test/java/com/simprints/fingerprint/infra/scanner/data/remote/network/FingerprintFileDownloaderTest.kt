@@ -1,15 +1,12 @@
 package com.simprints.fingerprint.infra.scanner.data.remote.network
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.fingerprint.infra.scanner.data.FirmwareTestData
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -19,10 +16,13 @@ internal class FingerprintFileDownloaderTest {
     private lateinit var fingerprintFileDownloader: FingerprintFileDownloader
 
     @MockK
-    lateinit var fingerprintApiClientFactory: FingerprintApiClientFactory
+    lateinit var backendApiClient: BackendApiClient
 
     @MockK
     lateinit var authStore: AuthStore
+
+    @MockK
+    lateinit var api: FileUrlRemoteInterface
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
@@ -32,20 +32,20 @@ internal class FingerprintFileDownloaderTest {
         MockKAnnotations.init(this)
         fingerprintFileDownloader =
             FingerprintFileDownloader(
-                fingerprintApiClientFactory,
+                backendApiClient,
                 authStore,
                 testCoroutineRule.testCoroutineDispatcher,
             )
     }
 
     @Test
-    fun getFileUrl() = runTest(UnconfinedTestDispatcher()) {
+    fun getFileUrl() = runTest {
         // Given
-        val apiClient: FingerprintApiClient<FileUrlRemoteInterface> = mockk()
-        val api: FileUrlRemoteInterface = mockk()
-        coEvery { fingerprintApiClientFactory.buildClient<FileUrlRemoteInterface>(any()) } returns apiClient
-        every { apiClient.api } returns api
         coEvery { api.getFileUrl(any(), any()) } returns FileUrl(FirmwareTestData.SOME_URL)
+        coEvery { backendApiClient.executeCall<FileUrlRemoteInterface, Any>(any(), any()) } coAnswers {
+            secondArg<suspend (FileUrlRemoteInterface) -> Any>()(api)
+        }
+
         every { authStore.signedInProjectId } returns "projectId"
         // When
         val result = fingerprintFileDownloader.getFileUrl("Any fileId")
