@@ -42,7 +42,6 @@ data class FingerprintReference(
 @Serializable
 enum class BiometricReferenceType {
     // a constant key is required to serialise/deserialize
-    // BiometricReference correctly with Jackson (see annotation in BiometricReference).
     // Add a key in the companion object for each enum value
 
     // key added: FACE_REFERENCE

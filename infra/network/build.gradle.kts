@@ -18,6 +18,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":infra:serialization"))
     implementation(project(":infra:logging"))
     implementation(project(":infra:logging-persistent"))
     implementation(project(":infra:security"))

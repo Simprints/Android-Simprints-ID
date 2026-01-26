@@ -1,7 +1,6 @@
 package com.simprints.infra.eventsync.event.remote
 
 import com.google.common.truth.Truth.*
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.events.event.domain.EventCount
@@ -80,7 +79,7 @@ class EventRemoteDataSourceTest {
 
         coEvery { authStore.buildClient(EventRemoteInterface::class) } returns simApiClient
         every { mapDomainEventScopeToApiUseCase(any(), any(), any()) } returns apiEventScope
-        eventRemoteDataSource = EventRemoteDataSource(authStore, JsonHelper)
+        eventRemoteDataSource = EventRemoteDataSource(authStore)
     }
 
     @After

@@ -1,7 +1,6 @@
 package com.simprints.infra.license.remote
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.license.models.LicenseVersion
 import com.simprints.infra.license.models.Vendor
 import com.simprints.infra.network.SimNetwork
@@ -31,7 +30,7 @@ class LicenseRemoteDataSourceImplTest {
     private val simApiClient = mockk<SimNetwork.SimApiClient<LicenseRemoteInterface>>()
     private val authStore = mockk<com.simprints.infra.authstore.AuthStore>()
     private val licenseRemoteDataSourceImpl =
-        LicenseRemoteDataSourceImpl(authStore, JsonHelper)
+        LicenseRemoteDataSourceImpl(authStore)
 
     @Before
     fun setup() {

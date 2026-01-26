@@ -1,10 +1,10 @@
 package com.simprints.infra.events.event.domain.models
 
 import com.google.common.truth.Truth.*
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.EventType.SUSPICIOUS_INTENT
 import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent.Companion.EVENT_VERSION
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.infra.serialization.SimJson
 import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Test
 
@@ -41,7 +41,7 @@ class SuspiciousIntentEventTest {
               }
             }
             """
-        val event = JsonHelper.json.decodeFromString<SuspiciousIntentEvent>(json)
+        val event = SimJson.decodeFromString<SuspiciousIntentEvent>(json)
         assertThat(event.payload.unexpectedExtras).isEqualTo(
             mapOf(
                 "extra_key" to JsonPrimitive("value"),

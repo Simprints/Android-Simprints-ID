@@ -3,9 +3,9 @@ package com.simprints.infra.events.event.local.models
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
+import com.simprints.infra.serialization.SimJson
 
 @Entity
 internal data class DbEvent(
@@ -26,6 +26,6 @@ internal fun Event.fromDomainToDb(): DbEvent = DbEvent(
     createdAt = payload.createdAt.fromDomainToDb(),
 )
 
-internal fun DbEvent.fromDbToDomain(): Event = JsonHelper.json.decodeFromString(
+internal fun DbEvent.fromDbToDomain(): Event = SimJson.decodeFromString(
     this.eventJson,
 )

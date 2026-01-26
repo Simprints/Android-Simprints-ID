@@ -1,12 +1,12 @@
 package com.simprints.feature.clientapi.usecases
 
 import com.google.common.truth.Truth.*
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
+import com.simprints.infra.serialization.SimJson
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -28,9 +28,6 @@ class GetEnrolmentCreationEventForRecordUseCaseTest {
     @MockK
     private lateinit var encoder: EncodingUtils
 
-    @MockK
-    private lateinit var jsonHelper: JsonHelper
-
     private lateinit var useCase: GetEnrolmentCreationEventForRecordUseCase
 
     @Before
@@ -41,7 +38,6 @@ class GetEnrolmentCreationEventForRecordUseCaseTest {
             configRepository,
             enrolmentRecordRepository,
             encoder,
-            jsonHelper,
         )
     }
 
@@ -84,6 +80,7 @@ class GetEnrolmentCreationEventForRecordUseCaseTest {
 
     @Test
     fun `returns event if biometrics coSync enabled`() = runTest {
+        mockkObject(SimJson)
         coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { synchronization.up.coSync.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
         }
@@ -93,7 +90,7 @@ class GetEnrolmentCreationEventForRecordUseCaseTest {
         val result = useCase("projectId", "subjectId")
 
         coVerify { enrolmentRecordRepository.load(any()) }
-        coVerify { jsonHelper.json.encodeToString(any<CoSyncEnrolmentRecordEvents>()) }
+        coVerify { SimJson.encodeToString(any<CoSyncEnrolmentRecordEvents>()) }
         assertThat(result).isNotNull()
     }
 }

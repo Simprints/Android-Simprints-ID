@@ -1,10 +1,10 @@
 package com.simprints.infra.events.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
 import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.Companion.NEW_EVENT_VERSION
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.infra.serialization.SimJson
 import org.junit.Test
 
 class Vero2InfoSnapshotEventTest {
@@ -53,7 +53,7 @@ class Vero2InfoSnapshotEventTest {
         )
 
         val eventAsString = Vero2InfoSnapshotEventSample.newApiJsonEventString
-        val actualEvent = JsonHelper.json.decodeFromString<Event>(eventAsString)
+        val actualEvent = SimJson.decodeFromString<Event>(eventAsString)
         assertThat(expectedEvent).isEqualTo(actualEvent)
     }
 
@@ -82,7 +82,7 @@ class Vero2InfoSnapshotEventTest {
         )
 
         val eventAsString = Vero2InfoSnapshotEventSample.oldApiJsonEventString
-        val actualEvent = JsonHelper.json.decodeFromString<Event>(eventAsString)
+        val actualEvent = SimJson.decodeFromString<Event>(eventAsString)
         assertThat(expectedEvent).isEqualTo(actualEvent)
     }
 }

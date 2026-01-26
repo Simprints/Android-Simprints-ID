@@ -1,4 +1,4 @@
-package com.simprints.infra.enrolment.records.repository.remote.models.fingerprint
+package com.simprints.infra.enrolment.records.repository.remote.models
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.TemplateIdentifier

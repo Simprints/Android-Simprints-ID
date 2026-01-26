@@ -8,7 +8,6 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.tools.extentions.getStringWithColumnName
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.scope.Device
 import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
@@ -16,6 +15,7 @@ import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
 import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.serialization.SimJson
 import kotlinx.serialization.Serializable
 
 internal class EventMigration10to11 : Migration(10, 11) {
@@ -70,7 +70,7 @@ internal class EventMigration10to11 : Migration(10, 11) {
 
         val endedAt = event.payload.endedAt.takeIf { it > 0 }
 
-        val payloadJson = JsonHelper.json.encodeToString(
+        val payloadJson = SimJson.encodeToString(
             EventScopePayload(
                 // Other end causes have not been used for a long time so it is save to assume
                 // that all previous sessions ended with new session termination cause
@@ -97,7 +97,7 @@ internal class EventMigration10to11 : Migration(10, 11) {
         }
     }
 
-    private fun fromJsonToDomain(eventJson: String): OldSessionCaptureEvent = JsonHelper.json.decodeFromString(eventJson)
+    private fun fromJsonToDomain(eventJson: String): OldSessionCaptureEvent = SimJson.decodeFromString(eventJson)
 
     private fun deleteSessionCaptureEvents(database: SupportSQLiteDatabase) {
         database.execSQL(

@@ -1,8 +1,8 @@
 package com.simprints.infra.events.event.domain.models
 
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.serialization.SimJson
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 
@@ -25,7 +25,7 @@ sealed class Event {
     final override fun hashCode(): Int = id.hashCode()
 
     @Suppress("UNCHECKED_CAST")
-    fun toJson() = JsonHelper.json.encodeToString(
+    fun toJson() = SimJson.encodeToString(
         concreteSerializer as KSerializer<Event>,
         this,
     )

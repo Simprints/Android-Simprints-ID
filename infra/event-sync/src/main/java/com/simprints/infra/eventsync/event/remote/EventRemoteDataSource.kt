@@ -1,7 +1,6 @@
 package com.simprints.infra.eventsync.event.remote
 
 import androidx.annotation.VisibleForTesting
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordEvent
@@ -12,6 +11,7 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork.SimApiClient
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
+import com.simprints.infra.serialization.SimJson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.produce
@@ -24,7 +24,6 @@ import javax.inject.Inject
 
 internal class EventRemoteDataSource @Inject constructor(
     private val authStore: AuthStore,
-    private val jsonHelper: JsonHelper,
 ) {
     suspend fun count(query: ApiRemoteEventQuery) = try {
         val response = executeCall { eventsRemoteInterface ->
@@ -47,9 +46,8 @@ internal class EventRemoteDataSource @Inject constructor(
 
     private fun getEventCountFromHeader(response: Response<*>): EventCount {
         val totalCount = response.headers()[COUNT_HEADER]?.toIntOrNull() ?: 0
-        val isTotalLowerBound = response
-            .headers()[IS_COUNT_HEADER_LOWER_BOUND]
-            ?.toBoolean() == true // If not present, assume it's not lower bound
+        val isTotalLowerBound =
+            response.headers()[IS_COUNT_HEADER_LOWER_BOUND]?.toBoolean() == true // If not present, assume it's not lower bound
         return EventCount(totalCount, isTotalLowerBound)
     }
 
@@ -93,11 +91,9 @@ internal class EventRemoteDataSource @Inject constructor(
         channel: SendChannel<EnrolmentRecordEvent>,
     ) {
         try {
-            jsonHelper.json
-                .decodeToSequence<ApiEnrolmentRecordEvent>(streaming)
-                .forEach { apiEvent ->
-                    channel.send(apiEvent.fromApiToDomain())
-                }
+            SimJson.decodeToSequence<ApiEnrolmentRecordEvent>(streaming).forEach { apiEvent ->
+                channel.send(apiEvent.fromApiToDomain())
+            }
             channel.close()
         } catch (t: Throwable) {
             Simber.i("Event parsing stream failed", t, tag = SYNC)

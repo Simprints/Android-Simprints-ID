@@ -3,13 +3,13 @@ package com.simprints.infra.config.store.local.migrations
 import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.datastore.core.DataMigration
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.local.migrations.models.OldProjectConfig
 import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
 import com.simprints.infra.config.store.local.models.toProto
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.serialization.SimJson
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.SerializationException
 import javax.inject.Inject
@@ -37,7 +37,7 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
         if (projectSettingsJson.isNullOrEmpty()) return currentData
 
         return try {
-            JsonHelper.json
+            SimJson
                 .decodeFromString<OldProjectConfig>(projectSettingsJson)
                 .toDomain(authStore.signedInProjectId)
                 .toProto()

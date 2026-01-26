@@ -10,7 +10,6 @@ import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.*
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.events.EventRepository
@@ -28,6 +27,7 @@ import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.C
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_UP_SYNC
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
+import com.simprints.infra.serialization.SimJson
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -62,7 +62,7 @@ internal class EventUpSyncUploaderWorkerTest {
     @MockK
     lateinit var eventScope: EventScope
 
-    private val projectScope = JsonHelper.json.encodeToString(EventUpSyncScope.ProjectScope(PROJECT_ID))
+    private val projectScope = SimJson.encodeToString(EventUpSyncScope.ProjectScope(PROJECT_ID))
 
     @Before
     fun setUp() {
@@ -288,7 +288,6 @@ internal class EventUpSyncUploaderWorkerTest {
             upSyncTask,
             eventSyncCache,
             authStore,
-            JsonHelper,
             eventRepository,
             dispatcher,
         )

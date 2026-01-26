@@ -5,7 +5,6 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.core.DispatcherBG
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationFlagsStore
@@ -32,24 +31,21 @@ internal class SimprintsEventDownSyncDownloaderWorker @AssistedInject constructo
     @Assisted params: WorkerParameters,
     eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     syncCache: EventSyncCache,
-    jsonHelper: JsonHelper,
     eventRepository: EventRepository,
     configRepository: ConfigRepository,
     @DispatcherBG dispatcher: CoroutineDispatcher,
     private val downSyncTask: SimprintsEventDownSyncTask,
     realmToRoomMigrationFlagsStore: RealmToRoomMigrationFlagsStore,
 ) : BaseEventDownSyncDownloaderWorker(
-    context,
-    params,
-    eventDownSyncScopeRepository,
-    syncCache,
-    jsonHelper,
-    eventRepository,
-    configRepository,
-    dispatcher,
-    realmToRoomMigrationFlagsStore,
-) {
-
+        context,
+        params,
+        eventDownSyncScopeRepository,
+        syncCache,
+        eventRepository,
+        configRepository,
+        dispatcher,
+        realmToRoomMigrationFlagsStore,
+    ) {
     override fun createDownSyncTask(): BaseEventDownSyncTask = downSyncTask
 
     override fun handleSyncException(t: Throwable) = when (t) {

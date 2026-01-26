@@ -1,6 +1,5 @@
 package com.simprints.infra.license.remote
 
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.license.models.LicenseVersion
 import com.simprints.infra.license.models.Vendor
@@ -10,13 +9,13 @@ import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
+import com.simprints.infra.serialization.SimJson
 import okhttp3.ResponseBody
 import retrofit2.HttpException
 import javax.inject.Inject
 
 internal class LicenseRemoteDataSourceImpl @Inject constructor(
     private val authStore: AuthStore,
-    private val jsonHelper: JsonHelper,
 ) : LicenseRemoteDataSource {
     override suspend fun getLicense(
         projectId: String,
@@ -75,8 +74,7 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
         return ApiLicenseResult.Error(errorCode)
     }
 
-    private fun getLicenseErrorCode(errorBody: ResponseBody): String =
-        jsonHelper.json.decodeFromString<ApiLicenseError>(errorBody.string()).error
+    private fun getLicenseErrorCode(errorBody: ResponseBody): String = SimJson.decodeFromString<ApiLicenseError>(errorBody.string()).error
 
     private suspend fun getProjectApiClient(): SimNetwork.SimApiClient<LicenseRemoteInterface> =
         authStore.buildClient(LicenseRemoteInterface::class)

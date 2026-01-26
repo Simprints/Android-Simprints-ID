@@ -5,7 +5,6 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.common.Partitioning
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.eventsync.SampleSyncScopes
@@ -20,6 +19,7 @@ import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.INPUT_EVENT_DOWN_SYNC_SCOPE_ID
 import com.simprints.infra.eventsync.sync.down.workers.CommCareEventSyncDownloaderWorker
+import com.simprints.infra.serialization.SimJson
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -51,7 +51,6 @@ class CommCareEventSyncWorkersBuilderTest {
 
         commCareEventSyncWorkersBuilder = CommCareEventSyncWorkersBuilder(
             eventDownSyncScopeRepository,
-            JsonHelper,
             configRepository,
         )
     }
@@ -174,13 +173,12 @@ class CommCareEventSyncWorkersBuilderTest {
     ) {
         val downloaders =
             filter { it.tags.contains(CommCareEventSyncDownloaderWorker::class.qualifiedName) }
-        val jsonHelper = JsonHelper
         val ops = downSyncScope.operations
         ops.forEach { op ->
             assertThat(
                 downloaders.any {
                     it.workSpec.input == workDataOf(
-                        INPUT_DOWN_SYNC_OPS to jsonHelper.json.encodeToString(op),
+                        INPUT_DOWN_SYNC_OPS to SimJson.encodeToString(op),
                         INPUT_EVENT_DOWN_SYNC_SCOPE_ID to scopeId,
                     )
                 },

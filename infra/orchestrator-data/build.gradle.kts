@@ -9,9 +9,6 @@ android {
 }
 
 dependencies {
-
     implementation(project(":infra:config-store"))
     implementation(project(":infra:events"))
-
-    implementation(libs.jackson.core)
 }

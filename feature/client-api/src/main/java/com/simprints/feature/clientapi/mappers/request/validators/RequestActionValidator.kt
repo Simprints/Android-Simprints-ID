@@ -1,9 +1,9 @@
 package com.simprints.feature.clientapi.mappers.request.validators
 
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.models.ClientApiError
+import com.simprints.infra.serialization.SimJson
 
 internal abstract class RequestActionValidator(
     private val extractor: ActionRequestExtractor,
@@ -46,7 +46,7 @@ internal abstract class RequestActionValidator(
     }
 
     private fun hasValidMetadata(): Boolean = try {
-        JsonHelper.validateJsonOrThrow(extractor.getMetadata())
+        SimJson.parseToJsonElement(extractor.getMetadata())
         true
     } catch (_: Throwable) {
         false

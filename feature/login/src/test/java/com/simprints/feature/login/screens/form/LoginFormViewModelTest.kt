@@ -4,7 +4,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.tokenization.asTokenizableRaw
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.feature.login.LoginParams
 import com.simprints.feature.login.screens.qrscanner.QrScannerResult
 import com.simprints.feature.login.screens.qrscanner.QrScannerResult.QrScannerError
@@ -43,7 +42,6 @@ internal class LoginFormViewModelTest {
             DEVICE_ID,
             simNetwork,
             authManager,
-            JsonHelper,
         )
     }
 
