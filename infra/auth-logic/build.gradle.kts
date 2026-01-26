@@ -2,6 +2,7 @@ plugins {
     id("simprints.infra")
     id("simprints.config.cloud")
     id("simprints.library.kotlinSerialization")
+    id("simprints.library.backendApi")
 }
 
 android {
@@ -21,7 +22,6 @@ dependencies {
 
     implementation(project(":fingerprint:infra:scanner"))
 
-    implementation(libs.retrofit.core)
     implementation(libs.playServices.integrity)
     implementation(libs.workManager.work)
 }

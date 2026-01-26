@@ -1,11 +1,10 @@
 package com.simprints.infra.license.remote
 
-import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.infra.license.models.LicenseVersion
 import com.simprints.infra.license.models.Vendor
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LICENSE
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -15,7 +14,7 @@ import retrofit2.HttpException
 import javax.inject.Inject
 
 internal class LicenseRemoteDataSourceImpl @Inject constructor(
-    private val authStore: AuthStore,
+    private val backendApiClient: BackendApiClient,
 ) : LicenseRemoteDataSource {
     override suspend fun getLicense(
         projectId: String,
@@ -23,8 +22,8 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
         vendor: Vendor,
         version: LicenseVersion,
     ): ApiLicenseResult = try {
-        getProjectApiClient().executeCall {
-            it
+        backendApiClient.executeCall(LicenseRemoteInterface::class) { api ->
+            api
                 .getLicense(projectId, deviceId, vendor.value, version.value)
                 .parseApiLicense()
                 .getLicenseBasedOnVendor(vendor)
@@ -75,9 +74,6 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
     }
 
     private fun getLicenseErrorCode(errorBody: ResponseBody): String = SimJson.decodeFromString<ApiLicenseError>(errorBody.string()).error
-
-    private suspend fun getProjectApiClient(): SimNetwork.SimApiClient<LicenseRemoteInterface> =
-        authStore.buildClient(LicenseRemoteInterface::class)
 
     companion object {
         private const val AUTHORIZATION_ERROR = 403

@@ -2,6 +2,7 @@ plugins {
     id("simprints.infra")
     id("simprints.testing.android")
     id("simprints.library.kotlinSerialization")
+    id("simprints.library.backendApi")
 }
 
 android {
@@ -9,9 +10,6 @@ android {
 }
 
 dependencies {
-
-    implementation(project(":infra:auth-store"))
     implementation(project(":infra:events"))
-    implementation(libs.retrofit.core)
     implementation(libs.androidX.security)
 }

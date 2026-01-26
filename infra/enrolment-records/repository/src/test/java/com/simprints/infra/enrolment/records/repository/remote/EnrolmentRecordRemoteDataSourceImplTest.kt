@@ -8,6 +8,7 @@ import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.remote.models.ApiEnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.remote.models.ApiEnrolmentRecords
@@ -16,10 +17,8 @@ import com.simprints.infra.enrolment.records.repository.remote.models.ApiFaceTem
 import com.simprints.infra.enrolment.records.repository.remote.models.ApiFinger
 import com.simprints.infra.enrolment.records.repository.remote.models.ApiFingerprintReference
 import com.simprints.infra.enrolment.records.repository.remote.models.ApiFingerprintTemplate
-import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
-import com.simprints.testtools.common.alias.InterfaceInvocation
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
@@ -39,26 +38,25 @@ class EnrolmentRecordRemoteDataSourceImplTest {
     }
 
     private val remoteInterface = mockk<EnrolmentRecordApiInterface>(relaxed = true)
-    private val simApiClient = mockk<SimNetwork.SimApiClient<EnrolmentRecordApiInterface>>()
     private val encodingUtils = mockk<EncodingUtils> {
         every { byteArrayToBase64(FINGERPRINT_TEMPLATE) } returns BASE64_FINGERPRINT_TEMPLATE
         every { byteArrayToBase64(FACE_TEMPLATE) } returns BASE64_FACE_TEMPLATE
     }
     private val authStore = mockk<AuthStore> {
         every { signedInProjectId } returns PROJECT_ID
-        coEvery { buildClient(EnrolmentRecordApiInterface::class) } returns simApiClient
     }
-    private val enrolmentRecordRemoteDataSourceImpl =
-        EnrolmentRecordRemoteDataSourceImpl(authStore, encodingUtils)
+
+    private val backendApiClient = mockk<BackendApiClient>()
+    private val enrolmentRecordRemoteDataSourceImpl = EnrolmentRecordRemoteDataSourceImpl(
+        authStore,
+        backendApiClient,
+        encodingUtils,
+    )
 
     @Before
     fun setup() {
-        coEvery { simApiClient.executeCall<Unit>(any()) } coAnswers {
-            val args = this.args
-            @Suppress("UNCHECKED_CAST")
-            (args[0] as InterfaceInvocation<EnrolmentRecordApiInterface, Unit>).invoke(
-                remoteInterface,
-            )
+        coEvery { backendApiClient.executeCall<EnrolmentRecordApiInterface, Any>(any(), any()) } coAnswers {
+            secondArg<suspend (EnrolmentRecordApiInterface) -> String>()(remoteInterface)
         }
     }
 

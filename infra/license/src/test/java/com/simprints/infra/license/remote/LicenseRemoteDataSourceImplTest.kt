@@ -1,15 +1,13 @@
 package com.simprints.infra.license.remote
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
+import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.infra.license.models.LicenseVersion
 import com.simprints.infra.license.models.Vendor
-import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
-import com.simprints.testtools.common.alias.InterfaceInvocation
-import io.mockk.coEvery
-import io.mockk.mockk
+import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -27,22 +25,15 @@ class LicenseRemoteDataSourceImplTest {
     private val expirationDate = "2023.12.31"
 
     private val remoteInterface = mockk<LicenseRemoteInterface>()
-    private val simApiClient = mockk<SimNetwork.SimApiClient<LicenseRemoteInterface>>()
-    private val authStore = mockk<com.simprints.infra.authstore.AuthStore>()
+    private val backendApiClient = mockk<BackendApiClient>()
     private val licenseRemoteDataSourceImpl =
-        LicenseRemoteDataSourceImpl(authStore)
+        LicenseRemoteDataSourceImpl(backendApiClient)
 
     @Before
     fun setup() {
-        coEvery { simApiClient.executeCall<ApiLicense>(any()) } coAnswers {
-            val args = this.args
-            @Suppress("UNCHECKED_CAST")
-            (args[0] as InterfaceInvocation<LicenseRemoteInterface, ApiLicense>).invoke(
-                remoteInterface,
-            )
+        coEvery { backendApiClient.executeCall<LicenseRemoteInterface, Any>(any(), any()) } coAnswers {
+            secondArg<suspend (LicenseRemoteInterface) -> Any>()(remoteInterface)
         }
-
-        coEvery { authStore.buildClient(LicenseRemoteInterface::class) } returns simApiClient
 
         coEvery {
             remoteInterface.getLicense("validProject", any(), any(), any())

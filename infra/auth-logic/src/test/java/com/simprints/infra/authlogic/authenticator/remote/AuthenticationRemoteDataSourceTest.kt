@@ -1,6 +1,6 @@
 package com.simprints.infra.authlogic.authenticator.remote
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.infra.authlogic.authenticator.remote.models.ApiAuthRequestBody
 import com.simprints.infra.authlogic.authenticator.remote.models.ApiAuthenticationData
 import com.simprints.infra.authlogic.authenticator.remote.models.ApiToken
@@ -8,13 +8,11 @@ import com.simprints.infra.authstore.domain.models.AuthRequest
 import com.simprints.infra.authstore.domain.models.AuthenticationData
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.authstore.exceptions.AuthRequestInvalidCredentialsException
-import com.simprints.infra.network.SimNetwork
+import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
-import com.simprints.testtools.common.alias.InterfaceInvocation
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.coEvery
-import io.mockk.mockk
+import io.mockk.*
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -33,20 +31,14 @@ class AuthenticationRemoteDataSourceTest {
     }
 
     private val remoteInterface = mockk<AuthenticationRemoteInterface>()
-    private val simApiClient = mockk<SimNetwork.SimApiClient<AuthenticationRemoteInterface>>()
-    private val simApiClientFactory = mockk<UnauthenticatedClientFactory>()
-    private val authenticationRemoteDataSource = AuthenticationRemoteDataSource(simApiClientFactory)
+    private val backendApiClient = mockk<BackendApiClient>()
+    private val authenticationRemoteDataSource = AuthenticationRemoteDataSource(backendApiClient)
 
     @Before
     fun setUp() {
-        coEvery { simApiClient.executeCall<ApiAuthenticationData>(any()) } coAnswers {
-            val args = this.args
-            @Suppress("UNCHECKED_CAST")
-            (args[0] as InterfaceInvocation<AuthenticationRemoteInterface, ApiAuthenticationData>).invoke(
-                remoteInterface,
-            )
+        coEvery { backendApiClient.executeUnauthenticatedCall<AuthenticationRemoteInterface, Any>(any(), any()) } coAnswers {
+            secondArg<suspend (AuthenticationRemoteInterface) -> Any>()(remoteInterface)
         }
-        coEvery { simApiClientFactory.build(AuthenticationRemoteInterface::class) } returns simApiClient
     }
 
     @Test

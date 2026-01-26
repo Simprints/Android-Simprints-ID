@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.event.remote
 
 import androidx.annotation.VisibleForTesting
-import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordEvent
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
@@ -9,7 +9,6 @@ import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncResult
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.network.SimNetwork.SimApiClient
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.infra.serialization.SimJson
 import kotlinx.coroutines.CoroutineScope
@@ -23,7 +22,7 @@ import java.io.InputStream
 import javax.inject.Inject
 
 internal class EventRemoteDataSource @Inject constructor(
-    private val authStore: AuthStore,
+    private val backendApiClient: BackendApiClient,
 ) {
     suspend fun count(query: ApiRemoteEventQuery) = try {
         val response = executeCall { eventsRemoteInterface ->
@@ -132,9 +131,8 @@ internal class EventRemoteDataSource @Inject constructor(
         )
     }
 
-    private suspend fun <T> executeCall(block: suspend (EventRemoteInterface) -> T): T = getEventsApiClient().executeCall { block(it) }
-
-    private suspend fun getEventsApiClient(): SimApiClient<EventRemoteInterface> = authStore.buildClient(EventRemoteInterface::class)
+    private suspend fun <T> executeCall(block: suspend (EventRemoteInterface) -> T): T =
+        backendApiClient.executeCall(EventRemoteInterface::class) { block(it) }
 
     companion object {
         private const val CHANNEL_CAPACITY_FOR_PROPAGATION = 2000
