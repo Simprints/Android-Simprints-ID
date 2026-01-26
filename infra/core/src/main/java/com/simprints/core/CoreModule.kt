@@ -6,7 +6,6 @@ import com.lyft.kronos.AndroidClockFactory
 import com.simprints.core.tools.exceptions.AppCoroutineExceptionHandler
 import com.simprints.core.tools.extentions.deviceHardwareId
 import com.simprints.core.tools.extentions.packageVersionName
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.KronosTimeHelperImpl
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
@@ -50,10 +49,6 @@ object CoreModule {
     fun provideSimNetworkUtils(
         @ApplicationContext ctx: Context,
     ): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
-
-    @Provides
-    @Singleton
-    fun provideJsonHelper(): JsonHelper = JsonHelper
 
     @Provides
     @Singleton

@@ -18,9 +18,9 @@ import kotlinx.serialization.json.put
 
 object TokenizableStringSerializer : KSerializer<TokenizableString> {
     private const val TOKENIZED = "TokenizableString.Tokenized"
-    private const val RAW = "TokenizableString.Raw"
-    private const val FIELD_CLASS_NAME = "className"
-    private const val FIELD_VALUE = "value"
+    const val RAW = "TokenizableString.Raw"
+    const val FIELD_CLASS_NAME = "className"
+    const val FIELD_VALUE = "value"
 
     override val descriptor: SerialDescriptor =
         buildClassSerialDescriptor("TokenizableString") {

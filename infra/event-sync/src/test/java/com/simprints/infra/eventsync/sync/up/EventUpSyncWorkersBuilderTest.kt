@@ -4,7 +4,6 @@ import androidx.work.WorkRequest
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.eventsync.SampleSyncScopes
@@ -18,6 +17,7 @@ import com.simprints.infra.eventsync.sync.common.TAG_UP_MASTER_SYNC_ID
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_EVENT_UP_SYNC_SCOPE_ID
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_UP_SYNC
+import com.simprints.infra.serialization.SimJson
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
@@ -40,7 +40,7 @@ class EventUpSyncWorkersBuilderTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        eventUpSyncWorkersBuilder = EventUpSyncWorkersBuilder(eventUpSyncScopeRepository, JsonHelper)
+        eventUpSyncWorkersBuilder = EventUpSyncWorkersBuilder(eventUpSyncScopeRepository)
     }
 
     @Test
@@ -123,12 +123,11 @@ class EventUpSyncWorkersBuilderTest {
 
     private fun List<WorkRequest>.assertUpSyncUploaderWorkerInput(upSyncScope: EventUpSyncScope) {
         val uploaders = filter { it.tags.contains(EventUpSyncUploaderWorker::class.qualifiedName) }
-        val jsonHelper = JsonHelper
 
         assertThat(
             uploaders.any {
                 it.workSpec.input == workDataOf(
-                    INPUT_UP_SYNC to jsonHelper.json.encodeToString(upSyncScope),
+                    INPUT_UP_SYNC to SimJson.encodeToString(upSyncScope),
                     INPUT_EVENT_UP_SYNC_SCOPE_ID to "scopeId",
                 )
             },

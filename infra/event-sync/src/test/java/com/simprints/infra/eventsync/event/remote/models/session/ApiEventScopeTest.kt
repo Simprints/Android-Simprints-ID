@@ -1,8 +1,8 @@
 package com.simprints.infra.eventsync.event.remote.models.session
 
 import com.google.common.truth.Truth
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
+import com.simprints.infra.serialization.SimJson
 import org.junit.Test
 
 class ApiEventScopeTest {
@@ -28,7 +28,7 @@ class ApiEventScopeTest {
         )
 
         // Act
-        val json = JsonHelper.json.encodeToString(apiEventScope)
+        val json = SimJson.encodeToString(apiEventScope)
 
         // Assert
         Truth.assertThat(json).doesNotContain("projectConfigurationUpdatedAt")
@@ -56,7 +56,7 @@ class ApiEventScopeTest {
         )
 
         // Act
-        val json = JsonHelper.json.encodeToString(apiEventScope)
+        val json = SimJson.encodeToString(apiEventScope)
 
         // Assert
         Truth.assertThat(json).contains("projectConfigurationUpdatedAt")

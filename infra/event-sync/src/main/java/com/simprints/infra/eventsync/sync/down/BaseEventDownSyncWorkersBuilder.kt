@@ -5,7 +5,6 @@ import androidx.work.Constraints
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkRequest
 import androidx.work.workDataOf
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
@@ -19,11 +18,11 @@ import com.simprints.infra.eventsync.sync.common.addTagForScheduledAtNow
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.INPUT_EVENT_DOWN_SYNC_SCOPE_ID
+import com.simprints.infra.serialization.SimJson
 import java.util.concurrent.TimeUnit
 
 internal abstract class BaseEventDownSyncWorkersBuilder(
     protected val downSyncScopeRepository: EventDownSyncScopeRepository,
-    protected val jsonHelper: JsonHelper,
     protected val configRepository: ConfigRepository,
 ) {
     abstract fun getWorkerClass(): Class<out BaseEventDownSyncDownloaderWorker>
@@ -43,7 +42,7 @@ internal abstract class BaseEventDownSyncWorkersBuilder(
         .Builder(getWorkerClass())
         .setInputData(
             workDataOf(
-                INPUT_DOWN_SYNC_OPS to jsonHelper.json.encodeToString(downSyncOperation),
+                INPUT_DOWN_SYNC_OPS to SimJson.encodeToString(downSyncOperation),
                 INPUT_EVENT_DOWN_SYNC_SCOPE_ID to uniqueDownSyncID,
             ),
         ).setDownSyncWorker(uniqueSyncID, uniqueDownSyncID, getDownSyncWorkerConstraints())

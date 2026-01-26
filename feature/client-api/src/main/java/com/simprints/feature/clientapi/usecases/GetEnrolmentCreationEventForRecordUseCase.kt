@@ -1,6 +1,5 @@
 package com.simprints.feature.clientapi.usecases
 
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.canCoSyncAllData
@@ -11,13 +10,13 @@ import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentR
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordCreationEvent
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.serialization.SimJson
 import javax.inject.Inject
 
 internal class GetEnrolmentCreationEventForRecordUseCase @Inject constructor(
     private val configRepository: ConfigRepository,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val encoder: EncodingUtils,
-    private val jsonHelper: JsonHelper,
 ) {
     suspend operator fun invoke(
         projectId: String,
@@ -41,8 +40,7 @@ internal class GetEnrolmentCreationEventForRecordUseCase @Inject constructor(
             )
             return null
         }
-
-        return jsonHelper.json.encodeToString(CoSyncEnrolmentRecordEvents(listOf(recordCreationEvent)))
+        return SimJson.encodeToString(CoSyncEnrolmentRecordEvents(listOf(recordCreationEvent)))
     }
 
     private fun EnrolmentRecord.fromSubjectToEnrolmentCreationEvent() = EnrolmentRecordCreationEvent(

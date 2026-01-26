@@ -2,20 +2,20 @@ package com.simprints.infra.enrolment.records.repository.remote
 
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.remote.models.ApiEnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.remote.models.ApiEnrolmentRecords
-import com.simprints.infra.enrolment.records.repository.remote.models.face.ApiFaceReference
-import com.simprints.infra.enrolment.records.repository.remote.models.face.ApiFaceTemplate
-import com.simprints.infra.enrolment.records.repository.remote.models.fingerprint.ApiFinger
-import com.simprints.infra.enrolment.records.repository.remote.models.fingerprint.ApiFingerprintReference
-import com.simprints.infra.enrolment.records.repository.remote.models.fingerprint.ApiFingerprintTemplate
+import com.simprints.infra.enrolment.records.repository.remote.models.ApiFaceReference
+import com.simprints.infra.enrolment.records.repository.remote.models.ApiFaceTemplate
+import com.simprints.infra.enrolment.records.repository.remote.models.ApiFinger
+import com.simprints.infra.enrolment.records.repository.remote.models.ApiFingerprintReference
+import com.simprints.infra.enrolment.records.repository.remote.models.ApiFingerprintTemplate
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException

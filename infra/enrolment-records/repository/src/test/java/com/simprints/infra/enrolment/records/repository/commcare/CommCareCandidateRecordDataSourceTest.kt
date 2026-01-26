@@ -5,13 +5,12 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.common.TemplateIdentifier.LEFT_INDEX_FINGER
+import com.simprints.core.domain.common.TemplateIdentifier.LEFT_THUMB
 import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.reference.CandidateRecord
-import com.simprints.core.domain.common.TemplateIdentifier.LEFT_INDEX_FINGER
-import com.simprints.core.domain.common.TemplateIdentifier.LEFT_THUMB
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.ExtractCommCareCaseIdUseCase
@@ -231,7 +230,6 @@ class CommCareCandidateRecordDataSourceTest {
         dataSource = CommCareCandidateRecordDataSource(
             timeHelper,
             encoder,
-            JsonHelper,
             useCase,
             extractCommCareCaseIdUseCase,
             4,

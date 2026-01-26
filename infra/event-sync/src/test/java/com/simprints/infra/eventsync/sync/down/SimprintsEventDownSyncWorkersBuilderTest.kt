@@ -7,7 +7,6 @@ import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.common.Partitioning
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.values
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
@@ -24,6 +23,7 @@ import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.INPUT_EVENT_DOWN_SYNC_SCOPE_ID
 import com.simprints.infra.eventsync.sync.down.workers.SimprintsEventDownSyncDownloaderWorker
+import com.simprints.infra.serialization.SimJson
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
@@ -67,7 +67,6 @@ class SimprintsEventDownSyncWorkersBuilderTest {
 
         eventDownSyncWorkersBuilder = SimprintsEventDownSyncWorkersBuilder(
             eventDownSyncScopeRepository,
-            JsonHelper,
             configRepository,
         )
     }
@@ -211,13 +210,12 @@ class SimprintsEventDownSyncWorkersBuilderTest {
     ) {
         val downloaders =
             filter { it.tags.contains(SimprintsEventDownSyncDownloaderWorker::class.qualifiedName) }
-        val jsonHelper = JsonHelper
         val ops = downSyncScope.operations
         ops.forEach { op ->
             assertThat(
                 downloaders.any {
                     it.workSpec.input == workDataOf(
-                        INPUT_DOWN_SYNC_OPS to jsonHelper.json.encodeToString(op),
+                        INPUT_DOWN_SYNC_OPS to SimJson.encodeToString(op),
                         INPUT_EVENT_DOWN_SYNC_SCOPE_ID to scopeId,
                     )
                 },

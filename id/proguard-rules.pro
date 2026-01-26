@@ -38,23 +38,6 @@
     volatile <fields>;
 }
 
-# Jackson
-# Proguard configuration for Jackson 2.x (fasterxml package instead of codehaus package)
--keep class com.fasterxml.jackson.databind.ObjectMapper {
-    public <methods>;
-    protected <methods>;
-}
--keep class com.fasterxml.jackson.databind.ObjectWriter {
-    public ** writeValueAsString(**);
-}
--keepnames class com.fasterxml.jackson.** { *; }
--dontwarn com.fasterxml.jackson.databind.**
-
-#Keep all TypeReferences to preserve generic types
--keep class * extends com.fasterxml.jackson.core.type.TypeReference {
-    public <init>(java.lang.reflect.Type);
-}
-
 #net.zetetic:android-sqlcipher
 -keep class net.zetetic.database.sqlcipher.** { *; }
 
@@ -77,3 +60,4 @@
 #keep everything for realm
 -keep class io.realm.** { *; }
 -keepnames class io.realm.** { *; }
+-dontwarn lombok.Generated

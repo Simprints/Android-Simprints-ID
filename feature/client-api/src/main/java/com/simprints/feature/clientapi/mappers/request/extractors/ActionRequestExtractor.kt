@@ -1,8 +1,8 @@
 package com.simprints.feature.clientapi.mappers.request.extractors
 
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.feature.clientapi.extensions.extractString
 import com.simprints.feature.clientapi.models.ClientApiConstants
+import com.simprints.infra.serialization.SimJson
 import com.simprints.libsimprints.Constants
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.intOrNull
@@ -34,7 +34,7 @@ internal abstract class ActionRequestExtractor(
 
     fun getSubjectAge(): Int? = try {
         val parsedMetadata =
-            JsonHelper.json.decodeFromString<Map<String, JsonElement>>(getMetadata())
+            SimJson.decodeFromString<Map<String, JsonElement>>(getMetadata())
         parsedMetadata[Constants.SIMPRINTS_SUBJECT_AGE]
             ?.jsonPrimitive
             ?.intOrNull

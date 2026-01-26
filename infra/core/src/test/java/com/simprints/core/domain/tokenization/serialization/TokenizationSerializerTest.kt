@@ -1,48 +1,19 @@
 package com.simprints.core.domain.tokenization.serialization
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.domain.tokenization.asTokenizableEncrypted
-import com.simprints.core.domain.tokenization.asTokenizableRaw
-import com.simprints.core.tools.json.JsonHelper.json
+import com.simprints.infra.serialization.SimJson
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Test
 
 class TokenizationSerializerTest {
-    // Todo remove this test once removing all the jackson code
-    @Test
-    fun `class name tokenization serialization and deserialization should produce same result`() {
-        val encrypted = "encrypted".asTokenizableEncrypted()
-        val raw = "raw".asTokenizableRaw()
-
-        val module = SimpleModule().apply {
-            addSerializer(TokenizableString::class.java, TokenizationClassNameSerializer())
-            addDeserializer(TokenizableString::class.java, TokenizationClassNameDeserializer())
-        }
-        val jackson: ObjectMapper = ObjectMapper()
-            .registerKotlinModule()
-            .registerModule(module)
-
-        val encryptedJson = jackson.writeValueAsString(encrypted)
-        val rawJson = jackson.writeValueAsString(raw)
-
-        val encryptedFromJson = jackson.readValue(encryptedJson, TokenizableString::class.java)
-        val rawFromJson = jackson.readValue(rawJson, TokenizableString::class.java)
-
-        assertThat(encryptedFromJson).isEqualTo(encrypted)
-        assertThat(rawFromJson).isEqualTo(raw)
-    }
-
     @Test
     fun `serialize Raw produces className Raw and value`() {
         val raw = TokenizableString.Raw("person")
 
-        val result = json.parseToJsonElement(
-            json.encodeToString(raw),
+        val result = SimJson.parseToJsonElement(
+            SimJson.encodeToString(raw),
         )
 
         val expected = JsonObject(
@@ -59,8 +30,8 @@ class TokenizationSerializerTest {
     fun `serialize Tokenized produces className Tokenized and value`() {
         val tokenized = TokenizableString.Tokenized("eq2Efc98d")
 
-        val result = json.parseToJsonElement(
-            json.encodeToString(tokenized),
+        val result = SimJson.parseToJsonElement(
+            SimJson.encodeToString(tokenized),
         )
 
         val expected = JsonObject(
@@ -78,7 +49,7 @@ class TokenizationSerializerTest {
         val jsonInput =
             """{"className":"TokenizableString.Raw","value":"person"}"""
 
-        val result = json.decodeFromString<TokenizableString>(jsonInput)
+        val result = SimJson.decodeFromString<TokenizableString>(jsonInput)
 
         assertThat(result).isEqualTo(TokenizableString.Raw("person"))
     }
@@ -88,7 +59,7 @@ class TokenizationSerializerTest {
         val jsonInput =
             """{"className":"TokenizableString.Tokenized","value":"eq2Efc98d"}"""
 
-        val result = json.decodeFromString<TokenizableString>(jsonInput)
+        val result = SimJson.decodeFromString<TokenizableString>(jsonInput)
 
         assertThat(result).isEqualTo(TokenizableString.Tokenized("eq2Efc98d"))
     }
@@ -98,7 +69,7 @@ class TokenizationSerializerTest {
         val jsonInput =
             """{"className":"SomethingElse","value":"name"}"""
 
-        val result = json.decodeFromString<TokenizableString>(jsonInput)
+        val result = SimJson.decodeFromString<TokenizableString>(jsonInput)
 
         assertThat(result).isEqualTo(TokenizableString.Raw("name"))
     }
@@ -108,7 +79,7 @@ class TokenizationSerializerTest {
         val jsonInput =
             """{"value":"no class"}"""
 
-        val result = json.decodeFromString<TokenizableString>(jsonInput)
+        val result = SimJson.decodeFromString<TokenizableString>(jsonInput)
 
         assertThat(result).isEqualTo(TokenizableString.Raw("no class"))
     }
@@ -118,15 +89,15 @@ class TokenizationSerializerTest {
         val jsonInput =
             """{"className":"TokenizableString.Raw"}"""
 
-        json.decodeFromString<TokenizableString>(jsonInput)
+        SimJson.decodeFromString<TokenizableString>(jsonInput)
     }
 
     @Test
     fun `round trip Raw preserves equality`() {
         val original = TokenizableString.Raw("raw")
 
-        val jsonValue = json.encodeToString(original)
-        val decoded = json.decodeFromString<TokenizableString>(jsonValue)
+        val jsonValue = SimJson.encodeToString(original)
+        val decoded = SimJson.decodeFromString<TokenizableString>(jsonValue)
 
         assertThat(decoded).isEqualTo(original)
     }
@@ -135,8 +106,8 @@ class TokenizationSerializerTest {
     fun `round trip Tokenized preserves equality`() {
         val original = TokenizableString.Tokenized("encrypted")
 
-        val jsonValue = json.encodeToString(original)
-        val decoded = json.decodeFromString<TokenizableString>(jsonValue)
+        val jsonValue = SimJson.encodeToString(original)
+        val decoded = SimJson.decodeFromString<TokenizableString>(jsonValue)
 
         assertThat(decoded).isEqualTo(original)
     }
@@ -149,7 +120,7 @@ class TokenizationSerializerTest {
 
         val jsonInput = """"legacy-string""""
 
-        val result = json.decodeFromString<TokenizableString>(jsonInput)
+        val result = SimJson.decodeFromString<TokenizableString>(jsonInput)
 
         assertThat(result).isEqualTo(
             TokenizableString.Raw("legacy-string"),

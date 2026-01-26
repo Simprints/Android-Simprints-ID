@@ -7,7 +7,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 enum class EventType {
     // a constant key is required to serialise/deserialize
-    // events correctly with Jackson (see annotation in Event).
     // Add a key in the companion object for each enum value
 
     // key added: AUTHENTICATION_KEY

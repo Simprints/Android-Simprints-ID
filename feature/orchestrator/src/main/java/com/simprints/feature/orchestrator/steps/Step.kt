@@ -63,9 +63,6 @@ enum class StepStatus {
     COMPLETED,
 }
 
-/**
- * This module replaces the Jackson Mixins.
- */
 val orchestratorSerializersModule = SerializersModule {
 
     // Register all StepResult subclasses

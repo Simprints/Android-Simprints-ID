@@ -1,19 +1,17 @@
 package com.simprints.feature.orchestrator.tools
 
 import com.simprints.feature.orchestrator.steps.orchestratorSerializersModule
+import com.simprints.infra.serialization.SimJson
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.plus
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 internal class OrchestrationJsonHelper @Inject constructor() {
     private val json: Json by lazy {
-        Json {
-            ignoreUnknownKeys = true
-            explicitNulls = false
-            encodeDefaults = true
-            coerceInputValues = true
-            serializersModule = orchestratorSerializersModule
+        Json(from = SimJson) {
+            serializersModule = SimJson.serializersModule + orchestratorSerializersModule
         }
     }
 

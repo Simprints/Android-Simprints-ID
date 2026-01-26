@@ -4,7 +4,6 @@ import android.database.sqlite.SQLiteDatabaseCorruptException
 import android.database.sqlite.SQLiteException
 import com.simprints.core.DispatcherIO
 import com.simprints.core.NonCancellableIO
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.BuildConfig
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
@@ -29,7 +28,6 @@ import kotlin.coroutines.CoroutineContext
 @Singleton
 internal open class EventLocalDataSource @Inject constructor(
     private val eventDatabaseFactory: EventDatabaseFactory,
-    private val jsonHelper: JsonHelper,
     @param:DispatcherIO private val readingDispatcher: CoroutineDispatcher,
     @param:NonCancellableIO private val writingContext: CoroutineContext,
 ) {
@@ -92,7 +90,7 @@ internal open class EventLocalDataSource @Inject constructor(
     }
 
     suspend fun saveEventScope(scope: EventScope) = useRoom(writingContext) {
-        scopeDao.insertOrUpdate(scope.fromDomainToDb(jsonHelper))
+        scopeDao.insertOrUpdate(scope.fromDomainToDb())
     }
 
     suspend fun countEventScopes(type: EventScopeType): Int = useRoom(readingDispatcher) {
@@ -104,22 +102,22 @@ internal open class EventLocalDataSource @Inject constructor(
     }
 
     suspend fun loadAllScopes(): List<EventScope> = useRoom(readingDispatcher) {
-        scopeDao.loadAll().map { it.fromDbToDomain(jsonHelper) }
+        scopeDao.loadAll().map { it.fromDbToDomain() }
     }
 
     suspend fun loadOpenedScopes(type: EventScopeType): List<EventScope> = useRoom(readingDispatcher) {
-        scopeDao.loadOpen(type).map { it.fromDbToDomain(jsonHelper) }
+        scopeDao.loadOpen(type).map { it.fromDbToDomain() }
     }
 
     suspend fun loadClosedScopes(
         type: EventScopeType,
         limit: Int,
     ): List<EventScope> = useRoom(readingDispatcher) {
-        scopeDao.loadClosed(type, limit).map { it.fromDbToDomain(jsonHelper) }
+        scopeDao.loadClosed(type, limit).map { it.fromDbToDomain() }
     }
 
     suspend fun loadEventScope(scopeId: String): EventScope? = useRoom(writingContext) {
-        scopeDao.loadScope(scopeId)?.fromDbToDomain(jsonHelper)
+        scopeDao.loadScope(scopeId)?.fromDbToDomain()
     }
 
     suspend fun deleteEventScope(scopeId: String) = useRoom(writingContext) {

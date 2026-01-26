@@ -1,7 +1,6 @@
 package com.simprints.infra.eventsync.sync.up.tasks
 
 import com.google.common.truth.Truth.*
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
@@ -120,7 +119,6 @@ internal class EventUpSyncTaskTest {
             eventRemoteDataSource = eventRemoteDataSource,
             timeHelper = timeHelper,
             configRepository = configRepository,
-            jsonHelper = JsonHelper,
             mapDomainEventScopeToApiUseCase = mapDomainEventScopeToApiUseCase,
         )
     }

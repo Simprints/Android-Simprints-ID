@@ -4,9 +4,9 @@ import androidx.annotation.Keep
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
+import com.simprints.infra.serialization.SimJson
 
 @Keep
 @Entity
@@ -21,20 +21,20 @@ internal data class DbEventScope(
     val payloadJson: String,
 )
 
-internal fun EventScope.fromDomainToDb(jsonHelper: JsonHelper): DbEventScope = DbEventScope(
+internal fun EventScope.fromDomainToDb(): DbEventScope = DbEventScope(
     id = id,
     projectId = projectId,
     type = type,
     createdAt = createdAt.fromDomainToDb(),
     endedAt = endedAt?.fromDomainToDb(),
-    payloadJson = jsonHelper.json.encodeToString(payload),
+    payloadJson = SimJson.encodeToString(payload),
 )
 
-internal fun DbEventScope.fromDbToDomain(jsonHelper: JsonHelper): EventScope = EventScope(
+internal fun DbEventScope.fromDbToDomain(): EventScope = EventScope(
     id = id,
     projectId = projectId,
     type = type,
     createdAt = createdAt.fromDbToDomain(),
     endedAt = endedAt?.fromDbToDomain(),
-    payload = jsonHelper.json.decodeFromString(payloadJson),
+    payload = SimJson.decodeFromString(payloadJson),
 )

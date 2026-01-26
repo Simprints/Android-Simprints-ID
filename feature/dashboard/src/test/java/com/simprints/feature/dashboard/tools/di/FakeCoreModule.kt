@@ -13,7 +13,6 @@ import com.simprints.core.ExternalScope
 import com.simprints.core.NonCancellableIO
 import com.simprints.core.PackageVersionName
 import com.simprints.core.SessionCoroutineScope
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.Ticker
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
@@ -49,10 +48,6 @@ object FakeCoreModule {
     @Provides
     @Singleton
     fun provideTicker(): Ticker = mockk(relaxed = true)
-
-    @Provides
-    @Singleton
-    fun provideJsonHelper(): JsonHelper = mockk()
 
     @DeviceID
     @Provides

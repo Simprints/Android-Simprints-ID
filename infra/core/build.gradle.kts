@@ -10,6 +10,7 @@ android {
 }
 
 dependencies {
+    api(project(":infra:serialization"))
     api(project(":infra:logging"))
     api(project(":infra:network"))
     api(project(":infra:resources"))
@@ -27,7 +28,6 @@ dependencies {
 
     runtimeOnly(libs.kotlin.coroutinesAndroid)
 
-    implementation(libs.jackson.core)
     implementation(libs.workManager.work)
     implementation(libs.kronos.kronos)
     implementation(libs.tink.core)

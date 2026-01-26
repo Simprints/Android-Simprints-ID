@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.local.migrations.ProjectConfigSharedPrefsMigration.Companion.ALL_KEYS
 import com.simprints.infra.config.store.local.migrations.ProjectConfigSharedPrefsMigration.Companion.PROJECT_SETTINGS_JSON_STRING_KEY
@@ -27,6 +26,7 @@ import com.simprints.infra.config.store.local.models.ProtoUpSynchronizationConfi
 import com.simprints.infra.config.store.local.models.ProtoVero1Configuration
 import com.simprints.infra.config.store.local.models.ProtoVero2Configuration
 import com.simprints.infra.config.store.testtools.protoProjectConfiguration
+import com.simprints.infra.serialization.SimJson
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
@@ -402,7 +402,7 @@ class ProjectConfigSharedPrefsMigrationTest {
     }
 
     @Test
-    fun `migrate should throw an exception if there is an issue that is not related to jackson`() = runTest {
+    fun `migrate should throw an exception if there is an issue that is not related to serialization`() = runTest {
         val json = concatMapsAsString(
             JSON_GENERAL_CONFIGURATION,
             JSON_CONSENT_CONFIGURATION,
@@ -415,8 +415,8 @@ class ProjectConfigSharedPrefsMigrationTest {
 
         // Force an exception
         val exception = Exception("")
-        mockkObject(JsonHelper)
-        every { JsonHelper.json.decodeFromString<OldProjectConfig>(any()) } throws exception
+        mockkObject(SimJson)
+        every { SimJson.decodeFromString<OldProjectConfig>(any()) } throws exception
         val receivedException = assertThrows<Exception> {
             projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
         }
@@ -444,14 +444,14 @@ class ProjectConfigSharedPrefsMigrationTest {
                 m[key] = value.toString()
             }
         }
-        return JsonHelper.json.encodeToString(m)
+        return SimJson.encodeToString(m)
     }
 
     companion object {
         private const val PROJECT_ID = "projectId"
 
         private val JSON_GENERAL_CONFIGURATION =
-            JsonHelper.json.decodeFromString<Map<String, String>>(
+            SimJson.decodeFromString<Map<String, String>>(
                 "{\"EnrolmentPlus\":\"false\",\"LocationRequired\":\"true\",\"Modality\":\"FACE,FINGER\",\"ProjectLanguages\":\"en,fr,pt\",\"ProjectSpecificMode\":\"true\",\"SelectedLanguage\":\"en\"}",
             )
 
@@ -474,7 +474,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             .build()
 
         private val JSON_CONSENT_CONFIGURATION =
-            JsonHelper.json.decodeFromString<Map<String, String>>(
+            SimJson.decodeFromString<Map<String, String>>(
                 "{\"ConsentGeneralOptions\":\"{\\\"consent_enrol_only\\\":false,\\\"consent_enrol\\\":true,\\\"consent_id_verify\\\":true,\\\"consent_share_data_no\\\":false,\\\"consent_share_data_yes\\\":true,\\\"consent_collect_yes\\\":true,\\\"consent_privacy_rights\\\":true,\\\"consent_confirmation\\\":true}\",\"ConsentParentalExists\":\"true\",\"ConsentParentalOptions\":\"{\\\"consent_parent_enrol_only\\\":true,\\\"consent_parent_enrol\\\":false,\\\"consent_parent_id_verify\\\":true,\\\"consent_parent_share_data_no\\\":true,\\\"consent_parent_share_data_yes\\\":false,\\\"consent_parent_collect_yes\\\":false,\\\"consent_parent_privacy_rights\\\":false,\\\"consent_parent_confirmation\\\":false}\",\"ConsentRequired\":\"true\",\"LogoExists\":\"true\",\"OrganizationName\":\"organization name\",\"ProgramName\":\"program name\"}",
             )
         private val PROTO_CONSENT_CONFIGURATION = ProtoConsentConfiguration
@@ -505,19 +505,19 @@ class ProjectConfigSharedPrefsMigrationTest {
             ).build()
 
         private val JSON_SYNCHRONIZATION_CONFIGURATION_EMPTY_SYNC_DESTINATION =
-            JsonHelper.json.decodeFromString<Map<String, String>>(
+            SimJson.decodeFromString<Map<String, String>>(
                 "{\"DownSyncSetting\":\"ON\",\"MaxNbOfModules\":\"5\",\"ModuleIdOptions\":\"module1|module2\",\"SyncDestination\":\"\",\"SyncGroup\":\"GLOBAL\"}",
             )
         private val JSON_SYNCHRONIZATION_CONFIGURATION_NON_EMPTY_SYNC_DESTINATION =
-            JsonHelper.json.decodeFromString<Map<String, String>>(
+            SimJson.decodeFromString<Map<String, String>>(
                 "{\"DownSyncSetting\":\"ON\",\"MaxNbOfModules\":\"5\",\"ModuleIdOptions\":\"module1|module2\",\"SimprintsSync\":\"ALL\",\"SyncDestination\":\"SIMPRINTS,COMMCARE\",\"SyncGroup\":\"GLOBAL\"}",
             )
         private val JSON_SYNCHRONIZATION_CONFIGURATION =
-            JsonHelper.json.decodeFromString<Map<String, String>>(
+            SimJson.decodeFromString<Map<String, String>>(
                 "{\"CoSync\":\"ONLY_ANALYTICS\",\"DownSyncSetting\":\"ON\",\"MaxNbOfModules\":\"5\",\"ModuleIdOptions\":\"module1|module2\",\"SimprintsSync\":\"ALL\",\"SyncDestination\":\"SIMPRINTS,COMMCARE\",\"SyncGroup\":\"GLOBAL\"}",
             )
         private val JSON_SYNCHRONIZATION_CONFIGURATION_NULL_VALUES =
-            JsonHelper.json.decodeFromString<Map<String, String>>(
+            SimJson.decodeFromString<Map<String, String>>(
                 "{\"DownSyncSetting\":\"ON\",\"MaxNbOfModules\":\"5\",\"ModuleIdOptions\":\"module1|module2\",\"SyncGroup\":\"GLOBAL\"}",
             )
         private val PROTO_SYNCHRONIZATION_CONFIGURATION =
@@ -693,7 +693,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                 ).build()
 
         private val JSON_IDENTIFICATION_CONFIGURATION =
-            JsonHelper.json.decodeFromString<Map<String, String>>(
+            SimJson.decodeFromString<Map<String, String>>(
                 "{\"MatchGroup\":\"MODULE\",\"NbOfIdsInt\":\"4\"}",
             )
         private val PROTO_IDENTIFICATION_CONFIGURATION =
@@ -703,15 +703,15 @@ class ProjectConfigSharedPrefsMigrationTest {
                 .setPoolType(ProtoIdentificationConfiguration.PoolType.MODULE)
                 .build()
 
-        private val JSON_FACE_CONFIGURATION = JsonHelper.json.decodeFromString<Map<String, String>>(
+        private val JSON_FACE_CONFIGURATION = SimJson.decodeFromString<Map<String, String>>(
             "{\"FaceConfidenceThresholds\":\"{\\\"LOW\\\":\\\"1\\\",\\\"MEDIUM\\\":\\\"20\\\",\\\"HIGH\\\":\\\"100\\\"}\",\"FaceNbOfFramesCaptured\":\"2\",\"FaceQualityThreshold\":\"-1\",\"SaveFaceImages\":\"true\"}",
         )
         private val JSON_FACE_CONFIGURATION_WITHOUT_FIELDS =
-            JsonHelper.json.decodeFromString<Map<String, String>>(
+            SimJson.decodeFromString<Map<String, String>>(
                 "{\"FaceQualityThreshold\":\"-1\"}",
             )
         private val JSON_FACE_CONFIGURATION_WITH_UNEXPECTED_FIELD =
-            JsonHelper.json.decodeFromString<Map<String, JsonElement>>(
+            SimJson.decodeFromString<Map<String, JsonElement>>(
                 """
                 {
                   "FaceMatchThreshold": 30,
@@ -770,7 +770,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             ).build()
 
         private val JSON_VERO_2_CONFIGURATION =
-            JsonHelper.json.decodeFromString<Map<String, String>>(
+            SimJson.decodeFromString<Map<String, String>>(
                 "{\"CaptureFingerprintStrategy\":\"SECUGEN_ISO_500_DPI\",\"FingerComparisonStrategyForVerification\":\"SAME_FINGER\",\"FingerprintLiveFeedbackOn\":\"true\",\"SaveFingerprintImagesStrategy\":\"WSQ_15_EAGER\",\"Vero2FirmwareVersions\":\"{\\\"E-1\\\":{\\\"cypress\\\":\\\"1.1\\\",\\\"stm\\\":\\\"1.0\\\",\\\"un20\\\":\\\"1.3\\\"}}\"}",
             )
         private val PROTO_VERO_2_CONFIGURATION = ProtoVero2Configuration
@@ -791,11 +791,11 @@ class ProjectConfigSharedPrefsMigrationTest {
             ).build()
 
         private val JSON_FINGERPRINT_CONFIGURATION =
-            JsonHelper.json.decodeFromString<Map<String, String>>(
+            SimJson.decodeFromString<Map<String, String>>(
                 "{\"FingerComparisonStrategyForVerification\":\"SAME_FINGER\",\"FingerImagesExist\":\"true\",\"FingerStatus\":\"{\\\"RIGHT_5TH_FINGER\\\":\\\"false\\\",\\\"RIGHT_4TH_FINGER\\\":\\\"false\\\",\\\"RIGHT_3RD_FINGER\\\":\\\"false\\\",\\\"RIGHT_INDEX_FINGER\\\":\\\"false\\\",\\\"RIGHT_THUMB\\\":\\\"false\\\",\\\"LEFT_THUMB\\\":\\\"true\\\",\\\"LEFT_INDEX_FINGER\\\":\\\"true\\\",\\\"LEFT_3RD_FINGER\\\":\\\"false\\\",\\\"LEFT_4TH_FINGER\\\":\\\"false\\\",\\\"LEFT_5TH_FINGER\\\":\\\"false\\\"}\",\"FingerprintConfidenceThresholds\":\"{\\\"LOW\\\":\\\"10\\\",\\\"MEDIUM\\\":\\\"40\\\",\\\"HIGH\\\":\\\"200\\\"}\",\"FingerprintQualityThreshold\":\"60\",\"FingerprintsToCollect\":\"LEFT_INDEX_FINGER,LEFT_INDEX_FINGER,LEFT_THUMB\",\"ScannerGenerations\":\"VERO_1,VERO_2\"}",
             )
         private val JSON_FINGERPRINT_CONFIGURATION_WITHOUT_FIELDS =
-            JsonHelper.json.decodeFromString<Map<String, String>>(
+            SimJson.decodeFromString<Map<String, String>>(
                 "{\"FingerprintQualityThreshold\":\"60\"}",
             )
         private val PROTO_FINGERPRINT_CONFIGURATION = ProtoFingerprintConfiguration
