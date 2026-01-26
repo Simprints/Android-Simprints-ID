@@ -23,7 +23,9 @@ import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.sync.ImageSyncStatus
+import com.simprints.infra.sync.SyncCommands
 import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.sync.SyncResponse
 import com.simprints.infra.sync.SyncStatus
 import com.simprints.infra.sync.usecase.SyncUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -32,6 +34,7 @@ import com.simprints.testtools.common.livedata.getOrAwaitValues
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -147,7 +150,10 @@ class SyncInfoViewModelTest {
         syncStatusFlow = MutableStateFlow(
             SyncStatus(eventSyncState = mockEventSyncState, imageSyncStatus = mockImageSyncStatus),
         )
-        every { sync.invoke(any(), any()) } returns syncStatusFlow
+        every { sync.invoke(SyncCommands.ObserveOnly) } returns SyncResponse(
+            syncCommandJob = Job().apply { complete() },
+            syncStatusFlow = syncStatusFlow,
+        )
         coEvery { syncOrchestrator.startEventSync(any()) } returns Unit
         coEvery { syncOrchestrator.stopEventSync() } returns Unit
         coEvery { syncOrchestrator.startImageSync() } returns Unit

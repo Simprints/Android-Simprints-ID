@@ -19,7 +19,7 @@ import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepositor
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
-import com.simprints.infra.sync.SyncCommand
+import com.simprints.infra.sync.SyncCommands
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.usecase.SyncUseCase
 import com.simprints.infra.uibase.view.applySystemBarInsets
@@ -67,7 +67,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
         super.onViewCreated(view, savedInstanceState)
         applySystemBarInsets(view)
 
-        sync(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+        sync(SyncCommands.ObserveOnly).syncStatusFlow
             .map {
                 it.eventSyncState
             }.asLiveData()

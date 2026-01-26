@@ -16,7 +16,7 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
-import com.simprints.infra.sync.SyncCommand
+import com.simprints.infra.sync.SyncCommands
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.usecase.SyncUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -57,7 +57,7 @@ internal class SyncInfoViewModel @Inject constructor(
         get() = _loginNavigationEventLiveData
     private val _loginNavigationEventLiveData = MutableLiveData<LoginParams>()
 
-    private val syncStatusFlow = sync(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+    private val syncStatusFlow = sync(SyncCommands.ObserveOnly).syncStatusFlow
     private val eventSyncStateFlow =
         syncStatusFlow.map { it.eventSyncState }
     private val imageSyncStatusFlow =

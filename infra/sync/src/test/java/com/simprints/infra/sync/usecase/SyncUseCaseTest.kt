@@ -5,7 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.sync.ImageSyncStatus
-import com.simprints.infra.sync.SyncCommand
+import com.simprints.infra.sync.SyncCommands
 import com.simprints.infra.sync.SyncStatus
 import com.simprints.infra.sync.usecase.internal.ObserveImageSyncStatusUseCase
 import io.mockk.MockKAnnotations
@@ -61,7 +61,7 @@ class SyncUseCaseTest {
         )
         val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
 
-        val resultFlow = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+        val resultFlow = useCase(SyncCommands.ObserveOnly).syncStatusFlow
 
         assertThat(resultFlow.value).isEqualTo(expected)
     }
@@ -85,7 +85,7 @@ class SyncUseCaseTest {
         val expected = SyncStatus(event, image)
         val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
 
-        val resultFlow = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+        val resultFlow = useCase(SyncCommands.ObserveOnly).syncStatusFlow
 
         runCurrent() // ensure upstream flows are collected before emitting
         eventSyncStatusFlow.emit(event)
@@ -108,7 +108,7 @@ class SyncUseCaseTest {
         )
         val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
 
-        val resultFlow = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+        val resultFlow = useCase(SyncCommands.ObserveOnly).syncStatusFlow
 
         runCurrent()
         val expected = with(resultFlow.value) {
@@ -129,7 +129,7 @@ class SyncUseCaseTest {
         )
         val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
 
-        val resultFlow = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+        val resultFlow = useCase(SyncCommands.ObserveOnly).syncStatusFlow
 
         runCurrent()
         val expected = with(resultFlow.value) {
@@ -164,7 +164,7 @@ class SyncUseCaseTest {
         val expected2 = SyncStatus(event2, image)
         val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
 
-        val resultFlow = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+        val resultFlow = useCase(SyncCommands.ObserveOnly).syncStatusFlow
 
         runCurrent()
         eventSyncStatusFlow.emit(event1)
@@ -202,7 +202,7 @@ class SyncUseCaseTest {
         val expected2 = SyncStatus(event, image2)
         val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
 
-        val resultFlow = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+        val resultFlow = useCase(SyncCommands.ObserveOnly).syncStatusFlow
 
         runCurrent()
         eventSyncStatusFlow.emit(event)
@@ -238,7 +238,7 @@ class SyncUseCaseTest {
         )
         val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
 
-        val resultFlow1 = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+        val resultFlow1 = useCase(SyncCommands.ObserveOnly).syncStatusFlow
 
         runCurrent()
         eventSyncStatusFlow.emit(event)
@@ -248,7 +248,7 @@ class SyncUseCaseTest {
         imageSyncStatusFlow.emit(image2)
         runCurrent()
 
-        val resultFlow2 = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+        val resultFlow2 = useCase(SyncCommands.ObserveOnly).syncStatusFlow
 
         assertThat(resultFlow1).isSameInstanceAs(resultFlow2)
         verify(exactly = 1) { eventSyncStateProcessor.getLastSyncState() }

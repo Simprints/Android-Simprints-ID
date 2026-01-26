@@ -23,7 +23,7 @@ import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.network.ConnectivityTracker
-import com.simprints.infra.sync.SyncCommand
+import com.simprints.infra.sync.SyncCommands
 import com.simprints.infra.sync.usecase.ObserveSyncableCountsUseCase
 import com.simprints.infra.sync.usecase.SyncUseCase
 import kotlinx.coroutines.CoroutineDispatcher
@@ -58,7 +58,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     operator fun invoke(isPreLogoutUpSync: Boolean = false): Flow<SyncInfo> = combine(
         combinedRefreshSignals(),
         authStore.observeSignedInProjectId(),
-        sync(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly),
+        sync(SyncCommands.ObserveOnly).syncStatusFlow,
         observeSyncableCounts(),
         observeConfigurationFlow(),
     ) { isOnline, projectId, (eventSyncState, imageSyncStatus), counts, (isRefreshing, isProjectRunning, moduleCounts, projectConfig) ->

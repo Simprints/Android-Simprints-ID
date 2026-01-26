@@ -2,7 +2,7 @@ package com.simprints.feature.validatepool.usecase
 
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.sync.SyncCommand
+import com.simprints.infra.sync.SyncCommands
 import com.simprints.infra.sync.usecase.SyncUseCase
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -14,7 +14,7 @@ internal class ShouldSuggestSyncUseCase @Inject constructor(
     private val sync: SyncUseCase,
     private val configRepository: ConfigRepository,
 ) {
-    suspend operator fun invoke(): Boolean = sync(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+    suspend operator fun invoke(): Boolean = sync(SyncCommands.ObserveOnly).syncStatusFlow
         .map { it.eventSyncState }
         .firstOrNull()
         ?.lastSyncTime
