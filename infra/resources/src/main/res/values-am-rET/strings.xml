@@ -539,7 +539,7 @@
     <string name="mfid_skip_reason_does_not_have">%1$sየለውም</string>
     <string name="mfid_skip_reason_did_not_bring">%1$sአላመጣም።</string>
     <string name="mfid_skip_reason_incorrect">በስህተት  የመጣ %1$sነው</string>
-    <string name="mfid_skip_reason_does_not_want_to_provide">%1$sማቅረብ አልፈለግም።</string>
+    <string name="mfid_skip_reason_does_not_want_to_provide">ማቅረብ አይፈልግም %1$s</string>
     <string name="mfid_skip_reason_damaged">የተበላሸ %1$s ወይም የማይነበብ</string>
     <string name="mfid_skip_reason_unable_to_scan">%1$sን ስካን ማድረግ አልተቻለም</string>
     <string name="mfid_skip_reason_other">ሌላ</string>
