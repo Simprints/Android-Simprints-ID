@@ -1,12 +1,15 @@
 package com.simprints.feature.dashboard.logout.sync
 
+import android.content.Context
 import androidx.lifecycle.Observer
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import androidx.work.Configuration
+import androidx.work.testing.WorkManagerTestInitHelper
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.logout.LogoutSyncViewModel
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
@@ -18,6 +21,7 @@ import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.every
 import io.mockk.mockk
 import org.hamcrest.core.IsNot.not
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -35,6 +39,13 @@ internal class LogoutSyncFragmentTest {
     internal val logoutSyncViewModel = mockk<LogoutSyncViewModel>(relaxed = true)
 
     private val navController = testNavController(R.navigation.graph_dashboard)
+
+    @Before
+    fun setUp() {
+        hiltRule.inject()
+        val ctx: Context = getApplicationContext()
+        WorkManagerTestInitHelper.initializeTestWorkManager(ctx, Configuration.Builder().build())
+    }
 
     @Test
     fun `instant logout button and instructions are visible when ready to be seen`() {

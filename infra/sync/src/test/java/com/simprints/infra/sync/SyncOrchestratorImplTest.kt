@@ -1,6 +1,5 @@
 package com.simprints.infra.sync
 
-import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
@@ -18,8 +17,6 @@ import com.simprints.infra.sync.SyncConstants.EVENT_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.EVENT_SYNC_WORK_NAME_ONE_TIME
 import com.simprints.infra.sync.SyncConstants.FILE_UP_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.FIRMWARE_UPDATE_WORK_NAME
-import com.simprints.infra.sync.SyncConstants.PROGRESS_CURRENT
-import com.simprints.infra.sync.SyncConstants.PROGRESS_MAX
 import com.simprints.infra.sync.SyncConstants.PROJECT_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.PROJECT_SYNC_WORK_NAME_ONE_TIME
 import com.simprints.infra.sync.SyncConstants.RECORD_UPLOAD_INPUT_ID_NAME
@@ -37,8 +34,6 @@ import io.mockk.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.count
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -172,6 +167,7 @@ class SyncOrchestratorImplTest {
             workManager.cancelUniqueWork(DEVICE_SYNC_WORK_NAME)
             workManager.cancelUniqueWork(FILE_UP_SYNC_WORK_NAME)
             workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME)
+            workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME_ONE_TIME)
             workManager.cancelUniqueWork(FIRMWARE_UPDATE_WORK_NAME)
 
             // Explicitly cancel event sync sub-workers
@@ -337,73 +333,6 @@ class SyncOrchestratorImplTest {
     }
 
     @Test
-    fun `observe image sync status returns syncing when worker is running`() = runTest {
-        val workInfoFlow = flowOf(createWorkInfo(WorkInfo.State.RUNNING))
-        every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
-        every { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns 30_000L
-        every { imageSyncTimestampProvider.getLastImageSyncTimestamp() } returns 1234567890L
-
-        val status = syncOrchestrator.observeImageSyncStatus().first()
-
-        assertThat(status.isSyncing).isTrue()
-        assertThat(status.lastUpdateTimeMillis).isEqualTo(1234567890L)
-    }
-
-    @Test
-    fun `observe image sync status returns not syncing when worker is cancelled`() = runTest {
-        val workInfoFlow = flowOf(createWorkInfo(WorkInfo.State.CANCELLED))
-        every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
-        every { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns 120_000L
-        every { imageSyncTimestampProvider.getLastImageSyncTimestamp() } returns 1234567890L
-
-        val status = syncOrchestrator.observeImageSyncStatus().first()
-
-        assertThat(status.isSyncing).isFalse()
-        assertThat(status.lastUpdateTimeMillis).isEqualTo(1234567890L)
-    }
-
-    @Test
-    fun `observe image sync status returns null timestamp when no sync has occurred`() = runTest {
-        val workInfoFlow = flowOf(createWorkInfo(WorkInfo.State.CANCELLED))
-        every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
-        every { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns null
-        every { imageSyncTimestampProvider.getLastImageSyncTimestamp() } returns null
-
-        val status = syncOrchestrator.observeImageSyncStatus().first()
-
-        assertThat(status.isSyncing).isFalse()
-        assertThat(status.lastUpdateTimeMillis).isNull()
-    }
-
-    @Test
-    fun `observe image sync status includes progress when available`() = runTest {
-        val workInfo1 = createWorkInfoWithProgress(WorkInfo.State.RUNNING, current = 5, max = 10)
-        val workInfo2 = createWorkInfoWithProgress(WorkInfo.State.RUNNING)
-        val workInfoFlow = flowOf(workInfo1, workInfo2)
-        every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
-        every { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns 0L
-
-        val status1 = syncOrchestrator.observeImageSyncStatus().first()
-        assertThat(status1.progress).isEqualTo(5 to 10)
-
-        val status2 = syncOrchestrator.observeImageSyncStatus().drop(1).first()
-        assertThat(status2.progress).isEqualTo(null)
-    }
-
-    @Test
-    fun `observe image sync status returns syncing momentarily when worker succeeds quickly`() = runTest {
-        val workInfoFlow = flowOf(createWorkInfo(WorkInfo.State.SUCCEEDED))
-        every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
-        every { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns 0L
-
-        val status1 = syncOrchestrator.observeImageSyncStatus().first()
-        assertThat(status1.isSyncing).isTrue()
-
-        val status2 = syncOrchestrator.observeImageSyncStatus().drop(1).first()
-        assertThat(status2.isSyncing).isFalse()
-    }
-
-    @Test
     fun `schedules record upload`() = runTest {
         syncOrchestrator.uploadEnrolmentRecords(INSTRUCTION_ID, listOf(SUBJECT_ID))
 
@@ -428,10 +357,9 @@ class SyncOrchestratorImplTest {
     @Test
     fun `delegates sync info deletion`() = runTest {
         syncOrchestrator.deleteEventSyncInfo()
-        coVerify {
-            eventSyncManager.deleteSyncInfo()
-            imageSyncTimestampProvider.clearTimestamp()
-        }
+        coVerify { eventSyncManager.deleteSyncInfo() }
+        verify { workManager.pruneWork() }
+        verify { imageSyncTimestampProvider.clearTimestamp() }
     }
 
     @Test
@@ -492,23 +420,6 @@ class SyncOrchestratorImplTest {
     private fun createWorkInfo(state: WorkInfo.State) = listOf(
         WorkInfo(UUID.randomUUID(), state, emptySet()),
     )
-
-    private fun createWorkInfoWithProgress(
-        state: WorkInfo.State,
-        current: Int? = null,
-        max: Int? = null,
-    ): List<WorkInfo> {
-        val workInfo = mockk<WorkInfo> {
-            every { this@mockk.state } returns state
-            every { progress } returns Data
-                .Builder()
-                .apply {
-                    current?.let { putInt(PROGRESS_CURRENT, current) }
-                    max?.let { putInt(PROGRESS_MAX, max) }
-                }.build()
-        }
-        return listOf(workInfo)
-    }
 
     companion object {
         private const val INSTRUCTION_ID = "id"

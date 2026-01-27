@@ -6,12 +6,18 @@ import com.simprints.infra.enrolment.records.repository.domain.models.CandidateR
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.Flow
 
 interface CandidateRecordDataSource {
     suspend fun count(
         query: EnrolmentRecordQuery = EnrolmentRecordQuery(),
         dataSource: BiometricDataSource = BiometricDataSource.Simprints,
     ): Int
+
+    fun observeCount(
+        query: EnrolmentRecordQuery = EnrolmentRecordQuery(),
+        dataSource: BiometricDataSource = BiometricDataSource.Simprints,
+    ): Flow<Int>
 
     /**
      * Loads records concurrently using the provided dispatcher and parallelism level.

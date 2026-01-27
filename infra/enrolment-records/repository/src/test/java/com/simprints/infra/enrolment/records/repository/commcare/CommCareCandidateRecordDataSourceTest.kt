@@ -2,6 +2,7 @@ package com.simprints.infra.enrolment.records.repository.commcare
 
 import android.content.ContentResolver
 import android.content.Context
+import android.database.ContentObserver
 import android.database.Cursor
 import android.net.Uri
 import com.simprints.core.domain.common.Modality
@@ -15,6 +16,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.ExtractCommCareCaseIdUseCase
 import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.enrolment.records.repository.commcare.CommCareCandidateRecordDataSource.Companion.CASE_COUNT_FALLBACK_POLL_INTERVAL_MILLIS
 import com.simprints.infra.enrolment.records.repository.commcare.CommCareCandidateRecordDataSource.Companion.COLUMN_DATUM_ID
 import com.simprints.infra.enrolment.records.repository.commcare.CommCareCandidateRecordDataSource.Companion.COLUMN_VALUE
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
@@ -26,7 +28,12 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.AfterClass
 import org.junit.Before
@@ -464,6 +471,83 @@ class CommCareCandidateRecordDataSourceTest {
         assertEquals(expectedCount, actualCount)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
         coVerify { mockMetadataCursor.count }
+    }
+
+    @Test
+    fun `observeCount emits an initial 0 if no records`() = runTest {
+        val contentObserver = slot<ContentObserver>()
+        every { mockMetadataCursor.count } returns 0
+        every { mockContentResolver.registerContentObserver(mockMetadataUri, true, capture(contentObserver)) } just Runs
+        every { mockContentResolver.unregisterContentObserver(any()) } just Runs
+        val channel = Channel<Int>(Channel.UNLIMITED)
+
+        val collectJob = launch {
+            dataSource
+                .observeCount(EnrolmentRecordQuery(), commCareBiometricDataSource)
+                .collect { channel.trySend(it) }
+        }
+
+        val firstEmission = channel.receive()
+        collectJob.cancel()
+        assertEquals(0, firstEmission)
+    }
+
+    @Test
+    fun `observeCount emits updated count after content observer invalidation`() = runTest {
+        val contentObserver = slot<ContentObserver>()
+        var metadataCount = 0
+        every { mockMetadataCursor.count } answers { metadataCount }
+        every { mockContentResolver.registerContentObserver(mockMetadataUri, true, capture(contentObserver)) } just Runs
+        every { mockContentResolver.unregisterContentObserver(any()) } just Runs
+        val channel = Channel<Int>(Channel.UNLIMITED)
+
+        val collectJob = launch {
+            dataSource
+                .observeCount(EnrolmentRecordQuery(), commCareBiometricDataSource)
+                .collect { channel.trySend(it) }
+        }
+
+        val initial = channel.receive()
+        metadataCount = 1
+        contentObserver.captured.onChange(false)
+
+        var updated: Int
+        do {
+            updated = channel.receive()
+        } while (updated != 1)
+        collectJob.cancel()
+        assertEquals(0, initial)
+        assertEquals(1, updated)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `observeCount polls periodically as a fallback`() = runTest {
+        val contentObserver = slot<ContentObserver>()
+        var metadataCount = 0
+        every { mockMetadataCursor.count } answers { metadataCount }
+        every { mockContentResolver.registerContentObserver(mockMetadataUri, true, capture(contentObserver)) } just Runs
+        every { mockContentResolver.unregisterContentObserver(any()) } just Runs
+        val channel = Channel<Int>(Channel.UNLIMITED)
+
+        val collectJob = launch {
+            dataSource
+                .observeCount(EnrolmentRecordQuery(), commCareBiometricDataSource)
+                .collect { channel.trySend(it) }
+        }
+
+        val initial = channel.receive()
+        metadataCount = 2
+        advanceTimeBy(CASE_COUNT_FALLBACK_POLL_INTERVAL_MILLIS)
+        runCurrent()
+
+        var polled: Int
+        do {
+            polled = channel.receive()
+        } while (polled != 2)
+        collectJob.cancel()
+        assertEquals(0, initial)
+        assertEquals(2, polled)
     }
 
     @Test

@@ -13,9 +13,9 @@ import com.simprints.feature.troubleshooting.AutoResettingClickCounter
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
-import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
+import com.simprints.infra.sync.usecase.ObserveSyncableCountsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -24,8 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 internal class AboutViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
+    private val observeSyncableCounts: ObserveSyncableCountsUseCase,
     private val logoutUseCase: LogoutUseCase,
-    private val eventSyncManager: EventSyncManager,
     private val recentUserActivityManager: RecentUserActivityManager,
 ) : ViewModel() {
     val syncAndSearchConfig: LiveData<SyncAndSearchConfig>
@@ -78,7 +78,7 @@ internal class AboutViewModel @Inject constructor(
         }
     }
 
-    private suspend fun hasEventsToUpload(): Boolean = eventSyncManager.countEventsToUpload().first() > 0
+    private suspend fun hasEventsToUpload(): Boolean = observeSyncableCounts().first().eventsToUpload > 0
 
     private suspend fun canSyncDataToSimprints(): Boolean = configRepository.getProjectConfiguration().canSyncDataToSimprints()
 

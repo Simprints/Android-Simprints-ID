@@ -3,11 +3,11 @@ package com.simprints.infra.enrolment.records.repository.local
 import androidx.test.core.app.*
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
@@ -23,7 +23,10 @@ import com.simprints.infra.security.keyprovider.LocalDbKey
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.toList
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -792,6 +795,93 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
         // Then
         assertThat(count).isEqualTo(0)
+    }
+
+    @Test
+    fun `observeCount emits an initial 0 if no records`() = runTest {
+        val channel = Channel<Int>(Channel.UNLIMITED)
+
+        val collectJob = launch {
+            dataSource
+                .observeCount(EnrolmentRecordQuery(projectId = PROJECT_1_ID))
+                .collect { channel.trySend(it) }
+        }
+
+        val firstEmission = channel.receive()
+        collectJob.cancel()
+        channel.close()
+        assertThat(firstEmission).isEqualTo(0)
+    }
+
+    @Test
+    fun `observeCount emits updated count after performActions creation`() = runTest {
+        val channel = Channel<Int>(Channel.UNLIMITED)
+
+        val collectJob = launch {
+            dataSource
+                .observeCount()
+                .collect { channel.trySend(it) }
+        }
+
+        val initial = channel.receive()
+        dataSource.performActions(
+            actions = listOf(EnrolmentRecordAction.Creation(enrolmentRecord1P1WithFace)),
+            project = project,
+        )
+
+        var updated: Int
+        do {
+            updated = channel.receive()
+        } while (updated != 1)
+        collectJob.cancel()
+        channel.close()
+        assertThat(initial).isEqualTo(0)
+        assertThat(updated).isEqualTo(1)
+    }
+
+    @Test
+    fun `observeCount emits updated count after delete`() = runTest {
+        val createdSubject = enrolmentRecord1P1WithFace
+        dataSource.performActions(
+            actions = listOf(EnrolmentRecordAction.Creation(createdSubject)),
+            project = project,
+        )
+        val channel = Channel<Int>(Channel.UNLIMITED)
+
+        val collectJob = launch {
+            dataSource
+                .observeCount()
+                .collect { channel.trySend(it) }
+        }
+
+        val initial = channel.receive()
+
+        dataSource.delete(listOf(EnrolmentRecordQuery(subjectId = createdSubject.subjectId)))
+
+        var afterDelete: Int
+        do {
+            afterDelete = channel.receive()
+        } while (afterDelete != 0)
+        collectJob.cancel()
+        channel.close()
+        assertThat(initial).isEqualTo(1)
+        assertThat(afterDelete).isEqualTo(0)
+    }
+
+    @Test
+    fun `observeCount emits updated count after deleteAll`() = runTest {
+        dataSource.performActions(
+            actions = listOf(EnrolmentRecordAction.Creation(enrolmentRecord1P1WithFace)),
+            project = project,
+        )
+
+        val initial = dataSource.observeCount().first()
+        assertThat(initial).isEqualTo(1)
+
+        dataSource.deleteAll()
+
+        val afterDelete = dataSource.observeCount().first()
+        assertThat(afterDelete).isEqualTo(0)
     }
 
     @Test(expected = IllegalArgumentException::class) // Reverted to JUnit exception check

@@ -33,6 +33,10 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -90,7 +94,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                             references = (
                                 dbSubject.faceSamples.toDomain() +
                                     dbSubject.fingerprintSamples.toDomain()
-                            ).filter { it.format == query.format },
+                                ).filter { it.format == query.format },
                         )
                     },
                     onCandidateLoaded = onCandidateLoaded,
@@ -146,6 +150,23 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
             .find()
             .toInt()
     }
+
+    override fun observeCount(
+        query: EnrolmentRecordQuery,
+        dataSource: BiometricDataSource,
+    ): Flow<Int> = flow {
+        emitAll(
+            realmWrapper.readRealm { realm ->
+                realm
+                    .query(DbSubject::class)
+                    .buildRealmQueryForSubject(query)
+                    .count()
+                    .asFlow()
+            }
+        )
+    }
+        .map { it.toInt() }
+        .distinctUntilChanged()
 
     override suspend fun performActions(
         actions: List<EnrolmentRecordAction>,
@@ -219,12 +240,12 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                                 faceSamplesMap[false].orEmpty() + action.samplesToAdd
                                     .filter { it.modality == Modality.FACE }
                                     .flatMap { it.toRealmFaceDb() }
-                            ).toRealmList()
+                                ).toRealmList()
                             dbSubject.fingerprintSamples = (
                                 fingerprintSamplesMap[false].orEmpty() + action.samplesToAdd
                                     .filter { it.modality == Modality.FINGERPRINT }
                                     .flatMap { it.toRealmFingerprintDb() }
-                            ).toRealmList()
+                                ).toRealmList()
                             dbSubject.externalCredentials = allExternalCredentials.toRealmList()
 
                             faceSamplesMap[true]?.forEach { realm.delete(it) }

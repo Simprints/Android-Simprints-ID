@@ -32,7 +32,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-internal class EventSyncStateProcessor @Inject constructor(
+class EventSyncStateProcessor @Inject constructor(
     private val eventSyncCache: EventSyncCache,
     private val syncWorkersInfoProvider: SyncWorkersInfoProvider,
 ) {
@@ -47,6 +47,8 @@ internal class EventSyncStateProcessor @Inject constructor(
 
                 val syncReporterStates = syncStartReporterStates(syncWorkers) + syncEndReporterStates(syncWorkers)
 
+                val lastSyncTime = eventSyncCache.readLastSuccessfulSyncTime()
+
                 val syncState = EventSyncState(
                     lastSyncId,
                     progress,
@@ -54,6 +56,7 @@ internal class EventSyncStateProcessor @Inject constructor(
                     upSyncStates,
                     downSyncStates,
                     syncReporterStates,
+                    lastSyncTime,
                 )
 
                 Simber.d("Emitting for sync state: $syncState", tag = SYNC)
@@ -71,13 +74,11 @@ internal class EventSyncStateProcessor @Inject constructor(
             val mostRecentSyncMaster = completedSyncMaster.sortByScheduledTime().lastOrNull()
 
             flow {
-                if (mostRecentSyncMaster != null) {
-                    val lastSyncId = mostRecentSyncMaster.outputData.getString(SYNC_ID_STARTED)
-                    if (!lastSyncId.isNullOrBlank()) {
-                        Simber.d("Received sync id: $lastSyncId", tag = SYNC)
-                        emit(lastSyncId)
-                    }
+                val lastSyncId = mostRecentSyncMaster?.outputData?.getString(SYNC_ID_STARTED).orEmpty()
+                if (lastSyncId.isNotBlank()) {
+                    Simber.d("Received sync id: $lastSyncId", tag = SYNC)
                 }
+                emit(lastSyncId)
             }
         }
 

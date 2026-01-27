@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.status.models
 
 import androidx.annotation.Keep
+import com.simprints.core.tools.time.Timestamp
 
 @Keep
 data class EventSyncState(
@@ -10,6 +11,7 @@ data class EventSyncState(
     val upSyncWorkersInfo: List<SyncWorkerInfo>,
     val downSyncWorkersInfo: List<SyncWorkerInfo>,
     val reporterStates: List<SyncWorkerInfo>,
+    val lastSyncTime: Timestamp?,
 ) {
     data class SyncWorkerInfo(
         val type: EventSyncWorkerType,
@@ -19,14 +21,14 @@ data class EventSyncState(
     private val syncWorkersInfo: List<SyncWorkerInfo>
         get() = upSyncWorkersInfo + downSyncWorkersInfo
 
-    fun isThereNotSyncHistory() = syncWorkersInfo
-        .isEmpty()
+    fun hasSyncHistory() = syncWorkersInfo
+        .isNotEmpty()
 
     fun isSyncRunning() = syncWorkersInfo
         .any { it.state is EventSyncWorkerState.Running || it.state is EventSyncWorkerState.Enqueued }
 
-    fun isSyncCompleted() = syncWorkersInfo
-        .all { it.state is EventSyncWorkerState.Succeeded }
+    fun isSyncCompleted() = hasSyncHistory() &&
+        syncWorkersInfo.all { it.state is EventSyncWorkerState.Succeeded }
 
     fun isSyncInProgress() = syncWorkersInfo
         .any { it.state is EventSyncWorkerState.Running }
@@ -61,10 +63,18 @@ data class EventSyncState(
                 it.state is EventSyncWorkerState.Cancelled
         }
 
-    fun isSyncReporterCompleted() = reporterStates
-        .all {
+    fun isSyncReporterCompleted() = reporterStates.isNotEmpty() &&
+        reporterStates.all {
             it.state !is EventSyncWorkerState.Running &&
                 it.state !is EventSyncWorkerState.Enqueued &&
                 it.state !is EventSyncWorkerState.Blocked
         }
+
+    fun isUninitialized(): Boolean = syncId.isBlank() &&
+        progress == null &&
+        total == null &&
+        upSyncWorkersInfo.isEmpty() &&
+        downSyncWorkersInfo.isEmpty() &&
+        reporterStates.isEmpty() &&
+        lastSyncTime == null
 }

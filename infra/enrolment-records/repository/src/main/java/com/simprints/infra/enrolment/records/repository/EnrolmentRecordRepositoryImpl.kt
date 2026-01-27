@@ -17,6 +17,9 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -93,6 +96,13 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
         query: EnrolmentRecordQuery,
         dataSource: BiometricDataSource,
     ): Int = fromCandidateDataSource(dataSource).count(query, dataSource)
+
+    override fun observeCount(
+        query: EnrolmentRecordQuery,
+        dataSource: BiometricDataSource,
+    ): Flow<Int> = flow {
+        emitAll(fromCandidateDataSource(dataSource).observeCount(query, dataSource))
+    }
 
     override suspend fun getLocalDBInfo(): String = selectEnrolmentRecordLocalDataSource().getLocalDBInfo()
 

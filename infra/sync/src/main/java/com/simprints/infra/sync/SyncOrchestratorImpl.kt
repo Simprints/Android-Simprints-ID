@@ -29,7 +29,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -153,55 +152,6 @@ internal class SyncOrchestratorImpl @Inject constructor(
 
     override fun stopImageSync() {
         workManager.cancelWorkers(SyncConstants.FILE_UP_SYNC_WORK_NAME)
-    }
-
-    override fun observeImageSyncStatus(): Flow<ImageSyncStatus> = workManager
-        .getWorkInfosFlow(WorkQuery.fromUniqueWorkNames(SyncConstants.FILE_UP_SYNC_WORK_NAME))
-        .associateWithIfSyncing()
-        .map { (workInfos, isSyncing) ->
-            val lastUpdateTimestamp = imageSyncTimestampProvider.getLastImageSyncTimestamp()
-            val currentIndex = workInfos
-                .firstOrNull()
-                ?.progress
-                ?.getInt(SyncConstants.PROGRESS_CURRENT, 0)
-                ?.coerceAtLeast(0) ?: 0
-            val totalCount = workInfos
-                .firstOrNull()
-                ?.progress
-                ?.getInt(SyncConstants.PROGRESS_MAX, 0)
-                ?.takeIf { it >= 1 }
-            val progress = totalCount?.let { currentIndex to totalCount }
-            ImageSyncStatus(isSyncing, progress, lastUpdateTimestamp)
-        }
-
-    /**
-     * Converts the flow of WorkInfo in the receiver into a flow of WorkInfo paired to whether sync is ongoing or not.
-     *
-     * Whether sync is ongoing or not - is calculated from the WorkInfo.
-     * A special case is handled for a job that succeeds promptly: a "pulse" of positive sync is emitted additionally.
-     * This allows immediately succeeding syncs to be detected in the return flow.
-     */
-    private fun Flow<List<WorkInfo>>.associateWithIfSyncing() = transformLatest { workInfos ->
-        val isJustUpdated = imageSyncTimestampProvider.getMillisSinceLastImageSync() == 0L
-        when {
-            workInfos.any {
-                it.state == WorkInfo.State.RUNNING
-            } -> {
-                emit(workInfos to true)
-            }
-
-            workInfos.any {
-                it.state == WorkInfo.State.SUCCEEDED
-            } &&
-                isJustUpdated -> {
-                emit(workInfos to true) // at least for a moment, in case if RUNNING was missed
-                emit(workInfos to false)
-            }
-
-            else -> {
-                emit(workInfos to false)
-            }
-        }
     }
 
     override suspend fun rescheduleImageUpSync() {

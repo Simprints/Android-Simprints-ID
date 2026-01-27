@@ -27,6 +27,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -78,6 +80,16 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     ): Int = withContext(dispatcherIO) {
         subjectDao.countSubjects(queryBuilder.buildCountQuery(query))
     }
+
+    /**
+     * Observes counts for subjects matching the given query.
+     */
+    override fun observeCount(
+        query: EnrolmentRecordQuery,
+        dataSource: BiometricDataSource,
+    ): Flow<Int> = subjectDao
+        .observeSubjectCounts(queryBuilder.buildCountQuery(query))
+        .distinctUntilChanged()
 
     /**
      * Loads identities in paged ranges.

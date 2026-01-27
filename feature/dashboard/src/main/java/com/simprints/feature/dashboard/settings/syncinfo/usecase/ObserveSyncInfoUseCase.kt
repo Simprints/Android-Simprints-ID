@@ -20,46 +20,34 @@ import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSampleUploadEnabledInProject
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
-import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
-import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
-import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.network.ConnectivityTracker
-import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.sync.SyncCommand
+import com.simprints.infra.sync.usecase.ObserveSyncableCountsUseCase
+import com.simprints.infra.sync.usecase.SyncUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.minutes
 
 internal class ObserveSyncInfoUseCase @Inject constructor(
     private val connectivityTracker: ConnectivityTracker,
-    private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val authStore: AuthStore,
-    private val imageRepository: ImageRepository,
-    private val eventSyncManager: EventSyncManager,
-    syncOrchestrator: SyncOrchestrator,
     private val timeHelper: TimeHelper,
     private val ticker: Ticker,
     private val appForegroundStateTracker: AppForegroundStateTracker,
     private val commCarePermissionChecker: CommCarePermissionChecker,
     private val observeConfigurationFlow: ObserveConfigurationChangesUseCase,
+    private val observeSyncableCounts: ObserveSyncableCountsUseCase,
+    private val sync: SyncUseCase,
     @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) {
-    private val eventSyncStateFlow = eventSyncManager
-        .getLastSyncState(useDefaultValue = true) // otherwise value not guaranteed
-
-    private val imageSyncStatusFlow = syncOrchestrator.observeImageSyncStatus()
-
     // Since we are not using distinctUntilChanged any emission from combined flows will trigger the main flow as well
     private fun combinedRefreshSignals() = combine(
         connectivityTracker.observeIsConnected(),
@@ -70,10 +58,10 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     operator fun invoke(isPreLogoutUpSync: Boolean = false): Flow<SyncInfo> = combine(
         combinedRefreshSignals(),
         authStore.observeSignedInProjectId(),
-        eventSyncStateFlow,
-        imageSyncStatusFlow,
+        sync(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly),
+        observeSyncableCounts(),
         observeConfigurationFlow(),
-    ) { isOnline, projectId, eventSyncState, imageSyncStatus, (isRefreshing, isProjectRunning, moduleCounts, projectConfig) ->
+    ) { isOnline, projectId, (eventSyncState, imageSyncStatus), counts, (isRefreshing, isProjectRunning, moduleCounts, projectConfig) ->
         val currentEvents = eventSyncState.progress?.coerceAtLeast(0) ?: 0
         val totalEvents = eventSyncState.total?.coerceAtLeast(0) ?: 0
         val currentImages = imageSyncStatus.progress?.first?.coerceAtLeast(0) ?: 0
@@ -93,7 +81,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             eventSyncState.isSyncInProgress() && totalEvents > 0 -> eventProgressProportion
 
             // Sync hasn't started
-            eventSyncState.isSyncConnecting() || eventSyncState.isThereNotSyncHistory() -> 0f
+            eventSyncState.isSyncConnecting() || !eventSyncState.hasSyncHistory() -> 0f
 
             // Sync done
             else -> 1f
@@ -103,11 +91,11 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         val imagesToUpload = if (imageSyncStatus.isSyncing) {
             null
         } else {
-            imageRepository.getNumberOfImagesToUpload(projectId = projectId)
+            counts.samplesToUpload // internal term is sample, user-facing (within sync info) term is image
         }
 
         val eventSyncProgressPart = SyncInfoProgressPart(
-            isPending = eventSyncState.isSyncConnecting() || eventSyncState.isThereNotSyncHistory(),
+            isPending = eventSyncState.isSyncConnecting() || !eventSyncState.hasSyncHistory(),
             isDone = eventSyncState.isSyncCompleted(),
             areNumbersVisible = eventSyncState.isSyncInProgress() && totalEvents > 0,
             currentNumber = currentEvents,
@@ -144,7 +132,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             SyncInfoProgress()
         }
 
-        val eventLastSyncTimestamp = eventSyncManager.getLastSyncTime() ?: Timestamp(-1)
+        val eventLastSyncTimestamp = eventSyncState.lastSyncTime ?: Timestamp(-1)
         val imageLastSyncTimestamp = Timestamp(imageSyncStatus.lastUpdateTimeMillis ?: -1)
 
         val isReLoginRequired = eventSyncState.isSyncFailedBecauseReloginRequired()
@@ -189,17 +177,17 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
 
         val recordsTotal = when {
             isEventSyncInProgress || projectId.isBlank() -> null
-
-            // without project ID, repository access attempts will throw an exception
-            else -> enrolmentRecordRepository.count(EnrolmentRecordQuery(projectId))
+            else -> counts.totalRecords
         }
         val recordsToUpload = when {
             isEventSyncInProgress -> null
-            else -> eventSyncManager.countEventsToUpload(listOf(EventType.ENROLMENT_V2, EventType.ENROLMENT_V4)).firstOrNull() ?: 0
+            else -> counts.enrolmentsToUpload
         }
         val recordsToDownload = when {
             isEventSyncInProgress || isPreLogoutUpSync -> null
-            projectConfig.isSimprintsEventDownSyncAllowed() -> countEventsToDownloadWithCaching()
+            projectConfig.isSimprintsEventDownSyncAllowed() -> with(counts) {
+                DownSyncCounts(recordEventsToDownload, isRecordEventsToDownloadLowerBound)
+            }
             else -> DownSyncCounts(0, isLowerBound = false)
         }?.let { "${it.count}${if (it.isLowerBound) "+" else ""}" }.orEmpty()
 
@@ -289,36 +277,8 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         action,
     )
 
-    // caching eventSyncManager.countEventsToDownload to avoid network-based delays on frequent calls
-
-    private var cachedEventCountToDownload: DownSyncCounts? = null
-    private var cachedEventCountToDownloadTimestamp: Long = 0
-
-    private suspend fun countEventsToDownloadWithCaching(): DownSyncCounts {
-        val timeNowMs = timeHelper.now().ms
-        val timeSinceLastDownload = timeNowMs - cachedEventCountToDownloadTimestamp
-        val cached = cachedEventCountToDownload // for smart-cast
-
-        if (cached == null || timeSinceLastDownload > COUNT_EVENTS_CACHE_LIFESPAN_MILLIS) {
-            val result = try {
-                withTimeout(COUNT_EVENTS_TIMEOUT_MILLIS) {
-                    eventSyncManager.countEventsToDownload()
-                }
-            } catch (_: Throwable) {
-                DownSyncCounts(0, isLowerBound = false)
-            }
-            cachedEventCountToDownload = result
-            cachedEventCountToDownloadTimestamp = timeNowMs
-            return result
-        }
-
-        return cached
-    }
-
     private companion object {
         private const val SYNC_COMPLETION_HOLD_MILLIS = 1000L
-        private const val COUNT_EVENTS_TIMEOUT_MILLIS = 10 * 1000L
-        private const val COUNT_EVENTS_CACHE_LIFESPAN_MILLIS = 10 * 1000L
     }
 }
 
