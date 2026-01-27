@@ -108,21 +108,21 @@ class SyncCommandsTest {
                 )
         }
 
-        buildersWithDelayParam.forEach { (builder, expectedTarget) ->
+        buildersWithDownSyncAllowedParam.forEach { (builder, expectedTarget) ->
             assertThat(builder.stopAndStart())
                 .isEqualTo(
                     expectedCommand(
                         target = expectedTarget,
                         action,
-                        params = mapOf(SyncParam.WITH_DELAY to false),
+                        params = mapOf(SyncParam.IS_DOWN_SYNC_ALLOWED to true),
                     ),
                 )
-            assertThat(builder.stopAndStart(withDelay = true))
+            assertThat(builder.stopAndStart(isDownSyncAllowed = false))
                 .isEqualTo(
                     expectedCommand(
                         target = expectedTarget,
                         action,
-                        params = mapOf(SyncParam.WITH_DELAY to true),
+                        params = mapOf(SyncParam.IS_DOWN_SYNC_ALLOWED to false),
                     ),
                 )
         }
