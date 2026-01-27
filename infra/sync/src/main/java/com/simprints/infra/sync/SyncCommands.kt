@@ -68,46 +68,52 @@ object SyncCommands {
 
         override fun stopAndStart() = getCommand(target, SyncAction.STOP_AND_START)
 
-        override fun stopAndStartAround(block: suspend () -> Unit) = getCommand(target, SyncAction.STOP_AND_START, null, block)
+        override fun stopAndStartAround(block: suspend () -> Unit) = getCommand(target, SyncAction.STOP_AND_START, block = block)
     }
 
     private fun buildSyncCommandsWithDownSyncParam(target: SyncTarget) = object : SyncCommandBuilderWithDownSyncParam {
         override fun stop() = getCommand(target, SyncAction.STOP)
 
         override fun start(isDownSyncAllowed: Boolean) =
-            getCommand(target, SyncAction.START, SyncParam.IS_DOWN_SYNC_ALLOWED to isDownSyncAllowed)
+            getCommand(target, SyncAction.START, payload = SyncCommandPayload.WithDownSyncAllowed(isDownSyncAllowed))
 
         override fun stopAndStart(isDownSyncAllowed: Boolean) =
-            getCommand(target, SyncAction.STOP_AND_START, SyncParam.IS_DOWN_SYNC_ALLOWED to isDownSyncAllowed)
+            getCommand(target, SyncAction.STOP_AND_START, payload = SyncCommandPayload.WithDownSyncAllowed(isDownSyncAllowed))
 
         override fun stopAndStartAround(
             isDownSyncAllowed: Boolean,
             block: suspend () -> Unit,
-        ) = getCommand(target, SyncAction.STOP_AND_START, SyncParam.IS_DOWN_SYNC_ALLOWED to isDownSyncAllowed, block)
+        ) = getCommand(
+            target,
+            SyncAction.STOP_AND_START,
+            payload = SyncCommandPayload.WithDownSyncAllowed(isDownSyncAllowed),
+            block = block
+        )
     }
 
     private fun buildSyncCommandsWithDelayParam(target: SyncTarget) = object : SyncCommandBuilderWithDelayParam {
         override fun stop() = getCommand(target, SyncAction.STOP)
 
-        override fun start(withDelay: Boolean) = getCommand(target, SyncAction.START, SyncParam.WITH_DELAY to withDelay)
+        override fun start(withDelay: Boolean) = getCommand(target, SyncAction.START, payload = SyncCommandPayload.WithDelay(withDelay))
 
-        override fun stopAndStart(withDelay: Boolean) = getCommand(target, SyncAction.STOP_AND_START, SyncParam.WITH_DELAY to withDelay)
+        override fun stopAndStart(withDelay: Boolean) =
+            getCommand(target, SyncAction.STOP_AND_START, payload = SyncCommandPayload.WithDelay(withDelay))
 
         override fun stopAndStartAround(
             withDelay: Boolean,
             block: suspend () -> Unit,
-        ) = getCommand(target, SyncAction.STOP_AND_START, SyncParam.WITH_DELAY to withDelay, block)
+        ) = getCommand(target, SyncAction.STOP_AND_START, payload = SyncCommandPayload.WithDelay(withDelay), block = block)
     }
 
     private fun getCommand(
         target: SyncTarget,
         action: SyncAction,
-        param: Pair<SyncParam, Any>? = null,
+        payload: SyncCommandPayload = SyncCommandPayload.None,
         block: (suspend () -> Unit)? = null,
     ) = ExecutableSyncCommand(
         target,
         action,
-        param?.run { mapOf(first to second) } ?: emptyMap(),
+        payload,
         block,
     )
 }
@@ -120,7 +126,7 @@ sealed class SyncCommand
 internal data class ExecutableSyncCommand(
     val target: SyncTarget,
     val action: SyncAction,
-    val params: Map<SyncParam, Any> = emptyMap(),
+    val payload: SyncCommandPayload = SyncCommandPayload.None,
     val blockToRunWhileStopped: (suspend () -> Unit)? = null,
 ) : SyncCommand()
 
@@ -138,7 +144,14 @@ internal enum class SyncAction {
     STOP_AND_START,
 }
 
-internal enum class SyncParam {
-    IS_DOWN_SYNC_ALLOWED,
-    WITH_DELAY,
+internal sealed class SyncCommandPayload {
+    object None : SyncCommandPayload()
+
+    data class WithDelay(
+        val withDelay: Boolean,
+    ) : SyncCommandPayload()
+
+    data class WithDownSyncAllowed(
+        val isDownSyncAllowed: Boolean,
+    ) : SyncCommandPayload()
 }

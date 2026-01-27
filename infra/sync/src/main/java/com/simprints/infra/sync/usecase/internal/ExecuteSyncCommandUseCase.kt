@@ -15,9 +15,9 @@ import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.sync.master.EventSyncMasterWorker
 import com.simprints.infra.sync.ExecutableSyncCommand
+import com.simprints.infra.sync.SyncCommandPayload
 import com.simprints.infra.sync.SyncAction
 import com.simprints.infra.sync.SyncConstants
-import com.simprints.infra.sync.SyncParam
 import com.simprints.infra.sync.SyncTarget
 import com.simprints.infra.sync.config.worker.DeviceConfigDownSyncWorker
 import com.simprints.infra.sync.config.worker.ProjectConfigDownSyncWorker
@@ -100,13 +100,11 @@ internal class ExecuteSyncCommandUseCase @Inject constructor(
     }
 
     private suspend fun ExecutableSyncCommand.start() {
-        val isDownSyncAllowed = params[SyncParam.IS_DOWN_SYNC_ALLOWED] as? Boolean ?: true
-        val withDelay = params[SyncParam.WITH_DELAY] as? Boolean ?: false
         when (target) {
-            SyncTarget.SCHEDULE_EVERYTHING -> scheduleBackgroundWork(withDelay)
-            SyncTarget.SCHEDULE_EVENTS -> rescheduleEventSync(withDelay)
+            SyncTarget.SCHEDULE_EVERYTHING -> scheduleBackgroundWork((payload as SyncCommandPayload.WithDelay).withDelay)
+            SyncTarget.SCHEDULE_EVENTS -> rescheduleEventSync((payload as SyncCommandPayload.WithDelay).withDelay)
             SyncTarget.SCHEDULE_IMAGES -> rescheduleImageUpSync()
-            SyncTarget.ONE_TIME_EVENTS -> startEventSync(isDownSyncAllowed)
+            SyncTarget.ONE_TIME_EVENTS -> startEventSync((payload as SyncCommandPayload.WithDownSyncAllowed).isDownSyncAllowed)
             SyncTarget.ONE_TIME_IMAGES -> startImageSync()
         }
     }

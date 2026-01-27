@@ -47,7 +47,7 @@ class SyncCommandsTest {
                     expectedCommand(
                         target = expectedTarget,
                         action = SyncAction.START,
-                        params = mapOf(SyncParam.IS_DOWN_SYNC_ALLOWED to true),
+                        payload = SyncCommandPayload.WithDownSyncAllowed(true),
                     ),
                 )
             assertThat(builder.start(isDownSyncAllowed = false))
@@ -55,7 +55,7 @@ class SyncCommandsTest {
                     expectedCommand(
                         target = expectedTarget,
                         action = SyncAction.START,
-                        params = mapOf(SyncParam.IS_DOWN_SYNC_ALLOWED to false),
+                        payload = SyncCommandPayload.WithDownSyncAllowed(false),
                     ),
                 )
         }
@@ -66,7 +66,7 @@ class SyncCommandsTest {
                     expectedCommand(
                         target = expectedTarget,
                         action = SyncAction.START,
-                        params = mapOf(SyncParam.WITH_DELAY to false),
+                        payload = SyncCommandPayload.WithDelay(false),
                     ),
                 )
             assertThat(builder.start(withDelay = true))
@@ -74,7 +74,7 @@ class SyncCommandsTest {
                     expectedCommand(
                         target = expectedTarget,
                         action = SyncAction.START,
-                        params = mapOf(SyncParam.WITH_DELAY to true),
+                        payload = SyncCommandPayload.WithDelay(true),
                     ),
                 )
         }
@@ -94,7 +94,7 @@ class SyncCommandsTest {
                     expectedCommand(
                         target = expectedTarget,
                         action,
-                        params = mapOf(SyncParam.WITH_DELAY to false),
+                        payload = SyncCommandPayload.WithDelay(false),
                     ),
                 )
             assertThat(builder.stopAndStart(withDelay = true))
@@ -102,7 +102,7 @@ class SyncCommandsTest {
                     expectedCommand(
                         target = expectedTarget,
                         action,
-                        params = mapOf(SyncParam.WITH_DELAY to true),
+                        payload = SyncCommandPayload.WithDelay(true),
                     ),
                 )
         }
@@ -113,7 +113,7 @@ class SyncCommandsTest {
                     expectedCommand(
                         target = expectedTarget,
                         action,
-                        params = mapOf(SyncParam.IS_DOWN_SYNC_ALLOWED to true),
+                        payload = SyncCommandPayload.WithDownSyncAllowed(true),
                     ),
                 )
             assertThat(builder.stopAndStart(isDownSyncAllowed = false))
@@ -121,7 +121,7 @@ class SyncCommandsTest {
                     expectedCommand(
                         target = expectedTarget,
                         action,
-                        params = mapOf(SyncParam.IS_DOWN_SYNC_ALLOWED to false),
+                        payload = SyncCommandPayload.WithDownSyncAllowed(false),
                     ),
                 )
         }
@@ -137,7 +137,7 @@ class SyncCommandsTest {
                 .isEqualTo(
                     expectedCommand(
                         target = expectedTarget,
-                        action,
+                        action = action,
                         block = block,
                     ),
                 )
@@ -149,7 +149,7 @@ class SyncCommandsTest {
                     expectedCommand(
                         target = expectedTarget,
                         action,
-                        params = mapOf(SyncParam.IS_DOWN_SYNC_ALLOWED to true),
+                        payload = SyncCommandPayload.WithDownSyncAllowed(true),
                         block,
                     ),
                 )
@@ -158,7 +158,7 @@ class SyncCommandsTest {
                     expectedCommand(
                         target = expectedTarget,
                         action,
-                        params = mapOf(SyncParam.IS_DOWN_SYNC_ALLOWED to false),
+                        payload = SyncCommandPayload.WithDownSyncAllowed(false),
                         block,
                     ),
                 )
@@ -170,7 +170,7 @@ class SyncCommandsTest {
                     expectedCommand(
                         target = expectedTarget,
                         action,
-                        params = mapOf(SyncParam.WITH_DELAY to false),
+                        payload = SyncCommandPayload.WithDelay(false),
                         block,
                     ),
                 )
@@ -179,7 +179,7 @@ class SyncCommandsTest {
                     expectedCommand(
                         target = expectedTarget,
                         action,
-                        params = mapOf(SyncParam.WITH_DELAY to true),
+                        payload = SyncCommandPayload.WithDelay(true),
                         block,
                     ),
                 )
@@ -195,12 +195,12 @@ class SyncCommandsTest {
     private fun expectedCommand(
         target: SyncTarget,
         action: SyncAction,
-        params: Map<SyncParam, Any> = emptyMap(),
+        payload: SyncCommandPayload = SyncCommandPayload.None,
         block: (suspend () -> Unit)? = null,
     ) = ExecutableSyncCommand(
         target = target,
         action = action,
-        params = params,
+        payload = payload,
         blockToRunWhileStopped = block,
     )
 }
