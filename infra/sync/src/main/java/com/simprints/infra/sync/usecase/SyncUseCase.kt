@@ -6,6 +6,7 @@ import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.sync.ExecutableSyncCommand
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncCommand
+import com.simprints.infra.sync.SyncCommands
 import com.simprints.infra.sync.SyncResponse
 import com.simprints.infra.sync.SyncStatus
 import com.simprints.infra.sync.usecase.internal.ExecuteSyncCommandUseCase
@@ -104,7 +105,7 @@ class SyncUseCase @Inject internal constructor(
         SyncResponse(
             syncCommandJob = when (syncCommand) {
                 is ExecutableSyncCommand -> executeSyncCommand(syncCommand)
-                else -> Job().apply { complete() } // no-op
+                is SyncCommands.ObserveOnly -> Job().apply { complete() } // no-op
             },
             syncStatusFlow = sharedSyncStatus,
         )
