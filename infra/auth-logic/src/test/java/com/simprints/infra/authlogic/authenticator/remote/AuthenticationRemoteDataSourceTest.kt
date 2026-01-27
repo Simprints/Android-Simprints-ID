@@ -8,6 +8,7 @@ import com.simprints.infra.authstore.domain.models.AuthRequest
 import com.simprints.infra.authstore.domain.models.AuthenticationData
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.authstore.exceptions.AuthRequestInvalidCredentialsException
+import com.simprints.infra.backendapi.ApiResult
 import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -37,7 +38,11 @@ class AuthenticationRemoteDataSourceTest {
     @Before
     fun setUp() {
         coEvery { backendApiClient.executeUnauthenticatedCall<AuthenticationRemoteInterface, Any>(any(), any()) } coAnswers {
-            secondArg<suspend (AuthenticationRemoteInterface) -> Any>()(remoteInterface)
+            try {
+                ApiResult.Success(secondArg<suspend (AuthenticationRemoteInterface) -> Any>()(remoteInterface))
+            } catch (e: Exception) {
+                ApiResult.Failure(e)
+            }
         }
     }
 

@@ -3,6 +3,7 @@ package com.simprints.fingerprint.infra.scanner.data.remote.network
 import com.google.common.truth.Truth.*
 import com.simprints.fingerprint.infra.scanner.data.FirmwareTestData
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.backendapi.ApiResult
 import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -43,7 +44,11 @@ internal class FingerprintFileDownloaderTest {
         // Given
         coEvery { api.getFileUrl(any(), any()) } returns FileUrl(FirmwareTestData.SOME_URL)
         coEvery { backendApiClient.executeCall<FileUrlRemoteInterface, Any>(any(), any()) } coAnswers {
-            secondArg<suspend (FileUrlRemoteInterface) -> Any>()(api)
+            try {
+                ApiResult.Success(secondArg<suspend (FileUrlRemoteInterface) -> Any>()(api))
+            } catch (e: Exception) {
+                ApiResult.Failure(e)
+            }
         }
 
         every { authStore.signedInProjectId } returns "projectId"

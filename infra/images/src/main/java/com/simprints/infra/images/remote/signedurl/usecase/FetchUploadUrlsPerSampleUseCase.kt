@@ -22,12 +22,9 @@ internal class FetchUploadUrlsPerSampleUseCase @Inject constructor(
                 metadata = it.metadata,
             )
         }.let { batch ->
-            try {
-                backendApiClient.executeCall(SampleUploadApiInterface::class) { api ->
-                    api.getSampleUploadUrl(projectId, batch)
-                }
-            } catch (_: Exception) {
-                emptyList()
+            backendApiClient.executeCall(SampleUploadApiInterface::class) { api ->
+                api.getSampleUploadUrl(projectId, batch)
             }
-        }.associate { it.sampleId to it.url }
+        }.getOrMapFailure { emptyList() }
+        .associate { it.sampleId to it.url }
 }

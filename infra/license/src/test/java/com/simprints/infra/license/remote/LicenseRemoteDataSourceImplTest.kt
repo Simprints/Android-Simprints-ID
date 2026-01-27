@@ -1,6 +1,7 @@
 package com.simprints.infra.license.remote
 
 import com.google.common.truth.Truth.*
+import com.simprints.infra.backendapi.ApiResult
 import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.infra.license.models.LicenseVersion
 import com.simprints.infra.license.models.Vendor
@@ -32,7 +33,11 @@ class LicenseRemoteDataSourceImplTest {
     @Before
     fun setup() {
         coEvery { backendApiClient.executeCall<LicenseRemoteInterface, Any>(any(), any()) } coAnswers {
-            secondArg<suspend (LicenseRemoteInterface) -> Any>()(remoteInterface)
+            try {
+                ApiResult.Success(secondArg<suspend (LicenseRemoteInterface) -> Any>()(remoteInterface))
+            } catch (e: Exception) {
+                ApiResult.Failure(e)
+            }
         }
 
         coEvery {

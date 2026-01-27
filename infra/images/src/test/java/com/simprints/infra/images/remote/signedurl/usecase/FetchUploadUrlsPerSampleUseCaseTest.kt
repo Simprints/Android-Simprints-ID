@@ -1,6 +1,7 @@
 package com.simprints.infra.images.remote.signedurl.usecase
 
 import com.google.common.truth.Truth.*
+import com.simprints.infra.backendapi.ApiResult
 import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
@@ -28,7 +29,11 @@ internal class FetchUploadUrlsPerSampleUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
 
         coEvery { backendApiClient.executeCall<SampleUploadApiInterface, Any>(any(), any()) } coAnswers {
-            secondArg<suspend (SampleUploadApiInterface) -> Any>()(apiInterface)
+            try {
+                ApiResult.Success(secondArg<suspend (SampleUploadApiInterface) -> Any>()(apiInterface))
+            } catch (e: Exception) {
+                ApiResult.Failure(e)
+            }
         }
         useCase = FetchUploadUrlsPerSampleUseCase(backendApiClient)
     }

@@ -131,8 +131,9 @@ internal class EventRemoteDataSource @Inject constructor(
         )
     }
 
-    private suspend fun <T> executeCall(block: suspend (EventRemoteInterface) -> T): T =
-        backendApiClient.executeCall(EventRemoteInterface::class) { block(it) }
+    private suspend fun <T> executeCall(block: suspend (EventRemoteInterface) -> T): T = backendApiClient
+        .executeCall(EventRemoteInterface::class) { block(it) }
+        .getOrThrow()
 
     companion object {
         private const val CHANNEL_CAPACITY_FOR_PROPAGATION = 2000

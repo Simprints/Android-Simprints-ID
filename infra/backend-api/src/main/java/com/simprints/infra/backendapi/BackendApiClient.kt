@@ -28,7 +28,11 @@ class BackendApiClient @Inject internal constructor(
     suspend fun <T : SimRemoteInterface, V> executeCall(
         remoteInterface: KClass<T>,
         block: suspend (T) -> V,
-    ): V = getApiClient(remoteInterface, authStore.getFirebaseToken()).executeCall(block)
+    ): ApiResult<V> = try {
+        ApiResult.Success(getApiClient(remoteInterface, authStore.getFirebaseToken()).executeCall(block))
+    } catch (t: Throwable) {
+        ApiResult.Failure(t)
+    }
 
     /**
      * Executes an unauthenticated backend call for the given [remoteInterface].
@@ -38,7 +42,11 @@ class BackendApiClient @Inject internal constructor(
     suspend fun <T : SimRemoteInterface, V> executeUnauthenticatedCall(
         remoteInterface: KClass<T>,
         block: suspend (T) -> V,
-    ): V = getApiClient(remoteInterface, null).executeCall(block)
+    ): ApiResult<V> = try {
+        ApiResult.Success(getApiClient(remoteInterface, null).executeCall(block))
+    } catch (t: Throwable) {
+        ApiResult.Failure(t)
+    }
 
     private suspend fun <T : SimRemoteInterface> getApiClient(
         remoteInterface: KClass<T>,

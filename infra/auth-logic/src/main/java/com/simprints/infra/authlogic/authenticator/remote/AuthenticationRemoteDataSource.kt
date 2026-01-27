@@ -18,6 +18,7 @@ internal class AuthenticationRemoteDataSource @Inject constructor(
     ): AuthenticationData = try {
         backendApiClient
             .executeUnauthenticatedCall(AuthenticationRemoteInterface::class) { api -> api.requestAuthenticationData(projectId, deviceId) }
+            .getOrThrow()
             .toDomain()
     } catch (e: Exception) {
         if (e is SyncCloudIntegrationException && e.httpStatusCode() == NOT_FOUND_STATUS_CODE) {
@@ -39,7 +40,8 @@ internal class AuthenticationRemoteDataSource @Inject constructor(
                     deviceId,
                     ApiAuthRequestBody.fromDomain(credentials),
                 )
-            }.toDomain()
+            }.getOrThrow()
+            .toDomain()
     } catch (e: Exception) {
         if (e is SyncCloudIntegrationException && e.httpStatusCode() == UNAUTHORIZED_STATUS_CODE) {
             throw AuthRequestInvalidCredentialsException()

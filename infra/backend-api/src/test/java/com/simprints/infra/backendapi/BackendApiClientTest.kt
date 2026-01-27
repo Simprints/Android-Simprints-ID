@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.*
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.SimRemoteInterface
-import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
@@ -50,7 +49,7 @@ internal class BackendApiClientTest {
 
         val result = subject.executeCall(TestRemoteInterface::class) { expectedValue }
 
-        assertThat(result).isEqualTo(expectedValue)
+        assertThat(result).isEqualTo(ApiResult.Success(expectedValue))
         coVerify(exactly = 1) {
             simNetwork.getSimApiClient(TestRemoteInterface::class, deviceId, versionName, "token")
         }
@@ -61,11 +60,9 @@ internal class BackendApiClientTest {
         val throwable = IllegalStateException("boom")
         coEvery { apiClient.executeCall(any<suspend (TestRemoteInterface) -> String>()) } throws throwable
 
-        val result = assertThrows<IllegalStateException> {
-            subject.executeCall(TestRemoteInterface::class) { "ignored" }
-        }
+        val result = subject.executeCall(TestRemoteInterface::class) { "ignored" }
 
-        assertThat(result).isEqualTo(throwable)
+        assertThat(result).isEqualTo(ApiResult.Failure<String>(throwable))
         coVerify(exactly = 1) {
             simNetwork.getSimApiClient(TestRemoteInterface::class, deviceId, versionName, "token")
         }
@@ -78,7 +75,7 @@ internal class BackendApiClientTest {
 
         val result = subject.executeUnauthenticatedCall(TestRemoteInterface::class) { expectedValue }
 
-        assertThat(result).isEqualTo(expectedValue)
+        assertThat(result).isEqualTo(ApiResult.Success(expectedValue))
         coVerify(exactly = 1) {
             simNetwork.getSimApiClient(TestRemoteInterface::class, deviceId, versionName, null)
         }
@@ -89,11 +86,9 @@ internal class BackendApiClientTest {
         val throwable = IllegalStateException("boom")
         coEvery { apiClient.executeCall(any<suspend (TestRemoteInterface) -> String>()) } throws throwable
 
-        val result = assertThrows<IllegalStateException> {
-            subject.executeUnauthenticatedCall(TestRemoteInterface::class) { "ignored" }
-        }
+        val result = subject.executeUnauthenticatedCall(TestRemoteInterface::class) { "ignored" }
 
-        assertThat(result).isEqualTo(throwable)
+        assertThat(result).isEqualTo(ApiResult.Failure<String>(throwable))
         coVerify(exactly = 1) {
             simNetwork.getSimApiClient(TestRemoteInterface::class, deviceId, versionName, null)
         }
