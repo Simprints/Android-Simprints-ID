@@ -68,7 +68,7 @@ internal class ExecuteSyncCommandUseCase @Inject constructor(
         }
     }
 
-    internal operator fun invoke(syncCommand: ExecutableSyncCommand): Job {
+    internal operator fun invoke(syncCommand: ExecutableSyncCommand, commandScope: CoroutineScope = appScope): Job {
         with(syncCommand) {
             val isStopNeeded = action in listOf(SyncAction.STOP, SyncAction.STOP_AND_START)
             if (isStopNeeded) {
@@ -77,7 +77,7 @@ internal class ExecuteSyncCommandUseCase @Inject constructor(
             val isStartNeeded = action in listOf(SyncAction.START, SyncAction.STOP_AND_START)
             val isFurtherAsyncActionNeeded = blockToRunWhileStopped != null || isStartNeeded
             return if (isFurtherAsyncActionNeeded) {
-                appScope.launch(ioDispatcher) {
+                commandScope.launch(ioDispatcher) {
                     blockToRunWhileStopped?.invoke()
                     if (isStartNeeded) {
                         start()

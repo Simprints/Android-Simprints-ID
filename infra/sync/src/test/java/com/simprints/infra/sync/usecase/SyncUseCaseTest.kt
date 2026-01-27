@@ -14,6 +14,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -45,7 +46,7 @@ class SyncUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
         every { eventSyncStateProcessor.getLastSyncState() } returns eventSyncStatusFlow
         every { imageSync.invoke() } returns imageSyncStatusFlow
-        every { executeSyncCommand.invoke(any()) } returns Job().apply { complete() }
+        every { executeSyncCommand.invoke(any(), any()) } returns Job().apply { complete() }
     }
 
     @Test
@@ -269,19 +270,34 @@ class SyncUseCaseTest {
         val response = useCase(SyncCommands.ObserveOnly)
 
         assertThat(response.syncCommandJob.isCompleted).isTrue()
-        verify(exactly = 0) { executeSyncCommand.invoke(any()) }
+        verify(exactly = 0) { executeSyncCommand.invoke(any(), any()) }
     }
 
     @Test
     fun `executes executable sync command and returns its job`() = runTest {
         val expectedJob = Job().apply { complete() }
-        every { executeSyncCommand.invoke(any()) } returns expectedJob
         val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, executeSyncCommand, appScope = backgroundScope)
         val command = SyncCommands.Schedule.Everything.stopAndStart() as ExecutableSyncCommand
+        every { executeSyncCommand.invoke(command, backgroundScope) } returns expectedJob
 
         val response = useCase(command)
 
         assertThat(response.syncCommandJob).isSameInstanceAs(expectedJob)
-        verify(exactly = 1) { executeSyncCommand.invoke(command) }
+        verify(exactly = 1) { executeSyncCommand.invoke(command, backgroundScope) }
+    }
+
+    @Test
+    fun `executes executable sync command using provided commandScope`() = runTest {
+        val expectedJob = Job().apply { complete() }
+        val customScope = CoroutineScope(backgroundScope.coroutineContext + Job())
+        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, executeSyncCommand, appScope = backgroundScope)
+        val command = SyncCommands.Schedule.Everything.stopAndStart() as ExecutableSyncCommand
+
+        every { executeSyncCommand.invoke(command, customScope) } returns expectedJob
+
+        val response = useCase(command, commandScope = customScope)
+
+        assertThat(response.syncCommandJob).isSameInstanceAs(expectedJob)
+        verify(exactly = 1) { executeSyncCommand.invoke(command, customScope) }
     }
 }

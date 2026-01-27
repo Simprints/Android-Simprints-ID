@@ -12,6 +12,7 @@ object SyncCommands {
     object ObserveOnly : SyncCommand()
 
     object OneTime {
+        // DSL-style capitalization to fit well when used like: sync(SyncCommands.OneTime.Events.start())
         val Events = buildSyncCommandsWithDownSyncParam(SyncTarget.ONE_TIME_EVENTS)
         val Images = buildSyncCommands(SyncTarget.ONE_TIME_IMAGES)
     }
