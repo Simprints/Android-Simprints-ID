@@ -98,7 +98,7 @@ class SyncUseCase @Inject internal constructor(
      * Sync returns a combo of a Job for the command and the flow of sync statuses.
      * For non-blocking use, the job doesn't matter.
      * If the command was for a inherently non-blocking job, it will be returned already completed.
-     * To suspend until the command completes, add .await(), or .syncCommandJob.join() - they are the same.
+     * To suspend until the command completes, add .await(), it rethrows cancellations / other exceptions.
      *
      * The commandScope param allows the sync command (incl. the optional stopAndStartAround block)
      * be cancelable when the passed scope's coroutine is cancelled,

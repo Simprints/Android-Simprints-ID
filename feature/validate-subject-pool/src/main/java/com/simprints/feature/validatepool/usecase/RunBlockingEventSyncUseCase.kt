@@ -1,6 +1,7 @@
 package com.simprints.feature.validatepool.usecase
 
 import com.simprints.infra.sync.SyncCommands
+import com.simprints.infra.sync.await
 import com.simprints.infra.sync.usecase.SyncUseCase
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -19,11 +20,11 @@ internal class RunBlockingEventSyncUseCase @Inject constructor(
             .map { it.eventSyncState }
             .firstOrNull { !it.isUninitialized() }
             ?.syncId
-        sync(SyncCommands.OneTime.Events.start()).let { (startJob, syncStatusFlow) ->
-            startJob.join()
-            syncStatusFlow
-                .map { it.eventSyncState }
-                .firstOrNull { it.syncId != lastSyncId && it.isSyncReporterCompleted() }
-        }
+        sync(SyncCommands.OneTime.Events.start())
+            .apply {
+                await()
+            }.syncStatusFlow
+            .map { it.eventSyncState }
+            .firstOrNull { it.syncId != lastSyncId && it.isSyncReporterCompleted() }
     }
 }
