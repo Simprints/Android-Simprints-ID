@@ -1175,6 +1175,24 @@ class FingerprintCaptureViewModelTest {
     }
 
     @Test
+    fun handleReconnectionNavigationFailed_resetsFlag_allowingSubsequentReconnectAttempts() = runTest {
+        every { scannerManager.isScannerConnected } returns false
+
+        vm.handleOnViewCreated(TWO_FINGERS_IDS, SECUGEN_SIM_MATCHER)
+        // First reconnect event is sent because scanner is not connected
+        vm.launchReconnect.assertEventReceived()
+
+        // Simulate navigation failure - this should reset the flag
+        vm.handleReconnectionNavigationFailed()
+
+        // Trigger another state update that checks scanner connection
+        vm.handleOnResume()
+
+        // Second reconnect event should be sent because flag was reset
+        vm.launchReconnect.assertEventReceived()
+    }
+
+    @Test
     @ExperimentalTime
     fun backPressed_whileTransferringImage_cancelsTransfer() = runTest {
         mockScannerTurnSmileLedsOff()
