@@ -15,6 +15,7 @@ import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.sync.SyncCommands
+import com.simprints.infra.sync.await
 import com.simprints.infra.sync.usecase.SyncUseCase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -50,7 +51,7 @@ class EventDownSyncResetService : Service() {
             // Reset current downsync state
             eventSyncManager.resetDownSyncInfo()
             // Trigger a new sync
-            sync(SyncCommands.OneTime.Events.start())
+            sync(SyncCommands.OneTime.Events.start()).await()
         }
         resetJob?.invokeOnCompletion { stopSelf() }
 
