@@ -20,7 +20,6 @@ import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.sync.SyncCommands
-import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.usecase.SyncUseCase
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
@@ -39,9 +38,6 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
 
     @Inject
     lateinit var eventSyncManager: EventSyncManager
-
-    @Inject
-    lateinit var syncOrchestrator: SyncOrchestrator
 
     @Inject
     lateinit var authStore: AuthStore
@@ -90,19 +86,15 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
             }
 
         binding.syncStart.setOnClickListener {
-            lifecycleScope.launch(dispatcher) {
-                syncOrchestrator.startEventSync()
-            }
+            sync(SyncCommands.OneTime.Events.start())
         }
 
         binding.syncStop.setOnClickListener {
-            syncOrchestrator.stopEventSync()
+            sync(SyncCommands.OneTime.Events.stop())
         }
 
         binding.syncSchedule.setOnClickListener {
-            lifecycleScope.launch(dispatcher) {
-                syncOrchestrator.rescheduleEventSync()
-            }
+            sync(SyncCommands.Schedule.Events.start())
         }
 
         binding.clearFirebaseToken.setOnClickListener {
@@ -127,8 +119,8 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
 
         binding.cleanAll.setOnClickListener {
             lifecycleScope.launch(dispatcher) {
-                syncOrchestrator.stopEventSync()
-                syncOrchestrator.cancelEventSync()
+                sync(SyncCommands.OneTime.Events.stop())
+                sync(SyncCommands.Schedule.Events.stop())
 
                 eventRepository.deleteAll()
                 eventSyncManager.resetDownSyncInfo()

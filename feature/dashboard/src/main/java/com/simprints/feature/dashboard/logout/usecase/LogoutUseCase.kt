@@ -4,12 +4,15 @@ import com.simprints.core.DispatcherIO
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationFlagsStore
+import com.simprints.infra.sync.SyncCommands
 import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.sync.usecase.SyncUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 internal class LogoutUseCase @Inject constructor(
+    private val sync: SyncUseCase,
     private val syncOrchestrator: SyncOrchestrator,
     private val authManager: AuthManager,
     private val flagsStore: RealmToRoomMigrationFlagsStore,
@@ -19,7 +22,7 @@ internal class LogoutUseCase @Inject constructor(
     // To prevent a race between wiping data and navigation, this use case must block the executing thread
     operator fun invoke() = runBlocking(ioDispatcher) {
         // Cancel all background sync
-        syncOrchestrator.cancelBackgroundWork()
+        sync(SyncCommands.Schedule.Everything.stop())
         syncOrchestrator.deleteEventSyncInfo()
         // sign out the user
         authManager.signOut()

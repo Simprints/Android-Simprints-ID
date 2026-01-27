@@ -17,7 +17,6 @@ import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.sync.SyncCommands
-import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.usecase.SyncUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -43,7 +42,6 @@ import javax.inject.Inject
 internal class SyncInfoViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
     private val authStore: AuthStore,
-    private val syncOrchestrator: SyncOrchestrator,
     private val recentUserActivityManager: RecentUserActivityManager,
     private val timeHelper: TimeHelper,
     observeSyncInfo: ObserveSyncInfoUseCase,
@@ -146,10 +144,8 @@ internal class SyncInfoViewModel @Inject constructor(
                 }
             }
 
-            syncOrchestrator.stopEventSync()
-
             val isDownSyncAllowed = !isPreLogoutUpSync && configRepository.getProject()?.state == ProjectState.RUNNING
-            syncOrchestrator.startEventSync(isDownSyncAllowed)
+            sync(SyncCommands.OneTime.Events.stopAndStart(isDownSyncAllowed))
         }
     }
 
@@ -157,10 +153,10 @@ internal class SyncInfoViewModel @Inject constructor(
         viewModelScope.launch {
             val isImageSyncing = imageSyncStatusFlow.firstOrNull()?.isSyncing == true
             if (isImageSyncing) {
-                syncOrchestrator.stopImageSync()
+                sync(SyncCommands.OneTime.Images.stop())
             } else {
                 imageSyncButtonClickFlow.emit(Unit)
-                syncOrchestrator.startImageSync()
+                sync(SyncCommands.OneTime.Images.start())
             }
         }
     }
@@ -218,7 +214,7 @@ internal class SyncInfoViewModel @Inject constructor(
                     .distinctUntilChanged()
                     .collect { isEventSyncCompleted ->
                         if (isEventSyncCompleted) {
-                            syncOrchestrator.startImageSync()
+                            sync(SyncCommands.OneTime.Images.start())
                         }
                     }
             }

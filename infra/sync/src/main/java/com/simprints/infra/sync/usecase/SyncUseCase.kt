@@ -8,6 +8,7 @@ import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncCommand
 import com.simprints.infra.sync.SyncResponse
 import com.simprints.infra.sync.SyncStatus
+import com.simprints.infra.sync.usecase.internal.ExecuteSyncCommandUseCase
 import com.simprints.infra.sync.usecase.internal.ObserveImageSyncStatusUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -29,7 +30,7 @@ import javax.inject.Singleton
 class SyncUseCase @Inject internal constructor(
     eventSyncStateProcessor: EventSyncStateProcessor,
     imageSync: ObserveImageSyncStatusUseCase,
-    // todo MS-1299 use private val executeSyncCommand: ExecuteSyncCommandUseCase,
+    private val executeSyncCommand: ExecuteSyncCommandUseCase,
     @param:AppScope private val appScope: CoroutineScope,
 ) {
     private val defaultEventSyncState = EventSyncState(
@@ -102,7 +103,7 @@ class SyncUseCase @Inject internal constructor(
     operator fun invoke(syncCommand: SyncCommand): SyncResponse =
         SyncResponse(
             syncCommandJob = when (syncCommand) {
-                is ExecutableSyncCommand -> throw NotImplementedError("Executable sync commands not implemented") // todo MS-1299 replace with executeSyncCommand(syncCommand)
+                is ExecutableSyncCommand -> executeSyncCommand(syncCommand)
                 else -> Job().apply { complete() } // no-op
             },
             syncStatusFlow = sharedSyncStatus,
