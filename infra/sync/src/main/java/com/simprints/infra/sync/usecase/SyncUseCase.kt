@@ -105,7 +105,10 @@ class SyncUseCase @Inject internal constructor(
      * and to allow stopAndStartAround throw exceptions in the passed scopes coroutine's context.
      * Note: cancelling a command may leave the corresponding sync in a stopped state. The stopping is synchronous.
      */
-    operator fun invoke(syncCommand: SyncCommand, commandScope: CoroutineScope = appScope): SyncResponse = SyncResponse(
+    operator fun invoke(
+        syncCommand: SyncCommand,
+        commandScope: CoroutineScope = appScope,
+    ): SyncResponse = SyncResponse(
         syncCommandJob = when (syncCommand) {
             is ExecutableSyncCommand -> executeSyncCommand(syncCommand, commandScope)
             is SyncCommands.ObserveOnly -> Job().apply { complete() } // no-op

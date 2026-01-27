@@ -15,8 +15,8 @@ import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.sync.master.EventSyncMasterWorker
 import com.simprints.infra.sync.ExecutableSyncCommand
-import com.simprints.infra.sync.SyncCommandPayload
 import com.simprints.infra.sync.SyncAction
+import com.simprints.infra.sync.SyncCommandPayload
 import com.simprints.infra.sync.SyncConstants
 import com.simprints.infra.sync.SyncTarget
 import com.simprints.infra.sync.config.worker.DeviceConfigDownSyncWorker
@@ -68,7 +68,10 @@ internal class ExecuteSyncCommandUseCase @Inject constructor(
         }
     }
 
-    internal operator fun invoke(syncCommand: ExecutableSyncCommand, commandScope: CoroutineScope = appScope): Job {
+    internal operator fun invoke(
+        syncCommand: ExecutableSyncCommand,
+        commandScope: CoroutineScope = appScope,
+    ): Job {
         with(syncCommand) {
             val isStopNeeded = action in listOf(SyncAction.STOP, SyncAction.STOP_AND_START)
             if (isStopNeeded) {

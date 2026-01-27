@@ -87,7 +87,7 @@ object SyncCommands {
             target,
             SyncAction.STOP_AND_START,
             payload = SyncCommandPayload.WithDownSyncAllowed(isDownSyncAllowed),
-            block = block
+            block = block,
         )
     }
 

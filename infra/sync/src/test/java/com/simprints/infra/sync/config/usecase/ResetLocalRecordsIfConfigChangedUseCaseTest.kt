@@ -9,9 +9,9 @@ import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.sync.ExecutableSyncCommand
 import com.simprints.infra.sync.SyncAction
 import com.simprints.infra.sync.SyncCommand
+import com.simprints.infra.sync.SyncCommandPayload
 import com.simprints.infra.sync.SyncResponse
 import com.simprints.infra.sync.SyncTarget
-import com.simprints.infra.sync.SyncCommandPayload
 import com.simprints.infra.sync.config.testtools.projectConfiguration
 import com.simprints.infra.sync.config.testtools.synchronizationConfiguration
 import com.simprints.infra.sync.usecase.SyncUseCase
