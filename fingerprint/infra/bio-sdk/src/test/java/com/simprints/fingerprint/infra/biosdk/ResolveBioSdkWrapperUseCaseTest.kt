@@ -12,15 +12,12 @@ class ResolveBioSdkWrapperUseCaseTest {
     private lateinit var bioSdkResolverUseCase: ResolveBioSdkWrapperUseCase
 
     @MockK
-    private lateinit var necBioSdkWrapper: BioSdkWrapper
-
-    @MockK
     private lateinit var simprintsBioSdkWrapper: BioSdkWrapper
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        bioSdkResolverUseCase = ResolveBioSdkWrapperUseCase(simprintsBioSdkWrapper, necBioSdkWrapper)
+        bioSdkResolverUseCase = ResolveBioSdkWrapperUseCase(simprintsBioSdkWrapper)
     }
 
     @Test
@@ -29,9 +26,9 @@ class ResolveBioSdkWrapperUseCaseTest {
         Truth.assertThat(simprintsBioSdkWrapper).isEqualTo(result)
     }
 
-    @Test
+    @Test(expected = IllegalStateException::class)
     fun `test  with nec sdk`() = runTest {
         val result = bioSdkResolverUseCase(ModalitySdkType.NEC)
-        Truth.assertThat(necBioSdkWrapper).isEqualTo(result)
+        // should throw IllegalStateException
     }
 }

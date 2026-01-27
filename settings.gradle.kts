@@ -89,7 +89,6 @@ include(
     ":fingerprint:infra:base-bio-sdk",
     ":fingerprint:infra:bio-sdk",
     ":fingerprint:infra:simprints-bio-sdk",
-    ":fingerprint:infra:nec-bio-sdk",
     ":fingerprint:infra:simafis-wrapper",
     ":fingerprint:infra:image-distortion-config",
 )
