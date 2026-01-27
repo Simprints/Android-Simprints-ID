@@ -22,7 +22,7 @@ internal class ResetLocalRecordsIfConfigChangedUseCase @Inject constructor(
                 SyncCommands.Schedule.Events.stopAndStartAround {
                     eventSyncManager.resetDownSyncInfo()
                     enrolmentRecordRepository.deleteAll()
-                }
+                },
             ).await()
         }
     }
@@ -37,5 +37,5 @@ internal class ResetLocalRecordsIfConfigChangedUseCase @Inject constructor(
             oldConfig.synchronization.down.simprints
                 ?.partitionType != newConfig.synchronization.down.simprints
                 ?.partitionType
-            )
+        )
 }

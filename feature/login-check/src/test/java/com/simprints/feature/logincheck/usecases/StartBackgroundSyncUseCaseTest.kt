@@ -13,9 +13,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
@@ -45,7 +45,8 @@ class StartBackgroundSyncUseCaseTest {
         coEvery {
             configRepository
                 .getProjectConfiguration()
-                .synchronization.down.simprints?.frequency
+                .synchronization.down.simprints
+                ?.frequency
         } returns
             Frequency.PERIODICALLY
 
@@ -57,7 +58,8 @@ class StartBackgroundSyncUseCaseTest {
         coEvery {
             configRepository
                 .getProjectConfiguration()
-                .synchronization.down.simprints?.frequency
+                .synchronization.down.simprints
+                ?.frequency
         } returns
             Frequency.PERIODICALLY_AND_ON_SESSION_START
 
@@ -69,7 +71,8 @@ class StartBackgroundSyncUseCaseTest {
         coEvery {
             configRepository
                 .getProjectConfiguration()
-                .synchronization.down.simprints?.frequency
+                .synchronization.down.simprints
+                ?.frequency
         } returns
             Frequency.PERIODICALLY
 

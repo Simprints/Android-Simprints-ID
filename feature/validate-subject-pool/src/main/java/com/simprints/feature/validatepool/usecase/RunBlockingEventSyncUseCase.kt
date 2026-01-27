@@ -14,7 +14,8 @@ internal class RunBlockingEventSyncUseCase @Inject constructor(
         // so it can be used to as a filter out old sync states.
         // To guarantee it's not associated with the newly run sync,
         // the value needs to be taken before it starts.
-        val lastSyncId = sync(SyncCommands.ObserveOnly).syncStatusFlow
+        val lastSyncId = sync(SyncCommands.ObserveOnly)
+            .syncStatusFlow
             .map { it.eventSyncState }
             .firstOrNull { !it.isUninitialized() }
             ?.syncId

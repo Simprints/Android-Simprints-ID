@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class SyncCommandsTest {
-
     private val buildersWithoutParams = listOf(
         SyncCommands.OneTime.Images to SyncTarget.ONE_TIME_IMAGES,
         SyncCommands.Schedule.Images to SyncTarget.SCHEDULE_IMAGES,

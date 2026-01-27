@@ -69,7 +69,6 @@ class SyncUseCase @Inject internal constructor(
      * with a .value also available to the callers synchronously.
      *
      * Usage:
-     * todo MS-1299
      * sync(
      *  SyncCommands.
      *   +- ObserveOnly.
@@ -101,13 +100,11 @@ class SyncUseCase @Inject internal constructor(
      * If the command was for a inherently non-blocking job, it will be returned already completed.
      * To suspend until the command completes, add .await(), or .syncCommandJob.join() - they are the same.
      */
-    operator fun invoke(syncCommand: SyncCommand): SyncResponse =
-        SyncResponse(
-            syncCommandJob = when (syncCommand) {
-                is ExecutableSyncCommand -> executeSyncCommand(syncCommand)
-                is SyncCommands.ObserveOnly -> Job().apply { complete() } // no-op
-            },
-            syncStatusFlow = sharedSyncStatus,
-        )
-
+    operator fun invoke(syncCommand: SyncCommand): SyncResponse = SyncResponse(
+        syncCommandJob = when (syncCommand) {
+            is ExecutableSyncCommand -> executeSyncCommand(syncCommand)
+            is SyncCommands.ObserveOnly -> Job().apply { complete() } // no-op
+        },
+        syncStatusFlow = sharedSyncStatus,
+    )
 }

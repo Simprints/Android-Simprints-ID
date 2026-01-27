@@ -2,7 +2,7 @@ package com.simprints.infra.sync
 
 import kotlinx.coroutines.flow.Flow
 
-// todo MS-1300 disband the rest into new other usecases
+// todo MS-1300 disband into usecases
 interface SyncOrchestrator {
     fun startConfigSync()
 

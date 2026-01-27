@@ -365,7 +365,8 @@ class ExecuteSyncCommandUseCaseTest {
     }
 
     @Test
-    fun `stops image worker when event sync starts`() = runTest { // init block test
+    fun `stops image worker when event sync starts`() = runTest {
+        // init block test
         val eventStartFlow = MutableSharedFlow<List<WorkInfo>>()
         every { workManager.getWorkInfosFlow(any()) } returns eventStartFlow
 
@@ -383,7 +384,8 @@ class ExecuteSyncCommandUseCaseTest {
     }
 
     @Test
-    fun `does not stop image worker when event sync is not running`() = runTest { // init block test
+    fun `does not stop image worker when event sync is not running`() = runTest {
+        // init block test
         val eventStartFlow = MutableSharedFlow<List<WorkInfo>>()
         every { workManager.getWorkInfosFlow(any()) } returns eventStartFlow
 

@@ -23,7 +23,6 @@ internal class SyncOrchestratorImpl @Inject constructor(
     private val cleanupDeprecatedWorkers: CleanupDeprecatedWorkersUseCase,
     private val imageSyncTimestampProvider: ImageSyncTimestampProvider,
 ) : SyncOrchestrator {
-
     override fun startConfigSync() {
         workManager.startWorker<ProjectConfigDownSyncWorker>(SyncConstants.PROJECT_SYNC_WORK_NAME_ONE_TIME)
         workManager.startWorker<DeviceConfigDownSyncWorker>(SyncConstants.DEVICE_SYNC_WORK_NAME_ONE_TIME)

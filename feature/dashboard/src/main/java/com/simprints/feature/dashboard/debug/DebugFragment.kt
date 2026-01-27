@@ -63,7 +63,8 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
         super.onViewCreated(view, savedInstanceState)
         applySystemBarInsets(view)
 
-        sync(SyncCommands.ObserveOnly).syncStatusFlow
+        sync(SyncCommands.ObserveOnly)
+            .syncStatusFlow
             .map {
                 it.eventSyncState
             }.asLiveData()

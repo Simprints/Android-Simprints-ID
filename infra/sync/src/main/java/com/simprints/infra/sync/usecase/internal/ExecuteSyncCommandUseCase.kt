@@ -60,8 +60,7 @@ internal class ExecuteSyncCommandUseCase @Inject constructor(
                     ),
                 ).map { workInfoList ->
                     workInfoList.anyRunning()
-                }
-                .distinctUntilChanged()
+                }.distinctUntilChanged()
                 .filter { it } // only if any running
                 .collect {
                     rescheduleImageUpSync()

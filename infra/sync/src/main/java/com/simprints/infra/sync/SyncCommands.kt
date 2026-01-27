@@ -9,7 +9,6 @@ package com.simprints.infra.sync
  * See also SyncUseCase.invoke.
  */
 object SyncCommands {
-
     object ObserveOnly : SyncCommand()
 
     object OneTime {
@@ -23,28 +22,42 @@ object SyncCommands {
         val Images = buildSyncCommands(SyncTarget.SCHEDULE_IMAGES)
     }
 
-
     // builders
 
     interface SyncCommandBuilder {
         fun stop(): SyncCommand
+
         fun start(): SyncCommand
+
         fun stopAndStart(): SyncCommand
+
         fun stopAndStartAround(block: suspend () -> Unit): SyncCommand
     }
 
     interface SyncCommandBuilderWithDownSyncParam {
         fun stop(): SyncCommand
+
         fun start(isDownSyncAllowed: Boolean = true): SyncCommand
+
         fun stopAndStart(isDownSyncAllowed: Boolean = true): SyncCommand
-        fun stopAndStartAround(isDownSyncAllowed: Boolean = true, block: suspend () -> Unit): SyncCommand
+
+        fun stopAndStartAround(
+            isDownSyncAllowed: Boolean = true,
+            block: suspend () -> Unit,
+        ): SyncCommand
     }
 
     interface SyncCommandBuilderWithDelayParam {
         fun stop(): SyncCommand
+
         fun start(withDelay: Boolean = false): SyncCommand
+
         fun stopAndStart(withDelay: Boolean = false): SyncCommand
-        fun stopAndStartAround(withDelay: Boolean = false, block: suspend () -> Unit): SyncCommand
+
+        fun stopAndStartAround(
+            withDelay: Boolean = false,
+            block: suspend () -> Unit,
+        ): SyncCommand
     }
 
     private fun buildSyncCommands(target: SyncTarget): SyncCommandBuilder = object : SyncCommandBuilder {
@@ -66,8 +79,10 @@ object SyncCommands {
         override fun stopAndStart(isDownSyncAllowed: Boolean) =
             getCommand(target, SyncAction.STOP_AND_START, SyncParam.IS_DOWN_SYNC_ALLOWED to isDownSyncAllowed)
 
-        override fun stopAndStartAround(isDownSyncAllowed: Boolean, block: suspend () -> Unit) =
-            getCommand(target, SyncAction.STOP_AND_START, SyncParam.IS_DOWN_SYNC_ALLOWED to isDownSyncAllowed, block)
+        override fun stopAndStartAround(
+            isDownSyncAllowed: Boolean,
+            block: suspend () -> Unit,
+        ) = getCommand(target, SyncAction.STOP_AND_START, SyncParam.IS_DOWN_SYNC_ALLOWED to isDownSyncAllowed, block)
     }
 
     private fun buildSyncCommandsWithDelayParam(target: SyncTarget) = object : SyncCommandBuilderWithDelayParam {
@@ -77,8 +92,10 @@ object SyncCommands {
 
         override fun stopAndStart(withDelay: Boolean) = getCommand(target, SyncAction.STOP_AND_START, SyncParam.WITH_DELAY to withDelay)
 
-        override fun stopAndStartAround(withDelay: Boolean, block: suspend () -> Unit) =
-            getCommand(target, SyncAction.STOP_AND_START, SyncParam.WITH_DELAY to withDelay, block)
+        override fun stopAndStartAround(
+            withDelay: Boolean,
+            block: suspend () -> Unit,
+        ) = getCommand(target, SyncAction.STOP_AND_START, SyncParam.WITH_DELAY to withDelay, block)
     }
 
     private fun getCommand(
@@ -92,7 +109,6 @@ object SyncCommands {
         param?.run { mapOf(first to second) } ?: emptyMap(),
         block,
     )
-
 }
 
 /**

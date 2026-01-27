@@ -4,10 +4,10 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.sync.ExecutableSyncCommand
 import com.simprints.infra.sync.SyncAction
-import com.simprints.infra.sync.SyncCommands
 import com.simprints.infra.sync.SyncCommand
-import com.simprints.infra.sync.SyncTarget
+import com.simprints.infra.sync.SyncCommands
 import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.sync.SyncTarget
 import com.simprints.infra.sync.usecase.SyncUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify

@@ -14,7 +14,8 @@ internal class ShouldSuggestSyncUseCase @Inject constructor(
     private val sync: SyncUseCase,
     private val configRepository: ConfigRepository,
 ) {
-    suspend operator fun invoke(): Boolean = sync(SyncCommands.ObserveOnly).syncStatusFlow
+    suspend operator fun invoke(): Boolean = sync(SyncCommands.ObserveOnly)
+        .syncStatusFlow
         .map { it.eventSyncState }
         .firstOrNull()
         ?.lastSyncTime
