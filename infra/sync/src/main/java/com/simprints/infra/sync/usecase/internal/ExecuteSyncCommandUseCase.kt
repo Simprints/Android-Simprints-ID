@@ -7,6 +7,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkQuery
 import androidx.work.workDataOf
 import com.simprints.core.AppScope
+import com.simprints.core.DispatcherIO
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.imagesUploadRequiresUnmeteredConnection
@@ -27,8 +28,12 @@ import com.simprints.infra.sync.extensions.startWorker
 import com.simprints.infra.sync.files.FileUpSyncWorker
 import com.simprints.infra.sync.firmware.FirmwareFileUpdateWorker
 import com.simprints.infra.sync.firmware.ShouldScheduleFirmwareUpdateUseCase
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -41,9 +46,11 @@ internal class ExecuteSyncCommandUseCase @Inject constructor(
     private val eventSyncManager: EventSyncManager,
     private val shouldScheduleFirmwareUpdate: ShouldScheduleFirmwareUpdateUseCase,
     @param:AppScope private val appScope: CoroutineScope,
+    @param:DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) {
     init {
-        appScope.launch {
+        appScope.launch(ioDispatcher) {
+            // Automatically conditioned sync command:
             // Stop image upload when event sync starts
             workManager
                 .getWorkInfosFlow(
@@ -51,8 +58,13 @@ internal class ExecuteSyncCommandUseCase @Inject constructor(
                         SyncConstants.EVENT_SYNC_WORK_NAME,
                         SyncConstants.EVENT_SYNC_WORK_NAME_ONE_TIME,
                     ),
-                ).collect { workInfoList ->
-                    if (workInfoList.anyRunning()) rescheduleImageUpSync()
+                ).map { workInfoList ->
+                    workInfoList.anyRunning()
+                }
+                .distinctUntilChanged()
+                .filter { it } // only if any running
+                .collect {
+                    rescheduleImageUpSync()
                 }
         }
     }
@@ -66,7 +78,7 @@ internal class ExecuteSyncCommandUseCase @Inject constructor(
             val isStartNeeded = action in listOf(SyncAction.START, SyncAction.STOP_AND_START)
             val isFurtherAsyncActionNeeded = blockToRunWhileStopped != null || isStartNeeded
             return if (isFurtherAsyncActionNeeded) {
-                appScope.launch {
+                appScope.launch(ioDispatcher) {
                     blockToRunWhileStopped?.invoke()
                     if (isStartNeeded) {
                         start()

@@ -409,6 +409,7 @@ class ExecuteSyncCommandUseCaseTest {
         eventSyncManager = eventSyncManager,
         shouldScheduleFirmwareUpdate = shouldScheduleFirmwareUpdate,
         appScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
+        ioDispatcher = testCoroutineRule.testCoroutineDispatcher,
     )
 
     private fun createWorkInfo(state: WorkInfo.State) = listOf(
