@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.event.remote
 
 import com.google.common.truth.Truth.*
+import com.simprints.infra.backendapi.ApiResult
 import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.events.event.domain.EventCount
@@ -67,7 +68,11 @@ class EventRemoteDataSourceTest {
         mockkStatic("kotlinx.coroutines.channels.ProduceKt")
 
         coEvery { backendApiClient.executeCall<EventRemoteInterface, Any>(any(), any()) } coAnswers {
-            secondArg<suspend (EventRemoteInterface) -> Any>()(eventRemoteInterface)
+            try {
+                ApiResult.Success(secondArg<suspend (EventRemoteInterface) -> Any>()(eventRemoteInterface))
+            } catch (e: Exception) {
+                ApiResult.Failure(e)
+            }
         }
 
         every { mapDomainEventScopeToApiUseCase(any(), any(), any()) } returns apiEventScope

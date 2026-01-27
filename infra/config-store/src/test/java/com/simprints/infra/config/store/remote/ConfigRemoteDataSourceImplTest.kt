@@ -1,6 +1,7 @@
 package com.simprints.infra.config.store.remote
 
 import com.google.common.truth.Truth.*
+import com.simprints.infra.backendapi.ApiResult
 import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.infra.config.store.remote.models.ApiFileUrl
 import com.simprints.infra.config.store.testtools.apiDeviceState
@@ -41,7 +42,11 @@ class ConfigRemoteDataSourceImplTest {
     @Before
     fun setup() {
         coEvery { backendApiClient.executeCall<ConfigRemoteInterface, Any>(any(), any()) } coAnswers {
-            secondArg<suspend (ConfigRemoteInterface) -> Any>()(remoteInterface)
+            try {
+                ApiResult.Success(secondArg<suspend (ConfigRemoteInterface) -> Any>()(remoteInterface))
+            } catch (e: Exception) {
+                ApiResult.Failure(e)
+            }
         }
     }
 

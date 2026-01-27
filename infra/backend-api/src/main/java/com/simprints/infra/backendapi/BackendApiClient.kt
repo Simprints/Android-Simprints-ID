@@ -7,6 +7,7 @@ import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.SimRemoteInterface
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.reflect.KClass
 
 /**
@@ -28,7 +29,11 @@ class BackendApiClient @Inject internal constructor(
     suspend fun <T : SimRemoteInterface, V> executeCall(
         remoteInterface: KClass<T>,
         block: suspend (T) -> V,
-    ): V = getApiClient(remoteInterface, authStore.getFirebaseToken()).executeCall(block)
+    ): ApiResult<V> = try {
+        ApiResult.Success(getApiClient(remoteInterface, authStore.getFirebaseToken()).executeCall(block))
+    } catch (t: Throwable) {
+        wrapException(t)
+    }
 
     /**
      * Executes an unauthenticated backend call for the given [remoteInterface].
@@ -38,10 +43,19 @@ class BackendApiClient @Inject internal constructor(
     suspend fun <T : SimRemoteInterface, V> executeUnauthenticatedCall(
         remoteInterface: KClass<T>,
         block: suspend (T) -> V,
-    ): V = getApiClient(remoteInterface, null).executeCall(block)
+    ): ApiResult<V> = try {
+        ApiResult.Success(getApiClient(remoteInterface, null).executeCall(block))
+    } catch (t: Throwable) {
+        wrapException(t)
+    }
 
     private suspend fun <T : SimRemoteInterface> getApiClient(
         remoteInterface: KClass<T>,
         authToken: String?,
     ): SimNetwork.SimApiClient<T> = simNetwork.getSimApiClient(remoteInterface, deviceId, versionName, authToken)
+
+    private fun <V> wrapException(t: Throwable): ApiResult.Failure<V> = when (t) {
+        is CancellationException -> throw t // Maintain the coroutine control flow by rethrowing the cancellation exception
+        else -> ApiResult.Failure(t)
+    }
 }

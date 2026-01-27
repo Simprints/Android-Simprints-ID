@@ -52,14 +52,15 @@ internal class UploadSampleWithTrackingUseCase @Inject constructor(
 
         return fileStream.use { stream ->
             try {
-                val response = backendApiClient.executeCall(SampleUploadApiInterface::class) { api ->
-                    api.uploadFile(
-                        uploadUrl = url,
-                        requestId = requestId,
-                        md5 = sampleData.md5,
-                        requestBody = SampleUploadRequestBody(stream, sampleData.size),
-                    )
-                }
+                val response = backendApiClient
+                    .executeCall(SampleUploadApiInterface::class) { api ->
+                        api.uploadFile(
+                            uploadUrl = url,
+                            requestId = requestId,
+                            md5 = sampleData.md5,
+                            requestBody = SampleUploadRequestBody(stream, sampleData.size),
+                        )
+                    }.getOrThrow()
                 if (response.isSuccessful) {
                     null
                 } else {

@@ -37,7 +37,8 @@ internal class FingerprintFileDownloader @Inject constructor(
         URL(url).readBytes()
     }
 
-    suspend fun getFileUrl(fileId: String): String = backendApiClient.executeCall(FileUrlRemoteInterface::class) { api ->
-        api.getFileUrl(projectId, fileId).url
-    }
+    suspend fun getFileUrl(fileId: String): String = backendApiClient
+        .executeCall(FileUrlRemoteInterface::class) { api ->
+            api.getFileUrl(projectId, fileId).url
+        }.getOrThrow()
 }

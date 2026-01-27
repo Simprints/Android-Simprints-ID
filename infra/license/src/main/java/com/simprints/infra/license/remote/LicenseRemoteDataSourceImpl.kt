@@ -21,37 +21,37 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
         deviceId: String,
         vendor: Vendor,
         version: LicenseVersion,
-    ): ApiLicenseResult = try {
-        backendApiClient.executeCall(LicenseRemoteInterface::class) { api ->
+    ): ApiLicenseResult = backendApiClient
+        .executeCall(LicenseRemoteInterface::class) { api ->
             api
                 .getLicense(projectId, deviceId, vendor.value, version.value)
                 .parseApiLicense()
                 .getLicenseBasedOnVendor(vendor)
                 ?.let { apiLicense -> ApiLicenseResult.Success(apiLicense) }
-        } ?: ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
-    } catch (t: Throwable) {
-        when (t) {
-            is NetworkConnectionException -> {
-                Simber.i("Licence download failed due to network error", t, tag = LICENSE)
-                ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
-            }
+                ?: ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
+        }.getOrMapFailure { failure ->
+            when (val t = failure.cause) {
+                is NetworkConnectionException -> {
+                    Simber.i("Licence download failed due to network error", t, tag = LICENSE)
+                    ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
+                }
 
-            is BackendMaintenanceException -> {
-                Simber.i("Licence download failed due to backend maintenance", t, tag = LICENSE)
-                ApiLicenseResult.BackendMaintenanceError(t.estimatedOutage)
-            }
+                is BackendMaintenanceException -> {
+                    Simber.i("Licence download failed due to backend maintenance", t, tag = LICENSE)
+                    ApiLicenseResult.BackendMaintenanceError(t.estimatedOutage)
+                }
 
-            is SyncCloudIntegrationException -> {
-                Simber.e("Licence download failed due to cloud integration error", t, tag = LICENSE)
-                handleCloudException(t)
-            }
+                is SyncCloudIntegrationException -> {
+                    Simber.e("Licence download failed due to cloud integration error", t, tag = LICENSE)
+                    handleCloudException(t)
+                }
 
-            else -> {
-                Simber.e("Licence download failed due to unknown error", t, tag = LICENSE)
-                ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
+                else -> {
+                    Simber.e("Licence download failed due to unknown error", t, tag = LICENSE)
+                    ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
+                }
             }
         }
-    }
 
     /**
      * If it's a Cloud exception we need to check if it's something we can recover from or not.

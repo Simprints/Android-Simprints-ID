@@ -22,6 +22,7 @@ internal class ConfigRemoteDataSourceImpl(
 
     override suspend fun getProject(projectId: String): ProjectWithConfig = backendApiClient
         .executeCall(ConfigRemoteInterface::class) { it.getProject(projectId) }
+        .getOrThrow()
         .let { ProjectWithConfig(it.toDomain(), it.configuration.toDomain()) }
 
     override suspend fun getPrivacyNotice(
@@ -30,6 +31,7 @@ internal class ConfigRemoteDataSourceImpl(
     ): String {
         val url = backendApiClient
             .executeCall(ConfigRemoteInterface::class) { it.getFileUrl(projectId, fileId) }
+            .getOrThrow()
             .url
 
         return withContext(dispatcherIO) { urlDownloader(url) }
@@ -41,5 +43,6 @@ internal class ConfigRemoteDataSourceImpl(
         previousInstructionId: String,
     ): DeviceState = backendApiClient
         .executeCall(ConfigRemoteInterface::class) { it.getDeviceState(projectId, deviceId, previousInstructionId) }
+        .getOrThrow()
         .toDomain()
 }

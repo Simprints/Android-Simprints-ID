@@ -4,12 +4,13 @@ import com.google.common.truth.Truth.*
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.SimRemoteInterface
-import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import java.io.IOException
 
 internal class BackendApiClientTest {
     internal interface TestRemoteInterface : SimRemoteInterface
@@ -50,25 +51,31 @@ internal class BackendApiClientTest {
 
         val result = subject.executeCall(TestRemoteInterface::class) { expectedValue }
 
-        assertThat(result).isEqualTo(expectedValue)
+        assertThat(result).isEqualTo(ApiResult.Success(expectedValue))
         coVerify(exactly = 1) {
             simNetwork.getSimApiClient(TestRemoteInterface::class, deviceId, versionName, "token")
         }
     }
 
     @Test
-    fun `executeCall returns Failure when api client returns Failure`() = runTest {
-        val throwable = IllegalStateException("boom")
+    fun `executeCall returns Failure when api client returns throws exception`() = runTest {
+        val throwable = IOException("boom")
         coEvery { apiClient.executeCall(any<suspend (TestRemoteInterface) -> String>()) } throws throwable
 
-        val result = assertThrows<IllegalStateException> {
-            subject.executeCall(TestRemoteInterface::class) { "ignored" }
-        }
+        val result = subject.executeCall(TestRemoteInterface::class) { "ignored" }
 
-        assertThat(result).isEqualTo(throwable)
+        assertThat(result).isEqualTo(ApiResult.Failure<String>(throwable))
         coVerify(exactly = 1) {
             simNetwork.getSimApiClient(TestRemoteInterface::class, deviceId, versionName, "token")
         }
+    }
+
+    @Test(expected = CancellationException::class)
+    fun `executeCall rethrows CancellationException`() = runTest {
+        val throwable = CancellationException("boom")
+        coEvery { apiClient.executeCall(any<suspend (TestRemoteInterface) -> String>()) } throws throwable
+
+        subject.executeCall(TestRemoteInterface::class) { "ignored" }
     }
 
     @Test
@@ -78,24 +85,30 @@ internal class BackendApiClientTest {
 
         val result = subject.executeUnauthenticatedCall(TestRemoteInterface::class) { expectedValue }
 
-        assertThat(result).isEqualTo(expectedValue)
+        assertThat(result).isEqualTo(ApiResult.Success(expectedValue))
         coVerify(exactly = 1) {
             simNetwork.getSimApiClient(TestRemoteInterface::class, deviceId, versionName, null)
         }
     }
 
     @Test
-    fun `executeUnauthenticatedCall returns Failure when api client returns Failure`() = runTest {
-        val throwable = IllegalStateException("boom")
+    fun `executeUnauthenticatedCall returns Failure when api client throws exeption`() = runTest {
+        val throwable = IOException("boom")
         coEvery { apiClient.executeCall(any<suspend (TestRemoteInterface) -> String>()) } throws throwable
 
-        val result = assertThrows<IllegalStateException> {
-            subject.executeUnauthenticatedCall(TestRemoteInterface::class) { "ignored" }
-        }
+        val result = subject.executeUnauthenticatedCall(TestRemoteInterface::class) { "ignored" }
 
-        assertThat(result).isEqualTo(throwable)
+        assertThat(result).isEqualTo(ApiResult.Failure<String>(throwable))
         coVerify(exactly = 1) {
             simNetwork.getSimApiClient(TestRemoteInterface::class, deviceId, versionName, null)
         }
+    }
+
+    @Test(expected = CancellationException::class)
+    fun `executeUnauthenticatedCall rethrows CancellationException`() = runTest {
+        val throwable = CancellationException("boom")
+        coEvery { apiClient.executeCall(any<suspend (TestRemoteInterface) -> String>()) } throws throwable
+
+        subject.executeUnauthenticatedCall(TestRemoteInterface::class) { "ignored" }
     }
 }

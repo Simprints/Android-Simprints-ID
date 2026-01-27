@@ -23,6 +23,6 @@ internal class EnrolmentRecordRemoteDataSourceImpl @Inject constructor(
                     projectId,
                     ApiEnrolmentRecords(enrolmentRecords.map { it.toEnrolmentRecord(encoder) }),
                 )
-            }
+            }.getOrThrow()
     }
 }

@@ -8,6 +8,7 @@ import com.simprints.core.domain.reference.BiometricTemplate
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.backendapi.ApiResult
 import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.remote.models.ApiEnrolmentRecord
@@ -56,7 +57,11 @@ class EnrolmentRecordRemoteDataSourceImplTest {
     @Before
     fun setup() {
         coEvery { backendApiClient.executeCall<EnrolmentRecordApiInterface, Any>(any(), any()) } coAnswers {
-            secondArg<suspend (EnrolmentRecordApiInterface) -> String>()(remoteInterface)
+            try {
+                ApiResult.Success(secondArg<suspend (EnrolmentRecordApiInterface) -> Any>()(remoteInterface))
+            } catch (e: Exception) {
+                ApiResult.Failure(e)
+            }
         }
     }
 
