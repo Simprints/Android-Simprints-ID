@@ -15,7 +15,8 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.sync.SyncCommands
+import com.simprints.infra.sync.usecase.SyncUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import com.simprints.testtools.common.syntax.assertThrows
@@ -39,7 +40,7 @@ class ModuleSelectionViewModelTest {
     private lateinit var repository: ModuleRepository
 
     @MockK
-    private lateinit var syncOrchestrator: SyncOrchestrator
+    private lateinit var sync: SyncUseCase
 
     @MockK
     private lateinit var configRepository: ConfigRepository
@@ -55,6 +56,7 @@ class ModuleSelectionViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
+        every { sync(any()) } returns mockk()
 
         val modulesDefault = listOf(
             Module("a".asTokenizableEncrypted(), false),
@@ -80,7 +82,7 @@ class ModuleSelectionViewModelTest {
 
         viewModel = ModuleSelectionViewModel(
             moduleRepository = repository,
-            syncOrchestrator = syncOrchestrator,
+            sync = sync,
             configRepository = configRepository,
             tokenizationProcessor = tokenizationProcessor,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
@@ -173,8 +175,7 @@ class ModuleSelectionViewModelTest {
         viewModel.saveModules()
 
         coVerify(exactly = 1) { repository.saveModules(updatedModules) }
-        coVerify(exactly = 1) { syncOrchestrator.stopEventSync() }
-        coVerify(exactly = 1) { syncOrchestrator.startEventSync() }
+        verify(exactly = 1) { sync(SyncCommands.OneTime.Events.stopAndStart()) }
     }
 
     @Test

@@ -21,7 +21,8 @@ import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationScheduler
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
-import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.sync.SyncCommands
+import com.simprints.infra.sync.usecase.SyncUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -62,7 +63,7 @@ internal class LoginCheckViewModelTest {
     lateinit var startBackgroundSync: StartBackgroundSyncUseCase
 
     @MockK
-    lateinit var syncOrchestrator: SyncOrchestrator
+    lateinit var sync: SyncUseCase
 
     @MockK
     lateinit var updateSessionScopePayloadUseCase: UpdateSessionScopePayloadUseCase
@@ -84,6 +85,7 @@ internal class LoginCheckViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
+        every { sync(any()) } returns mockk()
 
         viewModel = LoginCheckViewModel(
             rootManager = rootMatchers,
@@ -94,7 +96,7 @@ internal class LoginCheckViewModelTest {
             isUserSignedIn = isUserSignedInUseCase,
             configRepository = configRepository,
             startBackgroundSync = startBackgroundSync,
-            syncOrchestrator = syncOrchestrator,
+            sync = sync,
             updateDatabaseCountsInCurrentSession = updateSessionScopePayloadUseCase,
             updateProjectInCurrentSession = updateProjectStateUseCase,
             updateStoredUserId = updateStoredUserIdUseCase,
@@ -169,8 +171,8 @@ internal class LoginCheckViewModelTest {
 
         coVerify {
             addAuthorizationEventUseCase.invoke(any(), eq(false))
-            syncOrchestrator.cancelBackgroundWork()
         }
+        verify { sync(SyncCommands.Schedule.Everything.stop()) }
         viewModel.showLoginFlow
             .test()
             .assertValue { it.peekContent() == ActionFactory.getIdentifyRequest() }
