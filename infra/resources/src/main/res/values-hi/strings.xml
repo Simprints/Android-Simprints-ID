@@ -531,7 +531,7 @@
     <string name="mfid_skip_reason_does_not_have">%1$s नहीं है</string>
     <string name="mfid_skip_reason_did_not_bring">%1$s नहीं लाया</string>
     <string name="mfid_skip_reason_incorrect">ग़लत %1$s लाया गया</string>
-    <string name="mfid_skip_reason_does_not_want_to_provide">%1$s को विशेषाधिकार नहीं देना चाहता</string>
+    <string name="mfid_skip_reason_does_not_want_to_provide"> %1$s प्रदान नहीं करना चाहता </string>
     <string name="mfid_skip_reason_damaged">%1$s क्षतिग्रस्त या अपठनीय</string>
     <string name="mfid_skip_reason_unable_to_scan">%1$s को स्कैन करने में असमर्थ</string>
     <string name="mfid_skip_reason_other">अन्य</string>
