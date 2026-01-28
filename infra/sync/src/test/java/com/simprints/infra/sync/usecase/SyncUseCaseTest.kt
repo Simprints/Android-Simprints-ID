@@ -4,7 +4,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
-import com.simprints.infra.sync.ExecutableSyncCommand
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncCommands
 import com.simprints.infra.sync.SyncStatus
@@ -277,7 +276,7 @@ class SyncUseCaseTest {
     fun `executes executable sync command and returns its job`() = runTest {
         val expectedJob = Job().apply { complete() }
         val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, executeSyncCommand, appScope = backgroundScope)
-        val command = SyncCommands.Schedule.Everything.stopAndStart() as ExecutableSyncCommand
+        val command = SyncCommands.Schedule.Everything.stopAndStart() as SyncCommands.ExecutableSyncCommand
         every { executeSyncCommand.invoke(command, backgroundScope) } returns expectedJob
 
         val response = useCase(command)
@@ -291,7 +290,7 @@ class SyncUseCaseTest {
         val expectedJob = Job().apply { complete() }
         val customScope = CoroutineScope(backgroundScope.coroutineContext + Job())
         val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, executeSyncCommand, appScope = backgroundScope)
-        val command = SyncCommands.Schedule.Everything.stopAndStart() as ExecutableSyncCommand
+        val command = SyncCommands.Schedule.Everything.stopAndStart() as SyncCommands.ExecutableSyncCommand
 
         every { executeSyncCommand.invoke(command, customScope) } returns expectedJob
 

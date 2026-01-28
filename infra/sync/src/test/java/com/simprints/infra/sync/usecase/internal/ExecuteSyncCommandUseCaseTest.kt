@@ -10,7 +10,6 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.sync.master.EventSyncMasterWorker
-import com.simprints.infra.sync.ExecutableSyncCommand
 import com.simprints.infra.sync.SyncCommands
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.EVENT_SYNC_WORK_NAME
@@ -429,7 +428,7 @@ class ExecuteSyncCommandUseCaseTest {
         }
     }
 
-    private fun executable(syncCommand: com.simprints.infra.sync.SyncCommand) = syncCommand as ExecutableSyncCommand
+    private fun executable(syncCommand: com.simprints.infra.sync.SyncCommand) = syncCommand as SyncCommands.ExecutableSyncCommand
 
     private fun commandScope() = CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
 

@@ -3,7 +3,6 @@ package com.simprints.infra.sync.usecase
 import com.simprints.core.AppScope
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
-import com.simprints.infra.sync.ExecutableSyncCommand
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncCommand
 import com.simprints.infra.sync.SyncCommands
@@ -110,7 +109,7 @@ class SyncUseCase @Inject internal constructor(
         commandScope: CoroutineScope = appScope,
     ): SyncResponse = SyncResponse(
         syncCommandJob = when (syncCommand) {
-            is ExecutableSyncCommand -> executeSyncCommand(syncCommand, commandScope)
+            is SyncCommands.ExecutableSyncCommand -> executeSyncCommand(syncCommand, commandScope)
             is SyncCommands.ObserveOnly -> Job().apply { complete() } // no-op
         },
         syncStatusFlow = sharedSyncStatus,

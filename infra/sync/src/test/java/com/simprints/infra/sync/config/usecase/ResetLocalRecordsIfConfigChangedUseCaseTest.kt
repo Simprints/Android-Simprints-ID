@@ -6,10 +6,10 @@ import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.eventsync.EventSyncManager
-import com.simprints.infra.sync.ExecutableSyncCommand
 import com.simprints.infra.sync.SyncAction
 import com.simprints.infra.sync.SyncCommand
 import com.simprints.infra.sync.SyncCommandPayload
+import com.simprints.infra.sync.SyncCommands
 import com.simprints.infra.sync.SyncResponse
 import com.simprints.infra.sync.SyncTarget
 import com.simprints.infra.sync.config.testtools.projectConfiguration
@@ -105,7 +105,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
         )
 
         verify { sync(any()) }
-        val command = syncCommandSlot.captured as ExecutableSyncCommand
+        val command = syncCommandSlot.captured as SyncCommands.ExecutableSyncCommand
         assertThat(command.target)
             .isEqualTo(SyncTarget.SCHEDULE_EVENTS)
         assertThat(command.action)
@@ -145,7 +145,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
         )
 
         verify { sync(any()) }
-        val command = syncCommandSlot.captured as ExecutableSyncCommand
+        val command = syncCommandSlot.captured as SyncCommands.ExecutableSyncCommand
         assertThat(command.target)
             .isEqualTo(SyncTarget.SCHEDULE_EVENTS)
         assertThat(command.action)
@@ -183,7 +183,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
         )
 
         verify { sync(any()) }
-        val command = syncCommandSlot.captured as ExecutableSyncCommand
+        val command = syncCommandSlot.captured as SyncCommands.ExecutableSyncCommand
         assertThat(command.target)
             .isEqualTo(SyncTarget.SCHEDULE_EVENTS)
         assertThat(command.action)
@@ -221,7 +221,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
         )
 
         verify { sync(any()) }
-        val command = syncCommandSlot.captured as ExecutableSyncCommand
+        val command = syncCommandSlot.captured as SyncCommands.ExecutableSyncCommand
         assertThat(command.target)
             .isEqualTo(SyncTarget.SCHEDULE_EVENTS)
         assertThat(command.action)

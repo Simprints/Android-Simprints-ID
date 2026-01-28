@@ -2,7 +2,6 @@ package com.simprints.infra.sync.config.usecase
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.authlogic.AuthManager
-import com.simprints.infra.sync.ExecutableSyncCommand
 import com.simprints.infra.sync.SyncAction
 import com.simprints.infra.sync.SyncCommand
 import com.simprints.infra.sync.SyncCommands
@@ -49,7 +48,7 @@ class LogoutUseCaseTest {
     fun `Fully logs out when called`() = runTest {
         useCase.invoke()
 
-        val command = syncCommandSlot.captured as ExecutableSyncCommand
+        val command = syncCommandSlot.captured as SyncCommands.ExecutableSyncCommand
         assertThat(command.target).isEqualTo(SyncTarget.SCHEDULE_EVERYTHING)
         assertThat(command.action).isEqualTo(SyncAction.STOP)
         assertThat(command).isEqualTo(SyncCommands.Schedule.Everything.stop())

@@ -14,9 +14,9 @@ import com.simprints.infra.config.store.models.imagesUploadRequiresUnmeteredConn
 import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.sync.master.EventSyncMasterWorker
-import com.simprints.infra.sync.ExecutableSyncCommand
 import com.simprints.infra.sync.SyncAction
 import com.simprints.infra.sync.SyncCommandPayload
+import com.simprints.infra.sync.SyncCommands
 import com.simprints.infra.sync.SyncConstants
 import com.simprints.infra.sync.SyncTarget
 import com.simprints.infra.sync.config.worker.DeviceConfigDownSyncWorker
@@ -69,7 +69,7 @@ internal class ExecuteSyncCommandUseCase @Inject constructor(
     }
 
     internal operator fun invoke(
-        syncCommand: ExecutableSyncCommand,
+        syncCommand: SyncCommands.ExecutableSyncCommand,
         commandScope: CoroutineScope = appScope,
     ): Job {
         with(syncCommand) {
@@ -92,7 +92,7 @@ internal class ExecuteSyncCommandUseCase @Inject constructor(
         }
     }
 
-    private fun ExecutableSyncCommand.stop() {
+    private fun SyncCommands.ExecutableSyncCommand.stop() {
         when (target) {
             SyncTarget.SCHEDULE_EVERYTHING -> cancelBackgroundWork()
             SyncTarget.SCHEDULE_EVENTS -> cancelEventSync()
@@ -102,7 +102,7 @@ internal class ExecuteSyncCommandUseCase @Inject constructor(
         }
     }
 
-    private suspend fun ExecutableSyncCommand.start() {
+    private suspend fun SyncCommands.ExecutableSyncCommand.start() {
         when (target) {
             SyncTarget.SCHEDULE_EVERYTHING -> scheduleBackgroundWork((payload as SyncCommandPayload.WithDelay).withDelay)
             SyncTarget.SCHEDULE_EVENTS -> rescheduleEventSync((payload as SyncCommandPayload.WithDelay).withDelay)

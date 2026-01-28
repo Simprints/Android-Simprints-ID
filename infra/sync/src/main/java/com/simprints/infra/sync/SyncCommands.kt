@@ -23,6 +23,13 @@ object SyncCommands {
         val Images = buildSyncCommands(SyncTarget.SCHEDULE_IMAGES)
     }
 
+    internal data class ExecutableSyncCommand(
+        val target: SyncTarget,
+        val action: SyncAction,
+        val payload: SyncCommandPayload = SyncCommandPayload.None,
+        val blockToRunWhileStopped: (suspend () -> Unit)? = null,
+    ) : SyncCommand()
+
     // builders
 
     interface SyncCommandBuilder {
@@ -122,13 +129,6 @@ object SyncCommands {
  * Complete command built from SyncCommands and bundled with instructions ready to be processed by SyncUseCase.
  */
 sealed class SyncCommand
-
-internal data class ExecutableSyncCommand(
-    val target: SyncTarget,
-    val action: SyncAction,
-    val payload: SyncCommandPayload = SyncCommandPayload.None,
-    val blockToRunWhileStopped: (suspend () -> Unit)? = null,
-) : SyncCommand()
 
 enum class SyncTarget {
     SCHEDULE_EVERYTHING,

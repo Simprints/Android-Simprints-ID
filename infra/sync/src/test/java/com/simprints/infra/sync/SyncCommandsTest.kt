@@ -188,7 +188,7 @@ class SyncCommandsTest {
 
     @Test
     fun `observe only is not an executable command`() {
-        assertThat(ExecutableSyncCommand::class.java.isInstance(SyncCommands.ObserveOnly))
+        assertThat(SyncCommands.ExecutableSyncCommand::class.java.isInstance(SyncCommands.ObserveOnly))
             .isFalse()
     }
 
@@ -197,7 +197,7 @@ class SyncCommandsTest {
         action: SyncAction,
         payload: SyncCommandPayload = SyncCommandPayload.None,
         block: (suspend () -> Unit)? = null,
-    ) = ExecutableSyncCommand(
+    ) = SyncCommands.ExecutableSyncCommand(
         target = target,
         action = action,
         payload = payload,
