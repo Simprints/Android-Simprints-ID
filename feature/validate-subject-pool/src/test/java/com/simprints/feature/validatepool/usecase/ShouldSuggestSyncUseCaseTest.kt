@@ -6,12 +6,15 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.sync.ImageSyncStatus
+import com.simprints.infra.sync.SyncCommands
+import com.simprints.infra.sync.SyncResponse
 import com.simprints.infra.sync.SyncStatus
 import com.simprints.infra.sync.usecase.SyncUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -35,7 +38,10 @@ class ShouldSuggestSyncUseCaseTest {
         MockKAnnotations.init(this)
 
         syncStatusFlow = MutableStateFlow(createSyncStatus(lastSyncTime = null))
-        every { sync.invoke(any(), any()) } returns syncStatusFlow
+        every { sync.invoke(SyncCommands.ObserveOnly) } returns SyncResponse(
+            syncCommandJob = Job().apply { complete() },
+            syncStatusFlow = syncStatusFlow,
+        )
 
         usecase = ShouldSuggestSyncUseCase(timeHelper, sync, configRepository)
     }

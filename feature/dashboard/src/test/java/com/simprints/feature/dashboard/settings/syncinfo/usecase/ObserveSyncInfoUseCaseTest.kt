@@ -23,12 +23,14 @@ import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.sync.ImageSyncStatus
+import com.simprints.infra.sync.SyncResponse
 import com.simprints.infra.sync.SyncStatus
 import com.simprints.infra.sync.SyncableCounts
 import com.simprints.infra.sync.usecase.ObserveSyncableCountsUseCase
 import com.simprints.infra.sync.usecase.SyncUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -131,7 +133,10 @@ internal class ObserveSyncInfoUseCaseTest {
         every { connectivityTracker.observeIsConnected() } returns flowOf(true)
 
         syncStatusFlow.value = SyncStatus(eventSyncState = mockEventSyncState, imageSyncStatus = mockImageSyncStatus)
-        every { sync.invoke(any(), any()) } returns syncStatusFlow
+        every { sync.invoke(any()) } returns SyncResponse(
+            syncCommandJob = Job().apply { complete() },
+            syncStatusFlow = syncStatusFlow,
+        )
 
         every { mockEventSyncState.lastSyncTime } returns TEST_TIMESTAMP
         syncableCountsFlow.value = SyncableCounts(

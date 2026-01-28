@@ -5,14 +5,17 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.sync.ImageSyncStatus
-import com.simprints.infra.sync.SyncCommand
+import com.simprints.infra.sync.SyncCommands
 import com.simprints.infra.sync.SyncStatus
+import com.simprints.infra.sync.usecase.internal.ExecuteSyncCommandUseCase
 import com.simprints.infra.sync.usecase.internal.ObserveImageSyncStatusUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -31,6 +34,9 @@ class SyncUseCaseTest {
     @MockK
     private lateinit var imageSync: ObserveImageSyncStatusUseCase
 
+    @MockK
+    private lateinit var executeSyncCommand: ExecuteSyncCommandUseCase
+
     private val eventSyncStatusFlow = MutableSharedFlow<EventSyncState>()
     private val imageSyncStatusFlow = MutableSharedFlow<ImageSyncStatus>()
 
@@ -39,6 +45,7 @@ class SyncUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
         every { eventSyncStateProcessor.getLastSyncState() } returns eventSyncStatusFlow
         every { imageSync.invoke() } returns imageSyncStatusFlow
+        every { executeSyncCommand.invoke(any(), any()) } returns Job().apply { complete() }
     }
 
     @Test
@@ -59,9 +66,9 @@ class SyncUseCaseTest {
                 lastUpdateTimeMillis = -1L,
             ),
         )
-        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
+        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, executeSyncCommand, appScope = backgroundScope)
 
-        val resultFlow = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+        val resultFlow = useCase(SyncCommands.ObserveOnly).syncStatusFlow
 
         assertThat(resultFlow.value).isEqualTo(expected)
     }
@@ -83,9 +90,9 @@ class SyncUseCaseTest {
             lastUpdateTimeMillis = 123L,
         )
         val expected = SyncStatus(event, image)
-        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
+        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, executeSyncCommand, appScope = backgroundScope)
 
-        val resultFlow = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+        val resultFlow = useCase(SyncCommands.ObserveOnly).syncStatusFlow
 
         runCurrent() // ensure upstream flows are collected before emitting
         eventSyncStatusFlow.emit(event)
@@ -106,9 +113,9 @@ class SyncUseCaseTest {
             reporterStates = emptyList(),
             lastSyncTime = null,
         )
-        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
+        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, executeSyncCommand, appScope = backgroundScope)
 
-        val resultFlow = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+        val resultFlow = useCase(SyncCommands.ObserveOnly).syncStatusFlow
 
         runCurrent()
         val expected = with(resultFlow.value) {
@@ -127,9 +134,9 @@ class SyncUseCaseTest {
             progress = 2 to 5,
             lastUpdateTimeMillis = 123L,
         )
-        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
+        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, executeSyncCommand, appScope = backgroundScope)
 
-        val resultFlow = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+        val resultFlow = useCase(SyncCommands.ObserveOnly).syncStatusFlow
 
         runCurrent()
         val expected = with(resultFlow.value) {
@@ -162,9 +169,9 @@ class SyncUseCaseTest {
         )
         val expected1 = SyncStatus(event1, image)
         val expected2 = SyncStatus(event2, image)
-        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
+        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, executeSyncCommand, appScope = backgroundScope)
 
-        val resultFlow = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+        val resultFlow = useCase(SyncCommands.ObserveOnly).syncStatusFlow
 
         runCurrent()
         eventSyncStatusFlow.emit(event1)
@@ -200,9 +207,9 @@ class SyncUseCaseTest {
         )
         val expected1 = SyncStatus(event, image1)
         val expected2 = SyncStatus(event, image2)
-        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
+        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, executeSyncCommand, appScope = backgroundScope)
 
-        val resultFlow = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+        val resultFlow = useCase(SyncCommands.ObserveOnly).syncStatusFlow
 
         runCurrent()
         eventSyncStatusFlow.emit(event)
@@ -236,9 +243,9 @@ class SyncUseCaseTest {
         val image2 = image1.copy(
             isSyncing = false,
         )
-        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, appScope = backgroundScope)
+        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, executeSyncCommand, appScope = backgroundScope)
 
-        val resultFlow1 = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+        val resultFlow1 = useCase(SyncCommands.ObserveOnly).syncStatusFlow
 
         runCurrent()
         eventSyncStatusFlow.emit(event)
@@ -248,10 +255,48 @@ class SyncUseCaseTest {
         imageSyncStatusFlow.emit(image2)
         runCurrent()
 
-        val resultFlow2 = useCase(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+        val resultFlow2 = useCase(SyncCommands.ObserveOnly).syncStatusFlow
 
         assertThat(resultFlow1).isSameInstanceAs(resultFlow2)
         verify(exactly = 1) { eventSyncStateProcessor.getLastSyncState() }
         verify(exactly = 1) { imageSync() }
+    }
+
+    @Test
+    fun `does not execute sync command for observe-only`() = runTest {
+        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, executeSyncCommand, appScope = backgroundScope)
+
+        val response = useCase(SyncCommands.ObserveOnly)
+
+        assertThat(response.syncCommandJob.isCompleted).isTrue()
+        verify(exactly = 0) { executeSyncCommand.invoke(any(), any()) }
+    }
+
+    @Test
+    fun `executes executable sync command and returns its job`() = runTest {
+        val expectedJob = Job().apply { complete() }
+        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, executeSyncCommand, appScope = backgroundScope)
+        val command = SyncCommands.Schedule.Everything.stopAndStart() as SyncCommands.ExecutableSyncCommand
+        every { executeSyncCommand.invoke(command, backgroundScope) } returns expectedJob
+
+        val response = useCase(command)
+
+        assertThat(response.syncCommandJob).isSameInstanceAs(expectedJob)
+        verify(exactly = 1) { executeSyncCommand.invoke(command, backgroundScope) }
+    }
+
+    @Test
+    fun `executes executable sync command using provided commandScope`() = runTest {
+        val expectedJob = Job().apply { complete() }
+        val customScope = CoroutineScope(backgroundScope.coroutineContext + Job())
+        val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, executeSyncCommand, appScope = backgroundScope)
+        val command = SyncCommands.Schedule.Everything.stopAndStart() as SyncCommands.ExecutableSyncCommand
+
+        every { executeSyncCommand.invoke(command, customScope) } returns expectedJob
+
+        val response = useCase(command, commandScope = customScope)
+
+        assertThat(response.syncCommandJob).isSameInstanceAs(expectedJob)
+        verify(exactly = 1) { executeSyncCommand.invoke(command, customScope) }
     }
 }

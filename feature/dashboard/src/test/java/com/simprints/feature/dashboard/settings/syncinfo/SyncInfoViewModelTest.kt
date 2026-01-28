@@ -23,7 +23,8 @@ import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.sync.ImageSyncStatus
-import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.sync.SyncCommands
+import com.simprints.infra.sync.SyncResponse
 import com.simprints.infra.sync.SyncStatus
 import com.simprints.infra.sync.usecase.SyncUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -32,6 +33,7 @@ import com.simprints.testtools.common.livedata.getOrAwaitValues
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -56,9 +58,6 @@ class SyncInfoViewModelTest {
 
     @MockK
     private lateinit var authStore: AuthStore
-
-    @MockK
-    private lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
     private lateinit var recentUserActivityManager: RecentUserActivityManager
@@ -147,11 +146,10 @@ class SyncInfoViewModelTest {
         syncStatusFlow = MutableStateFlow(
             SyncStatus(eventSyncState = mockEventSyncState, imageSyncStatus = mockImageSyncStatus),
         )
-        every { sync.invoke(any(), any()) } returns syncStatusFlow
-        coEvery { syncOrchestrator.startEventSync(any()) } returns Unit
-        coEvery { syncOrchestrator.stopEventSync() } returns Unit
-        coEvery { syncOrchestrator.startImageSync() } returns Unit
-        coEvery { syncOrchestrator.stopImageSync() } returns Unit
+        every { sync.invoke(SyncCommands.ObserveOnly) } returns SyncResponse(
+            syncCommandJob = Job().apply { complete() },
+            syncStatusFlow = syncStatusFlow,
+        )
 
         every { timeHelper.now() } returns TEST_TIMESTAMP
         every { timeHelper.msBetweenNowAndTime(any()) } returns 0L
@@ -170,7 +168,6 @@ class SyncInfoViewModelTest {
         viewModel = SyncInfoViewModel(
             configRepository = configRepository,
             authStore = authStore,
-            syncOrchestrator = syncOrchestrator,
             recentUserActivityManager = recentUserActivityManager,
             timeHelper = timeHelper,
             observeSyncInfo = observeSyncInfo,
@@ -391,8 +388,7 @@ class SyncInfoViewModelTest {
 
         viewModel.forceEventSync()
 
-        coVerify { syncOrchestrator.stopEventSync() }
-        coVerify { syncOrchestrator.startEventSync(isDownSyncAllowed = true) }
+        verify { sync(SyncCommands.OneTime.Events.stopAndStart(isDownSyncAllowed = true)) }
     }
 
     @Test
@@ -401,8 +397,7 @@ class SyncInfoViewModelTest {
 
         viewModel.forceEventSync()
 
-        coVerify { syncOrchestrator.stopEventSync() }
-        coVerify { syncOrchestrator.startEventSync(isDownSyncAllowed = false) }
+        verify { sync(SyncCommands.OneTime.Events.stopAndStart(isDownSyncAllowed = false)) }
     }
 
     @Test
@@ -416,8 +411,7 @@ class SyncInfoViewModelTest {
 
         viewModel.forceEventSync()
 
-        coVerify { syncOrchestrator.stopEventSync() }
-        coVerify { syncOrchestrator.startEventSync(isDownSyncAllowed = false) }
+        verify { sync(SyncCommands.OneTime.Events.stopAndStart(isDownSyncAllowed = false)) }
     }
 
     @Test
@@ -431,8 +425,7 @@ class SyncInfoViewModelTest {
 
         viewModel.forceEventSync()
 
-        coVerify { syncOrchestrator.stopEventSync() }
-        coVerify { syncOrchestrator.startEventSync(isDownSyncAllowed = false) }
+        verify { sync(SyncCommands.OneTime.Events.stopAndStart(isDownSyncAllowed = false)) }
     }
 
     @Test
@@ -443,16 +436,14 @@ class SyncInfoViewModelTest {
 
         viewModel.forceEventSync()
 
-        coVerify { syncOrchestrator.stopEventSync() }
-        coVerify { syncOrchestrator.startEventSync(isDownSyncAllowed = false) }
+        verify { sync(SyncCommands.OneTime.Events.stopAndStart(isDownSyncAllowed = false)) }
     }
 
     @Test
     fun `should stop current event sync before starting new one`() = runTest {
         viewModel.forceEventSync()
 
-        coVerify { syncOrchestrator.stopEventSync() }
-        coVerify { syncOrchestrator.startEventSync(any()) }
+        verify { sync(SyncCommands.OneTime.Events.stopAndStart()) }
     }
 
     // toggleImageSync() tests
@@ -467,8 +458,8 @@ class SyncInfoViewModelTest {
 
         viewModel.toggleImageSync()
 
-        coVerify { syncOrchestrator.startImageSync() }
-        coVerify(exactly = 0) { syncOrchestrator.stopImageSync() }
+        verify { sync(SyncCommands.OneTime.Images.start()) }
+        verify(exactly = 0) { sync(SyncCommands.OneTime.Images.stop()) }
     }
 
     @Test
@@ -481,8 +472,8 @@ class SyncInfoViewModelTest {
 
         viewModel.toggleImageSync()
 
-        coVerify { syncOrchestrator.stopImageSync() }
-        coVerify(exactly = 0) { syncOrchestrator.startImageSync() }
+        verify { sync(SyncCommands.OneTime.Images.stop()) }
+        verify(exactly = 0) { sync(SyncCommands.OneTime.Images.start()) }
     }
 
     // logout() tests
@@ -536,7 +527,7 @@ class SyncInfoViewModelTest {
 
         viewModel.handleLoginResult(successResult)
 
-        coVerify { syncOrchestrator.startEventSync(any()) }
+        verify { sync(SyncCommands.OneTime.Events.stopAndStart()) }
     }
 
     @Test
@@ -547,7 +538,8 @@ class SyncInfoViewModelTest {
 
         viewModel.handleLoginResult(failureResult)
 
-        coVerify(exactly = 0) { syncOrchestrator.startEventSync(any()) }
+        verify(exactly = 0) { sync(SyncCommands.OneTime.Events.stopAndStart(isDownSyncAllowed = true)) }
+        verify(exactly = 0) { sync(SyncCommands.OneTime.Events.stopAndStart(isDownSyncAllowed = false)) }
     }
 
     // Sync button responsiveness optimization
@@ -683,7 +675,7 @@ class SyncInfoViewModelTest {
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        coVerify { syncOrchestrator.startEventSync(any()) }
+        verify { sync(SyncCommands.OneTime.Events.stopAndStart()) }
     }
 
     @Test
@@ -699,7 +691,7 @@ class SyncInfoViewModelTest {
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        coVerify { syncOrchestrator.startEventSync(any()) }
+        verify { sync(SyncCommands.OneTime.Events.stopAndStart()) }
     }
 
     @Test
@@ -715,7 +707,8 @@ class SyncInfoViewModelTest {
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        coVerify(exactly = 0) { syncOrchestrator.startEventSync(any()) }
+        verify(exactly = 0) { sync(SyncCommands.OneTime.Events.stopAndStart(isDownSyncAllowed = true)) }
+        verify(exactly = 0) { sync(SyncCommands.OneTime.Events.stopAndStart(isDownSyncAllowed = false)) }
     }
 
     @Test
@@ -729,7 +722,8 @@ class SyncInfoViewModelTest {
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        coVerify(exactly = 0) { syncOrchestrator.startEventSync(any()) }
+        verify(exactly = 0) { sync(SyncCommands.OneTime.Events.stopAndStart(isDownSyncAllowed = true)) }
+        verify(exactly = 0) { sync(SyncCommands.OneTime.Events.stopAndStart(isDownSyncAllowed = false)) }
     }
 
     @Test
@@ -746,7 +740,7 @@ class SyncInfoViewModelTest {
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        coVerify(atLeast = 0) { syncOrchestrator.startEventSync(any()) }
+        verify { sync(SyncCommands.OneTime.Events.stopAndStart(isDownSyncAllowed = false)) }
     }
 
     @Test
@@ -767,7 +761,7 @@ class SyncInfoViewModelTest {
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        coVerify(exactly = 1) { syncOrchestrator.startEventSync(any()) }
+        verify(exactly = 1) { sync(SyncCommands.OneTime.Events.stopAndStart(isDownSyncAllowed = false)) }
     }
 
     @Test
@@ -788,7 +782,8 @@ class SyncInfoViewModelTest {
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        coVerify(exactly = 0) { syncOrchestrator.startEventSync(any()) }
+        verify(exactly = 0) { sync(SyncCommands.OneTime.Events.stopAndStart(isDownSyncAllowed = true)) }
+        verify(exactly = 0) { sync(SyncCommands.OneTime.Events.stopAndStart(isDownSyncAllowed = false)) }
     }
 
     private companion object {
