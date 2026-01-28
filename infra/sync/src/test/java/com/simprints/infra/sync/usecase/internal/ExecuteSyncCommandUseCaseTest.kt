@@ -62,7 +62,7 @@ class ExecuteSyncCommandUseCaseTest {
     }
 
     @Test
-    fun `does not schedules any workers if not logged in`() = runTest {
+    fun `does not schedule any workers if not logged in`() = runTest {
         every { authStore.signedInProjectId } returns ""
         coEvery { shouldScheduleFirmwareUpdate.invoke() } returns false
 
