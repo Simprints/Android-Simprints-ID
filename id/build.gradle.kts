@@ -10,7 +10,7 @@ android {
     namespace = "com.simprints.id"
 
     defaultConfig {
-        ndk.abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
+        ndk.abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a"))
     }
 
     compileOptions {
