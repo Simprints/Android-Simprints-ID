@@ -1,28 +1,23 @@
 package com.simprints.infra.images.remote.signedurl.usecase
 
 import com.google.common.truth.Truth.*
-import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.backendapi.ApiResult
+import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.remote.signedurl.SampleUploadData
 import com.simprints.infra.images.remote.signedurl.api.ApiSampleUploadUrlRequest
 import com.simprints.infra.images.remote.signedurl.api.ApiSampleUploadUrlResponse
 import com.simprints.infra.images.remote.signedurl.api.SampleUploadApiInterface
-import com.simprints.infra.network.SimNetwork
-import com.simprints.testtools.common.alias.InterfaceInvocation
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import kotlin.reflect.KClass
 
 internal class FetchUploadUrlsPerSampleUseCaseTest {
     @MockK
-    lateinit var authStore: AuthStore
-
-    @MockK
-    lateinit var apiClient: SimNetwork.SimApiClient<SampleUploadApiInterface>
+    lateinit var backendApiClient: BackendApiClient
 
     @MockK
     lateinit var apiInterface: SampleUploadApiInterface
@@ -33,14 +28,14 @@ internal class FetchUploadUrlsPerSampleUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { authStore.buildClient(any<KClass<SampleUploadApiInterface>>()) } returns apiClient
-        coEvery { apiClient.executeCall<ApiSampleUploadUrlResponse>(any()) } coAnswers {
-            val args = this.args
-            @Suppress("UNCHECKED_CAST")
-            (args[0] as InterfaceInvocation<SampleUploadApiInterface, ApiSampleUploadUrlResponse>).invoke(apiInterface)
+        coEvery { backendApiClient.executeCall<SampleUploadApiInterface, Any>(any(), any()) } coAnswers {
+            try {
+                ApiResult.Success(secondArg<suspend (SampleUploadApiInterface) -> Any>()(apiInterface))
+            } catch (e: Exception) {
+                ApiResult.Failure(e)
+            }
         }
-
-        useCase = FetchUploadUrlsPerSampleUseCase(authStore)
+        useCase = FetchUploadUrlsPerSampleUseCase(backendApiClient)
     }
 
     @Test
@@ -78,15 +73,3 @@ internal class FetchUploadUrlsPerSampleUseCaseTest {
         private const val PROJECT_ID = "projectId"
     }
 }
-
-//  coEvery { authStore.buildClient(any<KClass<SampleUploadApiInterface>>()) } returns apiClient
-//        coEvery { apiClient.executeCall<ApiSampleUploadUrlResponse>(any()) } coAnswers {
-//            val args = this.args
-//            @Suppress("UNCHECKED_CAST")
-//            (args[0] as InterfaceInvocation<SampleUploadApiInterface, ApiSampleUploadUrlResponse>).invoke(apiInterface)
-//        }
-//        coEvery { apiClient.executeCall<Response<ResponseBody>>(any()) } coAnswers {
-//            val args = this.args
-//            @Suppress("UNCHECKED_CAST")
-//            (args[0] as InterfaceInvocation<SampleUploadApiInterface, Response<ResponseBody>>).invoke(apiInterface)
-//        }

@@ -3,10 +3,7 @@ package com.simprints.infra.authstore
 import com.google.firebase.FirebaseApp
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.authstore.domain.models.Token
-import com.simprints.infra.network.SimNetwork
-import com.simprints.infra.network.SimRemoteInterface
 import kotlinx.coroutines.flow.Flow
-import kotlin.reflect.KClass
 
 interface AuthStore {
     var signedInUserId: TokenizableString?
@@ -19,6 +16,8 @@ interface AuthStore {
     fun cleanCredentials()
 
     suspend fun storeFirebaseToken(token: Token)
+
+    suspend fun getFirebaseToken(): String
 
     fun clearFirebaseToken()
 
@@ -38,6 +37,4 @@ interface AuthStore {
         replaceWith = ReplaceWith("getCoreApp()"),
     )
     fun getLegacyAppFallback(): FirebaseApp
-
-    suspend fun <T : SimRemoteInterface> buildClient(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T>
 }

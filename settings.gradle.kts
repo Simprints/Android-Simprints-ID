@@ -151,6 +151,7 @@ include(
     ":infra:ui-base",
     ":infra:sync",
     ":infra:event-sync",
+    ":infra:backend-api",
 )
 // Test modules
 include(

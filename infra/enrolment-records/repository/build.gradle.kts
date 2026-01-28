@@ -3,6 +3,7 @@ plugins {
     id("kotlin-parcelize")
     id("simprints.testing.android")
     id("simprints.library.kotlinSerialization")
+    id("simprints.library.backendApi")
 }
 
 android {
@@ -20,6 +21,5 @@ dependencies {
     implementation(project(":infra:events"))
 
     implementation(libs.libsimprints)
-    implementation(libs.retrofit.core)
     implementation(libs.testing.androidX.room)
 }
