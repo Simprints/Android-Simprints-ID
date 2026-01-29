@@ -227,6 +227,11 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             renderCurrentDetection(it)
         }
 
+        vm.faceDiagnostics.observe(viewLifecycleOwner) { diagnostics ->
+            binding.diagnosticsPreview?.setImageBitmap(diagnostics.croppedBitmap)
+            binding.diagnosticsText?.text = diagnostics.toDisplayString()
+        }
+
         vm.capturingState.observe(viewLifecycleOwner) {
             when (it) {
                 LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED -> renderCaptureNotStarted()

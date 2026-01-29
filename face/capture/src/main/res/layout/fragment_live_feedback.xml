@@ -27,6 +27,36 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!-- Diagnostics: Shows the cropped bitmap that SimFace analyzes -->
+    <ImageView
+        android:id="@+id/diagnostics_preview"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_margin="8dp"
+        android:background="#CC000000"
+        android:padding="2dp"
+        android:scaleType="fitCenter"
+        android:visibility="visible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@android:drawable/ic_menu_camera" />
+
+    <!-- Diagnostics: Shows all detection values and thresholds -->
+    <TextView
+        android:id="@+id/diagnostics_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:background="#CC000000"
+        android:fontFamily="monospace"
+        android:padding="8dp"
+        android:textColor="#00FF00"
+        android:textSize="10sp"
+        android:visibility="visible"
+        app:layout_constraintStart_toEndOf="@id/diagnostics_preview"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Status: NOFACE\nFace detected: false\nArea: N/A" />
+
     <com.simprints.face.capture.screens.livefeedback.views.DashedCircularProgress
         android:id="@+id/capture_progress"
         android:layout_width="0dp"

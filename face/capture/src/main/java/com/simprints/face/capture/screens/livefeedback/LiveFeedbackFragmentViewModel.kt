@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.tools.extentions.area
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.capture.models.FaceDetection
+import com.simprints.face.capture.models.FaceDiagnostics
 import com.simprints.face.capture.models.FaceTarget
 import com.simprints.face.capture.models.SymmetricTarget
 import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
@@ -58,6 +59,9 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
 
     val displayCameraFlashControls = MutableLiveData(false)
+
+    // Diagnostics for debugging face detection in testing environments
+    val faceDiagnostics = MutableLiveData<FaceDiagnostics>()
 
     var isAutoCapture: Boolean = false
 
@@ -118,9 +122,15 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         val captureStartTime = timeHelper.now()
         val potentialFace = faceDetector.analyze(croppedBitmap)
 
+        // Emit diagnostics BEFORE getFaceDetectionFromPotentialFace which may recycle the bitmap
+        val diagnosticsBitmapCopy = croppedBitmap.copy(Bitmap.Config.ARGB_8888, false)
+
         val faceDetection = getFaceDetectionFromPotentialFace(croppedBitmap, potentialFace)
         faceDetection.detectionStartTime = captureStartTime
         faceDetection.detectionEndTime = timeHelper.now()
+
+        // Emit diagnostics for debugging
+        emitDiagnostics(diagnosticsBitmapCopy, potentialFace, faceDetection.status)
 
         if (isAutoCapture) {
             if (!isAutoCaptureHeldOff) {
@@ -156,6 +166,26 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             else -> { // no-op
             }
         }
+    }
+
+    private fun emitDiagnostics(bitmapCopy: Bitmap, potentialFace: Face?, status: FaceDetection.Status) {
+        val areaOccupied = potentialFace?.relativeBoundingBox?.area()
+        faceDiagnostics.postValue(
+            FaceDiagnostics(
+                croppedBitmap = bitmapCopy,
+                faceDetected = potentialFace != null,
+                areaOccupied = areaOccupied,
+                areaRangeMin = faceTarget.areaRange.start,
+                areaRangeMax = faceTarget.areaRange.endInclusive,
+                yaw = potentialFace?.yaw,
+                yawThreshold = VALID_YAW_DELTA,
+                roll = potentialFace?.roll,
+                rollThreshold = VALID_ROLL_DELTA,
+                quality = potentialFace?.quality,
+                qualityThreshold = qualityThreshold,
+                status = status,
+            ),
+        )
     }
 
     fun getNormalizedProgress(): Float = if (isAutoCapture) {
