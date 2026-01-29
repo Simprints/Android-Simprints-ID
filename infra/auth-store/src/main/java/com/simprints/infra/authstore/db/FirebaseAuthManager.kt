@@ -43,7 +43,7 @@ internal class FirebaseAuthManager @Inject constructor(
         // On legacy projects they may not have a separate Core Firebase Project, so we try to
         // log out on both just in case.
         try {
-            FirebaseAuth.getInstance(getLegacyAppFallback()).signOut()
+            FirebaseAuth.getInstance(getCoreApp()).signOut()
         } catch (e: Exception) {
             throw transformFirebaseExceptionIfNeeded(e)
         }
@@ -67,7 +67,7 @@ internal class FirebaseAuthManager @Inject constructor(
         // previous Firebase project until they login again.
         val result = try {
             FirebaseAuth
-                .getInstance(getLegacyAppFallback())
+                .getInstance(getCoreApp())
                 .currentUser
                 ?.getIdToken(false)
                 ?.await()
@@ -169,17 +169,6 @@ internal class FirebaseAuthManager @Inject constructor(
 
         initializeCoreProject(token, context)
         getCoreFirebaseApp()
-    }
-
-    @Deprecated(
-        message = "Since 2021.2.0. Can be removed once all projects are on 2021.2.0+",
-        replaceWith = ReplaceWith("getCoreApp()"),
-    )
-    fun getLegacyAppFallback() = try {
-        getCoreApp()
-    } catch (ex: IllegalStateException) {
-        // CORE_BACKEND_PROJECT doesn't exist
-        FirebaseApp.getInstance()
     }
 
     private fun transformFirebaseExceptionIfNeeded(e: Exception): Exception = when (e) {

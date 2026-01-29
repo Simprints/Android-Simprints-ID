@@ -49,8 +49,6 @@ internal class AuthStoreImpl @Inject constructor(
 
     override fun getCoreApp(): FirebaseApp = firebaseAuthManager.getCoreApp()
 
-    override fun getLegacyAppFallback(): FirebaseApp = firebaseAuthManager.getLegacyAppFallback()
-
     override suspend fun <T : SimRemoteInterface> buildClient(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T> =
         simApiClientFactory.buildClient(remoteInterface)
 }

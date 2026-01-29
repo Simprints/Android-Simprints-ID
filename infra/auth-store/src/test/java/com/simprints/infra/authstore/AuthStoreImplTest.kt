@@ -117,8 +117,8 @@ class AuthStoreImplTest {
 
     @Test
     fun `getLegacyAppFallback should call the correct method`() {
-        every { firebaseAuthManager.getLegacyAppFallback() } returns FIREBASE_APP
-        val receivedApp = loginManagerManagerImpl.getLegacyAppFallback()
+        every { firebaseAuthManager.getCoreApp() } returns FIREBASE_APP
+        val receivedApp = loginManagerManagerImpl.getCoreApp()
 
         assertThat(receivedApp).isEqualTo(FIREBASE_APP)
     }

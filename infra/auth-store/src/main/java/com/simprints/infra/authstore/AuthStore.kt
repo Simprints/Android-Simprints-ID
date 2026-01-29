@@ -33,11 +33,5 @@ interface AuthStore {
      */
     fun getCoreApp(): FirebaseApp
 
-    @Deprecated(
-        message = "Since 2021.2.0. Can be removed once all projects are on 2021.2.0+",
-        replaceWith = ReplaceWith("getCoreApp()"),
-    )
-    fun getLegacyAppFallback(): FirebaseApp
-
     suspend fun <T : SimRemoteInterface> buildClient(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T>
 }
