@@ -178,7 +178,11 @@ internal class FaceCaptureViewModel @Inject constructor(
             if (faceConfiguration?.imageSavingStrategy?.shouldSaveImage() == true) {
                 saveFaceDetections()
             }
-
+            if (faceDetections.isEmpty()) {
+                Simber.i("No face captured", tag = FACE_CAPTURE)
+                recapture()
+                return@launch
+            }
             val items = faceDetections.map { detection ->
                 BiometricTemplateCapture(
                     captureEventId = detection.id,
@@ -187,7 +191,6 @@ internal class FaceCaptureViewModel @Inject constructor(
             }
             val referenceId = UUID.randomUUID().toString()
             eventReporter.addBiometricReferenceCreationEvents(referenceId, items.map { it.captureEventId })
-
             val format = faceDetections
                 .firstOrNull()
                 ?.face
