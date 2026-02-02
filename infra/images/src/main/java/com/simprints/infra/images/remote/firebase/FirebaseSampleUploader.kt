@@ -35,7 +35,7 @@ internal class FirebaseSampleUploader @Inject constructor(
         projectId: String,
         progressCallback: (suspend (Int, Int) -> Unit)?,
     ): Boolean {
-        val firebaseApp = authStore.getLegacyAppFallback()
+        val firebaseApp = authStore.getCoreApp()
         if (firebaseApp.options.projectId.isNullOrBlank()) {
             Simber.i("Firebase projectId is null", tag = SAMPLE_UPLOAD)
             return false
