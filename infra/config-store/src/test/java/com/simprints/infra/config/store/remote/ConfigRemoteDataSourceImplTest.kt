@@ -1,27 +1,26 @@
 package com.simprints.infra.config.store.remote
 
-import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.authstore.AuthStore
+import com.google.common.truth.Truth.*
+import com.simprints.infra.backendapi.ApiResult
+import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.infra.config.store.remote.models.ApiFileUrl
 import com.simprints.infra.config.store.testtools.apiDeviceState
 import com.simprints.infra.config.store.testtools.apiProject
 import com.simprints.infra.config.store.testtools.deviceState
 import com.simprints.infra.config.store.testtools.project
 import com.simprints.infra.config.store.testtools.projectConfiguration
-import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
-import com.simprints.testtools.common.alias.InterfaceInvocation
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ConfigRemoteDataSourceImplTest {
     companion object {
         private const val PROJECT_ID = "projectId"
@@ -32,21 +31,22 @@ class ConfigRemoteDataSourceImplTest {
     }
 
     private val remoteInterface = mockk<ConfigRemoteInterface>()
-    private val simApiClient = mockk<SimNetwork.SimApiClient<ConfigRemoteInterface>>()
-    private val authStore = mockk<AuthStore>()
+    private val backendApiClient = mockk<BackendApiClient>()
     private val privacyNoticeDownloader = mockk<(String) -> String>()
-    private val configRemoteDataSourceImpl =
-        ConfigRemoteDataSourceImpl(authStore, UnconfinedTestDispatcher(), privacyNoticeDownloader)
+    private val configRemoteDataSourceImpl = ConfigRemoteDataSourceImpl(
+        backendApiClient,
+        UnconfinedTestDispatcher(),
+        privacyNoticeDownloader,
+    )
 
     @Before
     fun setup() {
-        coEvery { authStore.buildClient<ConfigRemoteInterface>(any()) } returns simApiClient
-        coEvery { simApiClient.executeCall<Any>(any()) } coAnswers {
-            val args = this.args
-            @Suppress("UNCHECKED_CAST")
-            (args[0] as InterfaceInvocation<ConfigRemoteInterface, Any>).invoke(
-                remoteInterface,
-            )
+        coEvery { backendApiClient.executeCall<ConfigRemoteInterface, Any>(any(), any()) } coAnswers {
+            try {
+                ApiResult.Success(secondArg<suspend (ConfigRemoteInterface) -> Any>()(remoteInterface))
+            } catch (e: Exception) {
+                ApiResult.Failure(e)
+            }
         }
     }
 

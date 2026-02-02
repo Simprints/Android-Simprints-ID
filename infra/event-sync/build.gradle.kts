@@ -3,6 +3,7 @@ plugins {
     id("simprints.library.room")
     id("simprints.testing.android")
     id("simprints.library.kotlinSerialization")
+    id("simprints.library.backendApi")
 }
 
 android {
@@ -35,5 +36,4 @@ dependencies {
 
     implementation(libs.libsimprints)
     implementation(libs.workManager.work)
-    implementation(libs.retrofit.core)
 }

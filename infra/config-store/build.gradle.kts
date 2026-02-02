@@ -2,6 +2,7 @@ plugins {
     id("simprints.infra")
     id("simprints.library.protobuf")
     id("simprints.library.kotlinSerialization")
+    id("simprints.library.backendApi")
     id("kotlin-parcelize")
 }
 
@@ -12,6 +13,6 @@ android {
 dependencies {
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:enrolment-records:realm-store"))
+
     implementation(libs.datastore)
-    implementation(libs.retrofit.core)
 }

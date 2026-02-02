@@ -80,6 +80,10 @@ gradlePlugin {
             id = "simprints.library.kotlinSerialization"
             implementationClass = "LibraryKotlinSerializationConventionPlugin"
         }
+        register("libraryBackendApi") {
+            id = "simprints.library.backendApi"
+            implementationClass = "LibraryBackendConventionPlugin"
+        }
 
         // Testing setup plugins
         register("testingUnit") {
