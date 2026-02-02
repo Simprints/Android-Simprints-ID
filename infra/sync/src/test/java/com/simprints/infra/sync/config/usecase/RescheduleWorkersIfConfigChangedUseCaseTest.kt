@@ -100,7 +100,7 @@ class RescheduleWorkersIfConfigChangedUseCaseTest {
         runCurrent()
         useCaseJob.await()
 
-        verify { sync(SyncCommands.Schedule.Images.start()) }
+        verify { sync(SyncCommands.ScheduleOf.Images.start()) }
         assertThat(useCaseJob.isCompleted).isTrue()
     }
 

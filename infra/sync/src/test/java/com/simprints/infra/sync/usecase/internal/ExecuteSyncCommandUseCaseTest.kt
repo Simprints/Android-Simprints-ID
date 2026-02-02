@@ -66,7 +66,7 @@ class ExecuteSyncCommandUseCaseTest {
         every { authStore.signedInProjectId } returns ""
         coEvery { shouldScheduleFirmwareUpdate.invoke() } returns false
 
-        useCase(executable(SyncCommands.Schedule.Everything.start()), commandScope()).join()
+        useCase(executable(SyncCommands.ScheduleOf.Everything.start()), commandScope()).join()
 
         verify(exactly = 0) { workManager.enqueueUniquePeriodicWork(any(), any(), any()) }
     }
@@ -76,7 +76,7 @@ class ExecuteSyncCommandUseCaseTest {
         every { authStore.signedInProjectId } returns "projectId"
         coEvery { shouldScheduleFirmwareUpdate.invoke() } returns true
 
-        useCase(executable(SyncCommands.Schedule.Everything.start()), commandScope()).join()
+        useCase(executable(SyncCommands.ScheduleOf.Everything.start()), commandScope()).join()
 
         verify {
             workManager.enqueueUniquePeriodicWork(PROJECT_SYNC_WORK_NAME, any(), any())
@@ -96,7 +96,7 @@ class ExecuteSyncCommandUseCaseTest {
         } returns false
         every { authStore.signedInProjectId } returns "projectId"
 
-        useCase(executable(SyncCommands.Schedule.Everything.start()), commandScope()).join()
+        useCase(executable(SyncCommands.ScheduleOf.Everything.start()), commandScope()).join()
 
         verify {
             workManager.enqueueUniquePeriodicWork(
@@ -117,7 +117,7 @@ class ExecuteSyncCommandUseCaseTest {
         every { authStore.signedInProjectId } returns "projectId"
         coEvery { shouldScheduleFirmwareUpdate.invoke() } returns false
 
-        useCase(executable(SyncCommands.Schedule.Everything.start()), commandScope()).join()
+        useCase(executable(SyncCommands.ScheduleOf.Everything.start()), commandScope()).join()
 
         verify {
             workManager.enqueueUniquePeriodicWork(
@@ -133,7 +133,7 @@ class ExecuteSyncCommandUseCaseTest {
         every { authStore.signedInProjectId } returns "projectId"
         coEvery { shouldScheduleFirmwareUpdate.invoke() } returns false
 
-        useCase(executable(SyncCommands.Schedule.Everything.start()), commandScope()).join()
+        useCase(executable(SyncCommands.ScheduleOf.Everything.start()), commandScope()).join()
 
         verify { workManager.cancelUniqueWork(FIRMWARE_UPDATE_WORK_NAME) }
     }
@@ -142,7 +142,7 @@ class ExecuteSyncCommandUseCaseTest {
     fun `cancels all necessary background workers`() = runTest {
         every { eventSyncManager.getAllWorkerTag() } returns "syncWorkers"
 
-        useCase(executable(SyncCommands.Schedule.Everything.stop()), commandScope())
+        useCase(executable(SyncCommands.ScheduleOf.Everything.stop()), commandScope())
 
         verify {
             workManager.cancelUniqueWork(PROJECT_SYNC_WORK_NAME)
@@ -159,7 +159,7 @@ class ExecuteSyncCommandUseCaseTest {
     fun `reschedules event sync worker with correct tags`() = runTest {
         every { eventSyncManager.getPeriodicWorkTags() } returns listOf("tag1", "tag2")
 
-        useCase(executable(SyncCommands.Schedule.Events.start()), commandScope()).join()
+        useCase(executable(SyncCommands.ScheduleOf.Events.start()), commandScope()).join()
 
         verify {
             workManager.enqueueUniquePeriodicWork(
@@ -174,7 +174,7 @@ class ExecuteSyncCommandUseCaseTest {
     fun `reschedules event sync worker with correct delay`() = runTest {
         every { eventSyncManager.getPeriodicWorkTags() } returns listOf("tag1", "tag2")
 
-        useCase(executable(SyncCommands.Schedule.Events.start(withDelay = true)), commandScope()).join()
+        useCase(executable(SyncCommands.ScheduleOf.Events.start(withDelay = true)), commandScope()).join()
 
         verify {
             workManager.enqueueUniquePeriodicWork(
@@ -190,7 +190,7 @@ class ExecuteSyncCommandUseCaseTest {
         every { eventSyncManager.getAllWorkerTag() } returns "syncWorkers"
         every { eventSyncManager.getPeriodicWorkTags() } returns listOf("tag1", "tag2")
 
-        useCase(executable(SyncCommands.Schedule.Events.stopAndStart(withDelay = true)), commandScope()).join()
+        useCase(executable(SyncCommands.ScheduleOf.Events.restart(withDelay = true)), commandScope()).join()
 
         verify {
             workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME)
@@ -211,7 +211,7 @@ class ExecuteSyncCommandUseCaseTest {
     fun `cancel event sync worker cancels correct worker`() = runTest {
         every { eventSyncManager.getAllWorkerTag() } returns "syncWorkers"
 
-        useCase(executable(SyncCommands.Schedule.Events.stop()), commandScope())
+        useCase(executable(SyncCommands.ScheduleOf.Events.stop()), commandScope())
 
         verify {
             workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME)
@@ -224,7 +224,7 @@ class ExecuteSyncCommandUseCaseTest {
     fun `start event sync worker with correct tags`() = runTest {
         every { eventSyncManager.getOneTimeWorkTags() } returns listOf("tag1", "tag2")
 
-        useCase(executable(SyncCommands.OneTime.Events.start()), commandScope()).join()
+        useCase(executable(SyncCommands.OneTimeNow.Events.start()), commandScope()).join()
 
         verify {
             workManager.enqueueUniqueWork(
@@ -239,7 +239,7 @@ class ExecuteSyncCommandUseCaseTest {
     fun `start event sync worker with correct input data`() = runTest {
         every { eventSyncManager.getOneTimeWorkTags() } returns listOf("tag1", "tag2")
 
-        useCase(executable(SyncCommands.OneTime.Events.start(isDownSyncAllowed = false)), commandScope()).join()
+        useCase(executable(SyncCommands.OneTimeNow.Events.start(isDownSyncAllowed = false)), commandScope()).join()
 
         verify {
             workManager.enqueueUniqueWork(
@@ -257,7 +257,7 @@ class ExecuteSyncCommandUseCaseTest {
         every { eventSyncManager.getAllWorkerTag() } returns "syncWorkers"
         every { eventSyncManager.getOneTimeWorkTags() } returns listOf("tag1", "tag2")
 
-        useCase(executable(SyncCommands.OneTime.Events.stopAndStart(isDownSyncAllowed = false)), commandScope()).join()
+        useCase(executable(SyncCommands.OneTimeNow.Events.restart(isDownSyncAllowed = false)), commandScope()).join()
 
         verify {
             workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME_ONE_TIME)
@@ -277,7 +277,7 @@ class ExecuteSyncCommandUseCaseTest {
     fun `stop event sync worker cancels correct workers`() = runTest {
         every { eventSyncManager.getAllWorkerTag() } returns "syncWorkers"
 
-        useCase(executable(SyncCommands.OneTime.Events.stop()), commandScope())
+        useCase(executable(SyncCommands.OneTimeNow.Events.stop()), commandScope())
 
         verify {
             workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME_ONE_TIME)
@@ -287,7 +287,7 @@ class ExecuteSyncCommandUseCaseTest {
 
     @Test
     fun `reschedules image worker when requested`() = runTest {
-        useCase(executable(SyncCommands.Schedule.Images.start()), commandScope()).join()
+        useCase(executable(SyncCommands.ScheduleOf.Images.start()), commandScope()).join()
 
         verify {
             workManager.enqueueUniquePeriodicWork(
@@ -300,7 +300,7 @@ class ExecuteSyncCommandUseCaseTest {
 
     @Test
     fun `start image sync re-starts image worker`() = runTest {
-        useCase(executable(SyncCommands.OneTime.Images.start()), commandScope()).join()
+        useCase(executable(SyncCommands.OneTimeNow.Images.start()), commandScope()).join()
 
         verify {
             workManager.cancelUniqueWork(FILE_UP_SYNC_WORK_NAME)
@@ -314,14 +314,14 @@ class ExecuteSyncCommandUseCaseTest {
 
     @Test
     fun `stop image sync cancels image worker`() = runTest {
-        useCase(executable(SyncCommands.OneTime.Images.stop()), commandScope())
+        useCase(executable(SyncCommands.OneTimeNow.Images.stop()), commandScope())
 
         verify { workManager.cancelUniqueWork(FILE_UP_SYNC_WORK_NAME) }
     }
 
     @Test
     fun `invoke stop command returns completed job and routes to stop logic`() = runTest {
-        val job = useCase(executable(SyncCommands.Schedule.Images.stop()), commandScope())
+        val job = useCase(executable(SyncCommands.ScheduleOf.Images.stop()), commandScope())
 
         assertThat(job.isCompleted).isTrue()
         verify { workManager.cancelUniqueWork(FILE_UP_SYNC_WORK_NAME) }
@@ -336,7 +336,7 @@ class ExecuteSyncCommandUseCaseTest {
             unblock.receive()
         }
 
-        val job = useCase(executable(SyncCommands.Schedule.Images.stopAndStartAround(block)), commandScope())
+        val job = useCase(executable(SyncCommands.ScheduleOf.Images.restartAfter(block)), commandScope())
 
         verify {
             workManager.cancelUniqueWork(FILE_UP_SYNC_WORK_NAME)
@@ -375,7 +375,7 @@ class ExecuteSyncCommandUseCaseTest {
             unblock.receive()
         }
 
-        val job = useCase(executable(SyncCommands.Schedule.Images.stopAndStartAround(block)), scope)
+        val job = useCase(executable(SyncCommands.ScheduleOf.Images.restartAfter(block)), scope)
 
         blockStarted.receive()
         parentJob.cancel()

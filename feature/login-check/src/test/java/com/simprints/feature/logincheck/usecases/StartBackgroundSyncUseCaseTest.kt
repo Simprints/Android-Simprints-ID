@@ -50,7 +50,7 @@ class StartBackgroundSyncUseCaseTest {
         } returns
             Frequency.PERIODICALLY
 
-        assertUseCaseAwaitsSync(SyncCommands.Schedule.Everything.start(withDelay = true))
+        assertUseCaseAwaitsSync(SyncCommands.ScheduleOf.Everything.start(withDelay = true))
     }
 
     @Test
@@ -63,7 +63,7 @@ class StartBackgroundSyncUseCaseTest {
         } returns
             Frequency.PERIODICALLY_AND_ON_SESSION_START
 
-        assertUseCaseAwaitsSync(SyncCommands.Schedule.Everything.start())
+        assertUseCaseAwaitsSync(SyncCommands.ScheduleOf.Everything.start())
     }
 
     @Test
@@ -76,7 +76,7 @@ class StartBackgroundSyncUseCaseTest {
         } returns
             Frequency.PERIODICALLY
 
-        assertUseCaseAwaitsSync(SyncCommands.Schedule.Everything.start(withDelay = true))
+        assertUseCaseAwaitsSync(SyncCommands.ScheduleOf.Everything.start(withDelay = true))
     }
 
     @Test
@@ -87,7 +87,7 @@ class StartBackgroundSyncUseCaseTest {
                 .synchronization.down.simprints
         } returns null
 
-        assertUseCaseAwaitsSync(SyncCommands.Schedule.Everything.start(withDelay = true))
+        assertUseCaseAwaitsSync(SyncCommands.ScheduleOf.Everything.start(withDelay = true))
     }
 
     private suspend fun TestScope.assertUseCaseAwaitsSync(expectedCommand: SyncCommand) {

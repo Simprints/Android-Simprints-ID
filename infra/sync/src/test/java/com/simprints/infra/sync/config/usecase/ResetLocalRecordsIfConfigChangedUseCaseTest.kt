@@ -109,7 +109,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
         assertThat(command.target)
             .isEqualTo(SyncTarget.SCHEDULE_EVENTS)
         assertThat(command.action)
-            .isEqualTo(SyncAction.STOP_AND_START)
+            .isEqualTo(SyncAction.RESTART)
         assertThat((command.payload as SyncCommandPayload.WithDelay).withDelay)
             .isFalse()
 
@@ -149,7 +149,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
         assertThat(command.target)
             .isEqualTo(SyncTarget.SCHEDULE_EVENTS)
         assertThat(command.action)
-            .isEqualTo(SyncAction.STOP_AND_START)
+            .isEqualTo(SyncAction.RESTART)
 
         command.blockToRunWhileStopped?.invoke()
         runCurrent()
@@ -187,7 +187,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
         assertThat(command.target)
             .isEqualTo(SyncTarget.SCHEDULE_EVENTS)
         assertThat(command.action)
-            .isEqualTo(SyncAction.STOP_AND_START)
+            .isEqualTo(SyncAction.RESTART)
 
         command.blockToRunWhileStopped?.invoke()
         runCurrent()
@@ -225,7 +225,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
         assertThat(command.target)
             .isEqualTo(SyncTarget.SCHEDULE_EVENTS)
         assertThat(command.action)
-            .isEqualTo(SyncAction.STOP_AND_START)
+            .isEqualTo(SyncAction.RESTART)
 
         command.blockToRunWhileStopped?.invoke()
         runCurrent()

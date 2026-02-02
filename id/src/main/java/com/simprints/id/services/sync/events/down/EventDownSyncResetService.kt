@@ -52,7 +52,7 @@ class EventDownSyncResetService : Service() {
             eventSyncManager.resetDownSyncInfo()
             // Trigger a new sync
             // Scope isn't passed to sync here to prevent a timeout cancellation leaving it in a stopped state
-            sync(SyncCommands.OneTime.Events.start()).await()
+            sync(SyncCommands.OneTimeNow.Events.start()).await()
         }
         resetJob?.invokeOnCompletion { stopSelf() }
 

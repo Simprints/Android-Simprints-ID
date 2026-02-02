@@ -12,7 +12,7 @@ internal class LogoutUseCase @Inject constructor(
     private val authManager: AuthManager,
 ) {
     suspend operator fun invoke() {
-        sync(SyncCommands.Schedule.Everything.stop())
+        sync(SyncCommands.ScheduleOf.Everything.stop())
         syncOrchestrator.deleteEventSyncInfo()
         authManager.signOut()
     }

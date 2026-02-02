@@ -71,22 +71,22 @@ class SyncUseCase @Inject internal constructor(
      * sync(
      *  SyncCommands.
      *   +- ObserveOnly.
-     *   +- Schedule.
+     *   +- ScheduleOf.
      *   |   +- Everything. --->|
      *   |   +- Events.     --->|           |--->   stop()
      *   |   +- Images.     --->|    for    |--->   start()
-     *   +- OneTime.            |---------->|--->   stopAndStart()
-     *       +- Events.     --->|    all    |--->   stopAndStartAround { /* stop, run this block, then start */ }
+     *   +- OneTimeNow.            |---------->|--->   restart()
+     *       +- Events.     --->|    all    |--->   restartAfter { /* stop, run this block, then start */ }
      *       +- Images.     --->|
      * )
      *
      * Examples:
      *
      *  sync(SyncCommands.ObserveOnly)
-     *  sync(SyncCommands.OneTime.Events.stop())
-     *  sync(SyncCommands.OneTime.Images.stopAndStart())  // starts even if wasn't running at stop command time
-     *  sync(SyncCommands.Schedule.Events.start())
-     *  sync(SyncCommands.Schedule.Everything.stopAndStartAround {
+     *  sync(SyncCommands.OneTimeNow.Events.stop())
+     *  sync(SyncCommands.OneTimeNow.Images.restart())  // starts even if wasn't running at stop command time
+     *  sync(SyncCommands.ScheduleOf.Events.start())
+     *  sync(SyncCommands.ScheduleOf.Everything.restartAfter {
      *      delay(10_000)   // transaction to wait for...
      *  }).await()          // ...now complete
      *  val lastEventSyncTime = sync(SyncCommands.ObserveOnly).syncStatusFlow.value.eventSyncState.lastSyncTime
@@ -99,9 +99,9 @@ class SyncUseCase @Inject internal constructor(
      * If the command was for a inherently non-blocking job, it will be returned already completed.
      * To suspend until the command completes, add .await(), it rethrows cancellations / other exceptions.
      *
-     * The commandScope param allows the sync command (incl. the optional stopAndStartAround block)
+     * The commandScope param allows the sync command (incl. the optional restartAfter block)
      * be cancelable when the passed scope's coroutine is cancelled,
-     * and to allow stopAndStartAround throw exceptions in the passed scopes coroutine's context.
+     * and to allow restartAfter throw exceptions in the passed scopes coroutine's context.
      * Note: cancelling a command may leave the corresponding sync in a stopped state. The stopping is synchronous.
      */
     operator fun invoke(

@@ -115,7 +115,7 @@ internal class ModuleSelectionViewModel @Inject constructor(
                 module.copy(name = encryptedName)
             }
             moduleRepository.saveModules(modules)
-            sync(SyncCommands.OneTime.Events.stopAndStart())
+            sync(SyncCommands.OneTimeNow.Events.restart())
         }
     }
 

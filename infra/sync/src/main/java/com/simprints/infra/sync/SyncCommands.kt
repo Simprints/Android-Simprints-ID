@@ -11,13 +11,13 @@ package com.simprints.infra.sync
 object SyncCommands {
     object ObserveOnly : SyncCommand()
 
-    object OneTime {
+    object OneTimeNow {
         // DSL-style capitalization to fit well when used like: sync(SyncCommands.OneTime.Events.start())
         val Events = buildSyncCommandsWithDownSyncParam(SyncTarget.ONE_TIME_EVENTS)
         val Images = buildSyncCommands(SyncTarget.ONE_TIME_IMAGES)
     }
 
-    object Schedule {
+    object ScheduleOf {
         val Everything = buildSyncCommandsWithDelayParam(SyncTarget.SCHEDULE_EVERYTHING)
         val Events = buildSyncCommandsWithDelayParam(SyncTarget.SCHEDULE_EVENTS)
         val Images = buildSyncCommands(SyncTarget.SCHEDULE_IMAGES)
@@ -37,9 +37,9 @@ object SyncCommands {
 
         fun start(): SyncCommand
 
-        fun stopAndStart(): SyncCommand
+        fun restart(): SyncCommand
 
-        fun stopAndStartAround(block: suspend () -> Unit): SyncCommand
+        fun restartAfter(block: suspend () -> Unit): SyncCommand
     }
 
     interface SyncCommandBuilderWithDownSyncParam {
@@ -47,9 +47,9 @@ object SyncCommands {
 
         fun start(isDownSyncAllowed: Boolean = true): SyncCommand
 
-        fun stopAndStart(isDownSyncAllowed: Boolean = true): SyncCommand
+        fun restart(isDownSyncAllowed: Boolean = true): SyncCommand
 
-        fun stopAndStartAround(
+        fun restartAfter(
             isDownSyncAllowed: Boolean = true,
             block: suspend () -> Unit,
         ): SyncCommand
@@ -60,9 +60,9 @@ object SyncCommands {
 
         fun start(withDelay: Boolean = false): SyncCommand
 
-        fun stopAndStart(withDelay: Boolean = false): SyncCommand
+        fun restart(withDelay: Boolean = false): SyncCommand
 
-        fun stopAndStartAround(
+        fun restartAfter(
             withDelay: Boolean = false,
             block: suspend () -> Unit,
         ): SyncCommand
@@ -73,9 +73,9 @@ object SyncCommands {
 
         override fun start() = getCommand(target, SyncAction.START)
 
-        override fun stopAndStart() = getCommand(target, SyncAction.STOP_AND_START)
+        override fun restart() = getCommand(target, SyncAction.RESTART)
 
-        override fun stopAndStartAround(block: suspend () -> Unit) = getCommand(target, SyncAction.STOP_AND_START, block = block)
+        override fun restartAfter(block: suspend () -> Unit) = getCommand(target, SyncAction.RESTART, block = block)
     }
 
     private fun buildSyncCommandsWithDownSyncParam(target: SyncTarget) = object : SyncCommandBuilderWithDownSyncParam {
@@ -84,15 +84,15 @@ object SyncCommands {
         override fun start(isDownSyncAllowed: Boolean) =
             getCommand(target, SyncAction.START, payload = SyncCommandPayload.WithDownSyncAllowed(isDownSyncAllowed))
 
-        override fun stopAndStart(isDownSyncAllowed: Boolean) =
-            getCommand(target, SyncAction.STOP_AND_START, payload = SyncCommandPayload.WithDownSyncAllowed(isDownSyncAllowed))
+        override fun restart(isDownSyncAllowed: Boolean) =
+            getCommand(target, SyncAction.RESTART, payload = SyncCommandPayload.WithDownSyncAllowed(isDownSyncAllowed))
 
-        override fun stopAndStartAround(
+        override fun restartAfter(
             isDownSyncAllowed: Boolean,
             block: suspend () -> Unit,
         ) = getCommand(
             target,
-            SyncAction.STOP_AND_START,
+            SyncAction.RESTART,
             payload = SyncCommandPayload.WithDownSyncAllowed(isDownSyncAllowed),
             block = block,
         )
@@ -103,13 +103,13 @@ object SyncCommands {
 
         override fun start(withDelay: Boolean) = getCommand(target, SyncAction.START, payload = SyncCommandPayload.WithDelay(withDelay))
 
-        override fun stopAndStart(withDelay: Boolean) =
-            getCommand(target, SyncAction.STOP_AND_START, payload = SyncCommandPayload.WithDelay(withDelay))
+        override fun restart(withDelay: Boolean) =
+            getCommand(target, SyncAction.RESTART, payload = SyncCommandPayload.WithDelay(withDelay))
 
-        override fun stopAndStartAround(
+        override fun restartAfter(
             withDelay: Boolean,
             block: suspend () -> Unit,
-        ) = getCommand(target, SyncAction.STOP_AND_START, payload = SyncCommandPayload.WithDelay(withDelay), block = block)
+        ) = getCommand(target, SyncAction.RESTART, payload = SyncCommandPayload.WithDelay(withDelay), block = block)
     }
 
     private fun getCommand(
@@ -141,7 +141,7 @@ enum class SyncTarget {
 internal enum class SyncAction {
     STOP,
     START,
-    STOP_AND_START,
+    RESTART,
 }
 
 internal sealed class SyncCommandPayload {

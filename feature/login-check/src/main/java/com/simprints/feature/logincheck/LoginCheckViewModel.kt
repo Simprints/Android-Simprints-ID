@@ -106,7 +106,7 @@ class LoginCheckViewModel @Inject internal constructor(
         cachedRequest = actionRequest
         loginAlreadyTried.set(true)
 
-        sync(SyncCommands.Schedule.Everything.stop())
+        sync(SyncCommands.ScheduleOf.Everything.stop())
 
         _showLoginFlow.send(actionRequest)
     }

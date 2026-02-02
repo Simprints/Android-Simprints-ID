@@ -172,7 +172,7 @@ internal class LoginCheckViewModelTest {
         coVerify {
             addAuthorizationEventUseCase.invoke(any(), eq(false))
         }
-        verify { sync(SyncCommands.Schedule.Everything.stop()) }
+        verify { sync(SyncCommands.ScheduleOf.Everything.stop()) }
         viewModel.showLoginFlow
             .test()
             .assertValue { it.peekContent() == ActionFactory.getIdentifyRequest() }

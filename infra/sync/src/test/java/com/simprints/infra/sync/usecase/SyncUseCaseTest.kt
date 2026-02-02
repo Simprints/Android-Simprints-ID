@@ -276,7 +276,7 @@ class SyncUseCaseTest {
     fun `executes executable sync command and returns its job`() = runTest {
         val expectedJob = Job().apply { complete() }
         val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, executeSyncCommand, appScope = backgroundScope)
-        val command = SyncCommands.Schedule.Everything.stopAndStart() as SyncCommands.ExecutableSyncCommand
+        val command = SyncCommands.ScheduleOf.Everything.restart() as SyncCommands.ExecutableSyncCommand
         every { executeSyncCommand.invoke(command, backgroundScope) } returns expectedJob
 
         val response = useCase(command)
@@ -290,7 +290,7 @@ class SyncUseCaseTest {
         val expectedJob = Job().apply { complete() }
         val customScope = CoroutineScope(backgroundScope.coroutineContext + Job())
         val useCase = SyncUseCase(eventSyncStateProcessor, imageSync, executeSyncCommand, appScope = backgroundScope)
-        val command = SyncCommands.Schedule.Everything.stopAndStart() as SyncCommands.ExecutableSyncCommand
+        val command = SyncCommands.ScheduleOf.Everything.restart() as SyncCommands.ExecutableSyncCommand
 
         every { executeSyncCommand.invoke(command, customScope) } returns expectedJob
 

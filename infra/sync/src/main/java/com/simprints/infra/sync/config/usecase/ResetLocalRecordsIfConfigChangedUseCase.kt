@@ -19,7 +19,7 @@ internal class ResetLocalRecordsIfConfigChangedUseCase @Inject constructor(
     ) {
         if (hasPartitionTypeChanged(oldConfig, newConfig)) {
             sync(
-                SyncCommands.Schedule.Events.stopAndStartAround {
+                SyncCommands.ScheduleOf.Events.restartAfter {
                     eventSyncManager.resetDownSyncInfo()
                     enrolmentRecordRepository.deleteAll()
                 },

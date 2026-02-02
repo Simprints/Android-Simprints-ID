@@ -52,7 +52,7 @@ class RunBlockingEventSyncUseCaseTest {
         testScheduler.advanceUntilIdle()
 
         verify(exactly = 1) { sync(SyncCommands.ObserveOnly) }
-        verify(exactly = 1) { sync.invoke(SyncCommands.OneTime.Events.start()) }
+        verify(exactly = 1) { sync.invoke(SyncCommands.OneTimeNow.Events.start()) }
     }
 
     @Test
@@ -67,7 +67,7 @@ class RunBlockingEventSyncUseCaseTest {
         testScheduler.advanceUntilIdle()
 
         verify(exactly = 1) { sync(SyncCommands.ObserveOnly) }
-        verify(exactly = 1) { sync.invoke(SyncCommands.OneTime.Events.start()) }
+        verify(exactly = 1) { sync.invoke(SyncCommands.OneTimeNow.Events.start()) }
     }
 
     @Test
@@ -82,7 +82,7 @@ class RunBlockingEventSyncUseCaseTest {
         testScheduler.advanceUntilIdle()
 
         verify(exactly = 1) { sync(SyncCommands.ObserveOnly) }
-        verify(exactly = 1) { sync.invoke(SyncCommands.OneTime.Events.start()) }
+        verify(exactly = 1) { sync.invoke(SyncCommands.OneTimeNow.Events.start()) }
     }
 
     @Test
@@ -93,12 +93,12 @@ class RunBlockingEventSyncUseCaseTest {
         val job = launch { usecase.invoke() }
         testScheduler.advanceUntilIdle()
 
-        verify(exactly = 0) { sync(SyncCommands.OneTime.Events.start()) }
+        verify(exactly = 0) { sync(SyncCommands.OneTimeNow.Events.start()) }
 
         syncFlow.value = createSyncStatus("sync", EventSyncWorkerState.Succeeded)
         testScheduler.advanceUntilIdle()
 
-        verify(exactly = 1) { sync(SyncCommands.OneTime.Events.start()) }
+        verify(exactly = 1) { sync(SyncCommands.OneTimeNow.Events.start()) }
         job.cancel()
     }
 
@@ -133,7 +133,7 @@ class RunBlockingEventSyncUseCaseTest {
             syncStatusFlow = syncFlow,
         )
         every { sync.invoke(SyncCommands.ObserveOnly) } returns syncResponse
-        every { sync.invoke(SyncCommands.OneTime.Events.start()) } returns syncResponse
+        every { sync.invoke(SyncCommands.OneTimeNow.Events.start()) } returns syncResponse
     }
 
     private fun createPlaceholderSyncStatus(): SyncStatus = createSyncStatus("", null, null, null)

@@ -20,7 +20,7 @@ internal class RunBlockingEventSyncUseCase @Inject constructor(
             .map { it.eventSyncState }
             .firstOrNull { !it.isUninitialized() }
             ?.syncId
-        sync(SyncCommands.OneTime.Events.start())
+        sync(SyncCommands.OneTimeNow.Events.start())
             .apply {
                 await()
             }.syncStatusFlow

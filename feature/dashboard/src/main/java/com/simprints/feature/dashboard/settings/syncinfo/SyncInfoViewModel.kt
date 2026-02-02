@@ -145,7 +145,7 @@ internal class SyncInfoViewModel @Inject constructor(
             }
 
             val isDownSyncAllowed = !isPreLogoutUpSync && configRepository.getProject()?.state == ProjectState.RUNNING
-            sync(SyncCommands.OneTime.Events.stopAndStart(isDownSyncAllowed))
+            sync(SyncCommands.OneTimeNow.Events.restart(isDownSyncAllowed))
         }
     }
 
@@ -153,10 +153,10 @@ internal class SyncInfoViewModel @Inject constructor(
         viewModelScope.launch {
             val isImageSyncing = imageSyncStatusFlow.firstOrNull()?.isSyncing == true
             if (isImageSyncing) {
-                sync(SyncCommands.OneTime.Images.stop())
+                sync(SyncCommands.OneTimeNow.Images.stop())
             } else {
                 imageSyncButtonClickFlow.emit(Unit)
-                sync(SyncCommands.OneTime.Images.start())
+                sync(SyncCommands.OneTimeNow.Images.start())
             }
         }
     }
@@ -214,7 +214,7 @@ internal class SyncInfoViewModel @Inject constructor(
                     .distinctUntilChanged()
                     .collect { isEventSyncCompleted ->
                         if (isEventSyncCompleted) {
-                            sync(SyncCommands.OneTime.Images.start())
+                            sync(SyncCommands.OneTimeNow.Images.start())
                         }
                     }
             }

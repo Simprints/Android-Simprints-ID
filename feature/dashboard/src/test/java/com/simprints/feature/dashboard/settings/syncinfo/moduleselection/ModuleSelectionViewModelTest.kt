@@ -175,7 +175,7 @@ class ModuleSelectionViewModelTest {
         viewModel.saveModules()
 
         coVerify(exactly = 1) { repository.saveModules(updatedModules) }
-        verify(exactly = 1) { sync(SyncCommands.OneTime.Events.stopAndStart()) }
+        verify(exactly = 1) { sync(SyncCommands.OneTimeNow.Events.restart()) }
     }
 
     @Test

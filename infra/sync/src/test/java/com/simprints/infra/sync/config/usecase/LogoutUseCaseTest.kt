@@ -51,9 +51,9 @@ class LogoutUseCaseTest {
         val command = syncCommandSlot.captured as SyncCommands.ExecutableSyncCommand
         assertThat(command.target).isEqualTo(SyncTarget.SCHEDULE_EVERYTHING)
         assertThat(command.action).isEqualTo(SyncAction.STOP)
-        assertThat(command).isEqualTo(SyncCommands.Schedule.Everything.stop())
+        assertThat(command).isEqualTo(SyncCommands.ScheduleOf.Everything.stop())
 
-        verify { sync(SyncCommands.Schedule.Everything.stop()) }
+        verify { sync(SyncCommands.ScheduleOf.Everything.stop()) }
         coVerify {
             syncOrchestrator.deleteEventSyncInfo()
             authManager.signOut()

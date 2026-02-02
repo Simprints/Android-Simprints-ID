@@ -61,7 +61,7 @@ class LogoutUseCaseTest {
     fun `Fully logs out when called`() = runTest {
         useCase.invoke()
 
-        verify { sync(SyncCommands.Schedule.Everything.stop()) }
+        verify { sync(SyncCommands.ScheduleOf.Everything.stop()) }
         coVerify {
             syncOrchestrator.deleteEventSyncInfo()
             authManager.signOut()

@@ -18,6 +18,6 @@ internal class StartBackgroundSyncUseCase @Inject constructor(
             ?.frequency
 
         val withDelay = frequency != Frequency.PERIODICALLY_AND_ON_SESSION_START
-        sync(SyncCommands.Schedule.Everything.start(withDelay)).await()
+        sync(SyncCommands.ScheduleOf.Everything.start(withDelay)).await()
     }
 }

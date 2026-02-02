@@ -5,17 +5,17 @@ import org.junit.Test
 
 class SyncCommandsTest {
     private val buildersWithoutParams = listOf(
-        SyncCommands.OneTime.Images to SyncTarget.ONE_TIME_IMAGES,
-        SyncCommands.Schedule.Images to SyncTarget.SCHEDULE_IMAGES,
+        SyncCommands.OneTimeNow.Images to SyncTarget.ONE_TIME_IMAGES,
+        SyncCommands.ScheduleOf.Images to SyncTarget.SCHEDULE_IMAGES,
     )
 
     private val buildersWithDelayParam = listOf(
-        SyncCommands.Schedule.Everything to SyncTarget.SCHEDULE_EVERYTHING,
-        SyncCommands.Schedule.Events to SyncTarget.SCHEDULE_EVENTS,
+        SyncCommands.ScheduleOf.Everything to SyncTarget.SCHEDULE_EVERYTHING,
+        SyncCommands.ScheduleOf.Events to SyncTarget.SCHEDULE_EVENTS,
     )
 
     private val buildersWithDownSyncAllowedParam = listOf(
-        SyncCommands.OneTime.Events to SyncTarget.ONE_TIME_EVENTS,
+        SyncCommands.OneTimeNow.Events to SyncTarget.ONE_TIME_EVENTS,
     )
 
     @Test
@@ -81,15 +81,15 @@ class SyncCommandsTest {
     }
 
     @Test
-    fun `stopAndStart builds executable command with expected params`() {
-        val action = SyncAction.STOP_AND_START
+    fun `restart builds executable command with expected params`() {
+        val action = SyncAction.RESTART
         buildersWithoutParams.forEach { (builder, expectedTarget) ->
-            assertThat(builder.stopAndStart())
+            assertThat(builder.restart())
                 .isEqualTo(expectedCommand(expectedTarget, action))
         }
 
         buildersWithDelayParam.forEach { (builder, expectedTarget) ->
-            assertThat(builder.stopAndStart())
+            assertThat(builder.restart())
                 .isEqualTo(
                     expectedCommand(
                         target = expectedTarget,
@@ -97,7 +97,7 @@ class SyncCommandsTest {
                         payload = SyncCommandPayload.WithDelay(false),
                     ),
                 )
-            assertThat(builder.stopAndStart(withDelay = true))
+            assertThat(builder.restart(withDelay = true))
                 .isEqualTo(
                     expectedCommand(
                         target = expectedTarget,
@@ -108,7 +108,7 @@ class SyncCommandsTest {
         }
 
         buildersWithDownSyncAllowedParam.forEach { (builder, expectedTarget) ->
-            assertThat(builder.stopAndStart())
+            assertThat(builder.restart())
                 .isEqualTo(
                     expectedCommand(
                         target = expectedTarget,
@@ -116,7 +116,7 @@ class SyncCommandsTest {
                         payload = SyncCommandPayload.WithDownSyncAllowed(true),
                     ),
                 )
-            assertThat(builder.stopAndStart(isDownSyncAllowed = false))
+            assertThat(builder.restart(isDownSyncAllowed = false))
                 .isEqualTo(
                     expectedCommand(
                         target = expectedTarget,
@@ -128,12 +128,12 @@ class SyncCommandsTest {
     }
 
     @Test
-    fun `stopAndStartAround builds executable command and stores block`() {
+    fun `restartAfter builds executable command and stores block`() {
         val block: suspend () -> Unit = { }
-        val action = SyncAction.STOP_AND_START
+        val action = SyncAction.RESTART
 
         buildersWithoutParams.forEach { (builder, expectedTarget) ->
-            assertThat(builder.stopAndStartAround(block))
+            assertThat(builder.restartAfter(block))
                 .isEqualTo(
                     expectedCommand(
                         target = expectedTarget,
@@ -144,7 +144,7 @@ class SyncCommandsTest {
         }
 
         buildersWithDownSyncAllowedParam.forEach { (builder, expectedTarget) ->
-            assertThat(builder.stopAndStartAround(block = block))
+            assertThat(builder.restartAfter(block = block))
                 .isEqualTo(
                     expectedCommand(
                         target = expectedTarget,
@@ -153,7 +153,7 @@ class SyncCommandsTest {
                         block,
                     ),
                 )
-            assertThat(builder.stopAndStartAround(isDownSyncAllowed = false, block = block))
+            assertThat(builder.restartAfter(isDownSyncAllowed = false, block = block))
                 .isEqualTo(
                     expectedCommand(
                         target = expectedTarget,
@@ -165,7 +165,7 @@ class SyncCommandsTest {
         }
 
         buildersWithDelayParam.forEach { (builder, expectedTarget) ->
-            assertThat(builder.stopAndStartAround(block = block))
+            assertThat(builder.restartAfter(block = block))
                 .isEqualTo(
                     expectedCommand(
                         target = expectedTarget,
@@ -174,7 +174,7 @@ class SyncCommandsTest {
                         block,
                     ),
                 )
-            assertThat(builder.stopAndStartAround(withDelay = true, block = block))
+            assertThat(builder.restartAfter(withDelay = true, block = block))
                 .isEqualTo(
                     expectedCommand(
                         target = expectedTarget,
