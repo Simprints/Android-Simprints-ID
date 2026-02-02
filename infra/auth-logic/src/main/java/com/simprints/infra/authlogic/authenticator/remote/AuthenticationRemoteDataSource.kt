@@ -5,21 +5,21 @@ import com.simprints.infra.authstore.domain.models.AuthRequest
 import com.simprints.infra.authstore.domain.models.AuthenticationData
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.authstore.exceptions.AuthRequestInvalidCredentialsException
-import com.simprints.infra.network.SimNetwork
+import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import javax.inject.Inject
 
 internal class AuthenticationRemoteDataSource @Inject constructor(
-    private val apiClientFactory: UnauthenticatedClientFactory,
+    private val backendApiClient: BackendApiClient,
 ) {
     suspend fun requestAuthenticationData(
         projectId: String,
         deviceId: String,
     ): AuthenticationData = try {
-        getApiClient()
-            .executeCall {
-                it.requestAuthenticationData(projectId, deviceId)
-            }.toDomain()
+        backendApiClient
+            .executeUnauthenticatedCall(AuthenticationRemoteInterface::class) { api -> api.requestAuthenticationData(projectId, deviceId) }
+            .getOrThrow()
+            .toDomain()
     } catch (e: Exception) {
         if (e is SyncCloudIntegrationException && e.httpStatusCode() == NOT_FOUND_STATUS_CODE) {
             throw AuthRequestInvalidCredentialsException()
@@ -33,14 +33,15 @@ internal class AuthenticationRemoteDataSource @Inject constructor(
         deviceId: String,
         credentials: AuthRequest,
     ): Token = try {
-        getApiClient()
-            .executeCall {
-                it.requestCustomTokens(
+        backendApiClient
+            .executeUnauthenticatedCall(AuthenticationRemoteInterface::class) { api ->
+                api.requestCustomTokens(
                     projectId,
                     deviceId,
                     ApiAuthRequestBody.fromDomain(credentials),
                 )
-            }.toDomain()
+            }.getOrThrow()
+            .toDomain()
     } catch (e: Exception) {
         if (e is SyncCloudIntegrationException && e.httpStatusCode() == UNAUTHORIZED_STATUS_CODE) {
             throw AuthRequestInvalidCredentialsException()
@@ -48,9 +49,6 @@ internal class AuthenticationRemoteDataSource @Inject constructor(
             throw e
         }
     }
-
-    private fun getApiClient(): SimNetwork.SimApiClient<AuthenticationRemoteInterface> =
-        apiClientFactory.build(AuthenticationRemoteInterface::class)
 
     companion object {
         private const val UNAUTHORIZED_STATUS_CODE = 401

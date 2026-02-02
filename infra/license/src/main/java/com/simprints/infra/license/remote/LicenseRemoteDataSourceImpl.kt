@@ -1,11 +1,10 @@
 package com.simprints.infra.license.remote
 
-import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.infra.license.models.LicenseVersion
 import com.simprints.infra.license.models.Vendor
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LICENSE
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -15,44 +14,44 @@ import retrofit2.HttpException
 import javax.inject.Inject
 
 internal class LicenseRemoteDataSourceImpl @Inject constructor(
-    private val authStore: AuthStore,
+    private val backendApiClient: BackendApiClient,
 ) : LicenseRemoteDataSource {
     override suspend fun getLicense(
         projectId: String,
         deviceId: String,
         vendor: Vendor,
         version: LicenseVersion,
-    ): ApiLicenseResult = try {
-        getProjectApiClient().executeCall {
-            it
+    ): ApiLicenseResult = backendApiClient
+        .executeCall(LicenseRemoteInterface::class) { api ->
+            api
                 .getLicense(projectId, deviceId, vendor.value, version.value)
                 .parseApiLicense()
                 .getLicenseBasedOnVendor(vendor)
                 ?.let { apiLicense -> ApiLicenseResult.Success(apiLicense) }
-        } ?: ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
-    } catch (t: Throwable) {
-        when (t) {
-            is NetworkConnectionException -> {
-                Simber.i("Licence download failed due to network error", t, tag = LICENSE)
-                ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
-            }
+                ?: ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
+        }.getOrMapFailure { failure ->
+            when (val t = failure.cause) {
+                is NetworkConnectionException -> {
+                    Simber.i("Licence download failed due to network error", t, tag = LICENSE)
+                    ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
+                }
 
-            is BackendMaintenanceException -> {
-                Simber.i("Licence download failed due to backend maintenance", t, tag = LICENSE)
-                ApiLicenseResult.BackendMaintenanceError(t.estimatedOutage)
-            }
+                is BackendMaintenanceException -> {
+                    Simber.i("Licence download failed due to backend maintenance", t, tag = LICENSE)
+                    ApiLicenseResult.BackendMaintenanceError(t.estimatedOutage)
+                }
 
-            is SyncCloudIntegrationException -> {
-                Simber.e("Licence download failed due to cloud integration error", t, tag = LICENSE)
-                handleCloudException(t)
-            }
+                is SyncCloudIntegrationException -> {
+                    Simber.e("Licence download failed due to cloud integration error", t, tag = LICENSE)
+                    handleCloudException(t)
+                }
 
-            else -> {
-                Simber.e("Licence download failed due to unknown error", t, tag = LICENSE)
-                ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
+                else -> {
+                    Simber.e("Licence download failed due to unknown error", t, tag = LICENSE)
+                    ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
+                }
             }
         }
-    }
 
     /**
      * If it's a Cloud exception we need to check if it's something we can recover from or not.
@@ -75,9 +74,6 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
     }
 
     private fun getLicenseErrorCode(errorBody: ResponseBody): String = SimJson.decodeFromString<ApiLicenseError>(errorBody.string()).error
-
-    private suspend fun getProjectApiClient(): SimNetwork.SimApiClient<LicenseRemoteInterface> =
-        authStore.buildClient(LicenseRemoteInterface::class)
 
     companion object {
         private const val AUTHORIZATION_ERROR = 403

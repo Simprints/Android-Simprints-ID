@@ -5,17 +5,12 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.authstore.db.FirebaseAuthManager
 import com.simprints.infra.authstore.domain.LoginInfoStore
 import com.simprints.infra.authstore.domain.models.Token
-import com.simprints.infra.authstore.network.SimApiClientFactory
-import com.simprints.infra.network.SimNetwork
-import com.simprints.infra.network.SimRemoteInterface
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
-import kotlin.reflect.KClass
 
 internal class AuthStoreImpl @Inject constructor(
     private val loginInfoStore: LoginInfoStore,
     private val firebaseAuthManager: FirebaseAuthManager,
-    private val simApiClientFactory: SimApiClientFactory,
 ) : AuthStore {
     override var signedInUserId: TokenizableString?
         get() = loginInfoStore.signedInUserId
@@ -41,6 +36,8 @@ internal class AuthStoreImpl @Inject constructor(
         firebaseAuthManager.signIn(token)
     }
 
+    override suspend fun getFirebaseToken(): String = firebaseAuthManager.getCurrentToken()
+
     override fun clearFirebaseToken() {
         firebaseAuthManager.signOut()
     }
@@ -48,9 +45,4 @@ internal class AuthStoreImpl @Inject constructor(
     override fun isFirebaseSignedIn(projectId: String): Boolean = firebaseAuthManager.isSignedIn(projectId)
 
     override fun getCoreApp(): FirebaseApp = firebaseAuthManager.getCoreApp()
-
-    override fun getLegacyAppFallback(): FirebaseApp = firebaseAuthManager.getLegacyAppFallback()
-
-    override suspend fun <T : SimRemoteInterface> buildClient(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T> =
-        simApiClientFactory.buildClient(remoteInterface)
 }
