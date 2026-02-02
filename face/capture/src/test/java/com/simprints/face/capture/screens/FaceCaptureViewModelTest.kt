@@ -140,6 +140,13 @@ class FaceCaptureViewModelTest {
     }
 
     @Test
+    fun `restart capture when flow finishes and no face detected`() {
+        viewModel.initFaceBioSdk(mockk(), ModalitySdkType.SIM_FACE)
+        viewModel.flowFinished()
+        assertThat(viewModel.recaptureEvent.getOrAwaitValue()).isNotNull()
+    }
+
+    @Test
     fun `Recapture requests clears capture list`() {
         viewModel.captureFinished(faceDetections)
         viewModel.recapture()
