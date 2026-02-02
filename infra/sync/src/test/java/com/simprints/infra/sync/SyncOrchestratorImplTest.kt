@@ -4,18 +4,24 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME_ONE_TIME
 import com.simprints.infra.sync.SyncConstants.PROJECT_SYNC_WORK_NAME_ONE_TIME
 import com.simprints.infra.sync.SyncConstants.RECORD_UPLOAD_INPUT_ID_NAME
 import com.simprints.infra.sync.SyncConstants.RECORD_UPLOAD_INPUT_SUBJECT_IDS_NAME
+import com.simprints.infra.sync.firmware.ShouldScheduleFirmwareUpdateUseCase
 import com.simprints.infra.sync.usecase.CleanupDeprecatedWorkersUseCase
+import com.simprints.infra.sync.usecase.internal.ObserveImageSyncStatusUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -32,7 +38,22 @@ class SyncOrchestratorImplTest {
     private lateinit var workManager: WorkManager
 
     @MockK
+    private lateinit var authStore: AuthStore
+
+    @MockK
+    private lateinit var configRepository: ConfigRepository
+
+    @MockK
     private lateinit var eventSyncManager: EventSyncManager
+
+    @MockK
+    private lateinit var eventSyncStateProcessor: EventSyncStateProcessor
+
+    @MockK
+    private lateinit var observeImageSyncStatus: ObserveImageSyncStatusUseCase
+
+    @MockK
+    private lateinit var shouldScheduleFirmwareUpdate: ShouldScheduleFirmwareUpdateUseCase
 
     @MockK
     private lateinit var cleanupDeprecatedWorkers: CleanupDeprecatedWorkersUseCase
@@ -45,6 +66,7 @@ class SyncOrchestratorImplTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
+        every { workManager.getWorkInfosFlow(any()) } returns flowOf(emptyList())
 
         syncOrchestrator = createSyncOrchestrator()
     }
@@ -120,9 +142,16 @@ class SyncOrchestratorImplTest {
 
     private fun createSyncOrchestrator() = SyncOrchestratorImpl(
         workManager,
+        authStore,
+        configRepository,
         eventSyncManager,
+        eventSyncStateProcessor,
+        observeImageSyncStatus,
+        shouldScheduleFirmwareUpdate,
         cleanupDeprecatedWorkers,
         imageSyncTimestampProvider,
+        CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
+        testCoroutineRule.testCoroutineDispatcher,
     )
 
     private fun createWorkInfo(state: WorkInfo.State) = listOf(

@@ -1,22 +1,16 @@
-package com.simprints.infra.sync
+package com.simprints.infra.sync.extensions
 
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-data class SyncResponse(
-    val syncCommandJob: Job,
-    val syncStatusFlow: StateFlow<SyncStatus>,
-)
-
 /**
- * Waits for the sync command job to complete, passes exceptions (incl. cancellations) to the caller.
+ * Waits for a Job to complete and rethrows failures (including cancellations).
  */
-suspend fun SyncResponse.await() {
+suspend fun Job.await() {
     suspendCancellableCoroutine { continuation ->
-        val handle = syncCommandJob.invokeOnCompletion { cause ->
+        val handle = invokeOnCompletion { cause ->
             when (cause) {
                 null -> continuation.resume(Unit)
                 else -> continuation.resumeWithException(cause)

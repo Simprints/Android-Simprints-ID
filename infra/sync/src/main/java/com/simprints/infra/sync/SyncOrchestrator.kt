@@ -1,9 +1,27 @@
 package com.simprints.infra.sync
 
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.Flow
 
-// todo MS-1300 disband into usecases
 interface SyncOrchestrator {
+    /**
+     * A combined reactive stream of sync state for all syncable entities.
+     */
+    fun observeSyncState(): StateFlow<SyncStatus>
+
+    /**
+     * Executes an immediate (one-time) sync control command.
+     * Returns a job of the ongoing command execution.
+     */
+    fun executeOneTime(command: OneTime): Job
+
+    /**
+     * Executes a periodic/background scheduling command.
+     * Returns a job of the ongoing command execution.
+     */
+    fun executeSchedulingCommand(command: ScheduleCommand): Job
+
     fun startConfigSync()
 
     /**

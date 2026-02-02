@@ -5,10 +5,9 @@ import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.sync.ImageSyncStatus
-import com.simprints.infra.sync.SyncCommands
-import com.simprints.infra.sync.SyncResponse
+import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncStatus
-import com.simprints.infra.sync.usecase.SyncUseCase
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -29,7 +28,7 @@ class RunBlockingEventSyncUseCaseTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    private lateinit var sync: SyncUseCase
+    private lateinit var syncOrchestrator: SyncOrchestrator
 
     private lateinit var usecase: RunBlockingEventSyncUseCase
 
@@ -37,7 +36,7 @@ class RunBlockingEventSyncUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this)
 
-        usecase = RunBlockingEventSyncUseCase(sync)
+        usecase = RunBlockingEventSyncUseCase(syncOrchestrator)
     }
 
     @Test
@@ -51,8 +50,8 @@ class RunBlockingEventSyncUseCaseTest {
         syncFlow.value = createSyncStatus("sync", EventSyncWorkerState.Succeeded)
         testScheduler.advanceUntilIdle()
 
-        verify(exactly = 1) { sync(SyncCommands.ObserveOnly) }
-        verify(exactly = 1) { sync.invoke(SyncCommands.OneTimeNow.Events.start()) }
+        verify(exactly = 1) { syncOrchestrator.observeSyncState() }
+        verify(exactly = 1) { syncOrchestrator.executeOneTime(OneTime.Events.start()) }
     }
 
     @Test
@@ -66,8 +65,8 @@ class RunBlockingEventSyncUseCaseTest {
         syncFlow.value = createSyncStatus("sync", EventSyncWorkerState.Failed())
         testScheduler.advanceUntilIdle()
 
-        verify(exactly = 1) { sync(SyncCommands.ObserveOnly) }
-        verify(exactly = 1) { sync.invoke(SyncCommands.OneTimeNow.Events.start()) }
+        verify(exactly = 1) { syncOrchestrator.observeSyncState() }
+        verify(exactly = 1) { syncOrchestrator.executeOneTime(OneTime.Events.start()) }
     }
 
     @Test
@@ -81,8 +80,8 @@ class RunBlockingEventSyncUseCaseTest {
         syncFlow.value = createSyncStatus("sync", EventSyncWorkerState.Cancelled)
         testScheduler.advanceUntilIdle()
 
-        verify(exactly = 1) { sync(SyncCommands.ObserveOnly) }
-        verify(exactly = 1) { sync.invoke(SyncCommands.OneTimeNow.Events.start()) }
+        verify(exactly = 1) { syncOrchestrator.observeSyncState() }
+        verify(exactly = 1) { syncOrchestrator.executeOneTime(OneTime.Events.start()) }
     }
 
     @Test
@@ -93,12 +92,12 @@ class RunBlockingEventSyncUseCaseTest {
         val job = launch { usecase.invoke() }
         testScheduler.advanceUntilIdle()
 
-        verify(exactly = 0) { sync(SyncCommands.OneTimeNow.Events.start()) }
+        verify(exactly = 0) { syncOrchestrator.executeOneTime(OneTime.Events.start()) }
 
         syncFlow.value = createSyncStatus("sync", EventSyncWorkerState.Succeeded)
         testScheduler.advanceUntilIdle()
 
-        verify(exactly = 1) { sync(SyncCommands.OneTimeNow.Events.start()) }
+        verify(exactly = 1) { syncOrchestrator.executeOneTime(OneTime.Events.start()) }
         job.cancel()
     }
 
@@ -128,12 +127,8 @@ class RunBlockingEventSyncUseCaseTest {
     }
 
     private fun setUpSync(syncFlow: StateFlow<SyncStatus>) {
-        val syncResponse = SyncResponse(
-            syncCommandJob = Job().apply { complete() },
-            syncStatusFlow = syncFlow,
-        )
-        every { sync.invoke(SyncCommands.ObserveOnly) } returns syncResponse
-        every { sync.invoke(SyncCommands.OneTimeNow.Events.start()) } returns syncResponse
+        every { syncOrchestrator.observeSyncState() } returns syncFlow
+        every { syncOrchestrator.executeOneTime(OneTime.Events.start()) } returns Job().apply { complete() }
     }
 
     private fun createPlaceholderSyncStatus(): SyncStatus = createSyncStatus("", null, null, null)

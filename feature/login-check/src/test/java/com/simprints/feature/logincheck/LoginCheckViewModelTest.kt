@@ -21,11 +21,12 @@ import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationScheduler
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
-import com.simprints.infra.sync.SyncCommands
-import com.simprints.infra.sync.usecase.SyncUseCase
+import com.simprints.infra.sync.ScheduleCommand
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -63,7 +64,7 @@ internal class LoginCheckViewModelTest {
     lateinit var startBackgroundSync: StartBackgroundSyncUseCase
 
     @MockK
-    lateinit var sync: SyncUseCase
+    lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
     lateinit var updateSessionScopePayloadUseCase: UpdateSessionScopePayloadUseCase
@@ -85,7 +86,7 @@ internal class LoginCheckViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        every { sync(any()) } returns mockk()
+        every { syncOrchestrator.executeSchedulingCommand(any()) } returns Job().apply { complete() }
 
         viewModel = LoginCheckViewModel(
             rootManager = rootMatchers,
@@ -96,7 +97,7 @@ internal class LoginCheckViewModelTest {
             isUserSignedIn = isUserSignedInUseCase,
             configRepository = configRepository,
             startBackgroundSync = startBackgroundSync,
-            sync = sync,
+            syncOrchestrator = syncOrchestrator,
             updateDatabaseCountsInCurrentSession = updateSessionScopePayloadUseCase,
             updateProjectInCurrentSession = updateProjectStateUseCase,
             updateStoredUserId = updateStoredUserIdUseCase,
@@ -172,7 +173,7 @@ internal class LoginCheckViewModelTest {
         coVerify {
             addAuthorizationEventUseCase.invoke(any(), eq(false))
         }
-        verify { sync(SyncCommands.ScheduleOf.Everything.stop()) }
+        verify { syncOrchestrator.executeSchedulingCommand(ScheduleCommand.Everything.unschedule()) }
         viewModel.showLoginFlow
             .test()
             .assertValue { it.peekContent() == ActionFactory.getIdentifyRequest() }

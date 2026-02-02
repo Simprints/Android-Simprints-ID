@@ -23,9 +23,8 @@ import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.network.ConnectivityTracker
-import com.simprints.infra.sync.SyncCommands
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.usecase.ObserveSyncableCountsUseCase
-import com.simprints.infra.sync.usecase.SyncUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -45,7 +44,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     private val commCarePermissionChecker: CommCarePermissionChecker,
     private val observeConfigurationFlow: ObserveConfigurationChangesUseCase,
     private val observeSyncableCounts: ObserveSyncableCountsUseCase,
-    private val sync: SyncUseCase,
+    private val syncOrchestrator: SyncOrchestrator,
     @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) {
     // Since we are not using distinctUntilChanged any emission from combined flows will trigger the main flow as well
@@ -58,7 +57,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     operator fun invoke(isPreLogoutUpSync: Boolean = false): Flow<SyncInfo> = combine(
         combinedRefreshSignals(),
         authStore.observeSignedInProjectId(),
-        sync(SyncCommands.ObserveOnly).syncStatusFlow,
+        syncOrchestrator.observeSyncState(),
         observeSyncableCounts(),
         observeConfigurationFlow(),
     ) { isOnline, projectId, (eventSyncState, imageSyncStatus), counts, (isRefreshing, isProjectRunning, moduleCounts, projectConfig) ->

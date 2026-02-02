@@ -16,9 +16,8 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.VER
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.logging.SimberBuilder
 import com.simprints.infra.logging.usecases.UpdateAndGetVersionHistoryUseCase
-import com.simprints.infra.sync.SyncCommands
+import com.simprints.infra.sync.ScheduleCommand
 import com.simprints.infra.sync.SyncOrchestrator
-import com.simprints.infra.sync.usecase.SyncUseCase
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
@@ -35,9 +34,6 @@ open class Application :
 
     @Inject
     lateinit var syncOrchestrator: SyncOrchestrator
-
-    @Inject
-    lateinit var sync: SyncUseCase
 
     @Inject
     lateinit var realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler
@@ -90,7 +86,7 @@ open class Application :
         appScope.launch {
             realmToRoomMigrationScheduler.scheduleMigrationWorkerIfNeeded()
             syncOrchestrator.cleanupWorkers()
-            sync(SyncCommands.ScheduleOf.Everything.start())
+            syncOrchestrator.executeSchedulingCommand(ScheduleCommand.Everything.reschedule())
         }
         if (DB_ENCRYPTION) {
             System.loadLibrary("sqlcipher")

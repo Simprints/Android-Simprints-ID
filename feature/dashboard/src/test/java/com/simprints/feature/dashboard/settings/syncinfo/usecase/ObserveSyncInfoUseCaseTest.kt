@@ -23,14 +23,12 @@ import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.sync.ImageSyncStatus
-import com.simprints.infra.sync.SyncResponse
 import com.simprints.infra.sync.SyncStatus
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.SyncableCounts
 import com.simprints.infra.sync.usecase.ObserveSyncableCountsUseCase
-import com.simprints.infra.sync.usecase.SyncUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -50,7 +48,7 @@ internal class ObserveSyncInfoUseCaseTest {
     private val connectivityTracker = mockk<ConnectivityTracker>()
     private val authStore = mockk<AuthStore>()
     private val observeSyncableCounts = mockk<ObserveSyncableCountsUseCase>()
-    private val sync = mockk<SyncUseCase>()
+    private val syncOrchestrator = mockk<SyncOrchestrator>()
     private val timeHelper = mockk<TimeHelper>()
     private val ticker = mockk<Ticker>()
     private val appForegroundStateTracker = mockk<AppForegroundStateTracker>()
@@ -133,10 +131,7 @@ internal class ObserveSyncInfoUseCaseTest {
         every { connectivityTracker.observeIsConnected() } returns flowOf(true)
 
         syncStatusFlow.value = SyncStatus(eventSyncState = mockEventSyncState, imageSyncStatus = mockImageSyncStatus)
-        every { sync.invoke(any()) } returns SyncResponse(
-            syncCommandJob = Job().apply { complete() },
-            syncStatusFlow = syncStatusFlow,
-        )
+        every { syncOrchestrator.observeSyncState() } returns syncStatusFlow
 
         every { mockEventSyncState.lastSyncTime } returns TEST_TIMESTAMP
         syncableCountsFlow.value = SyncableCounts(
@@ -175,7 +170,7 @@ internal class ObserveSyncInfoUseCaseTest {
             commCarePermissionChecker = commCarePermissionChecker,
             observeConfigurationFlow = observeConfigurationFlow,
             observeSyncableCounts = observeSyncableCounts,
-            sync = sync,
+            syncOrchestrator = syncOrchestrator,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
     }

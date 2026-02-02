@@ -10,8 +10,7 @@ import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
-import com.simprints.infra.sync.SyncCommands
-import com.simprints.infra.sync.usecase.SyncUseCase
+import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -22,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class LogoutSyncViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
-    sync: SyncUseCase,
+    syncOrchestrator: SyncOrchestrator,
     authStore: AuthStore,
     private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
@@ -36,8 +35,8 @@ internal class LogoutSyncViewModel @Inject constructor(
             .asLiveData(viewModelScope.coroutineContext)
 
     val isLogoutWithoutSyncVisibleLiveData: LiveData<Boolean> =
-        sync(SyncCommands.ObserveOnly)
-            .syncStatusFlow
+        syncOrchestrator
+            .observeSyncState()
             .map { syncStatus ->
                 !syncStatus.eventSyncState.isSyncCompleted() || syncStatus.imageSyncStatus.isSyncing
             }.debounce(timeoutMillis = ANTI_JITTER_DELAY_MILLIS)

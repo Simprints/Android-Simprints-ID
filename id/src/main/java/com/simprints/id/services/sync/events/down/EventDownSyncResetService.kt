@@ -14,9 +14,9 @@ import com.simprints.core.ExternalScope
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.sync.SyncCommands
-import com.simprints.infra.sync.await
-import com.simprints.infra.sync.usecase.SyncUseCase
+import com.simprints.infra.sync.OneTime
+import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.sync.extensions.await
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -32,7 +32,7 @@ class EventDownSyncResetService : Service() {
     lateinit var eventSyncManager: EventSyncManager
 
     @Inject
-    lateinit var sync: SyncUseCase
+    lateinit var syncOrchestrator: SyncOrchestrator
 
     private var resetJob: Job? = null
 
@@ -51,8 +51,8 @@ class EventDownSyncResetService : Service() {
             // Reset current downsync state
             eventSyncManager.resetDownSyncInfo()
             // Trigger a new sync
-            // Scope isn't passed to sync here to prevent a timeout cancellation leaving it in a stopped state
-            sync(SyncCommands.OneTimeNow.Events.start()).await()
+            // Execute in app scope to prevent a timeout cancellation leaving it in a stopped state
+            syncOrchestrator.executeOneTime(OneTime.Events.start()).await()
         }
         resetJob?.invokeOnCompletion { stopSelf() }
 

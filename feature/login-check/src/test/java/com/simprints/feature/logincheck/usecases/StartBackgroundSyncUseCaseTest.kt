@@ -3,16 +3,13 @@ package com.simprints.feature.logincheck.usecases
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Frequency
-import com.simprints.infra.sync.SyncCommand
-import com.simprints.infra.sync.SyncCommands
-import com.simprints.infra.sync.SyncResponse
-import com.simprints.infra.sync.usecase.SyncUseCase
+import com.simprints.infra.sync.ScheduleCommand
+import com.simprints.infra.sync.SyncOrchestrator
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -22,7 +19,7 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class StartBackgroundSyncUseCaseTest {
     @MockK
-    lateinit var sync: SyncUseCase
+    lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
     lateinit var configRepository: ConfigRepository
@@ -32,11 +29,11 @@ class StartBackgroundSyncUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        every { sync(any()) } returns mockk()
+        every { syncOrchestrator.executeSchedulingCommand(any()) } returns Job().apply { complete() }
 
         useCase = StartBackgroundSyncUseCase(
             configRepository,
-            sync,
+            syncOrchestrator,
         )
     }
 
@@ -50,7 +47,7 @@ class StartBackgroundSyncUseCaseTest {
         } returns
             Frequency.PERIODICALLY
 
-        assertUseCaseAwaitsSync(SyncCommands.ScheduleOf.Everything.start(withDelay = true))
+        assertUseCaseAwaitsSync(ScheduleCommand.Everything.reschedule(withDelay = true))
     }
 
     @Test
@@ -63,7 +60,7 @@ class StartBackgroundSyncUseCaseTest {
         } returns
             Frequency.PERIODICALLY_AND_ON_SESSION_START
 
-        assertUseCaseAwaitsSync(SyncCommands.ScheduleOf.Everything.start())
+        assertUseCaseAwaitsSync(ScheduleCommand.Everything.reschedule(withDelay = false))
     }
 
     @Test
@@ -76,26 +73,23 @@ class StartBackgroundSyncUseCaseTest {
         } returns
             Frequency.PERIODICALLY
 
-        assertUseCaseAwaitsSync(SyncCommands.ScheduleOf.Everything.start(withDelay = true))
+        assertUseCaseAwaitsSync(ScheduleCommand.Everything.reschedule(withDelay = true))
     }
 
     @Test
     fun `Does not start event sync on start if not Simprints sync`() = runTest {
         coEvery {
             configRepository
-                .getProjectConfiguration()
-                .synchronization.down.simprints
+            .getProjectConfiguration()
+            .synchronization.down.simprints
         } returns null
 
-        assertUseCaseAwaitsSync(SyncCommands.ScheduleOf.Everything.start(withDelay = true))
+        assertUseCaseAwaitsSync(ScheduleCommand.Everything.reschedule(withDelay = true))
     }
 
-    private suspend fun TestScope.assertUseCaseAwaitsSync(expectedCommand: SyncCommand) {
+    private suspend fun TestScope.assertUseCaseAwaitsSync(expectedCommand: ScheduleCommand) {
         val syncCommandJob = Job()
-        every { sync(any()) } returns SyncResponse(
-            syncCommandJob = syncCommandJob,
-            syncStatusFlow = MutableStateFlow(mockk(relaxed = true)),
-        )
+        every { syncOrchestrator.executeSchedulingCommand(any()) } returns syncCommandJob
 
         val useCaseJob = async { useCase.invoke() }
 
@@ -106,6 +100,6 @@ class StartBackgroundSyncUseCaseTest {
         runCurrent()
         useCaseJob.await()
 
-        verify { sync(expectedCommand) }
+        verify { syncOrchestrator.executeSchedulingCommand(expectedCommand) }
     }
 }

@@ -6,20 +6,14 @@ import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.eventsync.EventSyncManager
-import com.simprints.infra.sync.SyncAction
-import com.simprints.infra.sync.SyncCommand
-import com.simprints.infra.sync.SyncCommandPayload
-import com.simprints.infra.sync.SyncCommands
-import com.simprints.infra.sync.SyncResponse
-import com.simprints.infra.sync.SyncTarget
+import com.simprints.infra.sync.ScheduleCommand
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.config.testtools.projectConfiguration
 import com.simprints.infra.sync.config.testtools.synchronizationConfiguration
-import com.simprints.infra.sync.usecase.SyncUseCase
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -28,7 +22,7 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class ResetLocalRecordsIfConfigChangedUseCaseTest {
     @MockK
-    private lateinit var sync: SyncUseCase
+    private lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
     private lateinit var eventSyncManager: EventSyncManager
@@ -37,17 +31,17 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
     private lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
     private lateinit var useCase: ResetLocalRecordsIfConfigChangedUseCase
-    private val syncCommandSlot = slot<SyncCommand>()
+    private val scheduleCommandSlot = slot<ScheduleCommand>()
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        every { sync(capture(syncCommandSlot)) } returns noopSyncResponse()
+        every { syncOrchestrator.executeSchedulingCommand(capture(scheduleCommandSlot)) } returns noopJob()
 
         useCase = ResetLocalRecordsIfConfigChangedUseCase(
             eventSyncManager = eventSyncManager,
             enrolmentRecordRepository = enrolmentRecordRepository,
-            sync = sync,
+            syncOrchestrator = syncOrchestrator,
         )
     }
 
@@ -74,7 +68,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify(exactly = 0) { sync(any()) }
+        verify(exactly = 0) { syncOrchestrator.executeSchedulingCommand(any()) }
         coVerify(exactly = 0) {
             eventSyncManager.resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()
@@ -104,16 +98,13 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify { sync(any()) }
-        val command = syncCommandSlot.captured as SyncCommands.ExecutableSyncCommand
-        assertThat(command.target)
-            .isEqualTo(SyncTarget.SCHEDULE_EVENTS)
-        assertThat(command.action)
-            .isEqualTo(SyncAction.RESTART)
-        assertThat((command.payload as SyncCommandPayload.WithDelay).withDelay)
-            .isFalse()
+        verify { syncOrchestrator.executeSchedulingCommand(any()) }
+        val command = scheduleCommandSlot.captured as ScheduleCommand.EventsCommand
+        assertThat(command.action).isEqualTo(ScheduleCommand.Action.RESCHEDULE)
+        assertThat(command.withDelay).isFalse()
+        assertThat(command.blockWhileUnscheduled).isNotNull()
 
-        command.blockToRunWhileStopped?.invoke()
+        command.blockWhileUnscheduled?.invoke()
         runCurrent()
         coVerify {
             eventSyncManager.resetDownSyncInfo()
@@ -144,14 +135,12 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify { sync(any()) }
-        val command = syncCommandSlot.captured as SyncCommands.ExecutableSyncCommand
-        assertThat(command.target)
-            .isEqualTo(SyncTarget.SCHEDULE_EVENTS)
-        assertThat(command.action)
-            .isEqualTo(SyncAction.RESTART)
+        verify { syncOrchestrator.executeSchedulingCommand(any()) }
+        val command = scheduleCommandSlot.captured as ScheduleCommand.EventsCommand
+        assertThat(command.action).isEqualTo(ScheduleCommand.Action.RESCHEDULE)
+        assertThat(command.blockWhileUnscheduled).isNotNull()
 
-        command.blockToRunWhileStopped?.invoke()
+        command.blockWhileUnscheduled?.invoke()
         runCurrent()
         coVerify {
             eventSyncManager.resetDownSyncInfo()
@@ -182,14 +171,12 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify { sync(any()) }
-        val command = syncCommandSlot.captured as SyncCommands.ExecutableSyncCommand
-        assertThat(command.target)
-            .isEqualTo(SyncTarget.SCHEDULE_EVENTS)
-        assertThat(command.action)
-            .isEqualTo(SyncAction.RESTART)
+        verify { syncOrchestrator.executeSchedulingCommand(any()) }
+        val command = scheduleCommandSlot.captured as ScheduleCommand.EventsCommand
+        assertThat(command.action).isEqualTo(ScheduleCommand.Action.RESCHEDULE)
+        assertThat(command.blockWhileUnscheduled).isNotNull()
 
-        command.blockToRunWhileStopped?.invoke()
+        command.blockWhileUnscheduled?.invoke()
         runCurrent()
         coVerify {
             eventSyncManager.resetDownSyncInfo()
@@ -220,14 +207,12 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify { sync(any()) }
-        val command = syncCommandSlot.captured as SyncCommands.ExecutableSyncCommand
-        assertThat(command.target)
-            .isEqualTo(SyncTarget.SCHEDULE_EVENTS)
-        assertThat(command.action)
-            .isEqualTo(SyncAction.RESTART)
+        verify { syncOrchestrator.executeSchedulingCommand(any()) }
+        val command = scheduleCommandSlot.captured as ScheduleCommand.EventsCommand
+        assertThat(command.action).isEqualTo(ScheduleCommand.Action.RESCHEDULE)
+        assertThat(command.blockWhileUnscheduled).isNotNull()
 
-        command.blockToRunWhileStopped?.invoke()
+        command.blockWhileUnscheduled?.invoke()
         runCurrent()
         coVerify {
             eventSyncManager.resetDownSyncInfo()
@@ -258,7 +243,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify(exactly = 0) { sync(any()) }
+        verify(exactly = 0) { syncOrchestrator.executeSchedulingCommand(any()) }
         coVerify(exactly = 0) {
             eventSyncManager.resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()
@@ -288,7 +273,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify(exactly = 0) { sync(any()) }
+        verify(exactly = 0) { syncOrchestrator.executeSchedulingCommand(any()) }
         coVerify(exactly = 0) {
             eventSyncManager.resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()
@@ -318,7 +303,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify(exactly = 0) { sync(any()) }
+        verify(exactly = 0) { syncOrchestrator.executeSchedulingCommand(any()) }
         coVerify(exactly = 0) {
             eventSyncManager.resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()
@@ -348,15 +333,12 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify(exactly = 0) { sync(any()) }
+        verify(exactly = 0) { syncOrchestrator.executeSchedulingCommand(any()) }
         coVerify(exactly = 0) {
             eventSyncManager.resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()
         }
     }
 
-    private fun noopSyncResponse() = SyncResponse(
-        syncCommandJob = Job().apply { complete() },
-        syncStatusFlow = MutableStateFlow(mockk(relaxed = true)),
-    )
+    private fun noopJob(): Job = Job().apply { complete() }
 }

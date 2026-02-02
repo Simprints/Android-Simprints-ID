@@ -3,23 +3,23 @@ package com.simprints.infra.sync.config.usecase
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.eventsync.EventSyncManager
-import com.simprints.infra.sync.SyncCommands
-import com.simprints.infra.sync.await
-import com.simprints.infra.sync.usecase.SyncUseCase
+import com.simprints.infra.sync.ScheduleCommand
+import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.sync.extensions.await
 import javax.inject.Inject
 
 internal class ResetLocalRecordsIfConfigChangedUseCase @Inject constructor(
     private val eventSyncManager: EventSyncManager,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
-    private val sync: SyncUseCase,
+    private val syncOrchestrator: SyncOrchestrator,
 ) {
     suspend operator fun invoke(
         oldConfig: ProjectConfiguration,
         newConfig: ProjectConfiguration,
     ) {
         if (hasPartitionTypeChanged(oldConfig, newConfig)) {
-            sync(
-                SyncCommands.ScheduleOf.Events.restartAfter {
+            syncOrchestrator.executeSchedulingCommand(
+                ScheduleCommand.Events.rescheduleAfter {
                     eventSyncManager.resetDownSyncInfo()
                     enrolmentRecordRepository.deleteAll()
                 },

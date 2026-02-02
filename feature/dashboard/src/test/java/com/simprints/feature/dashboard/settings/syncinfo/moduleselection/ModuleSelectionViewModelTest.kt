@@ -15,14 +15,15 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.sync.SyncCommands
-import com.simprints.infra.sync.usecase.SyncUseCase
+import com.simprints.infra.sync.OneTime
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -40,7 +41,7 @@ class ModuleSelectionViewModelTest {
     private lateinit var repository: ModuleRepository
 
     @MockK
-    private lateinit var sync: SyncUseCase
+    private lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
     private lateinit var configRepository: ConfigRepository
@@ -56,7 +57,7 @@ class ModuleSelectionViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        every { sync(any()) } returns mockk()
+        every { syncOrchestrator.executeOneTime(any()) } returns Job().apply { complete() }
 
         val modulesDefault = listOf(
             Module("a".asTokenizableEncrypted(), false),
@@ -82,7 +83,7 @@ class ModuleSelectionViewModelTest {
 
         viewModel = ModuleSelectionViewModel(
             moduleRepository = repository,
-            sync = sync,
+            syncOrchestrator = syncOrchestrator,
             configRepository = configRepository,
             tokenizationProcessor = tokenizationProcessor,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
@@ -175,7 +176,7 @@ class ModuleSelectionViewModelTest {
         viewModel.saveModules()
 
         coVerify(exactly = 1) { repository.saveModules(updatedModules) }
-        verify(exactly = 1) { sync(SyncCommands.OneTimeNow.Events.restart()) }
+        verify(exactly = 1) { syncOrchestrator.executeOneTime(OneTime.Events.restart()) }
     }
 
     @Test

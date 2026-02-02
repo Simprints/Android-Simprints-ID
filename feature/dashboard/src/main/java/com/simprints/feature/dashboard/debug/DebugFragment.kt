@@ -19,8 +19,9 @@ import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepositor
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
-import com.simprints.infra.sync.SyncCommands
-import com.simprints.infra.sync.usecase.SyncUseCase
+import com.simprints.infra.sync.OneTime
+import com.simprints.infra.sync.ScheduleCommand
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,7 +35,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 internal class DebugFragment : Fragment(R.layout.fragment_debug) {
     @Inject
-    lateinit var sync: SyncUseCase
+    lateinit var syncOrchestrator: SyncOrchestrator
 
     @Inject
     lateinit var eventSyncManager: EventSyncManager
@@ -63,8 +64,8 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
         super.onViewCreated(view, savedInstanceState)
         applySystemBarInsets(view)
 
-        sync(SyncCommands.ObserveOnly)
-            .syncStatusFlow
+        syncOrchestrator
+            .observeSyncState()
             .map {
                 it.eventSyncState
             }.asLiveData()
@@ -84,18 +85,18 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
                 )
 
                 binding.logs.append(ssb)
-            }
+        }
 
         binding.syncStart.setOnClickListener {
-            sync(SyncCommands.OneTimeNow.Events.start())
+            syncOrchestrator.executeOneTime(OneTime.Events.start())
         }
 
         binding.syncStop.setOnClickListener {
-            sync(SyncCommands.OneTimeNow.Events.stop())
+            syncOrchestrator.executeOneTime(OneTime.Events.stop())
         }
 
         binding.syncSchedule.setOnClickListener {
-            sync(SyncCommands.ScheduleOf.Events.start())
+            syncOrchestrator.executeSchedulingCommand(ScheduleCommand.Events.reschedule())
         }
 
         binding.clearFirebaseToken.setOnClickListener {
@@ -120,8 +121,8 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
 
         binding.cleanAll.setOnClickListener {
             lifecycleScope.launch(dispatcher) {
-                sync(SyncCommands.OneTimeNow.Events.stop())
-                sync(SyncCommands.ScheduleOf.Events.stop())
+                syncOrchestrator.executeOneTime(OneTime.Events.stop())
+                syncOrchestrator.executeSchedulingCommand(ScheduleCommand.Events.unschedule())
 
                 eventRepository.deleteAll()
                 eventSyncManager.resetDownSyncInfo()

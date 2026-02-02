@@ -30,8 +30,8 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
-import com.simprints.infra.sync.SyncCommands
-import com.simprints.infra.sync.usecase.SyncUseCase
+import com.simprints.infra.sync.ScheduleCommand
+import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -49,7 +49,7 @@ class LoginCheckViewModel @Inject internal constructor(
     private val isUserSignedIn: IsUserSignedInUseCase,
     private val configRepository: ConfigRepository,
     private val startBackgroundSync: StartBackgroundSyncUseCase,
-    private val sync: SyncUseCase,
+    private val syncOrchestrator: SyncOrchestrator,
     private val updateDatabaseCountsInCurrentSession: UpdateSessionScopePayloadUseCase,
     private val updateProjectInCurrentSession: UpdateProjectInCurrentSessionUseCase,
     private val updateStoredUserId: UpdateStoredUserIdUseCase,
@@ -106,7 +106,7 @@ class LoginCheckViewModel @Inject internal constructor(
         cachedRequest = actionRequest
         loginAlreadyTried.set(true)
 
-        sync(SyncCommands.ScheduleOf.Everything.stop())
+        syncOrchestrator.executeSchedulingCommand(ScheduleCommand.Everything.unschedule())
 
         _showLoginFlow.send(actionRequest)
     }
