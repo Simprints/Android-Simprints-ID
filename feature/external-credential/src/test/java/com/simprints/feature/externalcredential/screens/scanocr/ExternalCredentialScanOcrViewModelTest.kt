@@ -108,6 +108,15 @@ internal class ExternalCredentialScanOcrViewModelTest {
     }
 
     @Test
+    fun `ocrStopped resets the flag for frame processing`() {
+        viewModel.ocrOnFrameStarted()
+        assertThat(viewModel.isRunningOcrOnFrame.get()).isTrue()
+
+        viewModel.ocrStopped()
+        assertThat(viewModel.isRunningOcrOnFrame.get()).isFalse()
+    }
+
+    @Test
     fun `runOcrOnFrame updates detected blocks and state when successful`() = runTest {
         val mockDetectedBlock = mockk<DetectedOcrBlock>()
         val mockNormalizedBitmap = mockk<Bitmap>()
@@ -122,7 +131,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
 
         val state = observer.value() as ScanOcrState.ScanningInProgress
         assertThat(state.successfulCaptures).isEqualTo(1)
-        assertThat(viewModel.isRunningOcrOnFrame).isFalse()
+        assertThat(viewModel.isRunningOcrOnFrame.get()).isFalse()
         assertThat(viewModel.isOcrActive).isTrue()
     }
 

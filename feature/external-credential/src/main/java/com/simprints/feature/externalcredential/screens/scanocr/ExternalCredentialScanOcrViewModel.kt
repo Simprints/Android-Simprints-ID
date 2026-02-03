@@ -37,6 +37,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicBoolean
 
 internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     @Assisted val ocrDocumentType: OcrDocumentType,
@@ -57,8 +58,8 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     }
 
     private var detectedBlocks: List<DetectedOcrBlock> = emptyList()
-    var isRunningOcrOnFrame: Boolean = false
-        private set
+    val isRunningOcrOnFrame = AtomicBoolean(false)
+
     val isOcrActive: Boolean
         get() = detectedBlocks.isNotEmpty()
     private var ocrState: ScanOcrState = ScanOcrState.EMPTY
@@ -107,6 +108,10 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
         }
     }
 
+    fun ocrStopped() {
+        isRunningOcrOnFrame.set(false)
+    }
+
     fun runOcrOnFrame(
         frame: Bitmap,
         cropConfig: OcrCropConfig,
@@ -127,7 +132,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
                     )
                 }
             } finally {
-                isRunningOcrOnFrame = false
+                isRunningOcrOnFrame.set(false)
             }
         }
     }
@@ -179,7 +184,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     }
 
     fun ocrOnFrameStarted() {
-        isRunningOcrOnFrame = true
+        isRunningOcrOnFrame.set(true)
     }
 
     companion object {
