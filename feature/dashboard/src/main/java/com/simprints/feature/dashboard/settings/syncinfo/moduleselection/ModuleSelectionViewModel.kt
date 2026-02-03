@@ -15,6 +15,7 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -114,8 +115,7 @@ internal class ModuleSelectionViewModel @Inject constructor(
                 module.copy(name = encryptedName)
             }
             moduleRepository.saveModules(modules)
-            syncOrchestrator.stopEventSync()
-            syncOrchestrator.startEventSync()
+            syncOrchestrator.executeOneTime(OneTime.Events.restart())
         }
     }
 

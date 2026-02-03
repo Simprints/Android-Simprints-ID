@@ -1,12 +1,26 @@
 package com.simprints.infra.sync
 
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.Flow
 
-// todo MS-1299, MS-1300 move sync controls into SyncUseCase & its helper usecases, disband the rest into new other usecases
 interface SyncOrchestrator {
-    suspend fun scheduleBackgroundWork(withDelay: Boolean = false)
+    /**
+     * A combined reactive stream of sync state for all syncable entities.
+     */
+    fun observeSyncState(): StateFlow<SyncStatus>
 
-    suspend fun cancelBackgroundWork()
+    /**
+     * Executes an immediate (one-time) sync control command.
+     * Returns a job of the ongoing command execution.
+     */
+    fun executeOneTime(command: OneTime): Job
+
+    /**
+     * Executes a periodic/background scheduling command.
+     * Returns a job of the ongoing command execution.
+     */
+    fun executeSchedulingCommand(command: ScheduleCommand): Job
 
     fun startConfigSync()
 
@@ -15,24 +29,6 @@ interface SyncOrchestrator {
      * Emits value when both sync workers are done.
      */
     fun refreshConfiguration(): Flow<Unit>
-
-    suspend fun rescheduleEventSync(withDelay: Boolean = false)
-
-    fun cancelEventSync()
-
-    suspend fun startEventSync(isDownSyncAllowed: Boolean = true)
-
-    fun stopEventSync()
-
-    fun startImageSync()
-
-    fun stopImageSync()
-
-    /**
-     * Fully reschedule the background worker.
-     * Should be used in when the configuration that affects scheduling has changed.
-     */
-    suspend fun rescheduleImageUpSync()
 
     /**
      * Schedule a worker to upload subjects with IDs in the provided list.

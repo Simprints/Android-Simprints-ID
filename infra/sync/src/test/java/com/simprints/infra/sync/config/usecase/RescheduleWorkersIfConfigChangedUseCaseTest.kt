@@ -1,16 +1,24 @@
 package com.simprints.infra.sync.config.usecase
 
+import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.sync.ScheduleCommand
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.config.testtools.projectConfiguration
 import com.simprints.infra.sync.config.testtools.simprintsUpSyncConfigurationConfiguration
 import com.simprints.infra.sync.config.testtools.synchronizationConfiguration
 import io.mockk.MockKAnnotations
-import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class RescheduleWorkersIfConfigChangedUseCaseTest {
     @MockK
     private lateinit var syncOrchestrator: SyncOrchestrator
@@ -20,6 +28,7 @@ class RescheduleWorkersIfConfigChangedUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
+        every { syncOrchestrator.executeSchedulingCommand(any()) } returns Job().apply { complete() }
 
         useCase = RescheduleWorkersIfConfigChangedUseCase(syncOrchestrator)
     }
@@ -47,32 +56,45 @@ class RescheduleWorkersIfConfigChangedUseCaseTest {
             ),
         )
 
-        coVerify(exactly = 0) { syncOrchestrator.rescheduleImageUpSync() }
+        verify(exactly = 0) { syncOrchestrator.executeSchedulingCommand(any()) }
     }
 
     @Test
     fun `should reschedule image upload when unmetered connection flag changes`() = runTest {
-        useCase(
-            projectConfiguration.copy(
-                synchronization = synchronizationConfiguration.copy(
-                    up = synchronizationConfiguration.up.copy(
-                        simprints = simprintsUpSyncConfigurationConfiguration.copy(
-                            imagesRequireUnmeteredConnection = false,
-                        ),
-                    ),
-                ),
-            ),
-            projectConfiguration.copy(
-                synchronization = synchronizationConfiguration.copy(
-                    up = synchronizationConfiguration.up.copy(
-                        simprints = simprintsUpSyncConfigurationConfiguration.copy(
-                            imagesRequireUnmeteredConnection = true,
-                        ),
-                    ),
-                ),
-            ),
-        )
+        val syncCommandJob = Job()
+        every { syncOrchestrator.executeSchedulingCommand(any()) } returns syncCommandJob
 
-        coVerify { syncOrchestrator.rescheduleImageUpSync() }
+        val useCaseJob = async {
+            useCase(
+                projectConfiguration.copy(
+                    synchronization = synchronizationConfiguration.copy(
+                        up = synchronizationConfiguration.up.copy(
+                            simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                                imagesRequireUnmeteredConnection = false,
+                            ),
+                        ),
+                    ),
+                ),
+                projectConfiguration.copy(
+                    synchronization = synchronizationConfiguration.copy(
+                        up = synchronizationConfiguration.up.copy(
+                            simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                                imagesRequireUnmeteredConnection = true,
+                            ),
+                        ),
+                    ),
+                ),
+            )
+        }
+
+        runCurrent()
+        assertThat(useCaseJob.isCompleted).isFalse()
+
+        syncCommandJob.complete()
+        runCurrent()
+        useCaseJob.await()
+
+        verify { syncOrchestrator.executeSchedulingCommand(ScheduleCommand.Images.reschedule()) }
+        assertThat(useCaseJob.isCompleted).isTrue()
     }
 }

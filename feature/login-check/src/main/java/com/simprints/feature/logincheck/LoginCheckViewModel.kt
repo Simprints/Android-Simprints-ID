@@ -30,6 +30,7 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
+import com.simprints.infra.sync.ScheduleCommand
 import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -105,7 +106,7 @@ class LoginCheckViewModel @Inject internal constructor(
         cachedRequest = actionRequest
         loginAlreadyTried.set(true)
 
-        syncOrchestrator.cancelBackgroundWork()
+        syncOrchestrator.executeSchedulingCommand(ScheduleCommand.Everything.unschedule())
 
         _showLoginFlow.send(actionRequest)
     }

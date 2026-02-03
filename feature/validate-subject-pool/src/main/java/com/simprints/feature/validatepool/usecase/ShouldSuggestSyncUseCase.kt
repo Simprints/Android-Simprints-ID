@@ -2,8 +2,7 @@ package com.simprints.feature.validatepool.usecase
 
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.sync.SyncCommand
-import com.simprints.infra.sync.usecase.SyncUseCase
+import com.simprints.infra.sync.SyncOrchestrator
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -11,10 +10,11 @@ import kotlin.time.Duration
 
 internal class ShouldSuggestSyncUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
-    private val sync: SyncUseCase,
+    private val syncOrchestrator: SyncOrchestrator,
     private val configRepository: ConfigRepository,
 ) {
-    suspend operator fun invoke(): Boolean = sync(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+    suspend operator fun invoke(): Boolean = syncOrchestrator
+        .observeSyncState()
         .map { it.eventSyncState }
         .firstOrNull()
         ?.lastSyncTime

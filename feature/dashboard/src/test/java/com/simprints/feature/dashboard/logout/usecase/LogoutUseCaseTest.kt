@@ -4,11 +4,15 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationFlagsStore
+import com.simprints.infra.sync.ScheduleCommand
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.verify
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -37,6 +41,7 @@ class LogoutUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
+        every { syncOrchestrator.executeSchedulingCommand(any()) } returns Job().apply { complete() }
 
         useCase = LogoutUseCase(
             syncOrchestrator = syncOrchestrator,
@@ -51,8 +56,8 @@ class LogoutUseCaseTest {
     fun `Fully logs out when called`() = runTest {
         useCase.invoke()
 
+        verify { syncOrchestrator.executeSchedulingCommand(ScheduleCommand.Everything.unschedule()) }
         coVerify {
-            syncOrchestrator.cancelBackgroundWork()
             syncOrchestrator.deleteEventSyncInfo()
             authManager.signOut()
             flagsStore.clearMigrationFlags()

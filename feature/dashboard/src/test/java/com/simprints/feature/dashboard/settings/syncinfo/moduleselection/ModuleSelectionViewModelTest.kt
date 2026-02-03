@@ -15,6 +15,7 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
@@ -22,6 +23,7 @@ import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -55,6 +57,7 @@ class ModuleSelectionViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
+        every { syncOrchestrator.executeOneTime(any()) } returns Job().apply { complete() }
 
         val modulesDefault = listOf(
             Module("a".asTokenizableEncrypted(), false),
@@ -173,8 +176,7 @@ class ModuleSelectionViewModelTest {
         viewModel.saveModules()
 
         coVerify(exactly = 1) { repository.saveModules(updatedModules) }
-        coVerify(exactly = 1) { syncOrchestrator.stopEventSync() }
-        coVerify(exactly = 1) { syncOrchestrator.startEventSync() }
+        verify(exactly = 1) { syncOrchestrator.executeOneTime(OneTime.Events.restart()) }
     }
 
     @Test

@@ -16,9 +16,8 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
-import com.simprints.infra.sync.SyncCommand
+import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
-import com.simprints.infra.sync.usecase.SyncUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -43,11 +42,10 @@ import javax.inject.Inject
 internal class SyncInfoViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
     private val authStore: AuthStore,
-    private val syncOrchestrator: SyncOrchestrator,
     private val recentUserActivityManager: RecentUserActivityManager,
     private val timeHelper: TimeHelper,
     observeSyncInfo: ObserveSyncInfoUseCase,
-    private val sync: SyncUseCase,
+    private val syncOrchestrator: SyncOrchestrator,
     private val logoutUseCase: LogoutUseCase,
     @param:DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -57,7 +55,7 @@ internal class SyncInfoViewModel @Inject constructor(
         get() = _loginNavigationEventLiveData
     private val _loginNavigationEventLiveData = MutableLiveData<LoginParams>()
 
-    private val syncStatusFlow = sync(eventSync = SyncCommand.ObserveOnly, imageSync = SyncCommand.ObserveOnly)
+    private val syncStatusFlow = syncOrchestrator.observeSyncState()
     private val eventSyncStateFlow =
         syncStatusFlow.map { it.eventSyncState }
     private val imageSyncStatusFlow =
@@ -146,10 +144,8 @@ internal class SyncInfoViewModel @Inject constructor(
                 }
             }
 
-            syncOrchestrator.stopEventSync()
-
             val isDownSyncAllowed = !isPreLogoutUpSync && configRepository.getProject()?.state == ProjectState.RUNNING
-            syncOrchestrator.startEventSync(isDownSyncAllowed)
+            syncOrchestrator.executeOneTime(OneTime.Events.restart(isDownSyncAllowed))
         }
     }
 
@@ -157,10 +153,10 @@ internal class SyncInfoViewModel @Inject constructor(
         viewModelScope.launch {
             val isImageSyncing = imageSyncStatusFlow.firstOrNull()?.isSyncing == true
             if (isImageSyncing) {
-                syncOrchestrator.stopImageSync()
+                syncOrchestrator.executeOneTime(OneTime.Images.stop())
             } else {
                 imageSyncButtonClickFlow.emit(Unit)
-                syncOrchestrator.startImageSync()
+                syncOrchestrator.executeOneTime(OneTime.Images.start())
             }
         }
     }
@@ -218,7 +214,7 @@ internal class SyncInfoViewModel @Inject constructor(
                     .distinctUntilChanged()
                     .collect { isEventSyncCompleted ->
                         if (isEventSyncCompleted) {
-                            syncOrchestrator.startImageSync()
+                            syncOrchestrator.executeOneTime(OneTime.Images.start())
                         }
                     }
             }

@@ -9,7 +9,7 @@ import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncStatus
-import com.simprints.infra.sync.usecase.SyncUseCase
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.*
@@ -31,7 +31,7 @@ internal class LogoutSyncViewModelTest {
     lateinit var configRepository: ConfigRepository
 
     @MockK
-    lateinit var sync: SyncUseCase
+    lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
     lateinit var authStore: AuthStore
@@ -140,12 +140,12 @@ internal class LogoutSyncViewModelTest {
         imageSyncStatus: ImageSyncStatus,
     ) {
         val statusFlow = MutableStateFlow(SyncStatus(eventSyncState = eventSyncState, imageSyncStatus = imageSyncStatus))
-        every { sync.invoke(any(), any()) } returns statusFlow
+        every { syncOrchestrator.observeSyncState() } returns statusFlow
     }
 
     private fun createViewModel() = LogoutSyncViewModel(
         configRepository = configRepository,
-        sync = sync,
+        syncOrchestrator = syncOrchestrator,
         authStore = authStore,
         logoutUseCase = logoutUseCase,
     )

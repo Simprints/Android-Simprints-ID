@@ -7,7 +7,7 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncStatus
-import com.simprints.infra.sync.usecase.SyncUseCase
+import com.simprints.infra.sync.SyncOrchestrator
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -22,7 +22,7 @@ class ShouldSuggestSyncUseCaseTest {
     lateinit var timeHelper: TimeHelper
 
     @MockK
-    lateinit var sync: SyncUseCase
+    lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
     lateinit var configRepository: ConfigRepository
@@ -35,9 +35,9 @@ class ShouldSuggestSyncUseCaseTest {
         MockKAnnotations.init(this)
 
         syncStatusFlow = MutableStateFlow(createSyncStatus(lastSyncTime = null))
-        every { sync.invoke(any(), any()) } returns syncStatusFlow
+        every { syncOrchestrator.observeSyncState() } returns syncStatusFlow
 
-        usecase = ShouldSuggestSyncUseCase(timeHelper, sync, configRepository)
+        usecase = ShouldSuggestSyncUseCase(timeHelper, syncOrchestrator, configRepository)
     }
 
     @Test
