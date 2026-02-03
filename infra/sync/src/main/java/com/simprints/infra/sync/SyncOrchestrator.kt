@@ -1,8 +1,8 @@
 package com.simprints.infra.sync
 
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface SyncOrchestrator {
     /**
@@ -14,13 +14,13 @@ interface SyncOrchestrator {
      * Executes an immediate (one-time) sync control command.
      * Returns a job of the ongoing command execution.
      */
-    fun executeOneTime(command: OneTime): Job
+    fun execute(command: OneTime): Job
 
     /**
      * Executes a periodic/background scheduling command.
      * Returns a job of the ongoing command execution.
      */
-    fun executeSchedulingCommand(command: ScheduleCommand): Job
+    fun execute(command: ScheduleCommand): Job
 
     fun startConfigSync()
 

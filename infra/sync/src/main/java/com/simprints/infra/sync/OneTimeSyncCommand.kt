@@ -3,7 +3,7 @@ package com.simprints.infra.sync
 /**
  * One-time (immediate) sync control commands.
  *
- * Intended to be executed via [SyncOrchestrator.executeOneTime].
+ * Intended to be executed via [SyncOrchestrator.execute].
  */
 sealed class OneTime {
     internal enum class Action {

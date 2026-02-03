@@ -106,7 +106,7 @@ class LoginCheckViewModel @Inject internal constructor(
         cachedRequest = actionRequest
         loginAlreadyTried.set(true)
 
-        syncOrchestrator.executeSchedulingCommand(ScheduleCommand.Everything.unschedule())
+        syncOrchestrator.execute(ScheduleCommand.Everything.unschedule())
 
         _showLoginFlow.send(actionRequest)
     }

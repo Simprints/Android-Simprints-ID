@@ -24,10 +24,10 @@ import com.simprints.infra.sync.extensions.anyRunning
 import com.simprints.infra.sync.extensions.cancelWorkers
 import com.simprints.infra.sync.extensions.schedulePeriodicWorker
 import com.simprints.infra.sync.extensions.startWorker
-import com.simprints.infra.sync.usecase.CleanupDeprecatedWorkersUseCase
 import com.simprints.infra.sync.files.FileUpSyncWorker
 import com.simprints.infra.sync.firmware.FirmwareFileUpdateWorker
 import com.simprints.infra.sync.firmware.ShouldScheduleFirmwareUpdateUseCase
+import com.simprints.infra.sync.usecase.CleanupDeprecatedWorkersUseCase
 import com.simprints.infra.sync.usecase.internal.ObserveImageSyncStatusUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -110,45 +110,41 @@ internal class SyncOrchestratorImpl @Inject constructor(
 
     override fun observeSyncState(): StateFlow<SyncStatus> = sharedSyncState
 
-    override fun executeOneTime(command: OneTime): Job {
-        return when (command) {
-            is OneTime.EventsCommand -> executeOneTimeAction(
-                action = command.action,
-                stop = ::stopEventSync,
-                start = { startEventSync(isDownSyncAllowed = command.isDownSyncAllowed) },
-            )
+    override fun execute(command: OneTime): Job = when (command) {
+        is OneTime.EventsCommand -> executeOneTimeAction(
+            action = command.action,
+            stop = ::stopEventSync,
+            start = { startEventSync(isDownSyncAllowed = command.isDownSyncAllowed) },
+        )
 
-            is OneTime.ImagesCommand -> executeOneTimeAction(
-                action = command.action,
-                stop = ::stopImageSync,
-                start = { startImageSync() },
-            )
-        }
+        is OneTime.ImagesCommand -> executeOneTimeAction(
+            action = command.action,
+            stop = ::stopImageSync,
+            start = { startImageSync() },
+        )
     }
 
-    override fun executeSchedulingCommand(command: ScheduleCommand): Job {
-        return when (command) {
-            is ScheduleCommand.EverythingCommand -> executeSchedulingAction(
-                action = command.action,
-                blockWhileUnscheduled = command.blockWhileUnscheduled,
-                unschedule = ::cancelBackgroundWork,
-                reschedule = { scheduleBackgroundWork(withDelay = command.withDelay) },
-            )
+    override fun execute(command: ScheduleCommand): Job = when (command) {
+        is ScheduleCommand.EverythingCommand -> executeSchedulingAction(
+            action = command.action,
+            blockWhileUnscheduled = command.blockWhileUnscheduled,
+            unschedule = ::cancelBackgroundWork,
+            reschedule = { scheduleBackgroundWork(withDelay = command.withDelay) },
+        )
 
-            is ScheduleCommand.EventsCommand -> executeSchedulingAction(
-                action = command.action,
-                blockWhileUnscheduled = command.blockWhileUnscheduled,
-                unschedule = ::cancelEventSync,
-                reschedule = { rescheduleEventSync(withDelay = command.withDelay) },
-            )
+        is ScheduleCommand.EventsCommand -> executeSchedulingAction(
+            action = command.action,
+            blockWhileUnscheduled = command.blockWhileUnscheduled,
+            unschedule = ::cancelEventSync,
+            reschedule = { rescheduleEventSync(withDelay = command.withDelay) },
+        )
 
-            is ScheduleCommand.ImagesCommand -> executeSchedulingAction(
-                action = command.action,
-                blockWhileUnscheduled = command.blockWhileUnscheduled,
-                unschedule = ::stopImageSync,
-                reschedule = { rescheduleImageUpSync() },
-            )
-        }
+        is ScheduleCommand.ImagesCommand -> executeSchedulingAction(
+            action = command.action,
+            blockWhileUnscheduled = command.blockWhileUnscheduled,
+            unschedule = ::stopImageSync,
+            reschedule = { rescheduleImageUpSync() },
+        )
     }
 
     override fun startConfigSync() {
@@ -196,21 +192,21 @@ internal class SyncOrchestratorImpl @Inject constructor(
         action: OneTime.Action,
         stop: () -> Unit,
         start: suspend () -> Unit,
-    ): Job {
-        val shouldStop =
-            action == OneTime.Action.STOP || action == OneTime.Action.RESTART
-        if (shouldStop) {
+    ): Job = when (action) {
+        OneTime.Action.STOP -> {
             stop()
+            Job().apply { complete() }
         }
-
-        val shouldStart =
-            action == OneTime.Action.START || action == OneTime.Action.RESTART
-        if (!shouldStart) {
-            return Job().apply { complete() }
+        OneTime.Action.START -> {
+            appScope.launch(ioDispatcher) {
+                start()
+            }
         }
-
-        return appScope.launch(ioDispatcher) {
-            start()
+        OneTime.Action.RESTART -> {
+            stop()
+            appScope.launch(ioDispatcher) {
+                start()
+            }
         }
     }
 
@@ -219,22 +215,17 @@ internal class SyncOrchestratorImpl @Inject constructor(
         blockWhileUnscheduled: (suspend () -> Unit)?,
         unschedule: () -> Unit,
         reschedule: suspend () -> Unit,
-    ): Job {
-        val shouldUnschedule =
-            action == ScheduleCommand.Action.UNSCHEDULE || blockWhileUnscheduled != null
-        if (shouldUnschedule) {
+    ): Job = when (action) {
+        ScheduleCommand.Action.UNSCHEDULE -> {
             unschedule()
+            Job().apply { complete() }
         }
-
-        val shouldSchedule =
-            action == ScheduleCommand.Action.RESCHEDULE
-        if (!shouldSchedule) {
-            return Job().apply { complete() }
-        }
-
-        return appScope.launch(ioDispatcher) {
-            blockWhileUnscheduled?.invoke()
-            reschedule()
+        ScheduleCommand.Action.RESCHEDULE -> {
+            unschedule()
+            appScope.launch(ioDispatcher) {
+                blockWhileUnscheduled?.invoke()
+                reschedule()
+            }
         }
     }
 

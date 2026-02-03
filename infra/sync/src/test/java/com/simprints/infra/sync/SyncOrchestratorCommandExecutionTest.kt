@@ -81,7 +81,7 @@ class SyncOrchestratorCommandExecutionTest {
         every { authStore.signedInProjectId } returns ""
         coEvery { shouldScheduleFirmwareUpdate.invoke() } returns false
 
-        orchestrator.executeSchedulingCommand(ScheduleCommand.Everything.reschedule()).join()
+        orchestrator.execute(ScheduleCommand.Everything.reschedule()).join()
 
         verify(exactly = 0) { workManager.enqueueUniquePeriodicWork(any(), any(), any()) }
     }
@@ -91,7 +91,7 @@ class SyncOrchestratorCommandExecutionTest {
         every { authStore.signedInProjectId } returns "projectId"
         coEvery { shouldScheduleFirmwareUpdate.invoke() } returns true
 
-        orchestrator.executeSchedulingCommand(ScheduleCommand.Everything.reschedule()).join()
+        orchestrator.execute(ScheduleCommand.Everything.reschedule()).join()
 
         verify {
             workManager.enqueueUniquePeriodicWork(PROJECT_SYNC_WORK_NAME, any(), any())
@@ -111,7 +111,7 @@ class SyncOrchestratorCommandExecutionTest {
         } returns false
         every { authStore.signedInProjectId } returns "projectId"
 
-        orchestrator.executeSchedulingCommand(ScheduleCommand.Everything.reschedule()).join()
+        orchestrator.execute(ScheduleCommand.Everything.reschedule()).join()
 
         verify {
             workManager.enqueueUniquePeriodicWork(
@@ -132,7 +132,7 @@ class SyncOrchestratorCommandExecutionTest {
         every { authStore.signedInProjectId } returns "projectId"
         coEvery { shouldScheduleFirmwareUpdate.invoke() } returns false
 
-        orchestrator.executeSchedulingCommand(ScheduleCommand.Everything.reschedule()).join()
+        orchestrator.execute(ScheduleCommand.Everything.reschedule()).join()
 
         verify {
             workManager.enqueueUniquePeriodicWork(
@@ -148,7 +148,7 @@ class SyncOrchestratorCommandExecutionTest {
         every { authStore.signedInProjectId } returns "projectId"
         coEvery { shouldScheduleFirmwareUpdate.invoke() } returns false
 
-        orchestrator.executeSchedulingCommand(ScheduleCommand.Everything.reschedule()).join()
+        orchestrator.execute(ScheduleCommand.Everything.reschedule()).join()
 
         verify { workManager.cancelUniqueWork(FIRMWARE_UPDATE_WORK_NAME) }
     }
@@ -157,7 +157,7 @@ class SyncOrchestratorCommandExecutionTest {
     fun `unschedule cancels all necessary background workers`() = runTest {
         every { eventSyncManager.getAllWorkerTag() } returns "syncWorkers"
 
-        orchestrator.executeSchedulingCommand(ScheduleCommand.Everything.unschedule())
+        orchestrator.execute(ScheduleCommand.Everything.unschedule())
 
         verify {
             workManager.cancelUniqueWork(PROJECT_SYNC_WORK_NAME)
@@ -174,7 +174,7 @@ class SyncOrchestratorCommandExecutionTest {
     fun `reschedules event sync worker with correct tags`() = runTest {
         every { eventSyncManager.getPeriodicWorkTags() } returns listOf("tag1", "tag2")
 
-        orchestrator.executeSchedulingCommand(ScheduleCommand.Events.reschedule()).join()
+        orchestrator.execute(ScheduleCommand.Events.reschedule()).join()
 
         verify {
             workManager.enqueueUniquePeriodicWork(
@@ -189,7 +189,7 @@ class SyncOrchestratorCommandExecutionTest {
     fun `reschedules event sync worker with correct delay`() = runTest {
         every { eventSyncManager.getPeriodicWorkTags() } returns listOf("tag1", "tag2")
 
-        orchestrator.executeSchedulingCommand(ScheduleCommand.Events.reschedule(withDelay = true)).join()
+        orchestrator.execute(ScheduleCommand.Events.reschedule(withDelay = true)).join()
 
         verify {
             workManager.enqueueUniquePeriodicWork(
@@ -206,7 +206,7 @@ class SyncOrchestratorCommandExecutionTest {
         every { eventSyncManager.getPeriodicWorkTags() } returns listOf("tag1", "tag2")
 
         orchestrator
-            .executeSchedulingCommand(
+            .execute(
                 ScheduleCommand.Events.rescheduleAfter(withDelay = true) { },
             ).join()
 
@@ -229,7 +229,7 @@ class SyncOrchestratorCommandExecutionTest {
     fun `unschedule events cancels correct workers`() = runTest {
         every { eventSyncManager.getAllWorkerTag() } returns "syncWorkers"
 
-        orchestrator.executeSchedulingCommand(ScheduleCommand.Events.unschedule())
+        orchestrator.execute(ScheduleCommand.Events.unschedule())
 
         verify {
             workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME)
@@ -242,7 +242,7 @@ class SyncOrchestratorCommandExecutionTest {
     fun `start one-time event sync uses correct tags`() = runTest {
         every { eventSyncManager.getOneTimeWorkTags() } returns listOf("tag1", "tag2")
 
-        orchestrator.executeOneTime(OneTime.Events.start()).join()
+        orchestrator.execute(OneTime.Events.start()).join()
 
         verify {
             workManager.enqueueUniqueWork(
@@ -257,7 +257,7 @@ class SyncOrchestratorCommandExecutionTest {
     fun `start one-time event sync uses correct input data`() = runTest {
         every { eventSyncManager.getOneTimeWorkTags() } returns listOf("tag1", "tag2")
 
-        orchestrator.executeOneTime(OneTime.Events.start(isDownSyncAllowed = false)).join()
+        orchestrator.execute(OneTime.Events.start(isDownSyncAllowed = false)).join()
 
         verify {
             workManager.enqueueUniqueWork(
@@ -275,7 +275,7 @@ class SyncOrchestratorCommandExecutionTest {
         every { eventSyncManager.getAllWorkerTag() } returns "syncWorkers"
         every { eventSyncManager.getOneTimeWorkTags() } returns listOf("tag1", "tag2")
 
-        orchestrator.executeOneTime(OneTime.Events.restart(isDownSyncAllowed = false)).join()
+        orchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)).join()
 
         verify {
             workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME_ONE_TIME)
@@ -295,7 +295,7 @@ class SyncOrchestratorCommandExecutionTest {
     fun `stop one-time event sync cancels correct workers`() = runTest {
         every { eventSyncManager.getAllWorkerTag() } returns "syncWorkers"
 
-        orchestrator.executeOneTime(OneTime.Events.stop())
+        orchestrator.execute(OneTime.Events.stop())
 
         verify {
             workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME_ONE_TIME)
@@ -305,7 +305,7 @@ class SyncOrchestratorCommandExecutionTest {
 
     @Test
     fun `reschedules image worker when requested`() = runTest {
-        orchestrator.executeSchedulingCommand(ScheduleCommand.Images.reschedule()).join()
+        orchestrator.execute(ScheduleCommand.Images.reschedule()).join()
 
         verify {
             workManager.enqueueUniquePeriodicWork(
@@ -318,7 +318,7 @@ class SyncOrchestratorCommandExecutionTest {
 
     @Test
     fun `start one-time image sync re-starts image worker`() = runTest {
-        orchestrator.executeOneTime(OneTime.Images.start()).join()
+        orchestrator.execute(OneTime.Images.start()).join()
 
         verify {
             workManager.cancelUniqueWork(FILE_UP_SYNC_WORK_NAME)
@@ -332,14 +332,14 @@ class SyncOrchestratorCommandExecutionTest {
 
     @Test
     fun `stop one-time image sync cancels image worker`() = runTest {
-        orchestrator.executeOneTime(OneTime.Images.stop())
+        orchestrator.execute(OneTime.Images.stop())
 
         verify { workManager.cancelUniqueWork(FILE_UP_SYNC_WORK_NAME) }
     }
 
     @Test
     fun `unschedule images returns completed job and routes to stop logic`() = runTest {
-        val job = orchestrator.executeSchedulingCommand(ScheduleCommand.Images.unschedule())
+        val job = orchestrator.execute(ScheduleCommand.Images.unschedule())
 
         assertThat(job.isCompleted).isTrue()
         verify { workManager.cancelUniqueWork(FILE_UP_SYNC_WORK_NAME) }
@@ -354,7 +354,7 @@ class SyncOrchestratorCommandExecutionTest {
             unblock.receive()
         }
 
-        val job = orchestrator.executeSchedulingCommand(ScheduleCommand.Images.rescheduleAfter(block))
+        val job = orchestrator.execute(ScheduleCommand.Images.rescheduleAfter(block))
 
         verify { workManager.cancelUniqueWork(FILE_UP_SYNC_WORK_NAME) }
 

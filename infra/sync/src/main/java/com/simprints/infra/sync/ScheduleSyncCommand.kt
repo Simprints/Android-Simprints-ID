@@ -3,7 +3,7 @@ package com.simprints.infra.sync
 /**
  * Periodic/background scheduling commands.
  *
- * Intended to be executed via [SyncOrchestrator.executeSchedulingCommand].
+ * Intended to be executed via [SyncOrchestrator.execute].
  */
 sealed class ScheduleCommand {
     internal enum class Action {

@@ -6,8 +6,8 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.OneTime
-import com.simprints.infra.sync.SyncStatus
 import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.sync.SyncStatus
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -51,7 +51,7 @@ class RunBlockingEventSyncUseCaseTest {
         testScheduler.advanceUntilIdle()
 
         verify(exactly = 1) { syncOrchestrator.observeSyncState() }
-        verify(exactly = 1) { syncOrchestrator.executeOneTime(OneTime.Events.start()) }
+        verify(exactly = 1) { syncOrchestrator.execute(OneTime.Events.start()) }
     }
 
     @Test
@@ -66,7 +66,7 @@ class RunBlockingEventSyncUseCaseTest {
         testScheduler.advanceUntilIdle()
 
         verify(exactly = 1) { syncOrchestrator.observeSyncState() }
-        verify(exactly = 1) { syncOrchestrator.executeOneTime(OneTime.Events.start()) }
+        verify(exactly = 1) { syncOrchestrator.execute(OneTime.Events.start()) }
     }
 
     @Test
@@ -81,7 +81,7 @@ class RunBlockingEventSyncUseCaseTest {
         testScheduler.advanceUntilIdle()
 
         verify(exactly = 1) { syncOrchestrator.observeSyncState() }
-        verify(exactly = 1) { syncOrchestrator.executeOneTime(OneTime.Events.start()) }
+        verify(exactly = 1) { syncOrchestrator.execute(OneTime.Events.start()) }
     }
 
     @Test
@@ -92,12 +92,12 @@ class RunBlockingEventSyncUseCaseTest {
         val job = launch { usecase.invoke() }
         testScheduler.advanceUntilIdle()
 
-        verify(exactly = 0) { syncOrchestrator.executeOneTime(OneTime.Events.start()) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.Events.start()) }
 
         syncFlow.value = createSyncStatus("sync", EventSyncWorkerState.Succeeded)
         testScheduler.advanceUntilIdle()
 
-        verify(exactly = 1) { syncOrchestrator.executeOneTime(OneTime.Events.start()) }
+        verify(exactly = 1) { syncOrchestrator.execute(OneTime.Events.start()) }
         job.cancel()
     }
 
@@ -128,7 +128,7 @@ class RunBlockingEventSyncUseCaseTest {
 
     private fun setUpSync(syncFlow: StateFlow<SyncStatus>) {
         every { syncOrchestrator.observeSyncState() } returns syncFlow
-        every { syncOrchestrator.executeOneTime(OneTime.Events.start()) } returns Job().apply { complete() }
+        every { syncOrchestrator.execute(OneTime.Events.start()) } returns Job().apply { complete() }
     }
 
     private fun createPlaceholderSyncStatus(): SyncStatus = createSyncStatus("", null, null, null)

@@ -57,7 +57,7 @@ class ModuleSelectionViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        every { syncOrchestrator.executeOneTime(any()) } returns Job().apply { complete() }
+        every { syncOrchestrator.execute(any<OneTime>()) } returns Job().apply { complete() }
 
         val modulesDefault = listOf(
             Module("a".asTokenizableEncrypted(), false),
@@ -176,7 +176,7 @@ class ModuleSelectionViewModelTest {
         viewModel.saveModules()
 
         coVerify(exactly = 1) { repository.saveModules(updatedModules) }
-        verify(exactly = 1) { syncOrchestrator.executeOneTime(OneTime.Events.restart()) }
+        verify(exactly = 1) { syncOrchestrator.execute(OneTime.Events.restart()) }
     }
 
     @Test

@@ -86,7 +86,7 @@ open class Application :
         appScope.launch {
             realmToRoomMigrationScheduler.scheduleMigrationWorkerIfNeeded()
             syncOrchestrator.cleanupWorkers()
-            syncOrchestrator.executeSchedulingCommand(ScheduleCommand.Everything.reschedule())
+            syncOrchestrator.execute(ScheduleCommand.Everything.reschedule())
         }
         if (DB_ENCRYPTION) {
             System.loadLibrary("sqlcipher")
