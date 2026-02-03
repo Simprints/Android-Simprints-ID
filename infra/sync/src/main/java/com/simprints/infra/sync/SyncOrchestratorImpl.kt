@@ -196,47 +196,44 @@ internal class SyncOrchestratorImpl @Inject constructor(
         action: OneTime.Action,
         stop: () -> Unit,
         start: suspend () -> Unit,
-    ): Job {
-        val shouldStop =
-            action == OneTime.Action.STOP || action == OneTime.Action.RESTART
-        if (shouldStop) {
-            stop()
+    ): Job =
+        when (action) {
+            OneTime.Action.STOP -> {
+                stop()
+                Job().apply { complete() }
+            }
+            OneTime.Action.START -> {
+                appScope.launch(ioDispatcher) {
+                    start()
+                }
+            }
+            OneTime.Action.RESTART -> {
+                stop()
+                appScope.launch(ioDispatcher) {
+                    start()
+                }
+            }
         }
-
-        val shouldStart =
-            action == OneTime.Action.START || action == OneTime.Action.RESTART
-        if (!shouldStart) {
-            return Job().apply { complete() }
-        }
-
-        return appScope.launch(ioDispatcher) {
-            start()
-        }
-    }
 
     private fun executeSchedulingAction(
         action: ScheduleCommand.Action,
         blockWhileUnscheduled: (suspend () -> Unit)?,
         unschedule: () -> Unit,
         reschedule: suspend () -> Unit,
-    ): Job {
-        val shouldUnschedule =
-            action == ScheduleCommand.Action.UNSCHEDULE || blockWhileUnscheduled != null
-        if (shouldUnschedule) {
-            unschedule()
+    ): Job =
+        when (action) {
+            ScheduleCommand.Action.UNSCHEDULE -> {
+                unschedule()
+                Job().apply { complete() }
+            }
+            ScheduleCommand.Action.RESCHEDULE -> {
+                unschedule()
+                appScope.launch(ioDispatcher) {
+                    blockWhileUnscheduled?.invoke()
+                    reschedule()
+                }
+            }
         }
-
-        val shouldSchedule =
-            action == ScheduleCommand.Action.RESCHEDULE
-        if (!shouldSchedule) {
-            return Job().apply { complete() }
-        }
-
-        return appScope.launch(ioDispatcher) {
-            blockWhileUnscheduled?.invoke()
-            reschedule()
-        }
-    }
 
     private suspend fun scheduleBackgroundWork(withDelay: Boolean) {
         if (authStore.signedInProjectId.isNotEmpty()) {
