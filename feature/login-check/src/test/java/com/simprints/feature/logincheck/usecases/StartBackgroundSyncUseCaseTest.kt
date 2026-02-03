@@ -80,8 +80,8 @@ class StartBackgroundSyncUseCaseTest {
     fun `Does not start event sync on start if not Simprints sync`() = runTest {
         coEvery {
             configRepository
-            .getProjectConfiguration()
-            .synchronization.down.simprints
+                .getProjectConfiguration()
+                .synchronization.down.simprints
         } returns null
 
         assertUseCaseAwaitsSync(ScheduleCommand.Everything.reschedule(withDelay = true))

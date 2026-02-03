@@ -24,8 +24,8 @@ import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.OneTime
-import com.simprints.infra.sync.SyncStatus
 import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.sync.SyncStatus
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import com.simprints.testtools.common.livedata.getOrAwaitValues

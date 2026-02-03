@@ -1,8 +1,8 @@
 package com.simprints.infra.sync
 
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface SyncOrchestrator {
     /**

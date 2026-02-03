@@ -18,12 +18,13 @@ internal class ResetLocalRecordsIfConfigChangedUseCase @Inject constructor(
         newConfig: ProjectConfiguration,
     ) {
         if (hasPartitionTypeChanged(oldConfig, newConfig)) {
-            syncOrchestrator.execute(
-                ScheduleCommand.Events.rescheduleAfter {
-                    eventSyncManager.resetDownSyncInfo()
-                    enrolmentRecordRepository.deleteAll()
-                },
-            ).await()
+            syncOrchestrator
+                .execute(
+                    ScheduleCommand.Events.rescheduleAfter {
+                        eventSyncManager.resetDownSyncInfo()
+                        enrolmentRecordRepository.deleteAll()
+                    },
+                ).await()
         }
     }
 
@@ -37,5 +38,5 @@ internal class ResetLocalRecordsIfConfigChangedUseCase @Inject constructor(
             oldConfig.synchronization.down.simprints
                 ?.partitionType != newConfig.synchronization.down.simprints
                 ?.partitionType
-        )
+            )
 }

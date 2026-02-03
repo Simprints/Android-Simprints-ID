@@ -85,7 +85,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
                 )
 
                 binding.logs.append(ssb)
-        }
+            }
 
         binding.syncStart.setOnClickListener {
             syncOrchestrator.execute(OneTime.Events.start())
