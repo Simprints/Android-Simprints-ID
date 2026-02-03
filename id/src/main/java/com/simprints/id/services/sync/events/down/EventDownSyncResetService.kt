@@ -52,7 +52,7 @@ class EventDownSyncResetService : Service() {
             eventSyncManager.resetDownSyncInfo()
             // Trigger a new sync
             // Execute in app scope to prevent a timeout cancellation leaving it in a stopped state
-            syncOrchestrator.executeOneTime(OneTime.Events.start()).await()
+            syncOrchestrator.execute(OneTime.Events.start()).await()
         }
         resetJob?.invokeOnCompletion { stopSelf() }
 

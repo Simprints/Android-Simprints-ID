@@ -29,7 +29,7 @@ class StartBackgroundSyncUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        every { syncOrchestrator.executeSchedulingCommand(any()) } returns Job().apply { complete() }
+        every { syncOrchestrator.execute(any<ScheduleCommand>()) } returns Job().apply { complete() }
 
         useCase = StartBackgroundSyncUseCase(
             configRepository,
@@ -89,7 +89,7 @@ class StartBackgroundSyncUseCaseTest {
 
     private suspend fun TestScope.assertUseCaseAwaitsSync(expectedCommand: ScheduleCommand) {
         val syncCommandJob = Job()
-        every { syncOrchestrator.executeSchedulingCommand(any()) } returns syncCommandJob
+        every { syncOrchestrator.execute(any<ScheduleCommand>()) } returns syncCommandJob
 
         val useCaseJob = async { useCase.invoke() }
 
@@ -100,6 +100,6 @@ class StartBackgroundSyncUseCaseTest {
         runCurrent()
         useCaseJob.await()
 
-        verify { syncOrchestrator.executeSchedulingCommand(expectedCommand) }
+        verify { syncOrchestrator.execute(expectedCommand) }
     }
 }

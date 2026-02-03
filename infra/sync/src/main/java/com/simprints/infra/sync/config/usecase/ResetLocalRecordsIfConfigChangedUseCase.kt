@@ -18,7 +18,7 @@ internal class ResetLocalRecordsIfConfigChangedUseCase @Inject constructor(
         newConfig: ProjectConfiguration,
     ) {
         if (hasPartitionTypeChanged(oldConfig, newConfig)) {
-            syncOrchestrator.executeSchedulingCommand(
+            syncOrchestrator.execute(
                 ScheduleCommand.Events.rescheduleAfter {
                     eventSyncManager.resetDownSyncInfo()
                     enrolmentRecordRepository.deleteAll()

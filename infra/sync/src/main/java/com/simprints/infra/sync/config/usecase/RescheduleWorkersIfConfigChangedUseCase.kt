@@ -15,7 +15,7 @@ internal class RescheduleWorkersIfConfigChangedUseCase @Inject constructor(
         newConfig: ProjectConfiguration,
     ) {
         if (shouldRescheduleImageUpload(oldConfig, newConfig)) {
-            syncOrchestrator.executeSchedulingCommand(ScheduleCommand.Images.reschedule()).await()
+            syncOrchestrator.execute(ScheduleCommand.Images.reschedule()).await()
         }
     }
 

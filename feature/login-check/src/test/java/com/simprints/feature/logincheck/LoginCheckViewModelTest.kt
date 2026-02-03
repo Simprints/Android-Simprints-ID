@@ -86,7 +86,7 @@ internal class LoginCheckViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        every { syncOrchestrator.executeSchedulingCommand(any()) } returns Job().apply { complete() }
+        every { syncOrchestrator.execute(any<ScheduleCommand>()) } returns Job().apply { complete() }
 
         viewModel = LoginCheckViewModel(
             rootManager = rootMatchers,
@@ -173,7 +173,7 @@ internal class LoginCheckViewModelTest {
         coVerify {
             addAuthorizationEventUseCase.invoke(any(), eq(false))
         }
-        verify { syncOrchestrator.executeSchedulingCommand(ScheduleCommand.Everything.unschedule()) }
+        verify { syncOrchestrator.execute(ScheduleCommand.Everything.unschedule()) }
         viewModel.showLoginFlow
             .test()
             .assertValue { it.peekContent() == ActionFactory.getIdentifyRequest() }

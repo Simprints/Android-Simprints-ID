@@ -36,7 +36,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        every { syncOrchestrator.executeSchedulingCommand(capture(scheduleCommandSlot)) } returns noopJob()
+        every { syncOrchestrator.execute(capture(scheduleCommandSlot)) } returns noopJob()
 
         useCase = ResetLocalRecordsIfConfigChangedUseCase(
             eventSyncManager = eventSyncManager,
@@ -68,7 +68,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify(exactly = 0) { syncOrchestrator.executeSchedulingCommand(any()) }
+        verify(exactly = 0) { syncOrchestrator.execute(any<ScheduleCommand>()) }
         coVerify(exactly = 0) {
             eventSyncManager.resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()
@@ -98,7 +98,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify { syncOrchestrator.executeSchedulingCommand(any()) }
+        verify { syncOrchestrator.execute(any<ScheduleCommand>()) }
         val command = scheduleCommandSlot.captured as ScheduleCommand.EventsCommand
         assertThat(command.action).isEqualTo(ScheduleCommand.Action.RESCHEDULE)
         assertThat(command.withDelay).isFalse()
@@ -135,7 +135,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify { syncOrchestrator.executeSchedulingCommand(any()) }
+        verify { syncOrchestrator.execute(any<ScheduleCommand>()) }
         val command = scheduleCommandSlot.captured as ScheduleCommand.EventsCommand
         assertThat(command.action).isEqualTo(ScheduleCommand.Action.RESCHEDULE)
         assertThat(command.blockWhileUnscheduled).isNotNull()
@@ -171,7 +171,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify { syncOrchestrator.executeSchedulingCommand(any()) }
+        verify { syncOrchestrator.execute(any<ScheduleCommand>()) }
         val command = scheduleCommandSlot.captured as ScheduleCommand.EventsCommand
         assertThat(command.action).isEqualTo(ScheduleCommand.Action.RESCHEDULE)
         assertThat(command.blockWhileUnscheduled).isNotNull()
@@ -207,7 +207,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify { syncOrchestrator.executeSchedulingCommand(any()) }
+        verify { syncOrchestrator.execute(any<ScheduleCommand>()) }
         val command = scheduleCommandSlot.captured as ScheduleCommand.EventsCommand
         assertThat(command.action).isEqualTo(ScheduleCommand.Action.RESCHEDULE)
         assertThat(command.blockWhileUnscheduled).isNotNull()
@@ -243,7 +243,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify(exactly = 0) { syncOrchestrator.executeSchedulingCommand(any()) }
+        verify(exactly = 0) { syncOrchestrator.execute(any<ScheduleCommand>()) }
         coVerify(exactly = 0) {
             eventSyncManager.resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()
@@ -273,7 +273,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify(exactly = 0) { syncOrchestrator.executeSchedulingCommand(any()) }
+        verify(exactly = 0) { syncOrchestrator.execute(any<ScheduleCommand>()) }
         coVerify(exactly = 0) {
             eventSyncManager.resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()
@@ -303,7 +303,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify(exactly = 0) { syncOrchestrator.executeSchedulingCommand(any()) }
+        verify(exactly = 0) { syncOrchestrator.execute(any<ScheduleCommand>()) }
         coVerify(exactly = 0) {
             eventSyncManager.resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()
@@ -333,7 +333,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify(exactly = 0) { syncOrchestrator.executeSchedulingCommand(any()) }
+        verify(exactly = 0) { syncOrchestrator.execute(any<ScheduleCommand>()) }
         coVerify(exactly = 0) {
             eventSyncManager.resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()

@@ -28,7 +28,7 @@ class RescheduleWorkersIfConfigChangedUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        every { syncOrchestrator.executeSchedulingCommand(any()) } returns Job().apply { complete() }
+        every { syncOrchestrator.execute(any<ScheduleCommand>()) } returns Job().apply { complete() }
 
         useCase = RescheduleWorkersIfConfigChangedUseCase(syncOrchestrator)
     }
@@ -56,13 +56,13 @@ class RescheduleWorkersIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify(exactly = 0) { syncOrchestrator.executeSchedulingCommand(any()) }
+        verify(exactly = 0) { syncOrchestrator.execute(any<ScheduleCommand>()) }
     }
 
     @Test
     fun `should reschedule image upload when unmetered connection flag changes`() = runTest {
         val syncCommandJob = Job()
-        every { syncOrchestrator.executeSchedulingCommand(any()) } returns syncCommandJob
+        every { syncOrchestrator.execute(any<ScheduleCommand>()) } returns syncCommandJob
 
         val useCaseJob = async {
             useCase(
@@ -94,7 +94,7 @@ class RescheduleWorkersIfConfigChangedUseCaseTest {
         runCurrent()
         useCaseJob.await()
 
-        verify { syncOrchestrator.executeSchedulingCommand(ScheduleCommand.Images.reschedule()) }
+        verify { syncOrchestrator.execute(ScheduleCommand.Images.reschedule()) }
         assertThat(useCaseJob.isCompleted).isTrue()
     }
 }

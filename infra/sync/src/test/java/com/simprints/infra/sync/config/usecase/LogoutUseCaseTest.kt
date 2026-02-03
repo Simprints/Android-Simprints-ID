@@ -25,7 +25,7 @@ class LogoutUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        every { syncOrchestrator.executeSchedulingCommand(any()) } returns Job().apply { complete() }
+        every { syncOrchestrator.execute(any<ScheduleCommand>()) } returns Job().apply { complete() }
 
         useCase = LogoutUseCase(
             syncOrchestrator = syncOrchestrator,
@@ -37,7 +37,7 @@ class LogoutUseCaseTest {
     fun `Fully logs out when called`() = runTest {
         useCase.invoke()
 
-        verify { syncOrchestrator.executeSchedulingCommand(ScheduleCommand.Everything.unschedule()) }
+        verify { syncOrchestrator.execute(ScheduleCommand.Everything.unschedule()) }
         coVerify {
             syncOrchestrator.deleteEventSyncInfo()
             authManager.signOut()

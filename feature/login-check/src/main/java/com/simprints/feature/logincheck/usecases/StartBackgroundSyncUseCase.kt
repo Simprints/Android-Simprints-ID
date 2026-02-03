@@ -18,6 +18,6 @@ internal class StartBackgroundSyncUseCase @Inject constructor(
             ?.frequency
 
         val withDelay = frequency != Frequency.PERIODICALLY_AND_ON_SESSION_START
-        syncOrchestrator.executeSchedulingCommand(ScheduleCommand.Everything.reschedule(withDelay)).await()
+        syncOrchestrator.execute(ScheduleCommand.Everything.reschedule(withDelay)).await()
     }
 }

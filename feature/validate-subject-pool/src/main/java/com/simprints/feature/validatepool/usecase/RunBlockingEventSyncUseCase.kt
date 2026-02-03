@@ -21,7 +21,7 @@ internal class RunBlockingEventSyncUseCase @Inject constructor(
             .firstOrNull { !it.isUninitialized() }
             ?.syncId
         syncOrchestrator
-            .executeOneTime(OneTime.Events.start())
+            .execute(OneTime.Events.start())
             .await()
         syncState
             .map { it.eventSyncState }

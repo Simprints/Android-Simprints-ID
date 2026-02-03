@@ -88,15 +88,15 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
         }
 
         binding.syncStart.setOnClickListener {
-            syncOrchestrator.executeOneTime(OneTime.Events.start())
+            syncOrchestrator.execute(OneTime.Events.start())
         }
 
         binding.syncStop.setOnClickListener {
-            syncOrchestrator.executeOneTime(OneTime.Events.stop())
+            syncOrchestrator.execute(OneTime.Events.stop())
         }
 
         binding.syncSchedule.setOnClickListener {
-            syncOrchestrator.executeSchedulingCommand(ScheduleCommand.Events.reschedule())
+            syncOrchestrator.execute(ScheduleCommand.Events.reschedule())
         }
 
         binding.clearFirebaseToken.setOnClickListener {
@@ -121,8 +121,8 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
 
         binding.cleanAll.setOnClickListener {
             lifecycleScope.launch(dispatcher) {
-                syncOrchestrator.executeOneTime(OneTime.Events.stop())
-                syncOrchestrator.executeSchedulingCommand(ScheduleCommand.Events.unschedule())
+                syncOrchestrator.execute(OneTime.Events.stop())
+                syncOrchestrator.execute(ScheduleCommand.Events.unschedule())
 
                 eventRepository.deleteAll()
                 eventSyncManager.resetDownSyncInfo()

@@ -146,7 +146,7 @@ class SyncInfoViewModelTest {
             SyncStatus(eventSyncState = mockEventSyncState, imageSyncStatus = mockImageSyncStatus),
         )
         every { syncOrchestrator.observeSyncState() } returns syncStatusFlow
-        every { syncOrchestrator.executeOneTime(any()) } returns Job().apply { complete() }
+        every { syncOrchestrator.execute(any<OneTime>()) } returns Job().apply { complete() }
 
         every { timeHelper.now() } returns TEST_TIMESTAMP
         every { timeHelper.msBetweenNowAndTime(any()) } returns 0L
@@ -385,7 +385,7 @@ class SyncInfoViewModelTest {
 
         viewModel.forceEventSync()
 
-        verify { syncOrchestrator.executeOneTime(OneTime.Events.restart(isDownSyncAllowed = true)) }
+        verify { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = true)) }
     }
 
     @Test
@@ -394,7 +394,7 @@ class SyncInfoViewModelTest {
 
         viewModel.forceEventSync()
 
-        verify { syncOrchestrator.executeOneTime(OneTime.Events.restart(isDownSyncAllowed = false)) }
+        verify { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
     }
 
     @Test
@@ -408,7 +408,7 @@ class SyncInfoViewModelTest {
 
         viewModel.forceEventSync()
 
-        verify { syncOrchestrator.executeOneTime(OneTime.Events.restart(isDownSyncAllowed = false)) }
+        verify { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
     }
 
     @Test
@@ -422,7 +422,7 @@ class SyncInfoViewModelTest {
 
         viewModel.forceEventSync()
 
-        verify { syncOrchestrator.executeOneTime(OneTime.Events.restart(isDownSyncAllowed = false)) }
+        verify { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
     }
 
     @Test
@@ -433,14 +433,14 @@ class SyncInfoViewModelTest {
 
         viewModel.forceEventSync()
 
-        verify { syncOrchestrator.executeOneTime(OneTime.Events.restart(isDownSyncAllowed = false)) }
+        verify { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
     }
 
     @Test
     fun `should stop current event sync before starting new one`() = runTest {
         viewModel.forceEventSync()
 
-        verify { syncOrchestrator.executeOneTime(OneTime.Events.restart()) }
+        verify { syncOrchestrator.execute(OneTime.Events.restart()) }
     }
 
     // toggleImageSync() tests
@@ -455,8 +455,8 @@ class SyncInfoViewModelTest {
 
         viewModel.toggleImageSync()
 
-        verify { syncOrchestrator.executeOneTime(OneTime.Images.start()) }
-        verify(exactly = 0) { syncOrchestrator.executeOneTime(OneTime.Images.stop()) }
+        verify { syncOrchestrator.execute(OneTime.Images.start()) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.Images.stop()) }
     }
 
     @Test
@@ -469,8 +469,8 @@ class SyncInfoViewModelTest {
 
         viewModel.toggleImageSync()
 
-        verify { syncOrchestrator.executeOneTime(OneTime.Images.stop()) }
-        verify(exactly = 0) { syncOrchestrator.executeOneTime(OneTime.Images.start()) }
+        verify { syncOrchestrator.execute(OneTime.Images.stop()) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.Images.start()) }
     }
 
     // logout() tests
@@ -524,7 +524,7 @@ class SyncInfoViewModelTest {
 
         viewModel.handleLoginResult(successResult)
 
-        verify { syncOrchestrator.executeOneTime(OneTime.Events.restart()) }
+        verify { syncOrchestrator.execute(OneTime.Events.restart()) }
     }
 
     @Test
@@ -535,8 +535,8 @@ class SyncInfoViewModelTest {
 
         viewModel.handleLoginResult(failureResult)
 
-        verify(exactly = 0) { syncOrchestrator.executeOneTime(OneTime.Events.restart(isDownSyncAllowed = true)) }
-        verify(exactly = 0) { syncOrchestrator.executeOneTime(OneTime.Events.restart(isDownSyncAllowed = false)) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = true)) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
     }
 
     // Sync button responsiveness optimization
@@ -672,7 +672,7 @@ class SyncInfoViewModelTest {
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        verify { syncOrchestrator.executeOneTime(OneTime.Events.restart()) }
+        verify { syncOrchestrator.execute(OneTime.Events.restart()) }
     }
 
     @Test
@@ -688,7 +688,7 @@ class SyncInfoViewModelTest {
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        verify { syncOrchestrator.executeOneTime(OneTime.Events.restart()) }
+        verify { syncOrchestrator.execute(OneTime.Events.restart()) }
     }
 
     @Test
@@ -704,8 +704,8 @@ class SyncInfoViewModelTest {
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        verify(exactly = 0) { syncOrchestrator.executeOneTime(OneTime.Events.restart(isDownSyncAllowed = true)) }
-        verify(exactly = 0) { syncOrchestrator.executeOneTime(OneTime.Events.restart(isDownSyncAllowed = false)) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = true)) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
     }
 
     @Test
@@ -719,8 +719,8 @@ class SyncInfoViewModelTest {
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        verify(exactly = 0) { syncOrchestrator.executeOneTime(OneTime.Events.restart(isDownSyncAllowed = true)) }
-        verify(exactly = 0) { syncOrchestrator.executeOneTime(OneTime.Events.restart(isDownSyncAllowed = false)) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = true)) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
     }
 
     @Test
@@ -737,7 +737,7 @@ class SyncInfoViewModelTest {
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        verify { syncOrchestrator.executeOneTime(OneTime.Events.restart(isDownSyncAllowed = false)) }
+        verify { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
     }
 
     @Test
@@ -758,7 +758,7 @@ class SyncInfoViewModelTest {
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        verify(exactly = 1) { syncOrchestrator.executeOneTime(OneTime.Events.restart(isDownSyncAllowed = false)) }
+        verify(exactly = 1) { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
     }
 
     @Test
@@ -779,8 +779,8 @@ class SyncInfoViewModelTest {
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        verify(exactly = 0) { syncOrchestrator.executeOneTime(OneTime.Events.restart(isDownSyncAllowed = true)) }
-        verify(exactly = 0) { syncOrchestrator.executeOneTime(OneTime.Events.restart(isDownSyncAllowed = false)) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = true)) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
     }
 
     private companion object {

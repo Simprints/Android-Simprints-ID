@@ -110,7 +110,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
 
     override fun observeSyncState(): StateFlow<SyncStatus> = sharedSyncState
 
-    override fun executeOneTime(command: OneTime): Job {
+    override fun execute(command: OneTime): Job {
         return when (command) {
             is OneTime.EventsCommand -> executeOneTimeAction(
                 action = command.action,
@@ -126,7 +126,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
         }
     }
 
-    override fun executeSchedulingCommand(command: ScheduleCommand): Job {
+    override fun execute(command: ScheduleCommand): Job {
         return when (command) {
             is ScheduleCommand.EverythingCommand -> executeSchedulingAction(
                 action = command.action,

@@ -20,7 +20,7 @@ internal class LogoutUseCase @Inject constructor(
     // To prevent a race between wiping data and navigation, this use case must block the executing thread
     operator fun invoke() = runBlocking(ioDispatcher) {
         // Cancel all background sync
-        syncOrchestrator.executeSchedulingCommand(ScheduleCommand.Everything.unschedule())
+        syncOrchestrator.execute(ScheduleCommand.Everything.unschedule())
         syncOrchestrator.deleteEventSyncInfo()
         // sign out the user
         authManager.signOut()
