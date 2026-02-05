@@ -73,7 +73,7 @@ class CypressOtaControllerTest {
         cypressOtaController.program(
             configureMessageStreamMock(errorPositions = listOf(0)),
             generateRandomBinFile(),
-        )
+        ).toList()
     }
 
     @Test(expected = OtaFailedException::class)
@@ -82,7 +82,7 @@ class CypressOtaControllerTest {
         cypressOtaController.program(
             configureMessageStreamMock(errorPositions = listOf(1)),
             generateRandomBinFile(),
-        )
+        ).toList()
     }
 
     @Test(expected = OtaFailedException::class)
