@@ -497,7 +497,7 @@ class ScannerTest {
         val progressValues = listOf(0.25f, 0.50f, 0.75f, 1.00f)
 
         val mockkStmOtaController = mockk<StmOtaController> {
-            coEvery {
+            every {
                 program(any(), any())
             } returns progressValues.asFlow()
         }
