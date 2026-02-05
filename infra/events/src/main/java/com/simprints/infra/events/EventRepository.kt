@@ -53,11 +53,11 @@ interface EventRepository {
 
     suspend fun getEventsJsonFromScope(scopeId: String): List<String>
 
-    suspend fun getAllEvents(): Flow<Event>
+    fun getAllEvents(): Flow<Event>
 
-    suspend fun observeEventCount(type: EventType?): Flow<Int>
+    fun observeEventCount(type: EventType?): Flow<Int>
 
-    suspend fun observeEventCountInClosedScopes(): Flow<Int>
+    fun observeEventCountInClosedScopes(): Flow<Int>
 
     suspend fun addOrUpdateEvent(
         scope: EventScope,

@@ -161,15 +161,15 @@ internal open class EventRepositoryImpl @Inject constructor(
 
     override suspend fun getEventsJsonFromScope(scopeId: String): List<String> = eventLocalDataSource.loadEventJsonInScope(scopeId)
 
-    override suspend fun getAllEvents(): Flow<Event> = eventLocalDataSource.loadAllEvents()
+    override fun getAllEvents(): Flow<Event> = eventLocalDataSource.loadAllEvents()
 
-    override suspend fun observeEventCount(type: EventType?): Flow<Int> = if (type != null) {
+    override fun observeEventCount(type: EventType?): Flow<Int> = if (type != null) {
         eventLocalDataSource.observeEventCount(type)
     } else {
         eventLocalDataSource.observeEventCount()
     }
 
-    override suspend fun observeEventCountInClosedScopes(): Flow<Int> = eventLocalDataSource.observeEventCountInClosedScopes()
+    override fun observeEventCountInClosedScopes(): Flow<Int> = eventLocalDataSource.observeEventCountInClosedScopes()
 
     override suspend fun addOrUpdateEvent(
         scope: EventScope,
