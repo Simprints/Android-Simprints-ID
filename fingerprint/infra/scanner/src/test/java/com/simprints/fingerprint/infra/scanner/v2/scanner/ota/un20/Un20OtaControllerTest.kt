@@ -70,7 +70,7 @@ class Un20OtaControllerTest {
         un20OtaController.program(
             configureMessageStreamMock(errorPositions = listOf(0)),
             generateRandomBinFile(),
-        )
+        ).toList()
     }
 
     @Test(expected = OtaFailedException::class)

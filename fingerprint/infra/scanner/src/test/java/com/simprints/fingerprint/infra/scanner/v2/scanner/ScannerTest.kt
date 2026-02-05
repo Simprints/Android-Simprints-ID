@@ -712,12 +712,12 @@ class ScannerTest {
     @Test
     fun test_startUn20Ota() = runTest {
         val otaBinary = byteArrayOf()
-        coEvery { un20OtaController.program(any(), otaBinary) } returns flowOf()
+        every { un20OtaController.program(any(), otaBinary) } returns flowOf()
         scanner.connect(mockkInputStream, mockkOutputStream)
         scanner.enterMainMode()
         scanner.state.un20On = true
         scanner.startUn20Ota(otaBinary)
-        coVerify { un20OtaController.program(any(), otaBinary) }
+        verify { un20OtaController.program(any(), otaBinary) }
     }
 
     private fun setupMainMessageInputStreamMock(
