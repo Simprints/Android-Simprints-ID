@@ -13,6 +13,7 @@ import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
 import io.mockk.CapturingSlot
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
@@ -38,7 +39,7 @@ class StmOtaHelperTest {
         coEvery { connectionHelperMock.reconnect(any(), any()) } answers {}
 
         coEvery { scannerMock.enterStmOtaMode() } just runs
-        coEvery { scannerMock.startStmOta(any()) } returns OTA_PROGRESS_VALUES.asFlow()
+        every { scannerMock.startStmOta(any()) } returns OTA_PROGRESS_VALUES.asFlow()
         coEvery { scannerMock.getVersionInformation() } returns OLD_SCANNER_VERSION
         coEvery { scannerMock.setVersionInformation(any()) } just runs
         coEvery { scannerMock.enterMainMode() } just runs
@@ -89,7 +90,7 @@ class StmOtaHelperTest {
             progressValues.map { StmOtaStep.TransferInProgress(it) }
         val error = ScannerV2OtaFailedException("oops!")
 
-        coEvery { scannerMock.startStmOta(any()) } returns progressValues.asFlow().onCompletion { throw error }
+        every { scannerMock.startStmOta(any()) } returns progressValues.asFlow().onCompletion { throw error }
 
         val otaFlow = stmOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_STM_VERSION_STRING)
         val actualSteps = otaFlow.take(expectedSteps.size).toList()
