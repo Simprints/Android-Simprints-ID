@@ -112,8 +112,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
 
     override fun onResume() {
         super.onResume()
-        val currentPermission = requireActivity().getCurrentPermissionStatus(CAMERA)
-        when (currentPermission) {
+        when (val currentPermission = requireActivity().getCurrentPermissionStatus(CAMERA)) {
             PermissionStatus.Granted -> initializeFragment()
             PermissionStatus.Denied -> {
                 // Permission dialog was already displayed, and user denied permissions. Showing rationale so to avoid constantly-appearing
@@ -292,7 +291,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
 
     private fun startOcr() {
         imageAnalysis.setAnalyzer(cameraExecutor) { videoFrame: ImageProxy ->
-            if (viewModel.isRunningOcrOnFrame) {
+            if (viewModel.isRunningOcrOnFrame.get()) {
                 videoFrame.close()
                 return@setAnalyzer
             }
@@ -360,6 +359,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         if (::imageAnalysis.isInitialized) {
             imageAnalysis.clearAnalyzer()
         }
+        viewModel.ocrStopped()
     }
 
     /**

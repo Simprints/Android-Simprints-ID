@@ -19,7 +19,7 @@ extra.apply {
      * Dev version >= 2025.2.0 is required to support enrolment record updates and SimFace configuration
      * Dev version >= 2025.3.0 is required to receive smaples and structured down sync configuration
      */
-    set("VERSION_NAME", "2025.4.0")
+    set("VERSION_NAME", "2026.1.0")
 
     /**
      * Build type. The version code describes which build type was used for the build.

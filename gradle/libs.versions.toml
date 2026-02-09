@@ -65,9 +65,8 @@ libsimprints_version = "2025.2.2"
 simmatcher_version = "1.3.0"
 roc_wrapper_version = "1.23.0"
 roc_wrapper-v3_version = "3.1.0"
-nec_version = "1.5.0"
 secugen_version = "1.1.0"
-simface = "2025.4.0"
+simface = "2026.1.0"
 
 junit_version = "4.13.2"
 junit_ext_version = "1.3.0"
@@ -201,9 +200,6 @@ simmatcher = { module = "com.simprints:libsimmatcher", version.ref = "simmatcher
 roc-v1 = { module = "com.simprints:rocwrapper", version.ref = "roc_wrapper_version" }
 # roc v3 sdk hosted in https://github.com/Simprints/lib-roc-wrapper-v3
 roc-v3 = { module = "com.simprints:rocwrapper-v3", version.ref = "roc_wrapper-v3_version" }
-# nec sdk hosted in https://github.com/Simprints/NEC-wrapper/
-nec-wrapper = { module = " com.simprints:necwrapper", version.ref = "nec_version" }
-nec-lib = { module = "com.nec:lib", version.ref = "nec_version" }
 # secugen sdk hosted in https://github.com/Simprints/secugen-wrapper
 secugen = { module = "com.simprints:secugenwrapper", version.ref = "secugen_version" }
 simface = { module = "com.simprints.biometrics:simface", version.ref = "simface" }

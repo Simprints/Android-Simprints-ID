@@ -38,7 +38,14 @@ internal class ConfirmationFragment : Fragment(R.layout.fragment_confirmation) {
     ) {
         super.onViewCreated(view, savedInstanceState)
         applySystemBarInsets(view)
-
+        val detection = mainVm.getSampleDetection()
+        // Check if state was lost (Process Death)
+        if (detection == null) {
+            // it is safer to force a recapture in this case
+            Simber.i("Face detection state lost during confirmation, forcing recapture", tag = ORCHESTRATION)
+            mainVm.recapture()
+            return
+        }
         Simber.i("ConfirmationFragment started", tag = ORCHESTRATION)
         startTime = faceTimeHelper.now()
 
