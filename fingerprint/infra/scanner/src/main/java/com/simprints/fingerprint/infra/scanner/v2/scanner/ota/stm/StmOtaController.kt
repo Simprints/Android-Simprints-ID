@@ -16,7 +16,11 @@ import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.byteArrayOf
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.chunked
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.toByteArray
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
 import javax.inject.Inject
 
 /**
@@ -39,12 +43,16 @@ class StmOtaController @Inject constructor() {
     ): Flow<Float> = flow {
         sendInitBootloaderCommand(stmOtaMessageChannel)
         eraseMemory(stmOtaMessageChannel)
-        val chunks = createFirmwareChunks(firmwareBinFile).pairWithProgress()
-        for ((chunk, progress) in chunks) {
-            sendOtaPacket(stmOtaMessageChannel, chunk)
-            emit(progress)
-        }
-        sendGoCommandAndAddress(stmOtaMessageChannel)
+        val chunks = createFirmwareChunks(firmwareBinFile)
+        emitAll(
+            chunks
+                .pairWithProgress()
+                .asFlow()
+                .map { (chunk, progress) ->
+                    sendOtaPacket(stmOtaMessageChannel, chunk)
+                    progress
+                }.onCompletion { sendGoCommandAndAddress(stmOtaMessageChannel) },
+        )
     }
 
     private fun List<FirmwareByteChunk>.pairWithProgress() = mapIndexed { index, chunk ->

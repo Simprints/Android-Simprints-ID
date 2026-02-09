@@ -13,7 +13,11 @@ import com.simprints.fingerprint.infra.scanner.v2.tools.crc.Crc32Calculator
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.chunked
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.pairWithProgress
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
 import java.util.UUID
 import javax.inject.Inject
 
@@ -26,11 +30,16 @@ class Un20OtaController @Inject constructor(
     ): Flow<Float> = flow {
         startOta(mainMessageChannel)
         val chunks = firmwareBinFile.chunked(MAX_UN20_OTA_CHUNK_SIZE).pairWithProgress()
-        for ((chunk, progress) in chunks) {
-            writeOtaChunk(mainMessageChannel, chunk)
-            emit(progress)
-        }
-        verifyOta(mainMessageChannel, crc32Calculator.calculateCrc32(firmwareBinFile))
+        emitAll(
+            chunks
+                .asFlow()
+                .map { (chunk, progress) ->
+                    writeOtaChunk(mainMessageChannel, chunk)
+                    progress
+                }.onCompletion {
+                    verifyOta(mainMessageChannel, crc32Calculator.calculateCrc32(firmwareBinFile))
+                },
+        )
     }
 
     private suspend fun startOta(mainMessageChannel: MainMessageChannel) = mainMessageChannel

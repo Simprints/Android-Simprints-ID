@@ -21,6 +21,7 @@ import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
@@ -64,6 +65,22 @@ class CypressOtaControllerTest {
 
         verify { crc32Calculator.calculateCrc32(any()) }
         coVerify(exactly = expectedNumberOfCalls) { messageStreamMock.outgoing.sendMessage(any()) }
+    }
+
+    @Test
+    fun program_whenCollectionStopsEarly_stillSendsVerifyCommand() = runTest {
+        val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
+        val messageStreamMock = configureMessageStreamMock()
+
+        cypressOtaController
+            .program(
+                messageStreamMock,
+                generateRandomBinFile(),
+            ).take(1)
+            .toList()
+
+        // prepare, download, first chunk, verify
+        coVerify(exactly = 4) { messageStreamMock.outgoing.sendMessage(any()) }
     }
 
     @Test(expected = OtaFailedException::class)

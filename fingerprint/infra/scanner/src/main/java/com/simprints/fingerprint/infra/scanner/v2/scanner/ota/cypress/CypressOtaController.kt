@@ -13,7 +13,11 @@ import com.simprints.fingerprint.infra.scanner.v2.tools.crc.Crc32Calculator
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.chunked
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.pairWithProgress
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
 import javax.inject.Inject
 
 /**
@@ -31,14 +35,19 @@ class CypressOtaController @Inject constructor(
         sendPrepareDownloadCommand(cypressOtaMessageChannel)
         sendDownloadCommand(cypressOtaMessageChannel, firmwareBinFile.size)
         val chunks = createFirmwareChunks(firmwareBinFile).pairWithProgress()
-        for ((chunk, progress) in chunks) {
-            sendImageChunk(cypressOtaMessageChannel, chunk)
-            emit(progress)
-        }
-        // verify OTA is OK
-        sendVerifyImageCommand(
-            cypressOtaMessageChannel,
-            crc32Calculator.calculateCrc32(firmwareBinFile),
+        emitAll(
+            chunks
+                .asFlow()
+                .map { (chunk, progress) ->
+                    sendImageChunk(cypressOtaMessageChannel, chunk)
+                    progress
+                }.onCompletion {
+                    // verify OTA is OK
+                    sendVerifyImageCommand(
+                        cypressOtaMessageChannel,
+                        crc32Calculator.calculateCrc32(firmwareBinFile),
+                    )
+                },
         )
     }
 

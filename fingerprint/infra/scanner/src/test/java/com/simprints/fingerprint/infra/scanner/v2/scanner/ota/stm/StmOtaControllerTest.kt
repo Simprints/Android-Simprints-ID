@@ -15,6 +15,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
@@ -47,6 +48,22 @@ class StmOtaControllerTest {
         val stmOtaController = StmOtaController()
         stmOtaController.program(messageStreamMock, firmwareBin).toList()
         coVerify(exactly = expectedNumberOfCalls) { messageStreamMock.outgoing.sendMessage(any()) }
+    }
+
+    @Test
+    fun program_whenCollectionStopsEarly_stillSendsGoCommands() = runTest {
+        val stmOtaController = StmOtaController()
+        val messageStreamMock = configureMessageStreamMock()
+
+        stmOtaController
+            .program(
+                messageStreamMock,
+                generateRandomBinFile(),
+            ).take(1)
+            .toList()
+
+        // init + erase(2) + first chunk(3) + go + go address
+        coVerify(exactly = 8) { messageStreamMock.outgoing.sendMessage(any()) }
     }
 
     @Test(expected = OtaFailedException::class)
