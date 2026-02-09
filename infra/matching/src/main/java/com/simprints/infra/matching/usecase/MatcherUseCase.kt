@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 interface MatcherUseCase {
     val crashReportTag: LoggingConstants.CrashReportTag
 
-    suspend operator fun invoke(
+    operator fun invoke(
         matchParams: MatchParams,
         project: Project,
     ): Flow<MatcherState>

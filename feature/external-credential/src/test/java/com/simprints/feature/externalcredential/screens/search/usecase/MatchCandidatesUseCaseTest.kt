@@ -123,8 +123,8 @@ internal class MatchCandidatesUseCaseTest {
         every { projectConfig.getModalitySdkConfig(ModalitySdkType.SECUGEN_SIM_MATCHER) } returns fingerprintSdkConfig
         every { fingerprintSdkConfig.verificationMatchThreshold } returns verificationMatchThreshold
         every { matcherSuccess.comparisonResults } returns listOf(matchResultItem)
-        coEvery { faceMatcher(matchParams, project) } returns flowOf(matcherSuccess)
-        coEvery { fingerprintMatcher(matchParams, project) } returns flowOf(matcherSuccess)
+        every { faceMatcher(matchParams, project) } returns flowOf(matcherSuccess)
+        every { fingerprintMatcher(matchParams, project) } returns flowOf(matcherSuccess)
     }
 
     private fun initMatchParams(isFace: Boolean) {

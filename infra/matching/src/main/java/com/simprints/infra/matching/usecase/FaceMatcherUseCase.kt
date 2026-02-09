@@ -34,7 +34,7 @@ class FaceMatcherUseCase @Inject constructor(
 ) : MatcherUseCase {
     override val crashReportTag = LoggingConstants.CrashReportTag.FACE_MATCHING
 
-    override suspend operator fun invoke(
+    override operator fun invoke(
         matchParams: MatchParams,
         project: Project,
     ): Flow<MatcherState> = channelFlow {
