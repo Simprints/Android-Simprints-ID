@@ -185,10 +185,7 @@ class SyncInfoViewModelTest {
             counterRecordsToDownload = "0",
             isCounterImagesToUploadVisible = false,
             counterImagesToUpload = "0",
-            isInstructionDefaultVisible = true,
-            isInstructionNoModulesVisible = false,
-            isInstructionOfflineVisible = false,
-            isInstructionErrorVisible = false,
+            recordSyncVisibleState = RecordSyncVisibleState.ON_STANDBY,
             instructionPopupErrorInfo = SyncInfoError(
                 isBackendMaintenance = false,
                 backendMaintenanceEstimatedOutage = -1,

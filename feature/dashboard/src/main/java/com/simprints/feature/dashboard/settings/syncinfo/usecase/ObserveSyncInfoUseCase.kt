@@ -6,6 +6,7 @@ import com.simprints.core.tools.extentions.onChange
 import com.simprints.core.tools.time.Ticker
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.feature.dashboard.settings.syncinfo.RecordSyncVisibleState
 import com.simprints.feature.dashboard.settings.syncinfo.SyncInfo
 import com.simprints.feature.dashboard.settings.syncinfo.SyncInfoError
 import com.simprints.feature.dashboard.settings.syncinfo.SyncInfoProgress
@@ -152,13 +153,14 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             eventSyncState.isSyncFailed() && !eventSyncState.isSyncFailedBecauseCommCarePermissionIsMissing()
 
         // an intermediate calculation of sync state shown in UI - not to be confused with the data layer-specific EventSyncState
-        val eventSyncVisibleState = when {
-            isEventSyncInProgress -> InProgress
-            isCommCareSyncBlockedByDeniedPermission -> CommCareError
-            isModuleSelectionRequired -> NoModulesError
-            isEventSyncConnectionBlocked -> OfflineError
-            isSyncFailedForNonCommCareReason -> Error
-            else -> OnStandby
+        val recordSyncVisibleState = when {
+            isEventSyncInProgress -> RecordSyncVisibleState.IN_PROGRESS
+            isCommCareSyncBlockedByDeniedPermission -> RecordSyncVisibleState.COMM_CARE_ERROR
+            isModuleSelectionRequired -> RecordSyncVisibleState.NO_MODULES_ERROR
+            isEventSyncConnectionBlocked -> RecordSyncVisibleState.OFFLINE_ERROR
+            isSyncFailedForNonCommCareReason -> RecordSyncVisibleState.ERROR
+            isPreLogoutUpSync -> RecordSyncVisibleState.NOTHING
+            else -> RecordSyncVisibleState.ON_STANDBY
         }
 
         val isEventUpSyncPossible = isOnline && projectConfig.canSyncDataToSimprints()
@@ -172,7 +174,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
                         )
                 )
         val isSyncButtonEnabled = ((!isPreLogoutUpSync && isDownSyncPossible) || isEventUpSyncPossible) &&
-            (eventSyncVisibleState == OnStandby || eventSyncVisibleState == Error)
+            (recordSyncVisibleState == RecordSyncVisibleState.ON_STANDBY || recordSyncVisibleState == RecordSyncVisibleState.ERROR)
 
         val recordsTotal = when {
             isEventSyncInProgress || projectId.isBlank() -> null
@@ -202,17 +204,13 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             counterRecordsToDownload = recordsToDownload,
             isCounterImagesToUploadVisible = isPreLogoutUpSync,
             counterImagesToUpload = imagesToUpload?.toString().orEmpty(),
-            isInstructionDefaultVisible = eventSyncVisibleState == OnStandby && !isPreLogoutUpSync,
-            isInstructionCommCarePermissionVisible = eventSyncVisibleState == CommCareError,
-            isInstructionNoModulesVisible = eventSyncVisibleState == NoModulesError,
-            isInstructionOfflineVisible = eventSyncVisibleState == OfflineError,
-            isInstructionErrorVisible = eventSyncVisibleState == Error,
+            recordSyncVisibleState = recordSyncVisibleState,
             instructionPopupErrorInfo = SyncInfoError(
                 isBackendMaintenance = eventSyncState.isSyncFailedBecauseBackendMaintenance(),
                 backendMaintenanceEstimatedOutage = eventSyncState.getEstimatedBackendMaintenanceOutage() ?: -1,
                 isTooManyRequests = eventSyncState.isSyncFailedBecauseTooManyRequests(),
             ),
-            isProgressVisible = eventSyncVisibleState == InProgress,
+            isProgressVisible = recordSyncVisibleState == RecordSyncVisibleState.IN_PROGRESS,
             progress = eventSyncProgress,
             isSyncButtonVisible = !isPreLogoutUpSync || eventSyncState.isSyncFailed(),
             isSyncButtonEnabled = isSyncButtonEnabled,
@@ -280,22 +278,3 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         private const val SYNC_COMPLETION_HOLD_MILLIS = 1000L
     }
 }
-
-/**
- * A representation of a non-overlapping, exhaustive "sync state" as shown in UI.
- * To be used in a temporary UI state calculation: good to be used with exhaustive pattern matching.
- * Not to be confused with the data layer-specific EventSyncState.
- */
-private sealed class EventSyncVisibleState
-
-private object OnStandby : EventSyncVisibleState()
-
-private object InProgress : EventSyncVisibleState()
-
-private object CommCareError : EventSyncVisibleState()
-
-private object NoModulesError : EventSyncVisibleState()
-
-private object OfflineError : EventSyncVisibleState()
-
-private object Error : EventSyncVisibleState()

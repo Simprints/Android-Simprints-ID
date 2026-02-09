@@ -229,11 +229,12 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         binding.comboImagesToUploadProgress.isGone = records.counterImagesToUpload.isNotBlank()
 
         // Instructions
-        binding.textEventSyncInstructionsDefault.isGone = !records.isInstructionDefaultVisible
-        binding.textEventSyncInstructionsCommCarePermission.isGone = !records.isInstructionCommCarePermissionVisible
-        binding.textEventSyncInstructionsOffline.isGone = !records.isInstructionOfflineVisible
-        binding.textEventSyncInstructionsNoModules.isGone = !records.isInstructionNoModulesVisible
-        binding.textEventSyncInstructionsError.isGone = !records.isInstructionErrorVisible
+        binding.textEventSyncInstructionsDefault.isGone = records.recordSyncVisibleState != RecordSyncVisibleState.ON_STANDBY
+        binding.textEventSyncInstructionsCommCarePermission.isGone =
+            records.recordSyncVisibleState != RecordSyncVisibleState.COMM_CARE_ERROR
+        binding.textEventSyncInstructionsOffline.isGone = records.recordSyncVisibleState != RecordSyncVisibleState.OFFLINE_ERROR
+        binding.textEventSyncInstructionsNoModules.isGone = records.recordSyncVisibleState != RecordSyncVisibleState.NO_MODULES_ERROR
+        binding.textEventSyncInstructionsError.isGone = records.recordSyncVisibleState != RecordSyncVisibleState.ERROR
         records.instructionPopupErrorInfo.configureErrorPopup()
 
         // Progress

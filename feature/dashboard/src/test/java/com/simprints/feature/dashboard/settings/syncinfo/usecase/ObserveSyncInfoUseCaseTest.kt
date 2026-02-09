@@ -7,6 +7,7 @@ import com.simprints.core.lifecycle.AppForegroundStateTracker
 import com.simprints.core.tools.time.Ticker
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.feature.dashboard.settings.syncinfo.RecordSyncVisibleState
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
@@ -261,9 +262,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
         val result = useCase().first()
 
-        assertThat(result.syncInfoSectionRecords.isInstructionOfflineVisible).isTrue()
-        assertThat(result.syncInfoSectionRecords.isInstructionErrorVisible).isFalse()
-        assertThat(result.syncInfoSectionRecords.isInstructionDefaultVisible).isFalse()
+        assertThat(result.syncInfoSectionRecords.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.OFFLINE_ERROR)
     }
 
     @Test
@@ -711,7 +710,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
         val offlineResult = useCase().first()
 
-        assertThat(offlineResult.syncInfoSectionRecords.isInstructionOfflineVisible).isTrue()
+        assertThat(offlineResult.syncInfoSectionRecords.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.OFFLINE_ERROR)
         assertThat(offlineResult.syncInfoSectionRecords.isSyncButtonEnabled).isFalse()
         assertThat(offlineResult.syncInfoSectionImages.isSyncButtonEnabled).isFalse()
 
@@ -719,7 +718,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
         val onlineResult = useCase().first()
 
-        assertThat(onlineResult.syncInfoSectionRecords.isInstructionOfflineVisible).isFalse()
+        assertThat(onlineResult.syncInfoSectionRecords.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.ON_STANDBY)
         assertThat(onlineResult.syncInfoSectionRecords.isSyncButtonEnabled).isTrue()
         assertThat(onlineResult.syncInfoSectionImages.isSyncButtonEnabled).isTrue()
     }
@@ -734,13 +733,13 @@ internal class ObserveSyncInfoUseCaseTest {
 
         val offlineResult = useCase().first()
 
-        assertThat(offlineResult.syncInfoSectionRecords.isInstructionOfflineVisible).isTrue()
+        assertThat(offlineResult.syncInfoSectionRecords.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.OFFLINE_ERROR)
 
         connectivityFlow.value = true // changed to online
 
         val onlineResult = useCase().first()
 
-        assertThat(onlineResult.syncInfoSectionRecords.isInstructionOfflineVisible).isFalse()
+        assertThat(onlineResult.syncInfoSectionRecords.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.ON_STANDBY)
     }
 
     @Test
@@ -933,12 +932,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
         val result = useCase().first()
 
-        assertThat(result.syncInfoSectionRecords.isInstructionCommCarePermissionVisible).isTrue()
-        assertThat(result.syncInfoSectionRecords.isInstructionDefaultVisible).isFalse()
-        assertThat(result.syncInfoSectionRecords.isInstructionOfflineVisible).isFalse()
-        assertThat(result.syncInfoSectionRecords.isInstructionErrorVisible).isFalse()
-        assertThat(result.syncInfoSectionRecords.isInstructionNoModulesVisible).isFalse()
-        assertThat(result.syncInfoSectionRecords.isInstructionDefaultVisible).isFalse()
+        assertThat(result.syncInfoSectionRecords.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.COMM_CARE_ERROR)
     }
 
     @Test
@@ -954,8 +948,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
         val result = useCase().first()
 
-        assertThat(result.syncInfoSectionRecords.isInstructionCommCarePermissionVisible).isFalse()
-        assertThat(result.syncInfoSectionRecords.isInstructionDefaultVisible).isTrue()
+        assertThat(result.syncInfoSectionRecords.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.ON_STANDBY)
     }
 
     @Test
@@ -964,7 +957,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
         val result = useCase(isPreLogoutUpSync = true).first()
 
-        assertThat(result.syncInfoSectionRecords.isInstructionDefaultVisible).isFalse()
+        assertThat(result.syncInfoSectionRecords.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.NOTHING)
     }
 
     @Test
@@ -973,7 +966,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
         val result = useCase().first()
 
-        assertThat(result.syncInfoSectionRecords.isInstructionDefaultVisible).isTrue()
+        assertThat(result.syncInfoSectionRecords.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.ON_STANDBY)
     }
 
     @Test
@@ -1185,9 +1178,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
         val result = useCase().first()
 
-        assertThat(result.syncInfoSectionRecords.isInstructionOfflineVisible).isTrue()
-        assertThat(result.syncInfoSectionRecords.isInstructionDefaultVisible).isFalse()
-        assertThat(result.syncInfoSectionRecords.isInstructionErrorVisible).isFalse()
+        assertThat(result.syncInfoSectionRecords.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.OFFLINE_ERROR)
         assertThat(result.syncInfoSectionImages.isInstructionOfflineVisible).isTrue()
         assertThat(result.syncInfoSectionImages.isInstructionDefaultVisible).isFalse()
     }
@@ -1204,9 +1195,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
         val result = useCase().first()
 
-        assertThat(result.syncInfoSectionRecords.isInstructionErrorVisible).isTrue()
-        assertThat(result.syncInfoSectionRecords.isInstructionDefaultVisible).isFalse()
-        assertThat(result.syncInfoSectionRecords.isInstructionOfflineVisible).isFalse()
+        assertThat(result.syncInfoSectionRecords.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.ERROR)
     }
 
     @Test
@@ -1233,10 +1222,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
         val result = useCase().first()
 
-        assertThat(result.syncInfoSectionRecords.isInstructionNoModulesVisible).isTrue()
-        assertThat(result.syncInfoSectionRecords.isInstructionDefaultVisible).isFalse()
-        assertThat(result.syncInfoSectionRecords.isInstructionOfflineVisible).isFalse()
-        assertThat(result.syncInfoSectionRecords.isInstructionErrorVisible).isFalse()
+        assertThat(result.syncInfoSectionRecords.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.NO_MODULES_ERROR)
     }
 
     @Test
@@ -1251,10 +1237,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
         val result = useCase().first()
 
-        assertThat(result.syncInfoSectionRecords.isInstructionDefaultVisible).isTrue()
-        assertThat(result.syncInfoSectionRecords.isInstructionOfflineVisible).isFalse()
-        assertThat(result.syncInfoSectionRecords.isInstructionErrorVisible).isFalse()
-        assertThat(result.syncInfoSectionRecords.isInstructionNoModulesVisible).isFalse()
+        assertThat(result.syncInfoSectionRecords.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.ON_STANDBY)
         assertThat(result.syncInfoSectionImages.isInstructionDefaultVisible).isTrue()
         assertThat(result.syncInfoSectionImages.isInstructionOfflineVisible).isFalse()
     }
@@ -1271,7 +1254,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
         val failedResult = useCase().first()
 
-        assertThat(failedResult.syncInfoSectionRecords.isInstructionErrorVisible).isTrue()
+        assertThat(failedResult.syncInfoSectionRecords.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.ERROR)
         assertThat(failedResult.syncInfoSectionRecords.isSyncButtonForRetry).isTrue()
     }
 
@@ -1310,8 +1293,7 @@ internal class ObserveSyncInfoUseCaseTest {
         val result = useCase().first()
 
         assertThat(result.syncInfoSectionRecords.isSyncButtonEnabled).isTrue()
-        assertThat(result.syncInfoSectionRecords.isInstructionOfflineVisible).isFalse()
-        assertThat(result.syncInfoSectionRecords.isInstructionDefaultVisible).isTrue()
+        assertThat(result.syncInfoSectionRecords.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.ON_STANDBY)
     }
 
     @Test
@@ -1326,9 +1308,8 @@ internal class ObserveSyncInfoUseCaseTest {
 
         val result = useCase().first()
 
-        assertThat(result.syncInfoSectionRecords.isInstructionCommCarePermissionVisible).isTrue()
+        assertThat(result.syncInfoSectionRecords.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.COMM_CARE_ERROR)
         assertThat(result.syncInfoSectionRecords.isSyncButtonEnabled).isFalse()
-        assertThat(result.syncInfoSectionRecords.isInstructionDefaultVisible).isFalse()
     }
 
     @Test
@@ -1342,9 +1323,8 @@ internal class ObserveSyncInfoUseCaseTest {
 
         val result = useCase().first()
 
-        assertThat(result.syncInfoSectionRecords.isInstructionCommCarePermissionVisible).isFalse()
         assertThat(result.syncInfoSectionRecords.isSyncButtonEnabled).isTrue()
-        assertThat(result.syncInfoSectionRecords.isInstructionDefaultVisible).isTrue()
+        assertThat(result.syncInfoSectionRecords.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.ON_STANDBY)
     }
 
     private fun createConfigurationState(

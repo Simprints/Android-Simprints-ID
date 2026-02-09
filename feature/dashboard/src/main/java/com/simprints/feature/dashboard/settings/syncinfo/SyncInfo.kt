@@ -12,6 +12,16 @@ internal data class SyncInfo(
     val syncInfoSectionModules: SyncInfoSectionModules = SyncInfoSectionModules(),
 )
 
+internal enum class RecordSyncVisibleState {
+    NOTHING,
+    ON_STANDBY,
+    IN_PROGRESS,
+    COMM_CARE_ERROR,
+    NO_MODULES_ERROR,
+    OFFLINE_ERROR,
+    ERROR,
+}
+
 internal data class SyncInfoSectionRecords(
     // counters
     val counterTotalRecords: String = "",
@@ -21,11 +31,7 @@ internal data class SyncInfoSectionRecords(
     val isCounterImagesToUploadVisible: Boolean = false, // images may be combined with the records
     val counterImagesToUpload: String = "",
     // instructions
-    val isInstructionDefaultVisible: Boolean = false,
-    val isInstructionCommCarePermissionVisible: Boolean = false,
-    val isInstructionNoModulesVisible: Boolean = false,
-    val isInstructionOfflineVisible: Boolean = false,
-    val isInstructionErrorVisible: Boolean = false,
+    val recordSyncVisibleState: RecordSyncVisibleState = RecordSyncVisibleState.NOTHING,
     val instructionPopupErrorInfo: SyncInfoError = SyncInfoError(),
     // progress text & progress bar
     val isProgressVisible: Boolean = false,
