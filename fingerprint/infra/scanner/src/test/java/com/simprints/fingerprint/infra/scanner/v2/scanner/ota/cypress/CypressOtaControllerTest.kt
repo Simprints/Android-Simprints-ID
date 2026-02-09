@@ -70,19 +70,21 @@ class CypressOtaControllerTest {
     fun program_receivesErrorAtPrepareDownload_throwsException() = runTest {
         val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
 
-        cypressOtaController.program(
-            configureMessageStreamMock(errorPositions = listOf(0)),
-            generateRandomBinFile(),
-        ).toList()
+        cypressOtaController
+            .program(
+                configureMessageStreamMock(errorPositions = listOf(0)),
+                generateRandomBinFile(),
+            ).toList()
     }
 
     @Test(expected = OtaFailedException::class)
     fun program_receivesErrorAtDownload_throwsException() = runTest {
         val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
-        cypressOtaController.program(
-            configureMessageStreamMock(errorPositions = listOf(1)),
-            generateRandomBinFile(),
-        ).toList()
+        cypressOtaController
+            .program(
+                configureMessageStreamMock(errorPositions = listOf(1)),
+                generateRandomBinFile(),
+            ).toList()
     }
 
     @Test(expected = OtaFailedException::class)

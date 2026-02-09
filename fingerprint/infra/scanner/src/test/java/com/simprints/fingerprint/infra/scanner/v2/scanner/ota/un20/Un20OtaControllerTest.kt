@@ -67,10 +67,11 @@ class Un20OtaControllerTest {
     fun program_receivesErrorAtPrepareDownload_throwsException() = runTest {
         val un20OtaController = Un20OtaController(configureCrcCalculatorMock())
 
-        un20OtaController.program(
-            configureMessageStreamMock(errorPositions = listOf(0)),
-            generateRandomBinFile(),
-        ).toList()
+        un20OtaController
+            .program(
+                configureMessageStreamMock(errorPositions = listOf(0)),
+                generateRandomBinFile(),
+            ).toList()
     }
 
     @Test(expected = OtaFailedException::class)
