@@ -5,11 +5,7 @@ import co.touchlab.kermit.LoggerConfig
 import co.touchlab.kermit.Severity
 import com.google.firebase.FirebaseNetworkException
 import com.simprints.infra.logging.Simber.USER_PROPERTY_TAG
-import io.mockk.every
-import io.mockk.justRun
-import io.mockk.mockk
-import io.mockk.mockkObject
-import io.mockk.verify
+import io.mockk.*
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -101,8 +97,8 @@ class SimberTest {
         val list = getListOfSkippableExceptions().map { Throwable(cause = it) }
         list.forEach { Simber.w("test", it) }
 
-        verify(exactly = 0) { Logger.processLog(Severity.Warn, any<String>(), any<Exception>(), "test") }
-        verify(exactly = list.size) { Logger.processLog(Severity.Info, any(), any<Exception>(), "test") }
+        verify(exactly = 0) { Logger.processLog(Severity.Warn, any<String>(), any<Throwable>(), "test") }
+        verify(exactly = list.size) { Logger.processLog(Severity.Info, any(), any<Throwable>(), "test") }
     }
 
     @Test
@@ -110,8 +106,8 @@ class SimberTest {
         val list = getListOfSkippableExceptions().map { Throwable(cause = it) }
         list.forEach { Simber.e("test", it) }
 
-        verify(exactly = 0) { Logger.processLog(Severity.Error, any<String>(), any<Exception>(), "test") }
-        verify(exactly = list.size) { Logger.processLog(Severity.Info, any(), any<Exception>(), "test") }
+        verify(exactly = 0) { Logger.processLog(Severity.Error, any<String>(), any<Throwable>(), "test") }
+        verify(exactly = list.size) { Logger.processLog(Severity.Info, any(), any<Throwable>(), "test") }
     }
 
     private fun getListOfSkippableExceptions() = listOf(
