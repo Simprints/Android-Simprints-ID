@@ -11,7 +11,7 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.ExternalScope
-import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.ResetDownSyncInfoUseCase
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.sync.OneTime
@@ -29,7 +29,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class EventDownSyncResetService : Service() {
     @Inject
-    lateinit var eventSyncManager: EventSyncManager
+    lateinit var resetDownSyncInfo: ResetDownSyncInfoUseCase
 
     @Inject
     lateinit var syncOrchestrator: SyncOrchestrator
@@ -49,7 +49,7 @@ class EventDownSyncResetService : Service() {
         resetJob = externalScope.launch {
             startForegroundIfNeeded()
             // Reset current downsync state
-            eventSyncManager.resetDownSyncInfo()
+            resetDownSyncInfo()
             // Trigger a new sync
             // Execute in app scope to prevent a timeout cancellation leaving it in a stopped state
             syncOrchestrator.execute(OneTime.Events.start()).await()

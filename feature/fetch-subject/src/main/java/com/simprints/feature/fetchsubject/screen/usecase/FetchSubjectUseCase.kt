@@ -3,15 +3,15 @@ package com.simprints.feature.fetchsubject.screen.usecase
 import com.simprints.feature.fetchsubject.screen.FetchSubjectState
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
-import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.DownSyncSubjectUseCase
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.ConnectivityTracker
 import javax.inject.Inject
 
 internal class FetchSubjectUseCase @Inject constructor(
     private val connectivityTracker: ConnectivityTracker,
+    private val downSyncSubject: DownSyncSubjectUseCase,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
-    private val eventSyncManager: EventSyncManager,
 ) {
     suspend operator fun invoke(
         projectId: String,
@@ -26,7 +26,7 @@ internal class FetchSubjectUseCase @Inject constructor(
                 return FetchSubjectState.FoundLocal
             }
 
-            eventSyncManager.downSyncSubject(projectId, subjectId, metadata)
+            downSyncSubject(projectId, subjectId, metadata)
             Simber.d("Network request done", tag = TAG)
 
             val remoteSubject = loadFromDatabase(projectId, subjectId)

@@ -13,7 +13,8 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.imagesUploadRequiresUnmeteredConnection
 import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
-import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.DeleteSyncInfoUseCase
+import com.simprints.infra.eventsync.EventSyncWorkerTagRepository
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.eventsync.sync.master.EventSyncMasterWorker
@@ -50,7 +51,8 @@ internal class SyncOrchestratorImpl @Inject constructor(
     private val workManager: WorkManager,
     private val authStore: AuthStore,
     private val configRepository: ConfigRepository,
-    private val eventSyncManager: EventSyncManager,
+    private val deleteSyncInfo: DeleteSyncInfoUseCase,
+    private val eventSyncWorkerTagRepository: EventSyncWorkerTagRepository,
     private val eventSyncStateProcessor: EventSyncStateProcessor,
     private val observeImageSyncStatus: ObserveImageSyncStatusUseCase,
     private val shouldScheduleFirmwareUpdate: ShouldScheduleFirmwareUpdateUseCase,
@@ -179,7 +181,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
     }
 
     override suspend fun deleteEventSyncInfo() {
-        eventSyncManager.deleteSyncInfo()
+        deleteSyncInfo()
         workManager.pruneWork()
         imageSyncTimestampProvider.clearTimestamp()
     }
@@ -273,7 +275,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
             repeatInterval = SyncConstants.EVENT_SYNC_WORKER_INTERVAL,
             initialDelay = if (withDelay) SyncConstants.EVENT_SYNC_WORKER_INTERVAL else 0,
             constraints = getEventSyncConstraints(),
-            tags = eventSyncManager.getPeriodicWorkTags(),
+            tags = eventSyncWorkerTagRepository.getPeriodicWorkTags(),
         )
     }
 
@@ -286,7 +288,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
         workManager.startWorker<EventSyncMasterWorker>(
             workName = SyncConstants.EVENT_SYNC_WORK_NAME_ONE_TIME,
             constraints = getEventSyncConstraints(),
-            tags = eventSyncManager.getOneTimeWorkTags(),
+            tags = eventSyncWorkerTagRepository.getOneTimeWorkTags(),
             inputData = workDataOf(EventSyncMasterWorker.IS_DOWN_SYNC_ALLOWED to isDownSyncAllowed),
         )
     }
@@ -294,7 +296,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
     private fun stopEventSync() {
         workManager.cancelWorkers(SyncConstants.EVENT_SYNC_WORK_NAME_ONE_TIME)
         // Event sync consists of multiple workers, so we cancel them all by tag.
-        workManager.cancelAllWorkByTag(eventSyncManager.getAllWorkerTag())
+        workManager.cancelAllWorkByTag(eventSyncWorkerTagRepository.getAllWorkerTag())
     }
 
     private fun startImageSync() {

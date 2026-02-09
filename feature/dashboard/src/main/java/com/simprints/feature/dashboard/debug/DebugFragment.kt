@@ -17,7 +17,7 @@ import com.simprints.feature.dashboard.databinding.FragmentDebugBinding
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.ResetDownSyncInfoUseCase
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.ScheduleCommand
@@ -38,7 +38,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
     lateinit var syncOrchestrator: SyncOrchestrator
 
     @Inject
-    lateinit var eventSyncManager: EventSyncManager
+    lateinit var resetDownSyncInfo: ResetDownSyncInfoUseCase
 
     @Inject
     lateinit var authStore: AuthStore
@@ -125,7 +125,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
                 syncOrchestrator.execute(ScheduleCommand.Events.unschedule())
 
                 eventRepository.deleteAll()
-                eventSyncManager.resetDownSyncInfo()
+                resetDownSyncInfo()
                 enrolmentRecordRepository.deleteAll()
                 wm.pruneWork()
             }
