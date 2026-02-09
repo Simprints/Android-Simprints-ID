@@ -26,5 +26,4 @@ class EventSyncWorkerTagRepository @Inject internal constructor(
     )
 
     fun getAllWorkerTag(): String = TAG_SUBJECTS_SYNC_ALL_WORKERS
-
 }

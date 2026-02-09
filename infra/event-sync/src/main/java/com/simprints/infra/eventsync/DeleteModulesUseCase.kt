@@ -14,5 +14,4 @@ class DeleteModulesUseCase @Inject internal constructor(
             modes = configRepository.getProjectConfiguration().general.modalities,
         )
     }
-    
 }

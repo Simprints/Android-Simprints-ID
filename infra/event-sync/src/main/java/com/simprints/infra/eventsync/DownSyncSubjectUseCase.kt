@@ -58,5 +58,4 @@ class DownSyncSubjectUseCase @Inject internal constructor(
     }
 
     private fun getProjectModalities(projectConfiguration: ProjectConfiguration) = projectConfiguration.general.modalities
-    
 }

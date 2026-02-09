@@ -19,5 +19,4 @@ class DeleteSyncInfoUseCase @Inject internal constructor(
         eventSyncCache.clearProgresses()
         eventSyncCache.storeLastSuccessfulSyncTime(null)
     }
-    
 }

@@ -12,5 +12,4 @@ class ResetDownSyncInfoUseCase @Inject internal constructor(
         downSyncScopeRepository.deleteAll()
         commCareSyncCache.clearAllSyncedCases()
     }
-
 }
