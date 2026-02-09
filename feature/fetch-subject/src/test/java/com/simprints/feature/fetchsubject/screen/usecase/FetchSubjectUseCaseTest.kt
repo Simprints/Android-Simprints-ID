@@ -5,7 +5,7 @@ import com.simprints.feature.fetchsubject.screen.FetchSubjectState
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
-import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.DownSyncSubjectUseCase
 import com.simprints.infra.network.ConnectivityTracker
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -24,7 +24,7 @@ internal class FetchSubjectUseCaseTest {
     private lateinit var connectivityTracker: ConnectivityTracker
 
     @MockK
-    lateinit var eventSyncManager: EventSyncManager
+    lateinit var downSyncSubject: DownSyncSubjectUseCase
 
     @MockK
     lateinit var enrolmentRecord: EnrolmentRecord
@@ -35,7 +35,7 @@ internal class FetchSubjectUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        useCase = FetchSubjectUseCase(connectivityTracker, enrolmentRecordRepository, eventSyncManager)
+        useCase = FetchSubjectUseCase(connectivityTracker, downSyncSubject, enrolmentRecordRepository)
     }
 
     @Test
@@ -55,7 +55,7 @@ internal class FetchSubjectUseCaseTest {
         val metadata = "ABC"
         val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID, metadata)
 
-        coVerify(exactly = 0) { eventSyncManager.downSyncSubject(any(), any(), metadata) }
+        coVerify(exactly = 0) { downSyncSubject(any(), any(), metadata) }
         assertThat(result).isInstanceOf(FetchSubjectState.FoundLocal::class.java)
     }
 
@@ -66,7 +66,7 @@ internal class FetchSubjectUseCaseTest {
         val metadata = "ABC"
         useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID, metadata)
 
-        coVerify { eventSyncManager.downSyncSubject(any(), any(), metadata) }
+        coVerify { downSyncSubject(any(), any(), metadata) }
     }
 
     @Test
