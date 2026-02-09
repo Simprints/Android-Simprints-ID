@@ -28,7 +28,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -114,20 +116,22 @@ internal class OtaViewModel @Inject constructor(
         }
     }
 
-    private suspend fun AvailableOta.toFlowOfSteps(): Flow<OtaStep> {
+    private fun AvailableOta.toFlowOfSteps(): Flow<OtaStep> = flow {
         val otaStartedTime = timeHelper.now()
-        val targetVersions = targetVersions(this)
-
-        return when (this) {
+        val targetVersions = targetVersions(this@toFlowOfSteps)
+        val otaFlow = when (this@toFlowOfSteps) {
             AvailableOta.CYPRESS -> scannerManager.otaOperationsWrapper.performCypressOta(targetVersions)
             AvailableOta.STM -> scannerManager.otaOperationsWrapper.performStmOta(targetVersions)
             AvailableOta.UN20 -> scannerManager.otaOperationsWrapper.performUn20Ota(targetVersions)
-        }.onCompletion { error ->
-            reportFirmwareUpdate(otaStartedTime, this@toFlowOfSteps, targetVersions, error)
-            if (error != null) {
-                throw error
-            }
         }
+        emitAll(
+            otaFlow.onCompletion { error ->
+                reportFirmwareUpdate(otaStartedTime, this@toFlowOfSteps, targetVersions, error)
+                if (error != null) {
+                    throw error
+                }
+            },
+        )
     }
 
     private suspend fun handleScannerError(
