@@ -15,7 +15,6 @@ import io.mockk.CapturingSlot
 import io.mockk.coEvery
 import io.mockk.coJustRun
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.last
@@ -39,7 +38,7 @@ class CypressOtaHelperTest {
         coEvery { connectionHelperMock.reconnect(any(), any()) } answers {}
 
         coJustRun { scannerMock.enterCypressOtaMode() }
-        every { scannerMock.startCypressOta(any()) } returns OTA_PROGRESS_VALUES.asFlow()
+        coEvery { scannerMock.startCypressOta(any()) } returns OTA_PROGRESS_VALUES.asFlow()
         coEvery { scannerMock.getVersionInformation() } returns OLD_SCANNER_VERSION
         coJustRun { scannerMock.setVersionInformation(any()) }
         coEvery { scannerMock.getCypressFirmwareVersion() } returns OLD_CYPRESS_VERSION
@@ -85,7 +84,7 @@ class CypressOtaHelperTest {
                 progressValues.map { CypressOtaStep.TransferInProgress(it) }
         val error = ScannerV2OtaFailedException("oops!")
 
-        every { scannerMock.startCypressOta(any()) } returns progressValues
+        coEvery { scannerMock.startCypressOta(any()) } returns progressValues
             .asFlow()
             .onCompletion { throw error }
 

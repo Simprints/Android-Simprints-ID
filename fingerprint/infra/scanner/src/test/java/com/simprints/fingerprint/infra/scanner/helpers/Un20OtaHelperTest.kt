@@ -12,7 +12,6 @@ import io.mockk.CapturingSlot
 import io.mockk.coEvery
 import io.mockk.coJustRun
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.last
@@ -37,7 +36,7 @@ class Un20OtaHelperTest {
 
         coJustRun { scannerMock.enterMainMode() }
         coJustRun { scannerMock.turnUn20On() }
-        every { scannerMock.startUn20Ota(any()) } returns OTA_PROGRESS_VALUES.asFlow()
+        coEvery { scannerMock.startUn20Ota(any()) } returns OTA_PROGRESS_VALUES.asFlow()
         coJustRun { scannerMock.turnUn20Off() }
         coEvery { scannerMock.getVersionInformation() } returns OLD_SCANNER_INFORMATION
         coJustRun { scannerMock.setVersionInformation(any()) }
@@ -96,7 +95,7 @@ class Un20OtaHelperTest {
         progressValues.map { Un20OtaStep.TransferInProgress(it) }
         val error = ScannerV2OtaFailedException("oops!")
 
-        every { scannerMock.startUn20Ota(any()) } returns (progressValues)
+        coEvery { scannerMock.startUn20Ota(any()) } returns (progressValues)
             .asFlow()
             .onCompletion { throw error }
 

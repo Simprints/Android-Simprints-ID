@@ -15,14 +15,10 @@ import com.simprints.fingerprint.infra.scanner.v2.exceptions.ota.OtaFailedExcept
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.byteArrayOf
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.chunked
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.toByteArray
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -39,26 +35,20 @@ class StmOtaController @Inject constructor() {
     /**
      * @throws OtaFailedException if received a NACK when communicating with STM
      */
-    fun program(
+    suspend fun program(
         stmOtaMessageChannel: StmOtaMessageChannel,
         firmwareBinFile: ByteArray,
-    ): Flow<Float> = flow {
+    ): Flow<Float> {
         sendInitBootloaderCommand(stmOtaMessageChannel)
         eraseMemory(stmOtaMessageChannel)
         val chunks = createFirmwareChunks(firmwareBinFile)
-        emitAll(
-            chunks
-                .pairWithProgress()
-                .asFlow()
-                .map { (chunk, progress) ->
-                    sendOtaPacket(stmOtaMessageChannel, chunk)
-                    progress
-                }.onCompletion {
-                    withContext(NonCancellable) {
-                        sendGoCommandAndAddress(stmOtaMessageChannel)
-                    }
-                },
-        )
+        return chunks
+            .pairWithProgress()
+            .asFlow()
+            .map { (chunk, progress) ->
+                sendOtaPacket(stmOtaMessageChannel, chunk)
+                progress
+            }.onCompletion { sendGoCommandAndAddress(stmOtaMessageChannel) }
     }
 
     private fun List<FirmwareByteChunk>.pairWithProgress() = mapIndexed { index, chunk ->

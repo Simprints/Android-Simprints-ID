@@ -2,10 +2,7 @@ package com.simprints.fingerprint.infra.scanner.v2.scanner.ota.stm
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.infra.scanner.v2.channel.StmOtaMessageChannel
-import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.StmOtaCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.StmOtaResponse
-import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.commands.GoAddressCommand
-import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.commands.GoCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.responses.CommandAcknowledgement
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.ota.OtaFailedException
 import com.simprints.fingerprint.infra.scanner.v2.incoming.stmota.StmOtaMessageInputStream
@@ -17,21 +14,12 @@ import io.mockk.justRun
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.ceil
 import kotlin.math.roundToInt
@@ -59,47 +47,6 @@ class StmOtaControllerTest {
         val stmOtaController = StmOtaController()
         stmOtaController.program(messageStreamMock, firmwareBin).toList()
         coVerify(exactly = expectedNumberOfCalls) { messageStreamMock.outgoing.sendMessage(any()) }
-    }
-
-    @Test
-    fun program_whenCollectionStopsEarly_stillSendsGoCommands() = runTest {
-        val stmOtaController = StmOtaController()
-        val messageStreamMock = configureMessageStreamMock()
-
-        stmOtaController
-            .program(
-                messageStreamMock,
-                generateRandomBinFile(),
-            ).take(1)
-            .toList()
-
-        // init + erase(2) + first chunk(3) + go + go address
-        coVerify(exactly = 8) { messageStreamMock.outgoing.sendMessage(any()) }
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun program_whenCollectionStopsEarly_goAddressCompletesEvenWhenFinalSendSuspends() = runTest {
-        val stmOtaController = StmOtaController()
-        val goCommandStarted = AtomicBoolean(false)
-        val goAddressSendCompleted = AtomicBoolean(false)
-        val messageStreamMock = configureMessageStreamMockWithSuspendingGoAddress(goCommandStarted, goAddressSendCompleted)
-
-        val job = launch {
-            stmOtaController
-                .program(
-                    messageStreamMock,
-                    generateRandomBinFile(),
-                ).take(1)
-                .toList()
-        }
-        runCurrent()
-        assertThat(goCommandStarted.get()).isTrue()
-        job.cancel()
-        advanceUntilIdle()
-        job.join()
-
-        assertThat(goAddressSendCompleted.get()).isTrue()
     }
 
     @Test(expected = OtaFailedException::class)
@@ -163,51 +110,6 @@ class StmOtaControllerTest {
         )
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun TestScope.configureMessageStreamMockWithSuspendingGoAddress(
-        goCommandStarted: AtomicBoolean,
-        goAddressSendCompleted: AtomicBoolean,
-    ): StmOtaMessageChannel {
-        var readyToRead = false
-        var responseStream: Flow<StmOtaResponse> = flowOf(CommandAcknowledgement(CommandAcknowledgement.Kind.ACK))
-        val testDispatcher = StandardTestDispatcher(testScheduler)
-        val incoming = mockk<StmOtaMessageInputStream> {
-            justRun { connect(any()) }
-            every { stmOtaResponseStream } answers {
-                while (!readyToRead) {
-                    advanceTimeBy(SMALL_DELAY)
-                }
-                readyToRead = false
-                responseStream
-            }
-        }
-        val outgoing = mockk<StmOtaMessageOutputStream> {
-            coEvery { sendMessage(any()) } answers {
-                when (args[0] as StmOtaCommand) {
-                    is GoCommand -> {
-                        responseStream = flow {
-                            goCommandStarted.set(true)
-                            delay(LARGE_DELAY)
-                            emit(CommandAcknowledgement(CommandAcknowledgement.Kind.ACK))
-                        }
-                    }
-                    is GoAddressCommand -> {
-                        goAddressSendCompleted.set(true)
-                    }
-                }
-                if (args[0] !is GoCommand) {
-                    responseStream = flowOf(CommandAcknowledgement(CommandAcknowledgement.Kind.ACK))
-                }
-                readyToRead = true
-            }
-        }
-        return StmOtaMessageChannel(
-            incoming,
-            outgoing,
-            testDispatcher,
-        )
-    }
-
     companion object {
         private fun generateRandomBinFile() = Random.nextBytes(1200 + Random.nextInt(2000))
 
@@ -219,6 +121,5 @@ class StmOtaControllerTest {
         }
 
         private const val SMALL_DELAY = 1L
-        private const val LARGE_DELAY = 500L
     }
 }

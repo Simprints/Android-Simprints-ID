@@ -430,7 +430,7 @@ class Scanner @Inject constructor(
     }
 
     /** @throws OtaFailedException If a domain error occurs at any step during the OTA process */
-    fun startCypressOta(firmwareBinFile: ByteArray): Flow<Float> {
+    suspend fun startCypressOta(firmwareBinFile: ByteArray): Flow<Float> {
         assertConnected()
         assertMode(CYPRESS_OTA)
         return cypressOtaController.program(
@@ -440,7 +440,7 @@ class Scanner @Inject constructor(
     }
 
     /** @throws OtaFailedException If a domain error occurs at any step during the OTA process */
-    fun startStmOta(firmwareBinFile: ByteArray): Flow<Float> {
+    suspend fun startStmOta(firmwareBinFile: ByteArray): Flow<Float> {
         assertConnected()
         assertMode(STM_OTA)
         return stmOtaController.program(
@@ -450,7 +450,7 @@ class Scanner @Inject constructor(
     }
 
     /** @throws OtaFailedException If a domain error occurs at any step during the OTA process */
-    fun startUn20Ota(firmwareBinFile: ByteArray): Flow<Float> {
+    suspend fun startUn20Ota(firmwareBinFile: ByteArray): Flow<Float> {
         assertConnected()
         assertMode(MAIN)
         assertUn20On()

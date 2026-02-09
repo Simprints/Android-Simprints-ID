@@ -12,14 +12,10 @@ import com.simprints.fingerprint.infra.scanner.v2.exceptions.ota.OtaFailedExcept
 import com.simprints.fingerprint.infra.scanner.v2.tools.crc.Crc32Calculator
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.chunked
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.pairWithProgress
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -30,29 +26,25 @@ import javax.inject.Inject
 class CypressOtaController @Inject constructor(
     private val crc32Calculator: Crc32Calculator,
 ) {
-    fun program(
+    suspend fun program(
         cypressOtaMessageChannel: CypressOtaMessageChannel,
         firmwareBinFile: ByteArray,
-    ): Flow<Float> = flow {
+    ): Flow<Float> {
         sendPrepareDownloadCommand(cypressOtaMessageChannel)
         sendDownloadCommand(cypressOtaMessageChannel, firmwareBinFile.size)
         val chunks = createFirmwareChunks(firmwareBinFile).pairWithProgress()
-        emitAll(
-            chunks
-                .asFlow()
-                .map { (chunk, progress) ->
-                    sendImageChunk(cypressOtaMessageChannel, chunk)
-                    progress
-                }.onCompletion {
-                    withContext(NonCancellable) {
-                        // verify OTA is OK
-                        sendVerifyImageCommand(
-                            cypressOtaMessageChannel,
-                            crc32Calculator.calculateCrc32(firmwareBinFile),
-                        )
-                    }
-                },
-        )
+        return chunks
+            .asFlow()
+            .map { (chunk, progress) ->
+                sendImageChunk(cypressOtaMessageChannel, chunk)
+                progress
+            }.onCompletion {
+                // verify OTA is OK
+                sendVerifyImageCommand(
+                    cypressOtaMessageChannel,
+                    crc32Calculator.calculateCrc32(firmwareBinFile),
+                )
+            }
     }
 
     private suspend fun sendPrepareDownloadCommand(cypressOtaMessageChannel: CypressOtaMessageChannel) = cypressOtaMessageChannel

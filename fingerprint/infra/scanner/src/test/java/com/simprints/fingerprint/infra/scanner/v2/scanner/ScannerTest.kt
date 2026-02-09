@@ -390,7 +390,7 @@ class ScannerTest {
         val progressValues = listOf(0.25f, 0.50f, 0.75f, 1.00f)
 
         val mockkCypressOtaController = mockk<CypressOtaController> {
-            every {
+            coEvery {
                 program(any(), any())
             } returns progressValues.asFlow()
         }
@@ -497,7 +497,7 @@ class ScannerTest {
         val progressValues = listOf(0.25f, 0.50f, 0.75f, 1.00f)
 
         val mockkStmOtaController = mockk<StmOtaController> {
-            every {
+            coEvery {
                 program(any(), any())
             } returns progressValues.asFlow()
         }
@@ -712,12 +712,12 @@ class ScannerTest {
     @Test
     fun test_startUn20Ota() = runTest {
         val otaBinary = byteArrayOf()
-        every { un20OtaController.program(any(), otaBinary) } returns flowOf()
+        coEvery { un20OtaController.program(any(), otaBinary) } returns flowOf()
         scanner.connect(mockkInputStream, mockkOutputStream)
         scanner.enterMainMode()
         scanner.state.un20On = true
         scanner.startUn20Ota(otaBinary)
-        verify { un20OtaController.program(any(), otaBinary) }
+        coVerify { un20OtaController.program(any(), otaBinary) }
     }
 
     private fun setupMainMessageInputStreamMock(

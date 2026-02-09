@@ -5,7 +5,6 @@ import com.simprints.fingerprint.infra.scanner.v2.channel.CypressOtaMessageChann
 import com.simprints.fingerprint.infra.scanner.v2.domain.cypressota.CypressOtaCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.cypressota.CypressOtaResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.cypressota.commands.SendImageChunk
-import com.simprints.fingerprint.infra.scanner.v2.domain.cypressota.commands.VerifyImageCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.cypressota.responses.ContinueResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.cypressota.responses.ErrorResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.cypressota.responses.OkResponse
@@ -21,21 +20,12 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.ceil
 import kotlin.math.roundToInt
@@ -76,66 +66,23 @@ class CypressOtaControllerTest {
         coVerify(exactly = expectedNumberOfCalls) { messageStreamMock.outgoing.sendMessage(any()) }
     }
 
-    @Test
-    fun program_whenCollectionStopsEarly_stillSendsVerifyCommand() = runTest {
-        val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
-        val messageStreamMock = configureMessageStreamMock()
-
-        cypressOtaController
-            .program(
-                messageStreamMock,
-                generateRandomBinFile(),
-            ).take(1)
-            .toList()
-
-        // prepare, download, first chunk, verify
-        coVerify(exactly = 4) { messageStreamMock.outgoing.sendMessage(any()) }
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun program_whenCollectionStopsEarly_verifyCompletesEvenWhenFinalSendSuspends() = runTest {
-        val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
-        val verifySendStarted = AtomicBoolean(false)
-        val verifySendCompleted = AtomicBoolean(false)
-        val messageStreamMock = configureMessageStreamMockWithSuspendingVerify(verifySendStarted, verifySendCompleted)
-
-        val job = launch {
-            cypressOtaController
-                .program(
-                    messageStreamMock,
-                    generateRandomBinFile(),
-                ).take(1)
-                .toList()
-        }
-        runCurrent()
-        assertThat(verifySendStarted.get()).isTrue()
-        job.cancel()
-        advanceUntilIdle()
-        job.join()
-
-        assertThat(verifySendCompleted.get()).isTrue()
-    }
-
     @Test(expected = OtaFailedException::class)
     fun program_receivesErrorAtPrepareDownload_throwsException() = runTest {
         val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
 
-        cypressOtaController
-            .program(
-                configureMessageStreamMock(errorPositions = listOf(0)),
-                generateRandomBinFile(),
-            ).toList()
+        cypressOtaController.program(
+            configureMessageStreamMock(errorPositions = listOf(0)),
+            generateRandomBinFile(),
+        )
     }
 
     @Test(expected = OtaFailedException::class)
     fun program_receivesErrorAtDownload_throwsException() = runTest {
         val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
-        cypressOtaController
-            .program(
-                configureMessageStreamMock(errorPositions = listOf(1)),
-                generateRandomBinFile(),
-            ).toList()
+        cypressOtaController.program(
+            configureMessageStreamMock(errorPositions = listOf(1)),
+            generateRandomBinFile(),
+        )
     }
 
     @Test(expected = OtaFailedException::class)
@@ -205,49 +152,6 @@ class CypressOtaControllerTest {
         )
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun TestScope.configureMessageStreamMockWithSuspendingVerify(
-        verifySendStarted: AtomicBoolean,
-        verifySendCompleted: AtomicBoolean,
-    ): CypressOtaMessageChannel {
-        var readyToRead = false
-        var responseStream: Flow<CypressOtaResponse> = flowOf(ContinueResponse())
-        val testDispatcher = StandardTestDispatcher(testScheduler)
-        val inputStream = mockk<CypressOtaMessageInputStream> {
-            justRun { connect(any()) }
-            every { cypressOtaResponseStream } answers {
-                while (!readyToRead) {
-                    advanceTimeBy(SMALL_DELAY)
-                }
-                readyToRead = false
-                responseStream
-            }
-        }
-        val outputStream = mockk<CypressOtaMessageOutputStream> {
-            coEvery { sendMessage(any()) } answers {
-                responseStream = when (args[0] as CypressOtaCommand) {
-                    is SendImageChunk -> flowOf(ContinueResponse())
-                    is VerifyImageCommand -> {
-                        flow {
-                            verifySendStarted.set(true)
-                            delay(LARGE_DELAY)
-                            verifySendCompleted.set(true)
-                            emit(OkResponse())
-                        }
-                    }
-
-                    else -> flowOf(OkResponse())
-                }
-                readyToRead = true
-            }
-        }
-        return CypressOtaMessageChannel(
-            inputStream,
-            outputStream,
-            testDispatcher,
-        )
-    }
-
     companion object {
         private fun generateRandomBinFile() = Random.nextBytes(1200 + Random.nextInt(2000))
 
@@ -259,6 +163,5 @@ class CypressOtaControllerTest {
         }
 
         private const val SMALL_DELAY = 1L
-        private const val LARGE_DELAY = 500L
     }
 }
