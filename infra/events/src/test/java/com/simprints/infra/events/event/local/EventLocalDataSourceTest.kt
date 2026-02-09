@@ -76,7 +76,7 @@ internal class EventLocalDataSourceTest {
             .throws(SQLiteDatabaseCorruptException())
             .andThen(emptyList())
         //
-        eventLocalDataSource.loadAllEvents()
+        eventLocalDataSource.loadAllEvents().toList()
         // Then
         verify {
             eventDatabaseFactory.recreateDatabase()
@@ -92,7 +92,7 @@ internal class EventLocalDataSourceTest {
             .throws(SQLiteException("file is not a database"))
             .andThen(emptyList())
         // When
-        eventLocalDataSource.loadAllEvents()
+        eventLocalDataSource.loadAllEvents().toList()
         // Then
         verify {
             eventDatabaseFactory.recreateDatabase()
@@ -105,7 +105,7 @@ internal class EventLocalDataSourceTest {
         // Given
         coEvery { eventDao.loadAll() } throws SQLiteException()
         // When
-        assertThrows<SQLiteException> { eventLocalDataSource.loadAllEvents() }
+        assertThrows<SQLiteException> { eventLocalDataSource.loadAllEvents().toList() }
         // Then
         verify(exactly = 0) {
             eventDatabaseFactory.recreateDatabase()
@@ -118,7 +118,7 @@ internal class EventLocalDataSourceTest {
         // Given
         coEvery { eventDao.loadAll() } throws Exception()
         // When
-        assertThrows<Exception> { eventLocalDataSource.loadAllEvents() }
+        assertThrows<Exception> { eventLocalDataSource.loadAllEvents().toList() }
         // Then
         verify(exactly = 0) {
             eventDatabaseFactory.recreateDatabase()
@@ -288,7 +288,7 @@ internal class EventLocalDataSourceTest {
 
     @Test
     fun loadAll() = runTest {
-        eventLocalDataSource.loadAllEvents()
+        eventLocalDataSource.loadAllEvents().toList()
 
         coVerify { eventDao.loadAll() }
     }

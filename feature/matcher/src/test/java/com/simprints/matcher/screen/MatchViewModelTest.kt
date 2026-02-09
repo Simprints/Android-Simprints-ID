@@ -85,7 +85,7 @@ internal class MatchViewModelTest {
             ComparisonResult("1", 90f),
         )
 
-        coEvery { faceMatcherUseCase.invoke(any(), any()) } returns flow {
+        every { faceMatcherUseCase.invoke(any(), any()) } returns flow {
             emit(MatcherUseCase.MatcherState.LoadingStarted(responseItems.size))
             emit(MatcherUseCase.MatcherState.CandidateLoaded)
             emit(
@@ -163,7 +163,7 @@ internal class MatchViewModelTest {
             ),
         )
 
-        coEvery { faceMatcherUseCase.invoke(any(), any()) } returns flow {
+        every { faceMatcherUseCase.invoke(any(), any()) } returns flow {
             emit(MatcherUseCase.MatcherState.LoadingStarted(responseItems.size))
             emit(MatcherUseCase.MatcherState.CandidateLoaded)
             emit(
@@ -256,7 +256,7 @@ internal class MatchViewModelTest {
             ),
         )
 
-        coEvery { fingerprintMatcherUseCase.invoke(any(), any()) } returns flow {
+        every { fingerprintMatcherUseCase.invoke(any(), any()) } returns flow {
             emit(MatcherUseCase.MatcherState.LoadingStarted(responseItems.size))
             emit(MatcherUseCase.MatcherState.CandidateLoaded)
             emit(
@@ -329,7 +329,7 @@ internal class MatchViewModelTest {
             ComparisonResult("1", 90f),
             ComparisonResult("1", 10f),
         )
-        coEvery { faceMatcherUseCase.invoke(any(), any()) } returns flow {
+        every { faceMatcherUseCase.invoke(any(), any()) } returns flow {
             emit(MatcherUseCase.MatcherState.LoadingStarted(responseItems.size))
             emit(
                 MatcherUseCase.MatcherState.Success(
@@ -371,7 +371,7 @@ internal class MatchViewModelTest {
     @Test
     fun `setupMatch does not continue when isMatcherRunning is true`() = runTest {
         // Seting up a matcher runs in background
-        coEvery { faceMatcherUseCase.invoke(any(), any()) } returns flow {
+        every { faceMatcherUseCase.invoke(any(), any()) } returns flow {
             emit(MatcherUseCase.MatcherState.LoadingStarted(1))
             emit(MatcherUseCase.MatcherState.CandidateLoaded)
             emit(
@@ -404,7 +404,7 @@ internal class MatchViewModelTest {
         viewModel.setupMatch(matchParams)
         advanceUntilIdle()
 
-        coVerify(exactly = 1) {
+        verify(exactly = 1) {
             faceMatcherUseCase.invoke(any(), any())
         }
         // Checking that no new states were emitted. History = (NotStarted, LoadingCandidates LoadingCandidates, Finished)

@@ -313,38 +313,38 @@ internal class EventRepositoryImplTest {
     fun `should delegate all fetch`() = runTest {
         eventRepo.getAllEvents()
 
-        coVerify { eventLocalDataSource.loadAllEvents() }
+        verify { eventLocalDataSource.loadAllEvents() }
     }
 
     @Test
     fun `when observeEventCount called with null type return all events`() = runTest {
-        coEvery { eventLocalDataSource.observeEventCount() } returns flowOf(7)
+        every { eventLocalDataSource.observeEventCount() } returns flowOf(7)
 
         assertThat(eventRepo.observeEventCount(null).firstOrNull()).isEqualTo(7)
 
-        coVerify(exactly = 1) { eventLocalDataSource.observeEventCount() }
-        coVerify(exactly = 0) { eventLocalDataSource.observeEventCount(any()) }
+        verify(exactly = 1) { eventLocalDataSource.observeEventCount() }
+        verify(exactly = 0) { eventLocalDataSource.observeEventCount(any()) }
     }
 
     @Test
     fun `when observeEventCount called with type return events of type`() = runTest {
-        coEvery { eventLocalDataSource.observeEventCount(any()) } returns flowOf(7)
+        every { eventLocalDataSource.observeEventCount(any()) } returns flowOf(7)
 
         assertThat(
             eventRepo.observeEventCount(EventType.CALLBACK_ENROLMENT).firstOrNull(),
         ).isEqualTo(7)
 
-        coVerify(exactly = 0) { eventLocalDataSource.observeEventCount() }
-        coVerify(exactly = 1) { eventLocalDataSource.observeEventCount(any()) }
+        verify(exactly = 0) { eventLocalDataSource.observeEventCount() }
+        verify(exactly = 1) { eventLocalDataSource.observeEventCount(any()) }
     }
 
     @Test
     fun `should delegate observeEventCountInClosedScopes calls`() = runTest {
-        coEvery { eventLocalDataSource.observeEventCountInClosedScopes() } returns flowOf(7)
+        every { eventLocalDataSource.observeEventCountInClosedScopes() } returns flowOf(7)
 
         assertThat(eventRepo.observeEventCountInClosedScopes().firstOrNull()).isEqualTo(7)
 
-        coVerify { eventLocalDataSource.observeEventCountInClosedScopes() }
+        verify { eventLocalDataSource.observeEventCountInClosedScopes() }
     }
 
     @Test

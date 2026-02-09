@@ -58,9 +58,9 @@ class ObserveSyncableCountsUseCaseTest {
         every { eventDownSyncCount.invoke() } returns recordEventsToDownloadCountFlow
         every { countEnrolmentRecords.invoke() } returns totalRecordsCountFlow
         every { countSamplesToUpload.invoke() } returns samplesToUploadCountFlow
-        coEvery { eventRepository.observeEventCount(null) } returns eventsToUploadCountFlow
-        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns enrolmentsToUploadCountFlowV2
-        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns enrolmentsToUploadCountFlowV4
+        every { eventRepository.observeEventCount(null) } returns eventsToUploadCountFlow
+        every { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns enrolmentsToUploadCountFlowV2
+        every { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns enrolmentsToUploadCountFlowV4
         val useCase =
             ObserveSyncableCountsUseCase(
                 countEnrolmentRecords,
@@ -114,9 +114,9 @@ class ObserveSyncableCountsUseCaseTest {
         every { eventDownSyncCount.invoke() } returns recordEventsToDownloadCountFlow
         every { countEnrolmentRecords.invoke() } returns totalRecordsCountFlow
         every { countSamplesToUpload.invoke() } returns samplesToUploadCountFlow
-        coEvery { eventRepository.observeEventCount(null) } returns eventsToUploadCountFlow
-        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns enrolmentsToUploadCountFlowV2
-        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns enrolmentsToUploadCountFlowV4
+        every { eventRepository.observeEventCount(null) } returns eventsToUploadCountFlow
+        every { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns enrolmentsToUploadCountFlowV2
+        every { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns enrolmentsToUploadCountFlowV4
         val useCase =
             ObserveSyncableCountsUseCase(
                 countEnrolmentRecords,
@@ -137,9 +137,9 @@ class ObserveSyncableCountsUseCaseTest {
         verify(exactly = 1) { eventDownSyncCount() }
         verify(exactly = 1) { countEnrolmentRecords() }
         verify(exactly = 1) { countSamplesToUpload() }
-        coVerify(exactly = 1) { eventRepository.observeEventCount(null) }
-        coVerify(exactly = 1) { eventRepository.observeEventCount(EventType.ENROLMENT_V2) }
-        coVerify(exactly = 1) { eventRepository.observeEventCount(EventType.ENROLMENT_V4) }
+        verify(exactly = 1) { eventRepository.observeEventCount(null) }
+        verify(exactly = 1) { eventRepository.observeEventCount(EventType.ENROLMENT_V2) }
+        verify(exactly = 1) { eventRepository.observeEventCount(EventType.ENROLMENT_V4) }
         collectJob.cancel()
     }
 
@@ -159,9 +159,9 @@ class ObserveSyncableCountsUseCaseTest {
         every { eventDownSyncCount.invoke() } returns recordEventsToDownloadCountFlow
         every { countEnrolmentRecords.invoke() } returns totalRecordsCountFlow
         every { countSamplesToUpload.invoke() } returns samplesToUploadCountFlow
-        coEvery { eventRepository.observeEventCount(null) } returns eventsToUploadCountFlow
-        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns enrolmentsToUploadCountFlowV2
-        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns enrolmentsToUploadCountFlowV4
+        every { eventRepository.observeEventCount(null) } returns eventsToUploadCountFlow
+        every { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns enrolmentsToUploadCountFlowV2
+        every { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns enrolmentsToUploadCountFlowV4
         val useCase =
             ObserveSyncableCountsUseCase(
                 countEnrolmentRecords,
@@ -208,9 +208,9 @@ class ObserveSyncableCountsUseCaseTest {
         val countSamplesToUpload = io.mockk.mockk<ObserveSamplesToUploadCountUseCase>()
         every { countEnrolmentRecords.invoke() } returns totalRecordsCountFlow
         every { countSamplesToUpload.invoke() } returns samplesToUploadCountFlow
-        coEvery { eventRepository.observeEventCount(null) } returns eventsToUploadCountFlow
-        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns enrolmentsToUploadCountFlowV2
-        coEvery { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns enrolmentsToUploadCountFlowV4
+        every { eventRepository.observeEventCount(null) } returns eventsToUploadCountFlow
+        every { eventRepository.observeEventCount(EventType.ENROLMENT_V2) } returns enrolmentsToUploadCountFlowV2
+        every { eventRepository.observeEventCount(EventType.ENROLMENT_V4) } returns enrolmentsToUploadCountFlowV4
 
         val useCase =
             ObserveSyncableCountsUseCase(

@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -54,20 +56,12 @@ internal open class EventLocalDataSource @Inject constructor(
         }
     }
 
-    private suspend fun <R> useRoomFlow(
+    private fun <R> useRoomFlow(
         context: CoroutineContext,
         block: () -> Flow<R>,
-    ): Flow<R> = withContext(context) {
-        try {
-            block().catch { cause ->
-                if (isFileCorruption(cause)) {
-                    recreateDatabase(cause)
-                    // Recreate flow and re-emit values with the new file and key
-                    emitAll(block())
-                } else {
-                    throw cause
-                }
-            }
+    ): Flow<R> = flow {
+        val roomFlow = try {
+            block()
         } catch (ex: SQLiteException) {
             if (isFileCorruption(ex)) {
                 recreateDatabase(ex)
@@ -77,7 +71,18 @@ internal open class EventLocalDataSource @Inject constructor(
                 throw ex
             }
         }
-    }
+        emitAll(
+            roomFlow.catch { cause ->
+                if (isFileCorruption(cause)) {
+                    recreateDatabase(cause)
+                    // Recreate flow and re-emit values with the new file and key
+                    emitAll(block())
+                } else {
+                    throw cause
+                }
+            },
+        )
+    }.flowOn(context)
 
     private fun isFileCorruption(ex: Throwable) = ex is SQLiteDatabaseCorruptException ||
         ex.let { it as? SQLiteException }?.message?.contains("file is not a database") == true
@@ -134,20 +139,24 @@ internal open class EventLocalDataSource @Inject constructor(
         eventDao.insertOrUpdate(event.fromDomainToDb())
     }
 
-    suspend fun observeEventCount(): Flow<Int> = useRoomFlow(readingDispatcher) {
+    fun observeEventCount(): Flow<Int> = useRoomFlow(readingDispatcher) {
         eventDao.observeCount()
     }
 
-    suspend fun observeEventCount(type: EventType): Flow<Int> = useRoomFlow(readingDispatcher) {
+    fun observeEventCount(type: EventType): Flow<Int> = useRoomFlow(readingDispatcher) {
         eventDao.observeCountFromType(type = type)
     }
 
-    suspend fun observeEventCountInClosedScopes(): Flow<Int> = useRoomFlow(readingDispatcher) {
+    fun observeEventCountInClosedScopes(): Flow<Int> = useRoomFlow(readingDispatcher) {
         eventDao.observeCountInClosedScopes()
     }
 
-    suspend fun loadAllEvents(): Flow<Event> = useRoom(readingDispatcher) {
-        eventDao.loadAll().map { it.fromDbToDomain() }.asFlow()
+    fun loadAllEvents(): Flow<Event> = flow {
+        emitAll(
+            useRoom(readingDispatcher) {
+                eventDao.loadAll().map { it.fromDbToDomain() }.asFlow()
+            },
+        )
     }
 
     suspend fun loadEventJsonInScope(scopeId: String): List<String> = useRoom(readingDispatcher) {

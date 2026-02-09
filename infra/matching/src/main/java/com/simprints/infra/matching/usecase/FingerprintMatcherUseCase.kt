@@ -37,7 +37,7 @@ class FingerprintMatcherUseCase @Inject constructor(
 ) : MatcherUseCase {
     override val crashReportTag = LoggingConstants.CrashReportTag.FINGER_MATCHING
 
-    override suspend operator fun invoke(
+    override operator fun invoke(
         matchParams: MatchParams,
         project: Project,
     ): Flow<MatcherState> = channelFlow {

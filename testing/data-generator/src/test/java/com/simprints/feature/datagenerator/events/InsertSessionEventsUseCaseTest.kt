@@ -62,7 +62,7 @@ class InsertSessionEventsUseCaseTest {
         val mockDbCommands = listOf("INSERT INTO ...")
 
         // Mock initial and final event counts from the repository
-        coEvery { mockEventRepository.observeEventCount(null) } returns flowOf(initialEventCount) andThen flowOf(finalEventCount)
+        every { mockEventRepository.observeEventCount(null) } returns flowOf(initialEventCount) andThen flowOf(finalEventCount)
 
         // Mock event scope creation and closing (suspend functions)
         coEvery { mockEventRepository.createEventScope(EventScopeType.SESSION) } returns mockEventScope
