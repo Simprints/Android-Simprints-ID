@@ -23,13 +23,21 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.ceil
 import kotlin.math.roundToInt
@@ -78,6 +86,31 @@ class Un20OtaControllerTest {
 
         // start ota, first chunk, verify
         coVerify(exactly = 3) { messageStreamMock.outgoing.sendMessage(any()) }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun program_whenCollectionStopsEarly_verifyCompletesEvenWhenFinalSendSuspends() = runTest {
+        val un20OtaController = Un20OtaController(configureCrcCalculatorMock())
+        val verifySendStarted = AtomicBoolean(false)
+        val verifySendCompleted = AtomicBoolean(false)
+        val messageStreamMock = configureMessageStreamMockWithSuspendingVerify(verifySendStarted, verifySendCompleted)
+
+        val job = launch {
+            un20OtaController
+                .program(
+                    messageStreamMock,
+                    generateRandomBinFile(),
+                ).take(1)
+                .toList()
+        }
+        runCurrent()
+        assertThat(verifySendStarted.get()).isTrue()
+        job.cancel()
+        advanceUntilIdle()
+        job.join()
+
+        assertThat(verifySendCompleted.get()).isTrue()
     }
 
     @Test(expected = OtaFailedException::class)
@@ -173,6 +206,50 @@ class Un20OtaControllerTest {
         )
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun TestScope.configureMessageStreamMockWithSuspendingVerify(
+        verifySendStarted: AtomicBoolean,
+        verifySendCompleted: AtomicBoolean,
+    ): MainMessageChannel {
+        var readyToRead = false
+        var responseStream: Flow<Un20Response> = flowOf(StartOtaResponse(OperationResultCode.OK))
+        val testDispatcher = StandardTestDispatcher(testScheduler)
+        val incoming = mockk<MainMessageInputStream> {
+            justRun { connect(any()) }
+            every { un20Responses } answers {
+                while (!readyToRead) {
+                    advanceTimeBy(SMALL_DELAY)
+                }
+                readyToRead = false
+                responseStream
+            }
+        }
+        val outgoing = mockk<MainMessageOutputStream> {
+            coEvery { sendMessage(any()) } answers {
+                responseStream = when (args[0] as Un20Command) {
+                    is StartOtaCommand -> flowOf(StartOtaResponse(OperationResultCode.OK))
+                    is WriteOtaChunkCommand -> flowOf(WriteOtaChunkResponse(OperationResultCode.OK))
+                    is VerifyOtaCommand -> {
+                        flow {
+                            verifySendStarted.set(true)
+                            delay(LARGE_DELAY)
+                            verifySendCompleted.set(true)
+                            emit(VerifyOtaResponse(OperationResultCode.OK))
+                        }
+                    }
+
+                    else -> flowOf(VerifyOtaResponse(OperationResultCode.OK))
+                }
+                readyToRead = true
+            }
+        }
+        return MainMessageChannel(
+            incoming,
+            outgoing,
+            testDispatcher,
+        )
+    }
+
     companion object {
         private fun generateRandomBinFile() = Random.nextBytes(350000 + Random.nextInt(200000))
 
@@ -185,5 +262,6 @@ class Un20OtaControllerTest {
         }
 
         private const val SMALL_DELAY = 1L
+        private const val LARGE_DELAY = 500L
     }
 }
