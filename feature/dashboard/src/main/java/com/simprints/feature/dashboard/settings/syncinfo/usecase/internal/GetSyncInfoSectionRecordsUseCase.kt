@@ -25,7 +25,6 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val commCarePermissionChecker: CommCarePermissionChecker,
 ) {
-
     operator fun invoke(
         isPreLogoutUpSync: Boolean,
         isOnline: Boolean,
@@ -136,8 +135,8 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
                         (
                             !eventSyncState.isSyncFailedBecauseCommCarePermissionIsMissing() ||
                                 commCarePermissionChecker.hasCommCarePermissions()
-                            )
-                    )
+                        )
+                )
         val isSyncButtonEnabled = ((!isPreLogoutUpSync && isDownSyncPossible) || isEventUpSyncPossible) &&
             (recordSyncVisibleState == RecordSyncVisibleState.ON_STANDBY || recordSyncVisibleState == RecordSyncVisibleState.ERROR)
 
@@ -187,5 +186,4 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
         current: Int,
         total: Int,
     ): Float = if (total == 0) 0f else (current.toFloat() / total).coerceIn(0f, 1f)
-
 }

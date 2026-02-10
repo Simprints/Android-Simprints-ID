@@ -49,7 +49,13 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         syncOrchestrator.observeSyncState(),
         observeSyncableCounts(),
         observeConfigurationFlow(),
-    ) { isOnline, projectId, (eventSyncState, imageSyncStatus), syncableCounts, (isRefreshing, isProjectRunning, moduleCounts, projectConfig) ->
+    ) {
+        isOnline,
+        projectId,
+        (eventSyncState, imageSyncStatus),
+        syncableCounts,
+        (isRefreshing, isProjectRunning, moduleCounts, projectConfig),
+        ->
         val isReLoginRequired = eventSyncState.isSyncFailedBecauseReloginRequired()
         val syncInfoSectionModules = SyncInfoSectionModules(
             isSectionAvailable = projectConfig.isModuleSelectionAvailable(),

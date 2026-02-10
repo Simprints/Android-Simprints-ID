@@ -14,7 +14,6 @@ import kotlin.math.roundToInt
 internal class GetSyncInfoSectionImagesUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
 ) {
-
     operator fun invoke(
         isOnline: Boolean,
         eventSyncState: EventSyncState,
@@ -71,5 +70,4 @@ internal class GetSyncInfoSectionImagesUseCase @Inject constructor(
         current: Int,
         total: Int,
     ): Float = if (total == 0) 0f else (current.toFloat() / total).coerceIn(0f, 1f)
-
 }
