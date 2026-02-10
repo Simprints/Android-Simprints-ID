@@ -77,6 +77,7 @@ data class ExternalCredentialSelectionEvent(
 
     @Keep
     enum class SkipReason {
+        HAS_NUMBER_NO_CARD,
         DOES_NOT_HAVE_ID,
         DID_NOT_BRING_ID,
         BROUGHT_INCORRECT_ID,

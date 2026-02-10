@@ -530,6 +530,7 @@
 
     <string name="mfid_add_document_title">Add this %1$s?</string>
     <string name="mfid_skip_title">Why did you skip the %1$s scan?</string>
+    <string name="mfid_skip_reason_has_number_no_card">Has number, no %1$s (Booklet)</string>
     <string name="mfid_skip_reason_does_not_have">Does not have %1$s</string>
     <string name="mfid_skip_reason_did_not_bring">Did not bring %1$s</string>
     <string name="mfid_skip_reason_incorrect">Brought incorrect %1$s</string>
