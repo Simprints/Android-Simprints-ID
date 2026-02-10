@@ -7,7 +7,6 @@ import android.provider.Settings
 import android.view.View
 import android.view.ViewPropertyAnimator
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.core.Camera
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -20,6 +19,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -89,7 +89,6 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     private var isAnimatingCompletion: Boolean = false
     private var pendingFinishAction: (() -> Unit)? = null
     private var ocrPreProcessingJob: Job? = null
-    private var camera: Camera? = null
 
     @Inject
     lateinit var viewModelFactory: ExternalCredentialScanOcrViewModel.Factory
@@ -213,10 +212,11 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
                 imageCapture = capture
             },
             onCameraReady = { camera ->
-                this.camera = camera
-                val cameraFocusManager = cameraFocusManagerFactory.create(MULTI_FACTOR_ID)
-                cameraFocusManager.setUpFocusOnTap(binding.preview, camera)
-                cameraFocusManager.setUpAutoFocus(binding.preview, camera)
+                if (lifecycle.currentState == Lifecycle.State.RESUMED) {
+                    val cameraFocusManager = cameraFocusManagerFactory.create(MULTI_FACTOR_ID)
+                    cameraFocusManager.setUpFocusOnTap(binding.preview, camera)
+                    cameraFocusManager.setUpAutoFocus(binding.preview, camera)
+                }
             },
         )
         cameraProviderFuture.addListener(cameraListener, ContextCompat.getMainExecutor(requireContext()))
@@ -373,7 +373,6 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         if (::cameraExecutor.isInitialized) {
             cameraExecutor.shutdown()
         }
-        camera = null
     }
 
     private fun stopOcr() {
