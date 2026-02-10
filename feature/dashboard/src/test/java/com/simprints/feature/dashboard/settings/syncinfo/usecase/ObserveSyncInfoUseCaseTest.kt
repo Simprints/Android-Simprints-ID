@@ -9,6 +9,8 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.dashboard.settings.syncinfo.RecordSyncVisibleState
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
+import com.simprints.feature.dashboard.settings.syncinfo.usecase.internal.GetSyncInfoSectionImagesUseCase
+import com.simprints.feature.dashboard.settings.syncinfo.usecase.internal.GetSyncInfoSectionRecordsUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
@@ -55,6 +57,8 @@ internal class ObserveSyncInfoUseCaseTest {
     private val appForegroundStateTracker = mockk<AppForegroundStateTracker>()
     private val commCarePermissionChecker = mockk<CommCarePermissionChecker>()
     private val observeConfigurationFlow = mockk<ObserveConfigurationChangesUseCase>()
+    private val getSyncInfoSectionImages = GetSyncInfoSectionImagesUseCase(timeHelper)
+    private val getSyncInfoSectionRecords = GetSyncInfoSectionRecordsUseCase(timeHelper, commCarePermissionChecker)
 
     private val syncStatusFlow = MutableStateFlow(
         SyncStatus(eventSyncState = mockk(relaxed = true), imageSyncStatus = mockk(relaxed = true)),
@@ -165,10 +169,10 @@ internal class ObserveSyncInfoUseCaseTest {
         useCase = ObserveSyncInfoUseCase(
             connectivityTracker = connectivityTracker,
             authStore = authStore,
-            timeHelper = timeHelper,
             ticker = ticker,
             appForegroundStateTracker = appForegroundStateTracker,
-            commCarePermissionChecker = commCarePermissionChecker,
+            getSyncInfoSectionImages = getSyncInfoSectionImages,
+            getSyncInfoSectionRecords = getSyncInfoSectionRecords,
             observeConfigurationFlow = observeConfigurationFlow,
             observeSyncableCounts = observeSyncableCounts,
             syncOrchestrator = syncOrchestrator,
