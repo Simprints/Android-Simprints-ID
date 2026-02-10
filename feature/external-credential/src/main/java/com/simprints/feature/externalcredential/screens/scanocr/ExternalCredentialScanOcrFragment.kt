@@ -7,6 +7,7 @@ import android.provider.Settings
 import android.view.View
 import android.view.ViewPropertyAnimator
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.Camera
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -38,6 +39,7 @@ import com.simprints.feature.externalcredential.screens.scanocr.usecase.ProvideC
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.uibase.camera.qrscan.CameraFocusManager
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.view.fadeIn
@@ -87,6 +89,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     private var isAnimatingCompletion: Boolean = false
     private var pendingFinishAction: (() -> Unit)? = null
     private var ocrPreProcessingJob: Job? = null
+    private var camera: Camera? = null
 
     @Inject
     lateinit var viewModelFactory: ExternalCredentialScanOcrViewModel.Factory
@@ -96,6 +99,9 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
 
     @Inject
     lateinit var provideCameraListenerUseCase: ProvideCameraListenerUseCase
+
+    @Inject
+    lateinit var cameraFocusManagerFactory: CameraFocusManager.Factory
 
     @Inject
     @DispatcherBG
@@ -114,7 +120,10 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         super.onResume()
         val currentPermission = requireActivity().getCurrentPermissionStatus(CAMERA)
         when (currentPermission) {
-            PermissionStatus.Granted -> initializeFragment()
+            PermissionStatus.Granted -> {
+                initializeFragment()
+            }
+
             PermissionStatus.Denied -> {
                 // Permission dialog was already displayed, and user denied permissions. Showing rationale so to avoid constantly-appearing
                 // system dialog.
@@ -167,8 +176,13 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
                     }
                 }
 
-                ScanOcrState.NotScanning -> renderInitialState()
-                ScanOcrState.Complete -> animateCompletionState()
+                ScanOcrState.NotScanning -> {
+                    renderInitialState()
+                }
+
+                ScanOcrState.Complete -> {
+                    animateCompletionState()
+                }
             }
         }
 
@@ -197,6 +211,12 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             },
             onImageCaptureReady = { capture ->
                 imageCapture = capture
+            },
+            onCameraReady = { camera ->
+                this.camera = camera
+                val cameraFocusManager = cameraFocusManagerFactory.create(MULTI_FACTOR_ID)
+                cameraFocusManager.setUpFocusOnTap(binding.preview, camera)
+                cameraFocusManager.setUpAutoFocus(binding.preview, camera)
             },
         )
         cameraProviderFuture.addListener(cameraListener, ContextCompat.getMainExecutor(requireContext()))
@@ -353,6 +373,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         if (::cameraExecutor.isInitialized) {
             cameraExecutor.shutdown()
         }
+        camera = null
     }
 
     private fun stopOcr() {
