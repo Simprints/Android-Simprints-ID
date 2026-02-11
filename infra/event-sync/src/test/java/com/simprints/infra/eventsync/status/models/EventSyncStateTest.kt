@@ -414,6 +414,93 @@ class EventSyncStateTest {
     }
 
     @Test
+    fun `nonNegativeProgress returns zeros where progress data is missing`() {
+        assertThat(
+            createUninitializedState()
+                .nonNegativeProgress,
+        ).isEqualTo(0 to 0)
+        assertThat(
+            createUninitializedState()
+                .copy(progress = 1)
+                .nonNegativeProgress,
+        ).isEqualTo(1 to 0)
+        assertThat(
+            createUninitializedState()
+                .copy(total = 1)
+                .nonNegativeProgress,
+        ).isEqualTo(0 to 1)
+    }
+
+    @Test
+    fun `nonNegativeProgress clamps negative values`() {
+        assertThat(
+            createUninitializedState()
+                .copy(progress = -1, total = -5)
+                .nonNegativeProgress,
+        ).isEqualTo(0 to 0)
+    }
+
+    @Test
+    fun `normalizedProgressProportion is one when sync is completed`() {
+        assertThat(
+            createState(
+                up = listOf(createWorker(Succeeded)),
+                down = listOf(createWorker(Succeeded)),
+                reporters = emptyList(),
+            ).copy(progress = 1, total = 10)
+                .normalizedProgressProportion,
+        ).isEqualTo(1f)
+    }
+
+    @Test
+    fun `normalizedProgressProportion is zero when sync is not in progress`() {
+        assertThat(
+            createState(
+                up = listOf(createWorker(Enqueued)),
+                down = emptyList(),
+                reporters = emptyList(),
+            ).copy(progress = 1, total = 10)
+                .normalizedProgressProportion,
+        ).isEqualTo(0f)
+    }
+
+    @Test
+    fun `normalizedProgressProportion is one when sync is in progress and total is zero`() {
+        assertThat(
+            createState(
+                up = listOf(createWorker(Running)),
+                down = emptyList(),
+                reporters = emptyList(),
+            ).copy(progress = 1, total = 0)
+                .normalizedProgressProportion,
+        ).isEqualTo(1f)
+    }
+
+    @Test
+    fun `normalizedProgressProportion returns progress ratio clamped to one`() {
+        assertThat(
+            createState(
+                up = listOf(createWorker(Running)),
+                down = emptyList(),
+                reporters = emptyList(),
+            ).copy(progress = 15, total = 10)
+                .normalizedProgressProportion,
+        ).isEqualTo(1f)
+    }
+
+    @Test
+    fun `normalizedProgressProportion returns progress ratio`() {
+        assertThat(
+            createState(
+                up = listOf(createWorker(Running)),
+                down = emptyList(),
+                reporters = emptyList(),
+            ).copy(progress = 3, total = 10)
+                .normalizedProgressProportion,
+        ).isEqualTo(0.3f)
+    }
+
+    @Test
     fun `isUninitialized() is true when all values are blank or empty`() {
         assertThat(
             createUninitializedState()

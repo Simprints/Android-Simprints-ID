@@ -99,15 +99,16 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
 
     @Test
     fun `should calculate correct image sync progress when images syncing`() = runTest {
-        val mockSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
-            every { isSyncing } returns true
-            every { progress } returns Pair(3, 10)
-        }
+        val imageSyncStatus = ImageSyncStatus(
+            isSyncing = true,
+            progress = Pair(3, 10),
+            lastUpdateTimeMillis = null,
+        )
 
         val result = useCase(
             isOnline = true,
             eventSyncState = mockEventSyncState,
-            imageSyncStatus = mockSyncingImageStatus,
+            imageSyncStatus = imageSyncStatus,
             syncableCounts = mockSyncableCounts,
         )
 
@@ -153,15 +154,16 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
 
     @Test
     fun `should emit SyncInfo section with empty images counter when sync in progress`() = runTest {
-        val mockSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
-            every { isSyncing } returns true
-            every { progress } returns null
-        }
+        val imageSyncStatus = ImageSyncStatus(
+            isSyncing = true,
+            progress = null,
+            lastUpdateTimeMillis = null,
+        )
 
         val result = useCase(
             isOnline = true,
             eventSyncState = mockEventSyncState,
-            imageSyncStatus = mockSyncingImageStatus,
+            imageSyncStatus = imageSyncStatus,
             syncableCounts = mockSyncableCounts,
         )
 

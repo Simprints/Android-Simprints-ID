@@ -2,9 +2,9 @@ package com.simprints.feature.dashboard.settings.syncinfo.usecase.internal
 
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.feature.dashboard.settings.syncinfo.SyncInfoProgress
-import com.simprints.feature.dashboard.settings.syncinfo.SyncInfoProgressPart
 import com.simprints.feature.dashboard.settings.syncinfo.SyncInfoSectionImages
+import com.simprints.feature.dashboard.settings.syncinfo.SyncProgressInfo
+import com.simprints.feature.dashboard.settings.syncinfo.SyncProgressInfoPart
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncableCounts
@@ -20,54 +20,43 @@ internal class GetSyncInfoSectionImagesUseCase @Inject constructor(
         imageSyncStatus: ImageSyncStatus,
         syncableCounts: SyncableCounts,
     ): SyncInfoSectionImages {
-        val currentImages = imageSyncStatus.progress?.first?.coerceAtLeast(0) ?: 0
-        val totalImages = imageSyncStatus.progress?.second?.takeIf { it >= 1 } ?: 0
-
-        val imageProgressProportion = calculateProportion(currentImages, totalImages)
-
-        val imagesNormalizedProgress = if (imageSyncStatus.isSyncing && totalImages > 0) imageProgressProportion else 1f
-
-        val imagesToUpload = if (imageSyncStatus.isSyncing) {
+        val imagesToUploadOrNull = if (imageSyncStatus.isSyncing) {
             null
         } else {
             syncableCounts.samplesToUpload // internal term is sample, user-facing (within sync info) term is image
         }
-
-        val imageSyncProgressPart = SyncInfoProgressPart(
-            isPending = eventSyncState.isSyncInProgress() && !imageSyncStatus.isSyncing,
-            isDone = !eventSyncState.isSyncInProgress() && !imageSyncStatus.isSyncing && imagesToUpload == 0,
-            areNumbersVisible = imageSyncStatus.isSyncing && totalImages > 0,
-            currentNumber = currentImages,
-            totalNumber = totalImages,
-        )
-
-        val imageSyncProgress = if (imageSyncStatus.isSyncing) {
-            SyncInfoProgress(
-                progressParts = listOf(imageSyncProgressPart),
-                progressBarPercentage = (imagesNormalizedProgress * 100).roundToInt(),
-            )
-        } else {
-            SyncInfoProgress()
-        }
-
+        val progress = getImageSyncProgress(imageSyncStatus)
         val imageLastSyncTimestamp = Timestamp(imageSyncStatus.lastUpdateTimeMillis ?: -1)
-
         val isReLoginRequired = eventSyncState.isSyncFailedBecauseReloginRequired()
 
         return SyncInfoSectionImages(
-            counterImagesToUpload = imagesToUpload?.toString().orEmpty(),
+            counterImagesToUpload = imagesToUploadOrNull?.toString().orEmpty(),
             isInstructionDefaultVisible = !imageSyncStatus.isSyncing && isOnline,
             isInstructionOfflineVisible = !isOnline,
             isProgressVisible = imageSyncStatus.isSyncing,
-            progress = imageSyncProgress,
+            progress,
             isSyncButtonEnabled = isOnline && !isReLoginRequired,
             isFooterLastSyncTimeVisible = !imageSyncStatus.isSyncing && imageLastSyncTimestamp.ms >= 0,
             footerLastSyncMinutesAgo = timeHelper.readableBetweenNowAndTime(imageLastSyncTimestamp),
         )
     }
 
-    private fun calculateProportion(
-        current: Int,
-        total: Int,
-    ): Float = if (total == 0) 0f else (current.toFloat() / total).coerceIn(0f, 1f)
+    private fun getImageSyncProgress(imageSyncStatus: ImageSyncStatus): SyncProgressInfo {
+        if (!imageSyncStatus.isSyncing) {
+            return SyncProgressInfo()
+        }
+        val (currentImages, totalImages) = imageSyncStatus.nonNegativeProgress
+
+        val imageSyncProgressPart = SyncProgressInfoPart(
+            isPending = false,
+            isDone = false,
+            areNumbersVisible = totalImages > 0,
+            currentNumber = currentImages,
+            totalNumber = totalImages,
+        )
+        return SyncProgressInfo(
+            progressParts = listOf(imageSyncProgressPart), // that's the only part of progress here
+            progressBarPercentage = (imageSyncStatus.normalizedProgressProportion * 100).roundToInt(),
+        )
+    }
 }

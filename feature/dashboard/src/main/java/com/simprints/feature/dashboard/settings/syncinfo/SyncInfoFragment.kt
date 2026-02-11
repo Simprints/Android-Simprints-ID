@@ -354,7 +354,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
     }
 
     private fun renderProgress(
-        progress: SyncInfoProgress,
+        progress: SyncProgressInfo,
         progressBar: LinearProgressIndicator,
         textView: TextView,
         vararg itemNameResIDs: Int,

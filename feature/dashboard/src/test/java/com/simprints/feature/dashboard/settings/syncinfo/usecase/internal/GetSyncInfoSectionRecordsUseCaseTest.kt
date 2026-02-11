@@ -697,6 +697,8 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
         total: Int? = null,
         lastSyncTime: Timestamp? = TEST_TIMESTAMP,
     ): EventSyncState = mockk(relaxed = true) {
+        val nonNegativeProgressPair = (progress?.coerceAtLeast(0) ?: 0) to (total?.coerceAtLeast(0) ?: 0)
+
         every { isSyncCompleted() } returns syncCompleted
         every { isSyncInProgress() } returns syncInProgress
         every { isSyncConnecting() } returns syncConnecting
@@ -710,6 +712,13 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
         every { hasSyncHistory() } returns hasSyncHistory
         every { this@mockk.progress } returns progress
         every { this@mockk.total } returns total
+        every { this@mockk.nonNegativeProgress } returns nonNegativeProgressPair
+        every { this@mockk.normalizedProgressProportion } returns when {
+            syncCompleted -> 1f
+            !syncInProgress -> 0f
+            nonNegativeProgressPair.second == 0 -> 1f
+            else -> (nonNegativeProgressPair.first.toFloat() / nonNegativeProgressPair.second).coerceIn(0f, 1f)
+        }
         every { this@mockk.lastSyncTime } returns lastSyncTime
     }
 

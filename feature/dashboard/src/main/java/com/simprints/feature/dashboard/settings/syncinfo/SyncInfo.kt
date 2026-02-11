@@ -35,7 +35,7 @@ internal data class SyncInfoSectionRecords(
     val instructionPopupErrorInfo: SyncInfoError = SyncInfoError(),
     // progress text & progress bar
     val isProgressVisible: Boolean = false,
-    val progress: SyncInfoProgress = SyncInfoProgress(),
+    val progress: SyncProgressInfo = SyncProgressInfo(),
     // sync button
     val isSyncButtonVisible: Boolean = false,
     val isSyncButtonEnabled: Boolean = false,
@@ -62,7 +62,7 @@ internal data class SyncInfoSectionImages(
     val isInstructionOfflineVisible: Boolean = false,
     // progress text & progress bar
     val isProgressVisible: Boolean = false,
-    val progress: SyncInfoProgress = SyncInfoProgress(),
+    val progress: SyncProgressInfo = SyncProgressInfo(),
     // sync button
     val isSyncButtonEnabled: Boolean = false,
     // footer
@@ -70,12 +70,12 @@ internal data class SyncInfoSectionImages(
     val footerLastSyncMinutesAgo: String = "",
 )
 
-internal data class SyncInfoProgress(
-    val progressParts: List<SyncInfoProgressPart> = listOf(),
+internal data class SyncProgressInfo(
+    val progressParts: List<SyncProgressInfoPart> = listOf(),
     val progressBarPercentage: Int = 0,
 )
 
-internal data class SyncInfoProgressPart(
+internal data class SyncProgressInfoPart(
     val isPending: Boolean = true,
     val isDone: Boolean = false,
     val areNumbersVisible: Boolean = false,
