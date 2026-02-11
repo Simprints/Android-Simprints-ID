@@ -8,7 +8,6 @@ import com.simprints.infra.eventsync.event.commcare.cache.CommCareSyncDatabase
 import com.simprints.infra.eventsync.status.EventSyncStatusDatabase
 import com.simprints.infra.eventsync.status.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.infra.eventsync.status.up.local.DbEventUpSyncOperationStateDao
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,10 +21,7 @@ import javax.inject.Singleton
     ],
 )
 @InstallIn(SingletonComponent::class)
-abstract class EventSyncModule {
-    @Binds
-    internal abstract fun provideEventSyncManager(impl: EventSyncManagerImpl): EventSyncManager
-}
+abstract class EventSyncModule
 
 @Module
 @InstallIn(SingletonComponent::class)

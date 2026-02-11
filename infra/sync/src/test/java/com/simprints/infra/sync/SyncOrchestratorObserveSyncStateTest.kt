@@ -3,7 +3,8 @@ package com.simprints.infra.sync
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.DeleteSyncInfoUseCase
+import com.simprints.infra.eventsync.EventSyncWorkerTagRepository
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.sync.firmware.ShouldScheduleFirmwareUpdateUseCase
@@ -36,7 +37,10 @@ class SyncOrchestratorObserveSyncStateTest {
     private lateinit var configRepository: ConfigRepository
 
     @MockK
-    private lateinit var eventSyncManager: EventSyncManager
+    private lateinit var deleteSyncInfo: DeleteSyncInfoUseCase
+
+    @MockK
+    private lateinit var eventSyncWorkerTagRepository: EventSyncWorkerTagRepository
 
     @MockK
     private lateinit var eventSyncStateProcessor: EventSyncStateProcessor
@@ -145,7 +149,8 @@ class SyncOrchestratorObserveSyncStateTest {
         workManager = workManager,
         authStore = authStore,
         configRepository = configRepository,
-        eventSyncManager = eventSyncManager,
+        deleteSyncInfo = deleteSyncInfo,
+        eventSyncWorkerTagRepository = eventSyncWorkerTagRepository,
         eventSyncStateProcessor = eventSyncStateProcessor,
         observeImageSyncStatus = observeImageSyncStatus,
         shouldScheduleFirmwareUpdate = shouldScheduleFirmwareUpdate,

@@ -6,7 +6,8 @@ import androidx.work.WorkManager
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.DeleteSyncInfoUseCase
+import com.simprints.infra.eventsync.EventSyncWorkerTagRepository
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME_ONE_TIME
 import com.simprints.infra.sync.SyncConstants.PROJECT_SYNC_WORK_NAME_ONE_TIME
@@ -44,7 +45,10 @@ class SyncOrchestratorImplTest {
     private lateinit var configRepository: ConfigRepository
 
     @MockK
-    private lateinit var eventSyncManager: EventSyncManager
+    private lateinit var deleteSyncInfo: DeleteSyncInfoUseCase
+
+    @MockK
+    private lateinit var eventSyncWorkerTagRepository: EventSyncWorkerTagRepository
 
     @MockK
     private lateinit var eventSyncStateProcessor: EventSyncStateProcessor
@@ -129,7 +133,7 @@ class SyncOrchestratorImplTest {
     @Test
     fun `delegates sync info deletion`() = runTest {
         syncOrchestrator.deleteEventSyncInfo()
-        coVerify { eventSyncManager.deleteSyncInfo() }
+        coVerify { deleteSyncInfo() }
         verify { workManager.pruneWork() }
         verify { imageSyncTimestampProvider.clearTimestamp() }
     }
@@ -144,7 +148,8 @@ class SyncOrchestratorImplTest {
         workManager,
         authStore,
         configRepository,
-        eventSyncManager,
+        deleteSyncInfo,
+        eventSyncWorkerTagRepository,
         eventSyncStateProcessor,
         observeImageSyncStatus,
         shouldScheduleFirmwareUpdate,

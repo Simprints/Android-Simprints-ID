@@ -5,7 +5,7 @@ import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.ResetDownSyncInfoUseCase
 import com.simprints.infra.sync.ScheduleCommand
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.config.testtools.projectConfiguration
@@ -25,7 +25,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
     private lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
-    private lateinit var eventSyncManager: EventSyncManager
+    private lateinit var resetDownSyncInfo: ResetDownSyncInfoUseCase
 
     @MockK
     private lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
@@ -39,8 +39,8 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
         every { syncOrchestrator.execute(capture(scheduleCommandSlot)) } returns noopJob()
 
         useCase = ResetLocalRecordsIfConfigChangedUseCase(
-            eventSyncManager = eventSyncManager,
             enrolmentRecordRepository = enrolmentRecordRepository,
+            resetDownSyncInfo = resetDownSyncInfo,
             syncOrchestrator = syncOrchestrator,
         )
     }
@@ -70,7 +70,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
 
         verify(exactly = 0) { syncOrchestrator.execute(any<ScheduleCommand>()) }
         coVerify(exactly = 0) {
-            eventSyncManager.resetDownSyncInfo()
+            resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()
         }
     }
@@ -107,7 +107,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
         command.blockWhileUnscheduled?.invoke()
         runCurrent()
         coVerify {
-            eventSyncManager.resetDownSyncInfo()
+            resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()
         }
     }
@@ -143,7 +143,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
         command.blockWhileUnscheduled?.invoke()
         runCurrent()
         coVerify {
-            eventSyncManager.resetDownSyncInfo()
+            resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()
         }
     }
@@ -179,7 +179,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
         command.blockWhileUnscheduled?.invoke()
         runCurrent()
         coVerify {
-            eventSyncManager.resetDownSyncInfo()
+            resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()
         }
     }
@@ -215,7 +215,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
         command.blockWhileUnscheduled?.invoke()
         runCurrent()
         coVerify {
-            eventSyncManager.resetDownSyncInfo()
+            resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()
         }
     }
@@ -245,7 +245,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
 
         verify(exactly = 0) { syncOrchestrator.execute(any<ScheduleCommand>()) }
         coVerify(exactly = 0) {
-            eventSyncManager.resetDownSyncInfo()
+            resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()
         }
     }
@@ -275,7 +275,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
 
         verify(exactly = 0) { syncOrchestrator.execute(any<ScheduleCommand>()) }
         coVerify(exactly = 0) {
-            eventSyncManager.resetDownSyncInfo()
+            resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()
         }
     }
@@ -305,7 +305,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
 
         verify(exactly = 0) { syncOrchestrator.execute(any<ScheduleCommand>()) }
         coVerify(exactly = 0) {
-            eventSyncManager.resetDownSyncInfo()
+            resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()
         }
     }
@@ -335,7 +335,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
 
         verify(exactly = 0) { syncOrchestrator.execute(any<ScheduleCommand>()) }
         coVerify(exactly = 0) {
-            eventSyncManager.resetDownSyncInfo()
+            resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()
         }
     }

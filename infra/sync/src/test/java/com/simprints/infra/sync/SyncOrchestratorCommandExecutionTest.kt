@@ -8,7 +8,8 @@ import androidx.work.WorkManager
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.DeleteSyncInfoUseCase
+import com.simprints.infra.eventsync.EventSyncWorkerTagRepository
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.eventsync.sync.master.EventSyncMasterWorker
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME
@@ -50,7 +51,10 @@ class SyncOrchestratorCommandExecutionTest {
     private lateinit var configRepository: ConfigRepository
 
     @MockK
-    private lateinit var eventSyncManager: EventSyncManager
+    private lateinit var deleteSyncInfo: DeleteSyncInfoUseCase
+
+    @MockK
+    private lateinit var eventSyncWorkerTagRepository: EventSyncWorkerTagRepository
 
     @MockK
     private lateinit var eventSyncStateProcessor: EventSyncStateProcessor
@@ -155,7 +159,7 @@ class SyncOrchestratorCommandExecutionTest {
 
     @Test
     fun `unschedule cancels all necessary background workers`() = runTest {
-        every { eventSyncManager.getAllWorkerTag() } returns "syncWorkers"
+        every { eventSyncWorkerTagRepository.getAllWorkerTag() } returns "syncWorkers"
 
         orchestrator.execute(ScheduleCommand.Everything.unschedule())
 
@@ -172,7 +176,7 @@ class SyncOrchestratorCommandExecutionTest {
 
     @Test
     fun `reschedules event sync worker with correct tags`() = runTest {
-        every { eventSyncManager.getPeriodicWorkTags() } returns listOf("tag1", "tag2")
+        every { eventSyncWorkerTagRepository.getPeriodicWorkTags() } returns listOf("tag1", "tag2")
 
         orchestrator.execute(ScheduleCommand.Events.reschedule()).join()
 
@@ -187,7 +191,7 @@ class SyncOrchestratorCommandExecutionTest {
 
     @Test
     fun `reschedules event sync worker with correct delay`() = runTest {
-        every { eventSyncManager.getPeriodicWorkTags() } returns listOf("tag1", "tag2")
+        every { eventSyncWorkerTagRepository.getPeriodicWorkTags() } returns listOf("tag1", "tag2")
 
         orchestrator.execute(ScheduleCommand.Events.reschedule(withDelay = true)).join()
 
@@ -202,8 +206,8 @@ class SyncOrchestratorCommandExecutionTest {
 
     @Test
     fun `rescheduleAfter for schedule events routes to unschedule and reschedule with delay`() = runTest {
-        every { eventSyncManager.getAllWorkerTag() } returns "syncWorkers"
-        every { eventSyncManager.getPeriodicWorkTags() } returns listOf("tag1", "tag2")
+        every { eventSyncWorkerTagRepository.getAllWorkerTag() } returns "syncWorkers"
+        every { eventSyncWorkerTagRepository.getPeriodicWorkTags() } returns listOf("tag1", "tag2")
 
         orchestrator
             .execute(
@@ -227,7 +231,7 @@ class SyncOrchestratorCommandExecutionTest {
 
     @Test
     fun `unschedule events cancels correct workers`() = runTest {
-        every { eventSyncManager.getAllWorkerTag() } returns "syncWorkers"
+        every { eventSyncWorkerTagRepository.getAllWorkerTag() } returns "syncWorkers"
 
         orchestrator.execute(ScheduleCommand.Events.unschedule())
 
@@ -240,7 +244,7 @@ class SyncOrchestratorCommandExecutionTest {
 
     @Test
     fun `start one-time event sync uses correct tags`() = runTest {
-        every { eventSyncManager.getOneTimeWorkTags() } returns listOf("tag1", "tag2")
+        every { eventSyncWorkerTagRepository.getOneTimeWorkTags() } returns listOf("tag1", "tag2")
 
         orchestrator.execute(OneTime.Events.start()).join()
 
@@ -255,7 +259,7 @@ class SyncOrchestratorCommandExecutionTest {
 
     @Test
     fun `start one-time event sync uses correct input data`() = runTest {
-        every { eventSyncManager.getOneTimeWorkTags() } returns listOf("tag1", "tag2")
+        every { eventSyncWorkerTagRepository.getOneTimeWorkTags() } returns listOf("tag1", "tag2")
 
         orchestrator.execute(OneTime.Events.start(isDownSyncAllowed = false)).join()
 
@@ -272,8 +276,8 @@ class SyncOrchestratorCommandExecutionTest {
 
     @Test
     fun `restart one-time event sync routes to stop and start with expected input param`() = runTest {
-        every { eventSyncManager.getAllWorkerTag() } returns "syncWorkers"
-        every { eventSyncManager.getOneTimeWorkTags() } returns listOf("tag1", "tag2")
+        every { eventSyncWorkerTagRepository.getAllWorkerTag() } returns "syncWorkers"
+        every { eventSyncWorkerTagRepository.getOneTimeWorkTags() } returns listOf("tag1", "tag2")
 
         orchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)).join()
 
@@ -293,7 +297,7 @@ class SyncOrchestratorCommandExecutionTest {
 
     @Test
     fun `stop one-time event sync cancels correct workers`() = runTest {
-        every { eventSyncManager.getAllWorkerTag() } returns "syncWorkers"
+        every { eventSyncWorkerTagRepository.getAllWorkerTag() } returns "syncWorkers"
 
         orchestrator.execute(OneTime.Events.stop())
 
@@ -420,7 +424,8 @@ class SyncOrchestratorCommandExecutionTest {
         workManager = workManager,
         authStore = authStore,
         configRepository = configRepository,
-        eventSyncManager = eventSyncManager,
+        deleteSyncInfo = deleteSyncInfo,
+        eventSyncWorkerTagRepository = eventSyncWorkerTagRepository,
         eventSyncStateProcessor = eventSyncStateProcessor,
         observeImageSyncStatus = observeImageSyncStatus,
         shouldScheduleFirmwareUpdate = shouldScheduleFirmwareUpdate,

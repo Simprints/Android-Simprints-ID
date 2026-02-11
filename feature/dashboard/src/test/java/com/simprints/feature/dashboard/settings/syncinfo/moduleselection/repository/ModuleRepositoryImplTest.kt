@@ -9,7 +9,7 @@ import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.DeleteModulesUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -34,7 +34,7 @@ class ModuleRepositoryImplTest {
     lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
     @MockK
-    lateinit var eventSyncManager: EventSyncManager
+    lateinit var deleteModules: DeleteModulesUseCase
 
     private lateinit var repository: ModuleRepositoryImpl
 
@@ -53,8 +53,8 @@ class ModuleRepositoryImplTest {
 
         repository = ModuleRepositoryImpl(
             configRepository,
+            deleteModules,
             enrolmentRecordRepository,
-            eventSyncManager,
         )
     }
 
@@ -110,7 +110,7 @@ class ModuleRepositoryImplTest {
         repository.saveModules(modules)
 
         coVerify(exactly = 1) {
-            eventSyncManager.deleteModules(unselectedModules)
+            deleteModules(unselectedModules)
         }
     }
 

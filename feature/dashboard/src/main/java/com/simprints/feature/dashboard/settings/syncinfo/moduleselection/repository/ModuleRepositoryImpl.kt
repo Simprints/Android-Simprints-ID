@@ -4,7 +4,7 @@ import com.simprints.core.domain.tokenization.values
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
-import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.DeleteModulesUseCase
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SETTINGS
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
 import com.simprints.infra.logging.Simber
@@ -13,8 +13,8 @@ import javax.inject.Inject
 // TODO move into the event system infra module?
 internal class ModuleRepositoryImpl @Inject constructor(
     private val configRepository: ConfigRepository,
+    private val deleteModules: DeleteModulesUseCase,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
-    private val eventSyncManager: EventSyncManager,
 ) : ModuleRepository {
     override suspend fun getModules(): List<Module> = configRepository
         .getProjectConfiguration()
@@ -58,7 +58,7 @@ internal class ModuleRepositoryImpl @Inject constructor(
 
         // Delete operations for unselected modules to ensure full sync if they are reselected
         // in the future
-        eventSyncManager.deleteModules(unselectedModules.map { it.name.value })
+        deleteModules(unselectedModules.map { it.name.value })
     }
 
     private fun setCrashlyticsKeyForModules(modules: List<String>) {
