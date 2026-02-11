@@ -9,7 +9,6 @@ import com.simprints.infra.eventsync.sync.common.TAG_SCHEDULED_AT
 import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
 import javax.inject.Inject
 
-@ExcludedFromGeneratedTestCoverageReports("There is no complex logic to test")
 class EventSyncWorkerTagRepository @Inject internal constructor(
     private val timeHelper: TimeHelper,
 ) {
