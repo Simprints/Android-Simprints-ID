@@ -44,7 +44,7 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
         val counterRecordsToUpload = getRecordsToUpload(isSyncInProgress, syncableCounts)
         val counterImagesToUpload = getImagesToUpload(imageSyncStatus, syncableCounts)
 
-        val progress = getSyncProgressInfo(isSyncInProgress, isPreLogoutUpSync, eventSyncState, imageSyncStatus, counterImagesToUpload)
+        val progress = getSyncProgressInfo(isSyncInProgress, isPreLogoutUpSync, eventSyncState, imageSyncStatus, syncableCounts)
 
         val recordSyncVisibleState =
             getSyncVisibleState(isSyncInProgress, isOnline, isPreLogoutUpSync, projectConfig, moduleCounts, eventSyncState)
@@ -131,7 +131,7 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
         isPreLogoutUpSync: Boolean,
         eventSyncState: EventSyncState,
         imageSyncStatus: ImageSyncStatus,
-        imagesToUpload: String,
+        syncableCounts: SyncableCounts,
     ): SyncProgressInfo {
         if (!isSyncInProgress) {
             return SyncProgressInfo()
@@ -153,7 +153,7 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
         )
         val imageSyncProgressPart = SyncProgressInfoPart(
             isPending = eventSyncState.isSyncInProgress() && !imageSyncStatus.isSyncing,
-            isDone = !eventSyncState.isSyncInProgress() && !imageSyncStatus.isSyncing && imagesToUpload.isEmpty(),
+            isDone = !eventSyncState.isSyncInProgress() && !imageSyncStatus.isSyncing && syncableCounts.samplesToUpload == 0,
             areNumbersVisible = imageSyncStatus.isSyncing && totalImages > 0,
             currentNumber = currentImages,
             totalNumber = totalImages,
