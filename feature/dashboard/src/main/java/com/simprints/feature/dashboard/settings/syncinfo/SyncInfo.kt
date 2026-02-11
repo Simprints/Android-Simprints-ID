@@ -12,6 +12,16 @@ internal data class SyncInfo(
     val syncInfoSectionModules: SyncInfoSectionModules = SyncInfoSectionModules(),
 )
 
+internal enum class RecordSyncVisibleState {
+    NOTHING,
+    ON_STANDBY,
+    IN_PROGRESS,
+    COMM_CARE_ERROR,
+    NO_MODULES_ERROR,
+    OFFLINE_ERROR,
+    ERROR,
+}
+
 internal data class SyncInfoSectionRecords(
     // counters
     val counterTotalRecords: String = "",
@@ -21,15 +31,11 @@ internal data class SyncInfoSectionRecords(
     val isCounterImagesToUploadVisible: Boolean = false, // images may be combined with the records
     val counterImagesToUpload: String = "",
     // instructions
-    val isInstructionDefaultVisible: Boolean = false,
-    val isInstructionCommCarePermissionVisible: Boolean = false,
-    val isInstructionNoModulesVisible: Boolean = false,
-    val isInstructionOfflineVisible: Boolean = false,
-    val isInstructionErrorVisible: Boolean = false,
+    val recordSyncVisibleState: RecordSyncVisibleState = RecordSyncVisibleState.NOTHING,
     val instructionPopupErrorInfo: SyncInfoError = SyncInfoError(),
     // progress text & progress bar
     val isProgressVisible: Boolean = false,
-    val progress: SyncInfoProgress = SyncInfoProgress(),
+    val progress: SyncProgressInfo = SyncProgressInfo(),
     // sync button
     val isSyncButtonVisible: Boolean = false,
     val isSyncButtonEnabled: Boolean = false,
@@ -56,7 +62,7 @@ internal data class SyncInfoSectionImages(
     val isInstructionOfflineVisible: Boolean = false,
     // progress text & progress bar
     val isProgressVisible: Boolean = false,
-    val progress: SyncInfoProgress = SyncInfoProgress(),
+    val progress: SyncProgressInfo = SyncProgressInfo(),
     // sync button
     val isSyncButtonEnabled: Boolean = false,
     // footer
@@ -64,12 +70,12 @@ internal data class SyncInfoSectionImages(
     val footerLastSyncMinutesAgo: String = "",
 )
 
-internal data class SyncInfoProgress(
-    val progressParts: List<SyncInfoProgressPart> = listOf(),
+internal data class SyncProgressInfo(
+    val progressParts: List<SyncProgressInfoPart> = listOf(),
     val progressBarPercentage: Int = 0,
 )
 
-internal data class SyncInfoProgressPart(
+internal data class SyncProgressInfoPart(
     val isPending: Boolean = true,
     val isDone: Boolean = false,
     val areNumbersVisible: Boolean = false,

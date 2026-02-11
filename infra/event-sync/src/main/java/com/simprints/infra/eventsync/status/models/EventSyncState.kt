@@ -77,4 +77,17 @@ data class EventSyncState(
         downSyncWorkersInfo.isEmpty() &&
         reporterStates.isEmpty() &&
         lastSyncTime == null
+
+    val nonNegativeProgress: Pair<Int, Int>
+        get() = (progress?.coerceAtLeast(0) ?: 0) to (total?.coerceAtLeast(0) ?: 0)
+
+    val normalizedProgressProportion: Float
+        get() = nonNegativeProgress.let { (current, total) ->
+            when {
+                isSyncCompleted() -> 1f
+                !isSyncInProgress() -> 0f
+                total == 0 -> 1f // nothing to sync? - done
+                else -> (current.toFloat() / total).coerceIn(0f, 1f)
+            }
+        }
 }

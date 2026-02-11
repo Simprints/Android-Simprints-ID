@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -168,28 +167,26 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         syncInfo: SyncInfo,
         config: SyncInfoFragmentConfig,
     ) {
-        // note: ".isGone = not" is preferred to ".isVisible =" below for non-ambiguity of the no-show state
-
         // App toolbar
-        binding.appBarLayout.isGone = !config.isSyncInfoToolbarVisible
+        binding.appBarLayout.isVisible = config.isSyncInfoToolbarVisible
 
-        // Config loading progress bar
+        // Config loading progress bar: using `isInvisible` because the empty space should still be there if no progress bar
         binding.progressConfigRefresh.isInvisible = !syncInfo.isConfigurationLoadingProgressBarVisible
 
         // Sync info header
-        binding.syncStatusHeader.isGone = !config.isSyncInfoStatusHeaderVisible
-        binding.syncSettingsButton.isGone = !config.isSyncInfoStatusHeaderSettingsButtonVisible
+        binding.syncStatusHeader.isVisible = config.isSyncInfoStatusHeaderVisible
+        binding.syncSettingsButton.isVisible = config.isSyncInfoStatusHeaderSettingsButtonVisible
 
         // Section separators
-        binding.headerRecordSync.isGone = !config.areSyncInfoSectionHeadersVisible
-        binding.sectionDivider1.isGone = !config.areSyncInfoSectionHeadersVisible
-        binding.headerImageSync.isGone = !config.areSyncInfoSectionHeadersVisible
-        binding.sectionDivider2.isGone = !config.areSyncInfoSectionHeadersVisible
-        binding.headerModuleSelection.isGone = !config.areSyncInfoSectionHeadersVisible
-        binding.sectionFooter.isGone = config.areSyncInfoSectionHeadersVisible
+        binding.headerRecordSync.isVisible = config.areSyncInfoSectionHeadersVisible
+        binding.sectionDivider1.isVisible = config.areSyncInfoSectionHeadersVisible
+        binding.headerImageSync.isVisible = config.areSyncInfoSectionHeadersVisible
+        binding.sectionDivider2.isVisible = config.areSyncInfoSectionHeadersVisible
+        binding.headerModuleSelection.isVisible = config.areSyncInfoSectionHeadersVisible
+        binding.sectionFooter.isVisible = !config.areSyncInfoSectionHeadersVisible
 
         // Re-login section
-        binding.syncReLoginRequiredSection.isGone = !syncInfo.isLoginPromptSectionVisible
+        binding.syncReLoginRequiredSection.isVisible = syncInfo.isLoginPromptSectionVisible
 
         // Records section
         renderRecordsSection(syncInfo.syncInfoSectionRecords, config)
@@ -207,36 +204,37 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         config: SyncInfoFragmentConfig,
     ) {
         // Counter - total records
-        binding.totalRecordsCount.isGone = records.counterTotalRecords.isBlank()
+        binding.totalRecordsCount.isVisible = records.counterTotalRecords.isNotBlank()
         binding.totalRecordsCount.text = records.counterTotalRecords
-        binding.totalRecordsProgress.isGone = records.counterTotalRecords.isNotBlank()
+        binding.totalRecordsProgress.isVisible = records.counterTotalRecords.isBlank()
 
         // Counter - records to upload
-        binding.layoutRecordsToDownload.isGone = !records.isCounterRecordsToDownloadVisible
-        binding.recordsToUploadCount.isGone = records.counterRecordsToUpload.isBlank()
+        binding.layoutRecordsToDownload.isVisible = records.isCounterRecordsToDownloadVisible
+        binding.recordsToUploadCount.isVisible = records.counterRecordsToUpload.isNotBlank()
         binding.recordsToUploadCount.text = records.counterRecordsToUpload
-        binding.recordsToUploadProgress.isGone = records.counterRecordsToUpload.isNotBlank()
+        binding.recordsToUploadProgress.isVisible = records.counterRecordsToUpload.isBlank()
 
         // Counter - records to download
-        binding.recordsToDownloadCount.isGone = records.counterRecordsToDownload.isBlank()
+        binding.recordsToDownloadCount.isVisible = records.counterRecordsToDownload.isNotBlank()
         binding.recordsToDownloadCount.text = records.counterRecordsToDownload
-        binding.recordsToDownloadProgress.isGone = records.counterRecordsToDownload.isNotBlank()
+        binding.recordsToDownloadProgress.isVisible = records.counterRecordsToDownload.isBlank()
 
         // Counter - images to upload (may be combined with records)
-        binding.layoutComboImageCounter.isGone = !config.isSyncInfoRecordsImagesCombined
-        binding.comboImagesToUploadCount.isGone = records.counterImagesToUpload.isBlank()
+        binding.layoutComboImageCounter.isVisible = config.isSyncInfoRecordsImagesCombined
+        binding.comboImagesToUploadCount.isVisible = records.counterImagesToUpload.isNotBlank()
         binding.comboImagesToUploadCount.text = records.counterImagesToUpload
-        binding.comboImagesToUploadProgress.isGone = records.counterImagesToUpload.isNotBlank()
+        binding.comboImagesToUploadProgress.isVisible = records.counterImagesToUpload.isBlank()
 
         // Instructions
-        binding.textEventSyncInstructionsDefault.isGone = !records.isInstructionDefaultVisible
-        binding.textEventSyncInstructionsCommCarePermission.isGone = !records.isInstructionCommCarePermissionVisible
-        binding.textEventSyncInstructionsOffline.isGone = !records.isInstructionOfflineVisible
-        binding.textEventSyncInstructionsNoModules.isGone = !records.isInstructionNoModulesVisible
-        binding.textEventSyncInstructionsError.isGone = !records.isInstructionErrorVisible
+        binding.textEventSyncInstructionsDefault.isVisible = records.recordSyncVisibleState == RecordSyncVisibleState.ON_STANDBY
+        binding.textEventSyncInstructionsCommCarePermission.isVisible =
+            records.recordSyncVisibleState == RecordSyncVisibleState.COMM_CARE_ERROR
+        binding.textEventSyncInstructionsOffline.isVisible = records.recordSyncVisibleState == RecordSyncVisibleState.OFFLINE_ERROR
+        binding.textEventSyncInstructionsNoModules.isVisible = records.recordSyncVisibleState == RecordSyncVisibleState.NO_MODULES_ERROR
+        binding.textEventSyncInstructionsError.isVisible = records.recordSyncVisibleState == RecordSyncVisibleState.ERROR
         records.instructionPopupErrorInfo.configureErrorPopup()
 
-        // Progress
+        // Progress: using `isInvisible` because the empty space should still be there if no progress bar
         binding.layoutEventSyncProgress.isInvisible = !records.isProgressVisible
         renderProgress(
             records.progress,
@@ -249,7 +247,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
         // Sync button
         val isSyncButtonVisible = !config.isSyncInfoLogoutOnComplete || records.isSyncButtonVisible
-        binding.buttonSyncRecordsNow.isGone = !isSyncButtonVisible
+        binding.buttonSyncRecordsNow.isVisible = isSyncButtonVisible
         binding.buttonSyncRecordsNow.isEnabled = records.isSyncButtonEnabled
         binding.buttonSyncRecordsNow.text = getString(
             when {
@@ -261,10 +259,10 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
         // Footer
         val isFooterSyncInProgressVisible = config.isSyncInfoLogoutOnComplete && records.isFooterSyncInProgressVisible
-        binding.textFooterRecordSyncInProgress.isGone = !isFooterSyncInProgressVisible
-        binding.layoutFooterRecordLoggingOut.isGone = !records.isFooterReadyToLogOutVisible
-        binding.textFooterRecordSyncIncomplete.isGone = !records.isFooterSyncIncompleteVisible
-        binding.textFooterRecordLastSyncedWhen.isGone = !records.isFooterLastSyncTimeVisible
+        binding.textFooterRecordSyncInProgress.isVisible = isFooterSyncInProgressVisible
+        binding.layoutFooterRecordLoggingOut.isVisible = records.isFooterReadyToLogOutVisible
+        binding.textFooterRecordSyncIncomplete.isVisible = records.isFooterSyncIncompleteVisible
+        binding.textFooterRecordLastSyncedWhen.isVisible = records.isFooterLastSyncTimeVisible
         binding.textFooterRecordLastSyncedWhen.text =
             String.format(getString(IDR.string.sync_info_last_sync), records.footerLastSyncMinutesAgo)
     }
@@ -294,15 +292,15 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
     private fun renderImagesSection(images: SyncInfoSectionImages) {
         // Counter - images to upload
-        binding.imagesToUploadCount.isGone = images.counterImagesToUpload.isBlank()
+        binding.imagesToUploadCount.isVisible = images.counterImagesToUpload.isNotBlank()
         binding.imagesToUploadCount.text = images.counterImagesToUpload
-        binding.imagesToUploadProgress.isGone = images.counterImagesToUpload.isNotBlank()
+        binding.imagesToUploadProgress.isVisible = images.counterImagesToUpload.isBlank()
 
         // Handle instruction visibility
-        binding.textImageSyncInstructionsDefault.isGone = !images.isInstructionDefaultVisible
-        binding.textImageSyncInstructionsOffline.isGone = !images.isInstructionOfflineVisible
+        binding.textImageSyncInstructionsDefault.isVisible = images.isInstructionDefaultVisible
+        binding.textImageSyncInstructionsOffline.isVisible = images.isInstructionOfflineVisible
 
-        // Progress
+        // Progress: using `isInvisible` because the empty space should still be there if no progress bar
         binding.layoutImageSyncProgress.isInvisible = !images.isProgressVisible
         renderProgress(images.progress, binding.imageSyncProgressBar, binding.textImageSyncProgress, IDR.string.sync_info_item_image)
         binding.imageSyncProgressBar.setPulseAnimation(isEnabled = images.isProgressVisible)
@@ -324,7 +322,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
             },
         )
 
-        // Footer
+        // Footer: using `isInvisible` because the empty space should still be there if no visible footer
         binding.textFooterImageLastSyncedWhen.isInvisible = !images.isFooterLastSyncTimeVisible
         binding.textFooterImageLastSyncedWhen.text =
             String.format(getString(IDR.string.sync_info_last_sync), images.footerLastSyncMinutesAgo)
@@ -336,8 +334,8 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
     ) {
         val isModuleSectionVisible =
             modules.isSectionAvailable && (config.isSyncInfoModuleListVisible || modules.moduleCounts.isEmpty())
-        binding.layoutModuleSelection.isGone = !isModuleSectionVisible
-        binding.selectedModulesView.isGone = !config.isSyncInfoModuleListVisible
+        binding.layoutModuleSelection.isVisible = isModuleSectionVisible
+        binding.selectedModulesView.isVisible = config.isSyncInfoModuleListVisible
 
         moduleCountAdapter.submitList(modules.moduleCounts)
 
@@ -356,7 +354,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
     }
 
     private fun renderProgress(
-        progress: SyncInfoProgress,
+        progress: SyncProgressInfo,
         progressBar: LinearProgressIndicator,
         textView: TextView,
         vararg itemNameResIDs: Int,
