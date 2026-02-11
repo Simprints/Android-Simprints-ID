@@ -1,6 +1,5 @@
 package com.simprints.infra.eventsync
 
-import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.eventsync.sync.common.MASTER_SYNC_SCHEDULERS
 import com.simprints.infra.eventsync.sync.common.MASTER_SYNC_SCHEDULER_ONE_TIME
