@@ -52,22 +52,22 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
         val isSyncButtonEnabled = isSyncButtonEnabled(isOnline, isPreLogoutUpSync, projectConfig, eventSyncState, recordSyncVisibleState)
 
         return SyncInfoSectionRecords(
-            counterTotalRecords,
-            counterRecordsToUpload,
+            counterTotalRecords = counterTotalRecords,
+            counterRecordsToUpload = counterRecordsToUpload,
             isCounterRecordsToDownloadVisible = !isPreLogoutUpSync && isProjectRunning,
-            counterRecordsToDownload,
+            counterRecordsToDownload = counterRecordsToDownload,
             isCounterImagesToUploadVisible = isPreLogoutUpSync,
-            counterImagesToUpload,
-            recordSyncVisibleState,
+            counterImagesToUpload = counterImagesToUpload,
+            recordSyncVisibleState = recordSyncVisibleState,
             instructionPopupErrorInfo = SyncInfoError(
                 isBackendMaintenance = eventSyncState.isSyncFailedBecauseBackendMaintenance(),
                 backendMaintenanceEstimatedOutage = eventSyncState.getEstimatedBackendMaintenanceOutage() ?: -1,
                 isTooManyRequests = eventSyncState.isSyncFailedBecauseTooManyRequests(),
             ),
             isProgressVisible = recordSyncVisibleState == RecordSyncVisibleState.IN_PROGRESS,
-            progress,
+            progress = progress,
             isSyncButtonVisible = !isPreLogoutUpSync || eventSyncState.isSyncFailed(),
-            isSyncButtonEnabled,
+            isSyncButtonEnabled = isSyncButtonEnabled,
             isSyncButtonForRetry = eventSyncState.isSyncFailed(),
             isFooterSyncInProgressVisible = isPreLogoutUpSync && isSyncInProgress,
             isFooterReadyToLogOutVisible = isPreLogoutUpSync && eventSyncState.isSyncCompleted() && !imageSyncStatus.isSyncing,
@@ -95,35 +95,28 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
         isSyncInProgress: Boolean,
         projectId: String,
         syncableCounts: SyncableCounts,
-    ): String {
-        val recordsTotal = when {
-            isSyncInProgress || projectId.isBlank() -> null
-            else -> syncableCounts.totalRecords
-        }
-        return recordsTotal?.toString().orEmpty()
+    ): String = if (isSyncInProgress || projectId.isBlank()) {
+        ""
+    } else {
+        syncableCounts.totalRecords.toString()
     }
 
     private fun getRecordsToUpload(
         isSyncInProgress: Boolean,
         syncableCounts: SyncableCounts,
-    ): String {
-        val recordsToUpload = when {
-            isSyncInProgress -> null
-            else -> syncableCounts.enrolmentsToUpload
-        }
-        return recordsToUpload?.toString().orEmpty()
+    ): String = if (isSyncInProgress) {
+        ""
+    } else {
+        syncableCounts.enrolmentsToUpload.toString()
     }
 
     private fun getImagesToUpload(
         imageSyncStatus: ImageSyncStatus,
         syncableCounts: SyncableCounts,
-    ): String {
-        val imagesToUpload = if (imageSyncStatus.isSyncing) {
-            null
-        } else {
-            syncableCounts.samplesToUpload // internal term is sample, user-facing (within sync info) term is image
-        }
-        return imagesToUpload?.toString().orEmpty()
+    ): String = if (imageSyncStatus.isSyncing) {
+        ""
+    } else {
+        syncableCounts.samplesToUpload.toString()
     }
 
     private fun getSyncProgressInfo(
@@ -136,11 +129,7 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
         if (!isSyncInProgress) {
             return SyncProgressInfo()
         }
-        val combinedProgressProportion = getCombinedProgressProportion(
-            isPreLogoutUpSync,
-            eventSyncState,
-            imageSyncStatus,
-        )
+        val combinedProgressProportion = getCombinedProgressProportion(isPreLogoutUpSync, eventSyncState, imageSyncStatus)
         val (currentEvents, totalEvents) = eventSyncState.nonNegativeProgress
         val (currentImages, totalImages) = imageSyncStatus.nonNegativeProgress
 

@@ -83,9 +83,9 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             isConfigurationLoadingProgressBarVisible = isRefreshing,
             isLoginPromptSectionVisible = isReLoginRequired && !isPreLogoutUpSync,
             isImageSyncSectionVisible = projectConfig.isSampleUploadEnabledInProject(),
-            syncInfoSectionRecords,
-            syncInfoSectionImages,
-            syncInfoSectionModules,
+            syncInfoSectionRecords = syncInfoSectionRecords,
+            syncInfoSectionImages = syncInfoSectionImages,
+            syncInfoSectionModules = syncInfoSectionModules,
         )
     }.onRecordSyncComplete { delay(timeMillis = SYNC_COMPLETION_HOLD_MILLIS) }
         .onImageSyncComplete { delay(timeMillis = SYNC_COMPLETION_HOLD_MILLIS) }

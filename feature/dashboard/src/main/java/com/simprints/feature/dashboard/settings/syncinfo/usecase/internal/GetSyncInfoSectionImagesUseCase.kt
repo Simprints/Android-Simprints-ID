@@ -34,7 +34,7 @@ internal class GetSyncInfoSectionImagesUseCase @Inject constructor(
             isInstructionDefaultVisible = !imageSyncStatus.isSyncing && isOnline,
             isInstructionOfflineVisible = !isOnline,
             isProgressVisible = imageSyncStatus.isSyncing,
-            progress,
+            progress = progress,
             isSyncButtonEnabled = isOnline && !isReLoginRequired,
             isFooterLastSyncTimeVisible = !imageSyncStatus.isSyncing && imageLastSyncTimestamp.ms >= 0,
             footerLastSyncMinutesAgo = timeHelper.readableBetweenNowAndTime(imageLastSyncTimestamp),
