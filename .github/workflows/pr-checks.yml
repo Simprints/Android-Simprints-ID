@@ -33,7 +33,7 @@ jobs:
             infra2: ${{ steps.filter.outputs.infra2 }}
             feature1: ${{ steps.filter.outputs.feature1 }}
             feature2: ${{ steps.filter.outputs.feature2 }}
-            dashboard: ${{ steps.filter.outputs.feature }}
+            dashboard: ${{ steps.filter.outputs.dashboard }}
             face: ${{ steps.filter.outputs.face }}
             fingerprint: ${{ steps.filter.outputs.fingerprint }}
             testing: ${{ steps.filter.outputs.testing }}
