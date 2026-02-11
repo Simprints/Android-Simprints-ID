@@ -1,6 +1,7 @@
 package com.simprints.feature.externalcredential.screens.scanocr.usecase
 
 import androidx.camera.core.AspectRatio
+import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
@@ -21,6 +22,7 @@ internal class ProvideCameraListenerUseCase @Inject constructor() {
         viewLifecycleOwner: LifecycleOwner,
         onImageAnalysisReady: (ImageAnalysis) -> Unit,
         onImageCaptureReady: (ImageCapture) -> Unit,
+        onCameraReady: (Camera) -> Unit,
     ) = Runnable {
         val cameraProvider = cameraProviderFuture.get()
         val aspectRatio = AspectRatio.RATIO_16_9
@@ -48,9 +50,10 @@ internal class ProvideCameraListenerUseCase @Inject constructor() {
 
         try {
             cameraProvider.unbindAll()
-            cameraProvider.bindToLifecycle(viewLifecycleOwner, cameraSelector, preview, imageCapture, imageAnalysis)
+            val camera = cameraProvider.bindToLifecycle(viewLifecycleOwner, cameraSelector, preview, imageCapture, imageAnalysis)
             onImageAnalysisReady(imageAnalysis)
             onImageCaptureReady(imageCapture)
+            onCameraReady(camera)
         } catch (e: Exception) {
             Simber.e("Camera binding failed in OCR", e, MULTI_FACTOR_ID)
         }
