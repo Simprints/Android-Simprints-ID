@@ -39,6 +39,19 @@ class SessionGenerator @Inject constructor(
         scopeId = scopeId,
     )
 
+    fun generateIdentificationRoc3ExternalCredential(
+        projectId: String,
+        attendantId: String,
+        moduleId: String,
+        scopeId: String,
+    ) = loadEventsSql(
+        eventNames = IDENTIFICATION_EXTERNAL_CREDENTIAL_EVENTS,
+        projectId = projectId,
+        attendantId = attendantId,
+        moduleId = moduleId,
+        scopeId = scopeId,
+    )
+
     /**
      * Corresponds to `Verification-roc-3.json`.
      * A standard verification session against a known GUID.
@@ -84,6 +97,19 @@ class SessionGenerator @Inject constructor(
         scopeId: String,
     ) = loadEventsSql(
         eventNames = ENROLMENT_SIMFACE_EVENTS,
+        projectId = projectId,
+        attendantId = attendantId,
+        moduleId = moduleId,
+        scopeId = scopeId,
+    )
+
+    fun generateEnrolmentSimFaceExternalCredential(
+        projectId: String,
+        attendantId: String,
+        moduleId: String,
+        scopeId: String,
+    ) = loadEventsSql(
+        eventNames = ENROLMENT_EXTERNAL_CREDENTIAL_EVENTS,
         projectId = projectId,
         attendantId = attendantId,
         moduleId = moduleId,
@@ -220,6 +246,51 @@ class SessionGenerator @Inject constructor(
             "BIOMETRIC_REFERENCE_CREATION",
             "ENROLMENT",
             "CALLBACK_ENROLMENT",
+            "COMPLETION_CHECK",
+        )
+
+        val ENROLMENT_EXTERNAL_CREDENTIAL_EVENTS = listOf(
+            "INTENT_PARSING",
+            "CONNECTIVITY_SNAPSHOT",
+            "CALLOUT_ENROLMENT",
+            "AUTHENTICATION",
+            "CONSENT",
+            "FACE_ONBOARDING_COMPLETE",
+            "LICENSE_CHECK",
+            "FACE_FALLBACK_CAPTURE",
+            "FACE_CAPTURE_BIOMETRICS",
+            "FACE_CAPTURE",
+            "FACE_CAPTURE_CONFIRMATION",
+            "BIOMETRIC_REFERENCE_CREATION",
+            "EXTERNAL_CREDENTIAL_SELECTION",
+            "EXTERNAL_CREDENTIAL_CAPTURE",
+            "EXTERNAL_CREDENTIAL_CAPTURE_VALUE",
+            "EXTERNAL_CREDENTIAL_CONFIRMATION",
+            "EXTERNAL_CREDENTIAL_SEARCH",
+            "ENROLMENT",
+            "CALLBACK_ENROLMENT",
+            "COMPLETION_CHECK",
+        )
+
+        val IDENTIFICATION_EXTERNAL_CREDENTIAL_EVENTS = listOf(
+            "INTENT_PARSING",
+            "CONNECTIVITY_SNAPSHOT",
+            "CALLOUT_IDENTIFICATION",
+            "AUTHORIZATION",
+            "CONSENT",
+            "FACE_FALLBACK_CAPTURE",
+            "LICENSE_CHECK",
+            "FACE_CAPTURE_BIOMETRICS",
+            "FACE_CAPTURE",
+            "FACE_CAPTURE_CONFIRMATION",
+            "BIOMETRIC_REFERENCE_CREATION",
+            "EXTERNAL_CREDENTIAL_SELECTION",
+            "EXTERNAL_CREDENTIAL_CAPTURE",
+            "EXTERNAL_CREDENTIAL_CAPTURE_VALUE",
+            "EXTERNAL_CREDENTIAL_CONFIRMATION",
+            "EXTERNAL_CREDENTIAL_SEARCH",
+            "ONE_TO_ONE_MATCH",
+            "CALLBACK_IDENTIFICATION",
             "COMPLETION_CHECK",
         )
 

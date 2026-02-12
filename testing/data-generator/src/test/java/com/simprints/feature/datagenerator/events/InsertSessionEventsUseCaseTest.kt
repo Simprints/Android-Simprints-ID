@@ -72,7 +72,7 @@ class InsertSessionEventsUseCaseTest {
         coEvery { mockEventRepository.executeRawEventInsertions(any()) } returns Unit
 
         // Mock the Random generator to always choose the first path (ISO) in insertEnrollmentEvents
-        every { Random.nextInt(2) } returns 0
+        every { Random.nextInt(3) } returns 0
 
         // Mock all session generator calls
         every { mockSessionGenerator.generateEnrolmentIso(any(), any(), any(), any()) } returns mockDbCommands
@@ -80,6 +80,8 @@ class InsertSessionEventsUseCaseTest {
         every { mockSessionGenerator.generateVerificationRoc3(any(), any(), any(), any()) } returns mockDbCommands
         every { mockSessionGenerator.generateConfirmationRoc3(any(), any(), any(), any()) } returns mockDbCommands
         every { mockSessionGenerator.generateEnrolLastBioRoc3(any(), any(), any(), any()) } returns mockDbCommands
+        every { mockSessionGenerator.generateIdentificationRoc3ExternalCredential(any(), any(), any(), any()) } returns mockDbCommands
+        every { mockSessionGenerator.generateEnrolmentSimFaceExternalCredential(any(), any(), any(), any()) } returns mockDbCommands
         every { mockSessionGenerator.clearCache() } returns Unit
 
         // WHEN: Execute the use case and collect all emitted values from the flow
@@ -112,6 +114,7 @@ class InsertSessionEventsUseCaseTest {
         coVerify(exactly = confirmIdentifyCount) { mockSessionGenerator.generateConfirmationRoc3(any(), any(), any(), any()) }
         coVerify(exactly = enrolLastCount) { mockSessionGenerator.generateEnrolLastBioRoc3(any(), any(), any(), any()) }
         coVerify(exactly = totalNewSessions) { mockEventRepository.createEventScope(EventScopeType.SESSION) }
+        coVerify(exactly = 1) { mockEventRepository.closeAllOpenScopes(any(), any()) }
         coVerify(exactly = 1) { mockSessionGenerator.clearCache() }
     }
 }
