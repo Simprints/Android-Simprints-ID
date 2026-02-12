@@ -313,4 +313,54 @@ internal class ExternalCredentialSearchViewModelTest {
         assertThat(viewModel.stateLiveData.value?.displayedCredential).isEqualTo(decryptedCredential)
         coVerify { tokenizationProcessor.decrypt(encryptedCredential, TokenKeyType.ExternalCredential, project) }
     }
+
+    @Test
+    fun `isCredentialFormatValid validates NHIS card format`() = runTest {
+        val validNhisCard = "12345678"
+        val invalidNhisCard = "invalid"
+
+        every { mockScannedCredential.credentialType } returns ExternalCredentialType.NHISCard
+        every { ghanaNhisCardOcrSelectorUseCase(validNhisCard) } returns true
+        every { ghanaNhisCardOcrSelectorUseCase(invalidNhisCard) } returns false
+
+        viewModel = createViewModel()
+
+        assertThat(viewModel.isCredentialFormatValid(validNhisCard)).isTrue()
+        assertThat(viewModel.isCredentialFormatValid(invalidNhisCard)).isFalse()
+        assertThat(viewModel.isCredentialFormatValid(null)).isFalse()
+        verify { ghanaNhisCardOcrSelectorUseCase(validNhisCard) }
+        verify { ghanaNhisCardOcrSelectorUseCase(invalidNhisCard) }
+    }
+
+    @Test
+    fun `isCredentialFormatValid validates Ghana ID card format`() = runTest {
+        val validGhanaIdCard = "GHA-12345789-0"
+        val invalidGhanaIdCard = "invalid"
+
+        every { mockScannedCredential.credentialType } returns ExternalCredentialType.GhanaIdCard
+        every { ghanaIdCardOcrSelectorUseCase(validGhanaIdCard) } returns true
+        every { ghanaIdCardOcrSelectorUseCase(invalidGhanaIdCard) } returns false
+
+        viewModel = createViewModel()
+
+        assertThat(viewModel.isCredentialFormatValid(validGhanaIdCard)).isTrue()
+        assertThat(viewModel.isCredentialFormatValid(invalidGhanaIdCard)).isFalse()
+        assertThat(viewModel.isCredentialFormatValid(null)).isFalse()
+        verify { ghanaIdCardOcrSelectorUseCase(validGhanaIdCard) }
+        verify { ghanaIdCardOcrSelectorUseCase(invalidGhanaIdCard) }
+    }
+
+    @Test
+    fun `isCredentialFormatValid always returns true for QR code`() = runTest {
+        val anyValue = "any_value"
+        val emptyValue = ""
+
+        every { mockScannedCredential.credentialType } returns ExternalCredentialType.QRCode
+
+        viewModel = createViewModel()
+
+        assertThat(viewModel.isCredentialFormatValid(anyValue)).isTrue()
+        assertThat(viewModel.isCredentialFormatValid(emptyValue)).isTrue()
+        assertThat(viewModel.isCredentialFormatValid(null)).isFalse()
+    }
 }
