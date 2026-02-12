@@ -52,11 +52,6 @@ class ScannedCredentialDialog(
         documentField.text = credentialField
         title.text = context.getString(IDR.string.mfid_add_document_title, credential)
         credentialValue.text = displayedCredential.value
-        confirmCredentialCheckbox.text =
-            context.getString(IDR.string.mfid_confirmation_checkbox_text, credentialField)
-        confirmCredentialCheckbox.setOnCheckedChangeListener { _, isChecked ->
-            buttonConfirm.isEnabled = isChecked
-        }
         buttonSkip.setOnClickListener { onSkip() }
         buttonConfirm.setOnClickListener { onConfirm() }
     }

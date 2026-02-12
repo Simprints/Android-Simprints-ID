@@ -19,9 +19,22 @@ ktlint_standard_annotation = disabled
 # If enabled, this rules forces any multiline assignment to the new line regardless of length
 ktlint_standard_multiline-expression-wrapping = disabled
 
+# If enabled, this rules forces braces to all branches if any single one has them
+ktlint_standard_when-entry-bracing = disabled
+
+# If enabled, this rule forces blank line between when branches if there is a single multiline branch
+ktlint_standard_blank-line-between-when-conditions = disabled
+ij_kotlin_line_break_after_multiline_when_entry = false
+
 # Default allows the expression body to be a single call to a wrapper
 # function (e.g. `runTest{}`) without a line break
 ktlint_function_signature_body_expression_wrapping = default
 
 # In tests star imports are fine since there could be lots helper functions
 ij_kotlin_packages_to_use_import_on_demand=androidx.test.**,io.mockk.**,com.google.common.truth.**
+
+# Backticked function names are only used in tests and those names can be very long
+ktlint_ignore_back_ticked_identifier=true
+
+# Unused import deletion is disabled by default due to a issue with
+ktlint_standard_no-unused-imports = enabled
