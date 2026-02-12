@@ -8,6 +8,8 @@ import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepositor
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
+import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEventsV1
+import com.simprints.infra.events.event.cosync.v1.toCoSync
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordCreationEvent
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.serialization.SimJson
@@ -40,7 +42,9 @@ internal class GetEnrolmentCreationEventForRecordUseCase @Inject constructor(
             )
             return null
         }
-        return SimJson.encodeToString(CoSyncEnrolmentRecordEvents(listOf(recordCreationEvent)))
+        return SimJson.encodeToString<CoSyncEnrolmentRecordEvents>(
+            CoSyncEnrolmentRecordEventsV1(events = listOf(recordCreationEvent.toCoSync())),
+        )
     }
 
     private fun EnrolmentRecord.fromSubjectToEnrolmentCreationEvent() = EnrolmentRecordCreationEvent(
