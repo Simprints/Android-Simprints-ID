@@ -12,6 +12,8 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.GhanaIdCardOcrSelectorUseCase
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.GhanaNhisCardOcrSelectorUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.externalcredential.screens.search.model.SearchCredentialState
 import com.simprints.feature.externalcredential.screens.search.model.SearchState
@@ -79,6 +81,12 @@ internal class ExternalCredentialSearchViewModelTest {
     @MockK
     lateinit var eventsTracker: ExternalCredentialEventTrackerUseCase
 
+    @MockK
+    lateinit var ghanaIdCardOcrSelectorUseCase: GhanaIdCardOcrSelectorUseCase
+
+    @MockK
+    lateinit var ghanaNhisCardOcrSelectorUseCase: GhanaNhisCardOcrSelectorUseCase
+
     private lateinit var viewModel: ExternalCredentialSearchViewModel
 
     private val projectId = "projectId"
@@ -105,6 +113,8 @@ internal class ExternalCredentialSearchViewModelTest {
         tokenizationProcessor = tokenizationProcessor,
         enrolmentRecordRepository = enrolmentRecordRepository,
         eventsTracker = eventsTracker,
+        ghanaIdCardOcrSelectorUseCase = ghanaIdCardOcrSelectorUseCase,
+        ghanaNhisCardOcrSelectorUseCase = ghanaNhisCardOcrSelectorUseCase,
     )
 
     @Test
