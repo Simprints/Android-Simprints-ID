@@ -3,6 +3,7 @@ package com.simprints.feature.externalcredential.screens.search
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
@@ -59,6 +60,7 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
 
     @Inject
     lateinit var zoomOntoCredentialUseCase: ZoomOntoCredentialUseCase
+    private var credentialTextWatcher: TextWatcher? = null
 
     override fun onViewCreated(
         view: View,
@@ -116,7 +118,8 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
             viewModel.updateConfirmation(isConfirmed = checkedId)
         }
 
-        credentialEditText.addTextChangedListener(
+        credentialTextWatcher?.let(credentialEditText::removeTextChangedListener)
+        credentialTextWatcher = credentialEditText.addTextChangedListener(
             afterTextChanged = { _ ->
                 renderEditIcon(isEditingCredential)
             },
