@@ -219,7 +219,7 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
                 ghanaNhisCardOcrSelectorUseCase(credential)
             }
             ExternalCredentialType.GhanaIdCard -> {
-                // Ghana ID card number pattern is "GHA-12345789-0"
+                // Ghana ID card number pattern is "GHA-123456789-0"
                 ghanaIdCardOcrSelectorUseCase(credential)
             }
             ExternalCredentialType.QRCode -> {
