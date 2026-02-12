@@ -2,6 +2,7 @@ package com.simprints.feature.datagenerator.events
 
 import com.simprints.core.DispatcherIO
 import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
@@ -37,7 +38,10 @@ class InsertSessionEventsUseCase @Inject constructor(
         emit("$confirmIdentifyCount Confirm Identify sessions inserted successfully")
         insertEnrolLastEvents(projectId, moduleId, attendantId, enrolLastCount)
         emit("$enrolLastCount Enrol Last sessions inserted successfully")
-
+        eventRepository.closeAllOpenScopes(
+            EventScopeType.SESSION,
+            reason = EventScopeEndCause.WORKFLOW_ENDED,
+        )
         val newEventsCount = eventRepository.observeEventCount(null).first()
         Simber.i(
             "Generated ${newEventsCount - eventsCount} events",
@@ -55,8 +59,14 @@ class InsertSessionEventsUseCase @Inject constructor(
         enrolCount: Int,
     ) {
         batchInsertEvents(count = enrolCount) { scopeId ->
-            when (Random.nextInt(2)) {
+            when (Random.nextInt(3)) {
                 0 -> sessionGenerator.generateEnrolmentIso(
+                    projectId = projectId,
+                    moduleId = moduleId,
+                    attendantId = attendantId,
+                    scopeId = scopeId,
+                )
+                1 -> sessionGenerator.generateEnrolmentSimFaceExternalCredential(
                     projectId = projectId,
                     moduleId = moduleId,
                     attendantId = attendantId,
@@ -80,12 +90,20 @@ class InsertSessionEventsUseCase @Inject constructor(
         identifyCount: Int,
     ) {
         batchInsertEvents(count = identifyCount) { scopeId ->
-            sessionGenerator.generateIdentificationRoc3(
-                projectId = projectId,
-                moduleId = moduleId,
-                attendantId = attendantId,
-                scopeId = scopeId,
-            )
+            when (Random.nextInt(2)) {
+                0 -> sessionGenerator.generateIdentificationRoc3(
+                    projectId = projectId,
+                    moduleId = moduleId,
+                    attendantId = attendantId,
+                    scopeId = scopeId,
+                )
+                else -> sessionGenerator.generateIdentificationRoc3ExternalCredential(
+                    projectId = projectId,
+                    moduleId = moduleId,
+                    attendantId = attendantId,
+                    scopeId = scopeId,
+                )
+            }
         }
     }
 
@@ -143,7 +161,7 @@ class InsertSessionEventsUseCase @Inject constructor(
     ) {
         val eventsToInsert = mutableListOf<String>()
         repeat(count) {
-            val scopeId = createEventScope()
+            val scopeId = eventRepository.createEventScope(EventScopeType.SESSION).id
             val dbInsertionCommands = generateCommands(scopeId)
             eventsToInsert.addAll(dbInsertionCommands)
             if (eventsToInsert.size >= BATCH_SIZE) {
@@ -154,12 +172,6 @@ class InsertSessionEventsUseCase @Inject constructor(
         if (eventsToInsert.isNotEmpty()) {
             eventRepository.executeRawEventInsertions(eventsToInsert)
         }
-    }
-
-    private suspend fun createEventScope(): String {
-        val eventScope = eventRepository.createEventScope(EventScopeType.SESSION)
-        eventRepository.closeEventScope(eventScope, null)
-        return eventScope.id
     }
 
     companion object {
