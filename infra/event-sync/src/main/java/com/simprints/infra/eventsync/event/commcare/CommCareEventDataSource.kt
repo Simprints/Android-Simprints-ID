@@ -193,7 +193,7 @@ internal class CommCareEventDataSource @Inject constructor(
                 }
 
                 coSyncEnrolmentRecordEvents
-                    .events
+                    .toDomainEvents()
                     .filterIsInstance<EnrolmentRecordCreationEvent>()
                     .forEach { event ->
                         pendingSyncedCases.add(case.copy(simprintsId = event.payload.subjectId))
