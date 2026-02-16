@@ -25,6 +25,7 @@ sealed class ActionResponse(
         override val sessionId: String,
         val identifications: List<AppMatchResult>,
         val isMultiFactorIdEnabled: Boolean,
+        val scannedCredential: AppExternalCredential?,
     ) : ActionResponse(actionIdentifier, sessionId)
 
     @ExcludedFromGeneratedTestCoverageReports("Data struct")

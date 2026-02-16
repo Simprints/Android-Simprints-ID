@@ -148,6 +148,7 @@ class ClientApiViewModel @Inject internal constructor(
                     sessionId = currentSessionId,
                     identifications = identifyResponse.identifications,
                     isMultiFactorIdEnabled = identifyResponse.isMultiFactorIdEnabled,
+                    scannedCredential = identifyResponse.scannedCredential,
                 ),
             ),
         )

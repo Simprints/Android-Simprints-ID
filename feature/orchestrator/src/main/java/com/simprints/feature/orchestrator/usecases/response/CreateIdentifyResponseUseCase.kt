@@ -1,12 +1,14 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.matching.FaceMatchResult
 import com.simprints.infra.matching.FingerprintMatchResult
 import com.simprints.infra.matching.MatchResultItem
+import com.simprints.infra.orchestration.data.responses.AppExternalCredential
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.orchestration.data.responses.AppResponse
@@ -45,10 +47,21 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
             .distinctBy(AppMatchResult::guid)
             .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
 
+        val credentialResult = results.filterIsInstance(ExternalCredentialSearchResult::class.java).lastOrNull()
+        val credentialValue = credentialResult?.scannedCredential.toAppCredential()
         return AppIdentifyResponse(
             sessionId = currentSessionId,
             isMultiFactorIdEnabled = isMultiFactorIdEnabled,
             identifications = identifications,
+            scannedCredential = credentialValue,
+        )
+    }
+
+    private fun ScannedCredential?.toAppCredential(): AppExternalCredential? = this?.let { scannedCredential ->
+        AppExternalCredential(
+            id = scannedCredential.credentialScanId,
+            value = scannedCredential.scannedValue,
+            type = scannedCredential.credentialType,
         )
     }
 
