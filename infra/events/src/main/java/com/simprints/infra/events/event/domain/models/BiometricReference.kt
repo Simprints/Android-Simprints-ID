@@ -15,7 +15,7 @@ sealed class BiometricReference {
 
 @ExcludedFromGeneratedTestCoverageReports("Domain model")
 @Serializable
-@SerialName(BiometricReferenceType.Companion.FACE_REFERENCE_KEY)
+@SerialName(BiometricReferenceType.FACE_REFERENCE_KEY)
 data class FaceReference(
     override val id: String,
     val templates: List<FaceTemplate>,
@@ -28,7 +28,7 @@ data class FaceReference(
 
 @ExcludedFromGeneratedTestCoverageReports("Domain model")
 @Serializable
-@SerialName(BiometricReferenceType.Companion.FINGERPRINT_REFERENCE_KEY)
+@SerialName(BiometricReferenceType.FINGERPRINT_REFERENCE_KEY)
 data class FingerprintReference(
     override val id: String,
     val templates: List<FingerprintTemplate>,
