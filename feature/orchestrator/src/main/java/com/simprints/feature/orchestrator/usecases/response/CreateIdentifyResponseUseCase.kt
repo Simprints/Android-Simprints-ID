@@ -48,16 +48,16 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
             .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
 
         val credentialResult = results.filterIsInstance(ExternalCredentialSearchResult::class.java).lastOrNull()
-        val credentialValue = credentialResult?.scannedCredential.toAppCredential()
+        val externalCredential = credentialResult?.scannedCredential.toAppExternalCredential()
         return AppIdentifyResponse(
             sessionId = currentSessionId,
             isMultiFactorIdEnabled = isMultiFactorIdEnabled,
             identifications = identifications,
-            scannedCredential = credentialValue,
+            scannedCredential = externalCredential,
         )
     }
 
-    private fun ScannedCredential?.toAppCredential(): AppExternalCredential? = this?.let { scannedCredential ->
+    private fun ScannedCredential?.toAppExternalCredential(): AppExternalCredential? = this?.let { scannedCredential ->
         AppExternalCredential(
             id = scannedCredential.credentialScanId,
             value = scannedCredential.scannedValue,
