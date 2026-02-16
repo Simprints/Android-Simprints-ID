@@ -55,6 +55,7 @@ class OdkResponseMapperTest {
                     ),
                 ),
                 isMultiFactorIdEnabled = false,
+                scannedCredential = null,
             ),
         )
 
@@ -75,6 +76,7 @@ class OdkResponseMapperTest {
                 sessionId = "sessionId",
                 identifications = listOf(),
                 isMultiFactorIdEnabled = false,
+                scannedCredential = null,
             ),
         )
 

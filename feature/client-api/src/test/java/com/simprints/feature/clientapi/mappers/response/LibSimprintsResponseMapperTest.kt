@@ -93,6 +93,7 @@ class LibSimprintsResponseMapperTest {
                     ),
                 ),
                 isMultiFactorIdEnabled = false,
+                scannedCredential = null,
             ),
         )
 
@@ -121,6 +122,7 @@ class LibSimprintsResponseMapperTest {
                     ),
                 ),
                 isMultiFactorIdEnabled = false,
+                scannedCredential = null,
             ),
         )
 
@@ -469,6 +471,7 @@ class LibSimprintsResponseMapperTest {
                 sessionId = "sessionId",
                 identifications = listOf(identification1, identification2),
                 isMultiFactorIdEnabled = true,
+                scannedCredential = null,
             ),
         )
 
@@ -496,6 +499,7 @@ class LibSimprintsResponseMapperTest {
                     ),
                 ),
                 isMultiFactorIdEnabled = true,
+                scannedCredential = null,
             ),
         )
 
@@ -523,6 +527,7 @@ class LibSimprintsResponseMapperTest {
                     ),
                 ),
                 isMultiFactorIdEnabled = false,
+                scannedCredential = null,
             ),
         )
 
