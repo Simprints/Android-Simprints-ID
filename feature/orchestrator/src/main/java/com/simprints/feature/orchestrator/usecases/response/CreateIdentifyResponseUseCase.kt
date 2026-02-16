@@ -47,8 +47,12 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
             .distinctBy(AppMatchResult::guid)
             .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
 
-        val credentialResult = results.filterIsInstance(ExternalCredentialSearchResult::class.java).lastOrNull()
-        val externalCredential = credentialResult?.scannedCredential.toAppExternalCredential()
+        val externalCredential = results
+            .filterIsInstance(ExternalCredentialSearchResult::class.java)
+            .lastOrNull()
+            ?.scannedCredential
+            .toAppExternalCredential()
+
         return AppIdentifyResponse(
             sessionId = currentSessionId,
             isMultiFactorIdEnabled = isMultiFactorIdEnabled,
