@@ -18,6 +18,7 @@ import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.navigation.navigationParams
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -39,7 +40,7 @@ internal class ExternalCredentialControllerFragment : Fragment(R.layout.fragment
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-
+        applySystemBarInsets(view)
         viewModel.init(params)
 
         findNavController().handleResult<ExitFormResult>(
