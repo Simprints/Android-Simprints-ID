@@ -1,11 +1,16 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.simprints.core.domain.response.AppMatchConfidence
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.infra.config.store.models.ModalitySdkType
+import com.simprints.infra.config.store.models.DecisionPolicy
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.getModalitySdkConfig
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.matching.MatchResult
 import com.simprints.infra.orchestration.data.responses.AppExternalCredential
@@ -17,9 +22,11 @@ import javax.inject.Inject
 
 internal class CreateIdentifyResponseUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
+    private val tokenizationProcessor: TokenizationProcessor,
 ) {
     suspend operator fun invoke(
         projectConfiguration: ProjectConfiguration,
+        project: Project?,
         results: List<Serializable>,
     ): AppResponse {
         val isMultiFactorIdEnabled = projectConfiguration.multifactorId?.allowedExternalCredentials?.isNotEmpty() ?: false
@@ -29,7 +36,7 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
             .filterIsInstance(ExternalCredentialSearchResult::class.java)
             .lastOrNull()
             ?.scannedCredential
-            .toAppExternalCredential()
+            ?.toAppExternalCredential(tokenizationProcessor, project)
 
         return AppIdentifyResponse(
             sessionId = currentSessionId,
@@ -40,11 +47,20 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
         )
     }
 
-    private fun ScannedCredential?.toAppExternalCredential(): AppExternalCredential? = this?.let { scannedCredential ->
-        AppExternalCredential(
-            id = scannedCredential.credentialScanId,
-            value = scannedCredential.scannedValue,
-            type = scannedCredential.credentialType,
+    private fun ScannedCredential.toAppExternalCredential(
+        tokenizationProcessor: TokenizationProcessor,
+        project: Project?,
+    ): AppExternalCredential? {
+        if (project == null) return null
+        val decryptedValue = tokenizationProcessor.decrypt(
+            encrypted = credential,
+            tokenKeyType = TokenKeyType.ExternalCredential,
+            project = project,
+        ) as? TokenizableString.Raw ?: return null
+        return AppExternalCredential(
+            id = credentialScanId,
+            value = decryptedValue,
+            type = credentialType,
         )
     }
 
