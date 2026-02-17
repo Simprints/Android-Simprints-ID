@@ -177,6 +177,7 @@ internal class ClientApiViewModelTest {
             mockk {
                 every { identifications } returns emptyList()
                 every { isMultiFactorIdEnabled } returns false
+                every { scannedCredential } returns null
             },
         )
 
