@@ -1,11 +1,15 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.matching.FaceMatchResult
 import com.simprints.infra.matching.FingerprintMatchResult
@@ -24,6 +28,12 @@ class CreateIdentifyResponseUseCaseTest {
     @MockK
     lateinit var eventRepository: SessionEventRepository
 
+    @MockK
+    lateinit var tokenizationProcessor: TokenizationProcessor
+
+    @MockK
+    lateinit var project: Project
+
     private lateinit var useCase: CreateIdentifyResponseUseCase
 
     @Before
@@ -32,7 +42,7 @@ class CreateIdentifyResponseUseCaseTest {
 
         coEvery { eventRepository.getCurrentSessionScope().id } returns "sessionId"
 
-        useCase = CreateIdentifyResponseUseCase(eventRepository)
+        useCase = CreateIdentifyResponseUseCase(eventRepository, tokenizationProcessor)
     }
 
     @Test
@@ -45,6 +55,7 @@ class CreateIdentifyResponseUseCaseTest {
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
             },
             results = listOf(createFaceMatchResult(10f, 20f, 30f)),
+            project = project,
         )
 
         assertThat((result as AppIdentifyResponse).identifications).isEmpty()
@@ -60,6 +71,7 @@ class CreateIdentifyResponseUseCaseTest {
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
             },
             results = listOf(createFaceMatchResult(10f, 20f, 30f)),
+            project = project,
         )
 
         assertThat((result as AppIdentifyResponse).identifications).isNotEmpty()
@@ -76,6 +88,7 @@ class CreateIdentifyResponseUseCaseTest {
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
             },
             results = listOf(createFaceMatchResult(20f, 25f, 30f, 40f)),
+            project = project,
         )
 
         assertThat((result as AppIdentifyResponse).identifications).isNotEmpty()
@@ -92,6 +105,7 @@ class CreateIdentifyResponseUseCaseTest {
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
             },
             results = listOf(createFaceMatchResult(15f, 30f, 100f)),
+            project = project,
         )
 
         assertThat((result as AppIdentifyResponse).identifications).isNotEmpty()
@@ -112,6 +126,7 @@ class CreateIdentifyResponseUseCaseTest {
                 )
             },
             results = listOf(createFingerprintMatchResult(10f, 20f, 30f)),
+            project = project,
         )
 
         assertThat((result as AppIdentifyResponse).identifications).isNotEmpty()
@@ -132,6 +147,7 @@ class CreateIdentifyResponseUseCaseTest {
                 )
             },
             results = listOf(createFingerprintMatchResult(20f, 25f, 30f, 40f)),
+            project = project,
         )
 
         assertThat((result as AppIdentifyResponse).identifications).isNotEmpty()
@@ -152,6 +168,7 @@ class CreateIdentifyResponseUseCaseTest {
                 )
             },
             results = listOf(createFingerprintMatchResult(15f, 30f, 100f)),
+            project = project,
         )
 
         assertThat((result as AppIdentifyResponse).identifications).isNotEmpty()
@@ -175,6 +192,7 @@ class CreateIdentifyResponseUseCaseTest {
                 createFaceMatchResult(15f, 30f, 100f),
                 createFingerprintMatchResult(15f, 30f, 105f),
             ),
+            project = project,
         )
 
         assertThat((result as AppIdentifyResponse).identifications).isNotEmpty()
@@ -198,6 +216,7 @@ class CreateIdentifyResponseUseCaseTest {
                 createFaceMatchResult(15f, 30f, 105f),
                 createFingerprintMatchResult(15f, 30f, 100f),
             ),
+            project = project,
         )
 
         assertThat((result as AppIdentifyResponse).identifications).isNotEmpty()
@@ -262,6 +281,7 @@ class CreateIdentifyResponseUseCaseTest {
                     every { scannedCredential } returns null
                 },
             ),
+            project = project,
         )
 
         assertThat((result as AppIdentifyResponse).identifications).isNotEmpty()
@@ -314,6 +334,7 @@ class CreateIdentifyResponseUseCaseTest {
                     FaceConfiguration.BioSdk.RANK_ONE,
                 ),
             ),
+            project = project,
         )
 
         assertThat((result as AppIdentifyResponse).identifications).hasSize(1)
@@ -366,6 +387,7 @@ class CreateIdentifyResponseUseCaseTest {
                     FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
                 ),
             ),
+            project = project,
         )
 
         assertThat((result as AppIdentifyResponse).identifications).hasSize(1)
@@ -437,6 +459,7 @@ class CreateIdentifyResponseUseCaseTest {
                 },
                 faceMatchResults,
             ),
+            project = project,
         )
 
         assertThat((result as AppIdentifyResponse).identifications).hasSize(maxNbOfReturnedCandidates)
@@ -452,6 +475,40 @@ class CreateIdentifyResponseUseCaseTest {
                 matchConfidence2.toInt(),
             ),
         )
+    }
+
+    @Test
+    fun `Returns scanned credential when decryption succeeds`() = runTest {
+        val id = "id"
+        val type = ExternalCredentialType.NHISCard
+        val expectedDecrypted = "expectedDecrypted".asTokenizableRaw()
+
+        every { tokenizationProcessor.decrypt(any(), any(), any()) } returns expectedDecrypted
+
+        val result = useCase(
+            mockk {
+                every { multifactorId?.allowedExternalCredentials } returns null
+                every { identification.maxNbOfReturnedCandidates } returns 2
+                every { face?.getSdkConfiguration(any())?.decisionPolicy } returns null
+                every { fingerprint?.getSdkConfiguration(any())?.decisionPolicy } returns null
+            },
+            results = listOf(
+                mockk<ExternalCredentialSearchResult> {
+                    every { matchResults } returns emptyList()
+                    every { scannedCredential } returns mockk {
+                        every { credentialScanId } returns id
+                        every { credentialType } returns type
+                        every { credential } returns mockk()
+                    }
+                },
+            ),
+            project = project,
+        )
+
+        assertThat((result as AppIdentifyResponse).scannedCredential).isNotNull()
+        assertThat(result.scannedCredential?.id).isEqualTo(id)
+        assertThat(result.scannedCredential?.type).isEqualTo(type)
+        assertThat(result.scannedCredential?.value).isEqualTo(expectedDecrypted)
     }
 
     private fun createFaceMatchResult(vararg confidences: Float): Serializable = FaceMatchResult(
