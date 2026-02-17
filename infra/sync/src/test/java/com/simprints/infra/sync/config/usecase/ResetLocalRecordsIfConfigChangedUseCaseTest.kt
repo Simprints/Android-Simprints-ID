@@ -1,6 +1,5 @@
 package com.simprints.infra.sync.config.usecase
 
-import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.Frequency
@@ -98,13 +97,11 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify { syncOrchestrator.execute(any<ScheduleCommand>()) }
-        val command = scheduleCommandSlot.captured as ScheduleCommand.EventsCommand
-        assertThat(command.action).isEqualTo(ScheduleCommand.Action.RESCHEDULE)
-        assertThat(command.withDelay).isFalse()
-        assertThat(command.blockWhileUnscheduled).isNotNull()
+        verify(exactly = 1) {
+            syncOrchestrator.execute(match<ScheduleCommand.EventsCommand> { it.action == ScheduleCommand.Action.UNSCHEDULE })
+            syncOrchestrator.execute(match<ScheduleCommand.EventsCommand> { it.action == ScheduleCommand.Action.RESCHEDULE })
+        }
 
-        command.blockWhileUnscheduled?.invoke()
         runCurrent()
         coVerify {
             resetDownSyncInfo()
@@ -135,13 +132,10 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify { syncOrchestrator.execute(any<ScheduleCommand>()) }
-        val command = scheduleCommandSlot.captured as ScheduleCommand.EventsCommand
-        assertThat(command.action).isEqualTo(ScheduleCommand.Action.RESCHEDULE)
-        assertThat(command.blockWhileUnscheduled).isNotNull()
-
-        command.blockWhileUnscheduled?.invoke()
-        runCurrent()
+        verify(exactly = 1) {
+            syncOrchestrator.execute(match<ScheduleCommand.EventsCommand> { it.action == ScheduleCommand.Action.UNSCHEDULE })
+            syncOrchestrator.execute(match<ScheduleCommand.EventsCommand> { it.action == ScheduleCommand.Action.RESCHEDULE })
+        }
         coVerify {
             resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()
@@ -171,13 +165,10 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify { syncOrchestrator.execute(any<ScheduleCommand>()) }
-        val command = scheduleCommandSlot.captured as ScheduleCommand.EventsCommand
-        assertThat(command.action).isEqualTo(ScheduleCommand.Action.RESCHEDULE)
-        assertThat(command.blockWhileUnscheduled).isNotNull()
-
-        command.blockWhileUnscheduled?.invoke()
-        runCurrent()
+        verify(exactly = 1) {
+            syncOrchestrator.execute(match<ScheduleCommand.EventsCommand> { it.action == ScheduleCommand.Action.UNSCHEDULE })
+            syncOrchestrator.execute(match<ScheduleCommand.EventsCommand> { it.action == ScheduleCommand.Action.RESCHEDULE })
+        }
         coVerify {
             resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()
@@ -207,13 +198,10 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             ),
         )
 
-        verify { syncOrchestrator.execute(any<ScheduleCommand>()) }
-        val command = scheduleCommandSlot.captured as ScheduleCommand.EventsCommand
-        assertThat(command.action).isEqualTo(ScheduleCommand.Action.RESCHEDULE)
-        assertThat(command.blockWhileUnscheduled).isNotNull()
-
-        command.blockWhileUnscheduled?.invoke()
-        runCurrent()
+        verify(exactly = 1) {
+            syncOrchestrator.execute(match<ScheduleCommand.EventsCommand> { it.action == ScheduleCommand.Action.UNSCHEDULE })
+            syncOrchestrator.execute(match<ScheduleCommand.EventsCommand> { it.action == ScheduleCommand.Action.RESCHEDULE })
+        }
         coVerify {
             resetDownSyncInfo()
             enrolmentRecordRepository.deleteAll()

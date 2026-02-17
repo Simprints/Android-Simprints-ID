@@ -28,7 +28,6 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -205,31 +204,6 @@ class SyncOrchestratorCommandExecutionTest {
     }
 
     @Test
-    fun `rescheduleAfter for schedule events routes to unschedule and reschedule with delay`() = runTest {
-        every { eventSyncWorkerTagRepository.getAllWorkerTag() } returns "syncWorkers"
-        every { eventSyncWorkerTagRepository.getPeriodicWorkTags() } returns listOf("tag1", "tag2")
-
-        orchestrator
-            .execute(
-                ScheduleCommand.Events.rescheduleAfter(withDelay = true) { },
-            ).join()
-
-        verify {
-            workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME)
-            workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME_ONE_TIME)
-            workManager.cancelAllWorkByTag("syncWorkers")
-            workManager.enqueueUniquePeriodicWork(
-                EVENT_SYNC_WORK_NAME,
-                any(),
-                match {
-                    it.workSpec.initialDelay > 0 &&
-                        it.tags.containsAll(setOf("tag1", "tag2"))
-                },
-            )
-        }
-    }
-
-    @Test
     fun `unschedule events cancels correct workers`() = runTest {
         every { eventSyncWorkerTagRepository.getAllWorkerTag() } returns "syncWorkers"
 
@@ -347,41 +321,6 @@ class SyncOrchestratorCommandExecutionTest {
 
         assertThat(job.isCompleted).isTrue()
         verify { workManager.cancelUniqueWork(FILE_UP_SYNC_WORK_NAME) }
-    }
-
-    @Test
-    fun `rescheduleAfter runs block before rescheduling images`() = runTest {
-        val blockStarted = Channel<Unit>(Channel.UNLIMITED)
-        val unblock = Channel<Unit>(Channel.UNLIMITED)
-        val block: suspend () -> Unit = {
-            blockStarted.trySend(Unit)
-            unblock.receive()
-        }
-
-        val job = orchestrator.execute(ScheduleCommand.Images.rescheduleAfter(block))
-
-        verify { workManager.cancelUniqueWork(FILE_UP_SYNC_WORK_NAME) }
-
-        blockStarted.receive()
-
-        verify(exactly = 0) {
-            workManager.enqueueUniquePeriodicWork(
-                FILE_UP_SYNC_WORK_NAME,
-                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
-                any(),
-            )
-        }
-
-        unblock.trySend(Unit)
-        job.join()
-
-        verify {
-            workManager.enqueueUniquePeriodicWork(
-                FILE_UP_SYNC_WORK_NAME,
-                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
-                any(),
-            )
-        }
     }
 
     @Test

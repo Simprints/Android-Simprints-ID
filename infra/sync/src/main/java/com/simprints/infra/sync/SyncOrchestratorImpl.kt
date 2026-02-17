@@ -129,21 +129,18 @@ internal class SyncOrchestratorImpl @Inject constructor(
     override fun execute(command: ScheduleCommand): Job = when (command) {
         is ScheduleCommand.EverythingCommand -> executeSchedulingAction(
             action = command.action,
-            blockWhileUnscheduled = command.blockWhileUnscheduled,
             unschedule = ::cancelBackgroundWork,
             reschedule = { scheduleBackgroundWork(withDelay = command.withDelay) },
         )
 
         is ScheduleCommand.EventsCommand -> executeSchedulingAction(
             action = command.action,
-            blockWhileUnscheduled = command.blockWhileUnscheduled,
             unschedule = ::cancelEventSync,
             reschedule = { rescheduleEventSync(withDelay = command.withDelay) },
         )
 
         is ScheduleCommand.ImagesCommand -> executeSchedulingAction(
             action = command.action,
-            blockWhileUnscheduled = command.blockWhileUnscheduled,
             unschedule = ::stopImageSync,
             reschedule = { rescheduleImageUpSync() },
         )
@@ -214,7 +211,6 @@ internal class SyncOrchestratorImpl @Inject constructor(
 
     private fun executeSchedulingAction(
         action: ScheduleCommand.Action,
-        blockWhileUnscheduled: (suspend () -> Unit)?,
         unschedule: () -> Unit,
         reschedule: suspend () -> Unit,
     ): Job = when (action) {
@@ -223,9 +219,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
             Job().apply { complete() }
         }
         ScheduleCommand.Action.RESCHEDULE -> {
-            unschedule()
             appScope.launch(ioDispatcher) {
-                blockWhileUnscheduled?.invoke()
                 reschedule()
             }
         }

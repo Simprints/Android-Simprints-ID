@@ -24,7 +24,7 @@ internal inline fun <reified T : ListenableWorker> WorkManager.schedulePeriodicW
     workName: String,
     repeatInterval: Long,
     existingWorkPolicy: ExistingPeriodicWorkPolicy = ExistingPeriodicWorkPolicy.UPDATE,
-    initialDelay: Long = 0,
+    initialDelay: Long = -1,
     backoffInterval: Long = SyncConstants.DEFAULT_BACKOFF_INTERVAL_MINUTES,
     constraints: Constraints = defaultWorkerConstraints(),
     tags: List<String> = emptyList(),
@@ -34,8 +34,13 @@ internal inline fun <reified T : ListenableWorker> WorkManager.schedulePeriodicW
     existingWorkPolicy,
     PeriodicWorkRequestBuilder<T>(repeatInterval, SyncConstants.SYNC_TIME_UNIT)
         .setConstraints(constraints)
-        .setInitialDelay(initialDelay, SyncConstants.SYNC_TIME_UNIT)
-        .setBackoffCriteria(BackoffPolicy.LINEAR, backoffInterval, SyncConstants.SYNC_TIME_UNIT)
+        .let {
+            if (initialDelay >= 0) {
+                it.setInitialDelay(initialDelay, SyncConstants.SYNC_TIME_UNIT)
+            } else {
+                it
+            }
+        }.setBackoffCriteria(BackoffPolicy.LINEAR, backoffInterval, SyncConstants.SYNC_TIME_UNIT)
         .let { if (inputData != null) it.setInputData(inputData) else it }
         .let { tags.fold(it) { builder, tag -> builder.addTag(tag) } }
         .build(),
