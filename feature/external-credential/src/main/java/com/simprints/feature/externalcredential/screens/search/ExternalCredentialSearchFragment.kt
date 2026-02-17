@@ -106,7 +106,8 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         credentialValue.text = currentEditTextValue
         confirmCredentialCheckbox.isVisible = state.searchState != SearchState.Searching
         confirmCredentialCheckbox.text = getString(IDR.string.mfid_confirmation_checkbox_text, credentialField)
-        confirmCredentialCheckbox.isChecked = state.isConfirmed
+        confirmCredentialCheckbox.isChecked = state.isConfirmed && !state.isEditingCredential
+        confirmCredentialCheckbox.isEnabled = !state.isEditingCredential
 
         iconEditCredential.setOnClickListener {
             if (isEditingCredential) {
