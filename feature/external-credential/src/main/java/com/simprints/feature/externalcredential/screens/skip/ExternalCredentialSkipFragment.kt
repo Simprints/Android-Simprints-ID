@@ -14,6 +14,7 @@ import com.simprints.feature.externalcredential.databinding.FragmentExternalCred
 import com.simprints.feature.externalcredential.ext.getCredentialTypeString
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
@@ -28,7 +29,7 @@ class ExternalCredentialSkipFragment : Fragment(R.layout.fragment_external_crede
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-
+        applySystemBarInsets(view)
         initObservers()
     }
 
