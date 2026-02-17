@@ -1,6 +1,8 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.infra.config.store.models.DecisionPolicy
@@ -473,6 +475,40 @@ class CreateIdentifyResponseUseCaseTest {
                 matchConfidence2.toInt(),
             ),
         )
+    }
+
+    @Test
+    fun `Returns scanned credential when decryption succeeds`() = runTest {
+        val id = "id"
+        val type = ExternalCredentialType.NHISCard
+        val expectedDecrypted = "expectedDecrypted".asTokenizableRaw()
+
+        every { tokenizationProcessor.decrypt(any(), any(), any()) } returns expectedDecrypted
+
+        val result = useCase(
+            mockk {
+                every { multifactorId?.allowedExternalCredentials } returns null
+                every { identification.maxNbOfReturnedCandidates } returns 2
+                every { face?.getSdkConfiguration(any())?.decisionPolicy } returns null
+                every { fingerprint?.getSdkConfiguration(any())?.decisionPolicy } returns null
+            },
+            results = listOf(
+                mockk<ExternalCredentialSearchResult> {
+                    every { matchResults } returns emptyList()
+                    every { scannedCredential } returns mockk {
+                        every { credentialScanId } returns id
+                        every { credentialType } returns type
+                        every { credential } returns mockk()
+                    }
+                },
+            ),
+            project = project,
+        )
+
+        assertThat((result as AppIdentifyResponse).scannedCredential).isNotNull()
+        assertThat(result.scannedCredential?.id).isEqualTo(id)
+        assertThat(result.scannedCredential?.type).isEqualTo(type)
+        assertThat(result.scannedCredential?.value).isEqualTo(expectedDecrypted)
     }
 
     private fun createFaceMatchResult(vararg confidences: Float): Serializable = FaceMatchResult(
