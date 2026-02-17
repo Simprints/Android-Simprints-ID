@@ -31,6 +31,7 @@ internal data class ApiExternalCredentialSelectionPayload(
     @Keep
     @Serializable
     enum class ApiExternalCredentialSkipReason {
+        HAS_NUMBER_NO_ID,
         DOES_NOT_HAVE_ID,
         DID_NOT_BRING_ID,
         BROUGHT_INCORRECT_ID,
@@ -44,6 +45,7 @@ internal data class ApiExternalCredentialSelectionPayload(
 }
 
 internal fun SkipReason.toApiExternalCredentialSkipReason(): ApiExternalCredentialSkipReason = when (this) {
+    SkipReason.HAS_NUMBER_NO_ID -> ApiExternalCredentialSkipReason.HAS_NUMBER_NO_ID
     SkipReason.DOES_NOT_HAVE_ID -> ApiExternalCredentialSkipReason.DOES_NOT_HAVE_ID
     SkipReason.DID_NOT_BRING_ID -> ApiExternalCredentialSkipReason.DID_NOT_BRING_ID
     SkipReason.BROUGHT_INCORRECT_ID -> ApiExternalCredentialSkipReason.BROUGHT_INCORRECT_ID
