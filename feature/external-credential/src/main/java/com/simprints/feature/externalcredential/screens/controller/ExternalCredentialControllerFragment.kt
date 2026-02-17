@@ -39,7 +39,6 @@ internal class ExternalCredentialControllerFragment : Fragment(R.layout.fragment
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-
         viewModel.init(params)
 
         findNavController().handleResult<ExitFormResult>(
