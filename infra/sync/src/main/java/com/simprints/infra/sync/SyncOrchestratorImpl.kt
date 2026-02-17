@@ -223,7 +223,6 @@ internal class SyncOrchestratorImpl @Inject constructor(
             Job().apply { complete() }
         }
         ScheduleCommand.Action.RESCHEDULE -> {
-            unschedule()
             appScope.launch(ioDispatcher) {
                 blockWhileUnscheduled?.invoke()
                 reschedule()
