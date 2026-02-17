@@ -2,11 +2,13 @@ package com.simprints.feature.orchestrator.usecases.response
 
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.getModalitySdkConfig
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.matching.MatchResult
+import com.simprints.infra.orchestration.data.responses.AppExternalCredential
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.orchestration.data.responses.AppResponse
@@ -23,11 +25,26 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
         val isMultiFactorIdEnabled = projectConfiguration.multifactorId?.allowedExternalCredentials?.isNotEmpty() ?: false
 
         val currentSessionId = eventRepository.getCurrentSessionScope().id
+        val externalCredential = results
+            .filterIsInstance(ExternalCredentialSearchResult::class.java)
+            .lastOrNull()
+            ?.scannedCredential
+            .toAppExternalCredential()
+
         return AppIdentifyResponse(
             sessionId = currentSessionId,
             isMultiFactorIdEnabled = isMultiFactorIdEnabled,
             // Return the results with the highest confidence score
             identifications = getResults(results, projectConfiguration),
+            scannedCredential = externalCredential,
+        )
+    }
+
+    private fun ScannedCredential?.toAppExternalCredential(): AppExternalCredential? = this?.let { scannedCredential ->
+        AppExternalCredential(
+            id = scannedCredential.credentialScanId,
+            value = scannedCredential.scannedValue,
+            type = scannedCredential.credentialType,
         )
     }
 

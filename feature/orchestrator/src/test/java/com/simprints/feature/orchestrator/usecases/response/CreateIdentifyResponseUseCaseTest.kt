@@ -297,6 +297,7 @@ class CreateIdentifyResponseUseCaseTest {
             results = listOf(
                 mockk<ExternalCredentialSearchResult> {
                     every { matchResults } returns fingerprintMatches + faceMatches
+                    every { scannedCredential } returns null
                 },
             ),
         )
@@ -333,6 +334,7 @@ class CreateIdentifyResponseUseCaseTest {
             results = listOf(
                 mockk<ExternalCredentialSearchResult> {
                     every { matchResults } returns credentialFaceMatches
+                    every { scannedCredential } returns null
                 },
                 MatchResult(
                     listOf(ComparisonResult(subjectId = sharedGuid, comparisonScore = faceConfidence)),
@@ -374,6 +376,7 @@ class CreateIdentifyResponseUseCaseTest {
             results = listOf(
                 mockk<ExternalCredentialSearchResult> {
                     every { matchResults } returns credentialFingerprintMatches
+                    every { scannedCredential } returns null
                 },
                 MatchResult(
                     listOf(ComparisonResult(subjectId = sharedGuid, comparisonScore = fingerprintConfidence)),
@@ -444,6 +447,7 @@ class CreateIdentifyResponseUseCaseTest {
             results = listOf(
                 mockk<ExternalCredentialSearchResult> {
                     every { matchResults } returns credentialFaceMatches
+                    every { scannedCredential } returns null
                 },
                 faceMatchResults,
             ),
