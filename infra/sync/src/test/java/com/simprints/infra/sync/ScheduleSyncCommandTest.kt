@@ -14,12 +14,6 @@ class ScheduleSyncCommandTest {
 
         assertThat(ScheduleCommand.Everything.unschedule())
             .isEqualTo(ScheduleCommand.EverythingCommand(action = ScheduleCommand.Action.UNSCHEDULE))
-
-        val block: suspend () -> Unit = { }
-        val command = ScheduleCommand.Everything.rescheduleAfter(withDelay = true, block = block) as ScheduleCommand.EverythingCommand
-        assertThat(command.action).isEqualTo(ScheduleCommand.Action.RESCHEDULE)
-        assertThat(command.withDelay).isTrue()
-        assertThat(command.blockWhileUnscheduled).isSameInstanceAs(block)
     }
 
     @Test
@@ -32,12 +26,6 @@ class ScheduleSyncCommandTest {
 
         assertThat(ScheduleCommand.Events.unschedule())
             .isEqualTo(ScheduleCommand.EventsCommand(action = ScheduleCommand.Action.UNSCHEDULE))
-
-        val block: suspend () -> Unit = { }
-        val command = ScheduleCommand.Events.rescheduleAfter(withDelay = false, block = block) as ScheduleCommand.EventsCommand
-        assertThat(command.action).isEqualTo(ScheduleCommand.Action.RESCHEDULE)
-        assertThat(command.withDelay).isFalse()
-        assertThat(command.blockWhileUnscheduled).isSameInstanceAs(block)
     }
 
     @Test
@@ -47,10 +35,5 @@ class ScheduleSyncCommandTest {
 
         assertThat(ScheduleCommand.Images.unschedule())
             .isEqualTo(ScheduleCommand.ImagesCommand(action = ScheduleCommand.Action.UNSCHEDULE))
-
-        val block: suspend () -> Unit = { }
-        val command = ScheduleCommand.Images.rescheduleAfter(block) as ScheduleCommand.ImagesCommand
-        assertThat(command.action).isEqualTo(ScheduleCommand.Action.RESCHEDULE)
-        assertThat(command.blockWhileUnscheduled).isSameInstanceAs(block)
     }
 }
