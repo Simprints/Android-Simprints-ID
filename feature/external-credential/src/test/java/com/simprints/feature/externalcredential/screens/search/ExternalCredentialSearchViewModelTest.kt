@@ -82,10 +82,10 @@ internal class ExternalCredentialSearchViewModelTest {
     lateinit var eventsTracker: ExternalCredentialEventTrackerUseCase
 
     @MockK
-    lateinit var ghanaIdCardOcrSelectorUseCase: GhanaIdCardOcrSelectorUseCase
+    lateinit var ghanaIdValidationUseCase: GhanaIdCardOcrSelectorUseCase
 
     @MockK
-    lateinit var ghanaNhisCardOcrSelectorUseCase: GhanaNhisCardOcrSelectorUseCase
+    lateinit var ghanaNhisCardValidationUseCase: GhanaNhisCardOcrSelectorUseCase
 
     private lateinit var viewModel: ExternalCredentialSearchViewModel
 
@@ -113,8 +113,8 @@ internal class ExternalCredentialSearchViewModelTest {
         tokenizationProcessor = tokenizationProcessor,
         enrolmentRecordRepository = enrolmentRecordRepository,
         eventsTracker = eventsTracker,
-        ghanaIdCardOcrSelectorUseCase = ghanaIdCardOcrSelectorUseCase,
-        ghanaNhisCardOcrSelectorUseCase = ghanaNhisCardOcrSelectorUseCase,
+        ghanaIdValidationUseCase = ghanaIdValidationUseCase,
+        ghanaNhisCardValidationUseCase = ghanaNhisCardValidationUseCase,
     )
 
     @Test
@@ -320,16 +320,16 @@ internal class ExternalCredentialSearchViewModelTest {
         val invalidNhisCard = "invalid"
 
         every { mockScannedCredential.credentialType } returns ExternalCredentialType.NHISCard
-        every { ghanaNhisCardOcrSelectorUseCase(validNhisCard) } returns true
-        every { ghanaNhisCardOcrSelectorUseCase(invalidNhisCard) } returns false
+        every { ghanaNhisCardValidationUseCase(validNhisCard) } returns true
+        every { ghanaNhisCardValidationUseCase(invalidNhisCard) } returns false
 
         viewModel = createViewModel()
 
         assertThat(viewModel.isCredentialFormatValid(validNhisCard)).isTrue()
         assertThat(viewModel.isCredentialFormatValid(invalidNhisCard)).isFalse()
         assertThat(viewModel.isCredentialFormatValid(null)).isFalse()
-        verify { ghanaNhisCardOcrSelectorUseCase(validNhisCard) }
-        verify { ghanaNhisCardOcrSelectorUseCase(invalidNhisCard) }
+        verify { ghanaNhisCardValidationUseCase(validNhisCard) }
+        verify { ghanaNhisCardValidationUseCase(invalidNhisCard) }
     }
 
     @Test
@@ -338,16 +338,16 @@ internal class ExternalCredentialSearchViewModelTest {
         val invalidGhanaIdCard = "invalid"
 
         every { mockScannedCredential.credentialType } returns ExternalCredentialType.GhanaIdCard
-        every { ghanaIdCardOcrSelectorUseCase(validGhanaIdCard) } returns true
-        every { ghanaIdCardOcrSelectorUseCase(invalidGhanaIdCard) } returns false
+        every { ghanaIdValidationUseCase(validGhanaIdCard) } returns true
+        every { ghanaIdValidationUseCase(invalidGhanaIdCard) } returns false
 
         viewModel = createViewModel()
 
         assertThat(viewModel.isCredentialFormatValid(validGhanaIdCard)).isTrue()
         assertThat(viewModel.isCredentialFormatValid(invalidGhanaIdCard)).isFalse()
         assertThat(viewModel.isCredentialFormatValid(null)).isFalse()
-        verify { ghanaIdCardOcrSelectorUseCase(validGhanaIdCard) }
-        verify { ghanaIdCardOcrSelectorUseCase(invalidGhanaIdCard) }
+        verify { ghanaIdValidationUseCase(validGhanaIdCard) }
+        verify { ghanaIdValidationUseCase(invalidGhanaIdCard) }
     }
 
     @Test

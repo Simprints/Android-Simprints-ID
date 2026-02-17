@@ -43,8 +43,8 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
     private val tokenizationProcessor: TokenizationProcessor,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val eventsTracker: ExternalCredentialEventTrackerUseCase,
-    private val ghanaIdCardOcrSelectorUseCase: GhanaIdCardOcrSelectorUseCase,
-    private val ghanaNhisCardOcrSelectorUseCase: GhanaNhisCardOcrSelectorUseCase,
+    private val ghanaIdValidationUseCase: GhanaIdCardOcrSelectorUseCase,
+    private val ghanaNhisCardValidationUseCase: GhanaNhisCardOcrSelectorUseCase,
 ) : ViewModel() {
     @AssistedFactory
     interface Factory {
@@ -216,11 +216,11 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         return when (scannedCredential.credentialType) {
             ExternalCredentialType.NHISCard -> {
                 // 8 digits
-                ghanaNhisCardOcrSelectorUseCase(credential)
+                ghanaNhisCardValidationUseCase(credential)
             }
             ExternalCredentialType.GhanaIdCard -> {
                 // Ghana ID card number pattern is "GHA-123456789-0"
-                ghanaIdCardOcrSelectorUseCase(credential)
+                ghanaIdValidationUseCase(credential)
             }
             ExternalCredentialType.QRCode -> {
                 // No QR code validation as of 2025.4.1
