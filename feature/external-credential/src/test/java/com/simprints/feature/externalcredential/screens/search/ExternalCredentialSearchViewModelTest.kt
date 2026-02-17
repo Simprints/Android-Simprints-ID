@@ -12,6 +12,8 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.GhanaIdCardOcrSelectorUseCase
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.GhanaNhisCardOcrSelectorUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.externalcredential.screens.search.model.SearchCredentialState
 import com.simprints.feature.externalcredential.screens.search.model.SearchState
@@ -79,6 +81,12 @@ internal class ExternalCredentialSearchViewModelTest {
     @MockK
     lateinit var eventsTracker: ExternalCredentialEventTrackerUseCase
 
+    @MockK
+    lateinit var ghanaIdValidationUseCase: GhanaIdCardOcrSelectorUseCase
+
+    @MockK
+    lateinit var ghanaNhisCardValidationUseCase: GhanaNhisCardOcrSelectorUseCase
+
     private lateinit var viewModel: ExternalCredentialSearchViewModel
 
     private val projectId = "projectId"
@@ -105,6 +113,8 @@ internal class ExternalCredentialSearchViewModelTest {
         tokenizationProcessor = tokenizationProcessor,
         enrolmentRecordRepository = enrolmentRecordRepository,
         eventsTracker = eventsTracker,
+        ghanaIdValidationUseCase = ghanaIdValidationUseCase,
+        ghanaNhisCardValidationUseCase = ghanaNhisCardValidationUseCase,
     )
 
     @Test
@@ -302,5 +312,55 @@ internal class ExternalCredentialSearchViewModelTest {
 
         assertThat(viewModel.stateLiveData.value?.displayedCredential).isEqualTo(decryptedCredential)
         coVerify { tokenizationProcessor.decrypt(encryptedCredential, TokenKeyType.ExternalCredential, project) }
+    }
+
+    @Test
+    fun `isCredentialFormatValid validates NHIS card format`() = runTest {
+        val validNhisCard = "12345678"
+        val invalidNhisCard = "invalid"
+
+        every { mockScannedCredential.credentialType } returns ExternalCredentialType.NHISCard
+        every { ghanaNhisCardValidationUseCase(validNhisCard) } returns true
+        every { ghanaNhisCardValidationUseCase(invalidNhisCard) } returns false
+
+        viewModel = createViewModel()
+
+        assertThat(viewModel.isCredentialFormatValid(validNhisCard)).isTrue()
+        assertThat(viewModel.isCredentialFormatValid(invalidNhisCard)).isFalse()
+        assertThat(viewModel.isCredentialFormatValid(null)).isFalse()
+        verify { ghanaNhisCardValidationUseCase(validNhisCard) }
+        verify { ghanaNhisCardValidationUseCase(invalidNhisCard) }
+    }
+
+    @Test
+    fun `isCredentialFormatValid validates Ghana ID card format`() = runTest {
+        val validGhanaIdCard = "GHA-12345789-0"
+        val invalidGhanaIdCard = "invalid"
+
+        every { mockScannedCredential.credentialType } returns ExternalCredentialType.GhanaIdCard
+        every { ghanaIdValidationUseCase(validGhanaIdCard) } returns true
+        every { ghanaIdValidationUseCase(invalidGhanaIdCard) } returns false
+
+        viewModel = createViewModel()
+
+        assertThat(viewModel.isCredentialFormatValid(validGhanaIdCard)).isTrue()
+        assertThat(viewModel.isCredentialFormatValid(invalidGhanaIdCard)).isFalse()
+        assertThat(viewModel.isCredentialFormatValid(null)).isFalse()
+        verify { ghanaIdValidationUseCase(validGhanaIdCard) }
+        verify { ghanaIdValidationUseCase(invalidGhanaIdCard) }
+    }
+
+    @Test
+    fun `isCredentialFormatValid always returns true for QR code`() = runTest {
+        val anyValue = "any_value"
+        val emptyValue = ""
+
+        every { mockScannedCredential.credentialType } returns ExternalCredentialType.QRCode
+
+        viewModel = createViewModel()
+
+        assertThat(viewModel.isCredentialFormatValid(anyValue)).isTrue()
+        assertThat(viewModel.isCredentialFormatValid(emptyValue)).isTrue()
+        assertThat(viewModel.isCredentialFormatValid(null)).isFalse()
     }
 }

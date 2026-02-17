@@ -13,6 +13,8 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.GhanaIdCardOcrSelectorUseCase
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.GhanaNhisCardOcrSelectorUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.externalcredential.screens.search.model.SearchCredentialState
 import com.simprints.feature.externalcredential.screens.search.model.SearchState
@@ -41,6 +43,8 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
     private val tokenizationProcessor: TokenizationProcessor,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val eventsTracker: ExternalCredentialEventTrackerUseCase,
+    private val ghanaIdValidationUseCase: GhanaIdCardOcrSelectorUseCase,
+    private val ghanaNhisCardValidationUseCase: GhanaNhisCardOcrSelectorUseCase,
 ) : ViewModel() {
     @AssistedFactory
     interface Factory {
@@ -77,6 +81,10 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
 
     fun updateConfirmation(isConfirmed: Boolean) {
         updateState { it.copy(isConfirmed = isConfirmed) }
+    }
+
+    fun updateIsEditingCredential(isEditing: Boolean) {
+        updateState { it.copy(isEditingCredential = isEditing) }
     }
 
     fun confirmCredentialUpdate(updatedCredential: TokenizableString.Raw) {
@@ -200,6 +208,24 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
                     matchResults = matches,
                 ),
             )
+        }
+    }
+
+    fun isCredentialFormatValid(credential: String?): Boolean {
+        if (credential == null) return false
+        return when (scannedCredential.credentialType) {
+            ExternalCredentialType.NHISCard -> {
+                // 8 digits
+                ghanaNhisCardValidationUseCase(credential)
+            }
+            ExternalCredentialType.GhanaIdCard -> {
+                // Ghana ID card number pattern is "GHA-123456789-0"
+                ghanaIdValidationUseCase(credential)
+            }
+            ExternalCredentialType.QRCode -> {
+                // No QR code validation as of 2025.4.1
+                true
+            }
         }
     }
 }
