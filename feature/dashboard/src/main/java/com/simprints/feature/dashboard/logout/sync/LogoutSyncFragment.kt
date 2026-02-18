@@ -12,6 +12,7 @@ import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentLogoutSyncBinding
 import com.simprints.feature.dashboard.logout.LogoutSyncViewModel
 import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -26,6 +27,7 @@ class LogoutSyncFragment : Fragment(R.layout.fragment_logout_sync) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         initViews()
         observeLiveData()
     }
