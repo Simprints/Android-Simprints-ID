@@ -1,6 +1,7 @@
 package com.simprints.infra.events.event.cosync.v1
 
 import androidx.annotation.Keep
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import kotlinx.serialization.Serializable
 
@@ -10,6 +11,7 @@ import kotlinx.serialization.Serializable
  */
 @Keep
 @Serializable
+@ExcludedFromGeneratedTestCoverageReports("Enum")
 enum class CoSyncExternalCredentialType {
     NHISCard,
     GhanaIdCard,

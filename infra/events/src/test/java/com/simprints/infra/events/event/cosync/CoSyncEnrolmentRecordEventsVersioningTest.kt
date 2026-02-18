@@ -1,20 +1,27 @@
 package com.simprints.infra.events.event.cosync
 
 import com.simprints.core.domain.common.TemplateIdentifier
+import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.events.event.cosync.v1.CoSyncEnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.cosync.v1.CoSyncEnrolmentRecordCreationPayload
-import com.simprints.infra.events.event.cosync.v1.CoSyncExternalCredentialType
 import com.simprints.infra.events.event.cosync.v1.CoSyncExternalCredential
+import com.simprints.infra.events.event.cosync.v1.CoSyncExternalCredentialType
 import com.simprints.infra.events.event.cosync.v1.CoSyncFaceReference
 import com.simprints.infra.events.event.cosync.v1.CoSyncFaceTemplate
 import com.simprints.infra.events.event.cosync.v1.CoSyncFingerprintReference
 import com.simprints.infra.events.event.cosync.v1.CoSyncFingerprintTemplate
 import com.simprints.infra.events.event.cosync.v1.CoSyncTemplateIdentifier
 import com.simprints.infra.events.event.cosync.v1.CoSyncTokenizableString
+import com.simprints.infra.events.event.cosync.v1.toCoSync
+import com.simprints.infra.events.event.cosync.v1.toDomain
 import com.simprints.infra.events.event.domain.models.EnrolmentRecordCreationEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentRecordDeletionEvent
 import com.simprints.infra.events.event.domain.models.FaceReference
+import com.simprints.infra.events.event.domain.models.FaceTemplate
 import com.simprints.infra.events.event.domain.models.FingerprintReference
+import com.simprints.infra.events.event.domain.models.FingerprintTemplate
 import com.simprints.infra.serialization.SimJson
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -23,7 +30,6 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class CoSyncEnrolmentRecordEventsVersioningTest {
-
     // region Schema version routing
 
     @Test
@@ -304,7 +310,164 @@ class CoSyncEnrolmentRecordEventsVersioningTest {
 
     // endregion
 
+    // region Domain to CoSync converter roundtrip
+
+    @Test
+    fun `domain event converts to CoSync and back preserving all fields`() {
+        val domain = EnrolmentRecordCreationEvent(
+            subjectId = "subject-1",
+            projectId = "project-1",
+            moduleId = TokenizableString.Tokenized("encrypted-module"),
+            attendantId = TokenizableString.Raw("attendant-1"),
+            biometricReferences = listOf(
+                FaceReference(
+                    id = "face-ref-1",
+                    templates = listOf(FaceTemplate(template = "dGVtcGxhdGU=")),
+                    format = "NEC_5",
+                    metadata = mapOf("key" to "value"),
+                ),
+                FingerprintReference(
+                    id = "fp-ref-1",
+                    templates = listOf(
+                        FingerprintTemplate(
+                            template = "ZmluZ2VycHJpbnQ=",
+                            finger = TemplateIdentifier.LEFT_INDEX_FINGER,
+                        ),
+                    ),
+                    format = "ISO_19794_2",
+                ),
+            ),
+            externalCredentials = listOf(
+                ExternalCredential(
+                    id = "cred-1",
+                    value = TokenizableString.Tokenized("encrypted-value"),
+                    subjectId = "subject-1",
+                    type = ExternalCredentialType.NHISCard,
+                ),
+            ),
+        )
+
+        val coSync = domain.toCoSync()
+        val wrapper = CoSyncEnrolmentRecordEventsV1(events = listOf(coSync))
+        val result = encodeAndDecodeDomainEvent(wrapper)
+
+        assertEquals(domain.payload.subjectId, result.payload.subjectId)
+        assertEquals(domain.payload.projectId, result.payload.projectId)
+        assertEquals(domain.payload.moduleId, result.payload.moduleId)
+        assertEquals(domain.payload.attendantId, result.payload.attendantId)
+
+        val faceRef = assertIs<FaceReference>(result.payload.biometricReferences[0])
+        assertEquals("face-ref-1", faceRef.id)
+        assertEquals("NEC_5", faceRef.format)
+        assertEquals("dGVtcGxhdGU=", faceRef.templates.first().template)
+        assertEquals(mapOf("key" to "value"), faceRef.metadata)
+
+        val fpRef = assertIs<FingerprintReference>(result.payload.biometricReferences[1])
+        assertEquals("fp-ref-1", fpRef.id)
+        assertEquals("ISO_19794_2", fpRef.format)
+        assertEquals(TemplateIdentifier.LEFT_INDEX_FINGER, fpRef.templates.first().finger)
+
+        val cred = result.payload.externalCredentials.single()
+        assertEquals("cred-1", cred.id)
+        assertEquals(TokenizableString.Tokenized("encrypted-value"), cred.value)
+        assertEquals(ExternalCredentialType.NHISCard, cred.type)
+    }
+
+    // endregion
+
+    // region Pinned JSON contract
+
+    @Test
+    fun `V1 serialization matches pinned JSON contract`() {
+        val wrapper = CoSyncEnrolmentRecordEventsV1(
+            events = listOf(
+                CoSyncEnrolmentRecordCreationEvent(
+                    id = "event-1",
+                    payload = CoSyncEnrolmentRecordCreationPayload(
+                        subjectId = "subject-1",
+                        projectId = "project-1",
+                        moduleId = CoSyncTokenizableString.Tokenized("encrypted-module"),
+                        attendantId = CoSyncTokenizableString.Raw("attendant-1"),
+                        biometricReferences = listOf(
+                            CoSyncFaceReference(
+                                id = "ref-1",
+                                templates = listOf(CoSyncFaceTemplate(template = "dGVtcGxhdGU=")),
+                                format = "NEC_5",
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        val json = SimJson.encodeToString<CoSyncEnrolmentRecordEvents>(wrapper)
+
+        // If this test fails, someone changed the serialization format — update pinned JSON deliberately
+        val parsed = SimJson.parseToJsonElement(json)
+        val pinned = SimJson.parseToJsonElement(pinnedV1Json)
+        assertEquals(pinned, parsed)
+    }
+
+    @Test
+    fun `pinned JSON deserializes to correct domain event`() {
+        val event = decodeDomainEvent(pinnedV1Json)
+
+        assertEquals("event-1", event.id)
+        assertEquals("subject-1", event.payload.subjectId)
+        assertEquals("project-1", event.payload.projectId)
+        assertEquals(TokenizableString.Tokenized("encrypted-module"), event.payload.moduleId)
+        assertEquals(TokenizableString.Raw("attendant-1"), event.payload.attendantId)
+
+        val ref = assertIs<FaceReference>(event.payload.biometricReferences.single())
+        assertEquals("ref-1", ref.id)
+        assertEquals("NEC_5", ref.format)
+        assertEquals("dGVtcGxhdGU=", ref.templates.first().template)
+    }
+
+    // endregion
+
+    // region Edge cases
+
+    @Test
+    fun `toCoSync throws for unsupported event type`() {
+        val deletionEvent = EnrolmentRecordDeletionEvent(
+            subjectId = "subject-1",
+            projectId = "project-1",
+            moduleId = "module-1",
+            attendantId = "attendant-1",
+        )
+
+        assertFailsWith<IllegalArgumentException> {
+            deletionEvent.toCoSync()
+        }
+    }
+
+    @Test
+    fun `CoSyncExternalCredential toDomain throws for Raw value`() {
+        val credential = CoSyncExternalCredential(
+            id = "cred-1",
+            value = CoSyncTokenizableString.Raw("plain-value"),
+            subjectId = "subject-1",
+            type = CoSyncExternalCredentialType.NHISCard,
+        )
+
+        assertFailsWith<IllegalStateException> {
+            credential.toDomain()
+        }
+    }
+
+    // endregion
+
     // region Helpers
+
+    /**
+     * Pinned JSON contract for V1 serialization format.
+     * If this needs updating, the protocol has changed — verify backward compatibility.
+     */
+    private val pinnedV1Json =
+        """
+        {"schemaVersion":"1.0","events":[{"type":"EnrolmentRecordCreation","id":"event-1","payload":{"subjectId":"subject-1","projectId":"project-1","moduleId":{"className":"TokenizableString.Tokenized","value":"encrypted-module"},"attendantId":{"className":"TokenizableString.Raw","value":"attendant-1"},"biometricReferences":[{"type":"FACE_REFERENCE","id":"ref-1","templates":[{"template":"dGVtcGxhdGU="}],"format":"NEC_5"}],"externalCredentials":[]}}]}
+        """.trimIndent()
 
     private fun buildCoSyncJson(
         schemaVersion: String? = "1.0",
@@ -316,24 +479,24 @@ class CoSyncEnrolmentRecordEventsVersioningTest {
         val versionLine = schemaVersion?.let { """"schemaVersion": "$it",""" } ?: ""
         val credentialsLine = externalCredentials?.let { """"externalCredentials": $it,""" } ?: ""
         return """
-        {
-            $versionLine
-            "events": [
-                {
-                    "type": "EnrolmentRecordCreation",
-                    "id": "event-1",
-                    "payload": {
-                        "subjectId": "subject-1",
-                        "projectId": "project-1",
-                        "moduleId": $moduleId,
-                        "attendantId": $attendantId,
-                        $credentialsLine
-                        "biometricReferences": $biometricReferences
+            {
+                $versionLine
+                "events": [
+                    {
+                        "type": "EnrolmentRecordCreation",
+                        "id": "event-1",
+                        "payload": {
+                            "subjectId": "subject-1",
+                            "projectId": "project-1",
+                            "moduleId": $moduleId,
+                            "attendantId": $attendantId,
+                            $credentialsLine
+                            "biometricReferences": $biometricReferences
+                        }
                     }
-                }
-            ]
-        }
-        """.trimIndent()
+                ]
+            }
+            """.trimIndent()
     }
 
     private fun buildSimpleV1Event() = CoSyncEnrolmentRecordEventsV1(
@@ -357,9 +520,7 @@ class CoSyncEnrolmentRecordEventsVersioningTest {
         return assertIs<EnrolmentRecordCreationEvent>(events.first())
     }
 
-    private fun encodeAndDecodeDomainEvent(
-        original: CoSyncEnrolmentRecordEvents,
-    ): EnrolmentRecordCreationEvent {
+    private fun encodeAndDecodeDomainEvent(original: CoSyncEnrolmentRecordEvents): EnrolmentRecordCreationEvent {
         val json = SimJson.encodeToString<CoSyncEnrolmentRecordEvents>(original)
         return decodeDomainEvent(json)
     }
