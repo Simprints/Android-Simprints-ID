@@ -203,7 +203,7 @@ internal class CommCareCandidateRecordDataSource @Inject constructor(
                 Simber.d(subjectActions)
                 val coSyncEnrolmentRecordEvents = parseRecordEvents(subjectActions)
 
-                coSyncEnrolmentRecordEvents?.events?.filterIsInstance<EnrolmentRecordCreationEvent>()?.filter { event ->
+                coSyncEnrolmentRecordEvents?.toDomainEvents()?.filterIsInstance<EnrolmentRecordCreationEvent>()?.filter { event ->
                     // [MS-852] Plain strings from CommCare might be tokenized or untokenized. The only way to properly compare them
                     // is by trying to decrypt the values to check if already tokenized, and then compare the values
                     isSubjectIdNullOrMatching(query, event) &&
