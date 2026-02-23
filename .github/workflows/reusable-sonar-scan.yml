@@ -45,17 +45,25 @@ jobs:
                 uses: actions/download-artifact@v7
                 with:
                     path: test-reports
-                    merge-multiple: true
 
             # Move all reports to the root directory
-            -   name: Collect test reports (skip missing)
-                shell: bash
+            # Use -f to force the move and || true to prevent failure if the file doesn't exist
+            -   name: Move reports
                 run: |
-                    set -euo pipefail
-                    shopt -s nullglob
+                    rsync -arv test-reports/core/* .  || true
+                    rsync -arv test-reports/infra1/* .  || true
+                    rsync -arv test-reports/infra2/* .  || true
+                    rsync -arv test-reports/feature1/* .  || true
+                    rsync -arv test-reports/feature2/* .  || true
+                    rsync -arv test-reports/dashboard/* .  || true
+                    rsync -arv test-reports/face/* .  || true
+                    rsync -arv test-reports/fingerprint/* .  || true
+                    rsync -arv test-reports/testing-tools/* .  || true
 
-                    echo "Copying artefact contents to workspace root"
-                    rsync -arv test-reports/* . || true
+            # list all reports for Id module
+            -   name: list reports
+                run: |
+                    ls -l id
 
             -   name: run sonar
                 env:

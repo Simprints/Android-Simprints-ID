@@ -5,105 +5,12 @@ on: # this checks should be triggered on pull request, before deployments, and m
     pull_request:
         paths-ignore:
             - 'infra/resources/src/main/res/**'
-            - '**.md'
-        types:
-            # Default types of PR triggers
-            - opened
-            - reopened
-            - synchronize
-            # Ensures that Sonar check are run once PR is ready
-            - ready_for_review
     workflow_call:
     workflow_dispatch:
 
-# Cancel in-progress runs when a new commit is pushed to the PR
-concurrency:
-    group: pr-checks-${{ github.event.pull_request.number || github.ref }}
-    cancel-in-progress: true
-
 jobs:
-
-    changes:
-        name: Check code changes
-        runs-on: ubuntu-latest
-        outputs:
-            versions: ${{ steps.filter.outputs.versions }}
-            core: ${{ steps.filter.outputs.core }}
-            infra1: ${{ steps.filter.outputs.infra1 }}
-            infra2: ${{ steps.filter.outputs.infra2 }}
-            feature1: ${{ steps.filter.outputs.feature1 }}
-            feature2: ${{ steps.filter.outputs.feature2 }}
-            dashboard: ${{ steps.filter.outputs.feature }}
-            face: ${{ steps.filter.outputs.face }}
-            fingerprint: ${{ steps.filter.outputs.fingerprint }}
-            testing: ${{ steps.filter.outputs.testing }}
-        steps:
-            -   name: Checkout
-                uses: actions/checkout@v6
-
-            -   name: Check directories in test groups
-                uses: dorny/paths-filter@v3
-                id: filter
-                with:
-                    filters: |
-                        versions:
-                            - 'gradle/libs.versions.toml'
-                        core:
-                            - 'infra/core/**'
-                            - 'infra/ui-base/**'
-                            - 'infra/network/**'
-                            - 'infra/logging/**'
-                            - 'infra/logging-persistent/**'
-                            - 'infra/security/**'
-                        infra1:
-                            - 'infra/orchestrator-data/**'
-                            - 'infra/enrolment-records:repository/**'
-                            - 'infra/enrolment-records:realm-store/**'
-                            - 'infra/enrolment-records:room-store/**'
-                            - 'infra/recent-user-activity/**'
-                            - 'infra/config-store/**'
-                            - 'infra/credential-store/**'
-                            - 'infra/sync/**'
-                        infra2:
-                            - 'infra/events/**'
-                            - 'infra/event-sync/**'
-                            - 'infra/license/**'
-                            - 'infra/images/**'
-                            - 'infra/auth-store/**'
-                            - 'infra/auth-logic/**'
-                            - 'infra/matching/**'
-                        feature1:
-                            - 'feature/orchestrator/**'
-                            - 'feature/client-api/**'
-                            - 'feature/login-check/**'
-                            - 'feature/alert/**'
-                            - 'feature/exit-form/**'
-                            - 'feature/select-subject-age-group/**'
-                            - 'feature/external-credential/**'
-                        feature2:
-                            - 'feature/consent/**'
-                            - 'feature/login/**'
-                            - 'feature/fetch-subject/**'
-                            - 'feature/select-subject/**'
-                            - 'feature/setup/**'
-                            - 'feature/enrol-last-biometric/**'
-                            - 'feature/matcher/**'
-                            - 'feature/validate-subject-pool/**'
-                        dashboard:
-                            - 'feature/dashboard/**'
-                            - 'feature/troubleshooting/**'
-                        face:
-                            - 'face/**'
-                        fingerprint:
-                            - 'fingerprint/**'
-                        testing:
-                            - 'testing/data-generator/**'
-
-
     core-unit-tests:
         name: Core Unit Tests
-        needs: changes
-        if: needs.changes.outputs.core == 'true' || needs.changes.outputs.versions == 'true'
         uses: ./.github/workflows/reusable-run-unit-tests.yml
         secrets: inherit
         with:
@@ -118,8 +25,6 @@ jobs:
 
     infra-unit-tests-1:
         name: Infra Unit Tests 1
-        needs: changes
-        if: needs.changes.outputs.infra1 == 'true' || needs.changes.outputs.versions == 'true'
         uses: ./.github/workflows/reusable-run-unit-tests.yml
         secrets: inherit
         with:
@@ -136,8 +41,6 @@ jobs:
 
     infra-unit-tests-2:
         name: Infra Unit Tests 2
-        needs: changes
-        if: needs.changes.outputs.infra2 == 'true' || needs.changes.outputs.versions == 'true'
         uses: ./.github/workflows/reusable-run-unit-tests.yml
         secrets: inherit
         with:
@@ -153,8 +56,6 @@ jobs:
 
     feature-unit-tests1:
         name: Feature Unit Tests 1
-        needs: changes
-        if: needs.changes.outputs.feature1 == 'true' || needs.changes.outputs.versions == 'true'
         uses: ./.github/workflows/reusable-run-unit-tests.yml
         secrets: inherit
         with:
@@ -170,8 +71,6 @@ jobs:
 
     feature-unit-tests2:
         name: Feature Unit Tests 2
-        needs: changes
-        if: needs.changes.outputs.feature2 == 'true' || needs.changes.outputs.versions == 'true'
         uses: ./.github/workflows/reusable-run-unit-tests.yml
         secrets: inherit
         with:
@@ -188,8 +87,6 @@ jobs:
 
     feature-dashboard-unit-tests:
         name: Feature Dashboard Unit Tests
-        needs: changes
-        if: needs.changes.outputs.dashboard == 'true' || needs.changes.outputs.versions == 'true'
         uses: ./.github/workflows/reusable-run-unit-tests.yml
         secrets: inherit
         with:
@@ -200,8 +97,6 @@ jobs:
 
     face-unit-tests:
         name: Face Unit Tests
-        needs: changes
-        if: needs.changes.outputs.face == 'true' || needs.changes.outputs.versions == 'true'
         uses: ./.github/workflows/reusable-run-unit-tests.yml
         secrets: inherit
         with:
@@ -216,8 +111,6 @@ jobs:
 
     fingerprint-unit-tests:
         name: Fingerprint Unit Tests
-        needs: changes
-        if: needs.changes.outputs.fingerprint == 'true' || needs.changes.outputs.versions == 'true'
         uses: ./.github/workflows/reusable-run-unit-tests.yml
         secrets: inherit
         with:
@@ -233,8 +126,6 @@ jobs:
             reportsId: fingerprint
     testing-tools:
         name: Testing Tools unit tests
-        needs: changes
-        if: needs.changes.outputs.testing == 'true' || needs.changes.outputs.versions == 'true'
         uses: ./.github/workflows/reusable-run-unit-tests.yml
         secrets: inherit
         with:
@@ -254,13 +145,3 @@ jobs:
                  fingerprint-unit-tests,
                  testing-tools ]
         uses: ./.github/workflows/reusable-sonar-scan.yml
-        # Only run if the PR ready for review or triggered manually, and if tests passed or matched 'skipped' status (due to smart filter).
-        # always() calls is required to prevent a hidden success() check being added.
-        # Skipping any PRs made by bots.
-        if: >
-            always() &&
-            (github.event.pull_request.draft == false || github.event_name == 'workflow_dispatch') &&
-            !startsWith(github.head_ref, 'dependabot') &&
-            !contains(github.actor, '[bot]') &&
-            !contains(needs.*.result, 'failure') &&
-            !contains(needs.*.result, 'cancelled')

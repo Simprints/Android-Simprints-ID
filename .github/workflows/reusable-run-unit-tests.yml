@@ -60,25 +60,19 @@ jobs:
             -   name: Run tests
                 run: |
                     # Get the modules array from the previous step
-                    modules_array=(${{ steps.create-modules-array.outputs.modules_array }})
-                    # Transform input list into a single string of gradle tasks
-                    TASKS=""
+                    modules_array=("${{ steps.create-modules-array.outputs.modules_array}}")
+                    modules_array=(${modules_array// / })
+                    # Iterate over the array
+                    tasks=""
                     for module in "${modules_array[@]}"; do
-                        if [ -n "$module" ]; then
-                            TASKS="$TASKS $module:jacocoTestReport"
-                        fi
+                        tasks="$tasks $module:jacocoTestReport"
                     done
+  
+                    # Run Gradle exactly once
+                    ./gradlew $tasks                   
 
-                    echo -e "\n\n"
-                    echo "=========================================="
-                    echo "=========================================="
-                    echo "Executing Gradle tasks: $TASKS"
-                    echo "=========================================="
-                    echo "=========================================="
-                    echo -e "\n\n"
-                    ./gradlew $TASKS --continue --no-daemon
             -   name: Upload Folders
-                uses: actions/upload-artifact@v6
+                uses: actions/upload-artifact@v4
                 with:
                     name: "${{ inputs.reportsId }}"
                     path: "*/**/build/reports/jacoco/jacocoTestReport"
