@@ -66,7 +66,8 @@ simmatcher_version = "1.3.0"
 roc_wrapper_version = "1.23.0"
 roc_wrapper-v3_version = "3.1.0"
 secugen_version = "1.1.0"
-simface = "2026.1.0"
+simface_version = "2026.1.0"
+polyprotect_version = "2025.1.1"
 
 junit_version = "4.13.2"
 junit_ext_version = "1.3.0"
@@ -86,6 +87,7 @@ protobuf_plugin_version = "0.9.6"
 deps_graph_version = "0.8.0"
 tink_version = "1.20.0"
 desugar_jdk_libsVersion = "2.1.5"
+
 [libraries]
 
 #Kotlin
@@ -196,13 +198,16 @@ libsimprints = { module = "com.simprints:libsimprints", version.ref = "libsimpri
 #simmatcher
 simmatcher = { module = "com.simprints:libsimmatcher", version.ref = "simmatcher_version" }
 
+polyprotect = { module = "com.simprints.biometrics:polyprotect", version.ref = "polyprotect_version" }
+
+
 # roc v1 sdk hosted in https://github.com/Simprints/lib-roc-wrapper
 roc-v1 = { module = "com.simprints:rocwrapper", version.ref = "roc_wrapper_version" }
 # roc v3 sdk hosted in https://github.com/Simprints/lib-roc-wrapper-v3
 roc-v3 = { module = "com.simprints:rocwrapper-v3", version.ref = "roc_wrapper-v3_version" }
 # secugen sdk hosted in https://github.com/Simprints/secugen-wrapper
 secugen = { module = "com.simprints:secugenwrapper", version.ref = "secugen_version" }
-simface = { module = "com.simprints.biometrics:simface", version.ref = "simface" }
+simface = { module = "com.simprints.biometrics:simface", version.ref = "simface_version" }
 
 #hilt
 hilt = { module = "com.google.dagger:hilt-android", version.ref = "hilt_version" }
