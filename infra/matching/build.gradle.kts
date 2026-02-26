@@ -18,4 +18,5 @@ dependencies {
 
     implementation(project(":fingerprint:infra:bio-sdk"))
     implementation(project(":infra:auth-store"))
+    implementation(project(":infra:template-protection"))
 }

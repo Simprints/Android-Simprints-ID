@@ -6,6 +6,7 @@ import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.simface.detection.SimFaceDetector
 import com.simprints.face.infra.simface.initialization.SimFaceInitializer
 import com.simprints.face.infra.simface.matching.SimFaceMatcher
+import com.simprints.infra.protection.TemplateProtection
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -14,6 +15,7 @@ class SimFaceBioSdk @Inject constructor(
     override val initializer: SimFaceInitializer,
     override val detector: SimFaceDetector,
     private val simFace: SimFace,
+    private val templateProtection: TemplateProtection, // TODO PoC
 ) : FaceBioSDK {
     override fun version(): String = "1"
 
@@ -21,5 +23,9 @@ class SimFaceBioSdk @Inject constructor(
 
     override fun matcherName(): String = "SIM_FACE"
 
-    override fun createMatcher(probeReference: BiometricReferenceCapture): FaceMatcher = SimFaceMatcher(simFace, probeReference)
+    override fun createMatcher(probeReference: BiometricReferenceCapture): FaceMatcher = SimFaceMatcher(
+        simFace,
+        templateProtection,
+        probeReference,
+    )
 }

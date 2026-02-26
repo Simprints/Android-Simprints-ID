@@ -3,6 +3,7 @@ package com.simprints.face.infra.rocv3.matching
 import ai.roc.rocsdk.embedded.SWIGTYPE_p_unsigned_char
 import ai.roc.rocsdk.embedded.roc
 import ai.roc.rocsdk.embedded.rocConstants.ROC_FACE_FAST_FV_SIZE
+import com.simprints.biometrics.polyprotect.AuxData
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.reference.CandidateRecord
@@ -22,7 +23,10 @@ class RocV3Matcher(
             probeTemplate
         }
 
-    override suspend fun getHighestComparisonScoreForCandidate(candidate: CandidateRecord): Float = nativeProbeTemplates
+    override suspend fun getHighestComparisonScoreForCandidate(
+        candidate: CandidateRecord,
+        probeAuxData: AuxData?, // TODO PoC - no-op in this class
+    ): Float = nativeProbeTemplates
         .flatMap { probeTemplate ->
             candidate.references.flatMap { it.templates }.map { face ->
                 getSimilarityScoreForCandidate(probeTemplate, face.template)

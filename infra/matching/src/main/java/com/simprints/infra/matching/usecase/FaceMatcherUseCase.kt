@@ -17,6 +17,7 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.matching.MatchBatchInfo
 import com.simprints.infra.matching.MatchParams
 import com.simprints.infra.matching.usecase.MatcherUseCase.MatcherState
+import com.simprints.infra.protection.TemplateProtection
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
@@ -30,6 +31,7 @@ class FaceMatcherUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val resolveFaceBioSdk: ResolveFaceBioSdkUseCase,
     private val createRanges: CreateRangesUseCase,
+    private val templateProtection: TemplateProtection,
     @param:DispatcherBG private val dispatcherBG: CoroutineDispatcher,
 ) : MatcherUseCase {
     override val crashReportTag = LoggingConstants.CrashReportTag.FACE_MATCHING
@@ -122,10 +124,13 @@ class FaceMatcherUseCase @Inject constructor(
         matcher: FaceMatcher,
         batchCandidates: List<CandidateRecord>,
     ) = batchCandidates.fold(MatchResultSet()) { acc, candidate ->
+        // TODO PoC - worth considering storing the AuxData in the enrolment record DB to be able to JOIN them during the lookup
+        val candidateAux = templateProtection.getAuxData(candidate.subjectId)
+
         acc.add(
             ComparisonResult(
                 candidate.subjectId,
-                matcher.getHighestComparisonScoreForCandidate(candidate),
+                matcher.getHighestComparisonScoreForCandidate(candidate, candidateAux),
             ),
         )
     }

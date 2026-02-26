@@ -12,12 +12,14 @@ import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppResponse
+import com.simprints.infra.protection.TemplateProtection
 import java.io.Serializable
 import javax.inject.Inject
 
 internal class CreateEnrolResponseUseCase @Inject constructor(
     private val enrolmentRecordFactory: EnrolmentRecordFactory,
     private val enrolRecord: EnrolRecordUseCase,
+    private val templateProtection: TemplateProtection,
 ) {
     suspend operator fun invoke(
         request: ActionRequest.EnrolActionRequest,
@@ -28,16 +30,32 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
         val credentialResult = results.filterIsInstance<ExternalCredentialSearchResult>().lastOrNull()
         val externalCredential = credentialResult?.scannedCredential?.toExternalCredential(enrolmentSubjectId)
 
+        val auxData = templateProtection.createAuxData()
         return try {
             val record = enrolmentRecordFactory.buildFromCaptureResults(
                 subjectId = enrolmentSubjectId,
                 projectId = request.projectId,
                 attendantId = request.userId,
                 moduleId = request.moduleId,
-                captures = results.filterIsInstance<BiometricReferenceCapture>(),
+                captures = results.filterIsInstance<BiometricReferenceCapture>().map { reference ->
+                    // TODO PoC - overriding captured templates with encoded ones
+                    reference.copy(
+                        templates = reference.templates.map { templateCapture ->
+                            templateCapture.copy(
+                                template = templateProtection.encodeTemplate(
+                                    template = templateCapture.template,
+                                    auxData = auxData,
+                                ),
+                            )
+                        },
+                    )
+                },
                 externalCredential = externalCredential,
             )
             enrolRecord(record, project)
+
+            // TODO PoC - Storing aux data for this subject
+            templateProtection.saveAuxData(enrolmentSubjectId, auxData)
 
             AppEnrolResponse(record.subjectId, externalCredential)
         } catch (e: Exception) {

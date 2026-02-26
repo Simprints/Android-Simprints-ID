@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class CandidateRecord(
+data class CandidateRecord(
     val subjectId: String,
     val references: List<BiometricReference>,
 ) : Parcelable

@@ -1,5 +1,6 @@
 package com.simprints.face.infra.rocv1.matching
 
+import com.simprints.biometrics.polyprotect.AuxData
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.reference.CandidateRecord
@@ -22,7 +23,10 @@ class RocV1Matcher(
             probeTemplate
         }
 
-    override suspend fun getHighestComparisonScoreForCandidate(candidate: CandidateRecord): Float = nativeProbeTemplates
+    override suspend fun getHighestComparisonScoreForCandidate(
+        candidate: CandidateRecord,
+        probeAuxData: AuxData?, // TODO PoC - no-op in this class
+    ): Float = nativeProbeTemplates
         .flatMap { probeTemplate ->
             candidate.references.flatMap { it.templates }.map { face ->
                 getSimilarityScoreForCandidate(probeTemplate, face.template)

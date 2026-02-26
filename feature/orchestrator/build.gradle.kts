@@ -38,6 +38,7 @@ dependencies {
     implementation(project(":infra:event-sync"))
     implementation(project(":infra:images"))
     implementation(project(":infra:matching"))
+	implementation(project(":infra:template-protection"))
 
     implementation(libs.androidX.ui.preference)
 }

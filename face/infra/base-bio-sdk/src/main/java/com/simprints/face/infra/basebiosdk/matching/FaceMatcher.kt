@@ -1,5 +1,6 @@
 package com.simprints.face.infra.basebiosdk.matching
 
+import com.simprints.biometrics.polyprotect.AuxData
 import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.reference.CandidateRecord
 
@@ -12,5 +13,8 @@ abstract class FaceMatcher(
      * @param candidate
      * @return the highest comparison score
      */
-    abstract suspend fun getHighestComparisonScoreForCandidate(candidate: CandidateRecord): Float
+    abstract suspend fun getHighestComparisonScoreForCandidate(
+        candidate: CandidateRecord,
+        probeAuxData: AuxData? = null, // TODO PoC
+    ): Float
 }
