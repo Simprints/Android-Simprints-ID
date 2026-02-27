@@ -81,7 +81,7 @@ uiAutomator_version = "2.3.0"
 jacoco_version = "0.8.14"
 
 sonar_plugin_version = "7.2.2.6593"
-realm_version = "4.0.1"
+realm_version = "4.0.2"
 protobuf_plugin_version = "0.9.6"
 deps_graph_version = "0.8.0"
 tink_version = "1.20.0"
