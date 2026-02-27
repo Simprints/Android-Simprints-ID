@@ -1,7 +1,7 @@
 import com.android.build.api.dsl.ApplicationExtension
 import common.BuildTypes
 import common.SdkVersions
-import common.configureKotlinAndroid
+import common.configureAndroidApplication
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -23,7 +23,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
             with(pluginManager) {
                 apply("com.android.application")
-                apply("org.jetbrains.kotlin.android")
                 apply("simprints.library.hilt")
 
                 apply("com.google.firebase.firebase-perf")
@@ -34,7 +33,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             }
 
             extensions.configure<ApplicationExtension> {
-                configureKotlinAndroid(this)
+                configureAndroidApplication(this)
 
                 defaultConfig {
                     targetSdk = SdkVersions.TARGET

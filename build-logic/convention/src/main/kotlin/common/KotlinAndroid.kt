@@ -1,15 +1,26 @@
 package common
 
-import com.android.build.api.dsl.CommonExtension
-import com.android.build.api.variant.AndroidComponentsExtension
+import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.Project
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-/**
- * Configure base Kotlin with Android options
- */
-internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, *, *, *, *, *>) {
-    commonExtension.apply {
+internal fun Project.configureKotlinCompiler() {
+    tasks.withType(KotlinCompile::class.java).configureEach {
+        compilerOptions {
+            freeCompilerArgs.addAll(
+                "-Xnew-inference",
+                "-opt-in=kotlin.RequiresOptIn",
+                "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+                "-opt-in=kotlinx.coroutines.FlowPreview",
+                "-opt-in=kotlin.Experimental",
+            )
+        }
+    }
+}
+
+internal fun Project.configureAndroidApplication(extension: ApplicationExtension) {
+    extension.apply {
         compileSdk = SdkVersions.TARGET
 
         defaultConfig {
@@ -20,23 +31,24 @@ internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, 
             sourceCompatibility = SdkVersions.JAVA_TARGET
             targetCompatibility = SdkVersions.JAVA_TARGET
         }
+    }
 
-        extensions.getByType(AndroidComponentsExtension::class.java).onVariants { variant ->
-            afterEvaluate {
-                val variantName = variant.name.replaceFirstChar { it.uppercaseChar() }
-                val compileTaskName = "compile${variantName}Kotlin"
+    configureKotlinCompiler()
+}
 
-                tasks.named(compileTaskName, KotlinCompilationTask::class.java) {
-                    compilerOptions.freeCompilerArgs.addAll(
-                        "-Xnew-inference",
-                        "-opt-in=kotlin.RequiresOptIn",
-                        // Enable experimental coroutines APIs, including Flow
-                        "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-                        "-opt-in=kotlinx.coroutines.FlowPreview",
-                        "-opt-in=kotlin.Experimental",
-                    )
-                }
-            }
+internal fun Project.configureAndroidLibrary(extension: LibraryExtension) {
+    extension.apply {
+        compileSdk = SdkVersions.TARGET
+
+        defaultConfig {
+            minSdk = SdkVersions.MIN
+        }
+
+        compileOptions {
+            sourceCompatibility = SdkVersions.JAVA_TARGET
+            targetCompatibility = SdkVersions.JAVA_TARGET
         }
     }
+
+    configureKotlinCompiler()
 }
