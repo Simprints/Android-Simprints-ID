@@ -8,6 +8,9 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
 
 // Utility to get local properties from file
 val properties = File(rootDir, "local.properties").inputStream().use {
@@ -72,6 +75,7 @@ dependencyResolutionManagement {
                 password = properties.getProperty("GITHUB_TOKEN", System.getenv("GITHUB_TOKEN"))
             }
         }
+        mavenLocal()
     }
 }
 

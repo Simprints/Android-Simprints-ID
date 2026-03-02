@@ -1,6 +1,6 @@
 package com.simprints.face.infra.simface
 
-import com.simprints.biometrics.simface.SimFace
+import com.simprints.biometrics.simpalm.SimPalm
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.basebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.face.infra.simface.detection.SimFaceDetector
@@ -17,7 +17,7 @@ import javax.inject.Singleton
 object SimFaceProviderModule {
     @Provides
     @Singleton
-    fun provideSimFace(): SimFace = SimFace()
+    fun provideSimPalm(): SimPalm = SimPalm()
 }
 
 @Module

@@ -1,6 +1,6 @@
 package com.simprints.face.infra.biosdkresolver
 
-import com.simprints.biometrics.simface.SimFace
+import com.simprints.biometrics.simpalm.SimPalm
 import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.simface.detection.SimFaceDetector
@@ -13,13 +13,13 @@ import javax.inject.Singleton
 class SimFaceBioSdk @Inject constructor(
     override val initializer: SimFaceInitializer,
     override val detector: SimFaceDetector,
-    private val simFace: SimFace,
+    private val simPalm: SimPalm,
 ) : FaceBioSDK {
     override fun version(): String = "1"
 
-    override fun templateFormat(): String = simFace.getTemplateVersion()
+    override fun templateFormat(): String = simPalm.getTemplateVersion()
 
     override fun matcherName(): String = "SIM_FACE"
 
-    override fun createMatcher(probeReference: BiometricReferenceCapture): FaceMatcher = SimFaceMatcher(simFace, probeReference)
+    override fun createMatcher(probeReference: BiometricReferenceCapture): FaceMatcher = SimFaceMatcher(simPalm, probeReference)
 }
