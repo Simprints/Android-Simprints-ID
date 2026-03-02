@@ -78,7 +78,7 @@ jobs:
                     echo -e "\n\n"
                     ./gradlew $TASKS --continue --no-daemon
             -   name: Upload Folders
-                uses: actions/upload-artifact@v6
+                uses: actions/upload-artifact@v7
                 with:
                     name: "${{ inputs.reportsId }}"
                     path: "*/**/build/reports/jacoco/jacocoTestReport"
