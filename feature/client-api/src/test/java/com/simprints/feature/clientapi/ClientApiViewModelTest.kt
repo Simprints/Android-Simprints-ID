@@ -201,7 +201,7 @@ internal class ClientApiViewModelTest {
     @Test
     fun `handleConfirmResponse saves correct events`() = runTest {
         viewModel.handleConfirmResponse(
-            mockRequest(),
+            mockConfirmRequest(),
             mockk {
                 every { identificationOutcome } returns true
                 every { externalCredential } returns mockk()
@@ -210,8 +210,60 @@ internal class ClientApiViewModelTest {
 
         coVerify {
             simpleEventReporter.addCompletionCheckEvent(eq(true))
+            getEnrolmentCreationEventForRecord.invoke("projectId", SELECTED_GUID)
             deleteSessionEventsIfNeeded(any())
             persistentLogger.log(any(), any(), any(), any())
+        }
+        verify { resultMapper.invoke(match<ActionResponse> { it is ActionResponse.ConfirmActionResponse }) }
+        viewModel.returnResponse.test().assertHasValue()
+    }
+
+    @Test
+    fun `handleConfirmResponse does not generate cosync when no credential`() = runTest {
+        viewModel.handleConfirmResponse(
+            mockConfirmRequest(),
+            mockk {
+                every { identificationOutcome } returns true
+                every { externalCredential } returns null
+            },
+        )
+
+        coVerify(exactly = 0) {
+            getEnrolmentCreationEventForRecord.invoke(any(), any())
+        }
+        verify { resultMapper.invoke(match<ActionResponse> { it is ActionResponse.ConfirmActionResponse }) }
+        viewModel.returnResponse.test().assertHasValue()
+    }
+
+    @Test
+    fun `handleConfirmResponse does not generate cosync when identification outcome is false`() = runTest {
+        viewModel.handleConfirmResponse(
+            mockConfirmRequest(),
+            mockk {
+                every { identificationOutcome } returns false
+                every { externalCredential } returns mockk()
+            },
+        )
+
+        coVerify(exactly = 0) {
+            getEnrolmentCreationEventForRecord.invoke(any(), any())
+        }
+        verify { resultMapper.invoke(match<ActionResponse> { it is ActionResponse.ConfirmActionResponse }) }
+        viewModel.returnResponse.test().assertHasValue()
+    }
+
+    @Test
+    fun `handleConfirmResponse does not generate cosync when no subject selected`() = runTest {
+        viewModel.handleConfirmResponse(
+            mockConfirmRequest(guid = NONE_SELECTED),
+            mockk {
+                every { identificationOutcome } returns true
+                every { externalCredential } returns mockk()
+            },
+        )
+
+        coVerify(exactly = 0) {
+            getEnrolmentCreationEventForRecord.invoke(any(), any())
         }
         verify { resultMapper.invoke(match<ActionResponse> { it is ActionResponse.ConfirmActionResponse }) }
         viewModel.returnResponse.test().assertHasValue()
@@ -307,5 +359,16 @@ internal class ClientApiViewModelTest {
     private fun mockRequest(): ActionRequest = mockk {
         every { projectId } returns "projectId"
         every { actionIdentifier } returns ActionRequestIdentifier("action", "package", "", 1, 0L)
+    }
+
+    private fun mockConfirmRequest(guid: String = SELECTED_GUID): ActionRequest.ConfirmIdentityActionRequest = mockk {
+        every { projectId } returns "projectId"
+        every { selectedGuid } returns guid
+        every { actionIdentifier } returns ActionRequestIdentifier("action", "package", "", 1, 0L)
+    }
+
+    companion object {
+        private const val SELECTED_GUID = "0b7a26c1-0d4d-4e1b-9c50-1cb3d1e0d1f2"
+        private const val NONE_SELECTED = "NONE_SELECTED"
     }
 }

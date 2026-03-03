@@ -45,7 +45,7 @@ internal class CommCareResponseMapper @Inject constructor(
             CommCareConstants.COMMCARE_SID_VERSION to appVersionName,
             CommCareConstants.SIMPRINTS_SESSION_ID to response.sessionId,
             CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY to "true",
-        ).toCommCareBundle()
+        ).appendCoSyncData(response.subjectActions).toCommCareBundle()
 
         is ActionResponse.VerifyActionResponse -> bundleOf(
             CommCareConstants.COMMCARE_DEVICE_ID to deviceId,

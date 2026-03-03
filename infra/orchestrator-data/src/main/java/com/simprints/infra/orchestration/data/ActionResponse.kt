@@ -33,6 +33,7 @@ sealed class ActionResponse(
         override val actionIdentifier: ActionRequestIdentifier,
         override val sessionId: String,
         val confirmed: Boolean,
+        val subjectActions: String?,
         val externalCredential: AppExternalCredential?,
     ) : ActionResponse(actionIdentifier, sessionId)
 

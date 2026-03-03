@@ -90,6 +90,7 @@ class OdkResponseMapperTest {
                 actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
                 sessionId = "sessionId",
                 confirmed = true,
+                subjectActions = null,
                 externalCredential = null,
             ),
         )

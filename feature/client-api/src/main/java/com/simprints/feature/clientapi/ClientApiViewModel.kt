@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.core.tools.extentions.isValidGuid
 import com.simprints.core.tools.extentions.toJsonElementMap
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
@@ -153,6 +154,19 @@ class ClientApiViewModel @Inject internal constructor(
         val currentSessionId = getCurrentSessionId()
         simpleEventReporter.addCompletionCheckEvent(flowCompleted = true)
 
+        val selectedGuid = (action as? ActionRequest.ConfirmIdentityActionRequest)
+            ?.selectedGuid
+            ?.takeIf { it.isValidGuid() }
+        val coSyncEnrolmentRecords = if (
+            confirmResponse.identificationOutcome &&
+            confirmResponse.externalCredential != null &&
+            selectedGuid != null
+        ) {
+            getEnrolmentCreationEventForRecord(action.projectId, selectedGuid)
+        } else {
+            null
+        }
+
         deleteSessionEventsIfNeeded(currentSessionId)
 
         logIntent(action, currentSessionId, "Confirmed: ${confirmResponse.identificationOutcome}")
@@ -163,6 +177,7 @@ class ClientApiViewModel @Inject internal constructor(
                     actionIdentifier = action.actionIdentifier,
                     sessionId = currentSessionId,
                     confirmed = confirmResponse.identificationOutcome,
+                    subjectActions = coSyncEnrolmentRecords,
                     externalCredential = confirmResponse.externalCredential,
                 ),
             ),

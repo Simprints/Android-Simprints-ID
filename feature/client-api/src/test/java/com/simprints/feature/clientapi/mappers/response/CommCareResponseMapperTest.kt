@@ -88,6 +88,7 @@ class CommCareResponseMapperTest {
                 actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
                 sessionId = "sessionId",
                 confirmed = true,
+                subjectActions = null,
                 externalCredential = null,
             ),
         ).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
@@ -96,6 +97,21 @@ class CommCareResponseMapperTest {
         assertThat(extras.getString(CommCareConstants.COMMCARE_DEVICE_ID)).isEqualTo("deviceId")
         assertThat(extras.getString(CommCareConstants.COMMCARE_SID_VERSION)).isEqualTo("appVersionName")
         assertThat(extras.getString(CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY)).isEqualTo("true")
+    }
+
+    @Test
+    fun `correctly maps confirm response with cosync data`() {
+        val extras = mapper(
+            ActionResponse.ConfirmActionResponse(
+                actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
+                sessionId = "sessionId",
+                confirmed = true,
+                subjectActions = "cosyncJson",
+                externalCredential = null,
+            ),
+        ).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
+
+        assertThat(extras.getString(Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS)).isEqualTo("cosyncJson")
     }
 
     @Test

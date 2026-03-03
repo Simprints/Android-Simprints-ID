@@ -146,6 +146,7 @@ class LibSimprintsResponseMapperTest {
                 actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
                 sessionId = "sessionId",
                 confirmed = true,
+                subjectActions = null,
                 externalCredential = mockk {
                     every { value } returns expectedValue
                     every { type } returns expectedType
@@ -160,6 +161,21 @@ class LibSimprintsResponseMapperTest {
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
         assertThat(extras.getBoolean(Constants.SIMPRINTS_HAS_CREDENTIAL)).isTrue()
         assertThat(extras.getString(Constants.SIMPRINTS_SCANNED_CREDENTIAL)).isEqualTo(expectedJson)
+    }
+
+    @Test
+    fun `correctly maps confirm response with cosync data`() {
+        val extras = mapper(
+            ActionResponse.ConfirmActionResponse(
+                actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
+                sessionId = "sessionId",
+                confirmed = true,
+                subjectActions = "cosyncJson",
+                externalCredential = null,
+            ),
+        )
+
+        assertThat(extras.getString(Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS)).isEqualTo("cosyncJson")
     }
 
     @Test
@@ -435,6 +451,7 @@ class LibSimprintsResponseMapperTest {
                 actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
                 sessionId = "sessionId",
                 confirmed = true,
+                subjectActions = null,
                 externalCredential = null,
             ),
         )
