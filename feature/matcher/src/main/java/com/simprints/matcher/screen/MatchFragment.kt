@@ -121,7 +121,11 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
         viewModel.matchResponse.observe(
             viewLifecycleOwner,
             LiveDataEventWithContentObserver {
-                findNavController().finishWithResult(this, it)
+                // Guard against delivering the match result after the fragment has already
+                // been popped (e.g. exit form submitted after match finished in the background).
+                if (findNavController().currentDestination?.id == R.id.matcherFragment) {
+                    findNavController().finishWithResult(this, it)
+                }
             },
         )
         viewModel.matchState.observe(viewLifecycleOwner) { matchState ->
