@@ -73,7 +73,7 @@ internal class LibSimprintsResponseMapper @Inject constructor(
                         .toJson(),
                 )
             }
-        }
+        }.appendExternalCredential(response.scannedCredential.takeIf { response.isMultiFactorIdEnabled })
 
         is ActionResponse.ConfirmActionResponse -> {
             bundleOf(
