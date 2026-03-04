@@ -2,7 +2,6 @@ package com.simprints.feature.orchestrator
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
 import com.simprints.core.tools.activity.BaseActivity
@@ -29,7 +28,7 @@ internal class OrchestratorActivity : BaseActivity() {
 
     /**
      * Flag for the navigation graph initialization state. The graph should only be initialized once
-     * during the existence of this activity, and the flag tracks graph's state.
+     * while the activity is in memory. Recreation of the activity should result in graph re-init
      */
     private var isGraphInitialized = false
 
@@ -37,7 +36,6 @@ internal class OrchestratorActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         Simber.d("OrchestratorActivity.onCreate isGraphInitialized=$isGraphInitialized", tag = ORCHESTRATION)
 
-        isGraphInitialized = savedInstanceState?.getBoolean(KEY_IS_GRAPH_INITIALIZED) ?: false
         lifecycle.addObserver(activityTracker)
 
         setContentView(binding.root)
@@ -79,17 +77,5 @@ internal class OrchestratorActivity : BaseActivity() {
             Simber.i("Orchestrator already executing, finishing with RESULT_CANCELED", tag = ORCHESTRATION)
             finish()
         }
-    }
-
-    override fun onSaveInstanceState(
-        outState: Bundle,
-        outPersistentState: PersistableBundle,
-    ) {
-        outState.putBoolean(KEY_IS_GRAPH_INITIALIZED, isGraphInitialized)
-        super.onSaveInstanceState(outState, outPersistentState)
-    }
-
-    companion object {
-        private const val KEY_IS_GRAPH_INITIALIZED = "KEY_IS_GRAPH_INITIALIZED"
     }
 }
