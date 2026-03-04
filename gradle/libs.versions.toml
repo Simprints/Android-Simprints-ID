@@ -59,7 +59,7 @@ kronos_version = "0.0.1-alpha11"
 protobuf_version = "4.33.5"
 circleImageView_version = "3.1.0"
 kermit_version = "2.0.8"
-zip4j_version = "2.11.5"
+zip4j_version = "2.11.6"
 
 libsimprints_version = "2025.2.2"
 simmatcher_version = "1.3.0"
