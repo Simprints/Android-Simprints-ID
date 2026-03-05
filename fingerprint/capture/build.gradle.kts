@@ -1,17 +1,11 @@
 plugins {
     id("simprints.feature")
-    id("simprints.testing.android")
     id("kotlin-parcelize")
     id("simprints.library.kotlinSerialization")
 }
 
 android {
     namespace = "com.simprints.fingerprint.capture"
-
-    defaultConfig {
-        testInstrumentationRunner = "com.simprints.fingerprint.CustomTestRunner"
-        testInstrumentationRunnerArguments["clearPackageData"] = "true"
-    }
 }
 
 dependencies {
