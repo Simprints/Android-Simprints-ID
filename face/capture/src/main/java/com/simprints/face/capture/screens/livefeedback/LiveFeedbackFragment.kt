@@ -141,7 +141,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     /** Initialize CameraX, and prepare to bind the camera use cases  */
-    private fun setUpCamera() = lifecycleScope.launch {
+    private fun setUpCamera() = viewLifecycleOwner.lifecycleScope.launch {
         if (::cameraExecutor.isInitialized && !cameraExecutor.isShutdown) {
             return@launch
         }
