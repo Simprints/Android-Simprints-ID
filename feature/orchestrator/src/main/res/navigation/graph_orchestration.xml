@@ -10,13 +10,6 @@
         android:name="com.simprints.feature.orchestrator.OrchestratorFragment"
         android:label="ClientApiFragment"
         tools:layout="@layout/fragment_orchestrator">
-
-        <argument
-            android:name="requestAction"
-            app:argType="string" />
-        <argument
-            android:name="requestParams"
-            app:argType="android.os.Bundle" />
     </fragment>
 
     <include app:graph="@navigation/graph_alert" />

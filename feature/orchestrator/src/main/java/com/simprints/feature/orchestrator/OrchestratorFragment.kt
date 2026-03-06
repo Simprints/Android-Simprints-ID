@@ -2,11 +2,11 @@ package com.simprints.feature.orchestrator
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
@@ -16,6 +16,7 @@ import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.clientapi.ClientApiViewModel
 import com.simprints.feature.clientapi.extensions.getResultCodeFromExtras
+import com.simprints.feature.clientapi.models.ClientApiConstants
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.exitform.ExitFormContract
@@ -30,6 +31,7 @@ import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.setup.SetupContract
 import com.simprints.feature.validatepool.ValidateSubjectPoolContract
 import com.simprints.fingerprint.capture.FingerprintCaptureContract
+import com.simprints.infra.config.store.LastCallingPackageStore
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.responses.AppConfirmationResponse
@@ -72,7 +74,10 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
     @Inject
     lateinit var orchestratorCache: OrchestratorCache
 
-    private val args by navArgs<OrchestratorFragmentArgs>()
+    @Inject
+    lateinit var lastCallingPackageStore: LastCallingPackageStore
+
+    private val intentAction get() = requireActivity().intent.action.orEmpty()
 
     private val loginCheckVm by viewModels<LoginCheckViewModel>()
     private val clientApiVm by viewModels<ClientApiViewModel>()
@@ -231,7 +236,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
 
                 if (response.request == null) {
                     clientApiVm.handleErrorResponse(
-                        args.requestAction,
+                        intentAction,
                         AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR),
                     )
                 } else {
@@ -257,7 +262,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
                         }
 
                         is AppErrorResponse -> {
-                            clientApiVm.handleErrorResponse(args.requestAction, response.response)
+                            clientApiVm.handleErrorResponse(intentAction, response.response)
                         }
                     }
                 }
@@ -282,8 +287,18 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
             Simber.i("Start processing action request", tag = ORCHESTRATION)
             if (loginCheckVm.isDeviceSafe()) {
                 lifecycleScope.launch {
-                    val actionRequest =
-                        clientApiVm.handleIntent(args.requestAction, args.requestParams)
+                    val extras = requireActivity().intent.extras ?: bundleOf()
+                    val callingPackage = requireActivity().callingPackage
+
+                    Simber.setUserProperty("Intent_received", intentAction)
+                    Simber.setUserProperty("Caller", callingPackage.orEmpty())
+
+                    // Some co-sync functionality depends on the exact package name of the caller app,
+                    // e.g. to switch content providers of debug and release variants of the caller app
+                    lastCallingPackageStore.lastCallingPackageName = callingPackage
+                    extras.putString(ClientApiConstants.CALLER_PACKAGE_NAME, callingPackage)
+
+                    val actionRequest = clientApiVm.handleIntent(intentAction, extras)
                     if (actionRequest != null) {
                         Simber.i("Action request parsed successfully", tag = ORCHESTRATION)
                         loginCheckVm.validateSignInAndProceed(actionRequest)
