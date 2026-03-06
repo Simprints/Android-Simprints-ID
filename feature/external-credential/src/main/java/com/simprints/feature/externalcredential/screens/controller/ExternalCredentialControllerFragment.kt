@@ -42,6 +42,8 @@ internal class ExternalCredentialControllerFragment : Fragment(R.layout.fragment
 
         viewModel.init(params)
 
+        internalNavController?.setGraph(R.navigation.graph_external_credential_internal)
+
         findNavController().handleResult<ExitFormResult>(
             this,
             R.id.externalCredentialControllerFragment,
@@ -57,7 +59,6 @@ internal class ExternalCredentialControllerFragment : Fragment(R.layout.fragment
                 )
             }
         }
-        internalNavController?.setGraph(R.navigation.graph_external_credential_internal)
 
         initObservers()
         initListeners()

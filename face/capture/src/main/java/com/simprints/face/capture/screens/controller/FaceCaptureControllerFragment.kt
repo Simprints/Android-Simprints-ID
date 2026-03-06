@@ -48,6 +48,19 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
         super.onViewCreated(view, savedInstanceState)
         Simber.i("FaceCaptureControllerFragment started", tag = ORCHESTRATION)
 
+        internalNavController
+            ?.navInflater
+            ?.inflate(R.navigation.graph_face_capture_internal)
+            ?.also {
+                it.setStartDestination(
+                    if (viewModel.shouldShowInstructionsScreen()) {
+                        R.id.facePreparationFragment
+                    } else {
+                        R.id.faceLiveFeedbackFragment
+                    },
+                )
+            }?.let { internalNavController?.setGraph(it, null) }
+
         findNavController().handleResult<ExitFormResult>(
             this,
             R.id.faceCaptureControllerFragment,
@@ -117,19 +130,6 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
                 else -> findNavController().popBackStack()
             }
         }
-
-        internalNavController
-            ?.navInflater
-            ?.inflate(R.navigation.graph_face_capture_internal)
-            ?.also {
-                it.setStartDestination(
-                    if (viewModel.shouldShowInstructionsScreen()) {
-                        R.id.facePreparationFragment
-                    } else {
-                        R.id.faceLiveFeedbackFragment
-                    },
-                )
-            }?.let { internalNavController?.setGraph(it, null) }
     }
 
     private fun initFaceBioSdk() {
