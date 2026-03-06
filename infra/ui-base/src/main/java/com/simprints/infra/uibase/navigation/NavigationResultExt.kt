@@ -185,14 +185,15 @@ private fun NavController.navigateIfPossible(
  *  @param currentFragment - currently displayed fragment in the [NavController]
  *  @return true if [NavController.currentDestination] is set and its class name matches
  *  [currentFragment], or if [NavController.currentDestination] is not a [FragmentNavigator.Destination].
- *  false if [currentFragment] is null or [NavController.currentDestination] is null.
+ *  false if [currentFragment] is null, [NavController.currentDestination] is null, or the
+ *  destination class name does not match [currentFragment] (indicating a navigation already occurred).
  */
 @ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
 private fun NavController.canNavigate(currentFragment: Fragment?): Boolean {
+    currentFragment ?: return false
     val currentDest = currentDestination ?: return false
-    val fragmentName = currentFragment?.let { it::class.java.name }
     val targetClassName = (currentDest as? FragmentNavigator.Destination)?.className
-    return currentFragment != null && (targetClassName == null || targetClassName == fragmentName)
+    return targetClassName == null || targetClassName == currentFragment::class.java.name
 }
 
 /**
