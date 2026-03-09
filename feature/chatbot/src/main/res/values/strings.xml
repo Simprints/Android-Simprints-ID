@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="chatbot_title">Simprints Assistant</string>
+    <string name="chatbot_minimize">Minimize chat</string>
+    <string name="chatbot_input_hint">Ask a question…</string>
+    <string name="chatbot_send">Send</string>
+    <string name="chatbot_typing">Assistant is typing…</string>
+    <string name="chatbot_offline_banner">📴 You\'re offline. Answers are limited to common help topics.</string>
+    <string name="chatbot_fab_description">Open chat assistant</string>
+    <string name="chatbot_welcome">Hi! I\'m the Simprints Assistant. How can I help you today?</string>
+</resources>
