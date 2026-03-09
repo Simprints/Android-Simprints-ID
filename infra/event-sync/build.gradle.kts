@@ -1,7 +1,6 @@
 plugins {
     id("simprints.infra")
     id("simprints.library.room")
-    id("simprints.testing.android")
     id("simprints.library.kotlinSerialization")
     id("simprints.library.backendApi")
 }
