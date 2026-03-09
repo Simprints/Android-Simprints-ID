@@ -6,6 +6,8 @@ import android.os.PersistableBundle
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
 import com.simprints.core.tools.activity.BaseActivity
+import com.simprints.feature.chatbot.ChatOverlayHost
+import com.simprints.feature.chatbot.ChatOverlayManager
 import com.simprints.feature.clientapi.models.ClientApiConstants
 import com.simprints.feature.orchestrator.databinding.ActivityOrchestratorBinding
 import com.simprints.infra.config.store.LastCallingPackageStore
@@ -18,8 +20,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-internal class OrchestratorActivity : BaseActivity() {
+internal class OrchestratorActivity : BaseActivity(), ChatOverlayHost {
     private val binding by viewBinding(ActivityOrchestratorBinding::inflate)
+
+    @Inject
+    lateinit var chatOverlayManager: ChatOverlayManager
 
     @Inject
     lateinit var activityTracker: ExecutionTracker
@@ -41,6 +46,8 @@ internal class OrchestratorActivity : BaseActivity() {
         lifecycle.addObserver(activityTracker)
 
         setContentView(binding.root)
+
+        chatOverlayManager.attach(this, binding.orchestratorRoot)
 
         binding.orchestrationHost.handleResult<AppResult>(
             this,
@@ -91,5 +98,9 @@ internal class OrchestratorActivity : BaseActivity() {
 
     companion object {
         private const val KEY_IS_GRAPH_INITIALIZED = "KEY_IS_GRAPH_INITIALIZED"
+    }
+
+    override fun minimizeChatOverlay() {
+        chatOverlayManager.minimize()
     }
 }
