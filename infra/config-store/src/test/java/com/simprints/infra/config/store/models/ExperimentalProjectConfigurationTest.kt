@@ -3,6 +3,7 @@ package com.simprints.infra.config.store.models
 import com.google.common.truth.Truth.*
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.CAMERA_FLASH_CONTROLS_ENABLED
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.CHATBOT_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.ENABLE_ID_POOL_VALIDATION
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS
@@ -205,6 +206,22 @@ internal class ExperimentalProjectConfigurationTest {
             mapOf(ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK to JsonPrimitive(true)) to true,
         ).forEach { (config, result) ->
             assertThat(ExperimentalProjectConfiguration(config).allowConfirmingGuidsNotInCallback).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `check chatbot enabled flag correctly`() {
+        mapOf(
+            // Value not present
+            emptyMap<String, JsonElement>() to false,
+            // Value not boolean
+            mapOf(CHATBOT_ENABLED to JsonPrimitive(1)) to false,
+            // Value present and FALSE
+            mapOf(CHATBOT_ENABLED to JsonPrimitive(false)) to false,
+            // Value present and TRUE
+            mapOf(CHATBOT_ENABLED to JsonPrimitive(true)) to true,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).chatbotEnabled).isEqualTo(result)
         }
     }
 }

@@ -52,6 +52,7 @@ object LoggingConstants {
         APPLICATION,
         COMMCARE_SYNC,
         MULTI_FACTOR_ID,
+        CHATBOT,
     }
 
     // Tags eligible for Firebase Analytics logging

@@ -98,6 +98,15 @@ data class ExperimentalProjectConfiguration(
             ?.booleanOrNull
             .let { it == true }
 
+    val chatbotEnabled: Boolean
+//        get() = customConfig
+//            ?.get(CHATBOT_ENABLED)
+//            ?.jsonPrimitive
+//            ?.booleanOrNull
+//            .let { it == true }
+        // TODO(milen): Remove short-circuit before deploying
+        get() = true
+
     companion object {
         internal const val ENABLE_ID_POOL_VALIDATION = "validateIdentificationPool"
         internal const val SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED = "singleQualityFallbackRequired"
@@ -124,5 +133,7 @@ data class ExperimentalProjectConfiguration(
         internal const val OCR_CAPTURES_DEFAULT = 3
 
         const val ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK = "allowConfirmingGuidsNotInCallback"
+
+        internal const val CHATBOT_ENABLED = "chatbotEnabled"
     }
 }
