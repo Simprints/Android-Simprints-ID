@@ -122,6 +122,7 @@ include(
     ":feature:matcher",
     ":feature:validate-subject-pool",
     ":feature:select-subject-age-group",
+    ":feature:chatbot",
 )
 
 // Infra modules
@@ -151,6 +152,7 @@ include(
     ":infra:sync",
     ":infra:event-sync",
     ":infra:backend-api",
+    ":infra:ai-chat",
 )
 // Test modules
 include(

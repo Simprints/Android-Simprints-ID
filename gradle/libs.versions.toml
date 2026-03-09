@@ -46,6 +46,7 @@ firebase_analytics_version = "23.0.0"
 firebase_perf_version = "22.0.4"
 firebase_crashlyticsPlugin_version = "3.0.6"
 firebase_perfPlugin_version = "2.0.2"
+firebase_ai_version = "17.9.0"
 
 retrofit_version = "3.0.0"
 okttp_version = "5.3.2"
@@ -153,6 +154,7 @@ firebase-storage = { module = "com.google.firebase:firebase-storage", version.re
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics", version.ref = "firebase_crashlytics_version" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics", version.ref = "firebase_analytics_version" }
 firebase-perf = { module = "com.google.firebase:firebase-perf", version.ref = "firebase_perf_version" }
+firebase-ai = { module = "com.google.firebase:firebase-ai", version.ref = "firebase_ai_version" }
 
 #SqlCipher
 sqlCipher-core = { module = "net.zetetic:sqlcipher-android", version.ref = "sqlCipher_version" }
