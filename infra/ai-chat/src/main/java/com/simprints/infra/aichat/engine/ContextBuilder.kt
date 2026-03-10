@@ -16,6 +16,7 @@ internal class ContextBuilder @Inject constructor() {
         appendLine()
 
         appendWorkflowState(context)
+        appendRequestParameters(context)
 
         if (context.currentScreen.isNotBlank()) {
             appendLine("- **Current screen**: ${context.currentScreen}")
@@ -51,6 +52,17 @@ internal class ContextBuilder @Inject constructor() {
             }
         } else {
             appendLine("- **User state**: App opened from launcher (no active workflow)")
+        }
+    }
+
+    private fun StringBuilder.appendRequestParameters(context: ChatContext) {
+        if (context.requestParameters.isEmpty()) return
+
+        appendLine()
+        appendLine("### Request Parameters")
+        appendLine("These are the parameters sent by the calling app that triggered this workflow.")
+        context.requestParameters.forEach { (key, value) ->
+            appendLine("- **$key**: $value")
         }
     }
 

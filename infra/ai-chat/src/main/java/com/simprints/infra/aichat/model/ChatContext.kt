@@ -9,6 +9,7 @@ data class ChatContext(
     val isInWorkflow: Boolean = false,
     val workflowType: String = "",
     val workflowSteps: List<WorkflowStepInfo> = emptyList(),
+    val requestParameters: Map<String, String> = emptyMap(),
     val projectName: String = "",
     val projectConfigSummary: String = "",
     val isConnected: Boolean = false,

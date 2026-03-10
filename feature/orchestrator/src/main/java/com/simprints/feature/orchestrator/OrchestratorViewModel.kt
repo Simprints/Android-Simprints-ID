@@ -101,6 +101,7 @@ internal class OrchestratorViewModel @Inject constructor(
         }
 
         pushStepContext()
+        pushRequestContext(action)
         doNextStep()
     }
 
@@ -342,6 +343,44 @@ internal class OrchestratorViewModel @Inject constructor(
                 )
             },
         )
+    }
+
+    private fun pushRequestContext(action: ActionRequest) {
+        runCatching {
+            val params = buildMap {
+                put("Project ID", action.projectId)
+                put("User ID", action.userId.value)
+                if (action is ActionRequest.FlowAction) {
+                    put("Module ID", action.moduleId.value)
+                }
+                if (action is ActionRequest.EnrolLastBiometricActionRequest) {
+                    put("Module ID", action.moduleId.value)
+                }
+                action.getSubjectAgeIfAvailable()?.let { put("Subject Age", it.toString()) }
+                when (action) {
+                    is ActionRequest.EnrolActionRequest -> put("Biometric Data Source", action.biometricDataSource)
+                    is ActionRequest.IdentifyActionRequest -> put("Biometric Data Source", action.biometricDataSource)
+                    is ActionRequest.VerifyActionRequest -> {
+                        put("Biometric Data Source", action.biometricDataSource)
+                        put("Verify GUID", action.verifyGuid)
+                    }
+                    is ActionRequest.ConfirmIdentityActionRequest -> {
+                        put("Session ID", action.sessionId)
+                        put("Selected GUID", action.selectedGuid)
+                    }
+                    is ActionRequest.EnrolLastBiometricActionRequest -> {
+                        put("Session ID", action.sessionId)
+                    }
+                }
+                val metadata = action.metadata
+                if (metadata.isNotBlank() && metadata != "{}") {
+                    put("Metadata", metadata)
+                }
+            }
+            chatContextProvider.updateRequestParameters(params)
+        }.onFailure {
+            Simber.d("Failed to push request context to chatbot", tag = ORCHESTRATION)
+        }
     }
 
     private fun stepIdToName(id: Int): String = when (id) {

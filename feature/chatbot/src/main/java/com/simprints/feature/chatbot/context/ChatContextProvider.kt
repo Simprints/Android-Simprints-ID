@@ -42,6 +42,7 @@ class ChatContextProvider @Inject constructor(
     private val _isInWorkflow = MutableStateFlow(false)
     private val _workflowType = MutableStateFlow("")
     private val _workflowSteps = MutableStateFlow<List<WorkflowStepInfo>>(emptyList())
+    private val _requestParameters = MutableStateFlow<Map<String, String>>(emptyMap())
 
     fun updateScreen(screenName: String) {
         _currentScreen.value = screenName
@@ -56,10 +57,15 @@ class ChatContextProvider @Inject constructor(
         _workflowSteps.value = steps
     }
 
+    fun updateRequestParameters(params: Map<String, String>) {
+        _requestParameters.value = params
+    }
+
     fun clearWorkflow() {
         _isInWorkflow.value = false
         _workflowType.value = ""
         _workflowSteps.value = emptyList()
+        _requestParameters.value = emptyMap()
     }
 
     suspend fun buildContext(): ChatContext {
@@ -72,6 +78,7 @@ class ChatContextProvider @Inject constructor(
             isInWorkflow = _isInWorkflow.value,
             workflowType = _workflowType.value,
             workflowSteps = _workflowSteps.value,
+            requestParameters = _requestParameters.value,
             projectName = project?.name ?: "",
             projectConfigSummary = formatConfigSummary(config, deviceConfig),
             isConnected = connectivityTracker.isConnected(),
