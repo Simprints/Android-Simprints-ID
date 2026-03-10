@@ -30,23 +30,28 @@ class KnowledgeBaseLoaderTest {
 
     @Test
     fun `loads knowledge base from assets`() {
-        val content = "# Test Knowledge Base\nSome content here."
-        every { assetManager.open("knowledge_base.md") } returns ByteArrayInputStream(content.toByteArray())
+        val kbContent = "# Test Knowledge Base\nSome content here."
+        val refContent = "# Internal Reference"
+        every { assetManager.open("knowledge_base.md") } returns ByteArrayInputStream(kbContent.toByteArray())
+        every { assetManager.open("internal_reference.md") } returns ByteArrayInputStream(refContent.toByteArray())
 
         val result = loader.load()
 
-        assertThat(result).isEqualTo(content)
+        assertThat(result).contains(kbContent)
+        assertThat(result).contains(refContent)
     }
 
     @Test
     fun `caches result after first load`() {
-        val content = "Cached content"
-        every { assetManager.open("knowledge_base.md") } returns ByteArrayInputStream(content.toByteArray())
+        val kbContent = "Cached content"
+        val refContent = "Reference content"
+        every { assetManager.open("knowledge_base.md") } returns ByteArrayInputStream(kbContent.toByteArray())
+        every { assetManager.open("internal_reference.md") } returns ByteArrayInputStream(refContent.toByteArray())
 
         val first = loader.load()
         val second = loader.load()
 
         assertThat(first).isEqualTo(second)
-        verify(exactly = 1) { assetManager.open(any()) }
+        verify(exactly = 1) { assetManager.open("knowledge_base.md") }
     }
 }
