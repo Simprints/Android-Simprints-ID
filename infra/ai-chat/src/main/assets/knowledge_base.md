@@ -14,7 +14,7 @@ in developing countries. It enables organisations to register and identify
 beneficiaries using fingerprint and/or face biometrics.
 
 SID is not a standalone application — it requires a **calling app** (e.g., ODK, DHIS2,
-Comm Care) to initiate biometric workflows via Android Intents. The calling app provides
+CommCare) to initiate biometric workflows via Android Intents. The calling app provides
 a project ID and the type of workflow to perform.
 
 SID can be downloaded from the Google Play Store:
@@ -80,25 +80,25 @@ SID is designed to be used alongside a calling app. This is typically a platform
 
 #### Responsibilities
 
-- Calling app -captures and stores medical records.
-- SID -biometrically authenticates patients when they access health services.
+- Calling app - captures and stores medical records.
+- SID - biometrically authenticates patients when they access health services.
 
 #### User Scenarios
 
 | Calling app | SID |
 | --- | --- |
-| Create medical records for a new beneficiary | Enrollthe beneficiary's biometric data |
-| Access a beneficiary’s medical records | Verifythat the beneficiary is present |
-| Check if a beneficiary has medical records | Identifythe beneficiary |
+| Create medical records for a new beneficiary | Enrol the beneficiary's biometric data |
+| Access a beneficiary’s medical records | Verify that the beneficiary is present |
+| Check if a beneficiary has medical records | Identify the beneficiary |
 
 #### Supported Platforms
 
 Simprints has integrations with the following platforms:
 
 - SurveyCTO
-- Comm Care(Doesn’t support Enrolment+ and Identification+)
+- CommCare (Doesn’t support Enrolment+ and Identification+)
 - OpenSRP
-- DHIS2(via a Simprints maintained fork:DHIS2 (Product))
+- DHIS2 (via a Simprints maintained fork: DHIS2 (Product))
 
 ---
 
@@ -109,7 +109,7 @@ Workflows enable operators to enrol, identify and verify biometric users.
 ### User flow
 
 - Workflows are started via a calling app; they cannot be started in any other way.
-- Each workflowcaptures biometrics; these are the only screens shown in SID during a workflow and they are shared across all workflows.
+- Each workflow captures biometrics; these are the only screens shown in SID during a workflow and they are shared across all workflows.
 - At the end of the workflow, SID returns data to the calling app.
 
 ### Workflows
@@ -122,7 +122,7 @@ Workflows enable operators to enrol, identify and verify biometric users.
 
 ### Device requirements
 
-|  | Face | Fingerprint (Minimum)As of July 2020 | Fingerprint (Recommended)As of December 2019 |
+|  | Face | Fingerprint (Minimum) As of July 2020 | Fingerprint (Recommended) As of December 2019 |
 | --- | --- | --- | --- |
 | Android Version | 8.0 (Oreo) | 6.0 (Marshmallow) | 9.0 (Pie) |
 | Android API | 26 | 23 | 28 |
@@ -136,7 +136,7 @@ Huawei Phones produced May 2019 onwards are not recommended (e.g. Huawei P40, Ma
 
 Due to Google’s revocation of Huawei’s Android license, these devices do not support Google Play Store, which prohibits the installation and update of Simprints ID via Play Store.
 
-Pro tip: When setting up devices with SID, you’ll want toensure that the device always has at least 20% of storage spacefree. This is to ensure SID works fast and does not take forever to load (if you see the buffering icon of doom during an identification flow, it could be because there isn’t enough free space for our algorithm to do it’s thing!). Why is this so? Well, when running identifications, SID ideally runs through matches in a cluster. Without sufficient space, it will run through matches one by one instead.
+Pro tip: When setting up devices with SID, you’ll want to ensure that the device always has at least 20% of storage space free. This is to ensure SID works fast and does not take forever to load (if you see the buffering icon of doom during an identification flow, it could be because there isn’t enough free space for our algorithm to do it’s thing!). Why is this so? Well, when running identifications, SID ideally runs through matches in a cluster. Without sufficient space, it will run through matches one by one instead.
 
 ---
 
@@ -166,7 +166,7 @@ This article is a user guide intended for Project Managers and field workers
 
 [Screenshot: (blue star)]
 
-Simprints ID Release2023.1.0introduces a new Settings Passwordfunctionality, allowing project managers to lock in-app configuration changes. By creating a Settings Password, project managers can prevent unnecessary configuration changes and log-outs in the field.
+Simprints ID Release 2023.1.0 introduces a new Settings Password functionality, allowing project managers to lock in-app configuration changes. By creating a Settings Password, project managers can prevent unnecessary configuration changes and log-outs in the field.
 
 ### Creating a Settings Password
 
@@ -195,9 +195,9 @@ Users will be required to enter the password before updating Simprints ID langua
 Users will be required to enter the password before logging out (Dashboard > ⋮ > Settings > About > Log Out). In addition to restricting which users can log out of Simprints ID, this feature also prevents unintentional logouts.
 ### Frequently Asked Questions
 
-- Can Simprints ID users change their own settings password?No, the password can only be set in Vulcan.
-- Does each user have a different password?No, the same settings password is used across all project devices
-- What happens if a user forgets their password, or a password is compromised?The password can be retrieved or edited by the project administrator.
+- Can Simprints ID users change their own settings password? No, the password can only be set in Vulcan.
+- Does each user have a different password? No, the same settings password is used across all project devices
+- What happens if a user forgets their password, or a password is compromised? The password can be retrieved or edited by the project administrator.
 
 ### Related articles
 
@@ -243,7 +243,7 @@ Users can tap the arrow at the top left corner or use the native Android back bu
 
 ### Enrolment
 
-During enrollment, an individual’s biometric information is captured and stored in the database for future use in Verificationor Identification.
+During enrollment, an individual’s biometric information is captured and stored in the database for future use in Verification or Identification.
 
 ### User flow
 
@@ -256,7 +256,7 @@ Depending on the modality configured for a project, the screens displayed in SID
 
 ### Enrollment+
 
-Enrollment+ includes an additional Identificationat the point of biometric capture.
+Enrollment+ includes an additional Identification at the point of biometric capture.
 
 This spots beneficiaries already in the system before their details are added again, which can help reduce duplicate records.
 
@@ -279,7 +279,7 @@ These values are returned to the calling app:
 
 #### Standard
 
-- GUID(globally unique identifier) for the newly enrolled user
+- GUID (globally unique identifier) for the newly enrolled user
 
 #### Enrollment+
 
@@ -306,7 +306,7 @@ The number of returned matches is configurable per project.
 
 ### Identification+
 
-Identification+ adds an option to automatically enrol a unsuccessfully identified individual without recapturing the biometrics.
+Identification+ adds an option to automatically enrol an unsuccessfully identified individual without recapturing the biometrics.
 
 Identification+ is configurable per project.
 
@@ -322,7 +322,10 @@ These values must be sent by the calling app:
 
 These values are returned to the calling app:
 
-- A list of potential matches. Each match includes:GU ID confidenceconfidence Band
+- A list of potential matches. Each match includes:
+  - GUID
+  - confidence
+  - confidence Band
 
 ---
 
@@ -354,13 +357,16 @@ These values must be sent by the calling app:
 
 These values are returned to the calling app:
 
-- A single match record, including:guidconfidenceconfidence Band
+- A single match record, including:
+  - GUID
+  - confidence
+  - confidence Band
 
 ---
 
 ### Biometric Capture
 
-Biometric capture is the process of capturing biometrics, for the purposes of completing abiometric workflow.
+Biometric capture is the process of capturing biometrics, for the purposes of completing a biometric workflow.
 
 ### Accessing biometric capture
 
@@ -400,24 +406,24 @@ A loading bar will appear on the screen; the user’s finger must be kept steady
 The following LEDs on the Vero scanner will also indicate the scan process:
 
 - Vero 1.0: The red LED on the image sensor will flash as it is activated, and the middle smile LED will turn red whilst the scan is in progress.
-- Vero 2.0:The green LED on the image sensor will flash as it is activated.
+- Vero 2.0: The green LED on the image sensor will flash as it is activated.
 
 If the “CANCEL” button is pressed the scan for that finger will stop. Scans of any previous fingers will be retained.
 
 #### Good scan
 
-If the image meets the Capture Qualitythreshold, SID will inform users it has been a good scan.
+If the image meets the Capture Quality threshold, SID will inform users it has been a good scan.
 
 - The breadcrumb will turn green
 - The button text will change to “GOOD SCAN”
 - The Vero scanner smile LEDs will turn green and reset.
 
-If additional fingerprints are required, SID will prompt for thenext fingerprint.
+If additional fingerprints are required, SID will prompt for the next fingerprint.
 
-If no additional fingerprints are required, SID will move to theconfirm screen.
+If no additional fingerprints are required, SID will move to the confirm screen.
 
 ### Scanning additional fingers
-If a project is configured for multiple finger scans, thesteps to scan a fingerare repeated (as many times as configured).
+If a project is configured for multiple finger scans, the steps to scan a finger are repeated (as many times as configured).
 
 The differences between fingers are:
 
@@ -437,7 +443,7 @@ If any fingers were skipped, a cross would appear against those instead of a tic
 ### Missing finger
 If a user is missing a finger, it can be skipped by tapping the “Missing Finger” link.
 
-- The “Let’s Try Another Finger!”overlay will appear
+- The “Let’s Try Another Finger!” overlay will appear
 - The graphic will change and indicate the new finger to be scanned.
 - An additional breadcrumb will be added, and the breadcrumb for the previous scan will be coloured red.
 
@@ -461,7 +467,7 @@ Once the finger to be re-scanned is selected, press on the “GOOD SCAN” butto
 
 ### Vero Scan Feedback (Fingerprint)
 
-Simprints ID 2024.2.1 introduces enhanced visual scan feedbackto aid attendants in taking scans without having to refer to their mobile device. This is particularly useful in busy clinic environments where attendants might need to concentrate on encouraging a child to have their fingers scanned.
+Simprints ID 2024.2.1 introduces enhanced visual scan feedback to aid attendants in taking scans without having to refer to their mobile device. This is particularly useful in busy clinic environments where attendants might need to concentrate on encouraging a child to have their fingers scanned.
 
 #### :vero: How do Vero visual cues work?
 
@@ -497,11 +503,11 @@ If an attendant’s scanner has not previously been configured to use visual cue
 
 ### Scanning Audio Cues
 
-Simprints ID 2024.2.1 introduces scanning audio cues. This a simple, feature to simplify the scanning process in busy environments by sounding a short beep after each scan.
+Simprints ID 2024.2.1 introduces scanning audio cues. This is a simple feature to simplify the scanning process in busy environments by sounding a short beep after each scan.
 
 #### How do Audio Cues Work?
 
-The feature itself is very simple. During a fingerprint workflow, a brief beep will be playedby the user’s mobile devicewhen the scan is complete and it is time to move to the next finger.
+The feature itself is very simple. During a fingerprint workflow, a brief beep will be played by the user’s mobile device when the scan is complete and it is time to move to the next finger.
 
 This feature allows an attendant to manage a multiple-fingerprint workflow without necessarily needing to refer back to their mobile device after each finger.
 
@@ -515,7 +521,7 @@ IMG_7148.mov
 
 Scanning audio cues are configured on a device-by-device basis, and are switched off by default. They can be switched on by opening Simprints ID and navigating to settings, where they will see a toggle controlling audio cues.
 
-Attendants should ensure that the volume is turned upon their mobile deviceif they want to use this feature.
+Attendants should ensure that the volume is turned up on their mobile device if they want to use this feature.
 ---
 
 ### [Experimental] Auto-capture
@@ -529,7 +535,7 @@ Useful especially in cases when the subject moves quickly; in other words, for f
 The feature is enabled when these conditions all apply:
 
 - SID version is at least 2025.1.0
-- Auto-capture is turned on in Vulcan for the project - see Custom configuration#Experimental-features. In short: in Configurations → Custom, have the JSON string of {"face Auto Capture Enabled": true} (or have "face Auto Capture Enabled": truebesides other, already existing, custom flags).
+- Auto-capture is turned on in Vulcan for the project - see Custom configuration#Experimental-features. In short: in Configurations → Custom, have the JSON string of {"faceAutoCaptureEnabled": true} (or have "faceAutoCaptureEnabled": true besides other, already existing, custom flags).
 - Auto-capture is enabled in SID settings. Enabled by default.
 
 Make sure that the configuration of SID is updated if you enabled auto-capture in Vulcan recently.
@@ -545,8 +551,8 @@ To quickly switch to regular (manual) capture or back to auto-capture if needed:
 
 #### Configuration
 
-- Duration of auto-capture imaging progress is by default 3 seconds but can be configured in Vulcan (see face Auto Capture Imaging Duration Millis in Custom configuration#Experimental-features.
-- Sensitivityof auto-capture triggering can be adjusted by changing the Quality Thresholdvalue in Vulcan.Note: this affects the regular capture and quality of image data; shouldn’t be normally done.
+- Duration of auto-capture imaging progress is by default 3 seconds but can be configured in Vulcan (see `faceAutoCaptureImagingDurationMillis` in Custom configuration#Experimental-features.
+- Sensitivity of auto-capture triggering can be adjusted by changing the Quality Threshold value in Vulcan. Note: this affects the regular capture and quality of image data; shouldn’t be normally done.
 
 ---
 
@@ -590,14 +596,14 @@ The user can also press ‘recapture’ if they wish to re-run the capture proce
 
 ### Face Capture - Device Flashlight
 
-If you are using a device with a built in flashlight during aface capture, from SimprintsID 2025.3onwards, you can enable the device flashlight during capture to get the best possible capture of your subject (particularly useful in low-light conditions).
+If you are using a device with a built in flashlight during aface capture, from Simprints ID 2025.3 onwards, you can enable the device flashlight during capture to get the best possible capture of your subject (particularly useful in low-light conditions).
 
 Note, constant flashlight use can drain a device’s battery, SID users should be advised to use it only when necessary.
 
 In order to use this feature, your project should first be configured with the followingcustom configuration:
 
 ```
-{"display Camera Flash Toggle": True}
+{"displayCameraFlashToggle": true}
 ```
 
 Having enabled this feature, SID users can toggle the flashlight on and off via a new button on the face capture screen:
@@ -630,12 +636,12 @@ This article is a user guide intended for Project Managers and attendants
 
 [Screenshot: (blue star)]
 
-Simprints ID Release2023.1.0introduced Dual Modality Support.This allows Simprints ID users to use both fingerprintandface modalities to enrol, verify and identify service users, allowing for greater flexibility and accuracy in the verification and identification of biometric data.
+Simprints ID Release 2023.1.0 introduced Dual Modality Support. This allows Simprints ID users to use both fingerprintandface modalities to enrol, verify and identify service users, allowing for greater flexibility and accuracy in the verification and identification of biometric data.
 
 If Dual Modality is enabled for your project, by default.
 
 - Both modalities are captured duringenrolment
-- Both modalities are captured forverificationand service usersare verified if either returns a match
+- Both modalities are captured forverificationand service users are verified if either returns a match
 - Both modalities are captured foridentification,the modality with the highest match score being used to identify the service user (more information).
 
 From Simprints ID 2024.2.1 onwards it is possible to use only one modality for verification and identification. See the Matching Modality section below for more details.
@@ -649,7 +655,7 @@ Selecting multiple modalities for your project is very similar to the previous p
 3. Click ‘SAVE’
 Users must either log out and log back to Simprints ID or wait for a least an hour for modality changes made in Vulcan to take effect on their device. Offline devices will need to come back online before registering new Vulcan changes.
 
-Please also ensure you have requested provision of the correct Face SDK Licenses.Details here
+Please also ensure you have requested provision of the correct Face SDK Licenses. Details here
 
 ### Using Dual Modality (Simprints ID)
 
@@ -660,7 +666,7 @@ Having successfully completed the process, Simprints ID will return the results 
 
 From Simprints ID 2024.2.1 onwards, when multiple modalities are selected for a project. Both modalities must always be used for enrolment, however, it is possible to use only one modality when doing a 1:1 or 1:N workflow.
 
-This feature (intended to balance the technical benefits of using both modalities with the operational burden of taking multiple captures), is controlled at a project level and can becontrolled in Vulcanalongside the selection of modalities.
+This feature (intended to balance the technical benefits of using both modalities with the operational burden of taking multiple captures), is controlled at a project level and can be controlled in Vulcan alongside the selection of modalities.
 
 [Screenshot: Screenshot 2024-11-06 at 16.09.33.png]
 
@@ -680,12 +686,12 @@ Identification:
 
 ### Frequently Asked Questions
 
-- Is consent given for each modality?No, consent for Dual Modality biometrics is still only requested once, at the beginning of the process.
-- Do I have to use both modalities when Dual Modality is enabled?You must capture both modalities when enrolling a subject, but you can use the matching modality control to limit modality capture during 1:1 or 1:N.
-- Can an existing project be switched to Dual Modality?Whilst it is technically possible to migrate a single modality project to Dual Modality (by selecting both in Vulcan), this is not advised as (for now):You will not be able to retrospectively attach modality results to older records If you switch to Dual Modality, only results with both modalities will be down-synced to your device Existing single-modality records stored on the phone can still be used for comparison. Both modalities would be captured but only the historical modality matched.
-- Can a Dual Modality project revert to a single modality?There is less risk of ongoing synchronisation issues reverting back to a single modality, but it is still not recommended. Please raise a ticket with the Panda Help Centerif this is something you are considering.
-- Will Dual Modality impact performance?Identification may take longer when using Dual Modality biometrics. You should use otherconfiguration optionsto minimise the dataset on each device.
-- Do ID+ & Enrol+ work with Dual Modality?Yes, these features will work the same as with single modality projects
+- Is consent given for each modality? No, consent for Dual Modality biometrics is still only requested once, at the beginning of the process.
+- Do I have to use both modalities when Dual Modality is enabled? You must capture both modalities when enrolling a subject, but you can use the matching modality control to limit modality capture during 1:1 or 1:N.
+- Can an existing project be switched to Dual Modality? Whilst it is technically possible to migrate a single modality project to Dual Modality (by selecting both in Vulcan), this is not advised as (for now):You will not be able to retrospectively attach modality results to older records If you switch to Dual Modality, only results with both modalities will be down-synced to your device Existing single-modality records stored on the phone can still be used for comparison. Both modalities would be captured but only the historical modality matched.
+- Can a Dual Modality project revert to a single modality? There is less risk of ongoing synchronisation issues reverting back to a single modality, but it is still not recommended. Please raise a ticket with the Panda Help Center if this is something you are considering.
+- Will Dual Modality impact performance? Identification may take longer when using Dual Modality biometrics. You should use other configuration options to minimise the dataset on each device.
+- Do ID+ & Enrol+ work with Dual Modality? Yes, these features will work the same as with single modality projects
 
 - Page:Fingerprint configuration
 - Page:Using Simprints ID (SID)
@@ -700,7 +706,7 @@ Simprints ID 2025.4 Introduces a major new feature designed to enhance users' ex
 
 MFID supercharges search by allowing the registration of an ‘external credential’ alongside biometrics.
 
-An external credential is simply a unique alphanumeric string of numbers associated with an individual, but defined outside of Simprints ID (distinct from simprints-generated GU ID s)
+An external credential is simply a unique alphanumeric string of numbers associated with an individual, but defined outside of Simprints ID (distinct from simprints-generated GUIDs)
 
 Whilst external credentials are defined outside of Simprints ID, this latest release allows users to detect and register external credentials within the app. The nature and delivery mechanism for external credentials are intentionally flexible to allow for expansion of the feature in the future, but there are currently two main ways that we can register and search:
 
@@ -720,7 +726,7 @@ capture nhis.mp4
 
 MFID is designed to enhance and complement biometrics rather than replace. Projects and users are not forced to use MFID if a credential is not available, but where it is, biometrics will still continue to be captured alongside the external credential. The feature is designed this way for two main reasons.
 
-Coverage may not be universal.Not all users will have an ID card/QR code with them (or even at all). In this case they are able to skip the credential capture and fall back to our standard biometric workflows.
+Coverage may not be universal. Not all users will have an ID card/QR code with them (or even at all). In this case they are able to skip the credential capture and fall back to our standard biometric workflows.
 
 Biometric verificationremains a key Simprints product offering. Using credentials and biometrics together provides re-assurance for our users and partners that we’re correctly identifying individuals and reflecting the uniqueness of a given intervention.
 
@@ -775,8 +781,8 @@ Having enabled MFID, users can now select the type of credential they would like
 
 For projects using OCR to capture credentials from pre-supported ID documents, it is possible to adjust the resolution of the camera feed as well as the number of images captured during the process.
 
-- "ocr Captures"- sets how many images to run OCR on. Default is 3, range is 1-10
-- "ocr High Res"- if false, the camer captures heavily-compressed images (faster, but less accurate). Default is true.
+- `"ocrCaptures"`- sets how many images to run OCR on. Default is 3, range is 1-10
+- `"ocrHighRes"`- if false, the camera captures heavily-compressed images (faster, but less accurate). Default is true.
 
 The process for implementing these adjustments as well as the specific JSON structure is defined on thecustom configurationpage.
 
@@ -784,32 +790,36 @@ The process for implementing these adjustments as well as the specific JSON stru
 
 There are currently some specific limitations projects wishing to use MFID should consider:
 
-1. Whilst projects configured with fingerprint/face separately are supported,dual modality projectswhich use both in combination are not currently supported.
+1. Whilst projects configured with fingerprint/face separately are supported,dual modality projects which use both in combination are not currently supported.
 2. Only pre-defined ID documentation types are supported (currently Ghana Card and Ghana NHIS card). Projects wishing to support additional document types shouldcontact P&E
 3. It is not currently possible for projects to save MFID OCR capture images (as is possible with biometric capture). This may be considered in future versions of this product.
-4. MFID does not currently support Co Syncing credentials.
+4. MFID does not currently support CoSyncing credentials.
 
 ---
 
 ### Using Multi-factor Identification
 
-Havingconfigured a projectto use MFID, users will be able to register and search with external credentials alongside biometrics. Before diving into each worflow, let’s refresh ourselves on the types of external credential currently supported:
+Havingconfigured a projectto use MFID, users will be able to register and search with external credentials alongside biometrics. Before diving into each workflow, let’s refresh ourselves on the types of external credential currently supported:
 
 | Name | Image | Description |
 | --- | --- | --- |
-| :qr:QR Code |  | Generic QR code embedding an alphanumeric string.Length: 6 characters exactly Content: alpha-numeric |
-| :identification_card:NHIS Card (Ghana) |  | Ghana’s National Health Insurance Scheme(NHIS) card. |
+| :qr:QR Code |  | Generic QR code embedding an alphanumeric string. Length: 6 characters exactly Content: alpha-numeric |
+| :identification_card:NHIS Card (Ghana) |  | Ghana’s National Health Insurance Scheme (NHIS) card. |
 | :identification_card:Ghana Card |  | Ghana’s National ID card |
 
 A user can perform a number of workflows using any of the credentials above (as configured in their project). When a project is configured to use MFID, only enrolment (including enrol+) and identification pathways will require users to scan external credentials (verification workflow does not include a credential scan). Key MFID workflows are detailed below:
 
 #### :identification_card: Credential Capture
 
-For all enrolment and identification callouts where MFID is configured for a project, a user will be first asked to capture biometricsbefore being asked to capture the configured credential.
+For all enrolment and identification callouts where MFID is configured for a project, a user will be first asked to capture biometrics before being asked to capture the configured credential.
 
 - They will initially be presented with a screen to select the credential or skip credential scan
-- They will then be presented with the UI for credential captureQR code scannerOCR ID card scanner
-- The result of the scan will then be presented to the user. This could be one of:No credential found in our database Credential matches one in our database
+- They will then be presented with the UI for credential capture:
+    - QR code scanner
+    - OCR ID card scanner
+- The result of the scan will then be presented to the user. This could be one of:
+    - No credential found in our database
+    - Credential matches one in our database
 - Users can then either proceed with their workflow, or re-capture the credential.
 
 qrtest.mp4
@@ -827,7 +837,7 @@ skip credential then 1toN.mp4
 If a user undertakes an enrolment pathway for a project configured with MFID, they will be promoted to capture biometrics followed by a credential.
 
 - If neither the credential nor biometrics match any on record, the individual will be enrolled directly and the user returned to the data collector
-- If either the credential, biometrics or both match, an identification response (enrol+) will be returned to the data collection platform so the user can choose an alternative indvidual, or choose to enrol anyway.
+- If either the credential, biometrics or both match, an identification response (enrol+) will be returned to the data collection platform so the user can choose an alternative individual, or choose to enrol anyway.
 - If there is a credential match whilst enrolling, this will also automatically be flagged in SID during the scanning process.
 
 direct_enrol.mp4
@@ -915,7 +925,7 @@ Within a single modality (e.g. fingerprint in this case) you cannot currently ov
 
 #### :vero: Upgrading your Vero firmware
 
-If your project uses fingerprint, it is essential to have the latest version of Vero’s firmware. Verosmanufacturedpost August 2024 will have this firmware automatically installed, however if you are using older Veros, you should enable over the air (OTA) updates for your project, which will automatically install the correct version. This will be done via each fingerprint configuration dialogue:
+If your project uses fingerprint, it is essential to have the latest version of Vero’s firmware. Veros manufactured post August 2024 will have this firmware automatically installed, however if you are using older Veros, you should enable over the air (OTA) updates for your project, which will automatically install the correct version. This will be done via each fingerprint configuration dialogue:
 
 [Screenshot: Screenshot 2024-08-08 at 21.11.05.png]
 
@@ -931,7 +941,7 @@ Where there is no age submitted to SID, a new screen will prompt the user to sub
 
 [Screenshot: Screenshot 2024-07-02 at 14.15.02-20240702-131509.png]
 
-👈 An example age prompt.In this particular scenario (let’s assume it’s an identification) two SDKs have been configured:
+👈 An example age prompt. In this particular scenario (let’s assume it’s an identification) two SDKs have been configured:
 
 NEC Fingerprint:6 months → 5 years
 
@@ -943,19 +953,25 @@ This means that:
 - If 6 months → 5 years is selected, the subject's fingerprints will be captured and compared using the NEC SDK
 - If 5 years+ the subject’s fingerprints will be captured and compared using the Sim Matcher SDK.
 
-As shown above, ifnobiometric SDK is configured for the subject’s age, the will be returned to the data collector (with an appropriate message - see below) without capturing or comparing the subject’s biometrics.
+As shown above, if no biometric SDK is configured for the subject’s age, the will be returned to the data collector (with an appropriate message - see below) without capturing or comparing the subject’s biometrics.
 
 Let’s examine two more examples:
 
 Example 1: One SDK, enrolment
 
-- A project is configured only with one SDK (Rank One Face)The SDK has an age range of 6m +
-- The data collector is enrolling a subject, but is passing the subject’s age (5m) in the intentA 3 month old is returned to the data collector
+- A project is configured only with one SDK (Rank One Face). The SDK has an age range of 6m +
+- The data collector is enrolling a subject, but is passing the subject’s age (5m) in the intent. A 3 month old is returned to the data collector
 
 Example 2: Three SDKs, verification
 
-- A project has been configured with three SDKs:NEC (fingerprint): 6m → 5y Sim Matcher (fingerprint): 5y +Rank One (face): 10y+
-- The data collector is verifying a subject and passing their age in the intent:A 3-year-old subject (enrolled 6 months ago) is verified using NECA 7-year-old subject (enrolled 6 months ago) is verified using only Sim MatcherA 13-year-old subject (enrolled 6 months ago) is verified using Sim Matcher and Rank One
+- A project has been configured with three SDKs:
+    - NEC (fingerprint): 6m → 5y 
+    - Sim Matcher (fingerprint): 5y+
+    - Rank One (face): 10y+
+- The data collector is verifying a subject and passing their age in the intent:
+    - A 3-year-old subject (enrolled 6 months ago) is verified using NEC
+    - A 7-year-old subject (enrolled 6 months ago) is verified using only Sim Matcher
+    - A 13-year-old subject (enrolled 6 months ago) is verified using Sim Matcher and Rank One
 
 A subject enrolled within a specific age bracket may have moved into another age bracket when being identified or verified. SID does not currently handle transitions (scheduled for late 2024).
 
@@ -966,7 +982,7 @@ In this scenario (which is much more unlikely in the early stages of a project)
 
 #### :binary: Data collector integrations
 
-Implementing these new features is dependent on changes to a project’s data collection platform. All changes required for data collection platforms are included in the latest version of Lib Simprints:
+Implementing these new features is dependent on changes to a project’s data collection platform. All changes required for data collection platforms are included in the latest version of LibSimprints:
 
 https://github.com/Simprints/Lib Simprints
 
@@ -993,18 +1009,18 @@ This article is a user guide intended for Project Managers & those configuring S
 
 Historically, when a verification has been triggered by a data collector, Simprints ID (SID) has returned a comparison score (on a scale determined by the SDK), but no decision as to the verification success, which has been left to the calling platform to determine.
 
-ForSID 2024.2.0and higher, a verification threshold can be configured for each SDK enabled in a Simprints project. In doing so, an indication of the verification’s success will be determined.
+For SID 2024.2.0 and higher, a verification threshold can be configured for each SDK enabled in a Simprints project. In doing so, an indication of the verification’s success will be determined.
 
 - A positive verification decision will be returned if the score is equal to or above the defined threshold (a match)
-- A negative verification decision (non- will be returned if the score is below the defined threshold (a non-match)
+- A negative verification decision (non-match) will be returned if the score is below the defined threshold (a non-match)
 
 #### Enabling verification threshold
 
-A verification threshold checkbox is available in theconfigurationdialogue forfaceandfingerSDKs in Vulcan.
+A verification threshold checkbox is available in the configuration dialogue for face and finger SDKs in Vulcan.
 
 [Screenshot: Screenshot 2024-08-08 at 17.47.52.png]
 
-This option will beturned off by defaultfor new and existing projects & the threshold will be set at a default value of 55 when enabled. Projects should adjust this value according to Well Labelled Dataset results.
+This option will be turned off by default for new and existing projects & the threshold will be set at a default value of 55 when enabled. Projects should adjust this value according to Well Labelled Dataset results.
 
 A verification threshold is configured separately for each active project SDK. It is technically possible to only configure a threshold for a subset of the total active SDKs in a multi-modality project. However, this is strongly discouraged as this may lead to a verification decision not being returned in some cases.
 
@@ -1018,19 +1034,19 @@ Frequently asked questions
 
 [Screenshot: (blue star)]
 
-Will this feature break my existing verification integration if I turn it on?Nothing should break with existing integrations, but if you turn on this feature for a project and do not update your integration it is advised to test your application still handles verification returns correctly
+Will this feature break my existing verification integration if I turn it on? Nothing should break with existing integrations, but if you turn on this feature for a project and do not update your integration it is advised to test your application still handles verification returns correctly
 
-What happens if I only turn verification decision on for one SDK?If you are using a project with multiple SDKs and only turn on verification for one SDK, the decision may not be returned depending on which SDK scored higher. For this reason, you should configure the threshold for each SDK you are actively using.
+What happens if I only turn verification decision on for one SDK? If you are using a project with multiple SDKs and only turn on verification for one SDK, the decision may not be returned depending on which SDK scored higher. For this reason, you should configure the threshold for each SDK you are actively using.
 
 ---
 
 ### Identification pool validation
 
-Please note, this feature is currently only available to projects viacustom configurationin Vulcan. Please raise a PHC ticket if you have any queries about setting this up.
+Please note, this feature is currently only available to projects via custom configuration in Vulcan. Please raise a PHC ticket if you have any queries about setting this up.
 
 #### Overview
 
-When performing a biometric identification, the pool you are validating against (ie.project, module or user partition) may be empty (containing no enrolment records) or not even synchronised to the device.
+When performing a biometric identification, the pool you are validating against (i.e. project, module or user partition) may be empty (containing no enrolment records) or not even synchronised to the device.
 
 For version2024.2.0onwards, SID will now flag when this is the case & may prompt the user to sync records or modules if this has not been done recently.
 
@@ -1056,7 +1072,7 @@ In the above scenarios, SID will check whether a device has been synced in the l
 
 [Screenshot: Screenshot 2024-09-04 at 17.26.12.png]
 
-See the Vulcan configuration guidancefor more information on customising the max age.
+See the Vulcan configuration guidance for more information on customising the max age.
 
 ---
 
@@ -1085,14 +1101,14 @@ In the humanitarian context, SID is frequently used in environments with low/no 
 
 ### Sync status
 
-The sync status card provides information on sync progress and enables users to trigger sync manually. It is visible on the SID dashboard whenlogged in.
+The sync status card provides information on sync progress and enables users to trigger sync manually. It is visible on the SID dashboard when logged in.
 ### Error States
 
 #### No internet connection
 #### Select Modules
 #### Sync Incomplete
 
-Sync failed for an unknown reason. It can be triggered again with the Try Againbutton.
+Sync failed for an unknown reason. It can be triggered again with the Try Again button.
 #### Sync failed
 
 Sync failed due to a cloud error. It can’t be triggered again, users should contact the Simprints team for support.
@@ -1129,9 +1145,9 @@ Biometric Images have additional requirements:
 
 Specifies when sync should occur.
 
-- Regardless of Frequency, sync is always attempted On Internet connectivity changing and becoming available After a Biometric Capture After the Module is changed
-- If Frequencyis set to Periodically Every hour
-- If Frequencyis set to Periodically and sessions start Every hour Each new session
+- Regardless of Frequency, sync is always attempted On internet connectivity changing and becoming available After a Biometric Capture After the Module is changed
+- If Frequency is set to Periodically: Every hour
+- If Frequency is set to Periodically and sessions start: Every hour, Each new session
 
 #### Connection Attempts
 
@@ -1154,8 +1170,8 @@ It can be accessed via Dashboard>Settings>Sync Information
 | Metric | Definition | Special Requirements |
 | --- | --- | --- |
 | Total records on device | Number of enrolment records currently on the device |  |
-| Records to upload | Number of unsynced enrolment records to upload | Only for sync to Simprints. If thedestinationis set to Calling App, the number will not decrease. |
-| Images to upload | Number of unsynced biometric images to upload | Only available in specific conditions, seeconfiguration. |
+| Records to upload | Number of unsynced enrolment records to upload | Only for sync to Simprints. If the destination is set to Calling App, the number will not decrease. |
+| Images to upload | Number of unsynced biometric images to upload | Only available in specific conditions, see configuration. |
 | Records to download | Number of records from the cloud to be downloaded. | Only displayed when internet connectivity is available. |
 | Records to delete | Number of records marked for deletion on the device. | Only displayed when internet connectivity is available. |
 
@@ -1168,7 +1184,7 @@ Modules are only shown when projects areconfiguredto sync by module.
 
 #### Changing Modules
 
-1. Tap the Select Modulesbutton
+1. Tap the Select Modules button
 2. Confirm changes via the confirmation dialog
 3. Sync will automatically be triggered
 
@@ -1183,7 +1199,7 @@ This article is a user guide intended for Project Managers and field workers
 
 [Screenshot: (blue star)]
 
-Simprints ID Release2023.1.0introduces Manual Data Synchronisation.Prior to this release, synchronisation (of some or all records) occurred periodically in the background and on session start (depending on yoursynchronisation configuration settings).
+Simprints ID Release 2023.1.0 introduces Manual Data Synchronisation. Prior to this release, synchronisation (of some or all records) occurred periodically in the background and on session start (depending on yoursynchronisation configuration settings).
 
 For some users in the field, internet connectivity can be sporadic, meaning waiting in a specific location for synchronisation to take place. The ability to manually synchronise records between BFSID and Simprints ID allows those users to update their devices when most convenient for them.
 ### Using Manual Synchronisation
@@ -1193,10 +1209,10 @@ Manual synchronisation requires no extra configuration in Vulcan and is automati
 Simprints ID Dashboard: When Simprints ID is launched, the dashboard shows a ‘Sync status’ box. When the application is aware that there are records to synchronise, a new ‘SYNC NOW’ button will appear in this box. Pressing this button will synchronise your Simprints ID app with BFSID.
 
 Following synchronisation, this button will disappear, and only re-appear when records are available to synchronise (for example, following offline record collection).
-If image upload is enabled for the project, it is already scheduled to run periodically. However, starting fromSID 2025.3.0, Users can also trigger image sync manually from the Sync Info screen.
+If image upload is enabled for the project, it is already scheduled to run periodically. However, starting from SID 2025.3.0, Users can also trigger image sync manually from the Sync Info screen.
 Simprints ID Settings Menu:Manual synchronisation is available at all times (whether the app detects records to synchronise or not) via the settings menu (Dashboard⋮> Settings > Sync Information > Select Modules). You will also see the details of the records ready to synchronise on this page.
 
-Please note that in versions before SID 2025.3.0, therefreshfunction (accessible via the refresh icon at the top right of this page) only updated the synchronization record statistics . It didnottrigger a manual synchronisation. This button was completely removed in SID 2025.3.0.
+Please note that in versions before SID 2025.3.0, the refresh function (accessible via the refresh icon at the top right of this page) only updated the synchronization record statistics . It did not trigger a manual synchronisation. This button was completely removed in SID 2025.3.0.
 ### Related articles
 
 - Page:Synchronization configuration
@@ -1215,7 +1231,7 @@ This article is a user guide intended for Project Managers and field workers usi
 
 Simprints ID (SID) has historically been designed specifically for use with mobile phones in portrait mode. Now, in 2024, projects are increasingly using larger-screened tablets, and will often initiate Simprints workflows in landscape mode.
 
-To account for this,SID 2024.2.0and higher will now:
+To account for this, SID 2024.2.0 and higher will now:
 
 - Scale user interface (UI) to account for larger screens
 - Present UI optimised for landscape view
@@ -1232,20 +1248,20 @@ Size optimisation and landscape support is only currently supported for biometri
 The exit form is presented when a user:
 
 - Doesn't provide Consent
-- Leaves one of the biometric Workflowsbefore it has been completed
+- Leaves one of the biometric Workflows before it has been completed
 #### Actions
 
 To confirm exit and return to the calling app:
 
 - Select a reason
-- Write some text in the Additional Informationbox
+- Write some text in the Additional Information box
 - Tap Submit
 
 Both a reason and additional information are required for the submit button to activate
 
 To cancel exit and return to the previous screen:
 
-- Tap Capture Biometics
+- Tap Capture Biometrics
 
 ---
 
@@ -1290,7 +1306,7 @@ Related to configuration errors. Current screens include:
 | INVALID_USER_ID | The user id in the intent is invalid |
 | INVALID_VERIFY_ID | The verify id in the intent is invalid |
 | INVALID_STATE_FOR_INTENT_ACTION | Invalid state for intent action, for example a confirmation after an enrolment. |
-| PROJECT_PAUSED | The project is currently in paused |
+| PROJECT_PAUSED | The project is currently paused |
 
 ## Grey error screens
 
@@ -1303,13 +1319,13 @@ Related to data, authentication, or connectivity errors. Current screens include
 | ENROLMENT_LAST_BIOMETRICS_FAILED | Fail to save enrolment record from the current session. |
 | FACE_LICENSE_MISSING | The device doesn’t have a face license |
 | FACE_LICENSE_INVALID | The device has an invalid face license |
-| BACKEND_MAINTENANCE_ERROR | The backend is in maintenance(This alert will only be triggered during the face configuration (i.e. fetching the license) and not log in) |
-| Face configuration error | Error code 000means that there was an unexpected error with the server.Error code 001means the authenticated user/device is not authorized to get a license attributed to the specified project, whether it is because the project does not exist, is ended, or because the device is compromised.Error code 002means the license project quota is exceeded. |
+| BACKEND_MAINTENANCE_ERROR | The backend is in maintenance (This alert will only be triggered during the face configuration (i.e. fetching the license) and not log in) |
+| Face configuration error | Error code 000 means that there was an unexpected error with the server. Error code 001 means the authenticated user/device is not authorized to get a license attributed to the specified project, whether it is because the project does not exist, is ended, or because the device is compromised. Error code 002 means the license project quota is exceeded. |
 
 Note: The following is from old documentation and probably does not exist anymore, keeping here for posterity and just in case:
 
 - unverified API key
-- Safety Net API down, or API key issue - “Please try again in 5-10 minutes” [Depracated and replaced by integrity services API]
+- Safety Net API down, or API key issue - “Please try again in 5-10 minutes” [Deprecated and replaced by integrity services API]
 
 ## Red error screens
 
@@ -1336,7 +1352,7 @@ As of version 2025.1.0, SID includes a hidden screen for advanced troubleshootin
 
 Some of the information on the screen could be considered internal, so access to the screen must be limited to Simprints employees.
 
-Having the "setting password “ set up in Vulcan is highly recommended.
+Having the "settings password" set up in Vulcan is highly recommended.
 If not logged in, press the Simprints logo on the “login request” pageten times.
 If logged in, pressfive timeson the “Sync & Search Configuration” field in the “About” screen. When prompted, enter the settings password.
 
@@ -1344,9 +1360,9 @@ If logged in, pressfive timeson the “Sync & Search Configuration” field in t
 
 | Tab | Details |
 | --- | --- |
-|  | The "Overview”tab contains the following information:IDs that could help find the exact device and user in the Big Query Information about the project configuration currently synchronised on the device (ID, time the configuration has been saved in Vulcan and how long ago it was synced)List of licenses available on the specific device Current network conditions as seen by the device (might not be accurate in reality due to some hidden factors).Information about the paired Vero scanner (scanner must be turned on to provide this information).The “Check connection” button sends a ping network request to verify that this specific device can reach Simprint's backend. This is relevant when the device is connected to some modem/router, which does not have access to the internet or specifically Google’s services.The “Export logs” button will initiate the creation of a zip archive with log messages collected over time. Then, the default email client will send the archive to the pre-defined support email address. Zip archive will be protected with the settings password from the project configuration or the project id if the settings password is not set.Log export is only available on devices with Android 8 and above.All of the information on the screen can be highlighted and copied by long pressing any text. |
-|  | The “Intents” tab contains a list of all callouts processed by SID in thelast 2 weeks.Each card shows the following information:Session ID for the specific callout (might be the same if multiple follow-up calls were made)Timestamp of the callout The exact intent and caller’s package name The summary of the callout result Contents of the card can be copied to the clipboard by pressing the icon in top left corner Pressing the “Details” button in the bottom left corner will open the full list of the events that were tracked in the specific session (second screenshot).Each event card shows the following information:The exact event key/name Timestamp of start (and end where appropriate) of the tracked event Event IDContents of the event payload (sanitised to avoid showing any sensitive information)Contents of the card can be copied to the clipboard by pressing the icon in top left corner Events are available locally only until they are uploaded to the BFSID. |
-|  | The “Network” tab contains a list of all network requests done by SID in thelast 2 weeks.Each card shows the following information:The exact endpoint of the request Timestamp of the request Response code or error Contents of the card can be copied to the clipboard by pressing the icon in top left corner |
+|  | The "Overview”tab contains the following information:IDs that could help find the exact device and user in the Big Query Information about the project configuration currently synchronised on the device (ID, time the configuration has been saved in Vulcan and how long ago it was synced)List of licenses available on the specific device Current network conditions as seen by the device (might not be accurate in reality due to some hidden factors).Information about the paired Vero scanner (scanner must be turned on to provide this information).The “Check connection” button sends a ping network request to verify that this specific device can reach Simprint's backend. This is relevant when the device is connected to some modem/router, which does not have access to the internet or specifically Google’s services. The “Export logs” button will initiate the creation of a zip archive with log messages collected over time. Then, the default email client will send the archive to the pre-defined support email address. Zip archive will be protected with the settings password from the project configuration or the project id if the settings password is not set. Log export is only available on devices with Android 8 and above. All of the information on the screen can be highlighted and copied by long pressing any text. |
+|  | The “Intents” tab contains a list of all callouts processed by SID in the last 2 weeks. Each card shows the following information:Session ID for the specific callout (might be the same if multiple follow-up calls were made)Timestamp of the callout The exact intent and caller’s package name The summary of the callout result Contents of the card can be copied to the clipboard by pressing the icon in top left corner Pressing the “Details” button in the bottom left corner will open the full list of the events that were tracked in the specific session (second screenshot).Each event card shows the following information:The exact event key/name Timestamp of start (and end where appropriate) of the tracked event Event IDContents of the event payload (sanitised to avoid showing any sensitive information)Contents of the card can be copied to the clipboard by pressing the icon in top left corner Events are available locally only until they are uploaded to the BFSID. |
+|  | The “Network” tab contains a list of all network requests done by SID in the last 2 weeks. Each card shows the following information:The exact endpoint of the request Timestamp of the request Response code or error Contents of the card can be copied to the clipboard by pressing the icon in top left corner |
 |  | The “Workers” tab contains a list of all available information about the background worker execution in SID.Each card shows the following information:The name of the background worker Status of the execution attempt - either Enqued for future work or Succeeded/Failed for past work Approximate time of the next enqueued run (actual time depends on the system)Execution result data for past work Contents of the card can be copied to the clipboard by pressing the icon in top left corner |
 
 ---
@@ -1363,14 +1379,14 @@ A: Realm is no longer supported by its developers, meaning it won’t receive fu
 
 Q2: When will this migration happen?
 
-A: The initial phase of the migration will be part of theSID 2025.2.0 release.In this version, both Realm and Room databases will coexist, with Realm remaining the single source of truthinitially.
+A: The initial phase of the migration will be part of the SID 2025.2.0 release. In this version, both Realm and Room databases will coexist, with Realm remaining the single source of truth initially.
 
 Q3: How will the migration be rolled out? Will it affect all users at once?
 
 A: We're taking a cautious approach. We've added two custom configuration flags (see Custom configuration):
 
-- records DbMigration From Realm Enabled:This allows us to enable the migration for a small subset of users initially.
-- records DbMigration From Realm Max Retries: This controls the number of times the app will attempt the migration if it encounters an issue. The default is10 retries, with anexponential backoff policy(Backoff Policy.EXPONENTIAL) between attempts. This phased rollout will help us monitor the process and ensure a smooth transition for everyone.
+- `recordsDbMigrationFromRealmEnabled`:This allows us to enable the migration for a small subset of users initially.
+- `recordsDbMigrationFromRealmMaxRetries`: This controls the number of times the app will attempt the migration if it encounters an issue. The default is10 retries, with anexponential backoff policy(`BackoffPolicy.EXPONENTIAL`) between attempts. This phased rollout will help us monitor the process and ensure a smooth transition for everyone.
 
 Q4: How will we track the migration progress and any issues?
 
@@ -1385,7 +1401,7 @@ Q5: How can I check which database is currently active in the SID app?
 To check which database is currently active in the SID app, navigate to the Troubleshootingscreen and open theMIGRATIONtab. This section provides key details such as the migration status (e.g., SUCCESS or FAILED), number of retries, and down sync status, along with the active database’s name, version, file path, size, and number of stored subjects. If the Realm database information is shown and the migration status indicatesFAILED, it means the app is still using Realm.
 Q6: What are the conditions for the migration to run? How long will it take?
 
-A: The migration will only run when the device hasenough storageand issufficiently charged(Workmangerconstraintsset Requires Storage Not Lowandset Requires Battery Not Low). For a Samsung Galaxy Tab A7 device with 3 Gigi of RAM and 50,000 enrolment records (each containing 2 ROCv3 templates), the migration is expected to takeless than 6 minutesrunning in the background.
+A: The migration will only run when the device has enough storage and is sufficiently charged (WorkManager constraints `setRequiresStorageNotLow` and `setRequiresBatteryNotLow`). For a Samsung Galaxy Tab A7 device with 3 GB of RAM and 50,000 enrolment records (each containing 2 ROCv3 templates), the migration is expected to take less than 6 minutes running in the background.
 
 Q7: How does the migration handle large amounts of data?
 
