@@ -17,6 +17,7 @@ internal class ContextBuilder @Inject constructor() {
 
         appendWorkflowState(context)
         appendRequestParameters(context)
+        appendActiveAlert(context)
 
         if (context.currentScreen.isNotBlank()) {
             appendLine("- **Current screen**: ${context.currentScreen}")
@@ -53,6 +54,15 @@ internal class ContextBuilder @Inject constructor() {
         } else {
             appendLine("- **User state**: App opened from launcher (no active workflow)")
         }
+    }
+
+    private fun StringBuilder.appendActiveAlert(context: ChatContext) {
+        if (context.activeAlert.isBlank()) return
+
+        appendLine()
+        appendLine("### ⚠️ Active Alert")
+        appendLine("The user is currently seeing an error/alert screen with the following details:")
+        appendLine(context.activeAlert)
     }
 
     private fun StringBuilder.appendRequestParameters(context: ChatContext) {

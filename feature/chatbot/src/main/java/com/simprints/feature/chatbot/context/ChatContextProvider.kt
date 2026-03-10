@@ -43,6 +43,7 @@ class ChatContextProvider @Inject constructor(
     private val _workflowType = MutableStateFlow("")
     private val _workflowSteps = MutableStateFlow<List<WorkflowStepInfo>>(emptyList())
     private val _requestParameters = MutableStateFlow<Map<String, String>>(emptyMap())
+    private val _activeAlert = MutableStateFlow("")
 
     fun updateScreen(screenName: String) {
         _currentScreen.value = screenName
@@ -61,11 +62,20 @@ class ChatContextProvider @Inject constructor(
         _requestParameters.value = params
     }
 
+    fun updateActiveAlert(alert: String) {
+        _activeAlert.value = alert
+    }
+
+    fun clearActiveAlert() {
+        _activeAlert.value = ""
+    }
+
     fun clearWorkflow() {
         _isInWorkflow.value = false
         _workflowType.value = ""
         _workflowSteps.value = emptyList()
         _requestParameters.value = emptyMap()
+        _activeAlert.value = ""
     }
 
     suspend fun buildContext(): ChatContext {
@@ -79,6 +89,7 @@ class ChatContextProvider @Inject constructor(
             workflowType = _workflowType.value,
             workflowSteps = _workflowSteps.value,
             requestParameters = _requestParameters.value,
+            activeAlert = _activeAlert.value,
             projectName = project?.name ?: "",
             projectConfigSummary = formatConfigSummary(config, deviceConfig),
             isConnected = connectivityTracker.isConnected(),

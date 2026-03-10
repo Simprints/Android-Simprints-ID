@@ -14,8 +14,10 @@ import com.simprints.face.capture.FaceCaptureContract
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.alert.toArgs
+import com.simprints.feature.chatbot.context.ChatContextProvider
 import com.simprints.feature.clientapi.ClientApiViewModel
 import com.simprints.feature.clientapi.extensions.getResultCodeFromExtras
+import com.simprints.feature.clientapi.models.ClientApiError
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.exitform.ExitFormContract
@@ -23,6 +25,7 @@ import com.simprints.feature.externalcredential.ExternalCredentialContract
 import com.simprints.feature.fetchsubject.FetchSubjectContract
 import com.simprints.feature.login.LoginContract
 import com.simprints.feature.login.LoginResult
+import com.simprints.feature.logincheck.LoginCheckError
 import com.simprints.feature.logincheck.LoginCheckViewModel
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupContract
@@ -72,6 +75,9 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
     @Inject
     lateinit var orchestratorCache: OrchestratorCache
 
+    @Inject
+    lateinit var chatContextProvider: ChatContextProvider
+
     private val args by navArgs<OrchestratorFragmentArgs>()
 
     private val loginCheckVm by viewModels<LoginCheckViewModel>()
@@ -103,6 +109,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
 
         handleResult<AlertResult>(AlertContract.DESTINATION) { alertResult ->
             Simber.i("Alert result: $alertResult", tag = ORCHESTRATION)
+            chatContextProvider.clearActiveAlert()
             orchestratorVm.handleErrorResponse(
                 AppErrorResponse(alertResult.appErrorReason ?: AppErrorReason.UNEXPECTED_ERROR),
             )
@@ -145,6 +152,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         loginCheckVm.showAlert.observe(
             viewLifecycleOwner,
             LiveDataEventWithContentObserver { error ->
+                chatContextProvider.updateActiveAlert(describeLoginCheckAlert(error))
                 findNavController().navigateSafely(
                     currentFragment = this,
                     actionId = R.id.action_orchestratorFragment_to_alert,
@@ -193,6 +201,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         clientApiVm.showAlert.observe(
             viewLifecycleOwner,
             LiveDataEventWithContentObserver { error ->
+                chatContextProvider.updateActiveAlert(describeClientApiAlert(error))
                 findNavController().navigateSafely(
                     currentFragment = this,
                     actionId = R.id.action_orchestratorFragment_to_alert,
@@ -292,6 +301,55 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
                 }
             }
         }
+    }
+
+    private fun describeLoginCheckAlert(error: LoginCheckError): String = when (error) {
+        LoginCheckError.DIFFERENT_PROJECT_ID ->
+            "Configuration Error: The project ID in the request doesn't match the project the user is signed into. " +
+                "The user needs to sign in with the correct project or the calling app needs to send the correct project ID."
+        LoginCheckError.PROJECT_PAUSED ->
+            "Project Paused: This project has been paused by the project administrator. " +
+                "No workflows can be executed until the project is resumed."
+        LoginCheckError.PROJECT_ENDING ->
+            "Project Ending: This project is ending and will be decommissioned. " +
+                "The user should contact their project administrator."
+        LoginCheckError.MISSING_GOOGLE_PLAY_SERVICES ->
+            "Missing Google Play Services: The device does not have Google Play Services installed. " +
+                "Google Play Services is required for the app to function."
+        LoginCheckError.GOOGLE_PLAY_SERVICES_OUTDATED ->
+            "Outdated Google Play Services: The Google Play Services on this device is outdated. " +
+                "The user needs to update Google Play Services."
+        LoginCheckError.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP ->
+            "Missing or Outdated Google Play Store: The Google Play Store app is missing or outdated. " +
+                "The user needs to install or update the Google Play Store."
+        LoginCheckError.INTEGRITY_SERVICE_ERROR ->
+            "Integrity Service Error: The device integrity check failed. " +
+                "This may indicate a problem with Google Play Services or the device's security state."
+        LoginCheckError.UNEXPECTED_LOGIN_ERROR ->
+            "Unexpected Login Error: An unexpected error occurred during the login process. " +
+                "The user should try again or check their internet connection."
+        LoginCheckError.ROOTED_DEVICE ->
+            "Rooted Device Detected: This device has been rooted, which is a security risk. " +
+                "The app cannot operate on rooted devices for data protection reasons."
+    }
+
+    private fun describeClientApiAlert(error: ClientApiError): String = when (error) {
+        ClientApiError.INVALID_STATE_FOR_INTENT_ACTION ->
+            "Invalid Intent Action: The calling app sent an action that is not valid in the current state."
+        ClientApiError.INVALID_METADATA ->
+            "Invalid Metadata: The metadata provided by the calling app is malformed or invalid."
+        ClientApiError.INVALID_MODULE_ID ->
+            "Invalid Module ID: The module ID provided by the calling app is invalid or not recognized."
+        ClientApiError.INVALID_PROJECT_ID ->
+            "Invalid Project ID: The project ID provided by the calling app is invalid."
+        ClientApiError.INVALID_SELECTED_ID ->
+            "Invalid Selected ID: The selected subject ID for confirm identity is invalid."
+        ClientApiError.INVALID_SESSION_ID ->
+            "Invalid Session ID: The session ID for a follow-up action is invalid or expired."
+        ClientApiError.INVALID_USER_ID ->
+            "Invalid User ID: The user ID provided by the calling app is invalid."
+        ClientApiError.INVALID_VERIFY_ID ->
+            "Invalid Verify GUID: The GUID provided for verification is invalid."
     }
 
     companion object {

@@ -188,6 +188,24 @@ class ChatContextProviderTest {
     }
 
     @Test
+    fun `updateActiveAlert sets alert and clearActiveAlert resets it`() = runTest {
+        coEvery { configRepository.getProjectConfiguration() } returns projectConfig
+        coEvery { configRepository.getProject() } returns null
+        every { projectConfig.general } returns generalConfig
+        every { generalConfig.modalities } returns emptyList()
+        every { projectConfig.fingerprint } returns null
+        every { connectivityTracker.isConnected() } returns true
+
+        provider.updateActiveAlert("Rooted Device Detected: security risk")
+        val withAlert = provider.buildContext()
+        assertThat(withAlert.activeAlert).contains("Rooted Device")
+
+        provider.clearActiveAlert()
+        val cleared = provider.buildContext()
+        assertThat(cleared.activeAlert).isEmpty()
+    }
+
+    @Test
     fun `collects recent logs from persistent logger`() = runTest {
         coEvery { configRepository.getProjectConfiguration() } returns projectConfig
         coEvery { configRepository.getProject() } returns null
