@@ -19,6 +19,7 @@ import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.chatbot.context.ChatContextProvider
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
 import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
@@ -88,6 +89,9 @@ internal class OrchestratorViewModelTest {
     @MockK
     private lateinit var mapStepsForLastBiometricEnrolUseCase: MapStepsForLastBiometricEnrolUseCase
 
+    @MockK
+    private lateinit var chatContextProvider: ChatContextProvider
+
     private lateinit var viewModel: OrchestratorViewModel
 
     @Before
@@ -105,6 +109,7 @@ internal class OrchestratorViewModelTest {
             dailyActivityUseCase,
             mapStepsForLastBiometricEnrolUseCase,
             OrchestrationJsonHelper(),
+            chatContextProvider,
         )
     }
 

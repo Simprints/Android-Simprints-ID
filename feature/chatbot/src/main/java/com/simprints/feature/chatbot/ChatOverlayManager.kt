@@ -11,6 +11,7 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.card.MaterialCardView
 import com.simprints.feature.chatbot.context.ChatContextProvider
+import com.simprints.infra.aichat.model.WorkflowStepInfo
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.experimental
 import kotlinx.coroutines.launch
@@ -22,8 +23,8 @@ import javax.inject.Inject
  * The FAB is only shown when the chatbot feature flag is enabled.
  *
  * Also serves as the public API for feeding runtime context into the chatbot
- * (screen name, workflow step, workflow type) via [updateScreen], [updateStep],
- * and [updateWorkflow].
+ * (screen name, workflow type, workflow steps) via [updateScreen], [updateWorkflow],
+ * [updateSteps], and [clearWorkflow].
  */
 class ChatOverlayManager @Inject constructor(
     private val configRepository: ConfigRepository,
@@ -119,12 +120,16 @@ class ChatOverlayManager @Inject constructor(
         contextProvider.updateScreen(screenName)
     }
 
-    fun updateStep(stepName: String, index: Int, total: Int) {
-        contextProvider.updateStep(stepName, index, total)
+    fun updateSteps(steps: List<WorkflowStepInfo>) {
+        contextProvider.updateSteps(steps)
     }
 
     fun updateWorkflow(workflowType: String) {
         contextProvider.updateWorkflow(workflowType)
+    }
+
+    fun clearWorkflow() {
+        contextProvider.clearWorkflow()
     }
 
     private fun dpToPx(activity: FragmentActivity, dp: Int): Int {

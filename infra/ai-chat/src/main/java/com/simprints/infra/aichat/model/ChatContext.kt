@@ -6,13 +6,11 @@ package com.simprints.infra.aichat.model
  */
 data class ChatContext(
     val currentScreen: String = "",
-    val currentStep: String = "",
-    val totalSteps: Int = 0,
-    val currentStepIndex: Int = 0,
+    val isInWorkflow: Boolean = false,
     val workflowType: String = "",
+    val workflowSteps: List<WorkflowStepInfo> = emptyList(),
     val projectName: String = "",
-    val enabledModalities: List<String> = emptyList(),
-    val scannerType: String = "",
+    val projectConfigSummary: String = "",
     val isConnected: Boolean = false,
     val recentErrors: List<String> = emptyList(),
     val recentLogs: List<String> = emptyList(),

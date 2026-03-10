@@ -8,7 +8,15 @@ import android.os.Build
 import android.os.Environment
 import android.os.StatFs
 import com.simprints.infra.aichat.model.ChatContext
+import com.simprints.infra.aichat.model.WorkflowStepInfo
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.ConsentConfiguration
+import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.IdentificationConfiguration
+import com.simprints.infra.config.store.models.MultiFactorIdConfiguration
+import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.logging.persistent.LogEntryType
 import com.simprints.logging.persistent.PersistentLogger
@@ -19,7 +27,7 @@ import javax.inject.Singleton
 
 /**
  * Provides real-time context about the user's current app state to enrich
- * chatbot prompts. Collects screen name, project config, device diagnostics,
+ * chatbot prompts. Collects workflow state, project config, device diagnostics,
  * recent logs and errors.
  */
 @Singleton
@@ -30,43 +38,40 @@ class ChatContextProvider @Inject constructor(
     private val persistentLogger: PersistentLogger,
 ) {
     private val _currentScreen = MutableStateFlow("")
-    private val _currentStep = MutableStateFlow("")
-    private val _totalSteps = MutableStateFlow(0)
-    private val _currentStepIndex = MutableStateFlow(0)
+    private val _isInWorkflow = MutableStateFlow(false)
     private val _workflowType = MutableStateFlow("")
+    private val _workflowSteps = MutableStateFlow<List<WorkflowStepInfo>>(emptyList())
 
     fun updateScreen(screenName: String) {
         _currentScreen.value = screenName
     }
 
-    fun updateStep(stepName: String, index: Int, total: Int) {
-        _currentStep.value = stepName
-        _currentStepIndex.value = index
-        _totalSteps.value = total
+    fun updateWorkflow(workflowType: String) {
+        _isInWorkflow.value = true
+        _workflowType.value = workflowType
     }
 
-    fun updateWorkflow(workflowType: String) {
-        _workflowType.value = workflowType
+    fun updateSteps(steps: List<WorkflowStepInfo>) {
+        _workflowSteps.value = steps
+    }
+
+    fun clearWorkflow() {
+        _isInWorkflow.value = false
+        _workflowType.value = ""
+        _workflowSteps.value = emptyList()
     }
 
     suspend fun buildContext(): ChatContext {
         val config = runCatching { configRepository.getProjectConfiguration() }.getOrNull()
         val project = runCatching { configRepository.getProject() }.getOrNull()
 
-        val modalities = config?.general?.modalities?.map { it.name } ?: emptyList()
-        val scanners = config?.fingerprint?.allowedScanners
-            ?.joinToString(", ") { it.name.replace("_", " ") }
-            ?: ""
-
         return ChatContext(
             currentScreen = _currentScreen.value,
-            currentStep = _currentStep.value,
-            totalSteps = _totalSteps.value,
-            currentStepIndex = _currentStepIndex.value,
+            isInWorkflow = _isInWorkflow.value,
             workflowType = _workflowType.value,
+            workflowSteps = _workflowSteps.value,
             projectName = project?.name ?: "",
-            enabledModalities = modalities,
-            scannerType = scanners,
+            projectConfigSummary = config?.let { formatProjectConfig(it) } ?: "",
             isConnected = connectivityTracker.isConnected(),
             recentErrors = collectRecentErrors(),
             recentLogs = collectRecentLogs(),
@@ -75,6 +80,101 @@ class ChatContextProvider @Inject constructor(
             freeStorageMb = getFreeStorageMb(),
             batteryPercent = getBatteryPercent(),
         )
+    }
+
+    private fun formatProjectConfig(config: ProjectConfiguration): String = buildString {
+        formatGeneral(config)
+        config.face?.let { formatFace(it) }
+        config.fingerprint?.let { formatFingerprint(it) }
+        formatConsent(config.consent)
+        formatIdentification(config.identification)
+        formatSync(config.synchronization)
+        config.multifactorId?.let { formatMultiFactorId(it) }
+    }.trimEnd()
+
+    private fun StringBuilder.formatGeneral(config: ProjectConfiguration) {
+        val g = config.general
+        appendLine("**General**")
+        appendLine("- Modalities: ${g.modalities.joinToString(", ")}")
+        appendLine("- Matching modalities: ${g.matchingModalities.joinToString(", ")}")
+        appendLine("- Languages: ${g.languageOptions.joinToString(", ")} (default: ${g.defaultLanguage})")
+        appendLine("- Collect location: ${g.collectLocation}")
+        appendLine("- Duplicate biometric check: ${g.duplicateBiometricEnrolmentCheck}")
+    }
+
+    private fun StringBuilder.formatFace(face: FaceConfiguration) {
+        appendLine("**Face**")
+        appendLine("- SDKs: ${face.allowedSDKs.joinToString(", ")}")
+        face.rankOne?.let { sdk ->
+            appendLine("- RankOne: images=${sdk.nbOfImagesToCapture}, quality=${sdk.qualityThreshold}, version=${sdk.version}")
+            appendLine("  - Decision policy: ${sdk.decisionPolicy}")
+            appendLine("  - Age range: ${sdk.allowedAgeRange}")
+            sdk.verificationMatchThreshold?.let { appendLine("  - Verification threshold: $it") }
+            appendLine("  - Image saving: ${sdk.imageSavingStrategy}")
+        }
+        face.simFace?.let { sdk ->
+            appendLine("- SimFace: images=${sdk.nbOfImagesToCapture}, quality=${sdk.qualityThreshold}, version=${sdk.version}")
+            appendLine("  - Decision policy: ${sdk.decisionPolicy}")
+            appendLine("  - Age range: ${sdk.allowedAgeRange}")
+            sdk.verificationMatchThreshold?.let { appendLine("  - Verification threshold: $it") }
+            appendLine("  - Image saving: ${sdk.imageSavingStrategy}")
+        }
+    }
+
+    private fun StringBuilder.formatFingerprint(fp: FingerprintConfiguration) {
+        appendLine("**Fingerprint**")
+        appendLine("- Scanners: ${fp.allowedScanners.joinToString(", ")}")
+        appendLine("- SDKs: ${fp.allowedSDKs.joinToString(", ")}")
+        appendLine("- Display hand icons: ${fp.displayHandIcons}")
+        fp.secugenSimMatcher?.let { sdk ->
+            appendLine("- SecugenSimMatcher: fingers=${sdk.fingersToCapture}, version=${sdk.version}")
+            appendLine("  - Decision policy: ${sdk.decisionPolicy}")
+            appendLine("  - Comparison strategy: ${sdk.comparisonStrategyForVerification}")
+            appendLine("  - Age range: ${sdk.allowedAgeRange}")
+            sdk.verificationMatchThreshold?.let { appendLine("  - Verification threshold: $it") }
+            sdk.maxCaptureAttempts?.let { appendLine("  - Max capture attempts: $it") }
+        }
+        fp.nec?.let { sdk ->
+            appendLine("- NEC: fingers=${sdk.fingersToCapture}, version=${sdk.version}")
+            appendLine("  - Decision policy: ${sdk.decisionPolicy}")
+            appendLine("  - Comparison strategy: ${sdk.comparisonStrategyForVerification}")
+            appendLine("  - Age range: ${sdk.allowedAgeRange}")
+            sdk.verificationMatchThreshold?.let { appendLine("  - Verification threshold: $it") }
+            sdk.maxCaptureAttempts?.let { appendLine("  - Max capture attempts: $it") }
+        }
+    }
+
+    private fun StringBuilder.formatConsent(consent: ConsentConfiguration) {
+        appendLine("**Consent**")
+        appendLine("- Program: ${consent.programName}")
+        appendLine("- Organization: ${consent.organizationName}")
+        appendLine("- Collect consent: ${consent.collectConsent}")
+        appendLine("- Parental consent: ${consent.allowParentalConsent}")
+    }
+
+    private fun StringBuilder.formatIdentification(id: IdentificationConfiguration) {
+        appendLine("**Identification**")
+        appendLine("- Max returned candidates: ${id.maxNbOfReturnedCandidates}")
+        appendLine("- Pool type: ${id.poolType}")
+    }
+
+    private fun StringBuilder.formatSync(sync: SynchronizationConfiguration) {
+        appendLine("**Synchronization**")
+        val up = sync.up.simprints
+        appendLine("- Upload: kind=${up.kind}, frequency=${up.frequency}")
+        appendLine("  - Images require WiFi: ${up.imagesRequireUnmeteredConnection}")
+        appendLine("- CoSync upload: kind=${sync.up.coSync.kind}")
+        sync.down.simprints?.let { down ->
+            appendLine("- Download: partition=${down.partitionType}, maxModules=${down.maxNbOfModules}, frequency=${down.frequency}")
+        }
+        if (sync.down.commCare != null) {
+            appendLine("- CommCare download: enabled")
+        }
+    }
+
+    private fun StringBuilder.formatMultiFactorId(mfid: MultiFactorIdConfiguration) {
+        appendLine("**Multi-Factor ID**")
+        appendLine("- Allowed credentials: ${mfid.allowedExternalCredentials.joinToString(", ")}")
     }
 
     private suspend fun collectRecentLogs(): List<String> = runCatching {

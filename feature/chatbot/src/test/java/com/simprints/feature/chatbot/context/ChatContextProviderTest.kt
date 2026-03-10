@@ -2,10 +2,13 @@ package com.simprints.feature.chatbot.context
 
 import android.content.Context
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.aichat.model.WorkflowStepInfo
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.ConsentConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.IdentificationConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.core.domain.common.Modality
 import com.simprints.logging.persistent.LogEntry
@@ -55,18 +58,29 @@ class ChatContextProviderTest {
     }
 
     @Test
-    fun `builds context with project config`() = runTest {
+    fun `builds context with project config summary`() = runTest {
         every { generalConfig.modalities } returns listOf(Modality.FINGERPRINT, Modality.FACE)
+        every { generalConfig.matchingModalities } returns listOf(Modality.FINGERPRINT)
+        every { generalConfig.languageOptions } returns listOf("en", "fr")
+        every { generalConfig.defaultLanguage } returns "en"
+        every { generalConfig.collectLocation } returns true
+        every { generalConfig.duplicateBiometricEnrolmentCheck } returns false
         every { projectConfig.general } returns generalConfig
+        every { projectConfig.face } returns null
         every { projectConfig.fingerprint } returns null
+        every { projectConfig.multifactorId } returns null
+        every { projectConfig.consent } returns mockk<ConsentConfiguration>(relaxed = true)
+        every { projectConfig.identification } returns mockk<IdentificationConfiguration>(relaxed = true)
+        every { projectConfig.synchronization } returns mockk<SynchronizationConfiguration>(relaxed = true)
         coEvery { configRepository.getProjectConfiguration() } returns projectConfig
         coEvery { configRepository.getProject() } returns null
         every { connectivityTracker.isConnected() } returns true
 
-        val context = provider.buildContext()
+        val result = provider.buildContext()
 
-        assertThat(context.enabledModalities).containsExactly("FINGERPRINT", "FACE")
-        assertThat(context.isConnected).isTrue()
+        assertThat(result.projectConfigSummary).contains("FINGERPRINT, FACE")
+        assertThat(result.projectConfigSummary).contains("General")
+        assertThat(result.isConnected).isTrue()
     }
 
     @Test
@@ -78,9 +92,9 @@ class ChatContextProviderTest {
         every { projectConfig.fingerprint } returns null
         every { connectivityTracker.isConnected() } returns false
 
-        val context = provider.buildContext()
+        val result = provider.buildContext()
 
-        assertThat(context.isConnected).isFalse()
+        assertThat(result.isConnected).isFalse()
     }
 
     @Test
@@ -89,10 +103,10 @@ class ChatContextProviderTest {
         coEvery { configRepository.getProject() } throws RuntimeException("not logged in")
         every { connectivityTracker.isConnected() } returns false
 
-        val context = provider.buildContext()
+        val result = provider.buildContext()
 
-        assertThat(context.enabledModalities).isEmpty()
-        assertThat(context.projectName).isEmpty()
+        assertThat(result.projectConfigSummary).isEmpty()
+        assertThat(result.projectName).isEmpty()
     }
 
     @Test
@@ -105,47 +119,13 @@ class ChatContextProviderTest {
         every { connectivityTracker.isConnected() } returns true
 
         provider.updateScreen("ConsentFragment")
-        val context = provider.buildContext()
+        val result = provider.buildContext()
 
-        assertThat(context.currentScreen).isEqualTo("ConsentFragment")
+        assertThat(result.currentScreen).isEqualTo("ConsentFragment")
     }
 
     @Test
-    fun `updateStep changes step info`() = runTest {
-        coEvery { configRepository.getProjectConfiguration() } returns projectConfig
-        coEvery { configRepository.getProject() } returns null
-        every { projectConfig.general } returns generalConfig
-        every { generalConfig.modalities } returns emptyList()
-        every { projectConfig.fingerprint } returns null
-        every { connectivityTracker.isConnected() } returns true
-
-        provider.updateStep("Fingerprint Capture", 2, 5)
-        val context = provider.buildContext()
-
-        assertThat(context.currentStep).isEqualTo("Fingerprint Capture")
-        assertThat(context.currentStepIndex).isEqualTo(2)
-        assertThat(context.totalSteps).isEqualTo(5)
-    }
-
-    @Test
-    fun `extracts scanner type from config`() = runTest {
-        every { generalConfig.modalities } returns listOf(Modality.FINGERPRINT)
-        every { projectConfig.general } returns generalConfig
-        val fingerprintConfig = mockk<FingerprintConfiguration> {
-            every { allowedScanners } returns listOf(FingerprintConfiguration.VeroGeneration.VERO_2)
-        }
-        every { projectConfig.fingerprint } returns fingerprintConfig
-        coEvery { configRepository.getProjectConfiguration() } returns projectConfig
-        coEvery { configRepository.getProject() } returns null
-        every { connectivityTracker.isConnected() } returns true
-
-        val context = provider.buildContext()
-
-        assertThat(context.scannerType).contains("VERO 2")
-    }
-
-    @Test
-    fun `updateWorkflow changes workflow type`() = runTest {
+    fun `updateWorkflow sets workflow state`() = runTest {
         coEvery { configRepository.getProjectConfiguration() } returns projectConfig
         coEvery { configRepository.getProject() } returns null
         every { projectConfig.general } returns generalConfig
@@ -154,9 +134,53 @@ class ChatContextProviderTest {
         every { connectivityTracker.isConnected() } returns true
 
         provider.updateWorkflow("Enrolment")
-        val context = provider.buildContext()
+        val result = provider.buildContext()
 
-        assertThat(context.workflowType).isEqualTo("Enrolment")
+        assertThat(result.isInWorkflow).isTrue()
+        assertThat(result.workflowType).isEqualTo("Enrolment")
+    }
+
+    @Test
+    fun `updateSteps provides full step list`() = runTest {
+        coEvery { configRepository.getProjectConfiguration() } returns projectConfig
+        coEvery { configRepository.getProject() } returns null
+        every { projectConfig.general } returns generalConfig
+        every { generalConfig.modalities } returns emptyList()
+        every { projectConfig.fingerprint } returns null
+        every { connectivityTracker.isConnected() } returns true
+
+        provider.updateSteps(
+            listOf(
+                WorkflowStepInfo("Setup", "Completed"),
+                WorkflowStepInfo("Consent", "In Progress"),
+                WorkflowStepInfo("Fingerprint Capture", "Not Started"),
+            ),
+        )
+        val result = provider.buildContext()
+
+        assertThat(result.workflowSteps).hasSize(3)
+        assertThat(result.workflowSteps[0].name).isEqualTo("Setup")
+        assertThat(result.workflowSteps[0].status).isEqualTo("Completed")
+        assertThat(result.workflowSteps[2].status).isEqualTo("Not Started")
+    }
+
+    @Test
+    fun `clearWorkflow resets workflow state`() = runTest {
+        coEvery { configRepository.getProjectConfiguration() } returns projectConfig
+        coEvery { configRepository.getProject() } returns null
+        every { projectConfig.general } returns generalConfig
+        every { generalConfig.modalities } returns emptyList()
+        every { projectConfig.fingerprint } returns null
+        every { connectivityTracker.isConnected() } returns true
+
+        provider.updateWorkflow("Enrolment")
+        provider.updateSteps(listOf(WorkflowStepInfo("Setup", "Completed")))
+        provider.clearWorkflow()
+        val result = provider.buildContext()
+
+        assertThat(result.isInWorkflow).isFalse()
+        assertThat(result.workflowType).isEmpty()
+        assertThat(result.workflowSteps).isEmpty()
     }
 
     @Test
@@ -174,11 +198,11 @@ class ChatContextProviderTest {
             LogEntry(timestampMs = 200, type = LogEntryType.Network, title = "Sync", body = "completed"),
         )
 
-        val context = provider.buildContext()
+        val result = provider.buildContext()
 
-        assertThat(context.recentLogs).hasSize(2)
-        assertThat(context.recentLogs[0]).contains("Network")
-        assertThat(context.recentLogs[1]).contains("Intent")
+        assertThat(result.recentLogs).hasSize(2)
+        assertThat(result.recentLogs[0]).contains("Network")
+        assertThat(result.recentLogs[1]).contains("Intent")
     }
 
     @Test
@@ -196,11 +220,11 @@ class ChatContextProviderTest {
             LogEntry(timestampMs = 300, type = LogEntryType.Network, title = "Sync", body = "completed"),
         )
 
-        val context = provider.buildContext()
+        val result = provider.buildContext()
 
-        assertThat(context.recentErrors).hasSize(2)
-        assertThat(context.recentErrors[0]).contains("Upload failed")
-        assertThat(context.recentErrors[1]).contains("Sync error")
+        assertThat(result.recentErrors).hasSize(2)
+        assertThat(result.recentErrors[0]).contains("Upload failed")
+        assertThat(result.recentErrors[1]).contains("Sync error")
     }
 
     @Test
@@ -213,9 +237,9 @@ class ChatContextProviderTest {
         every { connectivityTracker.isConnected() } returns true
         coEvery { persistentLogger.get(any()) } throws RuntimeException("DB error")
 
-        val context = provider.buildContext()
+        val result = provider.buildContext()
 
-        assertThat(context.recentLogs).isEmpty()
-        assertThat(context.recentErrors).isEmpty()
+        assertThat(result.recentLogs).isEmpty()
+        assertThat(result.recentErrors).isEmpty()
     }
 }

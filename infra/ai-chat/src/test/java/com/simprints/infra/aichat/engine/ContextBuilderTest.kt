@@ -2,6 +2,7 @@ package com.simprints.infra.aichat.engine
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.aichat.model.ChatContext
+import com.simprints.infra.aichat.model.WorkflowStepInfo
 import org.junit.Before
 import org.junit.Test
 
@@ -15,16 +16,20 @@ class ContextBuilderTest {
     }
 
     @Test
-    fun `builds context with all fields populated`() {
+    fun `builds context when user is in a workflow`() {
         val context = ChatContext(
             currentScreen = "ConsentScreen",
-            currentStep = "Fingerprint Capture",
-            totalSteps = 5,
-            currentStepIndex = 3,
+            isInWorkflow = true,
             workflowType = "Enrolment",
+            workflowSteps = listOf(
+                WorkflowStepInfo("Setup", "Completed"),
+                WorkflowStepInfo("Consent", "In Progress"),
+                WorkflowStepInfo("Fingerprint Capture", "Not Started"),
+                WorkflowStepInfo("Face Capture", "Not Started"),
+                WorkflowStepInfo("Enrol Biometric", "Not Started"),
+            ),
             projectName = "Test Project",
-            enabledModalities = listOf("FINGERPRINT", "FACE"),
-            scannerType = "VERO 2",
+            projectConfigSummary = "**General**\n- Modalities: FINGERPRINT, FACE",
             isConnected = true,
             recentErrors = listOf("Scanner timeout", "Bluetooth error"),
             recentLogs = listOf("Intent: Enrolment — started"),
@@ -36,13 +41,10 @@ class ContextBuilderTest {
 
         val result = contextBuilder.build(context)
 
-        assertThat(result).contains("ConsentScreen")
-        assertThat(result).contains("Fingerprint Capture")
-        assertThat(result).contains("step 3 of 5")
+        assertThat(result).contains("In a workflow")
         assertThat(result).contains("Enrolment")
+        assertThat(result).contains("ConsentScreen")
         assertThat(result).contains("Test Project")
-        assertThat(result).contains("FINGERPRINT, FACE")
-        assertThat(result).contains("VERO 2")
         assertThat(result).contains("Yes")
         assertThat(result).contains("Scanner timeout")
         assertThat(result).contains("Bluetooth error")
@@ -54,6 +56,39 @@ class ContextBuilderTest {
     }
 
     @Test
+    fun `renders workflow steps table`() {
+        val context = ChatContext(
+            isInWorkflow = true,
+            workflowSteps = listOf(
+                WorkflowStepInfo("Setup", "Completed"),
+                WorkflowStepInfo("Consent", "In Progress"),
+                WorkflowStepInfo("Fingerprint Capture", "Not Started"),
+            ),
+        )
+
+        val result = contextBuilder.build(context)
+
+        assertThat(result).contains("Workflow Steps")
+        assertThat(result).contains("| 1 | Setup | Completed |")
+        assertThat(result).contains("| 2 | Consent | In Progress |")
+        assertThat(result).contains("| 3 | Fingerprint Capture | Not Started |")
+    }
+
+    @Test
+    fun `shows not in workflow when at dashboard`() {
+        val context = ChatContext(
+            isInWorkflow = false,
+            currentScreen = "Dashboard",
+        )
+
+        val result = contextBuilder.build(context)
+
+        assertThat(result).contains("App opened from launcher")
+        assertThat(result).doesNotContain("Workflow Steps")
+        assertThat(result).contains("Dashboard")
+    }
+
+    @Test
     fun `builds context with minimal fields`() {
         val context = ChatContext()
 
@@ -61,24 +96,31 @@ class ContextBuilderTest {
 
         assertThat(result).contains("Connected to internet")
         assertThat(result).contains("No")
+        assertThat(result).contains("App opened from launcher")
         assertThat(result).doesNotContain("Current screen")
-        assertThat(result).doesNotContain("Current step")
         assertThat(result).doesNotContain("Project")
         assertThat(result).doesNotContain("Device Info")
         assertThat(result).doesNotContain("Recent Activity Log")
     }
 
     @Test
-    fun `omits step count when total is zero`() {
+    fun `shows project config summary when present`() {
         val context = ChatContext(
-            currentStep = "Login",
-            totalSteps = 0,
+            projectConfigSummary = "**General**\n- Modalities: FINGERPRINT, FACE\n**Consent**\n- Program: Test",
         )
 
         val result = contextBuilder.build(context)
 
-        assertThat(result).contains("Login")
-        assertThat(result).doesNotContain("step 0 of 0")
+        assertThat(result).contains("Project Configuration")
+        assertThat(result).contains("Modalities: FINGERPRINT, FACE")
+        assertThat(result).contains("Program: Test")
+    }
+
+    @Test
+    fun `omits project config section when empty`() {
+        val context = ChatContext()
+        val result = contextBuilder.build(context)
+        assertThat(result).doesNotContain("Project Configuration")
     }
 
     @Test
@@ -137,12 +179,12 @@ class ContextBuilderTest {
     }
 
     @Test
-    fun `shows workflow type when set`() {
-        val context = ChatContext(workflowType = "Identification")
+    fun `shows workflow type when in workflow`() {
+        val context = ChatContext(isInWorkflow = true, workflowType = "Identification")
 
         val result = contextBuilder.build(context)
 
-        assertThat(result).contains("Workflow")
+        assertThat(result).contains("Workflow type")
         assertThat(result).contains("Identification")
     }
 }

@@ -6,7 +6,7 @@ import javax.inject.Singleton
 
 /**
  * Builds the dynamic context section of the system prompt from the current
- * runtime state (screen, step, project config, device info, recent errors/logs).
+ * runtime state (workflow, project config, device info, recent errors/logs).
  */
 @Singleton
 internal class ContextBuilder @Inject constructor() {
@@ -15,18 +15,10 @@ internal class ContextBuilder @Inject constructor() {
         appendLine("## Current User Context")
         appendLine()
 
+        appendWorkflowState(context)
+
         if (context.currentScreen.isNotBlank()) {
             appendLine("- **Current screen**: ${context.currentScreen}")
-        }
-        if (context.currentStep.isNotBlank()) {
-            append("- **Current step**: ${context.currentStep}")
-            if (context.totalSteps > 0) {
-                append(" (step ${context.currentStepIndex} of ${context.totalSteps})")
-            }
-            appendLine()
-        }
-        if (context.workflowType.isNotBlank()) {
-            appendLine("- **Workflow**: ${context.workflowType}")
         }
 
         appendLine("- **Connected to internet**: ${if (context.isConnected) "Yes" else "No"}")
@@ -34,16 +26,40 @@ internal class ContextBuilder @Inject constructor() {
         if (context.projectName.isNotBlank()) {
             appendLine("- **Project**: ${context.projectName}")
         }
-        if (context.enabledModalities.isNotEmpty()) {
-            appendLine("- **Enabled modalities**: ${context.enabledModalities.joinToString(", ")}")
-        }
-        if (context.scannerType.isNotBlank()) {
-            appendLine("- **Scanner type**: ${context.scannerType}")
-        }
 
+        appendProjectConfig(context)
         appendDeviceInfo(context)
         appendRecentErrors(context)
         appendRecentLogs(context)
+    }
+
+    private fun StringBuilder.appendWorkflowState(context: ChatContext) {
+        if (context.isInWorkflow) {
+            appendLine("- **User state**: In a workflow")
+            if (context.workflowType.isNotBlank()) {
+                appendLine("- **Workflow type**: ${context.workflowType}")
+            }
+            if (context.workflowSteps.isNotEmpty()) {
+                appendLine()
+                appendLine("### Workflow Steps")
+                appendLine("| # | Step | Status |")
+                appendLine("|---|------|--------|")
+                context.workflowSteps.forEachIndexed { index, step ->
+                    appendLine("| ${index + 1} | ${step.name} | ${step.status} |")
+                }
+                appendLine()
+            }
+        } else {
+            appendLine("- **User state**: App opened from launcher (no active workflow)")
+        }
+    }
+
+    private fun StringBuilder.appendProjectConfig(context: ChatContext) {
+        if (context.projectConfigSummary.isBlank()) return
+
+        appendLine()
+        appendLine("### Project Configuration")
+        appendLine(context.projectConfigSummary)
     }
 
     private fun StringBuilder.appendDeviceInfo(context: ChatContext) {

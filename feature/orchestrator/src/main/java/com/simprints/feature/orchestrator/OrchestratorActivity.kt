@@ -13,6 +13,7 @@ import com.simprints.feature.orchestrator.databinding.ActivityOrchestratorBindin
 import com.simprints.infra.config.store.LastCallingPackageStore
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.orchestration.data.ActionConstants
 import com.simprints.infra.orchestration.data.results.AppResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.viewbinding.viewBinding
@@ -48,7 +49,7 @@ internal class OrchestratorActivity : BaseActivity(), ChatOverlayHost {
         setContentView(binding.root)
 
         chatOverlayManager.attach(this, binding.orchestratorRoot)
-        chatOverlayManager.updateWorkflow(intent.action.orEmpty())
+        chatOverlayManager.updateWorkflow(mapWorkflowName(intent.action.orEmpty()))
         observeNavigationForChatContext()
 
         binding.orchestrationHost.handleResult<AppResult>(
@@ -117,5 +118,14 @@ internal class OrchestratorActivity : BaseActivity(), ChatOverlayHost {
             // NavController may not be available yet; context updates will still work
             // once navigation starts since the listener is added lazily
         }
+    }
+
+    private fun mapWorkflowName(action: String): String = when {
+        action.endsWith(ActionConstants.ACTION_ENROL) -> "Enrolment"
+        action.endsWith(ActionConstants.ACTION_IDENTIFY) -> "Identification"
+        action.endsWith(ActionConstants.ACTION_VERIFY) -> "Verification"
+        action.endsWith(ActionConstants.ACTION_CONFIRM_IDENTITY) -> "Confirm Identity"
+        action.endsWith(ActionConstants.ACTION_ENROL_LAST_BIOMETRICS) -> "Enrol Last Biometrics"
+        else -> action
     }
 }

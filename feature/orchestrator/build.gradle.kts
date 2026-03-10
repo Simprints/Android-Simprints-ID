@@ -25,6 +25,7 @@ dependencies {
     implementation(project(":feature:select-subject-age-group"))
     implementation(project(":feature:external-credential"))
     implementation(project(":feature:chatbot"))
+    implementation(project(":infra:ai-chat"))
 
     implementation(project(":face:capture"))
 

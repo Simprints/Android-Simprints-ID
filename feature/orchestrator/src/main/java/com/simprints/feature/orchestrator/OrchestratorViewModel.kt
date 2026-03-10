@@ -16,6 +16,7 @@ import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.feature.chatbot.context.ChatContextProvider
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
 import com.simprints.feature.orchestrator.model.OrchestratorResult
@@ -33,6 +34,7 @@ import com.simprints.feature.orchestrator.usecases.steps.BuildStepsUseCase
 import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.setup.LocationStore
 import com.simprints.fingerprint.capture.FingerprintCaptureParams
+import com.simprints.infra.aichat.model.WorkflowStepInfo
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
@@ -56,6 +58,7 @@ internal class OrchestratorViewModel @Inject constructor(
     private val updateDailyActivity: UpdateDailyActivityUseCase,
     private val mapStepsForLastBiometrics: MapStepsForLastBiometricEnrolUseCase,
     private val orchestrationJsonHelper: OrchestrationJsonHelper,
+    private val chatContextProvider: ChatContextProvider,
 ) : ViewModel() {
     var isRequestProcessed = false
 
@@ -97,6 +100,7 @@ internal class OrchestratorViewModel @Inject constructor(
             return@launch
         }
 
+        pushStepContext()
         doNextStep()
     }
 
@@ -144,6 +148,7 @@ internal class OrchestratorViewModel @Inject constructor(
             removeMatcherStepIfRequired(result)
         }
 
+        pushStepContext()
         doNextStep()
     }
 
@@ -326,5 +331,38 @@ internal class OrchestratorViewModel @Inject constructor(
     } catch (e: Exception) {
         Simber.e("Action request serialization failed", e, tag = ORCHESTRATION)
         null
+    }
+
+    private fun pushStepContext() {
+        chatContextProvider.updateSteps(
+            steps.map { step ->
+                WorkflowStepInfo(
+                    name = stepIdToName(step.id),
+                    status = step.status.toDisplayName(),
+                )
+            },
+        )
+    }
+
+    private fun stepIdToName(id: Int): String = when (id) {
+        StepId.SETUP -> "Setup"
+        StepId.FETCH_GUID -> "Fetch Subject"
+        StepId.CONSENT -> "Consent"
+        StepId.ENROL_LAST_BIOMETRIC -> "Enrol Biometric"
+        StepId.CONFIRM_IDENTITY -> "Confirm Identity"
+        StepId.VALIDATE_ID_POOL -> "Validate ID Pool"
+        StepId.SELECT_SUBJECT_AGE -> "Select Age Group"
+        StepId.EXTERNAL_CREDENTIAL -> "External Credential"
+        StepId.FINGERPRINT_CAPTURE -> "Fingerprint Capture"
+        StepId.FINGERPRINT_MATCHER -> "Fingerprint Matching"
+        StepId.FACE_CAPTURE -> "Face Capture"
+        StepId.FACE_MATCHER -> "Face Matching"
+        else -> "Step $id"
+    }
+
+    private fun StepStatus.toDisplayName(): String = when (this) {
+        StepStatus.NOT_STARTED -> "Not Started"
+        StepStatus.IN_PROGRESS -> "In Progress"
+        StepStatus.COMPLETED -> "Completed"
     }
 }
