@@ -1,6 +1,5 @@
 package com.simprints.feature.chatbot
 
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.view.Gravity
 import android.view.View
@@ -48,7 +47,6 @@ class ChatOverlayManager @Inject constructor(
             }
             setBackgroundResource(R.drawable.bg_chat_fab)
             setImageResource(R.drawable.ic_chat_help)
-            imageTintList = ColorStateList.valueOf(Color.WHITE)
             contentDescription = activity.getString(R.string.chatbot_fab_description)
             elevation = dpToPx(activity, 6).toFloat()
             setOnClickListener { toggleChat() }
