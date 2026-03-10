@@ -101,6 +101,32 @@ internal class OrchestratorActivity : BaseActivity(), ChatOverlayHost {
 
     companion object {
         private const val KEY_IS_GRAPH_INITIALIZED = "KEY_IS_GRAPH_INITIALIZED"
+
+        private val SCREEN_NAME_MAP = mapOf(
+            "ClientApi" to "Processing Request",
+            "Setup" to "Setup / Download",
+            "Consent" to "Consent",
+            "PrivacyNotice" to "Privacy Notice",
+            "FaceCapture" to "Face Capture",
+            "FaceDetection" to "Face Capture — Live Feedback",
+            "Confirmation" to "Face Capture — Confirmation",
+            "Preparation" to "Face Capture — Preparation",
+            "FingerprintCapture" to "Fingerprint Capture",
+            "ConnectScanner" to "Scanner Connection",
+            "NfcOff" to "NFC Off",
+            "Ota" to "Scanner Firmware Update",
+            "ExitForm" to "Exit Form (user wants to quit)",
+            "Alert" to "Error Alert",
+            "Matcher" to "Matching",
+            "SelectSubject" to "Select Subject",
+            "FetchSubject" to "Fetching Subject",
+            "ValidateSubjectPool" to "Validating ID Pool",
+            "SelectSubjectAge" to "Select Age Group",
+            "ExternalCredential" to "External Credential",
+            "EnrolLastBiometric" to "Enrolling Last Biometric",
+            "LoginForm" to "Login",
+            "LoginQr" to "Login — QR Scanner",
+        )
     }
 
     override fun minimizeChatOverlay() {
@@ -111,14 +137,19 @@ internal class OrchestratorActivity : BaseActivity(), ChatOverlayHost {
         try {
             val navController = findNavController(R.id.orchestrationHost)
             navController.addOnDestinationChangedListener { _, destination, _ ->
-                val screenName = destination.label?.toString() ?: destination.displayName
-                chatOverlayManager.updateScreen(screenName)
+                val rawLabel = destination.label?.toString() ?: destination.displayName
+                chatOverlayManager.updateScreen(mapScreenName(rawLabel))
             }
         } catch (_: Exception) {
             // NavController may not be available yet; context updates will still work
             // once navigation starts since the listener is added lazily
         }
     }
+
+    private fun mapScreenName(label: String): String = SCREEN_NAME_MAP.entries
+        .firstOrNull { label.contains(it.key, ignoreCase = true) }
+        ?.value
+        ?: label
 
     private fun mapWorkflowName(action: String): String = when {
         action.endsWith(ActionConstants.ACTION_ENROL) -> "Enrolment"
