@@ -87,6 +87,7 @@ protobuf_plugin_version = "0.9.6"
 deps_graph_version = "0.8.0"
 tink_version = "1.20.0"
 desugar_jdk_libsVersion = "2.1.5"
+markwon_version = "4.6.2"
 [libraries]
 
 #Kotlin
@@ -266,6 +267,12 @@ plugin-play-publisher = { group = "com.github.triplet.gradle", name = "play-publ
 plugin-sonar = { group = "org.sonarsource.scanner.gradle", name = "sonarqube-gradle-plugin", version.ref = "sonar_plugin_version" }
 plugin-jacoco = { group = "org.jacoco", name = "org.jacoco.core", version.ref = "jacoco_version" }
 plugin-room = { group = "androidx.room", name = "room-gradle-plugin", version.ref = "androidx_room_version" }
+
+# Markdown rendering
+markwon-core = { module = "io.noties.markwon:core", version.ref = "markwon_version" }
+markwon-tables = { module = "io.noties.markwon:ext-tables", version.ref = "markwon_version" }
+markwon-strikethrough = { module = "io.noties.markwon:ext-strikethrough", version.ref = "markwon_version" }
+markwon-linkify = { module = "io.noties.markwon:linkify", version.ref = "markwon_version" }
 
 [plugins]
 

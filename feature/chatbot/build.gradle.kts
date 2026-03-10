@@ -13,4 +13,9 @@ dependencies {
     implementation(project(":infra:network"))
 
     implementation(libs.support.material)
+
+    implementation(libs.markwon.core)
+    implementation(libs.markwon.tables)
+    implementation(libs.markwon.strikethrough)
+    implementation(libs.markwon.linkify)
 }
