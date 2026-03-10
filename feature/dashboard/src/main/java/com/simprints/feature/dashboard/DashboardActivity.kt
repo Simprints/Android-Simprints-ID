@@ -19,6 +19,7 @@ class DashboardActivity : BaseActivity(R.layout.activity_dashboard_main), ChatOv
 
         val rootContainer = findViewById<FrameLayout>(R.id.dashboardRoot)
         chatOverlayManager.attach(this, rootContainer)
+        chatOverlayManager.updateScreen("Dashboard")
     }
 
     override fun minimizeChatOverlay() {

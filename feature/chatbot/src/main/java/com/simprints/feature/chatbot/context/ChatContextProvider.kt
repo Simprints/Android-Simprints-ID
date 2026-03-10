@@ -23,7 +23,7 @@ import javax.inject.Singleton
  * recent logs and errors.
  */
 @Singleton
-internal class ChatContextProvider @Inject constructor(
+class ChatContextProvider @Inject constructor(
     @ApplicationContext private val context: Context,
     private val configRepository: ConfigRepository,
     private val connectivityTracker: ConnectivityTracker,

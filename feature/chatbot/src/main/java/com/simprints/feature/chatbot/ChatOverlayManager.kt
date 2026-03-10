@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.card.MaterialCardView
+import com.simprints.feature.chatbot.context.ChatContextProvider
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.experimental
 import kotlinx.coroutines.launch
@@ -19,9 +20,14 @@ import javax.inject.Inject
  * Manages the floating chat FAB and chat panel overlay within an Activity.
  * Call [attach] from the activity's onCreate to add the FAB to the root layout.
  * The FAB is only shown when the chatbot feature flag is enabled.
+ *
+ * Also serves as the public API for feeding runtime context into the chatbot
+ * (screen name, workflow step, workflow type) via [updateScreen], [updateStep],
+ * and [updateWorkflow].
  */
 class ChatOverlayManager @Inject constructor(
     private val configRepository: ConfigRepository,
+    private val contextProvider: ChatContextProvider,
 ) {
     private var activity: FragmentActivity? = null
     private var fab: ImageButton? = null
@@ -107,6 +113,18 @@ class ChatOverlayManager @Inject constructor(
             }
         }
         isExpanded = true
+    }
+
+    fun updateScreen(screenName: String) {
+        contextProvider.updateScreen(screenName)
+    }
+
+    fun updateStep(stepName: String, index: Int, total: Int) {
+        contextProvider.updateStep(stepName, index, total)
+    }
+
+    fun updateWorkflow(workflowType: String) {
+        contextProvider.updateWorkflow(workflowType)
     }
 
     private fun dpToPx(activity: FragmentActivity, dp: Int): Int {

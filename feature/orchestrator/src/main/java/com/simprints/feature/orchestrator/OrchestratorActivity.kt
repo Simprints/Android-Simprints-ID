@@ -48,6 +48,8 @@ internal class OrchestratorActivity : BaseActivity(), ChatOverlayHost {
         setContentView(binding.root)
 
         chatOverlayManager.attach(this, binding.orchestratorRoot)
+        chatOverlayManager.updateWorkflow(intent.action.orEmpty())
+        observeNavigationForChatContext()
 
         binding.orchestrationHost.handleResult<AppResult>(
             this,
@@ -102,5 +104,18 @@ internal class OrchestratorActivity : BaseActivity(), ChatOverlayHost {
 
     override fun minimizeChatOverlay() {
         chatOverlayManager.minimize()
+    }
+
+    private fun observeNavigationForChatContext() {
+        try {
+            val navController = findNavController(R.id.orchestrationHost)
+            navController.addOnDestinationChangedListener { _, destination, _ ->
+                val screenName = destination.label?.toString() ?: destination.displayName
+                chatOverlayManager.updateScreen(screenName)
+            }
+        } catch (_: Exception) {
+            // NavController may not be available yet; context updates will still work
+            // once navigation starts since the listener is added lazily
+        }
     }
 }
