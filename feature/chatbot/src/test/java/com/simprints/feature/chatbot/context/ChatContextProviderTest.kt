@@ -5,12 +5,14 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.aichat.model.WorkflowStepInfo
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ConsentConfiguration
+import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.IdentificationConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.logging.persistent.LogEntry
 import com.simprints.logging.persistent.LogEntryType
 import com.simprints.logging.persistent.PersistentLogger
@@ -54,6 +56,7 @@ class ChatContextProviderTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
+        coEvery { configRepository.getDeviceConfiguration() } returns DeviceConfiguration("en", emptyList(), "")
         provider = ChatContextProvider(context, configRepository, connectivityTracker, persistentLogger)
     }
 
@@ -101,6 +104,7 @@ class ChatContextProviderTest {
     fun `builds context gracefully when config fails`() = runTest {
         coEvery { configRepository.getProjectConfiguration() } throws RuntimeException("not logged in")
         coEvery { configRepository.getProject() } throws RuntimeException("not logged in")
+        coEvery { configRepository.getDeviceConfiguration() } throws RuntimeException("not logged in")
         every { connectivityTracker.isConnected() } returns false
 
         val result = provider.buildContext()
@@ -241,5 +245,27 @@ class ChatContextProviderTest {
 
         assertThat(result.recentLogs).isEmpty()
         assertThat(result.recentErrors).isEmpty()
+    }
+
+    @Test
+    fun `includes device configuration with selected modules`() = runTest {
+        coEvery { configRepository.getProjectConfiguration() } returns projectConfig
+        coEvery { configRepository.getProject() } returns null
+        every { projectConfig.general } returns generalConfig
+        every { generalConfig.modalities } returns emptyList()
+        every { projectConfig.fingerprint } returns null
+        every { connectivityTracker.isConnected() } returns true
+        coEvery { configRepository.getDeviceConfiguration() } returns DeviceConfiguration(
+            language = "fr",
+            selectedModules = listOf("Module A".asTokenizableRaw(), "Module B".asTokenizableRaw()),
+            lastInstructionId = "instr-123",
+        )
+
+        val result = provider.buildContext()
+
+        assertThat(result.projectConfigSummary).contains("Device Configuration")
+        assertThat(result.projectConfigSummary).contains("Language: fr")
+        assertThat(result.projectConfigSummary).contains("Module A")
+        assertThat(result.projectConfigSummary).contains("Module B")
     }
 }

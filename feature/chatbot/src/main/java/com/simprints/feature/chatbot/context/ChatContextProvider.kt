@@ -11,6 +11,7 @@ import com.simprints.infra.aichat.model.ChatContext
 import com.simprints.infra.aichat.model.WorkflowStepInfo
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ConsentConfiguration
+import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.IdentificationConfiguration
@@ -64,6 +65,7 @@ class ChatContextProvider @Inject constructor(
     suspend fun buildContext(): ChatContext {
         val config = runCatching { configRepository.getProjectConfiguration() }.getOrNull()
         val project = runCatching { configRepository.getProject() }.getOrNull()
+        val deviceConfig = runCatching { configRepository.getDeviceConfiguration() }.getOrNull()
 
         return ChatContext(
             currentScreen = _currentScreen.value,
@@ -71,7 +73,7 @@ class ChatContextProvider @Inject constructor(
             workflowType = _workflowType.value,
             workflowSteps = _workflowSteps.value,
             projectName = project?.name ?: "",
-            projectConfigSummary = config?.let { formatProjectConfig(it) } ?: "",
+            projectConfigSummary = formatConfigSummary(config, deviceConfig),
             isConnected = connectivityTracker.isConnected(),
             recentErrors = collectRecentErrors(),
             recentLogs = collectRecentLogs(),
@@ -82,14 +84,20 @@ class ChatContextProvider @Inject constructor(
         )
     }
 
-    private fun formatProjectConfig(config: ProjectConfiguration): String = buildString {
-        formatGeneral(config)
-        config.face?.let { formatFace(it) }
-        config.fingerprint?.let { formatFingerprint(it) }
-        formatConsent(config.consent)
-        formatIdentification(config.identification)
-        formatSync(config.synchronization)
-        config.multifactorId?.let { formatMultiFactorId(it) }
+    private fun formatConfigSummary(
+        config: ProjectConfiguration?,
+        deviceConfig: DeviceConfiguration?,
+    ): String = buildString {
+        config?.let {
+            formatGeneral(it)
+            it.face?.let { face -> formatFace(face) }
+            it.fingerprint?.let { fp -> formatFingerprint(fp) }
+            formatConsent(it.consent)
+            formatIdentification(it.identification)
+            formatSync(it.synchronization)
+            it.multifactorId?.let { mfid -> formatMultiFactorId(mfid) }
+        }
+        deviceConfig?.let { formatDeviceConfig(it) }
     }.trimEnd()
 
     private fun StringBuilder.formatGeneral(config: ProjectConfiguration) {
@@ -175,6 +183,19 @@ class ChatContextProvider @Inject constructor(
     private fun StringBuilder.formatMultiFactorId(mfid: MultiFactorIdConfiguration) {
         appendLine("**Multi-Factor ID**")
         appendLine("- Allowed credentials: ${mfid.allowedExternalCredentials.joinToString(", ")}")
+    }
+
+    private fun StringBuilder.formatDeviceConfig(deviceConfig: DeviceConfiguration) {
+        appendLine("**Device Configuration**")
+        appendLine("- Language: ${deviceConfig.language}")
+        if (deviceConfig.selectedModules.isNotEmpty()) {
+            appendLine("- Selected modules:")
+            deviceConfig.selectedModules.forEach { module ->
+                appendLine("  - ${module.value}")
+            }
+        } else {
+            appendLine("- Selected modules: (none)")
+        }
     }
 
     private suspend fun collectRecentLogs(): List<String> = runCatching {
