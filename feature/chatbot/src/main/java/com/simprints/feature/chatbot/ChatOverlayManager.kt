@@ -47,7 +47,7 @@ class ChatOverlayManager @Inject constructor(
                 setMargins(0, 0, dpToPx(activity, 16), dpToPx(activity, 16))
             }
             setBackgroundResource(R.drawable.bg_chat_fab)
-            setImageResource(android.R.drawable.ic_dialog_info)
+            setImageResource(R.drawable.ic_chat_help)
             imageTintList = ColorStateList.valueOf(Color.WHITE)
             contentDescription = activity.getString(R.string.chatbot_fab_description)
             elevation = dpToPx(activity, 6).toFloat()
