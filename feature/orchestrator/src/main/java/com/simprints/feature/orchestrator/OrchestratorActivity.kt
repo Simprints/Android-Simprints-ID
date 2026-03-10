@@ -49,6 +49,7 @@ internal class OrchestratorActivity : BaseActivity(), ChatOverlayHost {
         setContentView(binding.root)
 
         chatOverlayManager.attach(this, binding.orchestratorRoot)
+        chatOverlayManager.clearWorkflow()
         chatOverlayManager.updateWorkflow(mapWorkflowName(intent.action.orEmpty()))
         observeNavigationForChatContext()
 

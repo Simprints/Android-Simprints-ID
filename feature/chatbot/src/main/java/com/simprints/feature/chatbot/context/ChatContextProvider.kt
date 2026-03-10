@@ -71,6 +71,7 @@ class ChatContextProvider @Inject constructor(
     }
 
     fun clearWorkflow() {
+        _currentScreen.value = ""
         _isInWorkflow.value = false
         _workflowType.value = ""
         _workflowSteps.value = emptyList()
