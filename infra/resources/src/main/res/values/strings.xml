@@ -172,7 +172,7 @@
 
     <!-- Face capture -->
     <string name="face_capture_onboarding_light">Find a well-lighted place.</string>
-    <string name="face_capture_onboarding_fill">Fill the face in the circle frame.</string>
+    <string name="face_capture_onboarding_fill">Fill the Hand in the circle frame.</string>
     <string name="face_capture_onboarding_straight">Make sure the person is looking straight.</string>
     <string name="face_capture_onboarding_continue_button">Tap anywhere to continue</string>
     <string name="face_capture_capturing_title">Live Capture</string>
@@ -180,12 +180,14 @@
     <string name="face_capture_start_capture">Start capture</string>
     <string name="face_capture_instructions_title">Instructions</string>
     <string name="face_capture_title_previewing">Preparing to scan</string>
-    <string name="face_capture_title_no_face">No face detected</string>
-    <string name="face_capture_error_no_face">Make sure the face fills the circle</string>
+    <string name="face_capture_title_no_face">No hand detected</string>
+    <string name="face_capture_error_no_face">Make sure the hand fills the circle</string>
     <string name="face_capture_title_bad_quality">Unclear Image</string>
-    <string name="face_capture_error_bad_quality">Try adjusting the lighting or repositioning the face for a clearer photo</string>
+    <string name="face_capture_error_bad_quality">Try adjusting the lighting or repositioning the hand for a clearer photo</string>
     <string name="face_capture_title_too_far">Too far</string>
     <string name="face_capture_error_too_far">Move closer</string>
+    <string name="face_capture_title_flipped_hand">Dorsal</string>
+    <string name="face_capture_error_flipped_hand">Flip hand</string>
     <string name="face_capture_title_too_close">Too close</string>
     <string name="face_capture_error_too_close">Move back</string>
     <string name="face_capture_title_look_straight">Not looking straight</string>
@@ -195,7 +197,7 @@
     <string name="face_capture_permission_denied">Please grant the camera permission</string>
     <string name="face_capture_permission_action">Grant permission</string>
     <string name="face_capture_hold">Hold the position…</string>
-    <string name="face_capture_successfully_title">Face has been successfully captured.</string>
+    <string name="face_capture_successfully_title">Hand has been successfully captured.</string>
     <string name="face_capture_confirmation_title">Confirmation</string>
     <string name="face_capture_recapture_button">Recapture</string>
     <string name="face_capture_finish_button">Tap to continue</string>

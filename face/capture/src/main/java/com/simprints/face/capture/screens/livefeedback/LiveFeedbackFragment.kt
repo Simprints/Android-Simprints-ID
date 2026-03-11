@@ -150,7 +150,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         // ImageAnalysis
         // Todo choose accurate output image resolution that respects quality,performance and face analysis SDKs https://simprints.atlassian.net/browse/CORE-2569
         if (!::targetResolution.isInitialized) {
-            targetResolution = Size(binding.captureOverlay.width, binding.captureOverlay.height)
+            targetResolution = Size(1800, 2280)
         }
 
         val imageAnalyzer = ImageAnalysis
@@ -174,6 +174,24 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             imageAnalyzer,
         )
         cameraControl = camera.cameraControl
+
+        // --- NEW: CENTER AUTO-FOCUS LOGIC ---
+        // 1. Create a factory representing the 2D space of the view (Width: 1f, Height: 1f)
+        val meteringPointFactory = androidx.camera.core.SurfaceOrientedMeteringPointFactory(1f, 1f)
+
+        // 2. Set the target point exactly in the middle (0.5x, 0.5y)
+        val centerPoint = meteringPointFactory.createPoint(0.5f, 0.5f)
+
+        // 3. Build the focus action to scan continuously every 2 seconds
+        val focusAction = androidx.camera.core.FocusMeteringAction
+            .Builder(centerPoint)
+            .setAutoCancelDuration(3, java.util.concurrent.TimeUnit.SECONDS)
+            .build()
+
+        // 4. Instruct the camera to start focusing
+        cameraControl?.startFocusAndMetering(focusAction)
+        // ------------------------------------
+
         // Attach the view's surface provider to preview use case
         preview.surfaceProvider = binding.faceCaptureCamera.surfaceProvider
         Simber.i("Camera setup finished", tag = FACE_CAPTURE)
@@ -264,6 +282,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             FaceDetection.Status.BAD_QUALITY -> renderBadQuality()
             FaceDetection.Status.VALID -> renderValidFace()
             FaceDetection.Status.VALID_CAPTURING -> renderValidCapturingFace()
+            FaceDetection.Status.FLIPPED -> renderHandFlipped()
         }
     }
 
@@ -329,6 +348,19 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 true,
                 ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp),
             )
+            renderProgressBar(false)
+        }
+    }
+
+    private fun renderHandFlipped() {
+        binding.apply {
+            captureFeedbackBtn.setText(IDR.string.face_capture_title_flipped_hand)
+            captureFeedbackTxtExplanation.setText(IDR.string.face_capture_error_flipped_hand)
+            captureFeedbackBtn.isVisible = true
+            captureFeedbackPermissionButton.isGone = true
+
+            captureFeedbackBtn.setCheckedWithLeftDrawable(false)
+            setManualCaptureButtonClickable(false)
             renderProgressBar(false)
         }
     }

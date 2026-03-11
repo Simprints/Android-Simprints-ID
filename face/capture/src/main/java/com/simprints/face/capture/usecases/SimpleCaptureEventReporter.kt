@@ -87,6 +87,7 @@ internal class SimpleCaptureEventReporter @Inject constructor(
         FaceDetection.Status.OFFROLL -> FaceCapturePayload.Result.OFF_ROLL
         FaceDetection.Status.TOOCLOSE -> FaceCapturePayload.Result.TOO_CLOSE
         FaceDetection.Status.TOOFAR -> FaceCapturePayload.Result.TOO_FAR
+        FaceDetection.Status.FLIPPED -> FaceCapturePayload.Result.FLIPPED
     }
 
     private fun mapDetectionToCapturePayloadFace(faceDetection: FaceDetection) =

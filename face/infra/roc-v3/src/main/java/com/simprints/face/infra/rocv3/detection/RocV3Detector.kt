@@ -71,6 +71,8 @@ class RocV3Detector @Inject constructor() : FaceDetector {
                 qualityValue,
                 roc3.cdata(roc3.roc_cast(template), roc3.ROC_FACE_FAST_FV_SIZE.toInt()),
                 RANK_ONE_TEMPLATE_FORMAT_3_1,
+                null,
+                false,
             )
         } else {
             null

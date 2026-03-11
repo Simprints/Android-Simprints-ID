@@ -15,6 +15,7 @@ internal data class FaceDetection(
     var isFallback: Boolean = false,
     var id: String = UUID.randomUUID().toString(),
     var detectionEndTime: Timestamp,
+    val isFlipped: Boolean = false,
 ) {
     enum class Status {
         VALID,
@@ -25,6 +26,7 @@ internal data class FaceDetection(
         OFFROLL,
         TOOCLOSE,
         TOOFAR,
+        FLIPPED,
     }
 
     fun hasValidStatus(): Boolean = status == Status.VALID || status == Status.VALID_CAPTURING

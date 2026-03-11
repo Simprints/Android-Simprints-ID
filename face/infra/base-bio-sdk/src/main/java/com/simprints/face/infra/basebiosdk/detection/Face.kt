@@ -1,5 +1,6 @@
 package com.simprints.face.infra.basebiosdk.detection
 
+import android.graphics.Bitmap
 import android.graphics.Rect
 import android.graphics.RectF
 
@@ -25,6 +26,8 @@ data class Face(
     val quality: Float,
     val template: ByteArray,
     val format: String,
+    val bitmap: Bitmap?,
+    val isFlipped: Boolean,
 ) {
     // Relative = coordinates are fractions of the source image dimensions
     val relativeBoundingBox

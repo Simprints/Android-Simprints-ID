@@ -70,4 +70,5 @@ internal fun FaceCapturePayload.Result.fromDomainToApi() = when (this) {
     FaceCapturePayload.Result.OFF_ROLL -> OFF_ROLL
     FaceCapturePayload.Result.TOO_CLOSE -> TOO_CLOSE
     FaceCapturePayload.Result.TOO_FAR -> TOO_FAR
+    FaceCapturePayload.Result.FLIPPED -> INVALID
 }

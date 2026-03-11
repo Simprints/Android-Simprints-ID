@@ -21,10 +21,8 @@ class SimFaceDetector @Inject constructor(
         if (palm.quality < BAD_FACE_THRESHOLD) return@runBlocking null
 
         // Extract the cropped palm image from the original bitmap
-        val croppedBitmap = palm.croppedPalmImage(bitmap)
-
         // Note: Returns empty bytes until a palm identity model is fully implemented
-        val template = simPalm.getEmbedding(croppedBitmap)
+        val template = simPalm.getEmbedding(bitmap)
         Face(
             sourceWidth = bitmap.width,
             sourceHeight = bitmap.height,
@@ -34,6 +32,8 @@ class SimFaceDetector @Inject constructor(
             quality = palm.quality,
             template = template,
             format = simPalm.getTemplateVersion(),
+            bitmap = palm.bitmap,
+            isFlipped = false, // palm.handedness == Handedness.FLIPPED,
         )
     }
 
@@ -46,6 +46,6 @@ class SimFaceDetector @Inject constructor(
     )
 
     companion object {
-        private const val BAD_FACE_THRESHOLD = 0.1
+        private const val BAD_FACE_THRESHOLD = 0.6
     }
 }

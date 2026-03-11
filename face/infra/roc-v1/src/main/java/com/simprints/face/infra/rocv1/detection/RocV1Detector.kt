@@ -108,6 +108,8 @@ class RocV1Detector @Inject constructor() : FaceDetector {
             qualityValue,
             roc.cdata(roc.roc_cast(rocFace.template), roc.ROC_FAST_FV_SIZE.toInt()),
             RANK_ONE_TEMPLATE_FORMAT_1_23,
+            null,
+            false,
         )
 
         // Free all resources after getting the face

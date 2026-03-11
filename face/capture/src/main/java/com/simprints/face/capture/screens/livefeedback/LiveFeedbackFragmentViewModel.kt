@@ -221,7 +221,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             detectionEndTime = timeHelper.now(),
         )
     } else {
-        getFaceDetection(bitmap, potentialFace)
+        getFaceDetection(potentialFace.bitmap!!, potentialFace)
     }
 
     private fun getFaceDetection(
@@ -236,6 +236,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             potentialFace.roll !in faceTarget.rollTarget -> FaceDetection.Status.OFFROLL
             shouldCheckQuality() && potentialFace.quality < qualityThreshold -> FaceDetection.Status.BAD_QUALITY
             capturingState.value == CapturingState.CAPTURING -> FaceDetection.Status.VALID_CAPTURING
+            potentialFace.isFlipped -> FaceDetection.Status.FLIPPED
             else -> FaceDetection.Status.VALID
         }
 
