@@ -97,9 +97,9 @@ internal class ExternalCredentialScanOcrViewModelTest {
     )
 
     @Test
-    fun `ocrStarted updates state to ScanningInProgress`() {
+    fun `startScanning updates state to ScanningInProgress`() {
         val observer = viewModel.scanOcrStateLiveData.test()
-        viewModel.ocrStarted()
+        viewModel.startScanning()
 
         val state = observer.value() as ScanOcrState.ScanningInProgress
         assertThat(state.ocrDocumentType).isEqualTo(documentType)
@@ -108,16 +108,16 @@ internal class ExternalCredentialScanOcrViewModelTest {
     }
 
     @Test
-    fun `ocrStopped resets the flag for frame processing`() {
-        viewModel.ocrOnFrameStarted()
-        assertThat(viewModel.isRunningOcrOnFrame.get()).isTrue()
+    fun `imageProcessingStopped resets the flag for image processing`() {
+        viewModel.imageProcessingStarted()
+        assertThat(viewModel.isProcessingImage.get()).isTrue()
 
-        viewModel.ocrStopped()
-        assertThat(viewModel.isRunningOcrOnFrame.get()).isFalse()
+        viewModel.imageProcessingStopped()
+        assertThat(viewModel.isProcessingImage.get()).isFalse()
     }
 
     @Test
-    fun `runOcrOnFrame updates detected blocks and state when successful`() = runTest {
+    fun `processImage updates detected blocks and state when OCR successful`() = runTest {
         val mockDetectedBlock = mockk<DetectedOcrBlock>()
         val mockNormalizedBitmap = mockk<Bitmap>()
         val mockCroppedBitmap = mockk<Bitmap>()
@@ -126,13 +126,30 @@ internal class ExternalCredentialScanOcrViewModelTest {
         coEvery { getCredentialCoordinatesUseCase(mockCroppedBitmap, documentType) } returns mockDetectedBlock
 
         val observer = viewModel.scanOcrStateLiveData.test()
-        viewModel.ocrOnFrameStarted()
-        viewModel.runOcrOnFrame(bitmap, cropConfig)
+        viewModel.imageProcessingStarted()
+        viewModel.startScanning()
+        viewModel.processImage(bitmap, cropConfig)
 
         val state = observer.value() as ScanOcrState.ScanningInProgress
         assertThat(state.successfulCaptures).isEqualTo(1)
-        assertThat(viewModel.isRunningOcrOnFrame.get()).isFalse()
+        assertThat(viewModel.isProcessingImage.get()).isFalse()
         assertThat(viewModel.isOcrActive).isTrue()
+    }
+
+    @Test
+    fun `processImage does not perform OCR when scanning not in progress`() = runTest {
+        val mockNormalizedBitmap = mockk<Bitmap>()
+        val mockCroppedBitmap = mockk<Bitmap>()
+        coEvery { normalizeBitmapToPreviewUseCase(bitmap, cropConfig) } returns mockNormalizedBitmap
+        coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
+
+        val observer = viewModel.scanOcrStateLiveData.test()
+        viewModel.imageProcessingStarted()
+        viewModel.processImage(bitmap, cropConfig)
+
+        assertThat(observer.value()).isInstanceOf(ScanOcrState.NotScanning::class.java)
+        coVerify(exactly = 0) { getCredentialCoordinatesUseCase.invoke(any(), any()) }
+        assertThat(viewModel.isOcrActive).isFalse()
     }
 
     @Test
@@ -161,7 +178,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
         val finishObserver = viewModel.finishOcrEvent.test()
         val stateObserver = viewModel.scanOcrStateLiveData.test()
 
-        viewModel.ocrStarted() // Initialises capture timing
+        viewModel.startScanning() // Initialises capture timing
         viewModel.processOcrResultsAndFinish()
 
         val scannedCredential = finishObserver.value()?.peekContent()
@@ -195,7 +212,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
 
         val finishObserver = viewModel.finishOcrEvent.test()
 
-        viewModel.ocrStarted() // Initialises capture timing
+        viewModel.startScanning() // Initialises capture timing
         viewModel.processOcrResultsAndFinish()
 
         val scannedCredential = finishObserver.value()?.peekContent()

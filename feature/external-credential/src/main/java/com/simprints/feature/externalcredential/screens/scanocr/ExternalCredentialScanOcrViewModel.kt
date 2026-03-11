@@ -58,7 +58,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     }
 
     private var detectedBlocks: List<DetectedOcrBlock> = emptyList()
-    val isRunningOcrOnFrame = AtomicBoolean(false)
+    val isProcessingImage = AtomicBoolean(false)
 
     val isOcrActive: Boolean
         get() = detectedBlocks.isNotEmpty()
@@ -97,7 +97,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
         OcrDocumentType.GhanaIdCard -> R.string.mfid_type_ghana_id_card
     }
 
-    fun ocrStarted() {
+    fun startScanning() {
         startTime = timeHelper.now()
         updateState {
             ScanOcrState.ScanningInProgress(
@@ -108,19 +108,25 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
         }
     }
 
-    fun ocrStopped() {
-        isRunningOcrOnFrame.set(false)
+    val isScanningInProgress: Boolean
+        get() = ocrState is ScanOcrState.ScanningInProgress
+
+    fun imageProcessingStopped() {
+        isProcessingImage.set(false)
     }
 
-    fun runOcrOnFrame(
-        frame: Bitmap,
+    fun processImage(
+        bitmap: Bitmap,
         cropConfig: OcrCropConfig,
     ) {
         viewModelScope.launch(bgDispatcher) {
             try {
-                Simber.d("started OCR")
-                val normalizedBitmap = normalizeBitmapToPreviewUseCase(frame, cropConfig)
+                val isOcrAllowed = isScanningInProgress
+                Simber.d("started image processing; with OCR: $isOcrAllowed")
+                val normalizedBitmap = normalizeBitmapToPreviewUseCase(bitmap, cropConfig)
                 val cropped = cropDocumentFromPreviewUseCase(bitmap = normalizedBitmap, cutoutRect = cropConfig.cutoutRect)
+                // todo lighting conditions assessment
+                if (!isOcrAllowed) return@launch
                 val detectedBlock = getCredentialCoordinatesUseCase(bitmap = cropped, documentType = ocrDocumentType) ?: return@launch
                 Simber.d("Detected OCR")
                 detectedBlocks += detectedBlock
@@ -132,7 +138,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
                     )
                 }
             } finally {
-                isRunningOcrOnFrame.set(false)
+                isProcessingImage.set(false)
             }
         }
     }
@@ -183,8 +189,8 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
         null
     }
 
-    fun ocrOnFrameStarted() {
-        isRunningOcrOnFrame.set(true)
+    fun imageProcessingStarted() {
+        isProcessingImage.set(true)
     }
 
     companion object {
