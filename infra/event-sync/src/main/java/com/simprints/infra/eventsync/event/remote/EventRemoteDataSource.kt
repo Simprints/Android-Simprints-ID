@@ -21,6 +21,7 @@ import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.produce
+import retrofit2.HttpException
 import retrofit2.Response
 import java.io.ByteArrayInputStream
 import java.io.InputStream
@@ -72,6 +73,14 @@ internal class EventRemoteDataSource @Inject constructor(
         scope: CoroutineScope,
     ): EventDownSyncResult = try {
         val response = takeStreaming(requestId, query)
+        if (!response.isSuccessful) {
+            if (response.code() == TOO_MANY_REQUEST_STATUS) {
+                throw TooManyRequestsException()
+            } else {
+                throw HttpException(response)
+            }
+        }
+
         val eventCount = getEventCountFromHeader(response)
         val streaming = response.body()?.byteStream() ?: ByteArrayInputStream(byteArrayOf())
 
@@ -136,6 +145,9 @@ internal class EventRemoteDataSource @Inject constructor(
     ): EventUpSyncResult {
         val response = executeCall { remoteInterface ->
             remoteInterface.uploadEvents(requestId, projectId, acceptInvalidEvents, body)
+        }
+        if (!response.isSuccessful) {
+            throw HttpException(response)
         }
 
         return EventUpSyncResult(
