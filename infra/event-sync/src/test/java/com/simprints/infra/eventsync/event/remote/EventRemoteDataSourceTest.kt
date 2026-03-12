@@ -361,4 +361,60 @@ class EventRemoteDataSourceTest {
             eventRemoteInterface.dumpInvalidEvents(DEFAULT_PROJECT_ID, events = events)
         }
     }
+
+    @Test
+    fun `getEvents should throw an exception received on failure response`() = runTest {
+        coEvery {
+            eventRemoteInterface.downloadEvents(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+            )
+        } returns Response.error(426, "".toResponseBody())
+
+        assertThrows<HttpException> {
+            eventRemoteDataSource.getEvents(GUID1, query, this)
+        }
+    }
+
+    @Test
+    fun `getEvents should throw an exception received on too many requests response`() = runTest {
+        coEvery {
+            eventRemoteInterface.downloadEvents(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+            )
+        } returns Response.error(429, "".toResponseBody())
+
+        assertThrows<TooManyRequestsException> {
+            eventRemoteDataSource.getEvents(GUID1, query, this)
+        }
+    }
+
+    @Test
+    fun `Post failure response should throw an exception`() = runTest {
+        coEvery {
+            eventRemoteInterface.uploadEvents(
+                any(),
+                any(),
+                any(),
+                any(),
+            )
+        } returns Response.error(426, "".toResponseBody())
+
+        assertThrows<HttpException> {
+            eventRemoteDataSource.post(
+                GUID1,
+                DEFAULT_PROJECT_ID,
+                ApiUploadEventsBody(),
+            )
+        }
+    }
 }
