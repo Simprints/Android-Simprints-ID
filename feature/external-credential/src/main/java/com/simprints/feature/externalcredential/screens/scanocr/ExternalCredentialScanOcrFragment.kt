@@ -209,6 +209,8 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         instructionsText.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_black))
         viewfinderMask.setMaskColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_white))
         viewfinderMask.alpha = VIEW_FINDER_ALPHA_SCAN_ACTIVE
+        scanHint.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_black))
+        scanHint.visibility = View.VISIBLE
     }
 
     private fun renderInitialState() = with(binding) {
@@ -225,6 +227,8 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         }
         viewfinderMask.setMaskColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_black))
         viewfinderMask.alpha = VIEW_FINDER_ALPHA_INITIAL
+        scanHint.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_white))
+        scanHint.visibility = View.VISIBLE
     }
 
     private fun animateCompletionState() = with(binding) {
@@ -248,6 +252,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             pendingFinishAction?.invoke()
             pendingFinishAction = null
         })
+        scanHint.visibility = View.INVISIBLE
     }
 
     private fun renderNoPermission(shouldOpenPhoneSettings: Boolean) {
