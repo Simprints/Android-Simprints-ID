@@ -32,6 +32,7 @@ import com.simprints.core.tools.extentions.permissionFromResult
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialScanOcrBinding
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
+import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessment
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.BuildOcrCropConfigUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ProvideCameraListenerUseCase
@@ -154,6 +155,15 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     }
 
     private fun initObservers() {
+        viewModel.lightingConditionsAssessment.observe(viewLifecycleOwner) { lightingConditionsAssessment ->
+            val lightingConditionsHintTextResourceId = when (lightingConditionsAssessment) {
+                LightingConditionsAssessment.NORMAL -> IDR.string.mfid_scan_hint_lighting_normal
+                LightingConditionsAssessment.TOO_DIM -> IDR.string.mfid_scan_hint_lighting_too_dim
+                LightingConditionsAssessment.TOO_BRIGHT -> IDR.string.mfid_scan_hint_lighting_too_bright
+            }
+            binding.scanHint.setText(lightingConditionsHintTextResourceId)
+        }
+
         viewModel.scanOcrStateLiveData.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is ScanOcrState.ScanningInProgress -> {

@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -13,12 +14,14 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
+import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessment
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import com.simprints.feature.externalcredential.screens.scanocr.model.asExternalCredentialType
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.CropDocumentFromPreviewUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetCredentialCoordinatesUseCase
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetLightingConditionsAssessmentUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.KeepOnlyBestDetectedBlockUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.NormalizeBitmapToPreviewUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ZoomOntoCredentialUseCase
@@ -36,6 +39,8 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -45,6 +50,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     private val normalizeBitmapToPreviewUseCase: NormalizeBitmapToPreviewUseCase,
     private val cropDocumentFromPreviewUseCase: CropDocumentFromPreviewUseCase,
     private val getCredentialCoordinatesUseCase: GetCredentialCoordinatesUseCase,
+    private val getLightingConditionsAssessment: GetLightingConditionsAssessmentUseCase,
     private val keepOnlyBestDetectedBlockUseCase: KeepOnlyBestDetectedBlockUseCase,
     private val credentialImageRepository: CredentialImageRepository,
     private val zoomOntoCredentialUseCase: ZoomOntoCredentialUseCase,
@@ -72,6 +78,12 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     val finishOcrEvent: LiveData<LiveDataEventWithContent<ScannedCredential>>
         get() = _finishOcrEvent
     private val _finishOcrEvent = MutableLiveData<LiveDataEventWithContent<ScannedCredential>>()
+
+    private val lightingConditionsAssessmentFlow = MutableStateFlow(LightingConditionsAssessment.NORMAL)
+    val lightingConditionsAssessment: LiveData<LightingConditionsAssessment> =
+        lightingConditionsAssessmentFlow
+            .debounce(LIGHTING_CONDITIONS_ASSESSMENT_DEBOUNCE_MILLIS)
+            .asLiveData(viewModelScope.coroutineContext)
 
     private lateinit var startTime: Timestamp
     lateinit var ocrConfig: OcrConfig
@@ -125,7 +137,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
                 Simber.d("started image processing; with OCR: $isOcrAllowed")
                 val normalizedBitmap = normalizeBitmapToPreviewUseCase(bitmap, cropConfig)
                 val cropped = cropDocumentFromPreviewUseCase(bitmap = normalizedBitmap, cutoutRect = cropConfig.cutoutRect)
-                // todo lighting conditions assessment
+                lightingConditionsAssessmentFlow.value = getLightingConditionsAssessment(bitmap = cropped)
                 if (!isOcrAllowed) return@launch
                 val detectedBlock = getCredentialCoordinatesUseCase(bitmap = cropped, documentType = ocrDocumentType) ?: return@launch
                 Simber.d("Detected OCR")
@@ -196,5 +208,6 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     companion object {
         private const val OCR_CAPTURE_MIN = 1
         private const val OCR_CAPTURE_MAX = 10
+        private const val LIGHTING_CONDITIONS_ASSESSMENT_DEBOUNCE_MILLIS = 500L
     }
 }
