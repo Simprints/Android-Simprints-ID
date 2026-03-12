@@ -173,32 +173,27 @@ private fun NavController.navigateIfPossible(
 }
 
 /**
- * Only one navigation request needs to be processed from the fragment. This method checks if the
- * no other navigation is scheduled in the [NavController]. It does so by checking whether the
- * class name in the [NavController.currentDestination] is null or equals to the current fragment
- * name.
+ * Checks whether the [NavController] is in a state that allows navigation from [currentFragment].
+ * This prevents duplicate navigation requests when a fragment triggers navigation more than once.
  *
- *  - On the app startup, the [NavController.currentDestination] is null, since there were no
- *  navigation requests.
- *  - When the first navigation request to the target 'A' happens, then the field 'className' in the
- *  [NavController.currentDestination] becomes 'A'.
- *  - When the [currentFragment] 'A' wants to navigate to the destination 'B', this method checks if
- *  the current value of the [NavController.currentDestination] is still 'A' (it was set to 'A'
- *  during the previous navigation request).
- *  - If the name of the [currentFragment] is different to the 'className' in the
- *  [NavController.currentDestination], it means that the the current fragment has a navigation
- *  request scheduled already, and the navigation cannot be executed.
+ *  - If [NavController.currentDestination] is null (no graph set), navigation is not possible.
+ *  - When the [currentFragment] 'A' wants to navigate to destination 'B', this method checks if
+ *  the 'className' in [NavController.currentDestination] still matches 'A'.
+ *  - If it doesn't match, another navigation request has already been processed and navigation
+ *  is rejected to prevent double-navigation.
  *
  *  @param currentFragment - currently displayed fragment in the [NavController]
- *  @return true if the class name of the [currentFragment] is equal to the 'className' field in the
- *  [NavController.currentDestination], or if the [NavController.currentDestination] is null. false
- *  otherwise.
+ *  @return true if [NavController.currentDestination] is set and its class name matches
+ *  [currentFragment], or if [NavController.currentDestination] is not a [FragmentNavigator.Destination].
+ *  false if [currentFragment] is null, [NavController.currentDestination] is null, or the
+ *  destination class name does not match [currentFragment] (indicating a navigation already occurred).
  */
 @ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
 private fun NavController.canNavigate(currentFragment: Fragment?): Boolean {
-    val fragmentName = currentFragment?.let { it::class.java.name }
-    val targetClassName = (currentDestination as? FragmentNavigator.Destination)?.className
-    return currentFragment != null && (targetClassName == null || targetClassName == fragmentName)
+    currentFragment ?: return false
+    val currentDest = currentDestination ?: return false
+    val targetClassName = (currentDest as? FragmentNavigator.Destination)?.className
+    return targetClassName == null || targetClassName == currentFragment::class.java.name
 }
 
 /**
