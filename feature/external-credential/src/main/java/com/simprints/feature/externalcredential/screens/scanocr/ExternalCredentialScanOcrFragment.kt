@@ -220,7 +220,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         viewfinderMask.setMaskColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_white))
         viewfinderMask.alpha = VIEW_FINDER_ALPHA_SCAN_ACTIVE
         scanHint.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_black))
-        scanHint.visibility = View.VISIBLE
+        scanHint.isVisible = true
     }
 
     private fun renderInitialState() = with(binding) {
@@ -238,7 +238,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         viewfinderMask.setMaskColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_black))
         viewfinderMask.alpha = VIEW_FINDER_ALPHA_INITIAL
         scanHint.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_white))
-        scanHint.visibility = View.VISIBLE
+        scanHint.isVisible = true
     }
 
     private fun animateCompletionState() = with(binding) {
@@ -262,7 +262,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             pendingFinishAction?.invoke()
             pendingFinishAction = null
         })
-        scanHint.visibility = View.INVISIBLE
+        scanHint.isInvisible = true
     }
 
     private fun renderNoPermission(shouldOpenPhoneSettings: Boolean) {
@@ -270,6 +270,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             instructionsText.isVisible = false
             progressContainer.isInvisible = true
             documentScannerArea.isInvisible = true
+            scanHint.isInvisible = true
             buttonScan.isVisible = false
             val documentTypeText = viewModel.getDocumentTypeRes().run(::getString)
             val bodyText = getString(IDR.string.mfid_scan_camera_permission_body, documentTypeText)
