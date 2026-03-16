@@ -10,6 +10,7 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.model.BoundingBox
 import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
 import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessment
+import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessmentConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.CropDocumentFromPreviewUseCase
@@ -21,16 +22,26 @@ import com.simprints.feature.externalcredential.screens.scanocr.usecase.ZoomOnto
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.credential.store.CredentialImageRepository
 import com.simprints.infra.resources.R
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -91,20 +102,30 @@ internal class ExternalCredentialScanOcrViewModelTest {
         every { timeHelper.now() } returns Timestamp(1L)
     }
 
-    private fun initViewModel(documentType: OcrDocumentType) = ExternalCredentialScanOcrViewModel(
-        ocrDocumentType = documentType,
-        timeHelper = timeHelper,
-        normalizeBitmapToPreviewUseCase = normalizeBitmapToPreviewUseCase,
-        cropDocumentFromPreviewUseCase = cropDocumentFromPreviewUseCase,
-        getCredentialCoordinatesUseCase = getCredentialCoordinatesUseCase,
-        getLightingConditionsAssessment = getLightingConditionsAssessment,
-        keepOnlyBestDetectedBlockUseCase = keepOnlyBestDetectedBlockUseCase,
-        zoomOntoCredentialUseCase = zoomOntoCredentialUseCase,
-        credentialImageRepository = credentialImageRepository,
-        bgDispatcher = testCoroutineRule.testCoroutineDispatcher,
-        tokenizationProcessor = tokenizationProcessor,
-        configRepository = configRepository,
-    )
+    private fun initViewModel(
+        documentType: OcrDocumentType,
+        customConfig: Map<String, JsonPrimitive> = emptyMap(),
+    ): ExternalCredentialScanOcrViewModel {
+        val projectConfiguration = mockk<ProjectConfiguration> {
+            every { custom } returns customConfig
+        }
+        coEvery { configRepository.getProjectConfiguration() } returns projectConfiguration
+
+        return ExternalCredentialScanOcrViewModel(
+            ocrDocumentType = documentType,
+            timeHelper = timeHelper,
+            normalizeBitmapToPreviewUseCase = normalizeBitmapToPreviewUseCase,
+            cropDocumentFromPreviewUseCase = cropDocumentFromPreviewUseCase,
+            getCredentialCoordinatesUseCase = getCredentialCoordinatesUseCase,
+            getLightingConditionsAssessment = getLightingConditionsAssessment,
+            keepOnlyBestDetectedBlockUseCase = keepOnlyBestDetectedBlockUseCase,
+            zoomOntoCredentialUseCase = zoomOntoCredentialUseCase,
+            credentialImageRepository = credentialImageRepository,
+            bgDispatcher = testCoroutineRule.testCoroutineDispatcher,
+            tokenizationProcessor = tokenizationProcessor,
+            configRepository = configRepository,
+        )
+    }
 
     @Test
     fun `startScanning updates state to ScanningInProgress`() {
@@ -131,10 +152,8 @@ internal class ExternalCredentialScanOcrViewModelTest {
         val mockDetectedBlock = mockk<DetectedOcrBlock>()
         val mockNormalizedBitmap = mockk<Bitmap>()
         val mockCroppedBitmap = mockk<Bitmap>()
-        val mockLightingConditionsAssessment = mockk<LightingConditionsAssessment>()
         coEvery { normalizeBitmapToPreviewUseCase(bitmap, cropConfig) } returns mockNormalizedBitmap
         coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
-        coEvery { getLightingConditionsAssessment(mockCroppedBitmap) } returns mockLightingConditionsAssessment
         coEvery { getCredentialCoordinatesUseCase(mockCroppedBitmap, documentType) } returns mockDetectedBlock
 
         val observer = viewModel.scanOcrStateLiveData.test()
@@ -153,9 +172,16 @@ internal class ExternalCredentialScanOcrViewModelTest {
         val mockNormalizedBitmap = mockk<Bitmap>()
         val mockCroppedBitmap = mockk<Bitmap>()
         val lightingConditionsAssessment = LightingConditionsAssessment.TOO_DIM
+        viewModel = initViewModel(
+            documentType = documentType,
+            customConfig = mapOf(
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED to JsonPrimitive(true),
+            ),
+        )
+        runCurrent()
         coEvery { normalizeBitmapToPreviewUseCase(bitmap, cropConfig) } returns mockNormalizedBitmap
         coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
-        coEvery { getLightingConditionsAssessment(mockCroppedBitmap) } returns lightingConditionsAssessment
+        coEvery { getLightingConditionsAssessment(mockCroppedBitmap, any()) } returns lightingConditionsAssessment
 
         val observer = viewModel.lightingConditionsAssessment.test()
 
@@ -170,7 +196,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
         advanceTimeBy(1L) // full debounce delay now
         runCurrent()
         assertThat(observer.value()).isEqualTo(lightingConditionsAssessment)
-        coVerify(exactly = 1) { getLightingConditionsAssessment(mockCroppedBitmap) }
+        coVerify(exactly = 1) { getLightingConditionsAssessment(mockCroppedBitmap, any()) }
     }
 
     @Test
@@ -180,7 +206,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
         val mockLightingConditionsAssessment = mockk<LightingConditionsAssessment>()
         coEvery { normalizeBitmapToPreviewUseCase(bitmap, cropConfig) } returns mockNormalizedBitmap
         coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
-        coEvery { getLightingConditionsAssessment(mockCroppedBitmap) } returns mockLightingConditionsAssessment
+        coEvery { getLightingConditionsAssessment(mockCroppedBitmap, any()) } returns mockLightingConditionsAssessment
 
         val observer = viewModel.scanOcrStateLiveData.test()
         viewModel.processImage(bitmap, cropConfig)
@@ -195,9 +221,16 @@ internal class ExternalCredentialScanOcrViewModelTest {
         val mockNormalizedBitmap = mockk<Bitmap>()
         val mockCroppedBitmap = mockk<Bitmap>()
         val lightingConditionsAssessment = LightingConditionsAssessment.TOO_BRIGHT
+        viewModel = initViewModel(
+            documentType = documentType,
+            customConfig = mapOf(
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED to JsonPrimitive(true),
+            ),
+        )
+        runCurrent()
         coEvery { normalizeBitmapToPreviewUseCase(bitmap, cropConfig) } returns mockNormalizedBitmap
         coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
-        coEvery { getLightingConditionsAssessment(mockCroppedBitmap) } returns lightingConditionsAssessment
+        coEvery { getLightingConditionsAssessment(mockCroppedBitmap, any()) } returns lightingConditionsAssessment
 
         val observer = viewModel.lightingConditionsAssessment.test()
 
@@ -208,8 +241,101 @@ internal class ExternalCredentialScanOcrViewModelTest {
         runCurrent()
 
         assertThat(observer.value()).isEqualTo(lightingConditionsAssessment)
-        coVerify(exactly = 1) { getLightingConditionsAssessment(mockCroppedBitmap) }
+        coVerify(exactly = 1) { getLightingConditionsAssessment(mockCroppedBitmap, any()) }
         coVerify(exactly = 0) { getCredentialCoordinatesUseCase.invoke(any(), any()) }
+    }
+
+    @Test
+    fun `processImage does not update lighting conditions when disabled in custom config`() = runTest {
+        val mockNormalizedBitmap = mockk<Bitmap>()
+        val mockCroppedBitmap = mockk<Bitmap>()
+        viewModel = initViewModel(
+            documentType = documentType,
+            customConfig = mapOf(
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED to JsonPrimitive(false),
+            ),
+        )
+        runCurrent()
+        coEvery { normalizeBitmapToPreviewUseCase(bitmap, cropConfig) } returns mockNormalizedBitmap
+        coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
+
+        viewModel.processImage(bitmap, cropConfig)
+        runCurrent()
+
+        advanceTimeBy(500L) // debounce delay
+        runCurrent()
+
+        coVerify(exactly = 0) { getLightingConditionsAssessment(any(), any()) }
+    }
+
+    @Test
+    fun `processImage does not update lighting conditions when config not yet initialized`() = runTest {
+        val mockNormalizedBitmap = mockk<Bitmap>()
+        val mockCroppedBitmap = mockk<Bitmap>()
+        val configLoadingDeferred = CompletableDeferred<ProjectConfiguration>()
+        val projectConfiguration = mockk<ProjectConfiguration> {
+            every { custom } returns mapOf(
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED to JsonPrimitive(true),
+            )
+        }
+        coEvery { configRepository.getProjectConfiguration() } coAnswers {
+            configLoadingDeferred.await()
+        }
+        viewModel = ExternalCredentialScanOcrViewModel(
+            ocrDocumentType = documentType,
+            timeHelper = timeHelper,
+            normalizeBitmapToPreviewUseCase = normalizeBitmapToPreviewUseCase,
+            cropDocumentFromPreviewUseCase = cropDocumentFromPreviewUseCase,
+            getCredentialCoordinatesUseCase = getCredentialCoordinatesUseCase,
+            getLightingConditionsAssessment = getLightingConditionsAssessment,
+            keepOnlyBestDetectedBlockUseCase = keepOnlyBestDetectedBlockUseCase,
+            zoomOntoCredentialUseCase = zoomOntoCredentialUseCase,
+            credentialImageRepository = credentialImageRepository,
+            bgDispatcher = testCoroutineRule.testCoroutineDispatcher,
+            tokenizationProcessor = tokenizationProcessor,
+            configRepository = configRepository,
+        )
+        coEvery { normalizeBitmapToPreviewUseCase(bitmap, cropConfig) } returns mockNormalizedBitmap
+        coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
+
+        viewModel.processImage(bitmap, cropConfig)
+        runCurrent()
+
+        advanceTimeBy(500L) // debounce delay
+        runCurrent()
+
+        coVerify(exactly = 0) { getLightingConditionsAssessment(any(), any()) }
+
+        configLoadingDeferred.complete(projectConfiguration)
+    }
+
+    @Test
+    fun `init maps experimental lighting config`() = runTest {
+        viewModel = initViewModel(
+            documentType = documentType,
+            customConfig = mapOf(
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED to JsonPrimitive(true),
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING to JsonPrimitive(7),
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST to JsonPrimitive(31),
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS to JsonPrimitive(21),
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS to JsonPrimitive(91),
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS to JsonPrimitive(97),
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY to JsonPrimitive(8),
+            ),
+        )
+        runCurrent()
+
+        assertThat(viewModel.lightingConditionsAssessmentConfig).isEqualTo(
+            LightingConditionsAssessmentConfig(
+                isEnabled = true,
+                borderWidthPercent = 7,
+                lowContrastThresholdPercent = 31,
+                lowMedianLuminanceThresholdPercent = 21,
+                highMedianLuminanceThresholdPercent = 91,
+                highGlareLuminanceThresholdPercent = 97,
+                glareDetectionGridMinDimension = 8,
+            ),
+        )
     }
 
     @Test

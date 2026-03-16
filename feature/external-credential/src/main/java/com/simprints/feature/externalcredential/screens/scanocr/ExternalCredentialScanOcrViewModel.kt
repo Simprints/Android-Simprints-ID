@@ -149,7 +149,12 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
                 Simber.d("started image processing; with OCR: $isOcrAllowed")
                 val normalizedBitmap = normalizeBitmapToPreviewUseCase(bitmap, cropConfig)
                 val cropped = cropDocumentFromPreviewUseCase(bitmap = normalizedBitmap, cutoutRect = cropConfig.cutoutRect)
-                lightingConditionsAssessmentFlow.value = getLightingConditionsAssessment(bitmap = cropped)
+                if (::lightingConditionsAssessmentConfig.isInitialized && lightingConditionsAssessmentConfig.isEnabled) {
+                    lightingConditionsAssessmentFlow.value = getLightingConditionsAssessment(
+                        bitmap = cropped,
+                        lightingConditionsAssessmentConfig = lightingConditionsAssessmentConfig,
+                    )
+                }
                 if (!isOcrAllowed) return@launch
                 val detectedBlock = getCredentialCoordinatesUseCase(bitmap = cropped, documentType = ocrDocumentType) ?: return@launch
                 Simber.d("Detected OCR")

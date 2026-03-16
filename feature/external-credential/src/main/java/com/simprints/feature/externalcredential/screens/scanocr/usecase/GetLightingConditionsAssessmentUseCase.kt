@@ -2,6 +2,7 @@ package com.simprints.feature.externalcredential.screens.scanocr.usecase
 
 import android.graphics.Bitmap
 import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessment
+import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessmentConfig
 import javax.inject.Inject
 import kotlin.math.ceil
 import kotlin.math.roundToInt
@@ -14,6 +15,9 @@ internal class GetLightingConditionsAssessmentUseCase @Inject constructor() {
      * - if it's so dim that contrast is impacted
      * - if it's so bright that contrast is impacted
      * - if there are light glares at and near which contrast is impacted
+     *
+     * Default values are used in the definitions below as an example; see LightingConditionsAssessmentConfig
+     * Default values are heuristically tested and can be overridden; see ExperimentalProjectConfiguration
      *
      * Definitions:
      * - image: the image in a scaled version of input bitmap, to size of 100 in width or height, whatever is smaller
@@ -40,15 +44,18 @@ internal class GetLightingConditionsAssessmentUseCase @Inject constructor() {
      *
      * Otherwise, the image is still considered too bright when it has reflection glare areas:
      * - the 5% border width along the edges is ignored to reduce influence of possible dim background behind the card
-     * - the remaining image is divided into a 6x6 grid of rectangular tiles to look for glare
+     * - the remaining image is divided into a 6x6 (or larger in longer dimension) grid of ~square tiles to look for glare
      * - at least 1 tile has near-maximum P95 luminance very high, >99% (clamped to nearly pure white)
      * - and at the same time low local contrast caused by the glare washout: difference between P90 and P10 luminance <30%
      *
      * Otherwise, the lighting conditions are considered normal.
-     *
-     * The default values are heuristically tested, see . Override values for brightness/contrast thresholds can be supplied. //todo
      */
-    operator fun invoke(bitmap: Bitmap): LightingConditionsAssessment {
+    operator fun invoke(
+        bitmap: Bitmap,
+        lightingConditionsAssessmentConfig: LightingConditionsAssessmentConfig,
+    ): LightingConditionsAssessment = with(lightingConditionsAssessmentConfig) {
+        if (!isEnabled) return LightingConditionsAssessment.NORMAL
+
         if (bitmap.width <= 0 || bitmap.height <= 0) return LightingConditionsAssessment.NORMAL // nothing to look for
         val scaledBitmap = bitmap.scaledTo(TARGET_MIN_DIMENSION_PX)
         val width = scaledBitmap.width
@@ -60,7 +67,7 @@ internal class GetLightingConditionsAssessmentUseCase @Inject constructor() {
             scaledBitmap.recycle()
         }
 
-        val borderWidth = minOf(width, height) * BORDER_PERCENT / 100
+        val borderWidth = minOf(width, height) * borderWidthPercent / 100
         val left = borderWidth
         val top = borderWidth
         val right = width - borderWidth
@@ -73,19 +80,19 @@ internal class GetLightingConditionsAssessmentUseCase @Inject constructor() {
         val p95 = imageHistogram.percentile(PERCENTILE_95)
         val globalContrast = p95 - p5
 
-        if (p50.isBelowPercent(DIM_MEDIAN_THRESHOLD_PERCENT) &&
-            globalContrast.isBelowPercent(CONTRAST_THRESHOLD_PERCENT)
+        if (p50.isBelowPercent(lowMedianLuminanceThresholdPercent) &&
+            globalContrast.isBelowPercent(lowContrastThresholdPercent)
         ) {
             return LightingConditionsAssessment.TOO_DIM
         }
 
-        if (p50.isAbovePercent(BRIGHT_MEDIAN_THRESHOLD_PERCENT) &&
-            globalContrast.isBelowPercent(CONTRAST_THRESHOLD_PERCENT)
+        if (p50.isAbovePercent(highMedianLuminanceThresholdPercent) &&
+            globalContrast.isBelowPercent(lowContrastThresholdPercent)
         ) {
             return LightingConditionsAssessment.TOO_BRIGHT
         }
 
-        if (hasReflectionGlare(pixels, stride, left, top, right, bottom)) {
+        if (hasReflectionGlare(pixels, stride, left, top, right, bottom, lightingConditionsAssessmentConfig)) {
             return LightingConditionsAssessment.TOO_BRIGHT
         }
 
@@ -99,19 +106,20 @@ internal class GetLightingConditionsAssessmentUseCase @Inject constructor() {
         top: Int,
         right: Int,
         bottom: Int,
-    ): Boolean {
+        lightingConditionsAssessmentConfig: LightingConditionsAssessmentConfig,
+    ): Boolean = with(lightingConditionsAssessmentConfig) {
         val innerWidth = right - left
         val innerHeight = bottom - top
 
         val gridRows = if (innerHeight > innerWidth) {
-            GLARE_GRID_MIN_SIZE * innerHeight / innerWidth
+            glareDetectionGridMinDimension * innerHeight / innerWidth
         } else {
-            GLARE_GRID_MIN_SIZE
+            glareDetectionGridMinDimension
         }
         val gridColumns = if (innerWidth > innerHeight) {
-            GLARE_GRID_MIN_SIZE * innerWidth / innerHeight
+            glareDetectionGridMinDimension * innerWidth / innerHeight
         } else {
-            GLARE_GRID_MIN_SIZE
+            glareDetectionGridMinDimension
         }
 
         for (row in 0 until gridRows) {
@@ -129,8 +137,8 @@ internal class GetLightingConditionsAssessmentUseCase @Inject constructor() {
                 val p95 = tileHistogram.percentile(PERCENTILE_95)
                 val localContrast = p90 - p10
 
-                if (p95.isAbovePercent(GLARE_BRIGHTNESS_THRESHOLD_PERCENT) &&
-                    localContrast.isBelowPercent(CONTRAST_THRESHOLD_PERCENT)
+                if (p95.isAbovePercent(highGlareLuminanceThresholdPercent) &&
+                    localContrast.isBelowPercent(lowContrastThresholdPercent)
                 ) {
                     return true
                 }
@@ -199,16 +207,7 @@ internal class GetLightingConditionsAssessmentUseCase @Inject constructor() {
     }
 
     private companion object {
-        // bitmap geometry
         private const val TARGET_MIN_DIMENSION_PX = 100
-        private const val BORDER_PERCENT = 5
-        private const val GLARE_GRID_MIN_SIZE = 6
-
-        // brightness/contrast thresholds
-        private const val DIM_MEDIAN_THRESHOLD_PERCENT = 25
-        private const val BRIGHT_MEDIAN_THRESHOLD_PERCENT = 95
-        private const val GLARE_BRIGHTNESS_THRESHOLD_PERCENT = 99
-        private const val CONTRAST_THRESHOLD_PERCENT = 30
 
         // percentiles
         private const val PERCENTILE_5 = 0.05
