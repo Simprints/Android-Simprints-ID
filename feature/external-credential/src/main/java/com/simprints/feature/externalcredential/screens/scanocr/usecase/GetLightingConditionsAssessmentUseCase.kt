@@ -46,7 +46,7 @@ internal class GetLightingConditionsAssessmentUseCase @Inject constructor() {
      *
      * Otherwise, the lighting conditions are considered normal.
      *
-     * The default values are heuristically tested. Override values for brightness/contrast thresholds can be supplied. //todo
+     * The default values are heuristically tested, see . Override values for brightness/contrast thresholds can be supplied. //todo
      */
     operator fun invoke(bitmap: Bitmap): LightingConditionsAssessment {
         if (bitmap.width <= 0 || bitmap.height <= 0) return LightingConditionsAssessment.NORMAL // nothing to look for
@@ -103,13 +103,24 @@ internal class GetLightingConditionsAssessmentUseCase @Inject constructor() {
         val innerWidth = right - left
         val innerHeight = bottom - top
 
-        for (row in 0 until GLARE_GRID_SIZE) {
-            val tileTop = top + row * innerHeight / GLARE_GRID_SIZE
-            val tileBottom = top + (row + 1) * innerHeight / GLARE_GRID_SIZE
+        val gridRows = if (innerHeight > innerWidth) {
+            GLARE_GRID_MIN_SIZE * innerHeight / innerWidth
+        } else {
+            GLARE_GRID_MIN_SIZE
+        }
+        val gridColumns = if (innerWidth > innerHeight) {
+            GLARE_GRID_MIN_SIZE * innerWidth / innerHeight
+        } else {
+            GLARE_GRID_MIN_SIZE
+        }
 
-            for (column in 0 until GLARE_GRID_SIZE) {
-                val tileLeft = left + column * innerWidth / GLARE_GRID_SIZE
-                val tileRight = left + (column + 1) * innerWidth / GLARE_GRID_SIZE
+        for (row in 0 until gridRows) {
+            val tileTop = top + row * innerHeight / gridRows
+            val tileBottom = top + (row + 1) * innerHeight / gridRows
+
+            for (column in 0 until gridColumns) {
+                val tileLeft = left + column * innerWidth / gridColumns
+                val tileRight = left + (column + 1) * innerWidth / gridColumns
 
                 val tileHistogram = buildLuminanceHistogram(pixels, stride, tileLeft, tileTop, tileRight, tileBottom)
 
@@ -191,7 +202,7 @@ internal class GetLightingConditionsAssessmentUseCase @Inject constructor() {
         // bitmap geometry
         private const val TARGET_MIN_DIMENSION_PX = 100
         private const val BORDER_PERCENT = 5
-        private const val GLARE_GRID_SIZE = 6
+        private const val GLARE_GRID_MIN_SIZE = 6
 
         // brightness/contrast thresholds
         private const val DIM_MEDIAN_THRESHOLD_PERCENT = 25
