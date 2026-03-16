@@ -11,6 +11,31 @@ import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MIN
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FALLBACK_TO_COMMCARE_THRESHOLD_DAYS
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FALLBACK_TO_COMMCARE_THRESHOLD_DAYS_DEFAULT
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS_DEFAULT
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS_MAX
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS_MIN
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_DEFAULT
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_MAX
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_MIN
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS_DEFAULT
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS_MAX
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS_MIN
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_DEFAULT
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_MAX
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_MIN
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST_DEFAULT
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST_MAX
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST_MIN
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING_DEFAULT
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING_MAX
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING_MIN
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_DEFAULT_MAX_RETRIES
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES
@@ -205,6 +230,148 @@ internal class ExperimentalProjectConfigurationTest {
             mapOf(ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK to JsonPrimitive(true)) to true,
         ).forEach { (config, result) ->
             assertThat(ExperimentalProjectConfiguration(config).allowConfirmingGuidsNotInCallback).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `check MFID lighting conditions assessment enabled flag correctly`() {
+        mapOf(
+            // Value not present
+            emptyMap<String, JsonElement>() to false,
+            // Value not boolean
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED to JsonPrimitive(1)) to false,
+            // Value present and FALSE
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED to JsonPrimitive(false)) to false,
+            // Value present and TRUE
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED to JsonPrimitive(true)) to true,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).mfidLightingConditionsAssessmentEnabled).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `check MFID lighting conditions assessment padding parsed correctly`() {
+        mapOf(
+            // Value not present
+            emptyMap<String, JsonElement>() to MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING_DEFAULT,
+            // Value not int
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING to JsonPrimitive(true)) to
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING_DEFAULT,
+            // Value present and lesser than min
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING to JsonPrimitive(-1)) to
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING_MIN,
+            // Value present and greater than max
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING to JsonPrimitive(31)) to
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING_MAX,
+            // Value present and within the range
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING to JsonPrimitive(12)) to 12,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).mfidLightingConditionsAssessmentPadding).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `check MFID lighting conditions assessment low contrast parsed correctly`() {
+        mapOf(
+            // Value not present
+            emptyMap<String, JsonElement>() to MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST_DEFAULT,
+            // Value not int
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST to JsonPrimitive(true)) to
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST_DEFAULT,
+            // Value present and lesser than min
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST to JsonPrimitive(-1)) to
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST_MIN,
+            // Value present and greater than max
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST to JsonPrimitive(51)) to
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST_MAX,
+            // Value present and within the range
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST to JsonPrimitive(22)) to 22,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).mfidLightingConditionsAssessmentLowContrast).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `check MFID lighting conditions assessment low brightness parsed correctly`() {
+        mapOf(
+            // Value not present
+            emptyMap<String, JsonElement>() to MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_DEFAULT,
+            // Value not int
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS to JsonPrimitive(true)) to
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_DEFAULT,
+            // Value present and lesser than min
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS to JsonPrimitive(-1)) to
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_MIN,
+            // Value present and greater than max
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS to JsonPrimitive(51)) to
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_MAX,
+            // Value present and within the range
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS to JsonPrimitive(24)) to 24,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).mfidLightingConditionsAssessmentLowBrightness).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `check MFID lighting conditions assessment high brightness parsed correctly`() {
+        mapOf(
+            // Value not present
+            emptyMap<String, JsonElement>() to MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS_DEFAULT,
+            // Value not int
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS to JsonPrimitive(true)) to
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS_DEFAULT,
+            // Value present and lesser than min
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS to JsonPrimitive(49)) to
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS_MIN,
+            // Value present and greater than max
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS to JsonPrimitive(101)) to
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS_MAX,
+            // Value present and within the range
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS to JsonPrimitive(87)) to 87,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).mfidLightingConditionsAssessmentHighBrightness).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `check MFID lighting conditions assessment glare brightness parsed correctly`() {
+        mapOf(
+            // Value not present
+            emptyMap<String, JsonElement>() to MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS_DEFAULT,
+            // Value not int
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS to JsonPrimitive(true)) to
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS_DEFAULT,
+            // Value present and lesser than min
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS to JsonPrimitive(49)) to
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS_MIN,
+            // Value present and greater than max
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS to JsonPrimitive(101)) to
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS_MAX,
+            // Value present and within the range
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS to JsonPrimitive(88)) to 88,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).mfidLightingConditionsAssessmentGlareBrightness).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `check MFID lighting conditions assessment glare sensitivity parsed correctly`() {
+        mapOf(
+            // Value not present
+            emptyMap<String, JsonElement>() to MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_DEFAULT,
+            // Value not int
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY to JsonPrimitive(true)) to
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_DEFAULT,
+            // Value present and lesser than min
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY to JsonPrimitive(0)) to
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_MIN,
+            // Value present and greater than max
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY to JsonPrimitive(21)) to
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_MAX,
+            // Value present and within the range
+            mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY to JsonPrimitive(9)) to 9,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).mfidLightingConditionsAssessmentGlareSensitivity).isEqualTo(result)
         }
     }
 }

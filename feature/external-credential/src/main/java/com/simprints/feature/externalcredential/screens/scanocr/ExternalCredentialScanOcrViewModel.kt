@@ -15,6 +15,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
 import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessment
+import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessmentConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
@@ -88,13 +89,24 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     private lateinit var startTime: Timestamp
     lateinit var ocrConfig: OcrConfig
         private set
+    lateinit var lightingConditionsAssessmentConfig: LightingConditionsAssessmentConfig
+        private set
 
     init {
         viewModelScope.launch {
-            ocrConfig = configRepository.getProjectConfiguration().experimental().let { config ->
-                OcrConfig(
-                    useHighRes = config.ocrUseHighRes,
-                    capturesRequired = config.ocrCaptures.coerceIn(OCR_CAPTURE_MIN, OCR_CAPTURE_MAX),
+            with(configRepository.getProjectConfiguration().experimental()) {
+                ocrConfig = OcrConfig(
+                    useHighRes = ocrUseHighRes,
+                    capturesRequired = ocrCaptures.coerceIn(OCR_CAPTURE_MIN, OCR_CAPTURE_MAX),
+                )
+                lightingConditionsAssessmentConfig = LightingConditionsAssessmentConfig(
+                    isEnabled = mfidLightingConditionsAssessmentEnabled,
+                    borderWidthPercent = mfidLightingConditionsAssessmentPadding,
+                    lowContrastThresholdPercent = mfidLightingConditionsAssessmentLowContrast,
+                    lowMedianLuminanceThresholdPercent = mfidLightingConditionsAssessmentLowBrightness,
+                    highMedianLuminanceThresholdPercent = mfidLightingConditionsAssessmentHighBrightness,
+                    highGlareLuminanceThresholdPercent = mfidLightingConditionsAssessmentGlareBrightness,
+                    glareDetectionGridMinDimension = mfidLightingConditionsAssessmentGlareSensitivity,
                 )
             }
         }
