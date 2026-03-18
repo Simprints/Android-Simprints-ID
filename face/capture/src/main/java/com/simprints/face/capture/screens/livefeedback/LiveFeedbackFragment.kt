@@ -13,6 +13,8 @@ import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
 import androidx.camera.core.Preview
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.lifecycle.awaitInstance
 import androidx.core.content.ContextCompat
@@ -154,10 +156,18 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             if (!::targetResolution.isInitialized) {
                 targetResolution = Size(binding.captureOverlay.width, binding.captureOverlay.height)
             }
+            val resolutionSelector = ResolutionSelector
+                .Builder()
+                .setResolutionStrategy(
+                    ResolutionStrategy(
+                        targetResolution,
+                        ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER,
+                    ),
+                ).build()
 
             val imageAnalyzer = ImageAnalysis
                 .Builder()
-                .setTargetResolution(targetResolution)
+                .setResolutionSelector(resolutionSelector)
                 .setOutputImageRotationEnabled(true)
                 .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
                 .build()
@@ -168,7 +178,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             // Preview
             val preview = Preview
                 .Builder()
-                .setTargetResolution(targetResolution)
+                .setResolutionSelector(resolutionSelector)
                 .build()
             val cameraProvider = ProcessCameraProvider.awaitInstance(requireContext())
             cameraProvider.unbindAll()
