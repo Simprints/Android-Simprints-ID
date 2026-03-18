@@ -125,7 +125,6 @@ internal class EventRemoteDataSource @Inject constructor(
         val response = executeCall { remoteInterface ->
             remoteInterface.uploadEvents(requestId, projectId, acceptInvalidEvents, body)
         }
-
         return EventUpSyncResult(
             status = response.code(),
         )

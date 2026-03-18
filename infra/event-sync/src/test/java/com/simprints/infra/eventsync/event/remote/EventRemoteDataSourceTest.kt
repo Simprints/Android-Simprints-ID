@@ -1,7 +1,6 @@
 package com.simprints.infra.eventsync.event.remote
 
 import com.google.common.truth.Truth.*
-import com.simprints.infra.backendapi.ApiResult
 import com.simprints.infra.backendapi.BackendApiClient
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.events.event.domain.EventCount
@@ -18,6 +17,7 @@ import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.event.remote.models.session.ApiEventScope
 import com.simprints.infra.eventsync.event.usecases.MapDomainEventScopeToApiUseCase
+import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.syntax.assertThrows
@@ -38,7 +38,6 @@ import retrofit2.Response
 import kotlin.test.assertEquals
 
 class EventRemoteDataSourceTest {
-    @MockK
     lateinit var backendApiClient: BackendApiClient
 
     @MockK
@@ -67,13 +66,21 @@ class EventRemoteDataSourceTest {
         MockKAnnotations.init(this, relaxed = true)
         mockkStatic("kotlinx.coroutines.channels.ProduceKt")
 
-        coEvery { backendApiClient.executeCall<EventRemoteInterface, Any>(any(), any()) } coAnswers {
-            try {
-                ApiResult.Success(secondArg<suspend (EventRemoteInterface) -> Any>()(eventRemoteInterface))
-            } catch (e: Exception) {
-                ApiResult.Failure(e)
-            }
-        }
+        // Faking is simpler than mocking in this case
+        backendApiClient = BackendApiClient(
+            simNetwork = mockk {
+                coEvery {
+                    getSimApiClient(EventRemoteInterface::class, any(), any(), any())
+                } returns mockk<SimNetwork.SimApiClient<EventRemoteInterface>> {
+                    coEvery { executeCall(any<suspend (EventRemoteInterface) -> Any>()) } coAnswers {
+                        firstArg<suspend (EventRemoteInterface) -> Any>()(eventRemoteInterface)
+                    }
+                }
+            },
+            authStore = mockk { coEvery { getFirebaseToken() } returns "token" },
+            deviceId = "deviceId",
+            versionName = "versionName",
+        )
 
         every { mapDomainEventScopeToApiUseCase(any(), any(), any()) } returns apiEventScope
         eventRemoteDataSource = EventRemoteDataSource(backendApiClient)
@@ -85,7 +92,7 @@ class EventRemoteDataSourceTest {
     }
 
     @Test
-    fun count_shouldMakeANetworkRequest() = runTest {
+    fun `count should make a network request`() = runTest {
         coEvery {
             eventRemoteInterface.countEvents(any(), any(), any(), any(), any())
         } returns Response.success(
@@ -108,7 +115,7 @@ class EventRemoteDataSourceTest {
     }
 
     @Test
-    fun errorForCountRequestFails_shouldThrowAnException() = runTest {
+    fun `count request fails should throw an exception`() = runTest {
         coEvery {
             eventRemoteInterface.countEvents(
                 any(),
@@ -125,7 +132,7 @@ class EventRemoteDataSourceTest {
     }
 
     @Test
-    fun downloadEvents_shouldParseStreamAndEmitEventsIncrementally() = runTest {
+    fun `parseStreamAndEmitEvents should parse stream and emit events incrementally`() = runTest {
         val stream =
             javaClass.classLoader!!
                 .getResourceAsStream("responses/down_sync_8events.json")
@@ -156,7 +163,7 @@ class EventRemoteDataSourceTest {
     }
 
     @Test
-    fun `Get events should throw the exception received when downloading events`() = runTest {
+    fun `getEvents should throw the exception received when downloading events`() = runTest {
         val exception = BackendMaintenanceException(estimatedOutage = 100)
         coEvery {
             eventRemoteInterface.downloadEvents(
@@ -176,7 +183,7 @@ class EventRemoteDataSourceTest {
     }
 
     @Test
-    fun `Get events should map a SyncCloudIntegrationException with the status 429 to a TooManyRequestException`() = runTest {
+    fun `getEvents should map a SyncCloudIntegrationException with the status 429 to a TooManyRequestException`() = runTest {
         val exception = SyncCloudIntegrationException(
             cause = HttpException(
                 Response.error<Event>(
@@ -202,7 +209,7 @@ class EventRemoteDataSourceTest {
     }
 
     @Test
-    fun getEvents_shouldMakeTheRightRequest() = runTest {
+    fun `getEvents should make the right request`() = runTest {
         coEvery {
             eventRemoteInterface.downloadEvents(
                 any(),
@@ -233,7 +240,7 @@ class EventRemoteDataSourceTest {
     }
 
     @Test
-    fun getEvents_shouldReturnCorrectTotalHeader() = runTest {
+    fun `getEvents should return correct total header`() = runTest {
         coEvery {
             eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any())
         } returns Response.success(
@@ -250,7 +257,7 @@ class EventRemoteDataSourceTest {
     }
 
     @Test
-    fun getEvents_shouldReturnCorrectStatus() = runTest {
+    fun `getEvents should return correct status`() = runTest {
         coEvery {
             eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any())
         } returns Response.success(205, "".toResponseBody())
@@ -262,7 +269,7 @@ class EventRemoteDataSourceTest {
     }
 
     @Test
-    fun getEvents_shouldNotReturnTotalHeaderWhenLowerBound() = runTest {
+    fun `getEvents should not return total header when lower bound`() = runTest {
         coEvery {
             eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any())
         } returns Response.success(
@@ -277,7 +284,7 @@ class EventRemoteDataSourceTest {
     }
 
     @Test
-    fun postEvent_shouldUploadEvents() = runTest {
+    fun `post should upload events`() = runTest {
         coEvery {
             eventRemoteInterface.uploadEvents(
                 any(),
@@ -317,7 +324,7 @@ class EventRemoteDataSourceTest {
     }
 
     @Test
-    fun postEventFails_shouldThrowAnException() = runTest {
+    fun `post fails should throw an exception`() = runTest {
         coEvery {
             eventRemoteInterface.uploadEvents(
                 any(),
@@ -337,7 +344,7 @@ class EventRemoteDataSourceTest {
     }
 
     @Test
-    fun dumpInvalidEvents_shouldDumpEvents() = runTest {
+    fun `dumpInvalidEvents should dump events`() = runTest {
         coEvery { eventRemoteInterface.dumpInvalidEvents(any(), any(), any()) } returns mockk()
 
         val events = listOf("anEventJson")
@@ -345,6 +352,62 @@ class EventRemoteDataSourceTest {
 
         coVerify(exactly = 1) {
             eventRemoteInterface.dumpInvalidEvents(DEFAULT_PROJECT_ID, events = events)
+        }
+    }
+
+    @Test
+    fun `getEvents should throw an exception received on failure response`() = runTest {
+        coEvery {
+            eventRemoteInterface.downloadEvents(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+            )
+        } returns Response.error(426, "".toResponseBody())
+
+        assertThrows<SyncCloudIntegrationException> {
+            eventRemoteDataSource.getEvents(GUID1, query, this)
+        }
+    }
+
+    @Test
+    fun `getEvents should throw an exception received on too many requests response`() = runTest {
+        coEvery {
+            eventRemoteInterface.downloadEvents(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+            )
+        } returns Response.error(429, "".toResponseBody())
+
+        assertThrows<TooManyRequestsException> {
+            eventRemoteDataSource.getEvents(GUID1, query, this)
+        }
+    }
+
+    @Test
+    fun `post failure response should throw an exception`() = runTest {
+        coEvery {
+            eventRemoteInterface.uploadEvents(
+                any(),
+                any(),
+                any(),
+                any(),
+            )
+        } returns Response.error(426, "".toResponseBody())
+
+        assertThrows<SyncCloudIntegrationException> {
+            eventRemoteDataSource.post(
+                GUID1,
+                DEFAULT_PROJECT_ID,
+                ApiUploadEventsBody(),
+            )
         }
     }
 }

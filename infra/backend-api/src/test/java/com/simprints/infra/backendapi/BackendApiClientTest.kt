@@ -8,8 +8,10 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
+import okhttp3.ResponseBody
 import org.junit.Before
 import org.junit.Test
+import retrofit2.Response
 import java.io.IOException
 
 internal class BackendApiClientTest {
@@ -52,6 +54,32 @@ internal class BackendApiClientTest {
         val result = subject.executeCall(TestRemoteInterface::class) { expectedValue }
 
         assertThat(result).isEqualTo(ApiResult.Success(expectedValue))
+        coVerify(exactly = 1) {
+            simNetwork.getSimApiClient(TestRemoteInterface::class, deviceId, versionName, "token")
+        }
+    }
+
+    @Test
+    fun `executeCall returns Success when api client returns successful response`() = runTest {
+        coEvery { apiClient.executeCall(any<suspend (TestRemoteInterface) -> Response<ResponseBody>>()) } returns
+            Response<ResponseBody>.success(ResponseBody.EMPTY)
+
+        val result = subject.executeCall(TestRemoteInterface::class) { "ignored" }
+
+        assertThat(result).isInstanceOf(ApiResult.Success::class.java)
+        coVerify(exactly = 1) {
+            simNetwork.getSimApiClient(TestRemoteInterface::class, deviceId, versionName, "token")
+        }
+    }
+
+    @Test
+    fun `executeCall returns Failure when api client returns failed response`() = runTest {
+        coEvery { apiClient.executeCall(any<suspend (TestRemoteInterface) -> Response<ResponseBody>>()) } returns
+            Response<ResponseBody>.error(426, ResponseBody.EMPTY)
+
+        val result = subject.executeCall(TestRemoteInterface::class) { "ignored" }
+
+        assertThat(result).isInstanceOf(ApiResult.Failure::class.java)
         coVerify(exactly = 1) {
             simNetwork.getSimApiClient(TestRemoteInterface::class, deviceId, versionName, "token")
         }
