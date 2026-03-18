@@ -17,6 +17,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.lifecycle.awaitInstance
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.core.view.doOnLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -141,42 +142,47 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     /** Initialize CameraX, and prepare to bind the camera use cases  */
-    private fun setUpCamera() = viewLifecycleOwner.lifecycleScope.launch {
-        if (::cameraExecutor.isInitialized && !cameraExecutor.isShutdown) {
-            return@launch
+    private fun setUpCamera() = binding.captureOverlay.doOnLayout {
+        viewLifecycleOwner.lifecycleScope.launch {
+            if (::cameraExecutor.isInitialized && !cameraExecutor.isShutdown) {
+                return@launch
+            }
+            // Initialize our background executor
+            cameraExecutor = Executors.newSingleThreadExecutor()
+            // ImageAnalysis
+            // Todo choose accurate output image resolution that respects quality,performance and face analysis SDKs https://simprints.atlassian.net/browse/CORE-2569
+            if (!::targetResolution.isInitialized) {
+                targetResolution = Size(binding.captureOverlay.width, binding.captureOverlay.height)
+            }
+
+            val imageAnalyzer = ImageAnalysis
+                .Builder()
+                .setTargetResolution(targetResolution)
+                .setOutputImageRotationEnabled(true)
+                .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
+                .build()
+            val cropAnalyzer = CropToTargetOverlayAnalyzer(binding.captureOverlay, ::analyze)
+
+            imageAnalyzer.setAnalyzer(cameraExecutor, cropAnalyzer)
+
+            // Preview
+            val preview = Preview
+                .Builder()
+                .setTargetResolution(targetResolution)
+                .build()
+            val cameraProvider = ProcessCameraProvider.awaitInstance(requireContext())
+            cameraProvider.unbindAll()
+            val camera = cameraProvider.bindToLifecycle(
+                this@LiveFeedbackFragment,
+                DEFAULT_BACK_CAMERA,
+                preview,
+                imageAnalyzer,
+            )
+            cameraControl = camera.cameraControl
+            // Attach the view's surface provider to preview use case
+            preview.surfaceProvider = binding.faceCaptureCamera.surfaceProvider
+            Simber.i("Camera setup finished", tag = FACE_CAPTURE)
         }
-        // Initialize our background executor
-        cameraExecutor = Executors.newSingleThreadExecutor()
-        // ImageAnalysis
-        // Todo choose accurate output image resolution that respects quality,performance and face analysis SDKs https://simprints.atlassian.net/browse/CORE-2569
-        if (!::targetResolution.isInitialized) {
-            targetResolution = Size(binding.captureOverlay.width, binding.captureOverlay.height)
-        }
-
-        val imageAnalyzer = ImageAnalysis
-            .Builder()
-            .setTargetResolution(targetResolution)
-            .setOutputImageRotationEnabled(true)
-            .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
-            .build()
-        val cropAnalyzer = CropToTargetOverlayAnalyzer(binding.captureOverlay, ::analyze)
-
-        imageAnalyzer.setAnalyzer(cameraExecutor, cropAnalyzer)
-
-        // Preview
-        val preview = Preview.Builder().setTargetResolution(targetResolution).build()
-        val cameraProvider = ProcessCameraProvider.awaitInstance(requireContext())
-        cameraProvider.unbindAll()
-        val camera = cameraProvider.bindToLifecycle(
-            this@LiveFeedbackFragment,
-            DEFAULT_BACK_CAMERA,
-            preview,
-            imageAnalyzer,
-        )
-        cameraControl = camera.cameraControl
-        // Attach the view's surface provider to preview use case
-        preview.surfaceProvider = binding.faceCaptureCamera.surfaceProvider
-        Simber.i("Camera setup finished", tag = FACE_CAPTURE)
     }
 
     override fun onResume() {
