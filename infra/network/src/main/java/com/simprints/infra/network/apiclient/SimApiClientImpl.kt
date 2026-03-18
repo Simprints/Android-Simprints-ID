@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.HttpException
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
@@ -62,7 +63,12 @@ internal class SimApiClientImpl<T : SimRemoteInterface>(
             runBlock = {
                 return@retryIO try {
                     withContext(Dispatchers.IO) {
-                        networkBlock(api)
+                        val result = networkBlock(api)
+                        if (result is Response<*> && !result.isSuccessful) {
+                            throw HttpException(result)
+                        } else {
+                            result
+                        }
                     }
                 } catch (e: Exception) {
                     throw transformExceptionIfNeeded(e)
