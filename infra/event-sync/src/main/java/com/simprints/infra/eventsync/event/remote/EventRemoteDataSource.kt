@@ -16,7 +16,6 @@ import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.produce
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.decodeToSequence
-import retrofit2.HttpException
 import retrofit2.Response
 import java.io.ByteArrayInputStream
 import java.io.InputStream
@@ -66,14 +65,6 @@ internal class EventRemoteDataSource @Inject constructor(
         scope: CoroutineScope,
     ): EventDownSyncResult = try {
         val response = takeStreaming(requestId, query)
-        if (!response.isSuccessful) {
-            if (response.code() == TOO_MANY_REQUEST_STATUS) {
-                throw TooManyRequestsException()
-            } else {
-                throw HttpException(response)
-            }
-        }
-
         val eventCount = getEventCountFromHeader(response)
         val streaming = response.body()?.byteStream() ?: ByteArrayInputStream(byteArrayOf())
 
@@ -134,10 +125,6 @@ internal class EventRemoteDataSource @Inject constructor(
         val response = executeCall { remoteInterface ->
             remoteInterface.uploadEvents(requestId, projectId, acceptInvalidEvents, body)
         }
-        if (!response.isSuccessful) {
-            throw HttpException(response)
-        }
-
         return EventUpSyncResult(
             status = response.code(),
         )

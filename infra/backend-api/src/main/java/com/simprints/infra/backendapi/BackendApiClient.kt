@@ -5,6 +5,9 @@ import com.simprints.core.PackageVersionName
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.SimRemoteInterface
+import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
+import retrofit2.HttpException
+import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
@@ -15,7 +18,7 @@ import kotlin.reflect.KClass
  * This is the single entry point for obtaining API clients in the infra layer.
  */
 @Singleton
-class BackendApiClient @Inject internal constructor(
+class BackendApiClient @Inject constructor(
     private val simNetwork: SimNetwork,
     private val authStore: AuthStore,
     @param:DeviceID private val deviceId: String,
@@ -30,7 +33,7 @@ class BackendApiClient @Inject internal constructor(
         remoteInterface: KClass<T>,
         block: suspend (T) -> V,
     ): ApiResult<V> = try {
-        ApiResult.Success(getApiClient(remoteInterface, authStore.getFirebaseToken()).executeCall(block))
+        wrapInApiResponse(getApiClient(remoteInterface, authStore.getFirebaseToken()).executeCall(block))
     } catch (t: Throwable) {
         wrapException(t)
     }
@@ -44,7 +47,7 @@ class BackendApiClient @Inject internal constructor(
         remoteInterface: KClass<T>,
         block: suspend (T) -> V,
     ): ApiResult<V> = try {
-        ApiResult.Success(getApiClient(remoteInterface, null).executeCall(block))
+        wrapInApiResponse(getApiClient(remoteInterface, null).executeCall(block))
     } catch (t: Throwable) {
         wrapException(t)
     }
@@ -53,6 +56,20 @@ class BackendApiClient @Inject internal constructor(
         remoteInterface: KClass<T>,
         authToken: String?,
     ): SimNetwork.SimApiClient<T> = simNetwork.getSimApiClient(remoteInterface, deviceId, versionName, authToken)
+
+    private fun <V> wrapInApiResponse(data: V): ApiResult<V> = if (data is Response<*>) {
+        // In cases where requests meta-data is required, the API client will return a Response object,
+        // such requests will return the Response with the error code instead of throwing exception,
+        // so we need to check the request was successful manually and wrap it in ApiResult accordingly.
+        if (data.isSuccessful) {
+            ApiResult.Success(data)
+        } else {
+            wrapException(SyncCloudIntegrationException(cause = HttpException(data)))
+        }
+    } else {
+        // Non-response types will throw directly
+        ApiResult.Success(data)
+    }
 
     private fun <V> wrapException(t: Throwable): ApiResult.Failure<V> = when (t) {
         is CancellationException -> throw t // Maintain the coroutine control flow by rethrowing the cancellation exception
