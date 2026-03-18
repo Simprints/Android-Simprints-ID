@@ -510,6 +510,7 @@ fun createEventUpSyncRequestEvent() = EventUpSyncRequestEvent(
         eventUpSyncCount = 2,
         eventDownSyncCount = 3,
         sampleUpSyncCount = 4,
+        deviceCount = 5,
     ),
     responseStatus = 200,
     errorType = "OK",

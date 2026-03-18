@@ -11,4 +11,5 @@ internal data class ApiUploadEventsBody(
     val eventUpSyncs: List<ApiEventScope> = emptyList(),
     val eventDownSyncs: List<ApiEventScope> = emptyList(),
     val sampleUpSyncs: List<ApiEventScope> = emptyList(),
+    val devices: List<ApiEventScope> = emptyList(),
 )

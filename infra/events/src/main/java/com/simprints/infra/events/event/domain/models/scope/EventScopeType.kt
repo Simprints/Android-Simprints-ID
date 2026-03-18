@@ -10,4 +10,5 @@ enum class EventScopeType {
     UP_SYNC,
     DOWN_SYNC,
     SAMPLE_UP_SYNC,
+    DEVICE,
 }
