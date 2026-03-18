@@ -14,6 +14,7 @@ import com.simprints.feature.externalcredential.databinding.FragmentExternalCred
 import com.simprints.feature.externalcredential.ext.getCredentialTypeString
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
@@ -28,7 +29,7 @@ class ExternalCredentialSkipFragment : Fragment(R.layout.fragment_external_crede
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-
+        applySystemBarInsets(view)
         initObservers()
     }
 
@@ -42,6 +43,7 @@ class ExternalCredentialSkipFragment : Fragment(R.layout.fragment_external_crede
     private fun initViews(credentialTypes: List<ExternalCredentialType>) = with(binding) {
         mapOf(
             title to IDR.string.mfid_skip_title,
+            skipReasonHasNumberNoId to IDR.string.mfid_skip_reason_has_number_no_id,
             skipReasonDoesNotHaveDocument to IDR.string.mfid_skip_reason_does_not_have,
             skipReasonDidNotBring to IDR.string.mfid_skip_reason_did_not_bring,
             skipReasonIncorrect to IDR.string.mfid_skip_reason_incorrect,
@@ -67,7 +69,9 @@ class ExternalCredentialSkipFragment : Fragment(R.layout.fragment_external_crede
                     reasonTextInput.text.toString().isNotEmpty()
                 }
 
-                else -> true
+                else -> {
+                    true
+                }
             }
             buttonSkip.isEnabled = isSkipButtonEnabled
         }
@@ -95,6 +99,7 @@ class ExternalCredentialSkipFragment : Fragment(R.layout.fragment_external_crede
     }
 
     private fun viewIdToOption(checkedId: Int) = when (checkedId) {
+        R.id.skipReasonHasNumberNoId -> ExternalCredentialSelectionEvent.SkipReason.HAS_NUMBER_NO_ID
         R.id.skipReasonDoesNotHaveDocument -> ExternalCredentialSelectionEvent.SkipReason.DOES_NOT_HAVE_ID
         R.id.skipReasonDidNotBring -> ExternalCredentialSelectionEvent.SkipReason.DID_NOT_BRING_ID
         R.id.skipReasonIncorrect -> ExternalCredentialSelectionEvent.SkipReason.BROUGHT_INCORRECT_ID
