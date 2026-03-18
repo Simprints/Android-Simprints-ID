@@ -283,6 +283,7 @@ message ProtoUpSyncBatchSizes {
     int32 eventUpSyncs = 4;
     int32 eventDownSyncs = 5;
     int32 sampleUpSyncs = 6;
+    int32 devices = 7;
 }
 
 message ProtoDecisionPolicy {

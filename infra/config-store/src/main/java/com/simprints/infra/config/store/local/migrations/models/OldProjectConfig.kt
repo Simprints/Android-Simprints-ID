@@ -215,6 +215,7 @@ internal data class OldProjectConfig(
                     eventUpSyncs = DEFAULT_BATCH_SIZE,
                     eventDownSyncs = DEFAULT_BATCH_SIZE,
                     sampleUpSyncs = DEFAULT_BATCH_SIZE,
+                    devices = DEFAULT_BATCH_SIZE,
                 ),
                 imagesRequireUnmeteredConnection = false,
                 frequency = when (downSyncSetting) {

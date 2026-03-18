@@ -360,6 +360,7 @@ internal val apiSynchronizationConfiguration = ApiSynchronizationConfiguration(
                 eventUpSyncs = 2,
                 eventDownSyncs = 3,
                 sampleUpSyncs = 4,
+                devices = 5,
             ),
             imagesRequireUnmeteredConnection = false,
             frequency = ApiSynchronizationConfiguration.ApiSynchronizationFrequency.PERIODICALLY,
@@ -390,6 +391,7 @@ internal val simprintsUpSyncConfigurationConfiguration = UpSynchronizationConfig
         eventUpSyncs = 2,
         eventDownSyncs = 3,
         sampleUpSyncs = 4,
+        devices = 5,
     ),
     imagesRequireUnmeteredConnection = false,
     frequency = Frequency.PERIODICALLY,
@@ -445,6 +447,7 @@ internal val protoSynchronizationConfiguration = ProtoSynchronizationConfigurati
                             .setEventUpSyncs(2)
                             .setEventDownSyncs(3)
                             .setSampleUpSyncs(4)
+                            .setDevices(5)
                             .build(),
                     ).setFrequency(ProtoSyncFrequency.PERIODICALLY)
                     .build(),

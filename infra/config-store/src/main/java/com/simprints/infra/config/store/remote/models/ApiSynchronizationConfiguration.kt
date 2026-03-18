@@ -99,9 +99,10 @@ internal data class ApiSynchronizationConfiguration(
             val eventUpSyncs: Int,
             val eventDownSyncs: Int,
             val sampleUpSyncs: Int,
+            val devices: Int,
         ) {
             fun toDomain(): UpSynchronizationConfiguration.UpSyncBatchSizes =
-                UpSynchronizationConfiguration.UpSyncBatchSizes(sessions, eventUpSyncs, eventDownSyncs, sampleUpSyncs)
+                UpSynchronizationConfiguration.UpSyncBatchSizes(sessions, eventUpSyncs, eventDownSyncs, sampleUpSyncs, devices)
         }
     }
 

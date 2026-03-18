@@ -537,6 +537,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                                         .setEventUpSyncs(1)
                                         .setEventDownSyncs(1)
                                         .setSampleUpSyncs(1)
+                                        .setDevices(1)
                                         .build(),
                                 ).setFrequency(ProtoSyncFrequency.PERIODICALLY)
                                 .build(),
@@ -580,6 +581,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                                         .setEventUpSyncs(1)
                                         .setEventDownSyncs(1)
                                         .setSampleUpSyncs(1)
+                                        .setDevices(1)
                                         .build(),
                                 ).setFrequency(ProtoSyncFrequency.PERIODICALLY)
                                 .build(),
@@ -623,6 +625,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                                         .setEventUpSyncs(1)
                                         .setEventDownSyncs(1)
                                         .setSampleUpSyncs(1)
+                                        .setDevices(1)
                                         .build(),
                                 ).setFrequency(ProtoSyncFrequency.PERIODICALLY)
                                 .build(),
@@ -666,6 +669,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                                         .setEventUpSyncs(1)
                                         .setEventDownSyncs(1)
                                         .setSampleUpSyncs(1)
+                                        .setDevices(1)
                                         .build(),
                                 ).setFrequency(ProtoSyncFrequency.PERIODICALLY)
                                 .build(),
