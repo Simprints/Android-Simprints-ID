@@ -1,9 +1,7 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.BIOMETRIC_REFERENCE_CREATION
 import com.simprints.infra.events.event.domain.models.EventType.Companion.BIOMETRIC_REFERENCE_CREATION_KEY
 import kotlinx.serialization.SerialName
@@ -36,10 +34,6 @@ data class BiometricReferenceCreationEvent(
         ),
         BIOMETRIC_REFERENCE_CREATION,
     )
-
-    override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
-
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>): Event = this
 
     @Keep
     @Serializable

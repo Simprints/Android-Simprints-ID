@@ -1,9 +1,7 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.Companion.FACE_ONBOARDING_COMPLETE_KEY
 import com.simprints.infra.events.event.domain.models.EventType.FACE_ONBOARDING_COMPLETE
 import kotlinx.serialization.SerialName
@@ -28,10 +26,6 @@ data class FaceOnboardingCompleteEvent(
         FaceOnboardingCompletePayload(startTime, endTime, EVENT_VERSION),
         FACE_ONBOARDING_COMPLETE,
     )
-
-    override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
-
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     @Serializable

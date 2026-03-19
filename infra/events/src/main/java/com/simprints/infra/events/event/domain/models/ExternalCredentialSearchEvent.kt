@@ -1,10 +1,8 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.Companion.EXTERNAL_CREDENTIAL_SEARCH_KEY
 import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_SEARCH
 import kotlinx.serialization.SerialName
@@ -60,10 +58,6 @@ data class ExternalCredentialSearchEvent(
     data class ExternalCredentialSearchResult(
         val candidateIds: List<String>,
     )
-
-    override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
-
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized field
 
     companion object {
         const val EVENT_VERSION = 0

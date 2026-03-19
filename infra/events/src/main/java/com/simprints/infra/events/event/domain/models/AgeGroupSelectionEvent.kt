@@ -1,9 +1,7 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.AGE_GROUP_SELECTION
 import com.simprints.infra.events.event.domain.models.EventType.Companion.AGE_GROUP_SELECTION_KEY
 import kotlinx.serialization.SerialName
@@ -29,10 +27,6 @@ data class AgeGroupSelectionEvent(
         AgeGroupSelectionPayload(createdAt, EVENT_VERSION, endedAt, subjectAgeGroup),
         AGE_GROUP_SELECTION,
     )
-
-    override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
-
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     @Serializable

@@ -2,9 +2,7 @@ package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.response.AppErrorReason
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ERROR
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CALLBACK_ERROR_KEY
 import kotlinx.serialization.SerialName
@@ -29,10 +27,6 @@ data class ErrorCallbackEvent(
         ErrorCallbackPayload(createdAt, EVENT_VERSION, reason),
         CALLBACK_ERROR,
     )
-
-    override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
-
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     @Serializable

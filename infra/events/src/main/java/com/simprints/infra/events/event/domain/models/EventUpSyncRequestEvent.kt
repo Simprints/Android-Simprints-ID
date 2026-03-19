@@ -1,9 +1,7 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.Companion.EVENT_UP_SYNC_REQUEST_KEY
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -68,10 +66,6 @@ data class EventUpSyncRequestEvent(
     ) {
         fun hasAny() = sessionCount > 0 || eventUpSyncCount > 0 || eventDownSyncCount > 0 || sampleUpSyncCount > 0 || deviceCount > 0
     }
-
-    override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
-
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>): Event = this
 
     companion object {
         const val EVENT_VERSION = 0

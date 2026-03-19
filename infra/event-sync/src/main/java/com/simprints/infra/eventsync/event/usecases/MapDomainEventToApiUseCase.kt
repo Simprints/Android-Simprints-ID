@@ -10,9 +10,15 @@ import javax.inject.Inject
 internal class MapDomainEventToApiUseCase @Inject constructor(
     private val tokenizeEventPayloadFieldsUseCase: TokenizeEventPayloadFieldsUseCase,
 ) {
-    operator fun invoke(event: Event, project: Project): ApiEvent = with(tokenizeEventPayloadFieldsUseCase(event, project)) {
+    operator fun invoke(
+        event: Event,
+        project: Project,
+    ): ApiEvent = with(tokenizeEventPayloadFieldsUseCase(event, project)) {
         val apiPayload = payload.fromDomainToApi()
-        val tokenizedKeyTypes = getTokenizableFields().filter { it.value is TokenizableString.Tokenized }.keys.toList()
+        val tokenizedKeyTypes =
+            getTokenizableFields().filter { it.value is TokenizableString.Tokenized }.keys.toList() +
+                getTokenizableListFields().filter { fields -> fields.value.any { it is TokenizableString.Tokenized } }.keys.toList()
+
         val tokenizedFields = tokenizedKeyTypes.mapNotNull(apiPayload::getTokenizedFieldJsonPath)
         ApiEvent(
             id = id,
@@ -22,5 +28,4 @@ internal class MapDomainEventToApiUseCase @Inject constructor(
             tokenizedFields = tokenizedFields,
         )
     }
-
 }

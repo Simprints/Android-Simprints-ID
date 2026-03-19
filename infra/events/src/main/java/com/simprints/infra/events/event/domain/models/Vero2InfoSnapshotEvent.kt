@@ -1,9 +1,7 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.Companion.VERO_2_INFO_SNAPSHOT_KEY
 import com.simprints.infra.events.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
 import kotlinx.serialization.DeserializationStrategy
@@ -40,10 +38,6 @@ data class Vero2InfoSnapshotEvent(
         ),
         VERO_2_INFO_SNAPSHOT,
     )
-
-    override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
-
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this
 
     @Keep
     @Serializable(with = Vero2InfoSnapshotPayloadSerializer::class)

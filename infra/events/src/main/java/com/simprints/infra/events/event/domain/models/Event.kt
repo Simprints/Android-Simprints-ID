@@ -16,9 +16,31 @@ sealed class Event {
     abstract var scopeId: String?
     abstract var projectId: String?
 
+    /**
+     * Returns a map of fields that should be tokenized when converting this Event into API model.
+     *
+     * Only one field per TokenKeyType should be returned across this and getTokenizableListFields(),
+     * since the TokenKeyType is used as the key when replacing values with their tokenized versions.
+     */
     open fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    abstract fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>): Event
+    /**
+     * Returns a map of list fields that should be tokenized when converting this Event into API model.
+     *
+     * Only one field per TokenKeyType should be returned across this and getTokenizableFields(),
+     * since the TokenKeyType is used as the key when replacing values with their tokenized versions.
+     */
+    open fun getTokenizableListFields(): Map<TokenKeyType, List<TokenizableString>> = emptyMap()
+
+    /**
+     * Updates the Event with the given tokenized values, returning a new Event instance with the updated fields.
+     */
+    open fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>): Event = this
+
+    /**
+     * Updates the Event with the given tokenized list values, returning a new Event instance with the updated fields.
+     */
+    open fun setTokenizedListFields(map: Map<TokenKeyType, List<TokenizableString>>): Event = this
 
     final override fun equals(other: Any?): Boolean = other is Event && other.id == id
 
