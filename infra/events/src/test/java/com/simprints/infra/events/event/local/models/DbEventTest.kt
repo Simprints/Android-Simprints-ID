@@ -360,4 +360,12 @@ class DbEventTest {
 
         assertThat(original).isEqualTo(transformed)
     }
+
+    @Test
+    fun convert_DeviceConfigurationUpdatedEvent() {
+        val original = createDeviceConfigurationUpdatedEvent()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
+
+        assertThat(original).isEqualTo(transformed)
+    }
 }

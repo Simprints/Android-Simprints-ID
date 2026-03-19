@@ -14,6 +14,7 @@ import com.simprints.infra.events.event.domain.models.ConfirmationCalloutEventV2
 import com.simprints.infra.events.event.domain.models.ConfirmationCalloutEventV3
 import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload
+import com.simprints.infra.events.event.domain.models.DeviceConfigurationUpdatedEvent.DeviceConfigurationUpdatedPayload
 import com.simprints.infra.events.event.domain.models.EnrolmentCallbackEvent.EnrolmentCallbackPayload
 import com.simprints.infra.events.event.domain.models.EnrolmentCalloutEventV2
 import com.simprints.infra.events.event.domain.models.EnrolmentCalloutEventV3
@@ -50,6 +51,7 @@ import com.simprints.infra.events.event.domain.models.EventType.CANDIDATE_READ
 import com.simprints.infra.events.event.domain.models.EventType.COMPLETION_CHECK
 import com.simprints.infra.events.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
 import com.simprints.infra.events.event.domain.models.EventType.CONSENT
+import com.simprints.infra.events.event.domain.models.EventType.DEVICE_CONFIGURATION_UPDATED
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_UPDATE
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V2
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V4
@@ -183,6 +185,7 @@ internal fun EventPayload.fromDomainToApi(): ApiEventPayload = when (this.type) 
     EXTERNAL_CREDENTIAL_CAPTURE_VALUE -> ApiExternalCredentialCaptureValuePayload(this as ExternalCredentialCaptureValuePayload)
     EXTERNAL_CREDENTIAL_SEARCH -> ApiExternalCredentialSearchPayload(this as ExternalCredentialSearchPayload)
     EXTERNAL_CREDENTIAL_CONFIRMATION -> ApiExternalCredentialConfirmationPayload(this as ExternalCredentialConfirmationPayload)
+    DEVICE_CONFIGURATION_UPDATED -> ApiDeviceConfigurationUpdatedPayload(this as DeviceConfigurationUpdatedPayload)
 }
 
 internal object ApiEventPayloadSerializer : KSerializer<ApiEventPayload> {
@@ -372,6 +375,10 @@ internal object ApiEventPayloadSerializer : KSerializer<ApiEventPayload> {
 
             is ApiVero2InfoSnapshotPayload.ApiVero2InfoSnapshotPayloadForOldApi -> {
                 encoder.encodeSerializableValue(ApiVero2InfoSnapshotPayload.ApiVero2InfoSnapshotPayloadForOldApi.serializer(), value)
+            }
+
+            is ApiDeviceConfigurationUpdatedPayload -> {
+                encoder.encodeSerializableValue(ApiDeviceConfigurationUpdatedPayload.serializer(), value)
             }
         }
     }

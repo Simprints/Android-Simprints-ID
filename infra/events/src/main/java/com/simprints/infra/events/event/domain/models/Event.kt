@@ -142,5 +142,6 @@ sealed class Event {
             is VerificationCalloutEventV2 -> VerificationCalloutEventV2.serializer()
             is VerificationCalloutEventV3 -> VerificationCalloutEventV3.serializer()
             is Vero2InfoSnapshotEvent -> Vero2InfoSnapshotEvent.serializer()
+            is DeviceConfigurationUpdatedEvent -> DeviceConfigurationUpdatedEvent.serializer()
         }
 }

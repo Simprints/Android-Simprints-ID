@@ -29,6 +29,7 @@ import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent
 import com.simprints.infra.events.event.domain.models.ConsentEvent
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
+import com.simprints.infra.events.event.domain.models.DeviceConfigurationUpdatedEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentCallbackEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentCalloutEventV2
 import com.simprints.infra.events.event.domain.models.EnrolmentCalloutEventV3
@@ -96,6 +97,7 @@ import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.CREDENTIAL_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_BIOMETRIC_DATA_SOURCE
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_LOCALE
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
@@ -587,4 +589,11 @@ fun createExternalCredentialConfirmationEvent() = ExternalCredentialConfirmation
     endedAt = CREATED_AT,
     result = ExternalCredentialConfirmationResult.CONTINUE,
     userInteractedWithImage = true,
+)
+
+fun createDeviceConfigurationUpdatedEvent() = DeviceConfigurationUpdatedEvent(
+    createdAt = CREATED_AT,
+    language = DEFAULT_LOCALE,
+    downSyncModules = listOf(DEFAULT_MODULE_ID),
+    sourceUpdate = DeviceConfigurationUpdatedEvent.DeviceConfigurationUpdateSource.REMOTE,
 )
