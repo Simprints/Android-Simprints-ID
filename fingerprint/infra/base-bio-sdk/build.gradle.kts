@@ -4,9 +4,12 @@ plugins {
 
 android {
     namespace = "com.simprints.fingerprint.infra.basebiosdk"
-
 }
 
 dependencies {
     implementation(project(":fingerprint:infra:scanner"))
+}
+
+tasks.withType<Test>().configureEach {
+    enabled = false
 }

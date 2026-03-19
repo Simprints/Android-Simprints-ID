@@ -12,6 +12,7 @@ More details about each feature or how each module work can be seen inside every
 
 - **Git**: Ensure you have Git installed to clone the repository.
 - **Android Studio**: Install the latest version of Android Studio.
+- **JDK 21**: Use Java 21 for command-line Gradle builds and ensure Android Studio is configured to use a Java 21 runtime for this project.
 - **GitHub Account**: You will need a GitHub account to generate a token.
 - **[KtLint](https://pinterest.github.io/ktlint/latest/install/setup/)**: To ensure consistent code style.
 
