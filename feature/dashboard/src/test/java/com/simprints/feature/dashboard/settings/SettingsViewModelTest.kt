@@ -1,7 +1,7 @@
 package com.simprints.feature.dashboard.settings
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.Modality
 import com.simprints.infra.config.store.ConfigRepository
@@ -11,6 +11,7 @@ import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
+import com.simprints.infra.events.device.DeviceEventTracker
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -48,6 +49,9 @@ class SettingsViewModelTest {
     @MockK
     private lateinit var configSyncCache: ConfigSyncCache
 
+    @MockK
+    private lateinit var deviceEventTracker: DeviceEventTracker
+
     private lateinit var viewModel: SettingsViewModel
 
     @Before
@@ -62,7 +66,9 @@ class SettingsViewModelTest {
             OTHER_LAST_UPDATED,
         )
 
-        viewModel = SettingsViewModel(configRepository, syncOrchestrator, configSyncCache)
+        coJustRun { deviceEventTracker.trackDeviceConfigurationUpdatedEvent(any(), any()) }
+
+        viewModel = SettingsViewModel(configRepository, syncOrchestrator, configSyncCache, deviceEventTracker)
     }
 
     @Test
@@ -78,7 +84,7 @@ class SettingsViewModelTest {
                 every { custom } returns experimentalConfig2
             },
         )
-        viewModel = SettingsViewModel(configRepository, syncOrchestrator, configSyncCache)
+        viewModel = SettingsViewModel(configRepository, syncOrchestrator, configSyncCache, deviceEventTracker)
 
         assertThat(viewModel.experimentalConfiguration.test().valueHistory())
             .isEqualTo(
@@ -109,6 +115,13 @@ class SettingsViewModelTest {
 
         assertThat(updatedConfig.language).isEqualTo(updatedLanguage)
         assertThat(viewModel.languagePreference.value).isEqualTo(updatedLanguage)
+
+        coVerify {
+            deviceEventTracker.trackDeviceConfigurationUpdatedEvent(
+                withArg { assertThat(it.language).isEqualTo(updatedLanguage) },
+                true,
+            )
+        }
     }
 
     @Test

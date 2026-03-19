@@ -1,13 +1,12 @@
 package com.simprints.infra.config.store.tokenization
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.utils.StringTokenizer
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
 import org.junit.Test
 
 class TokenizationProcessorTest {
@@ -91,5 +90,47 @@ class TokenizationProcessorTest {
             project = project,
         )
         assertThat(result).isEqualTo(encrypted)
+    }
+
+    @Test
+    fun `when tokenizeIfNecessary with raw, should return encrypted`() {
+        val result = manager.tokenizeIfNecessary(
+            tokenizableString = raw.asTokenizableRaw(),
+            tokenKeyType = tokenKeyType,
+            project = project,
+        )
+        assertThat(result).isEqualTo(encrypted.asTokenizableEncrypted())
+    }
+
+    @Test
+    fun `when tokenizeIfNecessary with encrypted, return encrypted`() {
+        val result = manager.tokenizeIfNecessary(
+            tokenizableString = encrypted.asTokenizableEncrypted(),
+            tokenKeyType = tokenKeyType,
+            project = project,
+        )
+
+        assertThat(result).isEqualTo(encrypted.asTokenizableEncrypted())
+    }
+
+    @Test
+    fun `when untokenizeIfNecessary with raw, should return raw`() {
+        val result = manager.untokenizeIfNecessary(
+            tokenizableString = raw.asTokenizableRaw(),
+            tokenKeyType = tokenKeyType,
+            project = project,
+        )
+        assertThat(result).isEqualTo(raw.asTokenizableRaw())
+    }
+
+    @Test
+    fun `when untokenizeIfNecessary with encrypted, return raw`() {
+        val result = manager.untokenizeIfNecessary(
+            tokenizableString = encrypted.asTokenizableEncrypted(),
+            tokenKeyType = tokenKeyType,
+            project = project,
+        )
+
+        assertThat(result).isEqualTo(raw.asTokenizableRaw())
     }
 }

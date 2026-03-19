@@ -14,6 +14,7 @@ import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.experimental
+import com.simprints.infra.events.device.DeviceEventTracker
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SETTINGS
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.sync.SyncOrchestrator
@@ -27,6 +28,7 @@ internal class SettingsViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
     private val syncOrchestrator: SyncOrchestrator,
     private val configSyncCache: ConfigSyncCache,
+    private val deviceEventTracker: DeviceEventTracker,
 ) : ViewModel() {
     val generalConfiguration: LiveData<GeneralConfiguration>
         get() = _generalConfiguration
@@ -59,7 +61,16 @@ internal class SettingsViewModel @Inject constructor(
 
     fun updateLanguagePreference(language: String) {
         viewModelScope.launch {
-            configRepository.updateDeviceConfiguration { it.apply { it.language = language } }
+            configRepository.updateDeviceConfiguration { configuration ->
+                configuration
+                    .apply { this.language = language }
+                    .also {
+                        deviceEventTracker.trackDeviceConfigurationUpdatedEvent(
+                            deviceConfiguration = it,
+                            isLocalChange = true,
+                        )
+                    }
+            }
             _languagePreference.postValue(language)
             Simber.i("Language set to $language", tag = SETTINGS)
         }

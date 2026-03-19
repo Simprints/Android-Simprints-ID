@@ -73,8 +73,8 @@ class ModuleSelectionViewModelTest {
         coEvery { configRepository.getProject() } returns project
         modulesDefault.forEach {
             coEvery {
-                tokenizationProcessor.decrypt(
-                    encrypted = it.name as TokenizableString.Tokenized,
+                tokenizationProcessor.untokenizeIfNecessary(
+                    tokenizableString = it.name as TokenizableString.Tokenized,
                     tokenKeyType = TokenKeyType.ModuleId,
                     project = project,
                 )
@@ -165,8 +165,8 @@ class ModuleSelectionViewModelTest {
         )
         updatedModules.forEach { module ->
             every {
-                tokenizationProcessor.encrypt(
-                    decrypted = module.name as TokenizableString.Raw,
+                tokenizationProcessor.tokenizeIfNecessary(
+                    tokenizableString = module.name as TokenizableString.Raw,
                     tokenKeyType = TokenKeyType.ModuleId,
                     project = project,
                 )

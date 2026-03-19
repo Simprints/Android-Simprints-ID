@@ -76,4 +76,18 @@ class TokenizationProcessor @Inject constructor(
 
         is TokenizableString.Tokenized -> tokenizableString
     }
+
+    fun untokenizeIfNecessary(
+        tokenizableString: TokenizableString,
+        tokenKeyType: TokenKeyType,
+        project: Project,
+    ) = when (tokenizableString) {
+        is TokenizableString.Raw -> tokenizableString
+
+        is TokenizableString.Tokenized -> decrypt(
+            encrypted = tokenizableString,
+            tokenKeyType = tokenKeyType,
+            project = project,
+        )
+    }
 }
