@@ -65,6 +65,24 @@ class ModuleSelectionRepositoryTest {
     }
 
     @Test
+    fun forceModuleSelection_shouldSaveSelectedModules() = runTest {
+        val updateConfigFn = slot<suspend (DeviceConfiguration) -> DeviceConfiguration>()
+        coEvery { configRepository.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
+        val selectedModules = listOf(
+            "a".asTokenizableRaw(),
+            "d".asTokenizableRaw(),
+        )
+
+        repository.forceModuleSelection(selectedModules, false)
+
+        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), ""))
+        // Comparing string representation as when executing the lambda captured in the mock it will
+        // not return an ArrayList but a LinkedHashMap.
+        assertThat(updatedConfig.selectedModules).containsExactlyElementsIn(selectedModules)
+        deleteModules(listOf("b", "d"))
+    }
+
+    @Test
     fun saveModules_shouldSaveSelectedModules() = runTest {
         val updateConfigFn = slot<suspend (DeviceConfiguration) -> DeviceConfiguration>()
         coEvery { configRepository.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
@@ -83,8 +101,7 @@ class ModuleSelectionRepositoryTest {
         val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), ""))
         // Comparing string representation as when executing the lambda captured in the mock it will
         // not return an ArrayList but a LinkedHashMap.
-        Truth
-            .assertThat(updatedConfig.selectedModules.toString())
+        assertThat(updatedConfig.selectedModules.toString())
             .isEqualTo(selectedModuleNames.map(TokenizableString::value).toString())
     }
 

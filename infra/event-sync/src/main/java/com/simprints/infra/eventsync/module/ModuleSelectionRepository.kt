@@ -1,5 +1,6 @@
 package com.simprints.infra.eventsync.module
 
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.values
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
@@ -17,22 +18,34 @@ class ModuleSelectionRepository @Inject internal constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val deviceEventTracker: DeviceEventTracker,
 ) {
-    suspend fun getModules(): List<SelectableModule> = configRepository
+    suspend fun getModules(): List<SelectableModule> = getModuleOptions()?.let { modules ->
+        val selectedModules = configRepository.getDeviceConfiguration().selectedModules.values()
+
+        modules.map { SelectableModule(it, selectedModules.contains(it.value)) }
+    } ?: emptyList()
+
+    suspend fun forceModuleSelection(
+        selectedModules: List<TokenizableString>,
+        isLocalChange: Boolean,
+    ) {
+        val options = getModuleOptions() ?: return
+
+        val selectedValues = selectedModules.values().toSet()
+        val allModules = options.map { SelectableModule(it, selectedValues.contains(it.value)) }
+
+        saveModules(allModules, isLocalChange)
+    }
+
+    private suspend fun getModuleOptions(): List<TokenizableString>? = configRepository
         .getProjectConfiguration()
         .synchronization.down.simprints
         ?.moduleOptions
-        ?.let { modules ->
-            val selectedModules = configRepository
-                .getDeviceConfiguration()
-                .selectedModules
-                .values()
 
-            modules.map { SelectableModule(it, selectedModules.contains(it.value)) }
-        }
-        ?: emptyList()
-
-    suspend fun saveModules(modules: List<SelectableModule>) {
-        setSelectedModules(modules.filter { it.isSelected })
+    suspend fun saveModules(
+        modules: List<SelectableModule>,
+        isLocalChange: Boolean = true,
+    ) {
+        setSelectedModules(modules.filter { it.isSelected }, isLocalChange)
         handleUnselectedModules(modules.filter { !it.isSelected })
     }
 
@@ -41,7 +54,10 @@ class ModuleSelectionRepository @Inject internal constructor(
         .synchronization.down.simprints
         ?.maxNbOfModules ?: 0
 
-    private suspend fun setSelectedModules(selectedModules: List<SelectableModule>) {
+    private suspend fun setSelectedModules(
+        selectedModules: List<SelectableModule>,
+        isLocalChange: Boolean,
+    ) {
         configRepository.updateDeviceConfiguration { configuration ->
             configuration
                 .apply { this.selectedModules = selectedModules.map { module -> module.name } }
@@ -51,7 +67,7 @@ class ModuleSelectionRepository @Inject internal constructor(
 
                     deviceEventTracker.trackDeviceConfigurationUpdatedEvent(
                         deviceConfiguration = it,
-                        isLocalChange = true,
+                        isLocalChange = isLocalChange,
                     )
                 }
         }
