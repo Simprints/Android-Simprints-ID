@@ -7,12 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.NoModuleSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.TooManyModulesSelectedException
-import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
-import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.ModuleRepository
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.eventsync.module.ModuleSelectionRepository
+import com.simprints.infra.eventsync.module.SelectableModule
 import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,20 +22,20 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class ModuleSelectionViewModel @Inject constructor(
-    private val moduleRepository: ModuleRepository,
+    private val moduleRepository: ModuleSelectionRepository,
     private val syncOrchestrator: SyncOrchestrator,
     private val configRepository: ConfigRepository,
     private val tokenizationProcessor: TokenizationProcessor,
     @param:ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
-    val modulesList: LiveData<List<Module>>
+    val modulesList: LiveData<List<SelectableModule>>
         get() = _modulesList
-    private val _modulesList = MutableLiveData<List<Module>>()
+    private val _modulesList = MutableLiveData<List<SelectableModule>>()
 
     private var maxNumberOfModules = 0
 
-    private var modules: MutableList<Module> = mutableListOf()
-    private var initialModules: List<Module> = listOf()
+    private var modules: MutableList<SelectableModule> = mutableListOf()
+    private var initialModules: List<SelectableModule> = listOf()
 
     val screenLocked: LiveData<SettingsPasswordConfig>
         get() = _screenLocked
@@ -69,7 +69,7 @@ internal class ModuleSelectionViewModel @Inject constructor(
         }
     }
 
-    fun updateModuleSelection(moduleToUpdate: Module) {
+    fun updateModuleSelection(moduleToUpdate: SelectableModule) {
         val selectedModulesSize = getSelected().size
         if (!moduleToUpdate.isSelected && selectedModulesSize == maxNumberOfModules) {
             throw TooManyModulesSelectedException(maxNumberOfModules = maxNumberOfModules)
@@ -109,7 +109,7 @@ internal class ModuleSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun postUpdateModules(block: suspend MutableList<Module>.() -> Unit) = viewModelScope.launch {
+    private fun postUpdateModules(block: suspend MutableList<SelectableModule>.() -> Unit) = viewModelScope.launch {
         modules.block()
         _modulesList.postValue(modules)
     }

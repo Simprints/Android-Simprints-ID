@@ -1,8 +1,8 @@
-package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository
+package com.simprints.infra.eventsync.module
 
 import com.simprints.core.domain.tokenization.TokenizableString
 
-internal data class Module(
+data class SelectableModule(
     val name: TokenizableString,
     var isSelected: Boolean,
 )

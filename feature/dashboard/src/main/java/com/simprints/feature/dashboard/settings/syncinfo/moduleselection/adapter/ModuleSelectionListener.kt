@@ -1,7 +1,7 @@
 package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.adapter
 
-import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
+import com.simprints.infra.eventsync.module.SelectableModule
 
 internal interface ModuleSelectionListener {
-    fun onModuleSelected(module: Module)
+    fun onModuleSelected(module: SelectableModule)
 }

@@ -26,9 +26,9 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.adapter
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.adapter.ModuleSelectionListener
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.NoModuleSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.TooManyModulesSelectedException
-import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.tools.ChipClickListener
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.tools.ModuleChipHelper
+import com.simprints.infra.eventsync.module.SelectableModule
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -49,7 +49,7 @@ internal class ModuleSelectionFragment :
     private val binding by viewBinding(FragmentSyncModuleSelectionBinding::bind)
 
     private var hasModulesSelectedInitially: Boolean? = null
-    private var modulesToSelect = emptyList<Module>()
+    private var modulesToSelect = emptyList<SelectableModule>()
     private var rvModules: RecyclerView? = null
 
     private val confirmModuleSelectionDialog by lazy {
@@ -106,7 +106,7 @@ internal class ModuleSelectionFragment :
         }
     }
 
-    override fun onModuleSelected(module: Module) {
+    override fun onModuleSelected(module: SelectableModule) {
         binding.searchViewInput.setText("")
         hideKeyboard()
         updateSelectionIfPossible(module)
@@ -117,7 +117,7 @@ internal class ModuleSelectionFragment :
         }
     }
 
-    override fun onChipClick(module: Module) {
+    override fun onChipClick(module: SelectableModule) {
         updateSelectionIfPossible(module)
     }
 
@@ -141,7 +141,7 @@ internal class ModuleSelectionFragment :
     private fun fetchData() {
         viewModel.modulesList.observe(viewLifecycleOwner) {
             if (hasModulesSelectedInitially == null) {
-                hasModulesSelectedInitially = it.any(Module::isSelected)
+                hasModulesSelectedInitially = it.any(SelectableModule::isSelected)
             }
             modulesToSelect = it
             adapter.submitList(it.getUnselected())
@@ -161,7 +161,7 @@ internal class ModuleSelectionFragment :
         }
     }
 
-    private fun updateSelectionIfPossible(lastModuleChanged: Module) {
+    private fun updateSelectionIfPossible(lastModuleChanged: SelectableModule) {
         try {
             viewModel.updateModuleSelection(lastModuleChanged)
         } catch (e: TooManyModulesSelectedException) {
@@ -247,11 +247,11 @@ internal class ModuleSelectionFragment :
         }
     }
 
-    private fun addChipForModule(selectedModule: Module) {
+    private fun addChipForModule(selectedModule: SelectableModule) {
         chipHelper.addModuleChip(binding.chipGroup, selectedModule)
     }
 
-    private fun removeChipForModule(selectedModule: Module) {
+    private fun removeChipForModule(selectedModule: SelectableModule) {
         chipHelper.removeModuleChip(binding.chipGroup, selectedModule)
     }
 
@@ -279,7 +279,7 @@ internal class ModuleSelectionFragment :
 
     private fun isNoModulesSelected() = modulesToSelect.none { it.isSelected }
 
-    private fun List<Module>.getUnselected() = filter { !it.isSelected }
+    private fun List<SelectableModule>.getUnselected() = filter { !it.isSelected }
 
     private fun EditText.observeSearchButton() {
         setOnEditorActionListener { v, actionId, _ ->

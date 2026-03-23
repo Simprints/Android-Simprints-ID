@@ -1,4 +1,4 @@
-package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository
+package com.simprints.infra.eventsync.module
 
 import com.simprints.core.domain.tokenization.values
 import com.simprints.infra.config.store.ConfigRepository
@@ -11,14 +11,13 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MOD
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
-// TODO move into the event system infra module?
-internal class ModuleRepositoryImpl @Inject constructor(
+class ModuleSelectionRepository @Inject internal constructor(
     private val configRepository: ConfigRepository,
     private val deleteModules: DeleteModulesUseCase,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val deviceEventTracker: DeviceEventTracker,
-) : ModuleRepository {
-    override suspend fun getModules(): List<Module> = configRepository
+) {
+    suspend fun getModules(): List<SelectableModule> = configRepository
         .getProjectConfiguration()
         .synchronization.down.simprints
         ?.moduleOptions
@@ -28,21 +27,21 @@ internal class ModuleRepositoryImpl @Inject constructor(
                 .selectedModules
                 .values()
 
-            modules.map { Module(it, selectedModules.contains(it.value)) }
+            modules.map { SelectableModule(it, selectedModules.contains(it.value)) }
         }
         ?: emptyList()
 
-    override suspend fun saveModules(modules: List<Module>) {
+    suspend fun saveModules(modules: List<SelectableModule>) {
         setSelectedModules(modules.filter { it.isSelected })
         handleUnselectedModules(modules.filter { !it.isSelected })
     }
 
-    override suspend fun getMaxNumberOfModules(): Int = configRepository
+    suspend fun getMaxNumberOfModules(): Int = configRepository
         .getProjectConfiguration()
         .synchronization.down.simprints
         ?.maxNbOfModules ?: 0
 
-    private suspend fun setSelectedModules(selectedModules: List<Module>) {
+    private suspend fun setSelectedModules(selectedModules: List<SelectableModule>) {
         configRepository.updateDeviceConfiguration { configuration ->
             configuration
                 .apply { this.selectedModules = selectedModules.map { module -> module.name } }
@@ -58,7 +57,7 @@ internal class ModuleRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun handleUnselectedModules(unselectedModules: List<Module>) {
+    private suspend fun handleUnselectedModules(unselectedModules: List<SelectableModule>) {
         val queries = unselectedModules.map {
             EnrolmentRecordQuery(moduleId = it.name)
         }

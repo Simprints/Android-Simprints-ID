@@ -5,15 +5,15 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.feature.dashboard.R
-import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
+import com.simprints.infra.eventsync.module.SelectableModule
 
 internal class ModuleAdapter(
     private val listener: ModuleSelectionListener,
 ) : RecyclerView.Adapter<ModuleViewHolder>() {
-    private var list = emptyList<Module>()
+    private var list = emptyList<SelectableModule>()
 
     @SuppressLint("NotifyDataSetChanged")
-    fun submitList(list: List<Module>) {
+    fun submitList(list: List<SelectableModule>) {
         this.list = list
         notifyDataSetChanged()
     }
