@@ -2,13 +2,14 @@ package com.simprints.infra.uibase.view
 
 import android.animation.ObjectAnimator
 import android.view.View
-import android.view.ViewPropertyAnimator
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 @ExcludedFromGeneratedTestCoverageReports("View animation")
 fun View.setPulseAnimation(isEnabled: Boolean) {
@@ -75,3 +76,38 @@ private const val PULSE_ANIMATION_ALPHA_FULL = 1.0f
 private const val PULSE_ANIMATION_ALPHA_INTERMEDIATE = 0.9f
 private const val PULSE_ANIMATION_ALPHA_MIN = 0.6f
 private const val PULSE_ANIMATION_DURATION_MILLIS = 2000L
+
+@ExcludedFromGeneratedTestCoverageReports("View extension")
+suspend fun View.awaitLayout() = suspendCancellableCoroutine<Unit> { continuation ->
+    if (isLaidOut) {
+        continuation.resume(Unit)
+        return@suspendCancellableCoroutine
+    }
+
+    val listener = object : View.OnLayoutChangeListener {
+        @ExcludedFromGeneratedTestCoverageReports("View extension")
+        override fun onLayoutChange(
+            v: View,
+            l: Int,
+            t: Int,
+            r: Int,
+            b: Int,
+            ol: Int,
+            ot: Int,
+            or: Int,
+            ob: Int,
+        ) {
+            v.removeOnLayoutChangeListener(this)
+
+            if (continuation.isActive) {
+                continuation.resume(Unit)
+            }
+        }
+    }
+
+    addOnLayoutChangeListener(listener)
+
+    continuation.invokeOnCancellation {
+        removeOnLayoutChangeListener(listener)
+    }
+}

@@ -13,6 +13,8 @@ import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
 import androidx.camera.core.Preview
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.lifecycle.awaitInstance
 import androidx.core.content.ContextCompat
@@ -37,6 +39,7 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.view.applySystemBarInsets
+import com.simprints.infra.uibase.view.awaitLayout
 import com.simprints.infra.uibase.view.setCheckedWithLeftDrawable
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -145,6 +148,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         if (::cameraExecutor.isInitialized && !cameraExecutor.isShutdown) {
             return@launch
         }
+        // Wait for the views to be properly laid out
+        binding.captureOverlay.awaitLayout()
         // Initialize our background executor
         cameraExecutor = Executors.newSingleThreadExecutor()
         // ImageAnalysis
@@ -152,10 +157,18 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         if (!::targetResolution.isInitialized) {
             targetResolution = Size(binding.captureOverlay.width, binding.captureOverlay.height)
         }
+        val resolutionSelector = ResolutionSelector
+            .Builder()
+            .setResolutionStrategy(
+                ResolutionStrategy(
+                    targetResolution,
+                    ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER,
+                ),
+            ).build()
 
         val imageAnalyzer = ImageAnalysis
             .Builder()
-            .setTargetResolution(targetResolution)
+            .setResolutionSelector(resolutionSelector)
             .setOutputImageRotationEnabled(true)
             .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
             .build()
@@ -164,7 +177,10 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         imageAnalyzer.setAnalyzer(cameraExecutor, cropAnalyzer)
 
         // Preview
-        val preview = Preview.Builder().setTargetResolution(targetResolution).build()
+        val preview = Preview
+            .Builder()
+            .setResolutionSelector(resolutionSelector)
+            .build()
         val cameraProvider = ProcessCameraProvider.awaitInstance(requireContext())
         cameraProvider.unbindAll()
         val camera = cameraProvider.bindToLifecycle(
