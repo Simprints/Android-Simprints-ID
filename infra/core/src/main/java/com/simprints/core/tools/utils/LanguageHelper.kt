@@ -38,15 +38,8 @@ object LanguageHelper {
     private fun localeFor(languageString: String): Locale {
         val localeParts = languageString.split("-r")
         val language = localeParts[0]
-        return if (localeParts.size > 1) {
-            Locale
-                .Builder()
-                .setLanguage(language)
-                .setRegion(localeParts[1])
-                .build()
-        } else {
-            Locale(localeParts[0])
-        }
+        // Region part is explicitly ignored while we are phasing out am_ET in all projects and until we have a need for it.
+        return Locale.Builder().setLanguage(language).build()
     }
 
     fun getLanguageConfigurationContext(ctx: Context): Context {
