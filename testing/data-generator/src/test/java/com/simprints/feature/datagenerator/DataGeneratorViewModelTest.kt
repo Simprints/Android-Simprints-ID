@@ -1,8 +1,11 @@
+package com.simprints.feature.datagenerator
+
 import android.content.Intent
 import android.os.Bundle
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.feature.datagenerator.DataGeneratorViewModel
 import com.simprints.feature.datagenerator.enrollmentrecords.InsertEnrollmentRecordsUseCase
 import com.simprints.feature.datagenerator.events.InsertSessionEventsUseCase
@@ -35,7 +38,6 @@ internal class DataGeneratorViewModelTest {
     private lateinit var authStore: AuthStore
 
     companion object {
-        // Private constants matching those in the ViewModel for test readability
         private const val ACTION_GENERATE_ENROLLMENT_RECORDS = "com.simprints.test.GENERATE_ENROLLMENT_RECORDS"
 
         private const val EXTRA_PROJECT_ID = "EXTRA_PROJECT_ID"
@@ -45,6 +47,7 @@ internal class DataGeneratorViewModelTest {
         private const val EXTRA_TEMPLATES_PER_FORMAT = "EXTRA_TEMPLATES_PER_FORMAT"
         private const val EXTRA_FIRST_SUBJECT_ID = "EXTRA_FIRST_SUBJECT_ID"
         private const val EXTRA_FINGER_ORDER = "EXTRA_FINGER_ORDER"
+        private const val EXTRA_EXTERNAL_CREDENTIALS_PER_TYPE = "EXTRA_EXTERNAL_CREDENTIALS_PER_TYPE"
     }
 
     @Before
@@ -143,6 +146,7 @@ internal class DataGeneratorViewModelTest {
         val firstSubjectId = "sub1"
         val templatesBundle = Bundle().apply { putInt("ISO_19794_2", 2) }
         val fingerOrderBundle = Bundle().apply { putString("ISO_19794_2", "LEFT_THUMB") }
+        val externalCredentialsBundle = Bundle().apply { putInt(ExternalCredentialType.NHISCard.name, 1) }
 
         val intent = Intent(ACTION_GENERATE_ENROLLMENT_RECORDS).apply {
             putExtra(EXTRA_PROJECT_ID, projectId)
@@ -152,10 +156,13 @@ internal class DataGeneratorViewModelTest {
             putExtra(EXTRA_FIRST_SUBJECT_ID, firstSubjectId)
             putExtra(EXTRA_TEMPLATES_PER_FORMAT, templatesBundle)
             putExtra(EXTRA_FINGER_ORDER, fingerOrderBundle)
+            putExtra(EXTRA_EXTERNAL_CREDENTIALS_PER_TYPE, externalCredentialsBundle)
         }
 
         val expectedStatus = "Inserted 50 biometric records"
-        coEvery { insertEnrollmentRecordsUseCase.invoke(any(), any(), any(), any(), any(), any(), any()) } returns flowOf(expectedStatus)
+        every {
+            insertEnrollmentRecordsUseCase.invoke(any(), any(), any(), any(), any(), any(), any(), any())
+        } returns flowOf(expectedStatus)
 
         // When
         viewModel.handleIntent(intent)
@@ -170,11 +177,11 @@ internal class DataGeneratorViewModelTest {
                 templatesPerFormat = templatesBundle,
                 firstSubjectId = firstSubjectId,
                 fingerOrder = fingerOrderBundle,
+                externalCredentialsPerType = externalCredentialsBundle,
             )
         }
 
-        val status = viewModel.statusMessage.value
-        assertThat(status).isEqualTo(expectedStatus)
+        assertThat(viewModel.statusMessage.value).isEqualTo(expectedStatus)
     }
 
     @Test
@@ -182,6 +189,7 @@ internal class DataGeneratorViewModelTest {
         // Given
         val templatesSlot = slot<Bundle>()
         val fingerOrderSlot = slot<Bundle>()
+        val externalCredentialsSlot = slot<Bundle>()
 
         val intent = Intent(ACTION_GENERATE_ENROLLMENT_RECORDS).apply {
             putExtra(EXTRA_PROJECT_ID, "proj1")
@@ -192,17 +200,29 @@ internal class DataGeneratorViewModelTest {
             putExtra("$EXTRA_TEMPLATES_PER_FORMAT.ISO_19794_2", 2)
             putExtra("$EXTRA_TEMPLATES_PER_FORMAT.SIM_FACE_BASE_1", 1)
             putExtra("$EXTRA_FINGER_ORDER.ISO_19794_2", "LEFT_THUMB,LEFT_INDEX_FINGER")
+            putExtra("$EXTRA_EXTERNAL_CREDENTIALS_PER_TYPE.${ExternalCredentialType.QRCode.name}", 2)
         }
 
         coEvery {
-            insertEnrollmentRecordsUseCase.invoke(any(), any(), any(), any(), capture(templatesSlot), any(), capture(fingerOrderSlot))
+            insertEnrollmentRecordsUseCase.invoke(
+                any(),
+                any(),
+                any(),
+                any(),
+                capture(templatesSlot),
+                any(),
+                capture(fingerOrderSlot),
+                capture(externalCredentialsSlot),
+            )
         } returns flowOf("Done")
 
         // When
         viewModel.handleIntent(intent)
 
         // Then
-        coVerify(exactly = 1) { insertEnrollmentRecordsUseCase.invoke(any(), any(), any(), any(), any(), any(), any()) }
+        coVerify(exactly = 1) {
+            insertEnrollmentRecordsUseCase.invoke(any(), any(), any(), any(), any(), any(), any(), any())
+        }
 
         // Verify the bundle was reconstructed correctly
         val capturedTemplates = templatesSlot.captured
@@ -211,6 +231,9 @@ internal class DataGeneratorViewModelTest {
 
         val capturedFingerOrder = fingerOrderSlot.captured
         assertThat(capturedFingerOrder.getString("ISO_19794_2")).isEqualTo("LEFT_THUMB,LEFT_INDEX_FINGER")
+
+        val capturedExternalCredentials = externalCredentialsSlot.captured
+        assertThat(capturedExternalCredentials.getInt(ExternalCredentialType.QRCode.name)).isEqualTo(2)
     }
 
     @Test

@@ -154,7 +154,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
 
         coEvery { configRepository.getProject() } returns mockProject
         coEvery { keepOnlyBestDetectedBlockUseCase(any(), documentType) } returns mockBestBlock
-        coEvery { tokenizationProcessor.encrypt(any(), TokenKeyType.ExternalCredential, mockProject) } returns mockTokenizedCredential
+        every { tokenizationProcessor.encrypt(any(), TokenKeyType.ExternalCredential, mockProject) } returns mockTokenizedCredential
         coEvery { zoomOntoCredentialUseCase(detectedBlockImagePath, mockBoundingBox) } returns mockBitmap
         coEvery { credentialImageRepository.saveCredentialScan(mockBitmap, any()) } returns zoomedImagePath
 
@@ -190,7 +190,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
 
         coEvery { configRepository.getProject() } returns mockProject
         coEvery { keepOnlyBestDetectedBlockUseCase(any(), documentType) } returns mockBestBlock
-        coEvery { tokenizationProcessor.encrypt(any(), TokenKeyType.ExternalCredential, mockProject) } returns mockTokenizedCredential
+        every { tokenizationProcessor.encrypt(any(), TokenKeyType.ExternalCredential, mockProject) } returns mockTokenizedCredential
         coEvery { zoomOntoCredentialUseCase(detectedBlockImagePath, mockBoundingBox) } throws Exception("Zoom failed")
 
         val finishObserver = viewModel.finishOcrEvent.test()

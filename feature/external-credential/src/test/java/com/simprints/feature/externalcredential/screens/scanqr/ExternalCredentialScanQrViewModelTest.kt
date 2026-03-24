@@ -87,7 +87,7 @@ internal class ExternalCredentialScanQrViewModelTest {
         val mockTokenizedCredential = mockk<TokenizableString.Tokenized>()
 
         coEvery { configRepository.getProject() } returns mockProject
-        coEvery { tokenizationProcessor.encrypt(any(), TokenKeyType.ExternalCredential, mockProject) } returns mockTokenizedCredential
+        every { tokenizationProcessor.encrypt(any(), TokenKeyType.ExternalCredential, mockProject) } returns mockTokenizedCredential
 
         viewModel.updateCameraPermissionStatus(permissionStatus = PermissionStatus.Granted) // inits the capture timing
         viewModel.updateCapturedValue(value)
