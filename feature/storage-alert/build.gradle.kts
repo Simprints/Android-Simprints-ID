@@ -1,5 +1,6 @@
 plugins {
     id("simprints.feature")
+    id("simprints.library.kotlinSerialization")
 }
 
 android {
