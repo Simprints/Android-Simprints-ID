@@ -171,6 +171,14 @@ data class ExperimentalProjectConfiguration(
             )
             ?: MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_DEFAULT
 
+    val minimumFreeSpacePercent: Int
+        get() = customConfig
+            ?.get(MINIMUM_FREE_SPACE_PERCENT)
+            ?.jsonPrimitive
+            ?.intOrNull
+            ?.coerceIn(0, 100)
+            ?: MINIMUM_FREE_SPACE_PERCENT_DEFAULT
+
     companion object {
         internal const val ENABLE_ID_POOL_VALIDATION = "validateIdentificationPool"
         internal const val SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED = "singleQualityFallbackRequired"
@@ -229,5 +237,8 @@ data class ExperimentalProjectConfiguration(
         internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_DEFAULT = 6
         internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_MIN = 1
         internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_MAX = 20
+
+        const val MINIMUM_FREE_SPACE_PERCENT = "minimumFreeSpacePercent"
+        const val MINIMUM_FREE_SPACE_PERCENT_DEFAULT = 10
     }
 }

@@ -374,4 +374,18 @@ internal class ExperimentalProjectConfigurationTest {
             assertThat(ExperimentalProjectConfiguration(config).mfidLightingConditionsAssessmentGlareSensitivity).isEqualTo(result)
         }
     }
+
+    @Test
+    fun `minimal free space requirement value correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to ExperimentalProjectConfiguration.MINIMUM_FREE_SPACE_PERCENT_DEFAULT,
+            mapOf(ExperimentalProjectConfiguration.MINIMUM_FREE_SPACE_PERCENT to JsonPrimitive(true))
+                to ExperimentalProjectConfiguration.MINIMUM_FREE_SPACE_PERCENT_DEFAULT,
+            mapOf(ExperimentalProjectConfiguration.MINIMUM_FREE_SPACE_PERCENT to JsonPrimitive(15)) to 15,
+            mapOf(ExperimentalProjectConfiguration.MINIMUM_FREE_SPACE_PERCENT to JsonPrimitive(-20)) to 0,
+            mapOf(ExperimentalProjectConfiguration.MINIMUM_FREE_SPACE_PERCENT to JsonPrimitive(120)) to 100,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).minimumFreeSpacePercent).isEqualTo(result)
+        }
+    }
 }
