@@ -25,6 +25,7 @@ import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetCrede
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetLightingConditionsAssessmentUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.KeepOnlyBestDetectedBlockUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.NormalizeBitmapToPreviewUseCase
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetLightingConditionsAssessmentConfigUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ZoomOntoCredentialUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.infra.config.store.ConfigRepository
@@ -42,6 +43,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -51,6 +53,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     private val normalizeBitmapToPreviewUseCase: NormalizeBitmapToPreviewUseCase,
     private val cropDocumentFromPreviewUseCase: CropDocumentFromPreviewUseCase,
     private val getCredentialCoordinatesUseCase: GetCredentialCoordinatesUseCase,
+    private val getLightingConditionsAssessmentConfig: GetLightingConditionsAssessmentConfigUseCase,
     private val getLightingConditionsAssessment: GetLightingConditionsAssessmentUseCase,
     private val keepOnlyBestDetectedBlockUseCase: KeepOnlyBestDetectedBlockUseCase,
     private val credentialImageRepository: CredentialImageRepository,
@@ -80,17 +83,17 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
         get() = _finishOcrEvent
     private val _finishOcrEvent = MutableLiveData<LiveDataEventWithContent<ScannedCredential>>()
 
-    private val lightingConditionsAssessmentFlow = MutableStateFlow(LightingConditionsAssessment.NORMAL)
+    private val lightingConditionsAssessmentFlow = MutableStateFlow<LightingConditionsAssessment?>(null)
     val lightingConditionsAssessment: LiveData<LightingConditionsAssessment> =
         lightingConditionsAssessmentFlow
+            .filterNotNull()
             .debounce(LIGHTING_CONDITIONS_ASSESSMENT_DEBOUNCE_MILLIS)
             .asLiveData(viewModelScope.coroutineContext)
 
     private lateinit var startTime: Timestamp
     lateinit var ocrConfig: OcrConfig
         private set
-    lateinit var lightingConditionsAssessmentConfig: LightingConditionsAssessmentConfig
-        private set
+    private var lightingConditionsAssessmentConfig: LightingConditionsAssessmentConfig? = null
 
     init {
         viewModelScope.launch {
@@ -99,16 +102,8 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
                     useHighRes = ocrUseHighRes,
                     capturesRequired = ocrCaptures.coerceIn(OCR_CAPTURE_MIN, OCR_CAPTURE_MAX),
                 )
-                lightingConditionsAssessmentConfig = LightingConditionsAssessmentConfig(
-                    isEnabled = mfidLightingConditionsAssessmentEnabled,
-                    borderWidthPercent = mfidLightingConditionsAssessmentPadding,
-                    lowContrastThresholdPercent = mfidLightingConditionsAssessmentLowContrast,
-                    lowMedianLuminanceThresholdPercent = mfidLightingConditionsAssessmentLowBrightness,
-                    highMedianLuminanceThresholdPercent = mfidLightingConditionsAssessmentHighBrightness,
-                    highGlareLuminanceThresholdPercent = mfidLightingConditionsAssessmentGlareBrightness,
-                    glareDetectionGridMinDimension = mfidLightingConditionsAssessmentGlareSensitivity,
-                )
             }
+            lightingConditionsAssessmentConfig = getLightingConditionsAssessmentConfig()
         }
     }
 
@@ -146,15 +141,19 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
         viewModelScope.launch(bgDispatcher) {
             try {
                 val isOcrAllowed = isScanningInProgress
-                Simber.d("started image processing; with OCR: $isOcrAllowed")
+                val isLightningAssessmentEnabled = lightingConditionsAssessmentConfig != null
+
+                if (!isOcrAllowed && !isLightningAssessmentEnabled) return@launch // no-op
+                Simber.d("started image processing; with OCR: $isOcrAllowed, lighting assessment: $isLightningAssessmentEnabled")
                 val normalizedBitmap = normalizeBitmapToPreviewUseCase(bitmap, cropConfig)
                 val cropped = cropDocumentFromPreviewUseCase(bitmap = normalizedBitmap, cutoutRect = cropConfig.cutoutRect)
-                if (::lightingConditionsAssessmentConfig.isInitialized && lightingConditionsAssessmentConfig.isEnabled) {
+                lightingConditionsAssessmentConfig?.run {
                     lightingConditionsAssessmentFlow.value = getLightingConditionsAssessment(
                         bitmap = cropped,
-                        lightingConditionsAssessmentConfig = lightingConditionsAssessmentConfig,
+                        lightingConditionsAssessmentConfig = this,
                     )
                 }
+
                 if (!isOcrAllowed) return@launch
                 val detectedBlock = getCredentialCoordinatesUseCase(bitmap = cropped, documentType = ocrDocumentType) ?: return@launch
                 Simber.d("Detected OCR")
