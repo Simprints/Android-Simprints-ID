@@ -8,6 +8,7 @@
 
     <string name="preference_last_calling_package_name_key" translatable="false">preference_last_calling_package_name_key</string>
     <string name="default_commcare_package_name" translatable="false">org.commcare.dalvik</string>
+    <string name="mfid_scan_hint_lighting_normal" translatable="false" />
 
 </resources>
 
