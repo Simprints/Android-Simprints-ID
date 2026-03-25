@@ -3,7 +3,7 @@ package common
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.variant.AndroidComponentsExtension
 import org.gradle.api.Project
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 /**
  * Configure base Kotlin with Android options
@@ -26,7 +26,7 @@ internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, 
                 val variantName = variant.name.replaceFirstChar { it.uppercaseChar() }
                 val compileTaskName = "compile${variantName}Kotlin"
 
-                tasks.named(compileTaskName, KotlinCompilationTask::class.java) {
+                tasks.named(compileTaskName, KotlinJvmCompile::class.java) {
                     compilerOptions.freeCompilerArgs.addAll(
                         "-Xnew-inference",
                         "-opt-in=kotlin.RequiresOptIn",
