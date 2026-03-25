@@ -5,6 +5,7 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.DeviceConfigurationUpdatedEvent
@@ -32,6 +33,9 @@ internal class DeviceEventTrackerTest {
     private lateinit var timeHelper: TimeHelper
 
     @MockK
+    private lateinit var configRepository: ConfigRepository
+
+    @MockK
     private lateinit var eventScope: EventScope
 
     private lateinit var tracker: DeviceEventTracker
@@ -45,9 +49,31 @@ internal class DeviceEventTrackerTest {
 
         tracker = DeviceEventTracker(
             eventRepository = eventRepository,
+            configRepository = configRepository,
             timeHelper = timeHelper,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
+    }
+
+    @Test
+    fun `trackInitialDeviceConfigurationEvent reports current device configuration in DEVICE event scope`() = runTest {
+        val deviceConfig = buildDeviceConfiguration(selectedModules = listOf<TokenizableString>("module1".asTokenizableRaw()))
+        coEvery { configRepository.getDeviceConfiguration() } returns deviceConfig
+
+        tracker.trackInitialDeviceConfigurationEvent()
+
+        coVerify(exactly = 1) {
+            eventRepository.createEventScope(type = EventScopeType.DEVICE, scopeId = null)
+            eventRepository.addOrUpdateEvent(
+                eventScope,
+                withArg<DeviceConfigurationUpdatedEvent> {
+                    assertThat(it.payload.configuration.language).isEqualTo("en")
+                    assertThat(it.payload.configuration.downSyncModules).containsExactly("module1".asTokenizableRaw())
+                    assertThat(it.payload.sourceUpdate).isEqualTo(DeviceConfigurationUpdateSource.LOCAL)
+                },
+            )
+            eventRepository.closeEventScope(eventScope, EventScopeEndCause.WORKFLOW_ENDED)
+        }
     }
 
     @Test
