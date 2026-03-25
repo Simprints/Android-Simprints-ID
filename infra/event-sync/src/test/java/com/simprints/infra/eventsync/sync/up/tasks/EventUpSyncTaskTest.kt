@@ -105,6 +105,7 @@ internal class EventUpSyncTaskTest {
             eventUpSyncs = 10,
             eventDownSyncs = 10,
             sampleUpSyncs = 10,
+            devices = 10,
         )
         coEvery { configRepository.refreshProject(any()) } returns projectWithConfig
         every { projectWithConfig.project } returns project
@@ -153,6 +154,7 @@ internal class EventUpSyncTaskTest {
             eventUpSyncs = 2,
             eventDownSyncs = 2,
             sampleUpSyncs = 2,
+            devices = 2,
         )
 
         coEvery { eventRepo.getClosedEventScopes(any(), any()) } returns emptyList()
@@ -180,6 +182,7 @@ internal class EventUpSyncTaskTest {
             eventUpSyncs = batchSize,
             eventDownSyncs = batchSize,
             sampleUpSyncs = batchSize,
+            devices = batchSize,
         )
 
         coEvery { eventRepo.getClosedEventScopes(any(), any()) } returns emptyList()
@@ -205,10 +208,11 @@ internal class EventUpSyncTaskTest {
     fun `upload out-of-session events in correct fields`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
         every { synchronizationConfiguration.up.simprints.batchSizes } returns UpSynchronizationConfiguration.UpSyncBatchSizes(
-            sessions = 3,
-            eventUpSyncs = 3,
-            eventDownSyncs = 3,
-            sampleUpSyncs = 3,
+            sessions = 5,
+            eventUpSyncs = 5,
+            eventDownSyncs = 5,
+            sampleUpSyncs = 5,
+            devices = 5,
         )
 
         coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.SESSION) } returns 0
@@ -222,11 +226,18 @@ internal class EventUpSyncTaskTest {
             createSessionScope(GUID2),
             createSessionScope(GUID3),
         )
-        coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.SAMPLE_UP_SYNC) } returns 2 andThen 0
+        coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.SAMPLE_UP_SYNC) } returns 3 andThen 0
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.SAMPLE_UP_SYNC, any()) } returns listOf(
             createSessionScope(GUID1),
             createSessionScope(GUID2),
             createSessionScope(GUID3),
+        )
+        coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.DEVICE) } returns 4 andThen 0
+        coEvery { eventRepo.getClosedEventScopes(EventScopeType.DEVICE, any()) } returns listOf(
+            createSessionScope(GUID1),
+            createSessionScope(GUID2),
+            createSessionScope(GUID3),
+            createSessionScope(GUID4),
         )
         coEvery {
             eventRepo.getEventsFromScope(any())
@@ -238,6 +249,7 @@ internal class EventUpSyncTaskTest {
             eventRemoteDataSource.post(any(), any(), match { it.eventDownSyncs.size == 1 })
             eventRemoteDataSource.post(any(), any(), match { it.eventUpSyncs.size == 2 })
             eventRemoteDataSource.post(any(), any(), match { it.sampleUpSyncs.size == 3 })
+            eventRemoteDataSource.post(any(), any(), match { it.devices.size == 4 })
         }
     }
 

@@ -18,6 +18,7 @@ extra.apply {
      * Dev version >= 2024.3.0 is required to receive configuration ID
      * Dev version >= 2025.2.0 is required to support enrolment record updates and SimFace configuration
      * Dev version >= 2025.3.0 is required to receive smaples and structured down sync configuration
+     * Dev version >= 2026.2.0 is required to track events in "Device" scope
      */
     set("VERSION_NAME", "2026.1.0")
 

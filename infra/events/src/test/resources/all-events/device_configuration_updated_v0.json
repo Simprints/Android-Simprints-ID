@@ -1,0 +1,25 @@
+{
+  "id": "eb04f816-fc7c-4ac7-9f34-63201bc3f207",
+  "type": "DEVICE_CONFIGURATION_UPDATED",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "0f1d099b-52ba-4fac-8052-009704a414d5",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "DEVICE_CONFIGURATION_UPDATED",
+    "eventVersion": 0,
+    "createdAt": 221675670,
+    "endedAt": 0,
+    "configuration": {
+      "language": "en",
+      "downSyncModules": [
+        {
+          "className": "TokenizableString.Raw",
+          "value": "module1"
+        }
+      ]
+    },
+    "sourceUpdate": "LOCAL"
+  }
+}

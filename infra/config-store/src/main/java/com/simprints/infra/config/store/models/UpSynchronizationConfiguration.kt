@@ -20,9 +20,16 @@ data class UpSynchronizationConfiguration(
         val eventUpSyncs: Int,
         val eventDownSyncs: Int,
         val sampleUpSyncs: Int,
+        val devices: Int,
     ) {
         companion object {
-            fun default() = UpSyncBatchSizes(sessions = 1, eventUpSyncs = 1, eventDownSyncs = 1, sampleUpSyncs = 1)
+            fun default() = UpSyncBatchSizes(
+                sessions = 1,
+                eventUpSyncs = 1,
+                eventDownSyncs = 1,
+                sampleUpSyncs = 1,
+                devices = 1,
+            )
         }
     }
 

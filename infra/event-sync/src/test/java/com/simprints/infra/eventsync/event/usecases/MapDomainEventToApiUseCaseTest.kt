@@ -22,6 +22,7 @@ import com.simprints.infra.events.sampledata.createConfirmationCalloutEventV2
 import com.simprints.infra.events.sampledata.createConfirmationCalloutEventV3
 import com.simprints.infra.events.sampledata.createConnectivitySnapshotEvent
 import com.simprints.infra.events.sampledata.createConsentEvent
+import com.simprints.infra.events.sampledata.createDeviceConfigurationUpdatedEvent
 import com.simprints.infra.events.sampledata.createEnrolmentCallbackEvent
 import com.simprints.infra.events.sampledata.createEnrolmentCalloutEventV2
 import com.simprints.infra.events.sampledata.createEnrolmentCalloutEventV3
@@ -81,6 +82,7 @@ import com.simprints.infra.eventsync.event.validateCommonParams
 import com.simprints.infra.eventsync.event.validateCompletionCheckEventApiModel
 import com.simprints.infra.eventsync.event.validateConnectivitySnapshotEventApiModel
 import com.simprints.infra.eventsync.event.validateConsentEventApiModel
+import com.simprints.infra.eventsync.event.validateDeviceConfigurationUpdatedApiModel
 import com.simprints.infra.eventsync.event.validateDownSyncRequestEventApiModel
 import com.simprints.infra.eventsync.event.validateEnrolmentEventV2ApiModel
 import com.simprints.infra.eventsync.event.validateEnrolmentEventV4ApiModel
@@ -629,6 +631,15 @@ internal class MapDomainEventToApiUseCaseTest {
     }
 
     @Test
+    fun validate_deviceConfigurationUpdatedEventApiModel() {
+        val event = createDeviceConfigurationUpdatedEvent()
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
+
+        validateDeviceConfigurationUpdatedApiModel(json)
+    }
+
+    @Test
     fun `when event contains tokenized attendant id, then ApiEvent should contain tokenizedField`() {
         validateUserIdTokenization(attendantId = "attendantId".asTokenizableEncrypted())
     }
@@ -742,6 +753,7 @@ internal class MapDomainEventToApiUseCaseTest {
             ExternalCredentialCapture -> validate_externalCredentialCaptureEventApiModel()
             ExternalCredentialSearch -> validate_externalCredentialSearchEventApiModel()
             ExternalCredentialConfirmation -> validate_externalCredentialConfirmationEventApiModel()
+            DeviceConfigurationUpdated -> validate_deviceConfigurationUpdatedEventApiModel()
             null -> TODO()
         }.safeSealedWhens
     }

@@ -1,6 +1,6 @@
 package com.simprints.infra.eventsync.event
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.utils.isValidGuid
 import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType
 import com.simprints.infra.eventsync.event.remote.models.ApiAuthenticationPayload
@@ -804,6 +804,16 @@ fun validateExternalCredentialConfirmationApiModel(json: JSONObject) {
     with(json.getJSONObject("payload")) {
         validateTimestamp(getJSONObject("startTime"))
         assertThat(getString("result")).isNotNull()
+    }
+}
+
+fun validateDeviceConfigurationUpdatedApiModel(json: JSONObject) {
+    validateCommonParams(json, "DeviceConfigurationUpdated", 0)
+    with(json.getJSONObject("payload")) {
+        validateTimestamp(getJSONObject("startTime"))
+        assertThat(getJSONObject("configuration").getString("language")).isNotNull()
+        assertThat(getJSONObject("configuration").getJSONArray("downSyncModules").length()).isGreaterThan(0)
+        assertThat(getString("sourceUpdate")).isNotNull()
     }
 }
 

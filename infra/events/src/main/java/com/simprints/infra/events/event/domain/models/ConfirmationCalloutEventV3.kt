@@ -1,9 +1,7 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_CONFIRMATION_V3
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CALLOUT_CONFIRMATION_V3_KEY
 import kotlinx.serialization.SerialName
@@ -38,10 +36,6 @@ data class ConfirmationCalloutEventV3(
         ),
         CALLOUT_CONFIRMATION_V3,
     )
-
-    override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
-
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     @Serializable

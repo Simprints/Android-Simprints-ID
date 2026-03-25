@@ -1,9 +1,7 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.Companion.PERSON_CREATION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.PERSON_CREATION
 import kotlinx.serialization.SerialName
@@ -39,10 +37,6 @@ data class PersonCreationEvent(
         ),
         PERSON_CREATION,
     )
-
-    override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
-
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     // At the end of the sequence of capture, we build a Person object used either for enrolment, verification or identification
     @Keep

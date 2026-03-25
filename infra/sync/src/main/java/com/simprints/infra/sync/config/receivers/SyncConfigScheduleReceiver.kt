@@ -3,6 +3,7 @@ package com.simprints.infra.sync.config.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.simprints.infra.events.device.DeviceEventTracker
 import com.simprints.infra.sync.SyncOrchestrator
 import javax.inject.Inject
 
@@ -15,11 +16,16 @@ class SyncConfigScheduleReceiver : BroadcastReceiver() {
     @Inject
     lateinit var syncOrchestrator: SyncOrchestrator
 
+    @Inject
+    lateinit var deviceEventTracker: DeviceEventTracker
+
     override fun onReceive(
         context: Context,
         intent: Intent,
     ) {
         if (Intent.ACTION_MY_PACKAGE_REPLACED == intent.action) {
+            // Ensuring that BE knows cuurrent device configuration after an update
+            deviceEventTracker.trackInitialDeviceConfigurationEvent()
             syncOrchestrator.startConfigSync()
         }
     }

@@ -1,9 +1,7 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CALLBACK_IDENTIFICATION_KEY
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -28,10 +26,6 @@ data class IdentificationCallbackEvent(
         IdentificationCallbackPayload(createdAt, EVENT_VERSION, sessionId, scores),
         EventType.CALLBACK_IDENTIFICATION,
     )
-
-    override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
-
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     @Serializable

@@ -150,6 +150,22 @@ internal class EventUpSyncTask @Inject constructor(
                 )
                 emitProgress(lastOperation, count)
             }
+            uploadEventScopeType(
+                eventScope = eventScope,
+                project = project,
+                eventScopeTypeToUpload = EventScopeType.DEVICE,
+                batchSize = config.synchronization.up.simprints.batchSizes.devices,
+                createUpSyncContent = {
+                    isUsefulUpload = isUsefulUpload || it > 0
+                    EventUpSyncRequestEvent.UpSyncContent(deviceCount = it)
+                },
+            ).collect { count ->
+                lastOperation = lastOperation.copy(
+                    lastState = RUNNING,
+                    lastSyncTime = timeHelper.now().ms,
+                )
+                emitProgress(lastOperation, count)
+            }
             lastOperation = lastOperation.copy(
                 lastState = COMPLETE,
                 lastSyncTime = timeHelper.now().ms,
@@ -237,6 +253,7 @@ internal class EventUpSyncTask @Inject constructor(
         EventScopeType.DOWN_SYNC -> ApiUploadEventsBody(eventDownSyncs = this)
         EventScopeType.UP_SYNC -> ApiUploadEventsBody(eventUpSyncs = this)
         EventScopeType.SAMPLE_UP_SYNC -> ApiUploadEventsBody(sampleUpSyncs = this)
+        EventScopeType.DEVICE -> ApiUploadEventsBody(devices = this)
     }
 
     private fun Map<EventScope, List<Event>?>.getCorruptedScopes() = filterValues { it == null }.keys
@@ -246,7 +263,7 @@ internal class EventUpSyncTask @Inject constructor(
      * If scope events are not un-marshal-able, the value will be null. Such scopes should be
      * uploaded as raw invalid events for further investigation.
      *
-     * Additionally emits the number of events in each scope to be used for progress tracking.
+     * Additionally, emits the number of events in each scope to be used for progress tracking.
      */
     private suspend fun FlowCollector<Int>.getClosedScopesForType(
         type: EventScopeType,

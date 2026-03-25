@@ -27,6 +27,7 @@ import com.simprints.infra.events.event.domain.models.EventType.CANDIDATE_READ
 import com.simprints.infra.events.event.domain.models.EventType.COMPLETION_CHECK
 import com.simprints.infra.events.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
 import com.simprints.infra.events.event.domain.models.EventType.CONSENT
+import com.simprints.infra.events.event.domain.models.EventType.DEVICE_CONFIGURATION_UPDATED
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_UPDATE
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V2
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V4
@@ -102,6 +103,7 @@ internal enum class ApiEventPayloadType {
     ExternalCredentialCapture,
     ExternalCredentialSearch,
     ExternalCredentialConfirmation,
+    DeviceConfigurationUpdated,
 }
 
 internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
@@ -200,6 +202,7 @@ internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     EXTERNAL_CREDENTIAL_SEARCH -> ApiEventPayloadType.ExternalCredentialSearch
 
     EXTERNAL_CREDENTIAL_CONFIRMATION -> ApiEventPayloadType.ExternalCredentialConfirmation
+    DEVICE_CONFIGURATION_UPDATED -> ApiEventPayloadType.DeviceConfigurationUpdated
 }
 
 internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
@@ -243,4 +246,5 @@ internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.ExternalCredentialCapture -> EXTERNAL_CREDENTIAL_CAPTURE
     ApiEventPayloadType.ExternalCredentialSearch -> EXTERNAL_CREDENTIAL_SEARCH
     ApiEventPayloadType.ExternalCredentialConfirmation -> EXTERNAL_CREDENTIAL_CONFIRMATION
+    ApiEventPayloadType.DeviceConfigurationUpdated -> DEVICE_CONFIGURATION_UPDATED
 }

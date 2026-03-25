@@ -5,8 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
-import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.NoModuleSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.TooManyModulesSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
@@ -47,22 +45,17 @@ internal class ModuleSelectionViewModel @Inject constructor(
     init {
         postUpdateModules {
             maxNumberOfModules = moduleRepository.getMaxNumberOfModules()
-            initialModules =
-                moduleRepository.getModules().map { module ->
-                    val decryptedName = when (val name = module.name) {
-                        is TokenizableString.Raw -> name
-
-                        is TokenizableString.Tokenized -> configRepository.getProject()?.let {
-                            tokenizationProcessor.decrypt(
-                                encrypted = name,
-                                tokenKeyType = TokenKeyType.ModuleId,
-                                project = it,
-                            )
-                        } ?: "".asTokenizableRaw()
-                    }
+            configRepository.getProject()?.let { project ->
+                initialModules = moduleRepository.getModules().map { module ->
+                    val decryptedName = tokenizationProcessor.untokenizeIfNecessary(
+                        tokenizableString = module.name,
+                        tokenKeyType = TokenKeyType.ModuleId,
+                        project = project,
+                    )
                     module.copy(name = decryptedName)
                 }
-            addAll(initialModules.map { it.copy() })
+                addAll(initialModules.map { it.copy() })
+            }
         }
     }
 
@@ -100,21 +93,18 @@ internal class ModuleSelectionViewModel @Inject constructor(
         }
 
         externalScope.launch {
-            val modules = modules.map { module ->
-                val encryptedName = when (val name = module.name) {
-                    is TokenizableString.Raw -> configRepository.getProject()?.let { project ->
-                        tokenizationProcessor.encrypt(
-                            decrypted = name,
-                            tokenKeyType = TokenKeyType.ModuleId,
-                            project = project,
-                        )
-                    } ?: "".asTokenizableRaw()
-
-                    is TokenizableString.Tokenized -> name
+            configRepository.getProject()?.let { project ->
+                val modules = modules.map { module ->
+                    val encryptedName = tokenizationProcessor.tokenizeIfNecessary(
+                        tokenizableString = module.name,
+                        tokenKeyType = TokenKeyType.ModuleId,
+                        project = project,
+                    )
+                    module.copy(name = encryptedName)
                 }
-                module.copy(name = encryptedName)
+                moduleRepository.saveModules(modules)
             }
-            moduleRepository.saveModules(modules)
+
             syncOrchestrator.execute(OneTime.Events.restart())
         }
     }

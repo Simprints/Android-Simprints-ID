@@ -10,7 +10,6 @@ import io.mockk.impl.annotations.MockK
 import org.junit.Before
 import kotlin.test.Test
 
-
 internal class TokenizeEventPayloadFieldsUseCaseTest {
     @MockK
     lateinit var tokenizationProcessor: TokenizationProcessor
@@ -23,39 +22,53 @@ internal class TokenizeEventPayloadFieldsUseCaseTest {
 
     lateinit var useCase: TokenizeEventPayloadFieldsUseCase
 
+    val tokenKeyType = TokenKeyType.AttendantId
+    val tokenKeyTypeList = TokenKeyType.ModuleId
+    val rawString = TokenizableString.Raw("decrypted")
+    val tokenizedString = TokenizableString.Tokenized("encrypted")
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         useCase = TokenizeEventPayloadFieldsUseCase(tokenizationProcessor)
+
+        every { event.setTokenizedFields(any()) } returns event
+        every { event.setTokenizedListFields(any()) } returns event
+
+        every { tokenizationProcessor.tokenizeIfNecessary(any(), any(), any()) } returns tokenizedString
     }
 
     @Test
-    fun `should invoke tokenizationProcessor encrypt for TokenizableString Raw`() {
-        val tokenKeyType = mockk<TokenKeyType>()
-        val rawString = TokenizableString.Raw("decrypted")
-        val tokenizedString = TokenizableString.Tokenized("encrypted")
-
-        val tokenizedMap = mapOf(tokenKeyType to rawString)
-
-        every { event.getTokenizableFields() } returns tokenizedMap
+    fun `should invoke tokenizeIfNecessary for TokenizableString`() {
+        every { event.getTokenizableFields() } returns mapOf(tokenKeyType to rawString)
+        every { event.getTokenizableListFields() } returns emptyMap()
         every { tokenizationProcessor.encrypt(rawString, tokenKeyType, project) } returns tokenizedString
 
         useCase(event = event, project = project)
 
-        verify { tokenizationProcessor.encrypt(rawString, tokenKeyType, project) }
         verify { event.setTokenizedFields(mapOf(tokenKeyType to tokenizedString)) }
+        verify { event.setTokenizedListFields(emptyMap()) }
     }
 
     @Test
-    fun `should set the same tokenized string if already tokenized`() {
-        val tokenKeyType = mockk<TokenKeyType>()
-        val tokenizedString = TokenizableString.Tokenized("encrypted")
-        val tokenizedMap = mapOf(tokenKeyType to tokenizedString)
+    fun `should invoke tokenizeIfNecessary for list of TokenizableString`() {
+        every { event.getTokenizableFields() } returns emptyMap()
+        every { event.getTokenizableListFields() } returns mapOf(tokenKeyTypeList to listOf(rawString, rawString))
 
-        every { event.getTokenizableFields() } returns tokenizedMap
+        useCase(event = event, project = project)
+
+        verify { event.setTokenizedFields(emptyMap()) }
+        verify { event.setTokenizedListFields(mapOf(tokenKeyTypeList to listOf(tokenizedString, tokenizedString))) }
+    }
+
+    @Test
+    fun `should handle both field and list of TokenizableString in same event`() {
+        every { event.getTokenizableFields() } returns mapOf(tokenKeyType to rawString)
+        every { event.getTokenizableListFields() } returns mapOf(tokenKeyTypeList to listOf(rawString, rawString))
 
         useCase(event = event, project = project)
 
         verify { event.setTokenizedFields(mapOf(tokenKeyType to tokenizedString)) }
+        verify { event.setTokenizedListFields(mapOf(tokenKeyTypeList to listOf(tokenizedString, tokenizedString))) }
     }
 }

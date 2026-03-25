@@ -39,6 +39,7 @@ internal fun UpSynchronizationConfiguration.UpSyncBatchSizes.toProto() = ProtoUp
     .setEventUpSyncs(eventUpSyncs)
     .setEventDownSyncs(eventDownSyncs)
     .setSampleUpSyncs(sampleUpSyncs)
+    .setDevices(devices)
     .build()
 
 internal fun SampleSynchronizationConfiguration.toProto() = ProtoSampleSynchronizationConfiguration
@@ -73,7 +74,7 @@ internal fun ProtoUpSynchronizationConfiguration.UpSynchronizationKind.toDomain(
 }
 
 internal fun ProtoUpSyncBatchSizes.toDomain(): UpSynchronizationConfiguration.UpSyncBatchSizes =
-    UpSynchronizationConfiguration.UpSyncBatchSizes(sessions, eventUpSyncs, eventDownSyncs, sampleUpSyncs)
+    UpSynchronizationConfiguration.UpSyncBatchSizes(sessions, eventUpSyncs, eventDownSyncs, sampleUpSyncs, devices)
 
 internal fun ProtoSampleSynchronizationConfiguration.toDomain() = SampleSynchronizationConfiguration(
     signedUrlBatchSize = signedUrlBatchSize,

@@ -1,6 +1,6 @@
 package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableRaw
@@ -9,13 +9,10 @@ import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.events.device.DeviceEventTracker
 import com.simprints.infra.eventsync.DeleteModulesUseCase
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.slot
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -36,6 +33,9 @@ class ModuleRepositoryImplTest {
     @MockK
     lateinit var deleteModules: DeleteModulesUseCase
 
+    @MockK
+    private lateinit var deviceEventTracker: DeviceEventTracker
+
     private lateinit var repository: ModuleRepositoryImpl
 
     @Before
@@ -51,10 +51,13 @@ class ModuleRepositoryImplTest {
             configRepository.getDeviceConfiguration()
         } returns DeviceConfiguration("", listOf("b", "c").map(TokenizableString::Tokenized), "")
 
+        coJustRun { deviceEventTracker.trackDeviceConfigurationUpdatedEvent(any(), any()) }
+
         repository = ModuleRepositoryImpl(
             configRepository,
             deleteModules,
             enrolmentRecordRepository,
+            deviceEventTracker,
         )
     }
 
@@ -111,6 +114,33 @@ class ModuleRepositoryImplTest {
 
         coVerify(exactly = 1) {
             deleteModules(unselectedModules)
+        }
+    }
+
+    @Test
+    fun saveModules_shouldTrackModulesInEvent() = runTest {
+        val updateConfigFn = slot<suspend (DeviceConfiguration) -> DeviceConfiguration>()
+        coEvery { configRepository.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
+        val modules = listOf(
+            Module("a".asTokenizableRaw(), true),
+            Module("b".asTokenizableRaw(), false),
+            Module("c".asTokenizableRaw(), false),
+            Module("d".asTokenizableRaw(), true),
+        )
+
+        repository.saveModules(modules)
+        updateConfigFn.captured(DeviceConfiguration("", listOf(), ""))
+
+        coVerify(exactly = 1) {
+            deviceEventTracker.trackDeviceConfigurationUpdatedEvent(
+                withArg { config ->
+                    assertThat(config.selectedModules).containsExactly(
+                        "a".asTokenizableRaw(),
+                        "d".asTokenizableRaw(),
+                    )
+                },
+                true,
+            )
         }
     }
 

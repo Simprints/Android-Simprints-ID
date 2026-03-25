@@ -7,6 +7,7 @@ import androidx.datastore.dataStoreFile
 import com.simprints.infra.config.store.local.ConfigLocalDataSource
 import com.simprints.infra.config.store.local.ConfigLocalDataSourceImpl
 import com.simprints.infra.config.store.local.migrations.DeviceConfigSharedPrefsMigration
+import com.simprints.infra.config.store.local.migrations.ProjectConfigDevicesScopeBatchMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigFaceBioSdkMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigFaceEmptyVersionMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigFaceSdkQualityThresholdMigration
@@ -80,6 +81,7 @@ object DataStoreModule {
         projectConfigFaceEmptyVersionMigration: ProjectConfigFaceEmptyVersionMigration,
         projectConfigSampleUploadMigration: ProjectConfigSampleUploadMigration,
         projectConfigDownSyncConfigMigration: ProjectConfigSimprintsSyncConfigMigration,
+        projectConfigDevicesScopeBatchMigration: ProjectConfigDevicesScopeBatchMigration,
     ): DataStore<ProtoProjectConfiguration> = DataStoreFactory.create(
         serializer = ProjectConfigurationSerializer,
         produceFile = { appContext.dataStoreFile(PROJECT_CONFIG_DATA_STORE_FILE_NAME) },
@@ -94,6 +96,7 @@ object DataStoreModule {
             projectConfigFaceEmptyVersionMigration,
             projectConfigSampleUploadMigration,
             projectConfigDownSyncConfigMigration,
+            projectConfigDevicesScopeBatchMigration,
         ),
     )
 

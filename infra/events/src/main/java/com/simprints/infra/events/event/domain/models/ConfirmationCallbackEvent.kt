@@ -1,9 +1,7 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_CONFIRMATION
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CALLBACK_CONFIRMATION_KEY
 import kotlinx.serialization.SerialName
@@ -28,10 +26,6 @@ data class ConfirmationCallbackEvent(
         ConfirmationCallbackPayload(createdAt, EVENT_VERSION, identificationOutcome),
         CALLBACK_CONFIRMATION,
     )
-
-    override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
-
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     @Serializable

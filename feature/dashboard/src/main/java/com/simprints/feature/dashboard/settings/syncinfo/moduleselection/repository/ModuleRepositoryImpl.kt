@@ -4,6 +4,7 @@ import com.simprints.core.domain.tokenization.values
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
+import com.simprints.infra.events.device.DeviceEventTracker
 import com.simprints.infra.eventsync.DeleteModulesUseCase
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SETTINGS
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
@@ -15,14 +16,21 @@ internal class ModuleRepositoryImpl @Inject constructor(
     private val configRepository: ConfigRepository,
     private val deleteModules: DeleteModulesUseCase,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
+    private val deviceEventTracker: DeviceEventTracker,
 ) : ModuleRepository {
     override suspend fun getModules(): List<Module> = configRepository
         .getProjectConfiguration()
         .synchronization.down.simprints
         ?.moduleOptions
-        ?.map {
-            Module(it, isModuleSelected(it.value))
-        } ?: emptyList()
+        ?.let { modules ->
+            val selectedModules = configRepository
+                .getDeviceConfiguration()
+                .selectedModules
+                .values()
+
+            modules.map { Module(it, selectedModules.contains(it.value)) }
+        }
+        ?: emptyList()
 
     override suspend fun saveModules(modules: List<Module>) {
         setSelectedModules(modules.filter { it.isSelected })
@@ -34,19 +42,19 @@ internal class ModuleRepositoryImpl @Inject constructor(
         .synchronization.down.simprints
         ?.maxNbOfModules ?: 0
 
-    private suspend fun isModuleSelected(moduleName: String): Boolean = configRepository
-        .getDeviceConfiguration()
-        .selectedModules
-        .values()
-        .contains(moduleName)
-
     private suspend fun setSelectedModules(selectedModules: List<Module>) {
-        configRepository.updateDeviceConfiguration {
-            it.apply {
-                this.selectedModules = selectedModules.map { module -> module.name }
-                logMessageForCrashReport("Modules set to ${this.selectedModules.values()}")
-                setCrashlyticsKeyForModules(this.selectedModules.values())
-            }
+        configRepository.updateDeviceConfiguration { configuration ->
+            configuration
+                .apply { this.selectedModules = selectedModules.map { module -> module.name } }
+                .also {
+                    logMessageForCrashReport("Modules set to ${it.selectedModules.values()}")
+                    setCrashlyticsKeyForModules(it.selectedModules.values())
+
+                    deviceEventTracker.trackDeviceConfigurationUpdatedEvent(
+                        deviceConfiguration = it,
+                        isLocalChange = true,
+                    )
+                }
         }
     }
 

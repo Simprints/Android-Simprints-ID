@@ -18,6 +18,7 @@ object SampleDefaults {
     val DEFAULT_USER_ID = "user_id".asTokenizableRaw()
     val DEFAULT_USER_ID_2 = "user_id_2".asTokenizableRaw()
     const val DEFAULT_METADATA = "DEFAULT_METADATA"
+    const val DEFAULT_LOCALE = "en"
     val DEFAULT_BIOMETRIC_DATA_SOURCE = BiometricDataSource.SIMPRINTS
 
     val CREATED_AT: Timestamp = Timestamp(1234L)
