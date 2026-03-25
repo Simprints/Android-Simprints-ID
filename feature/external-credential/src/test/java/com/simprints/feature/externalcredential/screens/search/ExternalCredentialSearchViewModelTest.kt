@@ -176,7 +176,7 @@ internal class ExternalCredentialSearchViewModelTest {
 
         coEvery { tokenizationProcessor.decrypt(any(), TokenKeyType.ExternalCredential, project) } returns decryptedCredential
         coEvery { enrolmentRecordRepository.load(any()) } returns emptyList()
-        coEvery { tokenizationProcessor.encrypt(newCredential, TokenKeyType.ExternalCredential, project) } returns encryptedCredential
+        every { tokenizationProcessor.encrypt(newCredential, TokenKeyType.ExternalCredential, project) } returns encryptedCredential
 
         viewModel = createViewModel()
 

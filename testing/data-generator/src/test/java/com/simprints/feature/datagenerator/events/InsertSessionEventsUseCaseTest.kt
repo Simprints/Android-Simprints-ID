@@ -108,13 +108,13 @@ class InsertSessionEventsUseCaseTest {
                 "Generated a total of ${finalEventCount - initialEventCount} new events",
             ).inOrder()
 
-        coVerify(exactly = enrolCount) { mockSessionGenerator.generateEnrolmentIso(any(), any(), any(), any()) }
-        coVerify(exactly = identifyCount) { mockSessionGenerator.generateIdentificationRoc3(any(), any(), any(), any()) }
-        coVerify(exactly = verifyCount) { mockSessionGenerator.generateVerificationRoc3(any(), any(), any(), any()) }
-        coVerify(exactly = confirmIdentifyCount) { mockSessionGenerator.generateConfirmationRoc3(any(), any(), any(), any()) }
-        coVerify(exactly = enrolLastCount) { mockSessionGenerator.generateEnrolLastBioRoc3(any(), any(), any(), any()) }
+        verify(exactly = enrolCount) { mockSessionGenerator.generateEnrolmentIso(any(), any(), any(), any()) }
+        verify(exactly = identifyCount) { mockSessionGenerator.generateIdentificationRoc3(any(), any(), any(), any()) }
+        verify(exactly = verifyCount) { mockSessionGenerator.generateVerificationRoc3(any(), any(), any(), any()) }
+        verify(exactly = confirmIdentifyCount) { mockSessionGenerator.generateConfirmationRoc3(any(), any(), any(), any()) }
+        verify(exactly = enrolLastCount) { mockSessionGenerator.generateEnrolLastBioRoc3(any(), any(), any(), any()) }
         coVerify(exactly = totalNewSessions) { mockEventRepository.createEventScope(EventScopeType.SESSION) }
         coVerify(exactly = 1) { mockEventRepository.closeAllOpenScopes(any(), any()) }
-        coVerify(exactly = 1) { mockSessionGenerator.clearCache() }
+        verify(exactly = 1) { mockSessionGenerator.clearCache() }
     }
 }

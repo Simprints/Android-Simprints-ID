@@ -35,6 +35,7 @@ internal class DataGeneratorViewModel @Inject constructor(
         private const val EXTRA_TEMPLATES_PER_FORMAT = "EXTRA_TEMPLATES_PER_FORMAT"
         private const val EXTRA_FIRST_SUBJECT_ID = "EXTRA_FIRST_SUBJECT_ID"
         private const val EXTRA_FINGER_ORDER = "EXTRA_FINGER_ORDER"
+        private const val EXTRA_EXTERNAL_CREDENTIALS_PER_TYPE = "EXTRA_EXTERNAL_CREDENTIALS_PER_TYPE"
 
         // Session Event Extras
         private const val EXTRA_ENROL_COUNT = "EXTRA_ENROL_COUNT"
@@ -80,6 +81,9 @@ internal class DataGeneratorViewModel @Inject constructor(
             intent.getBundleExtra(EXTRA_TEMPLATES_PER_FORMAT) ?: extractBundleFromFlatExtras(intent, EXTRA_TEMPLATES_PER_FORMAT)
         val firstSubjectId = intent.getStringExtra(EXTRA_FIRST_SUBJECT_ID)
         val fingerOrder = intent.getBundleExtra(EXTRA_FINGER_ORDER) ?: extractBundleFromFlatExtras(intent, EXTRA_FINGER_ORDER)
+        val externalCredentialsPerType =
+            intent.getBundleExtra(EXTRA_EXTERNAL_CREDENTIALS_PER_TYPE)
+                ?: extractBundleFromFlatExtras(intent, EXTRA_EXTERNAL_CREDENTIALS_PER_TYPE)
 
         if (projectId == null || moduleId == null || attendantId == null || numRecords <= 0) {
             Simber.i("Missing required extras for generating enrollment records.", tag = TAG)
@@ -97,6 +101,7 @@ internal class DataGeneratorViewModel @Inject constructor(
             templatesPerFormat = templatesPerFormat,
             firstSubjectId = firstSubjectId ?: "",
             fingerOrder = fingerOrder,
+            externalCredentialsPerType = externalCredentialsPerType,
         ).collect {
             _statusMessage.postValue(it)
         }

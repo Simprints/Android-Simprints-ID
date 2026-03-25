@@ -5,12 +5,16 @@ import androidx.core.os.bundleOf
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.TemplateIdentifier
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.feature.datagenerator.enrollmentrecords.InsertEnrollmentRecordsUseCase
 import com.simprints.feature.datagenerator.enrollmentrecords.InsertEnrollmentRecordsUseCase.Companion.BATCH_SIZE
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
+import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,6 +33,9 @@ internal class InsertEnrollmentRecordsUseCaseTest {
     @MockK
     private lateinit var configRepository: ConfigRepository
 
+    @MockK
+    private lateinit var tokenizationProcessor: TokenizationProcessor
+
     private lateinit var useCase: InsertEnrollmentRecordsUseCase
     private var templates: Bundle = bundleOf(
         Pair("ISO_19794_2", 1),
@@ -40,10 +47,12 @@ internal class InsertEnrollmentRecordsUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this)
         coEvery { configRepository.getProject() } returns mockk<Project>()
+        every { tokenizationProcessor.encrypt(any(), any(), any()) } returns "Encrypted".asTokenizableEncrypted()
         useCase = InsertEnrollmentRecordsUseCase(
             enrolmentRecordRepository,
             configRepository,
             mockk(relaxed = true),
+            tokenizationProcessor,
             UnconfinedTestDispatcher(),
         )
     }
@@ -59,6 +68,7 @@ internal class InsertEnrollmentRecordsUseCaseTest {
             templatesPerFormat = templates,
             firstSubjectId = "",
             fingerOrder = null,
+            externalCredentialsPerType = null,
         ).last()
 
         // Then
@@ -82,6 +92,7 @@ internal class InsertEnrollmentRecordsUseCaseTest {
             templatesPerFormat = templates,
             firstSubjectId = "",
             fingerOrder = null,
+            externalCredentialsPerType = null,
         ).last()
 
         // Then
@@ -105,6 +116,7 @@ internal class InsertEnrollmentRecordsUseCaseTest {
             templatesPerFormat = templates,
             firstSubjectId = "",
             fingerOrder = null,
+            externalCredentialsPerType = null,
         ).last()
 
         // Then
@@ -129,6 +141,7 @@ internal class InsertEnrollmentRecordsUseCaseTest {
             templatesPerFormat = templates,
             firstSubjectId = "",
             fingerOrder = null,
+            externalCredentialsPerType = null,
         ).last()
 
         // Then
@@ -155,6 +168,7 @@ internal class InsertEnrollmentRecordsUseCaseTest {
             templatesPerFormat = templates,
             firstSubjectId = firstId,
             fingerOrder = null,
+            externalCredentialsPerType = null,
         ).last()
 
         // Then
@@ -182,6 +196,7 @@ internal class InsertEnrollmentRecordsUseCaseTest {
             templatesPerFormat = templates,
             firstSubjectId = " ",
             fingerOrder = null,
+            externalCredentialsPerType = null,
         ).last()
 
         // Then
@@ -215,6 +230,7 @@ internal class InsertEnrollmentRecordsUseCaseTest {
                 "NEC_1_5" to
                     "LEFT_3RD_FINGER,LEFT_4TH_FINGER,LEFT_5TH_FINGER,RIGHT_3RD_FINGER,RIGHT_4TH_FINGER,RIGHT_5TH_FINGER",
             ),
+            externalCredentialsPerType = null,
         ).last()
 
         // Then
@@ -249,7 +265,8 @@ internal class InsertEnrollmentRecordsUseCaseTest {
             numRecords = 1,
             templatesPerFormat = templatesPerFormat,
             firstSubjectId = "",
-            fingerOrder = null, // No finger order provided
+            fingerOrder = null,
+            externalCredentialsPerType = null,
         ).last()
 
         // Then
@@ -293,6 +310,7 @@ internal class InsertEnrollmentRecordsUseCaseTest {
             templatesPerFormat = templatesPerFormat,
             firstSubjectId = "",
             fingerOrder = fingerOrder,
+            externalCredentialsPerType = null,
         ).last()
 
         // Then
@@ -309,5 +327,51 @@ internal class InsertEnrollmentRecordsUseCaseTest {
                 TemplateIdentifier.RIGHT_THUMB, // cycles back
                 TemplateIdentifier.RIGHT_INDEX_FINGER,
             ).inOrder()
+    }
+
+    @Test
+    fun `invoke should generate external credentials for configured types`() = runTest {
+        val enrolmentRecordActionsSlot = slot<List<EnrolmentRecordAction.Creation>>()
+        val externalCredentialsPerType = bundleOf(
+            ExternalCredentialType.NHISCard.name to 2,
+            ExternalCredentialType.QRCode.name to 1,
+        )
+        coEvery { enrolmentRecordRepository.performActions(capture(enrolmentRecordActionsSlot), any()) } returns mockk()
+
+        useCase(
+            projectId = "p1",
+            moduleId = "m1",
+            attendantId = "a1",
+            numRecords = 1,
+            templatesPerFormat = templates,
+            firstSubjectId = "",
+            fingerOrder = null,
+            externalCredentialsPerType = externalCredentialsPerType,
+        ).last()
+
+        val subject = enrolmentRecordActionsSlot.captured.first().enrolmentRecord
+        assertThat(subject.externalCredentials).hasSize(3)
+        assertThat(subject.externalCredentials.map { it.type })
+            .containsExactly(
+                ExternalCredentialType.QRCode,
+                ExternalCredentialType.NHISCard,
+                ExternalCredentialType.NHISCard,
+            )
+    }
+
+    @Test
+    fun `invoke should fail when external credential type is unknown`() = runTest {
+        assertThrows<IllegalArgumentException> {
+            useCase(
+                projectId = "p1",
+                moduleId = "m1",
+                attendantId = "a1",
+                numRecords = 1,
+                templatesPerFormat = templates,
+                firstSubjectId = "",
+                fingerOrder = null,
+                externalCredentialsPerType = bundleOf("UNKNOWN_TYPE" to 1),
+            ).last()
+        }
     }
 }

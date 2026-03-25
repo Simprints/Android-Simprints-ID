@@ -4,11 +4,18 @@ import android.os.Bundle
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.common.TemplateIdentifier
+import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricTemplate
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
@@ -24,6 +31,7 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val configRepository: ConfigRepository,
     private val timeHelper: TimeHelper,
+    private val tokenizationProcessor: TokenizationProcessor,
     @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {
     operator fun invoke(
@@ -34,6 +42,7 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
         templatesPerFormat: Bundle,
         firstSubjectId: String,
         fingerOrder: Bundle?,
+        externalCredentialsPerType: Bundle?,
     ): Flow<String> = flow {
         val project = configRepository.getProject() ?: return@flow
         val tokenizedModuleId = moduleId.asTokenizableEncrypted()
@@ -56,6 +65,11 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
                     fingerOrder = fingerOrder,
                 ) + generateFaceReferences(
                     templatesPerFormat = templatesPerFormat,
+                ),
+                externalCredentials = generateExternalCredentials(
+                    subjectId = subjectId,
+                    externalCredentialsPerType = externalCredentialsPerType,
+                    project,
                 ),
             )
             subjectCreationActions.add(EnrolmentRecordAction.Creation(enrolmentRecord))
@@ -139,6 +153,45 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
         return fingerprintReferences
     }
 
+    private fun generateExternalCredentials(
+        subjectId: String,
+        externalCredentialsPerType: Bundle?,
+        project: Project,
+    ): List<ExternalCredential> = if (externalCredentialsPerType == null) {
+        emptyList()
+    } else {
+        externalCredentialsPerType.keySet().flatMap { key ->
+            val credentialType = key.toExternalCredentialType()
+            val credential = getStaticExternalCredentials(credentialType, project)
+            List(externalCredentialsPerType.getInt(key, 0)) {
+                ExternalCredential(
+                    id = UUID.randomUUID().toString(),
+                    value = credential,
+                    subjectId = subjectId,
+                    type = credentialType,
+                )
+            }
+        }
+    }
+
+    private fun getStaticExternalCredentials(
+        credentialType: ExternalCredentialType,
+        project: Project,
+    ): TokenizableString.Tokenized {
+        val tokenizableRawCredential = when (credentialType) {
+            ExternalCredentialType.GhanaIdCard -> "GHA-12345789-0"
+            ExternalCredentialType.NHISCard -> "12345678"
+            ExternalCredentialType.QRCode -> "123456"
+        }.asTokenizableRaw()
+
+        return tokenizationProcessor.encrypt(
+            decrypted = tokenizableRawCredential,
+            tokenKeyType = TokenKeyType.ExternalCredential,
+            project = project,
+        ) as? TokenizableString.Tokenized
+            ?: error("Encryption did not return a Tokenized value")
+    }
+
     private fun String.toFingerIdentifier() = when (this.uppercase()) {
         "LEFT_THUMB" -> TemplateIdentifier.LEFT_THUMB
         "LEFT_INDEX_FINGER" -> TemplateIdentifier.LEFT_INDEX_FINGER
@@ -152,6 +205,10 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
         "RIGHT_5TH_FINGER" -> TemplateIdentifier.RIGHT_5TH_FINGER
         else -> TemplateIdentifier.LEFT_THUMB
     }
+
+    private fun String.toExternalCredentialType() = ExternalCredentialType.entries
+        .firstOrNull { it.name == this }
+        ?: throw IllegalArgumentException("Unknown external credential type: $this")
 
     private fun getTemplateForFormat(format: String): ByteArray = when (format) {
         "SIM_FACE_BASE_1" -> SIM_FACE_BASE_1
