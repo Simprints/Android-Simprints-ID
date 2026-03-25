@@ -544,5 +544,10 @@
     <string name="mfid_skip_confirm">Skip Scanning</string>
     <string name="mfid_skip_go_back">Go Back</string>
 
+    <!-- Low storage warning -->
+    <string name="storage_alert_channel_name">Low storage warning</string>
+    <string name="storage_alert_title">Storage space running low</string>
+    <string name="storage_alert_description">Simprints requires sufficient free storage space to operate correctly. Please free up some space to ensure the app continues to function properly.</string>
+    <string name="storage_alert_settings_action">Free up storage</string>
 
 </resources>
