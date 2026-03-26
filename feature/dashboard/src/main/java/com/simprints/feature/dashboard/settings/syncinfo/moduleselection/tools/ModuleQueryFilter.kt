@@ -1,13 +1,13 @@
 package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.tools
 
-import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.tools.fuzzySearch
+import com.simprints.infra.eventsync.module.SelectableModule
 
 internal class ModuleQueryFilter {
     fun getFilteredList(
-        items: List<Module>,
+        items: List<SelectableModule>,
         query: String?,
-    ): List<Module> = if (isRelevantQuery(query) && items.isNotEmpty()) {
+    ): List<SelectableModule> = if (isRelevantQuery(query) && items.isNotEmpty()) {
         items.fuzzySearch(query, { it.name.value })
     } else {
         items

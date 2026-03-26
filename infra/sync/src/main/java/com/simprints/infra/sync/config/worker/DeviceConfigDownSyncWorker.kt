@@ -6,6 +6,8 @@ import androidx.work.WorkerParameters
 import com.simprints.core.DispatcherBG
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.eventsync.module.ModuleSelectionRepository
+import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.config.usecase.LogoutUseCase
 import dagger.assisted.Assisted
@@ -20,6 +22,7 @@ internal class DeviceConfigDownSyncWorker @AssistedInject constructor(
     private val configRepository: ConfigRepository,
     private val logoutUseCase: LogoutUseCase,
     private val syncOrchestrator: SyncOrchestrator,
+    private val moduleRepository: ModuleSelectionRepository,
     @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
     override val tag: String = "DeviceConfigDownSync"
@@ -30,11 +33,16 @@ internal class DeviceConfigDownSyncWorker @AssistedInject constructor(
         try {
             val state = configRepository.getDeviceState()
 
-            if (state.isCompromised) {
-                logoutUseCase()
-            } else if (state.recordsToUpSync != null) {
-                state.recordsToUpSync?.let { records ->
+            when {
+                state.isCompromised -> logoutUseCase()
+                // Device "commands" below are mutually exclusive in the backend response
+                state.recordsToUpSync != null -> state.recordsToUpSync?.let { records ->
                     syncOrchestrator.uploadEnrolmentRecords(records.id, records.subjectIds)
+                }
+                state.selectModules != null -> state.selectModules?.let { modules ->
+                    moduleRepository.forceModuleSelection(modules.moduleIds, isLocalChange = false)
+                    configRepository.updateDeviceConfiguration { it.apply { lastInstructionId = modules.id } }
+                    syncOrchestrator.execute(OneTime.Events.restart())
                 }
             }
             success()

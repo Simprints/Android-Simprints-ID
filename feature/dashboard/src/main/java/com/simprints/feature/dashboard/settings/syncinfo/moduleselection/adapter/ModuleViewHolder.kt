@@ -4,7 +4,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.feature.dashboard.R
-import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
+import com.simprints.infra.eventsync.module.SelectableModule
 
 internal class ModuleViewHolder(
     itemView: View,
@@ -12,7 +12,7 @@ internal class ModuleViewHolder(
     private val txtModuleName: TextView = itemView.findViewById(R.id.txtModuleName)
 
     fun bindTo(
-        module: Module,
+        module: SelectableModule,
         listener: ModuleSelectionListener,
     ) {
         with(txtModuleName) {

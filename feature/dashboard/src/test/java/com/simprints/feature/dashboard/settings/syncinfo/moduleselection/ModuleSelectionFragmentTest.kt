@@ -4,28 +4,27 @@ import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.RootMatchers
+import androidx.test.espresso.action.ViewActions.pressBack
+import androidx.test.espresso.assertion.ViewAssertions.*
+import androidx.test.espresso.matcher.*
 import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.ext.junit.runners.*
+import androidx.test.platform.app.*
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.NoModuleSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.TooManyModulesSelectedException
-import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.tools.clickCloseChipIcon
 import com.simprints.feature.dashboard.tools.typeSearchViewText
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
+import com.simprints.infra.eventsync.module.SelectableModule
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.testtools.hilt.resetThemeResources
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import org.hamcrest.core.AllOf.allOf
 import org.hamcrest.core.IsNot.not
 import org.junit.After
@@ -53,11 +52,11 @@ class ModuleSelectionFragmentTest {
     internal val viewModel = mockk<ModuleSelectionViewModel>(relaxed = true) {
         every { modulesList } returns mockk {
             every { observe(any(), any()) } answers {
-                secondArg<Observer<List<Module>>>().onChanged(
+                secondArg<Observer<List<SelectableModule>>>().onChanged(
                     listOf(
-                        Module("module12".asTokenizableRaw(), true),
-                        Module("module2".asTokenizableRaw(), false),
-                        Module("module3".asTokenizableRaw(), false),
+                        SelectableModule("module12".asTokenizableRaw(), true),
+                        SelectableModule("module2".asTokenizableRaw(), false),
+                        SelectableModule("module3".asTokenizableRaw(), false),
                     ),
                 )
             }
@@ -88,7 +87,7 @@ class ModuleSelectionFragmentTest {
         onView(allOf(withParent(withId(R.id.rvModules)), withParentIndex(0))).perform(click())
 
         verify(exactly = 1) {
-            viewModel.updateModuleSelection(Module("module2".asTokenizableRaw(), false))
+            viewModel.updateModuleSelection(SelectableModule("module2".asTokenizableRaw(), false))
         }
     }
 
@@ -113,7 +112,7 @@ class ModuleSelectionFragmentTest {
         )
 
         verify(exactly = 1) {
-            viewModel.updateModuleSelection(Module("module12".asTokenizableRaw(), true))
+            viewModel.updateModuleSelection(SelectableModule("module12".asTokenizableRaw(), true))
         }
     }
 

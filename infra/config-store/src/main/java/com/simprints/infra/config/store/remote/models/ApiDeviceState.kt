@@ -10,10 +10,12 @@ internal data class ApiDeviceState(
     val deviceId: String,
     val isCompromised: Boolean,
     val mustUpSyncEnrolmentRecords: ApiUpSyncEnrolmentRecords? = null,
+    val mustUpdateDeviceConfiguration: ApiMustUpdateDeviceConfiguration? = null,
 ) {
     fun toDomain() = DeviceState(
-        deviceId,
-        isCompromised,
-        mustUpSyncEnrolmentRecords?.fromApiToDomain(),
+        deviceId = deviceId,
+        isCompromised = isCompromised,
+        recordsToUpSync = mustUpSyncEnrolmentRecords?.fromApiToDomain(),
+        selectModules = mustUpdateDeviceConfiguration?.fromApiToDomain(),
     )
 }

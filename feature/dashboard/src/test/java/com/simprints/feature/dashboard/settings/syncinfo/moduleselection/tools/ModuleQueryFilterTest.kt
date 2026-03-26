@@ -1,24 +1,24 @@
 package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.tools
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.tokenization.asTokenizableRaw
-import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
+import com.simprints.infra.eventsync.module.SelectableModule
 import org.junit.Test
 
 class ModuleQueryFilterTest {
     private val items = listOf(
-        Module("Abama".asTokenizableRaw(), false),
-        Module("Abama Dawet".asTokenizableRaw(), false),
-        Module("Achura Mazegaja".asTokenizableRaw(), false),
-        Module("Bangladesh rocks".asTokenizableRaw(), false),
-        Module("Dache Gofara".asTokenizableRaw(), false),
-        Module("Gara Goda".asTokenizableRaw(), false),
-        Module("Gurumo Koysha".asTokenizableRaw(), false),
-        Module("Hajo Salata".asTokenizableRaw(), false),
-        Module("Legama".asTokenizableRaw(), false),
-        Module("Madagascar".asTokenizableRaw(), false),
-        Module("Tadisa".asTokenizableRaw(), false),
-        Module("Wakanda".asTokenizableRaw(), false),
+        SelectableModule("Abama".asTokenizableRaw(), false),
+        SelectableModule("Abama Dawet".asTokenizableRaw(), false),
+        SelectableModule("Achura Mazegaja".asTokenizableRaw(), false),
+        SelectableModule("Bangladesh rocks".asTokenizableRaw(), false),
+        SelectableModule("Dache Gofara".asTokenizableRaw(), false),
+        SelectableModule("Gara Goda".asTokenizableRaw(), false),
+        SelectableModule("Gurumo Koysha".asTokenizableRaw(), false),
+        SelectableModule("Hajo Salata".asTokenizableRaw(), false),
+        SelectableModule("Legama".asTokenizableRaw(), false),
+        SelectableModule("Madagascar".asTokenizableRaw(), false),
+        SelectableModule("Tadisa".asTokenizableRaw(), false),
+        SelectableModule("Wakanda".asTokenizableRaw(), false),
     )
     private val filter = ModuleQueryFilter()
 
@@ -50,7 +50,7 @@ class ModuleQueryFilterTest {
     fun withEmptySourceList_shouldReturnOriginalList() {
         val query = "I\'ll have two number 9, a number 9 large, a number 6 with extra dip, " +
             "a number 7, two number 45, one with cheese and a large soda"
-        val list = emptyList<Module>()
+        val list = emptyList<SelectableModule>()
         val actual = filter.getFilteredList(list, query)
 
         assertThat(actual).isEmpty()
@@ -60,9 +60,9 @@ class ModuleQueryFilterTest {
     fun withExactQuery_shouldReturnCorrectResult() {
         val query = "Legama"
         val expected = listOf(
-            Module(name = "Legama".asTokenizableRaw(), isSelected = false),
-            Module(name = "Achura Mazegaja".asTokenizableRaw(), isSelected = false),
-            Module(name = "Abama".asTokenizableRaw(), isSelected = false),
+            SelectableModule(name = "Legama".asTokenizableRaw(), isSelected = false),
+            SelectableModule(name = "Achura Mazegaja".asTokenizableRaw(), isSelected = false),
+            SelectableModule(name = "Abama".asTokenizableRaw(), isSelected = false),
         )
         val actual = filter.getFilteredList(items, query)
 
@@ -73,9 +73,9 @@ class ModuleQueryFilterTest {
     fun withLowercaseQuery_shouldReturnCorrectResult() {
         val query = "legama"
         val expected = listOf(
-            Module(name = "Legama".asTokenizableRaw(), isSelected = false),
-            Module(name = "Achura Mazegaja".asTokenizableRaw(), isSelected = false),
-            Module(name = "Abama".asTokenizableRaw(), isSelected = false),
+            SelectableModule(name = "Legama".asTokenizableRaw(), isSelected = false),
+            SelectableModule(name = "Achura Mazegaja".asTokenizableRaw(), isSelected = false),
+            SelectableModule(name = "Abama".asTokenizableRaw(), isSelected = false),
         )
         val actual = filter.getFilteredList(items, query)
 
@@ -86,12 +86,12 @@ class ModuleQueryFilterTest {
     fun withInexactQuery_shouldReturnAllPossibleResults() {
         val query = "abama"
         val expected = listOf(
-            Module("Abama".asTokenizableRaw(), false),
-            Module("Abama Dawet".asTokenizableRaw(), false),
-            Module("Legama".asTokenizableRaw(), false),
-            Module("Achura Mazegaja".asTokenizableRaw(), false),
-            Module("Hajo Salata".asTokenizableRaw(), false),
-            Module("Wakanda".asTokenizableRaw(), false),
+            SelectableModule("Abama".asTokenizableRaw(), false),
+            SelectableModule("Abama Dawet".asTokenizableRaw(), false),
+            SelectableModule("Legama".asTokenizableRaw(), false),
+            SelectableModule("Achura Mazegaja".asTokenizableRaw(), false),
+            SelectableModule("Hajo Salata".asTokenizableRaw(), false),
+            SelectableModule("Wakanda".asTokenizableRaw(), false),
         )
         val actual = filter.getFilteredList(items, query)
 
@@ -102,7 +102,7 @@ class ModuleQueryFilterTest {
     fun withFuzzyQuery_shouldReturnAllPossibleResults() {
         val query = "binglodosh"
         val expected = listOf(
-            Module("Bangladesh rocks".asTokenizableRaw(), false),
+            SelectableModule("Bangladesh rocks".asTokenizableRaw(), false),
         )
 
         val actual = filter.getFilteredList(items, query)

@@ -3,13 +3,13 @@ package com.simprints.feature.dashboard.settings.syncinfo.moduleselection
 import android.text.Editable
 import android.text.TextWatcher
 import androidx.lifecycle.MutableLiveData
-import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.tools.ModuleQueryFilter
+import com.simprints.infra.eventsync.module.SelectableModule
 
 internal class ModuleSelectionQueryListener(
-    private val modules: List<Module>,
+    private val modules: List<SelectableModule>,
 ) : TextWatcher {
-    val searchResults = MutableLiveData<List<Module>>()
+    val searchResults = MutableLiveData<List<SelectableModule>>()
 
     private val queryFilter = ModuleQueryFilter()
 

@@ -1,5 +1,6 @@
-package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository
+package com.simprints.infra.eventsync.module
 
+import com.google.common.truth.*
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -17,7 +18,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-class ModuleRepositoryImplTest {
+class ModuleSelectionRepositoryTest {
     @MockK
     lateinit var downSynchronizationConfiguration: DownSynchronizationConfiguration
 
@@ -36,7 +37,7 @@ class ModuleRepositoryImplTest {
     @MockK
     private lateinit var deviceEventTracker: DeviceEventTracker
 
-    private lateinit var repository: ModuleRepositoryImpl
+    private lateinit var repository: ModuleSelectionRepository
 
     @Before
     fun setUp() {
@@ -46,14 +47,16 @@ class ModuleRepositoryImplTest {
         every { projectConfiguration.synchronization.down } returns downSynchronizationConfiguration
         coEvery { configRepository.getProjectConfiguration() } returns projectConfiguration
 
-        every { downSynchronizationConfiguration.simprints?.moduleOptions } returns listOf("a", "b", "c", "d").map(String::asTokenizableRaw)
+        every { downSynchronizationConfiguration.simprints?.moduleOptions } returns listOf("a", "b", "c", "d").map(
+            String::asTokenizableRaw,
+        )
         coEvery {
             configRepository.getDeviceConfiguration()
         } returns DeviceConfiguration("", listOf("b", "c").map(TokenizableString::Tokenized), "")
 
         coJustRun { deviceEventTracker.trackDeviceConfigurationUpdatedEvent(any(), any()) }
 
-        repository = ModuleRepositoryImpl(
+        repository = ModuleSelectionRepository(
             configRepository,
             deleteModules,
             enrolmentRecordRepository,
@@ -62,15 +65,33 @@ class ModuleRepositoryImplTest {
     }
 
     @Test
+    fun forceModuleSelection_shouldSaveSelectedModules() = runTest {
+        val updateConfigFn = slot<suspend (DeviceConfiguration) -> DeviceConfiguration>()
+        coEvery { configRepository.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
+        val selectedModules = listOf(
+            "a".asTokenizableRaw(),
+            "d".asTokenizableRaw(),
+        )
+
+        repository.forceModuleSelection(selectedModules, false)
+
+        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), ""))
+        // Comparing string representation as when executing the lambda captured in the mock it will
+        // not return an ArrayList but a LinkedHashMap.
+        assertThat(updatedConfig.selectedModules).containsExactlyElementsIn(selectedModules)
+        deleteModules(listOf("b", "d"))
+    }
+
+    @Test
     fun saveModules_shouldSaveSelectedModules() = runTest {
         val updateConfigFn = slot<suspend (DeviceConfiguration) -> DeviceConfiguration>()
         coEvery { configRepository.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
         val modules = listOf(
-            Module("1".asTokenizableRaw(), true),
-            Module("2".asTokenizableRaw(), true),
-            Module("3".asTokenizableRaw(), false),
-            Module("4".asTokenizableRaw(), true),
-            Module("5".asTokenizableRaw(), false),
+            SelectableModule("1".asTokenizableRaw(), true),
+            SelectableModule("2".asTokenizableRaw(), true),
+            SelectableModule("3".asTokenizableRaw(), false),
+            SelectableModule("4".asTokenizableRaw(), true),
+            SelectableModule("5".asTokenizableRaw(), false),
         )
 
         val selectedModuleNames = modules.filter { it.isSelected }.map { it.name }.toSet()
@@ -87,11 +108,11 @@ class ModuleRepositoryImplTest {
     @Test
     fun saveModules_shouldDeleteRecordsFromUnselectedModules() = runTest {
         val modules = listOf(
-            Module("1".asTokenizableRaw(), true),
-            Module("2".asTokenizableRaw(), true),
-            Module("3".asTokenizableRaw(), false),
-            Module("4".asTokenizableRaw(), true),
-            Module("5".asTokenizableRaw(), false),
+            SelectableModule("1".asTokenizableRaw(), true),
+            SelectableModule("2".asTokenizableRaw(), true),
+            SelectableModule("3".asTokenizableRaw(), false),
+            SelectableModule("4".asTokenizableRaw(), true),
+            SelectableModule("5".asTokenizableRaw(), false),
         )
 
         repository.saveModules(modules)
@@ -102,10 +123,10 @@ class ModuleRepositoryImplTest {
     @Test
     fun saveModules_shouldDeleteOperationsForUnselectedModules() = runTest {
         val modules = listOf(
-            Module("a".asTokenizableRaw(), true),
-            Module("b".asTokenizableRaw(), false),
-            Module("c".asTokenizableRaw(), false),
-            Module("d".asTokenizableRaw(), true),
+            SelectableModule("a".asTokenizableRaw(), true),
+            SelectableModule("b".asTokenizableRaw(), false),
+            SelectableModule("c".asTokenizableRaw(), false),
+            SelectableModule("d".asTokenizableRaw(), true),
         )
 
         val unselectedModules = listOf("b", "c")
@@ -122,10 +143,10 @@ class ModuleRepositoryImplTest {
         val updateConfigFn = slot<suspend (DeviceConfiguration) -> DeviceConfiguration>()
         coEvery { configRepository.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
         val modules = listOf(
-            Module("a".asTokenizableRaw(), true),
-            Module("b".asTokenizableRaw(), false),
-            Module("c".asTokenizableRaw(), false),
-            Module("d".asTokenizableRaw(), true),
+            SelectableModule("a".asTokenizableRaw(), true),
+            SelectableModule("b".asTokenizableRaw(), false),
+            SelectableModule("c".asTokenizableRaw(), false),
+            SelectableModule("d".asTokenizableRaw(), true),
         )
 
         repository.saveModules(modules)
@@ -134,7 +155,7 @@ class ModuleRepositoryImplTest {
         coVerify(exactly = 1) {
             deviceEventTracker.trackDeviceConfigurationUpdatedEvent(
                 withArg { config ->
-                    assertThat(config.selectedModules).containsExactly(
+                    Truth.assertThat(config.selectedModules).containsExactly(
                         "a".asTokenizableRaw(),
                         "d".asTokenizableRaw(),
                     )
@@ -147,10 +168,10 @@ class ModuleRepositoryImplTest {
     @Test
     fun shouldReturnAllModules() = runTest {
         val expected = listOf(
-            Module("a".asTokenizableRaw(), false),
-            Module("b".asTokenizableRaw(), true),
-            Module("c".asTokenizableRaw(), true),
-            Module("d".asTokenizableRaw(), false),
+            SelectableModule("a".asTokenizableRaw(), false),
+            SelectableModule("b".asTokenizableRaw(), true),
+            SelectableModule("c".asTokenizableRaw(), true),
+            SelectableModule("d".asTokenizableRaw(), false),
         )
 
         val actual = repository.getModules()

@@ -1,5 +1,6 @@
-package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository
+package com.simprints.infra.eventsync.module
 
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.values
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
@@ -11,38 +12,52 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MOD
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
-// TODO move into the event system infra module?
-internal class ModuleRepositoryImpl @Inject constructor(
+class ModuleSelectionRepository @Inject internal constructor(
     private val configRepository: ConfigRepository,
     private val deleteModules: DeleteModulesUseCase,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val deviceEventTracker: DeviceEventTracker,
-) : ModuleRepository {
-    override suspend fun getModules(): List<Module> = configRepository
+) {
+    suspend fun getModules(): List<SelectableModule> = getModuleOptions()?.let { modules ->
+        val selectedModules = configRepository.getDeviceConfiguration().selectedModules.values()
+
+        modules.map { SelectableModule(it, selectedModules.contains(it.value)) }
+    } ?: emptyList()
+
+    suspend fun forceModuleSelection(
+        selectedModules: List<TokenizableString>,
+        isLocalChange: Boolean,
+    ) {
+        val options = getModuleOptions() ?: return
+
+        val selectedValues = selectedModules.values().toSet()
+        val allModules = options.map { SelectableModule(it, selectedValues.contains(it.value)) }
+
+        saveModules(allModules, isLocalChange)
+    }
+
+    private suspend fun getModuleOptions(): List<TokenizableString>? = configRepository
         .getProjectConfiguration()
         .synchronization.down.simprints
         ?.moduleOptions
-        ?.let { modules ->
-            val selectedModules = configRepository
-                .getDeviceConfiguration()
-                .selectedModules
-                .values()
 
-            modules.map { Module(it, selectedModules.contains(it.value)) }
-        }
-        ?: emptyList()
-
-    override suspend fun saveModules(modules: List<Module>) {
-        setSelectedModules(modules.filter { it.isSelected })
+    suspend fun saveModules(
+        modules: List<SelectableModule>,
+        isLocalChange: Boolean = true,
+    ) {
+        setSelectedModules(modules.filter { it.isSelected }, isLocalChange)
         handleUnselectedModules(modules.filter { !it.isSelected })
     }
 
-    override suspend fun getMaxNumberOfModules(): Int = configRepository
+    suspend fun getMaxNumberOfModules(): Int = configRepository
         .getProjectConfiguration()
         .synchronization.down.simprints
         ?.maxNbOfModules ?: 0
 
-    private suspend fun setSelectedModules(selectedModules: List<Module>) {
+    private suspend fun setSelectedModules(
+        selectedModules: List<SelectableModule>,
+        isLocalChange: Boolean,
+    ) {
         configRepository.updateDeviceConfiguration { configuration ->
             configuration
                 .apply { this.selectedModules = selectedModules.map { module -> module.name } }
@@ -52,13 +67,13 @@ internal class ModuleRepositoryImpl @Inject constructor(
 
                     deviceEventTracker.trackDeviceConfigurationUpdatedEvent(
                         deviceConfiguration = it,
-                        isLocalChange = true,
+                        isLocalChange = isLocalChange,
                     )
                 }
         }
     }
 
-    private suspend fun handleUnselectedModules(unselectedModules: List<Module>) {
+    private suspend fun handleUnselectedModules(unselectedModules: List<SelectableModule>) {
         val queries = unselectedModules.map {
             EnrolmentRecordQuery(moduleId = it.name)
         }

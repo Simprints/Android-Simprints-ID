@@ -7,7 +7,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipDrawable
 import com.google.android.material.chip.ChipGroup
 import com.simprints.feature.dashboard.R
-import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
+import com.simprints.infra.eventsync.module.SelectableModule
 
 internal class ModuleChipHelper(
     private val context: Context,
@@ -15,14 +15,14 @@ internal class ModuleChipHelper(
 ) {
     fun addModuleChip(
         parent: ChipGroup,
-        module: Module,
+        module: SelectableModule,
     ) {
         parent.addView(createChipForModule(module))
     }
 
     fun removeModuleChip(
         parent: ChipGroup,
-        module: Module,
+        module: SelectableModule,
     ) {
         parent.removeView(parent.findViewWithTag<Chip>(module.name.value))
     }
@@ -33,7 +33,7 @@ internal class ModuleChipHelper(
             it.tag as? String
         }.toList()
 
-    private fun createChipForModule(module: Module): Chip {
+    private fun createChipForModule(module: SelectableModule): Chip {
         val chipDrawable = createChipDrawable()
 
         return Chip(context).apply {
