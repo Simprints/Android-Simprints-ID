@@ -32,6 +32,7 @@ import com.simprints.core.tools.extentions.permissionFromResult
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialScanOcrBinding
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
+import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessment
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.BuildOcrCropConfigUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ProvideCameraListenerUseCase
@@ -86,7 +87,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     private var checkAnimator: ViewPropertyAnimator? = null
     private var isAnimatingCompletion: Boolean = false
     private var pendingFinishAction: (() -> Unit)? = null
-    private var ocrPreProcessingJob: Job? = null
+    private var imagePreProcessingJob: Job? = null
 
     @Inject
     lateinit var viewModelFactory: ExternalCredentialScanOcrViewModel.Factory
@@ -133,7 +134,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     }
 
     override fun onDestroyView() {
-        stopOcr()
+        stopImageProcessing()
         stopCamera()
         clearAnimations()
         super.onDestroyView()
@@ -149,19 +150,26 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     private fun initializeFragment() {
         initObservers()
         initCamera(onComplete = {
-            if (viewModel.isOcrActive) {
-                startOcr()
-            }
+            setUpFrameProcessing()
         })
     }
 
     private fun initObservers() {
+        viewModel.lightingConditionsAssessment.observe(viewLifecycleOwner) { lightingConditionsAssessment ->
+            val lightingConditionsHintTextResourceId = when (lightingConditionsAssessment) {
+                LightingConditionsAssessment.NORMAL -> IDR.string.mfid_scan_hint_lighting_normal
+                LightingConditionsAssessment.TOO_DIM -> IDR.string.mfid_scan_hint_lighting_too_dim
+                LightingConditionsAssessment.TOO_BRIGHT -> IDR.string.mfid_scan_hint_lighting_too_bright
+            }
+            binding.scanHint.setText(lightingConditionsHintTextResourceId)
+        }
+
         viewModel.scanOcrStateLiveData.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is ScanOcrState.ScanningInProgress -> {
                     renderProgress(state)
                     if (state.successfulCaptures >= state.scansRequired) {
-                        stopOcr()
+                        stopImageProcessing()
                         viewModel.processOcrResultsAndFinish()
                     }
                 }
@@ -211,6 +219,8 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         instructionsText.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_black))
         viewfinderMask.setMaskColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_white))
         viewfinderMask.alpha = VIEW_FINDER_ALPHA_SCAN_ACTIVE
+        scanHint.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_black))
+        scanHint.isVisible = true
     }
 
     private fun renderInitialState() = with(binding) {
@@ -223,11 +233,12 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         progressContainer.isInvisible = true
         buttonScan.isVisible = true
         buttonScan.setOnClickListener {
-            viewModel.ocrStarted()
-            startOcr()
+            viewModel.startScanning()
         }
         viewfinderMask.setMaskColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_black))
         viewfinderMask.alpha = VIEW_FINDER_ALPHA_INITIAL
+        scanHint.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_white))
+        scanHint.isVisible = true
     }
 
     private fun animateCompletionState() = with(binding) {
@@ -251,6 +262,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             pendingFinishAction?.invoke()
             pendingFinishAction = null
         })
+        scanHint.isInvisible = true
     }
 
     private fun renderNoPermission(shouldOpenPhoneSettings: Boolean) {
@@ -258,6 +270,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             instructionsText.isVisible = false
             progressContainer.isInvisible = true
             documentScannerArea.isInvisible = true
+            scanHint.isInvisible = true
             buttonScan.isVisible = false
             val documentTypeText = viewModel.getDocumentTypeRes().run(::getString)
             val bodyText = getString(IDR.string.mfid_scan_camera_permission_body, documentTypeText)
@@ -289,41 +302,42 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         }
     }
 
-    private fun startOcr() {
+    private fun setUpFrameProcessing() {
         imageAnalysis.setAnalyzer(cameraExecutor) { videoFrame: ImageProxy ->
-            if (viewModel.isRunningOcrOnFrame.get()) {
+            if (viewModel.isProcessingImage.get()) {
                 videoFrame.close()
                 return@setAnalyzer
             }
 
-            // Running OCR as often as we can while camera feedback is displayed to the user
-            viewModel.ocrOnFrameStarted()
-            if (viewModel.ocrConfig.useHighRes) {
+            // Processing frames as often as we can while camera feedback is displayed to the user
+            viewModel.imageProcessingStarted()
+            if (viewModel.isScanningInProgress && viewModel.ocrConfig.useHighRes) {
+                // For hi-res OCR we don't need the frame and will capture a new image instead
                 videoFrame.close()
                 captureHighResImageForOcr { highResImage ->
-                    preProcessImageAndRunOcr(highResImage)
+                    processImage(highResImage)
                 }
             } else {
-                preProcessImageAndRunOcr(videoFrame)
+                processImage(videoFrame)
             }
         }
     }
 
-    private fun preProcessImageAndRunOcr(imageProxy: ImageProxy) {
-        ocrPreProcessingJob?.cancel()
-        ocrPreProcessingJob = lifecycleScope.launch(bgDispatcher) {
+    private fun processImage(imageProxy: ImageProxy) {
+        imagePreProcessingJob?.cancel()
+        imagePreProcessingJob = lifecycleScope.launch(bgDispatcher) {
             try {
                 val (bitmap, imageInfo) = imageProxy.toBitmap() to imageProxy.imageInfo
-                if (ocrPreProcessingJob?.isActive == true) {
+                if (imagePreProcessingJob?.isActive == true) {
                     val cropConfig: OcrCropConfig = buildOcrCropConfigUseCase(
                         rotationDegrees = imageInfo.rotationDegrees,
                         cameraPreview = binding.preview,
                         documentScannerArea = binding.documentScannerArea,
                     )
-                    viewModel.runOcrOnFrame(frame = bitmap, cropConfig)
+                    viewModel.processImage(bitmap = bitmap, cropConfig)
                 } else {
                     Simber.i(
-                        "Unable to run OCR preprocessing, coroutine context is cancelled",
+                        "Unable to run image processing, coroutine context is cancelled",
                         tag = MULTI_FACTOR_ID,
                     )
                 }
@@ -354,12 +368,12 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         }
     }
 
-    private fun stopOcr() {
-        ocrPreProcessingJob?.cancel()
+    private fun stopImageProcessing() {
+        imagePreProcessingJob?.cancel()
         if (::imageAnalysis.isInitialized) {
             imageAnalysis.clearAnalyzer()
         }
-        viewModel.ocrStopped()
+        viewModel.imageProcessingStopped()
     }
 
     /**

@@ -98,6 +98,79 @@ data class ExperimentalProjectConfiguration(
             ?.booleanOrNull
             .let { it == true }
 
+    val mfidLightingConditionsAssessmentEnabled: Boolean
+        get() = customConfig
+            ?.get(MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED)
+            ?.jsonPrimitive
+            ?.booleanOrNull
+            .let { it == true }
+
+    val mfidLightingConditionsAssessmentPadding: Int
+        get() = customConfig
+            ?.get(MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING)
+            ?.jsonPrimitive
+            ?.intOrNull
+            ?.coerceIn(
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING_MIN,
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING_MAX,
+            )
+            ?: MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING_DEFAULT
+
+    val mfidLightingConditionsAssessmentLowContrast: Int
+        get() = customConfig
+            ?.get(MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST)
+            ?.jsonPrimitive
+            ?.intOrNull
+            ?.coerceIn(
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST_MIN,
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST_MAX,
+            )
+            ?: MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST_DEFAULT
+
+    val mfidLightingConditionsAssessmentLowBrightness: Int
+        get() = customConfig
+            ?.get(MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS)
+            ?.jsonPrimitive
+            ?.intOrNull
+            ?.coerceIn(
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_MIN,
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_MAX,
+            )
+            ?: MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_DEFAULT
+
+    val mfidLightingConditionsAssessmentHighBrightness: Int
+        get() = customConfig
+            ?.get(MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS)
+            ?.jsonPrimitive
+            ?.intOrNull
+            ?.coerceIn(
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS_MIN,
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS_MAX,
+            )
+            ?: MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS_DEFAULT
+
+    val mfidLightingConditionsAssessmentGlareBrightness: Int
+        get() = customConfig
+            ?.get(MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS)
+            ?.jsonPrimitive
+            ?.intOrNull
+            ?.coerceIn(
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS_MIN,
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS_MAX,
+            )
+            ?: MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS_DEFAULT
+
+    val mfidLightingConditionsAssessmentGlareSensitivity: Int
+        get() = customConfig
+            ?.get(MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY)
+            ?.jsonPrimitive
+            ?.intOrNull
+            ?.coerceIn(
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_MIN,
+                MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_MAX,
+            )
+            ?: MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_DEFAULT
+
     companion object {
         internal const val ENABLE_ID_POOL_VALIDATION = "validateIdentificationPool"
         internal const val SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED = "singleQualityFallbackRequired"
@@ -124,5 +197,37 @@ data class ExperimentalProjectConfiguration(
         internal const val OCR_CAPTURES_DEFAULT = 3
 
         const val ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK = "allowConfirmingGuidsNotInCallback"
+
+        const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED = "mfidLightingConditionsAssessmentEnabled"
+
+        const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING = "mfidLightingConditionsAssessmentPadding"
+        internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING_DEFAULT = 5
+        internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING_MIN = 0
+        internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_PADDING_MAX = 30
+
+        const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST = "mfidLightingConditionsAssessmentLowContrast"
+        internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST_DEFAULT = 30
+        internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST_MIN = 0
+        internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST_MAX = 50
+
+        const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS = "mfidLightingConditionsAssessmentLowBrightness"
+        internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_DEFAULT = 25
+        internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_MIN = 0
+        internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_MAX = 50
+
+        const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS = "mfidLightingConditionsAssessmentHighBrightness"
+        internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS_DEFAULT = 95
+        internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS_MIN = 50
+        internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_HIGH_BRIGHTNESS_MAX = 100
+
+        const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS = "mfidLightingConditionsAssessmentGlareBrightness"
+        internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS_DEFAULT = 99
+        internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS_MIN = 50
+        internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS_MAX = 100
+
+        const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY = "mfidLightingConditionsAssessmentGlareSensitivity"
+        internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_DEFAULT = 6
+        internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_MIN = 1
+        internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_MAX = 20
     }
 }

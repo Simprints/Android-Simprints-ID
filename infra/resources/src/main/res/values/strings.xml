@@ -507,6 +507,8 @@
 
     <string name="mfid_qr_scan_no_qr_detected">No QR code detected</string>
     <string name="mfid_scan_instructions">Place %1$s in window</string>
+    <string name="mfid_scan_hint_lighting_too_dim">Not enough light</string>
+    <string name="mfid_scan_hint_lighting_too_bright">Too bright light</string>
     <string name="mfid_continue">Continue</string>
     <string name="mfid_dialog_wrong_qr_title">Invalid QR Code type</string>
     <string name="mfid_dialog_wrong_qr_body_top">Wrong QR code format is scanned</string>
