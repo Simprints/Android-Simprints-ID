@@ -81,6 +81,7 @@ jobs:
                             - 'feature/exit-form/**'
                             - 'feature/select-subject-age-group/**'
                             - 'feature/external-credential/**'
+                            - 'feature/storage-alert/**'
                         feature2:
                             - 'feature/consent/**'
                             - 'feature/login/**'
@@ -168,6 +169,7 @@ jobs:
                 feature:exit-form
                 feature:select-subject-age-group
                 feature:external-credential
+                feature:storage-alert
             reportsId: feature1
 
     feature-unit-tests2:
