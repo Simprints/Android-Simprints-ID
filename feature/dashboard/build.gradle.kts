@@ -21,6 +21,7 @@ dependencies {
     implementation(project(":feature:consent"))
     implementation(project(":feature:login"))
     implementation(project(":feature:troubleshooting"))
+    implementation(project(":feature:storage-alert"))
     // Data Generator is a test-only feature, only included in debug builds
     debugImplementation(project(":testing:data-generator"))
 
