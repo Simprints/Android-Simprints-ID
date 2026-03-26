@@ -5,6 +5,7 @@ import android.os.StatFs
 import com.simprints.core.ExternalScope
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.experimental
+import com.simprints.infra.logging.Simber
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -21,6 +22,7 @@ class ShowStorageAlertIfNecessaryUseCase @Inject internal constructor(
         val availableStoragePercent = getAvailableStoragePercentage()
 
         if (availableStoragePercent < minimalRequiredSpacePercent) {
+            Simber.w("Storage alert shown", StorageAlertShownException())
             showStorageNotification()
         }
     }
