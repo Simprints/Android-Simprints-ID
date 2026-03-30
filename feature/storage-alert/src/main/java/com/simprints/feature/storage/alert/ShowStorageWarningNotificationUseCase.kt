@@ -25,7 +25,7 @@ internal class ShowStorageWarningNotificationUseCase @Inject constructor(
                 .Builder(context, STORAGE_NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(context.getString(IDR.string.storage_alert_title))
                 .setContentText(context.getString(IDR.string.storage_alert_description))
-                .setSmallIcon(IDR.drawable.ic_notification_sync)
+                .setSmallIcon(IDR.drawable.ic_notification_default)
                 .setContentIntent(createOpenAppIntent())
                 .addAction(createStorageIntentAction())
                 .setOnlyAlertOnce(true)
@@ -52,7 +52,7 @@ internal class ShowStorageWarningNotificationUseCase @Inject constructor(
         .let {
             NotificationCompat.Action
                 .Builder(
-                    IDR.drawable.ic_notification_sync,
+                    IDR.drawable.ic_notification_default,
                     context.getString(IDR.string.storage_alert_settings_action),
                     it,
                 ).build()
