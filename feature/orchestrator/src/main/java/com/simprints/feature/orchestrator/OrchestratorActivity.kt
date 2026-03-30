@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.navigation.findNavController
 import com.simprints.core.tools.activity.BaseActivity
 import com.simprints.feature.orchestrator.databinding.ActivityOrchestratorBinding
+import com.simprints.feature.storage.alert.ShowStorageAlertIfNecessaryUseCase
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.results.AppResult
@@ -19,6 +20,9 @@ internal class OrchestratorActivity : BaseActivity() {
 
     @Inject
     lateinit var activityTracker: ExecutionTracker
+
+    @Inject
+    lateinit var showStorageAlertIfNecessary: ShowStorageAlertIfNecessaryUseCase
 
     /**
      * Flag for the navigation graph initialization state. The graph should only be initialized once
@@ -48,6 +52,7 @@ internal class OrchestratorActivity : BaseActivity() {
     override fun onStart() {
         super.onStart()
         Simber.d("OrchestratorActivity.onStart isGraphInitialized=$isGraphInitialized", tag = ORCHESTRATION)
+        showStorageAlertIfNecessary()
 
         if (activityTracker.isMain(activity = this)) {
             if (!isGraphInitialized) {

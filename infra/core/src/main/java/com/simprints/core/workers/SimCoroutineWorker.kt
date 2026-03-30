@@ -94,7 +94,7 @@ abstract class SimCoroutineWorker(
                 WORKER_FOREGROUND_NOTIFICATION_CHANNEL_ID,
             ).setContentTitle(context.getString(R.string.notification_sync_title))
             .setContentText(context.getString(notificationDescription))
-            .setSmallIcon(R.drawable.ic_notification_sync)
+            .setSmallIcon(R.drawable.ic_notification_default)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .apply {
