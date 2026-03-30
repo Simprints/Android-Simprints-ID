@@ -16,6 +16,8 @@ object LoggingConstants {
         const val SESSION_ID = "Session_ID"
 
         const val VERSION_HISTORY = "Version_History"
+
+        const val ALERT_EVENT_ID = "Alert_Event_ID"
     }
 
     object AnalyticsUserProperties {
