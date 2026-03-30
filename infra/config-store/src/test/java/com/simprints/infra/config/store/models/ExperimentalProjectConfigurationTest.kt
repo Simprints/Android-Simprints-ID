@@ -378,14 +378,13 @@ internal class ExperimentalProjectConfigurationTest {
     @Test
     fun `minimal free space requirement value correctly`() {
         mapOf(
-            emptyMap<String, JsonElement>() to ExperimentalProjectConfiguration.MINIMUM_FREE_SPACE_PERCENT_DEFAULT,
-            mapOf(ExperimentalProjectConfiguration.MINIMUM_FREE_SPACE_PERCENT to JsonPrimitive(true))
-                to ExperimentalProjectConfiguration.MINIMUM_FREE_SPACE_PERCENT_DEFAULT,
-            mapOf(ExperimentalProjectConfiguration.MINIMUM_FREE_SPACE_PERCENT to JsonPrimitive(15)) to 15,
-            mapOf(ExperimentalProjectConfiguration.MINIMUM_FREE_SPACE_PERCENT to JsonPrimitive(-20)) to 0,
-            mapOf(ExperimentalProjectConfiguration.MINIMUM_FREE_SPACE_PERCENT to JsonPrimitive(120)) to 100,
+            emptyMap<String, JsonElement>() to ExperimentalProjectConfiguration.MINIMUM_FREE_SPACE_MB_DEFAULT,
+            mapOf(ExperimentalProjectConfiguration.MINIMUM_FREE_SPACE_MB to JsonPrimitive(true))
+                to ExperimentalProjectConfiguration.MINIMUM_FREE_SPACE_MB_DEFAULT,
+            mapOf(ExperimentalProjectConfiguration.MINIMUM_FREE_SPACE_MB to JsonPrimitive(1000)) to 1000,
+            mapOf(ExperimentalProjectConfiguration.MINIMUM_FREE_SPACE_MB to JsonPrimitive(-20)) to 0,
         ).forEach { (config, result) ->
-            assertThat(ExperimentalProjectConfiguration(config).minimumFreeSpacePercent).isEqualTo(result)
+            assertThat(ExperimentalProjectConfiguration(config).minimumFreeSpaceMb).isEqualTo(result)
         }
     }
 }

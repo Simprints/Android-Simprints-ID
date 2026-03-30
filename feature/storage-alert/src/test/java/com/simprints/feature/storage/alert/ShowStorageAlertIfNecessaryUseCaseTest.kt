@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.StatFs
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MINIMUM_FREE_SPACE_PERCENT
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MINIMUM_FREE_SPACE_MB
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -42,7 +42,7 @@ class ShowStorageAlertIfNecessaryUseCaseTest {
         every { context.filesDir } returns File("/data/user/0/com.simprints.id/files")
 
         coEvery { configRepo.getProjectConfiguration() } returns mockk {
-            every { custom } returns mapOf(MINIMUM_FREE_SPACE_PERCENT to JsonPrimitive(20))
+            every { custom } returns mapOf(MINIMUM_FREE_SPACE_MB to JsonPrimitive(20))
         }
         justRun { showStorageNotification.invoke() }
 
@@ -61,7 +61,7 @@ class ShowStorageAlertIfNecessaryUseCaseTest {
 
     @Test
     fun `shows notification when available storage is below threshold`() = runTest {
-        mockStorageStats(freeBytes = 19L)
+        mockStorageStats(freeMb = 19L)
 
         useCase()
 
@@ -70,7 +70,7 @@ class ShowStorageAlertIfNecessaryUseCaseTest {
 
     @Test
     fun `does not show notification when available storage equals the threshold`() = runTest {
-        mockStorageStats(freeBytes = 20L)
+        mockStorageStats(freeMb = 20L)
 
         useCase()
 
@@ -79,18 +79,14 @@ class ShowStorageAlertIfNecessaryUseCaseTest {
 
     @Test
     fun `does not show notification when available storage is above threshold`() = runTest {
-        mockStorageStats(freeBytes = 21L)
+        mockStorageStats(freeMb = 21L)
 
         useCase()
 
         verify(exactly = 0) { showStorageNotification() }
     }
 
-    private fun mockStorageStats(
-        freeBytes: Long,
-        totalBytes: Long = 100L,
-    ) {
-        every { anyConstructed<StatFs>().freeBytes } returns freeBytes
-        every { anyConstructed<StatFs>().totalBytes } returns totalBytes
+    private fun mockStorageStats(freeMb: Long) {
+        every { anyConstructed<StatFs>().freeBytes } returns (freeMb * 1024 * 1024)
     }
 }

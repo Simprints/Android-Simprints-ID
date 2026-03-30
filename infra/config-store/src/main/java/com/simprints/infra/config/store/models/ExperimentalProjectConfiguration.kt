@@ -171,13 +171,13 @@ data class ExperimentalProjectConfiguration(
             )
             ?: MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_DEFAULT
 
-    val minimumFreeSpacePercent: Int
+    val minimumFreeSpaceMb: Int
         get() = customConfig
-            ?.get(MINIMUM_FREE_SPACE_PERCENT)
+            ?.get(MINIMUM_FREE_SPACE_MB)
             ?.jsonPrimitive
             ?.intOrNull
-            ?.coerceIn(0, 100)
-            ?: MINIMUM_FREE_SPACE_PERCENT_DEFAULT
+            ?.coerceAtLeast(0)
+            ?: MINIMUM_FREE_SPACE_MB_DEFAULT
 
     companion object {
         internal const val ENABLE_ID_POOL_VALIDATION = "validateIdentificationPool"
@@ -238,7 +238,7 @@ data class ExperimentalProjectConfiguration(
         internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_MIN = 1
         internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_MAX = 20
 
-        const val MINIMUM_FREE_SPACE_PERCENT = "minimumFreeSpacePercent"
-        const val MINIMUM_FREE_SPACE_PERCENT_DEFAULT = 10
+        const val MINIMUM_FREE_SPACE_MB = "minimumFreeSpaceMb"
+        const val MINIMUM_FREE_SPACE_MB_DEFAULT = 1024 // 1GB
     }
 }
