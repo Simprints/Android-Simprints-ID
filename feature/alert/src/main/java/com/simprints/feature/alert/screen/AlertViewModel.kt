@@ -7,6 +7,9 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.events.session.SessionEventRepository
+import com.simprints.infra.logging.LoggingConstants
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ALERT
+import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -26,9 +29,17 @@ internal class AlertViewModel @Inject constructor(
     fun saveAlertEvent(type: AlertScreenEvent.AlertScreenPayload.AlertScreenEventType) {
         sessionCoroutineScope.launch {
             val event = AlertScreenEvent(timeHelper.now(), type)
+            Simber.setUserProperty(LoggingConstants.CrashReportingCustomKeys.ALERT_EVENT_ID, event.id)
+
             eventRepository.addOrUpdateEvent(event)
             // Preserving the alert event to be able to export its data if requested by user
             cachedAlertEvent = event
+
+            // Report non-fatal to keep the logs for investigation.
+            // Called after saving the event to have the event ID in user properties for easier correlation.
+            if (type == AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.UNEXPECTED_ERROR) {
+                Simber.w("Unexpected error alert screen displayed", UnexpectedErrorAlertScreenException(), tag = ALERT)
+            }
         }
     }
 
