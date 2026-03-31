@@ -90,4 +90,4 @@ adb shell am start \
 
 A static face image is used for face template generation:
 
-<img src="./FACE-IMAGE.png" alt="Face image" />
+<img src="./FACE-IMAGE.jpg" alt="Face image" />
