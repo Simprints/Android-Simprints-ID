@@ -1,5 +1,6 @@
 package com.simprints.infra.events.session
 
+import com.simprints.core.broadcasts.InternalBroadcaster
 import com.simprints.infra.credential.store.CredentialImageRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.Event
@@ -17,6 +18,7 @@ internal class SessionEventRepositoryImpl @Inject constructor(
     private val eventRepository: EventRepository,
     private val sessionDataCache: SessionDataCache,
     private val credentialImageRepository: CredentialImageRepository,
+    private val broadcaster: InternalBroadcaster,
 ) : SessionEventRepository {
     private val eventsLock = Mutex()
 
@@ -77,6 +79,7 @@ internal class SessionEventRepositoryImpl @Inject constructor(
         credentialImageRepository.deleteAllCredentialScans()
         sessionDataCache.eventCache.clear()
         sessionDataCache.eventScope = null
+        broadcaster.sessionClosed()
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.simprints.infra.events.session
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.broadcasts.InternalBroadcaster
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.credential.store.CredentialImageRepository
 import com.simprints.infra.events.EventRepository
@@ -24,6 +25,9 @@ internal class SessionEventRepositoryImplTest {
     @MockK
     private lateinit var credentialImageRepository: CredentialImageRepository
 
+    @MockK
+    private lateinit var broadcaster: InternalBroadcaster
+
     private lateinit var sessionEventRepository: SessionEventRepositoryImpl
 
     @Before
@@ -35,6 +39,7 @@ internal class SessionEventRepositoryImplTest {
             eventRepository = eventRepository,
             sessionDataCache = sessionDataCache,
             credentialImageRepository = credentialImageRepository,
+            broadcaster = broadcaster,
         )
     }
 
@@ -227,5 +232,14 @@ internal class SessionEventRepositoryImplTest {
         coVerify { eventRepository.closeEventScope(any<EventScope>(), null) }
         assertThat(sessionDataCache.eventScope).isNull()
         assertThat(sessionDataCache.eventCache).isEmpty()
+    }
+
+    @Test
+    fun `broadcasts session closure internally`() = runTest {
+        coEvery { eventRepository.createEventScope(any()) } returns createSessionScope("mockId")
+
+        sessionEventRepository.closeCurrentSession(null)
+
+        verify { broadcaster.sessionClosed() }
     }
 }

@@ -85,7 +85,7 @@
             android:name=".receivers.CacheResetReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="android.intent.action.ACTION_MY_PACKAGE_REPLACED" />
+                <action android:name="com.simprints.id.broadcasts.SESSION_CLOSED_ACTION" />
             </intent-filter>
         </receiver>
 
