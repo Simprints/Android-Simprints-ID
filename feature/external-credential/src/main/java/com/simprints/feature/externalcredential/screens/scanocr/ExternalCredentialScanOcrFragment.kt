@@ -44,6 +44,7 @@ import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.view.fadeIn
 import com.simprints.infra.uibase.view.fadeOut
 import com.simprints.infra.uibase.viewbinding.viewBinding
+import com.simprints.infra.view.imagecapture.setProgressAnimated
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
@@ -213,11 +214,11 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         val progressPercentage = (state.successfulCaptures * 100 / state.scansRequired).coerceAtMost(100)
         buttonScan.isVisible = false
         progressContainer.isVisible = true
-        progressBar.isVisible = true
+        captureProgress.isVisible = true
         iconScanComplete.alpha = 0f
-        progressBar.setProgressCompat(progressPercentage, true)
+        captureProgress.setProgressAnimated(progressPercentage, durationMs = 400)
         instructionsText.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_black))
-        viewfinderMask.setMaskColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_white))
+        viewfinderMask.maskColor = ContextCompat.getColor(requireContext(), IDR.color.simprints_white)
         viewfinderMask.alpha = VIEW_FINDER_ALPHA_SCAN_ACTIVE
         scanHint.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_black))
         scanHint.isVisible = true
@@ -235,7 +236,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         buttonScan.setOnClickListener {
             viewModel.startScanning()
         }
-        viewfinderMask.setMaskColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_black))
+        viewfinderMask.maskColor = ContextCompat.getColor(requireContext(), IDR.color.simprints_black)
         viewfinderMask.alpha = VIEW_FINDER_ALPHA_INITIAL
         scanHint.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_white))
         scanHint.isVisible = true
@@ -244,9 +245,9 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     private fun animateCompletionState() = with(binding) {
         isAnimatingCompletion = true
         val finalVisibility = View.INVISIBLE
-        progressBar.fadeOut(
+        captureProgress.fadeOut(
             FINISH_ANIMATION_DURATION,
-            scaleX = true,
+            scaleX = false,
             fragment = this@ExternalCredentialScanOcrFragment,
             finalVisibility = finalVisibility,
         )
