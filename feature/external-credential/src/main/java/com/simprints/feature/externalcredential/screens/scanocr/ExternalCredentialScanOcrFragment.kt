@@ -44,7 +44,6 @@ import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.view.fadeIn
 import com.simprints.infra.uibase.view.fadeOut
 import com.simprints.infra.uibase.viewbinding.viewBinding
-import com.simprints.infra.view.imagecapture.setProgressAnimated
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job

@@ -21,6 +21,7 @@ class CaptureProgressView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : View(context, attrs, defStyleAttr) {
+    private var progressAnimator: ValueAnimator? = null
     private var max: Int = 100
         set(value) {
             field = value.coerceAtLeast(1)
@@ -135,6 +136,24 @@ class CaptureProgressView @JvmOverloads constructor(
         if (perimeterLength == 0f) return
 
         drawCompletedChips(canvas)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        progressAnimator?.cancel()
+        progressAnimator = null
+    }
+
+    fun setProgressAnimated(
+        value: Int,
+        durationMs: Long = 200L,
+    ) {
+        progressAnimator?.cancel()
+        progressAnimator = ValueAnimator.ofInt(progress, value).apply {
+            duration = durationMs
+            addUpdateListener { progress = it.animatedValue as Int }
+            start()
+        }
     }
 
     /**
@@ -319,32 +338,4 @@ class CaptureProgressView @JvmOverloads constructor(
     private fun updateChipStrokePaintWidth() {
         chipStrokePaint.strokeWidth = chipHeight + chipStrokeWidth * 2f
     }
-}
-
-fun CaptureProgressView.setProgressAnimated(
-    value: Int,
-    durationMs: Long = 200L,
-) {
-    // Unique tag for the progress animation, so that there is a reference to any running animation
-    val progressAnimationTag = id
-
-    // Cancelling any previous animations
-    (getTag(progressAnimationTag) as? ValueAnimator)?.cancel()
-
-    val animator = ValueAnimator.ofInt(progress, value).apply {
-        this.duration = durationMs
-        addUpdateListener { progress = it.animatedValue as Int }
-        start()
-    }
-    setTag(progressAnimationTag, animator)
-
-    // Cancelling animation at the end of lifecycle
-    addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-        override fun onViewAttachedToWindow(v: View) = Unit
-
-        override fun onViewDetachedFromWindow(v: View) {
-            animator.cancel()
-            removeOnAttachStateChangeListener(this)
-        }
-    })
 }
