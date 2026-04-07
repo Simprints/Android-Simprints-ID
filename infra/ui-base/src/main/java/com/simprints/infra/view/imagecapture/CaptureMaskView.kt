@@ -49,13 +49,13 @@ class CaptureMaskView @JvmOverloads constructor(
         setLayerType(LAYER_TYPE_SOFTWARE, null)
 
         context.theme
-            .obtainStyledAttributes(attrs, R.styleable.DocumentMaskView, 0, 0)
+            .obtainStyledAttributes(attrs, R.styleable.CaptureMaskView, 0, 0)
             .apply {
                 try {
-                    targetViewId = getResourceId(R.styleable.DocumentMaskView_targetViewId, NO_ID)
+                    targetViewId = getResourceId(R.styleable.CaptureMaskView_targetViewId, NO_ID)
 
                     bgPaint.color = getColor(
-                        R.styleable.DocumentMaskView_maskColor,
+                        R.styleable.CaptureMaskView_maskColor,
                         ContextCompat.getColor(context, IDR.color.simprints_black),
                     )
                 } finally {
