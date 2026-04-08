@@ -5,7 +5,7 @@ import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
-import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
+import com.simprints.infra.sync.config.usecase.LogoutUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.IdentificationConfiguration

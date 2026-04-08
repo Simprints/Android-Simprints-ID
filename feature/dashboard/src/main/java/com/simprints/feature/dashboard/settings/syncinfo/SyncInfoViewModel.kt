@@ -7,7 +7,6 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.feature.dashboard.settings.syncinfo.usecase.ObserveSyncInfoUseCase
 import com.simprints.feature.login.LoginParams
 import com.simprints.feature.login.LoginResult
@@ -18,6 +17,7 @@ import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.sync.config.usecase.LogoutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -161,7 +161,7 @@ internal class SyncInfoViewModel @Inject constructor(
         }
     }
 
-    fun performLogout() {
+    suspend fun performLogout() {
         logoutUseCase()
     }
 

@@ -8,7 +8,7 @@ import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
+import com.simprints.infra.sync.config.usecase.LogoutUseCase
 import com.simprints.feature.dashboard.settings.syncinfo.usecase.ObserveSyncInfoUseCase
 import com.simprints.feature.login.LoginResult
 import com.simprints.infra.authstore.AuthStore

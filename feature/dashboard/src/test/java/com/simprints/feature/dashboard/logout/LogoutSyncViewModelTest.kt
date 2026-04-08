@@ -2,7 +2,7 @@ package com.simprints.feature.dashboard.logout
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
-import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
+import com.simprints.infra.sync.config.usecase.LogoutUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
@@ -54,6 +54,7 @@ internal class LogoutSyncViewModelTest {
         val viewModel = createViewModel()
 
         viewModel.logout()
+        advanceUntilIdle()
 
         coVerify(exactly = 1) { logoutUseCase() }
     }
