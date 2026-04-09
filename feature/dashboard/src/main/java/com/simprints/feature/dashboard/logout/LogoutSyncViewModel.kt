@@ -7,32 +7,29 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.sync.config.usecase.LogoutUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
+import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 internal class LogoutSyncViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
-    syncOrchestrator: SyncOrchestrator,
+    private val syncOrchestrator: SyncOrchestrator,
     authStore: AuthStore,
-    private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
     val logoutEventLiveData: LiveData<Unit> =
         authStore
             .observeSignedInProjectId()
-            .filter { projectId ->
-                projectId.isEmpty()
-            }.distinctUntilChanged()
-            .map { /* Unit on every "true" */ }
+            .filter { projectId -> projectId.isEmpty() }
+            .distinctUntilChanged()
+            .map { }
             .asLiveData(viewModelScope.coroutineContext)
 
     val isLogoutWithoutSyncVisibleLiveData: LiveData<Boolean> =
@@ -49,7 +46,7 @@ internal class LogoutSyncViewModel @Inject constructor(
         }
 
     fun logout() {
-        viewModelScope.launch { logoutUseCase() }
+        syncOrchestrator.execute(OneTime.Logout.start())
     }
 
     private companion object {

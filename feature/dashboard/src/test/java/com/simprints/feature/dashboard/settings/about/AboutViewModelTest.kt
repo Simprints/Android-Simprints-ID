@@ -5,7 +5,6 @@ import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
-import com.simprints.infra.sync.config.usecase.LogoutUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.IdentificationConfiguration
@@ -14,16 +13,14 @@ import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
+import com.simprints.infra.sync.OneTime
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.SyncableCounts
 import com.simprints.infra.sync.usecase.ObserveSyncableCountsUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
@@ -65,7 +62,7 @@ class AboutViewModelTest {
     lateinit var configRepository: ConfigRepository
 
     @MockK
-    internal lateinit var logoutUseCase: LogoutUseCase
+    internal lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
     lateinit var recentUserActivityManager: RecentUserActivityManager
@@ -84,7 +81,7 @@ class AboutViewModelTest {
             configRepository = configRepository,
             observeSyncableCounts = observeSyncableCounts,
             recentUserActivityManager = recentUserActivityManager,
-            logoutUseCase = logoutUseCase,
+            syncOrchestrator = syncOrchestrator,
         )
 
         advanceUntilIdle()
@@ -97,36 +94,34 @@ class AboutViewModelTest {
     }
 
     @Test
-    fun `should sign out from signer manager when cannot sync data to simprints`() = runTest(testDispatcher) {
+    fun `should enqueue logout worker when cannot sync data to simprints`() = runTest(testDispatcher) {
         val viewModel =
             buildAboutViewModel(canSyncDataToSimprints = false, hasEventsToUpload = true)
         advanceUntilIdle()
         viewModel.processLogoutRequest()
         advanceUntilIdle()
-        coVerify(exactly = 1) { logoutUseCase.invoke() }
+        verify(exactly = 1) { syncOrchestrator.execute(any<OneTime>()) }
     }
 
     @Test
-    fun `should sign out from signer manager when can sync data to simprints but there are no events to upload`() =
-        runTest(testDispatcher) {
-            val viewModel =
-                buildAboutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = false)
-            advanceUntilIdle()
-            viewModel.processLogoutRequest()
-            advanceUntilIdle()
-            coVerify(exactly = 1) { logoutUseCase.invoke() }
-        }
+    fun `should enqueue logout worker when can sync data to simprints but there are no events to upload`() = runTest(testDispatcher) {
+        val viewModel =
+            buildAboutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = false)
+        advanceUntilIdle()
+        viewModel.processLogoutRequest()
+        advanceUntilIdle()
+        verify(exactly = 1) { syncOrchestrator.execute(any<OneTime>()) }
+    }
 
     @Test
-    fun `should not sign out from signer manager when can sync data to simprints and there are events to upload`() =
-        runTest(testDispatcher) {
-            val viewModel =
-                buildAboutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = true)
-            advanceUntilIdle()
-            viewModel.processLogoutRequest()
-            advanceUntilIdle()
-            coVerify(exactly = 0) { logoutUseCase.invoke() }
-        }
+    fun `should not enqueue logout worker when can sync data to simprints and there are events to upload`() = runTest(testDispatcher) {
+        val viewModel =
+            buildAboutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = true)
+        advanceUntilIdle()
+        viewModel.processLogoutRequest()
+        advanceUntilIdle()
+        verify(exactly = 0) { syncOrchestrator.execute(any<OneTime>()) }
+    }
 
     @Test
     fun `should emit LogoutDestination_LogoutDataSyncScreen when can sync data to simprints and there are events to upload`() =
@@ -230,7 +225,7 @@ class AboutViewModelTest {
             configRepository = configRepository,
             observeSyncableCounts = observeSyncableCounts,
             recentUserActivityManager = recentUserActivityManager,
-            logoutUseCase = logoutUseCase,
+            syncOrchestrator = syncOrchestrator,
         )
     }
 }

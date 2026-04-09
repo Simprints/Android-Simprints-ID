@@ -141,14 +141,6 @@ class AboutFragmentTest {
         )
     }
 
-    @Test
-    fun `should navigate to request login screen when LogoutDestination_LoginScreen is received`() {
-        runNavigationTest(
-            destination = LogoutDestination.LoginScreen,
-            targetDestinationId = R.id.requestLoginFragment,
-        )
-    }
-
     private fun runNavigationTest(
         destination: LogoutDestination,
         @IdRes targetDestinationId: Int,

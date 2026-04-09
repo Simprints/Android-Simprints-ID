@@ -8,13 +8,14 @@ import com.simprints.core.domain.common.Modality
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
-import com.simprints.infra.sync.config.usecase.LogoutUseCase
 import com.simprints.feature.troubleshooting.AutoResettingClickCounter
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
+import com.simprints.infra.sync.OneTime
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.usecase.ObserveSyncableCountsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
@@ -25,7 +26,7 @@ import javax.inject.Inject
 internal class AboutViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
     private val observeSyncableCounts: ObserveSyncableCountsUseCase,
-    private val logoutUseCase: LogoutUseCase,
+    private val syncOrchestrator: SyncOrchestrator,
     private val recentUserActivityManager: RecentUserActivityManager,
 ) : ViewModel() {
     val syncAndSearchConfig: LiveData<SyncAndSearchConfig>
@@ -70,7 +71,7 @@ internal class AboutViewModel @Inject constructor(
                 when (canSyncDataToSimprints() && hasEventsToUpload()) {
                     true -> LogoutDestination.LogoutDataSyncScreen
                     false -> {
-                        logoutUseCase()
+                        syncOrchestrator.execute(OneTime.Logout.start())
                         LogoutDestination.LoginScreen
                     }
                 }
