@@ -84,39 +84,38 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="16dp"
-                app:icon="@drawable/scan_qr"
-                app:iconGravity="textEnd"
-                app:iconTint="@null"
-                android:textAlignment="center"
+                android:layout_marginBottom="12dp"
                 android:includeFontPadding="false"
                 android:padding="8dp"
-                android:text="@string/login_scan_qr_button" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/loginButtonSignIn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/login_log_in_button" />
+                android:text="@string/login_scan_qr_button"
+                android:textAlignment="center"
+                app:icon="@drawable/scan_qr"
+                app:iconGravity="textEnd"
+                app:iconTint="@null" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/loginErrorCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="@color/simprints_white"
                 android:visibility="gone"
+                app:cardBackgroundColor="@color/simprints_red_dark"
                 tools:visibility="visible">
 
                 <TextView
                     android:id="@+id/loginErrorText"
-                    android:layout_gravity="center"
-                    style="@style/Text.Body1.Secondary"
+                    style="@style/Text.Body1.White"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:padding="12dp"
-                    tools:text="Some text goes heretext goes here" />
+                    tools:text="Some text goes here text goes here Some text goes here text goes hereSome text goes here text goes here " />
             </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/loginButtonSignIn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/login_log_in_button" />
         </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -160,9 +159,9 @@
             android:alpha="0.5"
             android:text="@string/login_change_url"
             android:textAllCaps="false"
-            app:layout_constraintTop_toBottomOf="@+id/form_container"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/form_container" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
