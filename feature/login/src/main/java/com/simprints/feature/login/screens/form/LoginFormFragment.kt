@@ -2,7 +2,6 @@ package com.simprints.feature.login.screens.form
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
@@ -127,6 +126,7 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
             binding.loginProgress.isVisible = isProcessingSignIn
             binding.loginButtonScanQr.isEnabled = !isProcessingSignIn
             binding.loginButtonSignIn.isEnabled = !isProcessingSignIn
+            binding.loginErrorCard.isVisible = false
         }
         viewModel.signInState.observe(viewLifecycleOwner) { event ->
             event?.getContentIfNotHandled()?.let(::handleSignInResult)
@@ -138,16 +138,16 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
 
         when (result) {
             // Showing toast
-            MissingCredential -> showToast(IDR.string.login_missing_credentials_error)
-            BadCredentials -> showToast(IDR.string.login_invalid_credentials_error)
-            ProjectIdMismatch -> showToast(IDR.string.login_project_id_intent_mismatch_error)
-            Offline -> showToast(IDR.string.login_no_network_error)
-            IntegrityServiceTemporaryDown -> showToast(IDR.string.login_integrity_service_down_error)
-            TechnicalFailure -> showToast(IDR.string.login_server_error)
-            QrCameraUnavailable -> showToast(IDR.string.login_qr_code_scanning_camera_unavailable_error)
-            QrGenericError -> showToast(IDR.string.login_qr_code_scanning_problem_error)
-            QrInvalidCode -> showToast(IDR.string.login_invalid_qr_code_error)
-            QrNoCameraPermission -> showToast(IDR.string.login_qr_code_scanning_camera_permission_error)
+            MissingCredential -> showErrorCard(IDR.string.login_missing_credentials_error)
+            BadCredentials -> showErrorCard(IDR.string.login_invalid_credentials_error)
+            ProjectIdMismatch -> showErrorCard(IDR.string.login_project_id_intent_mismatch_error)
+            Offline -> showErrorCard(IDR.string.login_no_network_error)
+            IntegrityServiceTemporaryDown -> showErrorCard(IDR.string.login_integrity_service_down_error)
+            TechnicalFailure -> showErrorCard(IDR.string.login_server_error)
+            QrCameraUnavailable -> showErrorCard(IDR.string.login_qr_code_scanning_camera_unavailable_error)
+            QrGenericError -> showErrorCard(IDR.string.login_qr_code_scanning_problem_error)
+            QrInvalidCode -> showErrorCard(IDR.string.login_invalid_qr_code_error)
+            QrNoCameraPermission -> showErrorCard(IDR.string.login_qr_code_scanning_camera_permission_error)
 
             is ShowUrlChangeDialog -> createChangeUrlDialog(result).show()
 
@@ -181,10 +181,11 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
         binding.loginErrorCard.isVisible = true
     }
 
-    private fun showToast(
+    private fun showErrorCard(
         @StringRes messageId: Int,
     ) {
-        Toast.makeText(requireContext(), getString(messageId), Toast.LENGTH_LONG).show()
+        binding.loginErrorText.setText(messageId)
+        binding.loginErrorCard.isVisible = true
     }
 
     private fun createChangeUrlDialog(result: ShowUrlChangeDialog): AlertDialog {
