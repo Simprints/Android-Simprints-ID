@@ -67,15 +67,17 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
         syncOrchestrator
             .observeSyncState()
             .map {
-                it.eventSyncState
+                Triple(it.upSyncState, it.downSyncState, it.imageSyncStatus)
             }.asLiveData()
-            .observe(viewLifecycleOwner) { state ->
-                val states =
-                    (state.downSyncWorkersInfo.map { it.state } + state.upSyncWorkersInfo.map { it.state })
+            .observe(viewLifecycleOwner) { (upState, downState, _) ->
+                val states = upState.workersInfo.map { it.state } + downState.workersInfo.map { it.state }
+                val syncId = upState.syncId.ifBlank { downState.syncId }.takeLast(5)
+                val progress = (upState.progress ?: 0) + (downState.progress ?: 0)
+                val total = (upState.total ?: 0) + (downState.total ?: 0)
                 val message =
-                    "${state.syncId.takeLast(5)} - " +
+                    "$syncId - " +
                         "${states.toDebugActivitySyncState().name} - " +
-                        "${state.progress}/${state.total}"
+                        "$progress/$total"
 
                 val ssb = SpannableStringBuilder(
                     coloredText(
@@ -88,15 +90,18 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
             }
 
         binding.syncStart.setOnClickListener {
-            syncOrchestrator.execute(OneTime.Events.start())
+            syncOrchestrator.execute(OneTime.UpSync.start())
+            syncOrchestrator.execute(OneTime.DownSync.start())
         }
 
         binding.syncStop.setOnClickListener {
-            syncOrchestrator.execute(OneTime.Events.stop())
+            syncOrchestrator.execute(OneTime.UpSync.stop())
+            syncOrchestrator.execute(OneTime.DownSync.stop())
         }
 
         binding.syncSchedule.setOnClickListener {
-            syncOrchestrator.execute(ScheduleCommand.Events.reschedule())
+            syncOrchestrator.execute(ScheduleCommand.UpSync.reschedule())
+            syncOrchestrator.execute(ScheduleCommand.DownSync.reschedule())
         }
 
         binding.clearFirebaseToken.setOnClickListener {
@@ -121,8 +126,10 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
 
         binding.cleanAll.setOnClickListener {
             lifecycleScope.launch(dispatcher) {
-                syncOrchestrator.execute(OneTime.Events.stop())
-                syncOrchestrator.execute(ScheduleCommand.Events.unschedule())
+                syncOrchestrator.execute(OneTime.UpSync.stop())
+                syncOrchestrator.execute(OneTime.DownSync.stop())
+                syncOrchestrator.execute(ScheduleCommand.UpSync.unschedule())
+                syncOrchestrator.execute(ScheduleCommand.DownSync.unschedule())
 
                 eventRepository.deleteAll()
                 resetDownSyncInfo()

@@ -32,6 +32,10 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
+@Deprecated(
+    "Replaced by UpSyncStateProcessor and DownSyncStateProcessor for independent state observation",
+    ReplaceWith("UpSyncStateProcessor or DownSyncStateProcessor"),
+)
 class EventSyncStateProcessor @Inject constructor(
     private val eventSyncCache: EventSyncCache,
     private val syncWorkersInfoProvider: SyncWorkersInfoProvider,

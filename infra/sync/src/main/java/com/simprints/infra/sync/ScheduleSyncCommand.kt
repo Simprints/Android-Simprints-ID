@@ -16,7 +16,12 @@ sealed class ScheduleCommand {
         val withDelay: Boolean = false,
     ) : ScheduleCommand()
 
-    internal data class EventsCommand(
+    internal data class UpSyncCommand(
+        val action: Action,
+        val withDelay: Boolean = false,
+    ) : ScheduleCommand()
+
+    internal data class DownSyncCommand(
         val action: Action,
         val withDelay: Boolean = false,
     ) : ScheduleCommand()
@@ -31,15 +36,31 @@ sealed class ScheduleCommand {
         fun unschedule(): ScheduleCommand = EverythingCommand(action = Action.UNSCHEDULE)
     }
 
-    object Events {
-        fun reschedule(withDelay: Boolean = false): ScheduleCommand = EventsCommand(action = Action.RESCHEDULE, withDelay = withDelay)
+    object UpSync {
+        fun reschedule(withDelay: Boolean = false): ScheduleCommand = UpSyncCommand(action = Action.RESCHEDULE, withDelay = withDelay)
 
-        fun unschedule(): ScheduleCommand = EventsCommand(action = Action.UNSCHEDULE)
+        fun unschedule(): ScheduleCommand = UpSyncCommand(action = Action.UNSCHEDULE)
+    }
+
+    object DownSync {
+        fun reschedule(withDelay: Boolean = false): ScheduleCommand = DownSyncCommand(action = Action.RESCHEDULE, withDelay = withDelay)
+
+        fun unschedule(): ScheduleCommand = DownSyncCommand(action = Action.UNSCHEDULE)
     }
 
     object Images {
         fun reschedule(): ScheduleCommand = ImagesCommand(action = Action.RESCHEDULE)
 
         fun unschedule(): ScheduleCommand = ImagesCommand(action = Action.UNSCHEDULE)
+    }
+
+    @Deprecated(
+        "Use ScheduleCommand.UpSync and ScheduleCommand.DownSync separately",
+        ReplaceWith("ScheduleCommand.UpSync or ScheduleCommand.DownSync"),
+    )
+    object Events {
+        fun reschedule(withDelay: Boolean = false): ScheduleCommand = EverythingCommand(action = Action.RESCHEDULE, withDelay = withDelay)
+
+        fun unschedule(): ScheduleCommand = EverythingCommand(action = Action.UNSCHEDULE)
     }
 }

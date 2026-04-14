@@ -98,8 +98,8 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
         )
 
         verify(exactly = 1) {
-            syncOrchestrator.execute(match<ScheduleCommand.EventsCommand> { it.action == ScheduleCommand.Action.UNSCHEDULE })
-            syncOrchestrator.execute(match<ScheduleCommand.EventsCommand> { it.action == ScheduleCommand.Action.RESCHEDULE })
+            syncOrchestrator.execute(match<ScheduleCommand.DownSyncCommand> { it.action == ScheduleCommand.Action.UNSCHEDULE })
+            syncOrchestrator.execute(match<ScheduleCommand.DownSyncCommand> { it.action == ScheduleCommand.Action.RESCHEDULE })
         }
 
         runCurrent()
@@ -133,8 +133,8 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
         )
 
         verify(exactly = 1) {
-            syncOrchestrator.execute(match<ScheduleCommand.EventsCommand> { it.action == ScheduleCommand.Action.UNSCHEDULE })
-            syncOrchestrator.execute(match<ScheduleCommand.EventsCommand> { it.action == ScheduleCommand.Action.RESCHEDULE })
+            syncOrchestrator.execute(match<ScheduleCommand.DownSyncCommand> { it.action == ScheduleCommand.Action.UNSCHEDULE })
+            syncOrchestrator.execute(match<ScheduleCommand.DownSyncCommand> { it.action == ScheduleCommand.Action.RESCHEDULE })
         }
         coVerify {
             resetDownSyncInfo()
@@ -166,8 +166,8 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
         )
 
         verify(exactly = 1) {
-            syncOrchestrator.execute(match<ScheduleCommand.EventsCommand> { it.action == ScheduleCommand.Action.UNSCHEDULE })
-            syncOrchestrator.execute(match<ScheduleCommand.EventsCommand> { it.action == ScheduleCommand.Action.RESCHEDULE })
+            syncOrchestrator.execute(match<ScheduleCommand.DownSyncCommand> { it.action == ScheduleCommand.Action.UNSCHEDULE })
+            syncOrchestrator.execute(match<ScheduleCommand.DownSyncCommand> { it.action == ScheduleCommand.Action.RESCHEDULE })
         }
         coVerify {
             resetDownSyncInfo()
@@ -199,8 +199,8 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
         )
 
         verify(exactly = 1) {
-            syncOrchestrator.execute(match<ScheduleCommand.EventsCommand> { it.action == ScheduleCommand.Action.UNSCHEDULE })
-            syncOrchestrator.execute(match<ScheduleCommand.EventsCommand> { it.action == ScheduleCommand.Action.RESCHEDULE })
+            syncOrchestrator.execute(match<ScheduleCommand.DownSyncCommand> { it.action == ScheduleCommand.Action.UNSCHEDULE })
+            syncOrchestrator.execute(match<ScheduleCommand.DownSyncCommand> { it.action == ScheduleCommand.Action.RESCHEDULE })
         }
         coVerify {
             resetDownSyncInfo()

@@ -5,27 +5,39 @@ import org.junit.Test
 
 class OneTimeSyncCommandTest {
     @Test
-    fun `events start builds expected command`() {
-        assertThat(OneTime.Events.start())
-            .isEqualTo(OneTime.EventsCommand(action = OneTime.Action.START, isDownSyncAllowed = true))
-
-        assertThat(OneTime.Events.start(isDownSyncAllowed = false))
-            .isEqualTo(OneTime.EventsCommand(action = OneTime.Action.START, isDownSyncAllowed = false))
+    fun `upSync start builds expected command`() {
+        assertThat(OneTime.UpSync.start())
+            .isEqualTo(OneTime.UpSyncCommand(action = OneTime.Action.START))
     }
 
     @Test
-    fun `events stop builds expected command`() {
-        assertThat(OneTime.Events.stop())
-            .isEqualTo(OneTime.EventsCommand(action = OneTime.Action.STOP, isDownSyncAllowed = true))
+    fun `upSync stop builds expected command`() {
+        assertThat(OneTime.UpSync.stop())
+            .isEqualTo(OneTime.UpSyncCommand(action = OneTime.Action.STOP))
     }
 
     @Test
-    fun `events restart builds expected command`() {
-        assertThat(OneTime.Events.restart())
-            .isEqualTo(OneTime.EventsCommand(action = OneTime.Action.RESTART, isDownSyncAllowed = true))
+    fun `upSync restart builds expected command`() {
+        assertThat(OneTime.UpSync.restart())
+            .isEqualTo(OneTime.UpSyncCommand(action = OneTime.Action.RESTART))
+    }
 
-        assertThat(OneTime.Events.restart(isDownSyncAllowed = false))
-            .isEqualTo(OneTime.EventsCommand(action = OneTime.Action.RESTART, isDownSyncAllowed = false))
+    @Test
+    fun `downSync start builds expected command`() {
+        assertThat(OneTime.DownSync.start())
+            .isEqualTo(OneTime.DownSyncCommand(action = OneTime.Action.START))
+    }
+
+    @Test
+    fun `downSync stop builds expected command`() {
+        assertThat(OneTime.DownSync.stop())
+            .isEqualTo(OneTime.DownSyncCommand(action = OneTime.Action.STOP))
+    }
+
+    @Test
+    fun `downSync restart builds expected command`() {
+        assertThat(OneTime.DownSync.restart())
+            .isEqualTo(OneTime.DownSyncCommand(action = OneTime.Action.RESTART))
     }
 
     @Test

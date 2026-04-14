@@ -4,7 +4,6 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.sync.SyncOrchestrator
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import kotlin.time.Duration
 
@@ -14,8 +13,7 @@ internal class ShouldSuggestSyncUseCase @Inject constructor(
     private val configRepository: ConfigRepository,
 ) {
     suspend operator fun invoke(): Boolean = syncOrchestrator
-        .observeSyncState()
-        .map { it.eventSyncState }
+        .observeDownSyncState()
         .firstOrNull()
         ?.lastSyncTime
         ?.let {

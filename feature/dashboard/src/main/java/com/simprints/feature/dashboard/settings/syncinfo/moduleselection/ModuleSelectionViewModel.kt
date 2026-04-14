@@ -105,7 +105,8 @@ internal class ModuleSelectionViewModel @Inject constructor(
                 moduleRepository.saveModules(modules)
             }
 
-            syncOrchestrator.execute(OneTime.Events.restart())
+            syncOrchestrator.execute(OneTime.UpSync.restart())
+            syncOrchestrator.execute(OneTime.DownSync.restart())
         }
     }
 

@@ -38,7 +38,9 @@ internal class LogoutSyncViewModel @Inject constructor(
         syncOrchestrator
             .observeSyncState()
             .map { syncStatus ->
-                !syncStatus.eventSyncState.isSyncCompleted() || syncStatus.imageSyncStatus.isSyncing
+                !syncStatus.upSyncState.isSyncCompleted() ||
+                    !syncStatus.downSyncState.isSyncCompleted() ||
+                    syncStatus.imageSyncStatus.isSyncing
             }.debounce(timeoutMillis = ANTI_JITTER_DELAY_MILLIS)
             .asLiveData(viewModelScope.coroutineContext)
 

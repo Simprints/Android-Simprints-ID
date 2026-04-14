@@ -3,7 +3,7 @@ package com.simprints.infra.eventsync.sync.common
 import android.content.SharedPreferences
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.eventsync.sync.common.EventSyncCache.Companion.PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY
+import com.simprints.infra.eventsync.sync.common.EventSyncCache.Companion.PEOPLE_SYNC_CACHE_LAST_UP_SYNC_TIME_KEY
 import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
@@ -56,7 +56,7 @@ class EventSyncCacheTest {
     fun `readLastSuccessfulSyncTime should return the date if it's greater than -1`() = runTest {
         every {
             sharedPrefsForLastSyncTime.getLong(
-                PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY,
+                PEOPLE_SYNC_CACHE_LAST_UP_SYNC_TIME_KEY,
                 -1,
             )
         } returns 30
@@ -69,7 +69,7 @@ class EventSyncCacheTest {
     fun `readLastSuccessfulSyncTime should return the date if it's equal to -1`() = runTest {
         every {
             sharedPrefsForLastSyncTime.getLong(
-                PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY,
+                PEOPLE_SYNC_CACHE_LAST_UP_SYNC_TIME_KEY,
                 -1,
             )
         } returns -1
@@ -84,7 +84,7 @@ class EventSyncCacheTest {
         every { sharedPrefsForLastSyncTime.edit() } returns editor
 
         eventSyncCache.storeLastSuccessfulSyncTime(Timestamp(30))
-        verify(exactly = 1) { editor.putLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, 30) }
+        verify(exactly = 1) { editor.putLong(PEOPLE_SYNC_CACHE_LAST_UP_SYNC_TIME_KEY, 30) }
     }
 
     @Test
@@ -93,7 +93,7 @@ class EventSyncCacheTest {
         every { sharedPrefsForLastSyncTime.edit() } returns editor
 
         eventSyncCache.storeLastSuccessfulSyncTime(null)
-        verify(exactly = 1) { editor.putLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, -1) }
+        verify(exactly = 1) { editor.putLong(PEOPLE_SYNC_CACHE_LAST_UP_SYNC_TIME_KEY, -1) }
     }
 
     @Test

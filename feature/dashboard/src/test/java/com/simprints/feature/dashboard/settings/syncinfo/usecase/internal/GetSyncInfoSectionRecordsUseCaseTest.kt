@@ -11,7 +11,8 @@ import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
-import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.infra.eventsync.status.models.DownSyncState
+import com.simprints.infra.eventsync.status.models.UpSyncState
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncableCounts
 import io.mockk.MockKAnnotations
@@ -67,14 +68,19 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `should emit SyncInfo section with correct syncInfoSectionRecords instruction visibility`() = runTest {
-        val mockOfflineEventSyncState = createEventSyncState(
+        val mockOfflineUpSyncState = createUpSyncState(
+            syncFailed = false,
+            syncInProgress = false,
+        )
+        val mockOfflineDownSyncState = createDownSyncState(
             syncFailed = false,
             syncInProgress = false,
         )
 
         val result = invokeUseCase(
             isOnline = false,
-            eventSyncState = mockOfflineEventSyncState,
+            upSyncState = mockOfflineUpSyncState,
+            downSyncState = mockOfflineDownSyncState,
         )
 
         assertThat(result.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.OFFLINE_ERROR)
@@ -83,7 +89,12 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `should emit SyncInfo section with correct syncInfoSectionRecords button states`() = runTest {
-        val mockNormalEventSyncState = createEventSyncState(
+        val mockNormalUpSyncState = createUpSyncState(
+            syncRunning = false,
+            syncFailedBecauseReloginRequired = false,
+            syncFailed = false,
+        )
+        val mockNormalDownSyncState = createDownSyncState(
             syncRunning = false,
             syncFailedBecauseReloginRequired = false,
             syncFailed = false,
@@ -91,7 +102,8 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
         val result = invokeUseCase(
             isOnline = true,
-            eventSyncState = mockNormalEventSyncState,
+            upSyncState = mockNormalUpSyncState,
+            downSyncState = mockNormalDownSyncState,
         )
 
         assertThat(result.isSyncButtonEnabled).isTrue()
@@ -101,13 +113,18 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `should emit SyncInfo section with correct syncInfoSectionRecords footer states`() = runTest {
-        val mockCompletedEventSyncState = createEventSyncState(
+        val mockCompletedUpSyncState = createUpSyncState(
+            syncInProgress = false,
+            lastSyncTime = TEST_TIMESTAMP,
+        )
+        val mockCompletedDownSyncState = createDownSyncState(
             syncInProgress = false,
             lastSyncTime = TEST_TIMESTAMP,
         )
 
         val result = invokeUseCase(
-            eventSyncState = mockCompletedEventSyncState,
+            upSyncState = mockCompletedUpSyncState,
+            downSyncState = mockCompletedDownSyncState,
         )
 
         assertThat(result.isFooterLastSyncTimeVisible).isTrue()
@@ -117,7 +134,13 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `should calculate correct event sync progress when sync in progress`() = runTest {
-        val mockInProgressEventSyncState = createEventSyncState(
+        val mockInProgressUpSyncState = createUpSyncState(
+            syncInProgress = true,
+            syncCompleted = false,
+            progress = 5,
+            total = 10,
+        )
+        val mockInProgressDownSyncState = createDownSyncState(
             syncInProgress = true,
             syncCompleted = false,
             progress = 5,
@@ -125,7 +148,8 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
         )
 
         val result = invokeUseCase(
-            eventSyncState = mockInProgressEventSyncState,
+            upSyncState = mockInProgressUpSyncState,
+            downSyncState = mockInProgressDownSyncState,
         )
 
         assertThat(result.isProgressVisible).isTrue()
@@ -134,7 +158,13 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `should calculate correct event sync progress when sync connecting`() = runTest {
-        val mockConnectingEventSyncState = createEventSyncState(
+        val mockConnectingUpSyncState = createUpSyncState(
+            syncConnecting = true,
+            syncInProgress = false,
+            syncCompleted = false,
+            hasSyncHistory = true,
+        )
+        val mockConnectingDownSyncState = createDownSyncState(
             syncConnecting = true,
             syncInProgress = false,
             syncCompleted = false,
@@ -142,7 +172,8 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
         )
 
         val result = invokeUseCase(
-            eventSyncState = mockConnectingEventSyncState,
+            upSyncState = mockConnectingUpSyncState,
+            downSyncState = mockConnectingDownSyncState,
         )
 
         assertThat(result.progress.progressBarPercentage).isEqualTo(0)
@@ -150,14 +181,20 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `should calculate correct event sync progress when sync approached completion`() = runTest {
-        val mockCompletedEventSyncState = createEventSyncState(
+        val mockCompletedUpSyncState = createUpSyncState(
+            syncInProgress = true,
+            progress = 10,
+            total = 10,
+        )
+        val mockCompletedDownSyncState = createDownSyncState(
             syncInProgress = true,
             progress = 10,
             total = 10,
         )
 
         val result = invokeUseCase(
-            eventSyncState = mockCompletedEventSyncState,
+            upSyncState = mockCompletedUpSyncState,
+            downSyncState = mockCompletedDownSyncState,
         )
 
         assertThat(result.progress.progressBarPercentage).isEqualTo(100)
@@ -165,12 +202,16 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `should not show event sync progress when sync completed`() = runTest {
-        val mockCompletedEventSyncState = createEventSyncState(
+        val mockCompletedUpSyncState = createUpSyncState(
+            syncCompleted = true,
+        )
+        val mockCompletedDownSyncState = createDownSyncState(
             syncCompleted = true,
         )
 
         val result = invokeUseCase(
-            eventSyncState = mockCompletedEventSyncState,
+            upSyncState = mockCompletedUpSyncState,
+            downSyncState = mockCompletedDownSyncState,
         )
 
         assertThat(result.isProgressVisible).isFalse()
@@ -178,7 +219,7 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `should calculate correct combined progress during pre-logout sync events phase`() = runTest {
-        val mockInProgressEventSyncState = createEventSyncState(
+        val mockInProgressUpSyncState = createUpSyncState(
             syncInProgress = true,
             syncCompleted = false,
             progress = 3,
@@ -191,7 +232,7 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
         val result = invokeUseCase(
             isPreLogoutUpSync = true,
-            eventSyncState = mockInProgressEventSyncState,
+            upSyncState = mockInProgressUpSyncState,
             imageSyncStatus = mockNotSyncingImageStatus,
         )
 
@@ -200,7 +241,7 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `should calculate correct combined progress during pre-logout sync images phase`() = runTest {
-        val mockCompletedEventSyncState = createEventSyncState(
+        val mockCompletedUpSyncState = createUpSyncState(
             syncCompleted = true,
             syncInProgress = false,
         )
@@ -211,7 +252,7 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
         val result = invokeUseCase(
             isPreLogoutUpSync = true,
-            eventSyncState = mockCompletedEventSyncState,
+            upSyncState = mockCompletedUpSyncState,
             imageSyncStatus = mockSyncingImageStatus,
         )
 
@@ -220,7 +261,11 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `should emit SyncInfo section with correct record counters when sync not in progress`() = runTest {
-        val mockIdleEventSyncState = createEventSyncState(
+        val mockIdleUpSyncState = createUpSyncState(
+            syncInProgress = false,
+            syncRunning = false,
+        )
+        val mockIdleDownSyncState = createDownSyncState(
             syncInProgress = false,
             syncRunning = false,
         )
@@ -234,7 +279,8 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
         )
 
         val result = invokeUseCase(
-            eventSyncState = mockIdleEventSyncState,
+            upSyncState = mockIdleUpSyncState,
+            downSyncState = mockIdleDownSyncState,
             syncableCounts = syncableCounts,
         )
 
@@ -245,14 +291,10 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `should not count records when project id blank`() = runTest {
-        val mockIdleEventSyncState = createEventSyncState(
-            syncInProgress = false,
-            syncRunning = false,
-        )
-
         val result = invokeUseCase(
             projectId = "",
-            eventSyncState = mockIdleEventSyncState,
+            upSyncState = createUpSyncState(syncInProgress = false, syncRunning = false),
+            downSyncState = createDownSyncState(syncInProgress = false, syncRunning = false),
         )
 
         assertThat(result.counterTotalRecords).isEmpty()
@@ -260,12 +302,16 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `should emit SyncInfo section with empty record counters when sync in progress`() = runTest {
-        val mockInProgressEventSyncState = createEventSyncState(
+        val mockInProgressUpSyncState = createUpSyncState(
+            syncInProgress = true,
+        )
+        val mockInProgressDownSyncState = createDownSyncState(
             syncInProgress = true,
         )
 
         val result = invokeUseCase(
-            eventSyncState = mockInProgressEventSyncState,
+            upSyncState = mockInProgressUpSyncState,
+            downSyncState = mockInProgressDownSyncState,
         )
 
         assertThat(result.counterTotalRecords).isEmpty()
@@ -308,7 +354,10 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
     @Test
     fun `should emit SyncInfo section with correct records to download counter visible when allowed`() = runTest {
         val mockProjectConfigWithDownSync = mockk<ProjectConfiguration>(relaxed = true)
-        val mockIdleEventSyncState = createEventSyncState(
+        val mockIdleUpSyncState = createUpSyncState(
+            syncInProgress = false,
+        )
+        val mockIdleDownSyncState = createDownSyncState(
             syncInProgress = false,
         )
         val syncableCounts = createSyncableCounts(
@@ -324,7 +373,8 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
         val result = invokeUseCase(
             projectConfig = mockProjectConfigWithDownSync,
-            eventSyncState = mockIdleEventSyncState,
+            upSyncState = mockIdleUpSyncState,
+            downSyncState = mockIdleDownSyncState,
             syncableCounts = syncableCounts,
         )
 
@@ -334,13 +384,10 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `should emit SyncInfo section with hidden records to download counter when pre-logout mode`() = runTest {
-        val mockIdleEventSyncState = createEventSyncState(
-            syncInProgress = false,
-        )
-
         val result = invokeUseCase(
             isPreLogoutUpSync = true,
-            eventSyncState = mockIdleEventSyncState,
+            upSyncState = createUpSyncState(syncInProgress = false),
+            downSyncState = createDownSyncState(syncInProgress = false),
         )
 
         assertThat(result.isCounterRecordsToDownloadVisible).isFalse()
@@ -348,7 +395,11 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `should show CommCare permission missing instruction when sync failed due to missing permission`() = runTest {
-        val mockFailedEventSyncState = createEventSyncState(
+        val mockFailedUpSyncState = createUpSyncState(
+            syncFailed = true,
+            syncInProgress = false,
+        )
+        val mockFailedDownSyncState = createDownSyncState(
             syncFailedBecauseCommCarePermissionIsMissing = true,
             syncFailed = true,
             syncInProgress = false,
@@ -358,7 +409,8 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
         val result = invokeUseCase(
             isOnline = true,
-            eventSyncState = mockFailedEventSyncState,
+            upSyncState = mockFailedUpSyncState,
+            downSyncState = mockFailedDownSyncState,
         )
 
         assertThat(result.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.COMM_CARE_ERROR)
@@ -366,7 +418,11 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `should hide CommCare permission missing instruction when permission is granted`() = runTest {
-        val mockNormalEventSyncState = createEventSyncState(
+        val mockNormalUpSyncState = createUpSyncState(
+            syncFailed = false,
+            syncInProgress = false,
+        )
+        val mockNormalDownSyncState = createDownSyncState(
             syncFailedBecauseCommCarePermissionIsMissing = false,
             syncFailed = false,
             syncInProgress = false,
@@ -374,7 +430,8 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
         val result = invokeUseCase(
             isOnline = true,
-            eventSyncState = mockNormalEventSyncState,
+            upSyncState = mockNormalUpSyncState,
+            downSyncState = mockNormalDownSyncState,
         )
 
         assertThat(result.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.ON_STANDBY)
@@ -398,12 +455,16 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `sync button should be disabled when not on standby`() = runTest {
-        val mockSyncingEventSyncState = createEventSyncState(
+        val mockSyncingUpSyncState = createUpSyncState(
+            syncInProgress = true,
+        )
+        val mockSyncingDownSyncState = createDownSyncState(
             syncInProgress = true,
         )
 
         val result = invokeUseCase(
-            eventSyncState = mockSyncingEventSyncState,
+            upSyncState = mockSyncingUpSyncState,
+            downSyncState = mockSyncingDownSyncState,
         )
 
         assertThat(result.isSyncButtonEnabled).isFalse()
@@ -443,13 +504,17 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `sync button should be enabled when Simprints down-sync allowed and re-login not required`() = runTest {
-        val mockNormalEventSyncState = createEventSyncState(
+        val mockNormalUpSyncState = createUpSyncState(
+            syncFailedBecauseReloginRequired = false,
+        )
+        val mockNormalDownSyncState = createDownSyncState(
             syncFailedBecauseReloginRequired = false,
         )
         every { any<ProjectConfiguration>().isSimprintsEventDownSyncAllowed() } returns true
 
         val result = invokeUseCase(
-            eventSyncState = mockNormalEventSyncState,
+            upSyncState = mockNormalUpSyncState,
+            downSyncState = mockNormalDownSyncState,
         )
 
         assertThat(result.isSyncButtonEnabled).isTrue()
@@ -457,13 +522,13 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `sync button should be enabled when CommCare down-sync allowed and no CommCare permission error`() = runTest {
-        val mockNormalEventSyncState = createEventSyncState(
+        val mockNormalDownSyncState = createDownSyncState(
             syncFailedBecauseCommCarePermissionIsMissing = false,
         )
         every { any<ProjectConfiguration>().isCommCareEventDownSyncAllowed() } returns true
 
         val result = invokeUseCase(
-            eventSyncState = mockNormalEventSyncState,
+            downSyncState = mockNormalDownSyncState,
         )
 
         assertThat(result.isSyncButtonEnabled).isTrue()
@@ -482,7 +547,10 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `sync button should be disabled when only Simprints down-sync allowed but re-login required`() = runTest {
-        val mockReLoginRequiredEventSyncState = createEventSyncState(
+        val mockReLoginRequiredUpSyncState = createUpSyncState(
+            syncFailedBecauseReloginRequired = true,
+        )
+        val mockReLoginRequiredDownSyncState = createDownSyncState(
             syncFailedBecauseReloginRequired = true,
         )
         every { any<ProjectConfiguration>().isSimprintsEventDownSyncAllowed() } returns true
@@ -490,7 +558,8 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
         every { any<ProjectConfiguration>().canSyncDataToSimprints() } returns false
 
         val result = invokeUseCase(
-            eventSyncState = mockReLoginRequiredEventSyncState,
+            upSyncState = mockReLoginRequiredUpSyncState,
+            downSyncState = mockReLoginRequiredDownSyncState,
         )
 
         assertThat(result.isSyncButtonEnabled).isFalse()
@@ -498,7 +567,7 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `sync button should be disabled when only CommCare down-sync allowed but there is CommCare permission error`() = runTest {
-        val mockCommCarePermissionErrorEventSyncState = createEventSyncState(
+        val mockCommCarePermissionErrorDownSyncState = createDownSyncState(
             syncFailedBecauseCommCarePermissionIsMissing = true,
         )
         every { any<ProjectConfiguration>().isCommCareEventDownSyncAllowed() } returns true
@@ -507,7 +576,7 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
         every { commCarePermissionChecker.hasCommCarePermissions() } returns false
 
         val result = invokeUseCase(
-            eventSyncState = mockCommCarePermissionErrorEventSyncState,
+            downSyncState = mockCommCarePermissionErrorDownSyncState,
         )
 
         assertThat(result.isSyncButtonEnabled).isFalse()
@@ -515,13 +584,17 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `sync button should be enabled when sync has failed for non-CommCare and non-network reasons`() = runTest {
-        val mockCommCarePermissionErrorEventSyncState = createEventSyncState(
+        val mockFailedUpSyncState = createUpSyncState(
+            syncFailed = true,
+        )
+        val mockFailedDownSyncState = createDownSyncState(
             syncFailed = true,
             syncFailedBecauseCommCarePermissionIsMissing = false,
         )
 
         val result = invokeUseCase(
-            eventSyncState = mockCommCarePermissionErrorEventSyncState,
+            upSyncState = mockFailedUpSyncState,
+            downSyncState = mockFailedDownSyncState,
         )
 
         assertThat(result.isSyncButtonEnabled).isTrue()
@@ -530,13 +603,17 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
     @Test
     fun `should calculate correct record last sync time when sync time available`() = runTest {
         val timestamp = Timestamp(0L)
-        val mockEventSyncState = createEventSyncState(
+        val mockUpSyncState = createUpSyncState(
+            lastSyncTime = timestamp,
+        )
+        val mockDownSyncState = createDownSyncState(
             lastSyncTime = timestamp,
         )
         every { timeHelper.readableBetweenNowAndTime(timestamp) } returns "5 minutes ago"
 
         val result = invokeUseCase(
-            eventSyncState = mockEventSyncState,
+            upSyncState = mockUpSyncState,
+            downSyncState = mockDownSyncState,
         )
 
         assertThat(result.isFooterLastSyncTimeVisible).isTrue()
@@ -545,12 +622,16 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `should have hidden record last sync time footer when no sync history`() = runTest {
-        val mockEventSyncState = createEventSyncState(
+        val mockUpSyncState = createUpSyncState(
+            lastSyncTime = null,
+        )
+        val mockDownSyncState = createDownSyncState(
             lastSyncTime = null,
         )
 
         val result = invokeUseCase(
-            eventSyncState = mockEventSyncState,
+            upSyncState = mockUpSyncState,
+            downSyncState = mockDownSyncState,
         )
 
         assertThat(result.isFooterLastSyncTimeVisible).isFalse()
@@ -558,14 +639,19 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `should show correct visibility states for error instructions`() = runTest {
-        val mockFailedEventSyncState = createEventSyncState(
+        val mockFailedUpSyncState = createUpSyncState(
+            syncFailed = true,
+            syncInProgress = false,
+        )
+        val mockFailedDownSyncState = createDownSyncState(
             syncFailed = true,
             syncInProgress = false,
         )
 
         val result = invokeUseCase(
             isOnline = true,
-            eventSyncState = mockFailedEventSyncState,
+            upSyncState = mockFailedUpSyncState,
+            downSyncState = mockFailedDownSyncState,
         )
 
         assertThat(result.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.ERROR)
@@ -574,7 +660,11 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
     @Test
     fun `should show correct visibility states for module selection instructions`() = runTest {
         val mockProjectConfigRequiringModules = mockk<ProjectConfiguration>(relaxed = true)
-        val mockIdleEventSyncState = createEventSyncState(
+        val mockIdleUpSyncState = createUpSyncState(
+            syncFailed = false,
+            syncInProgress = false,
+        )
+        val mockIdleDownSyncState = createDownSyncState(
             syncFailed = false,
             syncInProgress = false,
         )
@@ -584,7 +674,8 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
             projectConfig = mockProjectConfigRequiringModules,
             moduleCounts = emptyList(),
             isOnline = true,
-            eventSyncState = mockIdleEventSyncState,
+            upSyncState = mockIdleUpSyncState,
+            downSyncState = mockIdleDownSyncState,
         )
 
         assertThat(result.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.NO_MODULES_ERROR)
@@ -592,14 +683,20 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `should handle failed sync retry indication correctly`() = runTest {
-        val mockFailedState = createEventSyncState(
+        val mockFailedUpSyncState = createUpSyncState(
+            syncFailed = true,
+            syncInProgress = false,
+            syncFailedBecauseReloginRequired = false,
+        )
+        val mockFailedDownSyncState = createDownSyncState(
             syncFailed = true,
             syncInProgress = false,
             syncFailedBecauseReloginRequired = false,
         )
 
         val result = invokeUseCase(
-            eventSyncState = mockFailedState,
+            upSyncState = mockFailedUpSyncState,
+            downSyncState = mockFailedDownSyncState,
         )
 
         assertThat(result.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.ERROR)
@@ -609,7 +706,13 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
     @Test
     fun `should allow sync without network connection when CommCare down sync is configured`() = runTest {
         val mockProjectConfigWithCommCareDownSync = mockk<ProjectConfiguration>(relaxed = true)
-        val mockNormalEventSyncState = createEventSyncState(
+        val mockNormalUpSyncState = createUpSyncState(
+            syncRunning = false,
+            syncFailedBecauseReloginRequired = false,
+            syncFailed = false,
+            syncInProgress = false,
+        )
+        val mockNormalDownSyncState = createDownSyncState(
             syncFailedBecauseCommCarePermissionIsMissing = false,
             syncRunning = false,
             syncFailedBecauseReloginRequired = false,
@@ -620,7 +723,8 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
         val result = invokeUseCase(
             projectConfig = mockProjectConfigWithCommCareDownSync,
-            eventSyncState = mockNormalEventSyncState,
+            upSyncState = mockNormalUpSyncState,
+            downSyncState = mockNormalDownSyncState,
             isOnline = false,
         )
 
@@ -630,14 +734,14 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `should show CommCare permission missing when does not have permission`() = runTest {
-        val mockNormalEventSyncState = createEventSyncState(
+        val mockNormalDownSyncState = createDownSyncState(
             syncFailedBecauseCommCarePermissionIsMissing = true,
         )
         every { mockProjectConfiguration.isCommCareEventDownSyncAllowed() } returns true
         every { commCarePermissionChecker.hasCommCarePermissions() } returns false
 
         val result = invokeUseCase(
-            eventSyncState = mockNormalEventSyncState,
+            downSyncState = mockNormalDownSyncState,
         )
 
         assertThat(result.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.COMM_CARE_ERROR)
@@ -646,13 +750,13 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
     @Test
     fun `should hide CommCare permission instruction when does not have permission sync error`() = runTest {
-        val mockNormalEventSyncState = createEventSyncState(
+        val mockNormalDownSyncState = createDownSyncState(
             syncFailedBecauseCommCarePermissionIsMissing = false,
         )
 
         val result = invokeUseCase(
             isOnline = true,
-            eventSyncState = mockNormalEventSyncState,
+            downSyncState = mockNormalDownSyncState,
         )
 
         assertThat(result.isSyncButtonEnabled).isTrue()
@@ -663,7 +767,8 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
         isPreLogoutUpSync: Boolean = false,
         isOnline: Boolean = true,
         projectId: String = TEST_PROJECT_ID,
-        eventSyncState: EventSyncState = createEventSyncState(),
+        upSyncState: UpSyncState = createUpSyncState(),
+        downSyncState: DownSyncState = createDownSyncState(),
         imageSyncStatus: ImageSyncStatus = createImageSyncStatus(),
         syncableCounts: SyncableCounts = createSyncableCounts(),
         isProjectRunning: Boolean = true,
@@ -673,7 +778,8 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
         isPreLogoutUpSync = isPreLogoutUpSync,
         isOnline = isOnline,
         projectId = projectId,
-        eventSyncState = eventSyncState,
+        upSyncState = upSyncState,
+        downSyncState = downSyncState,
         imageSyncStatus = imageSyncStatus,
         syncableCounts = syncableCounts,
         isProjectRunning = isProjectRunning,
@@ -681,7 +787,46 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
         projectConfig = projectConfig,
     )
 
-    private fun createEventSyncState(
+    private fun createUpSyncState(
+        syncCompleted: Boolean = false,
+        syncInProgress: Boolean = false,
+        syncConnecting: Boolean = false,
+        syncRunning: Boolean = false,
+        syncFailed: Boolean = false,
+        syncFailedBecauseReloginRequired: Boolean = false,
+        syncFailedBecauseBackendMaintenance: Boolean = false,
+        syncFailedBecauseTooManyRequests: Boolean = false,
+        estimatedBackendMaintenanceOutage: Long? = null,
+        hasSyncHistory: Boolean = true,
+        progress: Int? = null,
+        total: Int? = null,
+        lastSyncTime: Timestamp? = TEST_TIMESTAMP,
+    ): UpSyncState = mockk(relaxed = true) {
+        val nonNegativeProgressPair = (progress?.coerceAtLeast(0) ?: 0) to (total?.coerceAtLeast(0) ?: 0)
+
+        every { isSyncCompleted() } returns syncCompleted
+        every { isSyncInProgress() } returns syncInProgress
+        every { isSyncConnecting() } returns syncConnecting
+        every { isSyncRunning() } returns syncRunning
+        every { isSyncFailed() } returns syncFailed
+        every { isSyncFailedBecauseReloginRequired() } returns syncFailedBecauseReloginRequired
+        every { isSyncFailedBecauseBackendMaintenance() } returns syncFailedBecauseBackendMaintenance
+        every { isSyncFailedBecauseTooManyRequests() } returns syncFailedBecauseTooManyRequests
+        every { getEstimatedBackendMaintenanceOutage() } returns estimatedBackendMaintenanceOutage
+        every { hasSyncHistory() } returns hasSyncHistory
+        every { this@mockk.progress } returns progress
+        every { this@mockk.total } returns total
+        every { this@mockk.nonNegativeProgress } returns nonNegativeProgressPair
+        every { this@mockk.normalizedProgressProportion } returns when {
+            syncCompleted -> 1f
+            !syncInProgress -> 0f
+            nonNegativeProgressPair.second == 0 -> 1f
+            else -> (nonNegativeProgressPair.first.toFloat() / nonNegativeProgressPair.second).coerceIn(0f, 1f)
+        }
+        every { this@mockk.lastSyncTime } returns lastSyncTime
+    }
+
+    private fun createDownSyncState(
         syncCompleted: Boolean = false,
         syncInProgress: Boolean = false,
         syncConnecting: Boolean = false,
@@ -696,7 +841,7 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
         progress: Int? = null,
         total: Int? = null,
         lastSyncTime: Timestamp? = TEST_TIMESTAMP,
-    ): EventSyncState = mockk(relaxed = true) {
+    ): DownSyncState = mockk(relaxed = true) {
         val nonNegativeProgressPair = (progress?.coerceAtLeast(0) ?: 0) to (total?.coerceAtLeast(0) ?: 0)
 
         every { isSyncCompleted() } returns syncCompleted

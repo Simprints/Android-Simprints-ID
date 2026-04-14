@@ -12,21 +12,32 @@ sealed class OneTime {
         RESTART,
     }
 
-    internal data class EventsCommand(
+    internal data class UpSyncCommand(
         val action: Action,
-        val isDownSyncAllowed: Boolean = true,
+    ) : OneTime()
+
+    internal data class DownSyncCommand(
+        val action: Action,
     ) : OneTime()
 
     internal data class ImagesCommand(
         val action: Action,
     ) : OneTime()
 
-    object Events {
-        fun start(isDownSyncAllowed: Boolean = true): OneTime = EventsCommand(Action.START, isDownSyncAllowed)
+    object UpSync {
+        fun start(): OneTime = UpSyncCommand(Action.START)
 
-        fun stop(): OneTime = EventsCommand(Action.STOP)
+        fun stop(): OneTime = UpSyncCommand(Action.STOP)
 
-        fun restart(isDownSyncAllowed: Boolean = true): OneTime = EventsCommand(Action.RESTART, isDownSyncAllowed)
+        fun restart(): OneTime = UpSyncCommand(Action.RESTART)
+    }
+
+    object DownSync {
+        fun start(): OneTime = DownSyncCommand(Action.START)
+
+        fun stop(): OneTime = DownSyncCommand(Action.STOP)
+
+        fun restart(): OneTime = DownSyncCommand(Action.RESTART)
     }
 
     object Images {
@@ -35,5 +46,17 @@ sealed class OneTime {
         fun stop(): OneTime = ImagesCommand(Action.STOP)
 
         fun restart(): OneTime = ImagesCommand(Action.RESTART)
+    }
+
+    @Deprecated(
+        "Use OneTime.UpSync and OneTime.DownSync separately",
+        ReplaceWith("OneTime.UpSync or OneTime.DownSync"),
+    )
+    object Events {
+        fun start(isDownSyncAllowed: Boolean = true): OneTime = UpSyncCommand(Action.START)
+
+        fun stop(): OneTime = UpSyncCommand(Action.STOP)
+
+        fun restart(isDownSyncAllowed: Boolean = true): OneTime = UpSyncCommand(Action.RESTART)
     }
 }

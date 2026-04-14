@@ -33,6 +33,10 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.util.UUID
 
+@Deprecated(
+    "Replaced by EventUpSyncMasterWorker and EventDownSyncMasterWorker for independent scheduling",
+    ReplaceWith("EventUpSyncMasterWorker or EventDownSyncMasterWorker"),
+)
 @HiltWorker
 class EventSyncMasterWorker @AssistedInject internal constructor(
     @Assisted private val appContext: Context,
@@ -83,7 +87,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
 
             if (!isSyncRunning()) {
                 val startSyncReporterWorker =
-                    eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
+                    eventSyncSubMasterWorkersBuilder.buildStartUpSyncReporterWorker(uniqueSyncId)
                 val workerChain = mutableListOf<OneTimeWorkRequest>()
                 if (configuration.canSyncDataToSimprints()) {
                     eventRepository.createEventScope(
@@ -129,9 +133,8 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                 }
 
                 val endSyncReporterWorker =
-                    eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(
+                    eventSyncSubMasterWorkersBuilder.buildEndUpSyncReporterWorker(
                         uniqueSyncId,
-                        downSyncWorkerScopeId,
                         upSyncWorkerScopeId,
                     )
 

@@ -38,17 +38,18 @@ internal class EventEndSyncReporterWorker @AssistedInject constructor(
             Simber.d("Params: $syncId", tag = tag)
 
             inputData.getString(EVENT_DOWN_SYNC_SCOPE_TO_CLOSE)?.let { scopeId ->
-                eventRepository.closeEventScope(scopeId, EventScopeEndCause.WORKFLOW_ENDED)
-            }
+                    eventRepository.closeEventScope(scopeId, EventScopeEndCause.WORKFLOW_ENDED)
+                    syncCache.storeLastDownSyncTime(timeHelper.now())
+                }
 
-            inputData.getString(EVENT_UP_SYNC_SCOPE_TO_CLOSE)?.let { scopeId ->
-                eventRepository.closeEventScope(scopeId, EventScopeEndCause.WORKFLOW_ENDED)
-            }
+                inputData.getString(EVENT_UP_SYNC_SCOPE_TO_CLOSE)?.let { scopeId ->
+                    eventRepository.closeEventScope(scopeId, EventScopeEndCause.WORKFLOW_ENDED)
+                    syncCache.storeLastUpSyncTime(timeHelper.now())
+                }
 
-            if (!syncId.isNullOrEmpty()) {
-                syncCache.storeLastSuccessfulSyncTime(timeHelper.now())
-                success()
-            } else {
+                if (!syncId.isNullOrEmpty()) {
+                    success()
+                } else {
                 throw IllegalArgumentException("SyncId missed")
             }
         } catch (t: Throwable) {

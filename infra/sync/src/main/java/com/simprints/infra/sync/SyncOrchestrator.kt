@@ -1,5 +1,7 @@
 package com.simprints.infra.sync
 
+import com.simprints.infra.eventsync.status.models.DownSyncState
+import com.simprints.infra.eventsync.status.models.UpSyncState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -9,6 +11,16 @@ interface SyncOrchestrator {
      * A combined reactive stream of sync state for all syncable entities.
      */
     fun observeSyncState(): StateFlow<SyncStatus>
+
+    /**
+     * A reactive stream of up-sync state only.
+     */
+    fun observeUpSyncState(): StateFlow<UpSyncState>
+
+    /**
+     * A reactive stream of down-sync state only.
+     */
+    fun observeDownSyncState(): StateFlow<DownSyncState>
 
     /**
      * Executes an immediate (one-time) sync control command.

@@ -138,8 +138,8 @@ internal class EventSyncMasterWorkerTest {
             commCareDownSyncWorker,
         )
         coEvery { upSyncWorkerBuilder.buildUpSyncWorkerChain(any(), any()) } returns listOf(upSyncWorker)
-        every { eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(any()) } returns startSyncReporterWorker
-        every { eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(any(), any(), any()) } returns endSyncReporterWorker
+        every { eventSyncSubMasterWorkersBuilder.buildStartUpSyncReporterWorker(any()) } returns startSyncReporterWorker
+        every { eventSyncSubMasterWorkersBuilder.buildEndUpSyncReporterWorker(any(), any()) } returns endSyncReporterWorker
 
         every { synchronizationConfiguration.up.simprints } returns bfsidUpSynchronizationConfiguration
         every { projectConfiguration.projectId } returns "projectId"
@@ -401,14 +401,13 @@ internal class EventSyncMasterWorkerTest {
     ) {
         val times = if (isBuilt) 1 else 0
         verify(exactly = times) {
-            eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(
+            eventSyncSubMasterWorkersBuilder.buildStartUpSyncReporterWorker(
                 uniqueSyncId,
             )
         }
         verify(exactly = times) {
-            eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(
+            eventSyncSubMasterWorkersBuilder.buildEndUpSyncReporterWorker(
                 uniqueSyncId,
-                any(),
                 any(),
             )
         }

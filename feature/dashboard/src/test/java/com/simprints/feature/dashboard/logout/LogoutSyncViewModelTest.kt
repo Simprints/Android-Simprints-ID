@@ -6,7 +6,8 @@ import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
-import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.infra.eventsync.status.models.DownSyncState
+import com.simprints.infra.eventsync.status.models.UpSyncState
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncStatus
 import com.simprints.infra.sync.SyncOrchestrator
@@ -92,12 +93,9 @@ internal class LogoutSyncViewModelTest {
 
     @Test
     fun `isLogoutWithoutSyncVisibleLiveData should return true when sync is not completed`() = runTest {
-        val eventSyncState = mockk<EventSyncState> {
-            every { isSyncCompleted() } returns false
-        }
         val imageSyncStatus = ImageSyncStatus(isSyncing = false, progress = null, lastUpdateTimeMillis = null)
 
-        setupSyncMocks(eventSyncState, imageSyncStatus)
+        setupSyncMocks(upSyncCompleted = false, imageSyncStatus = imageSyncStatus)
 
         val viewModel = createViewModel()
 
@@ -107,12 +105,9 @@ internal class LogoutSyncViewModelTest {
 
     @Test
     fun `isLogoutWithoutSyncVisibleLiveData should return true when image sync is running`() = runTest {
-        val eventSyncState = mockk<EventSyncState> {
-            every { isSyncCompleted() } returns true
-        }
         val imageSyncStatus = ImageSyncStatus(isSyncing = true, progress = null, lastUpdateTimeMillis = null)
 
-        setupSyncMocks(eventSyncState, imageSyncStatus)
+        setupSyncMocks(upSyncCompleted = true, imageSyncStatus = imageSyncStatus)
 
         val viewModel = createViewModel()
 
@@ -122,12 +117,9 @@ internal class LogoutSyncViewModelTest {
 
     @Test
     fun `isLogoutWithoutSyncVisibleLiveData should return false when conditions for logout are met`() = runTest {
-        val eventSyncState = mockk<EventSyncState> {
-            every { isSyncCompleted() } returns true
-        }
         val imageSyncStatus = ImageSyncStatus(isSyncing = false, progress = null, lastUpdateTimeMillis = null)
 
-        setupSyncMocks(eventSyncState, imageSyncStatus)
+        setupSyncMocks(upSyncCompleted = true, imageSyncStatus = imageSyncStatus)
 
         val viewModel = createViewModel()
 
@@ -136,10 +128,12 @@ internal class LogoutSyncViewModelTest {
     }
 
     private fun setupSyncMocks(
-        eventSyncState: EventSyncState,
+        upSyncCompleted: Boolean,
         imageSyncStatus: ImageSyncStatus,
     ) {
-        val statusFlow = MutableStateFlow(SyncStatus(eventSyncState = eventSyncState, imageSyncStatus = imageSyncStatus))
+        val upSyncState = mockk<UpSyncState>(relaxed = true) { every { isSyncCompleted() } returns upSyncCompleted }
+        val downSyncState = mockk<DownSyncState>(relaxed = true) { every { isSyncCompleted() } returns upSyncCompleted }
+        val statusFlow = MutableStateFlow(SyncStatus(upSyncState = upSyncState, downSyncState = downSyncState, imageSyncStatus = imageSyncStatus))
         every { syncOrchestrator.observeSyncState() } returns statusFlow
     }
 

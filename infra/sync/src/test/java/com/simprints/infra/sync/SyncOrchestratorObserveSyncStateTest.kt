@@ -5,8 +5,10 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.eventsync.DeleteSyncInfoUseCase
 import com.simprints.infra.eventsync.EventSyncWorkerTagRepository
-import com.simprints.infra.eventsync.status.models.EventSyncState
-import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
+import com.simprints.infra.eventsync.status.models.DownSyncState
+import com.simprints.infra.eventsync.status.models.UpSyncState
+import com.simprints.infra.eventsync.sync.down.DownSyncStateProcessor
+import com.simprints.infra.eventsync.sync.up.UpSyncStateProcessor
 import com.simprints.infra.sync.firmware.ShouldScheduleFirmwareUpdateUseCase
 import com.simprints.infra.sync.usecase.CleanupDeprecatedWorkersUseCase
 import com.simprints.infra.sync.usecase.internal.ObserveImageSyncStatusUseCase
@@ -43,7 +45,10 @@ class SyncOrchestratorObserveSyncStateTest {
     private lateinit var eventSyncWorkerTagRepository: EventSyncWorkerTagRepository
 
     @MockK
-    private lateinit var eventSyncStateProcessor: EventSyncStateProcessor
+    private lateinit var upSyncStateProcessor: UpSyncStateProcessor
+
+    @MockK
+    private lateinit var downSyncStateProcessor: DownSyncStateProcessor
 
     @MockK
     private lateinit var observeImageSyncStatus: ObserveImageSyncStatusUseCase
@@ -57,27 +62,34 @@ class SyncOrchestratorObserveSyncStateTest {
     @MockK
     private lateinit var imageSyncTimestampProvider: ImageSyncTimestampProvider
 
-    private val eventSyncStatusFlow = MutableSharedFlow<EventSyncState>()
+    private val upSyncStatusFlow = MutableSharedFlow<UpSyncState>()
+    private val downSyncStatusFlow = MutableSharedFlow<DownSyncState>()
     private val imageSyncStatusFlow = MutableSharedFlow<ImageSyncStatus>()
 
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
         every { workManager.getWorkInfosFlow(any()) } returns flowOf(emptyList())
-        every { eventSyncStateProcessor.getLastSyncState() } returns eventSyncStatusFlow
+        every { upSyncStateProcessor.getLastUpSyncState() } returns upSyncStatusFlow
+        every { downSyncStateProcessor.getLastDownSyncState() } returns downSyncStatusFlow
         every { observeImageSyncStatus.invoke() } returns imageSyncStatusFlow
     }
 
     @Test
     fun `returns default SyncStatus before upstream flows emit`() = runTest {
         val expected = SyncStatus(
-            eventSyncState = EventSyncState(
+            upSyncState = UpSyncState(
                 syncId = "",
+                workersInfo = emptyList(),
                 progress = null,
                 total = null,
-                upSyncWorkersInfo = emptyList(),
-                downSyncWorkersInfo = emptyList(),
-                reporterStates = emptyList(),
+                lastSyncTime = null,
+            ),
+            downSyncState = DownSyncState(
+                syncId = "",
+                workersInfo = emptyList(),
+                progress = null,
+                total = null,
                 lastSyncTime = null,
             ),
             imageSyncStatus = ImageSyncStatus(
@@ -97,14 +109,19 @@ class SyncOrchestratorObserveSyncStateTest {
     }
 
     @Test
-    fun `combines latest event and image states into SyncStatus`() = runTest {
-        val event = EventSyncState(
-            syncId = "sync-1",
+    fun `combines latest up, down and image states into SyncStatus`() = runTest {
+        val upSync = UpSyncState(
+            syncId = "up-1",
+            workersInfo = emptyList(),
             progress = 1,
             total = 10,
-            upSyncWorkersInfo = emptyList(),
-            downSyncWorkersInfo = emptyList(),
-            reporterStates = emptyList(),
+            lastSyncTime = null,
+        )
+        val downSync = DownSyncState(
+            syncId = "down-1",
+            workersInfo = emptyList(),
+            progress = 3,
+            total = 10,
             lastSyncTime = null,
         )
         val image = ImageSyncStatus(
@@ -120,11 +137,12 @@ class SyncOrchestratorObserveSyncStateTest {
         val resultFlow = orchestrator.observeSyncState()
 
         runCurrent() // ensure upstream flows are collected before emitting
-        eventSyncStatusFlow.emit(event)
+        upSyncStatusFlow.emit(upSync)
+        downSyncStatusFlow.emit(downSync)
         imageSyncStatusFlow.emit(image)
         runCurrent()
 
-        assertThat(resultFlow.value).isEqualTo(SyncStatus(event, image))
+        assertThat(resultFlow.value).isEqualTo(SyncStatus(upSync, downSync, image))
     }
 
     @Test
@@ -138,7 +156,8 @@ class SyncOrchestratorObserveSyncStateTest {
         val flow2 = orchestrator.observeSyncState()
 
         assertThat(flow1).isSameInstanceAs(flow2)
-        verify(exactly = 1) { eventSyncStateProcessor.getLastSyncState() }
+        verify(exactly = 1) { upSyncStateProcessor.getLastUpSyncState() }
+        verify(exactly = 1) { downSyncStateProcessor.getLastDownSyncState() }
         verify(exactly = 1) { observeImageSyncStatus.invoke() }
     }
 
@@ -151,7 +170,8 @@ class SyncOrchestratorObserveSyncStateTest {
         configRepository = configRepository,
         deleteSyncInfo = deleteSyncInfo,
         eventSyncWorkerTagRepository = eventSyncWorkerTagRepository,
-        eventSyncStateProcessor = eventSyncStateProcessor,
+        upSyncStateProcessor = upSyncStateProcessor,
+        downSyncStateProcessor = downSyncStateProcessor,
         observeImageSyncStatus = observeImageSyncStatus,
         shouldScheduleFirmwareUpdate = shouldScheduleFirmwareUpdate,
         cleanupDeprecatedWorkers = cleanupDeprecatedWorkers,

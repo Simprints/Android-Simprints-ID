@@ -17,15 +17,27 @@ class ScheduleSyncCommandTest {
     }
 
     @Test
-    fun `events commands build expected command`() {
-        assertThat(ScheduleCommand.Events.reschedule())
-            .isEqualTo(ScheduleCommand.EventsCommand(action = ScheduleCommand.Action.RESCHEDULE, withDelay = false))
+    fun `up sync commands build expected command`() {
+        assertThat(ScheduleCommand.UpSync.reschedule())
+            .isEqualTo(ScheduleCommand.UpSyncCommand(action = ScheduleCommand.Action.RESCHEDULE, withDelay = false))
 
-        assertThat(ScheduleCommand.Events.reschedule(withDelay = true))
-            .isEqualTo(ScheduleCommand.EventsCommand(action = ScheduleCommand.Action.RESCHEDULE, withDelay = true))
+        assertThat(ScheduleCommand.UpSync.reschedule(withDelay = true))
+            .isEqualTo(ScheduleCommand.UpSyncCommand(action = ScheduleCommand.Action.RESCHEDULE, withDelay = true))
 
-        assertThat(ScheduleCommand.Events.unschedule())
-            .isEqualTo(ScheduleCommand.EventsCommand(action = ScheduleCommand.Action.UNSCHEDULE))
+        assertThat(ScheduleCommand.UpSync.unschedule())
+            .isEqualTo(ScheduleCommand.UpSyncCommand(action = ScheduleCommand.Action.UNSCHEDULE))
+    }
+
+    @Test
+    fun `down sync commands build expected command`() {
+        assertThat(ScheduleCommand.DownSync.reschedule())
+            .isEqualTo(ScheduleCommand.DownSyncCommand(action = ScheduleCommand.Action.RESCHEDULE, withDelay = false))
+
+        assertThat(ScheduleCommand.DownSync.reschedule(withDelay = true))
+            .isEqualTo(ScheduleCommand.DownSyncCommand(action = ScheduleCommand.Action.RESCHEDULE, withDelay = true))
+
+        assertThat(ScheduleCommand.DownSync.unschedule())
+            .isEqualTo(ScheduleCommand.DownSyncCommand(action = ScheduleCommand.Action.UNSCHEDULE))
     }
 
     @Test
