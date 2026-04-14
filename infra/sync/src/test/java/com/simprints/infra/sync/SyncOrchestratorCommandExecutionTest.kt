@@ -10,11 +10,13 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.eventsync.DeleteSyncInfoUseCase
 import com.simprints.infra.eventsync.EventSyncWorkerTagRepository
-import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
-import com.simprints.infra.eventsync.sync.master.EventSyncMasterWorker
+import com.simprints.infra.eventsync.sync.down.DownSyncStateProcessor
+import com.simprints.infra.eventsync.sync.up.UpSyncStateProcessor
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME
-import com.simprints.infra.sync.SyncConstants.EVENT_SYNC_WORK_NAME
-import com.simprints.infra.sync.SyncConstants.EVENT_SYNC_WORK_NAME_ONE_TIME
+import com.simprints.infra.sync.SyncConstants.EVENT_DOWN_SYNC_WORK_NAME
+import com.simprints.infra.sync.SyncConstants.EVENT_DOWN_SYNC_WORK_NAME_ONE_TIME
+import com.simprints.infra.sync.SyncConstants.EVENT_UP_SYNC_WORK_NAME
+import com.simprints.infra.sync.SyncConstants.EVENT_UP_SYNC_WORK_NAME_ONE_TIME
 import com.simprints.infra.sync.SyncConstants.FILE_UP_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.FIRMWARE_UPDATE_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.PROJECT_SYNC_WORK_NAME
@@ -56,7 +58,10 @@ class SyncOrchestratorCommandExecutionTest {
     private lateinit var eventSyncWorkerTagRepository: EventSyncWorkerTagRepository
 
     @MockK
-    private lateinit var eventSyncStateProcessor: EventSyncStateProcessor
+    private lateinit var upSyncStateProcessor: UpSyncStateProcessor
+
+    @MockK
+    private lateinit var downSyncStateProcessor: DownSyncStateProcessor
 
     @MockK
     private lateinit var observeImageSyncStatus: ObserveImageSyncStatusUseCase
@@ -100,7 +105,8 @@ class SyncOrchestratorCommandExecutionTest {
             workManager.enqueueUniquePeriodicWork(PROJECT_SYNC_WORK_NAME, any(), any())
             workManager.enqueueUniquePeriodicWork(DEVICE_SYNC_WORK_NAME, any(), any())
             workManager.enqueueUniquePeriodicWork(FILE_UP_SYNC_WORK_NAME, any(), any())
-            workManager.enqueueUniquePeriodicWork(EVENT_SYNC_WORK_NAME, any(), any())
+            workManager.enqueueUniquePeriodicWork(EVENT_UP_SYNC_WORK_NAME, any(), any())
+            workManager.enqueueUniquePeriodicWork(EVENT_DOWN_SYNC_WORK_NAME, any(), any())
             workManager.enqueueUniquePeriodicWork(FIRMWARE_UPDATE_WORK_NAME, any(), any())
         }
     }
@@ -166,22 +172,23 @@ class SyncOrchestratorCommandExecutionTest {
             workManager.cancelUniqueWork(PROJECT_SYNC_WORK_NAME)
             workManager.cancelUniqueWork(DEVICE_SYNC_WORK_NAME)
             workManager.cancelUniqueWork(FILE_UP_SYNC_WORK_NAME)
-            workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME)
-            workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME_ONE_TIME)
+            workManager.cancelUniqueWork(EVENT_UP_SYNC_WORK_NAME)
+            workManager.cancelUniqueWork(EVENT_UP_SYNC_WORK_NAME_ONE_TIME)
+            workManager.cancelUniqueWork(EVENT_DOWN_SYNC_WORK_NAME)
+            workManager.cancelUniqueWork(EVENT_DOWN_SYNC_WORK_NAME_ONE_TIME)
             workManager.cancelUniqueWork(FIRMWARE_UPDATE_WORK_NAME)
-            workManager.cancelAllWorkByTag("syncWorkers")
         }
     }
 
     @Test
-    fun `reschedules event sync worker with correct tags`() = runTest {
-        every { eventSyncWorkerTagRepository.getPeriodicWorkTags() } returns listOf("tag1", "tag2")
+    fun `reschedules up sync worker with correct tags`() = runTest {
+        every { eventSyncWorkerTagRepository.getUpSyncPeriodicWorkTags() } returns listOf("tag1", "tag2")
 
-        orchestrator.execute(ScheduleCommand.Events.reschedule()).join()
+        orchestrator.execute(ScheduleCommand.UpSync.reschedule()).join()
 
         verify {
             workManager.enqueueUniquePeriodicWork(
-                EVENT_SYNC_WORK_NAME,
+                EVENT_UP_SYNC_WORK_NAME,
                 any(),
                 match { it.tags.containsAll(setOf("tag1", "tag2")) },
             )
@@ -189,14 +196,14 @@ class SyncOrchestratorCommandExecutionTest {
     }
 
     @Test
-    fun `reschedules event sync worker with correct delay`() = runTest {
-        every { eventSyncWorkerTagRepository.getPeriodicWorkTags() } returns listOf("tag1", "tag2")
+    fun `reschedules up sync worker with correct delay`() = runTest {
+        every { eventSyncWorkerTagRepository.getUpSyncPeriodicWorkTags() } returns listOf("tag1", "tag2")
 
-        orchestrator.execute(ScheduleCommand.Events.reschedule(withDelay = true)).join()
+        orchestrator.execute(ScheduleCommand.UpSync.reschedule(withDelay = true)).join()
 
         verify {
             workManager.enqueueUniquePeriodicWork(
-                EVENT_SYNC_WORK_NAME,
+                EVENT_UP_SYNC_WORK_NAME,
                 any(),
                 match { it.workSpec.initialDelay > 0 },
             )
@@ -204,27 +211,55 @@ class SyncOrchestratorCommandExecutionTest {
     }
 
     @Test
-    fun `unschedule events cancels correct workers`() = runTest {
-        every { eventSyncWorkerTagRepository.getAllWorkerTag() } returns "syncWorkers"
+    fun `unschedule up sync cancels correct workers`() = runTest {
+        every { eventSyncWorkerTagRepository.getUpSyncAllWorkersTag() } returns "upSyncWorkers"
 
-        orchestrator.execute(ScheduleCommand.Events.unschedule())
+        orchestrator.execute(ScheduleCommand.UpSync.unschedule())
 
         verify {
-            workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME)
-            workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME_ONE_TIME)
-            workManager.cancelAllWorkByTag("syncWorkers")
+            workManager.cancelUniqueWork(EVENT_UP_SYNC_WORK_NAME)
+            workManager.cancelUniqueWork(EVENT_UP_SYNC_WORK_NAME_ONE_TIME)
+            workManager.cancelAllWorkByTag("upSyncWorkers")
         }
     }
 
     @Test
-    fun `start one-time event sync uses correct tags`() = runTest {
-        every { eventSyncWorkerTagRepository.getOneTimeWorkTags() } returns listOf("tag1", "tag2")
+    fun `reschedules down sync worker with correct tags`() = runTest {
+        every { eventSyncWorkerTagRepository.getDownSyncPeriodicWorkTags() } returns listOf("tag3", "tag4")
 
-        orchestrator.execute(OneTime.Events.start()).join()
+        orchestrator.execute(ScheduleCommand.DownSync.reschedule()).join()
+
+        verify {
+            workManager.enqueueUniquePeriodicWork(
+                EVENT_DOWN_SYNC_WORK_NAME,
+                any(),
+                match { it.tags.containsAll(setOf("tag3", "tag4")) },
+            )
+        }
+    }
+
+    @Test
+    fun `unschedule down sync cancels correct workers`() = runTest {
+        every { eventSyncWorkerTagRepository.getDownSyncAllWorkersTag() } returns "downSyncWorkers"
+
+        orchestrator.execute(ScheduleCommand.DownSync.unschedule())
+
+        verify {
+            workManager.cancelUniqueWork(EVENT_DOWN_SYNC_WORK_NAME)
+            workManager.cancelUniqueWork(EVENT_DOWN_SYNC_WORK_NAME_ONE_TIME)
+            workManager.cancelAllWorkByTag("downSyncWorkers")
+        }
+    }
+
+    @Test
+    fun `start one-time up sync uses correct tags`() = runTest {
+        every { eventSyncWorkerTagRepository.getUpSyncOneTimeWorkTags() } returns listOf("tag1", "tag2")
+
+        orchestrator.execute(OneTime.UpSync.start()).join()
 
         verify {
             workManager.enqueueUniqueWork(
-                EVENT_SYNC_WORK_NAME_ONE_TIME,
+                EVENT_UP_SYNC_WORK_NAME_ONE_TIME,
                 any(),
                 match<OneTimeWorkRequest> { it.tags.containsAll(setOf("tag1", "tag2")) },
             )
@@ -232,52 +267,59 @@ class SyncOrchestratorCommandExecutionTest {
     }
 
     @Test
-    fun `start one-time event sync uses correct input data`() = runTest {
-        every { eventSyncWorkerTagRepository.getOneTimeWorkTags() } returns listOf("tag1", "tag2")
+    fun `restart one-time up sync routes to stop and start`() = runTest {
+        every { eventSyncWorkerTagRepository.getUpSyncAllWorkersTag() } returns "upSyncWorkers"
+        every { eventSyncWorkerTagRepository.getUpSyncOneTimeWorkTags() } returns listOf("tag1", "tag2")
 
-        orchestrator.execute(OneTime.Events.start(isDownSyncAllowed = false)).join()
+        orchestrator.execute(OneTime.UpSync.restart()).join()
 
         verify {
+            workManager.cancelUniqueWork(EVENT_UP_SYNC_WORK_NAME_ONE_TIME)
+            workManager.cancelAllWorkByTag("upSyncWorkers")
             workManager.enqueueUniqueWork(
-                EVENT_SYNC_WORK_NAME_ONE_TIME,
+                EVENT_UP_SYNC_WORK_NAME_ONE_TIME,
                 any(),
-                match<OneTimeWorkRequest> {
-                    !it.workSpec.input.getBoolean(EventSyncMasterWorker.IS_DOWN_SYNC_ALLOWED, true)
-                },
+                match<OneTimeWorkRequest> { it.tags.containsAll(setOf("tag1", "tag2")) },
             )
         }
     }
 
     @Test
-    fun `restart one-time event sync routes to stop and start with expected input param`() = runTest {
-        every { eventSyncWorkerTagRepository.getAllWorkerTag() } returns "syncWorkers"
-        every { eventSyncWorkerTagRepository.getOneTimeWorkTags() } returns listOf("tag1", "tag2")
+    fun `stop one-time up sync cancels correct workers`() = runTest {
+        every { eventSyncWorkerTagRepository.getUpSyncAllWorkersTag() } returns "upSyncWorkers"
 
-        orchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)).join()
+        orchestrator.execute(OneTime.UpSync.stop())
 
         verify {
-            workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME_ONE_TIME)
-            workManager.cancelAllWorkByTag("syncWorkers")
+            workManager.cancelUniqueWork(EVENT_UP_SYNC_WORK_NAME_ONE_TIME)
+            workManager.cancelAllWorkByTag("upSyncWorkers")
+        }
+    }
+
+    @Test
+    fun `start one-time down sync uses correct tags`() = runTest {
+        every { eventSyncWorkerTagRepository.getDownSyncOneTimeWorkTags() } returns listOf("tag3", "tag4")
+
+        orchestrator.execute(OneTime.DownSync.start()).join()
+
+        verify {
             workManager.enqueueUniqueWork(
-                EVENT_SYNC_WORK_NAME_ONE_TIME,
+                EVENT_DOWN_SYNC_WORK_NAME_ONE_TIME,
                 any(),
-                match<OneTimeWorkRequest> {
-                    it.tags.containsAll(setOf("tag1", "tag2")) &&
-                        !it.workSpec.input.getBoolean(EventSyncMasterWorker.IS_DOWN_SYNC_ALLOWED, true)
-                },
+                match<OneTimeWorkRequest> { it.tags.containsAll(setOf("tag3", "tag4")) },
             )
         }
     }
 
     @Test
-    fun `stop one-time event sync cancels correct workers`() = runTest {
-        every { eventSyncWorkerTagRepository.getAllWorkerTag() } returns "syncWorkers"
+    fun `stop one-time down sync cancels correct workers`() = runTest {
+        every { eventSyncWorkerTagRepository.getDownSyncAllWorkersTag() } returns "downSyncWorkers"
 
-        orchestrator.execute(OneTime.Events.stop())
+        orchestrator.execute(OneTime.DownSync.stop())
 
         verify {
-            workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME_ONE_TIME)
-            workManager.cancelAllWorkByTag("syncWorkers")
+            workManager.cancelUniqueWork(EVENT_DOWN_SYNC_WORK_NAME_ONE_TIME)
+            workManager.cancelAllWorkByTag("downSyncWorkers")
         }
     }
 
@@ -365,7 +407,8 @@ class SyncOrchestratorCommandExecutionTest {
         configRepository = configRepository,
         deleteSyncInfo = deleteSyncInfo,
         eventSyncWorkerTagRepository = eventSyncWorkerTagRepository,
-        eventSyncStateProcessor = eventSyncStateProcessor,
+        upSyncStateProcessor = upSyncStateProcessor,
+        downSyncStateProcessor = downSyncStateProcessor,
         observeImageSyncStatus = observeImageSyncStatus,
         shouldScheduleFirmwareUpdate = shouldScheduleFirmwareUpdate,
         cleanupDeprecatedWorkers = cleanupDeprecatedWorkers,

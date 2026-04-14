@@ -1,19 +1,18 @@
 package com.simprints.feature.validatepool.usecase
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.simprints.infra.eventsync.status.models.DownSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
-import com.simprints.infra.sync.ImageSyncStatus
+import com.simprints.infra.eventsync.status.models.UpSyncState
 import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
-import com.simprints.infra.sync.SyncStatus
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -35,101 +34,112 @@ class RunBlockingEventSyncUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-
         usecase = RunBlockingEventSyncUseCase(syncOrchestrator)
     }
 
     @Test
-    fun `finishes execution when sync reporters are finished`() = runTest {
-        val syncFlow = MutableStateFlow(createSyncStatus("oldSync", EventSyncWorkerState.Succeeded))
-        setUpSync(syncFlow)
+    fun `finishes execution when both up and down sync complete`() = runTest {
+        val upFlow = MutableStateFlow(createUpSyncState("oldSync"))
+        val downFlow = MutableStateFlow(createDownSyncState("oldSync"))
+        setUpSync(upFlow, downFlow)
 
         launch { usecase.invoke() }
         testScheduler.advanceUntilIdle()
 
-        syncFlow.value = createSyncStatus("sync", EventSyncWorkerState.Succeeded)
+        upFlow.value = createUpSyncState("newSync", EventSyncWorkerState.Succeeded)
+        downFlow.value = createDownSyncState("newSync", EventSyncWorkerState.Succeeded)
         testScheduler.advanceUntilIdle()
 
-        verify(exactly = 1) { syncOrchestrator.observeSyncState() }
-        verify(exactly = 1) { syncOrchestrator.execute(OneTime.Events.start()) }
+        verify(exactly = 1) { syncOrchestrator.execute(OneTime.UpSync.start()) }
+        verify(exactly = 1) { syncOrchestrator.execute(OneTime.DownSync.start()) }
     }
 
     @Test
-    fun `finishes execution when sync reporters have failed`() = runTest {
-        val syncFlow = MutableStateFlow(createSyncStatus("oldSync", EventSyncWorkerState.Succeeded))
-        setUpSync(syncFlow)
+    fun `finishes execution when sync has failed`() = runTest {
+        val upFlow = MutableStateFlow(createUpSyncState("oldSync"))
+        val downFlow = MutableStateFlow(createDownSyncState("oldSync"))
+        setUpSync(upFlow, downFlow)
 
         launch { usecase.invoke() }
         testScheduler.advanceUntilIdle()
 
-        syncFlow.value = createSyncStatus("sync", EventSyncWorkerState.Failed())
+        upFlow.value = createUpSyncState("newSync", EventSyncWorkerState.Failed())
+        downFlow.value = createDownSyncState("newSync", EventSyncWorkerState.Failed())
         testScheduler.advanceUntilIdle()
 
-        verify(exactly = 1) { syncOrchestrator.observeSyncState() }
-        verify(exactly = 1) { syncOrchestrator.execute(OneTime.Events.start()) }
+        verify(exactly = 1) { syncOrchestrator.execute(OneTime.UpSync.start()) }
+        verify(exactly = 1) { syncOrchestrator.execute(OneTime.DownSync.start()) }
     }
 
     @Test
-    fun `finishes execution when sync reporters have been cancelled`() = runTest {
-        val syncFlow = MutableStateFlow(createSyncStatus("oldSync", EventSyncWorkerState.Succeeded))
-        setUpSync(syncFlow)
+    fun `finishes execution when sync has been cancelled`() = runTest {
+        val upFlow = MutableStateFlow(createUpSyncState("oldSync"))
+        val downFlow = MutableStateFlow(createDownSyncState("oldSync"))
+        setUpSync(upFlow, downFlow)
 
         launch { usecase.invoke() }
         testScheduler.advanceUntilIdle()
 
-        syncFlow.value = createSyncStatus("sync", EventSyncWorkerState.Cancelled)
+        upFlow.value = createUpSyncState("newSync", EventSyncWorkerState.Cancelled)
+        downFlow.value = createDownSyncState("newSync", EventSyncWorkerState.Cancelled)
         testScheduler.advanceUntilIdle()
 
-        verify(exactly = 1) { syncOrchestrator.observeSyncState() }
-        verify(exactly = 1) { syncOrchestrator.execute(OneTime.Events.start()) }
+        verify(exactly = 1) { syncOrchestrator.execute(OneTime.UpSync.start()) }
+        verify(exactly = 1) { syncOrchestrator.execute(OneTime.DownSync.start()) }
     }
 
     @Test
-    fun `does not start sync early when initial default state is emitted before last completed sync`() = runTest {
-        val syncFlow = MutableStateFlow(createPlaceholderSyncStatus())
-        setUpSync(syncFlow)
+    fun `does not finish early when initial state has no sync history`() = runTest {
+        val upFlow = MutableStateFlow(createUpSyncState(""))
+        val downFlow = MutableStateFlow(createDownSyncState(""))
+        setUpSync(upFlow, downFlow)
 
         val job = launch { usecase.invoke() }
         testScheduler.advanceUntilIdle()
 
-        verify(exactly = 0) { syncOrchestrator.execute(OneTime.Events.start()) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.UpSync.start()) }
 
-        syncFlow.value = createSyncStatus("sync", EventSyncWorkerState.Succeeded)
+        upFlow.value = createUpSyncState("newSync", EventSyncWorkerState.Succeeded)
+        downFlow.value = createDownSyncState("newSync", EventSyncWorkerState.Succeeded)
         testScheduler.advanceUntilIdle()
 
-        verify(exactly = 1) { syncOrchestrator.execute(OneTime.Events.start()) }
+        verify(exactly = 1) { syncOrchestrator.execute(OneTime.UpSync.start()) }
         job.cancel()
     }
 
-    private fun createSyncStatus(
+    private fun createUpSyncState(
         syncId: String,
-        endReporterState: EventSyncWorkerState?,
-        progress: Int? = 0,
-        total: Int? = 0,
-    ): SyncStatus {
-        val eventSyncState = EventSyncState(
-            syncId,
-            progress,
-            total,
-            emptyList(),
-            emptyList(),
-            listOfNotNull(
-                endReporterState?.let {
-                    EventSyncState.SyncWorkerInfo(EventSyncWorkerType.END_SYNC_REPORTER, it)
-                },
-            ),
-            null,
-        )
-        return SyncStatus(
-            eventSyncState = eventSyncState,
-            imageSyncStatus = ImageSyncStatus(isSyncing = false, progress = null, lastUpdateTimeMillis = null),
-        )
-    }
+        workerState: EventSyncWorkerState? = null,
+    ) = UpSyncState(
+        syncId = syncId,
+        workersInfo = listOfNotNull(
+            workerState?.let { EventSyncState.SyncWorkerInfo(EventSyncWorkerType.UPLOADER, it) },
+        ),
+        progress = null,
+        total = null,
+        lastSyncTime = null,
+    )
 
-    private fun setUpSync(syncFlow: StateFlow<SyncStatus>) {
-        every { syncOrchestrator.observeSyncState() } returns syncFlow
-        every { syncOrchestrator.execute(OneTime.Events.start()) } returns Job().apply { complete() }
-    }
+    private fun createDownSyncState(
+        syncId: String,
+        workerState: EventSyncWorkerState? = null,
+    ) = DownSyncState(
+        syncId = syncId,
+        workersInfo = listOfNotNull(
+            workerState?.let { EventSyncState.SyncWorkerInfo(EventSyncWorkerType.DOWNLOADER, it) },
+        ),
+        progress = null,
+        total = null,
+        lastSyncTime = null,
+    )
 
-    private fun createPlaceholderSyncStatus(): SyncStatus = createSyncStatus("", null, null, null)
+    private fun setUpSync(
+        upFlow: MutableStateFlow<UpSyncState>,
+        downFlow: MutableStateFlow<DownSyncState>,
+    ) {
+        every { syncOrchestrator.observeUpSyncState() } returns upFlow
+        every { syncOrchestrator.observeDownSyncState() } returns downFlow
+        every { syncOrchestrator.execute(OneTime.UpSync.start()) } returns Job().apply { complete() }
+        every { syncOrchestrator.execute(OneTime.DownSync.start()) } returns Job().apply { complete() }
+    }
 }

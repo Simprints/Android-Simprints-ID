@@ -15,7 +15,8 @@ import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
-import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.infra.eventsync.status.models.DownSyncState
+import com.simprints.infra.eventsync.status.models.UpSyncState
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncableCounts
 import javax.inject.Inject
@@ -29,14 +30,16 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
         isPreLogoutUpSync: Boolean,
         isOnline: Boolean,
         projectId: String,
-        eventSyncState: EventSyncState,
+        upSyncState: UpSyncState,
+        downSyncState: DownSyncState,
         imageSyncStatus: ImageSyncStatus,
         syncableCounts: SyncableCounts,
         isProjectRunning: Boolean,
         moduleCounts: List<ModuleCount>,
         projectConfig: ProjectConfiguration,
     ): SyncInfoSectionRecords {
-        val isSyncInProgress = eventSyncState.isSyncInProgress() ||
+        val isSyncInProgress = upSyncState.isSyncInProgress() ||
+            downSyncState.isSyncInProgress() ||
             (isPreLogoutUpSync && imageSyncStatus.isSyncing) // also in progress if combined with image sync
 
         val counterTotalRecords = getRecordsTotal(isSyncInProgress, projectId, syncableCounts)
@@ -44,12 +47,19 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
         val counterRecordsToUpload = getRecordsToUpload(isSyncInProgress, syncableCounts)
         val counterImagesToUpload = getImagesToUpload(imageSyncStatus, syncableCounts)
 
-        val progress = getSyncProgressInfo(isSyncInProgress, isPreLogoutUpSync, eventSyncState, imageSyncStatus, syncableCounts)
+        val progress = getSyncProgressInfo(isSyncInProgress, isPreLogoutUpSync, upSyncState, imageSyncStatus, syncableCounts)
 
         val recordSyncVisibleState =
-            getSyncVisibleState(isSyncInProgress, isOnline, isPreLogoutUpSync, projectConfig, moduleCounts, eventSyncState)
+            getSyncVisibleState(isSyncInProgress, isOnline, isPreLogoutUpSync, projectConfig, moduleCounts, upSyncState, downSyncState)
 
-        val isSyncButtonEnabled = isSyncButtonEnabled(isOnline, isPreLogoutUpSync, projectConfig, eventSyncState, recordSyncVisibleState)
+        val isSyncButtonEnabled = isSyncButtonEnabled(isOnline, isPreLogoutUpSync, projectConfig, upSyncState, downSyncState, recordSyncVisibleState)
+
+        val isSyncFailed = upSyncState.isSyncFailed() || downSyncState.isSyncFailed()
+        val isSyncCompleted = upSyncState.isSyncCompleted() && (isPreLogoutUpSync || downSyncState.isSyncCompleted())
+        val lastSyncTimestamp = listOfNotNull(upSyncState.lastSyncTime, downSyncState.lastSyncTime)
+            .maxOrNull()
+            ?.let { it }
+            ?: Timestamp(-1)
 
         return SyncInfoSectionRecords(
             counterTotalRecords = counterTotalRecords,
@@ -60,21 +70,25 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
             counterImagesToUpload = counterImagesToUpload,
             recordSyncVisibleState = recordSyncVisibleState,
             instructionPopupErrorInfo = SyncInfoError(
-                isBackendMaintenance = eventSyncState.isSyncFailedBecauseBackendMaintenance(),
-                backendMaintenanceEstimatedOutage = eventSyncState.getEstimatedBackendMaintenanceOutage() ?: -1,
-                isTooManyRequests = eventSyncState.isSyncFailedBecauseTooManyRequests(),
+                isBackendMaintenance = upSyncState.isSyncFailedBecauseBackendMaintenance() ||
+                    downSyncState.isSyncFailedBecauseBackendMaintenance(),
+                backendMaintenanceEstimatedOutage = upSyncState.getEstimatedBackendMaintenanceOutage()
+                    ?: downSyncState.getEstimatedBackendMaintenanceOutage()
+                    ?: -1,
+                isTooManyRequests = upSyncState.isSyncFailedBecauseTooManyRequests() ||
+                    downSyncState.isSyncFailedBecauseTooManyRequests(),
             ),
             isProgressVisible = recordSyncVisibleState == RecordSyncVisibleState.IN_PROGRESS,
             progress = progress,
-            isSyncButtonVisible = !isPreLogoutUpSync || eventSyncState.isSyncFailed(),
+            isSyncButtonVisible = !isPreLogoutUpSync || isSyncFailed,
             isSyncButtonEnabled = isSyncButtonEnabled,
-            isSyncButtonForRetry = eventSyncState.isSyncFailed(),
+            isSyncButtonForRetry = isSyncFailed,
             isFooterSyncInProgressVisible = isPreLogoutUpSync && isSyncInProgress,
-            isFooterReadyToLogOutVisible = isPreLogoutUpSync && eventSyncState.isSyncCompleted() && !imageSyncStatus.isSyncing,
-            isFooterSyncIncompleteVisible = isPreLogoutUpSync && eventSyncState.isSyncFailed(),
+            isFooterReadyToLogOutVisible = isPreLogoutUpSync && isSyncCompleted && !imageSyncStatus.isSyncing,
+            isFooterSyncIncompleteVisible = isPreLogoutUpSync && isSyncFailed,
             isFooterLastSyncTimeVisible =
-                !isPreLogoutUpSync && !eventSyncState.isSyncInProgress() && eventSyncState.lastSyncTimestamp.ms >= 0,
-            footerLastSyncMinutesAgo = timeHelper.readableBetweenNowAndTime(eventSyncState.lastSyncTimestamp),
+                !isPreLogoutUpSync && !isSyncInProgress && lastSyncTimestamp.ms >= 0,
+            footerLastSyncMinutesAgo = timeHelper.readableBetweenNowAndTime(lastSyncTimestamp),
         )
     }
 
@@ -122,27 +136,27 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
     private fun getSyncProgressInfo(
         isSyncInProgress: Boolean,
         isPreLogoutUpSync: Boolean,
-        eventSyncState: EventSyncState,
+        upSyncState: UpSyncState,
         imageSyncStatus: ImageSyncStatus,
         syncableCounts: SyncableCounts,
     ): SyncProgressInfo {
         if (!isSyncInProgress) {
             return SyncProgressInfo()
         }
-        val combinedProgressProportion = getCombinedProgressProportion(isPreLogoutUpSync, eventSyncState, imageSyncStatus)
-        val (currentEvents, totalEvents) = eventSyncState.nonNegativeProgress
+        val combinedProgressProportion = getCombinedProgressProportion(isPreLogoutUpSync, upSyncState, imageSyncStatus)
+        val (currentEvents, totalEvents) = upSyncState.nonNegativeProgress
         val (currentImages, totalImages) = imageSyncStatus.nonNegativeProgress
 
         val eventSyncProgressPart = SyncProgressInfoPart(
-            isPending = eventSyncState.isSyncConnecting() || !eventSyncState.hasSyncHistory(),
-            isDone = eventSyncState.isSyncCompleted(),
-            areNumbersVisible = eventSyncState.isSyncInProgress() && totalEvents > 0,
+            isPending = upSyncState.isSyncConnecting() || !upSyncState.hasSyncHistory(),
+            isDone = upSyncState.isSyncCompleted(),
+            areNumbersVisible = upSyncState.isSyncInProgress() && totalEvents > 0,
             currentNumber = currentEvents,
             totalNumber = totalEvents,
         )
         val imageSyncProgressPart = SyncProgressInfoPart(
-            isPending = eventSyncState.isSyncInProgress() && !imageSyncStatus.isSyncing,
-            isDone = !eventSyncState.isSyncInProgress() && !imageSyncStatus.isSyncing && syncableCounts.samplesToUpload == 0,
+            isPending = upSyncState.isSyncInProgress() && !imageSyncStatus.isSyncing,
+            isDone = !upSyncState.isSyncInProgress() && !imageSyncStatus.isSyncing && syncableCounts.samplesToUpload == 0,
             areNumbersVisible = imageSyncStatus.isSyncing && totalImages > 0,
             currentNumber = currentImages,
             totalNumber = totalImages,
@@ -159,33 +173,33 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
 
     private fun getCombinedProgressProportion(
         isPreLogoutUpSync: Boolean,
-        eventSyncState: EventSyncState,
+        upSyncState: UpSyncState,
         imageSyncStatus: ImageSyncStatus,
     ): Float {
-        val eventPartProgressProportion = eventSyncState.normalizedProgressProportion
+        val eventPartProgressProportion = upSyncState.normalizedProgressProportion
         val imagePartProgressProportion = imageSyncStatus.normalizedProgressProportion
         val totalImages = imageSyncStatus.nonNegativeProgress.let { (_, total) -> total }
-        val totalEvents = eventSyncState.nonNegativeProgress.let { (_, total) -> total }
+        val totalEvents = upSyncState.nonNegativeProgress.let { (_, total) -> total }
 
         return when {
             // Combined progressbar in pre-logout screen, event sync done => updating images part in [0.5;1] range
-            isPreLogoutUpSync && eventSyncState.isSyncCompleted() && totalImages > 0 -> (0.5f + 0.5f * imagePartProgressProportion)
+            isPreLogoutUpSync && upSyncState.isSyncCompleted() && totalImages > 0 -> (0.5f + 0.5f * imagePartProgressProportion)
 
             // Combined progressbar in pre-logout screen, event sync in progress => updating events part in [0;0.5] range
-            isPreLogoutUpSync && eventSyncState.isSyncInProgress() && totalEvents > 0 -> 0.5f * eventPartProgressProportion
+            isPreLogoutUpSync && upSyncState.isSyncInProgress() && totalEvents > 0 -> 0.5f * eventPartProgressProportion
 
             // Showing only event sync progress
-            eventSyncState.isSyncInProgress() && totalEvents > 0 -> eventPartProgressProportion
+            upSyncState.isSyncInProgress() && totalEvents > 0 -> eventPartProgressProportion
 
             // Sync hasn't started
-            eventSyncState.isSyncConnecting() || !eventSyncState.hasSyncHistory() -> 0f
+            upSyncState.isSyncConnecting() || !upSyncState.hasSyncHistory() -> 0f
 
             // Sync done
             else -> 1f
         }
     }
 
-    private val EventSyncState.lastSyncTimestamp: Timestamp
+    private val UpSyncState.lastSyncTimestamp: Timestamp
         get() = lastSyncTime ?: Timestamp(-1)
 
     private fun getSyncVisibleState(
@@ -194,7 +208,8 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
         isPreLogoutUpSync: Boolean,
         projectConfig: ProjectConfiguration,
         moduleCounts: List<ModuleCount>,
-        eventSyncState: EventSyncState,
+        upSyncState: UpSyncState,
+        downSyncState: DownSyncState,
     ): RecordSyncVisibleState {
         val isModuleSelectionRequired =
             !isPreLogoutUpSync && projectConfig.isModuleSelectionAvailable() && moduleCounts.isEmpty()
@@ -203,12 +218,13 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
             !isPreLogoutUpSync && projectConfig.isCommCareEventDownSyncAllowed()
         val isCommCareSyncBlockedByDeniedPermission =
             isCommCareSyncExpected &&
-                eventSyncState.isSyncFailedBecauseCommCarePermissionIsMissing() &&
+                downSyncState.isSyncFailedBecauseCommCarePermissionIsMissing() &&
                 !commCarePermissionChecker.hasCommCarePermissions()
         val isEventSyncConnectionBlocked =
             !isOnline && !isCommCareSyncExpected // CommCare would be able to sync even if device is offline
+        val isSyncFailed = upSyncState.isSyncFailed() || downSyncState.isSyncFailed()
         val isSyncFailedForNonCommCareReason =
-            eventSyncState.isSyncFailed() && !eventSyncState.isSyncFailedBecauseCommCarePermissionIsMissing()
+            isSyncFailed && !downSyncState.isSyncFailedBecauseCommCarePermissionIsMissing()
 
         return when {
             isSyncInProgress -> RecordSyncVisibleState.IN_PROGRESS
@@ -225,17 +241,19 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
         isOnline: Boolean,
         isPreLogoutUpSync: Boolean,
         projectConfig: ProjectConfiguration,
-        eventSyncState: EventSyncState,
+        upSyncState: UpSyncState,
+        downSyncState: DownSyncState,
         recordSyncVisibleState: RecordSyncVisibleState,
     ): Boolean {
-        val isReLoginRequired = eventSyncState.isSyncFailedBecauseReloginRequired()
+        val isReLoginRequired = upSyncState.isSyncFailedBecauseReloginRequired() ||
+            downSyncState.isSyncFailedBecauseReloginRequired()
         val isEventUpSyncPossible = isOnline && projectConfig.canSyncDataToSimprints()
         val isDownSyncPossible =
             (isOnline && !isReLoginRequired && projectConfig.isSimprintsEventDownSyncAllowed()) ||
                 (
                     projectConfig.isCommCareEventDownSyncAllowed() &&
                         (
-                            !eventSyncState.isSyncFailedBecauseCommCarePermissionIsMissing() ||
+                            !downSyncState.isSyncFailedBecauseCommCarePermissionIsMissing() ||
                                 commCarePermissionChecker.hasCommCarePermissions()
                         )
                 )

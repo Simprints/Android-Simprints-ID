@@ -24,7 +24,8 @@ import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSampleUploadEnabledInProject
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
-import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.infra.eventsync.status.models.DownSyncState
+import com.simprints.infra.eventsync.status.models.UpSyncState
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncOrchestrator
@@ -65,7 +66,7 @@ internal class ObserveSyncInfoUseCaseTest {
     private val getSyncInfoSectionRecords = mockk<GetSyncInfoSectionRecordsUseCase>()
 
     private val syncStatusFlow = MutableStateFlow(
-        SyncStatus(eventSyncState = mockk(relaxed = true), imageSyncStatus = mockk(relaxed = true)),
+        SyncStatus(upSyncState = mockk(relaxed = true), downSyncState = mockk(relaxed = true), imageSyncStatus = mockk(relaxed = true)),
     )
     private val syncableCountsFlow = MutableStateFlow(
         SyncableCounts(
@@ -104,7 +105,20 @@ internal class ObserveSyncInfoUseCaseTest {
         every { synchronization } returns createMockSynchronizationConfiguration()
     }
 
-    private val mockEventSyncState = mockk<EventSyncState>(relaxed = true) {
+    private val mockUpSyncState = mockk<UpSyncState>(relaxed = true) {
+        every { isSyncCompleted() } returns false
+        every { isSyncInProgress() } returns false
+        every { isSyncConnecting() } returns false
+        every { isSyncRunning() } returns false
+        every { isSyncFailed() } returns false
+        every { isSyncFailedBecauseReloginRequired() } returns false
+        every { isSyncFailedBecauseBackendMaintenance() } returns false
+        every { isSyncFailedBecauseTooManyRequests() } returns false
+        every { hasSyncHistory() } returns true
+        every { progress } returns null
+        every { total } returns null
+    }
+    private val mockDownSyncState = mockk<DownSyncState>(relaxed = true) {
         every { isSyncCompleted() } returns false
         every { isSyncInProgress() } returns false
         every { isSyncConnecting() } returns false
@@ -139,10 +153,11 @@ internal class ObserveSyncInfoUseCaseTest {
 
         every { connectivityTracker.observeIsConnected() } returns flowOf(true)
 
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockEventSyncState, imageSyncStatus = mockImageSyncStatus)
+        syncStatusFlow.value = SyncStatus(upSyncState = mockUpSyncState, downSyncState = mockDownSyncState, imageSyncStatus = mockImageSyncStatus)
         every { syncOrchestrator.observeSyncState() } returns syncStatusFlow
 
-        every { mockEventSyncState.lastSyncTime } returns TEST_TIMESTAMP
+        every { mockUpSyncState.lastSyncTime } returns TEST_TIMESTAMP
+        every { mockDownSyncState.lastSyncTime } returns TEST_TIMESTAMP
         syncableCountsFlow.value = SyncableCounts(
             totalRecords = 0,
             recordEventsToDownload = 0,
@@ -165,11 +180,11 @@ internal class ObserveSyncInfoUseCaseTest {
         every { any<ProjectConfiguration>().isSampleUploadEnabledInProject() } returns true
 
         every {
-            getSyncInfoSectionRecords(any(), any(), any(), any(), any(), any(), any(), any(), any())
+            getSyncInfoSectionRecords(any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
         } returns SyncInfoSectionRecords()
 
         every {
-            getSyncInfoSectionImages(any(), any(), any(), any())
+            getSyncInfoSectionImages(any(), any(), any(), any(), any())
         } returns SyncInfoSectionImages()
     }
 
@@ -190,10 +205,13 @@ internal class ObserveSyncInfoUseCaseTest {
 
     @Test
     fun `should not show re-login prompt when sync has not failed due to authentication`() = runTest {
-        val mockNormalEventSyncState = mockk<EventSyncState>(relaxed = true) {
+        val mockNormalUpSyncState = mockk<UpSyncState>(relaxed = true) {
             every { isSyncFailedBecauseReloginRequired() } returns false
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockNormalEventSyncState, imageSyncStatus = mockImageSyncStatus)
+        val mockNormalDownSyncState = mockk<DownSyncState>(relaxed = true) {
+            every { isSyncFailedBecauseReloginRequired() } returns false
+        }
+        syncStatusFlow.value = SyncStatus(upSyncState = mockNormalUpSyncState, downSyncState = mockNormalDownSyncState, imageSyncStatus = mockImageSyncStatus)
         createUseCase()
 
         val result = useCase().first()
@@ -214,10 +232,13 @@ internal class ObserveSyncInfoUseCaseTest {
     @Test
     fun `should show re-login prompt when sync failed due to authentication required`() = runTest {
         every { observeConfigurationFlow.invoke() } returns flowOf(createConfigurationState())
-        val mockFailedEventSyncState = mockk<EventSyncState>(relaxed = true) {
+        val mockFailedUpSyncState = mockk<UpSyncState>(relaxed = true) {
             every { isSyncFailedBecauseReloginRequired() } returns true
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockFailedEventSyncState, imageSyncStatus = mockImageSyncStatus)
+        val mockFailedDownSyncState = mockk<DownSyncState>(relaxed = true) {
+            every { isSyncFailedBecauseReloginRequired() } returns false
+        }
+        syncStatusFlow.value = SyncStatus(upSyncState = mockFailedUpSyncState, downSyncState = mockFailedDownSyncState, imageSyncStatus = mockImageSyncStatus)
         createUseCase()
 
         val result = useCase().first()
@@ -227,10 +248,13 @@ internal class ObserveSyncInfoUseCaseTest {
 
     @Test
     fun `should show re-login prompt correctly based on pre-logout mode`() = runTest {
-        val mockFailedEventSyncState = mockk<EventSyncState>(relaxed = true) {
+        val mockFailedUpSyncState = mockk<UpSyncState>(relaxed = true) {
             every { isSyncFailedBecauseReloginRequired() } returns true
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockFailedEventSyncState, imageSyncStatus = mockImageSyncStatus)
+        val mockFailedDownSyncState = mockk<DownSyncState>(relaxed = true) {
+            every { isSyncFailedBecauseReloginRequired() } returns false
+        }
+        syncStatusFlow.value = SyncStatus(upSyncState = mockFailedUpSyncState, downSyncState = mockFailedDownSyncState, imageSyncStatus = mockImageSyncStatus)
         createUseCase()
 
         val result = useCase(
@@ -342,15 +366,15 @@ internal class ObserveSyncInfoUseCaseTest {
 
         useCase().first()
 
-        verify { getSyncInfoSectionRecords(any(), isOnline = false, any(), any(), any(), any(), any(), any(), any()) }
-        verify { getSyncInfoSectionImages(isOnline = false, any(), any(), any()) }
+        verify { getSyncInfoSectionRecords(any(), isOnline = false, any(), any(), any(), any(), any(), any(), any(), any()) }
+        verify { getSyncInfoSectionImages(isOnline = false, any(), any(), any(), any()) }
 
         connectivityFlow.value = true
 
         useCase().first()
 
-        verify { getSyncInfoSectionRecords(any(), isOnline = true, any(), any(), any(), any(), any(), any(), any()) }
-        verify { getSyncInfoSectionImages(isOnline = true, any(), any(), any()) }
+        verify { getSyncInfoSectionRecords(any(), isOnline = true, any(), any(), any(), any(), any(), any(), any(), any()) }
+        verify { getSyncInfoSectionImages(isOnline = true, any(), any(), any(), any()) }
     }
 
     // Flow combination tests
@@ -363,15 +387,15 @@ internal class ObserveSyncInfoUseCaseTest {
 
         useCase().first()
 
-        verify { getSyncInfoSectionRecords(any(), isOnline = false, any(), any(), any(), any(), any(), any(), any()) }
-        verify { getSyncInfoSectionImages(isOnline = false, any(), any(), any()) }
+        verify { getSyncInfoSectionRecords(any(), isOnline = false, any(), any(), any(), any(), any(), any(), any(), any()) }
+        verify { getSyncInfoSectionImages(isOnline = false, any(), any(), any(), any()) }
 
         connectivityFlow.value = true // changed to online
 
         useCase().first()
 
-        verify { getSyncInfoSectionRecords(any(), isOnline = true, any(), any(), any(), any(), any(), any(), any()) }
-        verify { getSyncInfoSectionImages(isOnline = true, any(), any(), any()) }
+        verify { getSyncInfoSectionRecords(any(), isOnline = true, any(), any(), any(), any(), any(), any(), any(), any()) }
+        verify { getSyncInfoSectionImages(isOnline = true, any(), any(), any(), any()) }
     }
 
     @Test
@@ -410,26 +434,34 @@ internal class ObserveSyncInfoUseCaseTest {
 
     @Test
     fun `should handle changes in event sync state stream`() = runTest {
-        val mockIdleState = mockk<EventSyncState>(relaxed = true) {
+        val mockIdleUpSyncState = mockk<UpSyncState>(relaxed = true) {
             every { isSyncInProgress() } returns false
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockIdleState, imageSyncStatus = mockImageSyncStatus)
+        val mockIdleDownSyncState = mockk<DownSyncState>(relaxed = true) {
+            every { isSyncInProgress() } returns false
+        }
+        syncStatusFlow.value = SyncStatus(upSyncState = mockIdleUpSyncState, downSyncState = mockIdleDownSyncState, imageSyncStatus = mockImageSyncStatus)
         createUseCase()
 
         useCase().first()
 
-        verify { getSyncInfoSectionRecords(any(), any(), any(), mockIdleState, any(), any(), any(), any(), any()) }
+        verify { getSyncInfoSectionRecords(any(), any(), any(), mockIdleUpSyncState, mockIdleDownSyncState, any(), any(), any(), any(), any()) }
 
-        val mockSyncingState = mockk<EventSyncState>(relaxed = true) {
+        val mockSyncingUpSyncState = mockk<UpSyncState>(relaxed = true) {
             every { isSyncInProgress() } returns true
             every { progress } returns 1
             every { total } returns 2
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockSyncingState, imageSyncStatus = mockImageSyncStatus)
+        val mockSyncingDownSyncState = mockk<DownSyncState>(relaxed = true) {
+            every { isSyncInProgress() } returns true
+            every { progress } returns 1
+            every { total } returns 2
+        }
+        syncStatusFlow.value = SyncStatus(upSyncState = mockSyncingUpSyncState, downSyncState = mockSyncingDownSyncState, imageSyncStatus = mockImageSyncStatus)
 
         useCase().first()
 
-        verify { getSyncInfoSectionRecords(any(), any(), any(), mockSyncingState, any(), any(), any(), any(), any()) }
+        verify { getSyncInfoSectionRecords(any(), any(), any(), mockSyncingUpSyncState, mockSyncingDownSyncState, any(), any(), any(), any(), any()) }
     }
 
     @Test
@@ -439,23 +471,23 @@ internal class ObserveSyncInfoUseCaseTest {
             every { progress } returns null
             every { lastUpdateTimeMillis } returns null
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockEventSyncState, imageSyncStatus = notSyncingImageStatus)
+        syncStatusFlow.value = SyncStatus(upSyncState = mockUpSyncState, downSyncState = mockDownSyncState, imageSyncStatus = notSyncingImageStatus)
         createUseCase()
 
         useCase().first()
 
-        verify { getSyncInfoSectionImages(any(), any(), notSyncingImageStatus, any()) }
+        verify { getSyncInfoSectionImages(any(), any(), any(), notSyncingImageStatus, any()) }
 
         val syncingImageStatus = mockk<ImageSyncStatus> {
             every { isSyncing } returns true
             every { progress } returns Pair(1, 2)
             every { lastUpdateTimeMillis } returns null
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockEventSyncState, imageSyncStatus = syncingImageStatus)
+        syncStatusFlow.value = SyncStatus(upSyncState = mockUpSyncState, downSyncState = mockDownSyncState, imageSyncStatus = syncingImageStatus)
 
         useCase().first()
 
-        verify { getSyncInfoSectionImages(any(), any(), syncingImageStatus, any()) }
+        verify { getSyncInfoSectionImages(any(), any(), any(), syncingImageStatus, any()) }
     }
 
     @Test
@@ -525,11 +557,15 @@ internal class ObserveSyncInfoUseCaseTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `should handle changes in time pacing stream`() = runTest {
-        val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
+        val mockIdleUpSyncState = mockk<UpSyncState>(relaxed = true) {
             every { isSyncRunning() } returns false
             every { lastSyncTime } returns TEST_TIMESTAMP
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus)
+        val mockIdleDownSyncState = mockk<DownSyncState>(relaxed = true) {
+            every { isSyncRunning() } returns false
+            every { lastSyncTime } returns TEST_TIMESTAMP
+        }
+        syncStatusFlow.value = SyncStatus(upSyncState = mockIdleUpSyncState, downSyncState = mockIdleDownSyncState, imageSyncStatus = mockImageSyncStatus)
         val timeHelper = mockk<TimeHelper>()
         val commCarePermissionChecker = mockk<CommCarePermissionChecker>()
         var nowMs = TEST_TIMESTAMP.ms

@@ -15,9 +15,12 @@ import com.simprints.infra.config.store.models.imagesUploadRequiresUnmeteredConn
 import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.eventsync.DeleteSyncInfoUseCase
 import com.simprints.infra.eventsync.EventSyncWorkerTagRepository
-import com.simprints.infra.eventsync.status.models.EventSyncState
-import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
-import com.simprints.infra.eventsync.sync.master.EventSyncMasterWorker
+import com.simprints.infra.eventsync.status.models.DownSyncState
+import com.simprints.infra.eventsync.status.models.UpSyncState
+import com.simprints.infra.eventsync.sync.down.DownSyncStateProcessor
+import com.simprints.infra.eventsync.sync.master.EventDownSyncMasterWorker
+import com.simprints.infra.eventsync.sync.master.EventUpSyncMasterWorker
+import com.simprints.infra.eventsync.sync.up.UpSyncStateProcessor
 import com.simprints.infra.sync.config.worker.DeviceConfigDownSyncWorker
 import com.simprints.infra.sync.config.worker.ProjectConfigDownSyncWorker
 import com.simprints.infra.sync.enrolments.EnrolmentRecordWorker
@@ -53,7 +56,8 @@ internal class SyncOrchestratorImpl @Inject constructor(
     private val configRepository: ConfigRepository,
     private val deleteSyncInfo: DeleteSyncInfoUseCase,
     private val eventSyncWorkerTagRepository: EventSyncWorkerTagRepository,
-    private val eventSyncStateProcessor: EventSyncStateProcessor,
+    private val upSyncStateProcessor: UpSyncStateProcessor,
+    private val downSyncStateProcessor: DownSyncStateProcessor,
     private val observeImageSyncStatus: ObserveImageSyncStatusUseCase,
     private val shouldScheduleFirmwareUpdate: ShouldScheduleFirmwareUpdateUseCase,
     private val cleanupDeprecatedWorkers: CleanupDeprecatedWorkersUseCase,
@@ -61,13 +65,18 @@ internal class SyncOrchestratorImpl @Inject constructor(
     @param:AppScope private val appScope: CoroutineScope,
     @param:DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) : SyncOrchestrator {
-    private val defaultEventSyncState = EventSyncState(
+    private val defaultUpSyncState = UpSyncState(
         syncId = "",
         progress = null,
         total = null,
-        upSyncWorkersInfo = emptyList(),
-        downSyncWorkersInfo = emptyList(),
-        reporterStates = emptyList(),
+        workersInfo = emptyList(),
+        lastSyncTime = null,
+    )
+    private val defaultDownSyncState = DownSyncState(
+        syncId = "",
+        progress = null,
+        total = null,
+        workersInfo = emptyList(),
         lastSyncTime = null,
     )
     private val defaultImageSyncStatus = ImageSyncStatus(
@@ -75,18 +84,32 @@ internal class SyncOrchestratorImpl @Inject constructor(
         progress = null,
         lastUpdateTimeMillis = -1L,
     )
-    private val defaultSyncStatus = SyncStatus(defaultEventSyncState, defaultImageSyncStatus)
+
+    private val sharedUpSyncState: StateFlow<UpSyncState> by lazy {
+        upSyncStateProcessor
+            .getLastUpSyncState()
+            .onStart { emit(defaultUpSyncState) }
+            .stateIn(appScope, SharingStarted.Eagerly, defaultUpSyncState)
+    }
+
+    private val sharedDownSyncState: StateFlow<DownSyncState> by lazy {
+        downSyncStateProcessor
+            .getLastDownSyncState()
+            .onStart { emit(defaultDownSyncState) }
+            .stateIn(appScope, SharingStarted.Eagerly, defaultDownSyncState)
+    }
 
     private val sharedSyncState: StateFlow<SyncStatus> by lazy {
         combine(
-            eventSyncStateProcessor.getLastSyncState().onStart { emit(defaultEventSyncState) },
+            sharedUpSyncState,
+            sharedDownSyncState,
             observeImageSyncStatus().onStart { emit(defaultImageSyncStatus) },
-        ) { eventSyncState, imageSyncStatus ->
-            SyncStatus(eventSyncState, imageSyncStatus)
+        ) { upSyncState, downSyncState, imageSyncStatus ->
+            SyncStatus(upSyncState, downSyncState, imageSyncStatus)
         }.stateIn(
             appScope,
             SharingStarted.Eagerly,
-            defaultSyncStatus,
+            SyncStatus(defaultUpSyncState, defaultDownSyncState, defaultImageSyncStatus),
         )
     }
 
@@ -97,8 +120,10 @@ internal class SyncOrchestratorImpl @Inject constructor(
             workManager
                 .getWorkInfosFlow(
                     WorkQuery.fromUniqueWorkNames(
-                        SyncConstants.EVENT_SYNC_WORK_NAME,
-                        SyncConstants.EVENT_SYNC_WORK_NAME_ONE_TIME,
+                        SyncConstants.EVENT_UP_SYNC_WORK_NAME,
+                        SyncConstants.EVENT_UP_SYNC_WORK_NAME_ONE_TIME,
+                        SyncConstants.EVENT_DOWN_SYNC_WORK_NAME,
+                        SyncConstants.EVENT_DOWN_SYNC_WORK_NAME_ONE_TIME,
                     ),
                 ).map { workInfoList ->
                     workInfoList.anyRunning()
@@ -112,11 +137,21 @@ internal class SyncOrchestratorImpl @Inject constructor(
 
     override fun observeSyncState(): StateFlow<SyncStatus> = sharedSyncState
 
+    override fun observeUpSyncState(): StateFlow<UpSyncState> = sharedUpSyncState
+
+    override fun observeDownSyncState(): StateFlow<DownSyncState> = sharedDownSyncState
+
     override fun execute(command: OneTime): Job = when (command) {
-        is OneTime.EventsCommand -> executeOneTimeAction(
+        is OneTime.UpSyncCommand -> executeOneTimeAction(
             action = command.action,
-            stop = ::stopEventSync,
-            start = { startEventSync(isDownSyncAllowed = command.isDownSyncAllowed) },
+            stop = ::stopUpSync,
+            start = { startUpSync() },
+        )
+
+        is OneTime.DownSyncCommand -> executeOneTimeAction(
+            action = command.action,
+            stop = ::stopDownSync,
+            start = { startDownSync() },
         )
 
         is OneTime.ImagesCommand -> executeOneTimeAction(
@@ -133,10 +168,16 @@ internal class SyncOrchestratorImpl @Inject constructor(
             reschedule = { scheduleBackgroundWork(withDelay = command.withDelay) },
         )
 
-        is ScheduleCommand.EventsCommand -> executeSchedulingAction(
+        is ScheduleCommand.UpSyncCommand -> executeSchedulingAction(
             action = command.action,
-            unschedule = ::cancelEventSync,
-            reschedule = { rescheduleEventSync(withDelay = command.withDelay) },
+            unschedule = ::cancelUpSync,
+            reschedule = { rescheduleUpSync(withDelay = command.withDelay) },
+        )
+
+        is ScheduleCommand.DownSyncCommand -> executeSchedulingAction(
+            action = command.action,
+            unschedule = ::cancelDownSync,
+            reschedule = { rescheduleDownSync(withDelay = command.withDelay) },
         )
 
         is ScheduleCommand.ImagesCommand -> executeSchedulingAction(
@@ -161,7 +202,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
                 ),
             ).filter { workInfoList ->
                 workInfoList.none { it.state == WorkInfo.State.ENQUEUED || it.state == WorkInfo.State.RUNNING }
-            }.map { } // Converts flow emissions to Unit value as we only care about when it happens, not the value
+            }.map { }
     }
 
     override fun uploadEnrolmentRecords(
@@ -240,7 +281,8 @@ internal class SyncOrchestratorImpl @Inject constructor(
                 SyncConstants.FILE_UP_SYNC_REPEAT_INTERVAL,
                 constraints = getImageUploadConstraints(),
             )
-            rescheduleEventSync(withDelay = withDelay)
+            rescheduleUpSync(withDelay = withDelay)
+            rescheduleDownSync(withDelay = withDelay)
             if (shouldScheduleFirmwareUpdate()) {
                 workManager.schedulePeriodicWorker<FirmwareFileUpdateWorker>(
                     SyncConstants.FIRMWARE_UPDATE_WORK_NAME,
@@ -257,40 +299,68 @@ internal class SyncOrchestratorImpl @Inject constructor(
             SyncConstants.PROJECT_SYNC_WORK_NAME,
             SyncConstants.DEVICE_SYNC_WORK_NAME,
             SyncConstants.FILE_UP_SYNC_WORK_NAME,
-            SyncConstants.EVENT_SYNC_WORK_NAME,
+            SyncConstants.EVENT_UP_SYNC_WORK_NAME,
+            SyncConstants.EVENT_DOWN_SYNC_WORK_NAME,
             SyncConstants.FIRMWARE_UPDATE_WORK_NAME,
         )
-        stopEventSync()
+        stopUpSync()
+        stopDownSync()
     }
 
-    private suspend fun rescheduleEventSync(withDelay: Boolean) {
-        workManager.schedulePeriodicWorker<EventSyncMasterWorker>(
-            workName = SyncConstants.EVENT_SYNC_WORK_NAME,
+    private suspend fun rescheduleUpSync(withDelay: Boolean) {
+        workManager.schedulePeriodicWorker<EventUpSyncMasterWorker>(
+            workName = SyncConstants.EVENT_UP_SYNC_WORK_NAME,
             repeatInterval = SyncConstants.EVENT_SYNC_WORKER_INTERVAL,
             initialDelay = if (withDelay) SyncConstants.EVENT_SYNC_WORKER_INTERVAL else 0,
             constraints = getEventSyncConstraints(),
-            tags = eventSyncWorkerTagRepository.getPeriodicWorkTags(),
+            tags = eventSyncWorkerTagRepository.getUpSyncPeriodicWorkTags(),
         )
     }
 
-    private fun cancelEventSync() {
-        workManager.cancelWorkers(SyncConstants.EVENT_SYNC_WORK_NAME)
-        stopEventSync()
-    }
-
-    private suspend fun startEventSync(isDownSyncAllowed: Boolean) {
-        workManager.startWorker<EventSyncMasterWorker>(
-            workName = SyncConstants.EVENT_SYNC_WORK_NAME_ONE_TIME,
+    private suspend fun rescheduleDownSync(withDelay: Boolean) {
+        workManager.schedulePeriodicWorker<EventDownSyncMasterWorker>(
+            workName = SyncConstants.EVENT_DOWN_SYNC_WORK_NAME,
+            repeatInterval = SyncConstants.EVENT_SYNC_WORKER_INTERVAL,
+            initialDelay = if (withDelay) SyncConstants.EVENT_SYNC_WORKER_INTERVAL else 0,
             constraints = getEventSyncConstraints(),
-            tags = eventSyncWorkerTagRepository.getOneTimeWorkTags(),
-            inputData = workDataOf(EventSyncMasterWorker.IS_DOWN_SYNC_ALLOWED to isDownSyncAllowed),
+            tags = eventSyncWorkerTagRepository.getDownSyncPeriodicWorkTags(),
         )
     }
 
-    private fun stopEventSync() {
-        workManager.cancelWorkers(SyncConstants.EVENT_SYNC_WORK_NAME_ONE_TIME)
-        // Event sync consists of multiple workers, so we cancel them all by tag.
-        workManager.cancelAllWorkByTag(eventSyncWorkerTagRepository.getAllWorkerTag())
+    private fun cancelUpSync() {
+        workManager.cancelWorkers(SyncConstants.EVENT_UP_SYNC_WORK_NAME)
+        stopUpSync()
+    }
+
+    private fun cancelDownSync() {
+        workManager.cancelWorkers(SyncConstants.EVENT_DOWN_SYNC_WORK_NAME)
+        stopDownSync()
+    }
+
+    private suspend fun startUpSync() {
+        workManager.startWorker<EventUpSyncMasterWorker>(
+            workName = SyncConstants.EVENT_UP_SYNC_WORK_NAME_ONE_TIME,
+            constraints = getEventSyncConstraints(),
+            tags = eventSyncWorkerTagRepository.getUpSyncOneTimeWorkTags(),
+        )
+    }
+
+    private suspend fun startDownSync() {
+        workManager.startWorker<EventDownSyncMasterWorker>(
+            workName = SyncConstants.EVENT_DOWN_SYNC_WORK_NAME_ONE_TIME,
+            constraints = getEventSyncConstraints(),
+            tags = eventSyncWorkerTagRepository.getDownSyncOneTimeWorkTags(),
+        )
+    }
+
+    private fun stopUpSync() {
+        workManager.cancelWorkers(SyncConstants.EVENT_UP_SYNC_WORK_NAME_ONE_TIME)
+        workManager.cancelAllWorkByTag(eventSyncWorkerTagRepository.getUpSyncAllWorkersTag())
+    }
+
+    private fun stopDownSync() {
+        workManager.cancelWorkers(SyncConstants.EVENT_DOWN_SYNC_WORK_NAME_ONE_TIME)
+        workManager.cancelAllWorkByTag(eventSyncWorkerTagRepository.getDownSyncAllWorkersTag())
     }
 
     private fun startImageSync() {

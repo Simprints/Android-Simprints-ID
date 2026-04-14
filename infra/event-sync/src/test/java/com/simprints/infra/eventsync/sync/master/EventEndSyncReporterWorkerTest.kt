@@ -9,6 +9,7 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.master.EventEndSyncReporterWorker.Companion.EVENT_DOWN_SYNC_SCOPE_TO_CLOSE
+import com.simprints.infra.eventsync.sync.master.EventEndSyncReporterWorker.Companion.EVENT_UP_SYNC_SCOPE_TO_CLOSE
 import com.simprints.infra.eventsync.sync.master.EventEndSyncReporterWorker.Companion.SYNC_ID_TO_MARK_AS_COMPLETED
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -43,7 +44,8 @@ internal class EventEndSyncReporterWorkerTest {
         val result = endSyncReportWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
-        coVerify(exactly = 0) { syncCache.storeLastSuccessfulSyncTime(any()) }
+        coVerify(exactly = 0) { syncCache.storeLastUpSyncTime(any()) }
+        coVerify(exactly = 0) { syncCache.storeLastDownSyncTime(any()) }
     }
 
     @Test
@@ -52,34 +54,38 @@ internal class EventEndSyncReporterWorkerTest {
         val result = endSyncReportWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
-        coVerify(exactly = 0) { syncCache.storeLastSuccessfulSyncTime(any()) }
+        coVerify(exactly = 0) { syncCache.storeLastUpSyncTime(any()) }
+        coVerify(exactly = 0) { syncCache.storeLastDownSyncTime(any()) }
     }
 
     @Test
-    fun `doWork should succeed otherwise and save the last success time`() = runTest {
+    fun `doWork should succeed otherwise and not save time when no scope provided`() = runTest {
         val endSyncReportWorker = createWorker("sync id", null, null)
         val result = endSyncReportWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
-        coVerify(exactly = 1) { syncCache.storeLastSuccessfulSyncTime(any()) }
+        coVerify(exactly = 0) { syncCache.storeLastUpSyncTime(any()) }
+        coVerify(exactly = 0) { syncCache.storeLastDownSyncTime(any()) }
     }
 
     @Test
-    fun `doWork should close down sync scope if id provided`() = runTest {
-        val endSyncReportWorker = createWorker("sync id", null, "scopeId")
+    fun `doWork should save up sync time when up sync scope provided`() = runTest {
+        val endSyncReportWorker = createWorker("sync id", upScopeId = "upScope", downScopeId = null)
         val result = endSyncReportWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
-        coVerify(exactly = 1) { eventRepository.closeEventScope("scopeId", any()) }
+        coVerify(exactly = 1) { syncCache.storeLastUpSyncTime(any()) }
+        coVerify(exactly = 0) { syncCache.storeLastDownSyncTime(any()) }
     }
 
     @Test
-    fun `doWork should close up sync scope if id provided`() = runTest {
-        val endSyncReportWorker = createWorker("sync id", null, "scopeId")
+    fun `doWork should save down sync time when down sync scope provided`() = runTest {
+        val endSyncReportWorker = createWorker("sync id", upScopeId = null, downScopeId = "downScope")
         val result = endSyncReportWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
-        coVerify(exactly = 1) { eventRepository.closeEventScope("scopeId", any()) }
+        coVerify(exactly = 0) { syncCache.storeLastUpSyncTime(any()) }
+        coVerify(exactly = 1) { syncCache.storeLastDownSyncTime(any()) }
     }
 
     private fun createWorker(
@@ -96,7 +102,7 @@ internal class EventEndSyncReporterWorkerTest {
             every { inputData } returns workDataOf(
                 SYNC_ID_TO_MARK_AS_COMPLETED to syncId,
                 EVENT_DOWN_SYNC_SCOPE_TO_CLOSE to downScopeId,
-                EVENT_DOWN_SYNC_SCOPE_TO_CLOSE to upScopeId,
+                EVENT_UP_SYNC_SCOPE_TO_CLOSE to upScopeId,
             )
         },
         syncCache,

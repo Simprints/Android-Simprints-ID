@@ -7,6 +7,7 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class SyncWorkersInfoProvider @Inject constructor(
@@ -15,6 +16,14 @@ class SyncWorkersInfoProvider @Inject constructor(
     private val wm = WorkManager.getInstance(ctx)
 
     fun getStartSyncReporters(): Flow<List<WorkInfo>> = wm.getWorkInfosByTagFlow(tagForType(EventSyncWorkerType.START_SYNC_REPORTER))
+
+    fun getUpSyncStartReporters(): Flow<List<WorkInfo>> = wm
+        .getWorkInfosByTagFlow(TAG_SUBJECTS_UP_SYNC_ALL_WORKERS)
+        .map { workers -> workers.filter { it.tags.contains(tagForType(EventSyncWorkerType.START_SYNC_REPORTER)) } }
+
+    fun getDownSyncStartReporters(): Flow<List<WorkInfo>> = wm
+        .getWorkInfosByTagFlow(TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS)
+        .map { workers -> workers.filter { it.tags.contains(tagForType(EventSyncWorkerType.START_SYNC_REPORTER)) } }
 
     fun getSyncWorkerInfos(uniqueSyncId: String): Flow<List<WorkInfo>> = wm.getWorkInfosByTagFlow(getUniqueSyncIdTag(uniqueSyncId))
 }

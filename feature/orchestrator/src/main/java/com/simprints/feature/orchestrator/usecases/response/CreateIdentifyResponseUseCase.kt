@@ -13,7 +13,7 @@ import com.simprints.infra.orchestration.data.responses.AppResponse
 import java.io.Serializable
 import javax.inject.Inject
 
-internal class CreateIdentifyResponseUseCase @Inject constructor(
+class CreateIdentifyResponseUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
 ) {
     suspend operator fun invoke(

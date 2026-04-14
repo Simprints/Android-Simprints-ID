@@ -26,16 +26,33 @@ class EventSyncCache @Inject constructor(
     private val sharedForLastSyncTime =
         securityManager.buildEncryptedSharedPreferences(FILENAME_FOR_LAST_SYNC_TIME_SHARED_PREFS)
 
-    suspend fun readLastSuccessfulSyncTime(): Timestamp? = withContext(dispatcher) {
+    suspend fun readLastSuccessfulSyncTime(): Timestamp? = readLastUpSyncTime()
+
+    suspend fun readLastUpSyncTime(): Timestamp? = withContext(dispatcher) {
         sharedForLastSyncTime
-            .getLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, -1)
+            .getLong(PEOPLE_SYNC_CACHE_LAST_UP_SYNC_TIME_KEY, -1)
             .takeIf { it >= 0 }
             ?.let { Timestamp(it) }
     }
 
-    suspend fun storeLastSuccessfulSyncTime(lastSyncTime: Timestamp?): Unit = withContext(dispatcher) {
+    suspend fun readLastDownSyncTime(): Timestamp? = withContext(dispatcher) {
+        sharedForLastSyncTime
+            .getLong(PEOPLE_SYNC_CACHE_LAST_DOWN_SYNC_TIME_KEY, -1)
+            .takeIf { it >= 0 }
+            ?.let { Timestamp(it) }
+    }
+
+    suspend fun storeLastSuccessfulSyncTime(lastSyncTime: Timestamp?): Unit = storeLastUpSyncTime(lastSyncTime)
+
+    suspend fun storeLastUpSyncTime(lastSyncTime: Timestamp?): Unit = withContext(dispatcher) {
         sharedForLastSyncTime.edit {
-            putLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, lastSyncTime?.ms ?: -1)
+            putLong(PEOPLE_SYNC_CACHE_LAST_UP_SYNC_TIME_KEY, lastSyncTime?.ms ?: -1)
+        }
+    }
+
+    suspend fun storeLastDownSyncTime(lastSyncTime: Timestamp?): Unit = withContext(dispatcher) {
+        sharedForLastSyncTime.edit {
+            putLong(PEOPLE_SYNC_CACHE_LAST_DOWN_SYNC_TIME_KEY, lastSyncTime?.ms ?: -1)
         }
     }
 
@@ -87,6 +104,12 @@ class EventSyncCache @Inject constructor(
     companion object {
         @VisibleForTesting
         const val PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY = "PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY"
+
+        @VisibleForTesting
+        const val PEOPLE_SYNC_CACHE_LAST_UP_SYNC_TIME_KEY = "PEOPLE_SYNC_CACHE_LAST_UP_SYNC_TIME_KEY"
+
+        @VisibleForTesting
+        const val PEOPLE_SYNC_CACHE_LAST_DOWN_SYNC_TIME_KEY = "PEOPLE_SYNC_CACHE_LAST_DOWN_SYNC_TIME_KEY"
 
         const val KEY_IGNORE_MAX = "IGNORE_MAX_VALUES"
 

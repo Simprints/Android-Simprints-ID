@@ -3,7 +3,8 @@ package com.simprints.feature.dashboard.settings.syncinfo.usecase.internal
 import com.google.common.truth.Truth.*
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.infra.eventsync.status.models.DownSyncState
+import com.simprints.infra.eventsync.status.models.UpSyncState
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncableCounts
 import io.mockk.MockKAnnotations
@@ -15,7 +16,11 @@ import org.junit.Test
 
 internal class GetSyncInfoSectionImagesUseCaseTest {
     private val timeHelper = mockk<TimeHelper>()
-    private val mockEventSyncState = mockk<EventSyncState>(relaxed = true) {
+    private val mockUpSyncState = mockk<UpSyncState>(relaxed = true) {
+        every { isSyncInProgress() } returns false
+        every { isSyncFailedBecauseReloginRequired() } returns false
+    }
+    private val mockDownSyncState = mockk<DownSyncState>(relaxed = true) {
         every { isSyncInProgress() } returns false
         every { isSyncFailedBecauseReloginRequired() } returns false
     }
@@ -52,7 +57,8 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
 
         val result = useCase(
             isOnline = false,
-            eventSyncState = mockEventSyncState,
+            upSyncState = mockUpSyncState,
+            downSyncState = mockDownSyncState,
             imageSyncStatus = mockNotSyncingImageStatus,
             syncableCounts = mockSyncableCounts,
         )
@@ -63,13 +69,17 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
 
     @Test
     fun `should emit SyncInfo section with correct syncInfoSectionImages button states`() = runTest {
-        val mockNormalEventSyncState = mockk<EventSyncState>(relaxed = true) {
+        val mockNormalUpSyncState = mockk<UpSyncState>(relaxed = true) {
+            every { isSyncFailedBecauseReloginRequired() } returns false
+        }
+        val mockNormalDownSyncState = mockk<DownSyncState>(relaxed = true) {
             every { isSyncFailedBecauseReloginRequired() } returns false
         }
 
         val result = useCase(
             isOnline = true,
-            eventSyncState = mockNormalEventSyncState,
+            upSyncState = mockNormalUpSyncState,
+            downSyncState = mockNormalDownSyncState,
             imageSyncStatus = mockImageSyncStatus,
             syncableCounts = mockSyncableCounts,
         )
@@ -88,7 +98,8 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
 
         val result = useCase(
             isOnline = true,
-            eventSyncState = mockEventSyncState,
+            upSyncState = mockUpSyncState,
+            downSyncState = mockDownSyncState,
             imageSyncStatus = mockImageStatusWithLastSync,
             syncableCounts = mockSyncableCounts,
         )
@@ -107,7 +118,8 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
 
         val result = useCase(
             isOnline = true,
-            eventSyncState = mockEventSyncState,
+            upSyncState = mockUpSyncState,
+            downSyncState = mockDownSyncState,
             imageSyncStatus = imageSyncStatus,
             syncableCounts = mockSyncableCounts,
         )
@@ -125,7 +137,8 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
 
         val result = useCase(
             isOnline = true,
-            eventSyncState = mockEventSyncState,
+            upSyncState = mockUpSyncState,
+            downSyncState = mockDownSyncState,
             imageSyncStatus = mockNotSyncingImageStatus,
             syncableCounts = mockSyncableCounts,
         )
@@ -144,7 +157,8 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
 
         val result = useCase(
             isOnline = true,
-            eventSyncState = mockEventSyncState,
+            upSyncState = mockUpSyncState,
+            downSyncState = mockDownSyncState,
             imageSyncStatus = mockNotSyncingImageStatus,
             syncableCounts = syncableCounts,
         )
@@ -162,7 +176,8 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
 
         val result = useCase(
             isOnline = true,
-            eventSyncState = mockEventSyncState,
+            upSyncState = mockUpSyncState,
+            downSyncState = mockDownSyncState,
             imageSyncStatus = imageSyncStatus,
             syncableCounts = mockSyncableCounts,
         )
@@ -181,7 +196,8 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
 
         val result = useCase(
             isOnline = true,
-            eventSyncState = mockEventSyncState,
+            upSyncState = mockUpSyncState,
+            downSyncState = mockDownSyncState,
             imageSyncStatus = mockImageStatusWithLastSync,
             syncableCounts = mockSyncableCounts,
         )
@@ -200,7 +216,8 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
 
         val result = useCase(
             isOnline = true,
-            eventSyncState = mockEventSyncState,
+            upSyncState = mockUpSyncState,
+            downSyncState = mockDownSyncState,
             imageSyncStatus = mockImageStatusWithoutLastSync,
             syncableCounts = mockSyncableCounts,
         )
@@ -218,7 +235,8 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
 
         val result = useCase(
             isOnline = true,
-            eventSyncState = mockEventSyncState,
+            upSyncState = mockUpSyncState,
+            downSyncState = mockDownSyncState,
             imageSyncStatus = mockImageStatusWithNegativeTimestamp,
             syncableCounts = mockSyncableCounts,
         )

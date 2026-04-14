@@ -10,7 +10,8 @@ import com.simprints.infra.config.store.models.SelectDownSyncModules
 import com.simprints.infra.config.store.models.UpSyncEnrolmentRecords
 import com.simprints.infra.eventsync.module.ModuleSelectionRepository
 import com.simprints.infra.sync.OneTime.Action
-import com.simprints.infra.sync.OneTime.EventsCommand
+import com.simprints.infra.sync.OneTime.UpSyncCommand
+import com.simprints.infra.sync.OneTime.DownSyncCommand
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.config.usecase.LogoutUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -121,7 +122,8 @@ class DeviceConfigDownSyncWorkerTest {
             configRepository.updateDeviceConfiguration(any())
         }
         verify {
-            syncOrchestrator.execute(eq(EventsCommand(Action.RESTART, true)))
+            syncOrchestrator.execute(eq(UpSyncCommand(Action.RESTART)))
+            syncOrchestrator.execute(eq(DownSyncCommand(Action.RESTART)))
         }
     }
 }

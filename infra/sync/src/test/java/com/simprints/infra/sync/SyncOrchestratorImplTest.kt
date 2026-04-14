@@ -8,7 +8,8 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.eventsync.DeleteSyncInfoUseCase
 import com.simprints.infra.eventsync.EventSyncWorkerTagRepository
-import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
+import com.simprints.infra.eventsync.sync.down.DownSyncStateProcessor
+import com.simprints.infra.eventsync.sync.up.UpSyncStateProcessor
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME_ONE_TIME
 import com.simprints.infra.sync.SyncConstants.PROJECT_SYNC_WORK_NAME_ONE_TIME
 import com.simprints.infra.sync.SyncConstants.RECORD_UPLOAD_INPUT_ID_NAME
@@ -51,7 +52,10 @@ class SyncOrchestratorImplTest {
     private lateinit var eventSyncWorkerTagRepository: EventSyncWorkerTagRepository
 
     @MockK
-    private lateinit var eventSyncStateProcessor: EventSyncStateProcessor
+    private lateinit var upSyncStateProcessor: UpSyncStateProcessor
+
+    @MockK
+    private lateinit var downSyncStateProcessor: DownSyncStateProcessor
 
     @MockK
     private lateinit var observeImageSyncStatus: ObserveImageSyncStatusUseCase
@@ -150,7 +154,8 @@ class SyncOrchestratorImplTest {
         configRepository,
         deleteSyncInfo,
         eventSyncWorkerTagRepository,
-        eventSyncStateProcessor,
+        upSyncStateProcessor,
+        downSyncStateProcessor,
         observeImageSyncStatus,
         shouldScheduleFirmwareUpdate,
         cleanupDeprecatedWorkers,

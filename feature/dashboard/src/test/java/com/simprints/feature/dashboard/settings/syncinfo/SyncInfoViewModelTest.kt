@@ -20,7 +20,8 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
-import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.infra.eventsync.status.models.DownSyncState
+import com.simprints.infra.eventsync.status.models.UpSyncState
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.OneTime
@@ -83,7 +84,10 @@ class SyncInfoViewModelTest {
     private lateinit var mockProject: Project
 
     @MockK
-    private lateinit var mockEventSyncState: EventSyncState
+    private lateinit var mockUpSyncState: UpSyncState
+
+    @MockK
+    private lateinit var mockDownSyncState: DownSyncState
 
     @MockK
     private lateinit var mockImageSyncStatus: ImageSyncStatus
@@ -102,19 +106,32 @@ class SyncInfoViewModelTest {
         every { mockDeviceConfiguration.selectedModules } returns emptyList()
         every { mockProject.state } returns ProjectState.RUNNING
 
-        every { mockEventSyncState.isSyncCompleted() } returns false
-        every { mockEventSyncState.isSyncInProgress() } returns false
-        every { mockEventSyncState.isSyncConnecting() } returns false
-        every { mockEventSyncState.isSyncRunning() } returns false
-        every { mockEventSyncState.isSyncFailed() } returns false
-        every { mockEventSyncState.isSyncFailedBecauseReloginRequired() } returns false
-        every { mockEventSyncState.isSyncFailedBecauseBackendMaintenance() } returns false
-        every { mockEventSyncState.isSyncFailedBecauseTooManyRequests() } returns false
-        every { mockEventSyncState.getEstimatedBackendMaintenanceOutage() } returns null
-        every { mockEventSyncState.hasSyncHistory() } returns true
-        every { mockEventSyncState.progress } returns null
-        every { mockEventSyncState.total } returns null
-        every { mockEventSyncState.lastSyncTime } returns TEST_TIMESTAMP
+        every { mockUpSyncState.isSyncCompleted() } returns false
+        every { mockUpSyncState.isSyncInProgress() } returns false
+        every { mockUpSyncState.isSyncConnecting() } returns false
+        every { mockUpSyncState.isSyncRunning() } returns false
+        every { mockUpSyncState.isSyncFailed() } returns false
+        every { mockUpSyncState.isSyncFailedBecauseReloginRequired() } returns false
+        every { mockUpSyncState.isSyncFailedBecauseBackendMaintenance() } returns false
+        every { mockUpSyncState.isSyncFailedBecauseTooManyRequests() } returns false
+        every { mockUpSyncState.hasSyncHistory() } returns true
+        every { mockUpSyncState.progress } returns null
+        every { mockUpSyncState.total } returns null
+        every { mockUpSyncState.lastSyncTime } returns TEST_TIMESTAMP
+
+        every { mockDownSyncState.isSyncCompleted() } returns false
+        every { mockDownSyncState.isSyncInProgress() } returns false
+        every { mockDownSyncState.isSyncConnecting() } returns false
+        every { mockDownSyncState.isSyncRunning() } returns false
+        every { mockDownSyncState.isSyncFailed() } returns false
+        every { mockDownSyncState.isSyncFailedBecauseReloginRequired() } returns false
+        every { mockDownSyncState.isSyncFailedBecauseBackendMaintenance() } returns false
+        every { mockDownSyncState.isSyncFailedBecauseTooManyRequests() } returns false
+        every { mockDownSyncState.getEstimatedBackendMaintenanceOutage() } returns null
+        every { mockDownSyncState.hasSyncHistory() } returns true
+        every { mockDownSyncState.progress } returns null
+        every { mockDownSyncState.total } returns null
+        every { mockDownSyncState.lastSyncTime } returns TEST_TIMESTAMP
 
         every { mockImageSyncStatus.isSyncing } returns false
         every { mockImageSyncStatus.progress } returns null
@@ -143,7 +160,7 @@ class SyncInfoViewModelTest {
         coEvery { configRepository.getProject() } returns mockProject
 
         syncStatusFlow = MutableStateFlow(
-            SyncStatus(eventSyncState = mockEventSyncState, imageSyncStatus = mockImageSyncStatus),
+            SyncStatus(upSyncState = mockUpSyncState, downSyncState = mockDownSyncState, imageSyncStatus = mockImageSyncStatus),
         )
         every { syncOrchestrator.observeSyncState() } returns syncStatusFlow
         every { syncOrchestrator.execute(any<OneTime>()) } returns Job().apply { complete() }
@@ -232,7 +249,10 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `should trigger logout when pre-logout sync completes successfully`() = runTest {
-        val mockCompletedEventSyncState = mockk<EventSyncState>(relaxed = true) {
+        val mockCompletedUpSyncState = mockk<UpSyncState>(relaxed = true) {
+            every { isSyncCompleted() } returns true
+        }
+        val mockCompletedDownSyncState = mockk<DownSyncState>(relaxed = true) {
             every { isSyncCompleted() } returns true
         }
         val mockNotSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
@@ -240,7 +260,7 @@ class SyncInfoViewModelTest {
             every { progress } returns null
             every { lastUpdateTimeMillis } returns 0
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockNotSyncingImageStatus)
+        syncStatusFlow.value = SyncStatus(upSyncState = mockCompletedUpSyncState, downSyncState = mockCompletedDownSyncState, imageSyncStatus = mockNotSyncingImageStatus)
         createViewModel()
         viewModel.isPreLogoutUpSync = true
 
@@ -257,7 +277,10 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `should emit a logout event after the intended delay since ready to logout`() = runTest {
-        val mockCompletedEventSyncState = mockk<EventSyncState>(relaxed = true) {
+        val mockCompletedUpSyncState = mockk<UpSyncState>(relaxed = true) {
+            every { isSyncCompleted() } returns true
+        }
+        val mockCompletedDownSyncState = mockk<DownSyncState>(relaxed = true) {
             every { isSyncCompleted() } returns true
         }
         val mockNotSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
@@ -265,7 +288,7 @@ class SyncInfoViewModelTest {
             every { progress } returns null
             every { lastUpdateTimeMillis } returns 0
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockNotSyncingImageStatus)
+        syncStatusFlow.value = SyncStatus(upSyncState = mockCompletedUpSyncState, downSyncState = mockCompletedDownSyncState, imageSyncStatus = mockNotSyncingImageStatus)
         createViewModel()
         viewModel.isPreLogoutUpSync = true
 
@@ -303,7 +326,10 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `should not trigger logout when not in pre-logout mode`() = runTest {
-        val mockCompletedEventSyncState = mockk<EventSyncState>(relaxed = true) {
+        val mockCompletedUpSyncState = mockk<UpSyncState>(relaxed = true) {
+            every { isSyncCompleted() } returns true
+        }
+        val mockCompletedDownSyncState = mockk<DownSyncState>(relaxed = true) {
             every { isSyncCompleted() } returns true
         }
         val mockNotSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
@@ -311,7 +337,7 @@ class SyncInfoViewModelTest {
             every { progress } returns null
             every { lastUpdateTimeMillis } returns 0
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockNotSyncingImageStatus)
+        syncStatusFlow.value = SyncStatus(upSyncState = mockCompletedUpSyncState, downSyncState = mockCompletedDownSyncState, imageSyncStatus = mockNotSyncingImageStatus)
         createViewModel()
         viewModel.isPreLogoutUpSync = false
 
@@ -327,7 +353,11 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `should not trigger logout when records still syncing`() = runTest {
-        val mockInProgressEventSyncState = mockk<EventSyncState>(relaxed = true) {
+        val mockInProgressUpSyncState = mockk<UpSyncState>(relaxed = true) {
+            every { isSyncCompleted() } returns false
+            every { isSyncInProgress() } returns true
+        }
+        val mockInProgressDownSyncState = mockk<DownSyncState>(relaxed = true) {
             every { isSyncCompleted() } returns false
             every { isSyncInProgress() } returns true
         }
@@ -336,7 +366,7 @@ class SyncInfoViewModelTest {
             every { progress } returns null
             every { lastUpdateTimeMillis } returns 0
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockInProgressEventSyncState, imageSyncStatus = mockNotSyncingImageStatus)
+        syncStatusFlow.value = SyncStatus(upSyncState = mockInProgressUpSyncState, downSyncState = mockInProgressDownSyncState, imageSyncStatus = mockNotSyncingImageStatus)
         createViewModel()
         viewModel.isPreLogoutUpSync = true
 
@@ -352,7 +382,10 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `should not trigger logout when images still syncing`() = runTest {
-        val mockCompletedEventSyncState = mockk<EventSyncState>(relaxed = true) {
+        val mockCompletedUpSyncState = mockk<UpSyncState>(relaxed = true) {
+            every { isSyncCompleted() } returns true
+        }
+        val mockCompletedDownSyncState = mockk<DownSyncState>(relaxed = true) {
             every { isSyncCompleted() } returns true
         }
         val mockSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
@@ -360,7 +393,7 @@ class SyncInfoViewModelTest {
             every { progress } returns Pair(1, 2)
             every { lastUpdateTimeMillis } returns null
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockSyncingImageStatus)
+        syncStatusFlow.value = SyncStatus(upSyncState = mockCompletedUpSyncState, downSyncState = mockCompletedDownSyncState, imageSyncStatus = mockSyncingImageStatus)
         createViewModel()
         viewModel.isPreLogoutUpSync = true
 
@@ -382,7 +415,8 @@ class SyncInfoViewModelTest {
 
         viewModel.forceEventSync()
 
-        verify { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = true)) }
+        verify { syncOrchestrator.execute(OneTime.UpSync.restart()) }
+        verify { syncOrchestrator.execute(OneTime.DownSync.restart()) }
     }
 
     @Test
@@ -391,7 +425,8 @@ class SyncInfoViewModelTest {
 
         viewModel.forceEventSync()
 
-        verify { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
+        verify { syncOrchestrator.execute(OneTime.UpSync.restart()) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.DownSync.restart()) }
     }
 
     @Test
@@ -405,7 +440,8 @@ class SyncInfoViewModelTest {
 
         viewModel.forceEventSync()
 
-        verify { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
+        verify { syncOrchestrator.execute(OneTime.UpSync.restart()) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.DownSync.restart()) }
     }
 
     @Test
@@ -419,7 +455,8 @@ class SyncInfoViewModelTest {
 
         viewModel.forceEventSync()
 
-        verify { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
+        verify { syncOrchestrator.execute(OneTime.UpSync.restart()) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.DownSync.restart()) }
     }
 
     @Test
@@ -430,14 +467,16 @@ class SyncInfoViewModelTest {
 
         viewModel.forceEventSync()
 
-        verify { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
+        verify { syncOrchestrator.execute(OneTime.UpSync.restart()) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.DownSync.restart()) }
     }
 
     @Test
     fun `should stop current event sync before starting new one`() = runTest {
         viewModel.forceEventSync()
 
-        verify { syncOrchestrator.execute(OneTime.Events.restart()) }
+        verify { syncOrchestrator.execute(OneTime.UpSync.restart()) }
+        verify { syncOrchestrator.execute(OneTime.DownSync.restart()) }
     }
 
     // toggleImageSync() tests
@@ -447,7 +486,7 @@ class SyncInfoViewModelTest {
         val mockNotSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
             every { isSyncing } returns false
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockEventSyncState, imageSyncStatus = mockNotSyncingImageStatus)
+        syncStatusFlow.value = SyncStatus(upSyncState = mockUpSyncState, downSyncState = mockDownSyncState, imageSyncStatus = mockNotSyncingImageStatus)
         createViewModel()
 
         viewModel.toggleImageSync()
@@ -461,7 +500,7 @@ class SyncInfoViewModelTest {
         val mockSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
             every { isSyncing } returns true
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockEventSyncState, imageSyncStatus = mockSyncingImageStatus)
+        syncStatusFlow.value = SyncStatus(upSyncState = mockUpSyncState, downSyncState = mockDownSyncState, imageSyncStatus = mockSyncingImageStatus)
         createViewModel()
 
         viewModel.toggleImageSync()
@@ -521,7 +560,8 @@ class SyncInfoViewModelTest {
 
         viewModel.handleLoginResult(successResult)
 
-        verify { syncOrchestrator.execute(OneTime.Events.restart()) }
+        verify { syncOrchestrator.execute(OneTime.UpSync.restart()) }
+        verify { syncOrchestrator.execute(OneTime.DownSync.restart()) }
     }
 
     @Test
@@ -532,8 +572,8 @@ class SyncInfoViewModelTest {
 
         viewModel.handleLoginResult(failureResult)
 
-        verify(exactly = 0) { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = true)) }
-        verify(exactly = 0) { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.UpSync.restart()) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.DownSync.restart()) }
     }
 
     // Sync button responsiveness optimization
@@ -554,10 +594,13 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `should not emit forced event progress when events already syncing`() = runTest {
-        val mockInProgressEventSyncState = mockk<EventSyncState>(relaxed = true) {
+        val mockInProgressUpSyncState = mockk<UpSyncState>(relaxed = true) {
             every { isSyncInProgress() } returns true
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockInProgressEventSyncState, imageSyncStatus = mockImageSyncStatus)
+        val mockInProgressDownSyncState = mockk<DownSyncState>(relaxed = true) {
+            every { isSyncInProgress() } returns true
+        }
+        syncStatusFlow.value = SyncStatus(upSyncState = mockInProgressUpSyncState, downSyncState = mockInProgressDownSyncState, imageSyncStatus = mockImageSyncStatus)
         createViewModel()
 
         val values = viewModel.syncInfoLiveData.getOrAwaitValues(number = 1) {
@@ -573,7 +616,7 @@ class SyncInfoViewModelTest {
         val mockNotSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
             every { isSyncing } returns false
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockEventSyncState, imageSyncStatus = mockNotSyncingImageStatus)
+        syncStatusFlow.value = SyncStatus(upSyncState = mockUpSyncState, downSyncState = mockDownSyncState, imageSyncStatus = mockNotSyncingImageStatus)
         createViewModel()
 
         val values = viewModel.syncInfoLiveData.getOrAwaitValues(number = 2) {
@@ -591,7 +634,7 @@ class SyncInfoViewModelTest {
         val mockSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
             every { isSyncing } returns true
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockEventSyncState, imageSyncStatus = mockSyncingImageStatus)
+        syncStatusFlow.value = SyncStatus(upSyncState = mockUpSyncState, downSyncState = mockDownSyncState, imageSyncStatus = mockSyncingImageStatus)
         createViewModel()
 
         val values = viewModel.syncInfoLiveData.getOrAwaitValues(number = 1) {
@@ -660,81 +703,107 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `should trigger initial sync when no previous sync history`() = runTest {
-        val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
+        val mockIdleUpSyncState = mockk<UpSyncState>(relaxed = true) {
             every { isSyncRunning() } returns false
             every { lastSyncTime } returns null
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus)
+        val mockIdleDownSyncState = mockk<DownSyncState>(relaxed = true) {
+            every { isSyncRunning() } returns false
+            every { lastSyncTime } returns null
+        }
+        syncStatusFlow.value = SyncStatus(upSyncState = mockIdleUpSyncState, downSyncState = mockIdleDownSyncState, imageSyncStatus = mockImageSyncStatus)
         createViewModel()
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        verify { syncOrchestrator.execute(OneTime.Events.restart()) }
+        verify { syncOrchestrator.execute(OneTime.UpSync.restart()) }
+        verify { syncOrchestrator.execute(OneTime.DownSync.restart()) }
     }
 
     @Test
     fun `should trigger initial sync when last sync too old`() = runTest {
         val oldTimestamp = Timestamp(TEST_TIMESTAMP.ms - 600000) // 10 minutes ago, over threshold of 5
-        val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
+        val mockIdleUpSyncState = mockk<UpSyncState>(relaxed = true) {
             every { isSyncRunning() } returns false
             every { lastSyncTime } returns oldTimestamp
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus)
+        val mockIdleDownSyncState = mockk<DownSyncState>(relaxed = true) {
+            every { isSyncRunning() } returns false
+            every { lastSyncTime } returns oldTimestamp
+        }
+        syncStatusFlow.value = SyncStatus(upSyncState = mockIdleUpSyncState, downSyncState = mockIdleDownSyncState, imageSyncStatus = mockImageSyncStatus)
         every { timeHelper.msBetweenNowAndTime(oldTimestamp) } returns 600000L // 10 minutes
         createViewModel()
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        verify { syncOrchestrator.execute(OneTime.Events.restart()) }
+        verify { syncOrchestrator.execute(OneTime.UpSync.restart()) }
+        verify { syncOrchestrator.execute(OneTime.DownSync.restart()) }
     }
 
     @Test
     fun `should not trigger initial sync when recently synced`() = runTest {
         val recentTimestamp = Timestamp(TEST_TIMESTAMP.ms - 60000) // 1 minute ago, under threshold of 5
-        val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
+        val mockIdleUpSyncState = mockk<UpSyncState>(relaxed = true) {
             every { isSyncRunning() } returns false
             every { lastSyncTime } returns recentTimestamp
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus)
+        val mockIdleDownSyncState = mockk<DownSyncState>(relaxed = true) {
+            every { isSyncRunning() } returns false
+            every { lastSyncTime } returns recentTimestamp
+        }
+        syncStatusFlow.value = SyncStatus(upSyncState = mockIdleUpSyncState, downSyncState = mockIdleDownSyncState, imageSyncStatus = mockImageSyncStatus)
+        every { syncOrchestrator.observeUpSyncState() } returns MutableStateFlow(mockIdleUpSyncState)
+        every { syncOrchestrator.observeDownSyncState() } returns MutableStateFlow(mockIdleDownSyncState)
         every { timeHelper.msBetweenNowAndTime(recentTimestamp) } returns 60000L // 1 minute
         createViewModel()
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        verify(exactly = 0) { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = true)) }
-        verify(exactly = 0) { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.UpSync.restart()) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.DownSync.restart()) }
     }
 
     @Test
     fun `should not trigger initial sync when sync already running`() = runTest {
-        val mockRunningSyncState = mockk<EventSyncState>(relaxed = true) {
+        val mockRunningUpSyncState = mockk<UpSyncState>(relaxed = true) {
             every { isSyncRunning() } returns true
             every { lastSyncTime } returns null
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockRunningSyncState, imageSyncStatus = mockImageSyncStatus)
+        val mockRunningDownSyncState = mockk<DownSyncState>(relaxed = true) {
+            every { isSyncRunning() } returns true
+            every { lastSyncTime } returns null
+        }
+        syncStatusFlow.value = SyncStatus(upSyncState = mockRunningUpSyncState, downSyncState = mockRunningDownSyncState, imageSyncStatus = mockImageSyncStatus)
+        every { syncOrchestrator.observeUpSyncState() } returns MutableStateFlow(mockRunningUpSyncState)
+        every { syncOrchestrator.observeDownSyncState() } returns MutableStateFlow(mockRunningDownSyncState)
         createViewModel()
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        verify(exactly = 0) { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = true)) }
-        verify(exactly = 0) { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.UpSync.restart()) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.DownSync.restart()) }
     }
 
     @Test
     fun `should trigger initial sync in pre-logout mode regardless of history`() = runTest {
         val recentTimestamp = Timestamp(TEST_TIMESTAMP.ms - 60000) // 1 minute ago, under threshold of 5
-        val mockIdleEventSyncState = mockk<EventSyncState>(relaxed = true) {
+        val mockIdleUpSyncState = mockk<UpSyncState>(relaxed = true) {
             every { isSyncRunning() } returns false
             every { lastSyncTime } returns recentTimestamp
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus)
+        val mockIdleDownSyncState = mockk<DownSyncState>(relaxed = true) {
+            every { isSyncRunning() } returns false
+            every { lastSyncTime } returns recentTimestamp
+        }
+        syncStatusFlow.value = SyncStatus(upSyncState = mockIdleUpSyncState, downSyncState = mockIdleDownSyncState, imageSyncStatus = mockImageSyncStatus)
         every { timeHelper.msBetweenNowAndTime(recentTimestamp) } returns 60000L // 1 minute
         createViewModel()
         viewModel.isPreLogoutUpSync = true
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        verify { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
+        verify { syncOrchestrator.execute(OneTime.UpSync.restart()) }
     }
 
     @Test
@@ -755,7 +824,7 @@ class SyncInfoViewModelTest {
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        verify(exactly = 1) { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
+        verify(exactly = 1) { syncOrchestrator.execute(OneTime.UpSync.restart()) }
     }
 
     @Test
@@ -776,8 +845,8 @@ class SyncInfoViewModelTest {
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 
-        verify(exactly = 0) { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = true)) }
-        verify(exactly = 0) { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.UpSync.restart()) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.DownSync.restart()) }
     }
 
     private companion object {

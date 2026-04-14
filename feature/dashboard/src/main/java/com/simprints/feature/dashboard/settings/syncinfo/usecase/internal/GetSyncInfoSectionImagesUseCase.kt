@@ -5,7 +5,8 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.dashboard.settings.syncinfo.SyncInfoSectionImages
 import com.simprints.feature.dashboard.settings.syncinfo.SyncProgressInfo
 import com.simprints.feature.dashboard.settings.syncinfo.SyncProgressInfoPart
-import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.infra.eventsync.status.models.DownSyncState
+import com.simprints.infra.eventsync.status.models.UpSyncState
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncableCounts
 import javax.inject.Inject
@@ -16,7 +17,8 @@ internal class GetSyncInfoSectionImagesUseCase @Inject constructor(
 ) {
     operator fun invoke(
         isOnline: Boolean,
-        eventSyncState: EventSyncState,
+        upSyncState: UpSyncState,
+        downSyncState: DownSyncState,
         imageSyncStatus: ImageSyncStatus,
         syncableCounts: SyncableCounts,
     ): SyncInfoSectionImages {
@@ -27,7 +29,8 @@ internal class GetSyncInfoSectionImagesUseCase @Inject constructor(
         }
         val progress = getImageSyncProgress(imageSyncStatus)
         val imageLastSyncTimestamp = Timestamp(imageSyncStatus.lastUpdateTimeMillis ?: -1)
-        val isReLoginRequired = eventSyncState.isSyncFailedBecauseReloginRequired()
+        val isReLoginRequired = upSyncState.isSyncFailedBecauseReloginRequired() ||
+            downSyncState.isSyncFailedBecauseReloginRequired()
 
         return SyncInfoSectionImages(
             counterImagesToUpload = imagesToUploadOrNull?.toString().orEmpty(),

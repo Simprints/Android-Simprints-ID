@@ -56,8 +56,8 @@ internal class SyncInfoViewModel @Inject constructor(
     private val _loginNavigationEventLiveData = MutableLiveData<LoginParams>()
 
     private val syncStatusFlow = syncOrchestrator.observeSyncState()
-    private val eventSyncStateFlow =
-        syncStatusFlow.map { it.eventSyncState }
+    private val upSyncStateFlow = syncOrchestrator.observeUpSyncState()
+    private val downSyncStateFlow = syncOrchestrator.observeDownSyncState()
     private val imageSyncStatusFlow =
         syncStatusFlow.map { it.imageSyncStatus }
 
@@ -67,10 +67,10 @@ internal class SyncInfoViewModel @Inject constructor(
     val logoutEventFlow: Flow<LogoutActionReason?> = combine(
         authStore.observeSignedInProjectId(),
         syncStatusFlow,
-    ) { projectId, (eventSyncState, imageSyncStatus) ->
+    ) { projectId, (upSyncState, _, imageSyncStatus) ->
         when {
             projectId.isEmpty() -> LogoutActionReason.PROJECT_ENDING_OR_DEVICE_COMPROMISED
-            isPreLogoutUpSync && eventSyncState.isSyncCompleted() && !imageSyncStatus.isSyncing -> LogoutActionReason.USER_ACTION
+            isPreLogoutUpSync && upSyncState.isSyncCompleted() && !imageSyncStatus.isSyncing -> LogoutActionReason.USER_ACTION
             else -> null
         }
     }.debounce(LOGOUT_DELAY_MILLIS)
@@ -138,14 +138,22 @@ internal class SyncInfoViewModel @Inject constructor(
     fun forceEventSync(canEmitSyncButtonClick: Boolean = true) {
         viewModelScope.launch {
             if (canEmitSyncButtonClick) {
-                val isEventSyncing = eventSyncStateFlow.firstOrNull()?.isSyncInProgress() == true
+                val isEventSyncing = upSyncStateFlow.firstOrNull()?.isSyncInProgress() == true ||
+                    downSyncStateFlow.firstOrNull()?.isSyncInProgress() == true
                 if (!isEventSyncing) {
                     eventSyncButtonClickFlow.emit(Unit)
                 }
             }
 
-            val isDownSyncAllowed = !isPreLogoutUpSync && configRepository.getProject()?.state == ProjectState.RUNNING
-            syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed))
+            if (isPreLogoutUpSync) {
+                syncOrchestrator.execute(OneTime.UpSync.restart())
+            } else {
+                val isProjectRunning = configRepository.getProject()?.state == ProjectState.RUNNING
+                syncOrchestrator.execute(OneTime.UpSync.restart())
+                if (isProjectRunning) {
+                    syncOrchestrator.execute(OneTime.DownSync.restart())
+                }
+            }
         }
     }
 
@@ -186,11 +194,14 @@ internal class SyncInfoViewModel @Inject constructor(
 
     private fun startInitialSyncIfRequired() {
         viewModelScope.launch {
-            val eventSyncState = eventSyncStateFlow
+            val upSyncState = upSyncStateFlow
                 .dropWhile { it.isUninitialized() }
                 .firstOrNull()
-            val isRunning = eventSyncState?.isSyncRunning() ?: false
-            val lastUpdate = eventSyncState?.lastSyncTime
+            val downSyncState = downSyncStateFlow
+                .dropWhile { it.isUninitialized() }
+                .firstOrNull()
+            val isRunning = upSyncState?.isSyncRunning() == true || downSyncState?.isSyncRunning() == true
+            val lastUpdate = listOfNotNull(upSyncState?.lastSyncTime, downSyncState?.lastSyncTime).maxOrNull()
 
             val isForceEventSync = when {
                 isPreLogoutUpSync -> true
@@ -209,11 +220,11 @@ internal class SyncInfoViewModel @Inject constructor(
     private fun syncImagesAfterEventsWhenRequired() {
         viewModelScope.launch {
             if (isPreLogoutUpSync) {
-                eventSyncStateFlow
+                upSyncStateFlow
                     .map { it.isSyncCompleted() }
                     .distinctUntilChanged()
-                    .collect { isEventSyncCompleted ->
-                        if (isEventSyncCompleted) {
+                    .collect { isUpSyncCompleted ->
+                        if (isUpSyncCompleted) {
                             syncOrchestrator.execute(OneTime.Images.start())
                         }
                     }

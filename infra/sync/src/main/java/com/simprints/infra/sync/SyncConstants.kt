@@ -24,8 +24,18 @@ internal object SyncConstants {
     const val FIRMWARE_UPDATE_WORK_NAME = "firmware-file-update-work-v2"
     const val FIRMWARE_UPDATE_REPEAT_INTERVAL = BuildConfig.FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES
 
+    @Deprecated("Use EVENT_UP_SYNC_WORK_NAME or EVENT_DOWN_SYNC_WORK_NAME")
     const val EVENT_SYNC_WORK_NAME = "event-sync-work"
+
+    @Deprecated("Use EVENT_UP_SYNC_WORK_NAME_ONE_TIME or EVENT_DOWN_SYNC_WORK_NAME_ONE_TIME")
     const val EVENT_SYNC_WORK_NAME_ONE_TIME = "event-sync-work-one-time"
+
+    const val EVENT_UP_SYNC_WORK_NAME = "event-up-sync-work"
+    const val EVENT_UP_SYNC_WORK_NAME_ONE_TIME = "event-up-sync-work-one-time"
+
+    const val EVENT_DOWN_SYNC_WORK_NAME = "event-down-sync-work"
+    const val EVENT_DOWN_SYNC_WORK_NAME_ONE_TIME = "event-down-sync-work-one-time"
+
     const val EVENT_SYNC_WORKER_INTERVAL = BuildConfig.EVENT_SYNC_WORKER_INTERVAL_MINUTES
 
     const val PROGRESS_CURRENT = "progress_current"

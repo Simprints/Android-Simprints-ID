@@ -12,6 +12,8 @@ import com.simprints.feature.dashboard.settings.syncinfo.usecase.internal.GetSyn
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSampleUploadEnabledInProject
+import com.simprints.infra.eventsync.status.models.DownSyncState
+import com.simprints.infra.eventsync.status.models.UpSyncState
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.usecase.ObserveSyncableCountsUseCase
@@ -52,11 +54,15 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     ) {
         isOnline,
         projectId,
-        (eventSyncState, imageSyncStatus),
+        syncStatus,
         syncableCounts,
         (isRefreshing, isProjectRunning, moduleCounts, projectConfig),
         ->
-        val isReLoginRequired = eventSyncState.isSyncFailedBecauseReloginRequired()
+        val upSyncState = syncStatus.upSyncState
+        val downSyncState = syncStatus.downSyncState
+        val imageSyncStatus = syncStatus.imageSyncStatus
+        val isReLoginRequired = upSyncState.isSyncFailedBecauseReloginRequired() ||
+            downSyncState.isSyncFailedBecauseReloginRequired()
         val syncInfoSectionModules = SyncInfoSectionModules(
             isSectionAvailable = projectConfig.isModuleSelectionAvailable(),
             moduleCounts = moduleCounts.prependTotalModuleCount(),
@@ -65,7 +71,8 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             isPreLogoutUpSync,
             isOnline,
             projectId,
-            eventSyncState,
+            upSyncState,
+            downSyncState,
             imageSyncStatus,
             syncableCounts,
             isProjectRunning,
@@ -74,7 +81,8 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         )
         val syncInfoSectionImages = getSyncInfoSectionImages(
             isOnline,
-            eventSyncState,
+            upSyncState,
+            downSyncState,
             imageSyncStatus,
             syncableCounts,
         )

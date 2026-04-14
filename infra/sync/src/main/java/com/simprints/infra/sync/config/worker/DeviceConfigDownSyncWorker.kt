@@ -42,7 +42,8 @@ internal class DeviceConfigDownSyncWorker @AssistedInject constructor(
                 state.selectModules != null -> state.selectModules?.let { modules ->
                     moduleRepository.forceModuleSelection(modules.moduleIds, isLocalChange = false)
                     configRepository.updateDeviceConfiguration { it.apply { lastInstructionId = modules.id } }
-                    syncOrchestrator.execute(OneTime.Events.restart())
+                    syncOrchestrator.execute(OneTime.UpSync.restart())
+                    syncOrchestrator.execute(OneTime.DownSync.restart())
                 }
             }
             success()
