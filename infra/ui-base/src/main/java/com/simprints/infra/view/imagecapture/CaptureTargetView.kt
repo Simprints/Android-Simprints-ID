@@ -6,9 +6,12 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
+import android.os.Bundle
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.ColorInt
+import androidx.core.os.BundleCompat
 import com.simprints.core.tools.extentions.dpToPx
 import com.simprints.infra.uibase.R
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
@@ -133,6 +136,26 @@ class CaptureTargetView @JvmOverloads constructor(
         canvas.drawPath(shapePath, strokePaint)
     }
 
+    override fun onSaveInstanceState(): Parcelable = Bundle().apply {
+        putParcelable(BUNDLE_ID_SAVE_INSTANCE_STATE, super.onSaveInstanceState())
+        putInt(BUNDLE_ID_SHAPE, shape.ordinal)
+        putFloat(BUNDLE_ID_CORNER_RADIUS, cornerRadius)
+        putInt(BUNDLE_ID_STROKE_COLOR, strokeColor)
+        putFloat(BUNDLE_ID_STROKE_WIDTH, strokeWidth)
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        if (state is Bundle) {
+            shape = Shape.entries.toTypedArray()[state.getInt(BUNDLE_ID_SHAPE, shape.ordinal)]
+            cornerRadius = state.getFloat(BUNDLE_ID_CORNER_RADIUS, cornerRadius)
+            strokeColor = state.getInt(BUNDLE_ID_STROKE_COLOR, strokeColor)
+            strokeWidth = state.getFloat(BUNDLE_ID_STROKE_WIDTH, strokeWidth)
+            super.onRestoreInstanceState(BundleCompat.getParcelable(state, BUNDLE_ID_SAVE_INSTANCE_STATE, BaseSavedState::class.java))
+        } else {
+            super.onRestoreInstanceState(state)
+        }
+    }
+
     private fun rebuildPath(
         w: Int,
         h: Int,
@@ -149,5 +172,13 @@ class CaptureTargetView @JvmOverloads constructor(
                 shapePath.addRoundRect(bounds, r, r, Path.Direction.CW)
             }
         }
+    }
+
+    companion object {
+        private const val BUNDLE_ID_SAVE_INSTANCE_STATE = "BUNDLE_ID_SAVE_INSTANCE_STATE"
+        private const val BUNDLE_ID_SHAPE = "BUNDLE_ID_SHAPE"
+        private const val BUNDLE_ID_CORNER_RADIUS = "BUNDLE_ID_CORNER_RADIUS"
+        private const val BUNDLE_ID_STROKE_COLOR = "BUNDLE_ID_STROKE_COLOR"
+        private const val BUNDLE_ID_STROKE_WIDTH = "BUNDLE_ID_STROKE_WIDTH"
     }
 }
