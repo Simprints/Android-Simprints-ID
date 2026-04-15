@@ -39,4 +39,10 @@ class OneTimeSyncCommandTest {
         assertThat(OneTime.Images.restart())
             .isEqualTo(OneTime.ImagesCommand(action = OneTime.Action.RESTART))
     }
+
+    @Test
+    fun `logout builds expected command`() {
+        assertThat(OneTime.Logout.start()).isEqualTo(OneTime.LogoutCommand(isProjectEnded = false))
+        assertThat(OneTime.Logout.start(true)).isEqualTo(OneTime.LogoutCommand(isProjectEnded = true))
+    }
 }

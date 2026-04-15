@@ -2,14 +2,14 @@ package com.simprints.feature.dashboard.logout
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
-import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.sync.ImageSyncStatus
-import com.simprints.infra.sync.SyncStatus
+import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.sync.SyncStatus
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.*
@@ -24,9 +24,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class LogoutSyncViewModelTest {
-    @MockK
-    lateinit var logoutUseCase: LogoutUseCase
-
     @MockK
     lateinit var configRepository: ConfigRepository
 
@@ -45,17 +42,18 @@ internal class LogoutSyncViewModelTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
-        // Setup default behavior for logoutUseCase
-        coEvery { logoutUseCase() } returns Unit
     }
 
     @Test
-    fun `should logout correctly`() = runTest {
+    fun `should enqueue logout worker when logout invoked`() = runTest {
         val viewModel = createViewModel()
 
         viewModel.logout()
+        advanceUntilIdle()
 
-        coVerify(exactly = 1) { logoutUseCase() }
+        verify(exactly = 1) {
+            syncOrchestrator.execute(any<OneTime>())
+        }
     }
 
     @Test
@@ -147,6 +145,5 @@ internal class LogoutSyncViewModelTest {
         configRepository = configRepository,
         syncOrchestrator = syncOrchestrator,
         authStore = authStore,
-        logoutUseCase = logoutUseCase,
     )
 }

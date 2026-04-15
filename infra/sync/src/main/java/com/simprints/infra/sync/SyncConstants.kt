@@ -30,4 +30,7 @@ internal object SyncConstants {
 
     const val PROGRESS_CURRENT = "progress_current"
     const val PROGRESS_MAX = "progress_max"
+
+    const val LOGOUT_WORK_NAME = "logout-work"
+    const val LOGOUT_INPUT_IS_PROJECT_ENDED = "INPUT_IS_PROJECT_ENDED"
 }

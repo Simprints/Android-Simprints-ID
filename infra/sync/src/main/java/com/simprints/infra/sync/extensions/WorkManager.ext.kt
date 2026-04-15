@@ -8,6 +8,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.ListenableWorker
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -52,6 +53,7 @@ internal inline fun <reified T : ListenableWorker> WorkManager.startWorker(
     existingWorkPolicy: ExistingWorkPolicy = ExistingWorkPolicy.KEEP,
     initialDelay: Long = 0,
     backoffInterval: Long = SyncConstants.DEFAULT_BACKOFF_INTERVAL_MINUTES,
+    isExpedited: Boolean = false,
     constraints: Constraints = defaultWorkerConstraints(),
     tags: List<String> = emptyList(),
     inputData: Data? = null,
@@ -62,6 +64,7 @@ internal inline fun <reified T : ListenableWorker> WorkManager.startWorker(
         .setConstraints(constraints)
         .setInitialDelay(initialDelay, SyncConstants.SYNC_TIME_UNIT)
         .setBackoffCriteria(BackoffPolicy.LINEAR, backoffInterval, SyncConstants.SYNC_TIME_UNIT)
+        .let { if (isExpedited) it.setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST) else it }
         .let { if (inputData != null) it.setInputData(inputData) else it }
         .let { tags.fold(it) { builder, tag -> builder.addTag(tag) } }
         .build(),

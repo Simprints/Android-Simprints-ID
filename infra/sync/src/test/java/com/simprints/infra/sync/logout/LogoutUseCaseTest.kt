@@ -1,6 +1,6 @@
-package com.simprints.feature.dashboard.logout.usecase
+package com.simprints.infra.sync.logout
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.simprints.core.broadcasts.InternalBroadcaster
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationFlagsStore
@@ -20,9 +20,6 @@ import org.junit.Test
 
 class LogoutUseCaseTest {
     @get:Rule
-    val rule = InstantTaskExecutorRule()
-
-    @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
@@ -34,7 +31,11 @@ class LogoutUseCaseTest {
     @MockK
     private lateinit var flagsStore: RealmToRoomMigrationFlagsStore
 
-    @MockK lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
+    @MockK
+    private lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
+
+    @MockK
+    private lateinit var broadcaster: InternalBroadcaster
 
     private lateinit var useCase: LogoutUseCase
 
@@ -48,6 +49,7 @@ class LogoutUseCaseTest {
             authManager = authManager,
             flagsStore = flagsStore,
             enrolmentRecordRepository = enrolmentRecordRepository,
+            broadcaster = broadcaster,
             ioDispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
     }
@@ -60,8 +62,16 @@ class LogoutUseCaseTest {
         coVerify {
             syncOrchestrator.deleteEventSyncInfo()
             authManager.signOut()
-            flagsStore.clearMigrationFlags()
-            enrolmentRecordRepository.closeOpenDbConnection()
         }
+        verify { flagsStore.clearMigrationFlags() }
+        coVerify { enrolmentRecordRepository.closeOpenDbConnection() }
+        verify { broadcaster.loggedOut(false) }
+    }
+
+    @Test
+    fun `sends logout broadcast with isProjectEnded=true when project ended`() = runTest {
+        useCase.invoke(isProjectEnded = true)
+
+        verify { broadcaster.loggedOut(true) }
     }
 }

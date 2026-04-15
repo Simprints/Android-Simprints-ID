@@ -9,7 +9,6 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.eventsync.module.ModuleSelectionRepository
 import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
-import com.simprints.infra.sync.config.usecase.LogoutUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -20,7 +19,6 @@ internal class DeviceConfigDownSyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val configRepository: ConfigRepository,
-    private val logoutUseCase: LogoutUseCase,
     private val syncOrchestrator: SyncOrchestrator,
     private val moduleRepository: ModuleSelectionRepository,
     @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
@@ -34,7 +32,8 @@ internal class DeviceConfigDownSyncWorker @AssistedInject constructor(
             val state = configRepository.getDeviceState()
 
             when {
-                state.isCompromised -> logoutUseCase()
+                state.isCompromised -> syncOrchestrator.execute(OneTime.Logout.start(isProjectEnded = true))
+
                 // Device "commands" below are mutually exclusive in the backend response
                 state.recordsToUpSync != null -> state.recordsToUpSync?.let { records ->
                     syncOrchestrator.uploadEnrolmentRecords(records.id, records.subjectIds)
