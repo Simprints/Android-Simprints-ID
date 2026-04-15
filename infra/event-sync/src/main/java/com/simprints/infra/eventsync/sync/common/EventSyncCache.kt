@@ -103,9 +103,6 @@ class EventSyncCache @Inject constructor(
 
     companion object {
         @VisibleForTesting
-        const val PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY = "PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY"
-
-        @VisibleForTesting
         const val PEOPLE_SYNC_CACHE_LAST_UP_SYNC_TIME_KEY = "PEOPLE_SYNC_CACHE_LAST_UP_SYNC_TIME_KEY"
 
         @VisibleForTesting

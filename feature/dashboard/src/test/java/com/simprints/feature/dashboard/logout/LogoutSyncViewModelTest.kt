@@ -5,7 +5,11 @@ import com.google.common.truth.Truth.*
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
+import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
+import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.eventsync.status.models.DownSyncState
 import com.simprints.infra.eventsync.status.models.UpSyncState
 import com.simprints.infra.sync.ImageSyncStatus
@@ -46,7 +50,7 @@ internal class LogoutSyncViewModelTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
-        // Setup default behavior for logoutUseCase
+        mockkStatic("com.simprints.infra.config.store.models.ProjectConfigurationKt")
         coEvery { logoutUseCase() } returns Unit
     }
 
@@ -127,12 +131,56 @@ internal class LogoutSyncViewModelTest {
         assertThat(result).isFalse()
     }
 
+    @Test
+    fun `isLogoutWithoutSyncVisibleLiveData should return false when project is ending and up sync is completed`() = runTest {
+        val imageSyncStatus = ImageSyncStatus(isSyncing = false, progress = null, lastUpdateTimeMillis = null)
+
+        setupSyncMocks(
+            upSyncCompleted = true,
+            downSyncCompleted = false,
+            imageSyncStatus = imageSyncStatus,
+            projectState = ProjectState.PROJECT_ENDING,
+        )
+
+        val viewModel = createViewModel()
+
+        val result = viewModel.isLogoutWithoutSyncVisibleLiveData.getOrAwaitValue(afterObserve = ::advanceUntilIdle)
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun `isLogoutWithoutSyncVisibleLiveData should return false when project is paused and up sync is completed`() = runTest {
+        val imageSyncStatus = ImageSyncStatus(isSyncing = false, progress = null, lastUpdateTimeMillis = null)
+
+        setupSyncMocks(
+            upSyncCompleted = true,
+            downSyncCompleted = false,
+            imageSyncStatus = imageSyncStatus,
+            projectState = ProjectState.PROJECT_PAUSED,
+        )
+
+        val viewModel = createViewModel()
+
+        val result = viewModel.isLogoutWithoutSyncVisibleLiveData.getOrAwaitValue(afterObserve = ::advanceUntilIdle)
+        assertThat(result).isFalse()
+    }
+
     private fun setupSyncMocks(
         upSyncCompleted: Boolean,
+        downSyncCompleted: Boolean = upSyncCompleted,
         imageSyncStatus: ImageSyncStatus,
+        projectState: ProjectState = ProjectState.RUNNING,
+        downSyncAllowed: Boolean = true,
     ) {
+        val mockProject = mockk<Project> { every { state } returns projectState }
+        coEvery { configRepository.getProject() } returns mockProject
+        val mockConfig = mockk<com.simprints.infra.config.store.models.ProjectConfiguration>(relaxed = true)
+        coEvery { configRepository.getProjectConfiguration() } returns mockConfig
+        every { mockConfig.isSimprintsEventDownSyncAllowed() } returns downSyncAllowed
+        every { mockConfig.isCommCareEventDownSyncAllowed() } returns false
+
         val upSyncState = mockk<UpSyncState>(relaxed = true) { every { isSyncCompleted() } returns upSyncCompleted }
-        val downSyncState = mockk<DownSyncState>(relaxed = true) { every { isSyncCompleted() } returns upSyncCompleted }
+        val downSyncState = mockk<DownSyncState>(relaxed = true) { every { isSyncCompleted() } returns downSyncCompleted }
         val statusFlow = MutableStateFlow(SyncStatus(upSyncState = upSyncState, downSyncState = downSyncState, imageSyncStatus = imageSyncStatus))
         every { syncOrchestrator.observeSyncState() } returns statusFlow
     }
