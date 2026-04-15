@@ -66,4 +66,12 @@ internal class OrchestratorActivity : BaseActivity() {
             finish()
         }
     }
+
+    override fun onLogout(isProjectEnded: Boolean) {
+        Simber.d("Logged out during workflow", tag = ORCHESTRATION)
+        // This should only happen when device is compromised and state refresh happens during execution of a workflow.
+        // Therefore, there is no reason to continue workflow or attempt to preserve any data.
+        setResult(RESULT_CANCELED, Intent().putExtras(Bundle()))
+        finish()
+    }
 }

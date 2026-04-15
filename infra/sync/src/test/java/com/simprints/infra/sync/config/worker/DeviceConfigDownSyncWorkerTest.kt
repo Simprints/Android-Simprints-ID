@@ -9,10 +9,10 @@ import com.simprints.infra.config.store.models.DeviceState
 import com.simprints.infra.config.store.models.SelectDownSyncModules
 import com.simprints.infra.config.store.models.UpSyncEnrolmentRecords
 import com.simprints.infra.eventsync.module.ModuleSelectionRepository
+import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.OneTime.Action
 import com.simprints.infra.sync.OneTime.EventsCommand
 import com.simprints.infra.sync.SyncOrchestrator
-import com.simprints.infra.sync.config.usecase.LogoutUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -24,9 +24,6 @@ import org.junit.Test
 class DeviceConfigDownSyncWorkerTest {
     @MockK
     private lateinit var configRepository: ConfigRepository
-
-    @MockK
-    private lateinit var logoutUseCase: LogoutUseCase
 
     @MockK
     private lateinit var syncOrchestrator: SyncOrchestrator
@@ -51,7 +48,6 @@ class DeviceConfigDownSyncWorkerTest {
             },
             params = mockk(relaxed = true),
             configRepository = configRepository,
-            logoutUseCase = logoutUseCase,
             syncOrchestrator = syncOrchestrator,
             moduleRepository = moduleRepository,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,
@@ -68,7 +64,7 @@ class DeviceConfigDownSyncWorkerTest {
         val result = deviceConfigWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
-        coVerify(exactly = 0) { logoutUseCase.invoke() }
+        coVerify(exactly = 0) { syncOrchestrator.execute(eq(OneTime.LogoutCommand(true))) }
         verify(exactly = 0) { syncOrchestrator.uploadEnrolmentRecords(any(), any()) }
     }
 
@@ -83,7 +79,7 @@ class DeviceConfigDownSyncWorkerTest {
         val result = deviceConfigWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
-        coVerify { logoutUseCase.invoke() }
+        coVerify { syncOrchestrator.execute(eq(OneTime.LogoutCommand(true))) }
         verify(exactly = 0) { syncOrchestrator.uploadEnrolmentRecords(any(), any()) }
     }
 
@@ -98,7 +94,7 @@ class DeviceConfigDownSyncWorkerTest {
         val result = deviceConfigWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
-        coVerify(exactly = 0) { logoutUseCase.invoke() }
+        coVerify(exactly = 0) { syncOrchestrator.execute(eq(OneTime.LogoutCommand(true))) }
         verify { syncOrchestrator.uploadEnrolmentRecords(any(), any()) }
     }
 
@@ -113,7 +109,7 @@ class DeviceConfigDownSyncWorkerTest {
         val result = deviceConfigWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
-        coVerify(exactly = 0) { logoutUseCase.invoke() }
+        coVerify(exactly = 0) { syncOrchestrator.execute(eq(OneTime.LogoutCommand(true))) }
         coJustRun { configRepository.updateDeviceConfiguration(any()) }
 
         coVerify {

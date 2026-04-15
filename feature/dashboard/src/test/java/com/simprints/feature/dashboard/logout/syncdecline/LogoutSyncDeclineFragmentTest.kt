@@ -98,46 +98,6 @@ internal class LogoutSyncDeclineFragmentTest {
         coVerify(exactly = 0) { viewModel.logout() }
     }
 
-    @Test
-    fun `should navigate to requestLoginFragment when logout confirmation button is pressed`() {
-        val logoutLiveData = MutableLiveData<Unit>()
-        every { viewModel.logoutEventLiveData } returns logoutLiveData
-
-        mockSettingsPassword(SettingsPasswordConfig.NotSet)
-        val navController =
-            testNavController(R.navigation.graph_dashboard, R.id.logOutSyncDeclineFragment)
-        launchFragmentInHiltContainer<LogoutSyncDeclineFragment>(navController = navController)
-
-        onView(withId(R.id.logoutWithoutSyncConfirmButton)).perform(click())
-        onView(withId(android.R.id.button1))
-            .inRoot(RootMatchers.isDialog())
-            .check(ViewAssertions.matches(isDisplayed()))
-            .perform(click())
-        logoutLiveData.value = Unit
-
-        assertThat(navController.currentDestination?.id)
-            .isEqualTo(R.id.requestLoginFragment)
-    }
-
-    @Test
-    fun `should navigate to requestLoginFragment when correct logout password is entered`() {
-        val password = "password123"
-        val logoutLiveData = MutableLiveData<Unit>()
-        every { viewModel.logoutEventLiveData } returns logoutLiveData
-        mockSettingsPassword(SettingsPasswordConfig.Locked(password = password))
-        val navController =
-            testNavController(R.navigation.graph_dashboard, R.id.logOutSyncDeclineFragment)
-        launchFragmentInHiltContainer<LogoutSyncDeclineFragment>(navController = navController)
-
-        onView(withId(R.id.logoutWithoutSyncConfirmButton)).perform(click())
-        onView(withId(R.id.password_input_field))
-            .inRoot(RootMatchers.isDialog())
-            .check(ViewAssertions.matches(isDisplayed()))
-            .perform(replaceText(password))
-        logoutLiveData.value = Unit
-        assertThat(navController.currentDestination?.id)
-            .isEqualTo(R.id.requestLoginFragment)
-    }
 
     private fun mockSettingsPassword(lock: SettingsPasswordConfig) {
         every { viewModel.settingsLocked } returns mockk {

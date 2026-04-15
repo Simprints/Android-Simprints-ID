@@ -1,17 +1,19 @@
 package com.simprints.infra.sync.config.usecase
 
 import com.simprints.infra.config.store.models.ProjectState
+import com.simprints.infra.sync.OneTime
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.usecase.ObserveSyncableCountsUseCase
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 internal class HandleProjectStateUseCase @Inject constructor(
     private val observeSyncableCounts: ObserveSyncableCountsUseCase,
-    private val logoutUseCase: LogoutUseCase,
+    private val syncOrchestrator: SyncOrchestrator,
 ) {
     suspend operator fun invoke(state: ProjectState) {
         if (shouldSignOut(state)) {
-            logoutUseCase()
+            syncOrchestrator.execute(OneTime.Logout.start(isProjectEnded = true))
         }
     }
 

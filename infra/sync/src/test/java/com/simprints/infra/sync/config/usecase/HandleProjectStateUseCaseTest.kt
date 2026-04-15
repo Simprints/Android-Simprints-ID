@@ -1,11 +1,11 @@
 package com.simprints.infra.sync.config.usecase
 
 import com.simprints.infra.config.store.models.ProjectState
+import com.simprints.infra.sync.OneTime
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.SyncableCounts
 import com.simprints.infra.sync.usecase.ObserveSyncableCountsUseCase
-import io.mockk.MockKAnnotations
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -17,7 +17,7 @@ internal class HandleProjectStateUseCaseTest {
     private lateinit var observeSyncableCounts: ObserveSyncableCountsUseCase
 
     @MockK
-    private lateinit var logoutUseCase: LogoutUseCase
+    private lateinit var syncOrchestrator: SyncOrchestrator
 
     private lateinit var useCase: HandleProjectStateUseCase
 
@@ -27,7 +27,7 @@ internal class HandleProjectStateUseCaseTest {
 
         useCase = HandleProjectStateUseCase(
             observeSyncableCounts = observeSyncableCounts,
-            logoutUseCase = logoutUseCase,
+            syncOrchestrator = syncOrchestrator,
         )
     }
 
@@ -46,7 +46,7 @@ internal class HandleProjectStateUseCaseTest {
 
         useCase(ProjectState.PROJECT_ENDED)
 
-        coVerify { logoutUseCase.invoke() }
+        coVerify { syncOrchestrator.execute(eq(OneTime.LogoutCommand(true))) }
     }
 
     @Test
@@ -64,7 +64,7 @@ internal class HandleProjectStateUseCaseTest {
 
         useCase(ProjectState.PROJECT_ENDING)
 
-        coVerify { logoutUseCase.invoke() }
+        coVerify { syncOrchestrator.execute(eq(OneTime.LogoutCommand(true))) }
     }
 
     @Test
@@ -82,7 +82,7 @@ internal class HandleProjectStateUseCaseTest {
 
         useCase(ProjectState.PROJECT_ENDING)
 
-        coVerify(exactly = 0) { logoutUseCase.invoke() }
+        coVerify(exactly = 0) { syncOrchestrator.execute(eq(OneTime.LogoutCommand(true))) }
     }
 
     @Test
@@ -100,6 +100,6 @@ internal class HandleProjectStateUseCaseTest {
 
         useCase(ProjectState.RUNNING)
 
-        coVerify(exactly = 0) { logoutUseCase.invoke() }
+        coVerify(exactly = 0) { syncOrchestrator.execute(eq(OneTime.LogoutCommand(true))) }
     }
 }

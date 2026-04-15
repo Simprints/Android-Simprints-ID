@@ -94,11 +94,15 @@ internal class AboutFragment : PreferenceFragmentCompat() {
         viewModel.logoutDestinationEvent.observe(
             viewLifecycleOwner,
             LiveDataEventWithContentObserver {
-                val destination = when (it) {
-                    LogoutDestination.LogoutDataSyncScreen -> AboutFragmentDirections.actionAboutFragmentToLogoutNavigation()
-                    LogoutDestination.LoginScreen -> AboutFragmentDirections.actionToRequestLoginFragment()
+                when (it) {
+                    LogoutDestination.LogoutDataSyncScreen -> {
+                        val destination = AboutFragmentDirections.actionAboutFragmentToLogoutNavigation()
+                        findNavController().navigateSafely(this, destination)
+                    }
+                    LogoutDestination.LoginScreen -> {
+                        // Logout navigation is handled by DashboardActivity
+                    }
                 }
-                findNavController().navigateSafely(this, destination)
             },
         )
         viewModel.openTroubleshooting.observe(

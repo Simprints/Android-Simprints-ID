@@ -21,6 +21,10 @@ sealed class OneTime {
         val action: Action,
     ) : OneTime()
 
+    internal data class LogoutCommand(
+        val isProjectEnded: Boolean,
+    ) : OneTime()
+
     object Events {
         fun start(isDownSyncAllowed: Boolean = true): OneTime = EventsCommand(Action.START, isDownSyncAllowed)
 
@@ -35,5 +39,9 @@ sealed class OneTime {
         fun stop(): OneTime = ImagesCommand(Action.STOP)
 
         fun restart(): OneTime = ImagesCommand(Action.RESTART)
+    }
+
+    object Logout {
+        fun start(isProjectEnded: Boolean = false): OneTime = LogoutCommand(isProjectEnded)
     }
 }

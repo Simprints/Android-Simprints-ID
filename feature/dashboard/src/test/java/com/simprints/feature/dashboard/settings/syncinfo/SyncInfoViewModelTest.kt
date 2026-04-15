@@ -8,7 +8,6 @@ import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.feature.dashboard.settings.syncinfo.usecase.ObserveSyncInfoUseCase
 import com.simprints.feature.login.LoginResult
 import com.simprints.infra.authstore.AuthStore
@@ -33,7 +32,6 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
@@ -42,7 +40,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import kotlin.test.fail
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SyncInfoViewModelTest {
@@ -69,9 +66,6 @@ class SyncInfoViewModelTest {
 
     @MockK
     private lateinit var syncOrchestrator: SyncOrchestrator
-
-    @MockK
-    private lateinit var logoutUseCase: LogoutUseCase
 
     @MockK
     private lateinit var mockProjectConfiguration: ProjectConfiguration
@@ -124,7 +118,6 @@ class SyncInfoViewModelTest {
         mockkStatic("com.simprints.infra.config.store.models.ProjectConfigurationKt")
         mockkStatic("com.simprints.core.tools.extentions.Flow_extKt")
         setupDefaultMocks()
-        createViewModel()
     }
 
     private fun setupDefaultMocks() {
@@ -169,7 +162,6 @@ class SyncInfoViewModelTest {
             timeHelper = timeHelper,
             observeSyncInfo = observeSyncInfo,
             syncOrchestrator = syncOrchestrator,
-            logoutUseCase = logoutUseCase,
             ioDispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
     }
@@ -222,6 +214,7 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `should show login navigation when user requests login`() = runTest {
+        createViewModel()
         viewModel.requestNavigationToLogin()
         val result = viewModel.loginNavigationEventLiveData.getOrAwaitValue()
 
@@ -240,19 +233,12 @@ class SyncInfoViewModelTest {
             every { progress } returns null
             every { lastUpdateTimeMillis } returns 0
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockNotSyncingImageStatus)
         createViewModel()
         viewModel.isPreLogoutUpSync = true
+        syncStatusFlow.value = SyncStatus(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockNotSyncingImageStatus)
 
-        var numberOfEmissions = 0
-        val flowCollector = async {
-            viewModel.logoutEventFlow.collect {
-                numberOfEmissions++
-            }
-        }
-        advanceTimeBy(3100L) // after the logout delay (3000ms)
-        assertThat(numberOfEmissions).isEqualTo(1)
-        flowCollector.cancel()
+        advanceTimeBy(4100L) // after the logout delay (3000ms)
+        verify(exactly = 1) { syncOrchestrator.execute(any<OneTime>()) }
     }
 
     @Test
@@ -265,40 +251,27 @@ class SyncInfoViewModelTest {
             every { progress } returns null
             every { lastUpdateTimeMillis } returns 0
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockNotSyncingImageStatus)
         createViewModel()
         viewModel.isPreLogoutUpSync = true
+        syncStatusFlow.value = SyncStatus(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockNotSyncingImageStatus)
 
-        var numberOfEmissions = 0
-        val flowCollector = async {
-            viewModel.logoutEventFlow.collect {
-                numberOfEmissions++
-            }
-        }
         advanceTimeBy(2900L) // still during the debounce delay
-        assertThat(numberOfEmissions).isEqualTo(0)
+        verify(exactly = 0) { syncOrchestrator.execute(any<OneTime>()) }
         advanceTimeBy(200L) // after the debounce delay (total 3100ms > 3000ms)
-        assertThat(numberOfEmissions).isEqualTo(1)
-        flowCollector.cancel()
+        verify(exactly = 1) { syncOrchestrator.execute(any<OneTime>()) }
     }
 
     @Test
-    fun `should emit a logout event when auth store is cleared`() = runTest {
+    fun `should not emit a logout event when auth store is cleared (handled by DashboardActivity broadcast)`() = runTest {
         val projectIdFlow = MutableStateFlow(TEST_PROJECT_ID)
         every { authStore.observeSignedInProjectId() } returns projectIdFlow
         createViewModel()
+        viewModel.isPreLogoutUpSync = false
 
-        var numberOfEmissions = 0
-        val flowCollector = async {
-            viewModel.logoutEventFlow.collect {
-                numberOfEmissions++
-            }
-        }
         projectIdFlow.value = ""
         advanceUntilIdle()
 
-        assertThat(numberOfEmissions).isEqualTo(1)
-        flowCollector.cancel()
+        verify(exactly = 0) { syncOrchestrator.execute(any<OneTime>()) }
     }
 
     @Test
@@ -311,18 +284,12 @@ class SyncInfoViewModelTest {
             every { progress } returns null
             every { lastUpdateTimeMillis } returns 0
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockNotSyncingImageStatus)
         createViewModel()
         viewModel.isPreLogoutUpSync = false
+        syncStatusFlow.value = SyncStatus(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockNotSyncingImageStatus)
 
-        val flowCollector = async {
-            viewModel.logoutEventFlow.collect {
-                // fail if any logout event is emitted
-                fail("should not emit logout event")
-            }
-        }
         advanceTimeBy(3100L) // after the logout delay (3000ms)
-        flowCollector.cancel()
+        verify(exactly = 0) { syncOrchestrator.execute(any<OneTime>()) }
     }
 
     @Test
@@ -336,18 +303,12 @@ class SyncInfoViewModelTest {
             every { progress } returns null
             every { lastUpdateTimeMillis } returns 0
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockInProgressEventSyncState, imageSyncStatus = mockNotSyncingImageStatus)
         createViewModel()
         viewModel.isPreLogoutUpSync = true
+        syncStatusFlow.value = SyncStatus(eventSyncState = mockInProgressEventSyncState, imageSyncStatus = mockNotSyncingImageStatus)
 
-        val flowCollector = async {
-            viewModel.logoutEventFlow.collect {
-                // fail if any logout event is emitted
-                fail("should not emit logout event")
-            }
-        }
         advanceTimeBy(3100L) // after the logout delay (3000ms)
-        flowCollector.cancel()
+        verify(exactly = 0) { syncOrchestrator.execute(any<OneTime>()) }
     }
 
     @Test
@@ -360,24 +321,19 @@ class SyncInfoViewModelTest {
             every { progress } returns Pair(1, 2)
             every { lastUpdateTimeMillis } returns null
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockSyncingImageStatus)
         createViewModel()
         viewModel.isPreLogoutUpSync = true
+        syncStatusFlow.value = SyncStatus(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockSyncingImageStatus)
 
-        val flowCollector = async {
-            viewModel.logoutEventFlow.collect {
-                // fail test if any logout event is emitted
-                fail("should not emit logout event")
-            }
-        }
         advanceTimeBy(3100L) // after the logout delay (3000ms)
-        flowCollector.cancel()
+        verify(exactly = 0) { syncOrchestrator.execute(any<OneTime>()) }
     }
 
     // forceEventSync() tests
 
     @Test
     fun `should start event sync with down sync allowed when not pre-logout`() = runTest {
+        createViewModel()
         viewModel.isPreLogoutUpSync = false
 
         viewModel.forceEventSync()
@@ -387,6 +343,7 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `should start event sync with down sync disabled when pre-logout`() = runTest {
+        createViewModel()
         viewModel.isPreLogoutUpSync = true
 
         viewModel.forceEventSync()
@@ -435,6 +392,7 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `should stop current event sync before starting new one`() = runTest {
+        createViewModel()
         viewModel.forceEventSync()
 
         verify { syncOrchestrator.execute(OneTime.Events.restart()) }
@@ -473,16 +431,18 @@ class SyncInfoViewModelTest {
     // logout() tests
 
     @Test
-    fun `should call logout use case when logout invoked`() = runTest {
+    fun `should enqueue logout worker when performLogout invoked`() = runTest {
+        createViewModel()
         viewModel.performLogout()
 
-        coVerify { logoutUseCase() }
+        verify { syncOrchestrator.execute(any<OneTime>()) }
     }
 
     // requestNavigationToLogin() tests
 
     @Test
     fun `should emit login navigation event with signed in project ID`() = runTest {
+        createViewModel()
         viewModel.requestNavigationToLogin()
 
         val result = viewModel.loginNavigationEventLiveData.getOrAwaitValue()
@@ -493,6 +453,7 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `should emit login navigation event with signed in user ID when available`() = runTest {
+        createViewModel()
         viewModel.requestNavigationToLogin()
 
         val result = viewModel.loginNavigationEventLiveData.getOrAwaitValue()
@@ -503,8 +464,8 @@ class SyncInfoViewModelTest {
     @Test
     fun `should emit login navigation event with recent user ID when signed in user unavailable`() = runTest {
         every { authStore.signedInUserId } returns null
-        createViewModel()
 
+        createViewModel()
         viewModel.requestNavigationToLogin()
 
         val result = viewModel.loginNavigationEventLiveData.getOrAwaitValue()
@@ -519,6 +480,7 @@ class SyncInfoViewModelTest {
             every { isSuccess } returns true
         }
 
+        createViewModel()
         viewModel.handleLoginResult(successResult)
 
         verify { syncOrchestrator.execute(OneTime.Events.restart()) }
@@ -530,6 +492,7 @@ class SyncInfoViewModelTest {
             every { isSuccess } returns false
         }
 
+        createViewModel()
         viewModel.handleLoginResult(failureResult)
 
         verify(exactly = 0) { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = true)) }
@@ -727,10 +690,10 @@ class SyncInfoViewModelTest {
             every { isSyncRunning() } returns false
             every { lastSyncTime } returns recentTimestamp
         }
-        syncStatusFlow.value = SyncStatus(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus)
         every { timeHelper.msBetweenNowAndTime(recentTimestamp) } returns 60000L // 1 minute
         createViewModel()
         viewModel.isPreLogoutUpSync = true
+        syncStatusFlow.value = SyncStatus(eventSyncState = mockIdleEventSyncState, imageSyncStatus = mockImageSyncStatus)
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 

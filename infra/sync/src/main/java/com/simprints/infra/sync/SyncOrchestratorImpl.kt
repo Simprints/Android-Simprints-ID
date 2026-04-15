@@ -2,6 +2,7 @@ package com.simprints.infra.sync
 
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -28,6 +29,7 @@ import com.simprints.infra.sync.extensions.startWorker
 import com.simprints.infra.sync.files.FileUpSyncWorker
 import com.simprints.infra.sync.firmware.FirmwareFileUpdateWorker
 import com.simprints.infra.sync.firmware.ShouldScheduleFirmwareUpdateUseCase
+import com.simprints.infra.sync.logout.LogoutWorker
 import com.simprints.infra.sync.usecase.CleanupDeprecatedWorkersUseCase
 import com.simprints.infra.sync.usecase.internal.ObserveImageSyncStatusUseCase
 import kotlinx.coroutines.CoroutineDispatcher
@@ -124,6 +126,8 @@ internal class SyncOrchestratorImpl @Inject constructor(
             stop = ::stopImageSync,
             start = { startImageSync() },
         )
+
+        is OneTime.LogoutCommand -> executeLogoutCommand(command.isProjectEnded)
     }
 
     override fun execute(command: ScheduleCommand): Job = when (command) {
@@ -207,6 +211,16 @@ internal class SyncOrchestratorImpl @Inject constructor(
                 start()
             }
         }
+    }
+
+    private fun executeLogoutCommand(isProjectEnded: Boolean): Job = appScope.launch(ioDispatcher) {
+        workManager.startWorker<LogoutWorker>(
+            SyncConstants.LOGOUT_WORK_NAME,
+            existingWorkPolicy = ExistingWorkPolicy.REPLACE,
+            isExpedited = true,
+            constraints = getNoConstraints(),
+            inputData = workDataOf(SyncConstants.LOGOUT_INPUT_IS_PROJECT_ENDED to isProjectEnded),
+        )
     }
 
     private fun executeSchedulingAction(
@@ -332,4 +346,6 @@ internal class SyncOrchestratorImpl @Inject constructor(
             .let { if (it) NetworkType.NOT_REQUIRED else NetworkType.CONNECTED }
         return Constraints.Builder().setRequiredNetworkType(networkType).build()
     }
+
+    private fun getNoConstraints(): Constraints = Constraints.Builder().build()
 }
