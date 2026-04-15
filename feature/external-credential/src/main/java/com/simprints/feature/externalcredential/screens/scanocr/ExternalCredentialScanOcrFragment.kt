@@ -328,8 +328,8 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         imagePreProcessingJob?.cancel()
         imagePreProcessingJob = lifecycleScope.launch(bgDispatcher) {
             try {
-                val (bitmap, imageInfo) = imageProxy.toBitmap() to imageProxy.imageInfo
                 if (isActive) {
+                    val (bitmap, imageInfo) = imageProxy.toBitmap() to imageProxy.imageInfo
                     val cropConfig: OcrCropConfig = buildOcrCropConfigUseCase(
                         rotationDegrees = imageInfo.rotationDegrees,
                         cameraPreview = binding.preview,
