@@ -47,6 +47,7 @@ import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -327,8 +328,8 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         imagePreProcessingJob?.cancel()
         imagePreProcessingJob = lifecycleScope.launch(bgDispatcher) {
             try {
-                val (bitmap, imageInfo) = imageProxy.toBitmap() to imageProxy.imageInfo
-                if (imagePreProcessingJob?.isActive == true) {
+                if (isActive) {
+                    val (bitmap, imageInfo) = imageProxy.toBitmap() to imageProxy.imageInfo
                     val cropConfig: OcrCropConfig = buildOcrCropConfigUseCase(
                         rotationDegrees = imageInfo.rotationDegrees,
                         cameraPreview = binding.preview,
