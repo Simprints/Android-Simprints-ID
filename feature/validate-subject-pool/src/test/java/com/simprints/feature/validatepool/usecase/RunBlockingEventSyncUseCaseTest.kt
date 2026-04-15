@@ -1,6 +1,11 @@
 package com.simprints.feature.validatepool.usecase
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.ProjectState
+import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
+import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.eventsync.status.models.DownSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
@@ -29,19 +34,23 @@ class RunBlockingEventSyncUseCaseTest {
     @MockK
     private lateinit var syncOrchestrator: SyncOrchestrator
 
+    @MockK
+    private lateinit var configRepository: ConfigRepository
+
     private lateinit var usecase: RunBlockingEventSyncUseCase
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        usecase = RunBlockingEventSyncUseCase(syncOrchestrator)
+        mockkStatic("com.simprints.infra.config.store.models.ProjectConfigurationKt")
+        usecase = RunBlockingEventSyncUseCase(syncOrchestrator, configRepository)
     }
 
     @Test
     fun `finishes execution when both up and down sync complete`() = runTest {
         val upFlow = MutableStateFlow(createUpSyncState("oldSync"))
         val downFlow = MutableStateFlow(createDownSyncState("oldSync"))
-        setUpSync(upFlow, downFlow)
+        setUpSync(upFlow, downFlow, downSyncAllowed = true)
 
         launch { usecase.invoke() }
         testScheduler.advanceUntilIdle()
@@ -58,7 +67,7 @@ class RunBlockingEventSyncUseCaseTest {
     fun `finishes execution when sync has failed`() = runTest {
         val upFlow = MutableStateFlow(createUpSyncState("oldSync"))
         val downFlow = MutableStateFlow(createDownSyncState("oldSync"))
-        setUpSync(upFlow, downFlow)
+        setUpSync(upFlow, downFlow, downSyncAllowed = true)
 
         launch { usecase.invoke() }
         testScheduler.advanceUntilIdle()
@@ -75,7 +84,7 @@ class RunBlockingEventSyncUseCaseTest {
     fun `finishes execution when sync has been cancelled`() = runTest {
         val upFlow = MutableStateFlow(createUpSyncState("oldSync"))
         val downFlow = MutableStateFlow(createDownSyncState("oldSync"))
-        setUpSync(upFlow, downFlow)
+        setUpSync(upFlow, downFlow, downSyncAllowed = true)
 
         launch { usecase.invoke() }
         testScheduler.advanceUntilIdle()
@@ -92,7 +101,7 @@ class RunBlockingEventSyncUseCaseTest {
     fun `does not finish early when initial state has no sync history`() = runTest {
         val upFlow = MutableStateFlow(createUpSyncState(""))
         val downFlow = MutableStateFlow(createDownSyncState(""))
-        setUpSync(upFlow, downFlow)
+        setUpSync(upFlow, downFlow, downSyncAllowed = true)
 
         val job = launch { usecase.invoke() }
         testScheduler.advanceUntilIdle()
@@ -105,6 +114,54 @@ class RunBlockingEventSyncUseCaseTest {
 
         verify(exactly = 1) { syncOrchestrator.execute(OneTime.UpSync.start()) }
         job.cancel()
+    }
+
+    @Test
+    fun `skips down sync when project is ending`() = runTest {
+        val upFlow = MutableStateFlow(createUpSyncState("oldSync"))
+        setUpSync(upFlow, downFlow = null, downSyncAllowed = false, projectState = ProjectState.PROJECT_ENDING)
+
+        launch { usecase.invoke() }
+        testScheduler.advanceUntilIdle()
+
+        upFlow.value = createUpSyncState("newSync", EventSyncWorkerState.Succeeded)
+        testScheduler.advanceUntilIdle()
+
+        verify(exactly = 1) { syncOrchestrator.execute(OneTime.UpSync.start()) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.DownSync.start()) }
+        verify(exactly = 0) { syncOrchestrator.observeDownSyncState() }
+    }
+
+    @Test
+    fun `skips down sync when project is paused`() = runTest {
+        val upFlow = MutableStateFlow(createUpSyncState("oldSync"))
+        setUpSync(upFlow, downFlow = null, downSyncAllowed = false, projectState = ProjectState.PROJECT_PAUSED)
+
+        launch { usecase.invoke() }
+        testScheduler.advanceUntilIdle()
+
+        upFlow.value = createUpSyncState("newSync", EventSyncWorkerState.Succeeded)
+        testScheduler.advanceUntilIdle()
+
+        verify(exactly = 1) { syncOrchestrator.execute(OneTime.UpSync.start()) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.DownSync.start()) }
+        verify(exactly = 0) { syncOrchestrator.observeDownSyncState() }
+    }
+
+    @Test
+    fun `skips down sync when down sync is disabled in config`() = runTest {
+        val upFlow = MutableStateFlow(createUpSyncState("oldSync"))
+        setUpSync(upFlow, downFlow = null, downSyncAllowed = false, projectState = ProjectState.RUNNING)
+
+        launch { usecase.invoke() }
+        testScheduler.advanceUntilIdle()
+
+        upFlow.value = createUpSyncState("newSync", EventSyncWorkerState.Succeeded)
+        testScheduler.advanceUntilIdle()
+
+        verify(exactly = 1) { syncOrchestrator.execute(OneTime.UpSync.start()) }
+        verify(exactly = 0) { syncOrchestrator.execute(OneTime.DownSync.start()) }
+        verify(exactly = 0) { syncOrchestrator.observeDownSyncState() }
     }
 
     private fun createUpSyncState(
@@ -135,11 +192,24 @@ class RunBlockingEventSyncUseCaseTest {
 
     private fun setUpSync(
         upFlow: MutableStateFlow<UpSyncState>,
-        downFlow: MutableStateFlow<DownSyncState>,
+        downFlow: MutableStateFlow<DownSyncState>?,
+        downSyncAllowed: Boolean,
+        projectState: ProjectState = ProjectState.RUNNING,
     ) {
+        val mockProject = mockk<Project> { every { state } returns projectState }
+        coEvery { configRepository.getProject() } returns mockProject
+        val mockConfig = mockk<com.simprints.infra.config.store.models.ProjectConfiguration>(relaxed = true)
+        coEvery { configRepository.getProjectConfiguration() } returns mockConfig
+        every { mockConfig.isSimprintsEventDownSyncAllowed() } returns downSyncAllowed
+        every { mockConfig.isCommCareEventDownSyncAllowed() } returns false
+
         every { syncOrchestrator.observeUpSyncState() } returns upFlow
-        every { syncOrchestrator.observeDownSyncState() } returns downFlow
+        if (downFlow != null) {
+            every { syncOrchestrator.observeDownSyncState() } returns downFlow
+        }
         every { syncOrchestrator.execute(OneTime.UpSync.start()) } returns Job().apply { complete() }
-        every { syncOrchestrator.execute(OneTime.DownSync.start()) } returns Job().apply { complete() }
+        if (downSyncAllowed) {
+            every { syncOrchestrator.execute(OneTime.DownSync.start()) } returns Job().apply { complete() }
+        }
     }
 }
