@@ -138,7 +138,7 @@ class CaptureTargetView @JvmOverloads constructor(
 
     override fun onSaveInstanceState(): Parcelable = Bundle().apply {
         putParcelable(BUNDLE_ID_SAVE_INSTANCE_STATE, super.onSaveInstanceState())
-        putInt(BUNDLE_ID_SHAPE, shape.ordinal)
+        putString(BUNDLE_ID_SHAPE, shape.name)
         putFloat(BUNDLE_ID_CORNER_RADIUS, cornerRadius)
         putInt(BUNDLE_ID_STROKE_COLOR, strokeColor)
         putFloat(BUNDLE_ID_STROKE_WIDTH, strokeWidth)
@@ -146,7 +146,7 @@ class CaptureTargetView @JvmOverloads constructor(
 
     override fun onRestoreInstanceState(state: Parcelable?) {
         if (state is Bundle) {
-            shape = Shape.entries.toTypedArray()[state.getInt(BUNDLE_ID_SHAPE, shape.ordinal)]
+            shape = Shape.entries.firstOrNull { it.name == state.getString(BUNDLE_ID_SHAPE) } ?: shape
             cornerRadius = state.getFloat(BUNDLE_ID_CORNER_RADIUS, cornerRadius)
             strokeColor = state.getInt(BUNDLE_ID_STROKE_COLOR, strokeColor)
             strokeWidth = state.getFloat(BUNDLE_ID_STROKE_WIDTH, strokeWidth)
