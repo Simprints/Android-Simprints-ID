@@ -38,7 +38,6 @@ fun View.setPulseAnimation(isEnabled: Boolean) {
 @ExcludedFromGeneratedTestCoverageReports("View animation")
 fun View.fadeOut(
     duration: Long,
-    scaleX: Boolean,
     fragment: Fragment,
     finalVisibility: Int = View.GONE,
 ) = animate()
@@ -50,9 +49,6 @@ fun View.fadeOut(
             this.visibility = finalVisibility
         }
     }.also {
-        if (scaleX) {
-            it.scaleX(0f)
-        }
         it.start()
     }
 

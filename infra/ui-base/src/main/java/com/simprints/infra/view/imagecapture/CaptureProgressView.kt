@@ -1,5 +1,8 @@
 package com.simprints.infra.view.imagecapture
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.TimeInterpolator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
@@ -8,9 +11,13 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PathMeasure
 import android.graphics.RectF
+import android.os.Bundle
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.View
+import android.view.animation.LinearInterpolator
 import androidx.annotation.ColorInt
+import androidx.core.os.BundleCompat
 import com.simprints.core.tools.extentions.dpToPx
 import com.simprints.infra.uibase.R
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
@@ -22,6 +29,7 @@ class CaptureProgressView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : View(context, attrs, defStyleAttr) {
     private var progressAnimator: ValueAnimator? = null
+    val isAnimating: Boolean get() = progressAnimator?.isRunning == true
     private var max: Int = 100
         set(value) {
             field = value.coerceAtLeast(1)
@@ -138,6 +146,22 @@ class CaptureProgressView @JvmOverloads constructor(
         drawCompletedChips(canvas)
     }
 
+    override fun onSaveInstanceState(): Parcelable = Bundle().apply {
+        putParcelable(BUNDLE_ID_SAVE_INSTANCE_STATE, super.onSaveInstanceState())
+        putInt(BUNDLE_ID_PROGRESS, progress)
+        putInt(BUNDLE_ID_MAX, max)
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        if (state is Bundle) {
+            progress = state.getInt(BUNDLE_ID_PROGRESS, progress)
+            max = state.getInt(BUNDLE_ID_MAX, max)
+            super.onRestoreInstanceState(BundleCompat.getParcelable(state, BUNDLE_ID_SAVE_INSTANCE_STATE, BaseSavedState::class.java))
+        } else {
+            super.onRestoreInstanceState(state)
+        }
+    }
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         progressAnimator?.cancel()
@@ -147,11 +171,19 @@ class CaptureProgressView @JvmOverloads constructor(
     fun setProgressAnimated(
         value: Int,
         durationMs: Long = 200L,
+        interpolator: TimeInterpolator = LinearInterpolator(),
+        onComplete: (() -> Unit)? = null,
     ) {
         progressAnimator?.cancel()
         progressAnimator = ValueAnimator.ofInt(progress, value).apply {
             duration = durationMs
+            this.interpolator = interpolator
             addUpdateListener { progress = it.animatedValue as Int }
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    onComplete?.invoke()
+                }
+            })
             start()
         }
     }
@@ -337,5 +369,11 @@ class CaptureProgressView @JvmOverloads constructor(
      */
     private fun updateChipStrokePaintWidth() {
         chipStrokePaint.strokeWidth = chipHeight + chipStrokeWidth * 2f
+    }
+
+    companion object {
+        private const val BUNDLE_ID_SAVE_INSTANCE_STATE = "BUNDLE_ID_SAVE_INSTANCE_STATE"
+        private const val BUNDLE_ID_PROGRESS = "BUNDLE_ID_PROGRESS"
+        private const val BUNDLE_ID_MAX = "BUNDLE_ID_MAX"
     }
 }

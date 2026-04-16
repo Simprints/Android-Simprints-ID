@@ -5,7 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
-import android.view.ViewPropertyAnimator
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
@@ -84,8 +85,6 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var imageAnalysis: ImageAnalysis
     private lateinit var imageCapture: ImageCapture
-    private var progressAnimator: ViewPropertyAnimator? = null
-    private var checkAnimator: ViewPropertyAnimator? = null
     private var isAnimatingCompletion: Boolean = false
     private var pendingFinishAction: (() -> Unit)? = null
     private var imagePreProcessingJob: Job? = null
@@ -144,8 +143,6 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     private fun clearAnimations() {
         pendingFinishAction = null
         isAnimatingCompletion = false
-        checkAnimator?.cancel()
-        progressAnimator?.cancel()
     }
 
     private fun initializeFragment() {
@@ -170,8 +167,16 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
                 is ScanOcrState.ScanningInProgress -> {
                     renderProgress(state)
                     if (state.successfulCaptures >= state.scansRequired) {
-                        stopImageProcessing()
-                        viewModel.processOcrResultsAndFinish()
+                        // Animate progress bar to go to 100%, and then finish the flow
+                        binding.captureProgress.setProgressAnimated(
+                            100,
+                            durationMs = PROGRESS_FINISH_REMAINING_MS,
+                            onComplete = {
+                                stopImageProcessing()
+                                viewModel.processOcrResultsAndFinish()
+                            },
+                            interpolator = AccelerateInterpolator(),
+                        )
                     }
                 }
 
@@ -211,12 +216,18 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     }
 
     private fun renderProgress(state: ScanOcrState.ScanningInProgress) = with(binding) {
-        val progressPercentage = (state.successfulCaptures * 100 / state.scansRequired).coerceAtMost(100)
+        if (!captureProgress.isAnimating) {
+            captureProgress.setProgressAnimated(
+                95,
+                durationMs = PROGRESS_ONE_SEGMENT_MS * state.scansRequired,
+                interpolator = DecelerateInterpolator(),
+            )
+        }
         buttonScan.isVisible = false
         progressContainer.isVisible = true
         captureProgress.isVisible = true
+        documentScannerArea.isVisible = true
         iconScanComplete.alpha = 0f
-        captureProgress.setProgressAnimated(progressPercentage, durationMs = 400)
         instructionsText.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_black))
         viewfinderMask.maskColor = ContextCompat.getColor(requireContext(), IDR.color.simprints_white)
         viewfinderMask.alpha = VIEW_FINDER_ALPHA_SCAN_ACTIVE
@@ -247,13 +258,11 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         val finalVisibility = View.INVISIBLE
         captureProgress.fadeOut(
             FINISH_ANIMATION_DURATION,
-            scaleX = false,
             fragment = this@ExternalCredentialScanOcrFragment,
             finalVisibility = finalVisibility,
         )
         scanInstructions.fadeOut(
             FINISH_ANIMATION_DURATION,
-            scaleX = false,
             fragment = this@ExternalCredentialScanOcrFragment,
             finalVisibility = finalVisibility,
         )
@@ -403,5 +412,16 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         private const val VIEW_FINDER_ALPHA_INITIAL = 0.5f
         private const val VIEW_FINDER_ALPHA_SCAN_ACTIVE = 0.9f
         private const val FINISH_ANIMATION_DURATION = 300L
+
+        /**
+         * How long does 1 scan iteration last.
+         * According to our analytics, a single 'take photo + run OCR' operation takes around 4 seconds on average
+         */
+        private const val PROGRESS_ONE_SEGMENT_MS = 4000L
+
+        /**
+         * How long to display the finishing animation of the progress indicator
+         */
+        private const val PROGRESS_FINISH_REMAINING_MS = 500L
     }
 }
