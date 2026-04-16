@@ -166,7 +166,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             when (state) {
                 is ScanOcrState.ScanningInProgress -> {
                     renderProgress(state)
-                    if (state.hasEnoughScans) {
+                    if (state.successfulCaptures >= state.scansRequired) {
                         // Animate progress bar to go to 100%, and then finish the flow
                         binding.captureProgress.setProgressAnimated(
                             100,

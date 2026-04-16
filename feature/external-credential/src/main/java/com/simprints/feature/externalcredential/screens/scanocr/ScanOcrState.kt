@@ -11,9 +11,7 @@ internal sealed class ScanOcrState {
         val ocrDocumentType: OcrDocumentType,
         val successfulCaptures: Int,
         val scansRequired: Int,
-    ) : ScanOcrState() {
-        val hasEnoughScans = successfulCaptures >= scansRequired
-    }
+    ) : ScanOcrState()
 
     data object Complete : ScanOcrState()
 
