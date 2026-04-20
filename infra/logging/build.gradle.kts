@@ -47,6 +47,7 @@ dependencies {
         exclude(group = "com.google.firebase", module = "protolite-well-known-types")
     }
     implementation(libs.kermit)
+    implementation(libs.androidX.core)
     implementation(libs.kermit.io)
 
     testImplementation(libs.testing.junit)
