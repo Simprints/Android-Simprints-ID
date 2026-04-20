@@ -13,8 +13,6 @@ import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
 import androidx.camera.core.Preview
-import androidx.camera.core.resolutionselector.ResolutionSelector
-import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.lifecycle.awaitInstance
 import androidx.core.content.ContextCompat
@@ -68,7 +66,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private val binding by viewBinding(FragmentLiveFeedbackBinding::bind)
 
     private lateinit var screenSize: Size
-    private lateinit var targetResolution: Size
+    //  private lateinit var targetResolution: Size
 
     private var cameraControl: CameraControl? = null
 
@@ -156,21 +154,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         cameraExecutor = Executors.newSingleThreadExecutor()
         // ImageAnalysis
         // Todo choose accurate output image resolution that respects quality,performance and face analysis SDKs https://simprints.atlassian.net/browse/CORE-2569
-        if (!::targetResolution.isInitialized) {
-            targetResolution = Size(binding.captureOverlay.width, binding.captureOverlay.height)
-        }
-        val resolutionSelector = ResolutionSelector
-            .Builder()
-            .setResolutionStrategy(
-                ResolutionStrategy(
-                    targetResolution,
-                    ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER,
-                ),
-            ).build()
 
         val imageAnalyzer = ImageAnalysis
             .Builder()
-            .setResolutionSelector(resolutionSelector)
             // Disabled to receive the rotation information in the image proxy
             .setOutputImageRotationEnabled(true)
             .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
@@ -182,7 +168,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         // Preview
         val preview = Preview
             .Builder()
-            .setResolutionSelector(resolutionSelector)
             .build()
         val cameraProvider = ProcessCameraProvider.awaitInstance(requireContext())
         cameraProvider.unbindAll()
