@@ -140,6 +140,6 @@ class SimFaceDetector @Inject constructor(
     }
 
     companion object {
-        private const val BAD_FACE_THRESHOLD = 0.1
+        private const val BAD_FACE_THRESHOLD = 0.0
     }
 }
