@@ -13,6 +13,7 @@ data class DownSynchronizationConfiguration(
         val moduleOptions: List<TokenizableString>,
         val maxAge: String,
         val frequency: Frequency,
+        val ignoreModuleNameCase: Boolean = true,
     )
 
     enum class PartitionType {

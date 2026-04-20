@@ -185,4 +185,64 @@ class ModuleSelectionRepositoryTest {
 
         assertThat(repository.getMaxNumberOfModules()).isEqualTo(10)
     }
+
+    @Test
+    fun getModules_withIgnoreModuleNameCase_true_shouldMatchCaseInsensitively() = runTest {
+        every { downSynchronizationConfiguration.simprints?.ignoreModuleNameCase } returns true
+        coEvery { configRepository.getDeviceConfiguration() } returns DeviceConfiguration(
+            "", listOf("B", "C").map(TokenizableString::Tokenized), "",
+        )
+
+        val actual = repository.getModules()
+
+        val expected = listOf(
+            SelectableModule("a".asTokenizableRaw(), false),
+            SelectableModule("b".asTokenizableRaw(), true),
+            SelectableModule("c".asTokenizableRaw(), true),
+            SelectableModule("d".asTokenizableRaw(), false),
+        )
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getModules_withIgnoreModuleNameCase_false_shouldMatchCaseSensitively() = runTest {
+        every { downSynchronizationConfiguration.simprints?.ignoreModuleNameCase } returns false
+        coEvery { configRepository.getDeviceConfiguration() } returns DeviceConfiguration(
+            "", listOf("B", "C").map(TokenizableString::Tokenized), "",
+        )
+
+        val actual = repository.getModules()
+
+        val expected = listOf(
+            SelectableModule("a".asTokenizableRaw(), false),
+            SelectableModule("b".asTokenizableRaw(), false),
+            SelectableModule("c".asTokenizableRaw(), false),
+            SelectableModule("d".asTokenizableRaw(), false),
+        )
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun forceModuleSelection_withIgnoreModuleNameCase_true_shouldMatchCaseInsensitively() = runTest {
+        every { downSynchronizationConfiguration.simprints?.ignoreModuleNameCase } returns true
+        val updateConfigFn = slot<suspend (DeviceConfiguration) -> DeviceConfiguration>()
+        coEvery { configRepository.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
+
+        repository.forceModuleSelection(listOf("A".asTokenizableRaw(), "D".asTokenizableRaw()), false)
+
+        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), ""))
+        assertThat(updatedConfig.selectedModules.map { it.value }).containsExactly("a", "d")
+    }
+
+    @Test
+    fun forceModuleSelection_withIgnoreModuleNameCase_false_shouldMatchCaseSensitively() = runTest {
+        every { downSynchronizationConfiguration.simprints?.ignoreModuleNameCase } returns false
+        val updateConfigFn = slot<suspend (DeviceConfiguration) -> DeviceConfiguration>()
+        coEvery { configRepository.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
+
+        repository.forceModuleSelection(listOf("A".asTokenizableRaw(), "D".asTokenizableRaw()), false)
+
+        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), ""))
+        assertThat(updatedConfig.selectedModules).isEmpty()
+    }
 }

@@ -25,6 +25,7 @@ internal class ObserveConfigurationChangesUseCase @Inject constructor(
         val project = configRepository.getProject()
 
         val moduleCounts = if (project != null) {
+            val ignoreModuleNameCase = projectConfig.synchronization.down.simprints?.ignoreModuleNameCase ?: true
             deviceConfig.selectedModules.map { moduleName ->
                 ModuleCount(
                     name = when (moduleName) {
@@ -35,7 +36,7 @@ internal class ObserveConfigurationChangesUseCase @Inject constructor(
                             tokenKeyType = TokenKeyType.ModuleId,
                             project,
                         )
-                    }.value,
+                    }.value.let { if (ignoreModuleNameCase) it.uppercase() else it },
                     count = enrolmentRecordRepository.count(
                         EnrolmentRecordQuery(projectId = project.id, moduleId = moduleName),
                     ),

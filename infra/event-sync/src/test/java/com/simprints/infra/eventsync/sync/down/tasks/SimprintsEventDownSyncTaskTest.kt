@@ -12,7 +12,10 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
+import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
@@ -591,6 +594,94 @@ class SimprintsEventDownSyncTaskTest {
                 },
                 any(),
             )
+        }
+    }
+
+    @Test
+    fun `moveSubjectToModuleUnderSyncing_caseInsensitiveEnabled_shouldPerformCreation`() = runTest {
+        val selectedModuleId = "moduleA".asTokenizableRaw()
+        val eventModuleId = "MODULEA".asTokenizableRaw()
+        val eventToMove = EnrolmentRecordMoveEvent(
+            EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove(
+                "subjectId", "projectId",
+                eventModuleId,
+                "attendantId".asTokenizableRaw(),
+                listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+                null,
+            ),
+            EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
+                "subjectId", "projectId", DEFAULT_MODULE_ID, "attendantId".asTokenizableRaw(),
+            ),
+        )
+        mockProgressEmission(listOf(eventToMove))
+        coEvery { configRepository.getDeviceConfiguration() } returns DeviceConfiguration(
+            "", listOf(selectedModuleId), "",
+        )
+        coEvery { configRepository.getProjectConfiguration() } returns mockProjectConfigWithIgnoreModuleNameCase(true)
+
+        val syncByModuleA = moduleOp.copy(
+            queryEvent = moduleOp.queryEvent.copy(moduleId = selectedModuleId.value),
+        )
+        eventDownSyncTask.downSync(this, syncByModuleA, eventScope, project).toList()
+
+        coVerify {
+            enrolmentRecordRepository.performActions(
+                listOf(
+                    Deletion(eventToMove.payload.enrolmentRecordDeletion.subjectId),
+                    Creation(enrolmentRecordFactory.buildFromMovePayload(eventToMove.payload.enrolmentRecordCreation)),
+                ),
+                project,
+            )
+        }
+    }
+
+    @Test
+    fun `moveSubjectToModuleUnderSyncing_caseInsensitiveDisabled_shouldPerformDeletionOnly`() = runTest {
+        val selectedModuleId = "moduleA".asTokenizableRaw()
+        val eventModuleId = "MODULEA".asTokenizableRaw()
+        val eventToMove = EnrolmentRecordMoveEvent(
+            EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove(
+                "subjectId", "projectId",
+                eventModuleId,
+                "attendantId".asTokenizableRaw(),
+                listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+                null,
+            ),
+            EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
+                "subjectId", "projectId", DEFAULT_MODULE_ID, "attendantId".asTokenizableRaw(),
+            ),
+        )
+        mockProgressEmission(listOf(eventToMove))
+        coEvery { configRepository.getDeviceConfiguration() } returns DeviceConfiguration(
+            "", listOf(selectedModuleId), "",
+        )
+        coEvery { configRepository.getProjectConfiguration() } returns mockProjectConfigWithIgnoreModuleNameCase(false)
+
+        val syncByModuleA = moduleOp.copy(
+            queryEvent = moduleOp.queryEvent.copy(moduleId = selectedModuleId.value),
+        )
+        eventDownSyncTask.downSync(this, syncByModuleA, eventScope, project).toList()
+
+        coVerify {
+            enrolmentRecordRepository.performActions(
+                listOf(Deletion(eventToMove.payload.enrolmentRecordDeletion.subjectId)),
+                project,
+            )
+        }
+    }
+
+    private fun mockProjectConfigWithIgnoreModuleNameCase(ignoreCase: Boolean): ProjectConfiguration {
+        val mockSimprints = mockk<DownSynchronizationConfiguration.SimprintsDownSynchronizationConfiguration> {
+            every { ignoreModuleNameCase } returns ignoreCase
+        }
+        val mockDown = mockk<DownSynchronizationConfiguration> {
+            every { simprints } returns mockSimprints
+        }
+        val mockSync = mockk<SynchronizationConfiguration> {
+            every { down } returns mockDown
+        }
+        return mockk(relaxed = true) {
+            every { synchronization } returns mockSync
         }
     }
 

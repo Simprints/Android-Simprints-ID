@@ -126,6 +126,7 @@ internal data class ApiSynchronizationConfiguration(
         val moduleOptions: List<String>? = null,
         val maxAge: String? = null,
         val frequency: ApiSynchronizationFrequency,
+        val ignoreModuleNameCase: Boolean? = null,
     ) {
         fun toDomain() = DownSynchronizationConfiguration.SimprintsDownSynchronizationConfiguration(
             partitionType = partitionType.toDomain(),
@@ -133,6 +134,7 @@ internal data class ApiSynchronizationConfiguration(
             moduleOptions = moduleOptions?.map(String::asTokenizableEncrypted) ?: emptyList(),
             maxAge = maxAge ?: DEFAULT_DOWN_SYNC_MAX_AGE,
             frequency = frequency.toDomain(),
+            ignoreModuleNameCase = ignoreModuleNameCase ?: true,
         )
 
         @Keep

@@ -69,6 +69,7 @@ class ModuleSelectionViewModelTest {
         coEvery { repository.getMaxNumberOfModules() } returns 2
         coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general.settingsPassword } returns SettingsPasswordConfig.Locked("1234")
+            every { synchronization.down.simprints?.ignoreModuleNameCase } returns false
         }
         coEvery { configRepository.getProject() } returns project
         modulesDefault.forEach {
@@ -177,6 +178,30 @@ class ModuleSelectionViewModelTest {
 
         coVerify(exactly = 1) { repository.saveModules(updatedModules) }
         verify(exactly = 1) { syncOrchestrator.execute(OneTime.Events.restart()) }
+    }
+
+    @Test
+    fun `should display module names in uppercase when ignoreModuleNameCase is true`() {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+            every { general.settingsPassword } returns SettingsPasswordConfig.Locked("1234")
+            every { synchronization.down.simprints?.ignoreModuleNameCase } returns true
+        }
+        viewModel = ModuleSelectionViewModel(
+            moduleRepository = repository,
+            syncOrchestrator = syncOrchestrator,
+            configRepository = configRepository,
+            tokenizationProcessor = tokenizationProcessor,
+            externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
+        )
+
+        assertThat(viewModel.modulesList.getOrAwaitValue()).isEqualTo(
+            listOf(
+                SelectableModule("A".asTokenizableRaw(), false),
+                SelectableModule("B".asTokenizableRaw(), false),
+                SelectableModule("C".asTokenizableRaw(), true),
+                SelectableModule("D".asTokenizableRaw(), false),
+            ),
+        )
     }
 
     @Test

@@ -27,6 +27,7 @@ internal fun SimprintsDownSynchronizationConfiguration.toProto(): ProtoSimprints
         .setIsTokenized(isTokenized)
         .setMaxAge(maxAge)
         .setFrequency(frequency.toProto())
+        .setIgnoreModuleNameCase(ignoreModuleNameCase)
         .build()
 }
 
@@ -52,6 +53,7 @@ internal fun ProtoSimprintsDownSynchronizationConfiguration.toDomain() = Simprin
     },
     maxAge = maxAge,
     frequency = frequency.toDomain(),
+    ignoreModuleNameCase = if (hasIgnoreModuleNameCase()) ignoreModuleNameCase else true,
 )
 
 internal fun ProtoDownSynchronizationConfiguration.PartitionType.toDomain(): DownSynchronizationConfiguration.PartitionType = when (this) {

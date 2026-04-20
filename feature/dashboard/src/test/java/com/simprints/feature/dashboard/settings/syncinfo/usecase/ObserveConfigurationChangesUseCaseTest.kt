@@ -91,6 +91,7 @@ class ObserveConfigurationChangesUseCaseTest {
             tokenizationProcessor.decrypt(any(), any(), any())
         } returns "moduleUntokenized".asTokenizableRaw()
         coEvery { enrolmentRepository.count(any(), any()) } returnsMany listOf(1, 2)
+        every { projectConfiguration.synchronization.down.simprints?.ignoreModuleNameCase } returns false
 
         every { configRepository.observeIsProjectRefreshing() } returns flowOf(true)
         every { configRepository.observeProjectConfiguration() } returns flowOf(projectConfiguration)
@@ -101,6 +102,33 @@ class ObserveConfigurationChangesUseCaseTest {
         assertThat(result.selectedModules).containsExactly(
             ModuleCount("moduleRaw", 1),
             ModuleCount("moduleUntokenized", 2),
+        )
+    }
+
+    @Test
+    fun `invoke untokenized list of modules with ignoreModuleNameCase true displays in uppercase`() = runTest {
+        coEvery { configRepository.getProject() } returns project
+        every { project.id } returns "projectId"
+        every { project.state } returns ProjectState.RUNNING
+        every { deviceConfiguration.selectedModules } returns listOf(
+            "moduleRaw".asTokenizableRaw(),
+            "moduleToken".asTokenizableEncrypted(),
+        )
+        every {
+            tokenizationProcessor.decrypt(any(), any(), any())
+        } returns "moduleUntokenized".asTokenizableRaw()
+        coEvery { enrolmentRepository.count(any(), any()) } returnsMany listOf(1, 2)
+        every { projectConfiguration.synchronization.down.simprints?.ignoreModuleNameCase } returns true
+
+        every { configRepository.observeIsProjectRefreshing() } returns flowOf(true)
+        every { configRepository.observeProjectConfiguration() } returns flowOf(projectConfiguration)
+        every { configRepository.observeDeviceConfiguration() } returns flowOf(deviceConfiguration)
+
+        val result = useCase().first()
+
+        assertThat(result.selectedModules).containsExactly(
+            ModuleCount("MODULERAW", 1),
+            ModuleCount("MODULEUNTOKENIZED", 2),
         )
     }
 }

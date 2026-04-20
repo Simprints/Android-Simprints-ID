@@ -20,8 +20,8 @@ class ModuleSelectionRepository @Inject internal constructor(
 ) {
     suspend fun getModules(): List<SelectableModule> = getModuleOptions()?.let { modules ->
         val selectedModules = configRepository.getDeviceConfiguration().selectedModules.values()
-
-        modules.map { SelectableModule(it, selectedModules.contains(it.value)) }
+        val ignoreCase = getIgnoreModuleNameCase()
+        modules.map { SelectableModule(it, selectedModules.any { selected -> selected.equals(it.value, ignoreCase = ignoreCase) }) }
     } ?: emptyList()
 
     suspend fun forceModuleSelection(
@@ -30,11 +30,17 @@ class ModuleSelectionRepository @Inject internal constructor(
     ) {
         val options = getModuleOptions() ?: return
 
+        val ignoreCase = getIgnoreModuleNameCase()
         val selectedValues = selectedModules.values().toSet()
-        val allModules = options.map { SelectableModule(it, selectedValues.contains(it.value)) }
+        val allModules = options.map { SelectableModule(it, selectedValues.any { selected -> selected.equals(it.value, ignoreCase = ignoreCase) }) }
 
         saveModules(allModules, isLocalChange)
     }
+
+    private suspend fun getIgnoreModuleNameCase(): Boolean = configRepository
+        .getProjectConfiguration()
+        .synchronization.down.simprints
+        ?.ignoreModuleNameCase ?: true
 
     private suspend fun getModuleOptions(): List<TokenizableString>? = configRepository
         .getProjectConfiguration()

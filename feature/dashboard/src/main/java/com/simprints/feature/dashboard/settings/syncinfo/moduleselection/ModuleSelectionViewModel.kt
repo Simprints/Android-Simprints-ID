@@ -10,6 +10,7 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.excepti
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.eventsync.module.ModuleSelectionRepository
 import com.simprints.infra.eventsync.module.SelectableModule
@@ -45,6 +46,8 @@ internal class ModuleSelectionViewModel @Inject constructor(
     init {
         postUpdateModules {
             maxNumberOfModules = moduleRepository.getMaxNumberOfModules()
+            val ignoreModuleNameCase = configRepository.getProjectConfiguration()
+                .synchronization.down.simprints?.ignoreModuleNameCase ?: true
             configRepository.getProject()?.let { project ->
                 initialModules = moduleRepository.getModules().map { module ->
                     val decryptedName = tokenizationProcessor.untokenizeIfNecessary(
@@ -52,7 +55,12 @@ internal class ModuleSelectionViewModel @Inject constructor(
                         tokenKeyType = TokenKeyType.ModuleId,
                         project = project,
                     )
-                    module.copy(name = decryptedName)
+                    val displayName = if (ignoreModuleNameCase) {
+                        decryptedName.value.uppercase().asTokenizableRaw()
+                    } else {
+                        decryptedName
+                    }
+                    module.copy(name = displayName)
                 }
                 addAll(initialModules.map { it.copy() })
             }

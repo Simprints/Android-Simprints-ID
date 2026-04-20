@@ -236,6 +236,7 @@ message ProtoDownSynchronizationConfiguration {
         bool is_tokenized = 4;
         string max_age = 5;
         ProtoSyncFrequency frequency = 6;
+        optional bool ignore_module_name_case = 7;
     }
 
     message ProtoCommCareDownSynchronizationConfiguration {

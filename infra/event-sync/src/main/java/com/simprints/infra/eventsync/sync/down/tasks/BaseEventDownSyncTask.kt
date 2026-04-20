@@ -234,11 +234,13 @@ internal abstract class BaseEventDownSyncTask(
     ): Boolean = when {
         // When syncing by module, check whether record was moved in a module selected for syncing
         operation.isSyncingByModule() -> {
+            val ignoreCase = configRepository.getProjectConfiguration()
+                .synchronization.down.simprints?.ignoreModuleNameCase ?: true
             configRepository
                 .getDeviceConfiguration()
                 .selectedModules
                 .values()
-                .contains(enrolmentRecordCreation.moduleId.value)
+                .any { it.equals(enrolmentRecordCreation.moduleId.value, ignoreCase = ignoreCase) }
         }
 
         // When syncing by attendant, check whether record was moved to the attendant we are  syncing by
