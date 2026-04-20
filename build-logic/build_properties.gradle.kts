@@ -20,7 +20,7 @@ extra.apply {
      * Dev version >= 2025.3.0 is required to receive smaples and structured down sync configuration
      * Dev version >= 2026.2.0 is required to track events in "Device" scope
      */
-    set("VERSION_NAME", "2026.1.0")
+    set("VERSION_NAME", "2026.1.0-debug-image-injection")
 
     /**
      * Build type. The version code describes which build type was used for the build.
