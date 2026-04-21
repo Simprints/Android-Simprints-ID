@@ -8,17 +8,21 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.DeviceID
 import com.simprints.core.domain.common.Modality
 import com.simprints.feature.setup.LocationStore
+import com.simprints.feature.setup.location.UpdateSessionScopeLocationUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
+import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
 import com.simprints.infra.license.models.LicenseState
 import com.simprints.infra.license.models.LicenseVersion
 import com.simprints.infra.license.models.Vendor
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
+import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,6 +35,7 @@ internal class SetupViewModel @Inject constructor(
     @param:DeviceID private val deviceID: String,
     private val authStore: AuthStore,
     private val saveLicenseCheckEvent: SaveLicenseCheckEventUseCase,
+    private val updateSessionScopeLocation: UpdateSessionScopeLocationUseCase,
 ) : ViewModel() {
     val requestLocationPermission: LiveData<Unit>
         get() = _requestLocationPermission
@@ -77,6 +82,11 @@ internal class SetupViewModel @Inject constructor(
     fun locationPermissionCheckDone(granted: Boolean) {
         if (granted) {
             locationStore.collectLocationInBackground()
+        } else {
+            viewModelScope.launch {
+                Simber.i("No permission to use location data", tag = CrashReportTag.SESSION)
+                updateSessionScopeLocation(Location.NO_PERMISSION)
+            }
         }
         requestCommCarePermissionIfNeeded()
     }

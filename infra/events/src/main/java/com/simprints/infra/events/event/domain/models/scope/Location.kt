@@ -10,4 +10,8 @@ data class Location(
     var longitude: Double = 0.0,
     val lastLocationTime: Long? = null,
     val noPermission: Boolean? = null,
-)
+) {
+    companion object {
+        val NO_PERMISSION = Location(noPermission = true)
+    }
+}
