@@ -376,7 +376,7 @@ internal class ExperimentalProjectConfigurationTest {
     }
 
     @Test
-    fun `minimal free space requirement value correctly`() {
+    fun `check minimal free space requirement value parsed correctly`() {
         mapOf(
             emptyMap<String, JsonElement>() to ExperimentalProjectConfiguration.MINIMUM_FREE_SPACE_MB_DEFAULT,
             mapOf(ExperimentalProjectConfiguration.MINIMUM_FREE_SPACE_MB to JsonPrimitive(true))
@@ -385,6 +385,18 @@ internal class ExperimentalProjectConfigurationTest {
             mapOf(ExperimentalProjectConfiguration.MINIMUM_FREE_SPACE_MB to JsonPrimitive(-20)) to 0,
         ).forEach { (config, result) ->
             assertThat(ExperimentalProjectConfiguration(config).minimumFreeSpaceMb).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `check use balanced location accuracy value parsed correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to false,
+            mapOf(ExperimentalProjectConfiguration.USE_BALANCED_LOCATION_ACCURACY to JsonPrimitive(2)) to false,
+            mapOf(ExperimentalProjectConfiguration.USE_BALANCED_LOCATION_ACCURACY to JsonPrimitive(false)) to false,
+            mapOf(ExperimentalProjectConfiguration.USE_BALANCED_LOCATION_ACCURACY to JsonPrimitive(true)) to true,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).useBalancedLocationAccuracy).isEqualTo(result)
         }
     }
 }

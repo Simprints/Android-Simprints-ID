@@ -5,6 +5,8 @@ import android.content.Context
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
+import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
@@ -16,6 +18,7 @@ import javax.inject.Inject
 
 internal class LocationManager @Inject constructor(
     @param:ApplicationContext val ctx: Context,
+    private val configRepository: ConfigRepository,
 ) {
     private val locationClient = LocationServices.getFusedLocationProviderClient(ctx)
 
@@ -26,6 +29,12 @@ internal class LocationManager @Inject constructor(
     @SuppressLint("MissingPermission")
     fun requestLocation(): Flow<Location?> = flow {
         val cancellationTokenSource = CancellationTokenSource()
+
+        val priority = if (configRepository.getProjectConfiguration().experimental().useBalancedLocationAccuracy) {
+            Priority.PRIORITY_BALANCED_POWER_ACCURACY
+        } else {
+            Priority.PRIORITY_HIGH_ACCURACY
+        }
 
         try {
             val lastLocation = locationClient.lastLocation.await()
@@ -41,7 +50,7 @@ internal class LocationManager @Inject constructor(
             }
 
             val currentLocation = locationClient
-                .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.token)
+                .getCurrentLocation(priority, cancellationTokenSource.token)
                 .await()
             if (currentLocation != null) {
                 Simber.i("Returning current location", tag = CrashReportTag.SESSION)

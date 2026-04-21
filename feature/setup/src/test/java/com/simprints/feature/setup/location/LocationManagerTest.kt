@@ -5,12 +5,16 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.Tasks
 import com.google.common.truth.Truth.*
+import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -27,6 +31,12 @@ internal class LocationManagerTest {
     @MockK
     private lateinit var mockedLocationClient: FusedLocationProviderClient
 
+    @MockK
+    private lateinit var configRepository: ConfigRepository
+
+    @MockK
+    private lateinit var config: ProjectConfiguration
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
@@ -36,7 +46,10 @@ internal class LocationManagerTest {
             LocationServices.getFusedLocationProviderClient(any<Context>())
         } returns mockedLocationClient
 
-        locationManager = LocationManager(mockk())
+        coEvery { configRepository.getProjectConfiguration() } returns config
+        every { config.custom } returns emptyMap()
+
+        locationManager = LocationManager(mockk(), configRepository)
     }
 
     @Test
@@ -127,5 +140,34 @@ internal class LocationManagerTest {
         // Then
         val results = flow.toList()
         assertThat(results).isEmpty()
+    }
+
+    @Test
+    fun `uses high accuracy if no custom configuration`() = runTest {
+        // Given
+        every { mockedLocationClient.lastLocation } returns Tasks.forResult(null)
+        every { mockedLocationClient.getCurrentLocation(any<Int>(), any()) } returns Tasks.forResult(null)
+
+        // When
+        locationManager.requestLocation().toList()
+
+        // Then
+        coVerify(exactly = 1) { mockedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, any()) }
+    }
+
+    @Test
+    fun `uses balanced accuracy if has custom configuration`() = runTest {
+        // Given
+        clearMocks(config)
+        every { config.custom } returns mapOf("useBalancedLocationAccuracy" to JsonPrimitive(true))
+
+        every { mockedLocationClient.lastLocation } returns Tasks.forResult(null)
+        every { mockedLocationClient.getCurrentLocation(any<Int>(), any()) } returns Tasks.forResult(null)
+
+        // When
+        locationManager.requestLocation().toList()
+
+        // Then
+        coVerify { mockedLocationClient.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, any()) }
     }
 }
