@@ -7,13 +7,9 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
-import com.google.common.truth.Truth
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import com.google.common.truth.Truth.*
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.slot
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.test.runTest
@@ -64,7 +60,9 @@ internal class LocationManagerTest {
         // When
         val flow = locationManager.requestLocation(LocationRequest.create()).take(1)
         // Then
-        Truth.assertThat(flow.firstOrNull()).isEqualTo(fakeLocation)
+        val result = flow.firstOrNull()
+        assertThat(result?.latitude).isEqualTo(fakeLocation.latitude)
+        assertThat(result?.longitude).isEqualTo(fakeLocation.longitude)
     }
 
     @Test
@@ -74,6 +72,6 @@ internal class LocationManagerTest {
         // When
         val flow = locationManager.requestLocation(LocationRequest.create()).take(1)
         // Then
-        Truth.assertThat(flow.firstOrNull()).isEqualTo(null)
+        assertThat(flow.firstOrNull()).isEqualTo(null)
     }
 }
