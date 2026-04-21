@@ -34,7 +34,7 @@ class SimFaceDetector @Inject constructor(
         .let { MlKitFaceDetection.getClient(it) }
 
     override fun analyze(bitmap: Bitmap): Face? = runBlocking {
-        Simber.d("vvvvvvvvvvvvvvvvvvv", tag = "FACE_DETECTOR")
+        Simber.d("--------------------------------------", tag = "FACE_DETECTOR")
 
         // Load a bitmap image for processing
         val faces = simFace.detectFaceBlocking(bitmap)
@@ -55,7 +55,7 @@ class SimFaceDetector @Inject constructor(
         Simber.d("Yaw: ${face.yaw} Roll: ${face.roll}", tag = "FACE_DETECTOR")
         Simber.d("Original size: ${bitmap.width}x${bitmap.height}", tag = "FACE_DETECTOR")
         Simber.d("Aligned size: ${alignedBitmap.width}x${alignedBitmap.height}", tag = "FACE_DETECTOR")
-        Simber.d("^^^^^^^^^^^^^^^^^^^^", tag = "FACE_DETECTOR")
+        Simber.d("---------------------------------------------------", tag = "FACE_DETECTOR")
 
         Face(
             sourceWidth = bitmap.width,

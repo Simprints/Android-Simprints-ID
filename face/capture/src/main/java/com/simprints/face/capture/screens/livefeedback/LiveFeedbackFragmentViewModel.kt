@@ -24,13 +24,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.atomic.AtomicBoolean
@@ -53,7 +53,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private val faceTarget = FaceTarget(
         SymmetricTarget(VALID_YAW_DELTA),
         SymmetricTarget(VALID_ROLL_DELTA),
-        0.20f..0.5f,
+        0.05f..0.5f,
     )
     private val fallbackCaptureEventStartTime = timeHelper.now()
     private var shouldSendFallbackCaptureEvent: AtomicBoolean = AtomicBoolean(true)
