@@ -46,7 +46,8 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private val faceTarget = FaceTarget(
         SymmetricTarget(VALID_YAW_DELTA),
         SymmetricTarget(VALID_ROLL_DELTA),
-        0.20f..0.5f,
+        minFacePixelArea = 10000f, // Todo to be visited latter
+        maxRelativeArea = 0.5f,
     )
     private val fallbackCaptureEventStartTime = timeHelper.now()
     private var shouldSendFallbackCaptureEvent: AtomicBoolean = AtomicBoolean(true)
@@ -229,9 +230,18 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         potentialFace: Face,
     ): FaceDetection {
         val areaOccupied = potentialFace.relativeBoundingBox.area()
+
+        // 2. Calculate the absolute pixel area the face occupies in the current bitmap
+        val totalImageArea = bitmap.width * bitmap.height
+        val absoluteFaceArea = areaOccupied * totalImageArea
+
         val status = when {
-            areaOccupied < faceTarget.areaRange.start -> FaceDetection.Status.TOOFAR
-            areaOccupied > faceTarget.areaRange.endInclusive -> FaceDetection.Status.TOOCLOSE
+            // Check if the face lacks enough pixel density (TOOFAR)
+            absoluteFaceArea < faceTarget.minFacePixelArea -> FaceDetection.Status.TOOFAR
+
+            // Check if the face is overflowing the camera frame (TOOCLOSE)
+            areaOccupied > faceTarget.maxRelativeArea -> FaceDetection.Status.TOOCLOSE
+
             potentialFace.yaw !in faceTarget.yawTarget -> FaceDetection.Status.OFFYAW
             potentialFace.roll !in faceTarget.rollTarget -> FaceDetection.Status.OFFROLL
             shouldCheckQuality() && potentialFace.quality < qualityThreshold -> FaceDetection.Status.BAD_QUALITY

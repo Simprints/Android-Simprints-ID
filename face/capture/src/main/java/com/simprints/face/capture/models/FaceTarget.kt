@@ -6,7 +6,8 @@ import kotlin.math.abs
 internal data class FaceTarget(
     val yawTarget: Target,
     val rollTarget: Target,
-    val areaRange: ClosedRange<Float>,
+    val minFacePixelArea: Float,
+    val maxRelativeArea: Float,
 ) {
     operator fun contains(face: Face): Boolean = face.roll in rollTarget && face.yaw in yawTarget
 }
