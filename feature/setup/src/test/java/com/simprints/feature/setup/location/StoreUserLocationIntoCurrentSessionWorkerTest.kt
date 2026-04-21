@@ -42,21 +42,21 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
 
     @Test
     fun storeUserLocationIntoCurrentSession() = runTest {
-        every { locationManager.requestLocation(any()) } returns flowOf(Location(latitude = 23.0, longitude = 54.0))
+        every { locationManager.requestLocation() } returns flowOf(Location(latitude = 23.0, longitude = 54.0))
         worker.doWork()
         coVerify(exactly = 1) { updateSessionScopeLocationUseCase.invoke(any()) }
     }
 
     @Test
     fun `storeUserLocationIntoCurrentSession requestLocation throw exception`() = runTest {
-        every { locationManager.requestLocation(any()) } throws Exception("Location collect exception")
+        every { locationManager.requestLocation() } throws Exception("Location collect exception")
         worker.doWork()
         coVerify(exactly = 0) { updateSessionScopeLocationUseCase.invoke(any()) }
     }
 
     @Test(expected = Test.None::class)
     fun `storeUserLocationIntoCurrentSession can't save event should not crash the app`() = runTest {
-        every { locationManager.requestLocation(any()) } returns flowOf(Location(latitude = 23.0, longitude = 54.0))
+        every { locationManager.requestLocation() } returns flowOf(Location(latitude = 23.0, longitude = 54.0))
         coEvery {
             updateSessionScopeLocationUseCase.invoke(any())
         } throws Exception("No session capture event found")
@@ -65,7 +65,7 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
 
     @Test
     fun `storeUserLocationIntoCurrentSession can't save events if the worker is canceled`() = runTest {
-        every { locationManager.requestLocation(any()) } returns flowOf(Location(latitude = 23.0, longitude = 54.0))
+        every { locationManager.requestLocation() } returns flowOf(Location(latitude = 23.0, longitude = 54.0))
         worker.stop(0)
         worker.doWork()
         coVerify(exactly = 0) { updateSessionScopeLocationUseCase.invoke(any()) }

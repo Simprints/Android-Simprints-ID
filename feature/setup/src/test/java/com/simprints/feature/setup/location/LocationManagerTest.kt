@@ -1,47 +1,35 @@
 package com.simprints.feature.setup.location
 
 import android.content.Context
-import android.location.Location
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.ext.junit.runners.*
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.common.truth.Truth.*
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 internal class LocationManagerTest {
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
+
     @MockK
     private lateinit var locationManager: LocationManager
 
     @MockK
     private lateinit var mockedLocationClient: FusedLocationProviderClient
 
-    @MockK
-    private lateinit var mockedLocationTask: Task<Location>
-
-    @MockK
-    private lateinit var locationResponseTask: Task<Location>
-
-    private var captureCallback = slot<OnCompleteListener<Location>>()
-
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-
-        every { mockedLocationTask.addOnCompleteListener(capture(captureCallback)) } answers {
-            captureCallback.captured.onComplete(locationResponseTask)
-            mockk()
-        }
-        every {
-            mockedLocationClient.getCurrentLocation(any<Int>(), any())
-        } returns mockedLocationTask
 
         mockkStatic(LocationServices::class)
         every {
@@ -52,26 +40,92 @@ internal class LocationManagerTest {
     }
 
     @Test
-    fun `test requestLocation success`() = runTest {
+    fun `test requestLocation success both locations`() = runTest {
         // Given
-        val fakeLocation = TestLocationData.buildFakeLocation()
-        every { locationResponseTask.isSuccessful } returns true
-        every { locationResponseTask.result } returns fakeLocation
+        val fakeLastLocation = TestLocationData.buildFakeLocation().apply {
+            latitude = 10.0
+            longitude = 10.0
+            time = 1000L
+        }
+        val fakeCurrentLocation = TestLocationData.buildFakeLocation().apply {
+            latitude = 20.0
+            longitude = 20.0
+        }
+
+        every { mockedLocationClient.lastLocation } returns Tasks.forResult(fakeLastLocation)
+        every { mockedLocationClient.getCurrentLocation(any<Int>(), any()) } returns Tasks.forResult(fakeCurrentLocation)
+
         // When
-        val flow = locationManager.requestLocation(LocationRequest.create()).take(1)
+        val flow = locationManager.requestLocation()
+
         // Then
-        val result = flow.firstOrNull()
-        assertThat(result?.latitude).isEqualTo(fakeLocation.latitude)
-        assertThat(result?.longitude).isEqualTo(fakeLocation.longitude)
+        val results = flow.toList()
+        assertThat(results).hasSize(2)
+
+        assertThat(results[0]?.latitude).isEqualTo(10.0)
+        assertThat(results[0]?.longitude).isEqualTo(10.0)
+        assertThat(results[0]?.lastLocationTime).isEqualTo(1000L)
+
+        assertThat(results[1]?.latitude).isEqualTo(20.0)
+        assertThat(results[1]?.longitude).isEqualTo(20.0)
+        assertThat(results[1]?.lastLocationTime).isNull()
     }
 
     @Test
-    fun `test requestLocation failure`() = runTest {
+    fun `test requestLocation success only current location`() = runTest {
         // Given
-        every { locationResponseTask.isSuccessful } returns false
+        val fakeCurrentLocation = TestLocationData.buildFakeLocation().apply {
+            latitude = 30.0
+            longitude = 30.0
+        }
+
+        every { mockedLocationClient.lastLocation } returns Tasks.forResult(null)
+        every { mockedLocationClient.getCurrentLocation(any<Int>(), any()) } returns Tasks.forResult(fakeCurrentLocation)
+
         // When
-        val flow = locationManager.requestLocation(LocationRequest.create()).take(1)
+        val flow = locationManager.requestLocation()
+
         // Then
-        assertThat(flow.firstOrNull()).isEqualTo(null)
+        val results = flow.toList()
+        assertThat(results).hasSize(1)
+
+        assertThat(results[0]?.latitude).isEqualTo(30.0)
+        assertThat(results[0]?.longitude).isEqualTo(30.0)
+    }
+
+    @Test
+    fun `test requestLocation success only last location`() = runTest {
+        // Given
+        val fakeLastLocation = TestLocationData.buildFakeLocation().apply {
+            latitude = 40.0
+            longitude = 40.0
+        }
+
+        every { mockedLocationClient.lastLocation } returns Tasks.forResult(fakeLastLocation)
+        every { mockedLocationClient.getCurrentLocation(any<Int>(), any()) } returns Tasks.forResult(null)
+
+        // When
+        val flow = locationManager.requestLocation()
+
+        // Then
+        val results = flow.toList()
+        assertThat(results).hasSize(1)
+
+        assertThat(results[0]?.latitude).isEqualTo(40.0)
+        assertThat(results[0]?.longitude).isEqualTo(40.0)
+    }
+
+    @Test
+    fun `test requestLocation failure both locations absent`() = runTest {
+        // Given
+        every { mockedLocationClient.lastLocation } returns Tasks.forResult(null)
+        every { mockedLocationClient.getCurrentLocation(any<Int>(), any()) } returns Tasks.forResult(null)
+
+        // When
+        val flow = locationManager.requestLocation()
+
+        // Then
+        val results = flow.toList()
+        assertThat(results).isEmpty()
     }
 }
