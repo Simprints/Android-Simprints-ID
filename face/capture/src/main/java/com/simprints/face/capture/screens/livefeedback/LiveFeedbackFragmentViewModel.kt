@@ -261,8 +261,10 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         potentialFace: Face,
     ): FaceDetection {
         val areaOccupied = potentialFace.relativeBoundingBox.area()
+        Simber.d("Area occupied: $areaOccupied", tag = FACE_CAPTURE)
+
         val status = when {
-            areaOccupied < faceTarget.areaRange.start -> FaceDetection.Status.TOOFAR
+            // areaOccupied < faceTarget.areaRange.start -> FaceDetection.Status.TOOFAR
             areaOccupied > faceTarget.areaRange.endInclusive -> FaceDetection.Status.TOOCLOSE
             potentialFace.yaw !in faceTarget.yawTarget -> FaceDetection.Status.OFFYAW
             potentialFace.roll !in faceTarget.rollTarget -> FaceDetection.Status.OFFROLL
