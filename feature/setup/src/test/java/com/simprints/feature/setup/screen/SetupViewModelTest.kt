@@ -4,10 +4,12 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.Modality
 import com.simprints.feature.setup.LocationStore
+import com.simprints.feature.setup.location.UpdateSessionScopeLocationUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
@@ -43,6 +45,9 @@ class SetupViewModelTest {
     @MockK
     private lateinit var saveLicenseCheckEvent: SaveLicenseCheckEventUseCase
 
+    @MockK
+    private lateinit var updateSessionScopeLocation: UpdateSessionScopeLocationUseCase
+
     private val configRepository = mockk<ConfigRepository>()
     private lateinit var viewModel: SetupViewModel
 
@@ -53,15 +58,17 @@ class SetupViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this)
         every { authStore.signedInProjectId } returns projectId
-        viewModel =
-            SetupViewModel(
-                locationStore,
-                configRepository,
-                licenseRepository,
-                deviceID,
-                authStore,
-                saveLicenseCheckEvent,
-            )
+        coJustRun { updateSessionScopeLocation.invoke(any()) }
+
+        viewModel = SetupViewModel(
+            locationStore,
+            configRepository,
+            licenseRepository,
+            deviceID,
+            authStore,
+            saveLicenseCheckEvent,
+            updateSessionScopeLocation,
+        )
     }
 
     @Test
@@ -112,7 +119,7 @@ class SetupViewModelTest {
     }
 
     @Test
-    fun `should not call locationStore collectLocationInBackground() if location permission is not granted`() = runTest {
+    fun `saves explicit missing permission if location permission is not granted`() = runTest {
         // Given
         justRun { locationStore.collectLocationInBackground() }
         coEvery { configRepository.getProjectConfiguration() } returns mockk<ProjectConfiguration>()
@@ -127,6 +134,7 @@ class SetupViewModelTest {
 
         // Then
         verify(exactly = 0) { locationStore.collectLocationInBackground() }
+        coVerify { updateSessionScopeLocation.invoke(eq(Location.NO_PERMISSION)) }
     }
 
     @Test
@@ -150,6 +158,7 @@ class SetupViewModelTest {
     fun `should request CommCare permission if needed when location permission is not granted`() = runTest {
         // Given
         justRun { locationStore.collectLocationInBackground() }
+
         coEvery {
             configRepository
                 .getProjectConfiguration()

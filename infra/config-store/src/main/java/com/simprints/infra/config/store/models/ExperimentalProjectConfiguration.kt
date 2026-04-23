@@ -179,6 +179,13 @@ data class ExperimentalProjectConfiguration(
             ?.coerceAtLeast(0)
             ?: MINIMUM_FREE_SPACE_MB_DEFAULT
 
+    val useBalancedLocationAccuracy: Boolean
+        get() = customConfig
+            ?.get(USE_BALANCED_LOCATION_ACCURACY)
+            ?.jsonPrimitive
+            ?.booleanOrNull
+            .let { it == true }
+
     companion object {
         internal const val ENABLE_ID_POOL_VALIDATION = "validateIdentificationPool"
         internal const val SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED = "singleQualityFallbackRequired"
@@ -240,5 +247,7 @@ data class ExperimentalProjectConfiguration(
 
         const val MINIMUM_FREE_SPACE_MB = "minimumFreeSpaceMb"
         const val MINIMUM_FREE_SPACE_MB_DEFAULT = 1024 // 1GB
+
+        const val USE_BALANCED_LOCATION_ACCURACY = "useBalancedLocationAccuracy"
     }
 }
