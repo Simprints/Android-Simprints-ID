@@ -199,7 +199,7 @@ simmatcher = { module = "com.simprints:libsimmatcher", version.ref = "simmatcher
 # roc v1 sdk hosted in https://github.com/Simprints/lib-roc-wrapper
 roc-v1 = { module = "com.simprints:rocwrapper", version.ref = "roc_wrapper_version" }
 # roc v3 sdk hosted in https://github.com/Simprints/lib-roc-wrapper-v3
-roc-v3 = { module = "com.simprints:rocwrapper-v3", version.ref = "roc_wrapper-v3_version" }
+roc-v3 = { module = "com.simprints:roc-v3", version.ref = "roc_wrapper-v3_version" }
 # secugen sdk hosted in https://github.com/Simprints/secugen-wrapper
 secugen = { module = "com.simprints:secugenwrapper", version.ref = "secugen_version" }
 simface = { module = "com.simprints.biometrics:simface", version.ref = "simface" }
