@@ -14,10 +14,6 @@ class OcrQueryScope internal constructor(
         filters += { line -> regex.containsMatchIn(line.text) }
     }
 
-    fun matchesNormalizedPattern(regex: Regex): OcrQueryScope = apply {
-        filters += { line -> regex.containsMatchIn(line.text) }
-    }
-
     fun containsText(text: String): OcrQueryScope = apply {
         filters += { line -> line.text.contains(text, ignoreCase = true) }
     }
