@@ -6,9 +6,10 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.feature.externalcredential.model.toBoundingBox
 import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
+import com.simprints.feature.externalcredential.screens.scanocr.reader.OcrModelBuilder
+import com.simprints.feature.externalcredential.screens.scanocr.reader.OcrReader
 import com.simprints.infra.credential.store.CredentialImageRepository
 import com.simprints.infra.credential.store.model.CredentialScanImageType.FullDocument
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
@@ -51,29 +52,22 @@ internal class GetCredentialCoordinatesUseCase @Inject constructor(
         val image = InputImage.fromBitmap(bitmap, 0)
         return try {
             val result = Tasks.await(recognizer.process(image)) ?: return null
-            return result.textBlocks.firstNotNullOfOrNull { textBlock ->
-                textBlock.lines.firstNotNullOfOrNull { textLine ->
-                    // Getting text from the entire line readout, and normalizing to avoid any extra spaces
-                    val lineReadout = textLine.text.trim().replace(" ", "")
-                    val isValid = when (documentType) {
-                        OcrDocumentType.NhisCard -> ghanaNhisCardOcrSelectorUseCase(lineReadout)
-                        OcrDocumentType.GhanaIdCard -> ghanaIdCardOcrSelectorUseCase(lineReadout)
-                    }
-                    if (isValid) {
-                        val blockBoundingRect = textBlock.boundingBox ?: return@firstNotNullOfOrNull null
-                        val lineBoundingRect = textLine.boundingBox ?: return@firstNotNullOfOrNull null
-                        val savedImagePath = credentialImageRepository.saveCredentialScan(bitmap, imageType = FullDocument)
-                        return@firstNotNullOfOrNull DetectedOcrBlock(
-                            imagePath = savedImagePath,
-                            documentType = documentType,
-                            blockBoundingBox = blockBoundingRect.toBoundingBox(),
-                            lineBoundingBox = lineBoundingRect.toBoundingBox(),
-                            readoutValue = lineReadout,
-                        )
-                    } else {
-                        return@firstNotNullOfOrNull null
-                    }
-                }
+            val ocrReader = OcrReader(OcrModelBuilder.build(result))
+            val credentialOcrLine = when (documentType) {
+                OcrDocumentType.NhisCard -> ghanaNhisCardOcrSelectorUseCase(ocrReader)
+                OcrDocumentType.GhanaIdCard -> ghanaIdCardOcrSelectorUseCase(ocrReader)
+            }
+            if (credentialOcrLine != null) {
+                val savedImagePath = credentialImageRepository.saveCredentialScan(bitmap, imageType = FullDocument)
+                return DetectedOcrBlock(
+                    imagePath = savedImagePath,
+                    documentType = documentType,
+                    blockBoundingBox = credentialOcrLine.blockBoundingBox,
+                    lineBoundingBox = credentialOcrLine.boundingBox,
+                    readoutValue = credentialOcrLine.text,
+                )
+            } else {
+                return null
             }
         } catch (e: Exception) {
             Simber.e("OCR failed for $documentType", e, tag = MULTI_FACTOR_ID)
