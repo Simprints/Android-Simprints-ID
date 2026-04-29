@@ -4,7 +4,7 @@ import com.simprints.core.domain.common.Modality
 import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.metadata.ImageMetadataStore
 import com.simprints.infra.images.model.SecuredImageRef
-import com.simprints.infra.images.usecase.GetUploaderUseCase
+import com.simprints.infra.images.remote.SampleUploader
 import com.simprints.infra.images.usecase.SamplePathConverter
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
@@ -17,7 +17,7 @@ internal class ImageRepositoryImpl @Inject internal constructor(
     private val localDataSource: ImageLocalDataSource,
     private val metadataStore: ImageMetadataStore,
     private val samplePathConverter: SamplePathConverter,
-    private val getSampleUploader: GetUploaderUseCase,
+    private val sampleUploader: SampleUploader,
 ) : ImageRepository {
     override suspend fun storeSample(
         projectId: String,
@@ -60,7 +60,7 @@ internal class ImageRepositoryImpl @Inject internal constructor(
     override suspend fun uploadStoredImagesAndDelete(
         projectId: String,
         progressCallback: (suspend (Int, Int) -> Unit)?,
-    ): Boolean = getSampleUploader().uploadAllSamples(projectId, progressCallback)
+    ): Boolean = sampleUploader.uploadAllSamples(projectId, progressCallback)
 
     override suspend fun deleteStoredImages() {
         metadataStore.deleteAllMetadata()

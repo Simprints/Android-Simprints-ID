@@ -7,7 +7,6 @@ import com.simprints.infra.images.metadata.ImageMetadataStore
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.remote.SampleUploader
-import com.simprints.infra.images.usecase.GetUploaderUseCase
 import com.simprints.infra.images.usecase.SamplePathConverter
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -40,9 +39,6 @@ internal class ImageRepositoryImplTest {
     @MockK
     lateinit var samplePathConverter: SamplePathConverter
 
-    @MockK
-    lateinit var getUploaderUseCase: GetUploaderUseCase
-
     private lateinit var repository: ImageRepository
 
     @Before
@@ -51,13 +47,12 @@ internal class ImageRepositoryImplTest {
 
         every { samplePathConverter.create(any(), any(), any(), any()) } returns Path(VALID_PATH)
         coEvery { sampleUploader.uploadAllSamples(any(), any()) } returns true
-        coEvery { getUploaderUseCase.invoke() } returns sampleUploader
 
         repository = ImageRepositoryImpl(
             localDataSource = localDataSource,
             metadataStore = metadataStore,
             samplePathConverter = samplePathConverter,
-            getSampleUploader = getUploaderUseCase,
+            sampleUploader = sampleUploader,
         )
     }
 
