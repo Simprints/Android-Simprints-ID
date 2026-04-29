@@ -8,14 +8,14 @@ package com.simprints.feature.externalcredential.screens.scanocr.reader
  * val model = OcrModelBuilder.build(mlKitText)
  * val reader = OcrReader(model)
  *
- * val membershipNumber = reader.query {
+ * val membershipNumber = reader.find {
  *     matchesPattern(Regex("\\d{8}"))
  *     isBelow { containsText("membership number") }
  *     isAbove { containsText("expiry date") }
  * }
  * ```
  */
-class OcrReader(
+internal class OcrReader(
     val model: OcrText,
 ) {
     /**

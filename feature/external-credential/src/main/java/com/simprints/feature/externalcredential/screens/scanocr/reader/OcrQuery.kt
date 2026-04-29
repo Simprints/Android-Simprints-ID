@@ -3,7 +3,7 @@ package com.simprints.feature.externalcredential.screens.scanocr.reader
 /**
  * Defines the search criteria for locating a single line of text within document scanned with OCR.
  */
-class OcrQueryScope internal constructor(
+internal class OcrQueryScope internal constructor(
     internal val allLines: List<OcrLine>,
 ) {
     private val filters = mutableListOf<(OcrLine) -> Boolean>()
@@ -52,10 +52,12 @@ class OcrQueryScope internal constructor(
         return allLines.firstOrNull { line ->
             val isBelowAnchor = belowAnchor == null || (
                 line.boundingBox.top > belowAnchor.boundingBox.top &&
+                    line.boundingBox.left >= belowAnchor.boundingBox.left &&
                     line.boundingBox.left < belowAnchor.boundingBox.right
             )
             val isAboveAnchor = aboveAnchor == null || (
                 line.boundingBox.top < aboveAnchor.boundingBox.top &&
+                    line.boundingBox.left >= aboveAnchor.boundingBox.left &&
                     line.boundingBox.left < aboveAnchor.boundingBox.right
             )
             filters.all { it(line) } && isBelowAnchor && isAboveAnchor
