@@ -1,66 +1,45 @@
 package com.simprints.feature.externalcredential.screens.scanocr.reader
 
 /**
- * Defines the search criteria for locating a single line of text within document scanned with OCR.
+ * Defines the search criteria for locating a single line of text within a scanned document.
+ * Used as the receiver of the [OcrReader.find] block.
  */
-internal class OcrQueryScope internal constructor(
-    internal val allLines: List<OcrLine>,
+internal class OcrQuery(
+    private val subQuery: (OcrQuery) -> OcrLine?,
 ) {
-    private val filters = mutableListOf<(OcrLine) -> Boolean>()
-    private var belowResolver: (() -> OcrLine?)? = null
-    private var aboveResolver: (() -> OcrLine?)? = null
+    internal val filters = mutableListOf<(OcrLine) -> Boolean>()
+    internal var belowResolver: (() -> OcrLine?)? = null
+    internal var aboveResolver: (() -> OcrLine?)? = null
 
-    fun matchesPattern(regex: Regex): OcrQueryScope = apply {
+    fun matchesPattern(regex: Regex): OcrQuery = apply {
         filters += { line -> regex.containsMatchIn(line.text) }
     }
 
-    fun containsText(text: String): OcrQueryScope = apply {
+    fun containsText(text: String): OcrQuery = apply {
         filters += { line -> line.text.contains(text, ignoreCase = true) }
     }
 
-    fun hasExactText(text: String): OcrQueryScope = apply {
+    fun hasExactText(text: String): OcrQuery = apply {
         filters += { line -> line.text.equals(text, ignoreCase = true) }
     }
 
-    fun hasId(id: Int): OcrQueryScope = apply {
+    fun hasId(id: Int): OcrQuery = apply {
         filters += { line -> line.id == id }
     }
 
-    fun isBelow(resolveAnchor: OcrQueryScope.() -> Unit): OcrQueryScope = apply {
-        belowResolver = { OcrQueryScope(allLines).apply(resolveAnchor).find() }
+    fun isBelow(resolveAnchor: OcrQuery.() -> Unit): OcrQuery = apply {
+        belowResolver = { subQuery(OcrQuery(subQuery).apply(resolveAnchor)) }
     }
 
-    fun isBelow(anchor: OcrLine): OcrQueryScope = apply {
+    fun isBelow(anchor: OcrLine): OcrQuery = apply {
         belowResolver = { anchor }
     }
 
-    fun isAbove(resolveAnchor: OcrQueryScope.() -> Unit): OcrQueryScope = apply {
-        aboveResolver = { OcrQueryScope(allLines).apply(resolveAnchor).find() }
+    fun isAbove(resolveAnchor: OcrQuery.() -> Unit): OcrQuery = apply {
+        aboveResolver = { subQuery(OcrQuery(subQuery).apply(resolveAnchor)) }
     }
 
-    fun isAbove(anchor: OcrLine): OcrQueryScope = apply {
+    fun isAbove(anchor: OcrLine): OcrQuery = apply {
         aboveResolver = { anchor }
-    }
-
-    internal fun find(): OcrLine? {
-        val belowAnchor = belowResolver?.invoke()
-        val aboveAnchor = aboveResolver?.invoke()
-
-        if (belowResolver != null && belowAnchor == null) return null
-        if (aboveResolver != null && aboveAnchor == null) return null
-
-        return allLines.firstOrNull { line ->
-            val isBelowAnchor = belowAnchor == null || (
-                line.boundingBox.top > belowAnchor.boundingBox.top &&
-                    line.boundingBox.left >= belowAnchor.boundingBox.left &&
-                    line.boundingBox.left < belowAnchor.boundingBox.right
-            )
-            val isAboveAnchor = aboveAnchor == null || (
-                line.boundingBox.top < aboveAnchor.boundingBox.top &&
-                    line.boundingBox.left >= aboveAnchor.boundingBox.left &&
-                    line.boundingBox.left < aboveAnchor.boundingBox.right
-            )
-            filters.all { it(line) } && isBelowAnchor && isAboveAnchor
-        }
     }
 }

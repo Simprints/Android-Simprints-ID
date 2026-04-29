@@ -20,8 +20,30 @@ internal class OcrReader(
 ) {
     /**
      * Executes the query defined in [block] and returns the first matching [OcrLine], or null.
-     * The [block] receives an [OcrQueryScope] as its receiver — call filter methods directly
+     * The [block] receives an [OcrQuery] as its receiver — call filter methods directly
      * without any chaining or terminal call.
      */
-    fun find(block: OcrQueryScope.() -> Unit): OcrLine? = OcrQueryScope(model.allLines).apply(block).find()
+    fun find(block: OcrQuery.() -> Unit): OcrLine? = runQuery(OcrQuery(::runQuery).apply(block))
+
+    private fun runQuery(scope: OcrQuery): OcrLine? {
+        val belowAnchor = scope.belowResolver?.invoke()
+        val aboveAnchor = scope.aboveResolver?.invoke()
+
+        if (scope.belowResolver != null && belowAnchor == null) return null
+        if (scope.aboveResolver != null && aboveAnchor == null) return null
+
+        return model.allLines.firstOrNull { line ->
+            val isBelowAnchor = belowAnchor == null || (
+                line.boundingBox.top > belowAnchor.boundingBox.top &&
+                    line.boundingBox.left >= belowAnchor.boundingBox.left &&
+                    line.boundingBox.left < belowAnchor.boundingBox.right
+            )
+            val isAboveAnchor = aboveAnchor == null || (
+                line.boundingBox.top < aboveAnchor.boundingBox.top &&
+                    line.boundingBox.left >= aboveAnchor.boundingBox.left &&
+                    line.boundingBox.left < aboveAnchor.boundingBox.right
+            )
+            scope.filters.all { it(line) } && isBelowAnchor && isAboveAnchor
+        }
+    }
 }
