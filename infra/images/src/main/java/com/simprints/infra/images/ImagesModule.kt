@@ -5,6 +5,8 @@ import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.local.ImageLocalDataSourceImpl
 import com.simprints.infra.images.metadata.database.ImageMetadataDao
 import com.simprints.infra.images.metadata.database.ImageMetadataDatabase
+import com.simprints.infra.images.remote.SampleUploader
+import com.simprints.infra.images.remote.signedurl.SignedUrlSampleUploader
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -16,6 +18,9 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class ImagesModule {
+    @Binds
+    internal abstract fun bindSampleUploader(impl: SignedUrlSampleUploader): SampleUploader
+
     @Binds
     internal abstract fun bindImageRepository(impl: ImageRepositoryImpl): ImageRepository
 

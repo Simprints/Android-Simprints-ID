@@ -39,7 +39,6 @@ import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_DEFAULT_MAX_RETRIES
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES
-import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.SAMPLE_UPLOAD_WITH_URL_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
@@ -140,22 +139,6 @@ internal class ExperimentalProjectConfigurationTest {
             mapOf(RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES to JsonPrimitive(3)) to 3,
         ).forEach { (config, result) ->
             assertThat(ExperimentalProjectConfiguration(config).recordsDbMigrationFromRealmMaxRetries).isEqualTo(result)
-        }
-    }
-
-    @Test
-    fun `check signed url enabled flag correctly`() {
-        mapOf(
-            // Value not present
-            emptyMap<String, JsonElement>() to false,
-            // Value not boolean
-            mapOf(SAMPLE_UPLOAD_WITH_URL_ENABLED to JsonPrimitive(1)) to false,
-            // Value present and FALSE
-            mapOf(SAMPLE_UPLOAD_WITH_URL_ENABLED to JsonPrimitive(false)) to false,
-            // Value present and TRUE
-            mapOf(SAMPLE_UPLOAD_WITH_URL_ENABLED to JsonPrimitive(true)) to true,
-        ).forEach { (config, result) ->
-            assertThat(ExperimentalProjectConfiguration(config).sampleUploadWithSignedUrlEnabled).isEqualTo(result)
         }
     }
 
