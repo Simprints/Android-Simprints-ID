@@ -2,18 +2,14 @@ package com.simprints.infra.sync.files
 
 import android.os.PowerManager
 import androidx.work.ListenableWorker.Result
-import com.google.common.truth.Truth
-import com.simprints.fingerprint.infra.imagedistortionconfig.ImageDistortionConfigRepo
+import com.google.common.truth.*
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.sync.ImageSyncTimestampProvider
 import com.simprints.infra.sync.SyncConstants
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
-import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -29,9 +25,6 @@ class FileUpSyncWorkerTest {
 
     @MockK
     private lateinit var imageRepository: ImageRepository
-
-    @MockK
-    private lateinit var imageDistortionConfigRepo: ImageDistortionConfigRepo
 
     @MockK
     private lateinit var authStore: AuthStore
@@ -54,7 +47,6 @@ class FileUpSyncWorkerTest {
             },
             mockk(relaxed = true),
             imageRepository,
-            imageDistortionConfigRepo,
             authStore,
             imageSyncTimestampProvider,
             testCoroutineRule.testCoroutineDispatcher,
@@ -62,24 +54,8 @@ class FileUpSyncWorkerTest {
     }
 
     @Test
-    fun `doWork returns retry when uploadPendingConfigs fails`() = runBlocking {
-        // Given
-        coEvery { imageDistortionConfigRepo.uploadPendingConfigs() } returns false
-
-        // When
-        val result = fileUpSyncWorker.doWork()
-
-        // Then
-        Truth.assertThat(Result.retry()).isEqualTo(result)
-        coVerify(exactly = 1) { imageDistortionConfigRepo.uploadPendingConfigs() }
-        coVerify(exactly = 0) { imageRepository.uploadStoredImagesAndDelete(any()) }
-        coVerify(exactly = 0) { imageSyncTimestampProvider.saveImageSyncCompletionTimestampNow() }
-    }
-
-    @Test
     fun `doWork returns success when uploadStoredImagesAndDelete succeeds`() = runBlocking {
         // Given
-        coEvery { imageDistortionConfigRepo.uploadPendingConfigs() } returns true
         coEvery { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID, any()) } returns true
 
         // When
@@ -87,7 +63,6 @@ class FileUpSyncWorkerTest {
 
         // Then
         Truth.assertThat(Result.success()).isEqualTo(result)
-        coVerify(exactly = 1) { imageDistortionConfigRepo.uploadPendingConfigs() }
         coVerify(exactly = 1) { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID, any()) }
         coVerify(exactly = 1) { imageSyncTimestampProvider.saveImageSyncCompletionTimestampNow() }
     }
@@ -95,7 +70,6 @@ class FileUpSyncWorkerTest {
     @Test
     fun `doWork returns retry when uploadStoredImagesAndDelete fails`() = runBlocking {
         // Given
-        coEvery { imageDistortionConfigRepo.uploadPendingConfigs() } returns true
         coEvery { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID, any()) } returns false
 
         // When
@@ -103,7 +77,6 @@ class FileUpSyncWorkerTest {
 
         // Then
         Truth.assertThat(Result.retry()).isEqualTo(result)
-        coVerify(exactly = 1) { imageDistortionConfigRepo.uploadPendingConfigs() }
         coVerify(exactly = 1) { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID, any()) }
         coVerify(exactly = 0) { imageSyncTimestampProvider.saveImageSyncCompletionTimestampNow() }
     }
@@ -111,22 +84,20 @@ class FileUpSyncWorkerTest {
     @Test
     fun `doWork returns retry when an exception occurs`() = runBlocking {
         // Given
-        coEvery { imageDistortionConfigRepo.uploadPendingConfigs() } throws RuntimeException("Test Exception")
+        coEvery { imageRepository.uploadStoredImagesAndDelete(any(), any()) } throws RuntimeException("Test Exception")
 
         // When
         val result = fileUpSyncWorker.doWork()
 
         // Then
         Truth.assertThat(Result.retry()).isEqualTo(result)
-        coVerify(exactly = 1) { imageDistortionConfigRepo.uploadPendingConfigs() }
-        coVerify(exactly = 0) { imageRepository.uploadStoredImagesAndDelete(any()) }
+        coVerify(exactly = 1) { imageRepository.uploadStoredImagesAndDelete(any(), any()) }
         coVerify(exactly = 0) { imageSyncTimestampProvider.saveImageSyncCompletionTimestampNow() }
     }
 
     @Test
     fun `doWork calls progress callback during image upload`() = runBlocking {
         // Given
-        coEvery { imageDistortionConfigRepo.uploadPendingConfigs() } returns true
         var progressCallbackReceived: (suspend (Int, Int) -> Unit)? = null
         coEvery { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID, any()) } coAnswers {
             progressCallbackReceived = secondArg<suspend (Int, Int) -> Unit>()
@@ -144,7 +115,6 @@ class FileUpSyncWorkerTest {
     @Test
     fun `doWork progress callback receives correct progress values`() = runBlocking {
         // Given
-        coEvery { imageDistortionConfigRepo.uploadPendingConfigs() } returns true
         val progressValues = mutableListOf<Pair<Int, Int>>()
         coEvery { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID, any()) } coAnswers {
             val progressCallback = secondArg<suspend (Int, Int) -> Unit>()

@@ -40,7 +40,6 @@ dependencies {
     implementation(project(":infra:images"))
 
     implementation(project(":fingerprint:infra:scanner"))
-    implementation(project(":fingerprint:infra:image-distortion-config"))
 
     implementation(libs.workManager.work)
     implementation(libs.kotlin.serialization)
