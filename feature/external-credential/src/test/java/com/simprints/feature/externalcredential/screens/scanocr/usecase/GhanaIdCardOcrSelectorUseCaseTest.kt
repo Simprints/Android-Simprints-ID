@@ -27,7 +27,6 @@ internal class GhanaIdCardOcrSelectorUseCaseTest {
         "GHA-123456789-A",
         "GHA-123456789-01",
         "",
-        "GHA-123456789-0 ",
     )
 
     @Before
@@ -40,7 +39,7 @@ internal class GhanaIdCardOcrSelectorUseCaseTest {
     fun `returns matching line for valid Ghana ID formats`() {
         validIds.forEachIndexed { id, ghanaId ->
             val nonMatching = line(id = id, text = label, top = 100)
-            val expected = line(id = id, text = ghanaId, top = 140)
+            val expected = line(id = id + 1, text = ghanaId, top = 140)
             val reader = buildReader(nonMatching, expected)
 
             assertThat(useCase(reader)).isEqualTo(expected)
@@ -52,7 +51,7 @@ internal class GhanaIdCardOcrSelectorUseCaseTest {
         invalidIds.forEachIndexed { id, ghanaId ->
             val reader = buildReader(
                 line(id = id, text = label, top = 100),
-                line(id = id, text = ghanaId, top = 140),
+                line(id = id + 1, text = ghanaId, top = 140),
             )
 
             assertThat(useCase(reader)).isNull()

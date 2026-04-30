@@ -35,7 +35,7 @@ internal class GhanaNhisCardOcrSelectorUseCaseTest {
     fun `returns matching line for valid NHIS membership numbers`() {
         validNumbers.forEachIndexed { id, number ->
             val label = line(id = id, text = label, top = 100)
-            val expected = line(id = id, text = number, top = 140)
+            val expected = line(id = id + 1, text = number, top = 140)
             val reader = buildReader(label, expected)
 
             assertThat(useCase(reader)).isEqualTo(expected)
@@ -47,7 +47,7 @@ internal class GhanaNhisCardOcrSelectorUseCaseTest {
         invalidNumbers.forEachIndexed { id, number ->
             val reader = buildReader(
                 line(id = id, text = "membership number", top = 100),
-                line(id = id, text = number, top = 140),
+                line(id = id + 1, text = number, top = 140),
             )
 
             assertThat(useCase(reader)).isNull()

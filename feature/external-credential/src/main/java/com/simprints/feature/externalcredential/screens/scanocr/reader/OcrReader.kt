@@ -5,8 +5,7 @@ package com.simprints.feature.externalcredential.screens.scanocr.reader
  *
  * Usage:
  * ```
- * val model = OcrModelBuilder.build(mlKitText)
- * val reader = OcrReader(model)
+ * val reader = OcrReader(ocrText)
  *
  * val membershipNumber = reader.find {
  *     matchesPattern(Regex("\\d{8}"))
@@ -16,7 +15,7 @@ package com.simprints.feature.externalcredential.screens.scanocr.reader
  * ```
  */
 internal class OcrReader(
-    val model: OcrText,
+    val ocrText: OcrText,
 ) {
     /**
      * Executes the query defined in [block] and returns the first matching [OcrLine], or null.
@@ -32,7 +31,7 @@ internal class OcrReader(
         if (scope.belowResolver != null && belowAnchor == null) return null
         if (scope.aboveResolver != null && aboveAnchor == null) return null
 
-        return model.allLines.firstOrNull { line ->
+        return ocrText.allLines.firstOrNull { line ->
             val isBelowAnchor = belowAnchor == null || (
                 line.boundingBox.top > belowAnchor.boundingBox.top &&
                     line.boundingBox.left >= belowAnchor.boundingBox.left &&

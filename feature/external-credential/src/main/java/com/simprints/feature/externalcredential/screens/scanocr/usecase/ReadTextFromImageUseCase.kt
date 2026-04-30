@@ -32,7 +32,7 @@ internal class ReadTextFromImageUseCase @Inject constructor() {
             val lines = block.lines.map { line ->
                 OcrLine(
                     id = nextLineId++,
-                    text = line.text.trim().replace(" ", ""),
+                    text = line.text.trim(),
                     boundingBox = line.boundingBox.toBoundingBox(),
                     blockBoundingBox = block.boundingBox.toBoundingBox(),
                     confidence = line.confidence,

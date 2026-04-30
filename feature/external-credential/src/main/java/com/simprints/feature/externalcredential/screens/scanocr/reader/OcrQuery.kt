@@ -12,7 +12,7 @@ internal class OcrQuery(
     internal var aboveResolver: (() -> OcrLine?)? = null
 
     fun matchesPattern(regex: Regex): OcrQuery = apply {
-        filters += { line -> regex.containsMatchIn(line.text) }
+        filters += { line -> regex.matches(line.text) }
     }
 
     fun containsText(text: String): OcrQuery = apply {
