@@ -16,6 +16,7 @@ class InsertSessionEventsUseCase @Inject constructor(
     private val eventRepository: EventRepository,
     private val sessionGenerator: SessionGenerator,
     @param:DispatcherIO private val dispatcher: CoroutineDispatcher,
+    private val random: Random = Random.Default,
 ) {
     operator fun invoke(
         projectId: String,
@@ -59,7 +60,8 @@ class InsertSessionEventsUseCase @Inject constructor(
         enrolCount: Int,
     ) {
         batchInsertEvents(count = enrolCount) { scopeId ->
-            when (Random.nextInt(3)) {
+            // Randomly generate different types of enrolment events to create more varied data
+            when (random.nextInt(3)) {
                 0 -> sessionGenerator.generateEnrolmentIso(
                     projectId = projectId,
                     moduleId = moduleId,
@@ -90,7 +92,8 @@ class InsertSessionEventsUseCase @Inject constructor(
         identifyCount: Int,
     ) {
         batchInsertEvents(count = identifyCount) { scopeId ->
-            when (Random.nextInt(2)) {
+            // Randomly generate different types of identify events to create more varied data
+            when (random.nextInt(2)) {
                 0 -> sessionGenerator.generateIdentificationRoc3(
                     projectId = projectId,
                     moduleId = moduleId,
