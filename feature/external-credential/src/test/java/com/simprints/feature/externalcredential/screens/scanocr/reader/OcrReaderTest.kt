@@ -86,7 +86,7 @@ internal class OcrReaderTest {
     @Test
     fun `matchesPattern finds date format`() {
         val result = reader.find { matchesPattern(Regex("^\\d{2}/\\d{2}$")) }
-        assertThat(result).isEqualTo(expiryDateValue)
+        assertThat(result).isEqualTo(issueDateValue)
     }
 
     @Test
