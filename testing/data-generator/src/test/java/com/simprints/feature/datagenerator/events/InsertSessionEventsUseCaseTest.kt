@@ -25,16 +25,19 @@ class InsertSessionEventsUseCaseTest {
     @MockK
     private lateinit var mockSessionGenerator: SessionGenerator
 
+    @MockK
+    private lateinit var mockRandom: Random
+
     private lateinit var useCase: InsertSessionEventsUseCase
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        mockkObject(Random.Default)
         useCase = InsertSessionEventsUseCase(
             eventRepository = mockEventRepository,
             sessionGenerator = mockSessionGenerator,
             dispatcher = testDispatcher,
+            random = mockRandom,
         )
     }
 
@@ -71,8 +74,8 @@ class InsertSessionEventsUseCaseTest {
         // Mock event insertion (suspend function)
         coEvery { mockEventRepository.executeRawEventInsertions(any()) } returns Unit
 
-        // Mock the Random generator to always choose the first path (ISO) in insertEnrollmentEvents
-        every { Random.nextInt(3) } returns 0
+        // Mock the Random generator to always choose the first path (ISO) in insertEnrollmentEvents and insertIdentifyEvents
+        every { mockRandom.nextInt(any()) } returns 0
 
         // Mock all session generator calls
         every { mockSessionGenerator.generateEnrolmentIso(any(), any(), any(), any()) } returns mockDbCommands
