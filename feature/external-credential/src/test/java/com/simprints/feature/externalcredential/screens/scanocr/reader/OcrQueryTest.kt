@@ -18,11 +18,15 @@ internal class OcrQueryTest {
         query = OcrQuery(noOpSubQuery)
     }
 
-    // ── Filter registration ───────────────────────────────────────────────────
-
     @Test
     fun `matchesPattern registers a filter`() {
         query.matchesPattern(Regex("\\d+"))
+        assertThat(query.filters).hasSize(1)
+    }
+
+    @Test
+    fun `containsPattern registers a filter`() {
+        query.containsPattern(Regex("\\d+"))
         assertThat(query.filters).hasSize(1)
     }
 
@@ -52,64 +56,86 @@ internal class OcrQueryTest {
         assertThat(query.filters).hasSize(3)
     }
 
-    // ── Filter correctness ────────────────────────────────────────────────────
-
     @Test
-    fun `matchesPattern filter passes matching line`() {
+    fun `matchesPattern passes line whose full text matches pattern`() {
         query.matchesPattern(Regex("^\\d{8}$"))
         assertThat(query.filters.all { it(line(text = "12345678")) }).isTrue()
     }
 
     @Test
-    fun `matchesPattern filter rejects non-matching line`() {
-        query.matchesPattern(Regex("^\\d{8}$"))
-        assertThat(query.filters.all { it(line(text = "random string")) }).isFalse()
+    fun `matchesPattern rejects line where pattern matches only a substring`() {
+        query.matchesPattern(Regex("\\d{8}"))
+        assertThat(query.filters.all { it(line(text = "ID:12345678")) }).isFalse()
     }
 
     @Test
-    fun `containsText filter passes line containing text`() {
+    fun `matchesPattern rejects non-matching line`() {
+        query.matchesPattern(Regex("^\\d{8}$"))
+        assertThat(query.filters.all { it(line(text = "abcdefgh")) }).isFalse()
+    }
+
+    @Test
+    fun `containsPattern passes line containing a partial match`() {
+        query.containsPattern(Regex("membership"))
+        assertThat(query.filters.all { it(line(text = "membership number")) }).isTrue()
+    }
+
+    @Test
+    fun `containsPattern passes line where pattern matches full text`() {
+        query.containsPattern(Regex("membership"))
+        assertThat(query.filters.all { it(line(text = "membership")) }).isTrue()
+    }
+
+    @Test
+    fun `containsPattern rejects line with no match`() {
+        query.containsPattern(Regex("expiry"))
+        assertThat(query.filters.all { it(line(text = "membership number")) }).isFalse()
+    }
+
+    @Test
+    fun `containsText passes line containing text`() {
         query.containsText("member")
         assertThat(query.filters.all { it(line(text = "membership number")) }).isTrue()
     }
 
     @Test
-    fun `containsText filter is case-insensitive`() {
+    fun `containsText is case-insensitive`() {
         query.containsText("MEMBER")
         assertThat(query.filters.all { it(line(text = "membership number")) }).isTrue()
     }
 
     @Test
-    fun `containsText filter rejects line not containing text`() {
+    fun `containsText rejects line not containing text`() {
         query.containsText("expiry")
         assertThat(query.filters.all { it(line(text = "membership number")) }).isFalse()
     }
 
     @Test
-    fun `hasExactText filter passes line with exact text`() {
+    fun `hasExactText passes line with exact text`() {
         query.hasExactText("expiry date")
         assertThat(query.filters.all { it(line(text = "expiry date")) }).isTrue()
     }
 
     @Test
-    fun `hasExactText filter is case-insensitive`() {
+    fun `hasExactText is case-insensitive`() {
         query.hasExactText("EXPIRY DATE")
         assertThat(query.filters.all { it(line(text = "expiry date")) }).isTrue()
     }
 
     @Test
-    fun `hasExactText filter rejects partial match`() {
+    fun `hasExactText rejects partial match`() {
         query.hasExactText("expiry date")
         assertThat(query.filters.all { it(line(text = "expiry")) }).isFalse()
     }
 
     @Test
-    fun `hasId filter passes line with matching id`() {
+    fun `hasId passes line with matching id`() {
         query.hasId(2)
         assertThat(query.filters.all { it(line(id = 2)) }).isTrue()
     }
 
     @Test
-    fun `hasId filter rejects line with different id`() {
+    fun `hasId rejects line with different id`() {
         query.hasId(2)
         assertThat(query.filters.all { it(line(id = 99)) }).isFalse()
     }

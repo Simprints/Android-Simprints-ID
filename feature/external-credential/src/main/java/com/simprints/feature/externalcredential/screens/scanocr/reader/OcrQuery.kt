@@ -15,6 +15,10 @@ internal class OcrQuery(
         filters += { line -> regex.matches(line.text) }
     }
 
+    fun containsPattern(regex: Regex): OcrQuery = apply {
+        filters += { line -> regex.containsMatchIn(line.text) }
+    }
+
     fun containsText(text: String): OcrQuery = apply {
         filters += { line -> line.text.contains(text, ignoreCase = true) }
     }

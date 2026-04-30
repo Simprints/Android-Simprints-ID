@@ -30,7 +30,7 @@ internal class OcrReaderTest {
         reader = OcrReader(
             OcrText(
                 blocks = emptyList(),
-                allLines = listOf(labelMembership, membershipValue, labelExpiryDate, expiryDateValue, labelIssueDate, issueDateValue),
+                allLines = listOf(labelMembership, membershipValue, labelIssueDate, issueDateValue, labelExpiryDate, expiryDateValue),
             ),
         )
     }
@@ -111,16 +111,16 @@ internal class OcrReaderTest {
     fun `isBelow block resolves anchor via text containment`() {
         val result = reader.find {
             matchesPattern(Regex("^\\d{8}$"))
-            isBelow { containsText("membership") }
+            isBelow { containsText("membership number") }
         }
         assertThat(result).isEqualTo(membershipValue)
     }
 
     @Test
-    fun `isBelow block resolves anchor via pattern`() {
+    fun `isBelow block resolves anchor via containsPattern`() {
         val result = reader.find {
             matchesPattern(Regex("^\\d{8}$"))
-            isBelow { matchesPattern(Regex("membership")) }
+            isBelow { containsPattern(Regex("membership")) }
         }
         assertThat(result).isEqualTo(membershipValue)
     }
@@ -156,10 +156,10 @@ internal class OcrReaderTest {
     }
 
     @Test
-    fun `isAbove block resolves anchor via pattern`() {
+    fun `isAbove block resolves anchor via containsPattern`() {
         val result = reader.find {
             matchesPattern(Regex("^\\d{8}$"))
-            isAbove { matchesPattern(Regex("expiry")) }
+            isAbove { containsPattern(Regex("expiry")) }
         }
         assertThat(result).isEqualTo(membershipValue)
     }
