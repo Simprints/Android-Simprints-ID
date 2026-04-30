@@ -1,17 +1,17 @@
 [versions]
-kotlin_version = "2.2.21"
+kotlin_version = "2.3.20"
 kotlin_coroutine_version = "1.10.2"
 ksp_version = "2.3.5"
-kotlin_serialization_version = "1.10.0"
+kotlin_serialization_version = "1.11.0"
 
-android_gradlePlugin_version = "8.13.2"
+android_gradlePlugin_version = "9.1.1"
 androidx_version = "1.7.0"
 androidx_core_version = "1.18.0"
 androidx_app_compat_version = "1.7.1"
 androidx_fragment_version = "1.8.9"
 androidx_navigation_version = "2.9.7"
 androidx_lifecycle_version = "2.10.0"
-androidx_work_version = "2.11.1"
+androidx_work_version = "2.11.2"
 androidx_room_version = "2.8.4"
 androidx_datastore_version = "1.2.1"
 androidx_camerax_version = "1.6.0"
@@ -23,42 +23,42 @@ androidx_cardview_version = "1.0.0"
 androidx_preferences_version = "1.2.1"
 androidx_viewpager_version = "1.1.0"
 androidx_security_version = "1.1.0"
-androidx_annotation_version = "1.9.1"
+androidx_annotation_version = "1.10.0"
 androidx_arch_core_version = "2.2.0"
 material_version = "1.13.0"
 
-hilt_version = "2.57.2"
+hilt_version = "2.59.2"
 hilt_androidx_version = "1.3.0"
 
 play_base_services_version = "18.10.0"
 play_location_services_version = "21.3.0"
 play_integrity_version = "1.6.0"
 gsm_plugin_version = "4.4.4"
-play_publisher_version = "3.13.0"
+play_publisher_version = "4.0.0"
 play_barcode_version = "18.3.1"
 
 ml_entity_extraction_version = "16.0.1"
 
 firebase_auth_version = "24.0.1"
 firebase_storage_version = "22.0.1"
-firebase_crashlytics_version = "20.0.4"
-firebase_analytics_version = "23.0.0"
-firebase_perf_version = "22.0.4"
-firebase_crashlyticsPlugin_version = "3.0.6"
+firebase_crashlytics_version = "20.0.5"
+firebase_analytics_version = "23.2.0"
+firebase_perf_version = "22.0.5"
+firebase_crashlyticsPlugin_version = "3.0.7"
 firebase_perfPlugin_version = "2.0.2"
 
 retrofit_version = "3.0.0"
 okttp_version = "5.3.2"
-chuck_version = "4.3.0"
+chuck_version = "4.3.1"
 
-sqlCipher_version = "4.13.0"
+sqlCipher_version = "4.14.1"
 fuzzywuzzy_version = "1.4.0"
-rootbeer_version = "0.1.1"
+rootbeer_version = "0.1.2"
 commons_io_version = "2.21.0"
 kronos_version = "0.0.1-alpha11"
 protobuf_version = "4.34.1"
 circleImageView_version = "3.1.0"
-kermit_version = "2.0.8"
+kermit_version = "2.1.0"
 zip4j_version = "2.11.6"
 
 libsimprints_version = "2026.1.0"
@@ -81,10 +81,10 @@ uiAutomator_version = "2.3.0"
 jacoco_version = "0.8.14"
 
 sonar_plugin_version = "7.2.3.7755"
-realm_version = "4.0.1"
-protobuf_plugin_version = "0.9.6"
+realm_version = "4.0.3"
+protobuf_plugin_version = "0.10.0"
 deps_graph_version = "0.8.0"
-tink_version = "1.20.0"
+tink_version = "1.21.0"
 desugar_jdk_libsVersion = "2.1.5"
 [libraries]
 
@@ -199,7 +199,7 @@ simmatcher = { module = "com.simprints:libsimmatcher", version.ref = "simmatcher
 # roc v1 sdk hosted in https://github.com/Simprints/lib-roc-wrapper
 roc-v1 = { module = "com.simprints:rocwrapper", version.ref = "roc_wrapper_version" }
 # roc v3 sdk hosted in https://github.com/Simprints/lib-roc-wrapper-v3
-roc-v3 = { module = "com.simprints:rocwrapper-v3", version.ref = "roc_wrapper-v3_version" }
+roc-v3 = { module = "com.simprints:roc-v3", version.ref = "roc_wrapper-v3_version" }
 # secugen sdk hosted in https://github.com/Simprints/secugen-wrapper
 secugen = { module = "com.simprints:secugenwrapper", version.ref = "secugen_version" }
 simface = { module = "com.simprints.biometrics:simface", version.ref = "simface" }
@@ -270,7 +270,6 @@ plugin-room = { group = "androidx.room", name = "room-gradle-plugin", version.re
 android-application = { id = "com.android.application", version.ref = "android_gradlePlugin_version" }
 android-library = { id = "com.android.library", version.ref = "android_gradlePlugin_version" }
 android-test = { id = "com.android.test", version.ref = "android_gradlePlugin_version" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin_version" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin_version" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp_version" }
 gms = { id = "com.google.gms.google-services", version.ref = "gsm_plugin_version" }

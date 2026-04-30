@@ -8,5 +8,5 @@ android {
 
 dependencies {
     implementation(project(":face:infra:base-bio-sdk"))
-    api(libs.simface)
+    implementation(libs.simface)
 }
