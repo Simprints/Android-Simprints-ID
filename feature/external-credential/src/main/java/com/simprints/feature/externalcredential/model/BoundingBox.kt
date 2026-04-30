@@ -18,6 +18,6 @@ data class BoundingBox(
     val bottom: Int,
 ) : JavaSerializable
 
-fun Rect.toBoundingBox(): BoundingBox = BoundingBox(left, top, right, bottom)
+fun Rect?.toBoundingBox(): BoundingBox = if (this == null) BoundingBox(0, 0, 0, 0) else BoundingBox(left, top, right, bottom)
 
 fun BoundingBox.toRect(): Rect = Rect(left, top, right, bottom)
