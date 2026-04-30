@@ -11,10 +11,6 @@ import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolAct
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolLastBiometricsActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.IdentifyRequestActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.VerifyActionFactory
-import com.simprints.feature.clientapi.mappers.response.LibSimprintsResponseMapper.Companion.HAS_CREDENTIAL
-import com.simprints.feature.clientapi.mappers.response.LibSimprintsResponseMapper.Companion.SCANNED_CREDENTIAL
-import com.simprints.feature.clientapi.mappers.response.LibSimprintsResponseMapper.Companion.SCANNED_CREDENTIAL_TYPE
-import com.simprints.feature.clientapi.mappers.response.LibSimprintsResponseMapper.Companion.SCANNED_CREDENTIAL_VALUE
 import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.libsimprints.Constants
@@ -139,7 +135,7 @@ class LibSimprintsResponseMapperTest {
     fun `correctly maps confirm response`() {
         val expectedValue = "expectedValue".asTokenizableRaw()
         val expectedType = ExternalCredentialType.NHISCard
-        val expectedJson = "{\"$SCANNED_CREDENTIAL_VALUE\":\"$expectedValue\",\"$SCANNED_CREDENTIAL_TYPE\":\"$expectedType\"}"
+        val expectedJson = """{"type":"$expectedType","value":"$expectedValue"}"""
         val extras = mapper(
             ActionResponse.ConfirmActionResponse(
                 actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
@@ -156,8 +152,8 @@ class LibSimprintsResponseMapperTest {
         assertThat(extras.getString(Constants.SIMPRINTS_DEVICE_ID)).isEqualTo("deviceId")
         assertThat(extras.getString(Constants.SIMPRINTS_APP_VERSION_NAME)).isEqualTo("appVersionName")
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
-        assertThat(extras.getBoolean(HAS_CREDENTIAL)).isTrue()
-        assertThat(extras.getString(SCANNED_CREDENTIAL)).isEqualTo(expectedJson)
+        assertThat(extras.getBoolean(Constants.SIMPRINTS_HAS_CREDENTIAL)).isTrue()
+        assertThat(extras.getString(Constants.SIMPRINTS_SCANNED_CREDENTIAL)).isEqualTo(expectedJson)
     }
 
     @Test
@@ -406,7 +402,7 @@ class LibSimprintsResponseMapperTest {
     fun `correctly maps enrol response with external credential`() {
         val expectedValue = "expectedValue".asTokenizableRaw()
         val expectedType = ExternalCredentialType.NHISCard
-        val expectedJson = "{\"$SCANNED_CREDENTIAL_VALUE\":\"$expectedValue\",\"$SCANNED_CREDENTIAL_TYPE\":\"$expectedType\"}"
+        val expectedJson = """{"type":"$expectedType","value":"$expectedValue"}"""
 
         val extras = mapper(
             ActionResponse.EnrolActionResponse(
@@ -421,8 +417,8 @@ class LibSimprintsResponseMapperTest {
             ),
         )
 
-        assertThat(extras.getBoolean(HAS_CREDENTIAL)).isTrue()
-        assertThat(extras.getString(SCANNED_CREDENTIAL)).isEqualTo(expectedJson)
+        assertThat(extras.getBoolean(Constants.SIMPRINTS_HAS_CREDENTIAL)).isTrue()
+        assertThat(extras.getString(Constants.SIMPRINTS_SCANNED_CREDENTIAL)).isEqualTo(expectedJson)
     }
 
     @Test
@@ -440,8 +436,8 @@ class LibSimprintsResponseMapperTest {
         assertThat(extras.getString(Constants.SIMPRINTS_DEVICE_ID)).isEqualTo("deviceId")
         assertThat(extras.getString(Constants.SIMPRINTS_APP_VERSION_NAME)).isEqualTo("appVersionName")
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
-        assertThat(extras.getBoolean(HAS_CREDENTIAL)).isFalse()
-        assertThat(extras.keySet()).doesNotContain(SCANNED_CREDENTIAL)
+        assertThat(extras.getBoolean(Constants.SIMPRINTS_HAS_CREDENTIAL)).isFalse()
+        assertThat(extras.keySet()).doesNotContain(Constants.SIMPRINTS_SCANNED_CREDENTIAL)
     }
 
     @Test
@@ -465,7 +461,9 @@ class LibSimprintsResponseMapperTest {
 
         val extras = mapper(
             ActionResponse.IdentifyActionResponse(
-                actionIdentifier = IdentifyRequestActionFactory.getIdentifier(),
+                actionIdentifier = IdentifyRequestActionFactory
+                    .getIdentifier()
+                    .copy(contractVersion = VersionsList.ADDED_EXTERNAL_CREDENTIALS),
                 sessionId = "sessionId",
                 identifications = listOf(identification1, identification2),
                 isMultiFactorIdEnabled = true,
@@ -484,7 +482,9 @@ class LibSimprintsResponseMapperTest {
         val guid = "guid"
         val extras = mapper(
             ActionResponse.IdentifyActionResponse(
-                actionIdentifier = IdentifyRequestActionFactory.getIdentifier(),
+                actionIdentifier = IdentifyRequestActionFactory
+                    .getIdentifier()
+                    .copy(contractVersion = VersionsList.ADDED_EXTERNAL_CREDENTIALS),
                 sessionId = "sessionId",
                 identifications = listOf(
                     AppMatchResult(
