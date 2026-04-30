@@ -149,7 +149,6 @@ mlkit-text-recognition = { module = "com.google.mlkit:text-recognition", version
 
 #Firebase
 firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebase_auth_version" }
-firebase-storage = { module = "com.google.firebase:firebase-storage", version.ref = "firebase_storage_version" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics", version.ref = "firebase_crashlytics_version" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics", version.ref = "firebase_analytics_version" }
 firebase-perf = { module = "com.google.firebase:firebase-perf", version.ref = "firebase_perf_version" }

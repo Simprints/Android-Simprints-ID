@@ -16,7 +16,6 @@ dependencies {
     implementation(project(":infra:events"))
 
     // Firebase
-    implementation(libs.firebase.storage)
     implementation(libs.firebase.auth)
 
     implementation(libs.androidX.security)
