@@ -4,6 +4,7 @@ import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.infra.matching.MatchResult
 import java.io.Serializable
 import javax.inject.Inject
@@ -12,6 +13,15 @@ import javax.inject.Inject
 internal class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
     operator fun invoke(results: List<Serializable>) = results.mapNotNull { result ->
         when (result) {
+            is ExternalCredentialSearchResult -> result.matchResults.takeUnless { it.isEmpty() }?.let { credentialMatches ->
+                EnrolLastBiometricStepResult.MatchResult(
+                    results = credentialMatches.map { credentialMatch ->
+                        ComparisonResult(credentialMatch.comparisonResult.subjectId, credentialMatch.comparisonResult.comparisonScore)
+                    },
+                    sdk = credentialMatches.first().bioSdk,
+                )
+            }
+
             is EnrolLastBiometricResult -> EnrolLastBiometricStepResult.EnrolLastBiometricsResult(result.newSubjectId)
 
             is BiometricReferenceCapture -> EnrolLastBiometricStepResult.CaptureResult(result)
