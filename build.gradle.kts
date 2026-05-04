@@ -38,7 +38,8 @@ tasks.withType(Test::class).configureEach {
 }
 
 // Kotlin 2.2.x generates class metadata with format version 2.3.0, but the kotlin-metadata-jvm
-// bundled in Hilt's annotation processor only supports up to 2.2.0. Since Hilt 2.57+ no longer
+// bundled in Hilt's annotation processor only supports up to 2.2.0.
+// Todo remove3 this once Hilt updates to a compatible version of kotlin-metadata-jvm
 allprojects {
     configurations.all {
         resolutionStrategy {
