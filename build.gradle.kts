@@ -36,3 +36,13 @@ https://docs.gradle.org/nightly/userguide/performance.html#suggestions_for_java_
 tasks.withType(Test::class).configureEach {
     maxParallelForks = Runtime.getRuntime().availableProcessors().div(2)
 }
+
+// Kotlin 2.2.x generates class metadata with format version 2.3.0, but the kotlin-metadata-jvm
+// bundled in Hilt's annotation processor only supports up to 2.2.0. Since Hilt 2.57+ no longer
+allprojects {
+    configurations.all {
+        resolutionStrategy {
+            force("org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.0")
+        }
+    }
+}
