@@ -2,6 +2,7 @@ package com.simprints.feature.alert.config
 
 import androidx.annotation.Keep
 import androidx.annotation.StringRes
+import com.simprints.core.domain.step.StepParams
 import com.simprints.feature.alert.AlertContract
 import kotlinx.serialization.Serializable
 import com.simprints.infra.resources.R as IDR
@@ -13,7 +14,7 @@ data class AlertButtonConfig(
     @StringRes val textRes: Int?,
     val resultKey: String?,
     val closeOnClick: Boolean,
-) {
+) : StepParams {
     companion object {
         val Close = AlertButtonConfig(
             text = null,
