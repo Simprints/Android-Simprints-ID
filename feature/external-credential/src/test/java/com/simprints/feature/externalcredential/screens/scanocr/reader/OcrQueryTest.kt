@@ -8,14 +8,12 @@ import org.junit.Before
 import org.junit.Test
 
 internal class OcrQueryTest {
-    private val noOpSubQuery: (OcrQuery) -> OcrLine? = { null }
-
     private lateinit var query: OcrQuery
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        query = OcrQuery(noOpSubQuery)
+        query = OcrQuery()
     }
 
     @Test
@@ -141,41 +139,45 @@ internal class OcrQueryTest {
     }
 
     @Test
-    fun `isBelow with block registers belowResolver`() {
+    fun `isBelow with block registers belowAnchor`() {
         query.isBelow { containsText("membership") }
-        assertThat(query.belowResolver).isNotNull()
+        assertThat(query.belowAnchor).isNotNull()
     }
 
     @Test
-    fun `isBelow with OcrLine registers belowResolver`() {
+    fun `isBelow with OcrLine registers belowAnchor`() {
         query.isBelow(mockk<OcrLine>(relaxed = true))
-        assertThat(query.belowResolver).isNotNull()
+        assertThat(query.belowAnchor).isNotNull()
     }
 
     @Test
-    fun `isAbove with block registers aboveResolver`() {
+    fun `isAbove with block registers aboveAnchor`() {
         query.isAbove { containsText("expiry") }
-        assertThat(query.aboveResolver).isNotNull()
+        assertThat(query.aboveAnchor).isNotNull()
     }
 
     @Test
-    fun `isAbove with OcrLine registers aboveResolver`() {
+    fun `isAbove with OcrLine registers aboveAnchor`() {
         query.isAbove(mockk<OcrLine>(relaxed = true))
-        assertThat(query.aboveResolver).isNotNull()
+        assertThat(query.aboveAnchor).isNotNull()
     }
 
     @Test
-    fun `isBelow with direct OcrLine resolver returns that line`() {
-        val anchor = line(id = 0, text = "anchor")
+    fun `isBelow with direct OcrLine stores id filter in anchor query`() {
+        val targetId = 17
+        val anchor = line(id = targetId, text = "anchor")
         query.isBelow(anchor)
-        assertThat(query.belowResolver?.invoke()).isEqualTo(anchor)
+        assertThat(query.belowAnchor?.filters?.all { it(line(id = targetId)) }).isTrue()
+        assertThat(query.belowAnchor?.filters?.all { it(line(id = 99)) }).isFalse()
     }
 
     @Test
-    fun `isAbove with direct OcrLine resolver returns that line`() {
-        val anchor = line(id = 0, text = "anchor")
+    fun `isAbove with direct OcrLine stores id filter in anchor query`() {
+        val targetId = 17
+        val anchor = line(id = targetId, text = "anchor")
         query.isAbove(anchor)
-        assertThat(query.aboveResolver?.invoke()).isEqualTo(anchor)
+        assertThat(query.aboveAnchor?.filters?.all { it(line(id = targetId)) }).isTrue()
+        assertThat(query.aboveAnchor?.filters?.all { it(line(id = 99)) }).isFalse()
     }
 
     private fun line(

@@ -22,14 +22,14 @@ internal class OcrReader(
      * The [block] receives an [OcrQuery] as its receiver — call filter methods directly
      * without any chaining or terminal call.
      */
-    fun find(block: OcrQuery.() -> Unit): OcrLine? = runQuery(OcrQuery(::runQuery).apply(block))
+    fun find(block: OcrQuery.() -> Unit): OcrLine? = runQuery(OcrQuery().apply(block))
 
-    private fun runQuery(scope: OcrQuery): OcrLine? {
-        val belowAnchor = scope.belowResolver?.invoke()
-        val aboveAnchor = scope.aboveResolver?.invoke()
+    private fun runQuery(query: OcrQuery): OcrLine? {
+        val belowAnchor = query.belowAnchor?.let { runQuery(it) }
+        val aboveAnchor = query.aboveAnchor?.let { runQuery(it) }
 
-        if (scope.belowResolver != null && belowAnchor == null) return null
-        if (scope.aboveResolver != null && aboveAnchor == null) return null
+        if (query.belowAnchor != null && belowAnchor == null) return null
+        if (query.aboveAnchor != null && aboveAnchor == null) return null
 
         return ocrText.allLines.firstOrNull { line ->
             val isBelowAnchor = belowAnchor == null || (
@@ -42,7 +42,7 @@ internal class OcrReader(
                     line.boundingBox.left >= aboveAnchor.boundingBox.left &&
                     line.boundingBox.left < aboveAnchor.boundingBox.right
             )
-            scope.filters.all { it(line) } && isBelowAnchor && isAboveAnchor
+            query.filters.all { it(line) } && isBelowAnchor && isAboveAnchor
         }
     }
 }
