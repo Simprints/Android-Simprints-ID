@@ -1,5 +1,6 @@
 package com.simprints.feature.clientapi.mappers.response
 
+import android.os.Bundle
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
@@ -12,6 +13,7 @@ import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolLas
 import com.simprints.feature.clientapi.mappers.request.requestFactories.IdentifyRequestActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.VerifyActionFactory
 import com.simprints.infra.orchestration.data.ActionResponse
+import com.simprints.infra.orchestration.data.responses.AppExternalCredential
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.contracts.VersionsList
@@ -89,6 +91,7 @@ class LibSimprintsResponseMapperTest {
                     ),
                 ),
                 isMultiFactorIdEnabled = false,
+                scannedCredential = null,
             ),
         )
 
@@ -117,6 +120,7 @@ class LibSimprintsResponseMapperTest {
                     ),
                 ),
                 isMultiFactorIdEnabled = false,
+                scannedCredential = null,
             ),
         )
 
@@ -467,6 +471,7 @@ class LibSimprintsResponseMapperTest {
                 sessionId = "sessionId",
                 identifications = listOf(identification1, identification2),
                 isMultiFactorIdEnabled = true,
+                scannedCredential = null,
             ),
         )
 
@@ -496,6 +501,7 @@ class LibSimprintsResponseMapperTest {
                     ),
                 ),
                 isMultiFactorIdEnabled = true,
+                scannedCredential = null,
             ),
         )
 
@@ -523,12 +529,83 @@ class LibSimprintsResponseMapperTest {
                     ),
                 ),
                 isMultiFactorIdEnabled = false,
+                scannedCredential = null,
             ),
         )
 
         assertThat(extras.getParcelableArrayList<LegacyIdentification>(Constants.SIMPRINTS_IDENTIFICATIONS)).containsExactly(
             LegacyIdentification(guid = guid, confidence = confidenceScore, tier = LegacyTier.TIER_2),
         )
+    }
+
+    @Test
+    fun `when MFID is enabled, identify response contains scanned credential`() {
+        val expectedValue = "expectedValue".asTokenizableRaw()
+        val expectedType = ExternalCredentialType.NHISCard
+        val expectedJson = """{"type":"$expectedType","value":"$expectedValue"}"""
+        val scannedCredential = mockk<AppExternalCredential> {
+            every { value } returns expectedValue
+            every { type } returns expectedType
+        }
+
+        val extras = mapper(
+            createIdentifyActionResponse(
+                isMultiFactorIdEnabled = true,
+                scannedCredential = scannedCredential,
+            ),
+        )
+
+        assertCommonMfidIdentifyFields(extras)
+        assertThat(extras.getString(Constants.SIMPRINTS_SCANNED_CREDENTIAL)).isEqualTo(expectedJson)
+    }
+
+    @Test
+    fun `when MFID is disabled, identify response does not contain credential`() {
+        val expectedValue = "expectedValue".asTokenizableRaw()
+        val expectedType = ExternalCredentialType.NHISCard
+        val scannedCredential = mockk<AppExternalCredential> {
+            every { value } returns expectedValue
+            every { type } returns expectedType
+        }
+
+        val extras = mapper(
+            createIdentifyActionResponse(
+                isMultiFactorIdEnabled = false,
+                scannedCredential = scannedCredential,
+            ),
+        )
+
+        assertCommonMfidIdentifyFields(extras)
+        assertThat(extras.keySet()).doesNotContain(Constants.SIMPRINTS_SCANNED_CREDENTIAL)
+    }
+
+    // Helper functions
+    private fun createIdentifyActionResponse(
+        sessionId: String = "sessionId",
+        isMultiFactorIdEnabled: Boolean,
+        scannedCredential: AppExternalCredential? = null,
+        identifications: List<AppMatchResult> = listOf(
+            AppMatchResult(
+                guid = "guid-1",
+                confidenceScore = 100,
+                matchConfidence = AppMatchConfidence.MEDIUM,
+                isLinkedToScannedCredential = true,
+                isCredentialVerified = true,
+            ),
+        ),
+    ) = ActionResponse.IdentifyActionResponse(
+        actionIdentifier = IdentifyRequestActionFactory.getIdentifier(),
+        sessionId = sessionId,
+        identifications = identifications,
+        isMultiFactorIdEnabled = isMultiFactorIdEnabled,
+        scannedCredential = scannedCredential,
+    )
+
+    private fun assertCommonMfidIdentifyFields(extras: Bundle) {
+        assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_DEVICE_ID)).isEqualTo("deviceId")
+        assertThat(extras.getString(Constants.SIMPRINTS_APP_VERSION_NAME)).isEqualTo("appVersionName")
+        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
     }
 
     private fun AppMatchResult.toResponseJson(): String {

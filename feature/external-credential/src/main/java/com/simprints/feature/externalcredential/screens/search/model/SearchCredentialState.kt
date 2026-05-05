@@ -5,6 +5,7 @@ import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.externalcredential.model.CredentialMatch
+import kotlin.Boolean
 
 @Keep
 @ExcludedFromGeneratedTestCoverageReports("Data struct")
@@ -14,6 +15,7 @@ internal data class SearchCredentialState(
     val flowType: FlowType,
     val searchState: SearchState,
     val isConfirmed: Boolean,
+    val isEditingCredential: Boolean,
 ) {
     companion object {
         fun buildInitial(
@@ -25,6 +27,7 @@ internal data class SearchCredentialState(
             flowType = flowType,
             searchState = SearchState.Searching,
             isConfirmed = false,
+            isEditingCredential = false,
         )
     }
 }

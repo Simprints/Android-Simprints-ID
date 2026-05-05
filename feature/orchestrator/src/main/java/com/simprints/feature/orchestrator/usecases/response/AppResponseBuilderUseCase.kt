@@ -29,13 +29,13 @@ internal class AppResponseBuilderUseCase @Inject constructor(
                 request = request,
                 results = results,
                 project = project,
-                enrolmentSubjectId = enrolmentSubjectId
+                enrolmentSubjectId = enrolmentSubjectId,
             )
         } else {
-            handleIdentify(projectConfiguration, results)
+            handleIdentify(projectConfiguration, project, results)
         }
 
-        is ActionRequest.IdentifyActionRequest -> handleIdentify(projectConfiguration, results)
+        is ActionRequest.IdentifyActionRequest -> handleIdentify(projectConfiguration, project, results)
         is ActionRequest.VerifyActionRequest -> handleVerify(projectConfiguration, results)
         is ActionRequest.ConfirmIdentityActionRequest -> handleConfirmIdentity(results)
         is ActionRequest.EnrolLastBiometricActionRequest -> handleEnrolLastBiometric(results)

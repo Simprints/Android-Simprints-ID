@@ -40,7 +40,7 @@ internal class AppResponseBuilderUseCaseTest {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
         coEvery { handleEnrolment.invoke(any(), any(), any(), any()) } returns mockk()
-        coEvery { handleIdentify.invoke(any(), any()) } returns mockk()
+        coEvery { handleIdentify.invoke(any(), any(), any()) } returns mockk()
         every { handleVerify.invoke(any(), any()) } returns mockk()
         every { handleConfirmIdentity.invoke(any()) } returns mockk()
         every { handleEnrolLastBiometric.invoke(any()) } returns mockk()
@@ -67,13 +67,13 @@ internal class AppResponseBuilderUseCaseTest {
     fun `Handles as identification for enrolment action with existing item`() = runTest {
         every { isNewEnrolment(any(), any()) } returns false
         useCase(mockk(), mockk<ActionRequest.EnrolActionRequest>(), mockk(), mockk(), enrolmentSubjectId)
-        coVerify { handleIdentify.invoke(any(), any()) }
+        coVerify { handleIdentify.invoke(any(), any(), any()) }
     }
 
     @Test
     fun `Handles as identification for identification action`() = runTest {
         useCase(mockk(), mockk<ActionRequest.IdentifyActionRequest>(), mockk(), mockk(), enrolmentSubjectId)
-        coVerify { handleIdentify.invoke(any(), any()) }
+        coVerify { handleIdentify.invoke(any(), any(), any()) }
     }
 
     @Test

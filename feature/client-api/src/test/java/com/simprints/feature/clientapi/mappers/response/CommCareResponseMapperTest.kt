@@ -61,6 +61,7 @@ class CommCareResponseMapperTest {
                     ),
                 ),
                 isMultiFactorIdEnabled = false,
+                scannedCredential = null,
             ),
         )
 
