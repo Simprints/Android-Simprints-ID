@@ -3,10 +3,12 @@ package com.simprints.feature.externalcredential.screens.search
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -59,7 +61,7 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
 
     @Inject
     lateinit var zoomOntoCredentialUseCase: ZoomOntoCredentialUseCase
-    private var isEditingCredential: Boolean = false
+    private var credentialTextWatcher: TextWatcher? = null
 
     override fun onViewCreated(
         view: View,
@@ -94,7 +96,9 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         val credentialType = state.scannedCredential.credentialType
         val credentialField = resources.getCredentialFieldTitle(credentialType)
         val currentEditTextValue = credentialEditText.text.toString()
+        val isEditingCredential = state.isEditingCredential
         renderImage(state.scannedCredential)
+        renderCredentialEdit(state)
         credential.takeIf { currentEditTextValue.isEmpty() }?.let {
             credentialEditText.setText(it) // Setting only once at the start
         }
@@ -104,18 +108,25 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         credentialValue.text = currentEditTextValue
         confirmCredentialCheckbox.isVisible = state.searchState != SearchState.Searching
         confirmCredentialCheckbox.text = getString(IDR.string.mfid_confirmation_checkbox_text, credentialField)
-        confirmCredentialCheckbox.isChecked = state.isConfirmed
+        confirmCredentialCheckbox.isChecked = state.isConfirmed && !state.isEditingCredential
+        confirmCredentialCheckbox.isEnabled = !state.isEditingCredential
 
         iconEditCredential.setOnClickListener {
-            viewModel.updateConfirmation(isConfirmed = false)
-            toggleCredentialEdit()
-            if (!isEditingCredential) {
-                viewModel.confirmCredentialUpdate(credentialEditText.text.toString().asTokenizableRaw())
+            if (isEditingCredential) {
+                viewModel.confirmCredentialUpdate(updatedCredential = credentialEditText.text.toString().asTokenizableRaw())
             }
+            viewModel.updateIsEditingCredential(isEditing = !isEditingCredential)
         }
         confirmCredentialCheckbox.setOnCheckedChangeListener { _, checkedId ->
             viewModel.updateConfirmation(isConfirmed = checkedId)
         }
+
+        credentialTextWatcher?.let(credentialEditText::removeTextChangedListener)
+        credentialTextWatcher = credentialEditText.addTextChangedListener(
+            afterTextChanged = { _ ->
+                renderEditIcon(isEditingCredential)
+            },
+        )
     }
 
     private fun renderSearchProgress(
@@ -198,7 +209,7 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         val isSearching = state.searchState != SearchState.Searching
         buttonRecapture.isVisible = isSearching
         buttonConfirm.isVisible = isSearching
-        buttonConfirm.isEnabled = state.isConfirmed
+        buttonConfirm.isEnabled = state.isConfirmed && !state.isEditingCredential
         viewModel.getButtonTextResource(state.searchState, state.flowType)?.run(buttonConfirm::setText)
         buttonConfirm.setOnClickListener {
             viewModel.finish(state)
@@ -226,8 +237,9 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         }
     }
 
-    private fun toggleCredentialEdit() = with(binding) {
-        isEditingCredential = !isEditingCredential
+    private fun renderCredentialEdit(state: SearchCredentialState) = with(binding) {
+        val isEditingCredential = state.isEditingCredential
+        renderEditIcon(isEditingCredential)
         val iconRes = if (isEditingCredential) {
             R.drawable.ic_done
         } else {
@@ -249,5 +261,15 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
 
     private fun hideKeyboard() {
         requireActivity().hideKeyboard()
+    }
+
+    private fun renderEditIcon(isEditingCredential: Boolean) = with(binding) {
+        val isEditIconEnabled = if (isEditingCredential) {
+            viewModel.isCredentialFormatValid(credentialEditText.text?.toString())
+        } else {
+            true
+        }
+        iconEditCredential.alpha = if (isEditIconEnabled) 1.0f else 0.5f
+        iconEditCredential.isEnabled = isEditIconEnabled
     }
 }

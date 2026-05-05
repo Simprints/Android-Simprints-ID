@@ -20,6 +20,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -40,6 +41,7 @@ import com.simprints.feature.externalcredential.screens.scanocr.usecase.ProvideC
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.uibase.camera.qrscan.CameraFocusManager
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.view.fadeIn
@@ -97,6 +99,9 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
 
     @Inject
     lateinit var provideCameraListenerUseCase: ProvideCameraListenerUseCase
+
+    @Inject
+    lateinit var cameraFocusManagerFactory: CameraFocusManager.Factory
 
     @Inject
     @DispatcherBG
@@ -210,6 +215,13 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             },
             onImageCaptureReady = { capture ->
                 imageCapture = capture
+            },
+            onCameraReady = { camera ->
+                if (lifecycle.currentState == Lifecycle.State.RESUMED) {
+                    val cameraFocusManager = cameraFocusManagerFactory.create(MULTI_FACTOR_ID)
+                    cameraFocusManager.setUpFocusOnTap(binding.preview, camera)
+                    cameraFocusManager.setUpAutoFocus(binding.preview, camera)
+                }
             },
         )
         cameraProviderFuture.addListener(cameraListener, ContextCompat.getMainExecutor(requireContext()))

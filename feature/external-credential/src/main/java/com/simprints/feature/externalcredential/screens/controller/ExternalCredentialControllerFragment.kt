@@ -39,7 +39,6 @@ internal class ExternalCredentialControllerFragment : Fragment(R.layout.fragment
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-
         viewModel.init(params)
 
         internalNavController?.setGraph(R.navigation.graph_external_credential_internal)
