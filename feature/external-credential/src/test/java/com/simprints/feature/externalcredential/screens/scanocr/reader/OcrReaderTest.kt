@@ -29,7 +29,6 @@ internal class OcrReaderTest {
 
         reader = OcrReader(
             OcrText(
-                blocks = emptyList(),
                 allLines = listOf(labelMembership, membershipValue, labelIssueDate, issueDateValue, labelExpiryDate, expiryDateValue),
             ),
         )

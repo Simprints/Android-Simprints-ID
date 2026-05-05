@@ -6,26 +6,11 @@ import com.simprints.feature.externalcredential.model.BoundingBox
 /**
  * Wrapper for all scanned text after the OCR
  *
- * @param blocks blocks of text, each containing multiple [OcrLine]
  * @param allLines all lines from blocks sorted by bounding box top coordinate ascending
  */
 @ExcludedFromGeneratedTestCoverageReports("Data class")
 internal data class OcrText(
-    val blocks: List<OcrBlock>,
     val allLines: List<OcrLine>,
-)
-
-/**
- * Representation of a single block detected by the OCR kit. A block can contain multiple lines that the OCR kit labeled as belonging to the
- * same paragraph of text.
- *
- * @param boundingBox coordinates of the block
- * @param lines nested lines of the block
- */
-@ExcludedFromGeneratedTestCoverageReports("Data class")
-internal data class OcrBlock(
-    val boundingBox: BoundingBox,
-    val lines: List<OcrLine>,
 )
 
 /**

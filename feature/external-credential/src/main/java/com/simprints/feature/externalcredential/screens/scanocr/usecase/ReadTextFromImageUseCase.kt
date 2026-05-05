@@ -8,7 +8,6 @@ import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.feature.externalcredential.model.toBoundingBox
-import com.simprints.feature.externalcredential.screens.scanocr.reader.OcrBlock
 import com.simprints.feature.externalcredential.screens.scanocr.reader.OcrLine
 import com.simprints.feature.externalcredential.screens.scanocr.reader.OcrText
 import javax.inject.Inject
@@ -28,29 +27,19 @@ internal class ReadTextFromImageUseCase @Inject constructor() {
     private fun build(mlKitText: Text): OcrText {
         var nextLineId = 0
 
-        val blocks = mlKitText.textBlocks.map { block ->
-            val lines = block.lines.map { line ->
-                OcrLine(
-                    id = nextLineId++,
-                    text = line.text.trim(),
-                    boundingBox = line.boundingBox.toBoundingBox(),
-                    blockBoundingBox = block.boundingBox.toBoundingBox(),
-                    confidence = line.confidence,
-                )
-            }
-            OcrBlock(
-                boundingBox = block.boundingBox.toBoundingBox(),
-                lines = lines,
-            )
-        }
+        val allLinesSorted = mlKitText.textBlocks
+            .flatMap { block ->
+                block.lines.map { line ->
+                    OcrLine(
+                        id = nextLineId++,
+                        text = line.text.trim(),
+                        boundingBox = line.boundingBox.toBoundingBox(),
+                        blockBoundingBox = block.boundingBox.toBoundingBox(),
+                        confidence = line.confidence,
+                    )
+                }
+            }.sortedBy { it.boundingBox.top }
 
-        val allLinesSorted = blocks
-            .flatMap { it.lines }
-            .sortedBy { it.boundingBox.top }
-
-        return OcrText(
-            blocks = blocks,
-            allLines = allLinesSorted,
-        )
+        return OcrText(allLines = allLinesSorted)
     }
 }

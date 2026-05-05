@@ -55,7 +55,7 @@ internal class GhanaNhisCardOcrSelectorUseCaseTest {
     }
 
     private fun buildReader(vararg lines: OcrLine) = OcrReader(
-        OcrText(blocks = emptyList(), allLines = lines.toList()),
+        OcrText(allLines = lines.toList()),
     )
 
     private fun line(

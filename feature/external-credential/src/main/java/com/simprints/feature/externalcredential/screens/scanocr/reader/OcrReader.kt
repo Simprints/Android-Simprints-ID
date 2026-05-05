@@ -21,6 +21,28 @@ internal class OcrReader(
      * Executes the query defined in [block] and returns the first matching [OcrLine], or null.
      * The [block] receives an [OcrQuery] as its receiver — call filter methods directly
      * without any chaining or terminal call.
+     *
+     * Usage:
+     * ```
+     * val reader = OcrReader(ocrText)
+     *
+     * val membershipNumber = reader.find {
+     *     matchesPattern(Regex("\\d{8}"))
+     *     isBelow { containsText("membership number") }
+     *     isAbove { containsText("expiry date") }
+     * }
+     * ```
+     *
+     * Only one level of nesting is supported. Spatial filters inside an anchor block are silently ignored.
+     * The following is NOT supported:
+     * ```
+     * reader.find {
+     *     isBelow {
+     *         isBelow { containsText("some major title") }  // ignored — has no effect
+     *         containsText("some subtitle")
+     *     }
+     * }
+     * ```
      */
     fun find(block: OcrQuery.() -> Unit): OcrLine? = runQuery(OcrQuery().apply(block))
 
