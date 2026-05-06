@@ -2,14 +2,14 @@ package com.simprints.feature.enrollast.screen
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 
 @ExcludedFromGeneratedTestCoverageReports("Data class")
 internal sealed class EnrolLastState {
     @ExcludedFromGeneratedTestCoverageReports("Data class")
     data class Success(
         val newGuid: String,
-        val externalCredential: ExternalCredential?,
+        val credentialSearchResult: ExternalCredentialSearchResult.Complete?,
     ) : EnrolLastState()
 
     @ExcludedFromGeneratedTestCoverageReports("Data class")

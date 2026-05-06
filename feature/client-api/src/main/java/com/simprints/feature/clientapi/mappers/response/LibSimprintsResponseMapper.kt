@@ -14,8 +14,8 @@ import com.simprints.libsimprints.contracts.data.Enrolment
 import com.simprints.libsimprints.contracts.data.Identification
 import com.simprints.libsimprints.contracts.data.Identification.Companion.toJson
 import com.simprints.libsimprints.contracts.data.RefusalForm
-import com.simprints.libsimprints.contracts.data.ScannedCredential
 import com.simprints.libsimprints.contracts.data.Verification
+import org.json.JSONObject
 import javax.inject.Inject
 import com.simprints.libsimprints.Identification as LegacyIdentification
 import com.simprints.libsimprints.RefusalForm as LegacyRefusalForm
@@ -165,10 +165,16 @@ internal class LibSimprintsResponseMapper @Inject constructor(
 
     private fun Bundle.appendExternalCredential(credential: AppExternalCredential?) = apply {
         credential?.let {
-            putString(
-                Constants.SIMPRINTS_SCANNED_CREDENTIAL,
-                ScannedCredential(it.type.name, it.value.value).toJson(),
-            )
+            val documentFields = JSONObject().apply {
+                it.nonCredentialFields.forEach { (key, value) -> put(key, value) }
+            }
+            val credentialJson = JSONObject()
+                .apply {
+                    put(SCANNED_CREDENTIAL_TYPE, it.type.name)
+                    put(SCANNED_CREDENTIAL_VALUE, it.value.value)
+                    put(SCANNED_CREDENTIAL_DOCUMENT_FIELDS, documentFields)
+                }.toString()
+            putString(Constants.SIMPRINTS_SCANNED_CREDENTIAL, credentialJson)
         }
     }
 
@@ -208,5 +214,8 @@ internal class LibSimprintsResponseMapper @Inject constructor(
 
     companion object {
         internal const val RESULT_CODE_OVERRIDE = "result_code_override"
+        internal const val SCANNED_CREDENTIAL_VALUE = "value"
+        internal const val SCANNED_CREDENTIAL_TYPE = "type"
+        internal const val SCANNED_CREDENTIAL_DOCUMENT_FIELDS = "documentFields"
     }
 }

@@ -190,7 +190,7 @@ internal class IsNewEnrolmentUseCaseTest {
             useCase(
                 projectConfiguration,
                 listOf(
-                    mockk<ExternalCredentialSearchResult> {
+                    mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
                         every { matchResults } returns credentialMatches
                     },
                 ),

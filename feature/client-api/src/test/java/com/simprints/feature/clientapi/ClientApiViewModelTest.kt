@@ -5,10 +5,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.os.bundleOf
 import androidx.test.ext.junit.runners.*
 import com.jraska.livedata.test
-import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
@@ -21,13 +18,12 @@ import com.simprints.feature.clientapi.usecases.GetEnrolmentCreationEventForReco
 import com.simprints.feature.clientapi.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.usecases.SimpleEventReporter
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
+import com.simprints.infra.orchestration.data.responses.AppExternalCredential
 import com.simprints.logging.persistent.PersistentLogger
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -109,7 +105,6 @@ internal class ClientApiViewModelTest {
             configRepository = configRepository,
             timeHelper = timeHelper,
             persistentLogger = persistentLogger,
-            tokenizationProcessor = tokenizationProcessor,
         )
     }
 
@@ -276,49 +271,24 @@ internal class ClientApiViewModelTest {
     }
 
     @Test
-    fun `handleEnrolResponse with externalCredential decrypts and includes it in response`() = runTest {
+    fun `handleEnrolResponse with externalCredential includes it in response`() = runTest {
         val mockGuid = "mockGuid"
         val expectedCredentialId = "credentialId"
         val expectedType = ExternalCredentialType.NHISCard
         val credential = mockExternalCredential(expectedCredentialId, expectedType)
-        val project = mockk<Project>(relaxed = true)
-        setupDecryption(project, "decrypted-value".asTokenizableRaw())
+        val slot = slot<ActionResponse>()
+        every { resultMapper.invoke(capture(slot)) } returns mockk()
 
         viewModel.handleEnrolResponse(mockRequest(), mockEnrolResponseWithCredential(mockGuid, credential))
 
-        verify {
-            resultMapper.invoke(
-                match<ActionResponse.EnrolActionResponse> {
-                    it.externalCredential?.id == expectedCredentialId &&
-                        it.externalCredential?.type == expectedType
-                },
-            )
-        }
-    }
-
-    @Test
-    fun `handleEnrolResponse with externalCredential but encrypted decryption returns null credential`() = runTest {
-        val mockGuid = "mockGuid"
-        val expectedCredentialId = "credentialId"
-        val expectedType = ExternalCredentialType.NHISCard
-        val credential = mockExternalCredential(expectedCredentialId, expectedType)
-        val project = mockk<Project>(relaxed = true)
-        setupDecryption(project, mockk<TokenizableString.Tokenized>())
-
-        viewModel.handleEnrolResponse(mockRequest(), mockEnrolResponseWithCredential(mockGuid, credential))
-
-        verify {
-            resultMapper.invoke(
-                match<ActionResponse.EnrolActionResponse> {
-                    it.externalCredential == null
-                },
-            )
-        }
+        val captured = slot.captured as ActionResponse.EnrolActionResponse
+        assert(captured.externalCredential?.id == expectedCredentialId)
+        assert(captured.externalCredential?.type == expectedType)
     }
 
     private fun mockEnrolResponseWithCredential(
         mockGuid: String,
-        credential: ExternalCredential?,
+        credential: AppExternalCredential?,
     ): AppEnrolResponse = mockk {
         every { guid } returns mockGuid
         every { externalCredential } returns credential
@@ -327,24 +297,10 @@ internal class ClientApiViewModelTest {
     private fun mockExternalCredential(
         mockId: String,
         mockType: ExternalCredentialType,
-    ): ExternalCredential = mockk {
+    ): AppExternalCredential = mockk {
         every { id } returns mockId
         every { value } returns mockk()
         every { type } returns mockType
-    }
-
-    private fun setupDecryption(
-        project: Project,
-        returnValue: TokenizableString,
-    ) {
-        coEvery { configRepository.getProject() } returns project
-        every {
-            tokenizationProcessor.decrypt(
-                encrypted = any(),
-                tokenKeyType = TokenKeyType.ExternalCredential,
-                project = project,
-            )
-        } returns returnValue
     }
 
     private fun mockRequest(): ActionRequest = mockk {

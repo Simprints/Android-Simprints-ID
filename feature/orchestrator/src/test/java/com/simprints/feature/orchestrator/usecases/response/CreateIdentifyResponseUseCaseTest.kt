@@ -10,7 +10,6 @@ import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.matching.MatchResult
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
@@ -26,9 +25,6 @@ class CreateIdentifyResponseUseCaseTest {
     lateinit var eventRepository: SessionEventRepository
 
     @MockK
-    lateinit var tokenizationProcessor: TokenizationProcessor
-
-    @MockK
     lateinit var project: Project
 
     private lateinit var useCase: CreateIdentifyResponseUseCase
@@ -39,7 +35,7 @@ class CreateIdentifyResponseUseCaseTest {
 
         coEvery { eventRepository.getCurrentSessionScope().id } returns "sessionId"
 
-        useCase = CreateIdentifyResponseUseCase(eventRepository, tokenizationProcessor)
+        useCase = CreateIdentifyResponseUseCase(eventRepository)
     }
 
     @Test
@@ -262,9 +258,8 @@ class CreateIdentifyResponseUseCaseTest {
                 every { fingerprint?.secugenSimMatcher?.verificationMatchThreshold } returns 0.0f
             },
             results = listOf(
-                mockk<ExternalCredentialSearchResult> {
+                mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
                     every { matchResults } returns faceMatches + fingerprintMatches
-                    every { scannedCredential } returns null
                 },
             ),
             project = project,
@@ -317,9 +312,8 @@ class CreateIdentifyResponseUseCaseTest {
                 every { fingerprint?.secugenSimMatcher?.verificationMatchThreshold } returns 0.0f
             },
             results = listOf(
-                mockk<ExternalCredentialSearchResult> {
+                mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
                     every { matchResults } returns fingerprintMatches + faceMatches
-                    every { scannedCredential } returns null
                 },
             ),
             project = project,
@@ -355,9 +349,8 @@ class CreateIdentifyResponseUseCaseTest {
                 every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns null
             },
             results = listOf(
-                mockk<ExternalCredentialSearchResult> {
+                mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
                     every { matchResults } returns credentialFaceMatches
-                    every { scannedCredential } returns null
                 },
                 MatchResult(
                     listOf(ComparisonResult(subjectId = sharedGuid, comparisonScore = faceConfidence)),
@@ -398,9 +391,8 @@ class CreateIdentifyResponseUseCaseTest {
                 every { fingerprint?.secugenSimMatcher?.verificationMatchThreshold } returns 0.0f
             },
             results = listOf(
-                mockk<ExternalCredentialSearchResult> {
+                mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
                     every { matchResults } returns credentialFingerprintMatches
-                    every { scannedCredential } returns null
                 },
                 MatchResult(
                     listOf(ComparisonResult(subjectId = sharedGuid, comparisonScore = fingerprintConfidence)),
@@ -470,9 +462,8 @@ class CreateIdentifyResponseUseCaseTest {
                 every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns null
             },
             results = listOf(
-                mockk<ExternalCredentialSearchResult> {
+                mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
                     every { matchResults } returns credentialFaceMatches
-                    every { scannedCredential } returns null
                 },
                 faceMatchResults,
             ),
@@ -495,12 +486,10 @@ class CreateIdentifyResponseUseCaseTest {
     }
 
     @Test
-    fun `Returns scanned credential when decryption succeeds`() = runTest {
+    fun `Returns scanned credential when credential search result is present`() = runTest {
         val id = "id"
         val type = ExternalCredentialType.NHISCard
-        val expectedDecrypted = "expectedDecrypted".asTokenizableRaw()
-
-        every { tokenizationProcessor.decrypt(any(), any(), any()) } returns expectedDecrypted
+        val confirmedCredential = "expectedValue".asTokenizableRaw()
 
         val result = useCase(
             mockk {
@@ -510,12 +499,12 @@ class CreateIdentifyResponseUseCaseTest {
                 every { fingerprint?.getSdkConfiguration(any())?.decisionPolicy } returns null
             },
             results = listOf(
-                mockk<ExternalCredentialSearchResult> {
+                mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
                     every { matchResults } returns emptyList()
-                    every { scannedCredential } returns mockk {
+                    every { this@mockk.confirmedCredential } returns confirmedCredential
+                    every { scannedCredentialResult } returns mockk(relaxed = true) {
                         every { credentialScanId } returns id
                         every { credentialType } returns type
-                        every { credential } returns mockk()
                     }
                 },
             ),
@@ -525,7 +514,7 @@ class CreateIdentifyResponseUseCaseTest {
         assertThat((result as AppIdentifyResponse).scannedCredential).isNotNull()
         assertThat(result.scannedCredential?.id).isEqualTo(id)
         assertThat(result.scannedCredential?.type).isEqualTo(type)
-        assertThat(result.scannedCredential?.value).isEqualTo(expectedDecrypted)
+        assertThat(result.scannedCredential?.value).isEqualTo(confirmedCredential)
     }
 
     private fun createFaceMatchResult(vararg confidences: Float): Serializable = MatchResult(

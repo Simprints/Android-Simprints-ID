@@ -18,7 +18,7 @@ internal class IsNewEnrolmentUseCase @Inject constructor() {
     ): Boolean {
         val hasCredentialMatchResults =
             results
-                .filterIsInstance<ExternalCredentialSearchResult>()
+                .filterIsInstance<ExternalCredentialSearchResult.Complete>()
                 .firstOrNull()
                 ?.matchResults
                 ?.isNotEmpty() ?: false

@@ -14,6 +14,5 @@ sealed class ScanQrState {
         val scanStartTime: Timestamp,
         val scanEndTime: Timestamp,
         val qrCode: TokenizableString.Raw,
-        val qrCodeEncrypted: TokenizableString.Tokenized,
     ) : ScanQrState()
 }

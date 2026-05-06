@@ -10,8 +10,8 @@ import kotlin.Boolean
 @Keep
 @ExcludedFromGeneratedTestCoverageReports("Data struct")
 internal data class SearchCredentialState(
-    val scannedCredential: ScannedCredential,
-    val displayedCredential: TokenizableString.Raw?,
+    val scannedCredentialResult: ScannedCredentialResult,
+    val displayedCredential: TokenizableString.Raw,
     val flowType: FlowType,
     val searchState: SearchState,
     val isConfirmed: Boolean,
@@ -19,11 +19,11 @@ internal data class SearchCredentialState(
 ) {
     companion object {
         fun buildInitial(
-            scannedCredential: ScannedCredential,
+            scannedCredentialResult: ScannedCredentialResult,
             flowType: FlowType,
         ) = SearchCredentialState(
-            scannedCredential = scannedCredential,
-            displayedCredential = null,
+            scannedCredentialResult = scannedCredentialResult,
+            displayedCredential = scannedCredentialResult.credential,
             flowType = flowType,
             searchState = SearchState.Searching,
             isConfirmed = false,

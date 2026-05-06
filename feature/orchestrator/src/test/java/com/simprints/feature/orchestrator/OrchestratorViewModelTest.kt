@@ -18,7 +18,7 @@ import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
 import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
@@ -405,7 +405,7 @@ internal class OrchestratorViewModelTest {
             userId = TokenizableString.Tokenized("userId"),
             moduleId = TokenizableString.Tokenized("moduleId"),
             steps = listOf(mockk<EnrolLastBiometricStepResult>()),
-            scannedCredential = null,
+            credentialSearchResult = null,
         )
         coEvery { stepsBuilder.build(any(), any(), any(), any()) } returns listOf(
             captureStep,
@@ -481,7 +481,7 @@ internal class OrchestratorViewModelTest {
 
     @Test
     fun `Removes matcher steps when external credential search has good matches in identify flow`() = runTest {
-        val externalCredentialResult = mockk<ExternalCredentialSearchResult> {
+        val externalCredentialResult = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
             every { flowType } returns FlowType.IDENTIFY
             every { goodMatches } returns listOf(mockk())
         }
@@ -505,7 +505,7 @@ internal class OrchestratorViewModelTest {
 
     @Test
     fun `Does not remove matcher steps when flow type is enrol even with good matches`() = runTest {
-        val externalCredentialResult = mockk<ExternalCredentialSearchResult> {
+        val externalCredentialResult = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
             every { flowType } returns FlowType.ENROL
             every { goodMatches } returns listOf(mockk())
         }
@@ -527,10 +527,7 @@ internal class OrchestratorViewModelTest {
 
     @Test
     fun `Passes cached scanned credential to steps builder when external credential step exists in cache`() = runTest {
-        val mockScannedCredential = mockk<ScannedCredential>(relaxed = true)
-        val externalCredentialResult = mockk<ExternalCredentialSearchResult> {
-            every { scannedCredential } returns mockScannedCredential
-        }
+        val externalCredentialResult = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true)
 
         val externalCredentialStep = createMockStep(StepId.EXTERNAL_CREDENTIAL).apply {
             status = StepStatus.COMPLETED
@@ -554,7 +551,7 @@ internal class OrchestratorViewModelTest {
                 action = any(),
                 projectConfiguration = any(),
                 enrolmentSubjectId = any(),
-                cachedScannedCredential = mockScannedCredential,
+                cachedCredentialSearchResult = externalCredentialResult,
             )
         }
     }

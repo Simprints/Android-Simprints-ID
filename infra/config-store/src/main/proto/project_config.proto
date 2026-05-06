@@ -26,6 +26,21 @@ enum ProtoExternalCredentialType {
 
 message ProtoMultiFactorIdConfiguration {
     repeated ProtoExternalCredentialType allowed_external_credentials = 1;
+    optional ProtoGhanaIdCardConfig ghana_id_card_config = 2;
+    optional ProtoNhisCardConfig nhis_card_config = 3;
+    optional ProtoQrCodeConfig qr_code_config = 4;
+}
+
+message ProtoGhanaIdCardConfig {
+    bool is_capturing_all_fields = 1;
+}
+
+message ProtoNhisCardConfig {
+    bool is_capturing_all_fields = 1;
+}
+
+message ProtoQrCodeConfig {
+    // Empty, reserved for future configuration
 }
 
 message ProtoGeneralConfiguration {

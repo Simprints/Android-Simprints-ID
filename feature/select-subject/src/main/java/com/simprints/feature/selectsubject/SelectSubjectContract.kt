@@ -1,6 +1,6 @@
 package com.simprints.feature.selectsubject
 
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 
 object SelectSubjectContract {
     val DESTINATION = R.id.selectSubjectFragment
@@ -8,6 +8,6 @@ object SelectSubjectContract {
     fun getParams(
         projectId: String,
         subjectId: String,
-        scannedCredential: ScannedCredential?
-    ) = SelectSubjectParams(projectId, subjectId, scannedCredential)
+        scannedCredentialResult: ExternalCredentialSearchResult.Complete?,
+    ) = SelectSubjectParams(projectId, subjectId, scannedCredentialResult)
 }

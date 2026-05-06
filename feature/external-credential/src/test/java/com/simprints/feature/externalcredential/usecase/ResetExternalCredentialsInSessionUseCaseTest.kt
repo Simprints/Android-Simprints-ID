@@ -1,11 +1,12 @@
 package com.simprints.feature.externalcredential.usecase
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.*
+import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
-import com.simprints.core.tools.time.Timestamp
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.ExternalCredentialMapper
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
@@ -14,8 +15,13 @@ import com.simprints.infra.events.event.domain.models.EnrolmentUpdateEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.clearMocks
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.slot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -39,10 +45,22 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
     lateinit var project: Project
 
     @MockK
-    lateinit var scannedCredential: ScannedCredential
+    lateinit var eventRepository: SessionEventRepository
 
     @MockK
-    lateinit var eventRepository: SessionEventRepository
+    lateinit var externalCredentialMapper: ExternalCredentialMapper
+
+    @MockK
+    lateinit var credentialSearchResult: ExternalCredentialSearchResult.Complete
+
+    @MockK
+    lateinit var mappedCredential: ExternalCredential
+
+    @MockK
+    lateinit var enrolmentUpdateEvent: EnrolmentUpdateEvent
+
+    @MockK
+    lateinit var otherEvent: ExternalCredentialSelectionEvent
 
     private lateinit var useCase: ResetExternalCredentialsInSessionUseCase
 
@@ -52,138 +70,199 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
 
         coEvery { configRepository.getProject() } returns project
 
+        coEvery {
+            externalCredentialMapper.mapExternalCredential(
+                searchResult = credentialSearchResult,
+                subjectId = SUBJECT_ID,
+            )
+        } returns mappedCredential
+
+        every { enrolmentUpdateEvent.payload.subjectId } returns PREVIOUS_SUBJECT_ID
+        every { enrolmentUpdateEvent.payload.externalCredentialIdsToAdd } returns
+            listOf(PREVIOUS_CREDENTIAL_ID)
+
+        every { mappedCredential.id } returns SCAN_ID
+        every { mappedCredential.subjectId } returns SUBJECT_ID
+        every { mappedCredential.type } returns CREDENTIAL_TYPE
+        every { mappedCredential.value } returns ENCRYPTED_CREDENTIAL
+
         useCase = ResetExternalCredentialsInSessionUseCase(
             enrolmentRecordRepository = enrolmentRecordRepository,
             configRepository = configRepository,
             eventRepository = eventRepository,
+            credentialMapper = externalCredentialMapper,
             sessionCoroutineScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
-        every { scannedCredential.credential } returns CREDENTIAL
-        every { scannedCredential.credentialType } returns CREDENTIAL_TYE
     }
 
     @Test
     fun `invokes enrolment repository with correct update action`() = runTest {
         coEvery { eventRepository.getEventsInCurrentSession() } returns emptyList()
 
-        useCase(scannedCredential, SUBJECT_ID)
+        useCase(
+            credentialSearchResult = credentialSearchResult,
+            subjectId = SUBJECT_ID,
+        )
 
-        val actionsSlot = slot<List<EnrolmentRecordAction>>()
-        coVerify { enrolmentRecordRepository.performActions(capture(actionsSlot), project) }
-
-        val actions = actionsSlot.captured
+        val actions = captureActions()
         assertThat(actions).hasSize(1)
         val updateAction = actions.first() as EnrolmentRecordAction.Update
         assertThat(updateAction.subjectId).isEqualTo(SUBJECT_ID)
-        assertThat(updateAction.externalCredentialsToAdd).hasSize(1)
+        assertThat(updateAction.externalCredentialsToAdd)
+            .containsExactly(mappedCredential)
         assertThat(updateAction.samplesToAdd).isEmpty()
         assertThat(updateAction.referenceIdsToRemove).isEmpty()
     }
 
     @Test
-    fun `adds correct external credential to subject`() = runTest {
-        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf()
+    fun `uses mapped external credential from mapper`() = runTest {
+        coEvery { eventRepository.getEventsInCurrentSession() } returns emptyList()
 
-        useCase(scannedCredential, SUBJECT_ID)
+        useCase(
+            credentialSearchResult = credentialSearchResult,
+            subjectId = SUBJECT_ID,
+        )
 
-        val actionsSlot = slot<List<EnrolmentRecordAction>>()
-        coVerify { enrolmentRecordRepository.performActions(capture(actionsSlot), project) }
-
-        val updateAction = actionsSlot.captured.first() as EnrolmentRecordAction.Update
-        val addedCredential = updateAction.externalCredentialsToAdd.first()
-        assertThat(addedCredential.value).isEqualTo(CREDENTIAL)
-        assertThat(addedCredential.type).isEqualTo(CREDENTIAL_TYE)
+        val actions = captureActions()
+        val updateAction = actions.first() as EnrolmentRecordAction.Update
+        assertThat(updateAction.externalCredentialsToAdd)
+            .containsExactly(mappedCredential)
+        coVerify(exactly = 1) {
+            externalCredentialMapper.mapExternalCredential(
+                searchResult = credentialSearchResult,
+                subjectId = SUBJECT_ID,
+            )
+        }
     }
 
     @Test
     fun `handles missing project`() = runTest {
         clearMocks(configRepository)
+
         coEvery { configRepository.getProject() } returns null
-        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf()
-
-        useCase(scannedCredential, SUBJECT_ID)
-
-        coVerify(exactly = 0) { enrolmentRecordRepository.performActions(any(), any()) }
-    }
-
-    @Test
-    fun `removes correct external credential to subject`() = runTest {
-        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
-            enrolmentUpdateEvent("subject-1", listOf("credentia-1")),
-        )
+        coEvery { eventRepository.getEventsInCurrentSession() } returns emptyList()
 
         useCase(
-            scannedCredential = scannedCredential,
+            credentialSearchResult = credentialSearchResult,
             subjectId = SUBJECT_ID,
         )
 
-        val actionsSlot = slot<List<EnrolmentRecordAction>>()
-        coVerify { enrolmentRecordRepository.performActions(capture(actionsSlot), project) }
+        coVerify(exactly = 0) {
+            enrolmentRecordRepository.performActions(any(), any())
+        }
+    }
 
-        // Remove actions come first
-        val removeAction = actionsSlot.captured.first() as EnrolmentRecordAction.Update
-        assertThat(removeAction.subjectId).isEqualTo("subject-1")
+    @Test
+    fun `removes correct external credential from previously linked subject`() = runTest {
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
+            enrolmentUpdateEvent,
+        )
+
+        useCase(
+            credentialSearchResult = credentialSearchResult,
+            subjectId = SUBJECT_ID,
+        )
+
+        val actions = captureActions()
+        val removeAction = actions.first() as EnrolmentRecordAction.Update
+        assertThat(removeAction.subjectId).isEqualTo(PREVIOUS_SUBJECT_ID)
         assertThat(removeAction.externalCredentialsToAdd).isEmpty()
-        assertThat(removeAction.externalCredentialIdsToRemove).containsExactly("credentia-1")
-        // Additions come after
-        val addAction = actionsSlot.captured.last() as EnrolmentRecordAction.Update
-        assertThat(addAction.externalCredentialsToAdd).isNotEmpty()
+        assertThat(removeAction.externalCredentialIdsToRemove)
+            .containsExactly(PREVIOUS_CREDENTIAL_ID)
+        val addAction = actions.last() as EnrolmentRecordAction.Update
+        assertThat(addAction.externalCredentialsToAdd)
+            .containsExactly(mappedCredential)
         assertThat(addAction.externalCredentialIdsToRemove).isEmpty()
     }
 
     @Test
     fun `remove existing update events in the session`() = runTest {
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
-            otherEvent(),
-            enrolmentUpdateEvent("subject-1", listOf("credentia-1")),
-            otherEvent(),
+            otherEvent,
+            enrolmentUpdateEvent,
+            otherEvent,
         )
 
         useCase(
-            scannedCredential = scannedCredential,
+            credentialSearchResult = credentialSearchResult,
             subjectId = SUBJECT_ID,
         )
 
-        coEvery { eventRepository.deleteEvents(match { it.size == 1 }) }
+        coVerify {
+            eventRepository.deleteEvents(match { it.size == 1 })
+        }
     }
 
     @Test
-    fun `does not add credentials to any subject if no subjectID`() = runTest {
+    fun `does not add credentials when subjectId is not a valid UUID`() = runTest {
+        coEvery { eventRepository.getEventsInCurrentSession() } returns emptyList()
+
         useCase(
-            scannedCredential = scannedCredential,
-            subjectId = "none_selected",
+            credentialSearchResult = credentialSearchResult,
+            subjectId = INVALID_SUBJECT_ID,
         )
 
-        val actionsSlot = slot<List<EnrolmentRecordAction>>()
-        coVerify { enrolmentRecordRepository.performActions(capture(actionsSlot), project) }
-
-        assertThat(actionsSlot.captured).isEmpty()
+        val actions = captureActions()
+        assertThat(actions).isEmpty()
+        coVerify(exactly = 0) {
+            externalCredentialMapper.mapExternalCredential(any(), any())
+        }
     }
 
     @Test
     fun `retrieves project using correct project id`() = runTest {
-        useCase(scannedCredential, SUBJECT_ID)
+        coEvery { eventRepository.getEventsInCurrentSession() } returns emptyList()
+
+        useCase(
+            credentialSearchResult = credentialSearchResult,
+            subjectId = SUBJECT_ID,
+        )
+
         coVerify { configRepository.getProject() }
     }
 
-    private fun enrolmentUpdateEvent(
-        subjectId: String,
-        credentialIds: List<String>,
-    ) = EnrolmentUpdateEvent(
-        createdAt = Timestamp(0L),
-        subjectId = subjectId,
-        externalCredentialIdsToAdd = credentialIds,
-    )
+    @Test
+    fun `invokes with null credentialSearchResult only removes existing links`() = runTest {
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
+            enrolmentUpdateEvent,
+        )
 
-    private fun otherEvent() = ExternalCredentialSelectionEvent(
-        Timestamp(0L),
-        Timestamp(1L),
-        CREDENTIAL_TYE,
-    )
+        useCase(
+            credentialSearchResult = null,
+            subjectId = SUBJECT_ID,
+        )
+
+        val actions = captureActions()
+        assertThat(actions).hasSize(1)
+        val removeAction = actions.first() as EnrolmentRecordAction.Update
+        assertThat(removeAction.subjectId).isEqualTo(PREVIOUS_SUBJECT_ID)
+        assertThat(removeAction.externalCredentialIdsToRemove)
+            .containsExactly(PREVIOUS_CREDENTIAL_ID)
+        coVerify(exactly = 0) {
+            externalCredentialMapper.mapExternalCredential(any(), any())
+        }
+    }
+
+    private fun captureActions(): List<EnrolmentRecordAction> {
+        val actionsSlot = slot<List<EnrolmentRecordAction>>()
+
+        coVerify {
+            enrolmentRecordRepository.performActions(capture(actionsSlot), project)
+        }
+
+        return actionsSlot.captured
+    }
 
     companion object {
         private const val SUBJECT_ID = "bbaa8ff3-34f7-41d3-a6c9-ff3b952d832e"
-        private val CREDENTIAL = "credential".asTokenizableEncrypted()
-        private val CREDENTIAL_TYE = ExternalCredentialType.NHISCard
+        private const val INVALID_SUBJECT_ID = "none_selected"
+        private const val PREVIOUS_SUBJECT_ID = "subject-1"
+        private const val PREVIOUS_CREDENTIAL_ID = "credential-1"
+        private const val SCAN_ID = "scan-id"
+
+        private val ENCRYPTED_CREDENTIAL =
+            "encrypted_credential".asTokenizableEncrypted()
+
+        private val CREDENTIAL_TYPE = ExternalCredentialType.NHISCard
     }
 }

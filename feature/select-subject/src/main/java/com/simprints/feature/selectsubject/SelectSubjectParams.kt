@@ -2,7 +2,7 @@ package com.simprints.feature.selectsubject
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.step.StepParams
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -12,5 +12,5 @@ import kotlinx.serialization.Serializable
 data class SelectSubjectParams(
     val projectId: String,
     val subjectId: String,
-    val scannedCredential: ScannedCredential?,
+    val credentialSearchResult: ExternalCredentialSearchResult.Complete?,
 ) : StepParams

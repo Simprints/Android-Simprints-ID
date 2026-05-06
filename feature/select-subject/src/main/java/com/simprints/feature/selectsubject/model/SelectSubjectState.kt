@@ -3,7 +3,7 @@ package com.simprints.feature.selectsubject.model
 import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 
 @Keep
 @ExcludedFromGeneratedTestCoverageReports("Data struct")
@@ -13,7 +13,7 @@ internal sealed class SelectSubjectState {
     data object SavingExternalCredential : SelectSubjectState()
 
     data class CredentialDialogDisplayed(
-        val scannedCredential: ScannedCredential,
+        val scannedCredentialResult: ScannedCredentialResult,
         val displayedCredential: TokenizableString.Raw,
     ) : SelectSubjectState()
 

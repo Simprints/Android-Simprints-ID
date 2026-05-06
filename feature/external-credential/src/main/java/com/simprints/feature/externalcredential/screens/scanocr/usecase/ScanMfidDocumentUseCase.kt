@@ -1,9 +1,10 @@
 package com.simprints.feature.externalcredential.screens.scanocr.usecase
 
 import android.graphics.Bitmap
-import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
+import com.simprints.feature.externalcredential.screens.scanocr.model.ScannedMfidDocument
 import com.simprints.feature.externalcredential.screens.scanocr.reader.OcrReader
+import com.simprints.infra.config.store.models.MultiFactorIdConfiguration
 import com.simprints.infra.credential.store.CredentialImageRepository
 import com.simprints.infra.credential.store.model.CredentialScanImageType.FullDocument
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
@@ -12,32 +13,31 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-internal class GetCredentialCoordinatesUseCase @Inject constructor(
+internal class ScanMfidDocumentUseCase @Inject constructor(
     private val readTextFromImage: ReadTextFromImageUseCase,
-    private val ghanaNhisCardOcrSelectorUseCase: GhanaNhisCardOcrSelectorUseCase,
-    private val ghanaIdCardOcrSelectorUseCase: GhanaIdCardOcrSelectorUseCase,
+    private val ghanaNhisCardOcrReaderUseCase: GhanaNhisCardOcrReaderUseCase,
+    private val ghanaIdCardOcrReaderUseCase: GhanaIdCardOcrReaderUseCase,
     private val credentialImageRepository: CredentialImageRepository,
 ) {
     suspend operator fun invoke(
         bitmap: Bitmap,
         documentType: OcrDocumentType,
-    ): DetectedOcrBlock? {
+        config: MultiFactorIdConfiguration,
+    ): ScannedMfidDocument? {
+        val isCapturingAllFields = when (documentType) {
+            OcrDocumentType.NhisCard -> config.nhisCardConfig?.isCapturingAllFields
+            OcrDocumentType.GhanaIdCard -> config.ghanaIdCardConfig?.isCapturingAllFields
+        } ?: false
         return try {
             val ocrText = readTextFromImage(bitmap) ?: return null
             val ocrReader = OcrReader(ocrText)
-            val credentialOcrLine = when (documentType) {
-                OcrDocumentType.NhisCard -> ghanaNhisCardOcrSelectorUseCase(ocrReader)
-                OcrDocumentType.GhanaIdCard -> ghanaIdCardOcrSelectorUseCase(ocrReader)
+            val scanResult = when (documentType) {
+                OcrDocumentType.NhisCard -> ghanaNhisCardOcrReaderUseCase(ocrReader, isCapturingAllFields)
+                OcrDocumentType.GhanaIdCard -> ghanaIdCardOcrReaderUseCase(ocrReader, isCapturingAllFields)
             }
-            if (credentialOcrLine != null) {
+            if (scanResult != null) {
                 val savedImagePath = credentialImageRepository.saveCredentialScan(bitmap, imageType = FullDocument)
-                DetectedOcrBlock(
-                    imagePath = savedImagePath,
-                    documentType = documentType,
-                    blockBoundingBox = credentialOcrLine.blockBoundingBox,
-                    lineBoundingBox = credentialOcrLine.boundingBox,
-                    readoutValue = credentialOcrLine.text,
-                )
+                ScannedMfidDocument(savedImagePath, scanResult)
             } else {
                 null
             }

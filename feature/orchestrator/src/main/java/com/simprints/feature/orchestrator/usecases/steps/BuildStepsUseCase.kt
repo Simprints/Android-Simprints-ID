@@ -8,7 +8,7 @@ import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.externalcredential.ExternalCredentialContract
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.fetchsubject.FetchSubjectContract
 import com.simprints.feature.orchestrator.R
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
@@ -44,7 +44,7 @@ internal class BuildStepsUseCase @Inject constructor(
         action: ActionRequest,
         projectConfiguration: ProjectConfiguration,
         enrolmentSubjectId: String,
-        cachedScannedCredential: ScannedCredential?,
+        cachedCredentialSearchResult: ExternalCredentialSearchResult.Complete?,
     ) = when (action) {
         is ActionRequest.EnrolActionRequest -> {
             listOf(
@@ -95,13 +95,13 @@ internal class BuildStepsUseCase @Inject constructor(
 
         is ActionRequest.EnrolLastBiometricActionRequest -> {
             listOf(
-                buildEnrolLastBiometricStep(action, projectConfiguration, cachedScannedCredential),
+                buildEnrolLastBiometricStep(action, projectConfiguration, cachedCredentialSearchResult),
             )
         }
 
         is ActionRequest.ConfirmIdentityActionRequest -> {
             listOf(
-                buildConfirmIdentityStep(action, cachedScannedCredential),
+                buildConfirmIdentityStep(action, cachedCredentialSearchResult),
             )
         }
     }.flatten()
@@ -499,7 +499,7 @@ internal class BuildStepsUseCase @Inject constructor(
     private fun buildEnrolLastBiometricStep(
         action: ActionRequest.EnrolLastBiometricActionRequest,
         projectConfiguration: ProjectConfiguration,
-        cachedScannedCredential: ScannedCredential?,
+        cachedCredentialSearchResult: ExternalCredentialSearchResult.Complete?,
     ): List<Step> {
         // Get capture steps needed for enrolment
         val enrolCaptureSteps = buildCaptureSteps(
@@ -525,7 +525,7 @@ internal class BuildStepsUseCase @Inject constructor(
                         userId = action.userId,
                         moduleId = action.moduleId,
                         steps = mapStepsForLastBiometrics(cache.steps.mapNotNull { it.result }),
-                        scannedCredential = cachedScannedCredential,
+                        credentialSearchResult = cachedCredentialSearchResult,
                     ),
                 )
         )
@@ -533,7 +533,7 @@ internal class BuildStepsUseCase @Inject constructor(
 
     private fun buildConfirmIdentityStep(
         action: ActionRequest.ConfirmIdentityActionRequest,
-        cachedScannedCredential: ScannedCredential?,
+        cachedCredentialSearchResult: ExternalCredentialSearchResult.Complete?,
     ) = listOf(
         Step(
             id = StepId.CONFIRM_IDENTITY,
@@ -542,7 +542,7 @@ internal class BuildStepsUseCase @Inject constructor(
             params = SelectSubjectContract.getParams(
                 projectId = action.projectId,
                 subjectId = action.selectedGuid,
-                scannedCredential = cachedScannedCredential,
+                scannedCredentialResult = cachedCredentialSearchResult,
             ),
         ),
     )

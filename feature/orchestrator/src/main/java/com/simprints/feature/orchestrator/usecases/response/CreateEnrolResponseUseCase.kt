@@ -2,8 +2,8 @@ package com.simprints.feature.orchestrator.usecases.response
 
 import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.feature.externalcredential.ExternalCredentialMapper
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
-import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.eventsync.sync.common.EnrolmentRecordFactory
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
@@ -18,6 +18,7 @@ import javax.inject.Inject
 internal class CreateEnrolResponseUseCase @Inject constructor(
     private val enrolmentRecordFactory: EnrolmentRecordFactory,
     private val enrolRecord: EnrolRecordUseCase,
+    private val credentialMapper: ExternalCredentialMapper,
 ) {
     suspend operator fun invoke(
         request: ActionRequest.EnrolActionRequest,
@@ -25,8 +26,8 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
         project: Project,
         enrolmentSubjectId: String,
     ): AppResponse {
-        val credentialResult = results.filterIsInstance<ExternalCredentialSearchResult>().lastOrNull()
-        val externalCredential = credentialResult?.scannedCredential?.toExternalCredential(enrolmentSubjectId)
+        val credentialSearchResult = results.filterIsInstance<ExternalCredentialSearchResult.Complete>().lastOrNull()
+        val externalCredential = credentialSearchResult?.let { credentialMapper.mapExternalCredential(it, enrolmentSubjectId) }
 
         return try {
             val record = enrolmentRecordFactory.buildFromCaptureResults(
@@ -39,7 +40,7 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
             )
             enrolRecord(record, project)
 
-            AppEnrolResponse(record.subjectId, externalCredential)
+            AppEnrolResponse(record.subjectId, credentialSearchResult?.toAppExternalCredential())
         } catch (e: Exception) {
             Simber.e("Error creating enrol response", e, tag = ORCHESTRATION)
             AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR)

@@ -13,9 +13,9 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.GhanaIdCardOcrSelectorUseCase
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.GhanaNhisCardOcrSelectorUseCase
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.GhanaIdCardOcrReaderUseCase
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.GhanaNhisCardOcrReaderUseCase
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.feature.externalcredential.screens.search.model.SearchCredentialState
 import com.simprints.feature.externalcredential.screens.search.model.SearchState
 import com.simprints.feature.externalcredential.screens.search.usecase.MatchCandidatesUseCase
@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 import com.simprints.infra.resources.R as IDR
 
 internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
-    @Assisted val scannedCredential: ScannedCredential,
+    @Assisted val scannedCredentialResult: ScannedCredentialResult,
     @Assisted val externalCredentialParams: ExternalCredentialParams,
     private val timeHelper: TimeHelper,
     private val configRepository: ConfigRepository,
@@ -42,13 +42,11 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
     private val tokenizationProcessor: TokenizationProcessor,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val eventsTracker: ExternalCredentialEventTrackerUseCase,
-    private val ghanaIdValidationUseCase: GhanaIdCardOcrSelectorUseCase,
-    private val ghanaNhisCardValidationUseCase: GhanaNhisCardOcrSelectorUseCase,
 ) : ViewModel() {
     @AssistedFactory
     interface Factory {
         fun create(
-            scannedCredential: ScannedCredential,
+            scannedCredentialResult: ScannedCredentialResult,
             externalCredentialParams: ExternalCredentialParams,
         ): ExternalCredentialSearchViewModel
     }
@@ -57,7 +55,7 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         get() = _finishEvent
     private val _finishEvent = MutableLiveData<LiveDataEventWithContent<ExternalCredentialSearchResult>>()
     private var state: SearchCredentialState =
-        SearchCredentialState.buildInitial(scannedCredential, externalCredentialParams.flowType)
+        SearchCredentialState.buildInitial(scannedCredentialResult, externalCredentialParams.flowType)
         set(value) {
             field = value
             _stateLiveData.postValue(value)
@@ -74,8 +72,7 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
     init {
         viewModelScope.launch {
             configRepository.getProject()?.let {
-                decryptCredentialToDisplay(it, scannedCredential.credential)
-                searchSubjectsLinkedToCredential(it, scannedCredential.credential)
+                searchSubjectsLinkedToCredential(it, scannedCredentialResult.credential)
             }
         }
     }
@@ -91,21 +88,13 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
     fun confirmCredentialUpdate(updatedCredential: TokenizableString.Raw) {
         viewModelScope.launch {
             configRepository.getProject()?.let { project ->
-                val encryptedCredential = tokenizationProcessor.encrypt(
-                    decrypted = updatedCredential,
-                    tokenKeyType = TokenKeyType.ExternalCredential,
-                    project = project,
-                ) as TokenizableString.Tokenized
                 updateState { currentState ->
                     currentState.copy(
                         isConfirmed = false,
-                        scannedCredential = currentState.scannedCredential.copy(
-                            credential = encryptedCredential,
-                        ),
                         displayedCredential = updatedCredential,
                     )
                 }
-                searchSubjectsLinkedToCredential(project, encryptedCredential)
+                searchSubjectsLinkedToCredential(project, updatedCredential)
             }
         }
     }
@@ -137,26 +126,21 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         }
     }
 
-    private fun decryptCredentialToDisplay(
-        project: Project,
-        credential: TokenizableString.Tokenized,
-    ) {
-        val decrypted = tokenizationProcessor.decrypt(
-            encrypted = credential,
-            tokenKeyType = TokenKeyType.ExternalCredential,
-            project = project,
-        ) as TokenizableString.Raw
-        updateState { it.copy(displayedCredential = decrypted) }
-    }
-
     private suspend fun searchSubjectsLinkedToCredential(
         project: Project,
-        credential: TokenizableString.Tokenized,
+        credential: TokenizableString.Raw,
     ) {
+        val encryptedCredential = tokenizationProcessor.encrypt(
+            decrypted = credential,
+            tokenKeyType = TokenKeyType.ExternalCredential,
+            project = project,
+        ) as TokenizableString.Tokenized
         updateState { it.copy(searchState = SearchState.Searching) }
         val searchStartTime = timeHelper.now()
-        val candidates = enrolmentRecordRepository.load(EnrolmentRecordQuery(projectId = project.id, externalCredential = credential))
-        eventsTracker.saveSearchEvent(searchStartTime, scannedCredential.credentialScanId, candidates)
+        val candidates = enrolmentRecordRepository.load(
+            EnrolmentRecordQuery(projectId = project.id, externalCredential = encryptedCredential),
+        )
+        eventsTracker.saveSearchEvent(searchStartTime, scannedCredentialResult.credentialScanId, candidates)
 
         when {
             candidates.isEmpty() -> {
@@ -165,7 +149,7 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
 
             else -> {
                 val projectConfig = configRepository.getProjectConfiguration()
-                val matches = matchCandidatesUseCase(candidates, credential, externalCredentialParams, project, projectConfig)
+                val matches = matchCandidatesUseCase(candidates, encryptedCredential, externalCredentialParams, project, projectConfig)
 
                 updateState { state -> state.copy(searchState = SearchState.CredentialLinked(matchResults = matches)) }
             }
@@ -176,7 +160,7 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
      * Function for QOL improvement. Sets the keyboard to specific [InputType] based on the credential type. QR code and Ghana ID card are
      * alpha-numeric, while the NHIS card memberships contain only digits.
      */
-    fun getKeyBoardInputType() = when (scannedCredential.credentialType) {
+    fun getKeyBoardInputType() = when (scannedCredentialResult.credentialType) {
         // NHIS card membership contains only numbers
         ExternalCredentialType.NHISCard -> InputType.TYPE_CLASS_NUMBER
         ExternalCredentialType.GhanaIdCard -> InputType.TYPE_CLASS_TEXT
@@ -206,9 +190,10 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
                 is SearchState.CredentialLinked -> searchState.matchResults
             }
             _finishEvent.send(
-                ExternalCredentialSearchResult(
+                ExternalCredentialSearchResult.Complete(
                     flowType = externalCredentialParams.flowType,
-                    scannedCredential = state.scannedCredential,
+                    scannedCredentialResult = state.scannedCredentialResult,
+                    confirmedCredential = state.displayedCredential,
                     matchResults = matches,
                 ),
             )
@@ -217,14 +202,14 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
 
     fun isCredentialFormatValid(credential: String?): Boolean {
         if (credential == null) return false
-        return when (scannedCredential.credentialType) {
+        return when (scannedCredentialResult.credentialType) {
             ExternalCredentialType.NHISCard -> {
                 // 8 digits
-                ghanaNhisCardValidationUseCase(credential)
+                GhanaNhisCardOcrReaderUseCase.NHIS_PATTERN.matches(credential)
             }
             ExternalCredentialType.GhanaIdCard -> {
                 // Ghana ID card number pattern is "GHA-123456789-0"
-                ghanaIdValidationUseCase(credential)
+                GhanaIdCardOcrReaderUseCase.GHANA_ID_PATTERN.matches(credential)
             }
             ExternalCredentialType.QRCode -> {
                 // No QR code validation as of 2025.4.1

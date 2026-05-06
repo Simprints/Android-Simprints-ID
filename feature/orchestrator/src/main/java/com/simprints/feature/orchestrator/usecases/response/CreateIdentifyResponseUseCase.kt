@@ -1,19 +1,13 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.simprints.core.domain.response.AppMatchConfidence
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.infra.config.store.models.ModalitySdkType
-import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.getModalitySdkConfig
-import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.matching.MatchResult
-import com.simprints.infra.orchestration.data.responses.AppExternalCredential
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.orchestration.data.responses.AppResponse
@@ -22,7 +16,6 @@ import javax.inject.Inject
 
 internal class CreateIdentifyResponseUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
-    private val tokenizationProcessor: TokenizationProcessor,
 ) {
     suspend operator fun invoke(
         projectConfiguration: ProjectConfiguration,
@@ -33,10 +26,9 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
 
         val currentSessionId = eventRepository.getCurrentSessionScope().id
         val externalCredential = results
-            .filterIsInstance(ExternalCredentialSearchResult::class.java)
+            .filterIsInstance<ExternalCredentialSearchResult.Complete>()
             .lastOrNull()
-            ?.scannedCredential
-            ?.toAppExternalCredential(tokenizationProcessor, project)
+            ?.toAppExternalCredential()
 
         return AppIdentifyResponse(
             sessionId = currentSessionId,
@@ -44,23 +36,6 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
             // Return the results with the highest confidence score
             identifications = getResults(results, projectConfiguration),
             scannedCredential = externalCredential,
-        )
-    }
-
-    private fun ScannedCredential.toAppExternalCredential(
-        tokenizationProcessor: TokenizationProcessor,
-        project: Project?,
-    ): AppExternalCredential? {
-        if (project == null) return null
-        val decryptedValue = tokenizationProcessor.decrypt(
-            encrypted = credential,
-            tokenKeyType = TokenKeyType.ExternalCredential,
-            project = project,
-        ) as? TokenizableString.Raw ?: return null
-        return AppExternalCredential(
-            id = credentialScanId,
-            value = decryptedValue,
-            type = credentialType,
         )
     }
 
@@ -119,7 +94,7 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
         results: List<Serializable>,
         projectConfiguration: ProjectConfiguration,
     ): Map<ModalitySdkType, List<AppMatchResult>> = results
-        .filterIsInstance<ExternalCredentialSearchResult>()
+        .filterIsInstance<ExternalCredentialSearchResult.Complete>()
         // Mapping the result to the common final type and pairing it with the sdk for later grouping
         .flatMap { credentialSearchResult ->
             credentialSearchResult.matchResults.mapNotNull { credentialMatchResult ->

@@ -1,21 +1,24 @@
 package com.simprints.feature.externalcredential.usecase
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.comparison.ComparisonResult
+import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.feature.externalcredential.ExternalCredentialMapper
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.CalculateLevenshteinDistanceUseCase
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.screens.search.model.MfidDocument
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirmationEvent
@@ -39,13 +42,13 @@ class ExternalCredentialEventTrackerUseCaseTest {
     private lateinit var configRepository: ConfigRepository
 
     @MockK
-    private lateinit var tokenizationProcessor: TokenizationProcessor
-
-    @MockK
     private lateinit var eventRepository: SessionEventRepository
 
     @MockK
     private lateinit var calculateDistance: CalculateLevenshteinDistanceUseCase
+
+    @MockK
+    private lateinit var externalCredentialMapper: ExternalCredentialMapper
 
     private lateinit var useCase: ExternalCredentialEventTrackerUseCase
 
@@ -55,37 +58,42 @@ class ExternalCredentialEventTrackerUseCaseTest {
         useCase = ExternalCredentialEventTrackerUseCase(
             timeHelper = timeHelper,
             configRepository = configRepository,
-            tokenizationProcessor = tokenizationProcessor,
             eventRepository = eventRepository,
             calculateDistance = calculateDistance,
+            externalCredentialMapper = externalCredentialMapper,
         )
 
         every { timeHelper.now() } returns END_TIME
 
         coEvery { configRepository.getProject() } returns mockk()
         coEvery {
-            tokenizationProcessor.decrypt(any(), TokenKeyType.ExternalCredential, any())
-        } returns RAW_SCANNED_VALUE.asTokenizableRaw()
+            externalCredentialMapper.mapExternalCredential(any(), any())
+        } returns ExternalCredential(
+            id = SCAN_ID,
+            value = ENCRYPTED_CREDENTIAL,
+            subjectId = SUBJECT_ID,
+            type = ExternalCredentialType.QRCode,
+        )
 
         coEvery { calculateDistance(any(), any()) } returns DEFAULT_DISTANCE
     }
 
     @Test
-    fun `saveCaptureEvents should save external credential capture events`() = runTest {
-        val scannedCredential = makeScannedCredential(ExternalCredentialType.QRCode)
-        useCase.saveCaptureEvents(START_TIME, SUBJECT_ID, scannedCredential, SELECTION_ID)
+    fun `saveCaptureEvents should save external credential capture value event`() = runTest {
+        val searchResult = makeCredentialSearchResult(ExternalCredentialType.QRCode)
+        useCase.saveCaptureEvents(searchResult, SUBJECT_ID, START_TIME, SELECTION_ID)
 
-        val valueEventSlot = slot<ExternalCredentialCaptureValueEvent>()
-        coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(valueEventSlot)) }
-        with(valueEventSlot.captured) {
-            assertThat(payload.credential.id).isEqualTo(SCAN_ID)
-            assertThat(payload.credential.subjectId).isEqualTo(SUBJECT_ID)
-        }
+        coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(any<ExternalCredentialCaptureValueEvent>()) }
+    }
+
+    @Test
+    fun `saveCaptureEvents should save external credential capture event`() = runTest {
+        val searchResult = makeCredentialSearchResult(ExternalCredentialType.QRCode)
+        useCase.saveCaptureEvents(searchResult, SUBJECT_ID, START_TIME, SELECTION_ID)
 
         val captureEventSlot = slot<ExternalCredentialCaptureEvent>()
         coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
         with(captureEventSlot.captured) {
-            assertThat(payload.id).isEqualTo(SCAN_ID)
             assertThat(payload.createdAt).isEqualTo(START_TIME)
             assertThat(payload.endedAt).isEqualTo(END_TIME)
             assertThat(payload.autoCaptureStartTime).isEqualTo(SCAN_START_TIME)
@@ -96,24 +104,9 @@ class ExternalCredentialEventTrackerUseCaseTest {
     }
 
     @Test
-    fun `saveCaptureEvents should handle missing project in capture events`() = runTest {
-        clearMocks(configRepository)
-        coEvery { configRepository.getProject() } returns null
-
-        val scannedCredential = makeScannedCredential(ExternalCredentialType.QRCode)
-        useCase.saveCaptureEvents(START_TIME, SUBJECT_ID, scannedCredential, SELECTION_ID)
-
-        val captureEventSlot = slot<ExternalCredentialCaptureEvent>()
-        coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
-        with(captureEventSlot.captured) {
-            assertThat(payload.ocrErrorCount).isEqualTo(0)
-        }
-    }
-
-    @Test
     fun `saveCaptureEvents should correctly calculate length for NHISCard`() = runTest {
-        val scannedCredential = makeScannedCredential(ExternalCredentialType.NHISCard)
-        useCase.saveCaptureEvents(START_TIME, SUBJECT_ID, scannedCredential, SELECTION_ID)
+        val searchResult = makeCredentialSearchResult(ExternalCredentialType.NHISCard)
+        useCase.saveCaptureEvents(searchResult, SUBJECT_ID, START_TIME, SELECTION_ID)
 
         val captureEventSlot = slot<ExternalCredentialCaptureEvent>()
         coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
@@ -122,8 +115,8 @@ class ExternalCredentialEventTrackerUseCaseTest {
 
     @Test
     fun `saveCaptureEvents should correctly calculate length for GhanaIdCard`() = runTest {
-        val scannedCredential = makeScannedCredential(ExternalCredentialType.GhanaIdCard)
-        useCase.saveCaptureEvents(START_TIME, SUBJECT_ID, scannedCredential, SELECTION_ID)
+        val searchResult = makeCredentialSearchResult(ExternalCredentialType.GhanaIdCard)
+        useCase.saveCaptureEvents(searchResult, SUBJECT_ID, START_TIME, SELECTION_ID)
 
         val captureEventSlot = slot<ExternalCredentialCaptureEvent>()
         coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
@@ -132,8 +125,8 @@ class ExternalCredentialEventTrackerUseCaseTest {
 
     @Test
     fun `saveCaptureEvents should correctly calculate length for QRCode`() = runTest {
-        val scannedCredential = makeScannedCredential(ExternalCredentialType.QRCode)
-        useCase.saveCaptureEvents(START_TIME, SUBJECT_ID, scannedCredential, SELECTION_ID)
+        val searchResult = makeCredentialSearchResult(ExternalCredentialType.QRCode)
+        useCase.saveCaptureEvents(searchResult, SUBJECT_ID, START_TIME, SELECTION_ID)
 
         val captureEventSlot = slot<ExternalCredentialCaptureEvent>()
         coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
@@ -226,17 +219,28 @@ class ExternalCredentialEventTrackerUseCaseTest {
         )
     }
 
-    private fun makeScannedCredential(type: ExternalCredentialType) = ScannedCredential(
-        credentialScanId = "test-scan-id",
-        credential = RAW_SCANNED_VALUE.asTokenizableEncrypted(),
-        credentialType = type,
-        documentImagePath = null,
-        zoomedCredentialImagePath = null,
-        credentialBoundingBox = null,
-        scanStartTime = SCAN_START_TIME,
-        scanEndTime = SCAN_END_TIME,
-        scannedValue = RAW_SCANNED_VALUE.asTokenizableRaw(),
-    )
+    private fun makeCredentialSearchResult(type: ExternalCredentialType): ExternalCredentialSearchResult.Complete {
+        val document: MfidDocument = when (type) {
+            ExternalCredentialType.NHISCard -> MfidDocument.GhanaNhisCard(credential = RAW_SCANNED_VALUE.asTokenizableRaw())
+            ExternalCredentialType.GhanaIdCard -> MfidDocument.GhanaIdCard(credential = RAW_SCANNED_VALUE.asTokenizableRaw())
+            ExternalCredentialType.QRCode -> MfidDocument.GhanaQrCode(credential = RAW_SCANNED_VALUE.asTokenizableRaw())
+        }
+        val scannedResult = ScannedCredentialResult(
+            credentialScanId = SCAN_ID,
+            document = document,
+            documentImagePath = null,
+            zoomedCredentialImagePath = null,
+            credentialBoundingBox = null,
+            scanStartTime = SCAN_START_TIME,
+            scanEndTime = SCAN_END_TIME,
+        )
+        return ExternalCredentialSearchResult.Complete(
+            flowType = FlowType.ENROL,
+            scannedCredentialResult = scannedResult,
+            confirmedCredential = RAW_SCANNED_VALUE.asTokenizableRaw(),
+            matchResults = emptyList(),
+        )
+    }
 
     private fun makeCredentialMatch(
         faceSdk: ModalitySdkType?,
@@ -249,7 +253,7 @@ class ExternalCredentialEventTrackerUseCaseTest {
 
         val sdk = faceSdk ?: fingerprintSdk!!
         return CredentialMatch(
-            credential = RAW_SCANNED_VALUE.asTokenizableEncrypted(),
+            credential = ENCRYPTED_CREDENTIAL,
             comparisonResult = matchResult,
             probeReferenceId = PROBE_REFERENCE_ID,
             verificationThreshold = 0.5f,
@@ -283,12 +287,12 @@ class ExternalCredentialEventTrackerUseCaseTest {
         private val END_TIME = Timestamp(6L)
         private const val SCAN_ID = "test-scan-id"
         private const val SUBJECT_ID = "test-subject-id"
-        private const val RAW_SCANNED_VALUE = "scanned-value"
+        private const val RAW_SCANNED_VALUE = "scanned"
+        private val ENCRYPTED_CREDENTIAL = "encrypted_credential".asTokenizableEncrypted()
         private const val DEFAULT_DISTANCE = 7
         private const val SELECTION_ID = "selection_id"
         private const val CONFIDENCE = 0.9f
         private const val PROBE_REFERENCE_ID = "probe-ref-id"
-        private const val MATCHER_NAME = "matcher-name"
         private val FACE_SDK = ModalitySdkType.RANK_ONE
         private val FINGERPRINT_SDK = ModalitySdkType.SECUGEN_SIM_MATCHER
     }

@@ -9,8 +9,8 @@ import io.mockk.MockKAnnotations
 import org.junit.Before
 import org.junit.Test
 
-internal class GhanaIdCardOcrSelectorUseCaseTest {
-    private lateinit var useCase: GhanaIdCardOcrSelectorUseCase
+internal class GhanaIdCardCredentialOcrExtractorUseCaseTest {
+    private lateinit var useCase: GhanaIdCardOcrReaderUseCase
     private val label = "Ghana Card Number"
     private val validIds = listOf(
         "GHA-123456789-0",
@@ -32,7 +32,7 @@ internal class GhanaIdCardOcrSelectorUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        useCase = GhanaIdCardOcrSelectorUseCase()
+        useCase = GhanaIdCardOcrReaderUseCase()
     }
 
     @Test
@@ -42,7 +42,7 @@ internal class GhanaIdCardOcrSelectorUseCaseTest {
             val expected = line(id = id + 1, text = ghanaId, top = 140)
             val reader = buildReader(nonMatching, expected)
 
-            assertThat(useCase(reader)).isEqualTo(expected)
+            assertThat(useCase(reader, isCapturingAllFields = false)?.credential).isEqualTo(expected)
         }
     }
 
@@ -54,7 +54,7 @@ internal class GhanaIdCardOcrSelectorUseCaseTest {
                 line(id = id + 1, text = ghanaId, top = 140),
             )
 
-            assertThat(useCase(reader)).isNull()
+            assertThat(useCase(reader, isCapturingAllFields = false)).isNull()
         }
     }
 

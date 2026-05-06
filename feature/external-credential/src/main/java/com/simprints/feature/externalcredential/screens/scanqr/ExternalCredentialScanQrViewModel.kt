@@ -10,9 +10,6 @@ import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.screens.scanqr.usecase.ExternalCredentialQrCodeValidatorUseCase
-import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,8 +18,6 @@ import javax.inject.Inject
 internal class ExternalCredentialScanQrViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     private val externalCredentialQrCodeValidator: ExternalCredentialQrCodeValidatorUseCase,
-    private val configRepository: ConfigRepository,
-    private val tokenizationProcessor: TokenizationProcessor,
 ) : ViewModel() {
     private lateinit var startTime: Timestamp
     private var state: ScanQrState = ScanQrState.ReadyToScan
@@ -42,19 +37,11 @@ internal class ExternalCredentialScanQrViewModel @Inject constructor(
             val newState = when (value) {
                 null -> ScanQrState.ReadyToScan
 
-                else -> configRepository.getProject()?.let { project ->
-                    val qrCodeEncrypted = tokenizationProcessor.encrypt(
-                        decrypted = value.asTokenizableRaw(),
-                        tokenKeyType = TokenKeyType.ExternalCredential,
-                        project = project,
-                    ) as TokenizableString.Tokenized
-                    ScanQrState.QrCodeCaptured(
-                        scanStartTime = startTime,
-                        scanEndTime = timeHelper.now(),
-                        qrCode = value.asTokenizableRaw(),
-                        qrCodeEncrypted = qrCodeEncrypted,
-                    )
-                } ?: ScanQrState.ReadyToScan
+                else -> ScanQrState.QrCodeCaptured(
+                    scanStartTime = startTime,
+                    scanEndTime = timeHelper.now(),
+                    qrCode = value.asTokenizableRaw(),
+                )
             }
             updateState { newState }
         }

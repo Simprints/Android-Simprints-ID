@@ -17,13 +17,13 @@ import com.simprints.feature.externalcredential.databinding.DialogScannedCredent
 import com.simprints.feature.externalcredential.databinding.ItemScannedImageBinding
 import com.simprints.feature.externalcredential.ext.getCredentialFieldTitle
 import com.simprints.feature.externalcredential.ext.getCredentialTypeString
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.infra.resources.R as IDR
 
 @ExcludedFromGeneratedTestCoverageReports("UI class")
 class ScannedCredentialDialog(
     context: Context,
-    private val credential: ScannedCredential,
+    private val credential: ScannedCredentialResult,
     private val displayedCredential: TokenizableString.Raw,
     private val onConfirm: () -> Unit,
     private val onSkip: () -> Unit,

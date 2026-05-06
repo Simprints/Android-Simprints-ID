@@ -425,6 +425,9 @@ internal val allowedExternalCredential = ExternalCredentialType.NHISCard
 
 internal val multiFactorIdConfiguration = MultiFactorIdConfiguration(
     allowedExternalCredentials = listOf(allowedExternalCredential),
+    ghanaIdCardConfig = null,
+    nhisCardConfig = null,
+    qrCodeConfig = null,
 )
 
 internal val protoMultiFactorIdConfiguration = ProtoMultiFactorIdConfiguration
@@ -482,6 +485,9 @@ internal val apiAllowedExternalCredential = ApiExternalCredentialType.NHIS_CARD
 
 internal val apiMultiFactorIdConfiguration = ApiMultiFactorIdConfiguration(
     allowedExternalCredentials = listOf(apiAllowedExternalCredential),
+    ghanaCard = null,
+    nhisCard = null,
+    qrCode = null,
 )
 
 internal val customKeyMap: Map<String, JsonElement> = mapOf(

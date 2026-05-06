@@ -2,16 +2,19 @@ package com.simprints.feature.externalcredential.screens.scanocr.reader
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.feature.externalcredential.model.BoundingBox
+import kotlinx.serialization.Serializable
+import java.io.Serializable as JavaSerializable
 
 /**
  * Wrapper for all scanned text after the OCR
  *
  * @param allLines all lines from blocks sorted by bounding box top coordinate ascending
  */
+@Serializable
 @ExcludedFromGeneratedTestCoverageReports("Data class")
 internal data class OcrText(
     val allLines: List<OcrLine>,
-)
+) : JavaSerializable
 
 /**
  * A single line of text detected by the OCR kit.
@@ -22,6 +25,7 @@ internal data class OcrText(
  * @param blockBoundingBox parent coordinates
  * @param confidence overall confidence of the text value based on the average confidence for each character (aka element) in [text]
  */
+@Serializable
 @ExcludedFromGeneratedTestCoverageReports("Data class")
 internal data class OcrLine(
     val id: Int,
@@ -29,4 +33,4 @@ internal data class OcrLine(
     val boundingBox: BoundingBox,
     val blockBoundingBox: BoundingBox,
     val confidence: Float,
-)
+) : JavaSerializable

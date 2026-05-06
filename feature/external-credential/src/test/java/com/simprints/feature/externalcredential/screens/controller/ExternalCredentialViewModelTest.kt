@@ -5,14 +5,12 @@ import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.core.domain.tokenization.asTokenizableEncrypted
-import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.BoundingBox
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.feature.externalcredential.usecase.ExternalCredentialEventTrackerUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
@@ -105,9 +103,12 @@ internal class ExternalCredentialViewModelTest {
 
     @Test
     fun `finish sends result to finishEvent`() = runTest {
-        val mockResult = mockk<ExternalCredentialSearchResult>(relaxed = true) {
-            every { scannedCredential } returns null
+        val mockResult = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
+            every { scannedCredentialResult } returns mockk()
         }
+        viewModel.init(createParams(subjectId = "subjectId", FlowType.IDENTIFY))
+        viewModel.selectionStarted()
+        viewModel.setSelectedExternalCredentialType(ExternalCredentialType.QRCode)
         viewModel.finish(mockResult)
         val observer = viewModel.finishEvent
             .test()
@@ -123,8 +124,8 @@ internal class ExternalCredentialViewModelTest {
         val subjectId = "subjectId"
         val flowType = FlowType.IDENTIFY
         val params = createParams(subjectId, flowType)
-        val credentialSearchResult = mockk<ExternalCredentialSearchResult>(relaxed = true) {
-            every { scannedCredential } returns createScannedCredential()
+        val credentialSearchResult = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
+            every { scannedCredentialResult } returns createScannedCredential()
         }
         viewModel.init(params)
         viewModel.selectionStarted()
@@ -141,8 +142,8 @@ internal class ExternalCredentialViewModelTest {
 
     @Test
     fun `finish saves success flow events`() = runTest {
-        val mockResult = mockk<ExternalCredentialSearchResult>(relaxed = true) {
-            every { scannedCredential } returns mockk(relaxed = true)
+        val mockResult = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
+            every { scannedCredentialResult } returns mockk(relaxed = true)
         }
         coEvery { eventsTracker.saveSelectionEvent(any(), any(), any()) } returns "selectionId"
 
@@ -157,9 +158,7 @@ internal class ExternalCredentialViewModelTest {
 
     @Test
     fun `finish saves skip event`() = runTest {
-        val mockResult = mockk<ExternalCredentialSearchResult>(relaxed = true) {
-            every { scannedCredential } returns null
-        }
+        val mockResult = mockk<ExternalCredentialSearchResult.Skipped>(relaxed = true)
         viewModel.selectionStarted()
         viewModel.skipOptionSelected(ExternalCredentialSelectionEvent.SkipReason.OTHER)
         viewModel.skipOtherReasonChanged("other")
@@ -200,20 +199,16 @@ internal class ExternalCredentialViewModelTest {
     }
 
     private fun createScannedCredential(
-        credential: String = "credential",
-        credentialType: ExternalCredentialType = ExternalCredentialType.NHISCard,
         documentImagePath: String? = "documentImagePath",
         zoomedCredentialImagePath: String? = "zoomedCredentialImagePath",
         credentialBoundingBox: BoundingBox? = BoundingBox(0, 0, 100, 100),
-    ) = ScannedCredential(
-        credential = credential.asTokenizableEncrypted(),
-        credentialType = credentialType,
+    ) = ScannedCredentialResult(
+        document = mockk(),
         documentImagePath = documentImagePath,
         zoomedCredentialImagePath = zoomedCredentialImagePath,
         credentialBoundingBox = credentialBoundingBox,
         scanStartTime = Timestamp(1L),
         scanEndTime = Timestamp(2L),
-        scannedValue = credential.asTokenizableRaw(),
     )
 
     private fun createParams(

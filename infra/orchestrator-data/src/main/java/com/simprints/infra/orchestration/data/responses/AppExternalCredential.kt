@@ -12,4 +12,5 @@ data class AppExternalCredential(
     val id: String,
     val value: TokenizableString.Raw,
     val type: ExternalCredentialType,
+    val nonCredentialFields: Map<String, String>,
 ) : Serializable

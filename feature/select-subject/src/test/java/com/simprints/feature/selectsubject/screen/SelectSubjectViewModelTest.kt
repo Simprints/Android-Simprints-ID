@@ -3,12 +3,14 @@ package com.simprints.feature.selectsubject.screen
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
-import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.feature.externalcredential.screens.search.model.MfidDocument
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.feature.externalcredential.usecase.ResetExternalCredentialsInSessionUseCase
 import com.simprints.feature.selectsubject.SelectSubjectParams
 import com.simprints.feature.selectsubject.model.SelectSubjectState
@@ -110,7 +112,7 @@ internal class SelectSubjectViewModelTest {
             .value()
             .getContentIfNotHandled()
         assertThat(result?.isSubjectIdSaved).isTrue()
-        assertThat(result?.savedCredential).isNull()
+        assertThat(result?.credentialSearchResult).isNull()
     }
 
     @Test
@@ -125,7 +127,7 @@ internal class SelectSubjectViewModelTest {
             .value()
             .getContentIfNotHandled()
         assertThat(result?.isSubjectIdSaved).isFalse()
-        assertThat(result?.savedCredential).isNull()
+        assertThat(result?.credentialSearchResult).isNull()
     }
 
     @Test
@@ -141,81 +143,94 @@ internal class SelectSubjectViewModelTest {
             .value()
             .getContentIfNotHandled()
         assertThat(result?.isSubjectIdSaved).isFalse()
-        assertThat(result?.savedCredential).isNull()
+        assertThat(result?.credentialSearchResult).isNull()
     }
 
     @Test
     fun `displays credential dialog when credential is scanned and not already linked`() = runTest {
-        val scannedCredential = mockk<ScannedCredential>(relaxed = true)
-        val displayedCredential = mockk<TokenizableString.Raw>(relaxed = true)
-        setupCredentialState(displayedCredential, repositoryResponse = emptyList())
+        val confirmedCredential = mockk<TokenizableString.Raw>(relaxed = true)
+        val scannedCredentialResult = mockk<ScannedCredentialResult>(relaxed = true)
+        val credentialSearchResult = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
+            every { this@mockk.scannedCredentialResult } returns scannedCredentialResult
+            every { this@mockk.confirmedCredential } returns confirmedCredential
+        }
+        setupCredentialState(confirmedCredential, repositoryResponse = emptyList())
 
-        val viewModel = createViewModel(params = selectSubjectParams.copy(scannedCredential = scannedCredential))
+        val viewModel = createViewModel(params = selectSubjectParams.copy(credentialSearchResult = credentialSearchResult))
 
         val state = viewModel.stateLiveData.test().value()
         assertThat(state).isInstanceOf(SelectSubjectState.CredentialDialogDisplayed::class.java)
         val dialogState = state as SelectSubjectState.CredentialDialogDisplayed
-        assertThat(dialogState.scannedCredential).isEqualTo(scannedCredential)
-        assertThat(dialogState.displayedCredential).isEqualTo(displayedCredential)
+        assertThat(dialogState.scannedCredentialResult).isEqualTo(scannedCredentialResult)
+        assertThat(dialogState.displayedCredential).isEqualTo(confirmedCredential)
     }
 
     @Test
     fun `displays credential dialog when credential is scanned and linked to different subject`() = runTest {
-        val scannedCredential = mockk<ScannedCredential>(relaxed = true)
-        val displayedCredential = mockk<TokenizableString.Raw>(relaxed = true)
+        val confirmedCredential = mockk<TokenizableString.Raw>(relaxed = true)
+        val scannedCredentialResult = mockk<ScannedCredentialResult>(relaxed = true)
+        val credentialSearchResult = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
+            every { this@mockk.scannedCredentialResult } returns scannedCredentialResult
+            every { this@mockk.confirmedCredential } returns confirmedCredential
+        }
         val repositoryResponse = listOf<EnrolmentRecord>(mockk { every { subjectId } returns "not_this_subject_id" })
-        setupCredentialState(displayedCredential, repositoryResponse = repositoryResponse)
+        setupCredentialState(confirmedCredential, repositoryResponse = repositoryResponse)
 
-        val viewModel = createViewModel(params = selectSubjectParams.copy(scannedCredential = scannedCredential))
+        val viewModel = createViewModel(params = selectSubjectParams.copy(credentialSearchResult = credentialSearchResult))
 
         val state = viewModel.stateLiveData.test().value()
         assertThat(state).isInstanceOf(SelectSubjectState.CredentialDialogDisplayed::class.java)
         val dialogState = state as SelectSubjectState.CredentialDialogDisplayed
-        assertThat(dialogState.scannedCredential).isEqualTo(scannedCredential)
-        assertThat(dialogState.displayedCredential).isEqualTo(displayedCredential)
+        assertThat(dialogState.scannedCredentialResult).isEqualTo(scannedCredentialResult)
+        assertThat(dialogState.displayedCredential).isEqualTo(confirmedCredential)
     }
 
     @Test
     fun `does not display credential dialog when credential is already linked to same subject`() = runTest {
-        val tokenizedValue = "tokenizedValue".asTokenizableEncrypted()
-        val type = ExternalCredentialType.NHISCard
-        val scannedCredential = mockk<ScannedCredential> {
-            every { credentialScanId } returns "credentialId"
-            every { credential } returns tokenizedValue
-            every { credentialType } returns type
+        val confirmedCredential = "12345678".asTokenizableRaw()
+        val scannedCredentialResult = ScannedCredentialResult(
+            credentialScanId = "credentialId",
+            document = MfidDocument.GhanaNhisCard(
+                credential = confirmedCredential,
+            ),
+            documentImagePath = null,
+            zoomedCredentialImagePath = null,
+            credentialBoundingBox = null,
+            scanStartTime = Timestamp(0L),
+            scanEndTime = Timestamp(1L),
+        )
+        val credentialSearchResult = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
+            every { this@mockk.scannedCredentialResult } returns scannedCredentialResult
+            every { this@mockk.confirmedCredential } returns confirmedCredential
         }
-        val displayedCredential = mockk<TokenizableString.Raw>(relaxed = true)
         val repositoryResponse = listOf<EnrolmentRecord>(mockk { every { subjectId } returns SUBJECT_ID })
-        setupCredentialState(displayedCredential, repositoryResponse = repositoryResponse)
+        setupCredentialState(confirmedCredential, repositoryResponse = repositoryResponse)
 
-        val viewModel = createViewModel(params = selectSubjectParams.copy(scannedCredential = scannedCredential))
+        val viewModel = createViewModel(params = selectSubjectParams.copy(credentialSearchResult = credentialSearchResult))
 
         val result = viewModel.finish
             .test()
             .value()
             .getContentIfNotHandled()
         assertThat(result?.isSubjectIdSaved).isTrue()
-        assertThat(result?.savedCredential?.value).isEqualTo(tokenizedValue)
-        assertThat(result?.savedCredential?.type).isEqualTo(type)
+        assertThat(result?.credentialSearchResult).isEqualTo(credentialSearchResult)
     }
 
     @Test
     fun `does not display credential dialog when subject ID is none_selected`() = runTest {
-        val tokenizedValue = "tokenizedValue".asTokenizableEncrypted()
-        val type = ExternalCredentialType.NHISCard
-        val scannedCredential = mockk<ScannedCredential> {
-            every { credentialScanId } returns "credentialId"
-            every { credential } returns tokenizedValue
-            every { credentialType } returns type
+        val confirmedCredential = "12345678".asTokenizableRaw()
+        val scannedCredentialResult = mockk<ScannedCredentialResult>(relaxed = true)
+        val credentialSearchResult = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
+            every { this@mockk.scannedCredentialResult } returns scannedCredentialResult
+            every { this@mockk.confirmedCredential } returns confirmedCredential
         }
-        val displayedCredential = mockk<TokenizableString.Raw>(relaxed = true)
         val repositoryResponse = listOf<EnrolmentRecord>(mockk { every { subjectId } returns SUBJECT_ID })
-        setupCredentialState(displayedCredential, repositoryResponse = repositoryResponse)
+        setupCredentialState(confirmedCredential, repositoryResponse = repositoryResponse)
 
         val viewModel = createViewModel(
             params = selectSubjectParams.copy(
                 subjectId = "none_selected",
-                scannedCredential = scannedCredential,
+                credentialSearchResult = credentialSearchResult,
             ),
         )
 
@@ -227,19 +242,23 @@ internal class SelectSubjectViewModelTest {
     }
 
     @Test
-    fun `does not display credential dialog when project not availalbe`() = runTest {
-        val scannedCredential = mockk<ScannedCredential>(relaxed = true)
-        val displayedCredential = mockk<TokenizableString.Raw>(relaxed = true)
+    fun `does not display credential dialog when project not available`() = runTest {
+        val confirmedCredential = mockk<TokenizableString.Raw>(relaxed = true)
+        val scannedCredentialResult = mockk<ScannedCredentialResult>(relaxed = true)
+        val credentialSearchResult = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
+            every { this@mockk.scannedCredentialResult } returns scannedCredentialResult
+            every { this@mockk.confirmedCredential } returns confirmedCredential
+        }
         val repositoryResponse = listOf<EnrolmentRecord>(mockk { every { subjectId } returns "not_this_subject_id" })
         setupCredentialState(
-            displayedCredential,
+            confirmedCredential,
             repositoryResponse = repositoryResponse,
             configuredProject = null,
         )
 
         val viewModel = createViewModel(
             params = selectSubjectParams.copy(
-                scannedCredential = scannedCredential,
+                credentialSearchResult = credentialSearchResult,
             ),
         )
 
@@ -261,11 +280,11 @@ internal class SelectSubjectViewModelTest {
             .value()
             .getContentIfNotHandled()
         assertThat(result?.isSubjectIdSaved).isTrue()
-        assertThat(result?.savedCredential).isNull()
+        assertThat(result?.credentialSearchResult).isNull()
     }
 
     private fun setupCredentialState(
-        displayedCredential: TokenizableString.Raw,
+        confirmedCredential: TokenizableString.Raw,
         repositoryResponse: List<EnrolmentRecord>,
         configuredProject: Project? = project,
     ) {
@@ -275,22 +294,21 @@ internal class SelectSubjectViewModelTest {
         coEvery { configRepository.getProject() } returns configuredProject
         coEvery { enrolmentRecordRepository.load(any()) } returns repositoryResponse
         coEvery {
-            tokenizationProcessor.decrypt(
-                encrypted = any(),
+            tokenizationProcessor.encrypt(
+                decrypted = confirmedCredential,
                 tokenKeyType = TokenKeyType.ExternalCredential,
                 project = any(),
             )
-        } returns displayedCredential
+        } returns "encrypted_credential".asTokenizableEncrypted()
     }
 
     @Test
     fun `saveCredential successfully saves credential`() = runTest {
-        val tokenizedValue = "tokenizedValue".asTokenizableEncrypted()
-        val type = ExternalCredentialType.NHISCard
-        val scannedCredential = mockk<ScannedCredential> {
-            every { credentialScanId } returns "credentialId"
-            every { credential } returns tokenizedValue
-            every { credentialType } returns type
+        val confirmedCredential = "12345678".asTokenizableRaw()
+        val scannedCredentialResult = mockk<ScannedCredentialResult>(relaxed = true)
+        val credentialSearchResult = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
+            every { this@mockk.scannedCredentialResult } returns scannedCredentialResult
+            every { this@mockk.confirmedCredential } returns confirmedCredential
         }
         coEvery {
             eventRepository.getEventsInCurrentSession()
@@ -304,8 +322,8 @@ internal class SelectSubjectViewModelTest {
             resetScannedCredentialsInSession(any(), any())
         }
 
-        val viewModel = createViewModel(params = selectSubjectParams.copy(scannedCredential = scannedCredential))
-        viewModel.saveCredential(scannedCredential)
+        val viewModel = createViewModel(params = selectSubjectParams.copy(credentialSearchResult = credentialSearchResult))
+        viewModel.saveCredential()
 
         val state = viewModel.stateLiveData.test().value()
         assertThat(state).isEqualTo(SelectSubjectState.SavingExternalCredential)
@@ -315,12 +333,11 @@ internal class SelectSubjectViewModelTest {
             .value()
             .getContentIfNotHandled()
         assertThat(result?.isSubjectIdSaved).isTrue()
-        assertThat(result?.savedCredential?.value).isEqualTo(tokenizedValue)
-        assertThat(result?.savedCredential?.type).isEqualTo(type)
+        assertThat(result?.credentialSearchResult).isEqualTo(credentialSearchResult)
 
         coVerify {
             resetScannedCredentialsInSession(
-                scannedCredential = scannedCredential,
+                credentialSearchResult = credentialSearchResult,
                 subjectId = SUBJECT_ID,
             )
         }
@@ -328,13 +345,12 @@ internal class SelectSubjectViewModelTest {
     }
 
     @Test
-    fun `saveCredential does not saves update event if invalid subject id`() = runTest {
-        val tokenizedValue = "tokenizedValue".asTokenizableEncrypted()
-        val type = ExternalCredentialType.NHISCard
-        val scannedCredential = mockk<ScannedCredential> {
-            every { credentialScanId } returns "credentialId"
-            every { credential } returns tokenizedValue
-            every { credentialType } returns type
+    fun `saveCredential does not save update event if invalid subject id`() = runTest {
+        val confirmedCredential = "12345678".asTokenizableRaw()
+        val scannedCredentialResult = mockk<ScannedCredentialResult>(relaxed = true)
+        val credentialSearchResult = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
+            every { this@mockk.scannedCredentialResult } returns scannedCredentialResult
+            every { this@mockk.confirmedCredential } returns confirmedCredential
         }
 
         coJustRun {
@@ -342,9 +358,9 @@ internal class SelectSubjectViewModelTest {
         }
 
         val viewModel = createViewModel(
-            params = selectSubjectParams.copy(subjectId = "none_selected", scannedCredential = scannedCredential),
+            params = selectSubjectParams.copy(subjectId = "none_selected", credentialSearchResult = credentialSearchResult),
         )
-        viewModel.saveCredential(scannedCredential)
+        viewModel.saveCredential()
 
         val state = viewModel.stateLiveData.test().value()
         assertThat(state).isEqualTo(SelectSubjectState.SavingExternalCredential)
@@ -354,13 +370,12 @@ internal class SelectSubjectViewModelTest {
             .value()
             .getContentIfNotHandled()
         assertThat(result?.isSubjectIdSaved).isTrue()
-        assertThat(result?.savedCredential?.value).isEqualTo(tokenizedValue)
-        assertThat(result?.savedCredential?.type).isEqualTo(type)
+        assertThat(result?.credentialSearchResult).isEqualTo(credentialSearchResult)
 
         coVerify {
             // Still needs to remove previous links
             resetScannedCredentialsInSession(
-                scannedCredential = scannedCredential,
+                credentialSearchResult = credentialSearchResult,
                 subjectId = "none_selected",
             )
         }
@@ -369,15 +384,14 @@ internal class SelectSubjectViewModelTest {
 
     @Test
     fun `saveCredential handles exception when saving fails`() = runTest {
-        val scannedCredential = mockk<ScannedCredential>(relaxed = true)
         coEvery {
             resetScannedCredentialsInSession(
-                scannedCredential = scannedCredential,
+                credentialSearchResult = any(),
                 subjectId = SUBJECT_ID,
             )
         } throws RuntimeException("RuntimeException")
 
-        viewModel.saveCredential(scannedCredential)
+        viewModel.saveCredential()
 
         val state = viewModel.stateLiveData.test().value()
         assertThat(state).isEqualTo(SelectSubjectState.SavingExternalCredential)
@@ -387,7 +401,7 @@ internal class SelectSubjectViewModelTest {
             .value()
             .getContentIfNotHandled()
         assertThat(result?.isSubjectIdSaved).isTrue()
-        assertThat(result?.savedCredential).isNull()
+        assertThat(result?.credentialSearchResult).isNull()
     }
 
     @Test
@@ -399,7 +413,7 @@ internal class SelectSubjectViewModelTest {
             .value()
             .getContentIfNotHandled()
         assertThat(result?.isSubjectIdSaved).isTrue()
-        assertThat(result?.savedCredential).isNull()
+        assertThat(result?.credentialSearchResult).isNull()
     }
 
     companion object {

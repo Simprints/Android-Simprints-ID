@@ -13,7 +13,7 @@ internal class CreateEnrolLastBiometricResponseUseCase @Inject constructor() {
         .lastOrNull()
         ?.let { result ->
             result.newSubjectId?.let { guid ->
-                AppEnrolResponse(guid, result.externalCredential)
+                AppEnrolResponse(guid = guid, externalCredential = result.credentialSearchResult.toAppExternalCredential())
             }
         }
         ?: AppErrorResponse(AppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED)

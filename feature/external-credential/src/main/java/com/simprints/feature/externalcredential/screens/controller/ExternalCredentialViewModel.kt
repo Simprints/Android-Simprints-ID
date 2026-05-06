@@ -45,7 +45,8 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
     private lateinit var selectionStartTime: Timestamp
     private lateinit var selectionEventId: String
     private lateinit var captureStartTime: Timestamp
-    private var selectedSkipReason: ExternalCredentialSelectionEvent.SkipReason? = null
+    var selectedSkipReason: ExternalCredentialSelectionEvent.SkipReason? = null
+        private set
     private var selectedSkipOtherText: String? = null
 
     init {
@@ -97,17 +98,22 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
 
     fun finish(result: ExternalCredentialSearchResult) {
         viewModelScope.launch {
-            if (result.scannedCredential == null) {
-                selectedSkipReason?.let { reason ->
-                    eventsTracker.saveSkippedEvent(selectionStartTime, reason, selectedSkipOtherText)
+            when (result) {
+                is ExternalCredentialSearchResult.Complete -> {
+                    eventsTracker.saveCaptureEvents(
+                        credentialSearchResult = result,
+                        subjectId = params.subjectId.orEmpty(),
+                        startTime = captureStartTime,
+                        selectionEventId = selectionEventId,
+                    )
                 }
-            } else {
-                eventsTracker.saveCaptureEvents(
-                    captureStartTime,
-                    params.subjectId.orEmpty(),
-                    result.scannedCredential,
-                    selectionEventId,
-                )
+                is ExternalCredentialSearchResult.Skipped -> {
+                    eventsTracker.saveSkippedEvent(
+                        startTime = selectionStartTime,
+                        skipReason = result.skipReason,
+                        skipOther = selectedSkipOtherText,
+                    )
+                }
             }
             _finishEvent.send(result)
         }

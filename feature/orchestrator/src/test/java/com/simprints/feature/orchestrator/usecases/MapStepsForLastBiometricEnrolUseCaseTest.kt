@@ -142,7 +142,7 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
             }
         val result = useCase(
             listOf(
-                mockk<ExternalCredentialSearchResult> {
+                mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
                     every { matchResults } returns listOf(match)
                 },
             ),
@@ -160,7 +160,7 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
     fun `maps ExternalCredentialSearchResult with empty matches to null (filtered out)`() {
         val result = useCase(
             listOf(
-                mockk<ExternalCredentialSearchResult> {
+                mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
                     every { matchResults } returns emptyList()
                 },
             ),
@@ -183,7 +183,7 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
         }
         val result = useCase(
             listOf(
-                mockk<ExternalCredentialSearchResult> {
+                mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
                     every { matchResults } returns listOf(match1, match2)
                 },
             ),
