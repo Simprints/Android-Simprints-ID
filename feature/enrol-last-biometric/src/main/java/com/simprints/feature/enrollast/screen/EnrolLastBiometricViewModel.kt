@@ -58,11 +58,11 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
         viewModelScope.launch {
             params.credentialSearchResult?.let { credentialSearchResult ->
                 val guidToEnrol = getPreviousEnrolmentResult(params.steps)?.subjectId
-                if (isCredentialLinkedToAnotherSubject(
-                        confirmedCredential = credentialSearchResult.confirmedCredential,
-                        guidToEnrol = guidToEnrol,
-                    )
-                ) {
+                val isCredentialLinkedToAnotherSubject = isCredentialLinkedToAnotherSubject(
+                    confirmedCredential = credentialSearchResult.confirmedCredential,
+                    guidToEnrol = guidToEnrol,
+                )
+                if (isCredentialLinkedToAnotherSubject) {
                     displayAddCredentialDialog(credentialSearchResult)
                     return@launch
                 }

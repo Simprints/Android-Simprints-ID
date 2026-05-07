@@ -140,7 +140,7 @@ class LibSimprintsResponseMapperTest {
     fun `correctly maps confirm response`() {
         val expectedValue = "expectedValue".asTokenizableRaw()
         val expectedType = ExternalCredentialType.NHISCard
-        val expectedJson = "{\"type\":\"$expectedType\",\"value\":\"$expectedValue\",\"$SCANNED_CREDENTIAL_DOCUMENT_FIELDS\":{}}"
+        val expectedJson = """{"type":"$expectedType","value":"$expectedValue","$SCANNED_CREDENTIAL_DOCUMENT_FIELDS":{}}"""
         val extras = mapper(
             ActionResponse.ConfirmActionResponse(
                 actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
@@ -408,7 +408,7 @@ class LibSimprintsResponseMapperTest {
     fun `correctly maps enrol response with external credential`() {
         val expectedValue = "expectedValue".asTokenizableRaw()
         val expectedType = ExternalCredentialType.NHISCard
-        val expectedJson = "{\"type\":\"$expectedType\",\"value\":\"$expectedValue\",\"$SCANNED_CREDENTIAL_DOCUMENT_FIELDS\":{}}"
+        val expectedJson = """{"type":"$expectedType","value":"$expectedValue","$SCANNED_CREDENTIAL_DOCUMENT_FIELDS":{}}"""
 
         val extras = mapper(
             ActionResponse.EnrolActionResponse(
@@ -549,7 +549,7 @@ class LibSimprintsResponseMapperTest {
         val field1Value = "field1Value"
         val field2Key = "field2Key"
         val field2Value = "field2Value"
-        val expectedJson = "{\"type\":\"$expectedType\",\"value\":\"$expectedValue\",\"$SCANNED_CREDENTIAL_DOCUMENT_FIELDS\":{\"$field1Key\":\"$field1Value\",\"$field2Key\":\"$field2Value\"}}"
+        val expectedJson = """{"type":"$expectedType","value":"$expectedValue","$SCANNED_CREDENTIAL_DOCUMENT_FIELDS":{"$field1Key":"$field1Value","$field2Key":"$field2Value"}}"""
 
         val extras = mapper(
             ActionResponse.EnrolActionResponse(
@@ -572,7 +572,7 @@ class LibSimprintsResponseMapperTest {
     fun `correctly maps external credential with empty non-credential fields`() {
         val expectedValue = "expectedValue".asTokenizableRaw()
         val expectedType = ExternalCredentialType.NHISCard
-        val expectedJson = "{\"type\":\"$expectedType\",\"value\":\"$expectedValue\",\"$SCANNED_CREDENTIAL_DOCUMENT_FIELDS\":{}}"
+        val expectedJson = """{"type":"$expectedType","value":"$expectedValue","$SCANNED_CREDENTIAL_DOCUMENT_FIELDS":{}}"""
 
         val extras = mapper(
             ActionResponse.EnrolActionResponse(
@@ -595,7 +595,7 @@ class LibSimprintsResponseMapperTest {
     fun `when MFID is enabled, identify response contains scanned credential`() {
         val expectedValue = "expectedValue".asTokenizableRaw()
         val expectedType = ExternalCredentialType.NHISCard
-        val expectedJson = "{\"type\":\"$expectedType\",\"value\":\"$expectedValue\",\"$SCANNED_CREDENTIAL_DOCUMENT_FIELDS\":{}}"
+        val expectedJson = """{"type":"$expectedType","value":"$expectedValue","$SCANNED_CREDENTIAL_DOCUMENT_FIELDS":{}}"""
         val scannedCredential = mockk<AppExternalCredential> {
             every { value } returns expectedValue
             every { type } returns expectedType

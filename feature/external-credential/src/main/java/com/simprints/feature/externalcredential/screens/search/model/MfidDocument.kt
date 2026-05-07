@@ -5,11 +5,12 @@ import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.tokenization.TokenizableString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.io.Serializable as JavaSerializable
 
 @Keep
 @Serializable
 @ExcludedFromGeneratedTestCoverageReports("Data class")
-sealed class MfidDocument : java.io.Serializable {
+sealed class MfidDocument : JavaSerializable {
     abstract val credential: TokenizableString.Raw
 
     @Serializable
