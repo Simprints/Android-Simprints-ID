@@ -324,4 +324,31 @@ internal class ExternalCredentialScanOcrViewModelTest {
         val result = viewModel.getDocumentTypeRes()
         assertThat(result).isEqualTo(R.string.mfid_type_ghana_id_card)
     }
+
+    @Test
+    fun `processImage does not append documents or update state after scanning is complete`() = runTest {
+        val mockScannedDocument = mockk<ScannedMfidDocument>()
+        val mockScannedCredentialResult = mockk<ScannedCredentialResult>()
+        val mockNormalizedBitmap = mockk<Bitmap>()
+        val mockCroppedBitmap = mockk<Bitmap>()
+
+        coEvery { normalizeBitmapToPreviewUseCase(bitmap, cropConfig) } returns mockNormalizedBitmap
+        coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
+        coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
+        coEvery { buildScannedCredentialResultUseCase(any(), documentType, any()) } returns mockScannedCredentialResult
+
+        val stateObserver = viewModel.scanOcrStateLiveData.test()
+
+        viewModel.startScanning()
+        // transitioning to Complete
+        viewModel.processOcrResultsAndFinish()
+
+        // Frame from camera arrives after Complete
+        viewModel.imageProcessingStarted()
+        viewModel.processImage(bitmap, cropConfig)
+
+        assertThat(stateObserver.value()).isEqualTo(ScanOcrState.Complete)
+        assertThat(viewModel.isOcrActive).isFalse()
+        coVerify(exactly = 0) { scanMfidDocumentUseCase.invoke(any(), any(), any()) }
+    }
 }
