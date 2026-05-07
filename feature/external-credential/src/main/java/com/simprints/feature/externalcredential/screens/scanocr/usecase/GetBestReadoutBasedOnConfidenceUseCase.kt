@@ -1,5 +1,6 @@
 package com.simprints.feature.externalcredential.screens.scanocr.usecase
 
+import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
 internal class GetBestReadoutBasedOnConfidenceUseCase @Inject constructor() {
@@ -34,6 +35,7 @@ internal class GetBestReadoutBasedOnConfidenceUseCase @Inject constructor() {
 
         val detectedValues = readoutValues.filter { it.length == length }
         if (detectedValues.isEmpty()) {
+            Simber.d("OCR: no values of length [$length] is detected in readout values $readoutValues")
             throw IllegalArgumentException("OCR block list is empty, cannot extract external credential from it")
         }
 
