@@ -57,7 +57,6 @@ class BuildRecordUseCaseTest {
             useCase(
                 createParams(steps = emptyList(), credentialSearchResult = credentialSearchResult),
                 isAddingCredential = false,
-                project = mockk(),
             )
 
         assertThat(result.references).isEmpty()
@@ -75,7 +74,6 @@ class BuildRecordUseCaseTest {
                 credentialSearchResult = credentialSearchResult,
             ),
             isAddingCredential = false,
-            project = mockk(),
         )
 
         assertThat(result.references).isEmpty()
@@ -107,7 +105,6 @@ class BuildRecordUseCaseTest {
                 credentialSearchResult = credentialSearchResult,
             ),
             isAddingCredential = false,
-            project = mockk(),
         )
 
         assertThat(result.references).isNotEmpty()
@@ -148,7 +145,6 @@ class BuildRecordUseCaseTest {
                 credentialSearchResult = credentialSearchResult,
             ),
             isAddingCredential = false,
-            project = mockk(),
         )
 
         assertThat(result.references.size).isEqualTo(1)
@@ -185,7 +181,6 @@ class BuildRecordUseCaseTest {
                 credentialSearchResult = credentialSearchResult,
             ),
             isAddingCredential = false,
-            project = mockk(),
         )
 
         assertThat(result.references).isNotEmpty()
@@ -207,7 +202,6 @@ class BuildRecordUseCaseTest {
             useCase(
                 createParams(steps = emptyList(), credentialSearchResult = credentialSearchResult),
                 isAddingCredential = true,
-                project = mockk(),
             )
 
         assertThat(result.externalCredentials).hasSize(1)
@@ -218,7 +212,7 @@ class BuildRecordUseCaseTest {
     @Test
     fun `has no external credentials when isAddingCredential is true but scannedCredential is null`() = runTest {
         val result =
-            useCase(createParams(steps = emptyList(), credentialSearchResult = null), isAddingCredential = true, project = mockk())
+            useCase(createParams(steps = emptyList(), credentialSearchResult = null), isAddingCredential = true)
 
         assertThat(result.externalCredentials).isEmpty()
     }
@@ -229,7 +223,6 @@ class BuildRecordUseCaseTest {
             useCase(
                 createParams(steps = emptyList(), credentialSearchResult = credentialSearchResult),
                 isAddingCredential = false,
-                project = mockk(),
             )
 
         assertThat(result.externalCredentials).isEmpty()

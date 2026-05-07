@@ -104,7 +104,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
         }
 
         try {
-            val subject = buildSubject(params, project, isAddingCredential = isAddingCredential)
+            val subject = buildSubject(params, isAddingCredential = isAddingCredential)
             registerEvent(subject)
             enrolmentRecordRepository.performActions(listOf(EnrolmentRecordAction.Creation(subject)), project)
             _finish.send(EnrolLastState.Success(subject.subjectId, credentialSearchResult))

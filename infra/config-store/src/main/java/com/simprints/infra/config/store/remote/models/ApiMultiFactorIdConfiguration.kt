@@ -15,9 +15,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 internal data class ApiMultiFactorIdConfiguration(
     val allowedExternalCredentials: List<ApiExternalCredentialType>,
-    val ghanaCard: ApiGhanaIdCardConfig?,
-    val nhisCard: ApiNhisCardConfig?,
-    val qrCode: ApiQrCodeConfig?,
+    val ghanaCard: ApiGhanaIdCardConfig? = null,
+    val nhisCard: ApiNhisCardConfig? = null,
+    val qrCode: ApiQrCodeConfig? = null,
 ) {
     fun toDomain(): MultiFactorIdConfiguration = MultiFactorIdConfiguration(
         allowedExternalCredentials = allowedExternalCredentials.map { it.toDomain() },

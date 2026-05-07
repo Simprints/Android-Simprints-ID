@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.os.bundleOf
 import androidx.test.ext.junit.runners.*
+import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.tools.time.TimeHelper
@@ -282,8 +283,8 @@ internal class ClientApiViewModelTest {
         viewModel.handleEnrolResponse(mockRequest(), mockEnrolResponseWithCredential(mockGuid, credential))
 
         val captured = slot.captured as ActionResponse.EnrolActionResponse
-        assert(captured.externalCredential?.id == expectedCredentialId)
-        assert(captured.externalCredential?.type == expectedType)
+        assertThat(captured.externalCredential?.id).isEqualTo(expectedCredentialId)
+        assertThat(captured.externalCredential?.type).isEqualTo(expectedType)
     }
 
     private fun mockEnrolResponseWithCredential(

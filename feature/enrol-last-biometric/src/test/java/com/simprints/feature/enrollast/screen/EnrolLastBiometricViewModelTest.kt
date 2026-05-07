@@ -223,7 +223,7 @@ internal class EnrolLastBiometricViewModelTest {
     @Test
     fun `returns success when no duplicate enrolments`() = runTest {
         every { checkForDuplicateEnrolments.invoke(any(), any()) } returns null
-        coEvery { buildRecord.invoke(any(), any(), any()) } returns enrolmentRecord
+        coEvery { buildRecord.invoke(any(), any()) } returns enrolmentRecord
 
         viewModel.enrolBiometric(createParams(listOf()), isAddingCredential = false)
 
@@ -237,7 +237,7 @@ internal class EnrolLastBiometricViewModelTest {
     @Test
     fun `saves event and record when no duplicate enrolments`() = runTest {
         every { checkForDuplicateEnrolments.invoke(any(), any()) } returns null
-        coEvery { buildRecord.invoke(any(), any(), any()) } returns enrolmentRecord
+        coEvery { buildRecord.invoke(any(), any()) } returns enrolmentRecord
 
         viewModel.enrolBiometric(createParams(listOf()), isAddingCredential = false)
 
@@ -248,7 +248,7 @@ internal class EnrolLastBiometricViewModelTest {
     @Test
     fun `returns failure record saving fails`() = runTest {
         every { checkForDuplicateEnrolments.invoke(any(), any()) } returns null
-        coEvery { buildRecord.invoke(any(), any(), any()) } returns enrolmentRecord
+        coEvery { buildRecord.invoke(any(), any()) } returns enrolmentRecord
         coEvery { enrolmentRecordRepository.performActions(any(), any()) } throws Exception()
 
         viewModel.enrolBiometric(createParams(listOf()), isAddingCredential = false)
@@ -323,7 +323,7 @@ internal class EnrolLastBiometricViewModelTest {
         assertThat(result).isNotNull()
         assertThat(result?.scannedCredentialResult).isEqualTo(credentialSearchResult.scannedCredentialResult)
         assertThat(result?.displayedCredential).isEqualTo(confirmedCredential)
-        coVerify(exactly = 0) { buildRecord.invoke(any(), any(), any()) }
+        coVerify(exactly = 0) { buildRecord.invoke(any(), any()) }
         coVerify(exactly = 0) { enrolmentRecordRepository.performActions(any(), any()) }
     }
 

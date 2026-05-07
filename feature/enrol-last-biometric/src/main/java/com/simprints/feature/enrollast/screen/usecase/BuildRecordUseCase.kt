@@ -7,7 +7,6 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.externalcredential.ExternalCredentialMapper
-import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.eventsync.sync.common.EnrolmentRecordFactory
 import java.util.Date
@@ -21,7 +20,6 @@ internal class BuildRecordUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         params: EnrolLastBiometricParams,
-        project: Project,
         isAddingCredential: Boolean,
     ): EnrolmentRecord {
         val subjectId = UUID.randomUUID().toString()
