@@ -23,7 +23,7 @@ internal class GhanaIdCardOcrReaderUseCase @Inject constructor() {
                 height = ocrReader.findBelow("height"),
                 documentNumber = ocrReader.findBelow("docu"),
                 placeOfIssue = ocrReader.findBelow("place"),
-                dateOfIssue = ocrReader.findBelow("uance"),
+                dateOfIssue = ocrReader.findBelow("mission"),
                 dateOfExpiry = ocrReader.findBelow("expiry"),
             )
         } else {
