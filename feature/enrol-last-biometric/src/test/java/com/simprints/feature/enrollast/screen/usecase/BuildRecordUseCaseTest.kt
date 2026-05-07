@@ -1,22 +1,24 @@
 package com.simprints.feature.enrollast.screen.usecase
 
 import com.google.common.truth.Truth.*
-import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.capture.BiometricTemplateCapture
+import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.common.TemplateIdentifier
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.ExternalCredentialMapper
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.infra.eventsync.sync.common.EnrolmentRecordFactory
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
@@ -25,7 +27,10 @@ class BuildRecordUseCaseTest {
     private lateinit var timeHelper: TimeHelper
 
     @MockK
-    private lateinit var scannedCredential: ScannedCredential
+    private lateinit var credentialSearchResult: ExternalCredentialSearchResult.Complete
+
+    @MockK
+    private lateinit var credentialMapper: ExternalCredentialMapper
 
     private lateinit var useCase: BuildRecordUseCase
 
@@ -39,18 +44,26 @@ class BuildRecordUseCaseTest {
             encodingUtils = EncodingUtilsImplForTests,
             timeHelper = timeHelper,
         )
-        useCase = BuildRecordUseCase(timeHelper = timeHelper, enrolmentRecordFactory = enrolmentRecordFactory)
+        useCase = BuildRecordUseCase(
+            timeHelper = timeHelper,
+            enrolmentRecordFactory = enrolmentRecordFactory,
+            credentialMapper = credentialMapper,
+        )
     }
 
     @Test
-    fun `has no references if no steps provided`() {
-        val result = useCase(createParams(steps = emptyList(), scannedCredential = scannedCredential), isAddingCredential = false)
+    fun `has no references if no steps provided`() = runTest {
+        val result =
+            useCase(
+                createParams(steps = emptyList(), credentialSearchResult = credentialSearchResult),
+                isAddingCredential = false,
+            )
 
         assertThat(result.references).isEmpty()
     }
 
     @Test
-    fun `has no references if no valid steps provided`() {
+    fun `has no references if no valid steps provided`() = runTest {
         val result = useCase(
             createParams(
                 steps = listOf(
@@ -58,7 +71,7 @@ class BuildRecordUseCaseTest {
                     EnrolLastBiometricStepResult.MatchResult(emptyList(), mockk()),
                     EnrolLastBiometricStepResult.MatchResult(emptyList(), mockk()),
                 ),
-                scannedCredential = scannedCredential,
+                credentialSearchResult = credentialSearchResult,
             ),
             isAddingCredential = false,
         )
@@ -67,7 +80,7 @@ class BuildRecordUseCaseTest {
     }
 
     @Test
-    fun `maps first available fingerprint capture step results`() {
+    fun `maps first available fingerprint capture step results`() = runTest {
         val result = useCase(
             params = createParams(
                 steps = listOf(
@@ -89,7 +102,7 @@ class BuildRecordUseCaseTest {
                         ),
                     ),
                 ),
-                scannedCredential = scannedCredential,
+                credentialSearchResult = credentialSearchResult,
             ),
             isAddingCredential = false,
         )
@@ -105,7 +118,7 @@ class BuildRecordUseCaseTest {
     }
 
     @Test
-    fun `maps all provided fingerprint capture samples`() {
+    fun `maps all provided fingerprint capture samples`() = runTest {
         val result = useCase(
             createParams(
                 steps = listOf(
@@ -129,7 +142,7 @@ class BuildRecordUseCaseTest {
                         ),
                     ),
                 ),
-                scannedCredential,
+                credentialSearchResult = credentialSearchResult,
             ),
             isAddingCredential = false,
         )
@@ -143,7 +156,7 @@ class BuildRecordUseCaseTest {
     }
 
     @Test
-    fun `maps first available face capture step results`() {
+    fun `maps first available face capture step results`() = runTest {
         val result = useCase(
             params = createParams(
                 listOf(
@@ -165,7 +178,7 @@ class BuildRecordUseCaseTest {
                         ),
                     ),
                 ),
-                scannedCredential = scannedCredential,
+                credentialSearchResult = credentialSearchResult,
             ),
             isAddingCredential = false,
         )
@@ -175,22 +188,21 @@ class BuildRecordUseCaseTest {
     }
 
     @Test
-    fun `includes external credential when isAddingCredential is true and scannedCredential is not null`() {
+    fun `includes external credential when isAddingCredential is true and scannedCredential is not null`() = runTest {
         val mockTokenized = mockk<TokenizableString.Tokenized>()
         val mockCredentialType = mockk<ExternalCredentialType>()
+        val mockExternalCredential = mockk<com.simprints.core.domain.externalcredential.ExternalCredential> {
+            every { value } returns mockTokenized
+            every { type } returns mockCredentialType
+        }
 
-        val scannedCredential = ScannedCredential(
-            credential = mockTokenized,
-            credentialType = mockCredentialType,
-            documentImagePath = null,
-            zoomedCredentialImagePath = null,
-            credentialBoundingBox = null,
-            scanStartTime = Timestamp(1L),
-            scanEndTime = Timestamp(1L),
-            scannedValue = TokenizableString.Raw("test"),
-        )
+        coEvery { credentialMapper.mapExternalCredential(credentialSearchResult, any()) } returns mockExternalCredential
 
-        val result = useCase(createParams(steps = emptyList(), scannedCredential = scannedCredential), isAddingCredential = true)
+        val result =
+            useCase(
+                createParams(steps = emptyList(), credentialSearchResult = credentialSearchResult),
+                isAddingCredential = true,
+            )
 
         assertThat(result.externalCredentials).hasSize(1)
         assertThat(result.externalCredentials.first().value).isEqualTo(mockTokenized)
@@ -198,21 +210,33 @@ class BuildRecordUseCaseTest {
     }
 
     @Test
-    fun `has no external credentials when isAddingCredential is true but scannedCredential is null`() {
-        val result = useCase(createParams(steps = emptyList(), scannedCredential = null), isAddingCredential = true)
+    fun `has no external credentials when isAddingCredential is true but scannedCredential is null`() = runTest {
+        val result =
+            useCase(createParams(steps = emptyList(), credentialSearchResult = null), isAddingCredential = true)
+
+        assertThat(result.externalCredentials).isEmpty()
+    }
+
+    @Test
+    fun `has no external credentials when isAddingCredential is false even if credentialSearchResult is not null`() = runTest {
+        val result =
+            useCase(
+                createParams(steps = emptyList(), credentialSearchResult = credentialSearchResult),
+                isAddingCredential = false,
+            )
 
         assertThat(result.externalCredentials).isEmpty()
     }
 
     private fun createParams(
         steps: List<EnrolLastBiometricStepResult>,
-        scannedCredential: ScannedCredential?,
+        credentialSearchResult: ExternalCredentialSearchResult.Complete?,
     ) = EnrolLastBiometricParams(
         projectId = PROJECT_ID,
         userId = USER_ID,
         moduleId = MODULE_ID,
         steps = steps,
-        scannedCredential = scannedCredential,
+        credentialSearchResult = credentialSearchResult,
     )
 
     private fun mockFingerprintResults(finger: TemplateIdentifier) = BiometricTemplateCapture(

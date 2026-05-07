@@ -10,8 +10,7 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.extentions.isValidGuid
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
-import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.usecase.ResetExternalCredentialsInSessionUseCase
 import com.simprints.feature.selectsubject.SelectSubjectParams
 import com.simprints.feature.selectsubject.SelectSubjectResult
@@ -69,16 +68,15 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
         viewModelScope.launch {
             val isSaved = saveGuidSelection(projectId = params.projectId, subjectId = params.subjectId)
             if (!isSaved) {
-                _finish.send(SelectSubjectResult(isSubjectIdSaved = false, savedCredential = null))
+                _finish.send(SelectSubjectResult(isSubjectIdSaved = false, credentialSearchResult = null))
                 return@launch
             }
 
-            val dialogDisplayedState = getDisplayDialogStateIfRequired(params.scannedCredential, params.subjectId)
+            val dialogDisplayedState = getDisplayDialogStateIfRequired(params.credentialSearchResult, params.subjectId)
             if (dialogDisplayedState != null) {
                 updateState { dialogDisplayedState }
             } else {
-                val credential = params.scannedCredential?.toExternalCredential(params.subjectId)
-                _finish.send(SelectSubjectResult(isSubjectIdSaved = true, savedCredential = credential))
+                _finish.send(SelectSubjectResult(isSubjectIdSaved = true, credentialSearchResult = params.credentialSearchResult))
             }
         }
     }
@@ -93,18 +91,24 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
     }
 
     private suspend fun getDisplayDialogStateIfRequired(
-        scannedCredential: ScannedCredential?,
+        credentialSearchResult: ExternalCredentialSearchResult.Complete?,
         subjectId: String,
     ): SelectSubjectState.CredentialDialogDisplayed? {
-        if (scannedCredential == null) return null
-        val credential = scannedCredential.credential
+        if (credentialSearchResult == null) return null
         val project = configRepository.getProject() ?: return null
+        val scannedCredentialResult = credentialSearchResult.scannedCredentialResult
+        val credential = credentialSearchResult.confirmedCredential
+        val encryptedCredential = tokenizationProcessor.encrypt(
+            decrypted = credential,
+            tokenKeyType = TokenKeyType.ExternalCredential,
+            project = project,
+        ) as TokenizableString.Tokenized
         val alreadyLinkedSubject = enrolmentRecordRepository
             .load(
                 EnrolmentRecordQuery(
                     projectId = project.id,
                     subjectId = subjectId,
-                    externalCredential = credential,
+                    externalCredential = encryptedCredential,
                 ),
             ).firstOrNull()
 
@@ -112,7 +116,7 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
             // Confirmation of "none_selected" (or any non UUID value) should not display the dialog,
             // but still remove update event from session and reset previously linked external credentials
             resetExternalCredentialsUseCase(
-                scannedCredential = scannedCredential,
+                credentialSearchResult = credentialSearchResult,
                 subjectId = params.subjectId,
             )
             return null
@@ -121,20 +125,19 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
         // Credentials already linked to the correct subject, so no need to re-link
         if (alreadyLinkedSubject != null && alreadyLinkedSubject.subjectId == subjectId) return null
 
-        val decrypted = tokenizationProcessor.decrypt(
-            encrypted = credential,
-            tokenKeyType = TokenKeyType.ExternalCredential,
-            project = project,
-        ) as TokenizableString.Raw
-        return SelectSubjectState.CredentialDialogDisplayed(scannedCredential = scannedCredential, displayedCredential = decrypted)
+        return SelectSubjectState.CredentialDialogDisplayed(
+            scannedCredentialResult = scannedCredentialResult,
+            displayedCredential = credential,
+        )
     }
 
-    fun saveCredential(scannedCredential: ScannedCredential) {
+    fun saveCredential() {
         updateState { SelectSubjectState.SavingExternalCredential }
         viewModelScope.launch {
-            val addedCredential = try {
+            val credentialSearchResult = params.credentialSearchResult
+            try {
                 resetExternalCredentialsUseCase(
-                    scannedCredential = scannedCredential,
+                    credentialSearchResult = credentialSearchResult,
                     subjectId = params.subjectId,
                 )
 
@@ -142,22 +145,20 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
                 if (params.subjectId.isValidGuid()) {
                     saveCredentialSelectionEvent(params.subjectId)
                 }
-                scannedCredential
             } catch (e: Exception) {
                 Simber.e("Failed to attach scanned credential", e, tag = SESSION)
-                null
             }
             _finish.send(
                 SelectSubjectResult(
                     isSubjectIdSaved = true,
-                    savedCredential = addedCredential?.toExternalCredential(params.subjectId),
+                    credentialSearchResult = credentialSearchResult,
                 ),
             )
         }
     }
 
     fun finishWithoutSavingCredential() {
-        _finish.send(SelectSubjectResult(isSubjectIdSaved = true, savedCredential = null))
+        _finish.send(SelectSubjectResult(isSubjectIdSaved = true, credentialSearchResult = null))
     }
 
     private suspend fun saveCredentialSelectionEvent(subjectId: String) = with(sessionCoroutineScope) {

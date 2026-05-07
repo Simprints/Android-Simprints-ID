@@ -6,7 +6,7 @@ import com.simprints.core.domain.capture.BiometricReferenceCapture
 import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.infra.config.store.models.ModalitySdkType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -19,7 +19,7 @@ data class EnrolLastBiometricParams(
     val userId: TokenizableString,
     val moduleId: TokenizableString,
     val steps: List<EnrolLastBiometricStepResult>,
-    val scannedCredential: ScannedCredential?,
+    val credentialSearchResult: ExternalCredentialSearchResult.Complete?,
 ) : StepParams
 
 @Serializable

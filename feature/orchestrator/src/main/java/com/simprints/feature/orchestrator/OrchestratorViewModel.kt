@@ -84,12 +84,12 @@ internal class OrchestratorViewModel @Inject constructor(
             // and add new ones to the list. This way all session steps are available throughout
             // the app for reference (i.e. have we already captured face in this session?)
             val cachedSteps = cache.steps
-            val cachedExternalCredentialResponse = getCachedCredentialResponse(cachedSteps)
+            val cachedCredentialSearchResult = getCachedCredentialSearchResult(cachedSteps)
             steps = cachedSteps + stepsBuilder.build(
                 action = action,
                 projectConfiguration = projectConfiguration,
                 enrolmentSubjectId = enrolmentSubjectId,
-                cachedScannedCredential = cachedExternalCredentialResponse?.scannedCredential,
+                cachedCredentialSearchResult = cachedCredentialSearchResult,
             )
             Simber.i("Steps to execute: ${steps.joinToString { it.id.toString() }}", tag = ORCHESTRATION)
         } catch (_: SubjectAgeNotSupportedException) {
@@ -100,10 +100,10 @@ internal class OrchestratorViewModel @Inject constructor(
         doNextStep()
     }
 
-    private fun getCachedCredentialResponse(steps: List<Step>): ExternalCredentialSearchResult? {
+    private fun getCachedCredentialSearchResult(steps: List<Step>): ExternalCredentialSearchResult.Complete? {
         steps.forEach { step ->
             if (step.id == StepId.EXTERNAL_CREDENTIAL) {
-                return step.result as? ExternalCredentialSearchResult
+                return step.result as? ExternalCredentialSearchResult.Complete
             }
         }
         return null
@@ -140,7 +140,7 @@ internal class OrchestratorViewModel @Inject constructor(
             steps = steps + captureAndMatchSteps
         }
 
-        if (result is ExternalCredentialSearchResult) {
+        if (result is ExternalCredentialSearchResult.Complete) {
             removeMatcherStepIfRequired(result)
         }
 
@@ -197,7 +197,7 @@ internal class OrchestratorViewModel @Inject constructor(
     /**
      * Removes Matcher steps during [FlowType.IDENTIFY] flow if External Credential search found any match.
      */
-    private fun removeMatcherStepIfRequired(result: ExternalCredentialSearchResult) {
+    private fun removeMatcherStepIfRequired(result: ExternalCredentialSearchResult.Complete) {
         if (result.flowType == FlowType.IDENTIFY) {
             val confirmedVerifications = result.goodMatches.size
             if (confirmedVerifications > 0) {
@@ -219,13 +219,13 @@ internal class OrchestratorViewModel @Inject constructor(
                 val updatedParams = params.copy(
                     steps = mapStepsForLastBiometrics(steps.mapNotNull { it.result }),
                 )
-                val cachedExternalCredentialResponse = getCachedCredentialResponse(cache.steps)
+                val cachedExternalCredentialResponse = getCachedCredentialSearchResult(cache.steps)
                 step.params = EnrolLastBiometricContract.getParams(
                     projectId = updatedParams.projectId,
                     userId = updatedParams.userId,
                     moduleId = updatedParams.moduleId,
                     steps = updatedParams.steps,
-                    scannedCredential = cachedExternalCredentialResponse?.scannedCredential,
+                    credentialSearchResult = cachedExternalCredentialResponse,
                 )
             }
         }

@@ -14,8 +14,7 @@ import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.GENERAL_E
 import com.simprints.feature.enrollast.screen.model.CredentialDialogItem
 import com.simprints.feature.enrollast.screen.usecase.BuildRecordUseCase
 import com.simprints.feature.enrollast.screen.usecase.CheckForDuplicateEnrolmentsUseCase
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
-import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.usecase.ResetExternalCredentialsInSessionUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -57,10 +56,14 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
 
     fun onViewCreated(params: EnrolLastBiometricParams) {
         viewModelScope.launch {
-            params.scannedCredential?.let { scannedCredential ->
+            params.credentialSearchResult?.let { credentialSearchResult ->
                 val guidToEnrol = getPreviousEnrolmentResult(params.steps)?.subjectId
-                if (isCredentialLinkedToAnotherSubject(scannedCredential, guidToEnrol = guidToEnrol, projectId = params.projectId)) {
-                    displayAddCredentialDialog(scannedCredential)
+                val isCredentialLinkedToAnotherSubject = isCredentialLinkedToAnotherSubject(
+                    confirmedCredential = credentialSearchResult.confirmedCredential,
+                    guidToEnrol = guidToEnrol,
+                )
+                if (isCredentialLinkedToAnotherSubject) {
+                    displayAddCredentialDialog(credentialSearchResult)
                     return@launch
                 }
             }
@@ -85,11 +88,11 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
         val modalities = projectConfig.general.modalities
 
         val previousLastEnrolmentResult = getPreviousEnrolmentResult(params.steps)
-        val scannedCredential = params.scannedCredential?.takeIf { isAddingCredential }
+        val credentialSearchResult = params.credentialSearchResult?.takeIf { isAddingCredential }
         if (previousLastEnrolmentResult != null) {
             _finish.send(
                 previousLastEnrolmentResult.subjectId
-                    ?.let { subjectId -> EnrolLastState.Success(subjectId, scannedCredential?.toExternalCredential(subjectId)) }
+                    ?.let { subjectId -> EnrolLastState.Success(subjectId, credentialSearchResult) }
                     ?: EnrolLastState.Failed(GENERAL_ERROR, modalities),
             )
             return@launch
@@ -104,35 +107,40 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
             val subject = buildSubject(params, isAddingCredential = isAddingCredential)
             registerEvent(subject)
             enrolmentRecordRepository.performActions(listOf(EnrolmentRecordAction.Creation(subject)), project)
-            _finish.send(EnrolLastState.Success(subject.subjectId, scannedCredential?.toExternalCredential(subject.subjectId)))
+            _finish.send(EnrolLastState.Success(subject.subjectId, credentialSearchResult))
         } catch (t: Throwable) {
             Simber.e("Enrolment failed", t, tag = ENROLMENT)
             _finish.send(EnrolLastState.Failed(GENERAL_ERROR, modalities))
         }
     }
 
-    private suspend fun displayAddCredentialDialog(scannedCredential: ScannedCredential) {
-        val project = configRepository.getProject() ?: return
-        val decrypted = tokenizationProcessor.decrypt(
-            encrypted = scannedCredential.credential,
-            tokenKeyType = TokenKeyType.ExternalCredential,
-            project = project,
-        ) as TokenizableString.Raw
-        _showAddCredentialDialog.send(CredentialDialogItem(scannedCredential, decrypted))
+    private fun displayAddCredentialDialog(credentialSearchResult: ExternalCredentialSearchResult.Complete) {
+        val scannedCredential = credentialSearchResult.scannedCredentialResult
+        val confirmedCredential = credentialSearchResult.confirmedCredential
+        _showAddCredentialDialog.send(
+            CredentialDialogItem(
+                scannedCredential,
+                confirmedCredential,
+            ),
+        )
     }
 
     private suspend fun isCredentialLinkedToAnotherSubject(
-        scannedCredential: ScannedCredential?,
+        confirmedCredential: TokenizableString.Raw?,
         guidToEnrol: String?,
-        projectId: String,
     ): Boolean {
-        if (scannedCredential == null || guidToEnrol == null) return false
-
+        if (confirmedCredential == null || guidToEnrol == null) return false
+        val project = configRepository.getProject() ?: return false
+        val credential = tokenizationProcessor.encrypt(
+            decrypted = confirmedCredential,
+            tokenKeyType = TokenKeyType.ExternalCredential,
+            project = project,
+        ) as TokenizableString.Tokenized
         return enrolmentRecordRepository
             .load(
                 EnrolmentRecordQuery(
-                    projectId = projectId,
-                    externalCredential = scannedCredential.credential,
+                    projectId = project.id,
+                    externalCredential = credential,
                 ),
             ).any { it.subjectId != guidToEnrol }
     }

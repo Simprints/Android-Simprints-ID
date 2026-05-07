@@ -3,6 +3,7 @@ package com.simprints.feature.enrollast.screen
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
@@ -10,12 +11,12 @@ import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.screen.usecase.BuildRecordUseCase
 import com.simprints.feature.enrollast.screen.usecase.CheckForDuplicateEnrolmentsUseCase
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.feature.externalcredential.usecase.ResetExternalCredentialsInSessionUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
@@ -43,6 +44,9 @@ internal class EnrolLastBiometricViewModelTest {
     lateinit var timeHelper: TimeHelper
 
     @MockK
+    private lateinit var credentialSearchResult: ExternalCredentialSearchResult.Complete
+
+    @MockK
     lateinit var configRepository: ConfigRepository
 
     @MockK
@@ -67,7 +71,7 @@ internal class EnrolLastBiometricViewModelTest {
     lateinit var enrolmentRecord: EnrolmentRecord
 
     @MockK
-    lateinit var scannedCredential: ScannedCredential
+    lateinit var scannedCredentialResult: ScannedCredentialResult
 
     @MockK
     lateinit var tokenizationProcessor: TokenizationProcessor
@@ -95,6 +99,8 @@ internal class EnrolLastBiometricViewModelTest {
 
         every { enrolmentRecord.subjectId } returns guidToEnrol
 
+        every { credentialSearchResult.scannedCredentialResult } returns scannedCredentialResult
+
         viewModel = EnrolLastBiometricViewModel(
             timeHelper = timeHelper,
             configRepository = configRepository,
@@ -109,6 +115,7 @@ internal class EnrolLastBiometricViewModelTest {
 
     @Test
     fun `only calls enrol once`() = runTest {
+        coEvery { configRepository.getProject() } returns null
         viewModel.onViewCreated(
             createParams(
                 listOf(
@@ -142,7 +149,7 @@ internal class EnrolLastBiometricViewModelTest {
             .test()
             .value()
             .getContentIfNotHandled()
-        assertThat(result).isEqualTo(EnrolLastState.Success(newGuid = "previousSubjectId", externalCredential = null))
+        assertThat(result).isEqualTo(EnrolLastState.Success(newGuid = "previousSubjectId", credentialSearchResult = null))
     }
 
     @Test
@@ -293,16 +300,12 @@ internal class EnrolLastBiometricViewModelTest {
 
     @Test
     fun `shows add credential dialog when scanned credential is linked to another subject`() = runTest {
-        val decryptedCredential = "decryptedCredential".asTokenizableRaw()
+        val confirmedCredential = "decryptedCredential".asTokenizableRaw()
+        val encryptedCredential = mockk<TokenizableString.Tokenized>()
+        every { credentialSearchResult.confirmedCredential } returns confirmedCredential
+        coEvery { tokenizationProcessor.encrypt(confirmedCredential, any(), project) } returns encryptedCredential
         coEvery { enrolmentRecordRepository.load(any()) } returns listOf(enrolmentRecord)
         coEvery { configRepository.getProject() } returns project
-        coEvery {
-            tokenizationProcessor.decrypt(
-                encrypted = scannedCredential.credential,
-                tokenKeyType = TokenKeyType.ExternalCredential,
-                project = project,
-            )
-        } returns decryptedCredential
 
         viewModel.onViewCreated(
             createParams(
@@ -318,24 +321,16 @@ internal class EnrolLastBiometricViewModelTest {
             .getContentIfNotHandled()
 
         assertThat(result).isNotNull()
-        assertThat(result?.scannedCredential).isEqualTo(scannedCredential)
-        assertThat(result?.displayedCredential).isEqualTo(decryptedCredential)
+        assertThat(result?.scannedCredentialResult).isEqualTo(credentialSearchResult.scannedCredentialResult)
+        assertThat(result?.displayedCredential).isEqualTo(confirmedCredential)
         coVerify(exactly = 0) { buildRecord.invoke(any(), any()) }
         coVerify(exactly = 0) { enrolmentRecordRepository.performActions(any(), any()) }
     }
 
     @Test
     fun `add credential dialog is not shown when there is no result`() = runTest {
-        val decryptedCredential = "decryptedCredential".asTokenizableRaw()
         coEvery { enrolmentRecordRepository.load(any()) } returns listOf(enrolmentRecord)
         coEvery { configRepository.getProject() } returns project
-        coEvery {
-            tokenizationProcessor.decrypt(
-                encrypted = scannedCredential.credential,
-                tokenKeyType = TokenKeyType.ExternalCredential,
-                project = project,
-            )
-        } returns decryptedCredential
 
         viewModel.onViewCreated(createParams(steps = listOf()))
 
@@ -344,21 +339,13 @@ internal class EnrolLastBiometricViewModelTest {
 
     @Test
     fun `add credential dialog is not shown when there are no credentials`() = runTest {
-        val decryptedCredential = "decryptedCredential".asTokenizableRaw()
         coEvery { enrolmentRecordRepository.load(any()) } returns listOf(enrolmentRecord)
         coEvery { configRepository.getProject() } returns project
-        coEvery {
-            tokenizationProcessor.decrypt(
-                encrypted = scannedCredential.credential,
-                tokenKeyType = TokenKeyType.ExternalCredential,
-                project = project,
-            )
-        } returns decryptedCredential
 
         viewModel.onViewCreated(
             createParams(
                 steps = listOf(EnrolLastBiometricStepResult.EnrolLastBiometricsResult(subjectId = enrolmentRecord.subjectId)),
-                credentials = null,
+                credentialResult = null,
             ),
         )
 
@@ -367,16 +354,9 @@ internal class EnrolLastBiometricViewModelTest {
 
     @Test
     fun `add credential dialog is not shown when credential is already linked to same subject`() = runTest {
-        val decryptedCredential = "decryptedCredential".asTokenizableRaw()
+        coEvery { tokenizationProcessor.encrypt(any(), any(), project) } returns mockk<TokenizableString.Tokenized>()
         coEvery { enrolmentRecordRepository.load(any()) } returns listOf(enrolmentRecord)
         coEvery { configRepository.getProject() } returns project
-        coEvery {
-            tokenizationProcessor.decrypt(
-                encrypted = scannedCredential.credential,
-                tokenKeyType = TokenKeyType.ExternalCredential,
-                project = project,
-            )
-        } returns decryptedCredential
 
         viewModel.onViewCreated(
             createParams(
@@ -391,13 +371,13 @@ internal class EnrolLastBiometricViewModelTest {
 
     private fun createParams(
         steps: List<EnrolLastBiometricStepResult>,
-        credentials: ScannedCredential? = scannedCredential,
+        credentialResult: ExternalCredentialSearchResult.Complete? = credentialSearchResult,
     ) = EnrolLastBiometricParams(
         projectId = PROJECT_ID,
         userId = USER_ID,
         moduleId = MODULE_ID,
         steps = steps,
-        scannedCredential = credentials,
+        credentialSearchResult = credentialResult,
     )
 
     companion object {

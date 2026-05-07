@@ -4,15 +4,10 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.permission.PermissionStatus
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.screens.scanqr.usecase.ExternalCredentialQrCodeValidatorUseCase
-import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -34,12 +29,6 @@ internal class ExternalCredentialScanQrViewModelTest {
     @MockK
     private lateinit var validator: ExternalCredentialQrCodeValidatorUseCase
 
-    @MockK
-    private lateinit var tokenizationProcessor: TokenizationProcessor
-
-    @MockK
-    private lateinit var configRepository: ConfigRepository
-
     private lateinit var viewModel: ExternalCredentialScanQrViewModel
 
     @Before
@@ -48,8 +37,6 @@ internal class ExternalCredentialScanQrViewModelTest {
         viewModel = ExternalCredentialScanQrViewModel(
             timeHelper = timeHelper,
             externalCredentialQrCodeValidator = validator,
-            tokenizationProcessor = tokenizationProcessor,
-            configRepository = configRepository,
         )
 
         every { timeHelper.now() } returns Timestamp(1L)
@@ -69,34 +56,17 @@ internal class ExternalCredentialScanQrViewModelTest {
     }
 
     @Test
-    fun `updateCapturedValue with missing project`() = runTest {
-        val observer = viewModel.stateLiveData.test()
-        val value = "value"
-
-        coEvery { configRepository.getProject() } returns null
-        viewModel.updateCapturedValue(value)
-
-        assertThat(observer.value()).isEqualTo(ScanQrState.ReadyToScan)
-    }
-
-    @Test
     fun `updateCapturedValue with non-null sets QrCodeCaptured`() = runTest {
         val observer = viewModel.stateLiveData.test()
         val value = "value"
-        val mockProject = mockk<Project>()
-        val mockTokenizedCredential = mockk<TokenizableString.Tokenized>()
 
-        coEvery { configRepository.getProject() } returns mockProject
-        every { tokenizationProcessor.encrypt(any(), TokenKeyType.ExternalCredential, mockProject) } returns mockTokenizedCredential
-
-        viewModel.updateCameraPermissionStatus(permissionStatus = PermissionStatus.Granted) // inits the capture timing
+        viewModel.updateCameraPermissionStatus(permissionStatus = PermissionStatus.Granted)
         viewModel.updateCapturedValue(value)
 
         val expected = ScanQrState.QrCodeCaptured(
             scanStartTime = Timestamp(1L),
             scanEndTime = Timestamp(1L),
             qrCode = value.asTokenizableRaw(),
-            qrCodeEncrypted = mockTokenizedCredential,
         )
         assertThat(observer.value()).isEqualTo(expected)
     }

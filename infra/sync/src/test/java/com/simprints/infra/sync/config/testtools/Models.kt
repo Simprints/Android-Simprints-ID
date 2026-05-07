@@ -122,6 +122,9 @@ internal val allowedExternalCredential = ExternalCredentialType.NHISCard
 
 internal val multiFactorIdConfiguration = MultiFactorIdConfiguration(
     allowedExternalCredentials = listOf(allowedExternalCredential),
+    ghanaIdCardConfig = null,
+    nhisCardConfig = null,
+    qrCodeConfig = null,
 )
 
 internal val synchronizationConfiguration = SynchronizationConfiguration(

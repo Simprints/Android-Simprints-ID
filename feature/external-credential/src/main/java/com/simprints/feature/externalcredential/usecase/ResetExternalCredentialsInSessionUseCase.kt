@@ -2,8 +2,8 @@ package com.simprints.feature.externalcredential.usecase
 
 import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.tools.extentions.isValidGuid
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
-import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
+import com.simprints.feature.externalcredential.ExternalCredentialMapper
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
@@ -12,14 +12,15 @@ import com.simprints.infra.events.session.SessionEventRepository
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
-class ResetExternalCredentialsInSessionUseCase @Inject() constructor(
+class ResetExternalCredentialsInSessionUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val configRepository: ConfigRepository,
     private val eventRepository: SessionEventRepository,
+    private val credentialMapper: ExternalCredentialMapper,
     @param:SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
     suspend operator fun invoke(
-        scannedCredential: ScannedCredential? = null,
+        credentialSearchResult: ExternalCredentialSearchResult.Complete? = null,
         subjectId: String = "",
     ) {
         val enrolmentUpdateEvents = eventRepository
@@ -39,13 +40,17 @@ class ResetExternalCredentialsInSessionUseCase @Inject() constructor(
         }
 
         val validSubjectId = subjectId.takeIf { it.isValidGuid() }
-        val credentialsToAdd = if (validSubjectId != null && scannedCredential != null) {
+        val credentialsToAdd = if (validSubjectId != null && credentialSearchResult != null) {
+            val externalCredential = credentialMapper.mapExternalCredential(
+                searchResult = credentialSearchResult,
+                subjectId = validSubjectId,
+            )
             listOf(
                 EnrolmentRecordAction.Update(
                     subjectId = subjectId,
                     samplesToAdd = emptyList(),
                     referenceIdsToRemove = emptyList(),
-                    externalCredentialsToAdd = listOf(scannedCredential.toExternalCredential(validSubjectId)),
+                    externalCredentialsToAdd = listOf(externalCredential),
                     externalCredentialIdsToRemove = emptyList(),
                 ),
             )

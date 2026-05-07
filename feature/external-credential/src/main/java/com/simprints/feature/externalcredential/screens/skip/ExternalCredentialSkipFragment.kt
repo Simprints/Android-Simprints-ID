@@ -87,10 +87,9 @@ class ExternalCredentialSkipFragment : Fragment(R.layout.fragment_external_crede
         // [MS-1166] We should log skip reasons in analytics.
         buttonSkip.setOnClickListener {
             mainViewModel.finish(
-                ExternalCredentialSearchResult(
+                ExternalCredentialSearchResult.Skipped(
                     flowType = mainViewModel.params.flowType,
-                    scannedCredential = null,
-                    matchResults = emptyList(),
+                    skipReason = viewIdToOption(skipCredentialScanRadioGroup.checkedRadioButtonId),
                 ),
             )
         }

@@ -4,28 +4,22 @@ import android.graphics.Bitmap
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.feature.externalcredential.model.BoundingBox
-import com.simprints.feature.externalcredential.screens.scanocr.model.DetectedOcrBlock
 import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessment
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
+import com.simprints.feature.externalcredential.screens.scanocr.model.ScannedMfidDocument
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.BuildScannedCredentialResultUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.CropDocumentFromPreviewUseCase
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetCredentialCoordinatesUseCase
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetLightingConditionsAssessmentUseCase
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.KeepOnlyBestDetectedBlockUseCase
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.NormalizeBitmapToPreviewUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetLightingConditionsAssessmentConfigUseCase
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.ZoomOntoCredentialUseCase
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetLightingConditionsAssessmentUseCase
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.NormalizeBitmapToPreviewUseCase
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.ScanMfidDocumentUseCase
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.credential.store.CredentialImageRepository
 import com.simprints.infra.resources.R
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -58,22 +52,13 @@ internal class ExternalCredentialScanOcrViewModelTest {
     private lateinit var cropDocumentFromPreviewUseCase: CropDocumentFromPreviewUseCase
 
     @MockK
-    private lateinit var getCredentialCoordinatesUseCase: GetCredentialCoordinatesUseCase
+    private lateinit var scanMfidDocumentUseCase: ScanMfidDocumentUseCase
+
+    @MockK
+    private lateinit var buildScannedCredentialResultUseCase: BuildScannedCredentialResultUseCase
 
     @MockK
     private lateinit var getLightingConditionsAssessment: GetLightingConditionsAssessmentUseCase
-
-    @MockK
-    private lateinit var keepOnlyBestDetectedBlockUseCase: KeepOnlyBestDetectedBlockUseCase
-
-    @MockK
-    private lateinit var zoomOntoCredentialUseCase: ZoomOntoCredentialUseCase
-
-    @MockK
-    private lateinit var credentialImageRepository: CredentialImageRepository
-
-    @MockK
-    private lateinit var tokenizationProcessor: TokenizationProcessor
 
     @MockK
     private lateinit var configRepository: ConfigRepository
@@ -100,7 +85,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
         documentType: OcrDocumentType,
         customConfig: Map<String, JsonPrimitive> = emptyMap(),
     ): ExternalCredentialScanOcrViewModel {
-        val projectConfiguration = mockk<ProjectConfiguration> {
+        val projectConfiguration = mockk<ProjectConfiguration>(relaxed = true) {
             every { custom } returns customConfig
         }
         coEvery { configRepository.getProjectConfiguration() } returns projectConfiguration
@@ -110,15 +95,12 @@ internal class ExternalCredentialScanOcrViewModelTest {
             timeHelper = timeHelper,
             normalizeBitmapToPreviewUseCase = normalizeBitmapToPreviewUseCase,
             cropDocumentFromPreviewUseCase = cropDocumentFromPreviewUseCase,
-            getCredentialCoordinatesUseCase = getCredentialCoordinatesUseCase,
+            scanMfidDocumentUseCase = scanMfidDocumentUseCase,
+            buildScannedCredentialResultUseCase = buildScannedCredentialResultUseCase,
             getLightingConditionsAssessmentConfig = GetLightingConditionsAssessmentConfigUseCase(configRepository),
             getLightingConditionsAssessment = getLightingConditionsAssessment,
-            keepOnlyBestDetectedBlockUseCase = keepOnlyBestDetectedBlockUseCase,
-            zoomOntoCredentialUseCase = zoomOntoCredentialUseCase,
-            credentialImageRepository = credentialImageRepository,
-            bgDispatcher = testCoroutineRule.testCoroutineDispatcher,
-            tokenizationProcessor = tokenizationProcessor,
             configRepository = configRepository,
+            bgDispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
     }
 
@@ -144,12 +126,12 @@ internal class ExternalCredentialScanOcrViewModelTest {
 
     @Test
     fun `processImage updates detected blocks and state when OCR successful`() = runTest {
-        val mockDetectedBlock = mockk<DetectedOcrBlock>()
+        val mockScannedDocument = mockk<ScannedMfidDocument>()
         val mockNormalizedBitmap = mockk<Bitmap>()
         val mockCroppedBitmap = mockk<Bitmap>()
         coEvery { normalizeBitmapToPreviewUseCase(bitmap, cropConfig) } returns mockNormalizedBitmap
         coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
-        coEvery { getCredentialCoordinatesUseCase(mockCroppedBitmap, documentType) } returns mockDetectedBlock
+        coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
 
         val observer = viewModel.scanOcrStateLiveData.test()
         viewModel.imageProcessingStarted()
@@ -202,7 +184,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
         assertThat(observer.value()).isInstanceOf(ScanOcrState.NotScanning::class.java)
         coVerify(exactly = 0) { normalizeBitmapToPreviewUseCase.invoke(any(), any()) }
         coVerify(exactly = 0) { cropDocumentFromPreviewUseCase.invoke(any(), any()) }
-        coVerify(exactly = 0) { getCredentialCoordinatesUseCase.invoke(any(), any()) }
+        coVerify(exactly = 0) { scanMfidDocumentUseCase.invoke(any(), any(), any()) }
         coVerify(exactly = 0) { getLightingConditionsAssessment.invoke(any(), any()) }
         assertThat(viewModel.isOcrActive).isFalse()
     }
@@ -233,7 +215,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
 
         assertThat(observer.value()).isEqualTo(lightingConditionsAssessment)
         coVerify(exactly = 1) { getLightingConditionsAssessment(mockCroppedBitmap, any()) }
-        coVerify(exactly = 0) { getCredentialCoordinatesUseCase.invoke(any(), any()) }
+        coVerify(exactly = 0) { scanMfidDocumentUseCase.invoke(any(), any(), any()) }
     }
 
     @Test
@@ -260,7 +242,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
     @Test
     fun `processImage skips image processing when config is not yet initialized and scanning is not in progress`() = runTest {
         val configLoadingDeferred = CompletableDeferred<ProjectConfiguration>()
-        val projectConfiguration = mockk<ProjectConfiguration> {
+        val projectConfiguration = mockk<ProjectConfiguration>(relaxed = true) {
             every { custom } returns mapOf(
                 MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED to JsonPrimitive(true),
             )
@@ -273,15 +255,12 @@ internal class ExternalCredentialScanOcrViewModelTest {
             timeHelper = timeHelper,
             normalizeBitmapToPreviewUseCase = normalizeBitmapToPreviewUseCase,
             cropDocumentFromPreviewUseCase = cropDocumentFromPreviewUseCase,
-            getCredentialCoordinatesUseCase = getCredentialCoordinatesUseCase,
+            scanMfidDocumentUseCase = scanMfidDocumentUseCase,
+            buildScannedCredentialResultUseCase = buildScannedCredentialResultUseCase,
             getLightingConditionsAssessmentConfig = GetLightingConditionsAssessmentConfigUseCase(configRepository),
             getLightingConditionsAssessment = getLightingConditionsAssessment,
-            keepOnlyBestDetectedBlockUseCase = keepOnlyBestDetectedBlockUseCase,
-            zoomOntoCredentialUseCase = zoomOntoCredentialUseCase,
-            credentialImageRepository = credentialImageRepository,
-            bgDispatcher = testCoroutineRule.testCoroutineDispatcher,
-            tokenizationProcessor = tokenizationProcessor,
             configRepository = configRepository,
+            bgDispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
 
         viewModel.processImage(bitmap, cropConfig)
@@ -299,71 +278,37 @@ internal class ExternalCredentialScanOcrViewModelTest {
 
     @Test
     fun `processOcrResultsAndFinish sends finish event with scanned credential`() = runTest {
-        val detectedBlockImagePath = "detectedBlockImagePath"
-        val readoutValue = "readoutValue"
-        val zoomedImagePath = "zoomedImagePath"
-        val mockBoundingBox = mockk<BoundingBox>()
-        val mockBitmap = mockk<Bitmap>()
-        val mockProject = mockk<Project>()
-        val mockTokenizedCredential = mockk<TokenizableString.Tokenized>()
-
-        val mockBestBlock = mockk<DetectedOcrBlock> {
-            every { documentType } returns OcrDocumentType.NhisCard
-            every { blockBoundingBox } returns mockBoundingBox
-            every { imagePath } returns detectedBlockImagePath
-            every { this@mockk.readoutValue } returns readoutValue
-        }
-
-        coEvery { configRepository.getProject() } returns mockProject
-        coEvery { keepOnlyBestDetectedBlockUseCase(any(), documentType) } returns mockBestBlock
-        every { tokenizationProcessor.encrypt(any(), TokenKeyType.ExternalCredential, mockProject) } returns mockTokenizedCredential
-        coEvery { zoomOntoCredentialUseCase(detectedBlockImagePath, mockBoundingBox) } returns mockBitmap
-        coEvery { credentialImageRepository.saveCredentialScan(mockBitmap, any()) } returns zoomedImagePath
+        val mockScannedCredentialResult = mockk<ScannedCredentialResult>()
+        coEvery { buildScannedCredentialResultUseCase(any(), documentType, any()) } returns mockScannedCredentialResult
 
         val finishObserver = viewModel.finishOcrEvent.test()
         val stateObserver = viewModel.scanOcrStateLiveData.test()
 
-        viewModel.startScanning() // Initialises capture timing
+        viewModel.startScanning()
         viewModel.processOcrResultsAndFinish()
 
-        val scannedCredential = finishObserver.value()?.peekContent()
-        assertThat(scannedCredential?.credential).isEqualTo(mockTokenizedCredential)
-        assertThat(scannedCredential?.documentImagePath).isEqualTo(detectedBlockImagePath)
-        assertThat(scannedCredential?.zoomedCredentialImagePath).isEqualTo(zoomedImagePath)
-        assertThat(scannedCredential?.credentialBoundingBox).isEqualTo(mockBoundingBox)
+        assertThat(finishObserver.value()?.peekContent()).isEqualTo(mockScannedCredentialResult)
         assertThat(stateObserver.value()).isEqualTo(ScanOcrState.Complete)
         assertThat(viewModel.isOcrActive).isFalse()
     }
 
     @Test
-    fun `processOcrResultsAndFinish sets null zoomed image path when zoom fails`() = runTest {
-        val detectedBlockImagePath = "detectedBlockImagePath"
-        val readoutValue = "readoutValue"
-        val mockBoundingBox = mockk<BoundingBox>()
-        val mockProject = mockk<Project>()
-        val mockTokenizedCredential = mockk<TokenizableString.Tokenized>()
+    fun `processOcrResultsAndFinish passes accumulated documents to build use case`() = runTest {
+        val mockScannedDocument = mockk<ScannedMfidDocument>()
+        val mockScannedCredentialResult = mockk<ScannedCredentialResult>()
+        val mockNormalizedBitmap = mockk<Bitmap>()
+        val mockCroppedBitmap = mockk<Bitmap>()
 
-        val mockBestBlock = mockk<DetectedOcrBlock> {
-            every { documentType } returns OcrDocumentType.NhisCard
-            every { blockBoundingBox } returns mockBoundingBox
-            every { imagePath } returns detectedBlockImagePath
-            every { this@mockk.readoutValue } returns readoutValue
-        }
+        coEvery { normalizeBitmapToPreviewUseCase(bitmap, cropConfig) } returns mockNormalizedBitmap
+        coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
+        coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
+        coEvery { buildScannedCredentialResultUseCase(any(), documentType, any()) } returns mockScannedCredentialResult
 
-        coEvery { configRepository.getProject() } returns mockProject
-        coEvery { keepOnlyBestDetectedBlockUseCase(any(), documentType) } returns mockBestBlock
-        every { tokenizationProcessor.encrypt(any(), TokenKeyType.ExternalCredential, mockProject) } returns mockTokenizedCredential
-        coEvery { zoomOntoCredentialUseCase(detectedBlockImagePath, mockBoundingBox) } throws Exception("Zoom failed")
-
-        val finishObserver = viewModel.finishOcrEvent.test()
-
-        viewModel.startScanning() // Initialises capture timing
+        viewModel.startScanning()
+        viewModel.processImage(bitmap, cropConfig)
         viewModel.processOcrResultsAndFinish()
 
-        val scannedCredential = finishObserver.value()?.peekContent()
-        assertThat(scannedCredential?.zoomedCredentialImagePath).isNull()
-        assertThat(scannedCredential?.credential).isEqualTo(mockTokenizedCredential)
-        assertThat(scannedCredential?.documentImagePath).isEqualTo(detectedBlockImagePath)
+        coVerify { buildScannedCredentialResultUseCase(listOf(mockScannedDocument), documentType, any()) }
     }
 
     @Test
@@ -378,5 +323,32 @@ internal class ExternalCredentialScanOcrViewModelTest {
         viewModel = initViewModel(OcrDocumentType.GhanaIdCard)
         val result = viewModel.getDocumentTypeRes()
         assertThat(result).isEqualTo(R.string.mfid_type_ghana_id_card)
+    }
+
+    @Test
+    fun `processImage does not append documents or update state after scanning is complete`() = runTest {
+        val mockScannedDocument = mockk<ScannedMfidDocument>()
+        val mockScannedCredentialResult = mockk<ScannedCredentialResult>()
+        val mockNormalizedBitmap = mockk<Bitmap>()
+        val mockCroppedBitmap = mockk<Bitmap>()
+
+        coEvery { normalizeBitmapToPreviewUseCase(bitmap, cropConfig) } returns mockNormalizedBitmap
+        coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
+        coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
+        coEvery { buildScannedCredentialResultUseCase(any(), documentType, any()) } returns mockScannedCredentialResult
+
+        val stateObserver = viewModel.scanOcrStateLiveData.test()
+
+        viewModel.startScanning()
+        // transitioning to Complete
+        viewModel.processOcrResultsAndFinish()
+
+        // Frame from camera arrives after Complete
+        viewModel.imageProcessingStarted()
+        viewModel.processImage(bitmap, cropConfig)
+
+        assertThat(stateObserver.value()).isEqualTo(ScanOcrState.Complete)
+        assertThat(viewModel.isOcrActive).isFalse()
+        coVerify(exactly = 0) { scanMfidDocumentUseCase.invoke(any(), any(), any()) }
     }
 }

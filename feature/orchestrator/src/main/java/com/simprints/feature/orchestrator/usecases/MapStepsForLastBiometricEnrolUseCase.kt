@@ -13,7 +13,7 @@ import javax.inject.Inject
 internal class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
     operator fun invoke(results: List<Serializable>) = results.mapNotNull { result ->
         when (result) {
-            is ExternalCredentialSearchResult -> result.matchResults.takeUnless { it.isEmpty() }?.let { credentialMatches ->
+            is ExternalCredentialSearchResult.Complete -> result.matchResults.takeUnless { it.isEmpty() }?.let { credentialMatches ->
                 EnrolLastBiometricStepResult.MatchResult(
                     results = credentialMatches.map { credentialMatch ->
                         ComparisonResult(credentialMatch.comparisonResult.subjectId, credentialMatch.comparisonResult.comparisonScore)

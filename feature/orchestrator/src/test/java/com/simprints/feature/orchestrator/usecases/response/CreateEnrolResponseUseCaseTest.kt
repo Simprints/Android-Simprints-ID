@@ -1,13 +1,14 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.google.common.truth.Truth.*
-import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.capture.BiometricReferenceCapture
+import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.feature.externalcredential.ExternalCredentialMapper
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
 import com.simprints.feature.orchestrator.exceptions.MissingCaptureException
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.eventsync.sync.common.EnrolmentRecordFactory
@@ -26,6 +27,9 @@ internal class CreateEnrolResponseUseCaseTest {
 
     @MockK
     lateinit var enrolRecord: EnrolRecordUseCase
+
+    @MockK
+    lateinit var credentialMapper: ExternalCredentialMapper
 
     @MockK
     lateinit var project: Project
@@ -48,7 +52,7 @@ internal class CreateEnrolResponseUseCaseTest {
 
         coJustRun { enrolRecord.invoke(any(), any()) }
 
-        useCase = CreateEnrolResponseUseCase(enrolmentRecordFactory, enrolRecord)
+        useCase = CreateEnrolResponseUseCase(enrolmentRecordFactory, enrolRecord, credentialMapper)
     }
 
     @Test
@@ -97,14 +101,14 @@ internal class CreateEnrolResponseUseCaseTest {
     @Test
     fun `correctly processes external credential result`() = runTest {
         val externalCredentialType = ExternalCredentialType.GhanaIdCard
-        val scannedCredentialMock = mockk<ScannedCredential> {
-            every { credentialScanId } returns "scanId"
-            every { credential } returns credentialEncrypted
-            every { credentialType } returns externalCredentialType
-        }
-        val credentialSearchResult = mockk<ExternalCredentialSearchResult> {
-            every { scannedCredential } returns scannedCredentialMock
-        }
+        val credentialSearchResult = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true)
+        val mappedCredential = ExternalCredential(
+            id = "scanId",
+            value = credentialEncrypted,
+            subjectId = enrolmentSubjectId,
+            type = externalCredentialType,
+        )
+        coEvery { credentialMapper.mapExternalCredential(credentialSearchResult, enrolmentSubjectId) } returns mappedCredential
 
         every {
             enrolmentRecordFactory.buildFromCaptureResults(

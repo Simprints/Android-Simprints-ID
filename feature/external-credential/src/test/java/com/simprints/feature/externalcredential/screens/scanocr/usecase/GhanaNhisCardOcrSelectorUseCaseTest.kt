@@ -10,7 +10,7 @@ import org.junit.Before
 import org.junit.Test
 
 internal class GhanaNhisCardOcrSelectorUseCaseTest {
-    private lateinit var useCase: GhanaNhisCardOcrSelectorUseCase
+    private lateinit var useCase: GhanaNhisCardOcrReaderUseCase
     private val label = "membership number"
     private val validNumbers = listOf(
         "12345678",
@@ -28,7 +28,7 @@ internal class GhanaNhisCardOcrSelectorUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        useCase = GhanaNhisCardOcrSelectorUseCase()
+        useCase = GhanaNhisCardOcrReaderUseCase()
     }
 
     @Test
@@ -38,7 +38,7 @@ internal class GhanaNhisCardOcrSelectorUseCaseTest {
             val expected = line(id = id + 1, text = number, top = 140)
             val reader = buildReader(label, expected)
 
-            assertThat(useCase(reader)).isEqualTo(expected)
+            assertThat(useCase(reader, isCapturingAllFields = false)?.credential).isEqualTo(expected)
         }
     }
 
@@ -50,7 +50,7 @@ internal class GhanaNhisCardOcrSelectorUseCaseTest {
                 line(id = id + 1, text = number, top = 140),
             )
 
-            assertThat(useCase(reader)).isNull()
+            assertThat(useCase(reader, isCapturingAllFields = false)).isNull()
         }
     }
 

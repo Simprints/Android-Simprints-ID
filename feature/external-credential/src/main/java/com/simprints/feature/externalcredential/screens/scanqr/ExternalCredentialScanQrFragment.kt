@@ -22,7 +22,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.extentions.getCurrentPermissionStatus
 import com.simprints.core.tools.extentions.hasPermission
@@ -30,7 +29,8 @@ import com.simprints.core.tools.extentions.permissionFromResult
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialScanQrBinding
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.screens.search.model.MfidDocument
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.camera.qrscan.CameraHelper
@@ -137,23 +137,21 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
     }
 
     private fun renderScanComplete(state: ScanQrState.QrCodeCaptured) = with(binding) {
-        val qrCodeRaw = state.qrCode
+        val qrCodeValue = state.qrCode
         qrInstructionsText.isVisible = false
         qrPreviewCard.isVisible = true
-        qrPreviewText.text = qrCodeRaw.value
+        qrPreviewText.text = state.qrCode.value
         buttonScan.setText(IDR.string.mfid_continue)
         buttonScan.isEnabled = true
         buttonScan.setOnClickListener {
-            if (viewModel.isValidQrCodeFormat(qrCodeRaw)) {
-                val args = ScannedCredential(
-                    credential = state.qrCodeEncrypted,
-                    credentialType = ExternalCredentialType.QRCode,
+            if (viewModel.isValidQrCodeFormat(qrCodeValue)) {
+                val args = ScannedCredentialResult(
+                    document = MfidDocument.GhanaQrCode(qrCodeValue),
                     documentImagePath = null,
                     credentialBoundingBox = null,
                     zoomedCredentialImagePath = null,
                     scanStartTime = state.scanStartTime,
                     scanEndTime = state.scanEndTime,
-                    scannedValue = state.qrCode,
                 )
                 findNavController().navigateSafely(
                     this@ExternalCredentialScanQrFragment,
@@ -161,7 +159,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
                 )
             } else {
                 showInvalidQrCodeFormatDialog(
-                    qrCodeValue = qrCodeRaw,
+                    qrCodeValue = qrCodeValue,
                     onDismiss = {
                         dismissDialog()
                         viewModel.updateCapturedValue(null)

@@ -1,18 +1,15 @@
 package com.simprints.feature.externalcredential.usecase
 
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.feature.externalcredential.ExternalCredentialMapper
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.CalculateLevenshteinDistanceUseCase
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
-import com.simprints.feature.externalcredential.screens.search.model.toExternalCredential
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ModalitySdkType
-import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
@@ -31,9 +28,9 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerCo
 internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val configRepository: ConfigRepository,
-    private val tokenizationProcessor: TokenizationProcessor,
     private val eventRepository: SessionEventRepository,
     private val calculateDistance: CalculateLevenshteinDistanceUseCase,
+    private val externalCredentialMapper: ExternalCredentialMapper,
 ) {
     suspend fun saveMatchEvent(
         startTime: Timestamp,
@@ -68,18 +65,21 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
     }
 
     suspend fun saveCaptureEvents(
-        startTime: Timestamp,
+        credentialSearchResult: ExternalCredentialSearchResult.Complete,
         subjectId: String,
-        scannedCredential: ScannedCredential,
+        startTime: Timestamp,
         selectionEventId: String,
     ) {
-        Simber.d("Saving External Credential Events for $scannedCredential")
-        val credential = scannedCredential.toExternalCredential(subjectId)
+        Simber.d("Saving External Credential Events for $credentialSearchResult")
+        val confirmedCredential = credentialSearchResult.confirmedCredential
+        val scannedCredentialResult = credentialSearchResult.scannedCredentialResult
+        val type = scannedCredentialResult.credentialType
+        val externalCredential = externalCredentialMapper.mapExternalCredential(credentialSearchResult, subjectId)
         eventRepository.addOrUpdateEvent(
             ExternalCredentialCaptureValueEvent(
                 createdAt = startTime,
-                payloadId = scannedCredential.credentialScanId,
-                credential = credential,
+                payloadId = externalCredential.id,
+                credential = externalCredential,
             ),
         )
 
@@ -87,36 +87,21 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
             ExternalCredentialCaptureEvent(
                 startTime = startTime,
                 endTime = timeHelper.now(),
-                payloadId = scannedCredential.credentialScanId,
-                autoCaptureStartTime = scannedCredential.scanStartTime,
-                autoCaptureEndTime = scannedCredential.scanEndTime,
-                ocrErrorCount = calculateOcrErrorCount(scannedCredential),
-                capturedTextLength = getActualCapturedCredentialLength(scannedCredential),
-                credentialTextLength = getExpectedCredentialValueLength(credential),
+                payloadId = externalCredential.id,
+                autoCaptureStartTime = scannedCredentialResult.scanStartTime,
+                autoCaptureEndTime = scannedCredentialResult.scanEndTime,
+                ocrErrorCount = calculateDistance(scannedCredentialResult.credential.value, confirmedCredential.value),
+                capturedTextLength = confirmedCredential.value.length,
+                credentialTextLength = getExpectedCredentialValueLength(type),
                 selectionId = selectionEventId,
             ),
         )
     }
 
-    private fun getActualCapturedCredentialLength(scannedCredential: ScannedCredential): Int = scannedCredential.scannedValue.value.length
-
-    private fun getExpectedCredentialValueLength(credential: ExternalCredential): Int = when (credential.type) {
+    private fun getExpectedCredentialValueLength(type: ExternalCredentialType): Int = when (type) {
         ExternalCredentialType.NHISCard -> NHIS_CARD_ID_LENGTH
         ExternalCredentialType.GhanaIdCard -> GHANA_ID_CARD_ID_LENGTH
         ExternalCredentialType.QRCode -> QR_CODE_LENGTH
-    }
-
-    private suspend fun calculateOcrErrorCount(scannedCredential: ScannedCredential): Int {
-        val project = configRepository.getProject() ?: return 0
-        val actualCredentialRaw = tokenizationProcessor.decrypt(
-            scannedCredential.credential,
-            TokenKeyType.ExternalCredential,
-            project,
-        )
-        return calculateDistance(
-            scannedCredential.scannedValue.value,
-            actualCredentialRaw.value,
-        )
     }
 
     suspend fun saveSelectionEvent(

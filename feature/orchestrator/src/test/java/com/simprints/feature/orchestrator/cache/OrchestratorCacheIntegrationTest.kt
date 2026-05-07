@@ -10,7 +10,6 @@ import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.comparison.ComparisonResult
-import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
@@ -29,7 +28,8 @@ import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.BoundingBox
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.screens.search.model.MfidDocument
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.feature.fetchsubject.FetchSubjectParams
 import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.login.LoginError
@@ -303,7 +303,7 @@ class OrchestratorCacheIntegrationTest {
                     ),
                     EnrolLastBiometricStepResult.EnrolLastBiometricsResult("subjectId"),
                 ),
-                scannedCredential = null,
+                credentialSearchResult = null,
             ),
             status = StepStatus.COMPLETED,
             result = ValidateSubjectPoolResult(true),
@@ -314,7 +314,7 @@ class OrchestratorCacheIntegrationTest {
             destinationId = 6,
             params = SelectSubjectParams("projectId", "subjectId", null),
             status = StepStatus.COMPLETED,
-            result = SelectSubjectResult(true, savedCredential = null),
+            result = SelectSubjectResult(true, credentialSearchResult = null),
         ),
         Step(
             id = StepId.VALIDATE_ID_POOL,
@@ -367,19 +367,18 @@ class OrchestratorCacheIntegrationTest {
                 ),
             ),
             status = StepStatus.COMPLETED,
-            result = ExternalCredentialSearchResult(
+            result = ExternalCredentialSearchResult.Complete(
                 flowType = FlowType.IDENTIFY,
-                scannedCredential = ScannedCredential(
+                scannedCredentialResult = ScannedCredentialResult(
                     credentialScanId = "scanId",
-                    credential = "credential".asTokenizableEncrypted(),
-                    credentialType = ExternalCredentialType.GhanaIdCard,
+                    document = MfidDocument.GhanaIdCard(credential = "credential".asTokenizableRaw()),
                     documentImagePath = "image/path.jpg",
                     zoomedCredentialImagePath = "image/path.jpg",
                     credentialBoundingBox = BoundingBox(0, 1, 2, 3),
                     scanStartTime = Timestamp(1L),
-                    scanEndTime = Timestamp(2L, false, 123L),
-                    scannedValue = "credential".asTokenizableRaw(),
+                    scanEndTime = Timestamp(2L),
                 ),
+                confirmedCredential = "credential".asTokenizableRaw(),
                 matchResults = listOf(
                     CredentialMatch(
                         credential = "credential".asTokenizableEncrypted(),

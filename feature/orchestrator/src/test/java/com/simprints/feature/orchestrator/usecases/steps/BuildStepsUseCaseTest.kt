@@ -5,7 +5,7 @@ import com.simprints.core.domain.common.AgeGroup
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
 import com.simprints.feature.orchestrator.steps.Step
@@ -46,7 +46,7 @@ class BuildStepsUseCaseTest {
     private lateinit var nec: FingerprintConfiguration.FingerprintSdkConfiguration
 
     @RelaxedMockK
-    private lateinit var cachedScannedCredential: ScannedCredential
+    private lateinit var cachedScannedCredentialResult: ExternalCredentialSearchResult.Complete
 
     private lateinit var useCase: BuildStepsUseCase
     private lateinit var enrolmentSubjectId: String
@@ -115,7 +115,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.EnrolActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns null
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -135,7 +135,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.EnrolActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns null
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -154,7 +154,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.EnrolActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns null
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -178,7 +178,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.EnrolActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns null
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -198,7 +198,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.IdentifyActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns null
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -221,7 +221,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.IdentifyActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns null
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -241,7 +241,7 @@ class BuildStepsUseCaseTest {
         every { projectConfiguration.custom } returns
             mapOf("validateIdentificationPool" to JsonPrimitive(true))
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -264,7 +264,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.VerifyActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns null
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -288,7 +288,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.VerifyActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns null
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -307,7 +307,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.ConfirmIdentityActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns null
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -326,7 +326,7 @@ class BuildStepsUseCaseTest {
             Step(StepId.FACE_CAPTURE, mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true)),
         )
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -345,7 +345,7 @@ class BuildStepsUseCaseTest {
             Step(StepId.FACE_CAPTURE, mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true)),
         )
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -366,7 +366,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.EnrolActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns null
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -387,7 +387,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.IdentifyActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns null
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -408,7 +408,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.VerifyActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns null
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -430,7 +430,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.EnrolActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns 25 // Subject age within the supported range
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -454,7 +454,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.EnrolActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns 25 // Subject age within the supported range
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -480,7 +480,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.IdentifyActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns 25 // Subject age within the supported range
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -507,7 +507,7 @@ class BuildStepsUseCaseTest {
             every { getSubjectAgeIfAvailable() } returns 25
             every { biometricDataSource } returns "COMMCARE"
         }
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -533,7 +533,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.VerifyActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns 25 // Subject age within the supported range
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -560,7 +560,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.VerifyActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns 25 // Subject age within the supported range
         every { action.biometricDataSource } returns "COMMCARE"
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -588,7 +588,7 @@ class BuildStepsUseCaseTest {
         every { action.getSubjectAgeIfAvailable() } returns 20 // Subject age not supported by any SDK
 
         assertThrows(SubjectAgeNotSupportedException::class.java) {
-            runBlocking { useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential) }
+            runBlocking { useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult) }
         }
     }
 
@@ -604,7 +604,7 @@ class BuildStepsUseCaseTest {
         every { action.getSubjectAgeIfAvailable() } returns 20 // Subject age not supported by any SDK
 
         assertThrows(SubjectAgeNotSupportedException::class.java) {
-            runBlocking { useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential) }
+            runBlocking { useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult) }
         }
     }
 
@@ -620,7 +620,7 @@ class BuildStepsUseCaseTest {
         every { action.getSubjectAgeIfAvailable() } returns 20 // Subject age not supported by any SDK
 
         assertThrows(SubjectAgeNotSupportedException::class.java) {
-            runBlocking { useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential) }
+            runBlocking { useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult) }
         }
     }
 
@@ -770,7 +770,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.EnrolActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns null
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         // Should not contain EXTERNAL_CREDENTIAL step
         assertStepOrder(
@@ -791,7 +791,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.EnrolActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns null
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -812,7 +812,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.IdentifyActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns null
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
@@ -836,7 +836,7 @@ class BuildStepsUseCaseTest {
         val action = mockk<ActionRequest.VerifyActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns null
 
-        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredential)
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         // Should not contain EXTERNAL_CREDENTIAL step for VERIFY flow
         assertStepOrder(
@@ -858,7 +858,7 @@ class BuildStepsUseCaseTest {
         val testProjectId = "projectId"
         val guid = "guid"
         val projectConfiguration = mockCommonProjectConfiguration()
-        val cachedScannedCredential = mockk<ScannedCredential>(relaxed = true)
+        val cachedCredentialSearchResult = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true)
 
         val action = mockk<ActionRequest.ConfirmIdentityActionRequest>(relaxed = true) {
             every { projectId } returns testProjectId
@@ -870,7 +870,7 @@ class BuildStepsUseCaseTest {
             action = action,
             projectConfiguration = projectConfiguration,
             enrolmentSubjectId = enrolmentSubjectId,
-            cachedScannedCredential = cachedScannedCredential,
+            cachedCredentialSearchResult = cachedCredentialSearchResult,
         )
 
         assertStepOrder(steps, StepId.CONFIRM_IDENTITY)
@@ -881,6 +881,6 @@ class BuildStepsUseCaseTest {
         assertThat(params).isNotNull()
         assertThat(params?.projectId).isEqualTo(testProjectId)
         assertThat(params?.subjectId).isEqualTo(guid)
-        assertThat(params?.scannedCredential).isEqualTo(cachedScannedCredential)
+        assertThat(params?.credentialSearchResult).isEqualTo(cachedCredentialSearchResult)
     }
 }

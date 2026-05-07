@@ -2,6 +2,8 @@ package com.simprints.feature.externalcredential.screens.scanocr.usecase
 
 import android.graphics.Bitmap
 import android.graphics.Rect
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
+import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
 internal class CropDocumentFromPreviewUseCase @Inject constructor() {
@@ -17,12 +19,14 @@ internal class CropDocumentFromPreviewUseCase @Inject constructor() {
         val width = right - left
         val height = bottom - top
 
-        if (width <= 0 || height <= 0) {
-            throw IllegalStateException(
-                "Invalid OCR crop dimensions: width=$width, height=$height. CutoutRect=[$cutoutRect], bitmapSize(w,h)=[${bitmap.width}x${bitmap.height}]",
-            )
+        return if (width <= 0 || height <= 0) {
+            val message =
+                "Invalid OCR crop dimensions: width=$width, height=$height. CutoutRect=[$cutoutRect], bitmapSize(w,h)=[${bitmap.width}x${bitmap.height}]"
+            Simber.e(message = message, t = IllegalStateException(message), tag = MULTI_FACTOR_ID)
+            // Returning original bitmap without zooming in
+            return bitmap
+        } else {
+            Bitmap.createBitmap(bitmap, left, top, width, height)
         }
-
-        return Bitmap.createBitmap(bitmap, left, top, width, height)
     }
 }

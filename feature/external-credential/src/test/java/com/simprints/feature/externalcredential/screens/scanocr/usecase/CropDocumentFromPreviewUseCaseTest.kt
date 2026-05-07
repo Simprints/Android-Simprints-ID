@@ -174,4 +174,20 @@ internal class CropDocumentFromPreviewUseCaseTest {
         }
         unmockkStatic(Bitmap::class)
     }
+
+    @Test
+    fun `returns original bitmap when clamped rect produces zero width`() {
+        // left and right both clamp to bitmapWidth, yielding width=0
+        val cutoutRect = Rect(bitmapWidth + 100, 0, bitmapWidth + 500, bitmapHeight)
+        val result = useCase(sourceBitmap, cutoutRect)
+        assertThat(result).isEqualTo(sourceBitmap)
+    }
+
+    @Test
+    fun `returns original bitmap when clamped rect produces zero height`() {
+        // top and bottom both clamp to bitmapHeight, yielding height=0
+        val cutoutRect = Rect(0, bitmapHeight + 100, bitmapWidth, bitmapHeight + 500)
+        val result = useCase(sourceBitmap, cutoutRect)
+        assertThat(result).isEqualTo(sourceBitmap)
+    }
 }

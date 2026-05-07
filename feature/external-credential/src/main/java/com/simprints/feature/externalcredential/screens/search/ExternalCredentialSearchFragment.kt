@@ -27,7 +27,7 @@ import com.simprints.feature.externalcredential.ext.getCredentialFieldTitle
 import com.simprints.feature.externalcredential.ext.getCredentialTypeString
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ZoomOntoCredentialUseCase
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.feature.externalcredential.screens.search.model.SearchCredentialState
 import com.simprints.feature.externalcredential.screens.search.model.SearchState
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
@@ -49,7 +49,7 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
                 return viewModelFactory.create(
-                    scannedCredential = args.scannedCredential,
+                    scannedCredentialResult = args.scannedCredentialResult,
                     externalCredentialParams = mainViewModel.params,
                 ) as T
             }
@@ -80,7 +80,7 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
     private fun initObservers() {
         viewModel.stateLiveData.observe(viewLifecycleOwner) { state ->
             renderCredentialCard(state)
-            renderSearchProgress(state.searchState, state.scannedCredential.credentialType, state.flowType)
+            renderSearchProgress(state.searchState, state.scannedCredentialResult.credentialType, state.flowType)
             renderButtons(state)
         }
         viewModel.finishEvent.observe(
@@ -92,12 +92,12 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
     }
 
     private fun renderCredentialCard(state: SearchCredentialState) = with(binding) {
-        val credential = state.displayedCredential?.value.orEmpty()
-        val credentialType = state.scannedCredential.credentialType
+        val credential = state.displayedCredential.value
+        val credentialType = state.scannedCredentialResult.credentialType
         val credentialField = resources.getCredentialFieldTitle(credentialType)
         val currentEditTextValue = credentialEditText.text.toString()
         val isEditingCredential = state.isEditingCredential
-        renderImage(state.scannedCredential)
+        renderImage(state.scannedCredentialResult)
         renderCredentialEdit(state)
         credential.takeIf { currentEditTextValue.isEmpty() }?.let {
             credentialEditText.setText(it) // Setting only once at the start
@@ -223,7 +223,7 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         }
     }
 
-    private fun renderImage(credential: ScannedCredential) {
+    private fun renderImage(credential: ScannedCredentialResult) {
         val documentImagePath: String? = credential.documentImagePath
         binding.documentPreview.isVisible = documentImagePath != null
         if (documentImagePath == null) return

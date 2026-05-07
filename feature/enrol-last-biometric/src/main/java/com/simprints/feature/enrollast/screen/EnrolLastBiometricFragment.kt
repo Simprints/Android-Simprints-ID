@@ -8,7 +8,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.alert.AlertContract
@@ -25,6 +24,7 @@ import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.DUPLICATE
 import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.GENERAL_ERROR
 import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.NO_MATCH_RESULTS
 import com.simprints.feature.enrollast.screen.model.CredentialDialogItem
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.view.ScannedCredentialDialog
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
@@ -55,7 +55,7 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
             viewLifecycleOwner,
             R.id.enrolLastBiometricFragment,
             AlertContract.DESTINATION,
-        ) { finish(newSubjectId = null, credential = null) }
+        ) { finish(newSubjectId = null, credentialSearchResult = null) }
 
         initObservers()
         viewModel.onViewCreated(params)
@@ -72,7 +72,7 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
     private fun displayCredentialDialog(credentialDialogItem: CredentialDialogItem) {
         dialog = ScannedCredentialDialog(
             context = requireActivity(),
-            credential = credentialDialogItem.scannedCredential,
+            credential = credentialDialogItem.scannedCredentialResult,
             displayedCredential = credentialDialogItem.displayedCredential,
             onConfirm = { viewModel.enrolBiometric(params, isAddingCredential = true) },
             onSkip = { viewModel.enrolBiometric(params, isAddingCredential = false) },
@@ -83,7 +83,7 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
         is EnrolLastState.Failed -> showError(result.errorType, result.modalities)
         is EnrolLastState.Success -> {
             Toast.makeText(requireContext(), getString(IDR.string.enrol_last_biometrics_success), Toast.LENGTH_LONG).show()
-            finish(result.newGuid, result.externalCredential)
+            finish(newSubjectId = result.newGuid, credentialSearchResult = result.credentialSearchResult)
         }
     }
 
@@ -128,8 +128,8 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
 
     private fun finish(
         newSubjectId: String?,
-        credential: ExternalCredential?,
+        credentialSearchResult: ExternalCredentialSearchResult.Complete?,
     ) {
-        findNavController().finishWithResult(this, EnrolLastBiometricResult(newSubjectId, credential))
+        findNavController().finishWithResult(this, EnrolLastBiometricResult(newSubjectId, credentialSearchResult))
     }
 }

@@ -2,7 +2,7 @@ package com.simprints.feature.enrollast
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 
 @ExcludedFromGeneratedTestCoverageReports("Data class")
 object EnrolLastBiometricContract {
@@ -13,12 +13,12 @@ object EnrolLastBiometricContract {
         userId: TokenizableString,
         moduleId: TokenizableString,
         steps: List<EnrolLastBiometricStepResult>,
-        scannedCredential: ScannedCredential?,
+        credentialSearchResult: ExternalCredentialSearchResult.Complete?,
     ) = EnrolLastBiometricParams(
         projectId = projectId,
         userId = userId,
         moduleId = moduleId,
         steps = steps,
-        scannedCredential = scannedCredential,
+        credentialSearchResult = credentialSearchResult,
     )
 }

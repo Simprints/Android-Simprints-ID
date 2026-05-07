@@ -38,7 +38,7 @@ import com.simprints.feature.externalcredential.screens.scanocr.model.LightingCo
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.BuildOcrCropConfigUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ProvideCameraListenerUseCase
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.camera.qrscan.CameraFocusManager
@@ -406,7 +406,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
      * The animation state is stored in the [isAnimatingCompletion]. If it is set to true, the navigation action is set to
      * [pendingFinishAction] which will be executed once animations are complete. If false, the navigation will proceed immediately.
      */
-    private fun scheduleFinish(credential: ScannedCredential) {
+    private fun scheduleFinish(credential: ScannedCredentialResult) {
         val navigationAction = {
             findNavController().navigateSafely(
                 this@ExternalCredentialScanOcrFragment,

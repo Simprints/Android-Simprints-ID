@@ -12,6 +12,6 @@ internal class CreateConfirmIdentityResponseUseCase @Inject constructor() {
     operator fun invoke(results: List<Serializable>): AppResponse = results
         .filterIsInstance<SelectSubjectResult>()
         .lastOrNull()
-        ?.let { AppConfirmationResponse(true, externalCredential = it.savedCredential) }
+        ?.let { AppConfirmationResponse(true, externalCredential = it.credentialSearchResult.toAppExternalCredential()) }
         ?: AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR)
 }

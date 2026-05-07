@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredential
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.feature.externalcredential.view.ScannedCredentialDialog
 import com.simprints.feature.selectsubject.R
 import com.simprints.feature.selectsubject.SelectSubjectParams
@@ -83,7 +83,7 @@ internal class SelectSubjectFragment : Fragment(R.layout.fragment_select_subject
         viewModel.stateLiveData.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is SelectSubjectState.CredentialDialogDisplayed -> {
-                    displayCredentialDialog(state.scannedCredential, state.displayedCredential)
+                    displayCredentialDialog(state.scannedCredentialResult, state.displayedCredential)
                 }
 
                 SelectSubjectState.SavingExternalCredential -> renderSavingCredential()
@@ -106,13 +106,16 @@ internal class SelectSubjectFragment : Fragment(R.layout.fragment_select_subject
         confirmationSentContainer.isVisible = true
     }
 
-    private fun displayCredentialDialog(scannedCredential: ScannedCredential, displayedCredential: TokenizableString.Raw) {
+    private fun displayCredentialDialog(
+        scannedCredentialResult: ScannedCredentialResult,
+        displayedCredential: TokenizableString.Raw,
+    ) {
         dialog = ScannedCredentialDialog(
             context = requireActivity(),
-            credential = scannedCredential,
+            credential = scannedCredentialResult,
             displayedCredential = displayedCredential,
-            onConfirm = { viewModel.saveCredential(scannedCredential) },
-            onSkip = (viewModel::finishWithoutSavingCredential)
+            onConfirm = { viewModel.saveCredential() },
+            onSkip = (viewModel::finishWithoutSavingCredential),
         ).also(ScannedCredentialDialog::show)
     }
 
