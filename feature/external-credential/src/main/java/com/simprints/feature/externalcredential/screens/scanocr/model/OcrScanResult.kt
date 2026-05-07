@@ -1,14 +1,15 @@
 package com.simprints.feature.externalcredential.screens.scanocr.model
 
 import androidx.annotation.Keep
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.feature.externalcredential.screens.scanocr.reader.OcrLine
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.io.Serializable as JavaSerializable
 
 @Keep
 @Serializable
-internal sealed class OcrScanResult : JavaSerializable {
+@ExcludedFromGeneratedTestCoverageReports("Data class")
+internal sealed class OcrScanResult {
     abstract val credential: OcrLine
 
     @Serializable
