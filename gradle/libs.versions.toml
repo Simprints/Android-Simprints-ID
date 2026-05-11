@@ -53,7 +53,7 @@ chuck_version = "4.3.1"
 
 sqlCipher_version = "4.13.0"
 fuzzywuzzy_version = "1.4.0"
-rootbeer_version = "0.1.1"
+rootbeer_version = "0.1.2"
 commons_io_version = "2.21.0"
 kronos_version = "0.0.1-alpha11"
 protobuf_version = "4.34.1"
