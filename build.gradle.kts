@@ -43,7 +43,7 @@ tasks.withType(Test::class).configureEach {
 allprojects {
     configurations.all {
         resolutionStrategy {
-            force("org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.0")
+            force("org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.21")
         }
     }
 }
