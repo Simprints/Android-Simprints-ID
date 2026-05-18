@@ -50,6 +50,8 @@ internal class ValidateSubjectPoolViewModel @Inject constructor(
 
     fun checkIdentificationPool(enrolmentRecordQuery: EnrolmentRecordQuery) = viewModelScope.launch {
         if (isSyncing) {
+            // In case of configuration change while syncing, we want to show the sync in progress state instead of default state
+            _state.send(ValidateSubjectPoolState.SyncInProgress)
             return@launch
         }
         _state.send(ValidateSubjectPoolState.Validating)
