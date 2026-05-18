@@ -39,7 +39,7 @@ internal class ValidateSubjectPoolFragment : Fragment(R.layout.fragment_validate
 
         binding.validationActionsClose.setOnClickListener { finishWithResult(false) }
         binding.validationActionsContinue.setOnClickListener { finishWithResult(true) }
-        binding.validationActionsSync.setOnClickListener { viewModel.syncAndRetry(params.enrolmentRecordQuery) }
+        binding.validationActionsSync.setOnClickListener { viewModel.startSync(params.enrolmentRecordQuery) }
 
         viewModel.checkIdentificationPool(params.enrolmentRecordQuery)
     }
