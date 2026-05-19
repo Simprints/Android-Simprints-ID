@@ -5,6 +5,7 @@ import android.content.Context
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.events.event.domain.models.scope.Location
@@ -15,6 +16,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 internal class LocationManager @Inject constructor(
     @param:ApplicationContext val ctx: Context,
@@ -44,7 +47,11 @@ internal class LocationManager @Inject constructor(
                     Location(
                         latitude = lastLocation.latitude,
                         longitude = lastLocation.longitude,
-                        lastLocationTime = lastLocation.time,
+                        lastLocationTime = Timestamp(
+                            ms = lastLocation.time,
+                            isTrustworthy = false,
+                            msSinceBoot = lastLocation.elapsedRealtimeNanos.toDuration(DurationUnit.NANOSECONDS).inWholeMilliseconds,
+                        ),
                     ),
                 )
             }
