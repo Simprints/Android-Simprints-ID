@@ -2,6 +2,7 @@ package com.simprints.feature.externalcredential.screens.controller
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
@@ -23,6 +24,7 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
     private val timeHelper: TimeHelper,
     private val configRepository: ConfigRepository,
     private val eventsTracker: ExternalCredentialEventTrackerUseCase,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private var isInitialized = false
     lateinit var params: ExternalCredentialParams
@@ -50,6 +52,10 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
     private var selectedSkipOtherText: String? = null
 
     init {
+        savedStateHandle.get<Timestamp>(KEY_SELECTION_START_TIME)?.let { selectionStartTime = it }
+        savedStateHandle.get<String>(KEY_SELECTION_EVENT_ID)?.let { selectionEventId = it }
+        savedStateHandle.get<Timestamp>(KEY_CAPTURE_START_TIME)?.let { captureStartTime = it }
+
         viewModelScope.launch {
             val config = configRepository.getProjectConfiguration()
             val allowedExternalCredentials = config.multifactorId?.allowedExternalCredentials.orEmpty()
@@ -58,7 +64,13 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
     }
 
     fun selectionStarted() {
+        if (savedStateHandle.contains(KEY_SELECTION_START_TIME)) {
+            // Selection time has been recorded, which means the user has already started selection before process death.
+            return
+        }
+
         selectionStartTime = timeHelper.now()
+        savedStateHandle[KEY_SELECTION_START_TIME] = selectionStartTime
     }
 
     fun skipOptionSelected(skipOption: ExternalCredentialSelectionEvent.SkipReason) {
@@ -78,7 +90,9 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
             if (selectedType != null) {
                 val selectionEndTime = timeHelper.now()
                 selectionEventId = eventsTracker.saveSelectionEvent(selectionStartTime, selectionEndTime, selectedType)
+                savedStateHandle[KEY_SELECTION_EVENT_ID] = selectionEventId
                 captureStartTime = timeHelper.now()
+                savedStateHandle[KEY_CAPTURE_START_TIME] = captureStartTime
             }
             updateState { it.copy(selectedType = selectedType) }
         }
@@ -117,5 +131,11 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
             }
             _finishEvent.send(result)
         }
+    }
+
+    internal companion object {
+        internal const val KEY_SELECTION_START_TIME = "selection_start_time"
+        internal const val KEY_SELECTION_EVENT_ID = "selection_event_id"
+        internal const val KEY_CAPTURE_START_TIME = "capture_start_time"
     }
 }
