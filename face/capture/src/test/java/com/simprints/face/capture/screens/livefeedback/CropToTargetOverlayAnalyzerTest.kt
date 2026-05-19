@@ -10,6 +10,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.justRun
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -46,6 +47,7 @@ internal class CropToTargetOverlayAnalyzerTest {
         // Cropped should be still square and half the side length of original
         assertThat(capturedBitmap?.width).isNull()
         assertThat(capturedBitmap?.height).isNull()
+        verify(exactly = 1) { imageProxy.close() }
     }
 
     @Test
@@ -60,6 +62,23 @@ internal class CropToTargetOverlayAnalyzerTest {
         // Cropped should be still square and half the side length of original
         assertThat(capturedBitmap?.width).isEqualTo(300)
         assertThat(capturedBitmap?.height).isEqualTo(300)
+    }
+
+    @Test
+    fun `Closes ImageProxy before invoking cropped callback`() {
+        setupScreenSize(1000, 2000)
+        every { targetOverlay.circleRect } returns RectF(200f, 200f, 800f, 800f)
+        setupImageSize(1000, 1000)
+
+        var closed = false
+        every { imageProxy.close() } answers { closed = true }
+        var closedBeforeCallback = false
+        val analyzer = CropToTargetOverlayAnalyzer(targetOverlay) { closedBeforeCallback = closed }
+
+        analyzer.analyze(imageProxy)
+
+        assertThat(closedBeforeCallback).isTrue()
+        verify(exactly = 1) { imageProxy.close() }
     }
 
     @Test
