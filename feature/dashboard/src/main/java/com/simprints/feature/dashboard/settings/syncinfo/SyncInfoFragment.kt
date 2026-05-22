@@ -74,6 +74,13 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         )
     }
 
+    override fun onDestroyView() {
+        binding.selectedModulesView.adapter = null
+        binding.eventSyncProgressBar.setPulseAnimation(isEnabled = false)
+        binding.imageSyncProgressBar.setPulseAnimation(isEnabled = false)
+        super.onDestroyView()
+    }
+
     private fun setupClickListeners() {
         binding.buttonSelectModules.setOnClickListener {
             findNavController().navigate(R.id.moduleSelectionFragment)
@@ -126,8 +133,8 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
     }
 
     private fun observeUI() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 renderSyncInfo(SyncInfo(), syncInfoConfig)
                 viewModel.syncInfoLiveData.observe(viewLifecycleOwner) { syncInfo ->
                     renderSyncInfo(syncInfo, syncInfoConfig)
@@ -316,16 +323,14 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
         moduleCountAdapter.submitList(modules.moduleCounts)
 
-        // RecyclerView height fix (wrong height may be caused by ConstraintLayout in parent views)
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                val itemHeight = resources.getDimensionPixelSize(R.dimen.module_item_height)
-                val itemCount = modules.moduleCounts.size.coerceAtMost(MAX_MODULE_LIST_HEIGHT_ITEMS)
-                binding.selectedModulesView.apply {
-                    layoutParams = layoutParams.apply {
-                        height = itemHeight * itemCount
-                    }
+        val itemHeight = resources.getDimensionPixelSize(R.dimen.module_item_height)
+        val itemCount = modules.moduleCounts.size.coerceAtMost(MAX_MODULE_LIST_HEIGHT_ITEMS)
+        binding.selectedModulesView.let { recyclerView ->
+            recyclerView.post {
+                recyclerView.layoutParams = recyclerView.layoutParams.apply {
+                    height = itemHeight * itemCount
                 }
+                recyclerView.requestLayout()
             }
         }
     }
