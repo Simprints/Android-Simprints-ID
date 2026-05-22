@@ -1,30 +1,31 @@
 package com.simprints.face.capture.screens.livefeedback
 
 import android.graphics.Bitmap
+import android.graphics.RectF
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import com.simprints.face.capture.screens.livefeedback.views.CameraTargetOverlay
 import kotlin.math.max
 import kotlin.math.min
 
 internal class CropToTargetOverlayAnalyzer(
-    private val targetOverlay: CameraTargetOverlay,
+    private val previewRect: RectF,
+    private val overlayWidth: Int,
+    private val overlayHeight: Int,
     private val onImageCropped: (Bitmap) -> Unit,
 ) : ImageAnalysis.Analyzer {
     override fun analyze(image: ImageProxy) {
         val croppedBitmap = image.use {
-            val previewRect = targetOverlay.circleRect
             if (previewRect.isEmpty) return
 
             // Adjust overlay size to be fit-center with the image size
             val scale = getSmallerRatio(
                 it.width,
                 it.height,
-                targetOverlay.width,
-                targetOverlay.height,
+                overlayWidth,
+                overlayHeight,
             )
-            val scaledWidth = (targetOverlay.width * scale).toInt()
-            val scaledHeight = (targetOverlay.height * scale).toInt()
+            val scaledWidth = (overlayWidth * scale).toInt()
+            val scaledHeight = (overlayHeight * scale).toInt()
 
             // Find the offsets caused by fit-center scaling
             val offsetX = (max(it.width, scaledWidth) - min(it.width, scaledWidth)) / 2

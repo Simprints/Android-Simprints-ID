@@ -67,6 +67,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private lateinit var screenSize: Size
     private lateinit var targetResolution: Size
+    private lateinit var imageAnalyzer: ImageAnalysis
+    private lateinit var preview: Preview
 
     private var cameraControl: CameraControl? = null
 
@@ -166,18 +168,24 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 ),
             ).build()
 
-        val imageAnalyzer = ImageAnalysis
+        imageAnalyzer = ImageAnalysis
             .Builder()
             .setResolutionSelector(resolutionSelector)
             .setOutputImageRotationEnabled(true)
             .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
             .build()
-        val cropAnalyzer = CropToTargetOverlayAnalyzer(binding.captureOverlay, ::analyze)
+
+        val cropAnalyzer = CropToTargetOverlayAnalyzer(
+            previewRect = binding.captureOverlay.circleRect,
+            overlayWidth = binding.captureOverlay.width,
+            overlayHeight = binding.captureOverlay.height,
+            onImageCropped = ::analyze,
+        )
 
         imageAnalyzer.setAnalyzer(cameraExecutor, cropAnalyzer)
 
         // Preview
-        val preview = Preview
+        preview = Preview
             .Builder()
             .setResolutionSelector(resolutionSelector)
             .build()
@@ -233,6 +241,13 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     override fun onDestroyView() {
         if (::cameraExecutor.isInitialized && !cameraExecutor.isShutdown) {
             cameraExecutor.shutdown()
+        }
+        if (::imageAnalyzer.isInitialized) {
+            imageAnalyzer.clearAnalyzer()
+        }
+
+        if (::preview.isInitialized) {
+            preview.surfaceProvider = null
         }
         super.onDestroyView()
     }
