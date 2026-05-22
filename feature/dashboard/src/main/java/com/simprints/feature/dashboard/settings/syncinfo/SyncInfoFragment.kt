@@ -14,9 +14,6 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.simprints.core.tools.utils.TimeUtils
@@ -31,7 +28,6 @@ import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.view.setPulseAnimation
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
@@ -133,15 +129,10 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
     }
 
     private fun observeUI() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                renderSyncInfo(SyncInfo(), syncInfoConfig)
-                viewModel.syncInfoLiveData.observe(viewLifecycleOwner) { syncInfo ->
-                    renderSyncInfo(syncInfo, syncInfoConfig)
-                }
-            }
+        renderSyncInfo(SyncInfo(), syncInfoConfig)
+        viewModel.syncInfoLiveData.observe(viewLifecycleOwner) { syncInfo ->
+            renderSyncInfo(syncInfo, syncInfoConfig)
         }
-
         viewModel.loginNavigationEventLiveData.observe(viewLifecycleOwner) { loginParams ->
             findNavController().navigate(com.simprints.feature.login.R.id.graph_login, loginParams.toBundle())
         }
