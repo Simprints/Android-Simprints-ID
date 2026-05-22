@@ -184,7 +184,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         val cameraProvider = ProcessCameraProvider.awaitInstance(requireContext())
         cameraProvider.unbindAll()
         val camera = cameraProvider.bindToLifecycle(
-            this@LiveFeedbackFragment,
+            viewLifecycleOwner,
             DEFAULT_BACK_CAMERA,
             preview,
             imageAnalyzer,
@@ -227,11 +227,14 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     override fun onStop() {
         toggleTorche(false)
-        // Shut down our background executor
-        if (::cameraExecutor.isInitialized) {
+        super.onStop()
+    }
+
+    override fun onDestroyView() {
+        if (::cameraExecutor.isInitialized && !cameraExecutor.isShutdown) {
             cameraExecutor.shutdown()
         }
-        super.onStop()
+        super.onDestroyView()
     }
 
     private fun bindViewModel() {
