@@ -3,6 +3,7 @@ package com.simprints.face.capture.screens.livefeedback
 import android.Manifest
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.RectF
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Size
@@ -176,7 +177,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             .build()
 
         val cropAnalyzer = CropToTargetOverlayAnalyzer(
-            previewRect = binding.captureOverlay.circleRect,
+            previewRect = RectF(binding.captureOverlay.circleRect), // create a new instance to avoid threading issues
             overlayWidth = binding.captureOverlay.width,
             overlayHeight = binding.captureOverlay.height,
             onImageCropped = ::analyze,
