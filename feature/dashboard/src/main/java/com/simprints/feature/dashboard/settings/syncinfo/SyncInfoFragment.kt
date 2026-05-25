@@ -14,9 +14,6 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.simprints.core.tools.utils.TimeUtils
@@ -31,7 +28,6 @@ import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.view.setPulseAnimation
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
@@ -72,6 +68,13 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
             LoginContract.DESTINATION,
             viewModel::handleLoginResult,
         )
+    }
+
+    override fun onDestroyView() {
+        binding.selectedModulesView.adapter = null
+        binding.eventSyncProgressBar.setPulseAnimation(isEnabled = false)
+        binding.imageSyncProgressBar.setPulseAnimation(isEnabled = false)
+        super.onDestroyView()
     }
 
     private fun setupClickListeners() {
@@ -126,15 +129,10 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
     }
 
     private fun observeUI() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                renderSyncInfo(SyncInfo(), syncInfoConfig)
-                viewModel.syncInfoLiveData.observe(viewLifecycleOwner) { syncInfo ->
-                    renderSyncInfo(syncInfo, syncInfoConfig)
-                }
-            }
+        renderSyncInfo(SyncInfo(), syncInfoConfig)
+        viewModel.syncInfoLiveData.observe(viewLifecycleOwner) { syncInfo ->
+            renderSyncInfo(syncInfo, syncInfoConfig)
         }
-
         viewModel.loginNavigationEventLiveData.observe(viewLifecycleOwner) { loginParams ->
             findNavController().navigate(com.simprints.feature.login.R.id.graph_login, loginParams.toBundle())
         }
@@ -316,16 +314,14 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
         moduleCountAdapter.submitList(modules.moduleCounts)
 
-        // RecyclerView height fix (wrong height may be caused by ConstraintLayout in parent views)
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                val itemHeight = resources.getDimensionPixelSize(R.dimen.module_item_height)
-                val itemCount = modules.moduleCounts.size.coerceAtMost(MAX_MODULE_LIST_HEIGHT_ITEMS)
-                binding.selectedModulesView.apply {
-                    layoutParams = layoutParams.apply {
-                        height = itemHeight * itemCount
-                    }
+        val itemHeight = resources.getDimensionPixelSize(R.dimen.module_item_height)
+        val itemCount = modules.moduleCounts.size.coerceAtMost(MAX_MODULE_LIST_HEIGHT_ITEMS)
+        binding.selectedModulesView.let { recyclerView ->
+            recyclerView.post {
+                recyclerView.layoutParams = recyclerView.layoutParams.apply {
+                    height = itemHeight * itemCount
                 }
+                recyclerView.requestLayout()
             }
         }
     }
