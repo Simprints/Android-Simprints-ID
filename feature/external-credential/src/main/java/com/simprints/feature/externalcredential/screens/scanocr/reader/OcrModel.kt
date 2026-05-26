@@ -1,9 +1,9 @@
 package com.simprints.feature.externalcredential.screens.scanocr.reader
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.domain.step.StepParams
 import com.simprints.feature.externalcredential.model.BoundingBox
 import kotlinx.serialization.Serializable
-import java.io.Serializable as JavaSerializable
 
 /**
  * Wrapper for all scanned text after the OCR
@@ -14,7 +14,7 @@ import java.io.Serializable as JavaSerializable
 @ExcludedFromGeneratedTestCoverageReports("Data class")
 internal data class OcrText(
     val allLines: List<OcrLine>,
-) : JavaSerializable
+) : StepParams
 
 /**
  * A single line of text detected by the OCR kit.
@@ -33,4 +33,4 @@ internal data class OcrLine(
     val boundingBox: BoundingBox,
     val blockBoundingBox: BoundingBox,
     val confidence: Float,
-) : JavaSerializable
+) : StepParams
