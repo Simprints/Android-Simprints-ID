@@ -8,6 +8,7 @@ import com.simprints.infra.events.event.domain.models.scope.Device
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
+import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.eventsync.event.remote.models.ApiEvent
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -57,7 +58,7 @@ internal class MapDomainEventScopeToApiUseCaseTest {
             assertEquals(id, scope.id)
             assertEquals(projectId, scope.projectId)
             assertEquals(startTime.unixMs, scope.createdAt.ms)
-            assertEquals(endTime, scope.endedAt)
+            assertEquals(endTime?.unixMs, scope.endedAt?.ms)
         }
     }
 
@@ -77,7 +78,11 @@ internal class MapDomainEventScopeToApiUseCaseTest {
             databaseInfo = DatabaseInfo(0, 0),
             projectConfigurationUpdatedAt = "",
             projectConfigurationId = "",
-            location = null,
+            location = Location(
+                latitude = 56.0,
+                longitude = 27.0,
+                lastLocationTime = Timestamp(1000L),
+            ),
         ),
     )
 }

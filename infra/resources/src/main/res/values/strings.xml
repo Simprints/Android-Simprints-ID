@@ -542,6 +542,16 @@
     <string name="mfid_skip_reason_other">Other</string>
     <string name="mfid_skip_reason_hint">Reason</string>
     <string name="mfid_skip_reason_helper_text">Please provide a reason for skipping</string>
+    <string name="mfid_skip_title_generic">Why did you skip the document scan?</string>
+    <string name="mfid_skip_reason_generic_has_number_no_id">Has number, no document (Booklet)</string>
+    <string name="mfid_skip_reason_generic_does_not_have">Does not have a document</string>
+    <string name="mfid_skip_reason_generic_did_not_bring">Did not bring a document</string>
+    <string name="mfid_skip_reason_generic_incorrect">Brought incorrect document</string>
+    <string name="mfid_skip_reason_generic_does_not_want_to_provide">Does not want to provide a document</string>
+    <string name="mfid_skip_reason_generic_damaged">Document damaged or unreadable</string>
+    <string name="mfid_skip_reason_generic_unable_to_scan">Unable to scan document</string>
+    <string name="mfid_skip_reason_generic_other">Other</string>
+    <string name="mfid_skip_reason_generic_hint">Reason</string>
     <string name="mfid_skip_confirm">Skip Scanning</string>
     <string name="mfid_skip_go_back">Go Back</string>
 

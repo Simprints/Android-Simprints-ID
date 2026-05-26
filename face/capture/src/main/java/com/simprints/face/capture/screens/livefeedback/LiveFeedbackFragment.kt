@@ -3,6 +3,7 @@ package com.simprints.face.capture.screens.livefeedback
 import android.Manifest
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.RectF
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Size
@@ -67,6 +68,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private lateinit var screenSize: Size
     private lateinit var targetResolution: Size
+    private lateinit var imageAnalyzer: ImageAnalysis
+    private lateinit var preview: Preview
 
     private var cameraControl: CameraControl? = null
 
@@ -166,25 +169,31 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 ),
             ).build()
 
-        val imageAnalyzer = ImageAnalysis
+        imageAnalyzer = ImageAnalysis
             .Builder()
             .setResolutionSelector(resolutionSelector)
             .setOutputImageRotationEnabled(true)
             .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
             .build()
-        val cropAnalyzer = CropToTargetOverlayAnalyzer(binding.captureOverlay, ::analyze)
+
+        val cropAnalyzer = CropToTargetOverlayAnalyzer(
+            previewRect = RectF(binding.captureOverlay.circleRect), // create a new instance to avoid threading issues
+            overlayWidth = binding.captureOverlay.width,
+            overlayHeight = binding.captureOverlay.height,
+            onImageCropped = ::analyze,
+        )
 
         imageAnalyzer.setAnalyzer(cameraExecutor, cropAnalyzer)
 
         // Preview
-        val preview = Preview
+        preview = Preview
             .Builder()
             .setResolutionSelector(resolutionSelector)
             .build()
         val cameraProvider = ProcessCameraProvider.awaitInstance(requireContext())
         cameraProvider.unbindAll()
         val camera = cameraProvider.bindToLifecycle(
-            this@LiveFeedbackFragment,
+            viewLifecycleOwner,
             DEFAULT_BACK_CAMERA,
             preview,
             imageAnalyzer,
@@ -227,11 +236,21 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     override fun onStop() {
         toggleTorche(false)
-        // Shut down our background executor
-        if (::cameraExecutor.isInitialized) {
+        super.onStop()
+    }
+
+    override fun onDestroyView() {
+        if (::cameraExecutor.isInitialized && !cameraExecutor.isShutdown) {
             cameraExecutor.shutdown()
         }
-        super.onStop()
+        if (::imageAnalyzer.isInitialized) {
+            imageAnalyzer.clearAnalyzer()
+        }
+
+        if (::preview.isInitialized) {
+            preview.surfaceProvider = null
+        }
+        super.onDestroyView()
     }
 
     private fun bindViewModel() {
