@@ -77,7 +77,7 @@ internal class LocationManagerTest {
 
         assertThat(results[0]?.latitude).isEqualTo(10.0)
         assertThat(results[0]?.longitude).isEqualTo(10.0)
-        assertThat(results[0]?.lastLocationTime).isEqualTo(1000L)
+        assertThat(results[0]?.lastLocationTime?.ms).isEqualTo(1000L)
 
         assertThat(results[1]?.latitude).isEqualTo(20.0)
         assertThat(results[1]?.longitude).isEqualTo(20.0)
@@ -112,6 +112,8 @@ internal class LocationManagerTest {
         val fakeLastLocation = TestLocationData.buildFakeLocation().apply {
             latitude = 40.0
             longitude = 40.0
+            time = 1000L
+            elapsedRealtimeNanos = 3000_000_000L // Using nanos since it is supported on older API levels
         }
 
         every { mockedLocationClient.lastLocation } returns Tasks.forResult(fakeLastLocation)
@@ -126,6 +128,8 @@ internal class LocationManagerTest {
 
         assertThat(results[0]?.latitude).isEqualTo(40.0)
         assertThat(results[0]?.longitude).isEqualTo(40.0)
+        assertThat(results[0]?.lastLocationTime?.ms).isEqualTo(1000L)
+        assertThat(results[0]?.lastLocationTime?.msSinceBoot).isEqualTo(3000L)
     }
 
     @Test

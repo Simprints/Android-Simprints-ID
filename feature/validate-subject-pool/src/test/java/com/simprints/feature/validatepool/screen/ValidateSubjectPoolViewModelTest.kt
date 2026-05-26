@@ -1,22 +1,26 @@
 package com.simprints.feature.validatepool.screen
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.feature.validatepool.usecase.HasRecordsUseCase
 import com.simprints.feature.validatepool.usecase.IsModuleIdNotSyncedUseCase
-import com.simprints.feature.validatepool.usecase.RunBlockingEventSyncUseCase
 import com.simprints.feature.validatepool.usecase.ShouldSuggestSyncUseCase
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
+import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
+import com.simprints.infra.sync.ImageSyncStatus
+import com.simprints.infra.sync.OneTime
+import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.sync.SyncStatus
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coJustRun
-import io.mockk.coVerify
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -40,7 +44,9 @@ class ValidateSubjectPoolViewModelTest {
     private lateinit var shouldSuggestSyncUseCase: ShouldSuggestSyncUseCase
 
     @MockK
-    private lateinit var runBlockingSync: RunBlockingEventSyncUseCase
+    private lateinit var syncOrchestrator: SyncOrchestrator
+
+    private lateinit var syncStatusFlow: MutableStateFlow<SyncStatus>
 
     private lateinit var viewModel: ValidateSubjectPoolViewModel
 
@@ -48,11 +54,14 @@ class ValidateSubjectPoolViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this)
 
+        syncStatusFlow = MutableStateFlow(createSyncStatus(isCompleted = false))
+        every { syncOrchestrator.observeSyncState() } returns syncStatusFlow
+
         viewModel = ValidateSubjectPoolViewModel(
             hasRecordsUseCase,
             isModuleIdNotSyncedUseCase,
             shouldSuggestSyncUseCase,
-            runBlockingSync,
+            syncOrchestrator,
         )
     }
 
@@ -163,38 +172,75 @@ class ValidateSubjectPoolViewModelTest {
         assertThat(viewModel.state.value?.peekContent()).isEqualTo(ValidateSubjectPoolState.PoolEmpty)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `runs sync and check`() = runTest {
         val enrolmentRecordQuery = EnrolmentRecordQuery(projectId = "projectId")
+        val job = Job()
 
         coEvery { hasRecordsUseCase(any()) } returnsMany listOf(true)
-        coJustRun { runBlockingSync() }
+        every { syncOrchestrator.execute(any<OneTime>()) } returns job
 
         val result = viewModel.state.test()
 
-        viewModel.syncAndRetry(enrolmentRecordQuery)
+        viewModel.startSync(enrolmentRecordQuery)
+
+        syncStatusFlow.value = createSyncStatus(isCompleted = true)
+        job.complete()
+        advanceUntilIdle()
 
         assertThat(result.valueHistory().map { it.peekContent() }).containsExactly(
             ValidateSubjectPoolState.SyncInProgress,
             ValidateSubjectPoolState.Validating,
             ValidateSubjectPoolState.Success,
         )
-        coVerify(exactly = 1) { runBlockingSync() }
+        coVerify(exactly = 1) { syncOrchestrator.execute(any<OneTime>()) }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `checkIdentificationPool not re-validating another time when sync in progress`() = runTest {
+    fun `checkIdentificationPool not re-validating when sync in progress`() = runTest {
         val enrolmentRecordQuery = EnrolmentRecordQuery(projectId = "projectId")
+        val job = Job()
         coEvery { hasRecordsUseCase(enrolmentRecordQuery) } returns true
-        coEvery { runBlockingSync() } coAnswers {
-            delay(1000)
-        }
-        viewModel.syncAndRetry(enrolmentRecordQuery)
+        every { syncOrchestrator.execute(any<OneTime>()) } returns job
+        viewModel.startSync(enrolmentRecordQuery)
 
         viewModel.checkIdentificationPool(enrolmentRecordQuery)
 
+        job.complete()
         advanceUntilIdle()
-        coVerify(exactly = 1) { hasRecordsUseCase(any()) }
+        coVerify(exactly = 1) { syncOrchestrator.execute(any<OneTime>()) }
+        coVerify(exactly = 0) { hasRecordsUseCase(any()) }
+    }
+
+    private fun createSyncStatus(isCompleted: Boolean): SyncStatus {
+        val reporterStates = if (isCompleted) {
+            listOf(
+                EventSyncState.SyncWorkerInfo(
+                    type = EventSyncWorkerType.END_SYNC_REPORTER,
+                    state = EventSyncWorkerState.Succeeded,
+                ),
+            )
+        } else {
+            emptyList()
+        }
+
+        return SyncStatus(
+            eventSyncState = EventSyncState(
+                syncId = "",
+                progress = null,
+                total = null,
+                upSyncWorkersInfo = emptyList(),
+                downSyncWorkersInfo = emptyList(),
+                reporterStates = reporterStates,
+                lastSyncTime = null,
+            ),
+            imageSyncStatus = ImageSyncStatus(
+                isSyncing = false,
+                progress = null,
+                lastUpdateTimeMillis = null,
+            ),
+        )
     }
 }

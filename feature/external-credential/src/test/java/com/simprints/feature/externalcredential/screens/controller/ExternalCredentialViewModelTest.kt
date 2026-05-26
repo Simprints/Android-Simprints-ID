@@ -1,6 +1,7 @@
 package com.simprints.feature.externalcredential.screens.controller
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.SavedStateHandle
 import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
@@ -37,17 +38,106 @@ internal class ExternalCredentialViewModelTest {
 
     @MockK
     private lateinit var configRepository: ConfigRepository
+    private lateinit var savedStateHandle: SavedStateHandle
     private lateinit var viewModel: ExternalCredentialViewModel
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
+        savedStateHandle = SavedStateHandle()
         viewModel = ExternalCredentialViewModel(
             configRepository = configRepository,
             timeHelper = timeHelper,
             eventsTracker = eventsTracker,
+            savedStateHandle = savedStateHandle,
         )
         every { timeHelper.now() } returns Timestamp(1L)
+    }
+
+    @Test
+    fun `selectionStarted persists selectionStartTime to savedStateHandle`() {
+        val expected = Timestamp(11L)
+        every { timeHelper.now() } returns expected
+
+        viewModel.selectionStarted()
+
+        assertThat(savedStateHandle.get<Timestamp>(ExternalCredentialViewModel.KEY_SELECTION_START_TIME))
+            .isEqualTo(expected)
+    }
+
+    @Test
+    fun `setSelectedExternalCredentialType persists selection event id and capture start time`() = runTest {
+        val selectionStartTime = Timestamp(10L)
+        val selectionEndTime = Timestamp(20L)
+        val captureStartTime = Timestamp(30L)
+        coEvery { eventsTracker.saveSelectionEvent(any(), any(), any()) } returns "selection-id"
+        every { timeHelper.now() } returnsMany listOf(selectionStartTime, selectionEndTime, captureStartTime)
+
+        viewModel.selectionStarted()
+        viewModel.setSelectedExternalCredentialType(ExternalCredentialType.QRCode)
+
+        assertThat(savedStateHandle.get<String>(ExternalCredentialViewModel.KEY_SELECTION_EVENT_ID))
+            .isEqualTo("selection-id")
+        assertThat(savedStateHandle.get<Timestamp>(ExternalCredentialViewModel.KEY_CAPTURE_START_TIME))
+            .isEqualTo(captureStartTime)
+    }
+
+    @Test
+    fun `finish complete uses restored selection event state from savedStateHandle`() = runTest {
+        val restoredCaptureStartTime = Timestamp(123L)
+        val restoredSelectionEventId = "restored-selection-id"
+        val restoredStateHandle = SavedStateHandle(
+            mapOf(
+                ExternalCredentialViewModel.KEY_CAPTURE_START_TIME to restoredCaptureStartTime,
+                ExternalCredentialViewModel.KEY_SELECTION_EVENT_ID to restoredSelectionEventId,
+            ),
+        )
+        val restoredViewModel = ExternalCredentialViewModel(
+            configRepository = configRepository,
+            timeHelper = timeHelper,
+            eventsTracker = eventsTracker,
+            savedStateHandle = restoredStateHandle,
+        )
+        val result = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
+            every { scannedCredentialResult } returns mockk(relaxed = true)
+        }
+
+        restoredViewModel.init(createParams(subjectId = "subjectId", flowType = FlowType.IDENTIFY))
+        restoredViewModel.finish(result)
+
+        coVerify {
+            eventsTracker.saveCaptureEvents(
+                credentialSearchResult = result,
+                subjectId = "subjectId",
+                startTime = restoredCaptureStartTime,
+                selectionEventId = restoredSelectionEventId,
+            )
+        }
+    }
+
+    @Test
+    fun `finish skipped uses restored selection start time from savedStateHandle`() = runTest {
+        val restoredSelectionStartTime = Timestamp(456L)
+        val restoredStateHandle = SavedStateHandle(
+            mapOf(ExternalCredentialViewModel.KEY_SELECTION_START_TIME to restoredSelectionStartTime),
+        )
+        val restoredViewModel = ExternalCredentialViewModel(
+            configRepository = configRepository,
+            timeHelper = timeHelper,
+            eventsTracker = eventsTracker,
+            savedStateHandle = restoredStateHandle,
+        )
+        val result = mockk<ExternalCredentialSearchResult.Skipped>(relaxed = true)
+
+        restoredViewModel.finish(result)
+
+        coVerify {
+            eventsTracker.saveSkippedEvent(
+                startTime = restoredSelectionStartTime,
+                skipReason = result.skipReason,
+                skipOther = null,
+            )
+        }
     }
 
     @Test
@@ -195,6 +285,7 @@ internal class ExternalCredentialViewModelTest {
             configRepository = configRepository,
             timeHelper = timeHelper,
             eventsTracker = eventsTracker,
+            savedStateHandle = SavedStateHandle(),
         )
     }
 
