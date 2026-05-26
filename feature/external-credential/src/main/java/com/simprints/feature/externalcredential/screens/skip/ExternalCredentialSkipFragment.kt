@@ -44,17 +44,6 @@ class ExternalCredentialSkipFragment : Fragment(R.layout.fragment_external_crede
         if (credentialTypes.size == 1) {
             val credentialText = resources.getCredentialTypeString(credentialTypes.first())
             mapOf(
-                title to IDR.string.mfid_skip_title_generic,
-                skipReasonHasNumberNoId to IDR.string.mfid_skip_reason_generic_has_number_no_id,
-                skipReasonDoesNotHaveDocument to IDR.string.mfid_skip_reason_generic_does_not_have,
-                skipReasonDidNotBring to IDR.string.mfid_skip_reason_generic_did_not_bring,
-                skipReasonIncorrect to IDR.string.mfid_skip_reason_generic_incorrect,
-                skipReasonDoesNotWantToProvide to IDR.string.mfid_skip_reason_generic_does_not_want_to_provide,
-                skipReasonDamaged to IDR.string.mfid_skip_reason_generic_damaged,
-                skipReasonUnableToScan to IDR.string.mfid_skip_reason_generic_unable_to_scan,
-            ).forEach { (textView, stringRes) -> textView.text = getString(stringRes, credentialText) }
-        } else {
-            mapOf(
                 title to IDR.string.mfid_skip_title,
                 skipReasonHasNumberNoId to IDR.string.mfid_skip_reason_has_number_no_id,
                 skipReasonDoesNotHaveDocument to IDR.string.mfid_skip_reason_does_not_have,
@@ -63,6 +52,17 @@ class ExternalCredentialSkipFragment : Fragment(R.layout.fragment_external_crede
                 skipReasonDoesNotWantToProvide to IDR.string.mfid_skip_reason_does_not_want_to_provide,
                 skipReasonDamaged to IDR.string.mfid_skip_reason_damaged,
                 skipReasonUnableToScan to IDR.string.mfid_skip_reason_unable_to_scan,
+            ).forEach { (textView, stringRes) -> textView.text = getString(stringRes, credentialText) }
+        } else {
+            mapOf(
+                title to IDR.string.mfid_skip_title_generic,
+                skipReasonHasNumberNoId to IDR.string.mfid_skip_reason_generic_has_number_no_id,
+                skipReasonDoesNotHaveDocument to IDR.string.mfid_skip_reason_generic_does_not_have,
+                skipReasonDidNotBring to IDR.string.mfid_skip_reason_generic_did_not_bring,
+                skipReasonIncorrect to IDR.string.mfid_skip_reason_generic_incorrect,
+                skipReasonDoesNotWantToProvide to IDR.string.mfid_skip_reason_generic_does_not_want_to_provide,
+                skipReasonDamaged to IDR.string.mfid_skip_reason_generic_damaged,
+                skipReasonUnableToScan to IDR.string.mfid_skip_reason_generic_unable_to_scan,
             ).forEach { (textView, stringRes) -> textView.text = getString(stringRes) }
         }
     }
