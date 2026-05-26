@@ -2,15 +2,15 @@ package com.simprints.feature.externalcredential.screens.search.model
 
 import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.domain.step.StepResult
 import com.simprints.core.domain.tokenization.TokenizableString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.io.Serializable as JavaSerializable
 
 @Keep
 @Serializable
 @ExcludedFromGeneratedTestCoverageReports("Data class")
-sealed class MfidDocument : JavaSerializable {
+sealed class MfidDocument : StepResult {
     abstract val credential: TokenizableString.Raw
 
     @Serializable

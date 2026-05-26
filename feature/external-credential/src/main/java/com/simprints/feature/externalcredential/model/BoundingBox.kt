@@ -2,8 +2,8 @@ package com.simprints.feature.externalcredential.model
 
 import android.graphics.Rect
 import androidx.annotation.Keep
+import com.simprints.core.domain.step.StepParams
 import kotlinx.serialization.Serializable
-import java.io.Serializable as JavaSerializable
 
 /**
  * A serializable substitute for Android's Rect class, which is not serializable.
@@ -16,7 +16,7 @@ data class BoundingBox(
     val top: Int,
     val right: Int,
     val bottom: Int,
-) : JavaSerializable
+) : StepParams
 
 fun Rect?.toBoundingBox(): BoundingBox = if (this == null) {
     BoundingBox(0, 0, 0, 0)
