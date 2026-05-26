@@ -58,7 +58,16 @@ internal class EventSyncMasterWorkerTest {
     private val ctx: Context = getApplicationContext()
 
     @MockK
-    lateinit var workContinuation: WorkContinuation
+    lateinit var continuationAfterStart: WorkContinuation
+
+    @MockK
+    lateinit var continuationAfterUp: WorkContinuation
+
+    @MockK
+    lateinit var continuationAfterDown: WorkContinuation
+
+    @MockK
+    lateinit var continuationAfterEnd: WorkContinuation
 
     @MockK
     lateinit var workManager: WorkManager
@@ -126,17 +135,39 @@ internal class EventSyncMasterWorkerTest {
         workManager = spyk(WorkManager.getInstance(ctx))
         mockkObject(WorkManager.Companion)
 
-        every { workContinuation.then(any<OneTimeWorkRequest>()) } returns workContinuation
-        every { workContinuation.then(any<List<OneTimeWorkRequest>>()) } returns workContinuation
-        every { workManager.beginWith(any<OneTimeWorkRequest>()) } returns workContinuation
         every { WorkManager.getInstance(ctx) } returns workManager
 
-        coEvery { simprintsDownSyncWorkerBuilder.buildDownSyncWorkerChain(any(), any()) } returns listOf(
-            simprintsDownSyncWorker,
-        )
-        coEvery { commCareDownSyncWorkerBuilder.buildDownSyncWorkerChain(any(), any()) } returns listOf(
-            commCareDownSyncWorker,
-        )
+        every { workManager.beginWith(startSyncReporterWorker) } returns continuationAfterStart
+
+        every { continuationAfterStart.then(match<List<OneTimeWorkRequest>> { it.contains(upSyncWorker) }) } returns continuationAfterUp
+
+        every {
+            continuationAfterStart.then(
+                match<List<OneTimeWorkRequest>> {
+                    it.contains(simprintsDownSyncWorker) || it.contains(
+                        commCareDownSyncWorker,
+                    )
+                },
+            )
+        } returns continuationAfterDown
+        every {
+            continuationAfterUp.then(
+                match<List<OneTimeWorkRequest>> {
+                    it.contains(simprintsDownSyncWorker) || it.contains(
+                        commCareDownSyncWorker,
+                    )
+                },
+            )
+        } returns continuationAfterDown
+
+        every { continuationAfterStart.then(endSyncReporterWorker) } returns continuationAfterEnd
+        every { continuationAfterUp.then(endSyncReporterWorker) } returns continuationAfterEnd
+        every { continuationAfterDown.then(endSyncReporterWorker) } returns continuationAfterEnd
+
+        every { continuationAfterEnd.enqueue() } returns mockk(relaxed = true)
+
+        coEvery { simprintsDownSyncWorkerBuilder.buildDownSyncWorkerChain(any(), any()) } returns listOf(simprintsDownSyncWorker)
+        coEvery { commCareDownSyncWorkerBuilder.buildDownSyncWorkerChain(any(), any()) } returns listOf(commCareDownSyncWorker)
         coEvery { upSyncWorkerBuilder.buildUpSyncWorkerChain(any(), any()) } returns listOf(upSyncWorker)
         every { eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(any()) } returns startSyncReporterWorker
         every { eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(any(), any(), any()) } returns endSyncReporterWorker
@@ -218,6 +249,13 @@ internal class EventSyncMasterWorkerTest {
         assertUpSyncWorkerPresence(true, uniqueSyncId)
         assertSimprintsDownSyncWorkerPresence(false, uniqueSyncId)
         assertWorkerChainBuild(true, uniqueSyncId)
+
+        verifyOrder {
+            workManager.beginWith(startSyncReporterWorker)
+            continuationAfterStart.then(match<List<OneTimeWorkRequest>> { it.contains(upSyncWorker) })
+            continuationAfterUp.then(endSyncReporterWorker)
+            continuationAfterEnd.enqueue()
+        }
     }
 
     @Test
@@ -245,10 +283,17 @@ internal class EventSyncMasterWorkerTest {
         assertUpSyncWorkerPresence(false, uniqueSyncId)
         assertSimprintsDownSyncWorkerPresence(true, uniqueSyncId)
         assertWorkerChainBuild(true, uniqueSyncId)
+
+        verifyOrder {
+            workManager.beginWith(startSyncReporterWorker)
+            continuationAfterStart.then(match<List<OneTimeWorkRequest>> { it.contains(simprintsDownSyncWorker) })
+            continuationAfterDown.then(endSyncReporterWorker)
+            continuationAfterEnd.enqueue()
+        }
     }
 
     @Test
-    fun `doWork should enqueue the down and up sync worker it can sync to BFSID`() = runTest {
+    fun `doWork should enqueue the down and up sync worker it can sync to BFSID sequentially`() = runTest {
         shouldSyncRun(false)
         canDownSyncFromSimprints(true)
         canUpSync(true)
@@ -270,10 +315,18 @@ internal class EventSyncMasterWorkerTest {
         assertUpSyncWorkerPresence(true, uniqueSyncId)
         assertSimprintsDownSyncWorkerPresence(true, uniqueSyncId)
         assertWorkerChainBuild(true, uniqueSyncId)
+
+        verifyOrder {
+            workManager.beginWith(startSyncReporterWorker)
+            continuationAfterStart.then(match<List<OneTimeWorkRequest>> { it.contains(upSyncWorker) })
+            continuationAfterUp.then(match<List<OneTimeWorkRequest>> { it.contains(simprintsDownSyncWorker) })
+            continuationAfterDown.then(endSyncReporterWorker)
+            continuationAfterEnd.enqueue()
+        }
     }
 
     @Test
-    fun `doWork should enqueue the down sync worker if CommCare sync`() = runTest {
+    fun `doWork should enqueue the down sync worker if CommCare sync sequentially`() = runTest {
         shouldSyncRun(false)
         canDownSyncFromCommCare(true)
         canUpSync(true)
@@ -295,6 +348,14 @@ internal class EventSyncMasterWorkerTest {
         assertUpSyncWorkerPresence(true, uniqueSyncId)
         assertCommCareDownSyncWorkerPresence(true, uniqueSyncId)
         assertWorkerChainBuild(true, uniqueSyncId)
+
+        verifyOrder {
+            workManager.beginWith(startSyncReporterWorker)
+            continuationAfterStart.then(match<List<OneTimeWorkRequest>> { it.contains(upSyncWorker) })
+            continuationAfterUp.then(match<List<OneTimeWorkRequest>> { it.contains(commCareDownSyncWorker) })
+            continuationAfterDown.then(endSyncReporterWorker)
+            continuationAfterEnd.enqueue()
+        }
     }
 
     @Test
@@ -401,18 +462,11 @@ internal class EventSyncMasterWorkerTest {
     ) {
         val times = if (isBuilt) 1 else 0
         verify(exactly = times) {
-            eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(
-                uniqueSyncId,
-            )
+            eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
         }
         verify(exactly = times) {
-            eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(
-                uniqueSyncId,
-                any(),
-                any(),
-            )
+            eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(uniqueSyncId, any(), any())
         }
-        verify(exactly = times) { workManager.beginWith(any<OneTimeWorkRequest>()) }
     }
 
     private fun assertUpSyncWorkerPresence(
@@ -421,13 +475,6 @@ internal class EventSyncMasterWorkerTest {
     ) {
         val times = if (isPresent) 1 else 0
         coVerify(exactly = times) { upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncId, any()) }
-        verify(exactly = times) {
-            workContinuation.then(
-                match<List<OneTimeWorkRequest>> {
-                    it.contains(upSyncWorker)
-                },
-            )
-        }
     }
 
     private fun assertSimprintsDownSyncWorkerPresence(
@@ -436,13 +483,6 @@ internal class EventSyncMasterWorkerTest {
     ) {
         val times = if (isPresent) 1 else 0
         coVerify(exactly = times) { simprintsDownSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId, any()) }
-        verify(exactly = times) {
-            workContinuation.then(
-                match<List<OneTimeWorkRequest>> {
-                    it.contains(simprintsDownSyncWorker)
-                },
-            )
-        }
     }
 
     private fun assertCommCareDownSyncWorkerPresence(
@@ -451,12 +491,5 @@ internal class EventSyncMasterWorkerTest {
     ) {
         val times = if (isPresent) 1 else 0
         coVerify(exactly = times) { commCareDownSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId, any()) }
-        verify(exactly = times) {
-            workContinuation.then(
-                match<List<OneTimeWorkRequest>> {
-                    it.contains(commCareDownSyncWorker)
-                },
-            )
-        }
     }
 }
