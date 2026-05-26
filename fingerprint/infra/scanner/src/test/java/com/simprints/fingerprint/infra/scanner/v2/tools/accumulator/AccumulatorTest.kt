@@ -52,7 +52,7 @@ class AccumulatorTest {
 
     class StringAccumulator :
         Accumulator<String, String, String>(
-            initialFragmentCollection = "",
+            initialFragmentCollection = { "" },
             addFragmentToCollection = { this + it },
             canComputeElementLengthFromCollection = { it.length >= LENGTH_INDICES.count() },
             computeElementLengthFromCollection = ::computeLength,
