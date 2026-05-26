@@ -33,6 +33,23 @@ class AccumulatorTest {
         assertThat(result.toList()).containsExactlyElementsIn(strings).inOrder()
     }
 
+    @Test
+    fun accumulator_resetAfterPartialElement_subsequentElementsAreCorrect() = runTest {
+        val accumulator = StringAccumulator()
+
+        // Feed a partial element header that announces a 28-byte element but only supply a few
+        // bytes. Without a reset the partial header would corrupt any later element parsing.
+        accumulator.updateWithNewFragment("28abc")
+        assertThat(accumulator.takeElements().toList()).isEmpty()
+
+        accumulator.reset()
+
+        // After reset, accumulating a fresh complete element should produce exactly that element,
+        // with no contamination from the partial bytes received before reset.
+        accumulator.updateWithNewFragment("05xyz")
+        assertThat(accumulator.takeElements().toList()).containsExactly("05xyz")
+    }
+
     class StringAccumulator :
         Accumulator<String, String, String>(
             initialFragmentCollection = "",

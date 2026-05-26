@@ -5,6 +5,8 @@ import com.simprints.fingerprint.infra.scanner.testtools.randomPacketWithSource
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.Route
 import com.simprints.fingerprint.infra.scanner.v2.tools.lang.objects
 import com.simprints.testtools.common.syntax.failTest
+import io.mockk.spyk
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
@@ -15,14 +17,16 @@ import org.junit.Before
 import org.junit.Test
 
 class PacketRouterTest {
+    private lateinit var byteArrayToPacketAccumulator: ByteArrayToPacketAccumulator
     private lateinit var router: PacketRouter
 
     @Before
     fun setUp() {
+        byteArrayToPacketAccumulator = spyk(ByteArrayToPacketAccumulator(PacketParser()))
         router = PacketRouter(
             Route.Remote::class.objects(),
             { source },
-            ByteArrayToPacketAccumulator(PacketParser()),
+            byteArrayToPacketAccumulator,
             Dispatchers.IO,
         )
     }
@@ -55,6 +59,15 @@ class PacketRouterTest {
 
         // Assert job  is cancelled
         assertThat(router.packetProcessingJob?.isCancelled).isTrue()
+    }
+
+    @Test
+    fun `disconnect resets the packet accumulator so stale bytes do not leak across reconnects`() = runTest {
+        router.connect(flowOf(byteArrayOf(0x01, 0x02)))
+
+        router.disconnect()
+
+        verify { byteArrayToPacketAccumulator.reset() }
     }
 
     @Test

@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.flow
  * @param buildElementFromCompleteCollection Method with which to build the next available Element from the collection
  */
 abstract class Accumulator<in Fragment, in FragmentCollection, Element>(
-    initialFragmentCollection: FragmentCollection,
+    private val initialFragmentCollection: FragmentCollection,
     private val addFragmentToCollection: FragmentCollection.(Fragment) -> FragmentCollection,
     private val canComputeElementLengthFromCollection: (FragmentCollection) -> Boolean,
     private val computeElementLengthFromCollection: (FragmentCollection) -> Int,
@@ -38,6 +38,16 @@ abstract class Accumulator<in Fragment, in FragmentCollection, Element>(
     private var fragmentCollection: FragmentCollection = initialFragmentCollection
 
     private var currentElementLength: Int? = null
+
+    /**
+     * Resets the accumulator to its initial empty state. Should be called when the underlying
+     * stream is disconnected so that any partial element bytes do not leak into the next
+     * connection's stream and corrupt subsequent message parsing.
+     */
+    fun reset() {
+        fragmentCollection = initialFragmentCollection
+        currentElementLength = null
+    }
 
     fun updateWithNewFragment(fragment: Fragment) {
         fragmentCollection = fragmentCollection.addFragmentToCollection(fragment)

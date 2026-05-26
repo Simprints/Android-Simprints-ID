@@ -4,6 +4,8 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.EnterMainModeResponse
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.chunked
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.hexToByteArray
+import io.mockk.spyk
+import io.mockk.verify
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.emitAll
@@ -12,7 +14,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class RootMessageInputStreamTest {
-    private val rootMessageAccumulator = RootResponseAccumulator(RootResponseParser())
+    private val rootMessageAccumulator = spyk(RootResponseAccumulator(RootResponseParser()))
     private val rootMessageInputStream = RootMessageInputStream(rootMessageAccumulator)
 
     @Test
@@ -50,5 +52,16 @@ class RootMessageInputStreamTest {
         val testResponseSubscriber =
             rootMessageInputStream.receiveResponse<EnterMainModeResponse>()
         assertThat(testResponseSubscriber).isInstanceOf(expectedResponse::class.java)
+    }
+
+    @Test
+    fun rootMessageInputStream_disconnect_resetsAccumulator() = runTest {
+        rootMessageInputStream.connect(MutableSharedFlow())
+
+        rootMessageInputStream.disconnect()
+
+        // Resetting prevents partial bytes received before the disconnect from corrupting
+        // subsequent message parsing once the channel is reconnected.
+        verify { rootMessageAccumulator.reset() }
     }
 }
