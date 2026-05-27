@@ -46,6 +46,7 @@ class PacketRouter @Inject constructor(
 
     override fun disconnect() {
         packetProcessingJob?.cancel()
+        byteArrayToPacketAccumulator.reset()
         internalPacketRoutes.values.forEach { it.resetReplayCache() }
     }
 }

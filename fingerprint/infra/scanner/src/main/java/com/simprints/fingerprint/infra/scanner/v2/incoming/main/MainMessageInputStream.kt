@@ -44,8 +44,15 @@ class MainMessageInputStream @Inject constructor(
         }
     }
 
-    // only disconnecting the packet router as the other three streams are derived from it as shared flows and will be disconnected automatically
-    override fun disconnect() = packetRouter.disconnect()
+    // Disconnect the packet router (the derived shared-flow streams are cleaned up with it) and
+    // reset every accumulator so that any partial bytes received before the disconnect do not
+    // corrupt message parsing on the next connection.
+    override fun disconnect() {
+        packetRouter.disconnect()
+        veroResponseAccumulator.reset()
+        veroEventAccumulator.reset()
+        un20ResponseAccumulator.reset()
+    }
 
     @ExcludedFromGeneratedTestCoverageReports(
         "This function is already tested in MainMessageInputStreamTest, but it does not appear in the test coverage report because it is an inline function.",
