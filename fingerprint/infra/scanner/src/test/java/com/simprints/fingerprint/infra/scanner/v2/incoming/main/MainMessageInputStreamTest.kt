@@ -24,6 +24,7 @@ import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.hexToByteArra
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
+import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -41,9 +42,9 @@ class MainMessageInputStreamTest {
         justRun { connect(any()) }
         justRun { disconnect() }
     }
-    private val veroResponseAccumulator = VeroResponseAccumulator(VeroResponseParser())
-    private val veroEventAccumulator = VeroEventAccumulator(VeroEventParser())
-    private val un20ResponseAccumulator = Un20ResponseAccumulator(Un20ResponseParser())
+    private val veroResponseAccumulator = spyk(VeroResponseAccumulator(VeroResponseParser()))
+    private val veroEventAccumulator = spyk(VeroEventAccumulator(VeroEventParser()))
+    private val un20ResponseAccumulator = spyk(Un20ResponseAccumulator(Un20ResponseParser()))
     private lateinit var messageInputStream: MainMessageInputStream
 
     @Before
@@ -207,6 +208,26 @@ class MainMessageInputStreamTest {
         verify {
             packetRouter.disconnect()
         }
+    }
+
+    @Test
+    fun messageInputStream_disconnect_resetsAllMessageAccumulators() = runTest {
+        val routes = mapOf(
+            VeroServer as Route to emptyFlow<Packet>(),
+            VeroEvent as Route to emptyFlow(),
+            Un20Server as Route to emptyFlow(),
+        )
+
+        every { packetRouter.incomingPacketRoutes } returns routes
+        justRun { packetRouter.disconnect() }
+        messageInputStream.connect(mockk())
+        messageInputStream.disconnect()
+
+        // Resetting prevents partial bytes received before the disconnect from corrupting
+        // subsequent message parsing once the channel is reconnected.
+        verify { veroResponseAccumulator.reset() }
+        verify { veroEventAccumulator.reset() }
+        verify { un20ResponseAccumulator.reset() }
     }
 
     private suspend fun MutableSharedFlow<Packet>.emitAll(
