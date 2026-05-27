@@ -79,7 +79,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
             .asLiveData(viewModelScope.coroutineContext)
 
     private lateinit var startTime: Timestamp
-    lateinit var ocrConfig: OcrConfig
+    var ocrConfig: OcrConfig? = null
         private set
     private var lightingConditionsAssessmentConfig: LightingConditionsAssessmentConfig? = null
 
@@ -105,12 +105,13 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     }
 
     fun startScanning() {
+        val captureConfig = ocrConfig ?: return
         startTime = timeHelper.now()
         updateState {
             ScanOcrState.ScanningInProgress(
                 ocrDocumentType = ocrDocumentType,
                 successfulCaptures = 0,
-                scansRequired = ocrConfig.capturesRequired,
+                scansRequired = captureConfig.capturesRequired,
             )
         }
     }
@@ -144,6 +145,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
 
                 if (!isOcrAllowed) return@launch
                 val mfidConfig = configRepository.getProjectConfiguration().multifactorId ?: return@launch
+                val captureConfig = ocrConfig ?: return@launch
                 val scannedMfidDocument =
                     scanMfidDocumentUseCase(bitmap = cropped, documentType = ocrDocumentType, config = mfidConfig) ?: return@launch
                 Simber.d("Detected OCR")
@@ -153,7 +155,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
                         ScanOcrState.ScanningInProgress(
                             ocrDocumentType = ocrDocumentType,
                             successfulCaptures = scannedMfidDocuments.size,
-                            scansRequired = ocrConfig.capturesRequired,
+                            scansRequired = captureConfig.capturesRequired,
                         )
                     }
                 }
