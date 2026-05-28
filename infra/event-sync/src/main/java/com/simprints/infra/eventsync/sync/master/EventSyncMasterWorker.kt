@@ -99,33 +99,35 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                 }
 
                 val isDownSyncAllowedInWorker = inputData.getBoolean(IS_DOWN_SYNC_ALLOWED, true)
-                if (configuration.isSimprintsEventDownSyncAllowed() && isDownSyncAllowedInWorker) {
-                    // TODO: Remove after all users have updated to 2025.3.0
-                    // In versions before 2025.3.0 a bug prevented single subject down-sync scopes from being closed and uploaded.
-                    // Attempting to close any such scopes and recover at least some of the data.
-                    eventRepository.closeAllOpenScopes(EventScopeType.DOWN_SYNC, null)
+                if (isDownSyncAllowedInWorker) {
+                    if (configuration.isSimprintsEventDownSyncAllowed()) {
+                        // TODO: Remove after all users have updated to 2025.3.0
+                        // In versions before 2025.3.0 a bug prevented single subject down-sync scopes from being closed and uploaded.
+                        // Attempting to close any such scopes and recover at least some of the data.
+                        eventRepository.closeAllOpenScopes(EventScopeType.DOWN_SYNC, null)
 
-                    eventRepository.createEventScope(
-                        EventScopeType.DOWN_SYNC,
-                        downSyncWorkerScopeId,
-                    )
-
-                    workerChain += simprintsDownSyncWorkerBuilder
-                        .buildDownSyncWorkerChain(
-                            uniqueSyncId,
+                        eventRepository.createEventScope(
+                            EventScopeType.DOWN_SYNC,
                             downSyncWorkerScopeId,
-                        ).also { Simber.d("Scheduled ${it.size} Simprints down workers", tag = tag) }
-                } else if (configuration.isCommCareEventDownSyncAllowed()) {
-                    eventRepository.createEventScope(
-                        EventScopeType.DOWN_SYNC,
-                        downSyncWorkerScopeId,
-                    )
+                        )
 
-                    workerChain += commCareDownSyncWorkerBuilder
-                        .buildDownSyncWorkerChain(
-                            uniqueSyncId,
+                        workerChain += simprintsDownSyncWorkerBuilder
+                            .buildDownSyncWorkerChain(
+                                uniqueSyncId,
+                                downSyncWorkerScopeId,
+                            ).also { Simber.d("Scheduled ${it.size} Simprints down workers", tag = tag) }
+                    } else if (configuration.isCommCareEventDownSyncAllowed()) {
+                        eventRepository.createEventScope(
+                            EventScopeType.DOWN_SYNC,
                             downSyncWorkerScopeId,
-                        ).also { Simber.d("Scheduled ${it.size} CommCare down workers", tag = tag) }
+                        )
+
+                        workerChain += commCareDownSyncWorkerBuilder
+                            .buildDownSyncWorkerChain(
+                                uniqueSyncId,
+                                downSyncWorkerScopeId,
+                            ).also { Simber.d("Scheduled ${it.size} CommCare down workers", tag = tag) }
+                    }
                 }
 
                 val endSyncReporterWorker =
