@@ -465,16 +465,18 @@
     <string name="notification_migration_description">Storage optimization in progress</string>
 
     <!-- Identification pool validation -->
-    <string name="id_pool_validation_issue_title">Identification issue</string>
-    <string name="id_pool_validation_default_message">Checking identification candidate pool</string>
-    <string name="id_pool_validation_user_mismatch_message">Provided attendant ID does not match synchronised data</string>
-    <string name="id_pool_validation_module_mismatch_message">Provided module ID does not match synchronised data</string>
-    <string name="id_pool_validation_sync_required_message">Data has not been synchronised recently</string>
-    <string name="id_pool_validation_syncing_message">Syncing…</string>
-    <string name="id_pool_validation_pool_empty_message">There are no records on the device</string>
-    <string name="id_pool_validation_action_close">Close</string>
+    <string name="id_pool_validation_validating">Validating…</string>
+    <string name="id_pool_validation_issue_title">Identification will fail</string>
+    <string name="id_pool_validation_default_message">There are no potential matches for this identification request.\n\nIf this is expected, you can safely continue with the capture. Otherwise, please contact your project manager for assistance.</string>
+    <string name="id_pool_validation_user_mismatch_message">Attendant ID in the request does not match the one in Simprints ID</string>
+    <string name="id_pool_validation_module_mismatch_message">Module ID in the request does not match any of the selected modules in Simprints ID</string>
+    <string name="id_pool_validation_sync_required_message">Simprints ID has not been synchronised for too long</string>
+    <string name="id_pool_validation_pool_empty_message">There are no records for this request on the device</string>
+    <string name="id_pool_validation_last_sync">Last sync: %1$s</string>
+    <string name="id_pool_validation_syncing_message">Sync in progress…</string>
     <string name="id_pool_validation_action_sync">Sync and retry</string>
-    <string name="id_pool_validation_action_continue">Proceed with capture</string>
+    <string name="id_pool_validation_action_close">Close</string>
+    <string name="id_pool_validation_action_continue">Continue capture</string>
 
     <!-- Age group selection -->
     <string name="age_group_selection_title">Select Subject\'s Age Group</string>

@@ -7,105 +7,192 @@
     android:background="@color/simprints_blue">
 
     <TextView
-        android:id="@+id/validationIssueTitle"
-        style="@style/Text.Headline5.White.Bold"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:maxLines="2"
-        android:text="@string/id_pool_validation_issue_title"
-        android:visibility="gone"
-        app:flow_verticalBias="0.1"
-        app:layout_constraintBottom_toTopOf="@+id/validationIssueMessage"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.8"
-        app:layout_constraintVertical_chainStyle="packed"
-        app:layout_constraintWidth_percent="0.8"
-        tools:visibility="visible" />
-
-    <TextView
-        android:id="@+id/validationIssueMessage"
-        style="@style/Text.Subtitle1.White"
+        android:id="@+id/validationValidating"
+        style="@style/Text.Body1.White"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:drawablePadding="16dp"
-        android:gravity="center"
-        android:maxWidth="320dp"
-        android:maxLines="5"
-        android:text="@string/id_pool_validation_default_message"
+        android:text="@string/id_pool_validation_validating"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        tools:visibility="visible" />
 
-    <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/validationLoadingIndicator"
-        style="@style/Widget.Simprints.LinearProgressIndicator.White.Large"
-        android:layout_width="320dp"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/validationMainCard"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:indeterminate="true"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="48dp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/validationIssueMessage"
-        tools:visibility="visible" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="500dp"
+        tools:visibility="visible">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/validationIssueTitle"
+                style="@style/Text.Headline6.Bold"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="@string/id_pool_validation_issue_title"
+                app:layout_constraintBottom_toTopOf="@+id/validationIssueMessage"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+            <TextView
+                android:id="@+id/validationIssueMessage"
+                style="@style/Text.Body1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="48dp"
+                android:gravity="center"
+                android:text="@string/id_pool_validation_default_message"
+                app:layout_constraintBottom_toTopOf="@+id/validationIssueDescriptionBlock"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/validationIssueTitle" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/validationIssueDescriptionBlock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="48dp"
+                android:background="@drawable/block_background"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="16dp"
+                app:layout_constraintBottom_toTopOf="@+id/validationLoadingBlock"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/validationIssueMessage">
+
+                <TextView
+                    android:id="@+id/validationIssueDescription"
+                    style="@style/Text.Body2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/id_pool_validation_pool_empty_message"
+                    app:layout_constraintBottom_toTopOf="@+id/validationIssueLastSynced"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/validationIssueLastSynced"
+                    style="@style/Text.Body2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/validationIssueDescription"
+                    app:layout_constraintStart_toStartOf="@id/validationIssueDescription"
+                    app:layout_constraintTop_toBottomOf="@id/validationIssueDescription"
+                    app:layout_goneMarginBottom="8dp"
+                    tools:text="Last synced: 2 days ago"
+                    tools:visibility="visible" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/validationLoadingBlock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/validationIssueDescriptionBlock">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/validationActionsSync"
+                    style="@style/Widget.Simprints.Button.Green"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/id_pool_validation_action_sync"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="gone" />
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/validationLoadingIndicator"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/validationLoadingIndicatorText"
+                    style="@style/Text.Subtitle1.Secondary"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="@string/id_pool_validation_syncing_message"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/validationLoadingIndicator"
+                    tools:visibility="visible" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/validationActions"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:visibility="visible">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/simprints_grey_light"
-            app:layout_constraintBottom_toTopOf="@id/validationActionsContinue" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/validationActionsClose"
+            style="@style/Widget.Simprints.Button.Red"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/id_pool_validation_action_close"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/validationActionsContinue"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/validationActionsContinue"
-            style="@style/Widget.Simprints.Button.TextButton.White"
+            style="@style/Widget.Simprints.Button"
             android:layout_width="0dp"
-            android:layout_height="96dp"
-            android:layout_marginTop="2dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
             android:text="@string/id_pool_validation_action_continue"
-            app:layout_constraintBottom_toTopOf="@id/validationActionsClose"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/validationActionsClose"
-            style="@style/Widget.Simprints.Button.TextButton.White"
-            android:layout_width="0dp"
-            android:layout_height="96dp"
-            android:layout_marginTop="2dp"
-            android:text="@string/id_pool_validation_action_close"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/validationActionsSync"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/validationActionsSync"
-            style="@style/Widget.Simprints.Button.TextButton.White"
-            android:layout_width="0dp"
-            android:layout_height="96dp"
-            android:layout_marginTop="2dp"
-            android:text="@string/id_pool_validation_action_sync"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/validationActionsClose"
-            tools:visibility="visible" />
+            app:layout_constraintStart_toEndOf="@id/validationActionsClose" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

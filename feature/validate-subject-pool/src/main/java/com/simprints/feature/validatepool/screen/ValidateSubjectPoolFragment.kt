@@ -37,6 +37,13 @@ internal class ValidateSubjectPoolFragment : Fragment(R.layout.fragment_validate
 
         viewModel.state.observe(viewLifecycleOwner, LiveDataEventWithContentObserver(::renderState))
 
+        viewModel.lastSyncLabel.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver { label ->
+                binding.validationIssueLastSynced.text = getString(IDR.string.id_pool_validation_last_sync, label)
+            },
+        )
+
         binding.validationActionsClose.setOnClickListener { finishWithResult(false) }
         binding.validationActionsContinue.setOnClickListener { finishWithResult(true) }
         binding.validationActionsSync.setOnClickListener { viewModel.startSync(params.enrolmentRecordQuery) }
@@ -48,53 +55,53 @@ internal class ValidateSubjectPoolFragment : Fragment(R.layout.fragment_validate
         ValidateSubjectPoolState.Success -> finishWithResult(true)
 
         ValidateSubjectPoolState.Validating -> setViews(
-            titleRes = IDR.string.id_pool_validation_default_message,
+            showValidating = true,
         )
 
         ValidateSubjectPoolState.UserMismatch -> setViews(
-            titleRes = IDR.string.id_pool_validation_user_mismatch_message,
-            showTitle = true,
-            showCloseAction = true,
+            descriptionRes = IDR.string.id_pool_validation_user_mismatch_message,
         )
 
         ValidateSubjectPoolState.ModuleMismatch -> setViews(
-            titleRes = IDR.string.id_pool_validation_module_mismatch_message,
-            showTitle = true,
-            showCloseAction = true,
+            descriptionRes = IDR.string.id_pool_validation_module_mismatch_message,
         )
 
         ValidateSubjectPoolState.RequiresSync -> setViews(
-            titleRes = IDR.string.id_pool_validation_sync_required_message,
-            showTitle = true,
-            showCloseAction = true,
-            showSyncAction = true,
+            descriptionRes = IDR.string.id_pool_validation_sync_required_message,
+            showSyncBlock = true,
         )
 
         ValidateSubjectPoolState.SyncInProgress -> setViews(
-            titleRes = IDR.string.id_pool_validation_syncing_message,
-            showTitle = true,
             showProgress = true,
+            showSyncBlock = true,
         )
 
         ValidateSubjectPoolState.PoolEmpty -> setViews(
-            titleRes = IDR.string.id_pool_validation_pool_empty_message,
-            showTitle = true,
-            showCloseAction = true,
+            descriptionRes = IDR.string.id_pool_validation_pool_empty_message,
+            showSyncBlock = true,
         )
     }
 
     private fun setViews(
-        @StringRes titleRes: Int,
-        showTitle: Boolean = false,
+        @StringRes descriptionRes: Int? = null,
+        showValidating: Boolean = false,
         showProgress: Boolean = false,
-        showCloseAction: Boolean = false,
-        showSyncAction: Boolean = false,
+        showSyncBlock: Boolean = false,
     ) = with(binding) {
-        validationIssueMessage.setText(titleRes)
-        validationIssueTitle.isVisible = showTitle
-        validationLoadingIndicator.isVisible = showProgress
-        validationActions.isVisible = showCloseAction || showSyncAction
-        validationActionsSync.isVisible = showSyncAction
+        validationValidating.isVisible = showValidating
+        validationMainCard.isVisible = !showValidating
+        validationActions.isVisible = !showValidating
+
+        descriptionRes?.let { validationIssueDescription.setText(it) }
+
+        // Last synced label
+        validationIssueLastSynced.isVisible = showSyncBlock
+
+        // Loading
+        validationLoadingBlock.isVisible = showSyncBlock
+        validationActionsSync.isVisible = showSyncBlock && !showProgress
+        validationLoadingIndicator.isVisible = showProgress && showSyncBlock
+        validationLoadingIndicatorText.isVisible = showProgress && showSyncBlock
     }
 
     private fun finishWithResult(isValid: Boolean) {
