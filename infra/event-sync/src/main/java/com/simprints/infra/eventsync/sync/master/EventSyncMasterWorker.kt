@@ -84,14 +84,15 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
             if (!isSyncRunning()) {
                 val startSyncReporterWorker =
                     eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
-                val workerChain = mutableListOf<OneTimeWorkRequest>()
+                val upSyncChain = mutableListOf<OneTimeWorkRequest>()
+                val downSyncChain = mutableListOf<OneTimeWorkRequest>()
                 if (configuration.canSyncDataToSimprints()) {
                     eventRepository.createEventScope(
                         EventScopeType.UP_SYNC,
                         upSyncWorkerScopeId,
                     )
 
-                    workerChain += upSyncWorkerBuilder
+                    upSyncChain += upSyncWorkerBuilder
                         .buildUpSyncWorkerChain(
                             uniqueSyncId,
                             upSyncWorkerScopeId,
@@ -110,7 +111,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                         downSyncWorkerScopeId,
                     )
 
-                    workerChain += simprintsDownSyncWorkerBuilder
+                    downSyncChain += simprintsDownSyncWorkerBuilder
                         .buildDownSyncWorkerChain(
                             uniqueSyncId,
                             downSyncWorkerScopeId,
@@ -121,7 +122,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                         downSyncWorkerScopeId,
                     )
 
-                    workerChain += commCareDownSyncWorkerBuilder
+                    downSyncChain += commCareDownSyncWorkerBuilder
                         .buildDownSyncWorkerChain(
                             uniqueSyncId,
                             downSyncWorkerScopeId,
@@ -135,11 +136,10 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                         upSyncWorkerScopeId,
                     )
 
-                wm
-                    .beginWith(startSyncReporterWorker)
-                    .then(workerChain)
-                    .then(endSyncReporterWorker)
-                    .enqueue()
+                var chain = wm.beginWith(startSyncReporterWorker)
+                if (upSyncChain.isNotEmpty()) chain = chain.then(upSyncChain)
+                if (downSyncChain.isNotEmpty()) chain = chain.then(downSyncChain)
+                chain.then(endSyncReporterWorker).enqueue()
 
                 eventSyncCache.clearProgresses()
 
