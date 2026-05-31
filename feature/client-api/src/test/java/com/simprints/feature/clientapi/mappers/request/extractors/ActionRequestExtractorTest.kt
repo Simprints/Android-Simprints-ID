@@ -3,7 +3,7 @@ package com.simprints.feature.clientapi.mappers.request.extractors
 import com.google.common.truth.Truth.assertThat
 import com.simprints.libsimprints.Constants.SIMPRINTS_METADATA
 import com.simprints.libsimprints.Constants.SIMPRINTS_SUBJECT_AGE
-import kotlin.test.Test
+import org.junit.Test
 
 internal class ActionRequestExtractorTest {
     // Concrete subclass for testing

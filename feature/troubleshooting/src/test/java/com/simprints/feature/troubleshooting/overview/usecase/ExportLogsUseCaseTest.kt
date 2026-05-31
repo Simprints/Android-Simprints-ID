@@ -14,9 +14,9 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
+import org.junit.Test
 import java.io.File
 import java.text.SimpleDateFormat
-import kotlin.test.Test
 
 class ExportLogsUseCaseTest {
     @MockK

@@ -3,8 +3,8 @@ package com.simprints.infra.logging
 import android.content.Context
 import io.mockk.every
 import io.mockk.mockk
+import org.junit.Test
 import java.io.File
-import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class LogDirectoryProviderTest {
