@@ -6,8 +6,8 @@ import androidx.test.platform.app.*
 import com.google.common.truth.Truth.*
 import com.simprints.infra.enrolment.records.room.store.SubjectsDatabase
 import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.test.Test
 
 @RunWith(AndroidJUnit4::class)
 class Migration1to2Test {

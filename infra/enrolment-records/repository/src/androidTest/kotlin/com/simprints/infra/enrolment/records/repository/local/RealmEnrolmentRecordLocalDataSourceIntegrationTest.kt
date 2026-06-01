@@ -3,11 +3,11 @@ package com.simprints.infra.enrolment.records.repository.local
 import androidx.test.core.app.*
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
+import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.reference.BiometricReference
 import com.simprints.core.domain.reference.BiometricTemplate
-import com.simprints.core.domain.common.TemplateIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
@@ -36,8 +36,8 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
+import org.junit.Test
 import java.util.UUID
-import kotlin.test.Test
 
 @HiltAndroidTest
 class RealmEnrolmentRecordLocalDataSourceIntegrationTest {

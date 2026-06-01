@@ -22,4 +22,5 @@ dependencies {
 
     implementation(libs.libsimprints)
     implementation(libs.testing.androidX.room)
+    implementation(libs.workManager.work)
 }

@@ -9,6 +9,7 @@ import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
@@ -62,7 +63,7 @@ internal class BackendApiClientTest {
     @Test
     fun `executeCall returns Success when api client returns successful response`() = runTest {
         coEvery { apiClient.executeCall(any<suspend (TestRemoteInterface) -> Response<ResponseBody>>()) } returns
-            Response<ResponseBody>.success(ResponseBody.EMPTY)
+            Response<ResponseBody>.success("".toResponseBody())
 
         val result = subject.executeCall(TestRemoteInterface::class) { "ignored" }
 
@@ -75,7 +76,7 @@ internal class BackendApiClientTest {
     @Test
     fun `executeCall returns Failure when api client returns failed response`() = runTest {
         coEvery { apiClient.executeCall(any<suspend (TestRemoteInterface) -> Response<ResponseBody>>()) } returns
-            Response<ResponseBody>.error(426, ResponseBody.EMPTY)
+            Response<ResponseBody>.error(426, "".toResponseBody())
 
         val result = subject.executeCall(TestRemoteInterface::class) { "ignored" }
 

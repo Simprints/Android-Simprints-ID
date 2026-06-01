@@ -72,11 +72,10 @@ open class Application :
         appScope.cancel()
     }
 
-    override val workManagerConfiguration: Configuration
-        get() = Configuration
-            .Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
+    override fun getWorkManagerConfiguration(): Configuration = Configuration
+        .Builder()
+        .setWorkerFactory(workerFactory)
+        .build()
 
     open fun initApplication() {
         SimberBuilder.initialize(this)
