@@ -24,8 +24,6 @@ class PipelineSonarConventionPlugin : Plugin<Project> {
                     properties {
                         // Fix for https://community.sonarsource.com/t/random-sub-projects-fail-analysis-in-gradle-multi-projects-build/49777
                         property("sonar.userHome", "$projectDir$cacheDir")
-                        property("sonar.sources", "$projectDir$sourceDir")
-                        property("sonar.java.binaries", "$projectDir$binariesDir")
                         property("sonar.coverage.jacoco.xmlReportPaths", listOf("$projectDir$jacocoDir"))
                     }
                 }
