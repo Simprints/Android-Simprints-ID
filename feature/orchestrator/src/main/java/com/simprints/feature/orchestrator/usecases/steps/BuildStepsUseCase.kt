@@ -356,7 +356,9 @@ internal class BuildStepsUseCase @Inject constructor(
         callerPackageName: String,
         projectConfiguration: ProjectConfiguration,
         mode: ValidateSubjectPoolFragmentParams.ValidationMode,
-    ) = if (projectConfiguration.experimental().idPoolValidationEnabled) {
+    ) = if (projectConfiguration.experimental().disableSubjectPoolValidation) {
+        emptyList()
+    } else {
         when (
             BiometricDataSource.fromString(
                 value = biometricDataSource,
@@ -374,8 +376,6 @@ internal class BuildStepsUseCase @Inject constructor(
 
             is BiometricDataSource.CommCare -> emptyList()
         }
-    } else {
-        emptyList()
     }
 
     /**

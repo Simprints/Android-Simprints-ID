@@ -3,7 +3,7 @@ package com.simprints.infra.config.store.models
 import com.google.common.truth.Truth.*
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.CAMERA_FLASH_CONTROLS_ENABLED
-import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.ENABLE_ID_POOL_VALIDATION
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.DISABLE_SUBJECT_POOL_VALIDATION
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
@@ -46,18 +46,18 @@ import org.junit.Test
 
 internal class ExperimentalProjectConfigurationTest {
     @Test
-    fun `check pool validation flag correctly`() {
+    fun `check disable pool validation flag correctly`() {
         mapOf(
             // Value not present
             emptyMap<String, JsonElement>() to false,
             // Value not boolean
-            mapOf(ENABLE_ID_POOL_VALIDATION to JsonPrimitive(1)) to false,
+            mapOf(DISABLE_SUBJECT_POOL_VALIDATION to JsonPrimitive(1)) to false,
             // Value present and FALSE
-            mapOf(ENABLE_ID_POOL_VALIDATION to JsonPrimitive(false)) to false,
+            mapOf(DISABLE_SUBJECT_POOL_VALIDATION to JsonPrimitive(false)) to false,
             // Value present and TRUE
-            mapOf(ENABLE_ID_POOL_VALIDATION to JsonPrimitive(true)) to true,
+            mapOf(DISABLE_SUBJECT_POOL_VALIDATION to JsonPrimitive(true)) to true,
         ).forEach { (config, result) ->
-            assertThat(ExperimentalProjectConfiguration(config).idPoolValidationEnabled).isEqualTo(result)
+            assertThat(ExperimentalProjectConfiguration(config).disableSubjectPoolValidation).isEqualTo(result)
         }
     }
 
