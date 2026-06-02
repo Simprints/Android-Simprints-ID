@@ -4,12 +4,6 @@ plugins {
     id("simprints.library.kotlinSerialization")
 }
 
-sonarqube {
-    properties {
-        property("sonar.sources", "src/main/java")
-    }
-}
-
 android {
     namespace = "com.simprints.face.capture"
 }
