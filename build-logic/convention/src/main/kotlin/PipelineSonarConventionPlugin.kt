@@ -24,8 +24,6 @@ class PipelineSonarConventionPlugin : Plugin<Project> {
                     properties {
                         // Fix for https://community.sonarsource.com/t/random-sub-projects-fail-analysis-in-gradle-multi-projects-build/49777
                         property("sonar.userHome", "$projectDir$cacheDir")
-                        property("sonar.sources", "$projectDir$sourceDir")
-                        property("sonar.java.binaries", "$projectDir$binariesDir")
                         property("sonar.coverage.jacoco.xmlReportPaths", listOf("$projectDir$jacocoDir"))
                     }
                 }
@@ -35,8 +33,7 @@ class PipelineSonarConventionPlugin : Plugin<Project> {
 
     companion object {
         private val cacheDir = "${File.separator}build${File.separator}.sonar"
-        private val jacocoDir = "${File.separator}build${File.separator}reports${File.separator}jacoco${File.separator}jacocoTestReport${File.separator}jacocoTestReport.xml"
-        private val sourceDir = "${File.separator}src${File.separator}main${File.separator}java${File.separator}com${File.separator}simprints"
-        private val binariesDir = "${File.separator}build${File.separator}"
+        private val jacocoDir =
+            "${File.separator}build${File.separator}reports${File.separator}jacoco${File.separator}jacocoTestReport${File.separator}jacocoTestReport.xml"
     }
 }
