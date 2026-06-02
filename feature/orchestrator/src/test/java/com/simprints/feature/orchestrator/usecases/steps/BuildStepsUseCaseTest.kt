@@ -170,6 +170,33 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
+    fun `build - enrol action - no age restriction - duplicate check - pool validation - returns expected steps`() = runTest {
+        val projectConfiguration = mockCommonProjectConfiguration()
+        every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
+
+        every { projectConfiguration.custom } returns
+            mapOf("validateIdentificationPool" to JsonPrimitive(true))
+
+        val action = mockk<ActionRequest.EnrolActionRequest>(relaxed = true)
+        every { action.getSubjectAgeIfAvailable() } returns null
+
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
+
+        assertStepOrder(
+            steps,
+            StepId.SETUP,
+            StepId.CONSENT,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FACE_CAPTURE,
+            StepId.VALIDATE_ID_POOL,
+            StepId.FINGERPRINT_MATCHER,
+            StepId.FINGERPRINT_MATCHER,
+            StepId.FACE_MATCHER,
+        )
+    }
+
+    @Test
     fun `build - enrol action - no age restriction - duplicate check - matching modalities - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
         every { projectConfiguration.general.matchingModalities } returns listOf(Modality.FACE)

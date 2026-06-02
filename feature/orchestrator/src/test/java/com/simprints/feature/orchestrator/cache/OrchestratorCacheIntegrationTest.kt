@@ -44,6 +44,7 @@ import com.simprints.feature.selectsubject.SelectSubjectParams
 import com.simprints.feature.selectsubject.SelectSubjectResult
 import com.simprints.feature.setup.SetupResult
 import com.simprints.feature.validatepool.ValidateSubjectPoolFragmentParams
+import com.simprints.feature.validatepool.ValidateSubjectPoolFragmentParams.ValidationMode
 import com.simprints.feature.validatepool.ValidateSubjectPoolResult
 import com.simprints.fingerprint.capture.FingerprintCaptureParams
 import com.simprints.infra.config.store.models.ModalitySdkType
@@ -320,7 +321,7 @@ class OrchestratorCacheIntegrationTest {
             id = StepId.VALIDATE_ID_POOL,
             navigationActionId = 5,
             destinationId = 6,
-            params = ValidateSubjectPoolFragmentParams(EnrolmentRecordQuery()),
+            params = ValidateSubjectPoolFragmentParams(EnrolmentRecordQuery(), ValidationMode.IDENTIFICATION),
             status = StepStatus.COMPLETED,
             result = ValidateSubjectPoolResult(true),
         ),
