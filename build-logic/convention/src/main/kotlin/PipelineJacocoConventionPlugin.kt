@@ -35,17 +35,30 @@ class PipelineJacocoConventionPlugin : Plugin<Project> {
             reports.xml.required.set(true)
             reports.html.required.set(false) // Disable html reports to decrease report upload/download time in github pipeline
 
-            val javaTree = fileTree("${project.buildDir}/intermediates/javac/debug/classes") { exclude(fileFilter) }
-            val kotlinTree = fileTree("${project.buildDir}/tmp/kotlin-classes/debug") { exclude(fileFilter) }
+            val javaTree = fileTree("${project.buildDir}/intermediates/javac/debug") {
+                include("**/classes/**")
+                exclude(fileFilter)
+            }
+            val kotlinTree = fileTree("${project.buildDir}") {
+                include("tmp/kotlin-classes/debug/**", "classes/kotlin/debug/**", "classes/kotlin/main/**")
+                exclude(fileFilter)
+            }
             classDirectories.setFrom(files(javaTree, kotlinTree))
 
-            sourceDirectories.setFrom(files("${project.projectDir}/src/main/java"))
+            sourceDirectories.setFrom(
+                files(
+                    "${project.projectDir}/src/main/java",
+                    "${project.projectDir}/src/main/kotlin",
+                ),
+            )
 
             executionData.setFrom(
-                fileTree("$buildDir") {
+                fileTree(buildDir) {
                     include(
-                        "jacoco/testDebugUnitTest.exec",
-                        "outputs/code-coverage/connected/*coverage.ec",
+                        "jacoco/testDebugUnitTest.exec", // Standard Gradle / Old AGP
+                        "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec", // Modern AGP Unit Tests
+                        "outputs/code-coverage/connected/*coverage.ec", // Old AGP Instrumented Tests
+                        "outputs/code_coverage/debugAndroidTest/connected/**/*.ec", // Modern AGP Instrumented Tests
                     )
                 },
             )

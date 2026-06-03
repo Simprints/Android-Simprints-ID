@@ -12,9 +12,9 @@ sonarqube {
         property "sonar.java.coveragePlugin", "jacoco"
     }
 }
-
 subprojects {
     sonarqube {
+        androidVariant = "debug"
         properties {
             property "sonar.java.binaries", "$projectDir$binariesDir"
             property "sonar.coverage.jacoco.xmlReportPaths", [
