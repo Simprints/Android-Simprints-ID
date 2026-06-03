@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.validatepool.usecase.HasRecordsUseCase
 import com.simprints.feature.validatepool.usecase.IsModuleIdNotSyncedUseCase
 import com.simprints.feature.validatepool.usecase.ShouldSuggestSyncUseCase
@@ -14,6 +15,7 @@ import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,6 +26,7 @@ internal class ValidateSubjectPoolViewModel @Inject constructor(
     private val isModuleIdNotSynced: IsModuleIdNotSyncedUseCase,
     private val shouldSuggestSync: ShouldSuggestSyncUseCase,
     private val syncOrchestrator: SyncOrchestrator,
+    private val timeHelper: TimeHelper,
 ) : ViewModel() {
     private lateinit var cachedQuery: EnrolmentRecordQuery
 
@@ -37,6 +40,10 @@ internal class ValidateSubjectPoolViewModel @Inject constructor(
         .filter { isSyncing }
         .map { it.eventSyncState }
 
+    val lastSyncLabel: LiveData<LiveDataEventWithContent<String>>
+        get() = _lastSyncLabel
+    private var _lastSyncLabel = MutableLiveData<LiveDataEventWithContent<String>>()
+
     init {
         viewModelScope.launch {
             syncStatusFlow.collect { syncState ->
@@ -45,6 +52,13 @@ internal class ValidateSubjectPoolViewModel @Inject constructor(
                     checkIdentificationPool(cachedQuery)
                 }
             }
+        }
+        viewModelScope.launch {
+            syncOrchestrator
+                .observeSyncState()
+                .map { it.eventSyncState.lastSyncTime }
+                .filterNotNull()
+                .collect { _lastSyncLabel.send(timeHelper.readableBetweenNowAndTime(it)) }
         }
     }
 

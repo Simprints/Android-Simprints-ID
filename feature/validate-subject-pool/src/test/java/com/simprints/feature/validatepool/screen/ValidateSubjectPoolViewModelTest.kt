@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.validatepool.usecase.HasRecordsUseCase
 import com.simprints.feature.validatepool.usecase.IsModuleIdNotSyncedUseCase
 import com.simprints.feature.validatepool.usecase.ShouldSuggestSyncUseCase
@@ -46,6 +47,9 @@ class ValidateSubjectPoolViewModelTest {
     @MockK
     private lateinit var syncOrchestrator: SyncOrchestrator
 
+    @MockK
+    private lateinit var timeHelper: TimeHelper
+
     private lateinit var syncStatusFlow: MutableStateFlow<SyncStatus>
 
     private lateinit var viewModel: ValidateSubjectPoolViewModel
@@ -56,12 +60,14 @@ class ValidateSubjectPoolViewModelTest {
 
         syncStatusFlow = MutableStateFlow(createSyncStatus(isCompleted = false))
         every { syncOrchestrator.observeSyncState() } returns syncStatusFlow
+        every { timeHelper.readableBetweenNowAndTime(any()) } returns "5 minutes ago"
 
         viewModel = ValidateSubjectPoolViewModel(
             hasRecordsUseCase,
             isModuleIdNotSyncedUseCase,
             shouldSuggestSyncUseCase,
             syncOrchestrator,
+            timeHelper,
         )
     }
 
