@@ -19,13 +19,43 @@ class PipelineJacocoConventionPlugin : Plugin<Project> {
         }
     }
 
-    private val fileFilter = listOf(
+    /**
+     * Unified exclusion list used for both class-directory filtering in the JacocoReport task
+     * and the JacocoTaskExtension excludes on each Test task.
+     */
+    private val excludedPatterns = listOf(
+        // Android generated
         "**/R.class",
         "**/R$*.class",
         "**/BuildConfig.*",
         "**/Manifest*.*",
+        // Test classes
         "**/*Test*.*",
+        // Android framework
         "android/**/*.*",
+        // JDK internals
+        "jdk.internal.*",
+        // Kotlin-generated classes — Jacoco cannot handle multiple "$" in class names
+        "**/*\$\$*",
+        "**/*\$Lambda$*.*",
+        "**/*\$inlined\$*.*",
+        // Dagger / Hilt generated (via KSP)
+        "**/*Dagger*.*",
+        "**/*MembersInjector*.*",
+        "**/*_Provide*Factory*.*",
+        "**/*_Factory*.*",
+        "**/*_HiltModule*.*",
+        "**/*_AssistedFactory*.*",
+        "**/*_AssistedFactory_Impl*.*",
+        "**/hilt_aggregated_deps/**",
+        // Room generated (via KSP) — DAO and Database implementations
+        "**/*Dao_Impl*.*",
+        "**/*Database_Impl*.*",
+        // Other generated code
+        "**/*\$JsonObjectMapper.*",
+        "**/*\$Icepick.*",
+        "**/*\$StateSaver.*",
+        "**/*AutoValue_*.*",
     )
 
     private fun Project.createJacocoTask() {
@@ -35,16 +65,24 @@ class PipelineJacocoConventionPlugin : Plugin<Project> {
             reports.xml.required.set(true)
             reports.html.required.set(false) // Disable html reports to decrease report upload/download time in github pipeline
 
-            val javaTree = fileTree("${project.buildDir}/intermediates/javac/debug") {
-                include("**/classes/**")
-                exclude(fileFilter)
-            }
-            val kotlinTree = fileTree("${project.buildDir}") {
-                include("tmp/kotlin-classes/debug/**", "classes/kotlin/debug/**", "classes/kotlin/main/**")
-                exclude(fileFilter)
-            }
-            classDirectories.setFrom(files(javaTree, kotlinTree))
+            val buildDir = layout.buildDirectory.get().asFile
 
+            val compiledClassPaths = listOf(
+                "tmp/kotlin-classes/debug",
+                "intermediates/javac/debug/classes",
+                "intermediates/asm_instrumented_project_classes/debug",
+                "intermediates/classes/debug",
+                "intermediates/local_classes/debug",
+                "intermediates/project_classes/debug",
+            )
+
+            val classTrees = compiledClassPaths.map { path ->
+                fileTree(buildDir.resolve(path)) {
+                    exclude(excludedPatterns)
+                }
+            }
+
+            classDirectories.setFrom(files(classTrees))
             sourceDirectories.setFrom(
                 files(
                     "${project.projectDir}/src/main/java",
@@ -73,24 +111,7 @@ class PipelineJacocoConventionPlugin : Plugin<Project> {
         tasks.withType<Test> {
             extensions.configure<JacocoTaskExtension> {
                 isIncludeNoLocationClasses = true
-                excludes = listOf(
-                    "jdk.internal.*",
-                    "**/R.class",
-                    "**/R$*.class",
-                    "**/*$$*",
-                    "**/BuildConfig.*",
-                    "**/Manifest*.*",
-                    "**/*\$Lambda$*.*", // Jacoco can not handle several "$" in class name.
-                    "**/*Dagger*.*", // Dagger auto-generated code.
-                    "**/*MembersInjector*.*", // Dagger auto-generated code.
-                    "**/*_Provide*Factory*.*", // Dagger auto-generated code.
-                    "**/*_Factory*.*", // Dagger auto-generated code.
-                    "**/*\$JsonObjectMapper.*", // LoganSquare auto-generated code.
-                    "**/*\$inlined$*.*", // Kotlin specific, Jacoco can not handle several "$" in class name.
-                    "**/*\$Icepick.*", // Icepick auto-generated code.
-                    "**/*\$StateSaver.*", // android-state auto-generated code.
-                    "**/*AutoValue_*.*", // AutoValue auto-generated code.
-                )
+                excludes = excludedPatterns
             }
         }
     }
