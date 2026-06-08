@@ -1,7 +1,7 @@
 [versions]
 kotlin_version = "2.3.21"
 kotlin_coroutine_version = "1.11.0"
-ksp_version = "2.3.5"
+ksp_version = "2.3.9"
 kotlin_serialization_version = "1.11.0"
 
 android_gradlePlugin_version = "9.2.1"
