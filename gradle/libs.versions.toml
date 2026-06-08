@@ -77,7 +77,7 @@ espresso_version = "3.7.0"
 espresso_accessibility_version = "4.1.1"
 barista_version = "4.3.0"
 uiAutomator_version = "2.3.0"
-jacoco_version = "0.8.14"
+jacoco_version = "0.8.15"
 
 sonar_plugin_version = "7.3.0.8198"
 realm_version = "4.0.3"
