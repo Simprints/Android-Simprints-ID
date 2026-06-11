@@ -30,18 +30,15 @@ jobs:
         environment: ${{ inputs.build-environment }}
 
         env:
-            # VERSION_CODE: Unique version code using the sum of the current timestamp and run number.
+            # VERSION_CODE formula: (year-2000)*10_000_000 + minor*100_000 + patch*1_000 + (run_number%1000)
+            # Re-runs are disabled: github.run_attempt must be 1.
+            # Guarantees within one VERSION_NAME:
+            # - VERSION_CODE is unique only until github.run_number%1000 wraps, so collisions can occur every 1000 runs
+            # Required release policy: keep VERSION_NAME increasing and bump it before 1000 workflow runs for the same VERSION_NAME.
             VERSION_CODE: "set in lower step"
-            # VERSION_NAME: Version name derived from the GitHub ref name after the final /.
             VERSION_NAME: ${{ inputs.version-name }}
-            # VERSION_SUFFIX: The build environment (e.g., dev, staging, internal).
             VERSION_SUFFIX: ${{ inputs.build-environment }}
-            # VERSION_BUILD: A unique build identifier combining the run number and attempt.
-            VERSION_BUILD: ${{ github.run_number }}.${{ github.run_attempt }}
-            # The final output file name.
             FILE_NAME: "set in lower step"
-            # The base floor version code. Please check the README for more information.
-            BASE_VERSION_CODE: 10000000
 
         steps:
             -   name: Checkout
@@ -53,26 +50,33 @@ jobs:
                     java-version: 21
                     distribution: 'temurin'
 
-            -   name: Check workflow validity
-                if: ${{ github.run_attempt > 99 }}
+            -   name: Validate version name and compute version code
                 run: |
-                    echo "Run attempts exceeded 99. Please start a new workflow."
-                    exit 1
-
-            -   name: Check base version code
-                run: |
-                    if [ $(( ${{ github.run_number }} * 100 )) -ge $BASE_VERSION_CODE ]; then
-                      echo "Github workflows now exceeds the base version code..."
-                      echo "BASE_VERSION_CODE=0" >> $GITHUB_ENV
+                    # Re-runs are disabled because VERSION_CODE uses only run_number for its sequence slot.
+                    if [ ${{ github.run_attempt }} -ne 1 ]; then
+                      echo "ERROR: Workflow re-runs are not allowed for this build; trigger a new run instead"; exit 1
                     fi
-
-            -   name: Compute version variables
-                run: |
-                    echo "VERSION_CODE=$(($BASE_VERSION_CODE + ${{ github.run_number }} * 100 + ${{ github.run_attempt }}))" >> $GITHUB_ENV
-
-            -   name: Compute file name
-                run: |
-                    echo "FILE_NAME=${{ env.VERSION_NAME }}+${{ env.VERSION_SUFFIX }}.${{ env.VERSION_BUILD }}" >> $GITHUB_ENV
+                    # Validate VERSION_NAME format: YYYY.M.P (e.g. 2026.2.0)
+                    if ! echo "$VERSION_NAME" | grep -qE '^[0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}$'; then
+                      echo "ERROR: VERSION_NAME '$VERSION_NAME' does not match required format YYYY.M.P"
+                      exit 1
+                    fi
+                    IFS='.' read -r VERSION_YEAR VERSION_MINOR VERSION_PATCH <<< "$VERSION_NAME"
+                    # Force base-10 to avoid octal misinterpretation (e.g. 08, 09)
+                    VERSION_YEAR=$((10#$VERSION_YEAR)); VERSION_MINOR=$((10#$VERSION_MINOR)); VERSION_PATCH=$((10#$VERSION_PATCH))
+                    if [ $VERSION_YEAR -lt 2020 ] || [ $VERSION_YEAR -gt 2099 ]; then
+                      echo "ERROR: Version year $VERSION_YEAR is out of supported range (2020-2099)"; exit 1
+                    fi
+                    if [ $VERSION_MINOR -gt 99 ] || [ $VERSION_PATCH -gt 99 ]; then
+                      echo "ERROR: Minor ($VERSION_MINOR) and patch ($VERSION_PATCH) must each be 0-99"; exit 1
+                    fi
+                    RUN_SEQ=$(( ${{ github.run_number }} % 1000 ))
+                    VERSION_CODE_CALCULATED=$(( (VERSION_YEAR - 2000) * 10000000 + VERSION_MINOR * 100000 + VERSION_PATCH * 1000 + RUN_SEQ ))
+                    if [ $VERSION_CODE_CALCULATED -gt 2100000000 ]; then
+                      echo "ERROR: VERSION_CODE $VERSION_CODE_CALCULATED exceeds Android max 2100000000"; exit 1
+                    fi
+                    echo "VERSION_CODE=$(( (VERSION_YEAR - 2000) * 10000000 + VERSION_MINOR * 100000 + VERSION_PATCH * 1000 + RUN_SEQ ))" >> $GITHUB_ENV
+                    echo "FILE_NAME=$VERSION_NAME+$VERSION_SUFFIX.$RUN_SEQ" >> $GITHUB_ENV
 
             -   name: Set up build files
                 uses: ./.github/actions/setup-gradle-build-files
