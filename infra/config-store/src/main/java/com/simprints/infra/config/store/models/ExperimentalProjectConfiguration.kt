@@ -13,9 +13,9 @@ import kotlinx.serialization.json.longOrNull
 data class ExperimentalProjectConfiguration(
     private val customConfig: Map<String, JsonElement>?,
 ) {
-    val idPoolValidationEnabled: Boolean
+    val disableSubjectPoolValidation: Boolean
         get() = customConfig
-            ?.get(ENABLE_ID_POOL_VALIDATION)
+            ?.get(DISABLE_SUBJECT_POOL_VALIDATION)
             ?.jsonPrimitive
             ?.booleanOrNull
             .let { it == true }
@@ -180,7 +180,7 @@ data class ExperimentalProjectConfiguration(
             .let { it == true }
 
     companion object {
-        internal const val ENABLE_ID_POOL_VALIDATION = "validateIdentificationPool"
+        internal const val DISABLE_SUBJECT_POOL_VALIDATION = "disableSubjectPoolValidation"
         internal const val SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED = "singleQualityFallbackRequired"
         internal const val FACE_AUTO_CAPTURE_ENABLED = "faceAutoCaptureEnabled"
         internal const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS = "faceAutoCaptureImagingDurationMillis"

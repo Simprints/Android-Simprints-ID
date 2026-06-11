@@ -46,9 +46,9 @@ internal class ValidateSubjectPoolFragment : Fragment(R.layout.fragment_validate
 
         binding.validationActionsClose.setOnClickListener { finishWithResult(false) }
         binding.validationActionsContinue.setOnClickListener { finishWithResult(true) }
-        binding.validationActionsSync.setOnClickListener { viewModel.startSync(params.enrolmentRecordQuery) }
+        binding.validationActionsSync.setOnClickListener { viewModel.startSync(params.enrolmentRecordQuery, params.mode) }
 
-        viewModel.checkIdentificationPool(params.enrolmentRecordQuery)
+        viewModel.checkIdentificationPool(params.enrolmentRecordQuery, params.mode)
     }
 
     private fun renderState(state: ValidateSubjectPoolState) = when (state) {
@@ -58,7 +58,7 @@ internal class ValidateSubjectPoolFragment : Fragment(R.layout.fragment_validate
             showValidating = true,
         )
 
-        ValidateSubjectPoolState.UserMismatch -> setViews(
+        ValidateSubjectPoolState.AttendantMismatch -> setViews(
             descriptionRes = IDR.string.id_pool_validation_user_mismatch_message,
         )
 

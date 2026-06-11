@@ -476,7 +476,7 @@
     <string name="id_pool_validation_syncing_message">Sync in progress…</string>
     <string name="id_pool_validation_action_sync">Sync and retry</string>
     <string name="id_pool_validation_action_close">Close</string>
-    <string name="id_pool_validation_action_continue">Continue capture</string>
+    <string name="id_pool_validation_action_continue">Continue</string>
 
     <!-- Age group selection -->
     <string name="age_group_selection_title">Select Subject\'s Age Group</string>

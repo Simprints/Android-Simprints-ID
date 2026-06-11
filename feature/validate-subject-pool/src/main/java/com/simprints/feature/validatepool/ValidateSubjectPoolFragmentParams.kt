@@ -11,4 +11,10 @@ import kotlinx.serialization.Serializable
 @SerialName("ValidateSubjectPoolFragmentParams")
 data class ValidateSubjectPoolFragmentParams(
     val enrolmentRecordQuery: EnrolmentRecordQuery,
-) : StepParams
+    val mode: ValidationMode,
+) : StepParams {
+    enum class ValidationMode {
+        IDENTIFICATION,
+        ENROL_PLUS,
+    }
+}

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.feature.validatepool.ValidateSubjectPoolFragmentParams.ValidationMode
 import com.simprints.feature.validatepool.usecase.HasRecordsUseCase
 import com.simprints.feature.validatepool.usecase.IsModuleIdNotSyncedUseCase
 import com.simprints.feature.validatepool.usecase.ShouldSuggestSyncUseCase
@@ -29,7 +30,7 @@ internal class ValidateSubjectPoolViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
 ) : ViewModel() {
     private lateinit var cachedQuery: EnrolmentRecordQuery
-
+    private lateinit var cachedMode: ValidationMode
     val state: LiveData<LiveDataEventWithContent<ValidateSubjectPoolState>>
         get() = _state
     private var _state = MutableLiveData<LiveDataEventWithContent<ValidateSubjectPoolState>>()
@@ -49,7 +50,7 @@ internal class ValidateSubjectPoolViewModel @Inject constructor(
             syncStatusFlow.collect { syncState ->
                 if (syncState.isSyncReporterCompleted()) {
                     isSyncing = false
-                    checkIdentificationPool(cachedQuery)
+                    checkIdentificationPool(cachedQuery, cachedMode)
                 }
             }
         }
@@ -62,7 +63,10 @@ internal class ValidateSubjectPoolViewModel @Inject constructor(
         }
     }
 
-    fun checkIdentificationPool(enrolmentRecordQuery: EnrolmentRecordQuery) = viewModelScope.launch {
+    fun checkIdentificationPool(
+        enrolmentRecordQuery: EnrolmentRecordQuery,
+        mode: ValidationMode,
+    ) = viewModelScope.launch {
         if (isSyncing) {
             // In case of configuration change while syncing, we want to show the sync in progress state instead of default state
             _state.send(ValidateSubjectPoolState.SyncInProgress)
@@ -71,18 +75,35 @@ internal class ValidateSubjectPoolViewModel @Inject constructor(
         _state.send(ValidateSubjectPoolState.Validating)
 
         val validationState = when {
+            // Check that any record are available as a shortcut
             hasRecords(enrolmentRecordQuery) -> ValidateSubjectPoolState.Success
-            enrolmentRecordQuery.attendantId != null && hasRecords(EnrolmentRecordQuery()) -> ValidateSubjectPoolState.UserMismatch
-            enrolmentRecordQuery.moduleId?.let { isModuleIdNotSynced(it) } == true -> ValidateSubjectPoolState.ModuleMismatch
+            // Check attendant ID or module ID based on the ID configuration in the project
+            hasInvalidAttendantId(enrolmentRecordQuery) -> ValidateSubjectPoolState.AttendantMismatch
+            hasInvalidModuleId(enrolmentRecordQuery) -> ValidateSubjectPoolState.ModuleMismatch
+            // Check for stale sync for a better result
             shouldSuggestSync() -> ValidateSubjectPoolState.RequiresSync
-            else -> ValidateSubjectPoolState.PoolEmpty
+            // For Identification requests, no-records is a fail state
+            mode == ValidationMode.IDENTIFICATION -> ValidateSubjectPoolState.PoolEmpty
+            // For Enrol+, no-records is a success state
+            else -> ValidateSubjectPoolState.Success
         }
 
         _state.send(validationState)
     }
 
-    fun startSync(enrolmentRecordQuery: EnrolmentRecordQuery) = viewModelScope.launch {
+    private suspend fun hasInvalidModuleId(enrolmentRecordQuery: EnrolmentRecordQuery): Boolean =
+        enrolmentRecordQuery.moduleId?.let { isModuleIdNotSynced(it) } == true
+
+    private suspend fun hasInvalidAttendantId(enrolmentRecordQuery: EnrolmentRecordQuery): Boolean =
+        enrolmentRecordQuery.attendantId != null && hasRecords(EnrolmentRecordQuery())
+
+    fun startSync(
+        enrolmentRecordQuery: EnrolmentRecordQuery,
+        mode: ValidationMode,
+    ) = viewModelScope.launch {
         cachedQuery = enrolmentRecordQuery
+        cachedMode = mode
+
         _state.send(ValidateSubjectPoolState.SyncInProgress)
         isSyncing = true
         syncOrchestrator.execute(OneTime.Events.start())
