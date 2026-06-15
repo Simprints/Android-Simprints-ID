@@ -1,10 +1,10 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.selectsubject.SelectSubjectResult
 import com.simprints.infra.orchestration.data.responses.AppConfirmationResponse
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
-import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
@@ -23,7 +23,7 @@ class CreateConfirmIdentityResponseUseCaseTest {
             useCase(
                 listOf(
                     SelectSubjectResult(true, mockk<ExternalCredentialSearchResult.Complete>(relaxed = true)),
-                    mockk(),
+                    mockk(relaxed = true),
                 ),
             ),
         ).isInstanceOf(AppConfirmationResponse::class.java)
