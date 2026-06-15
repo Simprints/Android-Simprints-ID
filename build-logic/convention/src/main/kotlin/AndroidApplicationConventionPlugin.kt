@@ -1,6 +1,7 @@
 import com.android.build.api.dsl.ApplicationExtension
 import common.BuildTypes
 import common.SdkVersions
+import common.addDefaultRobolectricConfig
 import common.configureAndroidApplication
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -51,6 +52,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                     unitTests.isIncludeAndroidResources = true
                     execution = "ANDROIDX_TEST_ORCHESTRATOR"
                     animationsDisabled = true
+                    unitTests.all { testTask -> addDefaultRobolectricConfig(target, testTask) }
                 }
 
                 bundle.language.enableSplit = false

@@ -21,7 +21,7 @@ internal fun Project.configureKotlinCompiler() {
 
 internal fun Project.configureAndroidApplication(extension: ApplicationExtension) {
     extension.apply {
-        compileSdk = SdkVersions.TARGET
+        compileSdk = SdkVersions.COMPILE
 
         defaultConfig {
             minSdk = SdkVersions.MIN
@@ -38,7 +38,7 @@ internal fun Project.configureAndroidApplication(extension: ApplicationExtension
 
 internal fun Project.configureAndroidLibrary(extension: LibraryExtension) {
     extension.apply {
-        compileSdk = SdkVersions.TARGET
+        compileSdk = SdkVersions.COMPILE
 
         defaultConfig {
             minSdk = SdkVersions.MIN
