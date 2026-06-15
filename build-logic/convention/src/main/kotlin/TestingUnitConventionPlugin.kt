@@ -1,4 +1,5 @@
 import com.android.build.api.dsl.LibraryExtension
+import common.addDefaultRobolectricConfig
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -16,6 +17,7 @@ class TestingUnitConventionPlugin : Plugin<Project> {
                 testOptions {
                     unitTests.isReturnDefaultValues = true
                     unitTests.isIncludeAndroidResources = true
+                    unitTests.all { testTask -> addDefaultRobolectricConfig(target, testTask) }
                 }
             }
 
