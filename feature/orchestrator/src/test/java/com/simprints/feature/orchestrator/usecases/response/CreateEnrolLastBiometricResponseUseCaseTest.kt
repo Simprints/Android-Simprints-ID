@@ -23,7 +23,7 @@ class CreateEnrolLastBiometricResponseUseCaseTest {
                 useCase(
                     listOf(
                         EnrolLastBiometricResult("1234", null),
-                        mockk(),
+                        mockk(relaxed = true),
                     ),
                 ),
             ).isInstanceOf(AppEnrolResponse::class.java)
