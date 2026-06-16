@@ -30,11 +30,8 @@ jobs:
         environment: ${{ inputs.build-environment }}
 
         env:
-            # VERSION_CODE formula: (year-2000)*10_000_000 + minor*100_000 + patch*1_000 + (run_number%1000)
+            # VERSION_CODE formula: (year-2000)*10_000_000 + minor*100_000 + patch*1_000 + run_number
             # Re-runs are disabled: github.run_attempt must be 1.
-            # Guarantees within one VERSION_NAME:
-            # - VERSION_CODE is unique only until github.run_number%1000 wraps, so collisions can occur every 1000 runs
-            # Required release policy: keep VERSION_NAME increasing and bump it before 1000 workflow runs for the same VERSION_NAME.
             VERSION_CODE: "set in lower step"
             VERSION_NAME: ${{ inputs.version-name }}
             VERSION_SUFFIX: ${{ inputs.build-environment }}
@@ -51,32 +48,10 @@ jobs:
                     distribution: 'temurin'
 
             -   name: Validate version name and compute version code
-                run: |
-                    # Re-runs are disabled because VERSION_CODE uses only run_number for its sequence slot.
-                    if [ ${{ github.run_attempt }} -ne 1 ]; then
-                      echo "ERROR: Workflow re-runs are not allowed for this build; trigger a new run instead"; exit 1
-                    fi
-                    # Validate VERSION_NAME format: YYYY.M.P (e.g. 2026.2.0)
-                    if ! echo "$VERSION_NAME" | grep -qE '^[0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}$'; then
-                      echo "ERROR: VERSION_NAME '$VERSION_NAME' does not match required format YYYY.M.P"
-                      exit 1
-                    fi
-                    IFS='.' read -r VERSION_YEAR VERSION_MINOR VERSION_PATCH <<< "$VERSION_NAME"
-                    # Force base-10 to avoid octal misinterpretation (e.g. 08, 09)
-                    VERSION_YEAR=$((10#$VERSION_YEAR)); VERSION_MINOR=$((10#$VERSION_MINOR)); VERSION_PATCH=$((10#$VERSION_PATCH))
-                    if [ $VERSION_YEAR -lt 2020 ] || [ $VERSION_YEAR -gt 2099 ]; then
-                      echo "ERROR: Version year $VERSION_YEAR is out of supported range (2020-2099)"; exit 1
-                    fi
-                    if [ $VERSION_MINOR -gt 99 ] || [ $VERSION_PATCH -gt 99 ]; then
-                      echo "ERROR: Minor ($VERSION_MINOR) and patch ($VERSION_PATCH) must each be 0-99"; exit 1
-                    fi
-                    RUN_SEQ=$(( ${{ github.run_number }} % 1000 ))
-                    VERSION_CODE_CALCULATED=$(( (VERSION_YEAR - 2000) * 10000000 + VERSION_MINOR * 100000 + VERSION_PATCH * 1000 + RUN_SEQ ))
-                    if [ $VERSION_CODE_CALCULATED -gt 2100000000 ]; then
-                      echo "ERROR: VERSION_CODE $VERSION_CODE_CALCULATED exceeds Android max 2100000000"; exit 1
-                    fi
-                    echo "VERSION_CODE=$(( (VERSION_YEAR - 2000) * 10000000 + VERSION_MINOR * 100000 + VERSION_PATCH * 1000 + RUN_SEQ ))" >> $GITHUB_ENV
-                    echo "FILE_NAME=$VERSION_NAME+$VERSION_SUFFIX.$RUN_SEQ" >> $GITHUB_ENV
+                env:
+                    RUN_ATTEMPT: ${{ github.run_attempt }}
+                    RUN_NUMBER: ${{ github.run_number }}
+                run: bash .github/scripts/generate-version.sh
 
             -   name: Set up build files
                 uses: ./.github/actions/setup-gradle-build-files
