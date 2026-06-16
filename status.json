@@ -2,19 +2,16 @@
   "production": {
     "version": null,
     "updated_at": null,
-    "apk_url": null,
     "release_url": null
   },
   "delivery_testing": {
     "version": null,
     "updated_at": null,
-    "apk_url": null,
     "release_url": null
   },
   "internal_testing": {
     "version": null,
     "updated_at": null,
-    "apk_url": null,
     "release_url": null
   }
 }

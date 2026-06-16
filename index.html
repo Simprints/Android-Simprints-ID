@@ -162,13 +162,9 @@
         ? `<div class="updated">Updated ${formatDate(updatedAt)}</div>`
         : `<div class="updated"></div>`;
 
-      const apkBtn = apkUrl
-        ? `<a class="btn btn-primary" href="${apkUrl}" download>⬇&nbsp;Download APK</a>`
-        : `<span class="btn btn-primary btn-disabled">⬇&nbsp;Download APK</span>`;
-
       const releaseBtn = releaseUrl
-        ? `<a class="btn btn-secondary" href="${releaseUrl}" target="_blank" rel="noopener">📋&nbsp;Release Notes</a>`
-        : `<span class="btn btn-secondary btn-disabled">📋&nbsp;Release Notes</span>`;
+        ? `<a class="btn btn-primary" href="${releaseUrl}" target="_blank" rel="noopener">📋&nbsp;View Release</a>`
+        : `<span class="btn btn-primary btn-disabled">📋&nbsp;View Release</span>`;
 
       return `
         <div class="card" style="--accent: ${env.accent}">
@@ -179,7 +175,6 @@
           ${versionHtml}
           ${updatedHtml}
           <div class="actions">
-            ${apkBtn}
             ${releaseBtn}
           </div>
         </div>`;
