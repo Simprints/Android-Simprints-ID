@@ -1,17 +1,27 @@
 {
   "production": {
-    "version": null,
+    "version": "v2025.2.1",
     "updated_at": null,
+    "apk_url": null,
+    "release_url": null
+  },
+  "production_ready": {
+    "version": "v2026.1.0",
+    "updated_at": null,
+    "apk_url": null,
     "release_url": null
   },
   "delivery_testing": {
-    "version": null,
+    "version": "v2026.2.0",
     "updated_at": null,
+    "apk_url": null,
     "release_url": null
   },
   "internal_testing": {
     "version": null,
+    "upcoming": "v2026.3.0",
     "updated_at": null,
+    "apk_url": null,
     "release_url": null
   }
 }
