@@ -10,13 +10,13 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 internal interface EventRoomDao {
-    @Query("select * from DbEvent order by createdAt_unixMs desc")
+    @Query("select * from DbEvent order by createdAt_unixMs asc")
     suspend fun loadAll(): List<DbEvent>
 
-    @Query("select * from DbEvent where scopeId = :scopeId order by createdAt_unixMs desc")
+    @Query("select * from DbEvent where scopeId = :scopeId order by createdAt_unixMs asc")
     suspend fun loadFromScope(scopeId: String): List<DbEvent>
 
-    @Query("select eventJson from DbEvent where scopeId = :scopeId order by createdAt_unixMs desc")
+    @Query("select eventJson from DbEvent where scopeId = :scopeId order by createdAt_unixMs asc")
     suspend fun loadEventJsonFromScope(scopeId: String): List<String>
 
     @Query("select count(*) from DbEvent")
