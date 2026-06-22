@@ -326,6 +326,53 @@ internal class ExternalCredentialScanOcrViewModelTest {
     }
 
     @Test
+    fun `processImage does not add documents or update state once required captures are reached`() = runTest {
+        val mockScannedDocument = mockk<ScannedMfidDocument>()
+        val mockNormalizedBitmap = mockk<Bitmap>()
+        val mockCroppedBitmap = mockk<Bitmap>()
+
+        coEvery { normalizeBitmapToPreviewUseCase(bitmap, cropConfig) } returns mockNormalizedBitmap
+        coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
+        coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
+
+        val observer = viewModel.scanOcrStateLiveData.test()
+        viewModel.startScanning()
+
+        val capturesRequired = (observer.value() as ScanOcrState.ScanningInProgress).scansRequired
+        repeat(capturesRequired) { viewModel.processImage(bitmap, cropConfig) }
+
+        val stateAtCapacity = observer.value() as ScanOcrState.ScanningInProgress
+        assertThat(stateAtCapacity.successfulCaptures).isEqualTo(capturesRequired)
+
+        viewModel.processImage(bitmap, cropConfig)
+
+        assertThat(observer.value()).isEqualTo(stateAtCapacity)
+    }
+
+    @Test
+    fun `processImage emits ScanningInProgress with enough captures exactly once`() = runTest {
+        val mockScannedDocument = mockk<ScannedMfidDocument>()
+        val mockNormalizedBitmap = mockk<Bitmap>()
+        val mockCroppedBitmap = mockk<Bitmap>()
+
+        coEvery { normalizeBitmapToPreviewUseCase(bitmap, cropConfig) } returns mockNormalizedBitmap
+        coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
+        coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
+
+        val observer = viewModel.scanOcrStateLiveData.test()
+        viewModel.startScanning()
+
+        val capturesRequired = (observer.value() as ScanOcrState.ScanningInProgress).scansRequired
+        repeat(capturesRequired + 2) { viewModel.processImage(bitmap, cropConfig) }
+
+        val completionTriggers = observer
+            .valueHistory()
+            .filterIsInstance<ScanOcrState.ScanningInProgress>()
+            .count { it.successfulCaptures >= it.scansRequired }
+        assertThat(completionTriggers).isEqualTo(1)
+    }
+
+    @Test
     fun `processImage does not append documents or update state after scanning is complete`() = runTest {
         val mockScannedDocument = mockk<ScannedMfidDocument>()
         val mockScannedCredentialResult = mockk<ScannedCredentialResult>()

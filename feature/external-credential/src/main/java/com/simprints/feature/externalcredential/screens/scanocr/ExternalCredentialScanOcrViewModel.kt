@@ -149,7 +149,8 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
                 val scannedMfidDocument =
                     scanMfidDocumentUseCase(bitmap = cropped, documentType = ocrDocumentType, config = mfidConfig) ?: return@launch
                 Simber.d("Detected OCR")
-                if (isScanningInProgress) {
+                val notEnoughCaptures = scannedMfidDocuments.size < ocrConfig.capturesRequired
+                if (isScanningInProgress && notEnoughCaptures) {
                     scannedMfidDocuments += scannedMfidDocument
                     updateState {
                         ScanOcrState.ScanningInProgress(

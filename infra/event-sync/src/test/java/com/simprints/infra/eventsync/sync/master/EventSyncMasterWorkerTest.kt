@@ -359,6 +359,32 @@ internal class EventSyncMasterWorkerTest {
     }
 
     @Test
+    fun `doWork should not enqueue CommCare down sync worker when isDownSyncAllowed is false`() = runTest {
+        val workerWithDownSyncDisabled = buildMasterWorker(isDownSyncAllowed = false)
+        shouldSyncRun(false)
+        canDownSyncFromCommCare(true)
+        canUpSync(true)
+
+        val uniqueSyncId = workerWithDownSyncDisabled.uniqueSyncId
+        val result = workerWithDownSyncDisabled.doWork()
+
+        assertThat(result).isEqualTo(
+            ListenableWorker.Result.success(
+                workDataOf(
+                    EventSyncMasterWorker.OUTPUT_LAST_SYNC_ID to uniqueSyncId,
+                ),
+            ),
+        )
+
+        coVerify(exactly = 1) { eventSyncCache.clearProgresses() }
+        coVerify(exactly = 1) { eventRepository.createEventScope(EventScopeType.UP_SYNC, any()) }
+        coVerify(exactly = 0) { eventRepository.createEventScope(EventScopeType.DOWN_SYNC, any()) }
+
+        assertUpSyncWorkerPresence(true, uniqueSyncId)
+        assertCommCareDownSyncWorkerPresence(false, uniqueSyncId)
+    }
+
+    @Test
     fun `doWork should not enqueue the workers is one is already running`() = runTest {
         shouldSyncRun(true)
         canDownSyncFromSimprints(true)
@@ -491,5 +517,27 @@ internal class EventSyncMasterWorkerTest {
     ) {
         val times = if (isPresent) 1 else 0
         coVerify(exactly = times) { commCareDownSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId, any()) }
+    }
+
+    private fun buildMasterWorker(isDownSyncAllowed: Boolean): EventSyncMasterWorker = spyk(
+        EventSyncMasterWorker(
+            appContext = ctx,
+            params = mockk(relaxed = true) {
+                every { tags } returns setOf(MASTER_SYNC_SCHEDULER_PERIODIC_TIME)
+                every { inputData.getBoolean(EventSyncMasterWorker.IS_DOWN_SYNC_ALLOWED, true) } returns isDownSyncAllowed
+            },
+            simprintsDownSyncWorkerBuilder = simprintsDownSyncWorkerBuilder,
+            commCareDownSyncWorkerBuilder = commCareDownSyncWorkerBuilder,
+            upSyncWorkerBuilder = upSyncWorkerBuilder,
+            configRepository = configRepository,
+            eventSyncCache = eventSyncCache,
+            eventSyncSubMasterWorkersBuilder = eventSyncSubMasterWorkersBuilder,
+            timeHelper = timeHelper,
+            dispatcher = testCoroutineRule.testCoroutineDispatcher,
+            securityManager = securityManager,
+            eventRepository = eventRepository,
+        ),
+    ).also {
+        coEvery { it["showProgressNotification"]() } returns Unit
     }
 }

@@ -14,7 +14,7 @@ abstract class ByteArrayAccumulator<in Fragment, Element>(
     computeElementLength: (ByteArray) -> Int,
     buildElement: (ByteArray) -> Element,
 ) : Accumulator<Fragment, ByteArray, Element>(
-        byteArrayOf(),
+        { byteArrayOf() },
         { fragment -> this + fragmentAsByteArray(fragment) },
         canComputeElementLength,
         computeElementLength,
