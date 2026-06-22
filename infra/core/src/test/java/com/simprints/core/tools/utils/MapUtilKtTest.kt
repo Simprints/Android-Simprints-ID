@@ -7,7 +7,7 @@ import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import kotlin.test.Test
+import org.junit.Test
 import kotlin.test.assertEquals
 
 class MapUtilKtTest {

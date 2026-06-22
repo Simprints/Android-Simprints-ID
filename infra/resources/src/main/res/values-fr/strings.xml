@@ -471,16 +471,9 @@
     <string name="notification_migration_description">Optimisation stockage en cours</string>
 
     <!-- Identification pool validation -->
-    <string name="id_pool_validation_issue_title">Problème d\'identification</string>
-    <string name="id_pool_validation_default_message"> Vérification de l\'identification dans le pool de candidats</string>
-    <string name="id_pool_validation_user_mismatch_message">L\'ID de d\'attendant ne correspond pas aux données synchronisées</string>
-    <string name="id_pool_validation_module_mismatch_message">L\'ID du module fourni ne correspond pas aux données synchronisées.</string>
-    <string name="id_pool_validation_sync_required_message">Les données n\'ont pas été synchronisées récemment.</string>
-    <string name="id_pool_validation_syncing_message">Synchronisation...</string>
     <string name="id_pool_validation_pool_empty_message">Il n\'y a pas d\'enregistrements sur l\'appareil</string>
     <string name="id_pool_validation_action_close">Fermer</string>
     <string name="id_pool_validation_action_sync">Synchroniser et réessayer</string>
-    <string name="id_pool_validation_action_continue">Continuer et capturer</string>
 
     <!-- Age group selection -->
     <string name="age_group_selection_title">Choisir le groupe d\'age du sujet</string>

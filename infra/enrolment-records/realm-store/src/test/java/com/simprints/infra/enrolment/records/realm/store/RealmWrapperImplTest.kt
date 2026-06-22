@@ -113,7 +113,7 @@ class RealmWrapperImplTest {
         verify {
             Realm.deleteRealm(configuration)
             secureLocalDbKeyProviderMock.recreateLocalDatabaseKey(PROJECT_ID)
-            context.startService(any()) // Start ResetDownSyncService service
+            context.startForegroundService(any()) // Start ResetDownSyncService service
         }
         verify(exactly = 2) { Realm.open(configuration) }
     }

@@ -463,16 +463,9 @@
     <string name="notification_migration_description">भंडारण अनुकूलन प्रगति पर है</string>
 
     <!-- Identification pool validation -->
-    <string name="id_pool_validation_issue_title">पहचान संबंधी समस्या</string>
-    <string name="id_pool_validation_default_message">पहचान उम्मीदवार पूल की जाँच की जा रही है</string>
-    <string name="id_pool_validation_user_mismatch_message">प्रदान की गई परिचर आईडी समकालिक डेटा से मेल नहीं खाती</string>
-    <string name="id_pool_validation_module_mismatch_message">प्रदान किया गया मॉड्यूल आईडी समकालिक डेटा से मेल नहीं खाता</string>
-    <string name="id_pool_validation_sync_required_message">हाल ही में डेटा सिंक्रनाइज़ नहीं किया गया है</string>
-    <string name="id_pool_validation_syncing_message">समन्वयन...</string>
     <string name="id_pool_validation_pool_empty_message">डिवाइस पर कोई रिकॉर्ड नहीं है</string>
     <string name="id_pool_validation_action_close">बंद करें</string>
     <string name="id_pool_validation_action_sync">सिंक करें और पुनः प्रयास करें</string>
-    <string name="id_pool_validation_action_continue">कैप्चर करने के साथ आगे बढ़ें</string>
 
     <!-- Age group selection -->
     <string name="age_group_selection_title">विषय आयु समूह का चयन करें</string>

@@ -1,7 +1,6 @@
 plugins {
     id("simprints.feature")
     id("kotlin-parcelize")
-    alias(libs.plugins.kotlin.android)
 }
 
 android {

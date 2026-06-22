@@ -17,7 +17,7 @@ class LastCallingPackageStore @Inject constructor(
     var lastCallingPackageName: String?
         get() = prefs.getString(
             KEY_LAST_CALLING_PACKAGE_NAME,
-            context.getString(com.simprints.infra.resources.R.string.default_commcare_package_name)
+            context.getString(com.simprints.infra.resources.R.string.default_commcare_package_name),
         )
         set(value) {
             prefs.edit {

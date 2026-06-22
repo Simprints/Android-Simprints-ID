@@ -1,0 +1,18 @@
+name: Test version generation
+
+on:
+    workflow_dispatch:
+    push:
+        paths:
+            - '.github/scripts/generate-version.sh'
+            - '.github/scripts/test-generate-version.sh'
+
+jobs:
+    test-version-generation:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v7
+
+            -   name: Run version generation tests
+                run: bash .github/scripts/test-generate-version.sh

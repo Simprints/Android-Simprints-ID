@@ -476,7 +476,6 @@
     <string name="id_pool_validation_pool_empty_message">ডিভাইসে কোনো রেকর্ড নেই</string>
     <string name="id_pool_validation_action_close">বন্ধ করুন </string>
     <string name="id_pool_validation_action_sync">সিঙ্ক করুন এবং আবার চেষ্টা করুন</string>
-    <string name="id_pool_validation_action_continue">সংগ্রহের পর এগিয়ে যান</string>
 
     <!-- Age group selection -->
     <string name="age_group_selection_title">সাবজেক্টের বয়সের কোঠা নির্বাচন করুন</string>

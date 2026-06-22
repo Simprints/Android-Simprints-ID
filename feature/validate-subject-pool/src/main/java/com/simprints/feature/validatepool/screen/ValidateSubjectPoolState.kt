@@ -5,7 +5,7 @@ internal sealed class ValidateSubjectPoolState {
 
     data object Success : ValidateSubjectPoolState()
 
-    data object UserMismatch : ValidateSubjectPoolState()
+    data object AttendantMismatch : ValidateSubjectPoolState()
 
     data object ModuleMismatch : ValidateSubjectPoolState()
 

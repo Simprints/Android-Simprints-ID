@@ -163,6 +163,33 @@ class BuildStepsUseCaseTest {
             StepId.FINGERPRINT_CAPTURE,
             StepId.FINGERPRINT_CAPTURE,
             StepId.FACE_CAPTURE,
+            StepId.VALIDATE_ID_POOL,
+            StepId.FINGERPRINT_MATCHER,
+            StepId.FINGERPRINT_MATCHER,
+            StepId.FACE_MATCHER,
+        )
+    }
+
+    @Test
+    fun `build - enrol action - no age restriction - duplicate check - pool validation disabled - returns expected steps`() = runTest {
+        val projectConfiguration = mockCommonProjectConfiguration()
+        every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
+
+        every { projectConfiguration.custom } returns
+            mapOf("disableSubjectPoolValidation" to JsonPrimitive(true))
+
+        val action = mockk<ActionRequest.EnrolActionRequest>(relaxed = true)
+        every { action.getSubjectAgeIfAvailable() } returns null
+
+        val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
+
+        assertStepOrder(
+            steps,
+            StepId.SETUP,
+            StepId.CONSENT,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FACE_CAPTURE,
             StepId.FINGERPRINT_MATCHER,
             StepId.FINGERPRINT_MATCHER,
             StepId.FACE_MATCHER,
@@ -187,6 +214,7 @@ class BuildStepsUseCaseTest {
             StepId.FINGERPRINT_CAPTURE,
             StepId.FINGERPRINT_CAPTURE,
             StepId.FACE_CAPTURE,
+            StepId.VALIDATE_ID_POOL,
             StepId.FACE_MATCHER,
         )
     }
@@ -203,6 +231,7 @@ class BuildStepsUseCaseTest {
         assertStepOrder(
             steps,
             StepId.SETUP,
+            StepId.VALIDATE_ID_POOL,
             StepId.CONSENT,
             StepId.FINGERPRINT_CAPTURE,
             StepId.FINGERPRINT_CAPTURE,
@@ -226,6 +255,7 @@ class BuildStepsUseCaseTest {
         assertStepOrder(
             steps,
             StepId.SETUP,
+            StepId.VALIDATE_ID_POOL,
             StepId.CONSENT,
             StepId.FACE_CAPTURE,
             StepId.FACE_MATCHER,
@@ -233,20 +263,19 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
-    fun `build - identify action - no age restriction - id pool validation - returns expected steps`() = runTest {
+    fun `build - identify action - no age restriction - pool validation disabled - returns expected steps`() = runTest {
         val projectConfiguration = mockCommonProjectConfiguration()
 
         val action = mockk<ActionRequest.IdentifyActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns null
         every { projectConfiguration.custom } returns
-            mapOf("validateIdentificationPool" to JsonPrimitive(true))
+            mapOf("disableSubjectPoolValidation" to JsonPrimitive(true))
 
         val steps = useCase.build(action, projectConfiguration, enrolmentSubjectId, cachedScannedCredentialResult)
 
         assertStepOrder(
             steps,
             StepId.SETUP,
-            StepId.VALIDATE_ID_POOL,
             StepId.CONSENT,
             StepId.FINGERPRINT_CAPTURE,
             StepId.FINGERPRINT_CAPTURE,
@@ -392,6 +421,7 @@ class BuildStepsUseCaseTest {
         assertStepOrder(
             steps,
             StepId.SETUP,
+            StepId.VALIDATE_ID_POOL,
             StepId.SELECT_SUBJECT_AGE,
             StepId.CONSENT,
         )
@@ -463,6 +493,7 @@ class BuildStepsUseCaseTest {
             StepId.FINGERPRINT_CAPTURE,
             StepId.FINGERPRINT_CAPTURE,
             StepId.FACE_CAPTURE,
+            StepId.VALIDATE_ID_POOL,
             StepId.FINGERPRINT_MATCHER,
             StepId.FINGERPRINT_MATCHER,
             StepId.FACE_MATCHER,
@@ -485,6 +516,7 @@ class BuildStepsUseCaseTest {
         assertStepOrder(
             steps,
             StepId.SETUP,
+            StepId.VALIDATE_ID_POOL,
             StepId.CONSENT,
             StepId.FINGERPRINT_CAPTURE,
             StepId.FINGERPRINT_CAPTURE,
@@ -662,6 +694,7 @@ class BuildStepsUseCaseTest {
             StepId.FINGERPRINT_CAPTURE,
             StepId.FINGERPRINT_CAPTURE,
             StepId.FACE_CAPTURE,
+            StepId.VALIDATE_ID_POOL,
             StepId.FINGERPRINT_MATCHER,
             StepId.FINGERPRINT_MATCHER,
             StepId.FACE_MATCHER,
@@ -817,6 +850,7 @@ class BuildStepsUseCaseTest {
         assertStepOrder(
             steps,
             StepId.SETUP,
+            StepId.VALIDATE_ID_POOL,
             StepId.CONSENT,
             StepId.FINGERPRINT_CAPTURE,
             StepId.FINGERPRINT_CAPTURE,

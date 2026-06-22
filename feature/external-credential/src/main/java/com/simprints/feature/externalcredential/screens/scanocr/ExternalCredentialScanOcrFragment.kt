@@ -333,7 +333,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
 
             // Processing frames as often as we can while camera feedback is displayed to the user
             viewModel.imageProcessingStarted()
-            if (viewModel.isScanningInProgress && viewModel.ocrConfig.useHighRes) {
+            if (viewModel.isScanningInProgress && viewModel.ocrConfig?.useHighRes == true) {
                 // For hi-res OCR we don't need the frame and will capture a new image instead
                 videoFrame.close()
                 captureHighResImageForOcr { highResImage ->

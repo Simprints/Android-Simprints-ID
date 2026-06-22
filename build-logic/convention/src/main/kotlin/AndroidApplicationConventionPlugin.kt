@@ -1,7 +1,8 @@
 import com.android.build.api.dsl.ApplicationExtension
 import common.BuildTypes
 import common.SdkVersions
-import common.configureKotlinAndroid
+import common.addDefaultRobolectricConfig
+import common.configureAndroidApplication
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -23,7 +24,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
             with(pluginManager) {
                 apply("com.android.application")
-                apply("org.jetbrains.kotlin.android")
                 apply("simprints.library.hilt")
 
                 apply("com.google.firebase.firebase-perf")
@@ -34,7 +34,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             }
 
             extensions.configure<ApplicationExtension> {
-                configureKotlinAndroid(this)
+                configureAndroidApplication(this)
 
                 defaultConfig {
                     targetSdk = SdkVersions.TARGET
@@ -52,6 +52,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                     unitTests.isIncludeAndroidResources = true
                     execution = "ANDROIDX_TEST_ORCHESTRATOR"
                     animationsDisabled = true
+                    unitTests.all { testTask -> addDefaultRobolectricConfig(target, testTask) }
                 }
 
                 bundle.language.enableSplit = false

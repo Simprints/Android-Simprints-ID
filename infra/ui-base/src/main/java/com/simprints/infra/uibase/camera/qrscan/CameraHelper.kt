@@ -17,7 +17,6 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.Executors
-import javax.inject.Inject
 
 @ExcludedFromGeneratedTestCoverageReports(
     reason = "This is an injectable wrapper around cameraX and ML kit APIs. There is no business logic.",

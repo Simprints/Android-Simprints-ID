@@ -1,13 +1,14 @@
 package com.simprints.core.domain.tokenization
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.step.StepParams
+import com.simprints.core.domain.step.StepResult
 import com.simprints.core.domain.tokenization.TokenizableString.Raw
 import com.simprints.core.domain.tokenization.TokenizableString.Tokenized
 import com.simprints.core.domain.tokenization.serialization.TokenizableStringSerializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import java.io.Serializable as JavaSerializable
 
 /**
  * Sealed class for values that might be tokenized (symmetrically encrypted). Use this wrapping
@@ -21,7 +22,9 @@ import java.io.Serializable as JavaSerializable
 @Serializable(with = TokenizableStringSerializer::class)
 @OptIn(ExperimentalSerializationApi::class)
 @JsonClassDiscriminator("className")
-sealed class TokenizableString : JavaSerializable {
+sealed class TokenizableString :
+    StepParams,
+    StepResult {
     abstract val value: String
     abstract val className: String
 

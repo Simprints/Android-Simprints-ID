@@ -21,6 +21,7 @@ import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupContract
 import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.setup.SetupContract
 import com.simprints.feature.validatepool.ValidateSubjectPoolContract
+import com.simprints.feature.validatepool.ValidateSubjectPoolFragmentParams
 import com.simprints.fingerprint.capture.FingerprintCaptureContract
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.allowedAgeRanges
@@ -65,6 +66,7 @@ internal class BuildStepsUseCase @Inject constructor(
                     biometricDataSource = action.biometricDataSource,
                     callerPackageName = action.actionIdentifier.callerPackageName,
                     projectConfiguration = projectConfiguration,
+                    mode = ValidateSubjectPoolFragmentParams.ValidationMode.IDENTIFICATION,
                 ),
                 buildAgeSelectionStepIfNeeded(action, projectConfiguration),
                 buildConsentStepIfNeeded(ConsentType.IDENTIFY, projectConfiguration),
@@ -191,16 +193,22 @@ internal class BuildStepsUseCase @Inject constructor(
                 flowType = enrolFlowType,
             )
         }
+
         val matcherSteps = if (projectConfiguration.general.duplicateBiometricEnrolmentCheck) {
-            buildMatcherSteps(
-                projectConfiguration,
-                enrolFlowType,
-                resolvedAgeGroup,
-                buildMatcherSubjectQuery(projectConfiguration, action),
-                BiometricDataSource.fromString(
-                    action.biometricDataSource,
-                    action.actionIdentifier.callerPackageName,
-                ),
+            val enrolmentRecordQuery = buildMatcherSubjectQuery(projectConfiguration, action)
+
+            buildValidateIdPoolStep(
+                enrolmentRecordQuery = enrolmentRecordQuery,
+                biometricDataSource = action.biometricDataSource,
+                callerPackageName = action.actionIdentifier.callerPackageName,
+                projectConfiguration = projectConfiguration,
+                mode = ValidateSubjectPoolFragmentParams.ValidationMode.ENROL_PLUS,
+            ) + buildMatcherSteps(
+                projectConfiguration = projectConfiguration,
+                flowType = enrolFlowType,
+                ageGroup = resolvedAgeGroup,
+                enrolmentRecordQuery = enrolmentRecordQuery,
+                biometricDataSource = BiometricDataSource.fromString(action.biometricDataSource, action.actionIdentifier.callerPackageName),
             )
         } else {
             emptyList()
@@ -347,7 +355,10 @@ internal class BuildStepsUseCase @Inject constructor(
         biometricDataSource: String,
         callerPackageName: String,
         projectConfiguration: ProjectConfiguration,
-    ) = if (projectConfiguration.experimental().idPoolValidationEnabled) {
+        mode: ValidateSubjectPoolFragmentParams.ValidationMode,
+    ) = if (projectConfiguration.experimental().disableSubjectPoolValidation) {
+        emptyList()
+    } else {
         when (
             BiometricDataSource.fromString(
                 value = biometricDataSource,
@@ -359,14 +370,12 @@ internal class BuildStepsUseCase @Inject constructor(
                     id = StepId.VALIDATE_ID_POOL,
                     navigationActionId = R.id.action_orchestratorFragment_to_validateSubjectPool,
                     destinationId = ValidateSubjectPoolContract.DESTINATION,
-                    params = ValidateSubjectPoolContract.getParams(enrolmentRecordQuery),
+                    params = ValidateSubjectPoolContract.getParams(enrolmentRecordQuery, mode),
                 ),
             )
 
             is BiometricDataSource.CommCare -> emptyList()
         }
-    } else {
-        emptyList()
     }
 
     /**

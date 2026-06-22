@@ -471,16 +471,9 @@
     <string name="notification_migration_description">የማከማቻ ማመቻቸት በሂደት ላይ ነው።</string>
 
     <!-- Identification pool validation -->
-    <string name="id_pool_validation_issue_title">የመለየት ችግር</string>
-    <string name="id_pool_validation_default_message">የልየታ እጩዎችን በማጣራት ላይ</string>
-    <string name="id_pool_validation_user_mismatch_message">የተጠቃሚው መለያ እና ሲንከ የተደረገው መረጃ አልተመሳሰለም</string>
-    <string name="id_pool_validation_module_mismatch_message">ሞጁሉ መለያ ሲንክ ከተደረገው መረጃ ጋር አልተመሳሰለም</string>
-    <string name="id_pool_validation_sync_required_message">መረጃው በቅርቡ አልተላከም</string>
-    <string name="id_pool_validation_syncing_message">ሲንክ በማድረግ ላይ</string>
     <string name="id_pool_validation_pool_empty_message">ስልኩ ላይ ምንም መረጃ የለም</string>
     <string name="id_pool_validation_action_close">ዝጋ</string>
     <string name="id_pool_validation_action_sync">ሲንከ አድርግና እና እንደገና ሞክር</string>
-    <string name="id_pool_validation_action_continue">በመያዝ ይቀጥሉ</string>
 
     <!-- Age group selection -->
     <string name="age_group_selection_title">የተጠቃሚውን የእድሜ ክልል ምረጥ</string>

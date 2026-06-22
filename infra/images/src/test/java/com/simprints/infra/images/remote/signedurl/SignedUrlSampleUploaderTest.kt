@@ -17,7 +17,7 @@ import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
 import okio.IOException
 import org.junit.Before
-import kotlin.test.Test
+import org.junit.Test
 
 internal class SignedUrlSampleUploaderTest {
     @MockK

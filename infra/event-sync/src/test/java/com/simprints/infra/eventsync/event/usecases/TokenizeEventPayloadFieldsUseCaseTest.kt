@@ -8,7 +8,7 @@ import com.simprints.infra.events.event.domain.models.Event
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import org.junit.Before
-import kotlin.test.Test
+import org.junit.Test
 
 internal class TokenizeEventPayloadFieldsUseCaseTest {
     @MockK
