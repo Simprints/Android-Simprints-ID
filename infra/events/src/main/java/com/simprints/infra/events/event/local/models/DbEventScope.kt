@@ -8,8 +8,10 @@ import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.serialization.SimJson
 
+import androidx.room.Index
+
 @Keep
-@Entity
+@Entity(indices = [Index(value = ["type", "start_unixMs"])])
 internal data class DbEventScope(
     @PrimaryKey val id: String,
     val projectId: String,

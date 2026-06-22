@@ -7,7 +7,9 @@ import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.serialization.SimJson
 
-@Entity
+import androidx.room.Index
+
+@Entity(indices = [Index(value = ["scopeId", "createdAt_unixMs"])])
 internal data class DbEvent(
     @PrimaryKey var id: String,
     @Embedded("createdAt_") val createdAt: DbTimestamp,
