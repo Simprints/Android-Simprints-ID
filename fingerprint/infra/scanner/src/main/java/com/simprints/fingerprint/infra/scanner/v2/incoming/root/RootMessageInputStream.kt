@@ -21,7 +21,9 @@ class RootMessageInputStream @Inject constructor(
     }
 
     override fun disconnect() {
-        // No action needed as this stream is not usable anymore
+        // Reset the accumulator so any partial bytes received before disconnect do not corrupt
+        // message parsing on the next connection.
+        rootResponseAccumulator.reset()
     }
 
     suspend inline fun <reified R : RootResponse> receiveResponse(): R = rootResponseStream.filterIsInstance<R>().first()

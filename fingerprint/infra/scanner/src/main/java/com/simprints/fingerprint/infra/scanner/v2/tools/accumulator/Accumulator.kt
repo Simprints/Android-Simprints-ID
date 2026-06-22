@@ -18,7 +18,9 @@ import kotlinx.coroutines.flow.flow
  * @param FragmentCollection The type of the collection in which Fragments are stored as they are accumulated
  * @param Element The type of the output of the Accumulator
  *
- * @param initialFragmentCollection The initial empty collection with which to accumulate elements into
+ * @param initialFragmentCollection Factory for the initial empty collection with which to accumulate elements into.
+ * Invoked on construction and on every [reset] so that the accumulator is always restored to a fresh instance,
+ * even if a concrete subclass uses a mutable collection type as its fragment collection.
  * @param addFragmentToCollection The method in which fragments are added to the collection
  * @param canComputeElementLengthFromCollection Whether there is sufficient information within the collection to determine the next Element's length
  * @param computeElementLengthFromCollection Compute the length of the current Element from the information within the Collection
@@ -27,7 +29,7 @@ import kotlinx.coroutines.flow.flow
  * @param buildElementFromCompleteCollection Method with which to build the next available Element from the collection
  */
 abstract class Accumulator<in Fragment, in FragmentCollection, Element>(
-    initialFragmentCollection: FragmentCollection,
+    private val initialFragmentCollection: () -> FragmentCollection,
     private val addFragmentToCollection: FragmentCollection.(Fragment) -> FragmentCollection,
     private val canComputeElementLengthFromCollection: (FragmentCollection) -> Boolean,
     private val computeElementLengthFromCollection: (FragmentCollection) -> Int,
@@ -35,9 +37,19 @@ abstract class Accumulator<in Fragment, in FragmentCollection, Element>(
     private val sliceCollection: FragmentCollection.(IntRange) -> FragmentCollection,
     private val buildElementFromCompleteCollection: (FragmentCollection) -> Element,
 ) {
-    private var fragmentCollection: FragmentCollection = initialFragmentCollection
+    private var fragmentCollection: FragmentCollection = initialFragmentCollection()
 
     private var currentElementLength: Int? = null
+
+    /**
+     * Resets the accumulator to its initial empty state. Should be called when the underlying
+     * stream is disconnected so that any partial element bytes do not leak into the next
+     * connection's stream and corrupt subsequent message parsing.
+     */
+    fun reset() {
+        fragmentCollection = initialFragmentCollection()
+        currentElementLength = null
+    }
 
     fun updateWithNewFragment(fragment: Fragment) {
         fragmentCollection = fragmentCollection.addFragmentToCollection(fragment)
