@@ -39,7 +39,7 @@ jobs:
             testing: ${{ steps.filter.outputs.testing }}
         steps:
             -   name: Checkout
-                uses: actions/checkout@v6
+                uses: actions/checkout@v7
 
             -   name: Check directories in test groups
                 uses: dorny/paths-filter@v4
