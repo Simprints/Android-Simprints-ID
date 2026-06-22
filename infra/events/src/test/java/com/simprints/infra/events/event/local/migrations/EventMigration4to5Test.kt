@@ -43,17 +43,18 @@ class EventMigration4to5Test {
         )
 
         // validate that the data was migrated properly.
-        val event = MigrationTestingTools.retrieveCursorWithEventById(db, EVENT_ID)
-        for (key in version4Event.keySet()) {
-            if (key == "subjectId") continue
+        MigrationTestingTools.retrieveCursorWithEventById(db, EVENT_ID).use { event ->
+            for (key in version4Event.keySet()) {
+                if (key == "subjectId") continue
 
-            val field = version4Event[key]
-            val dbValue = when (field) {
-                is Int -> event.getIntWithColumnName(key)
-                else -> event.getStringWithColumnName(key)
+                val field = version4Event[key]
+                val dbValue = when (field) {
+                    is Int -> event.getIntWithColumnName(key)
+                    else -> event.getStringWithColumnName(key)
+                }
+
+                assertThat(dbValue).isEqualTo(field)
             }
-
-            assertThat(dbValue).isEqualTo(field)
         }
     }
 

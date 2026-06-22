@@ -37,7 +37,7 @@ class EventMigration6to7Test {
 
         val eventJson = MigrationTestingTools
             .retrieveCursorWithEventById(db, eventId)
-            .getStringWithColumnName("eventJson")!!
+            .use { it.getStringWithColumnName("eventJson")!! }
         val payload = JSONObject(eventJson).getJSONObject("payload")
         assertThat(payload.getString("type")).isEqualTo("ONE_TO_ONE_MATCH")
         assertThat(payload.getInt("eventVersion")).isEqualTo(2)
@@ -55,7 +55,7 @@ class EventMigration6to7Test {
         val eventJson =
             MigrationTestingTools
                 .retrieveCursorWithEventById(db, eventId)
-                .getStringWithColumnName("eventJson")!!
+                .use { it.getStringWithColumnName("eventJson")!! }
 
         val payload = JSONObject(eventJson).getJSONObject("payload")
         assertThat(payload.getString("type")).isEqualTo("ONE_TO_ONE_MATCH")

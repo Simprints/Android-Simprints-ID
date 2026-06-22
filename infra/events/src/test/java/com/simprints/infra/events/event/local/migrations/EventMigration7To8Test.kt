@@ -87,7 +87,7 @@ class EventMigration7To8Test {
         assertThrows<CursorIndexOutOfBoundsException> {
             MigrationTestingTools
                 .retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
-                .getStringWithColumnName("eventJson")!!
+                .use { it.getStringWithColumnName("eventJson")!! }
         }
         helper.closeWhenFinished(db)
     }
@@ -114,7 +114,7 @@ class EventMigration7To8Test {
         assertThrows<CursorIndexOutOfBoundsException> {
             MigrationTestingTools
                 .retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
-                .getStringWithColumnName("eventJson")!!
+                .use { it.getStringWithColumnName("eventJson")!! }
         }
         helper.closeWhenFinished(db)
     }
@@ -151,7 +151,7 @@ class EventMigration7To8Test {
         assertThrows<CursorIndexOutOfBoundsException> {
             MigrationTestingTools
                 .retrieveCursorWithEventByType(db, FACE_CAPTURE_BIOMETRICS)
-                .getStringWithColumnName("eventJson")!!
+                .use { it.getStringWithColumnName("eventJson")!! }
         }
 
         helper.closeWhenFinished(db)
@@ -172,7 +172,7 @@ class EventMigration7To8Test {
         assertThrows<CursorIndexOutOfBoundsException> {
             MigrationTestingTools
                 .retrieveCursorWithEventByType(db, FACE_CAPTURE_BIOMETRICS)
-                .getStringWithColumnName("eventJson")!!
+                .use { it.getStringWithColumnName("eventJson")!! }
         }
 
         helper.closeWhenFinished(db)

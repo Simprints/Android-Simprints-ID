@@ -99,24 +99,27 @@ class EventMigration2to3Test {
         db: SupportSQLiteDatabase,
         id: String,
     ) {
-        val cursor = retrieveCursorWithEventById(db, id)
-        Truth.assertThat(cursor.getIntWithColumnName("sessionIsClosed")).isNotNull()
+        retrieveCursorWithEventById(db, id).use { cursor ->
+            Truth.assertThat(cursor.getIntWithColumnName("sessionIsClosed")).isNotNull()
+        }
     }
 
     private fun validateOpenSessionIsStillOpen(
         db: SupportSQLiteDatabase,
         openId: String,
     ) {
-        val cursor = retrieveCursorWithEventById(db, openId)
-        Truth.assertThat(cursor.getIntWithColumnName("sessionIsClosed")).isEqualTo(0)
+        retrieveCursorWithEventById(db, openId).use { cursor ->
+            Truth.assertThat(cursor.getIntWithColumnName("sessionIsClosed")).isEqualTo(0)
+        }
     }
 
     private fun validateClosedSessionIsStillClosed(
         db: SupportSQLiteDatabase,
         closedId: String,
     ) {
-        val cursor = retrieveCursorWithEventById(db, closedId)
-        Truth.assertThat(cursor.getIntWithColumnName("sessionIsClosed")).isEqualTo(1)
+        retrieveCursorWithEventById(db, closedId).use { cursor ->
+            Truth.assertThat(cursor.getIntWithColumnName("sessionIsClosed")).isEqualTo(1)
+        }
     }
 
     companion object {

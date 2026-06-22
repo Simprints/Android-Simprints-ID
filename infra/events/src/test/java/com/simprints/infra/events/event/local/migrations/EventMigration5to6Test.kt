@@ -38,7 +38,7 @@ class EventMigration5to6Test {
 
         val eventJson = MigrationTestingTools
             .retrieveCursorWithEventById(db, eventId)
-            .getStringWithColumnName("eventJson")!!
+            .use { it.getStringWithColumnName("eventJson")!! }
             .let { JSONObject(it) }
 
         assertThat(eventJson.getJSONObject("payload").getInt("eventVersion")).isEqualTo(2)
