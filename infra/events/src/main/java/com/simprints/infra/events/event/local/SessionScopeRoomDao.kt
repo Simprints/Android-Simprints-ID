@@ -15,7 +15,7 @@ internal interface SessionScopeRoomDao {
     @Query("select * from DbEventScope where type = :type AND end_unixMs IS NULL order by start_unixMs desc")
     suspend fun loadOpen(type: EventScopeType): List<DbEventScope>
 
-    @Query("select * from DbEventScope where type = :type AND end_unixMs IS NOT NULL order by start_unixMs desc limit :limit")
+    @Query("select * from DbEventScope where type = :type AND end_unixMs IS NOT NULL order by start_unixMs asc limit :limit")
     suspend fun loadClosed(
         type: EventScopeType,
         limit: Int,
