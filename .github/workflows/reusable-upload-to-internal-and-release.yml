@@ -39,11 +39,14 @@ jobs:
                 id: encode-creds
                 env:
                     GOOGLE_API_KEY_JSON: ${{ secrets.GOOGLE_API_KEY_JSON }}
-                run: echo "b64=$(echo "$GOOGLE_API_KEY_JSON" | base64 -w 0)" >> "$GITHUB_OUTPUT"
+                run: |
+                    b64=$(printf '%s' "$GOOGLE_API_KEY_JSON" | base64 -w 0)
+                    echo "::add-mask::$b64"
+                    echo "b64=$b64" >> "$GITHUB_OUTPUT"
 
             -   name: Upload AAB to Google Play Internal and download universal APK
                 id: upload-play
-                uses: TianchenWei/upload-aab-google-play@main
+                uses: TianchenWei/upload-aab-google-play@1b070738058f58636b4a5c92ece8bc89fc7e4910 # main
                 with:
                     service-account-credential-base64: ${{ steps.encode-creds.outputs.b64 }}
                     package-name: com.simprints.id
