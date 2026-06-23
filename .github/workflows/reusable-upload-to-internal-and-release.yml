@@ -1,0 +1,82 @@
+name: "[Reusable] Upload to Internal and Create Draft Release"
+
+on:
+    workflow_call:
+        inputs:
+            upload-artifact:
+                description: "Artifact name of the AAB file to upload"
+                type: string
+                required: true
+            version-name:
+                description: "Version name used for the draft release tag (e.g. 2026.2.0)"
+                type: string
+                required: true
+            mapping-file:
+                description: "Optional artifact name of the ProGuard mapping file"
+                type: string
+                required: false
+                default: ""
+
+jobs:
+    upload-and-release:
+        runs-on: ubuntu-latest
+
+        environment: Internal
+
+        permissions:
+            contents: write
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v6
+
+            -   name: Download AAB artifact
+                uses: actions/download-artifact@v8
+                with:
+                    name: ${{ inputs.upload-artifact }}
+
+            -   name: Encode service account credentials as base64
+                id: encode-creds
+                env:
+                    GOOGLE_API_KEY_JSON: ${{ secrets.GOOGLE_API_KEY_JSON }}
+                run: echo "b64=$(echo "$GOOGLE_API_KEY_JSON" | base64 -w 0)" >> "$GITHUB_OUTPUT"
+
+            -   name: Upload AAB to Google Play Internal and download universal APK
+                id: upload-play
+                uses: TianchenWei/upload-aab-google-play@main
+                with:
+                    service-account-credential-base64: ${{ steps.encode-creds.outputs.b64 }}
+                    package-name: com.simprints.id
+                    aab-file-path: ${{ inputs.upload-artifact }}
+
+            -   name: Rename universal APK
+                id: rename-apk
+                run: |
+                    APK_NAME="simprints-id-${{ inputs.version-name }}-universal.apk"
+                    mv "${{ steps.upload-play.outputs.universal-apk-file-path }}" "$APK_NAME"
+                    echo "apk-name=$APK_NAME" >> "$GITHUB_OUTPUT"
+
+            -   name: Download mapping file
+                if: ${{ inputs.mapping-file != '' }}
+                uses: actions/download-artifact@v8
+                with:
+                    name: ${{ inputs.mapping-file }}
+
+            -   name: Create draft GitHub release with universal APK
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: |
+                    TAG="v${{ inputs.version-name }}"
+                    APK_NAME="${{ steps.rename-apk.outputs.apk-name }}"
+
+                    ASSETS=("$APK_NAME")
+                    if [[ -n "${{ inputs.mapping-file }}" && -f "${{ inputs.mapping-file }}" ]]; then
+                        ASSETS+=("${{ inputs.mapping-file }}")
+                    fi
+
+                    gh release create "$TAG" \
+                        --repo "$GITHUB_REPOSITORY" \
+                        --title "Simprints ID ${{ inputs.version-name }}" \
+                        --draft \
+                        --generate-notes \
+                        "${ASSETS[@]}"

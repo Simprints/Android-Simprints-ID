@@ -18,16 +18,13 @@ jobs:
             build-environment: Internal
             version-name: ${{ needs.get-version.outputs.version-name }}
 
-    deploy-internal-build:
-        uses: ./.github/workflows/reusable-promote-artifact.yml
+    upload-to-internal-and-release:
+        uses: ./.github/workflows/reusable-upload-to-internal-and-release.yml
         secrets: inherit
         with:
-            deployment-track: Internal
             upload-artifact: ${{ needs.build-internal-aab.outputs.build-artifact }}
+            version-name: ${{ needs.get-version.outputs.version-name }}
             mapping-file: ${{ needs.build-internal-aab.outputs.optional-mapping-file }}
         needs:
+            - get-version
             - build-internal-aab
-    tag-release:
-        uses: ./.github/workflows/reusable-update-release-git-tag.yml
-        needs: deploy-internal-build
-        secrets: inherit
