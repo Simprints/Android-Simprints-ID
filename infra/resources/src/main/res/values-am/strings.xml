@@ -471,16 +471,19 @@
     <string name="notification_migration_description">የማከማቻ ማመቻቸት በሂደት ላይ ነው።</string>
 
     <!-- Identification pool validation -->
-    <string name="id_pool_validation_issue_title">የመለየት ችግር</string>
-    <string name="id_pool_validation_default_message">የልየታ እጩዎችን በማጣራት ላይ</string>
-    <string name="id_pool_validation_user_mismatch_message">የተጠቃሚው መለያ እና ሲንከ የተደረገው መረጃ አልተመሳሰለም</string>
-    <string name="id_pool_validation_module_mismatch_message">ሞጁሉ መለያ ሲንክ ከተደረገው መረጃ ጋር አልተመሳሰለም</string>
-    <string name="id_pool_validation_sync_required_message">መረጃው በቅርቡ አልተላከም</string>
-    <string name="id_pool_validation_syncing_message">ሲንክ በማድረግ ላይ</string>
-    <string name="id_pool_validation_pool_empty_message">ስልኩ ላይ ምንም መረጃ የለም</string>
-    <string name="id_pool_validation_action_close">ዝጋ</string>
+    <string name="id_pool_validation_validating">በማረጋገጥ ላይ…</string>
+    <string name="id_pool_validation_issue_title">መለየት አይሳካም</string>
+    <string name="id_pool_validation_default_message">ለዚህ የመለየት ጥያቄ ተዛማጅ ሊሆኑ የሚችሉ መረጃዎች አልተገኙም።
+ይህ የሚጠበቅ ከሆነ ምዝገባውን መቀጠል ይችላሉ። ያለበለዚያ እባክዎን የፕሮጀክት ስራ አስኪያጅዎን ያነጋግሩ።</string>
+    <string name="id_pool_validation_user_mismatch_message">በጥያቄው ላይ ያለው የአገልጋይ መለያ (Attendant ID) ከሲምፕሪንትስ መለያ (Simprints ID) ጋር አይዛመድም።</string>
+    <string name="id_pool_validation_module_mismatch_message">በጥያቄው ላይ ያለው የሞጁል መለያ (Module ID) በሲምፕሪንትስ (Simprints ID) ላይ ከተመረጡት ሞጁሎች መካከል ከአንዳቸውም ጋር አይዛመድም።</string>
+    <string name="id_pool_validation_sync_required_message">የሲምፕሪንትስ መረጃዎ ከሰርቨር ጋር ሳይመሳሰል ረጅም ጊዜ ቆይቷል።</string>
+    <string name="id_pool_validation_pool_empty_message">ለዚህ ጥያቄ የሚሆን ምንም ዓይነት መዝገብ/መረጃ በዚህ መሣሪያ (ስልክ) ላይ አልተገኘም።</string>
+    <string name="id_pool_validation_last_sync">የመጨረሻው የSync ጊዜ 1%1$s</string>
+    <string name="id_pool_validation_syncing_message">በማመሳሰል ላይ…</string>
     <string name="id_pool_validation_action_sync">ሲንከ አድርግና እና እንደገና ሞክር</string>
-    <string name="id_pool_validation_action_continue">በመያዝ ይቀጥሉ</string>
+    <string name="id_pool_validation_action_close">ዝጋ</string>
+    <string name="id_pool_validation_action_continue">ቀጥል</string>
 
     <!-- Age group selection -->
     <string name="age_group_selection_title">የተጠቃሚውን የእድሜ ክልል ምረጥ</string>
@@ -513,6 +516,8 @@
 
     <string name="mfid_qr_scan_no_qr_detected">ምንም የQR ኮድ አልተገኘም</string>
     <string name="mfid_scan_instructions">ይህንን%1$s በመስኮቱ ውስጥ ያስቀምጡት</string>
+    <string name="mfid_scan_hint_lighting_too_dim">በቂ ብርሃን የለም</string>
+    <string name="mfid_scan_hint_lighting_too_bright">ከፍተኛ ብርሃን አለ</string>
     <string name="mfid_continue">ቀጥል</string>
     <string name="mfid_dialog_wrong_qr_title">ልክ ያልሆነ የQR ኮድ አይነት</string>
     <string name="mfid_dialog_wrong_qr_body_top">የተሳሳተ የQR ኮድ ስካን ተደርጓል</string>
@@ -536,6 +541,7 @@
 
     <string name="mfid_add_document_title">ይህንን %1$sይጨምር?</string>
     <string name="mfid_skip_title">ለምን %1$sን ስካን ማድረግ ዘለልከው?</string>
+    <string name="mfid_skip_reason_has_number_no_id">ቁጥር አለው, 1%1$s (Booklet) የለም</string>
     <string name="mfid_skip_reason_does_not_have">%1$sየለውም</string>
     <string name="mfid_skip_reason_did_not_bring">%1$sአላመጣም።</string>
     <string name="mfid_skip_reason_incorrect">በስህተት  የመጣ %1$sነው</string>
@@ -545,8 +551,24 @@
     <string name="mfid_skip_reason_other">ሌላ</string>
     <string name="mfid_skip_reason_hint">ምክንያት</string>
     <string name="mfid_skip_reason_helper_text">እባክዎ ለመዝለል ምክንያት ያቅርቡ</string>
+    <string name="mfid_skip_title_generic">የደብተሩን ፎቶ/ስካን ለምን ዘለሉት?</string>
+    <string name="mfid_skip_reason_generic_has_number_no_id">ቁጥር አለው፣ ሰነዱ (ደብተሩ) የለም</string>
+    <string name="mfid_skip_reason_generic_does_not_have">ሰነድ (ደብተር) የለውም</string>
+    <string name="mfid_skip_reason_generic_did_not_bring">ሰነድ (ደብተር) አልያዘም / አልያዘችም</string>
+    <string name="mfid_skip_reason_generic_incorrect">የመጣው ሰነድ/ደብተር ትክክል አይደለም</string>
+    <string name="mfid_skip_reason_generic_does_not_want_to_provide">ሰነድ (ደብተር) ለመስጠት ፈቃደኛ አይደለም / አይደለችም</string>
+    <string name="mfid_skip_reason_generic_damaged">ሰነዱ (ደብተሩ) የተበላሸ ወይም የማይነበብ ነው</string>
+    <string name="mfid_skip_reason_generic_unable_to_scan">የደብተሩን ፎቶ/ስካን ማድረግ አልተቻለም</string>
+    <string name="mfid_skip_reason_generic_other">ሌላ
+ </string>
+    <string name="mfid_skip_reason_generic_hint">ምክንያት</string>
     <string name="mfid_skip_confirm">ስካን ማድረግን ዝለል</string>
     <string name="mfid_skip_go_back">ተመለስ</string>
 
+    <!-- Low storage warning -->
+    <string name="storage_alert_channel_name">የማከማቻ ቦታ እጥረት ማሳሰቢያ</string>
+    <string name="storage_alert_title">የስልኩ ማህደረ ትውስታ (ቦታ) ሊሞላ ነው</string>
+    <string name="storage_alert_description">መተግበሪያው በትክክል እንዲሰራ የስልክ ቦታ ያስፈልገዋል። እባክዎን የተወሰኑ ፋይሎችን በማጥፋት የስልክዎን ማከማቻ ቦታ ያጽዱ።</string>
+    <string name="storage_alert_settings_action">የማከማቻ ቦታ ያጽዱ</string>
 
 </resources>
