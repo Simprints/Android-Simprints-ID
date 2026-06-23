@@ -24,6 +24,7 @@ jobs:
         with:
             upload-artifact: ${{ needs.build-internal-aab.outputs.build-artifact }}
             version-name: ${{ needs.get-version.outputs.version-name }}
+            version-code: ${{ needs.build-internal-aab.outputs.version-code }}
             mapping-file: ${{ needs.build-internal-aab.outputs.optional-mapping-file }}
         needs:
             - get-version

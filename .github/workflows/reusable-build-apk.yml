@@ -17,6 +17,9 @@ on:
             optional-mapping-file:
                 description: "The mapping file for the built APK"
                 value: ${{ jobs.build-apk.outputs.mapping-text }}
+            version-code:
+                description: "The computed Android version code"
+                value: ${{ jobs.build-apk.outputs.version-code }}
 
 jobs:
     build-apk:
@@ -24,6 +27,7 @@ jobs:
         outputs:
             build-artifact: ${{ steps.set-build-artifact.outputs.artifact }}
             mapping-text: ${{ steps.build-internal-apk.outputs.mapping }}
+            version-code: ${{ steps.set-build-artifact.outputs.version-code }}
 
         runs-on: ubuntu-latest
 
@@ -117,4 +121,6 @@ jobs:
 
             -   name: Set build-artifact output
                 id: set-build-artifact
-                run: echo "artifact=${{ env.FILE_NAME }}" >> $GITHUB_OUTPUT
+                run: |
+                    echo "artifact=${{ env.FILE_NAME }}" >> $GITHUB_OUTPUT
+                    echo "version-code=$VERSION_CODE" >> $GITHUB_OUTPUT
