@@ -30,8 +30,6 @@ jobs:
         environment: ${{ inputs.build-environment }}
 
         env:
-            # VERSION_CODE formula: (year-2000)*10_000_000 + minor*100_000 + patch*1_000 + run_number
-            # Re-runs are disabled: github.run_attempt must be 1.
             VERSION_CODE: "set in lower step"
             VERSION_NAME: ${{ inputs.version-name }}
             VERSION_SUFFIX: ${{ inputs.build-environment }}
