@@ -166,6 +166,24 @@ assert_success "run_number at 999" \
     "260200999" "999.1" "2026.2.0+dev.999" \
     "2026.2.0" 1 999 "dev"
 
+# run_number at 9999 — last 4-digit run number
+# 2026.2.0, run 9999 → 260_200_000 + 9_999 = 260_209_999
+assert_success "run_number at 9999 (last 4-digit)" \
+    "260209999" "9999.1" "2026.2.0+dev.9999" \
+    "2026.2.0" 1 9999 "dev"
+
+# run_number at 10000 — first 5-digit run number
+# 2026.2.0, run 10000 → 260_200_000 + 10_000 = 260_210_000
+assert_success "run_number at 10000 (first 5-digit)" \
+    "260210000" "10000.1" "2026.2.0+dev.10000" \
+    "2026.2.0" 1 10000 "dev"
+
+# run_number at 99999 — last 5-digit run number
+# 2026.2.0, run 99999 → 260_200_000 + 99_999 = 260_299_999
+assert_success "run_number at 99999 (last 5-digit)" \
+    "260299999" "99999.1" "2026.2.0+dev.99999" \
+    "2026.2.0" 1 99999 "dev"
+
 # Patch at boundary 99: 2026.1.99, run 1 → 260_000_000 + 100_000 + 99_000 + 1 = 260_199_001
 assert_success "patch boundary 99" \
     "260199001" "1.1" "2026.1.99+dev.1" \
