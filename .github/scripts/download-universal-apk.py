@@ -41,8 +41,9 @@ def find_universal_apk_download_id(service, package_name: str, version_code: int
     ).execute()
 
     for apk in result.get("generatedApks", []):
-        if apk.get("universalApk"):
-            return apk["downloadId"]
+        universal = apk.get("generatedUniversalApk")
+        if universal:
+            return universal["downloadId"]
     return None
 
 
