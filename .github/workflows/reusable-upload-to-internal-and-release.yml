@@ -74,6 +74,9 @@ jobs:
                 with:
                     name: ${{ inputs.mapping-file }}
 
+            -   name: Create release git tag
+                uses: ./.github/actions/set-release-git-tag
+
             -   name: Create draft GitHub release with universal APK
                 env:
                     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
