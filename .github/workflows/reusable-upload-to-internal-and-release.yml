@@ -86,6 +86,11 @@ jobs:
                 run: |
                     TAG="v${VERSION_NAME}"
 
+                    # Delete any existing draft release with the same tag to avoid conflicts.
+                    if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isDraft --jq '.isDraft' 2>/dev/null | grep -q true; then
+                        gh release delete "$TAG" --repo "$GITHUB_REPOSITORY" --yes
+                    fi
+
                     ASSETS=("$APK_NAME")
                         if [[ -n "$MAPPING_FILE" && -f "$MAPPING_FILE" ]]; then
                             ASSETS+=("$MAPPING_FILE")
