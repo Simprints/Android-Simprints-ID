@@ -106,11 +106,12 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         credentialEditText.inputType = viewModel.getKeyBoardInputType()
         credentialEditText.hint = credentialField
         credentialValue.text = currentEditTextValue
-        confirmCredentialCheckbox.isVisible = state.searchState != SearchState.Searching
+        confirmCredentialCheckbox.isVisible = state.isUserConfirmationRequired && state.searchState != SearchState.Searching
         confirmCredentialCheckbox.text = getString(IDR.string.mfid_confirmation_checkbox_text, credentialField)
         confirmCredentialCheckbox.isChecked = state.isConfirmed && !state.isEditingCredential
         confirmCredentialCheckbox.isEnabled = !state.isEditingCredential
 
+        iconEditCredential.isVisible = state.isEditAvailable
         iconEditCredential.setOnClickListener {
             if (isEditingCredential) {
                 viewModel.confirmCredentialUpdate(updatedCredential = credentialEditText.text.toString().asTokenizableRaw())
@@ -209,7 +210,7 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         val isSearching = state.searchState != SearchState.Searching
         buttonRecapture.isVisible = isSearching
         buttonConfirm.isVisible = isSearching
-        buttonConfirm.isEnabled = state.isConfirmed && !state.isEditingCredential
+        buttonConfirm.isEnabled = !state.isUserConfirmationRequired || (state.isConfirmed && !state.isEditingCredential)
         viewModel.getButtonTextResource(state.searchState, state.flowType)?.run(buttonConfirm::setText)
         buttonConfirm.setOnClickListener {
             viewModel.finish(state)
