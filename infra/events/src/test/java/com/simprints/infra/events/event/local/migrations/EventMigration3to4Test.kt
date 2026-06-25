@@ -38,7 +38,7 @@ class EventMigration3to4Test {
         val db = helper.runMigrationsAndValidate(TEST_DB, 4, true, EventMigration3to4())
 
         val eventJson =
-            retrieveCursorWithEventById(db, eventId).getStringWithColumnName("eventJson")!!
+            retrieveCursorWithEventById(db, eventId).use { it.getStringWithColumnName("eventJson")!! }
         val jsonObject = JSONObject(eventJson).getJSONObject("payload")
 
         assertThat(jsonObject.getInt("eventVersion")).isEqualTo(2)

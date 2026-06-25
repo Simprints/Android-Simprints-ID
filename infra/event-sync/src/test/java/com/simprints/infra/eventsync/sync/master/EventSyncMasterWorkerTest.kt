@@ -360,7 +360,7 @@ internal class EventSyncMasterWorkerTest {
 
     @Test
     fun `doWork should not enqueue CommCare down sync worker when isDownSyncAllowed is false`() = runTest {
-        val workerWithDownSyncDisabled = buildMasterWorker(isDownSyncAllowed = false)
+        val workerWithDownSyncDisabled = buildMasterWorker()
         shouldSyncRun(false)
         canDownSyncFromCommCare(true)
         canUpSync(true)
@@ -519,12 +519,12 @@ internal class EventSyncMasterWorkerTest {
         coVerify(exactly = times) { commCareDownSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId, any()) }
     }
 
-    private fun buildMasterWorker(isDownSyncAllowed: Boolean): EventSyncMasterWorker = spyk(
+    private fun buildMasterWorker(): EventSyncMasterWorker = spyk(
         EventSyncMasterWorker(
             appContext = ctx,
             params = mockk(relaxed = true) {
                 every { tags } returns setOf(MASTER_SYNC_SCHEDULER_PERIODIC_TIME)
-                every { inputData.getBoolean(EventSyncMasterWorker.IS_DOWN_SYNC_ALLOWED, true) } returns isDownSyncAllowed
+                every { inputData.getBoolean(EventSyncMasterWorker.IS_DOWN_SYNC_ALLOWED, true) } returns false
             },
             simprintsDownSyncWorkerBuilder = simprintsDownSyncWorkerBuilder,
             commCareDownSyncWorkerBuilder = commCareDownSyncWorkerBuilder,

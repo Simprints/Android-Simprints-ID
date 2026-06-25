@@ -31,10 +31,10 @@ class EventMigration9To10Test {
         val db = helper.runMigrationsAndValidate(TEST_DB, 10, true, EventMigration9to10())
 
         // validate that the JSON values were migrated properly.
-        val event = MigrationTestingTools.retrieveCursorWithEventById(db, EVENT_ID)
-        val eventJson = event.getStringWithColumnName(EVENT_JSON_FIELD)
-
-        assertThat(eventJson).isEqualTo(EVENT_JSON_NEW)
+        MigrationTestingTools.retrieveCursorWithEventById(db, EVENT_ID).use { event ->
+            val eventJson = event.getStringWithColumnName(EVENT_JSON_FIELD)
+            assertThat(eventJson).isEqualTo(EVENT_JSON_NEW)
+        }
     }
 
     private fun createEvent(json: String) = ContentValues().apply {

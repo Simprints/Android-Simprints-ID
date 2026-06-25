@@ -108,11 +108,12 @@ class EventMigration1to2Test {
         db: SupportSQLiteDatabase,
         id: String,
     ) {
-        val cursor = retrieveCursorWithEventById(db, id)
-        assertThat(cursor.getStringWithColumnName("type")).isEqualTo("ENROLMENT_V1")
+        retrieveCursorWithEventById(db, id).use { cursor ->
+            assertThat(cursor.getStringWithColumnName("type")).isEqualTo("ENROLMENT_V1")
 
-        val eventJson = JSONObject(cursor.getStringWithColumnName("eventJson")!!)
-        assertThat(eventJson.getString("type")).isEqualTo("ENROLMENT_V1")
+            val eventJson = JSONObject(cursor.getStringWithColumnName("eventJson")!!)
+            assertThat(eventJson.getString("type")).isEqualTo("ENROLMENT_V1")
+        }
     }
 
     private fun validateSessionCaptureMigration(

@@ -30,11 +30,11 @@ class EventMigration8To9Test {
         val db = helper.runMigrationsAndValidate(TEST_DB, 9, true, EventMigration8to9())
 
         // validate that the data was migrated properly.
-        val event = MigrationTestingTools.retrieveCursorWithEventById(db, EVENT_ID)
-
-        assertThat(event.getColumnIndex("attendantId")).isEqualTo(-1)
-        assertThat(event.getColumnIndex("mode")).isEqualTo(-1)
-        assertThat(event.getColumnIndex("moduleIds")).isEqualTo(-1)
+        MigrationTestingTools.retrieveCursorWithEventById(db, EVENT_ID).use { event ->
+            assertThat(event.getColumnIndex("attendantId")).isEqualTo(-1)
+            assertThat(event.getColumnIndex("mode")).isEqualTo(-1)
+            assertThat(event.getColumnIndex("moduleIds")).isEqualTo(-1)
+        }
     }
 
     private fun createEvent() = ContentValues().apply {

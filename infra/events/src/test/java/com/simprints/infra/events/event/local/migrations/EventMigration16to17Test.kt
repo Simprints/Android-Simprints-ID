@@ -38,7 +38,7 @@ class EventMigration16to17Test {
 
         val eventJson = MigrationTestingTools
             .retrieveCursorWithEventById(db, eventId)
-            .getStringWithColumnName("eventJson")!!
+            .use { it.getStringWithColumnName("eventJson")!! }
 
         val jsonObject = JSONObject(eventJson)
         val payload = jsonObject.getJSONObject("payload")
@@ -100,7 +100,7 @@ class EventMigration16to17Test {
 
         val eventJson = MigrationTestingTools
             .retrieveCursorWithEventById(db, eventId)
-            .getStringWithColumnName("eventJson")!!
+            .use { it.getStringWithColumnName("eventJson")!! }
 
         // Verify the field appears only once
         val firstIndex = eventJson.indexOf("\"$EXTERNAL_CREDENTIAL_IDS_JSON_KEY\"")
@@ -120,7 +120,7 @@ class EventMigration16to17Test {
 
         val eventJson = MigrationTestingTools
             .retrieveCursorWithEventById(db, eventId)
-            .getStringWithColumnName("eventJson")!!
+            .use { it.getStringWithColumnName("eventJson")!! }
 
         assertThat(eventJson).doesNotContain(EXTERNAL_CREDENTIAL_IDS_JSON_KEY)
         db.close()

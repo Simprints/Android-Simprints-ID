@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.test.core.app.*
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.local.models.DbEvent
@@ -94,6 +95,35 @@ internal class EventRoomDaoTest {
         addIntoDb(event1, event2, event3)
         db.eventDao.deleteById(listOf(GUID1, GUID2))
         verifyEvents(listOf(event3), eventDao.loadAll())
+    }
+
+    @Test
+    fun `loadFromScope returns events in FIFO order`() = runTest {
+        val oldestEvent = event.copy(id = GUID1, scopeId = GUID2, createdAt = Timestamp(1000L).fromDomainToDb())
+        val middleEvent = event.copy(id = GUID2, scopeId = GUID2, createdAt = Timestamp(2000L).fromDomainToDb())
+        val newestEvent = event.copy(id = GUID3, scopeId = GUID2, createdAt = Timestamp(3000L).fromDomainToDb())
+        // Insert in reverse order to ensure ordering isn't insertion-dependent
+        addIntoDb(newestEvent, middleEvent, oldestEvent)
+
+        val result = eventDao.loadFromScope(scopeId = GUID2)
+
+        assertThat(result.map { it.id }).isEqualTo(listOf(GUID1, GUID2, GUID3))
+    }
+
+    @Test
+    fun `loadEventJsonFromScope returns event JSON in FIFO order`() = runTest {
+        val oldestJson = """{"id": "oldest"}"""
+        val middleJson = """{"id": "middle"}"""
+        val newestJson = """{"id": "newest"}"""
+        val oldestEvent = event.copy(id = GUID1, scopeId = GUID2, createdAt = Timestamp(1000L).fromDomainToDb(), eventJson = oldestJson)
+        val middleEvent = event.copy(id = GUID2, scopeId = GUID2, createdAt = Timestamp(2000L).fromDomainToDb(), eventJson = middleJson)
+        val newestEvent = event.copy(id = GUID3, scopeId = GUID2, createdAt = Timestamp(3000L).fromDomainToDb(), eventJson = newestJson)
+        // Insert in reverse order to ensure ordering isn't insertion-dependent
+        addIntoDb(newestEvent, middleEvent, oldestEvent)
+
+        val result = eventDao.loadEventJsonFromScope(scopeId = GUID2)
+
+        assertThat(result).isEqualTo(listOf(oldestJson, middleJson, newestJson))
     }
 
     private suspend fun addIntoDb(vararg events: DbEvent) {
