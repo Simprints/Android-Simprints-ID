@@ -2,7 +2,6 @@ package com.simprints.infra.config.store.models
 
 import com.google.common.truth.Truth.*
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK
-import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.CAMERA_FLASH_CONTROLS_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.DISABLE_SUBJECT_POOL_VALIDATION
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS
@@ -122,22 +121,6 @@ internal class ExperimentalProjectConfigurationTest {
             mapOf(RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES to JsonPrimitive(3)) to 3,
         ).forEach { (config, result) ->
             assertThat(ExperimentalProjectConfiguration(config).recordsDbMigrationFromRealmMaxRetries).isEqualTo(result)
-        }
-    }
-
-    @Test
-    fun `check display camera flash flag correctly`() {
-        mapOf(
-            // Value not present
-            emptyMap<String, JsonElement>() to false,
-            // Value not boolean
-            mapOf(CAMERA_FLASH_CONTROLS_ENABLED to JsonPrimitive(1)) to false,
-            // Value present and FALSE
-            mapOf(CAMERA_FLASH_CONTROLS_ENABLED to JsonPrimitive(false)) to false,
-            // Value present and TRUE
-            mapOf(CAMERA_FLASH_CONTROLS_ENABLED to JsonPrimitive(true)) to true,
-        ).forEach { (config, result) ->
-            assertThat(ExperimentalProjectConfiguration(config).displayCameraFlashToggle).isEqualTo(result)
         }
     }
 

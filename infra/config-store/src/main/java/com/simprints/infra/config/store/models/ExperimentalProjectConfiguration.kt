@@ -49,13 +49,6 @@ data class ExperimentalProjectConfiguration(
             ?.intOrNull
             ?: RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_DEFAULT_MAX_RETRIES
 
-    val displayCameraFlashToggle: Boolean
-        get() = customConfig
-            ?.get(CAMERA_FLASH_CONTROLS_ENABLED)
-            ?.jsonPrimitive
-            ?.booleanOrNull
-            .let { it == true }
-
     val fallbackToCommCareThresholdDays: Long
         get() = customConfig
             ?.get(FALLBACK_TO_COMMCARE_THRESHOLD_DAYS)
@@ -183,8 +176,6 @@ data class ExperimentalProjectConfiguration(
         internal const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MIN = 1L
         const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT = 3_000L
         internal const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MAX = 60_000L
-
-        internal const val CAMERA_FLASH_CONTROLS_ENABLED = "displayCameraFlashToggle"
 
         internal const val FALLBACK_TO_COMMCARE_THRESHOLD_DAYS = "fallbackToCommCareThresholdDays"
         internal const val FALLBACK_TO_COMMCARE_THRESHOLD_DAYS_DEFAULT = 5L
