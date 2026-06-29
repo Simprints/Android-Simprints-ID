@@ -256,6 +256,84 @@
     .btn-primary  { background: var(--accent); color: #fff; }
     .btn-secondary { background: rgba(255,255,255,0.07); color: var(--text); border: 1px solid var(--border); }
     .btn-disabled { opacity: 0.3; pointer-events: none; cursor: not-allowed; }
+    /* ── Tabs ── */
+    .tabs-bar {
+      display: flex;
+      gap: 0.25rem;
+      max-width: 1000px;
+      margin: 0 auto 2.5rem;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      padding-bottom: 0;
+    }
+    .tab-btn {
+      padding: 0.55rem 1.1rem;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      border-radius: 4px 4px 0 0;
+      transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active {
+      color: var(--text);
+      border-bottom-color: #6366f1;
+      font-weight: 700;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Project tab panel ── */
+    .project-panel {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .project-card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 1.75rem 2rem;
+      border: 1px solid var(--border);
+    }
+    .project-card h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      letter-spacing: -0.01em;
+    }
+    .project-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+    .project-row:last-of-type { border-bottom: none; }
+    .project-row-label {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+    .project-version-badge {
+      display: inline-block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+      background: rgba(99,102,241,0.18);
+      color: #a5b4fc;
+      border: 1px solid rgba(99,102,241,0.35);
+    }
+    .project-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
     footer {
       text-align: center;
       margin-top: 3.5rem;
@@ -273,25 +351,36 @@
     <div class="under-construction">🚧&nbsp; Under Construction</div>
   </header>
 
-  <div class="grid" id="grid"></div>
+  <!-- Tab bar — populated by JS once projects.csv is loaded -->
+  <nav class="tabs-bar" id="tabs-bar">
+    <button class="tab-btn active" data-tab="sid">📊 SID Releases</button>
+  </nav>
 
-  <section class="releases-section">
-    <h2>📦 All Releases</h2>
-    <div id="releases-loading">Loading releases…</div>
-    <div class="releases-table-wrap" id="releases-table-wrap" style="display:none">
-      <table>
-        <thead>
-          <tr>
-            <th>Tag</th>
-            <th>Release Title</th>
-            <th>Release Notes</th>
-            <th>APK</th>
-          </tr>
-        </thead>
-        <tbody id="releases-tbody"></tbody>
-      </table>
-    </div>
-  </section>
+  <!-- ── SID Releases tab ── -->
+  <div class="tab-panel active" id="tab-sid">
+    <div class="grid" id="grid"></div>
+
+    <section class="releases-section">
+      <h2>📦 All Releases</h2>
+      <div id="releases-loading">Loading releases…</div>
+      <div class="releases-table-wrap" id="releases-table-wrap" style="display:none">
+        <table>
+          <thead>
+            <tr>
+              <th>Tag</th>
+              <th>Release Title</th>
+              <th>Release Notes</th>
+              <th>APK</th>
+            </tr>
+          </thead>
+          <tbody id="releases-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── Project tabs injected by JS ── -->
+  <div id="project-tabs-container"></div>
 
   <footer>
     <p>
@@ -403,7 +492,7 @@
       try {
         [status, releases] = await Promise.all([
           fetch('status.json?_=' + Date.now()).then(r => r.json()).catch(() => ({})),
-          fetchAllReleases(),
+          releasesPromise,
         ]);
       } catch (e) {
         console.error('Failed to load data:', e);
@@ -448,7 +537,94 @@
       }
     }
 
+    // ── Tab switching ──────────────────────────────────────────────
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + tabId));
+    }
+
+    document.getElementById('tabs-bar').addEventListener('click', e => {
+      const btn = e.target.closest('.tab-btn');
+      if (btn) switchTab(btn.dataset.tab);
+    });
+
+    // ── CSV parser ────────────────────────────────────────────────
+    function parseCSV(text) {
+      const lines = text.trim().split('\n').map(l => l.trim()).filter(Boolean);
+      if (lines.length < 2) return [];
+      const headers = lines[0].split(',').map(h => h.trim());
+      return lines.slice(1).map(line => {
+        const values = line.split(',').map(v => v.trim());
+        return Object.fromEntries(headers.map((h, i) => [h, values[i] || '']));
+      });
+    }
+
+    // ── Render a project tab panel ────────────────────────────────
+    function renderProjectTab(project, tabId, releaseUrl, apkUrl) {
+      const notesBtn = releaseUrl
+        ? `<a class="tbl-btn tbl-btn-notes" href="${releaseUrl}" target="_blank" rel="noopener">📋 Release Notes</a>`
+        : `<span class="tbl-btn tbl-btn-na">📋 Release Notes</span>`;
+      const apkBtn = apkUrl
+        ? `<a class="tbl-btn tbl-btn-apk" href="${apkUrl}" download>⬇ APK</a>`
+        : `<span class="tbl-btn tbl-btn-na">⬇ APK</span>`;
+
+      return `
+        <div class="tab-panel" id="tab-${tabId}">
+          <div class="project-panel">
+            <div class="project-card">
+              <h2>📁 ${project.name}</h2>
+              <div class="project-row">
+                <span class="project-row-label">Supported SID Version</span>
+                <span class="project-version-badge">${project.sid_version || 'N/A'}</span>
+              </div>
+              <div class="project-row">
+                <span class="project-row-label">Release Notes</span>
+                <span class="project-actions">${notesBtn}</span>
+              </div>
+              <div class="project-row">
+                <span class="project-row-label">APK Download</span>
+                <span class="project-actions">${apkBtn}</span>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // ── Load projects from CSV and build tabs ─────────────────────
+    async function loadProjects() {
+      try {
+        const [text, releases] = await Promise.all([
+          fetch('projects.csv?_=' + Date.now()).then(r => r.text()),
+          releasesPromise,
+        ]);
+        const projects = parseCSV(text);
+        const tabsBar = document.getElementById('tabs-bar');
+        const container = document.getElementById('project-tabs-container');
+
+        projects.forEach((project, i) => {
+          const tabId = 'project-' + i;
+          const tag = project.sid_version?.startsWith('v') ? project.sid_version : `v${project.sid_version}`;
+          const rel = releases.find(r => r.tag_name === tag);
+          const releaseUrl = rel?.html_url || null;
+          const apkAsset = (rel?.assets || []).find(a => a.name.endsWith('.apk'));
+          const apkUrl = apkAsset?.browser_download_url || null;
+
+          const btn = document.createElement('button');
+          btn.className = 'tab-btn';
+          btn.dataset.tab = tabId;
+          btn.textContent = project.name;
+          tabsBar.appendChild(btn);
+          container.insertAdjacentHTML('beforeend', renderProjectTab(project, tabId, releaseUrl, apkUrl));
+        });
+      } catch (e) {
+        console.warn('Could not load projects.csv:', e);
+      }
+    }
+
+    const releasesPromise = fetchAllReleases().catch(() => []);
+
     loadAll();
+    loadProjects();
   </script>
 </body>
 </html>
