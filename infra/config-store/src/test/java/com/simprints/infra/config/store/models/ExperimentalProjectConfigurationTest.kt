@@ -2,7 +2,6 @@ package com.simprints.infra.config.store.models
 
 import com.google.common.truth.Truth.*
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK
-import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.CAMERA_FLASH_CONTROLS_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.DISABLE_SUBJECT_POOL_VALIDATION
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS
@@ -39,7 +38,6 @@ import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_DEFAULT_MAX_RETRIES
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES
-import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Test
@@ -58,22 +56,6 @@ internal class ExperimentalProjectConfigurationTest {
             mapOf(DISABLE_SUBJECT_POOL_VALIDATION to JsonPrimitive(true)) to true,
         ).forEach { (config, result) ->
             assertThat(ExperimentalProjectConfiguration(config).disableSubjectPoolValidation).isEqualTo(result)
-        }
-    }
-
-    @Test
-    fun `check single good face capture fallback flag correctly`() {
-        mapOf(
-            // Value not present
-            emptyMap<String, JsonElement>() to false,
-            // Value not boolean
-            mapOf(SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED to JsonPrimitive(1)) to false,
-            // Value present and FALSE
-            mapOf(SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED to JsonPrimitive(false)) to false,
-            // Value present and TRUE
-            mapOf(SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED to JsonPrimitive(true)) to true,
-        ).forEach { (config, result) ->
-            assertThat(ExperimentalProjectConfiguration(config).singleQualityFallbackRequired).isEqualTo(result)
         }
     }
 
@@ -139,22 +121,6 @@ internal class ExperimentalProjectConfigurationTest {
             mapOf(RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES to JsonPrimitive(3)) to 3,
         ).forEach { (config, result) ->
             assertThat(ExperimentalProjectConfiguration(config).recordsDbMigrationFromRealmMaxRetries).isEqualTo(result)
-        }
-    }
-
-    @Test
-    fun `check display camera flash flag correctly`() {
-        mapOf(
-            // Value not present
-            emptyMap<String, JsonElement>() to false,
-            // Value not boolean
-            mapOf(CAMERA_FLASH_CONTROLS_ENABLED to JsonPrimitive(1)) to false,
-            // Value present and FALSE
-            mapOf(CAMERA_FLASH_CONTROLS_ENABLED to JsonPrimitive(false)) to false,
-            // Value present and TRUE
-            mapOf(CAMERA_FLASH_CONTROLS_ENABLED to JsonPrimitive(true)) to true,
-        ).forEach { (config, result) ->
-            assertThat(ExperimentalProjectConfiguration(config).displayCameraFlashToggle).isEqualTo(result)
         }
     }
 

@@ -132,25 +132,6 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     }
 
     @Test
-    fun `Do not start capture if no valid quality face detected after start capture clicked`() = runTest {
-        coEvery { faceDetector.analyze(frame) } returns getFace(quality = -2f)
-        val currentDetection = viewModel.currentDetection.testObserver()
-        val capturingState = viewModel.capturingState.testObserver()
-
-        viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
-        viewModel.startCapture()
-        viewModel.process(frame)
-
-        Truth
-            .assertThat(currentDetection.observedValues.last()?.status)
-            .isEqualTo(FaceDetection.Status.BAD_QUALITY)
-        Truth
-            .assertThat(capturingState.observedValues.last())
-            .isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED)
-    }
-
-    @Test
     fun `Start capture if valid quality face detected when start capture clicked`() = runTest {
         coEvery { faceDetector.analyze(frame) } returns getFace()
         val currentDetection = viewModel.currentDetection.testObserver()
@@ -203,7 +184,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
 
         Truth
             .assertThat(currentDetection.observedValues.first()?.status)
-            .isEqualTo(FaceDetection.Status.BAD_QUALITY)
+            .isEqualTo(FaceDetection.Status.VALID)
         Truth
             .assertThat(capturingState.observedValues.first())
             .isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED)
@@ -252,7 +233,6 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         val bigFace: Face = getFace(Rect(0, 0, 80, 80))
         val yawedFace: Face = getFace(yaw = 45f)
         val rolledFace: Face = getFace(roll = 45f)
-        val badQuality: Face = getFace(quality = -2f)
         val noFace = null
 
         every { faceDetector.analyze(frame) } returnsMany listOf(
@@ -260,7 +240,6 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
             bigFace,
             yawedFace,
             rolledFace,
-            badQuality,
             noFace,
         )
 
@@ -281,8 +260,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
             Truth.assertThat(it[1]?.status).isEqualTo(FaceDetection.Status.TOOCLOSE)
             Truth.assertThat(it[2]?.status).isEqualTo(FaceDetection.Status.OFFYAW)
             Truth.assertThat(it[3]?.status).isEqualTo(FaceDetection.Status.OFFROLL)
-            Truth.assertThat(it[4]?.status).isEqualTo(FaceDetection.Status.BAD_QUALITY)
-            Truth.assertThat(it[5]?.status).isEqualTo(FaceDetection.Status.NOFACE)
+            Truth.assertThat(it[4]?.status).isEqualTo(FaceDetection.Status.NOFACE)
         }
 
         coVerify(exactly = 0) { eventReporter.addCaptureEvents(any(), any(), any()) }
@@ -292,10 +270,6 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     fun `Process invalid faces after single fallback correctly`() = runTest {
         val validFace: Face = getFace()
         val badQuality: Face = getFace(quality = -2f)
-
-        coEvery {
-            configRepository.getProjectConfiguration().custom
-        } returns mapOf("singleQualityFallbackRequired" to JsonPrimitive(true))
 
         every { faceDetector.analyze(frame) } returnsMany listOf(
             badQuality, // not a fallback image due to bad quality
@@ -352,7 +326,6 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         coEvery { configRepository.getProjectConfiguration().custom } returns
             mapOf(
                 "faceAutoCaptureImagingDurationMillis" to JsonPrimitive(configDuration.toInt()),
-                "singleQualityFallbackRequired" to JsonPrimitive(false),
             )
 
         val capturingState = viewModel.capturingState.testObserver()

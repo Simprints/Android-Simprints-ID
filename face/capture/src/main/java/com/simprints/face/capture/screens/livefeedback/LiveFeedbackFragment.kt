@@ -133,6 +133,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         }
 
         with(binding.captureFlashButton) {
+            isVisible = requireContext().hasCameraFlash
             isSelected = false
             setOnClickListener {
                 val torchEnabled = !binding.captureFlashButton.isSelected
@@ -254,10 +255,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     private fun bindViewModel() {
-        vm.displayCameraFlashControls.observe(viewLifecycleOwner) {
-            binding.captureFlashButton.isVisible = it && requireContext().hasCameraFlash
-        }
-
         vm.currentDetection.observe(viewLifecycleOwner) {
             renderCurrentDetection(it)
         }

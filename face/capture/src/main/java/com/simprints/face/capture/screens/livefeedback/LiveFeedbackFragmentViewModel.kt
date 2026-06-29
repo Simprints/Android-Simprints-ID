@@ -41,7 +41,6 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private var attemptNumber: Int = 1
     private var samplesToCapture: Int = 1
     private var qualityThreshold: Float = 0f
-    private var singleQualityFallbackCaptureRequired: Boolean = false
 
     private val faceTarget = FaceTarget(
         SymmetricTarget(VALID_YAW_DELTA),
@@ -56,8 +55,6 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     var sortedQualifyingCaptures = listOf<FaceDetection>()
     val currentDetection = MutableLiveData<FaceDetection>()
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
-
-    val displayCameraFlashControls = MutableLiveData(false)
 
     var isAutoCapture: Boolean = false
 
@@ -85,9 +82,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
 
             val config = configRepository.getProjectConfiguration()
             qualityThreshold = config.face?.getSdkConfiguration(bioSdk)?.qualityThreshold ?: 0f
-            singleQualityFallbackCaptureRequired = config.experimental().singleQualityFallbackRequired
             autoCaptureImagingDurationMillis = config.experimental().faceAutoCaptureImagingDurationMillis
-            displayCameraFlashControls.postValue(config.experimental().displayCameraFlashToggle)
         }
     }
 
@@ -234,7 +229,6 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             areaOccupied > faceTarget.areaRange.endInclusive -> FaceDetection.Status.TOOCLOSE
             potentialFace.yaw !in faceTarget.yawTarget -> FaceDetection.Status.OFFYAW
             potentialFace.roll !in faceTarget.rollTarget -> FaceDetection.Status.OFFROLL
-            shouldCheckQuality() && potentialFace.quality < qualityThreshold -> FaceDetection.Status.BAD_QUALITY
             capturingState.value == CapturingState.CAPTURING -> FaceDetection.Status.VALID_CAPTURING
             else -> FaceDetection.Status.VALID
         }
@@ -247,8 +241,6 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             detectionEndTime = timeHelper.now(),
         )
     }
-
-    private fun shouldCheckQuality() = !singleQualityFallbackCaptureRequired || fallbackCapture == null
 
     /**
      * While the user has not started the capture flow, we save fallback images. If the capture doesn't
