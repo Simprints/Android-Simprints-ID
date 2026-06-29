@@ -328,7 +328,7 @@
     <string name="sync_info_title">সিঙ্ক তথ্য</string>
 
     <string name="sync_info_header_title">সিঙ্ক স্ট্যাটাস</string>
-    <string name="sync_info_header_settings_button"><font fgcolor='#FF7C00'><u>সেটিংস</u></font></string>
+    <string name="sync_info_header_settings_button"><u>সেটিংস</u></string>
 
     <string name="sync_info_re_login_required">সিঙ্ক করার জন্য আপনাকে আবার লগ ইন করতে হবে</string>
 

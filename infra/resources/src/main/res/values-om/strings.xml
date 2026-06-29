@@ -271,7 +271,7 @@
     <string name="sync_info_no_modules_message">Maaloo moojuula sinkii gootuu filadhu</string>
     <string name="sync_info_no_modules_button">Moojula</string>
     <string name="sync_info_offline_message">Maaloo gara mijeessaa internetii keetii deebi\'i</string>
-    <string name="sync_info_header_settings_button"><font fgcolor='#FF7C00'><u>Mijeessaa</u></font></string>
+    <string name="sync_info_header_settings_button"><u>Mijeessaa</u></string>
     <string name="sync_info_last_sync">Yeroo dhumaaf siink kan tahe: %1$s</string>
     <string name="sync_info_records_uploaded">Galmeewwan hundi olkaa\'aman</string>
     <string name="sync_info_button_try_again">Irra deebi\'ii yaali</string>
