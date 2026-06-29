@@ -329,7 +329,7 @@
     <string name="sync_info_title">Informations sur la synchronisation</string>
 
     <string name="sync_info_header_title">Statut de la synchronisation</string>
-    <string name="sync_info_header_settings_button"><font fgcolor='#FF7C00'><u>Réglages</u></font></string>
+    <string name="sync_info_header_settings_button"><u>Réglages</u></string>
 
     <string name="sync_info_re_login_required">Vous devez vous connecter pour synchroniser.</string>
 
