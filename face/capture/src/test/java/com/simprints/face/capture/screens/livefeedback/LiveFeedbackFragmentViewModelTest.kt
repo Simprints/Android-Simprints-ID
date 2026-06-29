@@ -20,7 +20,6 @@ import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -69,8 +68,6 @@ internal class LiveFeedbackFragmentViewModelTest {
                 ?.qualityThreshold
         } returns QUALITY_THRESHOLD
         every { isUsingAutoCapture.invoke(any()) } returns false
-        coEvery { configRepository.getProjectConfiguration().custom } returns
-            mapOf("singleQualityFallbackRequired" to JsonPrimitive(false))
         every { timeHelper.now() } returnsMany (0..100L).map { Timestamp(it) }
         justRun { previewFrame.recycle() }
         val resolveFaceBioSdkUseCase = mockk<ResolveFaceBioSdkUseCase> {
@@ -124,7 +121,6 @@ internal class LiveFeedbackFragmentViewModelTest {
         val bigFace: Face = getFace(Rect(0, 0, 80, 80))
         val yawedFace: Face = getFace(yaw = 45f)
         val rolledFace: Face = getFace(roll = 45f)
-        val badQuality: Face = getFace(quality = -2f)
         val noFace = null
 
         every { faceDetector.analyze(frame) } returnsMany listOf(
@@ -132,7 +128,6 @@ internal class LiveFeedbackFragmentViewModelTest {
             bigFace,
             yawedFace,
             rolledFace,
-            badQuality,
             noFace,
         )
 
@@ -152,8 +147,7 @@ internal class LiveFeedbackFragmentViewModelTest {
             assertThat(it[1]?.status).isEqualTo(FaceDetection.Status.TOOCLOSE)
             assertThat(it[2]?.status).isEqualTo(FaceDetection.Status.OFFYAW)
             assertThat(it[3]?.status).isEqualTo(FaceDetection.Status.OFFROLL)
-            assertThat(it[4]?.status).isEqualTo(FaceDetection.Status.BAD_QUALITY)
-            assertThat(it[5]?.status).isEqualTo(FaceDetection.Status.NOFACE)
+            assertThat(it[4]?.status).isEqualTo(FaceDetection.Status.NOFACE)
         }
 
         coVerify(exactly = 0) { eventReporter.addCaptureEvents(any(), any(), any()) }
@@ -163,9 +157,6 @@ internal class LiveFeedbackFragmentViewModelTest {
     fun `Process invalid faces after single fallback correctly`() = runTest {
         val validFace: Face = getFace()
         val badQuality: Face = getFace(quality = -2f)
-
-        coEvery { configRepository.getProjectConfiguration().custom } returns
-            mapOf("singleQualityFallbackRequired" to JsonPrimitive(true))
 
         every { faceDetector.analyze(frame) } returnsMany listOf(
             badQuality,
@@ -181,9 +172,8 @@ internal class LiveFeedbackFragmentViewModelTest {
         viewModel.process(frame)
 
         detections.observedValues.let {
-            assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.BAD_QUALITY)
+            assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.VALID)
             assertThat(it[1]?.status).isEqualTo(FaceDetection.Status.VALID)
-            assertThat(it[2]?.status).isEqualTo(FaceDetection.Status.VALID)
         }
     }
 

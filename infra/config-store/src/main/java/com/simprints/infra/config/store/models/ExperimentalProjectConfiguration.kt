@@ -20,13 +20,6 @@ data class ExperimentalProjectConfiguration(
             ?.booleanOrNull
             .let { it == true }
 
-    val singleQualityFallbackRequired: Boolean
-        get() = customConfig
-            ?.get(SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED)
-            ?.jsonPrimitive
-            ?.booleanOrNull
-            .let { it == true }
-
     val faceAutoCaptureEnabled: Boolean
         get() = customConfig
             ?.get(FACE_AUTO_CAPTURE_ENABLED)
@@ -181,7 +174,6 @@ data class ExperimentalProjectConfiguration(
 
     companion object {
         internal const val DISABLE_SUBJECT_POOL_VALIDATION = "disableSubjectPoolValidation"
-        internal const val SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED = "singleQualityFallbackRequired"
         internal const val FACE_AUTO_CAPTURE_ENABLED = "faceAutoCaptureEnabled"
         internal const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS = "faceAutoCaptureImagingDurationMillis"
 

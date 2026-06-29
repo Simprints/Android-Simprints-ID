@@ -39,7 +39,6 @@ import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_DEFAULT_MAX_RETRIES
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES
-import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Test
@@ -58,22 +57,6 @@ internal class ExperimentalProjectConfigurationTest {
             mapOf(DISABLE_SUBJECT_POOL_VALIDATION to JsonPrimitive(true)) to true,
         ).forEach { (config, result) ->
             assertThat(ExperimentalProjectConfiguration(config).disableSubjectPoolValidation).isEqualTo(result)
-        }
-    }
-
-    @Test
-    fun `check single good face capture fallback flag correctly`() {
-        mapOf(
-            // Value not present
-            emptyMap<String, JsonElement>() to false,
-            // Value not boolean
-            mapOf(SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED to JsonPrimitive(1)) to false,
-            // Value present and FALSE
-            mapOf(SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED to JsonPrimitive(false)) to false,
-            // Value present and TRUE
-            mapOf(SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED to JsonPrimitive(true)) to true,
-        ).forEach { (config, result) ->
-            assertThat(ExperimentalProjectConfiguration(config).singleQualityFallbackRequired).isEqualTo(result)
         }
     }
 
