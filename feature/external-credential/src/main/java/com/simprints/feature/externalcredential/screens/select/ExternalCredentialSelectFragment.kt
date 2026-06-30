@@ -44,9 +44,9 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
         observeChanges()
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         dismissDialog()
-        super.onDestroy()
+        super.onDestroyView()
     }
 
     private fun dismissDialog() {

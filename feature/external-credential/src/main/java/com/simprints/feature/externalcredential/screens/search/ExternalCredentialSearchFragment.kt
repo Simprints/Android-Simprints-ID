@@ -83,9 +83,9 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         }
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         dismissDialog()
-        super.onDestroy()
+        super.onDestroyView()
     }
 
     override fun onPause() {
