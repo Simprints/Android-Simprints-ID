@@ -14,6 +14,7 @@ import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.externalcredential.usecase.ExternalCredentialEventTrackerUseCase
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -28,6 +29,10 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
 ) : ViewModel() {
     private var isInitialized = false
     lateinit var params: ExternalCredentialParams
+        private set
+    var defaultSkipReason: String? = null
+        private set
+    var skipReasonsHideHasNumber: Boolean = false
         private set
     val finishEvent: LiveData<LiveDataEventWithContent<ExternalCredentialSearchResult>>
         get() = _finishEvent
@@ -58,8 +63,11 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
 
         viewModelScope.launch {
             val config = configRepository.getProjectConfiguration()
+            val experimental = config.experimental()
             val allowedExternalCredentials = config.multifactorId?.allowedExternalCredentials.orEmpty()
             _externalCredentialTypes.postValue(allowedExternalCredentials)
+            defaultSkipReason = experimental.mfidDefaultSkipReason
+            skipReasonsHideHasNumber = experimental.mfidSkipReasonsHideHasNumber
         }
     }
 
@@ -79,6 +87,16 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
 
     fun skipOtherReasonChanged(otherText: String?) {
         selectedSkipOtherText = otherText?.ifBlank { null }
+    }
+
+    fun bypassSkipScreen() {
+        selectedSkipOtherText = defaultSkipReason
+        finish(
+            ExternalCredentialSearchResult.Skipped(
+                flowType = params.flowType,
+                skipReason = ExternalCredentialSelectionEvent.SkipReason.OTHER,
+            ),
+        )
     }
 
     private fun updateState(state: (ExternalCredentialState) -> ExternalCredentialState) {

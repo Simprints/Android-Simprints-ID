@@ -3,16 +3,11 @@ package com.simprints.feature.externalcredential.screens.select
 import android.app.Dialog
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialSelectBinding
@@ -22,6 +17,7 @@ import com.simprints.feature.externalcredential.screens.controller.ExternalCrede
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import com.simprints.feature.externalcredential.screens.scanocr.model.asOcrDocumentType
 import com.simprints.feature.externalcredential.screens.select.view.ExternalCredentialTypeAdapter
+import com.simprints.feature.externalcredential.view.SkipScanConfirmationDialog
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.navigateSafely
@@ -48,9 +44,9 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
         observeChanges()
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         dismissDialog()
-        super.onDestroy()
+        super.onDestroyView()
     }
 
     private fun dismissDialog() {
@@ -60,17 +56,23 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
 
     private fun initListeners(types: List<ExternalCredentialType>) {
         binding.skipScanning.setOnClickListener {
-            displaySkipScanningConfirmationDialog(
+            dismissDialog()
+            dialog = SkipScanConfirmationDialog(
+                context = requireContext(),
                 credentialTypes = types,
                 onConfirm = {
                     dismissDialog()
-                    findNavController().navigateSafely(
-                        this,
-                        ExternalCredentialSelectFragmentDirections.actionExternalCredentialSelectFragmentToExternalCredentialSkip(),
-                    )
+                    if (mainViewModel.defaultSkipReason != null) {
+                        mainViewModel.bypassSkipScreen()
+                    } else {
+                        findNavController().navigateSafely(
+                            this,
+                            ExternalCredentialSelectFragmentDirections.actionExternalCredentialSelectFragmentToExternalCredentialSkip(),
+                        )
+                    }
                 },
                 onCancel = ::dismissDialog,
-            )
+            ).also { it.show() }
         }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             binding.skipScanning.performClick()
@@ -125,39 +127,6 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
             this,
             ExternalCredentialSelectFragmentDirections.actionExternalCredentialSelectFragmentToExternalCredentialScanQr(),
         )
-    }
-
-    private fun displaySkipScanningConfirmationDialog(
-        credentialTypes: List<ExternalCredentialType>,
-        onConfirm: () -> Unit,
-        onCancel: () -> Unit,
-    ) {
-        dismissDialog()
-        dialog = BottomSheetDialog(requireContext()).also {
-            val view = layoutInflater
-                .inflate(R.layout.dialog_skip_scan_confirm, null)
-                .also { view ->
-                    val bodyText = view.findViewById<TextView>(R.id.skipDialogBodyText)
-                    val cancelButton = view.findViewById<Button>(R.id.buttonCancel)
-                    val confirmButton = view.findViewById<Button>(R.id.buttonSkip)
-
-                    bodyText.text = resources.getQuantityCredentialString(
-                        id = IDR.string.mfid_skip_scan_dialog_body,
-                        credentialTypes = credentialTypes,
-                        specificCredentialRes = resources.getCredentialTypeRes(credentialTypes.firstOrNull()),
-                        multipleCredentialsRes = IDR.string.mfid_type_any_document,
-                    )
-
-                    confirmButton.setOnClickListener { onConfirm() }
-                    cancelButton.setOnClickListener { onCancel() }
-                }
-            it.setContentView(view)
-            it.setCancelable(true)
-            it.behavior.state = BottomSheetBehavior.STATE_EXPANDED
-            it.behavior.isDraggable = false
-        }
-
-        dialog?.show()
     }
 
     private fun startOcr(ocrDocumentType: OcrDocumentType) {

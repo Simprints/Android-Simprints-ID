@@ -1,11 +1,13 @@
 package com.simprints.feature.externalcredential.screens.search
 
+import android.app.Dialog
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
@@ -30,6 +32,7 @@ import com.simprints.feature.externalcredential.screens.scanocr.usecase.ZoomOnto
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.feature.externalcredential.screens.search.model.SearchCredentialState
 import com.simprints.feature.externalcredential.screens.search.model.SearchState
+import com.simprints.feature.externalcredential.view.SkipScanConfirmationDialog
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.navigateSafely
@@ -62,6 +65,7 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
     @Inject
     lateinit var zoomOntoCredentialUseCase: ZoomOntoCredentialUseCase
     private var credentialTextWatcher: TextWatcher? = null
+    private var dialog: Dialog? = null
 
     override fun onViewCreated(
         view: View,
@@ -70,11 +74,28 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         super.onViewCreated(view, savedInstanceState)
         applySystemBarInsets(view)
         initObservers()
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            if (mainViewModel.defaultSkipReason != null) {
+                showSkipConfirmationDialog()
+            } else {
+                findNavController().navigate(R.id.externalCredentialSkip)
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        dismissDialog()
+        super.onDestroyView()
     }
 
     override fun onPause() {
         hideKeyboard()
         super.onPause()
+    }
+
+    private fun dismissDialog() {
+        dialog?.dismiss()
+        dialog = null
     }
 
     private fun initObservers() {
@@ -258,6 +279,19 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         if (!isEditingCredential) {
             hideKeyboard()
         }
+    }
+
+    private fun showSkipConfirmationDialog() {
+        dismissDialog()
+        dialog = SkipScanConfirmationDialog(
+            context = requireContext(),
+            credentialTypes = mainViewModel.externalCredentialTypes.value.orEmpty(),
+            onConfirm = {
+                dismissDialog()
+                mainViewModel.bypassSkipScreen()
+            },
+            onCancel = ::dismissDialog,
+        ).also { it.show() }
     }
 
     private fun hideKeyboard() {
