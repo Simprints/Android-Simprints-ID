@@ -388,16 +388,14 @@ internal class ExperimentalProjectConfigurationTest {
         assertThat(ExperimentalProjectConfiguration(emptyMap()).mfidDefaultSkipReason).isNull()
         assertThat(
             ExperimentalProjectConfiguration(
-                mapOf(ExperimentalProjectConfiguration.MFID_DEFAULT_SKIP_REASON to JsonPrimitive(true)),
+                mapOf(ExperimentalProjectConfiguration.MFID_DEFAULT_SKIP_REASON to JsonPrimitive("")),
             ).mfidDefaultSkipReason,
         ).isNull()
         assertThat(
             ExperimentalProjectConfiguration(
                 mapOf(ExperimentalProjectConfiguration.MFID_DEFAULT_SKIP_REASON to JsonPrimitive("project_reason")),
             ).mfidDefaultSkipReason,
-        ).isEqualTo(
-            "project_reason",
-        )
+        ).isEqualTo("project_reason")
     }
 
     @Test
