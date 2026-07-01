@@ -1,7 +1,10 @@
 package com.simprints.infra.config.store.models
 
+import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckMode
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.floatOrNull
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
@@ -165,6 +168,23 @@ data class ExperimentalProjectConfiguration(
             ?.booleanOrNull
             .let { it == true }
 
+    // TODO Temporary flags until configuration is added to FaceSdkConfiguration
+    val spoofCheckMode: SpoofCheckMode
+        get() = customConfig
+            ?.get(SPOOF_CHECK_MODE)
+            ?.jsonPrimitive
+            ?.contentOrNull
+            ?.let { SpoofCheckMode.fromString(it) }
+            ?: SpoofCheckMode.DISABLED
+
+    // TODO Temporary flags until configuration is added to FaceSdkConfiguration
+    val spoofCheckThreshold: Float
+        get() = customConfig
+            ?.get(SPOOF_CHECK_THRESHOLD)
+            ?.jsonPrimitive
+            ?.floatOrNull
+            ?: SPOOF_CHECK_THRESHOLD_DEFAULT
+
     companion object {
         internal const val DISABLE_SUBJECT_POOL_VALIDATION = "disableSubjectPoolValidation"
         internal const val FACE_AUTO_CAPTURE_ENABLED = "faceAutoCaptureEnabled"
@@ -223,5 +243,9 @@ data class ExperimentalProjectConfiguration(
         const val MINIMUM_FREE_SPACE_MB_DEFAULT = 1024 // 1GB
 
         const val USE_BALANCED_LOCATION_ACCURACY = "useBalancedLocationAccuracy"
+
+        const val SPOOF_CHECK_MODE = "spoofCheckMode"
+        const val SPOOF_CHECK_THRESHOLD = "spoofCheckThreshold"
+        const val SPOOF_CHECK_THRESHOLD_DEFAULT = 0.33f
     }
 }

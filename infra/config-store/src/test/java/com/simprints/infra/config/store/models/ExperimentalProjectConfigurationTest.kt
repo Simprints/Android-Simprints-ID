@@ -38,6 +38,7 @@ import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_DEFAULT_MAX_RETRIES
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES
+import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckMode
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Test
@@ -346,6 +347,32 @@ internal class ExperimentalProjectConfigurationTest {
             mapOf(ExperimentalProjectConfiguration.USE_BALANCED_LOCATION_ACCURACY to JsonPrimitive(true)) to true,
         ).forEach { (config, result) ->
             assertThat(ExperimentalProjectConfiguration(config).useBalancedLocationAccuracy).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `spoof check mode value parsed correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to SpoofCheckMode.DISABLED,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MODE to JsonPrimitive(null)) to SpoofCheckMode.DISABLED,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MODE to JsonPrimitive("string")) to SpoofCheckMode.DISABLED,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MODE to JsonPrimitive("ENFORCED")) to SpoofCheckMode.ENFORCED,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MODE to JsonPrimitive("RECORDED")) to SpoofCheckMode.RECORDED,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).spoofCheckMode).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `spoof check threshold value parsed correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to 0.33f,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_THRESHOLD to JsonPrimitive(null)) to 0.33f,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_THRESHOLD to JsonPrimitive("string")) to 0.33f,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_THRESHOLD to JsonPrimitive(1)) to 1f,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_THRESHOLD to JsonPrimitive(0f)) to 0f,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).spoofCheckThreshold).isEqualTo(result)
         }
     }
 }
