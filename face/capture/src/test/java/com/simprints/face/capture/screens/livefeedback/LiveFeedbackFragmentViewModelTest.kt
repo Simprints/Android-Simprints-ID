@@ -8,12 +8,14 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
+import com.simprints.face.capture.usecases.GetSpoofCheckConfigurationUseCase
 import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
@@ -54,6 +56,9 @@ internal class LiveFeedbackFragmentViewModelTest {
 
     @MockK
     private lateinit var isUsingAutoCapture: IsUsingAutoCaptureUseCase
+
+    @MockK
+    private lateinit var getSpoofCheckConfiguration: GetSpoofCheckConfigurationUseCase
     private lateinit var viewModel: LiveFeedbackFragmentViewModel
 
     @Before
@@ -68,6 +73,8 @@ internal class LiveFeedbackFragmentViewModelTest {
                 ?.qualityThreshold
         } returns QUALITY_THRESHOLD
         every { isUsingAutoCapture.invoke(any()) } returns false
+        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns FaceConfiguration.SpoofCheckConfiguration.DISABLED
+
         every { timeHelper.now() } returnsMany (0..100L).map { Timestamp(it) }
         justRun { previewFrame.recycle() }
         val resolveFaceBioSdkUseCase = mockk<ResolveFaceBioSdkUseCase> {
@@ -82,6 +89,7 @@ internal class LiveFeedbackFragmentViewModelTest {
             eventReporter,
             timeHelper,
             isUsingAutoCapture,
+            getSpoofCheckConfiguration,
         )
     }
 

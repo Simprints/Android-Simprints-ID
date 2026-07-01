@@ -9,6 +9,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.models.FaceTarget
 import com.simprints.face.capture.models.SymmetricTarget
+import com.simprints.face.capture.usecases.GetSpoofCheckConfigurationUseCase
 import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.detection.Face
@@ -16,6 +17,7 @@ import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
+import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckConfiguration
 import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
@@ -37,6 +39,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private val eventReporter: SimpleCaptureEventReporter,
     private val timeHelper: TimeHelper,
     private val isUsingAutoCaptureUseCase: IsUsingAutoCaptureUseCase,
+    private val getSpoofCheckConfiguration: GetSpoofCheckConfigurationUseCase,
 ) : ViewModel() {
     private var attemptNumber: Int = 1
     private var samplesToCapture: Int = 1
@@ -57,6 +60,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
 
     var isAutoCapture: Boolean = false
+    var spoofCheckConfig: SpoofCheckConfiguration = SpoofCheckConfiguration.DISABLED
 
     private var captureImagingStartTime: Long = 0
     private var isAutoCaptureHeldOff = true
@@ -81,6 +85,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             faceDetector = resolveFaceBioSdk(bioSdk).detector
 
             val config = configRepository.getProjectConfiguration()
+            spoofCheckConfig = getSpoofCheckConfiguration(config, bioSdk)
             qualityThreshold = config.face?.getSdkConfiguration(bioSdk)?.qualityThreshold ?: 0f
             autoCaptureImagingDurationMillis = config.experimental().faceAutoCaptureImagingDurationMillis
         }
