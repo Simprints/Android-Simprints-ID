@@ -32,4 +32,33 @@ data class FaceConfiguration(
 
         fun shouldSaveImage() = this != NEVER
     }
+
+    // TODO Will be a field in FaceSdkConfiguration later
+    data class SpoofCheckConfiguration(
+        val mode: SpoofCheckMode,
+        val threshold: Float,
+    ) {
+        companion object {
+            val DISABLED = SpoofCheckConfiguration(
+                mode = SpoofCheckMode.DISABLED,
+                threshold = 0f,
+            )
+        }
+    }
+
+    enum class SpoofCheckMode {
+        DISABLED,
+        ENFORCED,
+        RECORDED,
+        ;
+
+        companion object {
+            // TODO Later it will be enforced by API.
+            fun fromString(mode: String): SpoofCheckMode = when (mode.uppercase()) {
+                "ENFORCED" -> ENFORCED
+                "RECORDED" -> RECORDED
+                else -> DISABLED
+            }
+        }
+    }
 }
