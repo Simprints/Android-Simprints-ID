@@ -99,7 +99,7 @@ internal class LiveFeedbackFragmentViewModelTest {
 
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
 
         val currentDetection = viewModel.currentDetection.testObserver()
         assertThat(currentDetection.observedValues.last()?.status).isEqualTo(FaceDetection.Status.VALID)
@@ -113,9 +113,9 @@ internal class LiveFeedbackFragmentViewModelTest {
 
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
         viewModel.startCapture()
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
 
         val currentDetection = viewModel.currentDetection.testObserver()
         assertThat(currentDetection.observedValues.last()?.status).isEqualTo(FaceDetection.Status.VALID_CAPTURING)
@@ -143,12 +143,12 @@ internal class LiveFeedbackFragmentViewModelTest {
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 2, 0)
 
-        viewModel.process(frame)
-        viewModel.process(frame)
-        viewModel.process(frame)
-        viewModel.process(frame)
-        viewModel.process(frame)
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
 
         detections.observedValues.let {
             assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.TOOFAR)
@@ -175,9 +175,9 @@ internal class LiveFeedbackFragmentViewModelTest {
         val detections = viewModel.currentDetection.testObserver()
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
-        viewModel.process(frame)
-        viewModel.process(frame)
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
 
         detections.observedValues.let {
             assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.VALID)
@@ -195,10 +195,10 @@ internal class LiveFeedbackFragmentViewModelTest {
         val capturingStateObserver = viewModel.capturingState.testObserver()
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 2, 0)
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
         viewModel.startCapture()
-        viewModel.process(frame)
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
 
         currentDetectionObserver.observedValues.let {
             assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.VALID)

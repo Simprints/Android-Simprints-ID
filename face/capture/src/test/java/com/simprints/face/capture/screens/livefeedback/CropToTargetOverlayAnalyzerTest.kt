@@ -3,13 +3,10 @@ package com.simprints.face.capture.screens.livefeedback
 import android.graphics.Bitmap
 import android.graphics.RectF
 import androidx.camera.core.ImageProxy
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import androidx.test.ext.junit.runners.*
+import com.google.common.truth.Truth.*
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.justRun
-import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -36,7 +33,8 @@ internal class CropToTargetOverlayAnalyzerTest {
             previewRect = RectF(200f, 200f, 200f, 200f),
             overlayWidth = 1000,
             overlayHeight = 2000,
-        ) { capturedBitmap = it }
+            onImageCropped = { _, cropped -> capturedBitmap = cropped },
+        )
 
         analyzer.analyze(imageProxy)
 
@@ -53,7 +51,8 @@ internal class CropToTargetOverlayAnalyzerTest {
             previewRect = RectF(200f, 200f, 800f, 800f),
             overlayWidth = 1000,
             overlayHeight = 2000,
-        ) { capturedBitmap = it }
+            onImageCropped = { _, cropped -> capturedBitmap = cropped },
+        )
 
         analyzer.analyze(imageProxy)
 
@@ -73,7 +72,8 @@ internal class CropToTargetOverlayAnalyzerTest {
             previewRect = RectF(200f, 200f, 800f, 800f),
             overlayWidth = 1000,
             overlayHeight = 2000,
-        ) { closedBeforeCallback = closed }
+            onImageCropped = { _, _ -> closedBeforeCallback = closed },
+        )
 
         analyzer.analyze(imageProxy)
 
@@ -88,7 +88,8 @@ internal class CropToTargetOverlayAnalyzerTest {
             previewRect = RectF(700f, 200f, 1300f, 800f),
             overlayWidth = 2000,
             overlayHeight = 1000,
-        ) { capturedBitmap = it }
+            onImageCropped = { _, cropped -> capturedBitmap = cropped },
+        )
 
         analyzer.analyze(imageProxy)
 
@@ -104,7 +105,8 @@ internal class CropToTargetOverlayAnalyzerTest {
             previewRect = RectF(200f, 200f, 800f, 800f),
             overlayWidth = 1000,
             overlayHeight = 2000,
-        ) { capturedBitmap = it }
+            onImageCropped = { _, cropped -> capturedBitmap = cropped },
+        )
 
         analyzer.analyze(imageProxy)
 
@@ -120,7 +122,8 @@ internal class CropToTargetOverlayAnalyzerTest {
             previewRect = RectF(700f, 200f, 1300f, 800f),
             overlayWidth = 2000,
             overlayHeight = 1000,
-        ) { capturedBitmap = it }
+            onImageCropped = { _, cropped -> capturedBitmap = cropped },
+        )
 
         analyzer.analyze(imageProxy)
 

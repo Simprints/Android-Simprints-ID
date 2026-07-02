@@ -114,11 +114,14 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
      *
      * @param croppedBitmap is the camera frame
      */
-    fun process(croppedBitmap: Bitmap) {
+    fun process(
+        originalBitmap: Bitmap,
+        croppedBitmap: Bitmap,
+    ) {
         val captureStartTime = timeHelper.now()
         val potentialFace = faceDetector.analyze(croppedBitmap)
 
-        val faceDetection = getFaceDetectionFromPotentialFace(croppedBitmap, potentialFace)
+        val faceDetection = getFaceDetectionFromPotentialFace(originalBitmap, croppedBitmap, potentialFace)
         faceDetection.detectionStartTime = captureStartTime
         faceDetection.detectionEndTime = timeHelper.now()
 
@@ -209,11 +212,13 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     }
 
     private fun getFaceDetectionFromPotentialFace(
+        original: Bitmap,
         bitmap: Bitmap,
         potentialFace: Face?,
     ): FaceDetection = if (potentialFace == null) {
         bitmap.recycle()
         FaceDetection(
+            original = original,
             bitmap = bitmap,
             face = null,
             status = FaceDetection.Status.NOFACE,
@@ -221,10 +226,11 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             detectionEndTime = timeHelper.now(),
         )
     } else {
-        getFaceDetection(bitmap, potentialFace)
+        getFaceDetection(original, bitmap, potentialFace)
     }
 
     private fun getFaceDetection(
+        original: Bitmap,
         bitmap: Bitmap,
         potentialFace: Face,
     ): FaceDetection {
@@ -239,6 +245,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         }
 
         return FaceDetection(
+            original = original,
             bitmap = bitmap,
             face = potentialFace,
             status = status,

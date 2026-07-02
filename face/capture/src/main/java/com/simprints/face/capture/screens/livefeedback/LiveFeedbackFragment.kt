@@ -181,7 +181,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             previewRect = RectF(binding.captureOverlay.circleRect), // create a new instance to avoid threading issues
             overlayWidth = binding.captureOverlay.width,
             overlayHeight = binding.captureOverlay.height,
-            onImageCropped = ::analyze,
+            onImageCropped = { original, cropped -> analyze(original, cropped) },
         )
 
         imageAnalyzer.setAnalyzer(cameraExecutor, cropAnalyzer)
@@ -274,9 +274,12 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         }
     }
 
-    private fun analyze(image: Bitmap) {
+    private fun analyze(
+        original: Bitmap,
+        cropped: Bitmap,
+    ) {
         try {
-            vm.process(croppedBitmap = image)
+            vm.process(originalBitmap = original, croppedBitmap = cropped)
         } catch (t: Throwable) {
             Simber.e("Image analysis crashed", t, tag = FACE_CAPTURE)
             // Image analysis is running in bg thread

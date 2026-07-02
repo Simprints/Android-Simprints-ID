@@ -7,6 +7,7 @@ import com.simprints.infra.images.model.SecuredImageRef
 import java.util.UUID
 
 internal data class FaceDetection(
+    val original: Bitmap,
     val bitmap: Bitmap,
     val face: Face?,
     val status: Status,

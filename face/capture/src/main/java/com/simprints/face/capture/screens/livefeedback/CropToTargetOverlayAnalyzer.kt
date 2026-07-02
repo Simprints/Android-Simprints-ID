@@ -11,10 +11,10 @@ internal class CropToTargetOverlayAnalyzer(
     private val previewRect: RectF,
     private val overlayWidth: Int,
     private val overlayHeight: Int,
-    private val onImageCropped: (Bitmap) -> Unit,
+    private val onImageCropped: (original: Bitmap, cropped: Bitmap) -> Unit,
 ) : ImageAnalysis.Analyzer {
     override fun analyze(image: ImageProxy) {
-        val croppedBitmap = image.use {
+        val (originalBitmap, croppedBitmap) = image.use {
             if (previewRect.isEmpty) return
 
             // Adjust overlay size to be fit-center with the image size
@@ -37,7 +37,7 @@ internal class CropToTargetOverlayAnalyzer(
             val cropTop = offsetY + (previewRect.top * scale).toInt()
             val cropHeight = (previewRect.height() * scale).toInt()
 
-            Bitmap.createBitmap(
+            image.toBitmap() to Bitmap.createBitmap(
                 it.toBitmap(),
                 cropLeft,
                 cropTop,
@@ -45,7 +45,7 @@ internal class CropToTargetOverlayAnalyzer(
                 cropHeight,
             )
         }
-        onImageCropped(croppedBitmap)
+        onImageCropped(originalBitmap, croppedBitmap)
     }
 
     private fun getSmallerRatio(

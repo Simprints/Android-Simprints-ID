@@ -1,7 +1,7 @@
 package com.simprints.face.capture.usecases
 
 import android.graphics.Rect
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.EncodingUtils
@@ -16,11 +16,8 @@ import com.simprints.infra.events.event.domain.models.FaceFallbackCaptureEvent
 import com.simprints.infra.events.event.domain.models.FaceOnboardingCompleteEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -200,8 +197,17 @@ class SimpleCaptureEventReporterTest {
         }
     }
 
-    private fun getDetection(status: FaceDetection.Status) =
-        FaceDetection(mockk(), getFace(), status, mockk(), Timestamp(1L), false, "id", Timestamp(1L))
+    private fun getDetection(status: FaceDetection.Status) = FaceDetection(
+        mockk(),
+        mockk(),
+        getFace(),
+        status,
+        mockk(),
+        Timestamp(1L),
+        false,
+        "id",
+        Timestamp(1L),
+    )
 
     private fun getFace() = Face(
         100,

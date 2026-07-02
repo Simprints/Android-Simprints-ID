@@ -108,7 +108,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
 
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
 
         Truth
             .assertThat(currentDetection.observedValues)
@@ -128,7 +128,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
         viewModel.startCapture()
         viewModel.holdOffAutoCapture()
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
 
         Truth
             .assertThat(currentDetection.observedValues)
@@ -147,7 +147,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
         viewModel.startCapture()
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
 
         Truth.assertThat(currentDetection.observedValues.last()?.hasValidStatus()).isEqualTo(true)
         Truth
@@ -164,9 +164,9 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
         viewModel.startCapture()
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
         viewModel.holdOffAutoCapture()
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
 
         Truth.assertThat(currentDetection.observedValues.last()?.hasValidStatus()).isEqualTo(true)
         Truth
@@ -186,8 +186,8 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
         viewModel.startCapture()
-        viewModel.process(frame)
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
 
         Truth
             .assertThat(currentDetection.observedValues.first()?.status)
@@ -209,9 +209,9 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
 
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
-        viewModel.process(frame) // a fallback image frame before the preparation delay elapses
+        viewModel.process(frame, frame) // a fallback image frame before the preparation delay elapses
         viewModel.startCapture()
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
 
         val currentDetection = viewModel.currentDetection.testObserver()
         Truth.assertThat(currentDetection.observedValues.last()?.hasValidStatus()).isEqualTo(true)
@@ -225,7 +225,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
 
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
         viewModel.startCapture()
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
         advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS + 1)
 
         val currentDetection = viewModel.currentDetection.testObserver()
@@ -255,12 +255,12 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 2, 0)
         viewModel.startCapture()
 
-        viewModel.process(frame)
-        viewModel.process(frame)
-        viewModel.process(frame)
-        viewModel.process(frame)
-        viewModel.process(frame)
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
 
         detections.observedValues.let {
             Truth.assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.TOOFAR)
@@ -289,11 +289,11 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
         // fallback image frames before the preparation delay elapses
-        viewModel.process(frame)
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
         viewModel.startCapture()
-        viewModel.process(frame)
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
 
         detections.observedValues.let {
             // fallback image frame wasn't observed during preparation delay
@@ -314,7 +314,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
         viewModel.startCapture()
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
         advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS)
         Truth
             .assertThat(capturingState.observedValues.last())
@@ -340,7 +340,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
         viewModel.startCapture()
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
         advanceTimeBy(configDuration / 2)
         Truth
             .assertThat(capturingState.observedValues.last())
@@ -362,10 +362,10 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         val samplesToKeep = 2
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, samplesToKeep, 0)
-        viewModel.process(frame) // won't be observed during the preparation phase
+        viewModel.process(frame, frame) // won't be observed during the preparation phase
         viewModel.startCapture()
         repeat(100) {
-            viewModel.process(frame)
+            viewModel.process(frame, frame)
         }
         advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS + 1)
 
