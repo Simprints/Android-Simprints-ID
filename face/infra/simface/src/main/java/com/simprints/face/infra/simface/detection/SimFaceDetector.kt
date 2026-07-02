@@ -3,9 +3,12 @@ package com.simprints.face.infra.simface.detection
 import android.graphics.Bitmap
 import com.simprints.biometrics.simface.SimFace
 import com.simprints.face.infra.basebiosdk.detection.Face
+import com.simprints.face.infra.basebiosdk.detection.Face.Companion.IOD_NOT_AVAILABLE
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
+import com.simprints.face.infra.basebiosdk.detection.SpoofCheckResult
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
+import kotlin.math.abs
 
 class SimFaceDetector @Inject constructor(
     private val simFace: SimFace,
@@ -26,11 +29,14 @@ class SimFaceDetector @Inject constructor(
             absoluteBoundingBox = face.absoluteBoundingBox,
             yaw = face.yaw,
             roll = face.roll,
+            iod = face.landmarks?.let { abs(it.eyeLeft.x - it.eyeRight.x) } ?: IOD_NOT_AVAILABLE,
             quality = face.quality,
             template = template,
             format = simFace.getTemplateVersion(),
         )
     }
+
+    override fun runSpoofCheck(bitmap: Bitmap) = SpoofCheckResult(0f, SpoofCheckResult.SkipReason.NOT_AVAILABLE)
 
     companion object {
         private const val BAD_FACE_THRESHOLD = 0.1

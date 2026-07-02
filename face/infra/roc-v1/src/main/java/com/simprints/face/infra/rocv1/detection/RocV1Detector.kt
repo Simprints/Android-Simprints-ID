@@ -4,7 +4,9 @@ import android.graphics.Bitmap
 import android.graphics.Rect
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.face.infra.basebiosdk.detection.Face
+import com.simprints.face.infra.basebiosdk.detection.Face.Companion.IOD_NOT_AVAILABLE
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
+import com.simprints.face.infra.basebiosdk.detection.SpoofCheckResult
 import io.rankone.rocsdk.embedded.SWIGTYPE_p_float
 import io.rankone.rocsdk.embedded.SWIGTYPE_p_unsigned_char
 import io.rankone.rocsdk.embedded.roc
@@ -45,6 +47,8 @@ class RocV1Detector @Inject constructor() : FaceDetector {
             roc.delete_float(quality)
         }
     }
+
+    override fun runSpoofCheck(bitmap: Bitmap) = SpoofCheckResult(0f, SpoofCheckResult.SkipReason.NOT_AVAILABLE)
 
     override fun analyze(bitmap: Bitmap): Face? {
         val rocColorImage = roc_image()
@@ -105,6 +109,7 @@ class RocV1Detector @Inject constructor() : FaceDetector {
             ),
             yawValue,
             rocFace.face.rotation,
+            IOD_NOT_AVAILABLE, // Not available in ROC v1
             qualityValue,
             roc.cdata(roc.roc_cast(rocFace.template), roc.ROC_FAST_FV_SIZE.toInt()),
             RANK_ONE_TEMPLATE_FORMAT_1_23,

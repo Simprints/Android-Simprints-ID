@@ -21,6 +21,7 @@ import androidx.camera.lifecycle.awaitInstance
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -181,7 +182,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             previewRect = RectF(binding.captureOverlay.circleRect), // create a new instance to avoid threading issues
             overlayWidth = binding.captureOverlay.width,
             overlayHeight = binding.captureOverlay.height,
-            onImageCropped = ::analyze,
+            onImageCropped = { original, cropped -> analyze(original, cropped) },
         )
 
         imageAnalyzer.setAnalyzer(cameraExecutor, cropAnalyzer)
@@ -263,6 +264,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             when (it) {
                 LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED -> renderCaptureNotStarted()
                 LiveFeedbackFragmentViewModel.CapturingState.CAPTURING -> renderCapturing()
+                LiveFeedbackFragmentViewModel.CapturingState.VALIDATING -> renderValidating()
+                LiveFeedbackFragmentViewModel.CapturingState.VALIDATION_FAILED -> renderResetAfterValidation()
                 LiveFeedbackFragmentViewModel.CapturingState.FINISHED -> {
                     mainVm.captureFinished(vm.sortedQualifyingCaptures)
                     findNavController().navigateSafely(
@@ -274,9 +277,12 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         }
     }
 
-    private fun analyze(image: Bitmap) {
+    private fun analyze(
+        original: Bitmap,
+        cropped: Bitmap,
+    ) {
         try {
-            vm.process(croppedBitmap = image)
+            vm.process(original = original, croppedBitmap = cropped)
         } catch (t: Throwable) {
             Simber.e("Image analysis crashed", t, tag = FACE_CAPTURE)
             // Image analysis is running in bg thread
@@ -309,6 +315,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             }
 
             captureOverlay.drawSemiTransparentTarget()
+            captureFeedbackTxtExplanation.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_white))
+
             captureFeedbackBtn.isVisible = true
             captureFeedbackPermissionButton.isGone = true
             setManualCaptureButtonClickable(false)
@@ -318,15 +326,39 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private fun renderCapturing() {
         binding.apply {
             captureOverlay.drawWhiteTarget()
-            captureFeedbackTxtExplanation.setTextColor(
-                ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey),
-            )
+            captureFeedbackTxtExplanation.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey))
 
             captureProgress.isVisible = true
             captureFeedbackBtn.setText(IDR.string.face_capture_prep_begin_button_capturing)
             captureFeedbackBtn.isVisible = true
             captureFeedbackPermissionButton.isGone = true
             setManualCaptureButtonClickable(false)
+        }
+    }
+
+    private fun renderValidating() {
+        // TODO set correct UI state
+        binding.apply {
+            captureOverlay.drawWhiteTarget()
+            captureFeedbackTxtExplanation.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey))
+
+            captureProgress.isInvisible = true
+            captureFeedbackBtn.setText("Verifying your scan")
+            setManualCaptureButtonClickable(false)
+
+            captureFeedbackTxtExplanation.isVisible = false
+        }
+    }
+
+    private fun renderResetAfterValidation() {
+        binding.apply {
+            captureProgress.isInvisible = true
+            captureFeedbackBtn.setText("Unable to verify")
+            captureFeedbackBtn.setCheckedWithLeftDrawable(false)
+            setManualCaptureButtonClickable(false)
+
+            captureFeedbackTxtExplanation.isVisible = true
+            captureFeedbackTxtExplanation.setText("Please recapture and ensure a real person is in front of the camera")
         }
     }
 

@@ -3,11 +3,13 @@ package com.simprints.face.capture.models
 import android.graphics.Bitmap
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.infra.basebiosdk.detection.Face
+import com.simprints.face.infra.basebiosdk.detection.SpoofCheckResult
 import com.simprints.infra.images.model.SecuredImageRef
 import java.util.UUID
 
 internal data class FaceDetection(
     val bitmap: Bitmap,
+    val original: Bitmap,
     val face: Face?,
     val status: Status,
     var securedImageRef: SecuredImageRef? = null,
@@ -15,6 +17,7 @@ internal data class FaceDetection(
     var isFallback: Boolean = false,
     var id: String = UUID.randomUUID().toString(),
     var detectionEndTime: Timestamp,
+    var spoofCheckResult: SpoofCheckResult? = null,
 ) {
     enum class Status {
         VALID,

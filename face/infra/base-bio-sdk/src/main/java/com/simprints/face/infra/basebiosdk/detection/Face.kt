@@ -11,6 +11,7 @@ import android.graphics.RectF
  * @property absoluteBoundingBox Rect for the absolute coordinates of the detected face
  * @property yaw rotation around the y access
  * @property roll rotation around the x access
+ * @property iod inter-ocular distance
  * @property quality image quality
  * @property template
  * @property format
@@ -22,6 +23,7 @@ data class Face(
     private val absoluteBoundingBox: Rect,
     val yaw: Float,
     var roll: Float,
+    val iod: Float,
     val quality: Float,
     val template: ByteArray,
     val format: String,
@@ -34,4 +36,8 @@ data class Face(
             absoluteBoundingBox.right.toFloat() / sourceWidth,
             absoluteBoundingBox.bottom.toFloat() / sourceHeight,
         )
+
+    companion object {
+        const val IOD_NOT_AVAILABLE = -1f
+    }
 }
