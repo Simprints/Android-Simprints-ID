@@ -334,6 +334,56 @@
       border: 1px solid rgba(99,102,241,0.35);
     }
     .project-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .project-primary-action {
+      margin: 1.25rem 0 0.7rem;
+    }
+    .project-apk-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 58px;
+      padding: 0.95rem 1.4rem;
+      border-radius: 8px;
+      background: #16a34a;
+      color: #fff;
+      font-size: 1.08rem;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 10px 24px rgba(22,163,74,0.25);
+      transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+      white-space: nowrap;
+    }
+    .project-apk-btn:hover {
+      background: #22c55e;
+      box-shadow: 0 12px 28px rgba(34,197,94,0.32);
+      transform: translateY(-1px);
+    }
+    .project-apk-btn.disabled {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      box-shadow: none;
+      color: var(--muted);
+      cursor: not-allowed;
+      opacity: 0.45;
+      pointer-events: none;
+    }
+    .project-notes-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.4rem 0.85rem;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 0.82rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+    }
+    .project-notes-btn:hover { opacity: 0.8; }
 
     footer {
       text-align: center;
@@ -572,11 +622,11 @@
     // ── Render a project tab panel ────────────────────────────────
     function renderProjectTab(project, tabId, releaseUrl, apkUrl) {
       const notesBtn = releaseUrl
-        ? `<a class="tbl-btn tbl-btn-notes" href="${releaseUrl}" target="_blank" rel="noopener">📋 Release Notes</a>`
+        ? `<a class="project-notes-btn" href="${releaseUrl}" target="_blank" rel="noopener">📋 Release Notes</a>`
         : `<span class="tbl-btn tbl-btn-na">📋 Release Notes</span>`;
       const apkBtn = apkUrl
-        ? `<a class="tbl-btn tbl-btn-apk" href="${apkUrl}" download>⬇ APK</a>`
-        : `<span class="tbl-btn tbl-btn-na">⬇ APK</span>`;
+        ? `<a class="project-apk-btn" href="${apkUrl}" download>⬇ APK</a>`
+        : `<span class="project-apk-btn disabled">⬇ APK</span>`;
 
       return `
         <div class="tab-panel" id="tab-${tabId}">
@@ -587,13 +637,12 @@
                 <span class="project-row-label">Supported SID Version</span>
                 <span class="project-version-badge">${project.sid_version || 'N/A'}</span>
               </div>
+              <div class="project-primary-action">
+                ${apkBtn}
+              </div>
               <div class="project-row">
                 <span class="project-row-label">Release Notes</span>
                 <span class="project-actions">${notesBtn}</span>
-              </div>
-              <div class="project-row">
-                <span class="project-row-label">APK Download</span>
-                <span class="project-actions">${apkBtn}</span>
               </div>
             </div>
           </div>
