@@ -483,9 +483,10 @@
       const apkUrl     = data?.apk_url    || null;
       const releaseUrl = data?.release_url|| null;
       const updatedAt  = data?.updated_at || null;
+      const isDraft    = data?.is_draft   || false;
 
       const versionHtml = version
-        ? `<div class="version">${version}</div>`
+        ? `<div class="version">${version}${isDraft ? ' <span style="font-size:0.65rem;font-weight:600;background:rgba(59,130,246,0.2);color:#93c5fd;padding:0.15rem 0.5rem;border-radius:999px;vertical-align:middle;border:1px solid rgba(59,130,246,0.35)">DRAFT</span>' : ''}</div>`
         : upcoming
           ? `<div class="version-empty">No release yet</div>
              <div class="upcoming">🔜 Coming up: ${upcoming}</div>`
@@ -495,9 +496,12 @@
         ? `<div class="updated">Updated ${formatDate(updatedAt)}</div>`
         : `<div class="updated"></div>`;
 
-      const apkBtn = apkUrl
-        ? `<a class="btn btn-primary" href="${apkUrl}" download>⬇&nbsp;Download APK</a>`
-        : `<span class="btn btn-primary btn-disabled">⬇&nbsp;Download APK</span>`;
+      // Internal Testing: no APK download — show internal-only notice instead
+      const apkBtn = isDraft
+        ? `<span style="font-size:0.78rem;color:#93c5fd;display:inline-flex;align-items:center;gap:0.35rem;">🔒&nbsp;APK available internally only</span>`
+        : apkUrl
+          ? `<a class="btn btn-primary" href="${apkUrl}" download>⬇&nbsp;Download APK</a>`
+          : `<span class="btn btn-primary btn-disabled">⬇&nbsp;Download APK</span>`;
 
       const releaseBtn = releaseUrl
         ? `<a class="btn btn-secondary" href="${releaseUrl}" target="_blank" rel="noopener">📋&nbsp;Release Notes</a>`
@@ -534,16 +538,32 @@
       return all;
     }
 
+    async function fetchDraftRelease() {
+      try {
+        // Draft releases don't appear in /releases (public endpoint), so we use /releases with per_page=1
+        // and fall back to checking the first release that is a draft via the full list endpoint.
+        const res = await fetch(
+          'https://api.github.com/repos/Simprints/Android-Simprints-ID/releases?per_page=10&page=1'
+        );
+        const releases = await res.json();
+        if (!Array.isArray(releases)) return null;
+        return releases.find(r => r.draft) || null;
+      } catch (e) {
+        return null;
+      }
+    }
+
     async function loadAll() {
       const tbody   = document.getElementById('releases-tbody');
       const loading = document.getElementById('releases-loading');
       const wrap    = document.getElementById('releases-table-wrap');
 
-      let status = {}, releases = [];
+      let status = {}, releases = [], draftRelease = null;
       try {
-        [status, releases] = await Promise.all([
+        [status, releases, draftRelease] = await Promise.all([
           fetch('status.json?_=' + Date.now()).then(r => r.json()).catch(() => ({})),
           releasesPromise,
+          fetchDraftRelease(),
         ]);
       } catch (e) {
         console.error('Failed to load data:', e);
@@ -552,6 +572,15 @@
       // Render top cards — auto-fill apk_url / release_url from GitHub if missing
       document.getElementById('grid').innerHTML = ENVIRONMENTS.map(env => {
         const data = { ...(status[env.key] || {}) };
+
+        // Internal Testing: use the current draft release if available
+        if (env.key === 'internal_testing' && draftRelease) {
+          data.version     = draftRelease.tag_name || draftRelease.name || data.version;
+          data.release_url = draftRelease.html_url || data.release_url;
+          data.updated_at  = draftRelease.created_at || data.updated_at;
+          data.is_draft    = true;
+        }
+
         if (data.version && (!data.apk_url || !data.release_url)) {
           const tag = data.version.startsWith('v') ? data.version : `v${data.version}`;
           const rel = releases.find(r => r.tag_name === tag);
