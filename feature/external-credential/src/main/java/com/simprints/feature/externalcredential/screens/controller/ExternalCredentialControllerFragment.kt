@@ -77,10 +77,6 @@ internal class ExternalCredentialControllerFragment : Fragment(R.layout.fragment
     private fun initListeners() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             when (internalNavController?.currentDestination?.id) {
-                R.id.externalCredentialSearch -> {
-                    internalNavController?.navigate(R.id.externalCredentialSkip)
-                }
-
                 R.id.externalCredentialSkip, R.id.externalCredentialScanQr, R.id.externalCredentialScanOcr -> {
                     internalNavController?.popBackStack()
                 }

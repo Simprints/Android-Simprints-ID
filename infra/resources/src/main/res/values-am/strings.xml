@@ -473,13 +473,12 @@
     <!-- Identification pool validation -->
     <string name="id_pool_validation_validating">በማረጋገጥ ላይ…</string>
     <string name="id_pool_validation_issue_title">መለየት አይሳካም</string>
-    <string name="id_pool_validation_default_message">ለዚህ የመለየት ጥያቄ ተዛማጅ ሊሆኑ የሚችሉ መረጃዎች አልተገኙም።
-ይህ የሚጠበቅ ከሆነ ምዝገባውን መቀጠል ይችላሉ። ያለበለዚያ እባክዎን የፕሮጀክት ስራ አስኪያጅዎን ያነጋግሩ።</string>
+    <string name="id_pool_validation_default_message">ለዚህ የመለየት ጥያቄ ተዛማጅ ሊሆኑ የሚችሉ መረጃዎች አልተገኙም።\n\nይህ የሚጠበቅ ከሆነ ምዝገባውን መቀጠል ይችላሉ። ያለበለዚያ እባክዎን የፕሮጀክት ስራ አስኪያጅዎን ያነጋግሩ።</string>
     <string name="id_pool_validation_user_mismatch_message">በጥያቄው ላይ ያለው የአገልጋይ መለያ (Attendant ID) ከሲምፕሪንትስ መለያ (Simprints ID) ጋር አይዛመድም።</string>
     <string name="id_pool_validation_module_mismatch_message">በጥያቄው ላይ ያለው የሞጁል መለያ (Module ID) በሲምፕሪንትስ (Simprints ID) ላይ ከተመረጡት ሞጁሎች መካከል ከአንዳቸውም ጋር አይዛመድም።</string>
     <string name="id_pool_validation_sync_required_message">የሲምፕሪንትስ መረጃዎ ከሰርቨር ጋር ሳይመሳሰል ረጅም ጊዜ ቆይቷል።</string>
     <string name="id_pool_validation_pool_empty_message">ለዚህ ጥያቄ የሚሆን ምንም ዓይነት መዝገብ/መረጃ በዚህ መሣሪያ (ስልክ) ላይ አልተገኘም።</string>
-    <string name="id_pool_validation_last_sync">የመጨረሻው የSync ጊዜ 1%1$s</string>
+    <string name="id_pool_validation_last_sync">የመጨረሻው የSync ጊዜ %1$s</string>
     <string name="id_pool_validation_syncing_message">በማመሳሰል ላይ…</string>
     <string name="id_pool_validation_action_sync">ሲንከ አድርግና እና እንደገና ሞክር</string>
     <string name="id_pool_validation_action_close">ዝጋ</string>

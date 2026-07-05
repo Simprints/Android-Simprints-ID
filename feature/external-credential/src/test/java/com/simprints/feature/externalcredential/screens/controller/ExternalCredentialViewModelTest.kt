@@ -14,11 +14,13 @@ import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.feature.externalcredential.usecase.ExternalCredentialEventTrackerUseCase
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -258,6 +260,56 @@ internal class ExternalCredentialViewModelTest {
     }
 
     @Test
+    fun `bypassSkipScreen saves skipped event with OTHER reason and config string as skipOther`() = runTest {
+        val viewModel = setupViewModel(
+            allowedCredentials = listOf(ExternalCredentialType.QRCode),
+            customConfig = mapOf(ExperimentalProjectConfiguration.MFID_DEFAULT_SKIP_REASON to JsonPrimitive("project_reason")),
+        )
+        viewModel.selectionStarted()
+        viewModel.init(createParams(subjectId = "subjectId", flowType = FlowType.IDENTIFY))
+
+        viewModel.bypassSkipScreen()
+
+        coVerify {
+            eventsTracker.saveSkippedEvent(
+                any(),
+                skipReason = ExternalCredentialSelectionEvent.SkipReason.OTHER,
+                skipOther = "project_reason",
+            )
+        }
+        assertThat(
+            viewModel.finishEvent
+                .test()
+                .value()
+                .getContentIfNotHandled(),
+        ).isEqualTo(
+            ExternalCredentialSearchResult.Skipped(
+                flowType = FlowType.IDENTIFY,
+                skipReason = ExternalCredentialSelectionEvent.SkipReason.OTHER,
+            ),
+        )
+    }
+
+    @Test
+    fun `init block reads defaultSkipReason from config`() = runTest {
+        val reason = "reason"
+        val viewModel = setupViewModel(
+            allowedCredentials = emptyList(),
+            customConfig = mapOf(ExperimentalProjectConfiguration.MFID_DEFAULT_SKIP_REASON to JsonPrimitive(reason)),
+        )
+        assertThat(viewModel.defaultSkipReason).isEqualTo(reason)
+    }
+
+    @Test
+    fun `init block reads skipReasonsHideHasNumber flag from config`() = runTest {
+        val viewModel = setupViewModel(
+            allowedCredentials = emptyList(),
+            customConfig = mapOf(ExperimentalProjectConfiguration.MFID_SKIP_REASONS_HIDE_HAS_NUMBER to JsonPrimitive(true)),
+        )
+        assertThat(viewModel.skipReasonsHideHasNumber).isTrue()
+    }
+
+    @Test
     fun `init block loads allowed external credentials from config`() = runTest {
         val allowedCredentials = listOf(
             ExternalCredentialType.NHISCard,
@@ -275,11 +327,15 @@ internal class ExternalCredentialViewModelTest {
         assertThat(observer.value()).isEmpty()
     }
 
-    private fun setupViewModel(allowedCredentials: List<ExternalCredentialType>): ExternalCredentialViewModel {
+    private fun setupViewModel(
+        allowedCredentials: List<ExternalCredentialType>,
+        customConfig: Map<String, kotlinx.serialization.json.JsonElement>? = null,
+    ): ExternalCredentialViewModel {
         coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { multifactorId } returns mockk {
                 every { allowedExternalCredentials } returns allowedCredentials
             }
+            every { custom } returns customConfig
         }
         return ExternalCredentialViewModel(
             configRepository = configRepository,
