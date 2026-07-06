@@ -4,15 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Simprints ID — Release Dashboard</title>
+  <link rel="icon" type="image/png" href="app-icon.png" />
   <style>
     :root {
-      --bg:       #0f172a;
-      --card:     #1e293b;
-      --text:     #f1f5f9;
-      --muted:    #94a3b8;
-      --border:   #334155;
-      --brand-teal:   #50b1ce;
-      --brand-orange: #ef8432;
+      --bg:       #ffffff;
+      --card:     #f7f9fb;
+      --text:     #333333;
+      --muted:    #6b7280;
+      --border:   #e2e8f0;
+      --brand-teal:      #50b1ce;
+      --brand-teal-dark: #1c7690;
+      --brand-orange:    #ef8432;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -31,6 +33,13 @@
       font-weight: 700;
       letter-spacing: -0.02em;
     }
+    .app-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      margin-bottom: 0.75rem;
+    }
     header p {
       color: var(--muted);
       margin-top: 0.5rem;
@@ -45,7 +54,7 @@
       border-radius: 999px;
       background: rgba(251,191,36,0.12);
       border: 1px solid rgba(251,191,36,0.4);
-      color: #fbbf24;
+      color: #92400e;
       font-size: 0.82rem;
       font-weight: 600;
       letter-spacing: 0.05em;
@@ -98,7 +107,7 @@
       transition: background 0.12s;
     }
     tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: rgba(255,255,255,0.03); }
+    tbody tr:hover { background: rgba(0,0,0,0.025); }
     tbody td {
       padding: 0.75rem 1rem;
       vertical-align: middle;
@@ -110,8 +119,8 @@
       font-weight: 600;
       padding: 0.15rem 0.55rem;
       border-radius: 999px;
-      background: rgba(80,177,206,0.18);
-      color: var(--brand-teal);
+      background: rgba(80,177,206,0.14);
+      color: var(--brand-teal-dark);
       border: 1px solid rgba(80,177,206,0.35);
       white-space: nowrap;
     }
@@ -128,14 +137,42 @@
       white-space: nowrap;
     }
     .tbl-btn:hover { opacity: 0.8; }
-    .tbl-btn-notes { background: rgba(255,255,255,0.07); color: var(--text); border: 1px solid var(--border); }
+    .tbl-btn-notes { background: rgba(0,0,0,0.045); color: var(--text); border: 1px solid var(--border); }
     .tbl-btn-apk   { background: var(--brand-orange); color: #fff; }
-    .tbl-btn-na    { opacity: 0.3; pointer-events: none; cursor: not-allowed; background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
+    .tbl-btn-na    { opacity: 0.3; pointer-events: none; cursor: not-allowed; background: rgba(0,0,0,0.03); color: var(--muted); border: 1px solid var(--border); }
     #releases-loading { color: var(--muted); font-size: 0.875rem; padding: 1rem 0; text-align: center; }
+    .releases-more { color: var(--muted); font-size: 0.875rem; text-align: center; margin: 0.75rem 0 0; }
+    .releases-more a { color: var(--brand-orange); font-weight: 600; text-decoration: none; }
+    .releases-more a:hover { text-decoration: underline; }
+    .env-legend {
+      list-style: none;
+      max-width: 900px;
+      margin: 2rem auto 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .env-legend li {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .env-legend .dot {
+      flex: none;
+      width: 0.6rem;
+      height: 0.6rem;
+      border-radius: 50%;
+      margin-top: 0.35rem;
+    }
+    .env-legend strong { color: var(--text); }
     .card {
       background: var(--card);
       border-radius: 14px;
       padding: 1.625rem;
+      border: 1px solid var(--border);
       border-top: 4px solid var(--accent);
       display: flex;
       flex-direction: column;
@@ -166,7 +203,7 @@
       width: 16px;
       height: 16px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.06);
       border: 1px solid var(--border);
       color: var(--muted);
       font-size: 0.65rem;
@@ -188,16 +225,16 @@
       right: 0;
       width: 220px;
       background: #0f172a;
-      border: 1px solid var(--border);
+      border: 1px solid #0f172a;
       border-radius: 8px;
       padding: 0.6rem 0.75rem;
       font-size: 0.78rem;
       font-weight: 400;
       text-transform: none;
       letter-spacing: 0;
-      color: var(--text);
+      color: #f1f5f9;
       line-height: 1.45;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
       transition: opacity 0.15s, visibility 0.15s;
       z-index: 10;
     }
@@ -207,7 +244,7 @@
       top: 100%;
       right: 6px;
       border: 5px solid transparent;
-      border-top-color: var(--border);
+      border-top-color: #0f172a;
     }
     .hint-icon:hover .tooltip {
       visibility: visible;
@@ -256,7 +293,7 @@
     }
     .btn:hover { opacity: 0.82; }
     .btn-primary  { background: var(--accent); color: #fff; }
-    .btn-secondary { background: rgba(255,255,255,0.07); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary { background: rgba(0,0,0,0.045); color: var(--text); border: 1px solid var(--border); }
     .btn-disabled { opacity: 0.3; pointer-events: none; cursor: not-allowed; }
     /* ── Tabs ── */
     .tabs-bar {
@@ -331,8 +368,8 @@
       font-weight: 700;
       padding: 0.2rem 0.65rem;
       border-radius: 999px;
-      background: rgba(80,177,206,0.18);
-      color: var(--brand-teal);
+      background: rgba(80,177,206,0.14);
+      color: var(--brand-teal-dark);
       border: 1px solid rgba(80,177,206,0.35);
     }
     .project-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
@@ -362,7 +399,7 @@
       transform: translateY(-1px);
     }
     .project-apk-btn.disabled {
-      background: rgba(255,255,255,0.05);
+      background: rgba(0,0,0,0.04);
       border: 1px solid var(--border);
       box-shadow: none;
       color: var(--muted);
@@ -376,7 +413,7 @@
       gap: 0.3rem;
       padding: 0.4rem 0.85rem;
       border-radius: 6px;
-      background: rgba(255,255,255,0.07);
+      background: rgba(0,0,0,0.045);
       border: 1px solid var(--border);
       color: var(--text);
       font-size: 0.82rem;
@@ -393,7 +430,7 @@
       color: var(--muted);
       font-size: 0.78rem;
     }
-    footer a { color: var(--muted); text-decoration: none; }
+    footer a { color: var(--brand-teal-dark); text-decoration: none; }
     footer a:hover { text-decoration: underline; }
 
     /* ── QR modal ── */
@@ -423,16 +460,16 @@
     #qr-img { border-radius: 8px; display: block; margin: 0 auto; }
     #qr-close-btn {
       margin-top: 1.1rem; padding: 0.5rem 1.6rem;
-      background: #0f172a; color: #fff;
+      background: var(--brand-teal); color: #fff;
       border: none; border-radius: 8px;
       cursor: pointer; font-size: 0.88rem; font-weight: 600;
     }
-    #qr-close-btn:hover { background: #1e293b; }
+    #qr-close-btn:hover { background: var(--brand-teal-dark); }
     .btn-qr {
       display: inline-flex; align-items: center; gap: 0.3rem;
       padding: 0.55rem 0.9rem;
       border-radius: 6px;
-      background: rgba(255,255,255,0.07);
+      background: rgba(0,0,0,0.045);
       border: 1px solid var(--border);
       color: var(--text);
       font-size: 0.82rem; font-weight: 500;
@@ -444,7 +481,7 @@
       display: inline-flex; align-items: center; gap: 0.25rem;
       padding: 0.3rem 0.55rem;
       border-radius: 5px;
-      background: rgba(255,255,255,0.07);
+      background: rgba(0,0,0,0.045);
       border: 1px solid var(--border);
       color: var(--text); font-size: 0.78rem;
       cursor: pointer;
@@ -455,7 +492,7 @@
       display: inline-flex; align-items: center; justify-content: center;
       gap: 0.4rem; width: 100%; padding: 0.65rem 1rem;
       border-radius: 8px; margin-top: 0.5rem;
-      background: rgba(255,255,255,0.07);
+      background: rgba(0,0,0,0.045);
       border: 1px solid var(--border);
       color: var(--text); font-size: 0.9rem; font-weight: 600;
       cursor: pointer;
@@ -466,7 +503,8 @@
 </head>
 <body>
   <header>
-    <h1>🔬 Simprints ID</h1>
+    <img class="app-icon" src="app-icon.png" alt="Simprints ID app icon" />
+    <h1>Simprints ID</h1>
     <p>Release Status Dashboard</p>
     <div class="under-construction">🚧&nbsp; Under Construction</div>
   </header>
@@ -480,21 +518,26 @@
   <div class="tab-panel active" id="tab-sid">
     <div class="grid" id="grid"></div>
 
+    <ul class="env-legend" id="env-legend"></ul>
+
     <section class="releases-section">
-      <h2>📦 All Releases</h2>
+      <h2>📦 Recent Releases</h2>
       <div id="releases-loading">Loading releases…</div>
       <div class="releases-table-wrap" id="releases-table-wrap" style="display:none">
         <table>
           <thead>
             <tr>
               <th>Tag</th>
-              <th>Release Title</th>
               <th>Release Notes</th>
               <th>APK</th>
             </tr>
           </thead>
           <tbody id="releases-tbody"></tbody>
         </table>
+        <p class="releases-more">
+          Looking for an older version of SID?
+          <a href="https://github.com/Simprints/Android-Simprints-ID/releases" target="_blank" rel="noopener">See all releases on GitHub →</a>
+        </p>
       </div>
     </section>
   </div>
@@ -543,29 +586,33 @@
     const ENVIRONMENTS = [
       {
         key: 'production',
-        label: 'Production',
+        label: 'Prod',
         accent: '#22c55e',
-        hint: 'Live version currently shipped to end users via Google Play.',
+        hint: 'Live version currently shipped to end users via Google Play. Since Play Store releases go out to every project at once, this is what all users across all projects are running today.',
       },
       {
         key: 'production_ready',
-        label: 'Production Ready',
+        label: 'Beta',
         accent: '#8b5cf6',
-        hint: 'Technically complete and signed off, but held back from Google Play pending non-technical sign-offs such as user training or project milestones.',
+        hint: 'Technically complete, signed off, and ready to ship, but held back from Google Play pending non-technical sign-offs such as user training or project milestones. We always aim to promote this to Prod as fast as possible, but operational constraints on individual projects can delay that rollout.',
       },
       {
         key: 'delivery_testing',
         label: 'Delivery Testing',
         accent: '#f59e0b',
-        hint: 'Deployed to a limited group of testers for final validation before being promoted to Production.',
-      },
-      {
-        key: 'internal_testing',
-        label: 'Internal Testing / Development',
-        accent: '#3b82f6',
-        hint: 'Active development build used by the engineering team. Not yet ready for wider testing.',
+        hint: 'Deployed to a limited group of testers on a specific project for final validation before being promoted to Prod.',
       },
     ];
+
+    function renderEnvLegend() {
+      document.getElementById('env-legend').innerHTML = ENVIRONMENTS.map(env => `
+        <li>
+          <span class="dot" style="background:${env.accent}"></span>
+          <span><strong>${env.label}</strong> — ${env.hint}</span>
+        </li>
+      `).join('');
+    }
+    renderEnvLegend();
 
     function formatDate(iso) {
       if (!iso) return '';
@@ -585,7 +632,7 @@
       const isDraft    = data?.is_draft   || false;
 
       const versionHtml = version
-        ? `<div class="version">${version}${isDraft ? ' <span style="font-size:0.65rem;font-weight:600;background:rgba(59,130,246,0.2);color:#93c5fd;padding:0.15rem 0.5rem;border-radius:999px;vertical-align:middle;border:1px solid rgba(59,130,246,0.35)">DRAFT</span>' : ''}</div>`
+        ? `<div class="version">${version}${isDraft ? ' <span style="font-size:0.65rem;font-weight:600;background:rgba(59,130,246,0.14);color:#1d4ed8;padding:0.15rem 0.5rem;border-radius:999px;vertical-align:middle;border:1px solid rgba(59,130,246,0.35)">DRAFT</span>' : ''}</div>`
         : upcoming
           ? `<div class="version-empty">No release yet</div>
              <div class="upcoming">🔜 Coming up: ${upcoming}</div>`
@@ -597,7 +644,7 @@
 
       // Internal Testing: no APK download — show internal-only notice instead
       const apkBtn = isDraft
-        ? `<span style="font-size:0.78rem;color:#93c5fd;display:inline-flex;align-items:center;gap:0.35rem;">🔒&nbsp;APK available internally only</span>`
+        ? `<span style="font-size:0.78rem;color:#1d4ed8;display:inline-flex;align-items:center;gap:0.35rem;">🔒&nbsp;APK available internally only</span>`
         : apkUrl
           ? `<a class="btn btn-primary" href="${apkUrl}" download>⬇&nbsp;Download APK</a>
              <button class="btn-qr" data-qr-url="${apkUrl}" data-qr-label="${version || env.label}">📱&nbsp;QR</button>`
@@ -635,22 +682,23 @@
         if (batch.length < 30) break;
         page++;
       }
-      return all;
+      return sortReleasesByTag(all);
     }
 
-    async function fetchDraftRelease() {
-      try {
-        // Draft releases don't appear in /releases (public endpoint), so we use /releases with per_page=1
-        // and fall back to checking the first release that is a draft via the full list endpoint.
-        const res = await fetch(
-          'https://api.github.com/repos/Simprints/Android-Simprints-ID/releases?per_page=10&page=1'
-        );
-        const releases = await res.json();
-        if (!Array.isArray(releases)) return null;
-        return releases.find(r => r.draft) || null;
-      } catch (e) {
-        return null;
-      }
+    // Sorts releases by tag (e.g. "v2026.2.1") in descending order, numerically comparing
+    // each dot-separated segment so "v2026.10.0" correctly sorts above "v2026.2.0".
+    function sortReleasesByTag(releases) {
+      const parseTag = tag => (tag || '').replace(/^v/i, '').split('.').map(n => parseInt(n, 10) || 0);
+      return [...releases].sort((a, b) => {
+        const partsA = parseTag(a.tag_name);
+        const partsB = parseTag(b.tag_name);
+        const len = Math.max(partsA.length, partsB.length);
+        for (let i = 0; i < len; i++) {
+          const diff = (partsB[i] || 0) - (partsA[i] || 0);
+          if (diff !== 0) return diff;
+        }
+        return 0;
+      });
     }
 
     async function loadAll() {
@@ -658,12 +706,11 @@
       const loading = document.getElementById('releases-loading');
       const wrap    = document.getElementById('releases-table-wrap');
 
-      let status = {}, releases = [], draftRelease = null;
+      let status = {}, releases = [];
       try {
-        [status, releases, draftRelease] = await Promise.all([
+        [status, releases] = await Promise.all([
           fetch('status.json?_=' + Date.now()).then(r => r.json()).catch(() => ({})),
           releasesPromise,
-          fetchDraftRelease(),
         ]);
       } catch (e) {
         console.error('Failed to load data:', e);
@@ -672,14 +719,6 @@
       // Render top cards — auto-fill apk_url / release_url from GitHub if missing
       document.getElementById('grid').innerHTML = ENVIRONMENTS.map(env => {
         const data = { ...(status[env.key] || {}) };
-
-        // Internal Testing: use the current draft release if available
-        if (env.key === 'internal_testing' && draftRelease) {
-          data.version     = draftRelease.tag_name || draftRelease.name || data.version;
-          data.release_url = draftRelease.html_url || data.release_url;
-          data.updated_at  = draftRelease.created_at || data.updated_at;
-          data.is_draft    = true;
-        }
 
         if (data.version && (!data.apk_url || !data.release_url)) {
           const tag = data.version.startsWith('v') ? data.version : `v${data.version}`;
@@ -695,9 +734,11 @@
         return renderCard(env, data);
       }).join('');
 
-      // Render releases table
+      // Render releases table — only show the most recent releases; older ones are
+      // available via the "See all releases on GitHub" link.
+      const RECENT_RELEASES_LIMIT = 10;
       try {
-        tbody.innerHTML = releases.map(r => {
+        tbody.innerHTML = releases.slice(0, RECENT_RELEASES_LIMIT).map(r => {
           const apkAsset = (r.assets || []).find(a => a.name.endsWith('.apk'));
           const apkBtn = apkAsset
             ? `<a class="tbl-btn tbl-btn-apk" href="${apkAsset.browser_download_url}" download>⬇ APK</a>
@@ -705,7 +746,6 @@
             : `<span class="tbl-btn tbl-btn-na">⬇ APK</span>`;
           return `<tr>
             <td><span class="tag-badge">${r.tag_name}</span></td>
-            <td>${r.name || r.tag_name}</td>
             <td><a class="tbl-btn tbl-btn-notes" href="${r.html_url}" target="_blank" rel="noopener">📋 View Notes</a></td>
             <td style="white-space:nowrap">${apkBtn}</td>
           </tr>`;
