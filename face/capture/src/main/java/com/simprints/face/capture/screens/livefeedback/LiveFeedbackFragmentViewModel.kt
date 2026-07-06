@@ -266,7 +266,13 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
 
     private suspend fun showValidationErrorAndReset() {
         capturingState.postValue(CapturingState.VALIDATION_FAILED)
-        delay(MIN_SPOOF_CHECK_UI_TIME_MS.milliseconds) // Allow for error message to be shown
+        val duration = measureTimedValue {
+            // Still track the capture attempt events for analytics and troubleshooting
+            sendCaptureEvents(attemptNumber)
+        }
+        val delay = maxOf(MIN_SPOOF_CHECK_UI_TIME_MS - duration.duration.inWholeMilliseconds, 0)
+        Simber.i("Captures tracked in ${duration.duration}, waiting for ${delay}ms", tag = FACE_CAPTURE)
+        if (delay > 0) delay(delay.milliseconds)
 
         // Reset state
         userCaptures.clear()

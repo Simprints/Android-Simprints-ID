@@ -313,7 +313,14 @@ fun createFaceCaptureEvent() = FaceCaptureEvent(
     result = FaceCaptureEvent.FaceCapturePayload.Result.VALID,
     isAutoCapture = false,
     isFallback = true,
-    face = FaceCaptureEvent.FaceCapturePayload.Face(0F, 1F, 2F, FACE_TEMPLATE_FORMAT),
+    face = FaceCaptureEvent.FaceCapturePayload.Face(
+        yaw = 0F,
+        roll = 1F,
+        quality = 2F,
+        format = FACE_TEMPLATE_FORMAT,
+        spoofScore = 0.5f,
+        spoofSkipReason = FaceCaptureEvent.FaceCapturePayload.SpoofSkipReason.IMAGE_TOO_SMALL,
+    ),
 )
 
 fun createFaceFallbackCaptureEvent() = FaceFallbackCaptureEvent(

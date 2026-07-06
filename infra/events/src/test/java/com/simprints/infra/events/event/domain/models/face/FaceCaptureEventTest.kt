@@ -1,7 +1,7 @@
 package com.simprints.infra.events.event.domain.models.face
 
 import androidx.annotation.Keep
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.FaceCaptureEvent
 import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
@@ -12,16 +12,23 @@ import org.junit.Test
 class FaceCaptureEventTest {
     @Test
     fun create_FaceCaptureEvent() {
-        val faceArg = FaceCaptureEvent.FaceCapturePayload.Face(0F, 1F, 2F, FACE_TEMPLATE_FORMAT)
+        val faceArg = FaceCaptureEvent.FaceCapturePayload.Face(
+            yaw = 0F,
+            roll = 1F,
+            quality = 2F,
+            format = FACE_TEMPLATE_FORMAT,
+            spoofScore = 0.5f,
+            spoofSkipReason = FaceCaptureEvent.FaceCapturePayload.SpoofSkipReason.IMAGE_TOO_SMALL,
+        )
         val event = FaceCaptureEvent(
-            SampleDefaults.CREATED_AT,
-            SampleDefaults.ENDED_AT,
-            0,
-            1F,
-            FaceCaptureEvent.FaceCapturePayload.Result.VALID,
-            false,
-            true,
-            faceArg,
+            startTime = SampleDefaults.CREATED_AT,
+            endTime = SampleDefaults.ENDED_AT,
+            attemptNb = 0,
+            qualityThreshold = 1F,
+            result = FaceCaptureEvent.FaceCapturePayload.Result.VALID,
+            isAutoCapture = false,
+            isFallback = true,
+            face = faceArg,
         )
 
         assertThat(event.id).isNotNull()

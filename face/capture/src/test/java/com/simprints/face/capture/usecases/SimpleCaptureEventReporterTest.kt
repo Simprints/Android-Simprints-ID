@@ -7,6 +7,8 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.infra.basebiosdk.detection.Face
+import com.simprints.face.infra.basebiosdk.detection.SpoofCheckResult
+import com.simprints.face.infra.basebiosdk.detection.SpoofCheckResult.SkipReason
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent.BiometricReferenceCreationPayload
 import com.simprints.infra.events.event.domain.models.FaceCaptureBiometricsEvent
@@ -195,6 +197,47 @@ class SimpleCaptureEventReporterTest {
                 },
             )
         }
+    }
+
+    @Test
+    fun `Correctly maps spoof skip reasons`() = runTest {
+        reporter.addCaptureEvents(getSpoofedDetection(SkipReason.NOT_AVAILABLE), 1, 0.5f)
+        // to null,
+        reporter.addCaptureEvents(getSpoofedDetection(SkipReason.IOD_TOO_SMALL), 1, 0.5f)
+        // to FaceCaptureEvent.FaceCapturePayload.SpoofSkipReason.IMAGE_TOO_SMALL,
+        reporter.addCaptureEvents(getSpoofedDetection(SkipReason.IOD_TOO_LARGE), 1, 0.5f)
+        // to FaceCaptureEvent.FaceCapturePayload.SpoofSkipReason.IOD_TOO_LARGE,
+        reporter.addCaptureEvents(getSpoofedDetection(SkipReason.IMAGE_TOO_SMALL), 1, 0.5f)
+        // to FaceCaptureEvent.FaceCapturePayload.SpoofSkipReason.IMAGE_TOO_SMALL,
+
+        coVerify(exactly = 1) {
+            eventRepository.addOrUpdateEvent(
+                match<FaceCaptureEvent> {
+                    it.payload.face?.spoofSkipReason == FaceCaptureEvent.FaceCapturePayload.SpoofSkipReason.IMAGE_TOO_SMALL
+                },
+            )
+        }
+        coVerify(exactly = 1) {
+            eventRepository.addOrUpdateEvent(
+                match<FaceCaptureEvent> {
+                    it.payload.face?.spoofSkipReason == FaceCaptureEvent.FaceCapturePayload.SpoofSkipReason.IOD_TOO_SMALL
+                },
+            )
+        }
+        coVerify(exactly = 1) {
+            eventRepository.addOrUpdateEvent(
+                match<FaceCaptureEvent> {
+                    it.payload.face?.spoofSkipReason == FaceCaptureEvent.FaceCapturePayload.SpoofSkipReason.IOD_TOO_LARGE
+                },
+            )
+        }
+        coVerify(exactly = 1) {
+            eventRepository.addOrUpdateEvent(match { it is FaceCaptureEvent && it.payload.face?.spoofSkipReason == null })
+        }
+    }
+
+    private fun getSpoofedDetection(reason: SkipReason) = getDetection(FaceDetection.Status.VALID).also {
+        it.spoofCheckResult = SpoofCheckResult(0f, reason)
     }
 
     private fun getDetection(status: FaceDetection.Status) = FaceDetection(

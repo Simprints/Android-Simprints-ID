@@ -3,6 +3,7 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.FaceCaptureEvent.FaceCapturePayload
+import com.simprints.infra.events.event.domain.models.FaceCaptureEvent.FaceCapturePayload.SpoofSkipReason
 import com.simprints.infra.eventsync.event.remote.models.ApiFaceCapturePayload.ApiFace
 import com.simprints.infra.eventsync.event.remote.models.ApiFaceCapturePayload.ApiResult.BAD_QUALITY
 import com.simprints.infra.eventsync.event.remote.models.ApiFaceCapturePayload.ApiResult.INVALID
@@ -43,6 +44,8 @@ internal data class ApiFaceCapturePayload(
         var roll: Float,
         val quality: Float,
         val format: String,
+        val spoofScore: Float? = null,
+        val spoofSkipReason: ApiSpoofSkipReason? = null,
     )
 
     @Keep
@@ -57,10 +60,25 @@ internal data class ApiFaceCapturePayload(
         TOO_FAR,
     }
 
+    @Keep
+    @Serializable
+    enum class ApiSpoofSkipReason {
+        IMAGE_TOO_SMALL,
+        IOD_TOO_SMALL,
+        IOD_TOO_LARGE,
+    }
+
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 }
 
-internal fun FaceCapturePayload.Face.fromDomainToApi() = ApiFace(yaw, roll, quality, format)
+internal fun FaceCapturePayload.Face.fromDomainToApi() = ApiFace(
+    yaw = yaw,
+    roll = roll,
+    quality = quality,
+    format = format,
+    spoofScore = spoofScore,
+    spoofSkipReason = spoofSkipReason?.fromDomainToApi(),
+)
 
 internal fun FaceCapturePayload.Result.fromDomainToApi() = when (this) {
     FaceCapturePayload.Result.VALID -> VALID
@@ -70,4 +88,10 @@ internal fun FaceCapturePayload.Result.fromDomainToApi() = when (this) {
     FaceCapturePayload.Result.OFF_ROLL -> OFF_ROLL
     FaceCapturePayload.Result.TOO_CLOSE -> TOO_CLOSE
     FaceCapturePayload.Result.TOO_FAR -> TOO_FAR
+}
+
+internal fun SpoofSkipReason.fromDomainToApi() = when (this) {
+    SpoofSkipReason.IMAGE_TOO_SMALL -> ApiFaceCapturePayload.ApiSpoofSkipReason.IMAGE_TOO_SMALL
+    SpoofSkipReason.IOD_TOO_SMALL -> ApiFaceCapturePayload.ApiSpoofSkipReason.IOD_TOO_SMALL
+    SpoofSkipReason.IOD_TOO_LARGE -> ApiFaceCapturePayload.ApiSpoofSkipReason.IOD_TOO_LARGE
 }

@@ -64,7 +64,7 @@ data class FaceCaptureEvent(
     ) : EventPayload() {
         override fun toSafeString(): String =
             "result: $result, attempt nr: $attemptNb, auto-capture: $isAutoCapture, fallback: $isFallback, " +
-                "quality: ${face?.quality},  format: ${face?.format}"
+                "quality: ${face?.quality},  format: ${face?.format}, spoof score: ${face?.spoofScore}"
 
         @Keep
         @Serializable
@@ -73,6 +73,8 @@ data class FaceCaptureEvent(
             var roll: Float,
             val quality: Float,
             val format: String,
+            val spoofScore: Float? = null,
+            val spoofSkipReason: SpoofSkipReason? = null,
         )
 
         @Keep
@@ -85,6 +87,14 @@ data class FaceCaptureEvent(
             OFF_ROLL,
             TOO_CLOSE,
             TOO_FAR,
+        }
+
+        @Keep
+        @Serializable
+        enum class SpoofSkipReason {
+            IMAGE_TOO_SMALL,
+            IOD_TOO_SMALL,
+            IOD_TOO_LARGE,
         }
     }
 

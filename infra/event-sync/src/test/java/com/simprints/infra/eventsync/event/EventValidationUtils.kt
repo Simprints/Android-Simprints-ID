@@ -653,7 +653,9 @@ fun validateFaceCaptureEventApiModel(json: JSONObject) {
             assertThat(getDouble("roll")).isNotNull()
             assertThat(getDouble("quality")).isNotNull()
             assertThat(getString("format")).isIn(listOf("RANK_ONE_1_23"))
-            assertThat(length()).isEqualTo(4)
+            assertThat(getDouble("spoofScore")).isNotNull()
+            assertThat(getString("spoofSkipReason")).isNotNull()
+            assertThat(length()).isEqualTo(6)
         }
 
         assertThat(length()).isEqualTo(8)
