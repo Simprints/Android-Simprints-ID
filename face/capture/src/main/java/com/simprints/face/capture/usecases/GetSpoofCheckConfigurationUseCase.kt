@@ -28,6 +28,7 @@ class GetSpoofCheckConfigurationUseCase @Inject constructor(
             FaceConfiguration.SpoofCheckConfiguration(
                 mode = it.spoofCheckMode,
                 threshold = it.spoofCheckThreshold,
+                maxAttempts = it.spoofMaxAttempts,
             )
         }
     }

@@ -246,7 +246,7 @@ internal class LiveFeedbackFragmentViewModelTest {
                 any(),
                 any(),
             )
-        } returns FaceConfiguration.SpoofCheckConfiguration(FaceConfiguration.SpoofCheckMode.RECORDED, 0.5f)
+        } returns FaceConfiguration.SpoofCheckConfiguration(FaceConfiguration.SpoofCheckMode.RECORDED, 0.5f, 2)
         every { faceDetector.analyze(frame) } returns validFace
         coEvery { faceDetector.spoofCheck(any()) } returns SpoofCheckResult(score = 0.9f)
 
@@ -269,7 +269,7 @@ internal class LiveFeedbackFragmentViewModelTest {
     fun `Spoof check Enforced passed finishes capture`() = runTest {
         val validFace: Face = getFace()
         every { getSpoofCheckConfiguration.invoke(any(), any()) } returns
-            FaceConfiguration.SpoofCheckConfiguration(FaceConfiguration.SpoofCheckMode.ENFORCED, 0.5f)
+            FaceConfiguration.SpoofCheckConfiguration(FaceConfiguration.SpoofCheckMode.ENFORCED, 0.5f, 2)
         every { faceDetector.analyze(frame) } returns validFace
         coEvery { faceDetector.spoofCheck(any()) } returns SpoofCheckResult(score = 0.1f)
 
@@ -296,7 +296,7 @@ internal class LiveFeedbackFragmentViewModelTest {
                 any(),
                 any(),
             )
-        } returns FaceConfiguration.SpoofCheckConfiguration(FaceConfiguration.SpoofCheckMode.ENFORCED, 0.5f)
+        } returns FaceConfiguration.SpoofCheckConfiguration(FaceConfiguration.SpoofCheckMode.ENFORCED, 0.5f, 2)
         every { faceDetector.analyze(frame) } returns validFace
         coEvery { faceDetector.spoofCheck(any()) } returns SpoofCheckResult(score = 0.9f)
 
@@ -324,7 +324,7 @@ internal class LiveFeedbackFragmentViewModelTest {
                 any(),
                 any(),
             )
-        } returns FaceConfiguration.SpoofCheckConfiguration(FaceConfiguration.SpoofCheckMode.ENFORCED, 0.5f)
+        } returns FaceConfiguration.SpoofCheckConfiguration(FaceConfiguration.SpoofCheckMode.ENFORCED, 0.5f, 2)
         every { faceDetector.analyze(frame) } returns validFace
         coEvery { faceDetector.spoofCheck(any()) } returns SpoofCheckResult(score = 0.9f)
 

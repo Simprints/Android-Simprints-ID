@@ -37,11 +37,13 @@ data class FaceConfiguration(
     data class SpoofCheckConfiguration(
         val mode: SpoofCheckMode,
         val threshold: Float,
+        val maxAttempts: Int,
     ) {
         companion object {
             val DISABLED = SpoofCheckConfiguration(
                 mode = SpoofCheckMode.DISABLED,
                 threshold = 0f,
+                maxAttempts = 0,
             )
         }
     }

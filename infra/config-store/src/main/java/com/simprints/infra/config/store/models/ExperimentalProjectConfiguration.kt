@@ -193,6 +193,14 @@ data class ExperimentalProjectConfiguration(
             ?.floatOrNull
             ?: SPOOF_CHECK_THRESHOLD_DEFAULT
 
+    // TODO Temporary flags until configuration is added to FaceSdkConfiguration
+    val spoofMaxAttempts: Int
+        get() = customConfig
+            ?.get(SPOOF_CHECK_MAX_ATTEMPTS)
+            ?.jsonPrimitive
+            ?.intOrNull
+            ?: SPOOF_CHECK_MAX_ATTEMPTS_DEFAULT
+
     companion object {
         internal const val DISABLE_SUBJECT_POOL_VALIDATION = "disableSubjectPoolValidation"
         internal const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS = "faceAutoCaptureImagingDurationMillis"
@@ -256,6 +264,10 @@ data class ExperimentalProjectConfiguration(
 
         const val SPOOF_CHECK_MODE = "spoofCheckMode"
         const val SPOOF_CHECK_THRESHOLD = "spoofCheckThreshold"
+
         const val SPOOF_CHECK_THRESHOLD_DEFAULT = 0.33f
+
+        const val SPOOF_CHECK_MAX_ATTEMPTS = "spoofMaxAttempts"
+        const val SPOOF_CHECK_MAX_ATTEMPTS_DEFAULT = 2
     }
 }

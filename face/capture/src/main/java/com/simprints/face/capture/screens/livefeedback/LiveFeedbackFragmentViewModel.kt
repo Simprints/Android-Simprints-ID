@@ -227,8 +227,8 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
                     }
 
                     Simber.i("Spoof check passed: $spoofCheckPassed (check count: $spoofCheckCount)", tag = FACE_CAPTURE)
-                    // Only attempt up to MAX_SPOOF_CHECK_ATTEMPTS times to prevent hard-blocking user
-                    if (spoofCheckCount >= MAX_SPOOF_CHECK_ATTEMPTS || spoofCheckPassed) {
+                    // Only attempt up to configured amount of times to prevent hard-blocking user
+                    if (spoofCheckCount >= spoofCheckConfig.maxAttempts || spoofCheckPassed) {
                         sendEventsAndFinish(attemptNumber)
                     } else {
                         showValidationErrorAndReset()
@@ -377,6 +377,5 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         private const val VALID_YAW_DELTA = 30f
 
         private const val MIN_SPOOF_CHECK_UI_TIME_MS = 2000
-        private const val MAX_SPOOF_CHECK_ATTEMPTS = 2
     }
 }

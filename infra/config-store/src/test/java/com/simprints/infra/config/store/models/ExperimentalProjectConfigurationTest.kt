@@ -385,4 +385,17 @@ internal class ExperimentalProjectConfigurationTest {
             assertThat(ExperimentalProjectConfiguration(config).spoofCheckThreshold).isEqualTo(result)
         }
     }
+
+    @Test
+    fun `spoof check max attempts value parsed correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to 2,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_ATTEMPTS to JsonPrimitive(null)) to 2,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_ATTEMPTS to JsonPrimitive("string")) to 2,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_ATTEMPTS to JsonPrimitive(1)) to 1,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_ATTEMPTS to JsonPrimitive(0f)) to 0,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).spoofMaxAttempts).isEqualTo(result)
+        }
+    }
 }
