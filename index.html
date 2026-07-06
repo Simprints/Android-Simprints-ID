@@ -11,6 +11,8 @@
       --text:     #f1f5f9;
       --muted:    #94a3b8;
       --border:   #334155;
+      --brand-teal:   #50b1ce;
+      --brand-orange: #ef8432;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -108,9 +110,9 @@
       font-weight: 600;
       padding: 0.15rem 0.55rem;
       border-radius: 999px;
-      background: rgba(99,102,241,0.18);
-      color: #a5b4fc;
-      border: 1px solid rgba(99,102,241,0.35);
+      background: rgba(80,177,206,0.18);
+      color: var(--brand-teal);
+      border: 1px solid rgba(80,177,206,0.35);
       white-space: nowrap;
     }
     .tbl-btn {
@@ -127,7 +129,7 @@
     }
     .tbl-btn:hover { opacity: 0.8; }
     .tbl-btn-notes { background: rgba(255,255,255,0.07); color: var(--text); border: 1px solid var(--border); }
-    .tbl-btn-apk   { background: #22c55e; color: #fff; }
+    .tbl-btn-apk   { background: var(--brand-orange); color: #fff; }
     .tbl-btn-na    { opacity: 0.3; pointer-events: none; cursor: not-allowed; background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
     #releases-loading { color: var(--muted); font-size: 0.875rem; padding: 1rem 0; text-align: center; }
     .card {
@@ -284,7 +286,7 @@
     .tab-btn:hover { color: var(--text); }
     .tab-btn.active {
       color: var(--text);
-      border-bottom-color: #6366f1;
+      border-bottom-color: var(--brand-teal);
       font-weight: 700;
     }
     .tab-panel { display: none; }
@@ -329,9 +331,9 @@
       font-weight: 700;
       padding: 0.2rem 0.65rem;
       border-radius: 999px;
-      background: rgba(99,102,241,0.18);
-      color: #a5b4fc;
-      border: 1px solid rgba(99,102,241,0.35);
+      background: rgba(80,177,206,0.18);
+      color: var(--brand-teal);
+      border: 1px solid rgba(80,177,206,0.35);
     }
     .project-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
     .project-primary-action {
@@ -345,18 +347,18 @@
       min-height: 58px;
       padding: 0.95rem 1.4rem;
       border-radius: 8px;
-      background: #16a34a;
+      background: var(--brand-orange);
       color: #fff;
       font-size: 1.08rem;
       font-weight: 800;
       text-decoration: none;
-      box-shadow: 0 10px 24px rgba(22,163,74,0.25);
+      box-shadow: 0 10px 24px rgba(239,132,50,0.25);
       transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
       white-space: nowrap;
     }
     .project-apk-btn:hover {
-      background: #22c55e;
-      box-shadow: 0 12px 28px rgba(34,197,94,0.32);
+      background: #f9973f;
+      box-shadow: 0 12px 28px rgba(239,132,50,0.32);
       transform: translateY(-1px);
     }
     .project-apk-btn.disabled {
