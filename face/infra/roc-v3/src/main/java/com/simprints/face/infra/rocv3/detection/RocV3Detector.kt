@@ -184,8 +184,10 @@ class RocV3Detector @Inject constructor() : FaceDetector {
             return SpoofCheckResult(0f, SpoofCheckResult.SkipReason.IMAGE_TOO_SMALL)
         }
 
-        val scaledBitmap = if (bitmap.width > configuredMaxSize) {
-            bitmap.scale(configuredMaxSize, (bitmap.height * configuredMaxSize.toFloat() / bitmap.width).toInt(), false)
+        // Scaling image down to lower the chance that IOD is outside of requirements. The check also runs faster on smaller images.
+        val scaledBitmap = if (maxOf(bitmap.width, bitmap.height) > configuredMaxSize) {
+            val scale = configuredMaxSize.toFloat() / maxOf(bitmap.width, bitmap.height).toFloat()
+            bitmap.scale((bitmap.width * scale).toInt(), (bitmap.height * scale).toInt(), false)
         } else {
             bitmap
         }

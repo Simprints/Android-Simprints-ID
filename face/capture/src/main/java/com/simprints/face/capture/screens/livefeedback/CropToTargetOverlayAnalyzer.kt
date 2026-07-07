@@ -37,8 +37,9 @@ internal class CropToTargetOverlayAnalyzer(
             val cropTop = offsetY + (previewRect.top * scale).toInt()
             val cropHeight = (previewRect.height() * scale).toInt()
 
-            image.toBitmap() to Bitmap.createBitmap(
-                it.toBitmap(),
+            val imageBitmap = it.toBitmap()
+            imageBitmap to Bitmap.createBitmap(
+                imageBitmap,
                 cropLeft,
                 cropTop,
                 cropWidth,

@@ -133,8 +133,12 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             progressBarValue.postValue(
                 ((timeHelper.now().ms - validationStartTime).toFloat() / spoofCheckConfig.validationUiDurationMs).coerceIn(0f, 1f),
             )
+            originalBitmap.recycle()
+            croppedBitmap.recycle()
             return
         } else if (capturingState.value == CapturingState.VALIDATION_FAILED) {
+            originalBitmap.recycle()
+            croppedBitmap.recycle()
             return
         }
 
@@ -298,6 +302,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         bitmap: Bitmap,
         potentialFace: Face?,
     ): FaceDetection = if (potentialFace == null) {
+        original.recycle()
         bitmap.recycle()
         FaceDetection(
             original = original,
