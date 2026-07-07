@@ -131,7 +131,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         // Skip processing and only update progress bar while spoof check is running
         if (capturingState.value == CapturingState.VALIDATING) {
             progressBarValue.postValue(
-                ((timeHelper.now().ms - validationStartTime).toFloat() / MIN_SPOOF_CHECK_UI_TIME_MS).coerceIn(0f, 1f),
+                ((timeHelper.now().ms - validationStartTime).toFloat() / spoofCheckConfig.validationUiDurationMs).coerceIn(0f, 1f),
             )
             return
         } else if (capturingState.value == CapturingState.VALIDATION_FAILED) {
@@ -270,7 +270,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         }
 
         // Show the UI for at least a moment for it to register with the user
-        val delay = maxOf(MIN_SPOOF_CHECK_UI_TIME_MS - duration.duration.inWholeMilliseconds, 0)
+        val delay = maxOf(spoofCheckConfig.validationUiDurationMs - duration.duration.inWholeMilliseconds, 0)
         Simber.i("Spoof check performed in ${duration.duration}, waiting for ${delay}ms", tag = FACE_CAPTURE)
         if (delay > 0) delay(delay.milliseconds)
     }
@@ -281,7 +281,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             // Still track the capture attempt events for analytics and troubleshooting
             sendCaptureEvents(attemptNumber)
         }
-        val delay = maxOf(MIN_SPOOF_CHECK_UI_TIME_MS - duration.duration.inWholeMilliseconds, 0)
+        val delay = maxOf(spoofCheckConfig.validationErrorUiDurationMs - duration.duration.inWholeMilliseconds, 0)
         Simber.i("Captures tracked in ${duration.duration}, waiting for ${delay}ms", tag = FACE_CAPTURE)
         if (delay > 0) delay(delay.milliseconds)
 
@@ -387,7 +387,5 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     companion object {
         private const val VALID_ROLL_DELTA = 15f
         private const val VALID_YAW_DELTA = 30f
-
-        private const val MIN_SPOOF_CHECK_UI_TIME_MS = 2000
     }
 }

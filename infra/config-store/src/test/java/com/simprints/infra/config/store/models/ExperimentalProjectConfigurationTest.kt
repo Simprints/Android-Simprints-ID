@@ -411,4 +411,30 @@ internal class ExperimentalProjectConfigurationTest {
             assertThat(ExperimentalProjectConfiguration(config).spoofMaxBitmapSize).isEqualTo(result)
         }
     }
+
+    @Test
+    fun `spoof check spoof ui duration parsed correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to 2000,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MIN_VALIDATION_UI_DURATION_MS to JsonPrimitive(null)) to 2000,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MIN_VALIDATION_UI_DURATION_MS to JsonPrimitive("string")) to 2000,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MIN_VALIDATION_UI_DURATION_MS to JsonPrimitive(100)) to 100,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MIN_VALIDATION_UI_DURATION_MS to JsonPrimitive(0f)) to 2000,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).spoofMinValidationUiDurationMs).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `spoof check spoof error ui duration parsed correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to 2000,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MIN_VALIDATION_ERROR_UI_DURATION_MS to JsonPrimitive(null)) to 2000,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MIN_VALIDATION_ERROR_UI_DURATION_MS to JsonPrimitive("string")) to 2000,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MIN_VALIDATION_ERROR_UI_DURATION_MS to JsonPrimitive(100)) to 100,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MIN_VALIDATION_ERROR_UI_DURATION_MS to JsonPrimitive(0f)) to 2000,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).spoofMinValidationErrorUiDurationMs).isEqualTo(result)
+        }
+    }
 }

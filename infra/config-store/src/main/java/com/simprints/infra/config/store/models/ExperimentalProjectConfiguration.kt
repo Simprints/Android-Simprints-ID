@@ -212,6 +212,24 @@ data class ExperimentalProjectConfiguration(
             ?.coerceAtLeast(SPOOF_CHECK_MAX_BITMAP_SIZE_MINIMUM)
             ?: SPOOF_CHECK_MAX_BITMAP_SIZE_DEFAULT
 
+    // TODO Temporary flags until configuration is added to FaceSdkConfiguration
+    val spoofMinValidationUiDurationMs: Int
+        get() = customConfig
+            ?.get(SPOOF_CHECK_MIN_VALIDATION_UI_DURATION_MS)
+            ?.jsonPrimitive
+            ?.intOrNull
+            ?.coerceAtLeast(0)
+            ?: SPOOF_CHECK_MIN_VALIDATION_UI_DURATION_MS_DEFAULT
+
+    // TODO Temporary flags until configuration is added to FaceSdkConfiguration
+    val spoofMinValidationErrorUiDurationMs: Int
+        get() = customConfig
+            ?.get(SPOOF_CHECK_MIN_VALIDATION_ERROR_UI_DURATION_MS)
+            ?.jsonPrimitive
+            ?.intOrNull
+            ?.coerceAtLeast(0)
+            ?: SPOOF_CHECK_MIN_VALIDATION_ERROR_UI_DURATION_MS_DEFAULT
+
     companion object {
         internal const val DISABLE_SUBJECT_POOL_VALIDATION = "disableSubjectPoolValidation"
         internal const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS = "faceAutoCaptureImagingDurationMillis"
@@ -284,5 +302,10 @@ data class ExperimentalProjectConfiguration(
         const val SPOOF_CHECK_MAX_BITMAP_SIZE = "spoofMaxBitmapSize"
         const val SPOOF_CHECK_MAX_BITMAP_SIZE_MINIMUM = 720
         const val SPOOF_CHECK_MAX_BITMAP_SIZE_DEFAULT = 1500
+
+        const val SPOOF_CHECK_MIN_VALIDATION_UI_DURATION_MS = "spoofMinValidationUiDurationMs"
+        const val SPOOF_CHECK_MIN_VALIDATION_UI_DURATION_MS_DEFAULT = 2000
+        const val SPOOF_CHECK_MIN_VALIDATION_ERROR_UI_DURATION_MS = "spoofMinValidationErrorUiDurationMs"
+        const val SPOOF_CHECK_MIN_VALIDATION_ERROR_UI_DURATION_MS_DEFAULT = 2000
     }
 }

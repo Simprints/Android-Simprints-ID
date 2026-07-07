@@ -39,6 +39,8 @@ data class FaceConfiguration(
         val threshold: Float,
         val maxAttempts: Int,
         val maxBitmapSize: Int,
+        val validationUiDurationMs: Int,
+        val validationErrorUiDurationMs: Int,
     ) {
         companion object {
             val DISABLED = SpoofCheckConfiguration(
@@ -46,6 +48,8 @@ data class FaceConfiguration(
                 threshold = 0f,
                 maxAttempts = 0,
                 maxBitmapSize = 0,
+                validationUiDurationMs = 0,
+                validationErrorUiDurationMs = 0,
             )
         }
     }

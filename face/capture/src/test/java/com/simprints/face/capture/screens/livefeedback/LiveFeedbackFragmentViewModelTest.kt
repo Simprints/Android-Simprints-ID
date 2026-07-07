@@ -350,6 +350,8 @@ internal class LiveFeedbackFragmentViewModelTest {
         threshold = 0.5f,
         maxAttempts = 2,
         maxBitmapSize = 1500,
+        validationUiDurationMs = 1000,
+        validationErrorUiDurationMs = 1000,
     )
 
     companion object {

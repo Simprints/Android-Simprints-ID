@@ -30,6 +30,8 @@ class GetSpoofCheckConfigurationUseCase @Inject constructor(
                 threshold = it.spoofCheckThreshold,
                 maxAttempts = it.spoofMaxAttempts,
                 maxBitmapSize = it.spoofMaxBitmapSize,
+                validationUiDurationMs = it.spoofMinValidationUiDurationMs,
+                validationErrorUiDurationMs = it.spoofMinValidationErrorUiDurationMs,
             )
         }
     }
