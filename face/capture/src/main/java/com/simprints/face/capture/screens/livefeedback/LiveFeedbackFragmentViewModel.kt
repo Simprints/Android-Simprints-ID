@@ -65,12 +65,14 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     var sortedQualifyingCaptures = listOf<FaceDetection>()
     val currentDetection = MutableLiveData<FaceDetection>()
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
+    val progressBarValue = MutableLiveData<Float>()
 
     var isAutoCapture: Boolean = false
     var spoofCheckConfig: SpoofCheckConfiguration = SpoofCheckConfiguration.DISABLED
     var spoofCheckCount: Int = 0
 
     private var captureImagingStartTime: Long = 0
+    private var validationStartTime: Long = 0
     private var isAutoCaptureHeldOff = true
     private var autoCaptureImagingTimeoutJob: Job? = null
     private var autoCaptureImagingDurationMillis: Long = FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
@@ -126,8 +128,13 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         originalBitmap: Bitmap,
         croppedBitmap: Bitmap,
     ) {
-        if (capturingState.value == CapturingState.VALIDATING || capturingState.value == CapturingState.VALIDATION_FAILED) {
-            // Skip processing while spoof check is running
+        // Skip processing and only update progress bar while spoof check is running
+        if (capturingState.value == CapturingState.VALIDATING) {
+            progressBarValue.postValue(
+                ((timeHelper.now().ms - validationStartTime).toFloat() / MIN_SPOOF_CHECK_UI_TIME_MS).coerceIn(0f, 1f),
+            )
+            return
+        } else if (capturingState.value == CapturingState.VALIDATION_FAILED) {
             return
         }
 
@@ -153,6 +160,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         } else {
             currentDetection.postValue(faceDetection)
         }
+        progressBarValue.postValue(getNormalizedCaptureProgress())
 
         when (capturingState.value) {
             CapturingState.NOT_STARTED -> updateFallbackCaptureIfValid(faceDetection)
@@ -174,7 +182,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         }
     }
 
-    fun getNormalizedProgress(): Float = if (isAutoCapture) {
+    fun getNormalizedCaptureProgress(): Float = if (isAutoCapture) {
         ((timeHelper.now().ms - captureImagingStartTime).toFloat() / autoCaptureImagingDurationMillis).coerceIn(0f, 1f)
     } else {
         userCaptures.size.toFloat() / samplesToCapture
@@ -251,6 +259,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private suspend fun runSpoofChecksOnCaptures() = withContext(bgDispatcher) {
         capturingState.postValue(CapturingState.VALIDATING)
         spoofCheckCount++
+        validationStartTime = timeHelper.now().ms
 
         val duration = measureTimedValue {
             for ((index, bitmap) in userCaptures.map { it.original }.withIndex()) {
@@ -277,10 +286,11 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         if (delay > 0) delay(delay.milliseconds)
 
         // Reset state
+        capturingState.postValue(CapturingState.NOT_STARTED)
+        isAutoCaptureHeldOff = true
         userCaptures.clear()
         sortedQualifyingCaptures = emptyList()
         fallbackCapture = null
-        capturingState.postValue(CapturingState.NOT_STARTED)
     }
 
     private fun getFaceDetectionFromPotentialFace(

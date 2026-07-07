@@ -79,6 +79,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private val defaultCaptureProgressColor: Int
         get() = ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey_light)
 
+    private val validationProgressColor: Int
+        get() = ContextCompat.getColor(requireContext(), IDR.color.simprints_orange)
+
     private val launchPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
@@ -256,6 +259,10 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     private fun bindViewModel() {
+        vm.progressBarValue.observe(viewLifecycleOwner) {
+            binding.captureProgress.value = it
+        }
+
         vm.currentDetection.observe(viewLifecycleOwner) {
             renderCurrentDetection(it)
         }
@@ -293,6 +300,10 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     private fun renderCurrentDetection(faceDetection: FaceDetection) {
+        if (vm.isAutoCapture && vm.capturingState.value != LiveFeedbackFragmentViewModel.CapturingState.CAPTURING) {
+            return
+        }
+
         when (faceDetection.status) {
             FaceDetection.Status.NOFACE -> renderNoFace()
             FaceDetection.Status.OFFYAW -> renderFaceNotStraight()
@@ -310,6 +321,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             if (vm.isAutoCapture) {
                 captureFeedbackBtn.setText(IDR.string.face_capture_start_capture)
                 captureFeedbackBtn.isChecked = true
+                captureFeedbackBtn.isClickable = true
             } else {
                 captureFeedbackBtn.setText(IDR.string.face_capture_title_previewing)
             }
@@ -319,7 +331,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
             captureFeedbackBtn.isVisible = true
             captureFeedbackPermissionButton.isGone = true
-            setManualCaptureButtonClickable(false)
+            captureFeedbackTxtExplanation.isGone = true
         }
     }
 
@@ -327,6 +339,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         binding.apply {
             captureOverlay.drawWhiteTarget()
             captureFeedbackTxtExplanation.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey))
+            captureFeedbackTxtExplanation.isVisible = true
 
             captureProgress.isVisible = true
             captureFeedbackBtn.setText(IDR.string.face_capture_prep_begin_button_capturing)
@@ -339,9 +352,10 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private fun renderValidating() {
         binding.apply {
             captureOverlay.drawWhiteTarget()
-            captureFeedbackTxtExplanation.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey))
 
-            captureProgress.isInvisible = true
+            captureProgress.progressColor = validationProgressColor
+            captureProgress.isVisible = true
+
             captureFeedbackBtn.setText(IDR.string.face_capture_title_validating)
             captureFeedbackBtn.setCheckedWithLeftDrawable(false)
             setManualCaptureButtonClickable(false)
@@ -355,8 +369,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             captureProgress.isInvisible = true
             captureFeedbackBtn.setText(IDR.string.face_capture_title_validating_failed)
 
-            captureFeedbackTxtExplanation.isVisible = true
+            captureFeedbackTxtExplanation.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey))
             captureFeedbackTxtExplanation.setText(IDR.string.face_capture_error_validating_failed)
+            captureFeedbackTxtExplanation.isVisible = true
         }
     }
 
@@ -391,7 +406,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 true,
                 ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp),
             )
-            renderProgressBar(false)
+            captureProgress.progressColor = validCaptureProgressColor
         }
     }
 
@@ -404,7 +419,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
             captureFeedbackBtn.setCheckedWithLeftDrawable(false)
             setManualCaptureButtonClickable(false)
-            renderProgressBar(false)
+            captureProgress.progressColor = defaultCaptureProgressColor
         }
     }
 
@@ -417,7 +432,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
             captureFeedbackBtn.setCheckedWithLeftDrawable(false)
             setManualCaptureButtonClickable(false)
-            renderProgressBar(false)
+            captureProgress.progressColor = defaultCaptureProgressColor
         }
     }
 
@@ -430,7 +445,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
             captureFeedbackBtn.setCheckedWithLeftDrawable(false)
             setManualCaptureButtonClickable(false)
-            renderProgressBar(false)
+            captureProgress.progressColor = defaultCaptureProgressColor
         }
     }
 
@@ -443,7 +458,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
             captureFeedbackBtn.setCheckedWithLeftDrawable(false)
             setManualCaptureButtonClickable(false)
-            renderProgressBar(false)
+            captureProgress.progressColor = defaultCaptureProgressColor
         }
     }
 
@@ -456,13 +471,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
             captureFeedbackBtn.setCheckedWithLeftDrawable(false)
             setManualCaptureButtonClickable(false)
-            renderProgressBar(false)
+            captureProgress.progressColor = defaultCaptureProgressColor
         }
-    }
-
-    private fun FragmentLiveFeedbackBinding.renderProgressBar(validCapture: Boolean) {
-        captureProgress.progressColor = if (validCapture) validCaptureProgressColor else defaultCaptureProgressColor
-        captureProgress.value = vm.getNormalizedProgress()
     }
 
     private fun FragmentLiveFeedbackBinding.setManualCaptureButtonClickable(clickable: Boolean) {
