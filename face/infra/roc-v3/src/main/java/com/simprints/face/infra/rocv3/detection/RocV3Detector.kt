@@ -12,7 +12,6 @@ import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.basebiosdk.detection.SpoofCheckResult
-import com.simprints.infra.logging.Simber
 import java.nio.ByteBuffer
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -176,7 +175,6 @@ class RocV3Detector @Inject constructor() : FaceDetector {
         return byteBuffer
     }
 
-    // TODO verify results
     override fun spoofCheck(
         bitmap: Bitmap,
         configuredMaxSize: Int,
@@ -186,9 +184,8 @@ class RocV3Detector @Inject constructor() : FaceDetector {
             return SpoofCheckResult(0f, SpoofCheckResult.SkipReason.IMAGE_TOO_SMALL)
         }
 
-        val maxSize = configuredMaxSize
-        val scaledBitmap = if (bitmap.width > maxSize) {
-            bitmap.scale(maxSize, (bitmap.height * maxSize.toFloat() / bitmap.width).toInt(), false)
+        val scaledBitmap = if (bitmap.width > configuredMaxSize) {
+            bitmap.scale(configuredMaxSize, (bitmap.height * configuredMaxSize.toFloat() / bitmap.width).toInt(), false)
         } else {
             bitmap
         }
@@ -210,8 +207,6 @@ class RocV3Detector @Inject constructor() : FaceDetector {
 
         var iod = 0f
         var finalScore = 0f
-
-        val quality = roc3.new_float() // TODO remove later
 
         if (faceDetected) {
             val rightEye = roc_landmark()
@@ -245,7 +240,7 @@ class RocV3Detector @Inject constructor() : FaceDetector {
                     leftEye,
                     chin,
                     null,
-                    quality,
+                    null,
                     null,
                     null,
                     null,
@@ -280,11 +275,6 @@ class RocV3Detector @Inject constructor() : FaceDetector {
         roc3.roc_free_image(rocColorImage)
         detection.delete()
         byteBuffer.clear()
-
-        Simber.i(
-            "!!! width: ${scaledBitmap.width}, IOD: $iod, quality: ${roc3.float_value(quality)}, finalScore: $finalScore",
-            tag = "FACE_CAPTURE",
-        )
 
         return when {
             !faceDetected -> SpoofCheckResult(finalScore, SpoofCheckResult.SkipReason.NOT_AVAILABLE)
