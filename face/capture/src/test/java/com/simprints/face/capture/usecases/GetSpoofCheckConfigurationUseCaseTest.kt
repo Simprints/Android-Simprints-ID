@@ -70,11 +70,15 @@ class GetSpoofCheckConfigurationUseCaseTest {
         every { projectConfiguration.custom } returns mapOf(
             "spoofCheckMode" to JsonPrimitive("ENFORCED"),
             "spoofCheckThreshold" to JsonPrimitive(0.75f),
+            "spoofMaxAttempts" to JsonPrimitive(3),
+            "spoofMaxBitmapSize" to JsonPrimitive(1000),
         )
 
         val result = useCase(projectConfiguration, ModalitySdkType.RANK_ONE)
 
         assertThat(result.mode).isEqualTo(FaceConfiguration.SpoofCheckMode.ENFORCED)
         assertThat(result.threshold).isEqualTo(0.75f)
+        assertThat(result.maxAttempts).isEqualTo(3)
+        assertThat(result.maxBitmapSize).isEqualTo(1000)
     }
 }

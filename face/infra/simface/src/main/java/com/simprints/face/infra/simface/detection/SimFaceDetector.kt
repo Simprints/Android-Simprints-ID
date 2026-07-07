@@ -33,7 +33,10 @@ class SimFaceDetector @Inject constructor(
         )
     }
 
-    override fun spoofCheck(bitmap: Bitmap) = SpoofCheckResult(0f, SpoofCheckResult.SkipReason.NOT_AVAILABLE)
+    override fun spoofCheck(
+        bitmap: Bitmap,
+        configuredMaxSize: Int,
+    ) = SpoofCheckResult(0f, SpoofCheckResult.SkipReason.NOT_AVAILABLE)
 
     companion object {
         private const val BAD_FACE_THRESHOLD = 0.1

@@ -17,6 +17,7 @@ import com.simprints.face.infra.basebiosdk.detection.SpoofCheckResult
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckConfiguration
 import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
@@ -79,7 +80,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
                 ?.qualityThreshold
         } returns QUALITY_THRESHOLD
         every { isUsingAutoCapture.invoke(any()) } returns true
-        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns FaceConfiguration.SpoofCheckConfiguration.DISABLED
+        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns SpoofCheckConfiguration.DISABLED
         coEvery {
             configRepository.getProjectConfiguration().custom
         } returns mapOf("singleQualityFallbackRequired" to JsonPrimitive(false))
@@ -345,9 +346,9 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     fun `Auto capture spoof check Recorded finishes regardless of score`() = runTest {
         val validFace = getFace()
         every { getSpoofCheckConfiguration.invoke(any(), any()) } returns
-            FaceConfiguration.SpoofCheckConfiguration(FaceConfiguration.SpoofCheckMode.RECORDED, 0.5f, 2)
+            getDefaultSpoofConfig()
         every { faceDetector.analyze(frame) } returns validFace
-        coEvery { faceDetector.spoofCheck(any()) } returns SpoofCheckResult(score = 0.9f)
+        coEvery { faceDetector.spoofCheck(any(), any()) } returns SpoofCheckResult(score = 0.9f)
 
         val capturingState = viewModel.capturingState.testObserver()
 
@@ -367,10 +368,9 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     @Test
     fun `Auto capture spoof check Enforced passed finishes capture`() = runTest {
         val validFace = getFace()
-        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns
-            FaceConfiguration.SpoofCheckConfiguration(FaceConfiguration.SpoofCheckMode.ENFORCED, 0.5f, 2)
+        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns getDefaultSpoofConfig(FaceConfiguration.SpoofCheckMode.ENFORCED)
         every { faceDetector.analyze(frame) } returns validFace
-        coEvery { faceDetector.spoofCheck(any()) } returns SpoofCheckResult(score = 0.1f)
+        coEvery { faceDetector.spoofCheck(any(), any()) } returns SpoofCheckResult(score = 0.1f)
 
         val capturingState = viewModel.capturingState.testObserver()
 
@@ -390,10 +390,9 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     @Test
     fun `Auto capture spoof check Enforced failed resets state`() = runTest {
         val validFace = getFace()
-        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns
-            FaceConfiguration.SpoofCheckConfiguration(FaceConfiguration.SpoofCheckMode.ENFORCED, 0.5f, 2)
+        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns getDefaultSpoofConfig(FaceConfiguration.SpoofCheckMode.ENFORCED)
         every { faceDetector.analyze(frame) } returns validFace
-        coEvery { faceDetector.spoofCheck(any()) } returns SpoofCheckResult(score = 0.9f)
+        coEvery { faceDetector.spoofCheck(any(), any()) } returns SpoofCheckResult(score = 0.9f)
 
         val capturingState = viewModel.capturingState.testObserver()
 
@@ -413,10 +412,9 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     @Test
     fun `Auto capture spoof check Enforced failed max attempts finishes capture`() = runTest {
         val validFace = getFace()
-        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns
-            FaceConfiguration.SpoofCheckConfiguration(FaceConfiguration.SpoofCheckMode.ENFORCED, 0.5f, 2)
+        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns getDefaultSpoofConfig(FaceConfiguration.SpoofCheckMode.ENFORCED)
         every { faceDetector.analyze(frame) } returns validFace
-        coEvery { faceDetector.spoofCheck(any()) } returns SpoofCheckResult(score = 0.9f)
+        coEvery { faceDetector.spoofCheck(any(), any()) } returns SpoofCheckResult(score = 0.9f)
 
         val capturingState = viewModel.capturingState.testObserver()
 
@@ -439,10 +437,9 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     @Test
     fun `Skip frame processing while validating`() = runTest {
         val validFace = getFace()
-        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns
-            FaceConfiguration.SpoofCheckConfiguration(FaceConfiguration.SpoofCheckMode.ENFORCED, 0.5f, 2)
+        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns getDefaultSpoofConfig()
         every { faceDetector.analyze(frame) } returns validFace
-        coEvery { faceDetector.spoofCheck(any()) } answers {
+        coEvery { faceDetector.spoofCheck(any(), any()) } answers {
             viewModel.process(frame, frame)
             SpoofCheckResult(score = 0.9f)
         }
@@ -517,6 +514,15 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         yaw: Float = 0f,
         roll: Float = 0f,
     ) = Face(100, 100, rect, yaw, roll, quality, Random.nextBytes(20), "format")
+
+    private fun getDefaultSpoofConfig(
+        mode: FaceConfiguration.SpoofCheckMode = FaceConfiguration.SpoofCheckMode.RECORDED,
+    ): SpoofCheckConfiguration = SpoofCheckConfiguration(
+        mode = mode,
+        threshold = 0.5f,
+        maxAttempts = 2,
+        maxBitmapSize = 1500,
+    )
 
     companion object {
         private const val QUALITY_THRESHOLD = -1f

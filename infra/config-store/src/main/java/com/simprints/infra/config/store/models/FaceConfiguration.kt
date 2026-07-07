@@ -38,12 +38,14 @@ data class FaceConfiguration(
         val mode: SpoofCheckMode,
         val threshold: Float,
         val maxAttempts: Int,
+        val maxBitmapSize: Int,
     ) {
         companion object {
             val DISABLED = SpoofCheckConfiguration(
                 mode = SpoofCheckMode.DISABLED,
                 threshold = 0f,
                 maxAttempts = 0,
+                maxBitmapSize = 0,
             )
         }
     }

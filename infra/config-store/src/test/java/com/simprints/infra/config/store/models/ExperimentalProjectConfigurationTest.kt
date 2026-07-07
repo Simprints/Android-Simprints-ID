@@ -393,9 +393,22 @@ internal class ExperimentalProjectConfigurationTest {
             mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_ATTEMPTS to JsonPrimitive(null)) to 2,
             mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_ATTEMPTS to JsonPrimitive("string")) to 2,
             mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_ATTEMPTS to JsonPrimitive(1)) to 1,
-            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_ATTEMPTS to JsonPrimitive(0f)) to 0,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_ATTEMPTS to JsonPrimitive(0f)) to 2,
         ).forEach { (config, result) ->
             assertThat(ExperimentalProjectConfiguration(config).spoofMaxAttempts).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `spoof check max bitmap size value parsed correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to 1500,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_BITMAP_SIZE to JsonPrimitive(null)) to 1500,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_BITMAP_SIZE to JsonPrimitive("string")) to 1500,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_BITMAP_SIZE to JsonPrimitive(100)) to 720,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_BITMAP_SIZE to JsonPrimitive(0f)) to 1500,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).spoofMaxBitmapSize).isEqualTo(result)
         }
     }
 }

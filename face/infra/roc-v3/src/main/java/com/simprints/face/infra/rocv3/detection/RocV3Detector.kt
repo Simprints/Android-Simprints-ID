@@ -7,10 +7,12 @@ import ai.roc.rocsdk.embedded.roc_image
 import ai.roc.rocsdk.embedded.roc_landmark
 import android.graphics.Bitmap
 import android.graphics.Rect
+import androidx.core.graphics.scale
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.basebiosdk.detection.SpoofCheckResult
+import com.simprints.infra.logging.Simber
 import java.nio.ByteBuffer
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -65,14 +67,14 @@ class RocV3Detector @Inject constructor() : FaceDetector {
             val yawValue = roc3.float_value(yaw)
             val qualityValue = roc3.float_value(quality)
             Face(
-                width,
-                height,
-                detection.boundingRect(),
-                yawValue,
-                detection.rotation,
-                qualityValue,
-                roc3.cdata(roc3.roc_cast(template), roc3.ROC_FACE_FAST_FV_SIZE.toInt()),
-                RANK_ONE_TEMPLATE_FORMAT_3_1,
+                sourceWidth = width,
+                sourceHeight = height,
+                absoluteBoundingBox = detection.boundingRect(),
+                yaw = yawValue,
+                roll = detection.rotation,
+                quality = qualityValue,
+                template = roc3.cdata(roc3.roc_cast(template), roc3.ROC_FACE_FAST_FV_SIZE.toInt()),
+                format = RANK_ONE_TEMPLATE_FORMAT_3_1,
             )
         } else {
             null
@@ -175,20 +177,30 @@ class RocV3Detector @Inject constructor() : FaceDetector {
     }
 
     // TODO verify results
-    override fun spoofCheck(bitmap: Bitmap): SpoofCheckResult {
+    override fun spoofCheck(
+        bitmap: Bitmap,
+        configuredMaxSize: Int,
+    ): SpoofCheckResult {
         if (minOf(bitmap.width, bitmap.height) < SPOOF_MIN_SIZE) {
             // As per documentation - smallest dimension must be at least 720px
             return SpoofCheckResult(0f, SpoofCheckResult.SkipReason.IMAGE_TOO_SMALL)
         }
 
+        val maxSize = configuredMaxSize
+        val scaledBitmap = if (bitmap.width > maxSize) {
+            bitmap.scale(maxSize, (bitmap.height * maxSize.toFloat() / bitmap.width).toInt(), false)
+        } else {
+            bitmap
+        }
+
         val rocColorImage = roc_image()
         val rocGrayImage = roc_image()
-        val byteBuffer = bitmap.toByteBuffer()
+        val byteBuffer = scaledBitmap.toByteBuffer()
         roc3.roc_from_rgba(
             byteBuffer.array(),
-            bitmap.width.toLong(),
-            bitmap.height.toLong(),
-            bitmap.rowBytes.toLong(),
+            scaledBitmap.width.toLong(),
+            scaledBitmap.height.toLong(),
+            scaledBitmap.rowBytes.toLong(),
             rocColorImage,
         )
         roc3.roc_bgr2gray(rocColorImage, rocGrayImage)
@@ -268,6 +280,11 @@ class RocV3Detector @Inject constructor() : FaceDetector {
         roc3.roc_free_image(rocColorImage)
         detection.delete()
         byteBuffer.clear()
+
+        Simber.i(
+            "!!! width: ${scaledBitmap.width}, IOD: $iod, quality: ${roc3.float_value(quality)}, finalScore: $finalScore",
+            tag = "FACE_CAPTURE",
+        )
 
         return when {
             !faceDetected -> SpoofCheckResult(finalScore, SpoofCheckResult.SkipReason.NOT_AVAILABLE)

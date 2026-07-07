@@ -191,6 +191,7 @@ data class ExperimentalProjectConfiguration(
             ?.get(SPOOF_CHECK_THRESHOLD)
             ?.jsonPrimitive
             ?.floatOrNull
+            ?.coerceIn(0f, 1f)
             ?: SPOOF_CHECK_THRESHOLD_DEFAULT
 
     // TODO Temporary flags until configuration is added to FaceSdkConfiguration
@@ -199,7 +200,17 @@ data class ExperimentalProjectConfiguration(
             ?.get(SPOOF_CHECK_MAX_ATTEMPTS)
             ?.jsonPrimitive
             ?.intOrNull
+            ?.coerceAtLeast(1)
             ?: SPOOF_CHECK_MAX_ATTEMPTS_DEFAULT
+
+    // TODO Temporary flags until configuration is added to FaceSdkConfiguration
+    val spoofMaxBitmapSize: Int
+        get() = customConfig
+            ?.get(SPOOF_CHECK_MAX_BITMAP_SIZE)
+            ?.jsonPrimitive
+            ?.intOrNull
+            ?.coerceAtLeast(SPOOF_CHECK_MAX_BITMAP_SIZE_MINIMUM)
+            ?: SPOOF_CHECK_MAX_BITMAP_SIZE_DEFAULT
 
     companion object {
         internal const val DISABLE_SUBJECT_POOL_VALIDATION = "disableSubjectPoolValidation"
@@ -269,5 +280,9 @@ data class ExperimentalProjectConfiguration(
 
         const val SPOOF_CHECK_MAX_ATTEMPTS = "spoofMaxAttempts"
         const val SPOOF_CHECK_MAX_ATTEMPTS_DEFAULT = 2
+
+        const val SPOOF_CHECK_MAX_BITMAP_SIZE = "spoofMaxBitmapSize"
+        const val SPOOF_CHECK_MAX_BITMAP_SIZE_MINIMUM = 720
+        const val SPOOF_CHECK_MAX_BITMAP_SIZE_DEFAULT = 1500
     }
 }

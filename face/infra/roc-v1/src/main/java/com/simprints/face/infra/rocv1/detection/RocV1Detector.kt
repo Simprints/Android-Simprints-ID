@@ -47,7 +47,10 @@ class RocV1Detector @Inject constructor() : FaceDetector {
         }
     }
 
-    override fun spoofCheck(bitmap: Bitmap) = SpoofCheckResult(0f, SpoofCheckResult.SkipReason.NOT_AVAILABLE)
+    override fun spoofCheck(
+        bitmap: Bitmap,
+        configuredMaxSize: Int,
+    ) = SpoofCheckResult(0f, SpoofCheckResult.SkipReason.NOT_AVAILABLE)
 
     override fun analyze(bitmap: Bitmap): Face? {
         val rocColorImage = roc_image()

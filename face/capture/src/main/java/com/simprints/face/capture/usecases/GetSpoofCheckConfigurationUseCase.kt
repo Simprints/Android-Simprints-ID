@@ -29,6 +29,7 @@ class GetSpoofCheckConfigurationUseCase @Inject constructor(
                 mode = it.spoofCheckMode,
                 threshold = it.spoofCheckThreshold,
                 maxAttempts = it.spoofMaxAttempts,
+                maxBitmapSize = it.spoofMaxBitmapSize,
             )
         }
     }

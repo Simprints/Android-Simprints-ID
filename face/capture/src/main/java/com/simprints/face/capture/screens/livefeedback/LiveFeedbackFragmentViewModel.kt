@@ -254,7 +254,9 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
 
         val duration = measureTimedValue {
             for ((index, bitmap) in userCaptures.map { it.original }.withIndex()) {
-                userCaptures[index].spoofCheckResult = faceDetector.spoofCheck(bitmap)
+                val result = faceDetector.spoofCheck(bitmap, spoofCheckConfig.maxBitmapSize)
+                Simber.i("Spoof result: $result", tag = FACE_CAPTURE)
+                userCaptures[index].spoofCheckResult = result
             }
         }
 

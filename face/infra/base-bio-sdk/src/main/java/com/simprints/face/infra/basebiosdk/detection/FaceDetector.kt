@@ -17,5 +17,8 @@ interface FaceDetector {
      * @param bitmap original captured image (ARGB_8888)
      * @return Either a spoof score (lower is better) or a reason why the check was skipped
      */
-    fun spoofCheck(bitmap: Bitmap): SpoofCheckResult
+    fun spoofCheck(
+        bitmap: Bitmap,
+        configuredMaxSize: Int,
+    ): SpoofCheckResult
 }
