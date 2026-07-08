@@ -15,9 +15,7 @@ import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
 import com.simprints.infra.config.store.models.ModalitySdkType
-import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,6 +27,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 internal class LiveFeedbackFragmentViewModel @Inject constructor(
@@ -61,7 +60,6 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private var captureImagingStartTime: Long = 0
     private var isAutoCaptureHeldOff = true
     private var autoCaptureImagingTimeoutJob: Job? = null
-    private var autoCaptureImagingDurationMillis: Long = FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
     private lateinit var faceDetector: FaceDetector
 
     suspend fun initAutoCapture() {
@@ -82,7 +80,6 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
 
             val config = configRepository.getProjectConfiguration()
             qualityThreshold = config.face?.getSdkConfiguration(bioSdk)?.qualityThreshold ?: 0f
-            autoCaptureImagingDurationMillis = config.experimental().faceAutoCaptureImagingDurationMillis
         }
     }
 
@@ -124,7 +121,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
                     capturingState.postValue(CapturingState.CAPTURING)
                     captureImagingStartTime = captureStartTime.ms
                     autoCaptureImagingTimeoutJob = viewModelScope.launch {
-                        delay(autoCaptureImagingDurationMillis)
+                        delay(FACE_AUTO_CAPTURE_IMAGING_DURATION_MS.milliseconds)
                         finishCapture(attemptNumber)
                     }
                 }
@@ -154,7 +151,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     }
 
     fun getNormalizedProgress(): Float = if (isAutoCapture) {
-        ((timeHelper.now().ms - captureImagingStartTime).toFloat() / autoCaptureImagingDurationMillis).coerceIn(0f, 1f)
+        ((timeHelper.now().ms - captureImagingStartTime).toFloat() / FACE_AUTO_CAPTURE_IMAGING_DURATION_MS).coerceIn(0f, 1f)
     } else {
         userCaptures.size.toFloat() / samplesToCapture
     }
@@ -293,5 +290,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     companion object {
         private const val VALID_ROLL_DELTA = 15f
         private const val VALID_YAW_DELTA = 30f
+
+        private const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MS = 3000L
     }
 }

@@ -7,9 +7,8 @@ import com.simprints.core.domain.common.Modality
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.ConfigSyncCache
 import com.simprints.infra.config.store.models.DeviceConfiguration
-import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.events.device.DeviceEventTracker
 import com.simprints.infra.sync.SyncOrchestrator
@@ -18,7 +17,6 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -40,6 +38,13 @@ class SettingsViewModelTest {
         settingsPassword = SettingsPasswordConfig.Locked("1234"),
     )
 
+    private val faceConfiguration = FaceConfiguration(
+        allowedSDKs = listOf(),
+        isAutoCapture = true,
+        rankOne = null,
+        simFace = null,
+    )
+
     @MockK
     private lateinit var configRepository: ConfigRepository
 
@@ -59,6 +64,7 @@ class SettingsViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
 
         coEvery { configRepository.getProjectConfiguration().general } returns generalConfiguration
+        coEvery { configRepository.getProjectConfiguration().face } returns faceConfiguration
         coEvery { configRepository.getDeviceConfiguration().language } returns LANGUAGE
 
         coEvery { configSyncCache.sinceLastUpdateTime() } returnsMany listOf(
@@ -72,35 +78,22 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `experimentalConfiguration live data should follow the project experimental configuration`() = runTest {
-        val experimentalConfig1 = mapOf("key1" to JsonPrimitive("value1"))
-        val experimentalConfig2 = mapOf("key2" to JsonPrimitive("value2"))
-
-        coEvery { configRepository.observeProjectConfiguration() } returns flowOf(
-            mockk<ProjectConfiguration>(relaxed = true) {
-                every { custom } returns experimentalConfig1
-            },
-            mockk<ProjectConfiguration>(relaxed = true) {
-                every { custom } returns experimentalConfig2
-            },
-        )
-        viewModel = SettingsViewModel(configRepository, syncOrchestrator, configSyncCache, deviceEventTracker)
-
-        assertThat(viewModel.experimentalConfiguration.test().valueHistory())
-            .isEqualTo(
-                listOf(
-                    ExperimentalProjectConfiguration(experimentalConfig1),
-                    ExperimentalProjectConfiguration(experimentalConfig2),
-                ),
-            )
-    }
-
-    @Test
     fun `should initialize the live data correctly`() {
         assertThat(viewModel.generalConfiguration.value).isEqualTo(generalConfiguration)
         assertThat(viewModel.languagePreference.value).isEqualTo(LANGUAGE)
         assertThat(viewModel.settingsLocked.value).isEqualTo(SettingsPasswordConfig.Locked("1234"))
         assertThat(viewModel.sinceConfigLastUpdated.value?.peekContent()).isEqualTo(LAST_UPDATED)
+        assertThat(viewModel.faceConfiguration.value).isEqualTo(faceConfiguration)
+    }
+
+    @Test
+    fun `should initialize the live data correctly when no face configured`() {
+        coEvery { configRepository.getProjectConfiguration().face } returns null
+
+        // Recreating to set the new value
+        viewModel = SettingsViewModel(configRepository, syncOrchestrator, configSyncCache, deviceEventTracker)
+
+        assertThat(viewModel.faceConfiguration.value).isNull()
     }
 
     @Test

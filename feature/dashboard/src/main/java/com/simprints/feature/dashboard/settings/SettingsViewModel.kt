@@ -3,23 +3,20 @@ package com.simprints.feature.dashboard.settings
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.ConfigSyncCache
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
-import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.events.device.DeviceEventTracker
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SETTINGS
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,10 +31,9 @@ internal class SettingsViewModel @Inject constructor(
         get() = _generalConfiguration
     private val _generalConfiguration = MutableLiveData<GeneralConfiguration>()
 
-    val experimentalConfiguration = configRepository
-        .observeProjectConfiguration()
-        .map(ProjectConfiguration::experimental)
-        .asLiveData(viewModelScope.coroutineContext)
+    val faceConfiguration: LiveData<FaceConfiguration?>
+        get() = _faceConfiguration
+    private val _faceConfiguration = MutableLiveData<FaceConfiguration?>()
 
     val languagePreference: LiveData<String>
         get() = _languagePreference
@@ -77,12 +73,13 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private fun load() = viewModelScope.launch {
-        val configuration = configRepository.getProjectConfiguration().general
+        val configuration = configRepository.getProjectConfiguration()
 
         _sinceConfigLastUpdated.send(configSyncCache.sinceLastUpdateTime())
         _languagePreference.postValue(configRepository.getDeviceConfiguration().language)
-        _generalConfiguration.postValue(configuration)
-        _settingsLocked.postValue(configuration.settingsPassword)
+        _generalConfiguration.postValue(configuration.general)
+        _faceConfiguration.postValue(configuration.face)
+        _settingsLocked.postValue(configuration.general.settingsPassword)
     }
 
     fun unlockSettings() {
