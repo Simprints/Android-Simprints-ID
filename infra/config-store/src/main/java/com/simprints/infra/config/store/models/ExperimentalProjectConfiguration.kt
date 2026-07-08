@@ -21,21 +21,6 @@ data class ExperimentalProjectConfiguration(
             ?.booleanOrNull
             .let { it == true }
 
-    val faceAutoCaptureEnabled: Boolean
-        get() = customConfig
-            ?.get(FACE_AUTO_CAPTURE_ENABLED)
-            ?.jsonPrimitive
-            ?.booleanOrNull
-            .let { it == true }
-
-    val faceAutoCaptureImagingDurationMillis: Long
-        get() = customConfig
-            ?.get(FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS)
-            ?.jsonPrimitive
-            ?.longOrNull
-            ?.coerceIn(FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MIN, FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MAX)
-            ?: FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
-
     val recordsDbMigrationFromRealmEnabled: Boolean
         get() = customConfig
             ?.get(RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_ENABLED)
@@ -182,15 +167,10 @@ data class ExperimentalProjectConfiguration(
 
     companion object {
         internal const val DISABLE_SUBJECT_POOL_VALIDATION = "disableSubjectPoolValidation"
-        internal const val FACE_AUTO_CAPTURE_ENABLED = "faceAutoCaptureEnabled"
-        internal const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS = "faceAutoCaptureImagingDurationMillis"
 
         internal const val RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_ENABLED = "recordsDbMigrationFromRealmEnabled"
         const val RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES = "recordsDbMigrationFromRealmMaxRetries"
         internal const val RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_DEFAULT_MAX_RETRIES = 10
-        internal const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MIN = 1L
-        const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT = 3_000L
-        internal const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MAX = 60_000L
 
         internal const val FALLBACK_TO_COMMCARE_THRESHOLD_DAYS = "fallbackToCommCareThresholdDays"
         internal const val FALLBACK_TO_COMMCARE_THRESHOLD_DAYS_DEFAULT = 5L
