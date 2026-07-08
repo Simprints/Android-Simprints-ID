@@ -22,6 +22,7 @@ class FaceConfigurationTest {
 
     private fun createConfiguration(): FaceConfiguration = FaceConfiguration(
         allowedSDKs = listOf(ModalitySdkType.RANK_ONE),
+        isAutocapture = true,
         rankOne = FaceConfiguration.FaceSdkConfiguration(
             nbOfImagesToCapture = 2,
             qualityThreshold = 0.5f,

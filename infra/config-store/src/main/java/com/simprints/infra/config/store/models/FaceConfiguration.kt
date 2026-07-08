@@ -4,6 +4,7 @@ import com.simprints.core.domain.common.AgeGroup
 
 data class FaceConfiguration(
     val allowedSDKs: List<ModalitySdkType>,
+    val isAutocapture: Boolean,
     val rankOne: FaceSdkConfiguration?,
     val simFace: FaceSdkConfiguration?,
 ) {

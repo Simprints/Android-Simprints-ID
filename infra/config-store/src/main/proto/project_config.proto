@@ -68,6 +68,8 @@ message ProtoFaceConfiguration {
     optional ProtoFaceSdkConfiguration rank_one = 6;
     optional ProtoFaceSdkConfiguration sim_face = 7;
 
+    optional bool isAutocapture = 8;
+
     enum ProtoBioSdk {
         RANK_ONE = 0;
         SIM_FACE = 1;
