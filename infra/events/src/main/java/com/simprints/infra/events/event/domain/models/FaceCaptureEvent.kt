@@ -87,6 +87,7 @@ data class FaceCaptureEvent(
             OFF_ROLL,
             TOO_CLOSE,
             TOO_FAR,
+            SPOOFED,
         }
 
         @Keep

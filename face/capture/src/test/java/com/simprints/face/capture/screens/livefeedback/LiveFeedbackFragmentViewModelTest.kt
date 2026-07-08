@@ -124,7 +124,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         val currentDetection = viewModel.currentDetection.testObserver()
         assertThat(currentDetection.observedValues.last()?.status).isEqualTo(FaceDetection.Status.VALID_CAPTURING)
 
-        coVerify { eventReporter.addCaptureEvents(any(), any(), any()) }
+        coVerify { eventReporter.addCaptureEvents(any(), any(), any(), any()) }
     }
 
     @Test
@@ -162,7 +162,7 @@ internal class LiveFeedbackFragmentViewModelTest {
             assertThat(it[4]?.status).isEqualTo(FaceDetection.Status.NOFACE)
         }
 
-        coVerify(exactly = 0) { eventReporter.addCaptureEvents(any(), any(), any()) }
+        coVerify(exactly = 0) { eventReporter.addCaptureEvents(any(), any(), any(), any()) }
     }
 
     @Test
@@ -236,7 +236,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         }
 
         coVerify { eventReporter.addFallbackCaptureEvent(any(), any()) }
-        coVerify(exactly = 3) { eventReporter.addCaptureEvents(any(), any(), any()) }
+        coVerify(exactly = 3) { eventReporter.addCaptureEvents(any(), any(), any(), any()) }
     }
 
     @Test

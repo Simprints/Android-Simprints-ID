@@ -9,6 +9,7 @@ import com.simprints.infra.eventsync.event.remote.models.ApiFaceCapturePayload.A
 import com.simprints.infra.eventsync.event.remote.models.ApiFaceCapturePayload.ApiResult.INVALID
 import com.simprints.infra.eventsync.event.remote.models.ApiFaceCapturePayload.ApiResult.OFF_ROLL
 import com.simprints.infra.eventsync.event.remote.models.ApiFaceCapturePayload.ApiResult.OFF_YAW
+import com.simprints.infra.eventsync.event.remote.models.ApiFaceCapturePayload.ApiResult.SPOOFED
 import com.simprints.infra.eventsync.event.remote.models.ApiFaceCapturePayload.ApiResult.TOO_CLOSE
 import com.simprints.infra.eventsync.event.remote.models.ApiFaceCapturePayload.ApiResult.TOO_FAR
 import com.simprints.infra.eventsync.event.remote.models.ApiFaceCapturePayload.ApiResult.VALID
@@ -58,6 +59,7 @@ internal data class ApiFaceCapturePayload(
         OFF_ROLL,
         TOO_CLOSE,
         TOO_FAR,
+        SPOOFED,
     }
 
     @Keep
@@ -88,6 +90,7 @@ internal fun FaceCapturePayload.Result.fromDomainToApi() = when (this) {
     FaceCapturePayload.Result.OFF_ROLL -> OFF_ROLL
     FaceCapturePayload.Result.TOO_CLOSE -> TOO_CLOSE
     FaceCapturePayload.Result.TOO_FAR -> TOO_FAR
+    FaceCapturePayload.Result.SPOOFED -> SPOOFED
 }
 
 internal fun SpoofSkipReason.fromDomainToApi() = when (this) {

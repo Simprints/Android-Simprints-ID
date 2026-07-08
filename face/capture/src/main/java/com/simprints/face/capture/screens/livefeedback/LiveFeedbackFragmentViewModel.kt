@@ -384,7 +384,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         attemptNumber: Int,
     ) {
         if (faceDetection == null) return
-        eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold, isAutoCapture = isAutoCapture)
+        eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold, spoofCheckConfig, isAutoCapture = isAutoCapture)
     }
 
     enum class CapturingState { NOT_STARTED, CAPTURING, VALIDATING, VALIDATION_FAILED, FINISHED }

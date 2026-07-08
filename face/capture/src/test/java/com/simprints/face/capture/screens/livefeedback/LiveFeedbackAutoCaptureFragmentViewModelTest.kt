@@ -264,7 +264,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
             assertThat(it[4]?.status).isEqualTo(FaceDetection.Status.NOFACE)
         }
 
-        coVerify(exactly = 0) { eventReporter.addCaptureEvents(any(), any(), any()) }
+        coVerify(exactly = 0) { eventReporter.addCaptureEvents(any(), any(), any(), any()) }
     }
 
     @Test
@@ -505,7 +505,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         }
 
         coVerify { eventReporter.addFallbackCaptureEvent(any(), any()) }
-        coVerify(exactly = 3) { eventReporter.addCaptureEvents(any(), any(), any(), any()) }
+        coVerify(exactly = 3) { eventReporter.addCaptureEvents(any(), any(), any(), any(), any()) }
     }
 
     private fun getFace(
