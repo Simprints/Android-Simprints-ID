@@ -76,7 +76,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private var cameraControl: CameraControl? = null
 
-    private var isPermissionDenied = false
+    private var permissionStatus: PermissionStatus = PermissionStatus.Granted
     private var finishedHandled = false
 
     private val validCaptureProgressColor: Int
@@ -90,11 +90,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private val launchPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
-        when (requireActivity().permissionFromResult(Manifest.permission.CAMERA, granted)) {
-            PermissionStatus.Granted -> setUpCamera()
-            PermissionStatus.Denied -> renderNoPermission(false)
-            PermissionStatus.DeniedNeverAskAgain -> renderNoPermission(true)
-        }
+        permissionStatus = requireActivity().permissionFromResult(Manifest.permission.CAMERA, granted)
+        if (permissionStatus == PermissionStatus.Granted) setUpCamera() else renderNoPermission()
     }
 
     override fun onViewCreated(
@@ -158,8 +155,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     /** Initialize CameraX, and prepare to bind the camera use cases  */
     private fun setUpCamera() = viewLifecycleOwner.lifecycleScope.launch {
-        // Permission is available: resume state-driven rendering.
-        isPermissionDenied = false
+        permissionStatus = PermissionStatus.Granted
+
         if (::cameraExecutor.isInitialized && !cameraExecutor.isShutdown) {
             return@launch
         }
@@ -230,6 +227,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 if (requireActivity().hasPermission(Manifest.permission.CAMERA)) {
                     setUpCamera()
                 } else {
+                    permissionStatus = PermissionStatus.Denied
                     launchPermissionRequest.launch(Manifest.permission.CAMERA)
                 }
             }
@@ -286,7 +284,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     private fun render(state: LiveFeedbackState) {
-        if (isPermissionDenied) return
+        if (permissionStatus != PermissionStatus.Granted) return
 
         renderProgress(state.progress)
         when (state.phase) {
@@ -438,15 +436,14 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         }
     }
 
-    private fun renderNoPermission(shouldOpenSettings: Boolean) {
-        isPermissionDenied = true
+    private fun renderNoPermission() {
         binding.apply {
             renderOverlay(overlayWhite = false, explanationVisible = true)
             captureFeedbackTxtExplanation.setText(IDR.string.face_capture_permission_denied)
             captureFeedbackBtn.isGone = true
             captureFeedbackPermissionButton.isVisible = true
             captureFeedbackPermissionButton.setOnClickListener {
-                if (shouldOpenSettings) {
+                if (permissionStatus == PermissionStatus.DeniedNeverAskAgain) {
                     requireActivity().startActivity(
                         Intent(
                             Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
