@@ -38,6 +38,6 @@ class RealmConfig @Inject constructor() {
         .build()
 
     companion object {
-        private const val REALM_SCHEMA_VERSION: Long = 18
+        private const val REALM_SCHEMA_VERSION: Long = 19
     }
 }

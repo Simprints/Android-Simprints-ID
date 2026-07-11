@@ -10,11 +10,18 @@ import com.simprints.infra.enrolment.records.realm.store.models.toRealmInstant
 import io.realm.kotlin.dynamic.DynamicMutableRealmObject
 import io.realm.kotlin.dynamic.getValue
 import io.realm.kotlin.migration.AutomaticSchemaMigration
+import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmUUID
 import java.util.Date
 import java.util.UUID
 
 internal class RealmMigrations : AutomaticSchemaMigration {
+    companion object {
+        private const val SUBJECT_FINGERPRINT_SAMPLES_FIELD = "fingerprintSamples"
+        private const val SUBJECT_FACE_SAMPLES_FIELD = "faceSamples"
+        private const val REFERENCE_ID_FIELD = "referenceId"
+    }
+
     override fun migrate(migrationContext: AutomaticSchemaMigration.MigrationContext) {
         val oldVersion = migrationContext.oldRealm.schemaVersion()
         val newVersion = migrationContext.newRealm.schemaVersion()
@@ -25,6 +32,7 @@ internal class RealmMigrations : AutomaticSchemaMigration {
                 10 -> migrateTo11(migrationContext)
                 11 -> migrateTo12(migrationContext)
                 12 -> migrateTo13(migrationContext)
+                18 -> migrateTo19(migrationContext)
             }
         }
     }
@@ -105,5 +113,31 @@ internal class RealmMigrations : AutomaticSchemaMigration {
             val subjectId = oldObject.getValue<String>(SubjectsSchemaV13.SUBJECT_ID_FIELD)
             newObject?.set(SubjectsSchemaV13.SUBJECT_ID_FIELD, RealmUUID.from(subjectId))
         }
+    }
+
+    /**
+     * Because of a missing Realm migration when `referenceId` was introduced, samples created
+     * before that schema change were left with an empty referenceId.
+     *
+     * Backfill a stable, shared UUID for all samples of the same subject and modality that still
+     * have an empty referenceId, mirroring the grouping that historically applied before
+     * referenceId existed.
+     */
+
+    private fun migrateTo19(migrationContext: AutomaticSchemaMigration.MigrationContext) {
+        migrationContext.enumerate(SubjectsSchemaV13.SUBJECT_TABLE) { _, newObject ->
+            newObject?.let {
+                backfillEmptyReferenceIds(it.getObjectList(SUBJECT_FINGERPRINT_SAMPLES_FIELD))
+                backfillEmptyReferenceIds(it.getObjectList(SUBJECT_FACE_SAMPLES_FIELD))
+            }
+        }
+    }
+
+    private fun backfillEmptyReferenceIds(samples: RealmList<DynamicMutableRealmObject>) {
+        val samplesWithEmptyReferenceId = samples.filter { it.getValue<String>(REFERENCE_ID_FIELD).isEmpty() }
+        if (samplesWithEmptyReferenceId.isEmpty()) return
+
+        val newReferenceId = UUID.randomUUID().toString()
+        samplesWithEmptyReferenceId.forEach { it.set(REFERENCE_ID_FIELD, newReferenceId) }
     }
 }
