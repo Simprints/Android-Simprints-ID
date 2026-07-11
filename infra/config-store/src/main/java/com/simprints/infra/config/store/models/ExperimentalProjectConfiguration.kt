@@ -2,6 +2,7 @@ package com.simprints.infra.config.store.models
 
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
@@ -165,6 +166,20 @@ data class ExperimentalProjectConfiguration(
             ?.booleanOrNull
             .let { it == true }
 
+    val mfidDefaultSkipReason: String?
+        get() = customConfig
+            ?.get(MFID_DEFAULT_SKIP_REASON)
+            ?.jsonPrimitive
+            ?.contentOrNull
+            ?.takeIf { it.isNotEmpty() }
+
+    val mfidSkipReasonsHideHasNumber: Boolean
+        get() = customConfig
+            ?.get(MFID_SKIP_REASONS_HIDE_HAS_NUMBER)
+            ?.jsonPrimitive
+            ?.booleanOrNull
+            .let { it == true }
+
     companion object {
         internal const val DISABLE_SUBJECT_POOL_VALIDATION = "disableSubjectPoolValidation"
         internal const val FACE_AUTO_CAPTURE_ENABLED = "faceAutoCaptureEnabled"
@@ -223,5 +238,8 @@ data class ExperimentalProjectConfiguration(
         const val MINIMUM_FREE_SPACE_MB_DEFAULT = 1024 // 1GB
 
         const val USE_BALANCED_LOCATION_ACCURACY = "useBalancedLocationAccuracy"
+
+        const val MFID_DEFAULT_SKIP_REASON = "mfidDefaultSkipReason"
+        const val MFID_SKIP_REASONS_HIDE_HAS_NUMBER = "mfidSkipReasonsHideHasNumber"
     }
 }

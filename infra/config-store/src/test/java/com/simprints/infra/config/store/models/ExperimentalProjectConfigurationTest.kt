@@ -348,4 +348,31 @@ internal class ExperimentalProjectConfigurationTest {
             assertThat(ExperimentalProjectConfiguration(config).useBalancedLocationAccuracy).isEqualTo(result)
         }
     }
+
+    @Test
+    fun `check mfid default skip reason parsed correctly`() {
+        assertThat(ExperimentalProjectConfiguration(emptyMap()).mfidDefaultSkipReason).isNull()
+        assertThat(
+            ExperimentalProjectConfiguration(
+                mapOf(ExperimentalProjectConfiguration.MFID_DEFAULT_SKIP_REASON to JsonPrimitive("")),
+            ).mfidDefaultSkipReason,
+        ).isNull()
+        assertThat(
+            ExperimentalProjectConfiguration(
+                mapOf(ExperimentalProjectConfiguration.MFID_DEFAULT_SKIP_REASON to JsonPrimitive("project_reason")),
+            ).mfidDefaultSkipReason,
+        ).isEqualTo("project_reason")
+    }
+
+    @Test
+    fun `check mfid skip reasons hide has number flag parsed correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to false,
+            mapOf(ExperimentalProjectConfiguration.MFID_SKIP_REASONS_HIDE_HAS_NUMBER to JsonPrimitive(1)) to false,
+            mapOf(ExperimentalProjectConfiguration.MFID_SKIP_REASONS_HIDE_HAS_NUMBER to JsonPrimitive(false)) to false,
+            mapOf(ExperimentalProjectConfiguration.MFID_SKIP_REASONS_HIDE_HAS_NUMBER to JsonPrimitive(true)) to true,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).mfidSkipReasonsHideHasNumber).isEqualTo(result)
+        }
+    }
 }

@@ -1,0 +1,104 @@
+name: "[Reusable] Upload to Internal and Create Draft Release"
+
+on:
+    workflow_call:
+        inputs:
+            upload-artifact:
+                description: "Artifact name of the AAB file to upload"
+                type: string
+                required: true
+            version-name:
+                description: "Version name used for the draft release tag (e.g. 2026.2.0)"
+                type: string
+                required: true
+            version-code:
+                description: "Android version code for the build (used to download the universal APK from Play)"
+                type: string
+                required: true
+            mapping-file:
+                description: "Optional artifact name of the ProGuard mapping file"
+                type: string
+                required: false
+                default: ""
+
+jobs:
+    upload-and-release:
+        runs-on: ubuntu-latest
+
+        environment: Internal
+
+        permissions:
+            contents: write
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v6
+
+            -   name: Download AAB artifact
+                uses: actions/download-artifact@v8
+                with:
+                    name: ${{ inputs.upload-artifact }}
+
+            -   name: Upload AAB to Google Play Internal track
+                uses: r0adkll/upload-google-play@eb49699984a39f23558439581660aa6f088acfd6 # v1
+                with:
+                    serviceAccountJsonPlainText: ${{ secrets.GOOGLE_API_KEY_JSON }}
+                    packageName: com.simprints.id
+                    releaseFiles: ${{ inputs.upload-artifact }}
+                    track: internal
+                    status: completed
+
+            -   name: Set up Python
+                uses: actions/setup-python@v5
+                with:
+                    python-version: "3.11"
+
+            -   name: Install Python dependencies
+                run: |
+                    pip install --only-binary :all: "google-api-python-client==2.197.0" "google-auth==2.55.0"
+            -   name: Download universal APK from Google Play
+                id: download-apk
+                env:
+                    GOOGLE_API_KEY_JSON: ${{ secrets.GOOGLE_API_KEY_JSON }}
+                    VERSION_CODE: ${{ inputs.version-code }}
+                    VERSION_NAME: ${{ inputs.version-name }}
+                    PACKAGE_NAME: com.simprints.id
+                run: |
+                    APK_NAME="simprints-id-${VERSION_NAME}-universal.apk"
+                    OUTPUT_APK="$APK_NAME" python3 .github/scripts/download-universal-apk.py
+                    echo "apk-name=$APK_NAME" >> "$GITHUB_OUTPUT"
+
+            -   name: Download mapping file
+                if: ${{ inputs.mapping-file != '' }}
+                uses: actions/download-artifact@v8
+                with:
+                    name: ${{ inputs.mapping-file }}
+
+            -   name: Create release git tag
+                uses: ./.github/actions/set-release-git-tag
+
+            -   name: Create draft GitHub release with universal APK
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    VERSION_NAME: ${{ inputs.version-name }}
+                    MAPPING_FILE: ${{ inputs.mapping-file }}
+                    APK_NAME: ${{ steps.download-apk.outputs.apk-name }}
+                run: |
+                    TAG="v${VERSION_NAME}"
+
+                    # Delete any existing draft release with the same tag to avoid conflicts.
+                    if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isDraft --jq '.isDraft' 2>/dev/null | grep -q true; then
+                        gh release delete "$TAG" --repo "$GITHUB_REPOSITORY" --yes
+                    fi
+
+                    ASSETS=("$APK_NAME")
+                        if [[ -n "$MAPPING_FILE" && -f "$MAPPING_FILE" ]]; then
+                            ASSETS+=("$MAPPING_FILE")
+                    fi
+
+                    gh release create "$TAG" \
+                        --repo "$GITHUB_REPOSITORY" \
+                        --title "Simprints ID ${VERSION_NAME}" \
+                        --draft \
+                        --generate-notes \
+                        "${ASSETS[@]}"

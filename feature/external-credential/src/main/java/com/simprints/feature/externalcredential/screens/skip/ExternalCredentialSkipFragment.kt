@@ -41,6 +41,7 @@ class ExternalCredentialSkipFragment : Fragment(R.layout.fragment_external_crede
     }
 
     private fun initViews(credentialTypes: List<ExternalCredentialType>) = with(binding) {
+        skipReasonHasNumberNoId.isVisible = !mainViewModel.skipReasonsHideHasNumber
         if (credentialTypes.size == 1) {
             val credentialText = resources.getCredentialTypeString(credentialTypes.first())
             mapOf(
