@@ -1,0 +1,54 @@
+name: "Sync Release Stage Version Dropdown"
+# Keeps the `version` choice list in update-release-stage.yml in sync with actual
+# GitHub Release tags, since workflow_dispatch choice options must be static and
+# can't be populated dynamically at trigger time.
+
+on:
+    release:
+        types: [published]
+    workflow_dispatch: {}
+
+permissions:
+    contents: write
+
+jobs:
+    sync:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v6
+
+            -   name: Regenerate version list
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: |
+                    WORKFLOW_FILE=".github/workflows/update-release-stage.yml"
+                    OPTIONS_FILE="$(mktemp)"
+                    LIMIT=15
+
+                    # Fetch published (non-draft) release tags, newest first by semantic version.
+                    gh release list --repo "${{ github.repository }}" --limit 60 \
+                        --json tagName,isDraft \
+                        --jq '.[] | select(.isDraft==false) | .tagName' \
+                        | sed 's/^v//' \
+                        | sort -t. -k1,1nr -k2,2nr -k3,3nr \
+                        | head -n "$LIMIT" \
+                        | sed 's/^/                    - /' > "$OPTIONS_FILE"
+
+                    # Replace the block between the marker comments with the freshly generated options.
+                    awk -v optfile="$OPTIONS_FILE" '
+                        /# AUTO-GENERATED-VERSIONS-START/ { print; while ((getline line < optfile) > 0) print line; skip=1; next }
+                        /# AUTO-GENERATED-VERSIONS-END/   { skip=0 }
+                        skip != 1 { print }
+                    ' "$WORKFLOW_FILE" > "$WORKFLOW_FILE.tmp"
+                    mv "$WORKFLOW_FILE.tmp" "$WORKFLOW_FILE"
+                    rm -f "$OPTIONS_FILE"
+
+            -   name: Commit and push
+                run: |
+                    git config user.name  "github-actions[bot]"
+                    git config user.email "github-actions[bot]@users.noreply.github.com"
+                    git add .github/workflows/update-release-stage.yml
+                    git diff --cached --quiet && echo "No changes" && exit 0
+                    git commit -m "chore: sync release stage version dropdown"
+                    git push

@@ -1,0 +1,71 @@
+name: "Promote Release Stage"
+# Manually record that a version has reached Beta (Production Ready), Delivery Testing, or Production.
+# Looks up the GitHub Release for that version to find the APK download URL automatically.
+
+on:
+    workflow_dispatch:
+        inputs:
+            stage:
+                description: "Stage to promote to"
+                type: choice
+                required: true
+                options:
+                    - production_ready
+                    - delivery_testing
+                    - production
+            version:
+                description: "Version to promote"
+                type: choice
+                required: true
+                options:
+                    # AUTO-GENERATED-VERSIONS-START (kept in sync by .github/workflows/sync-release-stage-versions.yml)
+                    - 2026.2.1
+                    - 2026.2.0
+                    - 2026.1.0
+                    - 2025.4.2
+                    - 2025.4.0
+                    - 2025.3.1
+                    - 2025.3.0
+                    - 2025.2.1
+                    - 2025.2.0
+                    - 2025.1.0
+                    - 2024.2.2
+                    - 2024.2.1
+                    - 2024.2.0
+                    - 2024.1.5
+                    - 2024.1.4
+                    # AUTO-GENERATED-VERSIONS-END
+
+jobs:
+    resolve-release-info:
+        runs-on: ubuntu-latest
+        outputs:
+            apk_url:     ${{ steps.info.outputs.apk_url }}
+            release_url: ${{ steps.info.outputs.release_url }}
+
+        steps:
+            -   name: Resolve GitHub Release info
+                id: info
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    VERSION: ${{ inputs.version }}
+                run: |
+                    TAG="v${VERSION}"
+                    RELEASE_URL="https://github.com/${{ github.repository }}/releases/tag/$TAG"
+                    echo "release_url=$RELEASE_URL" >> "$GITHUB_OUTPUT"
+
+                    APK_URL=$(gh release view "$TAG" \
+                        --repo "${{ github.repository }}" \
+                        --json assets \
+                        --jq '[.assets[] | select(.name | endswith(".apk")) | .browserDownloadUrl] | first // ""' \
+                        2>/dev/null || echo "")
+                    echo "apk_url=$APK_URL" >> "$GITHUB_OUTPUT"
+
+    update-dashboard:
+        needs: resolve-release-info
+        uses: ./.github/workflows/reusable-update-dashboard.yml
+        with:
+            environment:  ${{ inputs.stage }}
+            version:      ${{ inputs.version }}
+            apk_url:      ${{ needs.resolve-release-info.outputs.apk_url }}
+            release_url:  ${{ needs.resolve-release-info.outputs.release_url }}
