@@ -50,7 +50,7 @@ retrofit_version = "3.0.0"
 okttp_version = "5.4.0"
 chuck_version = "4.3.1"
 
-sqlCipher_version = "4.16.0"
+sqlCipher_version = "4.17.0"
 fuzzywuzzy_version = "1.4.0"
 rootbeer_version = "0.1.2"
 commons_io_version = "2.22.0"
