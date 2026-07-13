@@ -83,7 +83,7 @@ sonar_plugin_version = "7.3.1.8318"
 realm_version = "4.0.4"
 protobuf_plugin_version = "0.10.0"
 deps_graph_version = "0.8.0"
-tink_version = "1.22.0"
+tink_version = "1.23.0"
 desugar_jdk_libsVersion = "2.1.5"
 [libraries]
 
