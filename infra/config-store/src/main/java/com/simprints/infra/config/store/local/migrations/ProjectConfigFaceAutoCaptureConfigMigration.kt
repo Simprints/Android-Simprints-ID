@@ -4,8 +4,11 @@ import androidx.datastore.core.DataMigration
 import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
-import org.json.JSONException
-import org.json.JSONObject
+import com.simprints.infra.serialization.SimJson
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import javax.inject.Inject
 
 /**
@@ -24,8 +27,12 @@ class ProjectConfigFaceAutoCaptureConfigMigration @Inject constructor() : DataMi
         Simber.i("Start migration of face auto-capture flag", tag = MIGRATION)
 
         val isAutoCapture = try {
-            JSONObject(currentData.customJson).optBoolean("faceAutoCaptureEnabled")
-        } catch (e: JSONException) {
+            SimJson
+                .parseToJsonElement(currentData.customJson)
+                .jsonObject["faceAutoCaptureEnabled"]
+                ?.jsonPrimitive
+                ?.booleanOrNull ?: false
+        } catch (e: SerializationException) {
             Simber.e("Failed to parse custom config", e, tag = MIGRATION)
             false
         }
