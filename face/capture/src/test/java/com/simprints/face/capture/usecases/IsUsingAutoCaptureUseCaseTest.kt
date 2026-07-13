@@ -37,7 +37,7 @@ class IsUsingAutoCaptureUseCaseTest {
         featureEnabled: Boolean,
         preferenceEnabled: Boolean,
     ) {
-        coEvery { projectConfiguration.face?.isAutocapture } returns featureEnabled
+        every { projectConfiguration.face?.isAutoCapture } returns featureEnabled
         every { sharedPreferences.getBoolean("preference_enable_face_auto_capture", true) } returns preferenceEnabled
     }
 

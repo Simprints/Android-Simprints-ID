@@ -10,13 +10,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 internal data class ApiFaceConfiguration(
     val allowedSDKs: List<BioSdk>,
-    val isAutocapture: Boolean = false,
+    val isAutoCapture: Boolean = false,
     val rankOne: ApiFaceSdkConfiguration? = null,
     val simFace: ApiFaceSdkConfiguration? = null,
 ) {
     fun toDomain(): FaceConfiguration = FaceConfiguration(
         allowedSDKs = allowedSDKs.map { it.toDomain() },
-        isAutocapture = isAutocapture,
+        isAutoCapture = isAutoCapture,
         rankOne = rankOne?.toDomain(),
         simFace = simFace?.toDomain(),
     )

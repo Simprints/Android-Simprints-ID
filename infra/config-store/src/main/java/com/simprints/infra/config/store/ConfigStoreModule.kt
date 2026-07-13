@@ -8,7 +8,7 @@ import com.simprints.infra.config.store.local.ConfigLocalDataSource
 import com.simprints.infra.config.store.local.ConfigLocalDataSourceImpl
 import com.simprints.infra.config.store.local.migrations.DeviceConfigSharedPrefsMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigDevicesScopeBatchMigration
-import com.simprints.infra.config.store.local.migrations.ProjectConfigFaceAutocaptureConfigMigration
+import com.simprints.infra.config.store.local.migrations.ProjectConfigFaceAutoCaptureConfigMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigFaceBioSdkMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigFaceEmptyVersionMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigFaceSdkQualityThresholdMigration
@@ -83,7 +83,7 @@ object DataStoreModule {
         projectConfigSampleUploadMigration: ProjectConfigSampleUploadMigration,
         projectConfigDownSyncConfigMigration: ProjectConfigSimprintsSyncConfigMigration,
         projectConfigDevicesScopeBatchMigration: ProjectConfigDevicesScopeBatchMigration,
-        projectConfigFaceAutoCaptureConfigMigration: ProjectConfigFaceAutocaptureConfigMigration,
+        projectConfigFaceAutoCaptureConfigMigration: ProjectConfigFaceAutoCaptureConfigMigration,
     ): DataStore<ProtoProjectConfiguration> = DataStoreFactory.create(
         serializer = ProjectConfigurationSerializer,
         produceFile = { appContext.dataStoreFile(PROJECT_CONFIG_DATA_STORE_FILE_NAME) },

@@ -14,7 +14,7 @@ class IsUsingAutoCaptureUseCase @Inject constructor(
     private val preference = PreferenceManager.getDefaultSharedPreferences(context)
 
     operator fun invoke(projectConfiguration: ProjectConfiguration): Boolean {
-        val isFeatureEnabled = projectConfiguration.face?.isAutocapture ?: false
+        val isFeatureEnabled = projectConfiguration.face?.isAutoCapture ?: false
         return isFeatureEnabled && isOptionTurnedOnInSettings()
     }
 
