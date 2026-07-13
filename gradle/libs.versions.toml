@@ -39,7 +39,7 @@ play_barcode_version = "18.3.1"
 
 ml_entity_extraction_version = "16.0.1"
 
-firebase_auth_version = "24.1.0"
+firebase_auth_version = "24.2.0"
 firebase_crashlytics_version = "20.1.0"
 firebase_analytics_version = "23.2.0"
 firebase_perf_version = "22.0.5"
