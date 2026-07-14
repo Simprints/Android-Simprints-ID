@@ -7,7 +7,6 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -38,8 +37,7 @@ class IsUsingAutoCaptureUseCaseTest {
         featureEnabled: Boolean,
         preferenceEnabled: Boolean,
     ) {
-        coEvery { projectConfiguration.custom } returns
-            mapOf("faceAutoCaptureEnabled" to JsonPrimitive(featureEnabled))
+        every { projectConfiguration.face?.isAutoCapture } returns featureEnabled
         every { sharedPreferences.getBoolean("preference_enable_face_auto_capture", true) } returns preferenceEnabled
     }
 

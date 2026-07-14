@@ -21,13 +21,6 @@ data class ExperimentalProjectConfiguration(
             ?.booleanOrNull
             .let { it == true }
 
-    val faceAutoCaptureEnabled: Boolean
-        get() = customConfig
-            ?.get(FACE_AUTO_CAPTURE_ENABLED)
-            ?.jsonPrimitive
-            ?.booleanOrNull
-            .let { it == true }
-
     val faceAutoCaptureImagingDurationMillis: Long
         get() = customConfig
             ?.get(FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS)
@@ -182,7 +175,6 @@ data class ExperimentalProjectConfiguration(
 
     companion object {
         internal const val DISABLE_SUBJECT_POOL_VALIDATION = "disableSubjectPoolValidation"
-        internal const val FACE_AUTO_CAPTURE_ENABLED = "faceAutoCaptureEnabled"
         internal const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS = "faceAutoCaptureImagingDurationMillis"
 
         internal const val RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_ENABLED = "recordsDbMigrationFromRealmEnabled"

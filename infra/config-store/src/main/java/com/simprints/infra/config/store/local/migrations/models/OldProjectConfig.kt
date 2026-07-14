@@ -106,6 +106,7 @@ internal data class OldProjectConfig(
     } else {
         FaceConfiguration(
             allowedSDKs = listOf(ModalitySdkType.RANK_ONE),
+            isAutoCapture = false,
             rankOne = FaceConfiguration.FaceSdkConfiguration(
                 nbOfImagesToCapture = faceNbOfFramesCaptured?.toIntOrNull() ?: DEFAULT_FACE_FRAMES_TO_CAPTURE,
                 qualityThreshold = faceQualityThreshold.toFloat(),

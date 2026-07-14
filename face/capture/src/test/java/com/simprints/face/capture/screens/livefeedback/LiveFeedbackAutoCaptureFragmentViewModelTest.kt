@@ -73,9 +73,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
                 ?.qualityThreshold
         } returns QUALITY_THRESHOLD
         every { isUsingAutoCapture.invoke(any()) } returns true
-        coEvery {
-            configRepository.getProjectConfiguration().custom
-        } returns mapOf("singleQualityFallbackRequired" to JsonPrimitive(false))
+
         every { timeHelper.now() } returnsMany (0..100L).map { Timestamp(it) }
         justRun { previewFrame.recycle() }
         val resolveFaceBioSdkUseCase = mockk<ResolveFaceBioSdkUseCase> {

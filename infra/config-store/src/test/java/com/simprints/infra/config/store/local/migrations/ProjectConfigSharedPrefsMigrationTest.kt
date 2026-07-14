@@ -733,6 +733,7 @@ class ProjectConfigSharedPrefsMigrationTest {
 
         private val PROTO_FACE_CONFIGURATION = ProtoFaceConfiguration
             .newBuilder()
+            .setIsAutoCapture(false)
             .addAllowedSdks(ProtoFaceConfiguration.ProtoBioSdk.RANK_ONE)
             .setRankOne(
                 ProtoFaceConfiguration.ProtoFaceSdkConfiguration
@@ -754,6 +755,7 @@ class ProjectConfigSharedPrefsMigrationTest {
 
         private val PROTO_FACE_DEFAULT_CONFIGURATION = ProtoFaceConfiguration
             .newBuilder()
+            .setIsAutoCapture(false)
             .addAllowedSdks(ProtoFaceConfiguration.ProtoBioSdk.RANK_ONE)
             .setRankOne(
                 ProtoFaceConfiguration.ProtoFaceSdkConfiguration

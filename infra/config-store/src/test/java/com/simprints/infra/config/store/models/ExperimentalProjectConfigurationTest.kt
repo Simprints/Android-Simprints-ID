@@ -3,7 +3,6 @@ package com.simprints.infra.config.store.models
 import com.google.common.truth.Truth.*
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.DISABLE_SUBJECT_POOL_VALIDATION
-import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MAX
@@ -56,22 +55,6 @@ internal class ExperimentalProjectConfigurationTest {
             mapOf(DISABLE_SUBJECT_POOL_VALIDATION to JsonPrimitive(true)) to true,
         ).forEach { (config, result) ->
             assertThat(ExperimentalProjectConfiguration(config).disableSubjectPoolValidation).isEqualTo(result)
-        }
-    }
-
-    @Test
-    fun `check face auto capture flag correctly`() {
-        mapOf(
-            // Value not present
-            emptyMap<String, JsonElement>() to false,
-            // Value not boolean
-            mapOf(FACE_AUTO_CAPTURE_ENABLED to JsonPrimitive(1)) to false,
-            // Value present and FALSE
-            mapOf(FACE_AUTO_CAPTURE_ENABLED to JsonPrimitive(false)) to false,
-            // Value present and TRUE
-            mapOf(FACE_AUTO_CAPTURE_ENABLED to JsonPrimitive(true)) to true,
-        ).forEach { (config, result) ->
-            assertThat(ExperimentalProjectConfiguration(config).faceAutoCaptureEnabled).isEqualTo(result)
         }
     }
 

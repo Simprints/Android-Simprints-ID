@@ -62,8 +62,8 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         viewModel.generalConfiguration.observe(viewLifecycleOwner) {
             enableFingerprintSettings(it.modalities.contains(Modality.FINGERPRINT))
         }
-        viewModel.experimentalConfiguration.observe(viewLifecycleOwner) {
-            showFaceAutoCaptureSetting(isVisible = it.faceAutoCaptureEnabled)
+        viewModel.faceConfiguration.observe(viewLifecycleOwner) {
+            showFaceAutoCaptureSetting(it?.isAutoCapture == true)
         }
         viewModel.languagePreference.observe(viewLifecycleOwner) {
             loadSelectedLanguage(it)

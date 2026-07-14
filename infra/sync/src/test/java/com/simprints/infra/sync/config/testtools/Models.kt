@@ -55,6 +55,7 @@ internal val faceConfiguration =
             decisionPolicy = decisionPolicy,
             version = "1.0",
         ),
+        isAutoCapture = false,
         simFace = FaceConfiguration.FaceSdkConfiguration(
             nbOfImagesToCapture = 2,
             qualityThreshold = -1f,

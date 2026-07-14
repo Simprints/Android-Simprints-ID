@@ -8,6 +8,7 @@ import com.simprints.infra.config.store.models.ModalitySdkType
 internal fun FaceConfiguration.toProto(): ProtoFaceConfiguration = ProtoFaceConfiguration
     .newBuilder()
     .addAllAllowedSdks(allowedSDKs.map { it.toProtoFaceConfiguration() })
+    .setIsAutoCapture(isAutoCapture)
     .also { if (rankOne != null) it.rankOne = rankOne.toProto() }
     .also { if (simFace != null) it.simFace = simFace.toProto() }
     .build()
@@ -32,6 +33,7 @@ internal fun FaceConfiguration.ImageSavingStrategy.toProto(): ProtoFaceConfigura
 
 internal fun ProtoFaceConfiguration.toDomain(): FaceConfiguration = FaceConfiguration(
     allowedSDKs = allowedSdksList.map { it.toDomain() },
+    isAutoCapture = isAutoCapture,
     rankOne = if (hasRankOne()) rankOne.toDomain() else null,
     simFace = if (hasSimFace()) simFace.toDomain() else null,
 )

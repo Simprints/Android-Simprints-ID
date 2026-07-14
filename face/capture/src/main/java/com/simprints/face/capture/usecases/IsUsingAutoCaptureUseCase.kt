@@ -3,19 +3,18 @@ package com.simprints.face.capture.usecases
 import android.content.Context
 import androidx.preference.PreferenceManager
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.store.models.experimental
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class IsUsingAutoCaptureUseCase @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ) {
     private val preference = PreferenceManager.getDefaultSharedPreferences(context)
 
     operator fun invoke(projectConfiguration: ProjectConfiguration): Boolean {
-        val isFeatureEnabled = projectConfiguration.experimental().faceAutoCaptureEnabled
+        val isFeatureEnabled = projectConfiguration.face?.isAutoCapture ?: false
         return isFeatureEnabled && isOptionTurnedOnInSettings()
     }
 

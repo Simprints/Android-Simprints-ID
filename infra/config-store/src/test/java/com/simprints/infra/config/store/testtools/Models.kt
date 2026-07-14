@@ -172,6 +172,7 @@ internal val faceSdkConfiguration = FaceSdkConfiguration(
 
 internal val apiFaceConfiguration = ApiFaceConfiguration(
     allowedSDKs = listOf(ApiFaceConfiguration.BioSdk.RANK_ONE),
+    isAutoCapture = true,
     rankOne = ApiFaceSdkConfiguration(
         nbOfImagesToCapture = 2,
         qualityThreshold = -1f,
@@ -193,11 +194,13 @@ internal val apiFaceConfiguration = ApiFaceConfiguration(
 )
 internal val faceConfiguration = FaceConfiguration(
     allowedSDKs = listOf(ModalitySdkType.RANK_ONE),
+    isAutoCapture = true,
     rankOne = faceSdkConfiguration,
     simFace = faceSdkConfiguration,
 )
 internal val protoFaceConfiguration = ProtoFaceConfiguration
     .newBuilder()
+    .setIsAutoCapture(true)
     .addAllowedSdks(ProtoFaceConfiguration.ProtoBioSdk.RANK_ONE)
     .setRankOne(
         ProtoFaceConfiguration.ProtoFaceSdkConfiguration
