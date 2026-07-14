@@ -36,6 +36,9 @@ on:
                     - 2024.1.4
                     # AUTO-GENERATED-VERSIONS-END
 
+permissions:
+    contents: write
+
 jobs:
     resolve-release-info:
         runs-on: ubuntu-latest

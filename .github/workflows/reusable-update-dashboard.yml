@@ -25,6 +25,10 @@ on:
 permissions:
     contents: write
 
+concurrency:
+    group: update-release-dashboard-gh-pages
+    cancel-in-progress: false
+
 jobs:
     update:
         runs-on: ubuntu-latest
