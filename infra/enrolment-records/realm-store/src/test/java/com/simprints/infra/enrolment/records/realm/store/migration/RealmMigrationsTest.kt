@@ -147,6 +147,42 @@ class RealmMigrationsTest {
         verify { newObject.set(eq(SubjectsSchemaV13.SUBJECT_ID_FIELD), eq(RealmUUID.from(GUID))) }
     }
 
+    @Test
+    fun `when migrating 18 to 19 backfills empty referenceId shared per modality`() {
+        setVersions(18L, 19L)
+
+        val fingerprintSample1 = createSampleMock(referenceId = "")
+        val fingerprintSample2 = createSampleMock(referenceId = "")
+        val faceSample = createSampleMock(referenceId = "")
+        val untouchedFingerprintSample = createSampleMock(referenceId = "existing-ref")
+
+        val newObject = mockk<DynamicMutableRealmObject>()
+        every { newObject.getObjectList(REFERENCE_ID_FINGERPRINT_SAMPLES_FIELD) } returns
+            realmListOf(fingerprintSample1, fingerprintSample2, untouchedFingerprintSample)
+        every { newObject.getObjectList(REFERENCE_ID_FACE_SAMPLES_FIELD) } returns realmListOf(faceSample)
+
+        val enumeratorSlot = slot<(DynamicRealmObject, DynamicMutableRealmObject?) -> Unit>()
+        every { migrationContext.enumerate(any(), capture(enumeratorSlot)) } answers {
+            enumeratorSlot.captured.invoke(mockk(), newObject)
+        }
+
+        realmMigrations.migrate(migrationContext)
+
+        val fingerprintReferenceIdSlot = slot<String>()
+        verify(exactly = 1) { fingerprintSample1.set(REFERENCE_ID_FIELD, capture(fingerprintReferenceIdSlot)) }
+        verify(exactly = 1) { fingerprintSample2.set(REFERENCE_ID_FIELD, eq(fingerprintReferenceIdSlot.captured)) }
+        verify(exactly = 0) { untouchedFingerprintSample.set(REFERENCE_ID_FIELD, any<String>()) }
+        verify(exactly = 1) { faceSample.set(REFERENCE_ID_FIELD, any<String>()) }
+        assertThat(fingerprintReferenceIdSlot.captured).isNotEmpty()
+    }
+
+    private fun createSampleMock(referenceId: String): DynamicMutableRealmObject {
+        val sample = mockk<DynamicMutableRealmObject>()
+        every { sample.getValue<String>(REFERENCE_ID_FIELD) } returns referenceId
+        every { sample.set(REFERENCE_ID_FIELD, any<String>()) } returns sample
+        return sample
+    }
+
     private fun setVersions(
         old: Long,
         new: Long,
@@ -198,5 +234,9 @@ class RealmMigrationsTest {
 
         private const val UNIQUE_ID = "uniqueId"
         private const val NOT_UNIQUE_ID = "nonUniqueId"
+
+        private const val REFERENCE_ID_FIELD = "referenceId"
+        private const val REFERENCE_ID_FINGERPRINT_SAMPLES_FIELD = "fingerprintSamples"
+        private const val REFERENCE_ID_FACE_SAMPLES_FIELD = "faceSamples"
     }
 }

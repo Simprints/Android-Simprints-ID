@@ -7,6 +7,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.simprints.infra.enrolment.records.room.store.SubjectsDatabase.Companion.SUBJECT_DB_VERSION
 import com.simprints.infra.enrolment.records.room.store.migration.SubjectMigration1to2
+import com.simprints.infra.enrolment.records.room.store.migration.SubjectMigration2to3
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate
 import com.simprints.infra.enrolment.records.room.store.models.DbExternalCredential
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject
@@ -35,12 +36,12 @@ abstract class SubjectsDatabase : RoomDatabase() {
         ): SubjectsDatabase {
             val builder = Room
                 .databaseBuilder(context, SubjectsDatabase::class.java, dbName)
-                .addMigrations(SubjectMigration1to2())
+                .addMigrations(SubjectMigration1to2(), SubjectMigration2to3())
             if (BuildConfig.DB_ENCRYPTION) {
                 builder.openHelperFactory(factory)
             }
             return builder.build()
         }
-        const val SUBJECT_DB_VERSION = 2
+        const val SUBJECT_DB_VERSION = 3
     }
 }
