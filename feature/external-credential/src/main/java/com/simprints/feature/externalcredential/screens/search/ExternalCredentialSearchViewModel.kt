@@ -214,8 +214,8 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
                 GhanaIdCardOcrReaderUseCase.GHANA_ID_PATTERN.matches(credential)
             }
             ExternalCredentialType.FaydaCard -> {
-                // Fayda Alias Number (FAN): exactly 16 digits after stripping non-digit chars
-                FaydaCardOcrReaderUseCase.FAN_PATTERN.matches(credential.filter(Char::isDigit))
+                // Fayda Alias Number (FAN): exactly 16 digits
+                FaydaCardOcrReaderUseCase.FAN_PATTERN.matches(credential)
             }
             ExternalCredentialType.QRCode -> {
                 // No QR code validation as of 2025.4.1

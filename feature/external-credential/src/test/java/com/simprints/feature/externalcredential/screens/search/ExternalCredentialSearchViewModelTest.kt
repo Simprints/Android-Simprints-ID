@@ -342,4 +342,18 @@ internal class ExternalCredentialSearchViewModelTest {
         assertThat(viewModel.isCredentialFormatValid("")).isTrue()
         assertThat(viewModel.isCredentialFormatValid(null)).isFalse()
     }
+
+    @Test
+    fun `isCredentialFormatValid validates Fayda card format`() = runTest {
+        every { mockScannedCredentialResult.credentialType } returns ExternalCredentialType.FaydaCard
+
+        viewModel = createViewModel()
+
+        assertThat(viewModel.isCredentialFormatValid("1234567812345678")).isTrue()
+        assertThat(viewModel.isCredentialFormatValid("1234 5678 1234 5678")).isFalse()
+        assertThat(viewModel.isCredentialFormatValid("1234-5678-1234-5678")).isFalse()
+        assertThat(viewModel.isCredentialFormatValid("123456781234567")).isFalse()
+        assertThat(viewModel.isCredentialFormatValid("invalid")).isFalse()
+        assertThat(viewModel.isCredentialFormatValid(null)).isFalse()
+    }
 }
