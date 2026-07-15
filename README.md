@@ -3,7 +3,7 @@
 This branch (`gh-pages`) hosts the **Release Status Dashboard** for the Simprints ID Android app.  
 It is served as a GitHub Pages site at:
 
-> **`https://simprints.github.io/Android-Simprints-ID/`**
+> **`https://releases.simprints.com`** (custom domain, see `CNAME`; also reachable at `https://simprints.github.io/Android-Simprints-ID/`)
 
 ---
 
@@ -25,6 +25,8 @@ The dashboard gives the team and stakeholders a single, always-up-to-date view o
 | `index.html` | The dashboard UI — a single self-contained HTML/CSS/JS page. No build step; it is served directly by GitHub Pages. |
 | `status.json` | Machine-written state file that records the current version (and optional APK/release URLs) for each environment. Updated by CI. |
 | `projects.csv` | Manually maintained registry of projects and the SID version they are pinned to. |
+| `app-icon.png` | Simprints ID app icon, used as the dashboard header logo and browser favicon. |
+| `CNAME` | GitHub Pages custom domain config, points the dashboard at `releases.simprints.com`. |
 
 ---
 
@@ -32,27 +34,6 @@ The dashboard gives the team and stakeholders a single, always-up-to-date view o
 
 `status.json` is updated automatically by CI using the reusable workflow
 [`.github/workflows/reusable-update-dashboard.yml`](.github/workflows/reusable-update-dashboard.yml).
-
-The workflow:
-1. Checks out this `gh-pages` branch.
-2. Uses `jq` to patch the relevant environment key inside `status.json` with the new `version`, `updated_at` timestamp, `apk_url`, and `release_url`.
-3. Commits and pushes the change back to `gh-pages`.
-
-### Inputs
-
-| Input | Required | Description |
-|-------|----------|-------------|
-| `environment` | ✅ | One of `internal_testing`, `delivery_testing`, `production_ready`, `production` |
-| `version` | ✅ | Version name, e.g. `2026.2.0` (without the leading `v`) |
-| `apk_url` | ➖ | Direct APK download URL |
-| `release_url` | ➖ | GitHub Release page URL |
-
-### Callers
-
-| Trigger | Workflow | Description |
-|---------|----------|-------------|
-| Manual (`workflow_dispatch`) | [`update-release-stage.yml`](.github/workflows/update-release-stage.yml) | Used to promote a version to `delivery_testing` or `production`. Automatically looks up the APK URL from the GitHub Release assets before calling the reusable workflow. |
-| Other CI jobs | `reusable-update-dashboard.yml` via `workflow_call` | Other pipelines (e.g. a release build) can call the reusable workflow directly to update `internal_testing` or `production_ready`. |
 
 ---
 
@@ -63,8 +44,8 @@ The workflow:
 ```
 name,sid_version
 GG2,v2026.2.0
-eCHIS,v2025.1.0
-operation_sight,v2024.3.2
+eCHIS,v2025.2.1
+RAMP,v2026.2.1
 ```
 
 - **`name`** — Display name shown as a tab on the dashboard.
@@ -101,36 +82,6 @@ Edit `projects.csv` on the `gh-pages` branch directly (via the GitHub UI or a lo
 
 ---
 
-## Release Pipeline
-
-```mermaid
-flowchart TD
-    A([🔨 Build & CI\nrelease APK]) --> B
-
-    B(["🔵 Internal Testing\nEngineering team\nvalidation"])
-    B -->|Pass| C
-
-    C(["🟡 Delivery Testing\nLimited tester group\nfinal validation"])
-    C -->|Issues found| B
-    C -->|Pass| D
-
-    D(["🟣 Production Ready\nTechnically signed off\nawaiting approvals"])
-    D -->|Non-technical\napprovals granted| E
-    D -->|Issues found| C
-
-    E(["🟢 Production\nLive on Google Play\nfor end users"])
-
-    style A fill:#334155,color:#fff,stroke:#475569
-    style B fill:#1d4ed8,color:#fff,stroke:#1e40af
-    style C fill:#92400e,color:#fff,stroke:#78350f
-    style D fill:#581c87,color:#fff,stroke:#4a1d7a
-    style E fill:#14532d,color:#fff,stroke:#15803d
-```
-
-> **How to promote a release:** run the [Promote Release Stage](.github/workflows/update-release-stage.yml) workflow from GitHub Actions, pick the target stage, and enter the version number. The dashboard updates automatically.
-
----
-
 ## Environments explained
 
 | Environment | Colour | Meaning |
@@ -138,4 +89,3 @@ flowchart TD
 | **Production** | 🟢 Green | Live version shipped to end users via Google Play. |
 | **Production Ready** | 🟣 Purple | Technically signed off, but held pending non-technical approvals (e.g. user training, project milestones). |
 | **Delivery Testing** | 🟡 Amber | Deployed to a limited tester group for final validation before promotion to Production. |
-| **Internal Testing** | 🔵 Blue | Active development build used by the engineering team. Not yet ready for wider testing. |
