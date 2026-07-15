@@ -9,4 +9,5 @@ enum class ExternalCredentialType {
     NHISCard,
     GhanaIdCard,
     QRCode,
+    FaydaCard,
 }

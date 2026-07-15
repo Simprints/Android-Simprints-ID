@@ -16,16 +16,19 @@ enum class CoSyncExternalCredentialType {
     NHISCard,
     GhanaIdCard,
     QRCode,
+    FaydaCard,
 }
 
 fun ExternalCredentialType.toCoSync(): CoSyncExternalCredentialType = when (this) {
     ExternalCredentialType.NHISCard -> CoSyncExternalCredentialType.NHISCard
     ExternalCredentialType.GhanaIdCard -> CoSyncExternalCredentialType.GhanaIdCard
     ExternalCredentialType.QRCode -> CoSyncExternalCredentialType.QRCode
+    ExternalCredentialType.FaydaCard -> CoSyncExternalCredentialType.FaydaCard
 }
 
 fun CoSyncExternalCredentialType.toDomain(): ExternalCredentialType = when (this) {
     CoSyncExternalCredentialType.NHISCard -> ExternalCredentialType.NHISCard
     CoSyncExternalCredentialType.GhanaIdCard -> ExternalCredentialType.GhanaIdCard
     CoSyncExternalCredentialType.QRCode -> ExternalCredentialType.QRCode
+    CoSyncExternalCredentialType.FaydaCard -> ExternalCredentialType.FaydaCard
 }

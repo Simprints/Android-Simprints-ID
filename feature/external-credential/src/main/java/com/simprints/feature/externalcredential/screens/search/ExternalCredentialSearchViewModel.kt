@@ -13,6 +13,7 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.FaydaCardOcrReaderUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GhanaIdCardOcrReaderUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GhanaNhisCardOcrReaderUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
@@ -161,8 +162,9 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
      * alpha-numeric, while the NHIS card memberships contain only digits.
      */
     fun getKeyBoardInputType() = when (scannedCredentialResult.credentialType) {
-        // NHIS card membership contains only numbers
+        // NHIS card membership and Fayda FAN contain only numbers
         ExternalCredentialType.NHISCard -> InputType.TYPE_CLASS_NUMBER
+        ExternalCredentialType.FaydaCard -> InputType.TYPE_CLASS_NUMBER
         ExternalCredentialType.GhanaIdCard -> InputType.TYPE_CLASS_TEXT
         ExternalCredentialType.QRCode -> InputType.TYPE_CLASS_TEXT
     }
@@ -210,6 +212,10 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
             ExternalCredentialType.GhanaIdCard -> {
                 // Ghana ID card number pattern is "GHA-123456789-0"
                 GhanaIdCardOcrReaderUseCase.GHANA_ID_PATTERN.matches(credential)
+            }
+            ExternalCredentialType.FaydaCard -> {
+                // Fayda Alias Number (FAN): exactly 16 digits after stripping non-digit chars
+                FaydaCardOcrReaderUseCase.FAN_PATTERN.matches(credential.filter(Char::isDigit))
             }
             ExternalCredentialType.QRCode -> {
                 // No QR code validation as of 2025.4.1

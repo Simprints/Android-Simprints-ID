@@ -28,7 +28,7 @@ internal data class SearchCredentialState(
             // [MS-1484] Editing and confirming the readout value should only be available for the OCR readouts (i.e.: Ghana NHIS card)
             // QR codes are not readable by humans, hence there is no point of asking the user to confirm the readout, nor to edit the readout
             val isOcrReadout = when (scannedCredentialResult.credentialType) {
-                ExternalCredentialType.NHISCard, ExternalCredentialType.GhanaIdCard -> true
+                ExternalCredentialType.NHISCard, ExternalCredentialType.GhanaIdCard, ExternalCredentialType.FaydaCard -> true
                 ExternalCredentialType.QRCode -> false
             }
             return SearchCredentialState(

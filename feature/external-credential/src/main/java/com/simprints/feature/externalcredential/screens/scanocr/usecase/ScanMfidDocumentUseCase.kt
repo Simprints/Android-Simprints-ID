@@ -17,6 +17,7 @@ internal class ScanMfidDocumentUseCase @Inject constructor(
     private val readTextFromImage: ReadTextFromImageUseCase,
     private val ghanaNhisCardOcrReaderUseCase: GhanaNhisCardOcrReaderUseCase,
     private val ghanaIdCardOcrReaderUseCase: GhanaIdCardOcrReaderUseCase,
+    private val faydaCardOcrReaderUseCase: FaydaCardOcrReaderUseCase,
     private val credentialImageRepository: CredentialImageRepository,
 ) {
     suspend operator fun invoke(
@@ -27,6 +28,7 @@ internal class ScanMfidDocumentUseCase @Inject constructor(
         val isCapturingAllFields = when (documentType) {
             OcrDocumentType.NhisCard -> config.nhisCardConfig?.isCapturingAllFields
             OcrDocumentType.GhanaIdCard -> config.ghanaIdCardConfig?.isCapturingAllFields
+            OcrDocumentType.FaydaCard -> config.faydaCardConfig?.isCapturingAllFields
         } ?: false
         return try {
             val ocrText = readTextFromImage(bitmap) ?: return null
@@ -34,6 +36,7 @@ internal class ScanMfidDocumentUseCase @Inject constructor(
             val scanResult = when (documentType) {
                 OcrDocumentType.NhisCard -> ghanaNhisCardOcrReaderUseCase(ocrReader, isCapturingAllFields)
                 OcrDocumentType.GhanaIdCard -> ghanaIdCardOcrReaderUseCase(ocrReader, isCapturingAllFields)
+                OcrDocumentType.FaydaCard -> faydaCardOcrReaderUseCase(ocrReader)
             }
             if (scanResult != null) {
                 val savedImagePath = credentialImageRepository.saveCredentialScan(bitmap, imageType = FullDocument)

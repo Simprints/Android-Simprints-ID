@@ -13,6 +13,10 @@ internal class OcrQuery {
         filters += { line -> regex.matches(line.text) }
     }
 
+    fun matchesCondition(condition: (line: String) -> Boolean) {
+        filters += { line -> condition(line.text) }
+    }
+
     fun containsPattern(regex: Regex) {
         filters += { line -> regex.containsMatchIn(line.text) }
     }

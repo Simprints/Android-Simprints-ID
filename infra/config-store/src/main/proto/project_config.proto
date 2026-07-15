@@ -22,6 +22,7 @@ enum ProtoExternalCredentialType {
     NHIS_CARD = 1;
     GHANA_ID_CARD = 2;
     QR_CODE = 3;
+    FAYDA_CARD = 4;
 }
 
 message ProtoMultiFactorIdConfiguration {
@@ -29,6 +30,7 @@ message ProtoMultiFactorIdConfiguration {
     optional ProtoGhanaIdCardConfig ghana_id_card_config = 2;
     optional ProtoNhisCardConfig nhis_card_config = 3;
     optional ProtoQrCodeConfig qr_code_config = 4;
+    optional ProtoFaydaCardConfig fayda_card_config = 5;
 }
 
 message ProtoGhanaIdCardConfig {
@@ -41,6 +43,10 @@ message ProtoNhisCardConfig {
 
 message ProtoQrCodeConfig {
     // Empty, reserved for future configuration
+}
+
+message ProtoFaydaCardConfig {
+    bool is_capturing_all_fields = 1;
 }
 
 message ProtoGeneralConfiguration {

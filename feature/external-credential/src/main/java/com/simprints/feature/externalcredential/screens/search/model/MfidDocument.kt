@@ -43,4 +43,10 @@ sealed class MfidDocument : StepResult {
     data class GhanaQrCode(
         override val credential: TokenizableString.Raw,
     ) : MfidDocument()
+
+    @Serializable
+    @SerialName("MfidDocument.FaydaCard")
+    data class FaydaCard(
+        override val credential: TokenizableString.Raw,
+    ) : MfidDocument()
 }
