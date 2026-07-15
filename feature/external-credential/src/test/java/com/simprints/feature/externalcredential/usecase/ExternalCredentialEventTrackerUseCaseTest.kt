@@ -224,6 +224,7 @@ class ExternalCredentialEventTrackerUseCaseTest {
             ExternalCredentialType.NHISCard -> MfidDocument.GhanaNhisCard(credential = RAW_SCANNED_VALUE.asTokenizableRaw())
             ExternalCredentialType.GhanaIdCard -> MfidDocument.GhanaIdCard(credential = RAW_SCANNED_VALUE.asTokenizableRaw())
             ExternalCredentialType.QRCode -> MfidDocument.GhanaQrCode(credential = RAW_SCANNED_VALUE.asTokenizableRaw())
+            ExternalCredentialType.FaydaCard -> MfidDocument.FaydaCard(credential = RAW_SCANNED_VALUE.asTokenizableRaw())
         }
         val scannedResult = ScannedCredentialResult(
             credentialScanId = SCAN_ID,
