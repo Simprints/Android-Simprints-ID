@@ -1,0 +1,70 @@
+name: "[Reusable] Update Release Dashboard"
+
+on:
+    workflow_call:
+        inputs:
+            environment:
+                description: "Target environment: production_ready | delivery_testing | production"
+                type: string
+                required: true
+            version:
+                description: "Version name (e.g. 2026.2.0)"
+                type: string
+                required: true
+            apk_url:
+                description: "Direct APK download URL"
+                type: string
+                required: false
+                default: ""
+            release_url:
+                description: "GitHub Release page URL"
+                type: string
+                required: false
+                default: ""
+
+permissions:
+    contents: write
+
+concurrency:
+    group: update-release-dashboard-gh-pages
+    cancel-in-progress: false
+
+jobs:
+    update:
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Checkout gh-pages branch
+                uses: actions/checkout@v6
+                with:
+                    ref: gh-pages
+
+            -   name: Update status.json
+                env:
+                    ENVIRONMENT:  ${{ inputs.environment }}
+                    VERSION:      ${{ inputs.version }}
+                    APK_URL:      ${{ inputs.apk_url }}
+                    RELEASE_URL:  ${{ inputs.release_url }}
+                run: |
+                    UPDATED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+                    jq \
+                        --arg env         "$ENVIRONMENT" \
+                        --arg version     "$VERSION" \
+                        --arg updated_at  "$UPDATED_AT" \
+                        --arg apk_url     "$APK_URL" \
+                        --arg release_url "$RELEASE_URL" \
+                        '.[$env] = {version: $version, updated_at: $updated_at, apk_url: $apk_url, release_url: $release_url}' \
+                        status.json > status.json.tmp
+                    mv status.json.tmp status.json
+
+            -   name: Commit and push
+                env:
+                    ENVIRONMENT: ${{ inputs.environment }}
+                    VERSION:     ${{ inputs.version }}
+                run: |
+                    git config user.name  "github-actions[bot]"
+                    git config user.email "github-actions[bot]@users.noreply.github.com"
+                    git add status.json
+                    git diff --cached --quiet && echo "No changes" && exit 0
+                    git commit -m "dashboard: update ${ENVIRONMENT} → ${VERSION}"
+                    git push
