@@ -280,37 +280,7 @@
     .btn-primary  { background: var(--accent); color: #fff; }
     .btn-secondary { background: rgba(0,0,0,0.045); color: var(--text); border: 1px solid var(--border); }
     .btn-disabled { opacity: 0.3; pointer-events: none; cursor: not-allowed; }
-    /* ── Tabs ── */
-    .tabs-bar {
-      display: flex;
-      gap: 0.25rem;
-      max-width: 1000px;
-      margin: 0 auto 2.5rem;
-      border-bottom: 1px solid var(--border);
-      flex-wrap: wrap;
-      padding-bottom: 0;
-    }
-    .tabs-bar.hidden { display: none; }
-    .tab-btn {
-      padding: 0.55rem 1.1rem;
-      border: none;
-      background: transparent;
-      color: var(--muted);
-      font-size: 0.88rem;
-      font-weight: 500;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-      border-radius: 4px 4px 0 0;
-      transition: color 0.15s, border-color 0.15s;
-      white-space: nowrap;
-    }
-    .tab-btn:hover { color: var(--text); }
-    .tab-btn.active {
-      color: var(--text);
-      border-bottom-color: var(--brand-teal);
-      font-weight: 700;
-    }
+    /* ── Tabs (panels only — no visible tab bar) ── */
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
@@ -493,19 +463,14 @@
     <p>Release Status Dashboard</p>
   </header>
 
-  <!-- Tab bar — populated by JS once projects.csv is loaded -->
-  <nav class="tabs-bar" id="tabs-bar">
-    <button class="tab-btn active" data-tab="sid">📊 SID Releases</button>
-  </nav>
-
-  <!-- ── SID Releases tab ── -->
+  <!-- ── SID Releases (main) tab — always the default view, no tab bar ── -->
   <div class="tab-panel active" id="tab-sid">
     <div class="grid" id="grid"></div>
 
     <ul class="env-legend" id="env-legend"></ul>
 
     <section class="releases-section">
-      <h2>📦 Recent Releases</h2>
+      <h2>Recent Releases</h2>
       <div id="releases-loading">Loading releases…</div>
       <div class="releases-table-wrap" id="releases-table-wrap" style="display:none">
         <table>
@@ -539,7 +504,7 @@
   <!-- QR modal -->
   <div id="qr-modal">
     <div class="qr-modal-box">
-      <h3>📱 Scan to Download</h3>
+      <h3><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-3px" aria-hidden="true"><path d="M3 3h7v7H3V3zm2 2v3h3V5H5zm9-2h7v7h-7V3zm2 2v3h3V5h-3zM3 14h7v7H3v-7zm2 2v3h3v-3H5zm11-2h2v2h-2v-2zm3 0h2v2h-2v-2zm-3 3h2v2h-2v-2zm3 0h2v2h-2v-2zm-3 3h2v2h-2v-2zm3 0h2v2h-2v-2z"/></svg>&nbsp;Scan to Download</h3>
       <span id="qr-modal-label" class="qr-modal-label"></span>
       <img id="qr-img" width="220" height="220" style="border-radius:8px;display:block;margin:0 auto;" alt="QR Code" />
       <p class="qr-modal-hint">Point your phone camera at this code</p>
@@ -549,6 +514,7 @@
 
   <script>
     // ── QR code helpers ─────────────────────────────────────────────
+    const QR_ICON_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px" aria-hidden="true"><path d="M3 3h7v7H3V3zm2 2v3h3V5H5zm9-2h7v7h-7V3zm2 2v3h3V5h-3zM3 14h7v7H3v-7zm2 2v3h3v-3H5zm11-2h2v2h-2v-2zm3 0h2v2h-2v-2zm-3 3h2v2h-2v-2zm3 0h2v2h-2v-2zm-3 3h2v2h-2v-2zm3 0h2v2h-2v-2z"/></svg>';
     const _qrModal = document.getElementById('qr-modal');
     document.getElementById('qr-close-btn').addEventListener('click', () => _qrModal.style.display = 'none');
     _qrModal.addEventListener('click', e => { if (e.target === _qrModal) _qrModal.style.display = 'none'; });
@@ -631,7 +597,7 @@
         ? `<span style="font-size:0.78rem;color:#1d4ed8;display:inline-flex;align-items:center;gap:0.35rem;">🔒&nbsp;APK available internally only</span>`
         : apkUrl
           ? `<a class="btn btn-primary" href="${apkUrl}" download>⬇&nbsp;Download APK</a>
-             <button class="btn-qr" data-qr-url="${apkUrl}" data-qr-label="${version || env.label}">📱&nbsp;QR</button>`
+             <button class="btn-qr" data-qr-url="${apkUrl}" data-qr-label="${version || env.label}">${QR_ICON_SVG}&nbsp;QR</button>`
           : `<span class="btn btn-primary btn-disabled">⬇&nbsp;Download APK</span>`;
 
       const releaseBtn = releaseUrl
@@ -726,7 +692,7 @@
           const apkAsset = (r.assets || []).find(a => a.name.endsWith('.apk'));
           const apkBtn = apkAsset
             ? `<a class="tbl-btn tbl-btn-apk" href="${apkAsset.browser_download_url}" download>⬇ APK</a>
-               <button class="tbl-btn-qr" data-qr-url="${apkAsset.browser_download_url}" data-qr-label="${r.tag_name}">📱 QR</button>`
+               <button class="tbl-btn-qr" data-qr-url="${apkAsset.browser_download_url}" data-qr-label="${r.tag_name}">${QR_ICON_SVG} QR</button>`
             : `<span class="tbl-btn tbl-btn-na">⬇ APK</span>`;
           return `<tr>
             <td><span class="tag-badge">${r.tag_name}</span></td>
@@ -742,16 +708,10 @@
       }
     }
 
-    // ── Tab switching ──────────────────────────────────────────────
+    // ── Tab switching (used only for deep-linked project panels) ───
     function switchTab(tabId) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + tabId));
     }
-
-    document.getElementById('tabs-bar').addEventListener('click', e => {
-      const btn = e.target.closest('.tab-btn');
-      if (btn) switchTab(btn.dataset.tab);
-    });
 
     function slugifyProjectName(name) {
       return (name || '')
@@ -782,7 +742,7 @@
         ? `<a class="project-apk-btn" href="${apkUrl}" download>⬇ APK</a>`
         : `<span class="project-apk-btn disabled">⬇ APK</span>`;
       const qrBtn = apkUrl
-        ? `<button class="project-qr-btn" data-qr-url="${apkUrl}" data-qr-label="${project.name} ${project.sid_version || ''}">📱&nbsp;Scan QR to Download</button>`
+        ? `<button class="project-qr-btn" data-qr-url="${apkUrl}" data-qr-label="${project.name} ${project.sid_version || ''}">${QR_ICON_SVG}&nbsp;Scan QR to Download</button>`
         : '';
 
       return `
@@ -815,36 +775,30 @@
           releasesPromise,
         ]);
         const projects = parseCSV(text);
-        const tabsBar = document.getElementById('tabs-bar');
         const container = document.getElementById('project-tabs-container');
-        const requestedProject = slugifyProjectName(
-          new URLSearchParams(window.location.search).get('project')
-        );
+        const requestedProject = (
+          new URLSearchParams(window.location.search).get('project') || ''
+        ).trim().toLowerCase();
         let requestedTabId = null;
 
-        projects.forEach((project, i) => {
-          const tabId = 'project-' + i;
+        projects.forEach((project) => {
+          const slug = (project.slug || slugifyProjectName(project.name)).trim().toLowerCase();
+          const tabId = 'project-' + slug;
           const tag = project.sid_version?.startsWith('v') ? project.sid_version : `v${project.sid_version}`;
           const rel = releases.find(r => r.tag_name === tag);
           const releaseUrl = rel?.html_url || null;
           const apkAsset = (rel?.assets || []).find(a => a.name.endsWith('.apk'));
           const apkUrl = apkAsset?.browser_download_url || null;
 
-          const btn = document.createElement('button');
-          btn.className = 'tab-btn';
-          btn.dataset.tab = tabId;
-          btn.textContent = project.name;
-          tabsBar.appendChild(btn);
           container.insertAdjacentHTML('beforeend', renderProjectTab(project, tabId, releaseUrl, apkUrl));
 
-          if (!requestedTabId && requestedProject && slugifyProjectName(project.name) === requestedProject) {
+          if (!requestedTabId && requestedProject && slug === requestedProject) {
             requestedTabId = tabId;
           }
         });
 
         if (requestedTabId) {
           switchTab(requestedTabId);
-          tabsBar.classList.add('hidden');
         }
       } catch (e) {
         console.warn('Could not load projects.csv:', e);
