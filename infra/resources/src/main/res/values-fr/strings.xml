@@ -187,8 +187,6 @@
     <string name="face_capture_title_previewing">Préparation du scan</string>
     <string name="face_capture_title_no_face">Aucun visage détecté</string>
     <string name="face_capture_error_no_face">Assurez-vous que le visage soit dans le cercle</string>
-    <string name="face_capture_title_bad_quality">Image floue</string>
-    <string name="face_capture_error_bad_quality">Essayez d\'ajuster l\'éclairage ou de repositionner le visage pour obtenir une meilleure photo.</string>
     <string name="face_capture_title_too_far">Trop loin</string>
     <string name="face_capture_error_too_far">Rapprochez-vous</string>
     <string name="face_capture_title_too_close">Trop près</string>

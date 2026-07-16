@@ -22,7 +22,6 @@ internal data class FaceDetection(
     enum class Status {
         VALID,
         VALID_CAPTURING,
-        BAD_QUALITY,
         NOFACE,
         OFFYAW,
         OFFROLL,

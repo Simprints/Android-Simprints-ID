@@ -185,8 +185,6 @@
     <string name="face_capture_title_previewing">ለማንሳት እየተዘጋጀ</string>
     <string name="face_capture_title_no_face">ምንም ፊት ማግኘት አልቻለም</string>
     <string name="face_capture_error_no_face">ፊቱ ክቡን መሙላቱን ያረጋግጡ</string>
-    <string name="face_capture_title_bad_quality">ግልጽ ያልሆነ ምስል</string>
-    <string name="face_capture_error_bad_quality">ይበልጥ ግልጽ የሆነ ፎቶ ለማግኘት መብራቱን ለማስተካከል ወይም ፊቱን ለማስተካከል ይሞክሩ</string>
     <string name="face_capture_title_too_far">ፊቱ በጣም ርቋል</string>
     <string name="face_capture_error_too_far">ቀረብ አድርግ(ፊት ርቋል)</string>
     <string name="face_capture_title_too_close">ፊቱ በጣም ቀርቧል</string>

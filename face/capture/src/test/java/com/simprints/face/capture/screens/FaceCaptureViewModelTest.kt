@@ -108,6 +108,7 @@ class FaceCaptureViewModelTest {
                 ?.imageSavingStrategy
         } returns ImageSavingStrategy.NEVER
 
+        viewModel.initFaceBioSdk(mockk(), ModalitySdkType.SIM_FACE)
         viewModel.captureFinished(faceDetections)
         viewModel.flowFinished()
         coVerify(exactly = 0) { faceImageUseCase.invoke(any(), any()) }
@@ -148,6 +149,7 @@ class FaceCaptureViewModelTest {
 
     @Test
     fun `Recapture requests clears capture list`() {
+        viewModel.initFaceBioSdk(mockk(), ModalitySdkType.SIM_FACE)
         viewModel.captureFinished(faceDetections)
         viewModel.recapture()
 

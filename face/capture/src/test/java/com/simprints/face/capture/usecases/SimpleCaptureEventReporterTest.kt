@@ -154,9 +154,8 @@ class SimpleCaptureEventReporterTest {
         reporter.addCaptureEvents(getDetection(FaceDetection.Status.OFFROLL), 1, 0.5f, SpoofCheckConfiguration.DISABLED)
         reporter.addCaptureEvents(getDetection(FaceDetection.Status.TOOCLOSE), 1, 0.5f, SpoofCheckConfiguration.DISABLED)
         reporter.addCaptureEvents(getDetection(FaceDetection.Status.TOOFAR), 1, 0.5f, SpoofCheckConfiguration.DISABLED)
-        reporter.addCaptureEvents(getDetection(FaceDetection.Status.BAD_QUALITY), 1, 0.5f, SpoofCheckConfiguration.DISABLED)
 
-        coVerify(exactly = 6) {
+        coVerify(exactly = 5) {
             eventRepository.addOrUpdateEvent(withArg { assertThat(it).isInstanceOf(FaceCaptureEvent::class.java) })
         }
         coVerify(exactly = 0) {
