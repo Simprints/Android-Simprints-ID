@@ -190,6 +190,9 @@
     <string name="face_capture_error_too_close">Move back</string>
     <string name="face_capture_title_look_straight">Not looking straight</string>
     <string name="face_capture_error_look_straight">Make sure the person is looking straight at the camera</string>
+    <string name="face_capture_title_validating">Verifying your scan</string>
+    <string name="face_capture_title_validating_failed">Unable to verify</string>
+    <string name="face_capture_error_validating_failed">Please recapture and ensure a real person is in front of the camera</string>
     <string name="face_capture_begin_button">Tap to capture</string>
     <string name="face_capture_prep_begin_button_capturing">Capturing…</string>
     <string name="face_capture_permission_denied">Please grant the camera permission</string>

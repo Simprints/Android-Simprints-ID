@@ -37,6 +37,7 @@ import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_DEFAULT_MAX_RETRIES
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES
+import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckMode
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Test
@@ -356,6 +357,84 @@ internal class ExperimentalProjectConfigurationTest {
             mapOf(ExperimentalProjectConfiguration.MFID_SKIP_REASONS_HIDE_HAS_NUMBER to JsonPrimitive(true)) to true,
         ).forEach { (config, result) ->
             assertThat(ExperimentalProjectConfiguration(config).mfidSkipReasonsHideHasNumber).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `spoof check mode value parsed correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to SpoofCheckMode.DISABLED,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MODE to JsonPrimitive(null)) to SpoofCheckMode.DISABLED,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MODE to JsonPrimitive("string")) to SpoofCheckMode.DISABLED,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MODE to JsonPrimitive("ENFORCED")) to SpoofCheckMode.ENFORCED,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MODE to JsonPrimitive("RECORDED")) to SpoofCheckMode.RECORDED,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).spoofCheckMode).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `spoof check threshold value parsed correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to 0.33f,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_THRESHOLD to JsonPrimitive(null)) to 0.33f,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_THRESHOLD to JsonPrimitive("string")) to 0.33f,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_THRESHOLD to JsonPrimitive(1)) to 1f,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_THRESHOLD to JsonPrimitive(0f)) to 0f,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).spoofCheckThreshold).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `spoof check max attempts value parsed correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to 2,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_ATTEMPTS to JsonPrimitive(null)) to 2,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_ATTEMPTS to JsonPrimitive("string")) to 2,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_ATTEMPTS to JsonPrimitive(1)) to 1,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_ATTEMPTS to JsonPrimitive(0f)) to 2,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).spoofMaxAttempts).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `spoof check max bitmap size value parsed correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to 1500,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_BITMAP_SIZE to JsonPrimitive(null)) to 1500,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_BITMAP_SIZE to JsonPrimitive("string")) to 1500,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_BITMAP_SIZE to JsonPrimitive(100)) to 720,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MAX_BITMAP_SIZE to JsonPrimitive(0f)) to 1500,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).spoofMaxBitmapSize).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `spoof check spoof ui duration parsed correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to 2000,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MIN_VALIDATION_UI_DURATION_MS to JsonPrimitive(null)) to 2000,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MIN_VALIDATION_UI_DURATION_MS to JsonPrimitive("string")) to 2000,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MIN_VALIDATION_UI_DURATION_MS to JsonPrimitive(100)) to 100,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MIN_VALIDATION_UI_DURATION_MS to JsonPrimitive(0f)) to 2000,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).spoofMinValidationUiDurationMs).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `spoof check spoof error ui duration parsed correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to 2000,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MIN_VALIDATION_ERROR_UI_DURATION_MS to JsonPrimitive(null)) to 2000,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MIN_VALIDATION_ERROR_UI_DURATION_MS to JsonPrimitive("string")) to 2000,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MIN_VALIDATION_ERROR_UI_DURATION_MS to JsonPrimitive(100)) to 100,
+            mapOf(ExperimentalProjectConfiguration.SPOOF_CHECK_MIN_VALIDATION_ERROR_UI_DURATION_MS to JsonPrimitive(0f)) to 2000,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).spoofMinValidationErrorUiDurationMs).isEqualTo(result)
         }
     }
 }

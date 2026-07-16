@@ -4,11 +4,13 @@ import android.graphics.Bitmap
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.extentions.area
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.models.FaceTarget
 import com.simprints.face.capture.models.SymmetricTarget
+import com.simprints.face.capture.usecases.GetSpoofCheckConfigurationUseCase
 import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.detection.Face
@@ -16,19 +18,25 @@ import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
+import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckConfiguration
 import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.measureTimedValue
 
 @HiltViewModel
 internal class LiveFeedbackFragmentViewModel @Inject constructor(
@@ -37,6 +45,8 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private val eventReporter: SimpleCaptureEventReporter,
     private val timeHelper: TimeHelper,
     private val isUsingAutoCaptureUseCase: IsUsingAutoCaptureUseCase,
+    private val getSpoofCheckConfiguration: GetSpoofCheckConfigurationUseCase,
+    @param:DispatcherBG private val bgDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private var attemptNumber: Int = 1
     private var samplesToCapture: Int = 1
@@ -55,10 +65,14 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     var sortedQualifyingCaptures = listOf<FaceDetection>()
     val currentDetection = MutableLiveData<FaceDetection>()
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
+    val progressBarValue = MutableLiveData<Float>()
 
     var isAutoCapture: Boolean = false
+    var spoofCheckConfig: SpoofCheckConfiguration = SpoofCheckConfiguration.DISABLED
+    var spoofCheckCount: Int = 0
 
     private var captureImagingStartTime: Long = 0
+    private var validationStartTime: Long = 0
     private var isAutoCaptureHeldOff = true
     private var autoCaptureImagingTimeoutJob: Job? = null
     private var autoCaptureImagingDurationMillis: Long = FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
@@ -81,6 +95,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             faceDetector = resolveFaceBioSdk(bioSdk).detector
 
             val config = configRepository.getProjectConfiguration()
+            spoofCheckConfig = getSpoofCheckConfiguration(config, bioSdk)
             qualityThreshold = config.face?.getSdkConfiguration(bioSdk)?.qualityThreshold ?: 0f
             autoCaptureImagingDurationMillis = config.experimental().faceAutoCaptureImagingDurationMillis
         }
@@ -109,11 +124,28 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
      *
      * @param croppedBitmap is the camera frame
      */
-    fun process(croppedBitmap: Bitmap) {
+    fun process(
+        originalBitmap: Bitmap,
+        croppedBitmap: Bitmap,
+    ) {
+        // Skip processing and only update progress bar while spoof check is running
+        if (capturingState.value == CapturingState.VALIDATING) {
+            progressBarValue.postValue(
+                ((timeHelper.now().ms - validationStartTime).toFloat() / spoofCheckConfig.validationUiDurationMs).coerceIn(0f, 1f),
+            )
+            originalBitmap.recycle()
+            croppedBitmap.recycle()
+            return
+        } else if (capturingState.value == CapturingState.VALIDATION_FAILED) {
+            originalBitmap.recycle()
+            croppedBitmap.recycle()
+            return
+        }
+
         val captureStartTime = timeHelper.now()
         val potentialFace = faceDetector.analyze(croppedBitmap)
 
-        val faceDetection = getFaceDetectionFromPotentialFace(croppedBitmap, potentialFace)
+        val faceDetection = getFaceDetectionFromPotentialFace(originalBitmap, croppedBitmap, potentialFace)
         faceDetection.detectionStartTime = captureStartTime
         faceDetection.detectionEndTime = timeHelper.now()
 
@@ -132,6 +164,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         } else {
             currentDetection.postValue(faceDetection)
         }
+        progressBarValue.postValue(getNormalizedCaptureProgress())
 
         when (capturingState.value) {
             CapturingState.NOT_STARTED -> updateFallbackCaptureIfValid(faceDetection)
@@ -153,7 +186,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         }
     }
 
-    fun getNormalizedProgress(): Float = if (isAutoCapture) {
+    fun getNormalizedCaptureProgress(): Float = if (isAutoCapture) {
         ((timeHelper.now().ms - captureImagingStartTime).toFloat() / autoCaptureImagingDurationMillis).coerceIn(0f, 1f)
     } else {
         userCaptures.size.toFloat() / samplesToCapture
@@ -192,23 +225,87 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private fun finishCapture(attemptNumber: Int) {
         Simber.i("Finish capture", tag = FACE_CAPTURE)
         viewModelScope.launch {
-            sortedQualifyingCaptures = userCaptures
-                .filter { isAutoCapture || it.hasValidStatus() } // Auto-capture images are pre-qualified
-                .sortedByDescending { it.face?.quality }
-                .ifEmpty { listOfNotNull(fallbackCapture) }
+            if (spoofCheckConfig == SpoofCheckConfiguration.DISABLED) {
+                sendEventsAndFinish(attemptNumber)
+            } else {
+                runSpoofChecksOnCaptures()
 
-            sendCaptureEvents(attemptNumber)
+                if (spoofCheckConfig.mode == FaceConfiguration.SpoofCheckMode.RECORDED) {
+                    sendEventsAndFinish(attemptNumber)
+                } else {
+                    val spoofCheckPassed = userCaptures.map { it.spoofCheckResult }.all {
+                        Simber.i("Spoof check result for capture: $it", tag = FACE_CAPTURE)
+                        it != null && it.skipReason == null && spoofCheckConfig.threshold > it.score
+                    }
 
-            capturingState.postValue(CapturingState.FINISHED)
+                    Simber.i("Spoof check passed: $spoofCheckPassed (check count: $spoofCheckCount)", tag = FACE_CAPTURE)
+                    // Only attempt up to configured amount of times to prevent hard-blocking user
+                    if (spoofCheckCount >= spoofCheckConfig.maxAttempts || spoofCheckPassed) {
+                        sendEventsAndFinish(attemptNumber)
+                    } else {
+                        showValidationErrorAndReset()
+                    }
+                }
+            }
         }
     }
 
+    private fun sendEventsAndFinish(attemptNumber: Int) {
+        sortedQualifyingCaptures = userCaptures
+            .filter { isAutoCapture || it.hasValidStatus() } // Auto-capture images are pre-qualified
+            .sortedByDescending { it.face?.quality }
+            .ifEmpty { listOfNotNull(fallbackCapture) }
+
+        sendCaptureEvents(attemptNumber)
+        capturingState.postValue(CapturingState.FINISHED)
+    }
+
+    private suspend fun runSpoofChecksOnCaptures() = withContext(bgDispatcher) {
+        capturingState.postValue(CapturingState.VALIDATING)
+        spoofCheckCount++
+        validationStartTime = timeHelper.now().ms
+
+        val duration = measureTimedValue {
+            for ((index, bitmap) in userCaptures.map { it.original }.withIndex()) {
+                val result = faceDetector.spoofCheck(bitmap, spoofCheckConfig.maxBitmapSize)
+                Simber.i("Spoof result: $result", tag = FACE_CAPTURE)
+                userCaptures[index].spoofCheckResult = result
+            }
+        }
+
+        // Show the UI for at least a moment for it to register with the user
+        val delay = maxOf(spoofCheckConfig.validationUiDurationMs - duration.duration.inWholeMilliseconds, 0)
+        Simber.i("Spoof check performed in ${duration.duration}, waiting for ${delay}ms", tag = FACE_CAPTURE)
+        if (delay > 0) delay(delay.milliseconds)
+    }
+
+    private suspend fun showValidationErrorAndReset() {
+        capturingState.postValue(CapturingState.VALIDATION_FAILED)
+        val duration = measureTimedValue {
+            // Still track the capture attempt events for analytics and troubleshooting
+            sendCaptureEvents(attemptNumber)
+        }
+        val delay = maxOf(spoofCheckConfig.validationErrorUiDurationMs - duration.duration.inWholeMilliseconds, 0)
+        Simber.i("Captures tracked in ${duration.duration}, waiting for ${delay}ms", tag = FACE_CAPTURE)
+        if (delay > 0) delay(delay.milliseconds)
+
+        // Reset state
+        capturingState.postValue(CapturingState.NOT_STARTED)
+        isAutoCaptureHeldOff = true
+        userCaptures.clear()
+        sortedQualifyingCaptures = emptyList()
+        fallbackCapture = null
+    }
+
     private fun getFaceDetectionFromPotentialFace(
+        original: Bitmap,
         bitmap: Bitmap,
         potentialFace: Face?,
     ): FaceDetection = if (potentialFace == null) {
+        original.recycle()
         bitmap.recycle()
         FaceDetection(
+            original = original,
             bitmap = bitmap,
             face = null,
             status = FaceDetection.Status.NOFACE,
@@ -216,10 +313,11 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             detectionEndTime = timeHelper.now(),
         )
     } else {
-        getFaceDetection(bitmap, potentialFace)
+        getFaceDetection(original, bitmap, potentialFace)
     }
 
     private fun getFaceDetection(
+        original: Bitmap,
         bitmap: Bitmap,
         potentialFace: Face,
     ): FaceDetection {
@@ -234,6 +332,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         }
 
         return FaceDetection(
+            original = original,
             bitmap = bitmap,
             face = potentialFace,
             status = status,
@@ -285,10 +384,10 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         attemptNumber: Int,
     ) {
         if (faceDetection == null) return
-        eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold, isAutoCapture = isAutoCapture)
+        eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold, spoofCheckConfig, isAutoCapture = isAutoCapture)
     }
 
-    enum class CapturingState { NOT_STARTED, CAPTURING, FINISHED }
+    enum class CapturingState { NOT_STARTED, CAPTURING, VALIDATING, VALIDATION_FAILED, FINISHED }
 
     companion object {
         private const val VALID_ROLL_DELTA = 15f

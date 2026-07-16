@@ -1,6 +1,6 @@
 package com.simprints.infra.eventsync.event.remote.models.face
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.events.event.domain.models.FaceCaptureEvent
 import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
@@ -17,6 +17,7 @@ class ApiFaceCapturePayloadTest {
             roll = 2.3f,
             quality = 12f,
             format = FACE_TEMPLATE_FORMAT,
+            spoofScore = 0.5f,
         )
         val payload = ApiFaceCapturePayload(
             id = randomUUID(),
@@ -41,52 +42,25 @@ class ApiFaceCapturePayloadTest {
     }
 
     @Test
-    fun `should map VALID correctly`() {
-        val result = FaceCaptureEvent.FaceCapturePayload.Result.VALID
-            .fromDomainToApi()
-        assertThat(result).isInstanceOf(ApiFaceCapturePayload.ApiResult.VALID::class.java)
+    fun `should map all face capture results correctly`() {
+        mapOf(
+            FaceCaptureEvent.FaceCapturePayload.Result.VALID to ApiFaceCapturePayload.ApiResult.VALID,
+            FaceCaptureEvent.FaceCapturePayload.Result.INVALID to ApiFaceCapturePayload.ApiResult.INVALID,
+            FaceCaptureEvent.FaceCapturePayload.Result.OFF_YAW to ApiFaceCapturePayload.ApiResult.OFF_YAW,
+            FaceCaptureEvent.FaceCapturePayload.Result.OFF_ROLL to ApiFaceCapturePayload.ApiResult.OFF_ROLL,
+            FaceCaptureEvent.FaceCapturePayload.Result.TOO_CLOSE to ApiFaceCapturePayload.ApiResult.TOO_CLOSE,
+            FaceCaptureEvent.FaceCapturePayload.Result.TOO_FAR to ApiFaceCapturePayload.ApiResult.TOO_FAR,
+            FaceCaptureEvent.FaceCapturePayload.Result.BAD_QUALITY to ApiFaceCapturePayload.ApiResult.BAD_QUALITY,
+        ).forEach { (mappedResult, expected) -> assertThat(mappedResult.fromDomainToApi()).isEqualTo(expected) }
     }
 
     @Test
-    fun `should map INVALID correctly`() {
-        val result = FaceCaptureEvent.FaceCapturePayload.Result.INVALID
-            .fromDomainToApi()
-        assertThat(result).isInstanceOf(ApiFaceCapturePayload.ApiResult.INVALID::class.java)
-    }
-
-    @Test
-    fun `should map OFF YAW correctly`() {
-        val result = FaceCaptureEvent.FaceCapturePayload.Result.OFF_YAW
-            .fromDomainToApi()
-        assertThat(result).isInstanceOf(ApiFaceCapturePayload.ApiResult.OFF_YAW::class.java)
-    }
-
-    @Test
-    fun `should map OFF ROLL correctly`() {
-        val result = FaceCaptureEvent.FaceCapturePayload.Result.OFF_ROLL
-            .fromDomainToApi()
-        assertThat(result).isInstanceOf(ApiFaceCapturePayload.ApiResult.OFF_ROLL::class.java)
-    }
-
-    @Test
-    fun `should map TOO CLOSE correctly`() {
-        val result = FaceCaptureEvent.FaceCapturePayload.Result.TOO_CLOSE
-            .fromDomainToApi()
-        assertThat(result).isInstanceOf(ApiFaceCapturePayload.ApiResult.TOO_CLOSE::class.java)
-    }
-
-    @Test
-    fun `should map TOO FAR correctly`() {
-        val result = FaceCaptureEvent.FaceCapturePayload.Result.TOO_FAR
-            .fromDomainToApi()
-        assertThat(result).isInstanceOf(ApiFaceCapturePayload.ApiResult.TOO_FAR::class.java)
-    }
-
-    @Test
-    fun `should map BAD QUALITY correctly`() {
-        val result = FaceCaptureEvent.FaceCapturePayload.Result.BAD_QUALITY
-            .fromDomainToApi()
-        assertThat(result).isInstanceOf(ApiFaceCapturePayload.ApiResult.BAD_QUALITY::class.java)
+    fun `should map all face spoof skip reasons correctly`() {
+        mapOf(
+            FaceCaptureEvent.FaceCapturePayload.SpoofSkipReason.IMAGE_TOO_SMALL to ApiFaceCapturePayload.ApiSpoofSkipReason.IMAGE_TOO_SMALL,
+            FaceCaptureEvent.FaceCapturePayload.SpoofSkipReason.IOD_TOO_LARGE to ApiFaceCapturePayload.ApiSpoofSkipReason.IOD_TOO_LARGE,
+            FaceCaptureEvent.FaceCapturePayload.SpoofSkipReason.IOD_TOO_SMALL to ApiFaceCapturePayload.ApiSpoofSkipReason.IOD_TOO_SMALL,
+        ).forEach { (mappedResult, expected) -> assertThat(mappedResult.fromDomainToApi()).isEqualTo(expected) }
     }
 
     @Test
@@ -97,11 +71,15 @@ class ApiFaceCapturePayloadTest {
                 roll = 1.0f,
                 quality = 3.0f,
                 format = FACE_TEMPLATE_FORMAT,
+                spoofScore = 0.5f,
+                spoofSkipReason = FaceCaptureEvent.FaceCapturePayload.SpoofSkipReason.IOD_TOO_SMALL,
             ).fromDomainToApi()
         assertThat(face).isInstanceOf(ApiFaceCapturePayload.ApiFace::class.java)
         assertThat(face.format).isEqualTo(FACE_TEMPLATE_FORMAT)
         assertThat(face.yaw).isEqualTo(2.0f)
         assertThat(face.roll).isEqualTo(1.0f)
         assertThat(face.quality).isEqualTo(3.0f)
+        assertThat(face.spoofScore).isEqualTo(0.5f)
+        assertThat(face.spoofSkipReason).isEqualTo(ApiFaceCapturePayload.ApiSpoofSkipReason.IOD_TOO_SMALL)
     }
 }

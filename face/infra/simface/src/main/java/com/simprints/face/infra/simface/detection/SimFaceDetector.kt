@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import com.simprints.biometrics.simface.SimFace
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
+import com.simprints.face.infra.basebiosdk.detection.SpoofCheckResult
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
@@ -31,6 +32,11 @@ class SimFaceDetector @Inject constructor(
             format = simFace.getTemplateVersion(),
         )
     }
+
+    override fun spoofCheck(
+        bitmap: Bitmap,
+        configuredMaxSize: Int,
+    ) = SpoofCheckResult(0f, SpoofCheckResult.SkipReason.NOT_AVAILABLE)
 
     companion object {
         private const val BAD_FACE_THRESHOLD = 0.1

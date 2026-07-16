@@ -8,17 +8,22 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
+import com.simprints.face.capture.usecases.GetSpoofCheckConfigurationUseCase
 import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
+import com.simprints.face.infra.basebiosdk.detection.SpoofCheckResult
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckConfiguration
 import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -54,6 +59,9 @@ internal class LiveFeedbackFragmentViewModelTest {
 
     @MockK
     private lateinit var isUsingAutoCapture: IsUsingAutoCaptureUseCase
+
+    @MockK
+    private lateinit var getSpoofCheckConfiguration: GetSpoofCheckConfigurationUseCase
     private lateinit var viewModel: LiveFeedbackFragmentViewModel
 
     @Before
@@ -68,6 +76,8 @@ internal class LiveFeedbackFragmentViewModelTest {
                 ?.qualityThreshold
         } returns QUALITY_THRESHOLD
         every { isUsingAutoCapture.invoke(any()) } returns false
+        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns FaceConfiguration.SpoofCheckConfiguration.DISABLED
+
         every { timeHelper.now() } returnsMany (0..100L).map { Timestamp(it) }
         justRun { previewFrame.recycle() }
         val resolveFaceBioSdkUseCase = mockk<ResolveFaceBioSdkUseCase> {
@@ -82,6 +92,8 @@ internal class LiveFeedbackFragmentViewModelTest {
             eventReporter,
             timeHelper,
             isUsingAutoCapture,
+            getSpoofCheckConfiguration,
+            testCoroutineRule.testCoroutineDispatcher,
         )
     }
 
@@ -91,7 +103,7 @@ internal class LiveFeedbackFragmentViewModelTest {
 
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
 
         val currentDetection = viewModel.currentDetection.testObserver()
         assertThat(currentDetection.observedValues.last()?.status).isEqualTo(FaceDetection.Status.VALID)
@@ -105,14 +117,14 @@ internal class LiveFeedbackFragmentViewModelTest {
 
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
         viewModel.startCapture()
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
 
         val currentDetection = viewModel.currentDetection.testObserver()
         assertThat(currentDetection.observedValues.last()?.status).isEqualTo(FaceDetection.Status.VALID_CAPTURING)
 
-        coVerify { eventReporter.addCaptureEvents(any(), any(), any()) }
+        coVerify { eventReporter.addCaptureEvents(any(), any(), any(), any()) }
     }
 
     @Test
@@ -135,12 +147,12 @@ internal class LiveFeedbackFragmentViewModelTest {
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 2, 0)
 
-        viewModel.process(frame)
-        viewModel.process(frame)
-        viewModel.process(frame)
-        viewModel.process(frame)
-        viewModel.process(frame)
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
 
         detections.observedValues.let {
             assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.TOOFAR)
@@ -150,7 +162,7 @@ internal class LiveFeedbackFragmentViewModelTest {
             assertThat(it[4]?.status).isEqualTo(FaceDetection.Status.NOFACE)
         }
 
-        coVerify(exactly = 0) { eventReporter.addCaptureEvents(any(), any(), any()) }
+        coVerify(exactly = 0) { eventReporter.addCaptureEvents(any(), any(), any(), any()) }
     }
 
     @Test
@@ -167,9 +179,9 @@ internal class LiveFeedbackFragmentViewModelTest {
         val detections = viewModel.currentDetection.testObserver()
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
-        viewModel.process(frame)
-        viewModel.process(frame)
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
 
         detections.observedValues.let {
             assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.VALID)
@@ -187,10 +199,10 @@ internal class LiveFeedbackFragmentViewModelTest {
         val capturingStateObserver = viewModel.capturingState.testObserver()
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 2, 0)
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
         viewModel.startCapture()
-        viewModel.process(frame)
-        viewModel.process(frame)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
 
         currentDetectionObserver.observedValues.let {
             assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.VALID)
@@ -224,7 +236,104 @@ internal class LiveFeedbackFragmentViewModelTest {
         }
 
         coVerify { eventReporter.addFallbackCaptureEvent(any(), any()) }
-        coVerify(exactly = 3) { eventReporter.addCaptureEvents(any(), any(), any()) }
+        coVerify(exactly = 3) { eventReporter.addCaptureEvents(any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `Spoof check Recorded finishes capture regardless of spoof result`() = runTest {
+        val validFace: Face = getFace()
+        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns getDefaultSpoofConfig()
+        every { faceDetector.analyze(frame) } returns validFace
+        coEvery { faceDetector.spoofCheck(any(), any()) } returns SpoofCheckResult(score = 0.9f)
+
+        val capturingStateObserver = viewModel.capturingState.testObserver()
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+
+        viewModel.process(frame, frame)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+
+        advanceUntilIdle()
+
+        assertThat(capturingStateObserver.observedValues.last()).isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.FINISHED)
+        assertThat(viewModel.sortedQualifyingCaptures.size).isEqualTo(1)
+        assertThat(viewModel.sortedQualifyingCaptures[0].spoofCheckResult?.score).isEqualTo(0.9f)
+    }
+
+    @Test
+    fun `Spoof check Enforced passed finishes capture`() = runTest {
+        val validFace: Face = getFace()
+        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns getDefaultSpoofConfig(FaceConfiguration.SpoofCheckMode.ENFORCED)
+        every { faceDetector.analyze(frame) } returns validFace
+        coEvery { faceDetector.spoofCheck(any(), any()) } returns SpoofCheckResult(score = 0.1f)
+
+        val capturingStateObserver = viewModel.capturingState.testObserver()
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+
+        viewModel.process(frame, frame)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+
+        advanceUntilIdle()
+
+        assertThat(capturingStateObserver.observedValues.last()).isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.FINISHED)
+        assertThat(viewModel.sortedQualifyingCaptures.size).isEqualTo(1)
+        assertThat(viewModel.sortedQualifyingCaptures[0].spoofCheckResult?.score).isEqualTo(0.1f)
+    }
+
+    @Test
+    fun `Spoof check Enforced failed resets state`() = runTest {
+        val validFace: Face = getFace()
+        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns getDefaultSpoofConfig(FaceConfiguration.SpoofCheckMode.ENFORCED)
+        every { faceDetector.analyze(frame) } returns validFace
+        coEvery { faceDetector.spoofCheck(any(), any()) } returns SpoofCheckResult(score = 0.9f)
+
+        val capturingStateObserver = viewModel.capturingState.testObserver()
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+
+        viewModel.process(frame, frame)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+
+        advanceUntilIdle()
+
+        assertThat(capturingStateObserver.observedValues).contains(LiveFeedbackFragmentViewModel.CapturingState.VALIDATION_FAILED)
+        assertThat(capturingStateObserver.observedValues.last()).isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED)
+        assertThat(viewModel.sortedQualifyingCaptures.size).isEqualTo(0)
+        assertThat(viewModel.userCaptures.size).isEqualTo(0)
+    }
+
+    @Test
+    fun `Spoof check Enforced failed max times finishes capture`() = runTest {
+        val validFace: Face = getFace()
+        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns getDefaultSpoofConfig(FaceConfiguration.SpoofCheckMode.ENFORCED)
+        every { faceDetector.analyze(frame) } returns validFace
+        coEvery { faceDetector.spoofCheck(any(), any()) } returns SpoofCheckResult(score = 0.9f)
+
+        val capturingStateObserver = viewModel.capturingState.testObserver()
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+
+        // Attempt 1
+        viewModel.process(frame, frame)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+
+        advanceUntilIdle()
+
+        assertThat(capturingStateObserver.observedValues.last()).isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED)
+
+        // Attempt 2
+        viewModel.process(frame, frame)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+
+        advanceUntilIdle()
+
+        assertThat(capturingStateObserver.observedValues.last()).isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.FINISHED)
     }
 
     private fun getFace(
@@ -233,6 +342,17 @@ internal class LiveFeedbackFragmentViewModelTest {
         yaw: Float = 0f,
         roll: Float = 0f,
     ) = Face(100, 100, rect, yaw, roll, quality, Random.nextBytes(20), "format")
+
+    private fun getDefaultSpoofConfig(
+        mode: FaceConfiguration.SpoofCheckMode = FaceConfiguration.SpoofCheckMode.RECORDED,
+    ): SpoofCheckConfiguration = SpoofCheckConfiguration(
+        mode = mode,
+        threshold = 0.5f,
+        maxAttempts = 2,
+        maxBitmapSize = 1500,
+        validationUiDurationMs = 1000,
+        validationErrorUiDurationMs = 1000,
+    )
 
     companion object {
         private const val QUALITY_THRESHOLD = -1f
