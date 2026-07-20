@@ -20,7 +20,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
-import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.extentions.hideKeyboard
 import com.simprints.feature.externalcredential.R
@@ -113,20 +112,18 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
     }
 
     private fun renderCredentialCard(state: SearchCredentialState) = with(binding) {
-        val credential = state.displayedCredential.value
         val credentialType = state.scannedCredentialResult.credentialType
+        val credential = state.displayedCredential.value.prettifyCredential(credentialType)
         val credentialField = resources.getCredentialFieldTitle(credentialType)
-        val currentEditTextValue = credentialEditText.text.toString()
         val isEditingCredential = state.isEditingCredential
         renderImage(state.scannedCredentialResult)
         renderCredentialEdit(state)
-        credential.takeIf { currentEditTextValue.isEmpty() }?.let {
-            credentialEditText.setText(it) // Setting only once at the start
-        }
+
+        credentialEditText.setText(credential)
         documentTypeTitle.text = credentialField
         credentialEditText.inputType = viewModel.getKeyBoardInputType()
         credentialEditText.hint = credentialField
-        credentialValue.text = currentEditTextValue
+        credentialValue.text = credential
         confirmCredentialCheckbox.isVisible = state.isUserConfirmationRequired && state.searchState != SearchState.Searching
         confirmCredentialCheckbox.text = getString(IDR.string.mfid_confirmation_checkbox_text, credentialField)
         confirmCredentialCheckbox.isChecked = state.isConfirmed && !state.isEditingCredential
@@ -135,7 +132,7 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         iconEditCredential.isVisible = state.isEditAvailable
         iconEditCredential.setOnClickListener {
             if (isEditingCredential) {
-                viewModel.confirmCredentialUpdate(updatedCredential = credentialEditText.text.toString().asTokenizableRaw())
+                viewModel.confirmCredentialUpdate(updatedCredential = credentialEditText.text.toString())
             }
             viewModel.updateIsEditingCredential(isEditing = !isEditingCredential)
         }
@@ -306,5 +303,18 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         }
         iconEditCredential.alpha = if (isEditIconEnabled) 1.0f else 0.5f
         iconEditCredential.isEnabled = isEditIconEnabled
+    }
+
+    /**
+     * Formats the credential for display.
+     * Fayda FAN is grouped as 4×4 digits for readability: "1234567812345678" -> "1234 5678 1234 5678"
+     * Other credential types are remain as-is.
+     */
+    private fun String.prettifyCredential(credentialType: ExternalCredentialType): String = when (credentialType) {
+        ExternalCredentialType.NHISCard,
+        ExternalCredentialType.GhanaIdCard,
+        ExternalCredentialType.QRCode,
+        -> this
+        ExternalCredentialType.FaydaCard -> chunked(4).joinToString(" ")
     }
 }
