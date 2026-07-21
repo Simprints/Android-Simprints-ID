@@ -19,6 +19,7 @@ enum class CoSyncExternalCredentialType {
     FaydaCard,
 }
 
+@ExcludedFromGeneratedTestCoverageReports("Mapper")
 fun ExternalCredentialType.toCoSync(): CoSyncExternalCredentialType = when (this) {
     ExternalCredentialType.NHISCard -> CoSyncExternalCredentialType.NHISCard
     ExternalCredentialType.GhanaIdCard -> CoSyncExternalCredentialType.GhanaIdCard
@@ -26,6 +27,7 @@ fun ExternalCredentialType.toCoSync(): CoSyncExternalCredentialType = when (this
     ExternalCredentialType.FaydaCard -> CoSyncExternalCredentialType.FaydaCard
 }
 
+@ExcludedFromGeneratedTestCoverageReports("Mapper")
 fun CoSyncExternalCredentialType.toDomain(): ExternalCredentialType = when (this) {
     CoSyncExternalCredentialType.NHISCard -> ExternalCredentialType.NHISCard
     CoSyncExternalCredentialType.GhanaIdCard -> ExternalCredentialType.GhanaIdCard

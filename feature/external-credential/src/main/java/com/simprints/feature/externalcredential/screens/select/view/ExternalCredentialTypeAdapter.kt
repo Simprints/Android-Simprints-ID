@@ -26,6 +26,7 @@ internal class ExternalCredentialTypeAdapter(
 
     override fun getItemCount(): Int = items.size
 
+    @ExcludedFromGeneratedTestCoverageReports("UI classes are not unit tested")
     inner class ViewHolder(
         private val binding: ItemDocumentBinding,
     ) : RecyclerView.ViewHolder(binding.root) {

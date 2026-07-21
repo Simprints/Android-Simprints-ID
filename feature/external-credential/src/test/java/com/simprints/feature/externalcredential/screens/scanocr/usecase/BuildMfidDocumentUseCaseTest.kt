@@ -233,9 +233,7 @@ internal class BuildMfidDocumentUseCaseTest {
         verify { getBestReadout(texts, targetLength = NHIS_CREDENTIAL_LENGTH) }
     }
 
-    private fun faydaScannedDocument(
-        credential: String = "1234567812345678",
-    ) = ScannedMfidDocument(
+    private fun faydaScannedDocument(credential: String = "1234567812345678") = ScannedMfidDocument(
         imagePath = "path/to/image.jpg",
         ocrScanResult = OcrScanResult.FaydaCard(
             credential = ocrLine(credential),
