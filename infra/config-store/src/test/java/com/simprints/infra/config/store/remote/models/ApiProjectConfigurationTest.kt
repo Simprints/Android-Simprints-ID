@@ -5,6 +5,7 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.testtools.apiConsentConfiguration
 import com.simprints.infra.config.store.testtools.apiGeneralConfiguration
 import com.simprints.infra.config.store.testtools.apiIdentificationConfiguration
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.infra.config.store.testtools.apiMultiFactorIdConfiguration
 import com.simprints.infra.config.store.testtools.apiProjectConfiguration
 import com.simprints.infra.config.store.testtools.apiSynchronizationConfiguration
@@ -21,6 +22,17 @@ class ApiProjectConfigurationTest {
     @Test
     fun `should map correctly the model`() {
         assertThat(apiProjectConfiguration.toDomain()).isEqualTo(projectConfiguration)
+    }
+
+    @Test
+    fun `should correctly map fayda card configuration`() {
+        val apiConfig = ApiMultiFactorIdConfiguration(
+            allowedExternalCredentials = listOf(ApiExternalCredentialType.FAYDA_CARD),
+            faydaCard = ApiFaydaCardConfig(isCapturingAllFields = true),
+        )
+        val domain = apiConfig.toDomain()
+        assertThat(domain.allowedExternalCredentials).containsExactly(ExternalCredentialType.FaydaCard)
+        assertThat(domain.faydaCardConfig?.isCapturingAllFields).isTrue()
     }
 
     @Test

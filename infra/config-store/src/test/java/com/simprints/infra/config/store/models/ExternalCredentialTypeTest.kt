@@ -16,7 +16,8 @@ class ExternalCredentialTypeMapperTest {
         val pairs = listOf(
             ExternalCredentialType.NHISCard to ProtoExternalCredentialType.NHIS_CARD,
             ExternalCredentialType.GhanaIdCard to ProtoExternalCredentialType.GHANA_ID_CARD,
-            ExternalCredentialType.QRCode to ProtoExternalCredentialType.QR_CODE
+            ExternalCredentialType.QRCode to ProtoExternalCredentialType.QR_CODE,
+            ExternalCredentialType.FaydaCard to ProtoExternalCredentialType.FAYDA_CARD
         )
 
         pairs.forEach { (domain, proto) ->
@@ -29,7 +30,8 @@ class ExternalCredentialTypeMapperTest {
         val pairs = listOf(
             ProtoExternalCredentialType.NHIS_CARD to ExternalCredentialType.NHISCard,
             ProtoExternalCredentialType.GHANA_ID_CARD to ExternalCredentialType.GhanaIdCard,
-            ProtoExternalCredentialType.QR_CODE to ExternalCredentialType.QRCode
+            ProtoExternalCredentialType.QR_CODE to ExternalCredentialType.QRCode,
+            ProtoExternalCredentialType.FAYDA_CARD to ExternalCredentialType.FaydaCard
         )
 
         pairs.forEach { (proto, domain) ->

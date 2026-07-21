@@ -124,6 +124,16 @@ class ExternalCredentialEventTrackerUseCaseTest {
     }
 
     @Test
+    fun `saveCaptureEvents should correctly calculate length for FaydaCard`() = runTest {
+        val searchResult = makeCredentialSearchResult(ExternalCredentialType.FaydaCard)
+        useCase.saveCaptureEvents(searchResult, SUBJECT_ID, START_TIME, SELECTION_ID)
+
+        val captureEventSlot = slot<ExternalCredentialCaptureEvent>()
+        coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
+        assertThat(captureEventSlot.captured.payload.credentialTextLength).isEqualTo(16)
+    }
+
+    @Test
     fun `saveCaptureEvents should correctly calculate length for QRCode`() = runTest {
         val searchResult = makeCredentialSearchResult(ExternalCredentialType.QRCode)
         useCase.saveCaptureEvents(searchResult, SUBJECT_ID, START_TIME, SELECTION_ID)
