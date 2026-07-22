@@ -25,5 +25,6 @@ internal data class ScannedMfidDocument(
         get() = when (ocrScanResult) {
             is OcrScanResult.GhanaIdCard -> OcrDocumentType.GhanaIdCard
             is OcrScanResult.GhanaNhisCard -> OcrDocumentType.NhisCard
+            is OcrScanResult.FaydaCard -> OcrDocumentType.FaydaCard
         }
 }

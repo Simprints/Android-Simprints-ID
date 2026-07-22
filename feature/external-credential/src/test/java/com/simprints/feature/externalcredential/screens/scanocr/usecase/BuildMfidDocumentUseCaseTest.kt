@@ -173,6 +173,42 @@ internal class BuildMfidDocumentUseCaseTest {
     }
 
     @Test
+    fun `returns FaydaCard for FaydaCard document type`() {
+        val documents = listOf(faydaScannedDocument())
+        val result = useCase(documents, OcrDocumentType.FaydaCard)
+        assertThat(result).isInstanceOf(MfidDocument.FaydaCard::class.java)
+    }
+
+    @Test
+    fun `passes credential texts with fayda target length to best readout use case`() {
+        val credentialText = "1234567812345678"
+        val documents = listOf(faydaScannedDocument(credential = credentialText))
+        useCase(documents, OcrDocumentType.FaydaCard)
+        verify { getBestReadout(listOf(credentialText), targetLength = FAYDA_CREDENTIAL_LENGTH) }
+    }
+
+    @Test
+    fun `sets credential from best readout for FaydaCard`() {
+        val expectedCredential = "1234567812345678"
+        every { getBestReadout(listOf(expectedCredential), targetLength = FAYDA_CREDENTIAL_LENGTH) } returns expectedCredential
+        val documents = listOf(faydaScannedDocument(credential = expectedCredential))
+        val result = useCase(documents, OcrDocumentType.FaydaCard) as MfidDocument.FaydaCard
+        assertThat(result.credential).isEqualTo(expectedCredential.asTokenizableRaw())
+    }
+
+    @Test
+    fun `aggregates credentials from multiple FaydaCard scans`() {
+        val bestReadout = "1234567812345678"
+        val closeReadout = "1234567812345679"
+        val texts = listOf(bestReadout, closeReadout, bestReadout)
+        val documents = texts.map { faydaScannedDocument(credential = it) }
+        every { getBestReadout(texts, targetLength = FAYDA_CREDENTIAL_LENGTH) } returns bestReadout
+        val result = useCase(documents, OcrDocumentType.FaydaCard) as MfidDocument.FaydaCard
+        assertThat(result.credential).isEqualTo(bestReadout.asTokenizableRaw())
+        verify { getBestReadout(texts, targetLength = FAYDA_CREDENTIAL_LENGTH) }
+    }
+
+    @Test
     fun `ignores non-matching scan result types when building nhis card fields`() {
         val expectedName = "JANE DOE"
         val nhisDocument = nhisScannedDocument(name = expectedName)
@@ -196,6 +232,13 @@ internal class BuildMfidDocumentUseCaseTest {
         assertThat(result.credential).isEqualTo(bestReadout.asTokenizableRaw())
         verify { getBestReadout(texts, targetLength = NHIS_CREDENTIAL_LENGTH) }
     }
+
+    private fun faydaScannedDocument(credential: String = "1234567812345678") = ScannedMfidDocument(
+        imagePath = "path/to/image.jpg",
+        ocrScanResult = OcrScanResult.FaydaCard(
+            credential = ocrLine(credential),
+        ),
+    )
 
     private fun ocrLine(text: String) = OcrLine(
         id = 0,
@@ -252,5 +295,6 @@ internal class BuildMfidDocumentUseCaseTest {
     companion object {
         private const val NHIS_CREDENTIAL_LENGTH = 8
         private const val GHANA_ID_CREDENTIAL_LENGTH = 15
+        private const val FAYDA_CREDENTIAL_LENGTH = 16
     }
 }

@@ -24,6 +24,7 @@ fun Resources.getCredentialFieldTitle(type: ExternalCredentialType): String = wh
     ExternalCredentialType.NHISCard -> IDR.string.mfid_nhis_card_credential_field
     ExternalCredentialType.GhanaIdCard -> IDR.string.mfid_ghana_id_credential_field
     ExternalCredentialType.QRCode -> IDR.string.mfid_qr_credential_field
+    ExternalCredentialType.FaydaCard -> IDR.string.mfid_fayda_card_credential_field
 }.run(::getString)
 
 fun Resources.getCredentialTypeString(type: ExternalCredentialType?): String = getCredentialTypeRes(type).run(::getString)
@@ -32,5 +33,6 @@ fun Resources.getCredentialTypeRes(type: ExternalCredentialType?): Int = when (t
     ExternalCredentialType.NHISCard -> IDR.string.mfid_type_nhis_card
     ExternalCredentialType.GhanaIdCard -> IDR.string.mfid_type_ghana_id_card
     ExternalCredentialType.QRCode -> IDR.string.mfid_type_qr_code
+    ExternalCredentialType.FaydaCard -> IDR.string.mfid_type_fayda_card
     null -> IDR.string.mfid_type_any_document
 }

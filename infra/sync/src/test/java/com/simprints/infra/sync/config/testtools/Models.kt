@@ -125,6 +125,7 @@ internal val multiFactorIdConfiguration = MultiFactorIdConfiguration(
     allowedExternalCredentials = listOf(allowedExternalCredential),
     ghanaIdCardConfig = null,
     nhisCardConfig = null,
+    faydaCardConfig = null,
     qrCodeConfig = null,
 )
 

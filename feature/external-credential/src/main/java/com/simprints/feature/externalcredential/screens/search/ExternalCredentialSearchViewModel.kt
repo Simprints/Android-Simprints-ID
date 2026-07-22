@@ -8,11 +8,13 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.FaydaCardOcrReaderUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GhanaIdCardOcrReaderUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GhanaNhisCardOcrReaderUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
@@ -85,16 +87,17 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         updateState { it.copy(isEditingCredential = isEditing) }
     }
 
-    fun confirmCredentialUpdate(updatedCredential: TokenizableString.Raw) {
+    fun confirmCredentialUpdate(updatedCredential: String) {
+        val credential = updatedCredential.normalize().asTokenizableRaw()
         viewModelScope.launch {
             configRepository.getProject()?.let { project ->
                 updateState { currentState ->
                     currentState.copy(
                         isConfirmed = false,
-                        displayedCredential = updatedCredential,
+                        displayedCredential = credential,
                     )
                 }
-                searchSubjectsLinkedToCredential(project, updatedCredential)
+                searchSubjectsLinkedToCredential(project, credential)
             }
         }
     }
@@ -161,8 +164,9 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
      * alpha-numeric, while the NHIS card memberships contain only digits.
      */
     fun getKeyBoardInputType() = when (scannedCredentialResult.credentialType) {
-        // NHIS card membership contains only numbers
+        // NHIS card membership and Fayda FAN contain only numbers
         ExternalCredentialType.NHISCard -> InputType.TYPE_CLASS_NUMBER
+        ExternalCredentialType.FaydaCard -> InputType.TYPE_CLASS_NUMBER
         ExternalCredentialType.GhanaIdCard -> InputType.TYPE_CLASS_TEXT
         ExternalCredentialType.QRCode -> InputType.TYPE_CLASS_TEXT
     }
@@ -202,14 +206,19 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
 
     fun isCredentialFormatValid(credential: String?): Boolean {
         if (credential == null) return false
+        val credentialNormalized = credential.normalize()
         return when (scannedCredentialResult.credentialType) {
             ExternalCredentialType.NHISCard -> {
                 // 8 digits
-                GhanaNhisCardOcrReaderUseCase.NHIS_PATTERN.matches(credential)
+                GhanaNhisCardOcrReaderUseCase.NHIS_PATTERN.matches(credentialNormalized)
             }
             ExternalCredentialType.GhanaIdCard -> {
                 // Ghana ID card number pattern is "GHA-123456789-0"
-                GhanaIdCardOcrReaderUseCase.GHANA_ID_PATTERN.matches(credential)
+                GhanaIdCardOcrReaderUseCase.GHANA_ID_PATTERN.matches(credentialNormalized)
+            }
+            ExternalCredentialType.FaydaCard -> {
+                // Fayda Alias Number (FAN): exactly 16 digits
+                FaydaCardOcrReaderUseCase.FAN_PATTERN.matches(credentialNormalized)
             }
             ExternalCredentialType.QRCode -> {
                 // No QR code validation as of 2025.4.1
@@ -217,4 +226,9 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
             }
         }
     }
+
+    /**
+     * Trims the given string and removes spaces. Used for normalizing the user input
+     */
+    private fun String.normalize() = trim().replace(" ", "")
 }

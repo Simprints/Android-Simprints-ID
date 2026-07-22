@@ -326,6 +326,13 @@ internal class ExternalCredentialScanOcrViewModelTest {
     }
 
     @Test
+    fun `getDocumentTypeRes returns correct resource for Fayda card`() {
+        viewModel = initViewModel(OcrDocumentType.FaydaCard)
+        val result = viewModel.getDocumentTypeRes()
+        assertThat(result).isEqualTo(R.string.mfid_type_fayda_card)
+    }
+
+    @Test
     fun `processImage does not add documents or update state once required captures are reached`() = runTest {
         val mockScannedDocument = mockk<ScannedMfidDocument>()
         val mockNormalizedBitmap = mockk<Bitmap>()

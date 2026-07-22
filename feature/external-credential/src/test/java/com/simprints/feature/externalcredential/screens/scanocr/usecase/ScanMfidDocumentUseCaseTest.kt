@@ -6,6 +6,7 @@ import com.simprints.feature.externalcredential.model.BoundingBox
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrScanResult
 import com.simprints.feature.externalcredential.screens.scanocr.reader.OcrLine
+import com.simprints.infra.config.store.models.FaydaCardConfig
 import com.simprints.infra.config.store.models.GhanaIdCardConfig
 import com.simprints.infra.config.store.models.MultiFactorIdConfiguration
 import com.simprints.infra.config.store.models.NhisCardConfig
@@ -32,6 +33,9 @@ internal class ScanMfidDocumentUseCaseTest {
     private lateinit var ghanaIdCardOcrReaderUseCase: GhanaIdCardOcrReaderUseCase
 
     @MockK
+    private lateinit var faydaCardOcrReaderUseCase: FaydaCardOcrReaderUseCase
+
+    @MockK
     private lateinit var credentialImageRepository: CredentialImageRepository
 
     private lateinit var useCase: ScanMfidDocumentUseCase
@@ -43,18 +47,28 @@ internal class ScanMfidDocumentUseCaseTest {
         ghanaIdCardConfig = null,
         nhisCardConfig = NhisCardConfig(isCapturingAllFields = false),
         qrCodeConfig = null,
+        faydaCardConfig = null,
     )
     private val ghanaIdConfig = MultiFactorIdConfiguration(
         allowedExternalCredentials = emptyList(),
         ghanaIdCardConfig = GhanaIdCardConfig(isCapturingAllFields = false),
         nhisCardConfig = null,
         qrCodeConfig = null,
+        faydaCardConfig = null,
+    )
+    private val faydaConfig = MultiFactorIdConfiguration(
+        allowedExternalCredentials = emptyList(),
+        ghanaIdCardConfig = null,
+        nhisCardConfig = null,
+        qrCodeConfig = null,
+        faydaCardConfig = FaydaCardConfig(isCapturingAllFields = false),
     )
     private val allFieldsConfig = MultiFactorIdConfiguration(
         allowedExternalCredentials = emptyList(),
         ghanaIdCardConfig = GhanaIdCardConfig(isCapturingAllFields = true),
         nhisCardConfig = NhisCardConfig(isCapturingAllFields = true),
         qrCodeConfig = null,
+        faydaCardConfig = FaydaCardConfig(isCapturingAllFields = true),
     )
 
     @Before
@@ -64,6 +78,7 @@ internal class ScanMfidDocumentUseCaseTest {
             readTextFromImage = readTextFromImage,
             ghanaNhisCardOcrReaderUseCase = ghanaNhisCardOcrReaderUseCase,
             ghanaIdCardOcrReaderUseCase = ghanaIdCardOcrReaderUseCase,
+            faydaCardOcrReaderUseCase = faydaCardOcrReaderUseCase,
             credentialImageRepository = credentialImageRepository,
         )
         coEvery { credentialImageRepository.saveCredentialScan(any(), any()) } returns savedImagePath
@@ -119,6 +134,34 @@ internal class ScanMfidDocumentUseCaseTest {
         assertThat(result).isNotNull()
         assertThat(result?.ocrScanResult?.credential?.text).isEqualTo(credentialLine.text)
         assertThat(result?.ocrScanResult).isInstanceOf(OcrScanResult.GhanaIdCard::class.java)
+    }
+
+    @Test
+    fun `returns null when selector finds no matching line for FaydaCard`() = runTest {
+        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
+        every { faydaCardOcrReaderUseCase(any()) } returns null
+        val result = useCase(bitmap, OcrDocumentType.FaydaCard, faydaConfig)
+        assertThat(result).isNull()
+    }
+
+    @Test
+    fun `returns ScannedMfidDocument for FaydaCard when line is found`() = runTest {
+        val credentialLine = ocrLine(text = "1234567812345678")
+        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
+        every { faydaCardOcrReaderUseCase(any()) } returns OcrScanResult.FaydaCard(credential = credentialLine)
+        val result = useCase(bitmap, OcrDocumentType.FaydaCard, faydaConfig)
+        assertThat(result).isNotNull()
+        assertThat(result?.ocrScanResult?.credential?.text).isEqualTo(credentialLine.text)
+        assertThat(result?.ocrScanResult).isInstanceOf(OcrScanResult.FaydaCard::class.java)
+    }
+
+    @Test
+    fun `delegates FaydaCard to fayda selector`() = runTest {
+        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
+        useCase(bitmap, OcrDocumentType.FaydaCard, faydaConfig)
+        verify(exactly = 1) { faydaCardOcrReaderUseCase(any()) }
+        verify(exactly = 0) { ghanaNhisCardOcrReaderUseCase(any(), any()) }
+        verify(exactly = 0) { ghanaIdCardOcrReaderUseCase(any(), any()) }
     }
 
     @Test
@@ -199,6 +242,7 @@ internal class ScanMfidDocumentUseCaseTest {
             ghanaIdCardConfig = null,
             nhisCardConfig = null,
             qrCodeConfig = null,
+            faydaCardConfig = null,
         )
         every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
 

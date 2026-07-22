@@ -36,4 +36,10 @@ internal sealed class OcrScanResult {
         val dateOfIssue: OcrLine? = null,
         val dateOfExpiry: OcrLine? = null,
     ) : OcrScanResult()
+
+    @Serializable
+    @SerialName("OcrScanResult.FaydaCard")
+    data class FaydaCard(
+        override val credential: OcrLine,
+    ) : OcrScanResult()
 }

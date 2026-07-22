@@ -26,6 +26,7 @@ internal class ExternalCredentialTypeAdapter(
 
     override fun getItemCount(): Int = items.size
 
+    @ExcludedFromGeneratedTestCoverageReports("UI classes are not unit tested")
     inner class ViewHolder(
         private val binding: ItemDocumentBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
@@ -35,12 +36,14 @@ internal class ExternalCredentialTypeAdapter(
                 ExternalCredentialType.NHISCard -> IDR.string.mfid_type_nhis_card
                 ExternalCredentialType.GhanaIdCard -> IDR.string.mfid_type_ghana_id_card
                 ExternalCredentialType.QRCode -> IDR.string.mfid_type_qr_code
+                ExternalCredentialType.FaydaCard -> IDR.string.mfid_type_fayda_card
             }.run(c::getString)
             val text = c.resources.getString(IDR.string.mfid_scan_action, credentialTypeText)
             val image = when (credentialType) {
                 ExternalCredentialType.NHISCard -> R.drawable.ghana_nhis_card
                 ExternalCredentialType.GhanaIdCard -> R.drawable.ghana_id_card
                 ExternalCredentialType.QRCode -> R.drawable.qr_code
+                ExternalCredentialType.FaydaCard -> R.drawable.fayda_card
             }
             binding.documentText.text = text
             binding.documentImage.setImageResource(image)

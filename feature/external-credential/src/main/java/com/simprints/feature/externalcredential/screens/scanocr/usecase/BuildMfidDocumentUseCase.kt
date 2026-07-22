@@ -17,6 +17,7 @@ internal class BuildMfidDocumentUseCase @Inject constructor(
     ): MfidDocument = when (documentType) {
         OcrDocumentType.NhisCard -> buildNhisCard(scannedDocuments)
         OcrDocumentType.GhanaIdCard -> buildGhanaIdCard(scannedDocuments)
+        OcrDocumentType.FaydaCard -> buildFaydaCard(scannedDocuments)
     }
 
     /**
@@ -68,6 +69,14 @@ internal class BuildMfidDocumentUseCase @Inject constructor(
         )
     }
 
+    private fun buildFaydaCard(scannedDocuments: List<ScannedMfidDocument>): MfidDocument.FaydaCard {
+        val credential = scannedDocuments
+            .map { it.ocrScanResult.credential.text }
+            .let { credentials -> getBestReadoutBasedOnConfidenceUseCase(credentials, targetLength = CREDENTIAL_LENGTH_FAYDA_CARD) }
+            .asTokenizableRaw()
+        return MfidDocument.FaydaCard(credential = credential)
+    }
+
     private fun <T> List<T>.bestReadoutOrNull(ocrLine: (T) -> OcrLine?) = mapNotNull(ocrLine)
         .takeUnless(List<OcrLine>::isEmpty)
         ?.let { getBestReadoutBasedOnConfidenceUseCase(it.map(OcrLine::text)) }
@@ -79,5 +88,8 @@ internal class BuildMfidDocumentUseCase @Inject constructor(
 
         // Ghana ID field contains 15 chars: GHA-123456789-0
         private const val CREDENTIAL_LENGTH_GHANA_ID = 15
+
+        // Fayda Alias Number (FAN) contains 16 digits
+        private const val CREDENTIAL_LENGTH_FAYDA_CARD = 16
     }
 }

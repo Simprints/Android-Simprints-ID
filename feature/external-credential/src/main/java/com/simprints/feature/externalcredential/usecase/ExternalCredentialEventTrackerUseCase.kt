@@ -102,6 +102,7 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
         ExternalCredentialType.NHISCard -> NHIS_CARD_ID_LENGTH
         ExternalCredentialType.GhanaIdCard -> GHANA_ID_CARD_ID_LENGTH
         ExternalCredentialType.QRCode -> QR_CODE_LENGTH
+        ExternalCredentialType.FaydaCard -> FAYDA_CARD_FAN_LENGTH
     }
 
     suspend fun saveSelectionEvent(
@@ -154,5 +155,6 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
         private const val NHIS_CARD_ID_LENGTH = 8
         private const val GHANA_ID_CARD_ID_LENGTH = 15
         private const val QR_CODE_LENGTH = 6
+        private const val FAYDA_CARD_FAN_LENGTH = 16
     }
 }

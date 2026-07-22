@@ -18,6 +18,8 @@ class ResourceExtTest {
             .isEqualTo(IDR.string.mfid_type_ghana_id_card)
         assertThat(mockResources.getCredentialTypeRes(ExternalCredentialType.QRCode))
             .isEqualTo(IDR.string.mfid_type_qr_code)
+        assertThat(mockResources.getCredentialTypeRes(ExternalCredentialType.FaydaCard))
+            .isEqualTo(IDR.string.mfid_type_fayda_card)
         assertThat(mockResources.getCredentialTypeRes(null))
             .isEqualTo(IDR.string.mfid_type_any_document)
     }
@@ -31,6 +33,8 @@ class ResourceExtTest {
         verify { mockResources.getString(IDR.string.mfid_ghana_id_credential_field) }
         mockResources.getCredentialFieldTitle(ExternalCredentialType.QRCode)
         verify { mockResources.getString(IDR.string.mfid_qr_credential_field) }
+        mockResources.getCredentialFieldTitle(ExternalCredentialType.FaydaCard)
+        verify { mockResources.getString(IDR.string.mfid_fayda_card_credential_field) }
     }
 
     @Test

@@ -360,6 +360,27 @@ internal class InsertEnrollmentRecordsUseCaseTest {
     }
 
     @Test
+    fun `invoke should generate external credentials for Fayda card type`() = runTest {
+        val enrolmentRecordActionsSlot = slot<List<EnrolmentRecordAction.Creation>>()
+        coEvery { enrolmentRecordRepository.performActions(capture(enrolmentRecordActionsSlot), any()) } returns mockk()
+
+        useCase(
+            projectId = "p1",
+            moduleId = "m1",
+            attendantId = "a1",
+            numRecords = 1,
+            templatesPerFormat = templates,
+            firstSubjectId = "",
+            fingerOrder = null,
+            externalCredentialsPerType = bundleOf(ExternalCredentialType.FaydaCard.name to 1),
+        ).last()
+
+        val subject = enrolmentRecordActionsSlot.captured.first().enrolmentRecord
+        assertThat(subject.externalCredentials).hasSize(1)
+        assertThat(subject.externalCredentials.first().type).isEqualTo(ExternalCredentialType.FaydaCard)
+    }
+
+    @Test
     fun `invoke should fail when external credential type is unknown`() = runTest {
         assertThrows<IllegalArgumentException> {
             useCase(

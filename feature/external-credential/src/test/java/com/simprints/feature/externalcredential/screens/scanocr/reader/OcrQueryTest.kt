@@ -23,6 +23,24 @@ internal class OcrQueryTest {
     }
 
     @Test
+    fun `matchesCondition registers a filter`() {
+        query.matchesCondition { it.isNotEmpty() }
+        assertThat(query.filters).hasSize(1)
+    }
+
+    @Test
+    fun `matchesCondition passes line when condition returns true`() {
+        query.matchesCondition { line -> line.filter(Char::isDigit).length == 16 }
+        assertThat(query.filters.all { it(line(text = "1234567812345678")) }).isTrue()
+    }
+
+    @Test
+    fun `matchesCondition rejects line when condition returns false`() {
+        query.matchesCondition { line -> line.filter(Char::isDigit).length == 16 }
+        assertThat(query.filters.all { it(line(text = "123")) }).isFalse()
+    }
+
+    @Test
     fun `containsPattern registers a filter`() {
         query.containsPattern(Regex("\\d+"))
         assertThat(query.filters).hasSize(1)

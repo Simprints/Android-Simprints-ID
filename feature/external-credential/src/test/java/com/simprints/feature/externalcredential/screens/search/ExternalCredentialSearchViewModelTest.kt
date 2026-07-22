@@ -158,26 +158,27 @@ internal class ExternalCredentialSearchViewModelTest {
         coEvery { configRepository.getProject() } returns null
 
         viewModel = createViewModel()
-        viewModel.confirmCredentialUpdate("".asTokenizableRaw())
+        viewModel.confirmCredentialUpdate("")
 
         coVerify(exactly = 0) { tokenizationProcessor.encrypt(any(), any(), any()) }
     }
 
     @Test
-    fun `confirmCredentialUpdate triggers new search and encrypts credential`() = runTest {
-        val newCredential = "newCredential".asTokenizableRaw()
+    fun `confirmCredentialUpdate normalizes credential and triggers new search and encrypts credential`() = runTest {
+        val nonNormalizedCredential = " new Credential "
+        val expectedCredential = "newCredential".asTokenizableRaw()
         val encryptedCredential = mockk<TokenizableString.Tokenized>()
 
         coEvery { enrolmentRecordRepository.load(any()) } returns emptyList()
-        every { tokenizationProcessor.encrypt(newCredential, TokenKeyType.ExternalCredential, project) } returns encryptedCredential
+        every { tokenizationProcessor.encrypt(expectedCredential, TokenKeyType.ExternalCredential, project) } returns encryptedCredential
 
         viewModel = createViewModel()
 
-        viewModel.confirmCredentialUpdate(newCredential)
+        viewModel.confirmCredentialUpdate(nonNormalizedCredential)
 
-        coVerify { tokenizationProcessor.encrypt(newCredential, TokenKeyType.ExternalCredential, project) }
+        coVerify { tokenizationProcessor.encrypt(expectedCredential, TokenKeyType.ExternalCredential, project) }
         coVerify { enrolmentRecordRepository.load(match { it.externalCredential == encryptedCredential }) }
-        assertThat(viewModel.stateLiveData.value?.displayedCredential).isEqualTo(newCredential)
+        assertThat(viewModel.stateLiveData.value?.displayedCredential).isEqualTo(expectedCredential)
     }
 
     @Test
@@ -316,6 +317,7 @@ internal class ExternalCredentialSearchViewModelTest {
         viewModel = createViewModel()
 
         assertThat(viewModel.isCredentialFormatValid("12345678")).isTrue()
+        assertThat(viewModel.isCredentialFormatValid("  1234  5678  ")).isTrue()
         assertThat(viewModel.isCredentialFormatValid("invalid")).isFalse()
         assertThat(viewModel.isCredentialFormatValid("1234567")).isFalse()
         assertThat(viewModel.isCredentialFormatValid(null)).isFalse()
@@ -328,6 +330,7 @@ internal class ExternalCredentialSearchViewModelTest {
         viewModel = createViewModel()
 
         assertThat(viewModel.isCredentialFormatValid("GHA-123456789-0")).isTrue()
+        assertThat(viewModel.isCredentialFormatValid("  GHA - 123456789-0 ")).isTrue()
         assertThat(viewModel.isCredentialFormatValid("invalid")).isFalse()
         assertThat(viewModel.isCredentialFormatValid(null)).isFalse()
     }
@@ -339,7 +342,22 @@ internal class ExternalCredentialSearchViewModelTest {
         viewModel = createViewModel()
 
         assertThat(viewModel.isCredentialFormatValid("any_value")).isTrue()
+        assertThat(viewModel.isCredentialFormatValid(" any_value ")).isTrue()
         assertThat(viewModel.isCredentialFormatValid("")).isTrue()
+        assertThat(viewModel.isCredentialFormatValid(null)).isFalse()
+    }
+
+    @Test
+    fun `isCredentialFormatValid validates Fayda card format`() = runTest {
+        every { mockScannedCredentialResult.credentialType } returns ExternalCredentialType.FaydaCard
+
+        viewModel = createViewModel()
+
+        assertThat(viewModel.isCredentialFormatValid("1234567812345678")).isTrue()
+        assertThat(viewModel.isCredentialFormatValid(" 1234 5678 1234 5678 ")).isTrue()
+        assertThat(viewModel.isCredentialFormatValid("1234-5678-1234-5678")).isFalse()
+        assertThat(viewModel.isCredentialFormatValid("123456781234567")).isFalse()
+        assertThat(viewModel.isCredentialFormatValid("invalid")).isFalse()
         assertThat(viewModel.isCredentialFormatValid(null)).isFalse()
     }
 }

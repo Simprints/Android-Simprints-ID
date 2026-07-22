@@ -7,6 +7,7 @@ data class MultiFactorIdConfiguration(
     val ghanaIdCardConfig: GhanaIdCardConfig?,
     val nhisCardConfig: NhisCardConfig?,
     val qrCodeConfig: QrCodeConfig?,
+    val faydaCardConfig: FaydaCardConfig?,
 )
 
 data class GhanaIdCardConfig(
@@ -18,3 +19,7 @@ data class NhisCardConfig(
 )
 
 object QrCodeConfig
+
+data class FaydaCardConfig(
+    val isCapturingAllFields: Boolean,
+)
