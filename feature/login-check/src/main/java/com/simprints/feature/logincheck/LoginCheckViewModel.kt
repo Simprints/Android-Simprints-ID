@@ -91,7 +91,7 @@ class LoginCheckViewModel @Inject internal constructor(
         when (isUserSignedIn(actionRequest)) {
             MISMATCHED_PROJECT_ID -> _showAlert.send(LoginCheckError.DIFFERENT_PROJECT_ID)
             NOT_SIGNED_IN -> startSignInAttempt(actionRequest)
-            SIGNED_IN -> validateProjectAndProceed(actionRequest)
+            SIGNED_IN -> validateProjectAndProceed(actionRequest, isFreshLogin = false)
         }
     }
 
@@ -115,7 +115,8 @@ class LoginCheckViewModel @Inject internal constructor(
         Simber.i("Log-in result: $result", tag = LOGIN)
         val requestAction = cachedRequest?.takeIf { result.isSuccess }
         if (requestAction != null) {
-            validateProjectAndProceed(requestAction)
+            // This path is only reached after a fresh login attempt.
+            validateProjectAndProceed(requestAction, isFreshLogin = true)
         } else {
             when (result.error) {
                 null, LoginError.LoginNotCompleted -> {
@@ -136,16 +137,22 @@ class LoginCheckViewModel @Inject internal constructor(
         }
     }
 
-    private suspend fun validateProjectAndProceed(actionRequest: ActionRequest) {
+    private suspend fun validateProjectAndProceed(
+        actionRequest: ActionRequest,
+        isFreshLogin: Boolean,
+    ) {
         when (configRepository.getProject()?.state) {
             null, ProjectState.PROJECT_ENDING -> _showAlert.send(LoginCheckError.PROJECT_ENDING)
             ProjectState.PROJECT_PAUSED -> _showAlert.send(LoginCheckError.PROJECT_PAUSED)
             ProjectState.PROJECT_ENDED -> startSignInAttempt(actionRequest)
-            ProjectState.RUNNING -> proceedWithAction(ensureActionFieldsTokenizedUseCase(actionRequest))
+            ProjectState.RUNNING -> proceedWithAction(ensureActionFieldsTokenizedUseCase(actionRequest), isFreshLogin)
         }
     }
 
-    private fun proceedWithAction(actionRequest: ActionRequest) = viewModelScope.launch {
+    private fun proceedWithAction(
+        actionRequest: ActionRequest,
+        isFreshLogin: Boolean,
+    ) = viewModelScope.launch {
         updateProjectInCurrentSession()
         updateStoredUserId(actionRequest.userId)
         awaitAll(
@@ -153,9 +160,11 @@ class LoginCheckViewModel @Inject internal constructor(
             async { addAuthorizationEvent(actionRequest, true) },
             async { extractParametersForCrashReport(actionRequest) },
         )
-        // Schedule Realm-to-Room migration after successful login, if needed.
-        // This avoids down-syncing data into Realm then migrate to room instead set Room  immediately the active db.
-        realmToRoomMigrationScheduler.scheduleMigrationWorkerIfNeeded()
+        // After any fresh user login, make Room the default enrolment records database immediately,
+        // ignoring the migration flags.
+        if (isFreshLogin) {
+            realmToRoomMigrationScheduler.forceRoomAsDefaultDatabase()
+        }
         startBackgroundSync()
         _proceedWithAction.send(actionRequest)
     }

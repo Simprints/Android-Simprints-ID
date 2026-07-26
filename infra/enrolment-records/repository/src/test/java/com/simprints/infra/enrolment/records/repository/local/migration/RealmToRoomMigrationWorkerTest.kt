@@ -19,11 +19,13 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.just
 import io.mockk.mockk
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 
@@ -194,5 +196,33 @@ class RealmToRoomMigrationWorkerTest {
         coVerify { realmToRoomMigrationFlagsStore.updateStatus(MigrationStatus.FAILED) }
         coVerify { realmToRoomMigrationFlagsStore.incrementRetryCount() }
         assertThat(result).isEqualTo(Result.failure())
+    }
+
+    @Test
+    fun `doWork should rethrow CancellationException without touching flags or deleting Room data`() = runTest {
+        val mockSubjectsBatch1 = listOf<EnrolmentRecord>(mockk(), mockk())
+
+        // Given
+        coEvery { realmToRoomMigrationFlagsStore.isDownSyncInProgress() } returns false
+        coEvery { realmDataSource.count(any()) } returns 3
+        coEvery {
+            realmDataSource.loadAllSubjectsInBatches(any())
+        } returns flowOf(mockSubjectsBatch1)
+        coEvery { roomDataSource.performActions(any(), any()) } throws CancellationException("Work cancelled")
+
+        // When
+        try {
+            worker.doWork()
+            fail("Expected CancellationException to be thrown")
+        } catch (_: CancellationException) {
+            // expected
+        }
+
+        // Then
+        coVerify(exactly = 0) { realmToRoomMigrationFlagsStore.incrementRetryCount() }
+        coVerify(exactly = 0) { realmToRoomMigrationFlagsStore.updateStatus(MigrationStatus.FAILED) }
+        coVerify(exactly = 0) { realmToRoomMigrationFlagsStore.updateStatus(MigrationStatus.COMPLETED) }
+        // deleteAll is called once before processing records, but not a second time as part of failure handling
+        coVerify(exactly = 1) { roomDataSource.deleteAll() }
     }
 }

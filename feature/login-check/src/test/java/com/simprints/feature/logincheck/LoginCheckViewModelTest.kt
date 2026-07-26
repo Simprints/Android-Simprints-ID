@@ -276,12 +276,48 @@ internal class LoginCheckViewModelTest {
     }
 
     @Test
+    fun `Forces Room as default database after a fresh login`() = runTest {
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
+        coEvery { configRepository.getProject()?.state } returns ProjectState.RUNNING
+
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
+        viewModel.handleLoginResult(LoginResult(true, null))
+
+        coVerify(exactly = 1) { realmToRoomMigrationScheduler.forceRoomAsDefaultDatabase() }
+    }
+
+    @Test
+    fun `Awaits forceRoomAsDefaultDatabase before starting background sync on a fresh login`() = runTest {
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
+        coEvery { configRepository.getProject()?.state } returns ProjectState.RUNNING
+
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
+        viewModel.handleLoginResult(LoginResult(true, null))
+
+        // The migration flag must be flipped to COMPLETED before background sync starts writing to the DB.
+        coVerifyOrder {
+            realmToRoomMigrationScheduler.forceRoomAsDefaultDatabase()
+            startBackgroundSync.invoke()
+        }
+    }
+
+    @Test
     fun `Correctly handles signed in users`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
 
         viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
 
         coVerify { configRepository.getProject() }
+    }
+
+    @Test
+    fun `Does nothing to migration flags when the user is already logged in`() = runTest {
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
+        coEvery { configRepository.getProject()?.state } returns ProjectState.RUNNING
+
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
+
+        coVerify(exactly = 0) { realmToRoomMigrationScheduler.forceRoomAsDefaultDatabase() }
     }
 
     @Test
@@ -349,6 +385,7 @@ internal class LoginCheckViewModelTest {
             startBackgroundSync.invoke()
             ensureActionFieldsTokenizedUseCase.invoke(any())
         }
+        coVerify(exactly = 0) { realmToRoomMigrationScheduler.forceRoomAsDefaultDatabase() }
 
         viewModel.proceedWithAction
             .test()
