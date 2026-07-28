@@ -18,7 +18,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.simprints.core.tools.extentions.hideKeyboard
+import com.simprints.core.tools.extensions.hideKeyboard
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSyncModuleSelectionBinding
 import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment

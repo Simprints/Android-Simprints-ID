@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.core.tools.extentions.toStringMap
+import com.simprints.core.tools.extensions.toStringMap
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent.SuspiciousIntentPayload
 import kotlinx.serialization.Serializable

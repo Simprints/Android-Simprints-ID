@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
-import com.simprints.core.tools.extentions.toJsonElementMap
+import com.simprints.core.tools.extensions.toJsonElementMap
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.isValidGuid
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException

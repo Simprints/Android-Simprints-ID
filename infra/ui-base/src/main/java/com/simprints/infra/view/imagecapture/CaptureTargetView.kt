@@ -12,7 +12,7 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.ColorInt
 import androidx.core.os.BundleCompat
-import com.simprints.core.tools.extentions.dpToPx
+import com.simprints.core.tools.extensions.dpToPx
 import com.simprints.infra.uibase.R
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 

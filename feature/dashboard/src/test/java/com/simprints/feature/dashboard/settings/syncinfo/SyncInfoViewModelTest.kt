@@ -116,7 +116,7 @@ class SyncInfoViewModelTest {
 
         mockkStatic("androidx.lifecycle.FlowLiveDataConversions")
         mockkStatic("com.simprints.infra.config.store.models.ProjectConfigurationKt")
-        mockkStatic("com.simprints.core.tools.extentions.Flow_extKt")
+        mockkStatic("com.simprints.core.tools.extensions.Flow_extKt")
         setupDefaultMocks()
     }
 

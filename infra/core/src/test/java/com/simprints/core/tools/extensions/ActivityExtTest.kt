@@ -5,7 +5,7 @@ import androidx.core.app.ActivityCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.core.domain.permission.PermissionStatus
-import com.simprints.core.tools.extentions.permissionFromResult
+import com.simprints.core.tools.extensions.permissionFromResult
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic

@@ -3,9 +3,9 @@ package com.simprints.infra.events.event.local.migrations
 import android.content.ContentValues
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.simprints.core.tools.extentions.getIntWithColumnName
-import com.simprints.core.tools.extentions.getLongWithColumnName
-import com.simprints.core.tools.extentions.getStringWithColumnName
+import com.simprints.core.tools.extensions.getIntWithColumnName
+import com.simprints.core.tools.extensions.getLongWithColumnName
+import com.simprints.core.tools.extensions.getStringWithColumnName
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
 import net.zetetic.database.sqlcipher.SQLiteDatabase

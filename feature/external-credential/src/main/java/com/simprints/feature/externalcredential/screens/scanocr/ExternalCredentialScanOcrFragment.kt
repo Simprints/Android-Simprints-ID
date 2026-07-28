@@ -29,8 +29,8 @@ import androidx.navigation.fragment.navArgs
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.core.tools.extentions.getCurrentPermissionStatus
-import com.simprints.core.tools.extentions.permissionFromResult
+import com.simprints.core.tools.extensions.getCurrentPermissionStatus
+import com.simprints.core.tools.extensions.permissionFromResult
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialScanOcrBinding
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel

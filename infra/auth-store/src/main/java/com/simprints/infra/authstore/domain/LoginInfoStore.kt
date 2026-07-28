@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.isTokenized
-import com.simprints.core.tools.extentions.onUpdate
+import com.simprints.core.tools.extensions.onUpdate
 import com.simprints.infra.security.SecurityManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject

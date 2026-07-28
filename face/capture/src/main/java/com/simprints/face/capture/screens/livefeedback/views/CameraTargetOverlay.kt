@@ -10,7 +10,7 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.res.ResourcesCompat
-import com.simprints.core.tools.extentions.dpToPx
+import com.simprints.core.tools.extensions.dpToPx
 import com.simprints.face.capture.R
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 import kotlin.math.max

@@ -23,9 +23,9 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.tools.extentions.getCurrentPermissionStatus
-import com.simprints.core.tools.extentions.hasPermission
-import com.simprints.core.tools.extentions.permissionFromResult
+import com.simprints.core.tools.extensions.getCurrentPermissionStatus
+import com.simprints.core.tools.extensions.hasPermission
+import com.simprints.core.tools.extensions.permissionFromResult
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialScanQrBinding
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel

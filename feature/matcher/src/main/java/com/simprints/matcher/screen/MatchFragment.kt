@@ -12,9 +12,9 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.core.tools.extentions.applicationSettingsIntent
-import com.simprints.core.tools.extentions.hasPermission
-import com.simprints.core.tools.extentions.permissionFromResult
+import com.simprints.core.tools.extensions.applicationSettingsIntent
+import com.simprints.core.tools.extensions.hasPermission
+import com.simprints.core.tools.extensions.permissionFromResult
 import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION

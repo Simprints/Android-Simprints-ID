@@ -1,4 +1,4 @@
-package com.simprints.core.tools.extentions
+package com.simprints.core.tools.extensions
 
 import android.content.SharedPreferences
 import kotlinx.coroutines.channels.awaitClose

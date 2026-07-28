@@ -9,8 +9,8 @@ import androidx.test.ext.junit.runners.*
 import androidx.test.platform.app.*
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.tools.extentions.getLongWithColumnName
-import com.simprints.core.tools.extentions.getStringWithColumnName
+import com.simprints.core.tools.extensions.getLongWithColumnName
+import com.simprints.core.tools.extensions.getStringWithColumnName
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo

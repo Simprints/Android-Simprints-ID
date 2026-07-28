@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import androidx.test.core.app.*
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
-import com.simprints.core.tools.extentions.onUpdate
+import com.simprints.core.tools.extensions.onUpdate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle

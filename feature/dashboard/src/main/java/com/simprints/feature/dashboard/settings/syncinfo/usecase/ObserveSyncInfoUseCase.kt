@@ -2,7 +2,7 @@ package com.simprints.feature.dashboard.settings.syncinfo.usecase
 
 import com.simprints.core.DispatcherBG
 import com.simprints.core.lifecycle.AppForegroundStateTracker
-import com.simprints.core.tools.extentions.onChange
+import com.simprints.core.tools.extensions.onChange
 import com.simprints.core.tools.time.Ticker
 import com.simprints.feature.dashboard.settings.syncinfo.SyncInfo
 import com.simprints.feature.dashboard.settings.syncinfo.SyncInfoSectionModules

@@ -1,4 +1,4 @@
-package com.simprints.core.tools.extentions
+package com.simprints.core.tools.extensions
 
 fun <T> List<T>.updateOnIndex(
     index: Int,

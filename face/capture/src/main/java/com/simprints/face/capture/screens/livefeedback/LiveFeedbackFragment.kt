@@ -32,9 +32,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.domain.permission.PermissionStatus
-import com.simprints.core.tools.extentions.hasCameraFlash
-import com.simprints.core.tools.extentions.hasPermission
-import com.simprints.core.tools.extentions.permissionFromResult
+import com.simprints.core.tools.extensions.hasCameraFlash
+import com.simprints.core.tools.extensions.hasPermission
+import com.simprints.core.tools.extensions.permissionFromResult
 import com.simprints.face.capture.R
 import com.simprints.face.capture.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.capture.models.FaceDetection
