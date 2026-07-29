@@ -62,6 +62,17 @@ internal class TokenizeEventPayloadFieldsUseCaseTest {
     }
 
     @Test
+    fun `should not invoke tokenizeIfNecessary for empty list of TokenizableString`() {
+        every { event.getTokenizableFields() } returns emptyMap()
+        every { event.getTokenizableListFields() } returns mapOf(tokenKeyTypeList to emptyList())
+
+        useCase(event = event, project = project)
+
+        verify(exactly = 0) { tokenizationProcessor.tokenizeIfNecessary(any(), any(), any()) }
+        verify { event.setTokenizedListFields(emptyMap()) }
+    }
+
+    @Test
     fun `should handle both field and list of TokenizableString in same event`() {
         every { event.getTokenizableFields() } returns mapOf(tokenKeyType to rawString)
         every { event.getTokenizableListFields() } returns mapOf(tokenKeyTypeList to listOf(rawString, rawString))

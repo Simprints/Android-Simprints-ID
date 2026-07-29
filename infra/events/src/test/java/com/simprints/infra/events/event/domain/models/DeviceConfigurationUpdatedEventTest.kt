@@ -1,6 +1,7 @@
 package com.simprints.infra.events.event.domain.models
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -56,13 +57,36 @@ class DeviceConfigurationUpdatedEventTest {
         )
     }
 
-    private fun createDefaultEvent(): DeviceConfigurationUpdatedEvent = DeviceConfigurationUpdatedEvent(
-        createdAt = CREATED_AT,
-        language = "en",
-        downSyncModules = listOf(
+    @Test
+    fun setTokenizableFields_keepsExistingModuleIdsWhenMapHasNoModuleIds() {
+        val event = createDefaultEvent()
+
+        val updatedEvent = event.setTokenizedListFields(emptyMap()) as DeviceConfigurationUpdatedEvent
+
+        assertThat(updatedEvent.payload.configuration.downSyncModules).containsExactly(
+            "module1".asTokenizableRaw(),
+            "module2".asTokenizableEncrypted(),
+        )
+    }
+
+    @Test
+    fun setTokenizableFields_keepsModuleIdsNullWhenMapHasNoModuleIds() {
+        val event = createDefaultEvent(downSyncModules = null)
+
+        val updatedEvent = event.setTokenizedListFields(emptyMap()) as DeviceConfigurationUpdatedEvent
+
+        assertThat(updatedEvent.payload.configuration.downSyncModules).isNull()
+    }
+
+    private fun createDefaultEvent(
+        downSyncModules: List<TokenizableString>? = listOf(
             "module1".asTokenizableRaw(),
             "module2".asTokenizableEncrypted(),
         ),
+    ): DeviceConfigurationUpdatedEvent = DeviceConfigurationUpdatedEvent(
+        createdAt = CREATED_AT,
+        language = "en",
+        downSyncModules = downSyncModules,
         sourceUpdate = DeviceConfigurationUpdatedEvent.DeviceConfigurationUpdateSource.REMOTE,
     )
 }

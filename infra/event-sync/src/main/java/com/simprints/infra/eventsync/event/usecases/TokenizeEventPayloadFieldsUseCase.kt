@@ -19,15 +19,20 @@ internal class TokenizeEventPayloadFieldsUseCase @Inject constructor(
                 project = project,
             )
         }
-        val tokenizedListFields = event.getTokenizableListFields().mapValues { (tokenKeyType, listFieldValue) ->
-            listFieldValue.map { fieldValue ->
-                tokenizationProcessor.tokenizeIfNecessary(
-                    tokenizableString = fieldValue,
-                    tokenKeyType = tokenKeyType,
-                    project = project,
-                )
+        val tokenizedListFields = event
+            .getTokenizableListFields()
+            // Empty lists have nothing to tokenize, and propagating them would replace an absent
+            // field with an empty one that the backend then rejects as untokenized.
+            .filterValues { it.isNotEmpty() }
+            .mapValues { (tokenKeyType, listFieldValue) ->
+                listFieldValue.map { fieldValue ->
+                    tokenizationProcessor.tokenizeIfNecessary(
+                        tokenizableString = fieldValue,
+                        tokenKeyType = tokenKeyType,
+                        project = project,
+                    )
+                }
             }
-        }
         return event.setTokenizedFields(tokenizedFields).setTokenizedListFields(tokenizedListFields)
     }
 }
