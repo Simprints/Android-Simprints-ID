@@ -38,6 +38,16 @@ class RealmToRoomMigrationScheduler @Inject constructor(
         enqueueMigrationWork()
     }
 
+    /**
+     * Forces Room to become the default enrolment records database immediately, ignoring the migration flags
+     */
+    suspend fun forceRoomAsDefaultDatabase() {
+        log("Forcing Room as default database after login, ignoring migration flags.")
+        workManager.cancelUniqueWork(RealmToRoomMigrationWorker.WORK_NAME)
+        realmToRoomMigrationFlagsStore.updateStatus(MigrationStatus.COMPLETED)
+        realmToRoomMigrationFlagsStore.resetRetryCount()
+    }
+
     private fun enqueueMigrationWork() {
         val constraints = Constraints
             .Builder()

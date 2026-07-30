@@ -14,6 +14,7 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportTag.REALM_DB_MIGR
 import com.simprints.infra.logging.Simber
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlin.time.measureTime
@@ -69,6 +70,10 @@ internal class RealmToRoomMigrationWorker @AssistedInject constructor(
             realmToRoomMigrationFlagsStore.updateStatus(MigrationStatus.COMPLETED)
             realmToRoomMigrationFlagsStore.resetRetryCount()
             return@withContext success()
+        } catch (e: CancellationException) {
+            // The work may have been canceled deliberately (e.g. forceRoomAsDefaultDatabase())
+            Simber.i("[RealmToRoomMigrationWorker] Migration cancelled: ${e.message}", tag = REALM_DB_MIGRATION)
+            throw e
         } catch (e: Exception) {
             Simber.e("[RealmToRoomMigrationWorker] Migration failed: ${e.message}", e)
             realmToRoomMigrationFlagsStore.incrementRetryCount()

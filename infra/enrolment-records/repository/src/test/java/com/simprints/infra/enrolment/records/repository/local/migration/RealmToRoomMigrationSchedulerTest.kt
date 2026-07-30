@@ -8,6 +8,7 @@ import androidx.work.WorkManager
 import com.google.common.truth.Truth.assertThat
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -194,5 +195,22 @@ class RealmToRoomMigrationSchedulerTest {
         coVerify(exactly = 0) { mockWorkManager.cancelUniqueWork(any()) }
         val capturedRequest = workRequestSlot.captured
         assertThat(capturedRequest.workSpec.workerClassName).isEqualTo(RealmToRoomMigrationWorker::class.java.name)
+    }
+
+    @Test
+    fun `forceRoomAsDefaultDatabase should cancel worker and mark migration as completed`() = runTest {
+        // Given
+        coJustRun { mockRealmToRoomMigrationFlagsStore.updateStatus(any()) }
+        coJustRun { mockRealmToRoomMigrationFlagsStore.resetRetryCount() }
+
+        // When
+        scheduler.forceRoomAsDefaultDatabase()
+
+        // Then
+        coVerify(exactly = 1) {
+            mockWorkManager.cancelUniqueWork(RealmToRoomMigrationWorker.WORK_NAME)
+            mockRealmToRoomMigrationFlagsStore.updateStatus(MigrationStatus.COMPLETED)
+            mockRealmToRoomMigrationFlagsStore.resetRetryCount()
+        }
     }
 }
