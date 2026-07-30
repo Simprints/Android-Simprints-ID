@@ -88,7 +88,8 @@ internal class LibSimprintsResponseMapper @Inject constructor(
                 Constants.SIMPRINTS_APP_VERSION_NAME to appVersionName,
                 Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
                 Constants.SIMPRINTS_HAS_CREDENTIAL to (response.externalCredential != null),
-            ).appendExternalCredential(response.externalCredential)
+            ).appendCoSyncData(response.subjectActions)
+                .appendExternalCredential(response.externalCredential)
         }
 
         is ActionResponse.VerifyActionResponse -> bundleOf(
