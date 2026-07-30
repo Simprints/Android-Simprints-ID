@@ -8,8 +8,8 @@ import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
-import com.simprints.core.tools.extentions.isValidGuid
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.utils.isValidGuid
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.usecase.ResetExternalCredentialsInSessionUseCase
 import com.simprints.feature.selectsubject.SelectSubjectParams

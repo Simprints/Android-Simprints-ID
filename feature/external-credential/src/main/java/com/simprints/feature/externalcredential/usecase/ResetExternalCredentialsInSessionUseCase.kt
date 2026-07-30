@@ -1,7 +1,7 @@
 package com.simprints.feature.externalcredential.usecase
 
 import com.simprints.core.SessionCoroutineScope
-import com.simprints.core.tools.extentions.isValidGuid
+import com.simprints.core.tools.utils.isValidGuid
 import com.simprints.feature.externalcredential.ExternalCredentialMapper
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.infra.config.store.ConfigRepository
