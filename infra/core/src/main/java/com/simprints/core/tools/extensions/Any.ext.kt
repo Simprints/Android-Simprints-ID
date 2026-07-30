@@ -1,4 +1,4 @@
-package com.simprints.core.tools.extentions
+package com.simprints.core.tools.extensions
 
 // Sealed whens throw compiling issues only if the whens result is assigned to variables.
 // safeSealedWhens to force the Sealed whens to be exhaustive:

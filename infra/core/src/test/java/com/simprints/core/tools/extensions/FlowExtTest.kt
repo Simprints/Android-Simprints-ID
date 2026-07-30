@@ -1,4 +1,4 @@
-package com.simprints.core.tools.extentions
+package com.simprints.core.tools.extensions
 
 import com.google.common.truth.Truth.*
 import kotlinx.coroutines.flow.flowOf

@@ -1,4 +1,4 @@
-package com.simprints.core.tools.extentions
+package com.simprints.core.tools.extensions
 
 import kotlinx.coroutines.CancellableContinuation
 import kotlin.coroutines.resume

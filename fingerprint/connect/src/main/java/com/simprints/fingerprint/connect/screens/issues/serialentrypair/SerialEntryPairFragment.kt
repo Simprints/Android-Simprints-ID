@@ -15,7 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.core.tools.extentions.hideKeyboard
+import com.simprints.core.tools.extensions.hideKeyboard
 import com.simprints.fingerprint.connect.R
 import com.simprints.fingerprint.connect.databinding.FragmentSerialEntryPairBinding
 import com.simprints.fingerprint.connect.screens.ConnectScannerViewModel

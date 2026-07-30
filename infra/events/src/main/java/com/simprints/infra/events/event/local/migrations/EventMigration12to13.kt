@@ -5,8 +5,8 @@ import android.database.sqlite.SQLiteDatabase
 import androidx.annotation.VisibleForTesting
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.simprints.core.tools.extentions.getLongWithColumnName
-import com.simprints.core.tools.extentions.getStringWithColumnName
+import com.simprints.core.tools.extensions.getLongWithColumnName
+import com.simprints.core.tools.extensions.getStringWithColumnName
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
 

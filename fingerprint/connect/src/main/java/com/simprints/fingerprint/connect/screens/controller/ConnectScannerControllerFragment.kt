@@ -17,8 +17,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.domain.permission.worstPermissionStatus
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.core.tools.extentions.hasPermissions
-import com.simprints.core.tools.extentions.permissionFromResult
+import com.simprints.core.tools.extensions.hasPermissions
+import com.simprints.core.tools.extensions.permissionFromResult
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.alert.toArgs

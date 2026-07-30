@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DispatcherBG
-import com.simprints.core.tools.extentions.area
+import com.simprints.core.tools.extensions.area
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.models.FaceTarget

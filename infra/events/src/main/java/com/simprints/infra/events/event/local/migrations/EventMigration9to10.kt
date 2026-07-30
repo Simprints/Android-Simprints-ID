@@ -5,7 +5,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.simprints.core.domain.tokenization.serialization.TokenizableStringSerializer.FIELD_CLASS_NAME
 import com.simprints.core.domain.tokenization.serialization.TokenizableStringSerializer.FIELD_VALUE
 import com.simprints.core.domain.tokenization.serialization.TokenizableStringSerializer.RAW
-import com.simprints.core.tools.extentions.getStringWithColumnName
+import com.simprints.core.tools.extensions.getStringWithColumnName
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
 

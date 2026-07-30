@@ -2,7 +2,7 @@ package com.simprints.face.capture.usecases
 
 import android.content.Context
 import android.graphics.Bitmap
-import com.simprints.core.tools.extentions.dpToPx
+import com.simprints.core.tools.extensions.dpToPx
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject

@@ -6,8 +6,8 @@ import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.core.tools.extentions.resumeSafely
-import com.simprints.core.tools.extentions.resumeWithExceptionSafely
+import com.simprints.core.tools.extensions.resumeSafely
+import com.simprints.core.tools.extensions.resumeWithExceptionSafely
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import dagger.assisted.Assisted

@@ -129,7 +129,7 @@ internal class ObserveSyncInfoUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         mockkStatic("com.simprints.infra.config.store.models.ProjectConfigurationKt")
-        mockkStatic("com.simprints.core.tools.extentions.Flow_extKt")
+        mockkStatic("com.simprints.core.tools.extensions.Flow_extKt")
         setupDefaultMocks()
         createUseCase()
     }

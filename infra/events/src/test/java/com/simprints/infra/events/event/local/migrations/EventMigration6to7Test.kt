@@ -8,7 +8,7 @@ import androidx.sqlite.db.SupportSQLiteQuery
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.*
-import com.simprints.core.tools.extentions.getStringWithColumnName
+import com.simprints.core.tools.extensions.getStringWithColumnName
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.events.event.local.EventRoomDatabase
 import io.mockk.spyk

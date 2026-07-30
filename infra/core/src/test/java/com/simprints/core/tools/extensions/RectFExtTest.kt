@@ -3,7 +3,7 @@ package com.simprints.core.tools.extensions
 import android.graphics.RectF
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.*
-import com.simprints.core.tools.extentions.area
+import com.simprints.core.tools.extensions.area
 import org.junit.Test
 import org.junit.runner.RunWith
 

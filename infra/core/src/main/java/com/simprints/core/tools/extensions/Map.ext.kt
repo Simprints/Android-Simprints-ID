@@ -1,4 +1,4 @@
-package com.simprints.core.tools.extentions
+package com.simprints.core.tools.extensions
 
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive

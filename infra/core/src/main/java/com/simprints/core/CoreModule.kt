@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.work.WorkManager
 import com.lyft.kronos.AndroidClockFactory
 import com.simprints.core.tools.exceptions.AppCoroutineExceptionHandler
-import com.simprints.core.tools.extentions.deviceHardwareId
-import com.simprints.core.tools.extentions.packageVersionName
+import com.simprints.core.tools.extensions.deviceHardwareId
+import com.simprints.core.tools.extensions.packageVersionName
 import com.simprints.core.tools.time.KronosTimeHelperImpl
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils

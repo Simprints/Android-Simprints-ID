@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase.CONFLICT_NONE
 import androidx.room.testing.MigrationTestHelper
 import androidx.test.ext.junit.runners.*
 import androidx.test.platform.app.*
-import com.simprints.core.tools.extentions.getStringWithColumnName
+import com.simprints.core.tools.extensions.getStringWithColumnName
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.local.EventRoomDatabase

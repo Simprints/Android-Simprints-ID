@@ -1,7 +1,7 @@
 package com.simprints.core.tools.utils
 
-import com.simprints.core.tools.extentions.toJsonElementMap
-import com.simprints.core.tools.extentions.toStringMap
+import com.simprints.core.tools.extensions.toJsonElementMap
+import com.simprints.core.tools.extensions.toStringMap
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonArray

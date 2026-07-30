@@ -6,7 +6,7 @@ import androidx.work.Configuration
 import com.simprints.core.AppScope
 import com.simprints.core.CoreApplication
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.core.tools.extentions.deviceHardwareId
+import com.simprints.core.tools.extensions.deviceHardwareId
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationScheduler
 import com.simprints.infra.eventsync.BuildConfig.DB_ENCRYPTION

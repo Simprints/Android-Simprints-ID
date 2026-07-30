@@ -5,7 +5,7 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
-import com.simprints.core.tools.extentions.safeSealedWhens
+import com.simprints.core.tools.extensions.safeSealedWhens
 import com.simprints.core.tools.utils.StringTokenizer
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectState

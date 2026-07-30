@@ -21,7 +21,7 @@ import androidx.navigation.fragment.navArgs
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.core.tools.extentions.hideKeyboard
+import com.simprints.core.tools.extensions.hideKeyboard
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialSearchBinding
 import com.simprints.feature.externalcredential.ext.getCredentialFieldTitle

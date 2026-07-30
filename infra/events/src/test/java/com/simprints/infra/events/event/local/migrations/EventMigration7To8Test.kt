@@ -10,7 +10,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.TemplateIdentifier
-import com.simprints.core.tools.extentions.getStringWithColumnName
+import com.simprints.core.tools.extensions.getStringWithColumnName
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.events.event.local.EventRoomDatabase
 import com.simprints.testtools.common.syntax.assertThrows

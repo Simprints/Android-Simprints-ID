@@ -5,7 +5,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.simprints.core.tools.extentions.getStringWithColumnName
+import com.simprints.core.tools.extensions.getStringWithColumnName
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
