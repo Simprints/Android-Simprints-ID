@@ -640,6 +640,18 @@ internal class MapDomainEventToApiUseCaseTest {
     }
 
     @Test
+    fun `when no modules are selected, then downSyncModules should be omitted from the ApiEvent`() {
+        val event = createDeviceConfigurationUpdatedEvent().let {
+            it.copy(payload = it.payload.copy(configuration = it.payload.configuration.copy(downSyncModules = null)))
+        }
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
+
+        assertThat(json.getJSONObject("payload").getJSONObject("configuration").has("downSyncModules")).isFalse()
+        assertThat(json.getJSONArray("tokenizedFields").length()).isEqualTo(0)
+    }
+
+    @Test
     fun `when event contains tokenized attendant id, then ApiEvent should contain tokenizedField`() {
         validateUserIdTokenization(attendantId = "attendantId".asTokenizableEncrypted())
     }
