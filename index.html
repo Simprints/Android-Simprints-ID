@@ -683,16 +683,17 @@
 
       const callerApkUrl = project.caller_apk_url || null;
       const callerReleaseUrl = project.caller_release_url || null;
+      const callerAppTitle = project.caller_app_title || 'Caller App';
       const callerNotesBtn = callerReleaseUrl
         ? `<a class="tbl-btn tbl-btn-notes" href="${callerReleaseUrl}" target="_blank" rel="noopener">📋 Release Notes</a>`
         : `<span class="tbl-btn tbl-btn-na">📋 Release Notes</span>`;
       const callerRow = callerApkUrl
         ? `<tr>
-            <td>Caller App</td>
+            <td>${callerAppTitle}</td>
             <td>${project.caller_version ? `<span class="project-version-badge">${project.caller_version}</span>` : '—'}</td>
             <td style="white-space:nowrap">
               <a class="tbl-btn tbl-btn-apk" href="${callerApkUrl}" download>⬇ APK</a>
-              <button class="tbl-btn-qr" data-qr-url="${callerApkUrl}" data-qr-label="${project.name} Caller App">${QR_ICON_SVG} QR</button>
+              <button class="tbl-btn-qr" data-qr-url="${callerApkUrl}" data-qr-label="${project.name} ${callerAppTitle}">${QR_ICON_SVG} QR</button>
             </td>
             <td>${callerNotesBtn}</td>
           </tr>`
