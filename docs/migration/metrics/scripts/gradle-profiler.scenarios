@@ -1,0 +1,20 @@
+default-scenarios = ["clean_build", "incremental_build"]
+
+clean_build {
+  title = "Clean build"
+  tasks = ["id:assembleDebug"]
+  cleanup-tasks = ["clean"]
+  daemon = warm
+  warm-ups = 1
+  iterations = 1
+}
+
+incremental_build {
+  title = "Incremental build"
+  tasks = ["id:assembleDebug"]
+  daemon = warm
+  warm-ups = 1
+  iterations = 1
+
+  apply-android-layout-change-to = "feature/dashboard/src/main/res/layout/fragment_main.xml"
+}
