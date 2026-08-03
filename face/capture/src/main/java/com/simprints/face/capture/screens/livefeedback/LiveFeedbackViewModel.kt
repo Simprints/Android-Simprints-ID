@@ -17,8 +17,8 @@ import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
-import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckConfiguration
+import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckMode
 import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
@@ -273,12 +273,12 @@ internal class LiveFeedbackViewModel @Inject constructor(
     private fun finishCapture(attemptNumber: Int) {
         Simber.i("Finish capture", tag = FACE_CAPTURE)
         viewModelScope.launch {
-            if (spoofCheckConfig == SpoofCheckConfiguration.DISABLED) {
+            if (spoofCheckConfig.mode == SpoofCheckMode.DISABLED) {
                 sendEventsAndFinish(attemptNumber)
             } else {
                 runSpoofChecksOnCaptures()
 
-                if (spoofCheckConfig.mode == FaceConfiguration.SpoofCheckMode.RECORDED) {
+                if (spoofCheckConfig.mode == SpoofCheckMode.RECORDED) {
                     sendEventsAndFinish(attemptNumber)
                 } else {
                     val spoofCheckPassed = userCaptures.map { it.spoofCheckResult }.all {

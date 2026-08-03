@@ -25,14 +25,18 @@ class GetSpoofCheckConfigurationUseCase @Inject constructor(
 
         // TODO use the Face SDK configuration instead
         return projectConfiguration.experimental().let {
-            FaceConfiguration.SpoofCheckConfiguration(
-                mode = it.spoofCheckMode,
-                threshold = it.spoofCheckThreshold,
-                maxAttempts = it.spoofMaxAttempts,
-                maxBitmapSize = it.spoofMaxBitmapSize,
-                validationUiDurationMs = it.spoofMinValidationUiDurationMs,
-                validationErrorUiDurationMs = it.spoofMinValidationErrorUiDurationMs,
-            )
+            if (it.spoofCheckMode == FaceConfiguration.SpoofCheckMode.DISABLED) {
+                FaceConfiguration.SpoofCheckConfiguration.DISABLED
+            } else {
+                FaceConfiguration.SpoofCheckConfiguration(
+                    mode = it.spoofCheckMode,
+                    threshold = it.spoofCheckThreshold,
+                    maxAttempts = it.spoofMaxAttempts,
+                    maxBitmapSize = it.spoofMaxBitmapSize,
+                    validationUiDurationMs = it.spoofMinValidationUiDurationMs,
+                    validationErrorUiDurationMs = it.spoofMinValidationErrorUiDurationMs,
+                )
+            }
         }
     }
 }
