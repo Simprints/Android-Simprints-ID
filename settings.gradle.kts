@@ -122,6 +122,7 @@ include(
     ":feature:validate-subject-pool",
     ":feature:select-subject-age-group",
     ":feature:storage-alert",
+    ":feature:module-selector",
 )
 
 // Infra modules
