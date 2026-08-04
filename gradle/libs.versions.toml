@@ -85,6 +85,8 @@ protobuf_plugin_version = "0.10.0"
 deps_graph_version = "0.8.0"
 tink_version = "1.23.0"
 desugar_jdk_libsVersion = "2.1.5"
+benchmark_macro_version = "1.4.1"
+
 [libraries]
 
 #Kotlin
@@ -248,6 +250,7 @@ testing-AndroidX-orchestrator = { module = "androidx.test:orchestrator", version
 testing-AndroidX-runner = { module = "androidx.test:runner", version.ref = "androidx_version" }
 testing-AndroidX-room = { module = "androidx.room:room-testing", version.ref = "androidx_room_version" }
 testing-AndroidX-uiAutomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiAutomator_version" }
+benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmark_macro_version" }
 
 # Dependencies of the included build-logic
 plugin-gradle-android = { group = "com.android.tools.build", name = "gradle", version.ref = "android_gradlePlugin_version" }
