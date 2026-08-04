@@ -81,4 +81,33 @@ class GetSpoofCheckConfigurationUseCaseTest {
         assertThat(result.maxAttempts).isEqualTo(3)
         assertThat(result.maxBitmapSize).isEqualTo(1000)
     }
+
+    @Test
+    fun `Returns config when ROC V3 is used with spoof check is disabled`() {
+        every { projectConfiguration.face } returns faceConfiguration
+        every { faceConfiguration.getSdkConfiguration(any()) } returns faceSdkConfiguration
+        every { faceSdkConfiguration.version } returns "3.1"
+        every { projectConfiguration.custom } returns mapOf(
+            "spoofCheckMode" to JsonPrimitive("DISABLED"),
+            "spoofCheckThreshold" to JsonPrimitive(0.75f),
+            "spoofMaxAttempts" to JsonPrimitive(3),
+            "spoofMaxBitmapSize" to JsonPrimitive(1000),
+        )
+
+        val result = useCase(projectConfiguration, ModalitySdkType.RANK_ONE)
+
+        assertThat(result).isEqualTo(SpoofCheckConfiguration.DISABLED)
+    }
+
+    @Test
+    fun `Returns config when ROC V3 is used without spoof check configuration`() {
+        every { projectConfiguration.face } returns faceConfiguration
+        every { faceConfiguration.getSdkConfiguration(any()) } returns faceSdkConfiguration
+        every { faceSdkConfiguration.version } returns "3.1"
+        every { projectConfiguration.custom } returns mapOf()
+
+        val result = useCase(projectConfiguration, ModalitySdkType.RANK_ONE)
+
+        assertThat(result).isEqualTo(SpoofCheckConfiguration.DISABLED)
+    }
 }

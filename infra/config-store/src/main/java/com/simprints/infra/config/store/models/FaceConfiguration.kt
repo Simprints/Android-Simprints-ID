@@ -48,8 +48,8 @@ data class FaceConfiguration(
                 threshold = 0f,
                 maxAttempts = 0,
                 maxBitmapSize = 0,
-                validationUiDurationMs = 0,
-                validationErrorUiDurationMs = 0,
+                validationUiDurationMs = 1, // To avoid division by 0
+                validationErrorUiDurationMs = 1, // To avoid division by 0
             )
         }
     }
