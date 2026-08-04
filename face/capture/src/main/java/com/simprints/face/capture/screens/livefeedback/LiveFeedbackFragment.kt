@@ -6,19 +6,9 @@ import android.graphics.Bitmap
 import android.graphics.RectF
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Size
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
-import androidx.camera.core.CameraControl
-import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
-import androidx.camera.core.Preview
-import androidx.camera.core.resolutionselector.ResolutionSelector
-import androidx.camera.core.resolutionselector.ResolutionStrategy
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.lifecycle.awaitInstance
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.isGone
@@ -39,6 +29,7 @@ import com.simprints.face.capture.R
 import com.simprints.face.capture.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.screens.FaceCaptureViewModel
+import com.simprints.infra.camera.CameraFrameProvider
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
@@ -48,34 +39,29 @@ import com.simprints.infra.uibase.view.awaitLayout
 import com.simprints.infra.uibase.view.setCheckedWithLeftDrawable
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
-/**
- * As the user is capturing subject's face, they are presented with this fragment, which displays
- * live information about distance and whether the face is ready to be captured or not.
- * It also displays the capture process of the face and then sends this result to
- * [com.simprints.face.capture.screens.confirmation.ConfirmationFragment]
- */
 @AndroidEntryPoint
 internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) {
-    /** Blocking camera operations are performed using this executor */
-    private lateinit var cameraExecutor: ExecutorService
+    @Inject
+    lateinit var cameraFrameProviderFactory: CameraFrameProvider.Factory
+
+    private val cameraFrameProvider: CameraFrameProvider by lazy {
+        cameraFrameProviderFactory.create(crashReportTag = FACE_CAPTURE)
+    }
+    private var overlayRect: RectF = RectF()
+    private var overlayWidth: Int = 0
+    private var overlayHeight: Int = 0
 
     private val mainVm: FaceCaptureViewModel by activityViewModels()
-
     private val vm: LiveFeedbackViewModel by viewModels()
     private val binding by viewBinding(FragmentLiveFeedbackBinding::bind)
 
-    private lateinit var screenSize: Size
-    private lateinit var targetResolution: Size
-    private lateinit var imageAnalyzer: ImageAnalysis
-    private lateinit var preview: Preview
-
-    private var cameraControl: CameraControl? = null
-
+    private var cameraStarted = false
     private var permissionStatus: PermissionStatus = PermissionStatus.Granted
     private var finishedHandled = false
 
@@ -83,7 +69,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         get() = ContextCompat.getColor(requireContext(), IDR.color.simprints_green_light)
     private val defaultCaptureProgressColor: Int
         get() = ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey_light)
-
     private val validationProgressColor: Int
         get() = ContextCompat.getColor(requireContext(), IDR.color.simprints_orange)
 
@@ -106,7 +91,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     private fun initFragment() {
-        screenSize = with(resources.displayMetrics) { Size(widthPixels, widthPixels) }
         bindViewModel()
         binding.captureProgress.max = 1 // normalized progress
 
@@ -149,67 +133,29 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     private fun toggleTorch(enabled: Boolean) {
-        cameraControl?.enableTorch(enabled)
+        cameraFrameProvider.setTorchEnabled(enabled)
         binding.captureFlashButton.isSelected = enabled
     }
 
-    /** Initialize CameraX, and prepare to bind the camera use cases  */
     private fun setUpCamera() = viewLifecycleOwner.lifecycleScope.launch {
-        permissionStatus = PermissionStatus.Granted
+        if (cameraStarted) return@launch
+        cameraStarted = true
 
-        if (::cameraExecutor.isInitialized && !cameraExecutor.isShutdown) {
-            return@launch
-        }
-        // Wait for the views to be properly laid out
         binding.captureOverlay.awaitLayout()
-        // Initialize our background executor
-        cameraExecutor = Executors.newSingleThreadExecutor()
-        // ImageAnalysis
-        // Todo choose accurate output image resolution that respects quality,performance and face analysis SDKs https://simprints.atlassian.net/browse/CORE-2569
-        if (!::targetResolution.isInitialized) {
-            targetResolution = Size(binding.captureOverlay.width, binding.captureOverlay.height)
+
+        overlayRect = RectF(binding.captureOverlay.circleRect)
+        overlayWidth = binding.captureOverlay.width
+        overlayHeight = binding.captureOverlay.height
+
+        cameraFrameProvider.bind(viewLifecycleOwner, binding.faceCaptureCamera)
+
+        launch(Dispatchers.Default) {
+            vm.detectorReady.first { it }
+            cameraFrameProvider.frames.collect { rawBitmap ->
+                analyze(rawBitmap)
+            }
         }
-        val resolutionSelector = ResolutionSelector
-            .Builder()
-            .setResolutionStrategy(
-                ResolutionStrategy(
-                    targetResolution,
-                    ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER,
-                ),
-            ).build()
 
-        imageAnalyzer = ImageAnalysis
-            .Builder()
-            .setResolutionSelector(resolutionSelector)
-            .setOutputImageRotationEnabled(true)
-            .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
-            .build()
-
-        val cropAnalyzer = CropToTargetOverlayAnalyzer(
-            previewRect = RectF(binding.captureOverlay.circleRect), // create a new instance to avoid threading issues
-            overlayWidth = binding.captureOverlay.width,
-            overlayHeight = binding.captureOverlay.height,
-            onImageCropped = { original, cropped -> analyze(original, cropped) },
-        )
-
-        imageAnalyzer.setAnalyzer(cameraExecutor, cropAnalyzer)
-
-        // Preview
-        preview = Preview
-            .Builder()
-            .setResolutionSelector(resolutionSelector)
-            .build()
-        val cameraProvider = ProcessCameraProvider.awaitInstance(requireContext())
-        cameraProvider.unbindAll()
-        val camera = cameraProvider.bindToLifecycle(
-            viewLifecycleOwner,
-            DEFAULT_BACK_CAMERA,
-            preview,
-            imageAnalyzer,
-        )
-        cameraControl = camera.cameraControl
-        // Attach the view's surface provider to preview use case
-        preview.surfaceProvider = binding.faceCaptureCamera.surfaceProvider
         Simber.i("Camera setup finished", tag = FACE_CAPTURE)
     }
 
@@ -248,15 +194,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     override fun onDestroyView() {
-        if (::cameraExecutor.isInitialized && !cameraExecutor.isShutdown) {
-            cameraExecutor.shutdown()
-        }
-        if (::imageAnalyzer.isInitialized) {
-            imageAnalyzer.clearAnalyzer()
-        }
-        if (::preview.isInitialized) {
-            preview.surfaceProvider = null
-        }
+        cameraFrameProvider.release()
+        cameraStarted = false
         super.onDestroyView()
     }
 
@@ -268,15 +207,16 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         }
     }
 
-    private fun analyze(
-        original: Bitmap,
-        cropped: Bitmap,
-    ) {
+    private fun analyze(rawBitmap: Bitmap) {
         try {
-            vm.process(originalBitmap = original, croppedBitmap = cropped)
+            vm.process(
+                rawBitmap = rawBitmap,
+                overlayRect = overlayRect,
+                overlayWidth = overlayWidth,
+                overlayHeight = overlayHeight,
+            )
         } catch (t: Throwable) {
             Simber.e("Image analysis crashed", t, tag = FACE_CAPTURE)
-            // Image analysis is running in bg thread
             lifecycleScope.launch {
                 mainVm.submitError(t)
             }

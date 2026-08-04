@@ -26,7 +26,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.camera.view.PreviewView
+    <com.simprints.infra.camera.CameraPreviewView
         android:id="@+id/face_capture_camera"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

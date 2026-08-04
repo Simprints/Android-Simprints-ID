@@ -1,6 +1,7 @@
 package com.simprints.face.capture.screens.livefeedback
 
 import android.graphics.Bitmap
+import android.graphics.RectF
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DispatcherBG
@@ -9,6 +10,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.models.FaceTarget
 import com.simprints.face.capture.models.SymmetricTarget
+import com.simprints.face.capture.usecases.CropBitmapToOverlayUseCase
 import com.simprints.face.capture.usecases.GetSpoofCheckConfigurationUseCase
 import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
@@ -48,6 +50,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     private val isUsingAutoCaptureUseCase: IsUsingAutoCaptureUseCase,
     private val getSpoofCheckConfiguration: GetSpoofCheckConfigurationUseCase,
+    private val cropBitmapToOverlay: CropBitmapToOverlayUseCase,
     @param:DispatcherBG private val bgDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private var attemptNumber: Int = 1
@@ -83,6 +86,9 @@ internal class LiveFeedbackViewModel @Inject constructor(
     private var autoCaptureImagingTimeoutJob: Job? = null
     private var autoCaptureImagingDurationMillis: Long = FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
     private lateinit var faceDetector: FaceDetector
+
+    private val _detectorReady = MutableStateFlow(false)
+    val detectorReady: StateFlow<Boolean> = _detectorReady.asStateFlow()
 
     private val phase: LiveFeedbackState.Phase
         get() = _state.value.phase
@@ -124,6 +130,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
         this.attemptNumber = attemptNumber
         viewModelScope.launch {
             faceDetector = resolveFaceBioSdk(bioSdk).detector
+            _detectorReady.value = true
 
             val config = configRepository.getProjectConfiguration()
             spoofCheckConfig = getSpoofCheckConfiguration(config, bioSdk)
@@ -151,23 +158,26 @@ internal class LiveFeedbackViewModel @Inject constructor(
     }
 
     /**
-     * Processes the image. Called on the CameraX analyzer executor (off the main thread).
+     * Processes the image. Called on the camera frame collector (off the main thread).
      */
     fun process(
-        originalBitmap: Bitmap,
-        croppedBitmap: Bitmap,
+        rawBitmap: Bitmap,
+        overlayRect: RectF,
+        overlayWidth: Int,
+        overlayHeight: Int,
     ) {
         // Skip processing and only update progress bar while spoof check is running
         if (phase == LiveFeedbackState.Phase.VALIDATING) {
             emit(phase = LiveFeedbackState.Phase.VALIDATING)
-            originalBitmap.recycle()
-            croppedBitmap.recycle()
+            rawBitmap.recycle()
             return
         } else if (phase == LiveFeedbackState.Phase.VALIDATION_FAILED) {
-            originalBitmap.recycle()
-            croppedBitmap.recycle()
+            rawBitmap.recycle()
             return
         }
+
+        val originalBitmap = rawBitmap.copy(rawBitmap.config ?: Bitmap.Config.ARGB_8888, false)
+        val croppedBitmap = cropBitmapToOverlay(originalBitmap, overlayRect, overlayWidth, overlayHeight)
 
         val captureStartTime = timeHelper.now()
         val potentialFace = faceDetector.analyze(croppedBitmap)

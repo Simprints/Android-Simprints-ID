@@ -21,20 +21,16 @@ dependencies {
     implementation(project(":feature:exit-form"))
     implementation(project(":infra:license"))
     implementation(project(":feature:alert"))
+    implementation(project(":infra:camera"))
 
     // BIO SDK
     implementation(project(":face:infra:bio-sdk-resolver"))
 
-    implementation(libs.androidX.cameraX.core)
-    implementation(libs.androidX.cameraX.lifecycle)
-    implementation(libs.androidX.cameraX.view)
     implementation(libs.androidX.ui.preference)
     implementation(libs.workManager.work)
     implementation(libs.kotlin.serialization)
 
     implementation(libs.circleImageView)
-
-    runtimeOnly(libs.androidX.cameraX.core)
 
     // ######################################################
     //                      Android test

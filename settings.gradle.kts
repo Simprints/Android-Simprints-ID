@@ -148,6 +148,7 @@ include(
     ":infra:security",
     ":infra:orchestrator-data",
     ":infra:ui-base",
+    ":infra:camera",
     ":infra:sync",
     ":infra:event-sync",
     ":infra:backend-api",

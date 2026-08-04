@@ -35,6 +35,8 @@ android {
 dependencies {
 
     implementation(project(":infra:core"))
+    implementation(project(":infra:ui-base"))
+    implementation(project(":infra:camera"))
     implementation(project(":infra:event-sync"))
     implementation(project(":infra:sync"))
     implementation(project(":infra:enrolment-records:repository"))
