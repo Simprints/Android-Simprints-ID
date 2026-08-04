@@ -16,13 +16,14 @@ This document defines a repeatable process to collect all migration metrics into
 
 ## 2. Metrics and where they come from
 
-| Metric                         | Source                                                                     | Automated by                                                      |
-|--------------------------------|----------------------------------------------------------------------------|-------------------------------------------------------------------|
-| Module Conversion %            | `docs/migration/metrics/compose-module-status.csv` + `settings.gradle.kts` | `collect-compose-migration-metrics.py`                            |
-| View-Compose Interop Nodes     | Kotlin source scan (`ComposeView`, `AndroidView`)                          | `collect-compose-migration-metrics.py`                            |
-| Code Ignored in Coverage       | `@ExcludedFromGeneratedTestCoverageReports` usage + optional JaCoCo XML    | `collect-compose-migration-metrics.py`                            |
-| Build Time (clean/incremental) | `gradle-profiler` benchmark CSV                                            | `run-gradle-profiler-metrics.sh` + `parse-gradle-profiler-csv.py` |
-| APK Download Size              | AAB artifact size                                                          | `record-metric-fragment.py`                                       |
+| Metric                         | Source                                                                     | Automated by                                                              |
+|--------------------------------|----------------------------------------------------------------------------|---------------------------------------------------------------------------|
+| Module Conversion %            | `docs/migration/metrics/compose-module-status.csv` + `settings.gradle.kts` | `collect-compose-migration-metrics.py`                                    |
+| View-Compose Interop Nodes     | Kotlin source scan (`ComposeView`, `AndroidView`)                          | `collect-compose-migration-metrics.py`                                    |
+| Code Ignored in Coverage       | `@ExcludedFromGeneratedTestCoverageReports` usage + optional JaCoCo XML    | `collect-compose-migration-metrics.py`                                    |
+| Build Time (clean/incremental) | `gradle-profiler` benchmark CSV                                            | `run-gradle-profiler-metrics.sh` + `parse-gradle-profiler-csv.py`         |
+| APK Download Size              | AAB artifact size                                                          | `record-metric-fragment.py`                                               |
+| App Startup Time               | `:benchmark:connectedBenchmarkAndroidTest` benchmark JSON output           | `run-startup-benchmark-metrics.sh` + `parse-startup-benchmark-results.py` |
 
 ## 3. Step-by-step collection
 
@@ -65,7 +66,19 @@ python3 docs/migration/metrics/scripts/record-metric-fragment.py \
   apk_size.aab_bytes=$(stat -f%z id/build/outputs/bundle/debug/id-debug.aab)
 ```
 
-### Step 4 - Merge it into the unified snapshot:
+### Step 4 - Collect app startup metrics
+
+Run startup benchmark tests from the benchmark module (requires a connected benchmark-capable device/emulator):
+
+```bash
+bash docs/migration/metrics/scripts/run-startup-benchmark-metrics.sh
+```
+
+This writes a fragment:
+
+- `docs/migration/metrics/results/fragments/startup_time.json`
+
+### Step 5 - Merge it into the unified snapshot:
 
 ```bash
 python3 docs/migration/metrics/scripts/collect-compose-migration-metrics.py
@@ -91,6 +104,12 @@ python3 docs/migration/metrics/scripts/collect-compose-migration-metrics.py
 
 - `docs/migration/metrics/scripts/parse-gradle-profiler-csv.py`  
   Parses `benchmark.csv` and computes average scenario times in seconds.
+
+- `docs/migration/metrics/scripts/run-startup-benchmark-metrics.sh`  
+  Runs `:benchmark:connectedBenchmarkAndroidTest`, parses startup benchmark JSON output, and emits `startup_time.json`.
+
+- `docs/migration/metrics/scripts/parse-startup-benchmark-results.py`  
+  Parses benchmark output JSON files and computes startup metric aggregates.
 
 - `docs/migration/metrics/scripts/record-metric-fragment.py`  
   Writes/updates a JSON fragment from `key=value` arguments for manual or scripted ingestion.

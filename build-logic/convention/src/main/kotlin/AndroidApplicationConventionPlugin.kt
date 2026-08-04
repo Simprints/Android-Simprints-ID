@@ -106,6 +106,15 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                             }
                         }
                     }
+
+                    create("benchmark") {
+                        initWith(buildTypes.getByName("release"))
+                        signingConfig = signingConfigs.getByName("debug")
+                        matchingFallbacks += listOf("release")
+                        isMinifyEnabled = true
+                        isShrinkResources = true
+                        isDebuggable = false
+                    }
                 }
             }
         }
