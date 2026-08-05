@@ -3,7 +3,6 @@ package com.simprints.feature.externalcredential.screens.scanqr
 import android.Manifest.permission.CAMERA
 import android.app.Dialog
 import android.content.Intent
-import android.graphics.Rect
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
@@ -29,19 +28,21 @@ import com.simprints.core.tools.extensions.permissionFromResult
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialScanQrBinding
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetBoundsRelativeToParentUseCase
 import com.simprints.feature.externalcredential.screens.search.model.MfidDocument
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
+import com.simprints.infra.camera.CameraFrameProvider
+import com.simprints.infra.camera.postprocess.DetectQrCodeUseCase
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.uibase.camera.qrscan.CameraHelper
-import com.simprints.infra.uibase.camera.qrscan.QrCodeAnalyzer
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.view.applySystemBarInsets
+import com.simprints.infra.uibase.view.awaitLayout
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
@@ -53,17 +54,20 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
     private val viewModel by viewModels<ExternalCredentialScanQrViewModel>()
 
     private var dialog: Dialog? = null
-    private var isCameraInitialized = false
+
+    private val cameraInitLock = Mutex()
 
     @Inject
-    lateinit var cameraHelperFactory: CameraHelper.Factory
-    private val cameraHelper: CameraHelper by lazy {
-        cameraHelperFactory.create(crashReportTag)
+    lateinit var cameraFrameProvider: CameraFrameProvider
+
+    @Inject
+    lateinit var getBoundsRelativeToParentUseCase: GetBoundsRelativeToParentUseCase
+
+    @Inject
+    lateinit var detectQrCodeUseCaseFactory: DetectQrCodeUseCase.Factory
+    private val detectQrCodeUseCase: DetectQrCodeUseCase by lazy {
+        detectQrCodeUseCaseFactory.create(crashReportTag = crashReportTag)
     }
-
-    @Inject
-    lateinit var qrCodeAnalyzerFactory: QrCodeAnalyzer.Factory
-    private lateinit var qrCodeAnalyzer: QrCodeAnalyzer
 
     private val launchPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -81,18 +85,11 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
         Simber.i("ExternalCredentialScanQrFragment started", tag = MULTI_FACTOR_ID)
 
         initObservers()
+        startAnalyzer()
 
         if (!requireActivity().hasPermission(CAMERA)) {
             launchPermissionRequest.launch(CAMERA)
         }
-    }
-
-    override fun onPause() {
-        if (isCameraInitialized) {
-            cameraHelper.stopCamera()
-            isCameraInitialized = false
-        }
-        super.onPause()
     }
 
     override fun onResume() {
@@ -103,6 +100,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
 
     override fun onDestroyView() {
         dismissDialog()
+        cameraFrameProvider.release()
         super.onDestroyView()
     }
 
@@ -121,6 +119,14 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
 
                 is ScanQrState.QrCodeCaptured -> renderScanComplete(state)
                 is ScanQrState.NoCameraPermission -> renderNoPermission(state.shouldOpenPhoneSettings)
+            }
+        }
+    }
+
+    private fun startAnalyzer() = viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            cameraFrameProvider.frames.collect { frame ->
+                detectQrCodeUseCase(frame)?.let { qrCode -> viewModel.updateCapturedValue(qrCode) }
             }
         }
     }
@@ -193,57 +199,32 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
     }
 
     private fun initCamera() {
-        binding.qrScannerArea.post {
-            if (isCameraInitialized) return@post
-            isCameraInitialized = true
-            startCamera()
-            startAnalyzer()
-        }
-    }
-
-    private fun startAnalyzer() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                qrCodeAnalyzer.scannedCode
-                    .catch { e ->
-                        Simber.e("Camera not available for QR scanning", e, tag = crashReportTag)
-                        Toast.makeText(requireActivity(), "No camera", Toast.LENGTH_LONG).show()
-                    }.collectLatest { qrCode ->
-                        viewModel.updateCapturedValue(qrCode)
-                    }
+            cameraInitLock.withLock {
+                if (!cameraFrameProvider.isInitialised()) {
+                    startCamera()
+                }
             }
         }
     }
 
-    private fun startCamera() {
-        val cropConfig = getCropConfig()
-        qrCodeAnalyzer = qrCodeAnalyzerFactory.create(cropConfig = cropConfig, crashReportTag = crashReportTag)
+    private suspend fun startCamera() {
+        // Wait for the views to be properly laid out
+        binding.qrScannerPreview.awaitLayout()
+        binding.qrScannerArea.awaitLayout()
 
-        cameraHelper.startCamera(
-            viewLifecycleOwner,
-            binding.qrScannerPreview,
-            qrCodeAnalyzer,
-        ) {
-            Toast.makeText(requireActivity(), "No Camera available", Toast.LENGTH_LONG).show()
+        val targetRect = getBoundsRelativeToParentUseCase(
+            parent = binding.qrScannerPreview,
+            child = binding.qrScannerArea,
+        )
+        cameraFrameProvider.initialiseCamera(
+            lifecycleOwner = viewLifecycleOwner,
+            previewView = binding.qrScannerPreview,
+            target = targetRect,
+        ) { e ->
+            Simber.e("Camera not available for QR scanning", e, tag = crashReportTag)
+            Toast.makeText(requireActivity(), "No camera", Toast.LENGTH_LONG).show()
         }
-    }
-
-    private fun getCropConfig(): QrCodeAnalyzer.CropConfig = with(binding) {
-        val qrScannerArea = Rect(
-            qrScannerArea.left,
-            qrScannerArea.top,
-            qrScannerArea.right,
-            qrScannerArea.bottom,
-        )
-        val orientation = resources.configuration.orientation
-        val previewWidth = qrScannerPreview.width
-        val previewHeight = qrScannerPreview.height
-        return QrCodeAnalyzer.CropConfig(
-            rect = qrScannerArea,
-            orientation = orientation,
-            rootViewWidth = previewWidth,
-            rootViewHeight = previewHeight,
-        )
     }
 
     private fun renderNoPermission(shouldOpenPhoneSettings: Boolean) = with(binding) {

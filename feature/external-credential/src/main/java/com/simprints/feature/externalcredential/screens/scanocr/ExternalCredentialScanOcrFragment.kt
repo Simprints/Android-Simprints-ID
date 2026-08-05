@@ -189,7 +189,10 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         if (cameraFrameProvider.isInitialised()) {
             return
         }
-        binding.preview.awaitLayout() // Wait for the views to be properly laid out
+        // Wait for the views to be properly laid out
+        binding.preview.awaitLayout()
+        binding.documentScannerArea.awaitLayout()
+
         val targetRect = getBoundsRelativeToParentUseCase(
             parent = binding.preview,
             child = binding.documentScannerArea,
