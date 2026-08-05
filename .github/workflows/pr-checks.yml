@@ -73,6 +73,7 @@ jobs:
                             - 'infra/auth-logic/**'
                             - 'infra/matching/**'
                             - 'infra/backend-api/**'
+                            - 'infra/camera/**'
                         feature1:
                             - 'feature/orchestrator/**'
                             - 'feature/client-api/**'
@@ -152,6 +153,7 @@ jobs:
                 infra:auth-logic
                 infra:matching
                 infra:backend-api
+                infra:camera
             reportsId: infra2
 
     feature-unit-tests1:

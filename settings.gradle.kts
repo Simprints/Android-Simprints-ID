@@ -151,6 +151,7 @@ include(
     ":infra:sync",
     ":infra:event-sync",
     ":infra:backend-api",
+    ":infra:camera",
 )
 // Test modules
 include(
