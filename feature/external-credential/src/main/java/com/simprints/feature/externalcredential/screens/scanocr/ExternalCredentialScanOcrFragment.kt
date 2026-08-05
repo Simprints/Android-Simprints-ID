@@ -8,11 +8,6 @@ import android.view.View
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.ImageProxy
-import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.isInvisible
@@ -24,6 +19,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.DispatcherBG
@@ -35,25 +31,24 @@ import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialScanOcrBinding
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
 import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessment
-import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.BuildOcrCropConfigUseCase
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.ProvideCameraListenerUseCase
+import com.simprints.feature.externalcredential.screens.scanocr.model.OcrConfig
+import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetBoundsRelativeToParentUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
+import com.simprints.infra.camera.CameraFrameProvider
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.camera.qrscan.CameraFocusManager
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.view.applySystemBarInsets
+import com.simprints.infra.uibase.view.awaitLayout
 import com.simprints.infra.uibase.view.fadeIn
 import com.simprints.infra.uibase.view.fadeOut
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
@@ -61,6 +56,7 @@ import com.simprints.infra.resources.R as IDR
 internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_external_credential_scan_ocr) {
     private val args: ExternalCredentialScanOcrFragmentArgs by navArgs()
     private val binding by viewBinding(FragmentExternalCredentialScanOcrBinding::bind)
+
     private val mainViewModel: ExternalCredentialViewModel by activityViewModels()
     private val viewModel by viewModels<ExternalCredentialScanOcrViewModel> {
         object : ViewModelProvider.Factory {
@@ -75,7 +71,6 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
         val cameraPermissionStatus = requireActivity().permissionFromResult(CAMERA, granted)
-        previousPermissionStatus = cameraPermissionStatus
         if (cameraPermissionStatus == PermissionStatus.Granted) {
             initializeFragment()
         } else {
@@ -83,22 +78,20 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             renderNoPermission(shouldOpenPhoneSettings)
         }
     }
-    private var previousPermissionStatus: PermissionStatus? = null
-    private lateinit var cameraExecutor: ExecutorService
-    private lateinit var imageAnalysis: ImageAnalysis
-    private lateinit var imageCapture: ImageCapture
+    private var shouldAutoRequestCameraPermission: Boolean = true
     private var isAnimatingCompletion: Boolean = false
     private var pendingFinishAction: (() -> Unit)? = null
-    private var imagePreProcessingJob: Job? = null
+
+    private val cameraInitLock = Mutex()
+
+    @Inject
+    lateinit var cameraFrameProvider: CameraFrameProvider
+
+    @Inject
+    lateinit var getBoundsRelativeToParentUseCase: GetBoundsRelativeToParentUseCase
 
     @Inject
     lateinit var viewModelFactory: ExternalCredentialScanOcrViewModel.Factory
-
-    @Inject
-    lateinit var buildOcrCropConfigUseCase: BuildOcrCropConfigUseCase
-
-    @Inject
-    lateinit var provideCameraListenerUseCase: ProvideCameraListenerUseCase
 
     @Inject
     lateinit var cameraFocusManagerFactory: CameraFocusManager.Factory
@@ -113,6 +106,9 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     ) {
         super.onViewCreated(view, savedInstanceState)
         applySystemBarInsets(view)
+
+        initObservers()
+        setUpFrameProcessing()
         Simber.i("ExternalCredentialScanOcrFragment started", tag = MULTI_FACTOR_ID)
     }
 
@@ -120,26 +116,15 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         super.onResume()
         when (val currentPermission = requireActivity().getCurrentPermissionStatus(CAMERA)) {
             PermissionStatus.Granted -> initializeFragment()
-            PermissionStatus.Denied -> {
-                // Permission dialog was already displayed, and user denied permissions. Showing rationale so to avoid constantly-appearing
-                // system dialog.
-                if (previousPermissionStatus == currentPermission) {
-                    renderNoPermission(shouldOpenPhoneSettings = false)
-                } else {
-                    launchPermissionRequest.launch(CAMERA)
-                }
-            }
-
-            PermissionStatus.DeniedNeverAskAgain -> {
-                // Requesting system dialog just in case. Some devices faulty report 'DeniedNeverAskAgain' status when it is actually 'Denied'
-                launchPermissionRequest.launch(CAMERA)
-                renderNoPermission(shouldOpenPhoneSettings = true)
+            PermissionStatus.Denied, PermissionStatus.DeniedNeverAskAgain -> if (shouldAutoRequestCameraPermission) {
+                requestCameraPermission()
+            } else {
+                renderNoPermission(shouldOpenPhoneSettings = currentPermission == PermissionStatus.DeniedNeverAskAgain)
             }
         }
     }
 
     override fun onDestroyView() {
-        stopImageProcessing()
         stopCamera()
         clearAnimations()
         super.onDestroyView()
@@ -150,11 +135,14 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         isAnimatingCompletion = false
     }
 
-    private fun initializeFragment() {
-        initObservers()
-        initCamera(onComplete = {
-            setUpFrameProcessing()
-        })
+    private fun initializeFragment() = viewLifecycleOwner.lifecycleScope.launch {
+        val ocrConfig = viewModel.awaitOcrConfig()
+        cameraInitLock.withLock {
+            if (!cameraFrameProvider.isInitialised()) {
+                initCamera(ocrConfig)
+            }
+        }
+        renderInitialState()
     }
 
     private fun initObservers() {
@@ -177,7 +165,6 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
                             100,
                             durationMs = PROGRESS_FINISH_REMAINING_MS,
                             onComplete = {
-                                stopImageProcessing()
                                 viewModel.processOcrResultsAndFinish()
                             },
                             interpolator = AccelerateInterpolator(),
@@ -198,33 +185,23 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         )
     }
 
-    private fun initCamera(onComplete: () -> Unit) {
-        if (::cameraExecutor.isInitialized) {
+    private suspend fun initCamera(ocrConfig: OcrConfig) {
+        if (cameraFrameProvider.isInitialised()) {
             return
         }
-
-        cameraExecutor = Executors.newSingleThreadExecutor()
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
-        val cameraListener = provideCameraListenerUseCase(
-            cameraProviderFuture = cameraProviderFuture,
-            surfaceProvider = binding.preview.surfaceProvider,
-            viewLifecycleOwner = viewLifecycleOwner,
-            onImageAnalysisReady = { analysis ->
-                imageAnalysis = analysis
-                onComplete()
-            },
-            onImageCaptureReady = { capture ->
-                imageCapture = capture
-            },
-            onCameraReady = { camera ->
-                if (lifecycle.currentState == Lifecycle.State.RESUMED) {
-                    val cameraFocusManager = cameraFocusManagerFactory.create(MULTI_FACTOR_ID)
-                    cameraFocusManager.setUpFocusOnTap(binding.preview, camera)
-                    cameraFocusManager.setUpAutoFocus(binding.preview, camera)
-                }
-            },
+        binding.preview.awaitLayout() // Wait for the views to be properly laid out
+        val targetRect = getBoundsRelativeToParentUseCase(
+            parent = binding.preview,
+            child = binding.documentScannerArea,
         )
-        cameraProviderFuture.addListener(cameraListener, ContextCompat.getMainExecutor(requireContext()))
+        cameraFrameProvider.initialiseCamera(
+            lifecycleOwner = viewLifecycleOwner,
+            previewView = binding.preview,
+            target = targetRect,
+            highResolution = ocrConfig.useHighRes,
+        ) {
+            Simber.e("Camera binding failed in OCR", it, MULTI_FACTOR_ID)
+        }
     }
 
     private fun renderProgress(state: ScanOcrState.ScanningInProgress) = with(binding) {
@@ -288,6 +265,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     }
 
     private fun renderNoPermission(shouldOpenPhoneSettings: Boolean) {
+        stopCamera()
         with(binding) {
             instructionsText.isVisible = false
             progressContainer.isInvisible = true
@@ -316,7 +294,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
                     body = bodyText,
                     buttonText = IDR.string.face_capture_permission_action,
                     onClickListener = {
-                        launchPermissionRequest.launch(CAMERA)
+                        requestCameraPermission()
                     },
                 )
             }
@@ -324,78 +302,34 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         }
     }
 
+    private fun requestCameraPermission() {
+        shouldAutoRequestCameraPermission = false
+        launchPermissionRequest.launch(CAMERA)
+    }
+
     private fun setUpFrameProcessing() {
-        imageAnalysis.setAnalyzer(cameraExecutor) { videoFrame: ImageProxy ->
-            if (viewModel.isProcessingImage.get()) {
-                videoFrame.close()
-                return@setAnalyzer
-            }
-
-            // Processing frames as often as we can while camera feedback is displayed to the user
-            viewModel.imageProcessingStarted()
-            if (viewModel.isScanningInProgress && viewModel.ocrConfig?.useHighRes == true) {
-                // For hi-res OCR we don't need the frame and will capture a new image instead
-                videoFrame.close()
-                captureHighResImageForOcr { highResImage ->
-                    processImage(highResImage)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                launch {
+                    viewModel.isProcessingImage.collect { isProcessing ->
+                        cameraFrameProvider.setFrameEmissionEnabled(!isProcessing)
+                    }
                 }
-            } else {
-                processImage(videoFrame)
+
+                launch {
+                    cameraFrameProvider.frames.collect { frame ->
+                        viewModel.imageProcessingStarted()
+                        viewModel.processImage(frame)
+                    }
+                }
             }
         }
-    }
-
-    private fun processImage(imageProxy: ImageProxy) {
-        imagePreProcessingJob?.cancel()
-        imagePreProcessingJob = lifecycleScope.launch(bgDispatcher) {
-            try {
-                if (isActive) {
-                    val (bitmap, imageInfo) = imageProxy.toBitmap() to imageProxy.imageInfo
-                    val cropConfig: OcrCropConfig = buildOcrCropConfigUseCase(
-                        rotationDegrees = imageInfo.rotationDegrees,
-                        cameraPreview = binding.preview,
-                        documentScannerArea = binding.documentScannerArea,
-                    )
-                    viewModel.processImage(bitmap = bitmap, cropConfig)
-                } else {
-                    Simber.i(
-                        "Unable to run image processing, coroutine context is cancelled",
-                        tag = MULTI_FACTOR_ID,
-                    )
-                }
-            } finally {
-                imageProxy.close()
-            }
-        }
-    }
-
-    private fun captureHighResImageForOcr(onImageCaptured: (ImageProxy) -> Unit) {
-        imageCapture.takePicture(
-            cameraExecutor,
-            object : ImageCapture.OnImageCapturedCallback() {
-                override fun onCaptureSuccess(imageProxy: ImageProxy) {
-                    onImageCaptured(imageProxy)
-                }
-
-                override fun onError(e: ImageCaptureException) {
-                    Simber.e("Photo capture failed in OCR", e, MULTI_FACTOR_ID)
-                }
-            },
-        )
     }
 
     private fun stopCamera() {
-        if (::cameraExecutor.isInitialized) {
-            cameraExecutor.shutdown()
+        if (cameraFrameProvider.isInitialised()) {
+            cameraFrameProvider.release()
         }
-    }
-
-    private fun stopImageProcessing() {
-        imagePreProcessingJob?.cancel()
-        if (::imageAnalysis.isInitialized) {
-            imageAnalysis.clearAnalyzer()
-        }
-        viewModel.imageProcessingStopped()
     }
 
     /**

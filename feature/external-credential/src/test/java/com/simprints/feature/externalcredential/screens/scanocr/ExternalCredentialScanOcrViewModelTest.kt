@@ -7,16 +7,15 @@ import com.jraska.livedata.test
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessment
-import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import com.simprints.feature.externalcredential.screens.scanocr.model.ScannedMfidDocument
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.BuildScannedCredentialResultUseCase
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.CropDocumentFromPreviewUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetLightingConditionsAssessmentConfigUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetLightingConditionsAssessmentUseCase
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.NormalizeBitmapToPreviewUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ScanMfidDocumentUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
+import com.simprints.infra.camera.Frame
+import com.simprints.infra.camera.postprocess.FrameCropToTargetUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED
 import com.simprints.infra.config.store.models.ProjectConfiguration
@@ -46,10 +45,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
     private lateinit var timeHelper: TimeHelper
 
     @MockK
-    private lateinit var normalizeBitmapToPreviewUseCase: NormalizeBitmapToPreviewUseCase
-
-    @MockK
-    private lateinit var cropDocumentFromPreviewUseCase: CropDocumentFromPreviewUseCase
+    private lateinit var frameCropToTargetUseCase: FrameCropToTargetUseCase
 
     @MockK
     private lateinit var scanMfidDocumentUseCase: ScanMfidDocumentUseCase
@@ -64,10 +60,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
     private lateinit var configRepository: ConfigRepository
 
     @MockK
-    private lateinit var bitmap: Bitmap
-
-    @MockK
-    private lateinit var cropConfig: OcrCropConfig
+    private lateinit var frame: Frame
 
     private lateinit var viewModel: ExternalCredentialScanOcrViewModel
 
@@ -93,8 +86,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
         return ExternalCredentialScanOcrViewModel(
             ocrDocumentType = documentType,
             timeHelper = timeHelper,
-            normalizeBitmapToPreviewUseCase = normalizeBitmapToPreviewUseCase,
-            cropDocumentFromPreviewUseCase = cropDocumentFromPreviewUseCase,
+            frameCropToTargetUseCase = frameCropToTargetUseCase,
             scanMfidDocumentUseCase = scanMfidDocumentUseCase,
             buildScannedCredentialResultUseCase = buildScannedCredentialResultUseCase,
             getLightingConditionsAssessmentConfig = GetLightingConditionsAssessmentConfigUseCase(configRepository),
@@ -116,37 +108,34 @@ internal class ExternalCredentialScanOcrViewModelTest {
     }
 
     @Test
-    fun `imageProcessingStopped resets the flag for image processing`() {
+    fun `imageProcessingStopped resets the flag for image processing`() = runTest {
         viewModel.imageProcessingStarted()
-        assertThat(viewModel.isProcessingImage.get()).isTrue()
+        assertThat(viewModel.isProcessingImage.value).isTrue()
 
         viewModel.imageProcessingStopped()
-        assertThat(viewModel.isProcessingImage.get()).isFalse()
+        assertThat(viewModel.isProcessingImage.value).isFalse()
     }
 
     @Test
     fun `processImage updates detected blocks and state when OCR successful`() = runTest {
         val mockScannedDocument = mockk<ScannedMfidDocument>()
-        val mockNormalizedBitmap = mockk<Bitmap>()
         val mockCroppedBitmap = mockk<Bitmap>()
-        coEvery { normalizeBitmapToPreviewUseCase(bitmap, cropConfig) } returns mockNormalizedBitmap
-        coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
+        coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
         coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
 
         val observer = viewModel.scanOcrStateLiveData.test()
         viewModel.imageProcessingStarted()
         viewModel.startScanning()
-        viewModel.processImage(bitmap, cropConfig)
+        viewModel.processImage(frame)
 
         val state = observer.value() as ScanOcrState.ScanningInProgress
         assertThat(state.successfulCaptures).isEqualTo(1)
-        assertThat(viewModel.isProcessingImage.get()).isFalse()
+        assertThat(viewModel.isProcessingImage.value).isFalse()
         assertThat(viewModel.isOcrActive).isTrue()
     }
 
     @Test
     fun `processImage updates lighting conditions after debounce`() = runTest {
-        val mockNormalizedBitmap = mockk<Bitmap>()
         val mockCroppedBitmap = mockk<Bitmap>()
         val lightingConditionsAssessment = LightingConditionsAssessment.TOO_DIM
         viewModel = initViewModel(
@@ -156,13 +145,12 @@ internal class ExternalCredentialScanOcrViewModelTest {
             ),
         )
         runCurrent()
-        coEvery { normalizeBitmapToPreviewUseCase(bitmap, cropConfig) } returns mockNormalizedBitmap
-        coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
+        coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
         coEvery { getLightingConditionsAssessment(mockCroppedBitmap, any()) } returns lightingConditionsAssessment
 
         val observer = viewModel.lightingConditionsAssessment.test()
 
-        viewModel.processImage(bitmap, cropConfig)
+        viewModel.processImage(frame)
         runCurrent()
         observer.assertNoValue()
 
@@ -179,11 +167,10 @@ internal class ExternalCredentialScanOcrViewModelTest {
     @Test
     fun `processImage skips normalization and OCR when scanning not in progress and lighting is disabled`() = runTest {
         val observer = viewModel.scanOcrStateLiveData.test()
-        viewModel.processImage(bitmap, cropConfig)
+        viewModel.processImage(frame)
 
         assertThat(observer.value()).isInstanceOf(ScanOcrState.NotScanning::class.java)
-        coVerify(exactly = 0) { normalizeBitmapToPreviewUseCase.invoke(any(), any()) }
-        coVerify(exactly = 0) { cropDocumentFromPreviewUseCase.invoke(any(), any()) }
+        coVerify(exactly = 0) { frameCropToTargetUseCase(frame) }
         coVerify(exactly = 0) { scanMfidDocumentUseCase.invoke(any(), any(), any()) }
         coVerify(exactly = 0) { getLightingConditionsAssessment.invoke(any(), any()) }
         assertThat(viewModel.isOcrActive).isFalse()
@@ -191,7 +178,6 @@ internal class ExternalCredentialScanOcrViewModelTest {
 
     @Test
     fun `processImage updates lighting conditions when scanning not in progress`() = runTest {
-        val mockNormalizedBitmap = mockk<Bitmap>()
         val mockCroppedBitmap = mockk<Bitmap>()
         val lightingConditionsAssessment = LightingConditionsAssessment.TOO_BRIGHT
         viewModel = initViewModel(
@@ -201,13 +187,12 @@ internal class ExternalCredentialScanOcrViewModelTest {
             ),
         )
         runCurrent()
-        coEvery { normalizeBitmapToPreviewUseCase(bitmap, cropConfig) } returns mockNormalizedBitmap
-        coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
+        coEvery { frameCropToTargetUseCase(any()) } returns mockCroppedBitmap
         coEvery { getLightingConditionsAssessment(mockCroppedBitmap, any()) } returns lightingConditionsAssessment
 
         val observer = viewModel.lightingConditionsAssessment.test()
 
-        viewModel.processImage(bitmap, cropConfig)
+        viewModel.processImage(frame)
         runCurrent()
 
         advanceTimeBy(500L) // debounce delay
@@ -228,14 +213,13 @@ internal class ExternalCredentialScanOcrViewModelTest {
         )
         runCurrent()
 
-        viewModel.processImage(bitmap, cropConfig)
+        viewModel.processImage(frame)
         runCurrent()
 
         advanceTimeBy(500L) // debounce delay
         runCurrent()
 
-        coVerify(exactly = 0) { normalizeBitmapToPreviewUseCase.invoke(any(), any()) }
-        coVerify(exactly = 0) { cropDocumentFromPreviewUseCase.invoke(any(), any()) }
+        coVerify(exactly = 0) { frameCropToTargetUseCase(frame) }
         coVerify(exactly = 0) { getLightingConditionsAssessment(any(), any()) }
     }
 
@@ -253,8 +237,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
         viewModel = ExternalCredentialScanOcrViewModel(
             ocrDocumentType = documentType,
             timeHelper = timeHelper,
-            normalizeBitmapToPreviewUseCase = normalizeBitmapToPreviewUseCase,
-            cropDocumentFromPreviewUseCase = cropDocumentFromPreviewUseCase,
+            frameCropToTargetUseCase = frameCropToTargetUseCase,
             scanMfidDocumentUseCase = scanMfidDocumentUseCase,
             buildScannedCredentialResultUseCase = buildScannedCredentialResultUseCase,
             getLightingConditionsAssessmentConfig = GetLightingConditionsAssessmentConfigUseCase(configRepository),
@@ -263,14 +246,13 @@ internal class ExternalCredentialScanOcrViewModelTest {
             bgDispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
 
-        viewModel.processImage(bitmap, cropConfig)
+        viewModel.processImage(frame)
         runCurrent()
 
         advanceTimeBy(500L) // debounce delay
         runCurrent()
 
-        coVerify(exactly = 0) { normalizeBitmapToPreviewUseCase.invoke(any(), any()) }
-        coVerify(exactly = 0) { cropDocumentFromPreviewUseCase.invoke(any(), any()) }
+        coVerify(exactly = 0) { frameCropToTargetUseCase(frame) }
         coVerify(exactly = 0) { getLightingConditionsAssessment(any(), any()) }
 
         configLoadingDeferred.complete(projectConfiguration)
@@ -296,16 +278,14 @@ internal class ExternalCredentialScanOcrViewModelTest {
     fun `processOcrResultsAndFinish passes accumulated documents to build use case`() = runTest {
         val mockScannedDocument = mockk<ScannedMfidDocument>()
         val mockScannedCredentialResult = mockk<ScannedCredentialResult>()
-        val mockNormalizedBitmap = mockk<Bitmap>()
         val mockCroppedBitmap = mockk<Bitmap>()
 
-        coEvery { normalizeBitmapToPreviewUseCase(bitmap, cropConfig) } returns mockNormalizedBitmap
-        coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
+        coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
         coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
         coEvery { buildScannedCredentialResultUseCase(any(), documentType, any()) } returns mockScannedCredentialResult
 
         viewModel.startScanning()
-        viewModel.processImage(bitmap, cropConfig)
+        viewModel.processImage(frame)
         viewModel.processOcrResultsAndFinish()
 
         coVerify { buildScannedCredentialResultUseCase(listOf(mockScannedDocument), documentType, any()) }
@@ -335,23 +315,21 @@ internal class ExternalCredentialScanOcrViewModelTest {
     @Test
     fun `processImage does not add documents or update state once required captures are reached`() = runTest {
         val mockScannedDocument = mockk<ScannedMfidDocument>()
-        val mockNormalizedBitmap = mockk<Bitmap>()
         val mockCroppedBitmap = mockk<Bitmap>()
 
-        coEvery { normalizeBitmapToPreviewUseCase(bitmap, cropConfig) } returns mockNormalizedBitmap
-        coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
+        coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
         coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
 
         val observer = viewModel.scanOcrStateLiveData.test()
         viewModel.startScanning()
 
         val capturesRequired = (observer.value() as ScanOcrState.ScanningInProgress).scansRequired
-        repeat(capturesRequired) { viewModel.processImage(bitmap, cropConfig) }
+        repeat(capturesRequired) { viewModel.processImage(frame) }
 
         val stateAtCapacity = observer.value() as ScanOcrState.ScanningInProgress
         assertThat(stateAtCapacity.successfulCaptures).isEqualTo(capturesRequired)
 
-        viewModel.processImage(bitmap, cropConfig)
+        viewModel.processImage(frame)
 
         assertThat(observer.value()).isEqualTo(stateAtCapacity)
     }
@@ -359,18 +337,16 @@ internal class ExternalCredentialScanOcrViewModelTest {
     @Test
     fun `processImage emits ScanningInProgress with enough captures exactly once`() = runTest {
         val mockScannedDocument = mockk<ScannedMfidDocument>()
-        val mockNormalizedBitmap = mockk<Bitmap>()
         val mockCroppedBitmap = mockk<Bitmap>()
 
-        coEvery { normalizeBitmapToPreviewUseCase(bitmap, cropConfig) } returns mockNormalizedBitmap
-        coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
+        coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
         coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
 
         val observer = viewModel.scanOcrStateLiveData.test()
         viewModel.startScanning()
 
         val capturesRequired = (observer.value() as ScanOcrState.ScanningInProgress).scansRequired
-        repeat(capturesRequired + 2) { viewModel.processImage(bitmap, cropConfig) }
+        repeat(capturesRequired + 2) { viewModel.processImage(frame) }
 
         val completionTriggers = observer
             .valueHistory()
@@ -383,11 +359,9 @@ internal class ExternalCredentialScanOcrViewModelTest {
     fun `processImage does not append documents or update state after scanning is complete`() = runTest {
         val mockScannedDocument = mockk<ScannedMfidDocument>()
         val mockScannedCredentialResult = mockk<ScannedCredentialResult>()
-        val mockNormalizedBitmap = mockk<Bitmap>()
         val mockCroppedBitmap = mockk<Bitmap>()
 
-        coEvery { normalizeBitmapToPreviewUseCase(bitmap, cropConfig) } returns mockNormalizedBitmap
-        coEvery { cropDocumentFromPreviewUseCase(mockNormalizedBitmap, any()) } returns mockCroppedBitmap
+        coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
         coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
         coEvery { buildScannedCredentialResultUseCase(any(), documentType, any()) } returns mockScannedCredentialResult
 
@@ -399,7 +373,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
 
         // Frame from camera arrives after Complete
         viewModel.imageProcessingStarted()
-        viewModel.processImage(bitmap, cropConfig)
+        viewModel.processImage(frame)
 
         assertThat(stateObserver.value()).isEqualTo(ScanOcrState.Complete)
         assertThat(viewModel.isOcrActive).isFalse()
