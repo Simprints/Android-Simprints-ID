@@ -37,7 +37,6 @@ import com.simprints.feature.externalcredential.screens.search.model.ScannedCred
 import com.simprints.infra.camera.CameraFrameProvider
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.uibase.camera.qrscan.CameraFocusManager
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.view.awaitLayout
@@ -92,9 +91,6 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
 
     @Inject
     lateinit var viewModelFactory: ExternalCredentialScanOcrViewModel.Factory
-
-    @Inject
-    lateinit var cameraFocusManagerFactory: CameraFocusManager.Factory
 
     @Inject
     @DispatcherBG

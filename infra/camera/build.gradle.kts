@@ -9,6 +9,9 @@ android {
 dependencies {
     implementation(libs.androidX.cameraX.core)
     implementation(libs.androidX.cameraX.lifecycle)
-    implementation(libs.androidX.cameraX.view)
+
+    // Exported so that dependant modules have access to PreviewView
+    api(libs.androidX.cameraX.view)
+
     implementation(libs.playServices.barcode)
 }
