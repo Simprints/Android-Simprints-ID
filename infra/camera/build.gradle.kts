@@ -4,9 +4,12 @@ plugins {
 
 android {
     namespace = "com.simprints.infra.camera"
+
+    viewBinding.enable = true
 }
 
 dependencies {
+    implementation(libs.support.material)
     implementation(libs.androidX.cameraX.core)
     implementation(libs.androidX.cameraX.lifecycle)
 

@@ -1,4 +1,4 @@
-package com.simprints.infra.view.imagecapture
+package com.simprints.infra.camera.view
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -18,9 +18,9 @@ import android.view.View
 import android.view.animation.LinearInterpolator
 import androidx.annotation.ColorInt
 import androidx.core.os.BundleCompat
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.tools.extensions.dpToPx
-import com.simprints.infra.uibase.R
-import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.infra.camera.R
 
 @ExcludedFromGeneratedTestCoverageReports("UI Code")
 class CaptureProgressView @JvmOverloads constructor(

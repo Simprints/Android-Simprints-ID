@@ -1,4 +1,4 @@
-package com.simprints.infra.view.imagecapture
+package com.simprints.infra.camera.view
 
 import android.content.Context
 import android.graphics.Canvas
@@ -12,9 +12,9 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.ColorInt
 import androidx.core.os.BundleCompat
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.tools.extensions.dpToPx
-import com.simprints.infra.uibase.R
-import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.infra.camera.R
 
 @ExcludedFromGeneratedTestCoverageReports("UI Code")
 class CaptureTargetView @JvmOverloads constructor(
