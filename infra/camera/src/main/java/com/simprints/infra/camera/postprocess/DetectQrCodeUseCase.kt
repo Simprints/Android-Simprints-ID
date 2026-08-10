@@ -25,6 +25,7 @@ import kotlinx.coroutines.withContext
 class DetectQrCodeUseCase @AssistedInject constructor(
     @param:DispatcherBG private val bgDispatcher: CoroutineDispatcher,
     @Assisted private val crashReportTag: LoggingConstants.CrashReportTag,
+    private val cropToTargetUseCase: FrameCropToTargetUseCase,
 ) {
     @AssistedFactory
     interface Factory {
@@ -40,7 +41,7 @@ class DetectQrCodeUseCase @AssistedInject constructor(
 
     suspend operator fun invoke(frame: Frame): String? = withContext(bgDispatcher) {
         try {
-            detectInImage(InputImage.fromBitmap(frame.bitmap, frame.rotation))
+            detectInImage(InputImage.fromBitmap(cropToTargetUseCase(frame), frame.rotation))
         } catch (t: Throwable) {
             Simber.e("QR code detection failed", t, tag = crashReportTag)
             null
