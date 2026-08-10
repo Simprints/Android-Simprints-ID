@@ -1,5 +1,6 @@
 package com.simprints.face.capture.screens.livefeedback
 
+import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.face.capture.models.FaceDetection
 
 /**
@@ -9,6 +10,7 @@ internal data class LiveFeedbackState(
     val phase: Phase,
     val feedback: Feedback,
     val isAutoCapture: Boolean,
+    val permissionStatus: PermissionStatus,
     val progress: Progress,
     val result: List<FaceDetection> = emptyList(),
 ) {
@@ -26,6 +28,7 @@ internal data class LiveFeedbackState(
             phase = Phase.NOT_STARTED,
             feedback = Feedback.NONE,
             isAutoCapture = isAutoCapture,
+            permissionStatus = PermissionStatus.Denied,
             progress = Progress.HIDDEN,
         )
     }

@@ -23,8 +23,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.permission.PermissionStatus
+import com.simprints.core.tools.extensions.getCurrentPermissionStatus
 import com.simprints.core.tools.extensions.hasCameraFlash
-import com.simprints.core.tools.extensions.hasPermission
 import com.simprints.core.tools.extensions.permissionFromResult
 import com.simprints.face.capture.R
 import com.simprints.face.capture.databinding.FragmentLiveFeedbackBinding
@@ -42,6 +42,8 @@ import com.simprints.infra.uibase.view.setCheckedWithLeftDrawable
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -72,7 +74,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     @DispatcherBG
     lateinit var bgDispatcher: CoroutineDispatcher
 
-    private var permissionStatus: PermissionStatus = PermissionStatus.Granted
     private var finishedHandled = false
 
     private val validCaptureProgressColor: Int
@@ -86,8 +87,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private val launchPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
-        permissionStatus = requireActivity().permissionFromResult(Manifest.permission.CAMERA, granted)
-        if (permissionStatus == PermissionStatus.Granted) setUpCamera() else renderNoPermission()
+        vm.onPermissionResult(requireActivity().permissionFromResult(Manifest.permission.CAMERA, granted))
     }
 
     override fun onViewCreated(
@@ -104,14 +104,14 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private fun initFragment() {
         screenSize = with(resources.displayMetrics) { Size(widthPixels, widthPixels) }
         bindViewModel()
+        bindPermissionActions()
         setUpFrameProcessing()
 
         binding.captureProgress.max = 1 // normalized progress
 
-        // `isAutoCapture` affects major parts of the UI state, so resolve it before wiring the capture button
+        setUpCaptureButton()
         viewLifecycleOwner.lifecycleScope.launch {
             vm.initAutoCapture()
-            setUpCaptureButton()
         }
 
         // Wait till the views gets its final size then init frame processor and setup the camera
@@ -126,6 +126,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 currentFragment = this,
                 directions = LiveFeedbackFragmentDirections.actionFaceLiveFeedbackFragmentToFacePreparationFragment(),
             )
+        }
+        binding.captureFeedbackPermissionButton.setOnClickListener {
+            vm.onPermissionButtonClicked()
         }
 
         with(binding.captureFlashButton) {
@@ -153,8 +156,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     /** Initialize CameraX, and prepare to bind the camera use cases  */
     private fun setUpCamera() = viewLifecycleOwner.lifecycleScope.launch {
-        permissionStatus = PermissionStatus.Granted
-
         if (cameraFrameProvider.isInitialised()) {
             return@launch
         }
@@ -173,25 +174,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     override fun onResume() {
         super.onResume()
-        when {
-            requireActivity().hasPermission(Manifest.permission.CAMERA) -> {
-                setUpCamera()
-                toggleCaptureButtonIfAutoCapture(true)
-            }
-
-            mainVm.shouldCheckCameraPermissions.getAndSet(false) -> {
-                // Check permission in onResume() so that if user left the app to go to Settings
-                // and give the permission, it's reflected when they come back to SID
-                if (requireActivity().hasPermission(Manifest.permission.CAMERA)) {
-                    setUpCamera()
-                } else {
-                    permissionStatus = PermissionStatus.Denied
-                    launchPermissionRequest.launch(Manifest.permission.CAMERA)
-                }
-            }
-
-            else -> mainVm.shouldCheckCameraPermissions.set(true)
-        }
+        vm.onScreenResumed(requireActivity().getCurrentPermissionStatus(Manifest.permission.CAMERA))
     }
 
     private fun toggleCaptureButtonIfAutoCapture(enabled: Boolean) {
@@ -212,7 +195,41 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun bindViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) { vm.state.collect(::render) }
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { vm.state.collect(::render) }
+                launch {
+                    vm.state
+                        .map { it.permissionStatus }
+                        .distinctUntilChanged()
+                        .collect { permissionStatus ->
+                            if (permissionStatus == PermissionStatus.Granted) {
+                                setUpCamera()
+                                toggleCaptureButtonIfAutoCapture(true)
+                            }
+                        }
+                }
+            }
+        }
+    }
+
+    private fun bindPermissionActions() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                vm.permissionActions.collect { action ->
+                    when (action) {
+                        LiveFeedbackViewModel.PermissionAction.RequestCameraPermission ->
+                            launchPermissionRequest.launch(Manifest.permission.CAMERA)
+
+                        LiveFeedbackViewModel.PermissionAction.OpenAppSettings ->
+                            requireActivity().startActivity(
+                                Intent(
+                                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                    "package:${requireActivity().packageName}".toUri(),
+                                ),
+                            )
+                    }
+                }
+            }
         }
     }
 
@@ -239,7 +256,10 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     private fun render(state: LiveFeedbackState) {
-        if (permissionStatus != PermissionStatus.Granted) return
+        if (state.permissionStatus != PermissionStatus.Granted) {
+            renderNoPermission()
+            return
+        }
 
         renderProgress(state.progress)
         when (state.phase) {
@@ -397,18 +417,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             captureFeedbackTxtExplanation.setText(IDR.string.face_capture_permission_denied)
             captureFeedbackBtn.isGone = true
             captureFeedbackPermissionButton.isVisible = true
-            captureFeedbackPermissionButton.setOnClickListener {
-                if (permissionStatus == PermissionStatus.DeniedNeverAskAgain) {
-                    requireActivity().startActivity(
-                        Intent(
-                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                            "package:${requireActivity().packageName}".toUri(),
-                        ),
-                    )
-                } else {
-                    launchPermissionRequest.launch(Manifest.permission.CAMERA)
-                }
-            }
             setManualCaptureButtonClickable(false)
         }
     }

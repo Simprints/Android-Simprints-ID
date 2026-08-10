@@ -5,6 +5,7 @@ import android.graphics.Rect
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.usecases.GetSpoofCheckConfigurationUseCase
@@ -121,9 +122,39 @@ internal class LiveFeedbackViewModelTest {
         every { isUsingAutoCapture.invoke(any()) } returns true
 
         viewModel.initAutoCapture()
+        advanceUntilIdle()
 
         assertThat(viewModel.state.value.isAutoCapture).isTrue()
         assertThat(viewModel.isAutoCapture).isTrue()
+    }
+
+    @Test
+    fun `onScreenResumed with denied permission auto-requests only once`() = runTest {
+        val actions = mutableListOf<LiveFeedbackViewModel.PermissionAction>()
+        backgroundScope.launch(testCoroutineRule.testCoroutineDispatcher) {
+            viewModel.permissionActions.toList(actions)
+        }
+
+        viewModel.onScreenResumed(PermissionStatus.Denied)
+        viewModel.onScreenResumed(PermissionStatus.Denied)
+        advanceUntilIdle()
+
+        assertThat(actions).containsExactly(LiveFeedbackViewModel.PermissionAction.RequestCameraPermission)
+        assertThat(viewModel.state.value.permissionStatus).isEqualTo(PermissionStatus.Denied)
+    }
+
+    @Test
+    fun `permission button opens settings when permission is denied forever`() = runTest {
+        val actions = mutableListOf<LiveFeedbackViewModel.PermissionAction>()
+        backgroundScope.launch(testCoroutineRule.testCoroutineDispatcher) {
+            viewModel.permissionActions.toList(actions)
+        }
+
+        viewModel.onPermissionResult(PermissionStatus.DeniedNeverAskAgain)
+        viewModel.onPermissionButtonClicked()
+        advanceUntilIdle()
+
+        assertThat(actions).containsExactly(LiveFeedbackViewModel.PermissionAction.OpenAppSettings)
     }
 
     @Test
