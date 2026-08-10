@@ -112,11 +112,11 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
     private fun initObservers() {
         viewModel.stateLiveData.observe(viewLifecycleOwner) { state ->
             when (state) {
+                ScanQrState.NotInitialised -> renderInitialState()
                 ScanQrState.ReadyToScan -> {
                     renderInitialState()
                     initCamera()
                 }
-
                 is ScanQrState.QrCodeCaptured -> renderScanComplete(state)
                 is ScanQrState.NoCameraPermission -> renderNoPermission(state.shouldOpenPhoneSettings)
             }

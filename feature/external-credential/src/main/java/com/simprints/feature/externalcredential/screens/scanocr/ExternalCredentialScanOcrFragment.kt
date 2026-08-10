@@ -140,6 +140,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         cameraInitLock.withLock {
             if (!cameraFrameProvider.isInitialised()) {
                 initCamera(ocrConfig)
+                renderInitialState()
             }
         }
         renderInitialState()
