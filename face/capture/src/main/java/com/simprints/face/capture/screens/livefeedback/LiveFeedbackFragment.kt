@@ -2,24 +2,14 @@ package com.simprints.face.capture.screens.livefeedback
 
 import android.Manifest
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.RectF
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Size
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
-import androidx.camera.core.CameraControl
-import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
-import androidx.camera.core.Preview
-import androidx.camera.core.resolutionselector.ResolutionSelector
-import androidx.camera.core.resolutionselector.ResolutionStrategy
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.lifecycle.awaitInstance
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.toRect
 import androidx.core.net.toUri
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
@@ -31,14 +21,17 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.permission.PermissionStatus
+import com.simprints.core.tools.extensions.getCurrentPermissionStatus
 import com.simprints.core.tools.extensions.hasCameraFlash
-import com.simprints.core.tools.extensions.hasPermission
 import com.simprints.core.tools.extensions.permissionFromResult
 import com.simprints.face.capture.R
 import com.simprints.face.capture.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.screens.FaceCaptureViewModel
+import com.simprints.infra.camera.CameraFrameProvider
+import com.simprints.infra.camera.postprocess.FrameCropToTargetUseCase
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
@@ -48,9 +41,12 @@ import com.simprints.infra.uibase.view.awaitLayout
 import com.simprints.infra.uibase.view.setCheckedWithLeftDrawable
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
 /**
@@ -61,22 +57,23 @@ import com.simprints.infra.resources.R as IDR
  */
 @AndroidEntryPoint
 internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) {
-    /** Blocking camera operations are performed using this executor */
-    private lateinit var cameraExecutor: ExecutorService
-
     private val mainVm: FaceCaptureViewModel by activityViewModels()
 
     private val vm: LiveFeedbackViewModel by viewModels()
     private val binding by viewBinding(FragmentLiveFeedbackBinding::bind)
 
     private lateinit var screenSize: Size
-    private lateinit var targetResolution: Size
-    private lateinit var imageAnalyzer: ImageAnalysis
-    private lateinit var preview: Preview
 
-    private var cameraControl: CameraControl? = null
+    @Inject
+    lateinit var cameraFrameProvider: CameraFrameProvider
 
-    private var permissionStatus: PermissionStatus = PermissionStatus.Granted
+    @Inject
+    lateinit var frameCropToTargetUseCase: FrameCropToTargetUseCase
+
+    @Inject
+    @DispatcherBG
+    lateinit var bgDispatcher: CoroutineDispatcher
+
     private var finishedHandled = false
 
     private val validCaptureProgressColor: Int
@@ -90,8 +87,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private val launchPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
-        permissionStatus = requireActivity().permissionFromResult(Manifest.permission.CAMERA, granted)
-        if (permissionStatus == PermissionStatus.Granted) setUpCamera() else renderNoPermission()
+        vm.onPermissionResult(requireActivity().permissionFromResult(Manifest.permission.CAMERA, granted))
     }
 
     override fun onViewCreated(
@@ -108,12 +104,14 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private fun initFragment() {
         screenSize = with(resources.displayMetrics) { Size(widthPixels, widthPixels) }
         bindViewModel()
+        bindPermissionActions()
+        setUpFrameProcessing()
+
         binding.captureProgress.max = 1 // normalized progress
 
-        // `isAutoCapture` affects major parts of the UI state, so resolve it before wiring the capture button
+        setUpCaptureButton()
         viewLifecycleOwner.lifecycleScope.launch {
             vm.initAutoCapture()
-            setUpCaptureButton()
         }
 
         // Wait till the views gets its final size then init frame processor and setup the camera
@@ -128,6 +126,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 currentFragment = this,
                 directions = LiveFeedbackFragmentDirections.actionFaceLiveFeedbackFragmentToFacePreparationFragment(),
             )
+        }
+        binding.captureFeedbackPermissionButton.setOnClickListener {
+            vm.onPermissionButtonClicked()
         }
 
         with(binding.captureFlashButton) {
@@ -149,91 +150,31 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     private fun toggleTorch(enabled: Boolean) {
-        cameraControl?.enableTorch(enabled)
+        cameraFrameProvider.setTorchEnabled(enabled)
         binding.captureFlashButton.isSelected = enabled
     }
 
     /** Initialize CameraX, and prepare to bind the camera use cases  */
     private fun setUpCamera() = viewLifecycleOwner.lifecycleScope.launch {
-        permissionStatus = PermissionStatus.Granted
-
-        if (::cameraExecutor.isInitialized && !cameraExecutor.isShutdown) {
+        if (cameraFrameProvider.isInitialised()) {
             return@launch
         }
+
         // Wait for the views to be properly laid out
+        binding.faceCaptureCamera.awaitLayout()
         binding.captureOverlay.awaitLayout()
-        // Initialize our background executor
-        cameraExecutor = Executors.newSingleThreadExecutor()
-        // ImageAnalysis
-        // Todo choose accurate output image resolution that respects quality,performance and face analysis SDKs https://simprints.atlassian.net/browse/CORE-2569
-        if (!::targetResolution.isInitialized) {
-            targetResolution = Size(binding.captureOverlay.width, binding.captureOverlay.height)
-        }
-        val resolutionSelector = ResolutionSelector
-            .Builder()
-            .setResolutionStrategy(
-                ResolutionStrategy(
-                    targetResolution,
-                    ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER,
-                ),
-            ).build()
 
-        imageAnalyzer = ImageAnalysis
-            .Builder()
-            .setResolutionSelector(resolutionSelector)
-            .setOutputImageRotationEnabled(true)
-            .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
-            .build()
-
-        val cropAnalyzer = CropToTargetOverlayAnalyzer(
-            previewRect = RectF(binding.captureOverlay.circleRect), // create a new instance to avoid threading issues
-            overlayWidth = binding.captureOverlay.width,
-            overlayHeight = binding.captureOverlay.height,
-            onImageCropped = { original, cropped -> analyze(original, cropped) },
+        cameraFrameProvider.initialiseCamera(
+            lifecycleOwner = viewLifecycleOwner,
+            previewView = binding.faceCaptureCamera,
+            target = binding.captureOverlay.circleRect.toRect(),
         )
-
-        imageAnalyzer.setAnalyzer(cameraExecutor, cropAnalyzer)
-
-        // Preview
-        preview = Preview
-            .Builder()
-            .setResolutionSelector(resolutionSelector)
-            .build()
-        val cameraProvider = ProcessCameraProvider.awaitInstance(requireContext())
-        cameraProvider.unbindAll()
-        val camera = cameraProvider.bindToLifecycle(
-            viewLifecycleOwner,
-            DEFAULT_BACK_CAMERA,
-            preview,
-            imageAnalyzer,
-        )
-        cameraControl = camera.cameraControl
-        // Attach the view's surface provider to preview use case
-        preview.surfaceProvider = binding.faceCaptureCamera.surfaceProvider
         Simber.i("Camera setup finished", tag = FACE_CAPTURE)
     }
 
     override fun onResume() {
         super.onResume()
-        when {
-            requireActivity().hasPermission(Manifest.permission.CAMERA) -> {
-                setUpCamera()
-                toggleCaptureButtonIfAutoCapture(true)
-            }
-
-            mainVm.shouldCheckCameraPermissions.getAndSet(false) -> {
-                // Check permission in onResume() so that if user left the app to go to Settings
-                // and give the permission, it's reflected when they come back to SID
-                if (requireActivity().hasPermission(Manifest.permission.CAMERA)) {
-                    setUpCamera()
-                } else {
-                    permissionStatus = PermissionStatus.Denied
-                    launchPermissionRequest.launch(Manifest.permission.CAMERA)
-                }
-            }
-
-            else -> mainVm.shouldCheckCameraPermissions.set(true)
-        }
+        vm.onScreenResumed(requireActivity().getCurrentPermissionStatus(Manifest.permission.CAMERA))
     }
 
     private fun toggleCaptureButtonIfAutoCapture(enabled: Boolean) {
@@ -248,43 +189,77 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     override fun onDestroyView() {
-        if (::cameraExecutor.isInitialized && !cameraExecutor.isShutdown) {
-            cameraExecutor.shutdown()
-        }
-        if (::imageAnalyzer.isInitialized) {
-            imageAnalyzer.clearAnalyzer()
-        }
-        if (::preview.isInitialized) {
-            preview.surfaceProvider = null
-        }
+        cameraFrameProvider.release()
         super.onDestroyView()
     }
 
     private fun bindViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                vm.state.collect(::render)
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { vm.state.collect(::render) }
+                launch {
+                    vm.state
+                        .map { it.permissionStatus }
+                        .distinctUntilChanged()
+                        .collect { permissionStatus ->
+                            if (permissionStatus == PermissionStatus.Granted) {
+                                setUpCamera()
+                                toggleCaptureButtonIfAutoCapture(true)
+                            }
+                        }
+                }
             }
         }
     }
 
-    private fun analyze(
-        original: Bitmap,
-        cropped: Bitmap,
-    ) {
-        try {
-            vm.process(originalBitmap = original, croppedBitmap = cropped)
-        } catch (t: Throwable) {
-            Simber.e("Image analysis crashed", t, tag = FACE_CAPTURE)
-            // Image analysis is running in bg thread
-            lifecycleScope.launch {
-                mainVm.submitError(t)
+    private fun bindPermissionActions() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                vm.permissionActions.collect { action ->
+                    when (action) {
+                        LiveFeedbackViewModel.PermissionAction.RequestCameraPermission ->
+                            launchPermissionRequest.launch(Manifest.permission.CAMERA)
+
+                        LiveFeedbackViewModel.PermissionAction.OpenAppSettings ->
+                            requireActivity().startActivity(
+                                Intent(
+                                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                    "package:${requireActivity().packageName}".toUri(),
+                                ),
+                            )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setUpFrameProcessing() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                cameraFrameProvider.frames.collect { frame ->
+                    cameraFrameProvider.setFrameEmissionEnabled(false)
+                    try {
+                        withContext(bgDispatcher) {
+                            val cropped = frameCropToTargetUseCase(frame)
+                            vm.process(originalBitmap = frame.bitmap, croppedBitmap = cropped)
+                        }
+                    } catch (t: Throwable) {
+                        Simber.e("Image analysis crashed", t, tag = FACE_CAPTURE)
+                        // submitError updates LiveData, so ensure it happens on the main thread
+                        viewLifecycleOwner.lifecycleScope.launch { mainVm.submitError(t) }
+                    } finally {
+                        cameraFrameProvider.setFrameEmissionEnabled(true)
+                    }
+                }
             }
         }
     }
 
     private fun render(state: LiveFeedbackState) {
-        if (permissionStatus != PermissionStatus.Granted) return
+        if (state.permissionStatus != PermissionStatus.Granted) {
+            renderNoPermission()
+            return
+        }
 
         renderProgress(state.progress)
         when (state.phase) {
@@ -442,18 +417,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             captureFeedbackTxtExplanation.setText(IDR.string.face_capture_permission_denied)
             captureFeedbackBtn.isGone = true
             captureFeedbackPermissionButton.isVisible = true
-            captureFeedbackPermissionButton.setOnClickListener {
-                if (permissionStatus == PermissionStatus.DeniedNeverAskAgain) {
-                    requireActivity().startActivity(
-                        Intent(
-                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                            "package:${requireActivity().packageName}".toUri(),
-                        ),
-                    )
-                } else {
-                    launchPermissionRequest.launch(Manifest.permission.CAMERA)
-                }
-            }
             setManualCaptureButtonClickable(false)
         }
     }

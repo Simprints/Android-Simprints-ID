@@ -16,6 +16,8 @@ dependencies {
     implementation(project(":infra:matching"))
     implementation(project(":infra:events"))
     implementation(project(":infra:credential-store"))
-    implementation(libs.androidX.cameraX.view)
+
+    implementation(project(":infra:camera"))
+
     implementation(libs.mlkit.text.recognition)
 }

@@ -20,13 +20,14 @@ internal class ExternalCredentialScanQrViewModel @Inject constructor(
     private val externalCredentialQrCodeValidator: ExternalCredentialQrCodeValidatorUseCase,
 ) : ViewModel() {
     private lateinit var startTime: Timestamp
-    private var state: ScanQrState = ScanQrState.ReadyToScan
+    private var state: ScanQrState = ScanQrState.NotInitialised
         set(value) {
             field = value
-            _stateLiveData.postValue(value)
+            stateLiveData.postValue(value)
         }
-    private val _stateLiveData = MutableLiveData<ScanQrState>(ScanQrState.ReadyToScan)
-    val stateLiveData: LiveData<ScanQrState> = _stateLiveData
+
+    val stateLiveData: LiveData<ScanQrState>
+        field = MutableLiveData<ScanQrState>(ScanQrState.NotInitialised)
 
     private fun updateState(state: (ScanQrState) -> ScanQrState) {
         this.state = state(this.state)

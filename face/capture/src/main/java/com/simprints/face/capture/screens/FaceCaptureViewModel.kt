@@ -41,7 +41,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.UUID
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 @HiltViewModel
@@ -62,8 +61,6 @@ internal class FaceCaptureViewModel @Inject constructor(
     var samplesToCapture = 1
     var initialised = false
     lateinit var bioSDK: ModalitySdkType
-
-    var shouldCheckCameraPermissions = AtomicBoolean(true)
 
     private var faceDetections = listOf<FaceDetection>()
 

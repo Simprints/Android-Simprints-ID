@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DispatcherBG
+import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.tools.extensions.area
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.capture.models.FaceDetection
@@ -29,9 +30,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -70,8 +72,11 @@ internal class LiveFeedbackViewModel @Inject constructor(
      * The single source of truth for the whole screen.
      * The fragment renders this deterministically; all transitions funnel through [emit].
      */
-    private val _state = MutableStateFlow(LiveFeedbackState.initial())
-    val state: StateFlow<LiveFeedbackState> = _state.asStateFlow()
+
+    val state: StateFlow<LiveFeedbackState>
+        field = MutableStateFlow(LiveFeedbackState.initial())
+    val permissionActions: SharedFlow<PermissionAction>
+        field = MutableSharedFlow<PermissionAction>(extraBufferCapacity = 1)
 
     var isAutoCapture: Boolean = false
     private var spoofCheckConfig: SpoofCheckConfiguration = SpoofCheckConfiguration.DISABLED
@@ -83,21 +88,24 @@ internal class LiveFeedbackViewModel @Inject constructor(
     private var autoCaptureImagingTimeoutJob: Job? = null
     private var autoCaptureImagingDurationMillis: Long = FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
     private lateinit var faceDetector: FaceDetector
+    private var hasAutoRequestedPermission = false
 
     private val phase: LiveFeedbackState.Phase
-        get() = _state.value.phase
+        get() = state.value.phase
 
     private fun emit(
-        phase: LiveFeedbackState.Phase = _state.value.phase,
-        feedback: LiveFeedbackState.Feedback = _state.value.feedback,
+        phase: LiveFeedbackState.Phase = state.value.phase,
+        feedback: LiveFeedbackState.Feedback = state.value.feedback,
+        permissionStatus: PermissionStatus = state.value.permissionStatus,
         detectionForTint: FaceDetection? = null,
-        result: List<FaceDetection> = _state.value.result,
+        result: List<FaceDetection> = state.value.result,
     ) {
-        _state.update { currentState ->
+        state.update { currentState ->
             currentState.copy(
                 phase = phase,
                 feedback = feedback,
                 isAutoCapture = isAutoCapture,
+                permissionStatus = permissionStatus,
                 progress = computeProgress(phase, detectionForTint),
                 result = result,
             )
@@ -112,6 +120,33 @@ internal class LiveFeedbackViewModel @Inject constructor(
             holdOffAutoCapture()
         }
         emit() // Reset UI state with correct auto-capture value
+    }
+
+    fun onScreenResumed(permissionStatus: PermissionStatus) {
+        emit(permissionStatus = permissionStatus)
+        if (permissionStatus == PermissionStatus.Granted) {
+            hasAutoRequestedPermission = false
+            return
+        }
+        if (permissionStatus == PermissionStatus.Denied && !hasAutoRequestedPermission) {
+            hasAutoRequestedPermission = true
+            permissionActions.tryEmit(PermissionAction.RequestCameraPermission)
+        }
+    }
+
+    fun onPermissionResult(permissionStatus: PermissionStatus) {
+        emit(permissionStatus = permissionStatus)
+        if (permissionStatus == PermissionStatus.Granted) {
+            hasAutoRequestedPermission = false
+        }
+    }
+
+    fun onPermissionButtonClicked() {
+        when (state.value.permissionStatus) {
+            PermissionStatus.DeniedNeverAskAgain -> permissionActions.tryEmit(PermissionAction.OpenAppSettings)
+            PermissionStatus.Granted -> Unit
+            PermissionStatus.Denied -> permissionActions.tryEmit(PermissionAction.RequestCameraPermission)
+        }
     }
 
     fun initCapture(
@@ -177,7 +212,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
         faceDetection.detectionEndTime = timeHelper.now()
 
         var newPhase = phase
-        var feedback = _state.value.feedback
+        var feedback = state.value.feedback
 
         if (isAutoCapture) {
             if (!isAutoCaptureHeldOff) {
@@ -447,5 +482,10 @@ internal class LiveFeedbackViewModel @Inject constructor(
     companion object {
         private const val VALID_ROLL_DELTA = 15f
         private const val VALID_YAW_DELTA = 30f
+    }
+
+    enum class PermissionAction {
+        RequestCameraPermission,
+        OpenAppSettings,
     }
 }

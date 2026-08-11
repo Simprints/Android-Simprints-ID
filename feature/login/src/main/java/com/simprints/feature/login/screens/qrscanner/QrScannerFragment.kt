@@ -13,16 +13,17 @@ import androidx.navigation.fragment.findNavController
 import com.simprints.core.tools.extensions.hasPermission
 import com.simprints.feature.login.R
 import com.simprints.feature.login.databinding.FragmentQrScannerBinding
+import com.simprints.infra.camera.CameraFrameProvider
+import com.simprints.infra.camera.postprocess.DetectQrCodeUseCase
+import com.simprints.infra.camera.usecase.GetBoundsRelativeToParentUseCase
 import com.simprints.infra.logging.LoggingConstants
-import com.simprints.infra.uibase.camera.qrscan.CameraHelper
-import com.simprints.infra.uibase.camera.qrscan.QrCodeAnalyzer
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.finishWithResult
+import com.simprints.infra.uibase.view.applySystemBarInsets
+import com.simprints.infra.uibase.view.awaitLayout
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,16 +31,17 @@ import javax.inject.Inject
 internal class QrScannerFragment : Fragment(R.layout.fragment_qr_scanner) {
     private val binding by viewBinding(FragmentQrScannerBinding::bind)
     private val crashReportTag = LoggingConstants.CrashReportTag.LOGIN
-    @Inject
-    lateinit var cameraHelperFactory: CameraHelper.Factory
-    @Inject
-    lateinit var qrCodeAnalyzerFactory: QrCodeAnalyzer.Factory
 
-    private val cameraHelper: CameraHelper by lazy {
-        cameraHelperFactory.create(crashReportTag)
-    }
-    private val qrCodeAnalyzer by lazy {
-        qrCodeAnalyzerFactory.create(cropConfig = null, crashReportTag = crashReportTag)
+    @Inject
+    lateinit var cameraFrameProvider: CameraFrameProvider
+
+    @Inject
+    lateinit var getBoundsRelativeToParentUseCase: GetBoundsRelativeToParentUseCase
+
+    @Inject
+    lateinit var detectQrCodeUseCaseFactory: DetectQrCodeUseCase.Factory
+    private val detectQrCodeUseCase: DetectQrCodeUseCase by lazy {
+        detectQrCodeUseCaseFactory.create(crashReportTag = crashReportTag)
     }
 
     private val launchPermissionRequest = registerForActivityResult(
@@ -59,20 +61,7 @@ internal class QrScannerFragment : Fragment(R.layout.fragment_qr_scanner) {
         super.onViewCreated(view, savedInstanceState)
         applySystemBarInsets(view)
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                qrCodeAnalyzer.scannedCode
-                    .catch { e ->
-                        Simber.e("Camera not available for QR scanning", e, tag = crashReportTag)
-                        finishWithError(QrScannerResult.QrScannerError.CameraNotAvailable)
-                    }.collectLatest { qrCode ->
-                        if (qrCode.isNotEmpty()) {
-                            finishWithContent(qrCode)
-                        }
-                    }
-            }
-        }
-
+        startAnalyzer()
         if (requireActivity().hasPermission(CAMERA)) {
             startCamera()
         } else {
@@ -80,15 +69,40 @@ internal class QrScannerFragment : Fragment(R.layout.fragment_qr_scanner) {
         }
     }
 
-    private fun startCamera() {
-        binding.qrScannerArea.isVisible = true
-        cameraHelper.startCamera(
-            viewLifecycleOwner,
-            binding.qrScannerPreview,
-            qrCodeAnalyzer,
+    override fun onDestroyView() {
+        cameraFrameProvider.release()
+        super.onDestroyView()
+    }
+
+    private fun startAnalyzer() = viewLifecycleOwner.lifecycleScope.launch {
+        repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            cameraFrameProvider.frames
+                .catch { e ->
+                    Simber.e("Camera not available for QR scanning", e, tag = crashReportTag)
+                    finishWithError(QrScannerResult.QrScannerError.CameraNotAvailable)
+                }.collect { frame ->
+                    detectQrCodeUseCase(frame)?.takeIf { it.isNotEmpty() }?.let { qrCode -> finishWithContent(qrCode) }
+                }
+        }
+    }
+
+    private fun startCamera() = viewLifecycleOwner.lifecycleScope.launch {
+        // Wait for the views to be properly laid out
+        binding.qrScannerPreview.awaitLayout()
+        binding.qrScannerArea.awaitLayout()
+
+        val targetRect = getBoundsRelativeToParentUseCase(
+            parent = binding.qrScannerPreview,
+            child = binding.qrScannerArea,
+        )
+        cameraFrameProvider.initialiseCamera(
+            lifecycleOwner = viewLifecycleOwner,
+            previewView = binding.qrScannerPreview,
+            target = targetRect,
         ) {
             finishWithError(QrScannerResult.QrScannerError.CameraNotAvailable)
         }
+        binding.qrScannerArea.isVisible = true
     }
 
     private fun finishWithContent(content: String) {

@@ -4,6 +4,8 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 
 sealed class ScanQrState {
+    data object NotInitialised : ScanQrState()
+
     data object ReadyToScan : ScanQrState()
 
     data class NoCameraPermission(

@@ -54,6 +54,7 @@ object LoggingConstants {
         APPLICATION,
         COMMCARE_SYNC,
         MULTI_FACTOR_ID,
+        CAMERA,
     }
 
     // Tags eligible for Firebase Analytics logging

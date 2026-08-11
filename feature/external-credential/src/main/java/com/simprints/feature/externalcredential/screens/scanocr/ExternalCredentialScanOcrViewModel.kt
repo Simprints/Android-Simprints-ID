@@ -1,6 +1,5 @@
 package com.simprints.feature.externalcredential.screens.scanocr
 
-import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,16 +13,15 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessment
 import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessmentConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrConfig
-import com.simprints.feature.externalcredential.screens.scanocr.model.OcrCropConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import com.simprints.feature.externalcredential.screens.scanocr.model.ScannedMfidDocument
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.BuildScannedCredentialResultUseCase
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.CropDocumentFromPreviewUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetLightingConditionsAssessmentConfigUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetLightingConditionsAssessmentUseCase
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.NormalizeBitmapToPreviewUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ScanMfidDocumentUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
+import com.simprints.infra.camera.Frame
+import com.simprints.infra.camera.postprocess.FrameCropToTargetUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.logging.Simber
@@ -33,16 +31,17 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.time.Duration.Companion.milliseconds
 
 internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     @Assisted val ocrDocumentType: OcrDocumentType,
     private val timeHelper: TimeHelper,
-    private val normalizeBitmapToPreviewUseCase: NormalizeBitmapToPreviewUseCase,
-    private val cropDocumentFromPreviewUseCase: CropDocumentFromPreviewUseCase,
+    private val frameCropToTargetUseCase: FrameCropToTargetUseCase,
     private val scanMfidDocumentUseCase: ScanMfidDocumentUseCase,
     private val buildScannedCredentialResultUseCase: BuildScannedCredentialResultUseCase,
     private val getLightingConditionsAssessmentConfig: GetLightingConditionsAssessmentConfigUseCase,
@@ -56,7 +55,9 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     }
 
     private var scannedMfidDocuments: List<ScannedMfidDocument> = emptyList()
-    val isProcessingImage = AtomicBoolean(false)
+
+    val isProcessingImage: StateFlow<Boolean>
+        field = MutableStateFlow(false)
 
     val isOcrActive: Boolean
         get() = scannedMfidDocuments.isNotEmpty()
@@ -68,25 +69,23 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     private val _scanOcrStateLiveData = MutableLiveData(ocrState)
     val scanOcrStateLiveData: LiveData<ScanOcrState> = _scanOcrStateLiveData
     val finishOcrEvent: LiveData<LiveDataEventWithContent<ScannedCredentialResult>>
-        get() = _finishOcrEvent
-    private val _finishOcrEvent = MutableLiveData<LiveDataEventWithContent<ScannedCredentialResult>>()
-
+        field = MutableLiveData<LiveDataEventWithContent<ScannedCredentialResult>>()
     private val lightingConditionsAssessmentFlow = MutableStateFlow<LightingConditionsAssessment?>(null)
     val lightingConditionsAssessment: LiveData<LightingConditionsAssessment> =
         lightingConditionsAssessmentFlow
             .filterNotNull()
-            .debounce(LIGHTING_CONDITIONS_ASSESSMENT_DEBOUNCE_MILLIS)
+            .debounce(LIGHTING_CONDITIONS_ASSESSMENT_DEBOUNCE_MILLIS.milliseconds)
             .asLiveData(viewModelScope.coroutineContext)
 
     private lateinit var startTime: Timestamp
-    var ocrConfig: OcrConfig? = null
-        private set
+    private val ocrConfigFlow = MutableStateFlow<OcrConfig?>(null)
+
     private var lightingConditionsAssessmentConfig: LightingConditionsAssessmentConfig? = null
 
     init {
         viewModelScope.launch {
             with(configRepository.getProjectConfiguration().experimental()) {
-                ocrConfig = OcrConfig(
+                ocrConfigFlow.value = OcrConfig(
                     useHighRes = ocrUseHighRes,
                     capturesRequired = ocrCaptures.coerceIn(OCR_CAPTURE_MIN, OCR_CAPTURE_MAX),
                 )
@@ -94,6 +93,8 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
             lightingConditionsAssessmentConfig = getLightingConditionsAssessmentConfig()
         }
     }
+
+    suspend fun awaitOcrConfig(): OcrConfig = ocrConfigFlow.filterNotNull().first()
 
     private fun updateState(state: (ScanOcrState) -> ScanOcrState) {
         this.ocrState = state(this.ocrState)
@@ -106,7 +107,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     }
 
     fun startScanning() {
-        val captureConfig = ocrConfig ?: return
+        val captureConfig = ocrConfigFlow.value ?: return
         startTime = timeHelper.now()
         updateState {
             ScanOcrState.ScanningInProgress(
@@ -120,23 +121,16 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     val isScanningInProgress: Boolean
         get() = ocrState is ScanOcrState.ScanningInProgress
 
-    fun imageProcessingStopped() {
-        isProcessingImage.set(false)
-    }
-
-    fun processImage(
-        bitmap: Bitmap,
-        cropConfig: OcrCropConfig,
-    ) {
+    fun processImage(frame: Frame) {
         viewModelScope.launch(bgDispatcher) {
+            imageProcessingStarted()
             try {
                 val isOcrAllowed = isScanningInProgress
                 val isLightningAssessmentEnabled = lightingConditionsAssessmentConfig != null
 
                 if (!isOcrAllowed && !isLightningAssessmentEnabled) return@launch // no-op
                 Simber.d("started image processing; with OCR: $isOcrAllowed, lighting assessment: $isLightningAssessmentEnabled")
-                val normalizedBitmap = normalizeBitmapToPreviewUseCase(bitmap, cropConfig)
-                val cropped = cropDocumentFromPreviewUseCase(bitmap = normalizedBitmap, cutoutRect = cropConfig.cutoutRect)
+                val cropped = frameCropToTargetUseCase(frame)
                 lightingConditionsAssessmentConfig?.run {
                     lightingConditionsAssessmentFlow.value = getLightingConditionsAssessment(
                         bitmap = cropped,
@@ -146,7 +140,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
 
                 if (!isOcrAllowed) return@launch
                 val mfidConfig = configRepository.getProjectConfiguration().multifactorId ?: return@launch
-                val captureConfig = ocrConfig ?: return@launch
+                val captureConfig = ocrConfigFlow.value ?: return@launch
                 val scannedMfidDocument =
                     scanMfidDocumentUseCase(bitmap = cropped, documentType = ocrDocumentType, config = mfidConfig) ?: return@launch
                 Simber.d("Detected OCR")
@@ -162,7 +156,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
                     }
                 }
             } finally {
-                isProcessingImage.set(false)
+                imageProcessingStopped()
             }
         }
     }
@@ -171,13 +165,17 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
         updateState { ScanOcrState.Complete }
         viewModelScope.launch {
             val scannedCredentialResult = buildScannedCredentialResultUseCase(scannedMfidDocuments, ocrDocumentType, startTime)
-            _finishOcrEvent.send(scannedCredentialResult)
+            finishOcrEvent.send(scannedCredentialResult)
             scannedMfidDocuments = emptyList()
         }
     }
 
-    fun imageProcessingStarted() {
-        isProcessingImage.set(true)
+    suspend fun imageProcessingStarted() {
+        isProcessingImage.emit(true)
+    }
+
+    suspend fun imageProcessingStopped() {
+        isProcessingImage.emit(false)
     }
 
     companion object {

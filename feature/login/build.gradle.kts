@@ -12,13 +12,8 @@ dependencies {
 
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:auth-logic"))
+    implementation(project(":infra:camera"))
 
     // Integrity check related
     implementation(libs.playServices.base)
-
-    // QR scanner related
-    implementation(libs.androidX.cameraX.core)
-    implementation(libs.androidX.cameraX.lifecycle)
-    implementation(libs.androidX.cameraX.view)
-    implementation(libs.playServices.barcode)
 }
