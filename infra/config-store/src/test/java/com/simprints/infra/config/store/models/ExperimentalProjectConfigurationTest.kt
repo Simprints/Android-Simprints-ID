@@ -437,4 +437,17 @@ internal class ExperimentalProjectConfigurationTest {
             assertThat(ExperimentalProjectConfiguration(config).spoofMinValidationErrorUiDurationMs).isEqualTo(result)
         }
     }
+
+    @Test
+    fun `use parent consent as default parsed correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to false,
+            mapOf(ExperimentalProjectConfiguration.USE_PARENTAL_CONSENT_AS_DEFAULT to JsonPrimitive(null)) to false,
+            mapOf(ExperimentalProjectConfiguration.USE_PARENTAL_CONSENT_AS_DEFAULT to JsonPrimitive("string")) to false,
+            mapOf(ExperimentalProjectConfiguration.USE_PARENTAL_CONSENT_AS_DEFAULT to JsonPrimitive(true)) to true,
+            mapOf(ExperimentalProjectConfiguration.USE_PARENTAL_CONSENT_AS_DEFAULT to JsonPrimitive(false)) to false,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).useParentalConsentAsDefault).isEqualTo(result)
+        }
+    }
 }

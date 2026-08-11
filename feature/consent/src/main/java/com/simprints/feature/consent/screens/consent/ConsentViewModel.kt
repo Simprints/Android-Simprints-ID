@@ -16,6 +16,7 @@ import com.simprints.feature.consent.screens.consent.helpers.ParentalConsentText
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.events.event.domain.models.ConsentEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,24 +33,20 @@ internal class ConsentViewModel @Inject constructor(
     @param:SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) : ViewModel() {
     private val startConsentEventTime = timeHelper.now()
+    private var selectedTab: Int = TAB_NOT_SELECTED
 
     val viewState: LiveData<ConsentViewState>
-        get() = _viewState
-    private val _viewState = MutableLiveData(ConsentViewState())
-    private var selectedTab: Int = 0
+        field = MutableLiveData(ConsentViewState())
 
     val showExitForm: LiveData<LiveDataEvent>
-        get() = _showExitForm
-    private val _showExitForm = MutableLiveData<LiveDataEvent>()
-
+        field = MutableLiveData<LiveDataEvent>()
     val returnConsentResult: LiveData<LiveDataEventWithContent<Serializable>>
-        get() = _returnConsentResult
-    private val _returnConsentResult = MutableLiveData<LiveDataEventWithContent<Serializable>>()
+        field = MutableLiveData<LiveDataEventWithContent<Serializable>>()
 
     fun loadConfiguration(consentType: ConsentType) {
         viewModelScope.launch {
             val projectConfig = configRepository.getProjectConfiguration()
-            _viewState.postValue(
+            viewState.postValue(
                 mapConfigToViewState(
                     projectConfig = projectConfig,
                     consentType = consentType,
@@ -61,18 +58,18 @@ internal class ConsentViewModel @Inject constructor(
 
     fun acceptClicked(currentConsentTab: ConsentTab) {
         saveConsentEvent(currentConsentTab, ConsentEvent.ConsentPayload.Result.ACCEPTED)
-        _returnConsentResult.send(ConsentResult(true))
+        returnConsentResult.send(ConsentResult(true))
     }
 
     fun declineClicked(currentConsentTab: ConsentTab) {
         saveConsentEvent(currentConsentTab, ConsentEvent.ConsentPayload.Result.DECLINED)
-        _showExitForm.send()
+        showExitForm.send()
     }
 
     fun handleExitFormResponse(exitResult: ExitFormResult) {
         if (exitResult.wasSubmitted) {
             deleteLocationInfoFromSession()
-            _returnConsentResult.send(exitResult)
+            returnConsentResult.send(exitResult)
         }
     }
 
@@ -103,7 +100,15 @@ internal class ConsentViewModel @Inject constructor(
             } else {
                 null
             },
-            selectedTab = selectedTabIndex,
+            selectedTab = if (selectedTabIndex == TAB_NOT_SELECTED) {
+                if (allowParentalConsent && projectConfig.experimental().useParentalConsentAsDefault) {
+                    PARENTAL_CONSENT_TAB
+                } else {
+                    GENERAL_CONSENT_TAB
+                }
+            } else {
+                selectedTabIndex
+            },
         )
     }
 
@@ -127,5 +132,11 @@ internal class ConsentViewModel @Inject constructor(
 
     fun setSelectedTab(index: Int) {
         selectedTab = index
+    }
+
+    companion object {
+        const val TAB_NOT_SELECTED = -1
+        const val GENERAL_CONSENT_TAB = 0
+        const val PARENTAL_CONSENT_TAB = 1
     }
 }
