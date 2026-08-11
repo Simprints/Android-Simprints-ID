@@ -43,9 +43,9 @@ internal class ExternalCredentialScanQrViewModelTest {
     }
 
     @Test
-    fun `initial state is ReadyToScan`() {
+    fun `initial state is NotInitialised`() {
         val observer = viewModel.stateLiveData.test()
-        assertThat(observer.value()).isEqualTo(ScanQrState.ReadyToScan)
+        assertThat(observer.value()).isEqualTo(ScanQrState.NotInitialised)
     }
 
     @Test
