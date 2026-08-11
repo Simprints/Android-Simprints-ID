@@ -22,6 +22,7 @@ import com.simprints.core.DispatcherMain
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.camera.helpers.CameraFocusHelper
 import com.simprints.infra.camera.helpers.FrameEmissionHelper
+import com.simprints.infra.camera.repository.InjectedImageRepository
 import com.simprints.infra.camera.usecase.NormalizeHighResBitmapToPreviewUseCase
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
@@ -42,6 +43,7 @@ class CameraFrameProvider @Inject internal constructor(
     @DispatcherMain private val mainDispatcher: CoroutineDispatcher,
     private val cameraFocusManagerFactory: CameraFocusHelper.Factory,
     private val normalizeHighResBitmapToPreviewUseCase: NormalizeHighResBitmapToPreviewUseCase,
+    private val injectedImageRepository: InjectedImageRepository,
 ) {
     private var executor: ExecutorService = Executors.newSingleThreadExecutor()
 
@@ -206,7 +208,15 @@ class CameraFrameProvider @Inject internal constructor(
         bitmap: Bitmap,
         rotation: Int,
     ) {
-        frames.tryEmit(Frame(bitmap = bitmap, rotation = rotation, previewBounds = previewRect, targetBounds = targetRect))
+        val frame = injectedImageRepository.injectedImage ?: bitmap
+        frames.tryEmit(
+            Frame(
+                bitmap = frame,
+                rotation = rotation,
+                previewBounds = previewRect,
+                targetBounds = targetRect,
+            ),
+        )
     }
 
     private fun captureHighResolutionFrame() {
