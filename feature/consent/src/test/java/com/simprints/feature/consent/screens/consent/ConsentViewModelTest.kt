@@ -7,6 +7,8 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.consent.ConsentType
+import com.simprints.feature.consent.screens.consent.ConsentViewModel.Companion.GENERAL_CONSENT_TAB
+import com.simprints.feature.consent.screens.consent.ConsentViewModel.Companion.PARENTAL_CONSENT_TAB
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
@@ -18,6 +20,7 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -75,18 +78,34 @@ class ConsentViewModelTest {
         assertThat(state.consentTextBuilder).isNotNull()
         assertThat(state.showParentalConsent).isTrue()
         assertThat(state.parentalTextBuilder).isNotNull()
+        assertThat(state.selectedTab).isEqualTo(GENERAL_CONSENT_TAB)
     }
 
     @Test
     fun `loadConfiguration passes correct values from config without parental consent to state`() = runTest {
         every { projectConfig.consent.allowParentalConsent } returns false
         every { projectConfig.general.modalities } returns defaultModalityList
+        every { projectConfig.custom } returns mapOf("useParentalConsentAsDefault" to JsonPrimitive(true))
 
         vm.loadConfiguration(ConsentType.ENROL)
         val state = vm.viewState.getOrAwaitValue()
 
         assertThat(state.showParentalConsent).isFalse()
         assertThat(state.parentalTextBuilder).isNull()
+        assertThat(state.selectedTab).isEqualTo(GENERAL_CONSENT_TAB)
+    }
+
+    @Test
+    fun `loadConfiguration passes correct values from config with parental consent as default to state`() = runTest {
+        every { projectConfig.consent.allowParentalConsent } returns true
+        every { projectConfig.custom } returns mapOf("useParentalConsentAsDefault" to JsonPrimitive(true))
+        every { projectConfig.general.modalities } returns defaultModalityList
+
+        vm.loadConfiguration(ConsentType.ENROL)
+        val state = vm.viewState.getOrAwaitValue()
+
+        assertThat(state.showParentalConsent).isTrue()
+        assertThat(state.selectedTab).isEqualTo(PARENTAL_CONSENT_TAB)
     }
 
     @Test

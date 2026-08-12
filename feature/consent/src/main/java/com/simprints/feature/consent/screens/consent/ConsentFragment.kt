@@ -14,6 +14,8 @@ import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.feature.consent.ConsentParams
 import com.simprints.feature.consent.R
 import com.simprints.feature.consent.databinding.FragmentConsentBinding
+import com.simprints.feature.consent.screens.consent.ConsentViewModel.Companion.GENERAL_CONSENT_TAB
+import com.simprints.feature.consent.screens.consent.ConsentViewModel.Companion.PARENTAL_CONSENT_TAB
 import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
@@ -141,10 +143,5 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
         GENERAL_CONSENT_TAB -> ConsentTab.INDIVIDUAL
         PARENTAL_CONSENT_TAB -> ConsentTab.PARENTAL
         else -> throw IllegalStateException("Invalid consent tab selected")
-    }
-
-    companion object {
-        private const val GENERAL_CONSENT_TAB = 0
-        private const val PARENTAL_CONSENT_TAB = 1
     }
 }

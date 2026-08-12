@@ -5,7 +5,6 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.floatOrNull
-import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
@@ -230,6 +229,13 @@ data class ExperimentalProjectConfiguration(
             ?.coerceAtLeast(0)
             ?: SPOOF_CHECK_MIN_VALIDATION_ERROR_UI_DURATION_MS_DEFAULT
 
+    val useParentalConsentAsDefault: Boolean
+        get() = customConfig
+            ?.get(USE_PARENTAL_CONSENT_AS_DEFAULT)
+            ?.jsonPrimitive
+            ?.booleanOrNull
+            .let { it == true }
+
     companion object {
         internal const val DISABLE_SUBJECT_POOL_VALIDATION = "disableSubjectPoolValidation"
         internal const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS = "faceAutoCaptureImagingDurationMillis"
@@ -307,5 +313,7 @@ data class ExperimentalProjectConfiguration(
         const val SPOOF_CHECK_MIN_VALIDATION_UI_DURATION_MS_DEFAULT = 2000
         const val SPOOF_CHECK_MIN_VALIDATION_ERROR_UI_DURATION_MS = "spoofMinValidationErrorUiDurationMs"
         const val SPOOF_CHECK_MIN_VALIDATION_ERROR_UI_DURATION_MS_DEFAULT = 2000
+
+        const val USE_PARENTAL_CONSENT_AS_DEFAULT = "useParentalConsentAsDefault"
     }
 }
