@@ -5,6 +5,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.core.workers.SimCoroutineWorker
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationFlagsStore
 import com.simprints.infra.events.EventRepository
@@ -46,7 +47,11 @@ internal abstract class BaseEventDownSyncDownloaderWorker(
 
     abstract fun createDownSyncTask(): BaseEventDownSyncTask
 
-    abstract fun handleSyncException(t: Throwable): Result
+    abstract fun handleSyncException(
+        t: Throwable,
+        count: Int,
+        max: Int?,
+    ): Result
 
     override suspend fun doWork(): Result {
         // Check if the migration is in progress before starting the sync
@@ -66,14 +71,14 @@ internal abstract class BaseEventDownSyncDownloaderWorker(
     protected open suspend fun performDownSync(): Result = withContext(dispatcher) {
         showProgressNotification()
         crashlyticsLog("Started")
+        val workerId = id.toString()
+        var count = syncCache.readProgress(workerId)
+        var max: Int? = syncCache.readMax(workerId)
         try {
-            val workerId = id.toString()
-            var count = syncCache.readProgress(workerId)
-            var max: Int? = syncCache.readMax(workerId)
             val project = configRepository.getProject()
 
             if (project == null) {
-                fail(IllegalStateException("User is not signed in"))
+                throw RemoteDbNotSignedInException()
             } else {
                 createDownSyncTask().downSync(this, getDownSyncOperation(), getEventScope(), project).collect {
                     count = it.progress
@@ -93,7 +98,7 @@ internal abstract class BaseEventDownSyncDownloaderWorker(
                 )
             }
         } catch (t: Throwable) {
-            handleSyncException(t)
+            handleSyncException(t, count, max)
         }
     }
 

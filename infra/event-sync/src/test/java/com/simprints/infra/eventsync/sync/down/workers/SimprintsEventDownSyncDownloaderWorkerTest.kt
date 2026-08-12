@@ -25,6 +25,7 @@ import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_TOO_MANY_
 import com.simprints.infra.eventsync.sync.down.tasks.SimprintsEventDownSyncTask
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.INPUT_EVENT_DOWN_SYNC_SCOPE_ID
+import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_MAX_SYNC
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -130,16 +131,23 @@ internal class SimprintsEventDownSyncDownloaderWorkerTest {
     }
 
     @Test
-    fun worker_noEventScope_shouldFail() = runTest {
+    fun worker_noEventScope_shouldSucceedWithoutFailureFlags() = runTest {
         coEvery { eventRepository.getEventScope(any()) } returns null
 
         val result = eventDownSyncDownloaderWorker.doWork()
 
-        assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        assertThat(result).isEqualTo(
+            ListenableWorker.Result.success(
+                workDataOf(
+                    OUTPUT_DOWN_SYNC to 0,
+                    OUTPUT_DOWN_MAX_SYNC to 0,
+                ),
+            ),
+        )
     }
 
     @Test
-    fun worker_failForCloudIntegration_shouldFail() = runTest {
+    fun worker_failForCloudIntegration_shouldSetFailureFlag() = runTest {
         coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
             downSyncTask.downSync(any(), any(), any(), any())
@@ -148,8 +156,10 @@ internal class SimprintsEventDownSyncDownloaderWorkerTest {
         val result = eventDownSyncDownloaderWorker.doWork()
 
         assertThat(result).isEqualTo(
-            ListenableWorker.Result.failure(
+            ListenableWorker.Result.success(
                 workDataOf(
+                    OUTPUT_DOWN_SYNC to 0,
+                    OUTPUT_DOWN_MAX_SYNC to 0,
                     OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true,
                 ),
             ),
@@ -157,7 +167,7 @@ internal class SimprintsEventDownSyncDownloaderWorkerTest {
     }
 
     @Test
-    fun worker_failForBackendMaintenanceError_shouldFail() = runTest {
+    fun worker_failForBackendMaintenanceError_shouldSetFailureFlag() = runTest {
         coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
             downSyncTask.downSync(any(), any(), any(), any())
@@ -166,17 +176,19 @@ internal class SimprintsEventDownSyncDownloaderWorkerTest {
         val result = eventDownSyncDownloaderWorker.doWork()
 
         assertThat(result).isEqualTo(
-            ListenableWorker.Result.failure(
+            ListenableWorker.Result.success(
                 workDataOf(
+                    OUTPUT_DOWN_SYNC to 0,
+                    OUTPUT_DOWN_MAX_SYNC to 0,
                     OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
-                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to null,
+                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to 0L,
                 ),
             ),
         )
     }
 
     @Test
-    fun worker_failForTimedBackendMaintenanceError_shouldFail() = runTest {
+    fun worker_failForTimedBackendMaintenanceError_shouldSetFailureFlag() = runTest {
         coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
             downSyncTask.downSync(any(), any(), any(), any())
@@ -185,8 +197,10 @@ internal class SimprintsEventDownSyncDownloaderWorkerTest {
         val result = eventDownSyncDownloaderWorker.doWork()
 
         assertThat(result).isEqualTo(
-            ListenableWorker.Result.failure(
+            ListenableWorker.Result.success(
                 workDataOf(
+                    OUTPUT_DOWN_SYNC to 0,
+                    OUTPUT_DOWN_MAX_SYNC to 0,
                     OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
                     OUTPUT_ESTIMATED_MAINTENANCE_TIME to 600L,
                 ),
@@ -195,7 +209,7 @@ internal class SimprintsEventDownSyncDownloaderWorkerTest {
     }
 
     @Test
-    fun worker_failForTooManyRequestsError_shouldFail() = runTest {
+    fun worker_failForTooManyRequestsError_shouldSetFailureFlag() = runTest {
         coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
             downSyncTask.downSync(any(), any(), any(), any())
@@ -204,8 +218,10 @@ internal class SimprintsEventDownSyncDownloaderWorkerTest {
         val result = eventDownSyncDownloaderWorker.doWork()
 
         assertThat(result).isEqualTo(
-            ListenableWorker.Result.failure(
+            ListenableWorker.Result.success(
                 workDataOf(
+                    OUTPUT_DOWN_SYNC to 0,
+                    OUTPUT_DOWN_MAX_SYNC to 0,
                     OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true,
                 ),
             ),
@@ -213,7 +229,7 @@ internal class SimprintsEventDownSyncDownloaderWorkerTest {
     }
 
     @Test
-    fun worker_failForRemoteDbNotSignedInException_shouldFail() = runTest {
+    fun worker_failForRemoteDbNotSignedInException_shouldSetFailureFlag() = runTest {
         coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
             downSyncTask.downSync(any(), any(), any(), any())
@@ -222,8 +238,10 @@ internal class SimprintsEventDownSyncDownloaderWorkerTest {
         val result = eventDownSyncDownloaderWorker.doWork()
 
         assertThat(result).isEqualTo(
-            ListenableWorker.Result.failure(
+            ListenableWorker.Result.success(
                 workDataOf(
+                    OUTPUT_DOWN_SYNC to 0,
+                    OUTPUT_DOWN_MAX_SYNC to 0,
                     OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true,
                 ),
             ),
@@ -231,7 +249,7 @@ internal class SimprintsEventDownSyncDownloaderWorkerTest {
     }
 
     @Test
-    fun worker_failForNetworkIssue_shouldRetry() = runTest {
+    fun worker_failForNetworkIssue_shouldSucceedWithoutFailureFlags() = runTest {
         coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
             downSyncTask.downSync(any(), any(), any(), any())
@@ -239,7 +257,14 @@ internal class SimprintsEventDownSyncDownloaderWorkerTest {
 
         val result = eventDownSyncDownloaderWorker.doWork()
 
-        assertThat(result).isEqualTo(ListenableWorker.Result.retry())
+        assertThat(result).isEqualTo(
+            ListenableWorker.Result.success(
+                workDataOf(
+                    OUTPUT_DOWN_SYNC to 0,
+                    OUTPUT_DOWN_MAX_SYNC to 0,
+                ),
+            ),
+        )
     }
 
     @Test

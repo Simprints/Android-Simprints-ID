@@ -245,6 +245,51 @@ internal class EventSyncStateProcessorTest {
             .assertEqualToFailedState(expectedState)
     }
 
+    @Test
+    fun getLastSyncState_shouldMapDownloaderBackendMaintenanceFlagsEvenWhenWorkerSucceeded() = runTest {
+        startSyncReporterWorker.emit(successfulMasterWorkers)
+        syncWorkersFlow.emit(createWorkInfosHistoryForSucceededSyncWithDownloaderBackendMaintenanceError())
+
+        val syncStates = eventSyncStateProcessor.getLastSyncState().first()
+
+        val expectedState = EventSyncWorkerState.Failed(
+            failedBecauseBackendMaintenance = true,
+            estimatedOutage = 6,
+        )
+        syncStates.downSyncWorkersInfo
+            .first()
+            .state
+            .assertEqualToFailedState(expectedState)
+    }
+
+    @Test
+    fun getLastSyncState_shouldMapDownloaderTooManyRequestsFlagsEvenWhenWorkerSucceeded() = runTest {
+        startSyncReporterWorker.emit(successfulMasterWorkers)
+        syncWorkersFlow.emit(createWorkInfosHistoryForSucceededSyncWithDownloaderTooManyRequestsError())
+
+        val syncStates = eventSyncStateProcessor.getLastSyncState().first()
+
+        val expectedState = EventSyncWorkerState.Failed(failedBecauseTooManyRequest = true)
+        syncStates.downSyncWorkersInfo
+            .first()
+            .state
+            .assertEqualToFailedState(expectedState)
+    }
+
+    @Test
+    fun getLastSyncState_shouldMapDownloaderCloudIntegrationFlagsEvenWhenWorkerSucceeded() = runTest {
+        startSyncReporterWorker.emit(successfulMasterWorkers)
+        syncWorkersFlow.emit(createWorkInfosHistoryForSucceededSyncWithDownloaderCloudIntegrationError())
+
+        val syncStates = eventSyncStateProcessor.getLastSyncState().first()
+
+        val expectedState = EventSyncWorkerState.Failed(failedBecauseCloudIntegration = true)
+        syncStates.downSyncWorkersInfo
+            .first()
+            .state
+            .assertEqualToFailedState(expectedState)
+    }
+
     private fun createStartSyncReporterWorker(
         state: WorkInfo.State = SUCCEEDED,
         uniqueMasterSyncId: String,

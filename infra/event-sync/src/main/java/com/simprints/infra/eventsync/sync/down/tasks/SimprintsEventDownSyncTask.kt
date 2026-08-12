@@ -6,9 +6,12 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
+import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.sync.common.EnrolmentRecordFactory
+import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -59,6 +62,9 @@ internal class SimprintsEventDownSyncTask @Inject constructor(
 
     override fun shouldRethrowError(throwable: Throwable): Boolean {
         // Return true to re-throw specific exceptions that should not be handled by the base class
-        return throwable is RemoteDbNotSignedInException
+        return throwable is RemoteDbNotSignedInException ||
+            throwable is BackendMaintenanceException ||
+            throwable is SyncCloudIntegrationException ||
+            throwable is TooManyRequestsException
     }
 }

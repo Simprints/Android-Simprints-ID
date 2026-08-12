@@ -176,6 +176,36 @@ fun createWorkInfosHistoryForSucceededSyncWithDownloaderCommCarePermissionError(
     createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
 )
 
+fun createWorkInfosHistoryForSucceededSyncWithDownloaderBackendMaintenanceError(): List<WorkInfo> = listOf(
+    createDownSyncDownloaderWorker(
+        SUCCEEDED,
+        UNIQUE_SYNC_ID,
+        workDataOf(
+            OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
+            OUTPUT_ESTIMATED_MAINTENANCE_TIME to 6L,
+        ),
+    ),
+    createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+)
+
+fun createWorkInfosHistoryForSucceededSyncWithDownloaderTooManyRequestsError(): List<WorkInfo> = listOf(
+    createDownSyncDownloaderWorker(
+        SUCCEEDED,
+        UNIQUE_SYNC_ID,
+        workDataOf(OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true),
+    ),
+    createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+)
+
+fun createWorkInfosHistoryForSucceededSyncWithDownloaderCloudIntegrationError(): List<WorkInfo> = listOf(
+    createDownSyncDownloaderWorker(
+        SUCCEEDED,
+        UNIQUE_SYNC_ID,
+        workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true),
+    ),
+    createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+)
+
 fun createWorkInfosHistoryForConnectingSync(): List<WorkInfo> = listOf(
     createDownSyncDownloaderWorker(ENQUEUED, UNIQUE_SYNC_ID),
     createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),

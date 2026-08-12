@@ -2,8 +2,8 @@ package com.simprints.infra.eventsync.sync.down.workers
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
+import androidx.work.Data
 import androidx.work.WorkerParameters
-import androidx.work.workDataOf
 import com.simprints.core.DispatcherBG
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.ConfigRepository
@@ -19,6 +19,7 @@ import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_RELOGIN_R
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS
 import com.simprints.infra.eventsync.sync.down.tasks.BaseEventDownSyncTask
 import com.simprints.infra.eventsync.sync.down.tasks.SimprintsEventDownSyncTask
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import dagger.assisted.Assisted
@@ -48,21 +49,47 @@ internal class SimprintsEventDownSyncDownloaderWorker @AssistedInject constructo
     ) {
     override fun createDownSyncTask(): BaseEventDownSyncTask = downSyncTask
 
-    override fun handleSyncException(t: Throwable) = when (t) {
-        is IllegalArgumentException -> fail(t, t.message)
+    override fun handleSyncException(
+        t: Throwable,
+        count: Int,
+        max: Int?,
+    ): Result {
+        val outputData = Data.Builder()
+            .putInt(OUTPUT_DOWN_SYNC, count)
+            .putInt(OUTPUT_DOWN_MAX_SYNC, max ?: 0)
 
-        is BackendMaintenanceException -> fail(
-            t,
-            t.message,
-            workDataOf(
-                OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
-                OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.estimatedOutage,
-            ),
-        )
+        when (t) {
+            is BackendMaintenanceException -> {
+                outputData
+                    .putBoolean(OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE, true)
+                    .putLong(OUTPUT_ESTIMATED_MAINTENANCE_TIME, t.estimatedOutage ?: 0L)
+                Simber.i("Down-sync completed with recoverable issue", t, tag = tag)
+            }
 
-        is SyncCloudIntegrationException -> fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
-        is TooManyRequestsException -> fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true))
-        is RemoteDbNotSignedInException -> fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true))
-        else -> retry(t)
+            is SyncCloudIntegrationException -> {
+                outputData.putBoolean(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION, true)
+                Simber.i("Down-sync completed with recoverable issue", t, tag = tag)
+            }
+
+            is TooManyRequestsException -> {
+                outputData.putBoolean(OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS, true)
+                Simber.i("Down-sync completed with recoverable issue", t, tag = tag)
+            }
+
+            is RemoteDbNotSignedInException -> {
+                outputData.putBoolean(OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED, true)
+                Simber.i("Down-sync completed with recoverable issue", t, tag = tag)
+            }
+
+            is IllegalArgumentException -> {
+                Simber.i("Down-sync completed with recoverable issue", t, tag = tag)
+            }
+
+            else -> {
+                Simber.e("Down-sync completed with unexpected issue", t, tag = tag)
+            }
+        }
+
+        return success(outputData.build(), "Completed with down-sync error: ${t.message}")
     }
 }
