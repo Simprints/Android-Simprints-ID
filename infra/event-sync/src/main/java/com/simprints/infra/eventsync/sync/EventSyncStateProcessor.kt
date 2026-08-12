@@ -19,6 +19,7 @@ import com.simprints.infra.eventsync.sync.common.didFailBecauseReloginRequired
 import com.simprints.infra.eventsync.sync.common.didFailBecauseTooManyRequests
 import com.simprints.infra.eventsync.sync.common.filterByTags
 import com.simprints.infra.eventsync.sync.common.getEstimatedOutageTime
+import com.simprints.infra.eventsync.sync.common.hasAnyFailureReason
 import com.simprints.infra.eventsync.sync.common.sortByScheduledTime
 import com.simprints.infra.eventsync.sync.down.workers.extractDownSyncMaxCount
 import com.simprints.infra.eventsync.sync.down.workers.extractDownSyncProgress
@@ -134,7 +135,7 @@ class EventSyncStateProcessor @Inject constructor(
         }
 
     private fun WorkInfo.toEventSyncWorkerState(): EventSyncWorkerState = fromWorkInfo(
-        state = state,
+        state = if (hasAnyFailureReason()) WorkInfo.State.FAILED else state,
         failedBecauseReloginRequired = didFailBecauseReloginRequired(),
         failedBecauseCloudIntegration = didFailBecauseCloudIntegration(),
         failedBecauseBackendMaintenance = didFailBecauseBackendMaintenance(),

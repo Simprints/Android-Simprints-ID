@@ -6,7 +6,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkInfo.State.FAILED
 import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.workDataOf
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
@@ -197,6 +197,48 @@ internal class EventSyncStateProcessorTest {
         val syncStates = eventSyncStateProcessor.getLastSyncState().first()
 
         val expectedState = EventSyncWorkerState.Failed(failedBecauseCloudIntegration = true)
+        syncStates.downSyncWorkersInfo
+            .first()
+            .state
+            .assertEqualToFailedState(expectedState)
+    }
+
+    @Test
+    fun getLastSyncState_shouldMapUploaderFailureFlagsEvenWhenWorkerSucceeded() = runTest {
+        startSyncReporterWorker.emit(successfulMasterWorkers)
+        syncWorkersFlow.emit(createWorkInfosHistoryForSucceededSyncWithUploaderReloginError())
+
+        val syncStates = eventSyncStateProcessor.getLastSyncState().first()
+
+        val expectedState = EventSyncWorkerState.Failed(failedBecauseReloginRequired = true)
+        syncStates.upSyncWorkersInfo
+            .first()
+            .state
+            .assertEqualToFailedState(expectedState)
+    }
+
+    @Test
+    fun getLastSyncState_shouldMapTooManyRequestsFlagsEvenWhenWorkerSucceeded() = runTest {
+        startSyncReporterWorker.emit(successfulMasterWorkers)
+        syncWorkersFlow.emit(createWorkInfosHistoryForSucceededSyncWithUploaderTooManyRequestsError())
+
+        val syncStates = eventSyncStateProcessor.getLastSyncState().first()
+
+        val expectedState = EventSyncWorkerState.Failed(failedBecauseTooManyRequest = true)
+        syncStates.upSyncWorkersInfo
+            .first()
+            .state
+            .assertEqualToFailedState(expectedState)
+    }
+
+    @Test
+    fun getLastSyncState_shouldMapCommCarePermissionFlagsEvenWhenWorkerSucceeded() = runTest {
+        startSyncReporterWorker.emit(successfulMasterWorkers)
+        syncWorkersFlow.emit(createWorkInfosHistoryForSucceededSyncWithDownloaderCommCarePermissionError())
+
+        val syncStates = eventSyncStateProcessor.getLastSyncState().first()
+
+        val expectedState = EventSyncWorkerState.Failed(failedBecauseCommCarePermissionMissing = true)
         syncStates.downSyncWorkersInfo
             .first()
             .state
