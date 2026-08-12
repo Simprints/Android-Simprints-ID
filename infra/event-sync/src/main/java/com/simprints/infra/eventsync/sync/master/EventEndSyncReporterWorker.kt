@@ -9,10 +9,13 @@ import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
+import com.simprints.infra.eventsync.sync.common.SyncWorkersInfoProvider
+import com.simprints.infra.eventsync.sync.common.hasAnyFailureReason
 import com.simprints.infra.logging.Simber
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 
 /**
@@ -25,6 +28,7 @@ internal class EventEndSyncReporterWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val syncCache: EventSyncCache,
     private val eventRepository: EventRepository,
+    private val syncWorkersInfoProvider: SyncWorkersInfoProvider,
     private val timeHelper: TimeHelper,
     @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(appContext, params) {
@@ -46,7 +50,15 @@ internal class EventEndSyncReporterWorker @AssistedInject constructor(
             }
 
             if (!syncId.isNullOrEmpty()) {
-                syncCache.storeLastSuccessfulSyncTime(timeHelper.now())
+                val hasWorkerFailures = syncWorkersInfoProvider
+                    .getSyncWorkerInfos(syncId)
+                    .firstOrNull()
+                    .orEmpty()
+                    .any { it.hasAnyFailureReason() }
+
+                if (!hasWorkerFailures) {
+                    syncCache.storeLastSuccessfulSyncTime(timeHelper.now())
+                }
                 success()
             } else {
                 throw IllegalArgumentException("SyncId missed")

@@ -8,11 +8,15 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
+import com.simprints.infra.eventsync.sync.common.SyncWorkersInfoProvider
 import com.simprints.infra.eventsync.sync.master.EventEndSyncReporterWorker.Companion.EVENT_DOWN_SYNC_SCOPE_TO_CLOSE
+import com.simprints.infra.eventsync.sync.master.EventEndSyncReporterWorker.Companion.EVENT_UP_SYNC_SCOPE_TO_CLOSE
 import com.simprints.infra.eventsync.sync.master.EventEndSyncReporterWorker.Companion.SYNC_ID_TO_MARK_AS_COMPLETED
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -31,10 +35,14 @@ internal class EventEndSyncReporterWorkerTest {
     @MockK
     lateinit var eventRepository: EventRepository
 
+    @MockK
+    lateinit var syncWorkersInfoProvider: SyncWorkersInfoProvider
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         every { timeHelper.now() } returns Timestamp(1)
+        every { syncWorkersInfoProvider.getSyncWorkerInfos(any()) } returns flowOf(emptyList())
     }
 
     @Test
@@ -82,6 +90,23 @@ internal class EventEndSyncReporterWorkerTest {
         coVerify(exactly = 1) { eventRepository.closeEventScope("scopeId", any()) }
     }
 
+    @Test
+    fun `doWork should not save last success time when workers contain failure flags`() = runTest {
+        every { syncWorkersInfoProvider.getSyncWorkerInfos(any()) } returns flowOf(
+            listOf(
+                mockk(relaxed = true) {
+                    every { outputData } returns workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true)
+                },
+            ),
+        )
+
+        val endSyncReportWorker = createWorker("sync id", null, null)
+        val result = endSyncReportWorker.doWork()
+
+        assertThat(result).isEqualTo(ListenableWorker.Result.success())
+        coVerify(exactly = 0) { syncCache.storeLastSuccessfulSyncTime(any()) }
+    }
+
     private fun createWorker(
         syncId: String?,
         downScopeId: String?,
@@ -96,11 +121,12 @@ internal class EventEndSyncReporterWorkerTest {
             every { inputData } returns workDataOf(
                 SYNC_ID_TO_MARK_AS_COMPLETED to syncId,
                 EVENT_DOWN_SYNC_SCOPE_TO_CLOSE to downScopeId,
-                EVENT_DOWN_SYNC_SCOPE_TO_CLOSE to upScopeId,
+                EVENT_UP_SYNC_SCOPE_TO_CLOSE to upScopeId,
             )
         },
         syncCache,
         eventRepository,
+        syncWorkersInfoProvider,
         timeHelper,
         testCoroutineRule.testCoroutineDispatcher,
     )
