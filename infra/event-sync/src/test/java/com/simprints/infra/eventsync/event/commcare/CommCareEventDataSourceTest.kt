@@ -34,6 +34,7 @@ import org.junit.Test
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 
 class CommCareEventDataSourceTest {
     companion object {
@@ -53,8 +54,13 @@ class CommCareEventDataSourceTest {
 
         private val emptyEventQuery = RemoteEventQuery(projectId = DEFAULT_PROJECT_ID, modes = emptyList())
 
-        // Helper to format date strings as CommCare does (using US locale to match Java's Date.toString())
-        private val commCareDateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US)
+        // Helper to format date strings as CommCare does (using US locale to match Java's Date.toString()).
+        // The timezone is pinned to UTC so the formatted/parsed round trip is deterministic regardless of
+        // the machine's default timezone (e.g. "Europe/London" prints "GMT" for its short zone name even
+        // during BST, which reparsed as literal GMT/UTC+0 would silently shift timestamps by an hour).
+        private val commCareDateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US).apply {
+            timeZone = TimeZone.getTimeZone("UTC")
+        }
 
         private fun formatCommCareDate(millis: Long): String = commCareDateFormat.format(Date(millis))
 
