@@ -25,6 +25,7 @@ import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.eventsync.event.remote.ApiUploadEventsBody
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
+import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.event.remote.models.session.ApiEventScope
 import com.simprints.infra.eventsync.event.usecases.MapDomainEventScopeToApiUseCase
 import com.simprints.infra.eventsync.exceptions.TryToUploadEventsForNotSignedProject
@@ -37,7 +38,9 @@ import com.simprints.infra.eventsync.status.up.domain.EventUpSyncResult
 import com.simprints.infra.eventsync.sync.up.EventUpSyncProgress
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
+import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.infra.serialization.SimJson
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
@@ -173,10 +176,6 @@ internal class EventUpSyncTask @Inject constructor(
 
             emitProgress(lastOperation, 0)
         } catch (t: Throwable) {
-            if (t is RemoteDbNotSignedInException) {
-                throw t
-            }
-
             Simber.e("Failed to upload event scopes", t, tag = SYNC)
             lastOperation = lastOperation.copy(
                 lastState = FAILED,
@@ -184,6 +183,9 @@ internal class EventUpSyncTask @Inject constructor(
             )
 
             emitProgress(lastOperation, 0)
+            if (isTerminalException(t)) {
+                throw t
+            }
         }
     }
 
@@ -194,6 +196,11 @@ internal class EventUpSyncTask @Inject constructor(
         eventUpSyncScopeRepo.insertOrUpdate(lastOperation)
         this.emit(EventUpSyncProgress(lastOperation, count))
     }
+
+    private fun isTerminalException(t: Throwable): Boolean = t is RemoteDbNotSignedInException ||
+        t is BackendMaintenanceException ||
+        t is SyncCloudIntegrationException ||
+        t is TooManyRequestsException
 
     private fun uploadEventScopeType(
         eventScope: EventScope,
