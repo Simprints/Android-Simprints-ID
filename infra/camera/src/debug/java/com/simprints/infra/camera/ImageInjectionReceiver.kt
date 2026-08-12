@@ -25,13 +25,13 @@ class ImageInjectionReceiver : BroadcastReceiver() {
         val filename = intent.getStringExtra(EXTRA_FILE)
         if (filename.isNullOrBlank()) {
             cache.injectedImage = null
-            Simber.d("Image injection broadcast does not contain '$EXTRA_FILE' extra. Image injection aborted")
+            Simber.d("Image injection broadcast does not contain '$EXTRA_FILE' extra. Image injection cleared")
             return
         }
         val dir = context.applicationContext.getExternalFilesDir(null)
         if (dir == null) {
             cache.injectedImage = null
-            Simber.d("External files dir cannot be resolved. Image injection aborted.")
+            Simber.d("External files dir cannot be resolved. Image injection cleared.")
             return
         }
         val bitmap = BitmapFactory.decodeFile(File(dir, filename).absolutePath)
@@ -42,7 +42,7 @@ class ImageInjectionReceiver : BroadcastReceiver() {
             Toast.makeText(context.applicationContext, message, Toast.LENGTH_LONG).show()
         } else {
             cache.injectedImage = null
-            Simber.d("failed to decode '$filename'. Image injection aborted")
+            Simber.d("failed to decode '$filename'. Image injection cleared")
         }
     }
 
