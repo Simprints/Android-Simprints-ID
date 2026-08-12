@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.util.Size
-import android.view.View
 import android.widget.ImageView
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
@@ -18,14 +17,14 @@ import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.lifecycle.awaitInstance
 import androidx.camera.view.PreviewView
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import com.simprints.core.DispatcherBG
 import com.simprints.core.DispatcherMain
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.camera.helpers.CameraFocusHelper
 import com.simprints.infra.camera.helpers.FrameEmissionHelper
-import com.simprints.infra.camera.repository.InjectedImageCache
-import com.simprints.infra.camera.usecase.InjectedImagePreProcessUseCase
+import com.simprints.infra.camera.usecase.FramePreProcessUseCase
 import com.simprints.infra.camera.usecase.NormalizeHighResBitmapToPreviewUseCase
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
@@ -46,8 +45,7 @@ class CameraFrameProvider @Inject internal constructor(
     @DispatcherMain private val mainDispatcher: CoroutineDispatcher,
     private val cameraFocusManagerFactory: CameraFocusHelper.Factory,
     private val normalizeHighResBitmapToPreviewUseCase: NormalizeHighResBitmapToPreviewUseCase,
-    private val injectedImageCache: InjectedImageCache,
-    private val injectedImagePreProcessUseCase: InjectedImagePreProcessUseCase,
+    private val framePreProcessUseCase: FramePreProcessUseCase,
 ) {
     private var executor: ExecutorService = Executors.newSingleThreadExecutor()
 
@@ -216,29 +214,21 @@ class CameraFrameProvider @Inject internal constructor(
         bitmap: Bitmap,
         rotation: Int,
     ) {
-        val injected = injectedImageCache.injectedImage
-        val (frameBitmap: Bitmap, frameRotation: Int) = when (injected) {
-            null -> bitmap to rotation
-            else -> injectedImagePreProcessUseCase(injected, previewRect, targetRect) to 0
-        }
-        if (injected != null) {
-            displayInjectedImage(frameBitmap)
-        }
-        frames.tryEmit(
-            Frame(
-                bitmap = frameBitmap,
-                rotation = frameRotation,
-                previewBounds = previewRect,
-                targetBounds = targetRect,
-            ),
+        val frame = framePreProcessUseCase(
+            bitmap = bitmap,
+            rotation = rotation,
+            previewRect = previewRect,
+            targetRect = targetRect,
         )
+        displayInjectedImage(frame)
+        frames.tryEmit(frame)
     }
 
-    private fun displayInjectedImage(bitmap: Bitmap) {
+    private fun displayInjectedImage(frame: Frame) {
         val overlay = injectionOverlay
         overlay?.post {
-            overlay.setImageBitmap(bitmap)
-            overlay.visibility = View.VISIBLE
+            overlay.setImageBitmap(frame.bitmap)
+            overlay.isVisible = frame.isInjected
         }
     }
 
