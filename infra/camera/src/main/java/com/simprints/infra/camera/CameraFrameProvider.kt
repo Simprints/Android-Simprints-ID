@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.util.Size
+import android.view.View
+import android.widget.ImageView
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
 import androidx.camera.core.ImageAnalysis
@@ -22,7 +24,8 @@ import com.simprints.core.DispatcherMain
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.camera.helpers.CameraFocusHelper
 import com.simprints.infra.camera.helpers.FrameEmissionHelper
-import com.simprints.infra.camera.repository.InjectedImageRepository
+import com.simprints.infra.camera.repository.InjectedImageCache
+import com.simprints.infra.camera.usecase.InjectedImagePreProcessUseCase
 import com.simprints.infra.camera.usecase.NormalizeHighResBitmapToPreviewUseCase
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
@@ -43,7 +46,8 @@ class CameraFrameProvider @Inject internal constructor(
     @DispatcherMain private val mainDispatcher: CoroutineDispatcher,
     private val cameraFocusManagerFactory: CameraFocusHelper.Factory,
     private val normalizeHighResBitmapToPreviewUseCase: NormalizeHighResBitmapToPreviewUseCase,
-    private val injectedImageRepository: InjectedImageRepository,
+    private val injectedImageCache: InjectedImageCache,
+    private val injectedImagePreProcessUseCase: InjectedImagePreProcessUseCase,
 ) {
     private var executor: ExecutorService = Executors.newSingleThreadExecutor()
 
@@ -62,6 +66,8 @@ class CameraFrameProvider @Inject internal constructor(
     private lateinit var targetRect: Rect
 
     private var previewSurface: PreviewView? = null
+    private var injectionOverlay: ImageView? = null
+
     private val frameEmissionHelper = FrameEmissionHelper()
 
     fun isInitialised() = camera != null
@@ -79,13 +85,13 @@ class CameraFrameProvider @Inject internal constructor(
     @ExcludedFromGeneratedTestCoverageReports(reason = "Camera API wrapper")
     suspend fun initialiseCamera(
         lifecycleOwner: LifecycleOwner,
-        previewView: PreviewView,
+        cameraPreviewView: CameraPreviewView,
         target: Rect? = null,
         highResolution: Boolean = false,
         onError: (Throwable) -> Unit = {},
     ) = withContext(bgDispatcher) {
+        val previewView = cameraPreviewView.previewView
         try {
-            // Caching to return with frames for post-processing and also to use for injection in future
             previewRect = fullPreviewSizeRect(previewView)
             targetRect = target ?: previewRect
         } catch (e: Exception) {
@@ -96,6 +102,7 @@ class CameraFrameProvider @Inject internal constructor(
 
         ensureExecutor()
         previewSurface = previewView
+        injectionOverlay = cameraPreviewView.injectionOverlay
 
         frameEmissionHelper.configure(highResolution = highResolution)
 
@@ -191,6 +198,7 @@ class CameraFrameProvider @Inject internal constructor(
         cameraProvider = null
 
         previewSurface = null
+        injectionOverlay = null
         imageCapture = null
         camera = null
         frameEmissionHelper.reset()
@@ -208,15 +216,30 @@ class CameraFrameProvider @Inject internal constructor(
         bitmap: Bitmap,
         rotation: Int,
     ) {
-        val frame = injectedImageRepository.injectedImage ?: bitmap
+        val injected = injectedImageCache.injectedImage
+        val (frameBitmap: Bitmap, frameRotation: Int) = when (injected) {
+            null -> bitmap to rotation
+            else -> injectedImagePreProcessUseCase(injected, previewRect, targetRect) to 0
+        }
+        if (injected != null) {
+            displayInjectedImage(frameBitmap)
+        }
         frames.tryEmit(
             Frame(
-                bitmap = frame,
-                rotation = rotation,
+                bitmap = frameBitmap,
+                rotation = frameRotation,
                 previewBounds = previewRect,
                 targetBounds = targetRect,
             ),
         )
+    }
+
+    private fun displayInjectedImage(bitmap: Bitmap) {
+        val overlay = injectionOverlay
+        overlay?.post {
+            overlay.setImageBitmap(bitmap)
+            overlay.visibility = View.VISIBLE
+        }
     }
 
     private fun captureHighResolutionFrame() {

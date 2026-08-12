@@ -166,7 +166,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
         cameraFrameProvider.initialiseCamera(
             lifecycleOwner = viewLifecycleOwner,
-            previewView = binding.faceCaptureCamera,
+            cameraPreviewView = binding.faceCaptureCamera,
             target = binding.captureOverlay.circleRect.toRect(),
         )
         Simber.i("Camera setup finished", tag = FACE_CAPTURE)

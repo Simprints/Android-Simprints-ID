@@ -196,7 +196,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         )
         cameraFrameProvider.initialiseCamera(
             lifecycleOwner = viewLifecycleOwner,
-            previewView = binding.preview,
+            cameraPreviewView = binding.preview,
             target = targetRect,
             highResolution = ocrConfig.useHighRes,
         ) {

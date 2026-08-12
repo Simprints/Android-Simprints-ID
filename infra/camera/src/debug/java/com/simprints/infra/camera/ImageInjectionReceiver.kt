@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.widget.Toast
-import com.simprints.infra.camera.repository.InjectedImageRepository
+import com.simprints.infra.camera.repository.InjectedImageCache
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
@@ -14,7 +14,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ImageInjectionReceiver : BroadcastReceiver() {
     @Inject
-    lateinit var repository: InjectedImageRepository
+    lateinit var cache: InjectedImageCache
 
     override fun onReceive(
         context: Context,
@@ -34,7 +34,7 @@ class ImageInjectionReceiver : BroadcastReceiver() {
         }
         val bitmap = BitmapFactory.decodeFile(File(dir, filename).absolutePath)
         if (bitmap != null) {
-            repository.injectedImage = bitmap
+            cache.injectedImage = bitmap
             val message = "Image injected: $filename"
             Simber.d(message)
             Toast.makeText(context.applicationContext, message, Toast.LENGTH_LONG).show()
