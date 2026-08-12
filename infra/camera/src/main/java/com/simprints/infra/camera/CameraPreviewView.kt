@@ -6,12 +6,13 @@ import android.view.View.IMPORTANT_FOR_ACCESSIBILITY_NO
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.camera.view.PreviewView
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 
+@ExcludedFromGeneratedTestCoverageReports("UI class")
 class CameraPreviewView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
 ) : FrameLayout(context, attrs) {
-
     val previewView: PreviewView = PreviewView(context).apply {
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
