@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.widget.Toast
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.camera.repository.InjectedImageCache
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.AndroidEntryPoint
@@ -12,6 +13,7 @@ import java.io.File
 import javax.inject.Inject
 
 @AndroidEntryPoint
+@ExcludedFromGeneratedTestCoverageReports("Wrapper for E2E test image injection broadcast receiver")
 class ImageInjectionReceiver : BroadcastReceiver() {
     @Inject
     lateinit var cache: InjectedImageCache
