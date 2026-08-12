@@ -23,12 +23,14 @@ class ImageInjectionReceiver : BroadcastReceiver() {
         val extras = intent.extras
         Simber.d("Image injection broadcast received. Extras: ${extras?.keySet()?.joinToString { "$it=${extras[it]}" }}")
         val filename = intent.getStringExtra(EXTRA_FILE)
-        if (filename == null) {
+        if (filename.isNullOrBlank()) {
+            cache.injectedImage = null
             Simber.d("Image injection broadcast does not contain '$EXTRA_FILE' extra. Image injection aborted")
             return
         }
         val dir = context.applicationContext.getExternalFilesDir(null)
         if (dir == null) {
+            cache.injectedImage = null
             Simber.d("External files dir cannot be resolved. Image injection aborted.")
             return
         }
@@ -39,6 +41,7 @@ class ImageInjectionReceiver : BroadcastReceiver() {
             Simber.d(message)
             Toast.makeText(context.applicationContext, message, Toast.LENGTH_LONG).show()
         } else {
+            cache.injectedImage = null
             Simber.d("failed to decode '$filename'. Image injection aborted")
         }
     }

@@ -227,7 +227,7 @@ class CameraFrameProvider @Inject internal constructor(
     private fun displayInjectedImage(frame: Frame) {
         val overlay = injectionOverlay
         overlay?.post {
-            overlay.setImageBitmap(frame.bitmap)
+            overlay.setImageBitmap(frame.takeIf { it.isInjected }?.bitmap)
             overlay.isVisible = frame.isInjected
         }
     }
