@@ -84,7 +84,8 @@ internal class LiveFeedbackViewModel @Inject constructor(
 
     private var captureImagingStartTime: Long = 0
     private var validationStartTime: Long = 0
-    private var isAutoCaptureHeldOff = true
+    var isAutoCaptureHeldOff = true
+        private set
     private var autoCaptureImagingTimeoutJob: Job? = null
     private var autoCaptureImagingDurationMillis: Long = FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
     private lateinit var faceDetector: FaceDetector

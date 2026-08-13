@@ -311,7 +311,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     private fun renderFeedbackOnButton(state: LiveFeedbackState) = with(binding) {
-        val feedback = if (state.isAutoCapture && state.phase != LiveFeedbackState.Phase.CAPTURING) {
+        val feedback = if (state.isAutoCapture && vm.isAutoCaptureHeldOff) {
             LiveFeedbackState.Feedback.NONE
         } else {
             state.feedback
