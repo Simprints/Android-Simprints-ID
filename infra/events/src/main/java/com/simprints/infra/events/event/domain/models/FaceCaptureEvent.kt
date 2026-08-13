@@ -82,8 +82,6 @@ data class FaceCaptureEvent(
         enum class Result {
             VALID,
             INVALID,
-
-            @Deprecated("Not used since 2026.3.0")
             BAD_QUALITY,
             OFF_YAW,
             OFF_ROLL,

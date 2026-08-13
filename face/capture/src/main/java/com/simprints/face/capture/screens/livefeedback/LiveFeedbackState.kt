@@ -21,7 +21,7 @@ internal data class LiveFeedbackState(
      * UI-facing guidance derived from the latest [FaceDetection].
      * Decoupled from the biometric [FaceDetection.Status] so the fragment maps it to text/visuals via a simple lookup.
      */
-    enum class Feedback { NONE, NO_FACE, LOOK_STRAIGHT, TOO_CLOSE, TOO_FAR, VALID, VALID_CAPTURING }
+    enum class Feedback { NONE, NO_FACE, LOOK_STRAIGHT, TOO_CLOSE, TOO_FAR, BAD_QUALITY, VALID, VALID_CAPTURING }
 
     companion object {
         fun initial(isAutoCapture: Boolean = false) = LiveFeedbackState(
@@ -54,4 +54,5 @@ internal fun FaceDetection.Status.toFeedback(): LiveFeedbackState.Feedback = whe
     FaceDetection.Status.OFFROLL -> LiveFeedbackState.Feedback.LOOK_STRAIGHT
     FaceDetection.Status.TOOCLOSE -> LiveFeedbackState.Feedback.TOO_CLOSE
     FaceDetection.Status.TOOFAR -> LiveFeedbackState.Feedback.TOO_FAR
+    FaceDetection.Status.BAD_QUALITY -> LiveFeedbackState.Feedback.BAD_QUALITY
 }

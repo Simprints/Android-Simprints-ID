@@ -343,6 +343,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             LiveFeedbackState.Feedback.TOO_FAR ->
                 renderInvalidFace(IDR.string.face_capture_title_too_far, IDR.string.face_capture_error_too_far)
 
+            LiveFeedbackState.Feedback.BAD_QUALITY ->
+                renderInvalidFace(IDR.string.face_capture_title_bad_quality, IDR.string.face_capture_error_bad_quality)
+
             LiveFeedbackState.Feedback.VALID -> {
                 if (state.isAutoCapture) {
                     captureFeedbackBtn.setText(IDR.string.face_capture_prep_begin_button_capturing)
