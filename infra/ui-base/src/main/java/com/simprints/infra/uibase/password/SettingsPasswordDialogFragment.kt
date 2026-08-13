@@ -1,4 +1,4 @@
-package com.simprints.feature.dashboard.settings.password
+package com.simprints.infra.uibase.password
 
 import android.app.Dialog
 import android.os.Bundle
@@ -9,7 +9,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.simprints.feature.dashboard.databinding.FragmentSettingsPasswordInputBinding
+import com.simprints.infra.uibase.databinding.DialogSettingsPasswordInputBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
@@ -21,7 +21,7 @@ class SettingsPasswordDialogFragment : DialogFragment() {
         .setNegativeButton(IDR.string.dashboard_password_lock_cancel) { _, _ -> dismiss() }
         .create()
 
-    private fun inflateInputView() = FragmentSettingsPasswordInputBinding
+    private fun inflateInputView() = DialogSettingsPasswordInputBinding
         .inflate(layoutInflater)
         .apply {
             passwordInputField.addTextChangedListener(
@@ -32,13 +32,13 @@ class SettingsPasswordDialogFragment : DialogFragment() {
             )
         }.root
 
-    private fun FragmentSettingsPasswordInputBinding.resetErrorText(text: Editable?) {
+    private fun DialogSettingsPasswordInputBinding.resetErrorText(text: Editable?) {
         if (passwordInputLayout.error != null && text?.isNotEmpty() == true) {
             passwordInputLayout.error = null
         }
     }
 
-    private fun FragmentSettingsPasswordInputBinding.checkPassword(text: Editable?) {
+    private fun DialogSettingsPasswordInputBinding.checkPassword(text: Editable?) {
         val passwordToMatch = arguments?.getString(ARG_PASSWORD).orEmpty()
         if (text?.length == passwordToMatch.length) {
             if (text.toString() == passwordToMatch) {
@@ -73,11 +73,11 @@ class SettingsPasswordDialogFragment : DialogFragment() {
             title: Int = IDR.string.dashboard_password_lock_title_default,
             action: String? = null,
         ): DialogFragment = SettingsPasswordDialogFragment().also {
-            it.arguments = bundleOf(
-                ARG_TITLE to title,
-                ARG_ACTION to action,
-                ARG_PASSWORD to passwordToMatch,
-            )
+            it.arguments = bundleOf().apply {
+                putInt(ARG_TITLE, title)
+                putString(ARG_PASSWORD, passwordToMatch)
+                putString(ARG_ACTION, action)
+            }
         }
 
         fun registerForResult(
