@@ -21,7 +21,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.core.tools.extensions.hideKeyboard
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSyncModuleSelectionBinding
-import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.adapter.ModuleAdapter
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.adapter.ModuleSelectionListener
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.NoModuleSelectedException
@@ -29,6 +28,7 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.excepti
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.tools.ChipClickListener
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.tools.ModuleChipHelper
 import com.simprints.infra.eventsync.module.SelectableModule
+import com.simprints.infra.uibase.password.SettingsPasswordDialogFragment
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
