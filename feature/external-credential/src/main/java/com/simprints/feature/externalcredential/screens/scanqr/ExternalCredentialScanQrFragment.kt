@@ -219,7 +219,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
         )
         cameraFrameProvider.initialiseCamera(
             lifecycleOwner = viewLifecycleOwner,
-            previewView = binding.qrScannerPreview,
+            cameraPreviewView = binding.qrScannerPreview,
             target = targetRect,
         ) { e ->
             Simber.e("Camera not available for QR scanning", e, tag = crashReportTag)

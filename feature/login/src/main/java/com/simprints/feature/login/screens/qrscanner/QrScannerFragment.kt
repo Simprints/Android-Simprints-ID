@@ -97,7 +97,7 @@ internal class QrScannerFragment : Fragment(R.layout.fragment_qr_scanner) {
         )
         cameraFrameProvider.initialiseCamera(
             lifecycleOwner = viewLifecycleOwner,
-            previewView = binding.qrScannerPreview,
+            cameraPreviewView = binding.qrScannerPreview,
             target = targetRect,
         ) {
             finishWithError(QrScannerResult.QrScannerError.CameraNotAvailable)

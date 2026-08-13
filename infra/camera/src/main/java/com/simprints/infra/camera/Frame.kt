@@ -8,4 +8,5 @@ data class Frame(
     val rotation: Int,
     val targetBounds: Rect,
     val previewBounds: Rect,
+    val isInjected: Boolean = false,
 )

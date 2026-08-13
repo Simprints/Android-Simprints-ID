@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.util.Size
+import android.widget.ImageView
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
 import androidx.camera.core.ImageAnalysis
@@ -16,12 +17,14 @@ import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.lifecycle.awaitInstance
 import androidx.camera.view.PreviewView
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import com.simprints.core.DispatcherBG
 import com.simprints.core.DispatcherMain
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.camera.helpers.CameraFocusHelper
 import com.simprints.infra.camera.helpers.FrameEmissionHelper
+import com.simprints.infra.camera.usecase.FramePreProcessUseCase
 import com.simprints.infra.camera.usecase.NormalizeHighResBitmapToPreviewUseCase
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
@@ -42,6 +45,7 @@ class CameraFrameProvider @Inject internal constructor(
     @DispatcherMain private val mainDispatcher: CoroutineDispatcher,
     private val cameraFocusManagerFactory: CameraFocusHelper.Factory,
     private val normalizeHighResBitmapToPreviewUseCase: NormalizeHighResBitmapToPreviewUseCase,
+    private val framePreProcessUseCase: FramePreProcessUseCase,
 ) {
     private var executor: ExecutorService = Executors.newSingleThreadExecutor()
 
@@ -60,6 +64,8 @@ class CameraFrameProvider @Inject internal constructor(
     private lateinit var targetRect: Rect
 
     private var previewSurface: PreviewView? = null
+    private var injectionOverlay: ImageView? = null
+
     private val frameEmissionHelper = FrameEmissionHelper()
 
     fun isInitialised() = camera != null
@@ -77,13 +83,13 @@ class CameraFrameProvider @Inject internal constructor(
     @ExcludedFromGeneratedTestCoverageReports(reason = "Camera API wrapper")
     suspend fun initialiseCamera(
         lifecycleOwner: LifecycleOwner,
-        previewView: PreviewView,
+        cameraPreviewView: CameraPreviewView,
         target: Rect? = null,
         highResolution: Boolean = false,
         onError: (Throwable) -> Unit = {},
     ) = withContext(bgDispatcher) {
+        val previewView = cameraPreviewView.previewView
         try {
-            // Caching to return with frames for post-processing and also to use for injection in future
             previewRect = fullPreviewSizeRect(previewView)
             targetRect = target ?: previewRect
         } catch (e: Exception) {
@@ -94,6 +100,7 @@ class CameraFrameProvider @Inject internal constructor(
 
         ensureExecutor()
         previewSurface = previewView
+        injectionOverlay = cameraPreviewView.injectionOverlay
 
         frameEmissionHelper.configure(highResolution = highResolution)
 
@@ -189,6 +196,7 @@ class CameraFrameProvider @Inject internal constructor(
         cameraProvider = null
 
         previewSurface = null
+        injectionOverlay = null
         imageCapture = null
         camera = null
         frameEmissionHelper.reset()
@@ -206,7 +214,22 @@ class CameraFrameProvider @Inject internal constructor(
         bitmap: Bitmap,
         rotation: Int,
     ) {
-        frames.tryEmit(Frame(bitmap = bitmap, rotation = rotation, previewBounds = previewRect, targetBounds = targetRect))
+        val frame = framePreProcessUseCase(
+            bitmap = bitmap,
+            rotation = rotation,
+            previewRect = previewRect,
+            targetRect = targetRect,
+        )
+        displayInjectedImage(frame)
+        frames.tryEmit(frame)
+    }
+
+    private fun displayInjectedImage(frame: Frame) {
+        val overlay = injectionOverlay
+        overlay?.post {
+            overlay.setImageBitmap(frame.takeIf { it.isInjected }?.bitmap)
+            overlay.isVisible = frame.isInjected
+        }
     }
 
     private fun captureHighResolutionFrame() {

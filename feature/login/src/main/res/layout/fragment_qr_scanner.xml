@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.camera.view.PreviewView
+    <com.simprints.infra.camera.CameraPreviewView
         android:id="@+id/qrScannerPreview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
