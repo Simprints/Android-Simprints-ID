@@ -13,7 +13,7 @@ android {
         animationsDisabled = true
     }
 
-    viewBinding.enable = true
+    buildFeatures.viewBinding = true
 }
 
 dependencies {
