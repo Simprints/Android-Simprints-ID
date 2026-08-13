@@ -228,7 +228,14 @@ internal class LiveFeedbackViewModel @Inject constructor(
                 }
             }
         } else {
-            feedback = faceDetection.status.toFeedback()
+            feedback = if (fallbackCapture != null && faceDetection.status == FaceDetection.Status.BAD_QUALITY) {
+                // In some environment it might be difficult to maintain the image quality for long enough to press capture button,
+                // therefore once we have at least one good quality fallback capture, the user can ignore the "bad_quality" state
+                // and proceed with capture as long as the face is in the correct position.
+                LiveFeedbackState.Feedback.VALID
+            } else {
+                faceDetection.status.toFeedback()
+            }
         }
 
         when (newPhase) {
@@ -419,6 +426,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
             areaOccupied > faceTarget.areaRange.endInclusive -> FaceDetection.Status.TOOCLOSE
             potentialFace.yaw !in faceTarget.yawTarget -> FaceDetection.Status.OFFYAW
             potentialFace.roll !in faceTarget.rollTarget -> FaceDetection.Status.OFFROLL
+            potentialFace.quality < qualityThreshold -> FaceDetection.Status.BAD_QUALITY
             phase == LiveFeedbackState.Phase.CAPTURING -> FaceDetection.Status.VALID_CAPTURING
             else -> FaceDetection.Status.VALID
         }
