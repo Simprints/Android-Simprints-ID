@@ -1,6 +1,6 @@
 package com.simprints.feature.setup
 
-import com.simprints.feature.setup.location.LocationStoreWorkerScheduler
+import com.simprints.feature.setup.location.LocationStoreImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -10,5 +10,5 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 abstract class SetupModule {
     @Binds
-    internal abstract fun provideLocationStore(authManager: LocationStoreWorkerScheduler): LocationStore
+    internal abstract fun provideLocationStore(locationStoreImpl: LocationStoreImpl): LocationStore
 }

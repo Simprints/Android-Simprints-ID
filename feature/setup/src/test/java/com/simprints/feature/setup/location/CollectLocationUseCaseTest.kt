@@ -1,9 +1,11 @@
 package com.simprints.feature.setup.location
 
-import android.os.PowerManager
 import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -11,7 +13,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-internal class StoreUserLocationIntoCurrentSessionWorkerTest {
+internal class CollectLocationUseCaseTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -21,53 +23,43 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
     @MockK
     private lateinit var updateSessionScopeLocationUseCase: UpdateSessionScopeLocationUseCase
 
-    private lateinit var worker: StoreUserLocationIntoCurrentSessionWorker
+    private lateinit var collectLocation: CollectLocationUseCase
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        worker = StoreUserLocationIntoCurrentSessionWorker(
-            mockk(relaxed = true) {
-                every { getSystemService<PowerManager>(any()) } returns mockk {
-                    every { isIgnoringBatteryOptimizations(any()) } returns true
-                }
-            },
-            mockk(relaxed = true),
-            updateSessionScopeLocationUseCase,
-            locationManager,
-            testCoroutineRule.testCoroutineDispatcher,
+        collectLocation = CollectLocationUseCase(
+            locationManager = locationManager,
+            updateSessionScopeLocationUseCase = updateSessionScopeLocationUseCase,
         )
     }
 
     @Test
-    fun storeUserLocationIntoCurrentSession() = runTest {
+    fun `invoke saves location into current session`() = runTest {
         every { locationManager.requestLocation() } returns flowOf(Location(latitude = 23.0, longitude = 54.0))
-        worker.doWork()
+
+        collectLocation()
+
         coVerify(exactly = 1) { updateSessionScopeLocationUseCase.invoke(any()) }
     }
 
     @Test
-    fun `storeUserLocationIntoCurrentSession requestLocation throw exception`() = runTest {
+    fun `invoke requestLocation throws exception does not crash`() = runTest {
         every { locationManager.requestLocation() } throws Exception("Location collect exception")
-        worker.doWork()
+
+        collectLocation()
+
         coVerify(exactly = 0) { updateSessionScopeLocationUseCase.invoke(any()) }
     }
 
     @Test(expected = Test.None::class)
-    fun `storeUserLocationIntoCurrentSession can't save event should not crash the app`() = runTest {
+    fun `invoke can't save event should not crash the app`() = runTest {
         every { locationManager.requestLocation() } returns flowOf(Location(latitude = 23.0, longitude = 54.0))
         coEvery {
             updateSessionScopeLocationUseCase.invoke(any())
         } throws Exception("No session capture event found")
-        worker.doWork()
-    }
 
-    @Test
-    fun `storeUserLocationIntoCurrentSession can't save events if the worker is canceled`() = runTest {
-        every { locationManager.requestLocation() } returns flowOf(Location(latitude = 23.0, longitude = 54.0))
-        worker.stop(0)
-        worker.doWork()
-        coVerify(exactly = 0) { updateSessionScopeLocationUseCase.invoke(any()) }
+        collectLocation()
     }
 }
