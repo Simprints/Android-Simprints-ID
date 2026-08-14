@@ -1,5 +1,6 @@
 package com.simprints.feature.setup.location
 
+import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
@@ -7,6 +8,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -61,5 +63,22 @@ internal class CollectLocationUseCaseTest {
         } throws Exception("No session capture event found")
 
         collectLocation()
+    }
+
+    @Test
+    fun `invoke rethrows cancellation exception thrown while saving location`() = runTest {
+        every { locationManager.requestLocation() } returns flowOf(Location(latitude = 23.0, longitude = 54.0))
+        coEvery {
+            updateSessionScopeLocationUseCase.invoke(any())
+        } throws CancellationException("Cancelled")
+
+        var thrown: Throwable? = null
+        try {
+            collectLocation()
+        } catch (c: CancellationException) {
+            thrown = c
+        }
+
+        assertThat(thrown).isInstanceOf(CancellationException::class.java)
     }
 }
