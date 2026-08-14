@@ -1,8 +1,8 @@
 package com.simprints.infra.facebiosdk.detection
 
 import android.graphics.Rect
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import androidx.test.ext.junit.runners.*
+import com.google.common.truth.Truth.*
 import com.simprints.face.infra.basebiosdk.detection.Face
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,6 +21,8 @@ class FaceTest {
             template = byteArrayOf(0),
             format = "format",
             absoluteBoundingBox = Rect(0, 0, 50, 100),
+            age = 0f,
+            gender = Face.Gender(0.5f, 0.5f),
         )
         // when
         val relativeBoundingBox = face.relativeBoundingBox

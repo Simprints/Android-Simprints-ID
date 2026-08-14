@@ -12,6 +12,10 @@ import org.junit.Test
 class FaceCaptureEventTest {
     @Test
     fun create_FaceCaptureEvent() {
+        val genderArg = FaceCaptureEvent.FaceCapturePayload.Gender(
+            male = 0.6f,
+            female = 0.4f,
+        )
         val faceArg = FaceCaptureEvent.FaceCapturePayload.Face(
             yaw = 0F,
             roll = 1F,
@@ -19,6 +23,8 @@ class FaceCaptureEventTest {
             format = FACE_TEMPLATE_FORMAT,
             spoofScore = 0.5f,
             spoofSkipReason = FaceCaptureEvent.FaceCapturePayload.SpoofSkipReason.IMAGE_TOO_SMALL,
+            age = 25F,
+            gender = genderArg,
         )
         val event = FaceCaptureEvent(
             startTime = SampleDefaults.CREATED_AT,
@@ -43,6 +49,8 @@ class FaceCaptureEventTest {
             assertThat(result).isEqualTo(FaceCaptureEvent.FaceCapturePayload.Result.VALID)
             assertThat(isFallback).isEqualTo(true)
             assertThat(face).isEqualTo(faceArg)
+            assertThat(face?.age).isEqualTo(25F)
+            assertThat(face?.gender).isEqualTo(genderArg)
         }
     }
 }

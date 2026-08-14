@@ -440,6 +440,7 @@ internal class LiveFeedbackViewModelTest {
     fun `event saving - captured samples are stored as non-fallback with one event per sample plus fallback`() = runTest {
         val validFace = getFace()
         every { faceDetector.analyze(frame) } returns validFace
+        every { faceDetector.analyze(any(), estimateAgeAndGender = true) } returns null
 
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 2, 0)
@@ -458,6 +459,58 @@ internal class LiveFeedbackViewModelTest {
         // 2 captures + 1 fallback.
         coVerify(exactly = 3) { eventReporter.addCaptureEvents(any(), any(), any(), any(), any()) }
         coVerify(exactly = 1) { eventReporter.addFallbackCaptureEvent(any(), any()) }
+    }
+
+    @Test
+    fun `event saving - enriches only the final accepted captures with age and gender`() = runTest {
+        val validFace = getFace()
+        val enrichedFace = getFace().copy(age = 34f, gender = Face.Gender(0.2f, 0.8f))
+        every { faceDetector.analyze(frame) } returns validFace
+        every { faceDetector.analyze(any(), estimateAgeAndGender = true) } returns enrichedFace
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.RANK_ONE, 1, 0)
+        viewModel.process(frame, frame) // fallback frame before start
+        viewModel.startCapture()
+        viewModel.process(frame, frame) // captured sample -> finishes
+
+        with(viewModel.sortedQualifyingCaptures) {
+            assertThat(this).hasSize(1)
+            assertThat(first().face?.age).isEqualTo(34f)
+            assertThat(first().face?.gender).isEqualTo(Face.Gender(0.2f, 0.8f))
+        }
+        // Once for the captured sample and once for the fallback capture.
+        verify(exactly = 2) { faceDetector.analyze(any(), estimateAgeAndGender = true) }
+    }
+
+    @Test
+    fun `event saving - age and gender estimation is not repeated on every failed spoof-check retry`() = runTest {
+        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns spoofConfig(FaceConfiguration.SpoofCheckMode.ENFORCED)
+        every { faceDetector.analyze(frame) } returns getFace()
+        every { faceDetector.analyze(any(), estimateAgeAndGender = true) } returns getFace()
+        coEvery { faceDetector.spoofCheck(any(), any()) } returns SpoofCheckResult(score = 0.9f) // always fails
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+
+        // Attempt 1 fails and gets discarded.
+        viewModel.process(frame, frame)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+        advanceUntilIdle()
+        assertThat(viewModel.state.value.phase).isEqualTo(LiveFeedbackState.Phase.NOT_STARTED)
+        verify(exactly = 0) { faceDetector.analyze(any(), estimateAgeAndGender = true) }
+
+        // Attempt 2 reaches maxAttempts and finishes despite still failing spoof check.
+        viewModel.process(frame, frame)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+        advanceUntilIdle()
+        assertThat(viewModel.state.value.phase).isEqualTo(LiveFeedbackState.Phase.FINISHED)
+
+        // Enrichment only runs once, for the final (accepted) attempt's captures + fallback -
+        // never for the discarded first attempt.
+        verify(exactly = 2) { faceDetector.analyze(any(), estimateAgeAndGender = true) }
     }
 
     @Test

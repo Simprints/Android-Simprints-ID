@@ -335,6 +335,14 @@ internal class LiveFeedbackViewModel @Inject constructor(
     }
 
     private suspend fun sendEventsAndFinish(attemptNumber: Int) {
+        // Freeze frame processing so `process()` can't concurrently mutate `userCaptures`/
+        // `fallbackCapture` while we enrich captures and write events below.
+        emit(phase = LiveFeedbackState.Phase.VALIDATING)
+
+        // Age/gender estimation is extra native processing, so it's only run here on the final,
+        // accepted set of captures.
+        enrichCapturesWithAgeAndGender()
+
         sortedQualifyingCaptures = userCaptures
             .filter { isAutoCapture || it.hasValidStatus() } // Auto-capture images are pre-qualified
             .sortedByDescending { it.face?.quality }
@@ -470,6 +478,19 @@ internal class LiveFeedbackViewModel @Inject constructor(
             .map { async { sendCaptureEvent(it, attemptNumber) } }
             .plus(async { sendCaptureEvent(fallbackCapture, attemptNumber) })
             .awaitAll()
+    }
+
+    private suspend fun enrichCapturesWithAgeAndGender() = withContext(bgDispatcher) {
+        userCaptures.forEachIndexed { index, faceDetection ->
+            userCaptures[index] = enrichWithAgeAndGender(faceDetection) ?: faceDetection
+        }
+        fallbackCapture = enrichWithAgeAndGender(fallbackCapture)
+    }
+
+    private fun enrichWithAgeAndGender(faceDetection: FaceDetection?): FaceDetection? {
+        val face = faceDetection?.face ?: return faceDetection
+        val ageAndGender = faceDetector.analyze(faceDetection.bitmap, estimateAgeAndGender = true) ?: return faceDetection
+        return faceDetection.copy(face = face.copy(age = ageAndGender.age, gender = ageAndGender.gender))
     }
 
     private suspend fun sendCaptureEvent(
