@@ -1,4 +1,4 @@
 name,slug,sid_version,caller_apk_url,caller_release_url,caller_version,caller_app_title
 GG2,2r6g,v2026.2.0,https://github.com/Simprints/dhis2-gg2-android-capture-app/releases/download/v3.3.1-simprints-fork-3/dhis2-v3.3.1-simprints-fork-3.apk,https://github.com/Simprints/dhis2-gg2-android-capture-app/releases/tag/v3.3.1-simprints-fork-3,v3.3.1 fork 3,DHIS2
 eCHIS,j9u7,v2025.2.1,,,,
-RAMP,cg6y,v2026.2.1,https://github.com/Simprints/SimCapture/releases/download/RAMPcapture-DHIS2-v3.4.1-fork-15/RAMPcapture-DHIS2-v3.4.1-fork-15-universal.apk,https://github.com/Simprints/SimCapture/releases/tag/RAMPcapture-DHIS2-v3.4.1-fork-15,v3.4.1-fork-15,DHIS2
+RAMP,cg6y,v2026.2.1,https://github.com/Simprints/SimCapture/releases/download/RAMPcapture-DHIS2-v3.4.1-fork-16/RAMPcapture-DHIS2-v3.4.1-fork-16-universal.apk,https://github.com/Simprints/SimCapture/releases/tag/RAMPcapture-DHIS2-v3.4.1-fork-16,v3.4.1-fork-16,DHIS2
