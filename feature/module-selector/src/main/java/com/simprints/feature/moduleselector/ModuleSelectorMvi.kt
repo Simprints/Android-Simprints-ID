@@ -2,7 +2,7 @@ package com.simprints.feature.moduleselector
 
 import com.simprints.feature.moduleselector.adapter.ModuleSelectorItem
 
-internal data class ModuleSelectorDialogState(
+internal data class ModuleSelectorState(
     val modules: List<ModuleSelectorItem> = emptyList(),
     val query: String = "",
     val onlySelected: Boolean = false,
@@ -19,32 +19,32 @@ internal data class ModuleSelectorDialogState(
     }
 }
 
-internal sealed interface ModuleSelectorDialogEffects {
-    data object DismissDialog : ModuleSelectorDialogEffects
+internal sealed interface ModuleSelectorEffects {
+    data object Dismiss : ModuleSelectorEffects
 
-    data class ShowPasswordDialog(
+    data class ShowPassword(
         val password: String,
-    ) : ModuleSelectorDialogEffects
+    ) : ModuleSelectorEffects
 }
 
-internal sealed interface ModuleSelectorDialogAction {
-    data object LockOverlayClicked : ModuleSelectorDialogAction
+internal sealed interface ModuleSelectorAction {
+    data object LockOverlayClicked : ModuleSelectorAction
 
-    data object UnlockScreen : ModuleSelectorDialogAction
+    data object UnlockScreen : ModuleSelectorAction
 
     data class SearchQueryChanged(
         val query: String,
-    ) : ModuleSelectorDialogAction
+    ) : ModuleSelectorAction
 
     data class OnlySelectedChanged(
         val enabled: Boolean,
-    ) : ModuleSelectorDialogAction
+    ) : ModuleSelectorAction
 
     data class ModuleClicked(
         val module: ModuleSelectorItem.Module,
-    ) : ModuleSelectorDialogAction
+    ) : ModuleSelectorAction
 
-    data object CancelClicked : ModuleSelectorDialogAction
+    data object CancelClicked : ModuleSelectorAction
 
-    data object SaveClicked : ModuleSelectorDialogAction
+    data object SaveClicked : ModuleSelectorAction
 }

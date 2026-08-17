@@ -5,7 +5,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableRaw
-import com.simprints.feature.moduleselector.ModuleSelectorDialogState.SelectionError
+import com.simprints.feature.moduleselector.ModuleSelectorState.SelectionError
 import com.simprints.feature.moduleselector.adapter.ModuleSelectorItem
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
@@ -26,7 +26,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-internal class ModuleSelectorDialogViewModelTest {
+internal class ModuleSelectorViewModelTest {
     @get:Rule
     val instantRule = InstantTaskExecutorRule()
 
@@ -48,7 +48,7 @@ internal class ModuleSelectorDialogViewModelTest {
     @MockK
     private lateinit var project: Project
 
-    private lateinit var viewModel: ModuleSelectorDialogViewModel
+    private lateinit var viewModel: ModuleSelectorViewModel
 
     @Before
     fun setUp() {
@@ -118,7 +118,7 @@ internal class ModuleSelectorDialogViewModelTest {
         viewModel = createViewModel()
         advanceUntilIdle()
 
-        viewModel.onAction(ModuleSelectorDialogAction.SearchQueryChanged("alp"))
+        viewModel.onAction(ModuleSelectorAction.SearchQueryChanged("alp"))
 
         assertThat(viewModel.state.value.modules).containsExactly(
             ModuleSelectorItem.Module("Alpha Module", "Alpha Module".asTokenizableRaw(), true),
@@ -136,7 +136,7 @@ internal class ModuleSelectorDialogViewModelTest {
         viewModel = createViewModel()
         advanceUntilIdle()
 
-        viewModel.onAction(ModuleSelectorDialogAction.SearchQueryChanged("zzz"))
+        viewModel.onAction(ModuleSelectorAction.SearchQueryChanged("zzz"))
 
         assertThat(viewModel.state.value.modules).containsExactly(ModuleSelectorItem.NoResult)
     }
@@ -152,7 +152,7 @@ internal class ModuleSelectorDialogViewModelTest {
         viewModel = createViewModel()
         advanceUntilIdle()
 
-        viewModel.onAction(ModuleSelectorDialogAction.OnlySelectedChanged(true))
+        viewModel.onAction(ModuleSelectorAction.OnlySelectedChanged(true))
 
         assertThat(viewModel.state.value.modules).containsExactly(
             ModuleSelectorItem.Module("Alpha", "Alpha".asTokenizableRaw(), true),
@@ -172,7 +172,7 @@ internal class ModuleSelectorDialogViewModelTest {
         advanceUntilIdle()
 
         viewModel.onAction(
-            ModuleSelectorDialogAction.ModuleClicked(
+            ModuleSelectorAction.ModuleClicked(
                 ModuleSelectorItem.Module("Beta", "Beta".asTokenizableRaw(), false),
             ),
         )
@@ -193,7 +193,7 @@ internal class ModuleSelectorDialogViewModelTest {
         advanceUntilIdle()
 
         viewModel.onAction(
-            ModuleSelectorDialogAction.ModuleClicked(
+            ModuleSelectorAction.ModuleClicked(
                 ModuleSelectorItem.Module("Alpha", "Alpha".asTokenizableRaw(), true),
             ),
         )
@@ -211,8 +211,8 @@ internal class ModuleSelectorDialogViewModelTest {
         advanceUntilIdle()
 
         viewModel.effects.test {
-            viewModel.onAction(ModuleSelectorDialogAction.CancelClicked)
-            assertThat(awaitItem()).isEqualTo(ModuleSelectorDialogEffects.DismissDialog)
+            viewModel.onAction(ModuleSelectorAction.CancelClicked)
+            assertThat(awaitItem()).isEqualTo(ModuleSelectorEffects.Dismiss)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -230,8 +230,8 @@ internal class ModuleSelectorDialogViewModelTest {
         advanceUntilIdle()
 
         viewModel.effects.test {
-            viewModel.onAction(ModuleSelectorDialogAction.SaveClicked)
-            assertThat(awaitItem()).isEqualTo(ModuleSelectorDialogEffects.DismissDialog)
+            viewModel.onAction(ModuleSelectorAction.SaveClicked)
+            assertThat(awaitItem()).isEqualTo(ModuleSelectorEffects.Dismiss)
             cancelAndIgnoreRemainingEvents()
         }
         advanceUntilIdle()
@@ -258,8 +258,8 @@ internal class ModuleSelectorDialogViewModelTest {
         advanceUntilIdle()
 
         viewModel.effects.test {
-            viewModel.onAction(ModuleSelectorDialogAction.LockOverlayClicked)
-            assertThat(awaitItem()).isEqualTo(ModuleSelectorDialogEffects.ShowPasswordDialog("1234"))
+            viewModel.onAction(ModuleSelectorAction.LockOverlayClicked)
+            assertThat(awaitItem()).isEqualTo(ModuleSelectorEffects.ShowPassword("1234"))
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -276,8 +276,8 @@ internal class ModuleSelectorDialogViewModelTest {
         advanceUntilIdle()
 
         viewModel.effects.test {
-            viewModel.onAction(ModuleSelectorDialogAction.UnlockScreen)
-            viewModel.onAction(ModuleSelectorDialogAction.LockOverlayClicked)
+            viewModel.onAction(ModuleSelectorAction.UnlockScreen)
+            viewModel.onAction(ModuleSelectorAction.LockOverlayClicked)
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
@@ -285,7 +285,7 @@ internal class ModuleSelectorDialogViewModelTest {
         assertThat(viewModel.state.value.isScreenLocked).isFalse()
     }
 
-    private fun createViewModel() = ModuleSelectorDialogViewModel(
+    private fun createViewModel() = ModuleSelectorViewModel(
         moduleRepository = moduleRepository,
         syncOrchestrator = syncOrchestrator,
         configRepository = configRepository,
