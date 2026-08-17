@@ -2,6 +2,7 @@ package com.simprints.infra.eventsync.sync.up.workers
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
+import androidx.work.Data
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
@@ -10,6 +11,7 @@ import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.events.EventRepository
+import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.exceptions.MalformedSyncOperationException
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
@@ -17,6 +19,7 @@ import com.simprints.infra.eventsync.sync.common.OUTPUT_ESTIMATED_MAINTENANCE_TI
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS
 import com.simprints.infra.eventsync.sync.common.WorkerProgressCountReporter
 import com.simprints.infra.eventsync.sync.up.tasks.EventUpSyncTask
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_MAX_SYNC
@@ -70,12 +73,12 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(dispatcher) {
         showProgressNotification()
         crashlyticsLog("Started")
+        val workerId = this@EventUpSyncUploaderWorker.id.toString()
+        var count = eventSyncCache.readProgress(workerId)
+        var max = count
+
         try {
-            val workerId = this@EventUpSyncUploaderWorker.id.toString()
-            var count = eventSyncCache.readProgress(workerId)
-            val max = eventRepository
-                .observeEventCountInClosedScopes()
-                .firstOrNull() ?: 0
+            max = eventRepository.observeEventCountInClosedScopes().firstOrNull() ?: 0
 
             upSyncTask.upSync(upSyncScope.operation, getEventScope()).collect {
                 count += it.progress
@@ -86,44 +89,39 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
             }
 
             success(
-                workDataOf(
-                    OUTPUT_UP_SYNC to count,
-                    OUTPUT_UP_MAX_SYNC to max,
-                ),
+                createOutputData(count, max),
                 "Total uploaded: $count / $max",
             )
         } catch (t: Throwable) {
-            retryOrFailIfCloudIntegrationOrBackendMaintenanceError(t)
+            Simber.i("Up-sync completed with issue", t, tag = tag)
+            success(
+                createOutputData(count, max, t),
+                "Completed with up-sync error: ${t.message}",
+            )
         }
     }
 
-    private fun retryOrFailIfCloudIntegrationOrBackendMaintenanceError(t: Throwable) = when (t) {
-        is IllegalArgumentException -> {
-            fail(t, t.message)
+    private fun createOutputData(
+        count: Int,
+        max: Int,
+        t: Throwable? = null,
+    ): Data {
+        val outputDataBuilder = Data
+            .Builder()
+            .putInt(OUTPUT_UP_SYNC, count)
+            .putInt(OUTPUT_UP_MAX_SYNC, max)
+
+        when (t) {
+            is SyncCloudIntegrationException -> outputDataBuilder.putBoolean(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION, true)
+            is RemoteDbNotSignedInException -> outputDataBuilder.putBoolean(OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED, true)
+            is TooManyRequestsException -> outputDataBuilder.putBoolean(OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS, true)
+            is BackendMaintenanceException ->
+                outputDataBuilder
+                    .putBoolean(OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE, true)
+                    .putLong(OUTPUT_ESTIMATED_MAINTENANCE_TIME, t.estimatedOutage ?: 0L)
         }
 
-        is BackendMaintenanceException -> {
-            fail(
-                t,
-                t.message,
-                workDataOf(
-                    OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
-                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.estimatedOutage,
-                ),
-            )
-        }
-
-        is SyncCloudIntegrationException -> {
-            fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
-        }
-
-        is RemoteDbNotSignedInException -> {
-            fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true))
-        }
-
-        else -> {
-            retry(t)
-        }
+        return outputDataBuilder.build()
     }
 
     override suspend fun reportCount(

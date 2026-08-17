@@ -27,6 +27,8 @@ import com.simprints.infra.eventsync.sync.EventSyncStateProcessorTest.Companion.
 import com.simprints.infra.eventsync.sync.common.OUTPUT_ESTIMATED_MAINTENANCE_TIME
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_COMMCARE_PERMISSION_MISSING
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS
 import com.simprints.infra.eventsync.sync.common.TAG_DOWN_MASTER_SYNC_ID
 import com.simprints.infra.eventsync.sync.common.TAG_MASTER_SYNC_ID
@@ -49,9 +51,11 @@ fun EventSyncWorkerState.assertEqualToFailedState(e: Failed) {
     assertThat(this).isInstanceOf(Failed::class.java)
     val failed = this as Failed
     assertThat(failed.estimatedOutage).isEqualTo(e.estimatedOutage)
+    assertThat(failed.failedBecauseReloginRequired).isEqualTo(e.failedBecauseReloginRequired)
     assertThat(failed.failedBecauseCloudIntegration).isEqualTo(e.failedBecauseCloudIntegration)
     assertThat(failed.failedBecauseBackendMaintenance).isEqualTo(e.failedBecauseBackendMaintenance)
     assertThat(failed.failedBecauseTooManyRequest).isEqualTo(e.failedBecauseTooManyRequest)
+    assertThat(failed.failedBecauseCommCarePermissionMissing).isEqualTo(e.failedBecauseCommCarePermissionMissing)
 }
 
 fun EventSyncState.assertConnectingSyncState() {
@@ -145,6 +149,63 @@ fun createWorkInfosHistoryForFailingSyncDueCloudIntegrationError(): List<WorkInf
     createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
 )
 
+fun createWorkInfosHistoryForSucceededSyncWithUploaderReloginError(): List<WorkInfo> = listOf(
+    createDownSyncDownloaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+    createUpSyncUploaderWorker(
+        SUCCEEDED,
+        UNIQUE_SYNC_ID,
+        output = workDataOf(OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true),
+    ),
+)
+
+fun createWorkInfosHistoryForSucceededSyncWithUploaderTooManyRequestsError(): List<WorkInfo> = listOf(
+    createDownSyncDownloaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+    createUpSyncUploaderWorker(
+        SUCCEEDED,
+        UNIQUE_SYNC_ID,
+        output = workDataOf(OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true),
+    ),
+)
+
+fun createWorkInfosHistoryForSucceededSyncWithDownloaderCommCarePermissionError(): List<WorkInfo> = listOf(
+    createDownSyncDownloaderWorker(
+        SUCCEEDED,
+        UNIQUE_SYNC_ID,
+        workDataOf(OUTPUT_FAILED_BECAUSE_COMMCARE_PERMISSION_MISSING to true),
+    ),
+    createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+)
+
+fun createWorkInfosHistoryForSucceededSyncWithDownloaderBackendMaintenanceError(): List<WorkInfo> = listOf(
+    createDownSyncDownloaderWorker(
+        SUCCEEDED,
+        UNIQUE_SYNC_ID,
+        workDataOf(
+            OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
+            OUTPUT_ESTIMATED_MAINTENANCE_TIME to 6L,
+        ),
+    ),
+    createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+)
+
+fun createWorkInfosHistoryForSucceededSyncWithDownloaderTooManyRequestsError(): List<WorkInfo> = listOf(
+    createDownSyncDownloaderWorker(
+        SUCCEEDED,
+        UNIQUE_SYNC_ID,
+        workDataOf(OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true),
+    ),
+    createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+)
+
+fun createWorkInfosHistoryForSucceededSyncWithDownloaderCloudIntegrationError(): List<WorkInfo> = listOf(
+    createDownSyncDownloaderWorker(
+        SUCCEEDED,
+        UNIQUE_SYNC_ID,
+        workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true),
+    ),
+    createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+)
+
 fun createWorkInfosHistoryForConnectingSync(): List<WorkInfo> = listOf(
     createDownSyncDownloaderWorker(ENQUEUED, UNIQUE_SYNC_ID),
     createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
@@ -176,13 +237,17 @@ private fun createDownSyncDownloaderWorker(
 private fun createUpSyncUploaderWorker(
     state: WorkInfo.State,
     uniqueMasterSyncId: String?,
+    output: Data = workDataOf(),
     uniqueSyncId: String? = UNIQUE_UP_SYNC_ID,
     id: UUID = UUID.randomUUID(),
 ) = createWorkInfo(
     state,
-    workDataOf(
-        OUTPUT_UP_SYNC to UPLOADED,
-        OUTPUT_UP_MAX_SYNC to TO_UPLOAD,
+    concatData(
+        workDataOf(
+            OUTPUT_UP_SYNC to UPLOADED,
+            OUTPUT_UP_MAX_SYNC to TO_UPLOAD,
+        ),
+        output,
     ),
     createCommonUpSyncTags(uniqueMasterSyncId, uniqueSyncId) + setOf(tagForType(UPLOADER)),
     workDataOf(

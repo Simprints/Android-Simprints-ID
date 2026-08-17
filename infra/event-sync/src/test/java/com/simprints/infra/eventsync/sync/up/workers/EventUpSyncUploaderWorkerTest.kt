@@ -14,6 +14,7 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScope
+import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
@@ -21,6 +22,7 @@ import com.simprints.infra.eventsync.sync.common.OUTPUT_ESTIMATED_MAINTENANCE_TI
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS
 import com.simprints.infra.eventsync.sync.up.EventUpSyncProgress
 import com.simprints.infra.eventsync.sync.up.tasks.EventUpSyncTask
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_EVENT_UP_SYNC_SCOPE_ID
@@ -101,16 +103,23 @@ internal class EventUpSyncUploaderWorkerTest {
     }
 
     @Test
-    fun worker_shouldFailCorrectlyIfNoEventScope() = runTest {
+    fun worker_shouldSucceedWithoutFlagsIfNoEventScope() = runTest {
         coEvery { eventRepository.getEventScope(any()) } returns null
 
         val result = init(projectScope).doWork()
 
-        assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        assertThat(result).isEqualTo(
+            ListenableWorker.Result.success(
+                workDataOf(
+                    EventUpSyncUploaderWorker.OUTPUT_UP_SYNC to 0,
+                    EventUpSyncUploaderWorker.OUTPUT_UP_MAX_SYNC to 12,
+                ),
+            ),
+        )
     }
 
     @Test
-    fun worker_shouldSetFailCorrectlyIfBackendError() = runTest {
+    fun worker_shouldSetFailureFlagCorrectlyIfBackendError() = runTest {
         coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
             upSyncTask.upSync(any(), eventScope)
@@ -119,17 +128,19 @@ internal class EventUpSyncUploaderWorkerTest {
         val result = init(projectScope).doWork()
 
         assertThat(result).isEqualTo(
-            ListenableWorker.Result.failure(
+            ListenableWorker.Result.success(
                 workDataOf(
+                    EventUpSyncUploaderWorker.OUTPUT_UP_SYNC to 0,
+                    EventUpSyncUploaderWorker.OUTPUT_UP_MAX_SYNC to 12,
                     OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
-                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to null,
+                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to 0L,
                 ),
             ),
         )
     }
 
     @Test
-    fun worker_shouldSetFailCorrectlyIfTimedBackendError() = runTest {
+    fun worker_shouldSetFailureFlagCorrectlyIfTimedBackendError() = runTest {
         coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
             upSyncTask.upSync(any(), eventScope)
@@ -138,8 +149,10 @@ internal class EventUpSyncUploaderWorkerTest {
         val result = init(projectScope).doWork()
 
         assertThat(result).isEqualTo(
-            ListenableWorker.Result.failure(
+            ListenableWorker.Result.success(
                 workDataOf(
+                    EventUpSyncUploaderWorker.OUTPUT_UP_SYNC to 0,
+                    EventUpSyncUploaderWorker.OUTPUT_UP_MAX_SYNC to 12,
                     OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
                     OUTPUT_ESTIMATED_MAINTENANCE_TIME to 600L,
                 ),
@@ -148,7 +161,7 @@ internal class EventUpSyncUploaderWorkerTest {
     }
 
     @Test
-    fun worker_shouldSetFailCorrectlyIfCloudIntegrationError() = runTest {
+    fun worker_shouldSetFailureFlagCorrectlyIfCloudIntegrationError() = runTest {
         coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
             upSyncTask.upSync(any(), eventScope)
@@ -157,8 +170,10 @@ internal class EventUpSyncUploaderWorkerTest {
         val result = init(projectScope).doWork()
 
         assertThat(result).isEqualTo(
-            ListenableWorker.Result.failure(
+            ListenableWorker.Result.success(
                 workDataOf(
+                    EventUpSyncUploaderWorker.OUTPUT_UP_SYNC to 0,
+                    EventUpSyncUploaderWorker.OUTPUT_UP_MAX_SYNC to 12,
                     OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true,
                 ),
             ),
@@ -166,7 +181,7 @@ internal class EventUpSyncUploaderWorkerTest {
     }
 
     @Test
-    fun worker_shouldSetFailCorrectlyIfRemoteDbNotSignedInException() = runTest {
+    fun worker_shouldSetFailureFlagCorrectlyIfRemoteDbNotSignedInException() = runTest {
         val eventUpSyncUploaderWorker = init(projectScope)
 
         coEvery {
@@ -176,8 +191,10 @@ internal class EventUpSyncUploaderWorkerTest {
         val result = eventUpSyncUploaderWorker.doWork()
 
         assertThat(result).isEqualTo(
-            ListenableWorker.Result.failure(
+            ListenableWorker.Result.success(
                 workDataOf(
+                    EventUpSyncUploaderWorker.OUTPUT_UP_SYNC to 0,
+                    EventUpSyncUploaderWorker.OUTPUT_UP_MAX_SYNC to 12,
                     OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true,
                 ),
             ),
@@ -185,7 +202,27 @@ internal class EventUpSyncUploaderWorkerTest {
     }
 
     @Test
-    fun worker_shouldRetryIfNotBackendMaintenanceOrSyncIssue() = runTest {
+    fun worker_shouldSetFailureFlagCorrectlyIfTooManyRequests() = runTest {
+        coEvery { eventRepository.getEventScope(any()) } returns eventScope
+        coEvery {
+            upSyncTask.upSync(any(), eventScope)
+        } throws TooManyRequestsException()
+
+        val result = init(projectScope).doWork()
+
+        assertThat(result).isEqualTo(
+            ListenableWorker.Result.success(
+                workDataOf(
+                    EventUpSyncUploaderWorker.OUTPUT_UP_SYNC to 0,
+                    EventUpSyncUploaderWorker.OUTPUT_UP_MAX_SYNC to 12,
+                    OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true,
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun worker_shouldSucceedWithoutFlagsIfUnexpectedIssue() = runTest {
         coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
             upSyncTask.upSync(any(), eventScope)
@@ -193,7 +230,14 @@ internal class EventUpSyncUploaderWorkerTest {
 
         val result = init(projectScope).doWork()
 
-        assertThat(result).isEqualTo(ListenableWorker.Result.retry())
+        assertThat(result).isEqualTo(
+            ListenableWorker.Result.success(
+                workDataOf(
+                    EventUpSyncUploaderWorker.OUTPUT_UP_SYNC to 0,
+                    EventUpSyncUploaderWorker.OUTPUT_UP_MAX_SYNC to 12,
+                ),
+            ),
+        )
     }
 
     @Test
@@ -238,12 +282,19 @@ internal class EventUpSyncUploaderWorkerTest {
     }
 
     @Test
-    fun `should retry when input is null`() = runTest {
+    fun `should succeed when input is null`() = runTest {
         val eventUpSyncUploaderWorker = init(null)
 
         val result = eventUpSyncUploaderWorker.doWork()
 
-        assertThat(result).isEqualTo(ListenableWorker.Result.retry())
+        assertThat(result).isEqualTo(
+            ListenableWorker.Result.success(
+                workDataOf(
+                    EventUpSyncUploaderWorker.OUTPUT_UP_SYNC to 0,
+                    EventUpSyncUploaderWorker.OUTPUT_UP_MAX_SYNC to 12,
+                ),
+            ),
+        )
     }
 
     // We are using the TestListenableWorkerBuilder and not the constructor directly to have a test worker

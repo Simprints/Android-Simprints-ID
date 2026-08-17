@@ -16,9 +16,11 @@ import com.simprints.infra.eventsync.SampleSyncScopes.projectDownSyncScope
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_COMMCARE_PERMISSION_MISSING
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED
 import com.simprints.infra.eventsync.sync.down.tasks.CommCareEventSyncTask
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.INPUT_EVENT_DOWN_SYNC_SCOPE_ID
+import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_MAX_SYNC
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
 import com.simprints.infra.serialization.SimJson
@@ -119,16 +121,40 @@ internal class CommCareEventSyncDownloaderWorkerTest {
     }
 
     @Test
-    fun `worker with no event scope should fail`() = runTest {
+    fun `worker with no event scope should succeed without failure flags`() = runTest {
         coEvery { eventRepository.getEventScope(any()) } returns null
 
         val result = eventDownSyncDownloaderWorker.doWork()
 
-        assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        assertThat(result).isEqualTo(
+            ListenableWorker.Result.success(
+                workDataOf(
+                    OUTPUT_DOWN_SYNC to 0,
+                    OUTPUT_DOWN_MAX_SYNC to 0,
+                ),
+            ),
+        )
     }
 
     @Test
-    fun `worker should fail if task throws IllegalArgumentException`() = runTest {
+    fun `worker with no project should succeed with relogin flag`() = runTest {
+        coEvery { configRepository.getProject() } returns null
+
+        val result = eventDownSyncDownloaderWorker.doWork()
+
+        assertThat(result).isEqualTo(
+            ListenableWorker.Result.success(
+                workDataOf(
+                    OUTPUT_DOWN_SYNC to 0,
+                    OUTPUT_DOWN_MAX_SYNC to 0,
+                    OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true,
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun `worker should succeed without failure flags if task throws IllegalArgumentException`() = runTest {
         coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
             commCareSyncTask.downSync(any(), any(), any(), any())
@@ -136,11 +162,18 @@ internal class CommCareEventSyncDownloaderWorkerTest {
 
         val result = eventDownSyncDownloaderWorker.doWork()
 
-        assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        assertThat(result).isEqualTo(
+            ListenableWorker.Result.success(
+                workDataOf(
+                    OUTPUT_DOWN_SYNC to 0,
+                    OUTPUT_DOWN_MAX_SYNC to 0,
+                ),
+            ),
+        )
     }
 
     @Test
-    fun `worker should fail if task throws SecurityException`() = runTest {
+    fun `worker should set permission-missing failure flag if task throws SecurityException`() = runTest {
         coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
             commCareSyncTask.downSync(any(), any(), any(), any())
@@ -149,8 +182,10 @@ internal class CommCareEventSyncDownloaderWorkerTest {
         val result = eventDownSyncDownloaderWorker.doWork()
 
         assertThat(result).isEqualTo(
-            ListenableWorker.Result.failure(
+            ListenableWorker.Result.success(
                 workDataOf(
+                    OUTPUT_DOWN_SYNC to 0,
+                    OUTPUT_DOWN_MAX_SYNC to 0,
                     OUTPUT_FAILED_BECAUSE_COMMCARE_PERMISSION_MISSING to true,
                 ),
             ),

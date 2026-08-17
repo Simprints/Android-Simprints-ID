@@ -34,12 +34,15 @@ import com.simprints.infra.events.sampledata.createPersonCreationEvent
 import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.infra.eventsync.SampleSyncScopes
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
+import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.event.usecases.MapDomainEventScopeToApiUseCase
 import com.simprints.infra.eventsync.exceptions.TryToUploadEventsForNotSignedProject
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState
+import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
+import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.toList
@@ -685,6 +688,27 @@ internal class EventUpSyncTaskTest {
     @Test(expected = RemoteDbNotSignedInException::class)
     fun `upSync should throw up if RemoteDbNotSignedInException occurs`() = runTest {
         coEvery { eventRepo.getClosedEventScopesCount(any()) } throws RemoteDbNotSignedInException()
+
+        eventUpSyncTask.upSync(operation, eventScope).toList()
+    }
+
+    @Test(expected = BackendMaintenanceException::class)
+    fun `upSync should throw up if BackendMaintenanceException occurs`() = runTest {
+        coEvery { eventRepo.getClosedEventScopesCount(any()) } throws BackendMaintenanceException(estimatedOutage = null)
+
+        eventUpSyncTask.upSync(operation, eventScope).toList()
+    }
+
+    @Test(expected = SyncCloudIntegrationException::class)
+    fun `upSync should throw up if SyncCloudIntegrationException occurs`() = runTest {
+        coEvery { eventRepo.getClosedEventScopesCount(any()) } throws SyncCloudIntegrationException("", Throwable())
+
+        eventUpSyncTask.upSync(operation, eventScope).toList()
+    }
+
+    @Test(expected = TooManyRequestsException::class)
+    fun `upSync should throw up if TooManyRequestsException occurs`() = runTest {
+        coEvery { eventRepo.getClosedEventScopesCount(any()) } throws TooManyRequestsException()
 
         eventUpSyncTask.upSync(operation, eventScope).toList()
     }

@@ -71,6 +71,7 @@ internal abstract class BaseEventDownSyncTask(
         val requestId = UUID.randomUUID().toString()
         var result: EventFetchResult? = null
         var errorType: String? = null
+        var errorToRethrow: Throwable? = null
 
         try {
             result = fetchEvents(operation, scope, requestId)
@@ -98,11 +99,6 @@ internal abstract class BaseEventDownSyncTask(
             lastOperation = lastOperation.copy(state = COMPLETE, lastSyncTime = timeHelper.now().ms)
             emitProgress(lastOperation, count, result.totalCount)
         } catch (t: Throwable) {
-            if (shouldRethrowError(t)) {
-                throw t
-            }
-
-            Simber.i("Down sync error", t, tag = SYNC)
             errorType = t.javaClass.simpleName
 
             lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation, project)
@@ -110,6 +106,12 @@ internal abstract class BaseEventDownSyncTask(
 
             lastOperation = lastOperation.copy(state = FAILED, lastSyncTime = timeHelper.now().ms)
             emitProgress(lastOperation, count, count)
+
+            if (shouldRethrowError(t)) {
+                errorToRethrow = t
+            } else {
+                Simber.i("Down sync error", t, tag = SYNC)
+            }
         }
 
         if (count > 0 || errorType != null) {
@@ -136,6 +138,8 @@ internal abstract class BaseEventDownSyncTask(
                 ),
             )
         }
+
+        errorToRethrow?.let { throw it }
     }
 
     private suspend fun FlowCollector<EventDownSyncProgress>.emitProgress(

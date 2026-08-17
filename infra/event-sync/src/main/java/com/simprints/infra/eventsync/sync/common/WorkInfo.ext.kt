@@ -25,3 +25,10 @@ internal fun WorkInfo.didFailBecauseCommCarePermissionMissing(): Boolean =
     this.outputData.getBoolean(OUTPUT_FAILED_BECAUSE_COMMCARE_PERMISSION_MISSING, false)
 
 internal fun WorkInfo.getEstimatedOutageTime(): Long = this.outputData.getLong(OUTPUT_ESTIMATED_MAINTENANCE_TIME, 0L)
+
+internal fun WorkInfo.hasAnyFailureReason(): Boolean =
+    didFailBecauseReloginRequired() ||
+        didFailBecauseCloudIntegration() ||
+        didFailBecauseBackendMaintenance() ||
+        didFailBecauseTooManyRequests() ||
+        didFailBecauseCommCarePermissionMissing()

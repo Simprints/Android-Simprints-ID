@@ -25,11 +25,9 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.eventsync.sync.common.EnrolmentRecordFactory
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import java.util.Date
-import java.util.UUID
 
 class EnrolmentRecordFactoryTest {
     @MockK
@@ -41,18 +39,12 @@ class EnrolmentRecordFactoryTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
-        mockkStatic(UUID::class)
 
         every { encodingUtils.base64ToBytes(any()) } returns BASE_64_BYTES
         factory = EnrolmentRecordFactory(
             encodingUtils = encodingUtils,
             timeHelper = timeHelper,
         )
-    }
-
-    @After
-    fun tearDown() {
-        unmockkStatic(UUID::class)
     }
 
     @Test
@@ -279,7 +271,6 @@ class EnrolmentRecordFactoryTest {
     @Test
     fun `when buildFromCaptureResults is called, correct subject is built`() {
         val randomUUID = "5a95b24d-23c5-4d24-9277-0d3d2a287508" // "chosen by fair dice roll. guaranteed to be random" (c) xkcd
-        every { UUID.randomUUID().toString() } returns randomUUID
 
         val expected = EnrolmentRecord(
             subjectId = randomUUID,

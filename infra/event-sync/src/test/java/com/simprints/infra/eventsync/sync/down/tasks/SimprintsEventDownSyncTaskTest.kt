@@ -35,6 +35,7 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID_2
 import com.simprints.infra.eventsync.SampleSyncScopes
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
+import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.COMPLETE
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.FAILED
@@ -42,6 +43,8 @@ import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.D
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
 import com.simprints.infra.eventsync.sync.common.EnrolmentRecordFactory
 import com.simprints.infra.eventsync.sync.down.tasks.BaseEventDownSyncTask.Companion.EVENTS_BATCH_SIZE
+import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.*
@@ -278,6 +281,50 @@ class SimprintsEventDownSyncTaskTest {
         coEvery { eventRemoteDataSource.getEvents(any(), any(), any()) } throws RemoteDbNotSignedInException()
 
         eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
+    }
+
+    @Test(expected = BackendMaintenanceException::class)
+    fun downSync_shouldThrowUpIfBackendMaintenanceExceptionOccurs() = runTest {
+        coEvery { eventRemoteDataSource.getEvents(any(), any(), any()) } throws BackendMaintenanceException(estimatedOutage = null)
+
+        eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
+    }
+
+    @Test(expected = SyncCloudIntegrationException::class)
+    fun downSync_shouldThrowUpIfSyncCloudIntegrationExceptionOccurs() = runTest {
+        coEvery { eventRemoteDataSource.getEvents(any(), any(), any()) } throws SyncCloudIntegrationException("Cloud integration", Throwable())
+
+        eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
+    }
+
+    @Test(expected = TooManyRequestsException::class)
+    fun downSync_shouldThrowUpIfTooManyRequestsExceptionOccurs() = runTest {
+        coEvery { eventRemoteDataSource.getEvents(any(), any(), any()) } throws TooManyRequestsException()
+
+        eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
+    }
+
+    @Test
+    fun downSync_shouldLogRequestEventBeforeRethrowingCloudIntegrationException() = runTest {
+        val expectedException = SyncCloudIntegrationException("Cloud integration", Throwable())
+        coEvery { eventRemoteDataSource.getEvents(any(), any(), any()) } throws expectedException
+
+        try {
+            eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
+            throw AssertionError("Expected SyncCloudIntegrationException")
+        } catch (ex: SyncCloudIntegrationException) {
+            assertThat(ex).isEqualTo(expectedException)
+        }
+
+        coVerify(exactly = 1) {
+            eventRepository.addOrUpdateEvent(
+                eventScope,
+                match {
+                    it is EventDownSyncRequestEvent &&
+                        it.payload.errorType == expectedException.javaClass.simpleName
+                },
+            )
+        }
     }
 
     @Test
