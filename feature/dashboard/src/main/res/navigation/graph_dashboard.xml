@@ -108,11 +108,10 @@
             android:id="@+id/action_syncInfoFragment_to_login"
             app:destination="@id/graph_login" />
     </fragment>
-    <fragment
+    <dialog
         android:id="@+id/moduleSelectionFragment"
-        android:name="com.simprints.feature.dashboard.settings.syncinfo.moduleselection.ModuleSelectionFragment"
-        android:label="ModuleSelectionFragment"
-        tools:layout="@layout/fragment_sync_module_selection" />
+        android:name="com.simprints.feature.moduleselector.ModuleSelectorDialogFragment"
+        android:label="ModuleSelectionFragment" />
     <fragment
         android:id="@+id/fingerSelectionFragment"
         android:name="com.simprints.feature.dashboard.settings.fingerselection.FingerSelectionFragment"
