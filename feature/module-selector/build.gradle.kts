@@ -8,4 +8,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":infra:event-sync"))
+    implementation(project(":infra:config-store"))
+    implementation(project(":infra:sync"))
 }

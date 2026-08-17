@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/module_selection_header_text"
+        style="@style/Text.Headline6"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="@string/select_modules_title"
+        app:layout_constraintBottom_toBottomOf="@+id/module_selection_toggle_container"
+        app:layout_constraintEnd_toStartOf="@+id/module_selection_toggle_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/module_selection_toggle_container" />
+
+    <LinearLayout
+        android:id="@+id/module_selection_toggle_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/module_selection_toggle_switch"
+            style="@style/Widget.Simprints.Switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_modules_selected_only"
+            android:textAppearance="@style/TextAppearance.Simprints.Subtitle2"
+            app:switchPadding="8dp" />
+    </LinearLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/module_selection_recycler_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginVertical="8dp"
+        android:nestedScrollingEnabled="false"
+        android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_max="320dp"
+        app:layout_constraintHeight_min="240dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/module_selection_toggle_container"
+        tools:itemCount="7"
+        tools:listitem="@layout/dialog_module_selector_item" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/module_selection_search_layout"
+        style="@style/Widget.Simprints.FilledTextInputLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        app:endIconMode="clear_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/module_selection_recycler_view"
+        app:startIconDrawable="@drawable/ic_search">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/module_selection_search_input"
+            style="@style/Widget.Simprints.FilledTextInputEditTextStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/select_modules_search_hint"
+            android:imeOptions="actionDone"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <TextView
+        android:id="@+id/module_selection_error_text"
+        style="@style/Text.Body1.Error"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/select_modules_no_modules_selected"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/module_selection_search_layout"
+        tools:visibility="visible" />
+
+
+    <LinearLayout
+        android:id="@+id/module_selection_button_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/module_selection_error_text">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/module_selection_cancel_button"
+            style="@style/Widget.Simprints.Button.Red"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="@string/select_modules_cancel" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/module_selection_confirm_button"
+            style="@style/Widget.Simprints.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:text="@string/select_modules_confirm" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/modulesLockOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:alpha="0.7"
+        android:background="@color/simprints_grey"
+        android:clickable="true"
+        android:focusable="false"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="KeyboardInaccessibleWidget"
+        tools:visibility="gone">
+
+        <TextView
+            android:id="@+id/modulesLockOverlayClickableArea"
+            style="@style/Text.Headline5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawablePadding="16dp"
+            android:padding="24dp"
+            android:text="@string/select_modules_lock_overlay_title"
+            app:drawableTopCompat="@drawable/ic_overlay_lock" />
+    </FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

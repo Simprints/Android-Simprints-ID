@@ -85,6 +85,21 @@
         <item name="colorSecondary">@color/simprints_orange</item>
     </style>
 
+    <!-- Switch ========================================================================= -->
+    <!-- https://m2.material.io/components/switches/android#switch -->
+
+    <style name="Widget.Simprints.Switch" parent="Widget.MaterialComponents.CompoundButton.Switch">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.Switch</item>
+        <item name="android:textAppearance">@style/TextAppearance.Simprints.Body1</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.Switch" parent="">
+        <item name="colorOnSurface">@color/simprints_text_black</item>
+        <item name="colorSecondary">@color/simprints_orange</item>
+    </style>
+
     <!-- Tab layout ============================================================================ -->
     <!-- https://m2.material.io/components/tabs/android#theming-tabs -->
 
@@ -109,6 +124,7 @@
         <item name="shapeAppearance">@style/Shape.Simprints.MediumComponent</item>
         <item name="android:textColorHint">@color/simprints_text_grey_light</item>
         <item name="endIconTint">@color/simprints_text_grey_light</item>
+        <item name="startIconTint">@color/simprints_text_grey_light</item>
         <item name="android:textColor">@color/simprints_text_black</item>
         <item name="boxBackgroundColor">@color/input_text_background</item>
     </style>
