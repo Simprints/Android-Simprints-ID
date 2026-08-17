@@ -198,7 +198,34 @@ internal class LiveFeedbackViewModelTest {
             getFace(Rect(0, 0, 80, 80)), // too close
             getFace(yaw = 45f), // off yaw
             getFace(roll = 45f), // off roll
+            getFace(quality = 0f),
             null, // no face
+        )
+        val states = collectStates()
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2, 0)
+        repeat(6) { viewModel.process(frame, frame) }
+
+        val feedbacks = states.map { it.feedback }
+        assertThat(feedbacks).containsExactly(
+            LiveFeedbackState.Feedback.NONE,
+            LiveFeedbackState.Feedback.TOO_FAR,
+            LiveFeedbackState.Feedback.TOO_CLOSE,
+            LiveFeedbackState.Feedback.LOOK_STRAIGHT,
+            LiveFeedbackState.Feedback.BAD_QUALITY,
+            LiveFeedbackState.Feedback.NO_FACE,
+        )
+        coVerify(exactly = 0) { eventReporter.addCaptureEvents(any(), any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `manual - bad quality faces considered valid after a valid fallback capture`() = runTest {
+        every { faceDetector.analyze(frame) } returnsMany listOf(
+            getFace(quality = 0f),
+            getFace(),
+            getFace(yaw = 45f), // to switch out the result
+            getFace(quality = 0f),
         )
         val states = collectStates()
 
@@ -207,13 +234,13 @@ internal class LiveFeedbackViewModelTest {
         repeat(5) { viewModel.process(frame, frame) }
 
         val feedbacks = states.map { it.feedback }
-        assertThat(feedbacks).containsAtLeast(
-            LiveFeedbackState.Feedback.TOO_FAR,
-            LiveFeedbackState.Feedback.TOO_CLOSE,
+        assertThat(feedbacks).containsExactly(
+            LiveFeedbackState.Feedback.NONE,
+            LiveFeedbackState.Feedback.BAD_QUALITY,
+            LiveFeedbackState.Feedback.VALID,
             LiveFeedbackState.Feedback.LOOK_STRAIGHT,
-            LiveFeedbackState.Feedback.NO_FACE,
+            LiveFeedbackState.Feedback.VALID,
         )
-        coVerify(exactly = 0) { eventReporter.addCaptureEvents(any(), any(), any(), any(), any()) }
     }
 
     @Test
@@ -304,6 +331,65 @@ internal class LiveFeedbackViewModelTest {
                 LiveFeedbackState.Phase.FINISHED,
             ).inOrder()
         coVerify { eventReporter.addCaptureEvents(any(), any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `auto - invalid faces map to the correct feedback`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        every { faceDetector.analyze(frame) } returnsMany listOf(
+            getFace(Rect(0, 0, 30, 30)), // too far
+            getFace(Rect(0, 0, 80, 80)), // too close
+            getFace(yaw = 45f), // off yaw
+            getFace(roll = 45f), // off roll
+            getFace(quality = 0f), // bad quality
+            null, // no face
+        )
+        val states = collectStates()
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+        viewModel.startCapture()
+        repeat(6) {
+            viewModel.process(frame, frame)
+        }
+        advanceUntilIdle()
+
+        val feedbacks = states.map { it.feedback }
+        assertThat(feedbacks).containsAtLeast(
+            LiveFeedbackState.Feedback.NONE, // This may repeat multiple time so cannot do exact comparison
+            LiveFeedbackState.Feedback.TOO_FAR,
+            LiveFeedbackState.Feedback.TOO_CLOSE,
+            LiveFeedbackState.Feedback.LOOK_STRAIGHT,
+            LiveFeedbackState.Feedback.BAD_QUALITY,
+            LiveFeedbackState.Feedback.NO_FACE,
+        )
+        coVerify(exactly = 0) { eventReporter.addCaptureEvents(any(), any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `auto - returns correct amount of valid faces after finishing`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        every { faceDetector.analyze(frame) } returnsMany listOf(
+            getFace(Rect(0, 0, 30, 30)), // too far
+            getFace(quality = 0.95f), // good
+            getFace(quality = 0f), // bad quality
+            getFace(quality = 0.9f), // good, but will be replaced
+            getFace(quality = 0.97f), // good
+            null, // no face
+        )
+        val states = collectStates()
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2, 0)
+        viewModel.startCapture()
+        repeat(7) {
+            viewModel.process(frame, frame)
+        }
+        advanceUntilIdle()
+
+        assertThat(viewModel.sortedQualifyingCaptures).hasSize(2)
+        assertThat(viewModel.sortedQualifyingCaptures.map { it.face?.quality }).containsExactly(0.97f, 0.95f)
+        coVerify(exactly = 2) { eventReporter.addCaptureEvents(any(), any(), any(), any(), any()) }
     }
 
     @Test
@@ -525,7 +611,7 @@ internal class LiveFeedbackViewModelTest {
         )
 
     companion object {
-        private const val QUALITY_THRESHOLD = -1f
+        private const val QUALITY_THRESHOLD = 0.5f
         private const val AUTO_CAPTURE_IMAGING_DURATION_MS = 3000L
     }
 }
