@@ -3,7 +3,7 @@ package com.simprints.feature.moduleselector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
-import com.simprints.feature.moduleselector.ModuleSelectorDialogState.SelectionError
+import com.simprints.feature.moduleselector.ModuleSelectorState.SelectionError
 import com.simprints.feature.moduleselector.adapter.ModuleSelectorItem
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
@@ -23,18 +23,18 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-internal class ModuleSelectorDialogViewModel @Inject constructor(
+internal class ModuleSelectorViewModel @Inject constructor(
     private val moduleRepository: ModuleSelectionRepository,
     private val syncOrchestrator: SyncOrchestrator,
     private val configRepository: ConfigRepository,
     private val tokenizationProcessor: TokenizationProcessor,
     @param:ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
-    val state: StateFlow<ModuleSelectorDialogState>
-        field = MutableStateFlow(ModuleSelectorDialogState())
+    val state: StateFlow<ModuleSelectorState>
+        field = MutableStateFlow(ModuleSelectorState())
 
-    val effects: SharedFlow<ModuleSelectorDialogEffects>
-        field = MutableSharedFlow<ModuleSelectorDialogEffects>(extraBufferCapacity = 1)
+    val effects: SharedFlow<ModuleSelectorEffects>
+        field = MutableSharedFlow<ModuleSelectorEffects>(extraBufferCapacity = 1)
 
     private var maxNumberOfModules = 0
     private var allModules: List<ModuleSelectorItem.Module> = listOf()
@@ -63,21 +63,21 @@ internal class ModuleSelectorDialogViewModel @Inject constructor(
         }
     }
 
-    fun onAction(action: ModuleSelectorDialogAction) = when (action) {
-        ModuleSelectorDialogAction.LockOverlayClicked -> {
+    fun onAction(action: ModuleSelectorAction) = when (action) {
+        ModuleSelectorAction.LockOverlayClicked -> {
             settingsPassword
                 .getNullablePassword()
-                ?.let { passwords -> emitEffect(ModuleSelectorDialogEffects.ShowPasswordDialog(passwords)) }
+                ?.let { passwords -> emitEffect(ModuleSelectorEffects.ShowPassword(passwords)) }
         }
-        ModuleSelectorDialogAction.UnlockScreen -> {
+        ModuleSelectorAction.UnlockScreen -> {
             settingsPassword = SettingsPasswordConfig.Unlocked
             updateState { it.copy(isScreenLocked = false) }
         }
-        is ModuleSelectorDialogAction.OnlySelectedChanged -> setOnlySelectedFilter(action.enabled)
-        is ModuleSelectorDialogAction.SearchQueryChanged -> filterModules(action.query)
-        is ModuleSelectorDialogAction.ModuleClicked -> updateModuleSelection(action.module)
-        ModuleSelectorDialogAction.CancelClicked -> emitEffect(ModuleSelectorDialogEffects.DismissDialog)
-        ModuleSelectorDialogAction.SaveClicked -> saveModules()
+        is ModuleSelectorAction.OnlySelectedChanged -> setOnlySelectedFilter(action.enabled)
+        is ModuleSelectorAction.SearchQueryChanged -> filterModules(action.query)
+        is ModuleSelectorAction.ModuleClicked -> updateModuleSelection(action.module)
+        ModuleSelectorAction.CancelClicked -> emitEffect(ModuleSelectorEffects.Dismiss)
+        ModuleSelectorAction.SaveClicked -> saveModules()
     }
 
     private fun updateModuleSelection(moduleToUpdate: ModuleSelectorItem.Module) {
@@ -99,7 +99,7 @@ internal class ModuleSelectorDialogViewModel @Inject constructor(
         updateStateModules(state.value.copy(onlySelected = enabled))
     }
 
-    private fun updateStateModules(newState: ModuleSelectorDialogState) {
+    private fun updateStateModules(newState: ModuleSelectorState) {
         val filteredModules = allModules
             .filter { !newState.onlySelected || it.isSelected }
             .filter { newState.query.isBlank() || it.name.contains(newState.query, ignoreCase = true) }
@@ -126,14 +126,14 @@ internal class ModuleSelectorDialogViewModel @Inject constructor(
             moduleRepository.saveModules(allModules.map { module -> SelectableModule(module.tokenizedName, module.isSelected) })
             syncOrchestrator.execute(OneTime.Events.restart())
         }
-        emitEffect(ModuleSelectorDialogEffects.DismissDialog)
+        emitEffect(ModuleSelectorEffects.Dismiss)
     }
 
-    private fun updateState(block: (currentState: ModuleSelectorDialogState) -> ModuleSelectorDialogState) {
+    private fun updateState(block: (currentState: ModuleSelectorState) -> ModuleSelectorState) {
         state.value = block(state.value)
     }
 
-    private fun emitEffect(effect: ModuleSelectorDialogEffects) {
+    private fun emitEffect(effect: ModuleSelectorEffects) {
         effects.tryEmit(effect)
     }
 }

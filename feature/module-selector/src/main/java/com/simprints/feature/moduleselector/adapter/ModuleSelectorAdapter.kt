@@ -23,7 +23,7 @@ internal class ModuleSelectorAdapter(
         viewType: Int,
     ): ModuleSelectorViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val itemView = inflater.inflate(R.layout.dialog_module_selector_item, parent, false)
+        val itemView = inflater.inflate(R.layout.item_module_selector, parent, false)
         return ModuleSelectorViewHolder(itemView)
     }
 
