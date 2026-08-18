@@ -188,13 +188,16 @@
     <string name="face_capture_title_no_face">Aucun visage détecté</string>
     <string name="face_capture_error_no_face">Assurez-vous que le visage soit dans le cercle</string>
     <string name="face_capture_title_bad_quality">Image floue</string>
-    <string name="face_capture_error_bad_quality">Essayez d\'ajuster l\'éclairage ou de repositionner le visage pour obtenir une meilleure photo.</string>
+    <string name="face_capture_error_bad_quality">Essayez d\'ajuster la lumière ou repositionner le visage pour une meilleure photo</string>
     <string name="face_capture_title_too_far">Trop loin</string>
     <string name="face_capture_error_too_far">Rapprochez-vous</string>
     <string name="face_capture_title_too_close">Trop près</string>
     <string name="face_capture_error_too_close">Reculez</string>
     <string name="face_capture_title_look_straight">La personne ne regarde pas droit devant elle</string>
     <string name="face_capture_error_look_straight">Assurez-vous que la personne regarde droit vers la caméra.</string>
+    <string name="face_capture_title_validating">Vérification du scan</string>
+    <string name="face_capture_title_validating_failed">Vérification impossible</string>
+    <string name="face_capture_error_validating_failed">Recapturez et vérifiez qu\'une personne réelle est en face de la caméra</string>
     <string name="face_capture_begin_button">Touchez pour capturer</string>
     <string name="face_capture_prep_begin_button_capturing">Capture en cours...</string>
     <string name="face_capture_permission_denied">Veuillez autoriser les permissions de l\'appareil photo</string>
@@ -329,7 +332,7 @@
     <string name="sync_info_title">Informations sur la synchronisation</string>
 
     <string name="sync_info_header_title">Statut de la synchronisation</string>
-    <string name="sync_info_header_settings_button"><u>Réglages</u></string>
+    <string name="sync_info_header_settings_button"><u>Détails</u></string>
 
     <string name="sync_info_re_login_required">Vous devez vous connecter pour synchroniser.</string>
 
@@ -471,9 +474,18 @@
     <string name="notification_migration_description">Optimisation stockage en cours</string>
 
     <!-- Identification pool validation -->
-    <string name="id_pool_validation_pool_empty_message">Il n\'y a pas d\'enregistrements sur l\'appareil</string>
-    <string name="id_pool_validation_action_close">Fermer</string>
+    <string name="id_pool_validation_validating">Validation...</string>
+    <string name="id_pool_validation_issue_title">L\'identification va échouer</string>
+    <string name="id_pool_validation_default_message">Aucun match potentiel n\'existe pour cette requête d\'identification.\n\nSi c\'est attendu, you pouvez continuer la capture. Autrement, merci de contacter votre responsable de projet pour obtenir de l\'assistance.</string>
+    <string name="id_pool_validation_user_mismatch_message">L\'identifiant de l\'agent dans la requête ne correspond pas à celui dans Simprints ID</string>
+    <string name="id_pool_validation_module_mismatch_message">L\'identifiant du module dans la requête ne correspond à aucun des modules sélectionnés dans Simprints ID</string>
+    <string name="id_pool_validation_sync_required_message">Simprints ID n\'a pas été synchronisé depuis trop longtemps</string>
+    <string name="id_pool_validation_pool_empty_message">Aucun enregistrement n\'a été trouvé pour cette requête sur l\'appareil.</string>
+    <string name="id_pool_validation_last_sync">Dernière synchro: %1$s</string>
+    <string name="id_pool_validation_syncing_message">Synchronisation en cours...</string>
     <string name="id_pool_validation_action_sync">Synchroniser et réessayer</string>
+    <string name="id_pool_validation_action_close">Fermer</string>
+    <string name="id_pool_validation_action_continue">Continuer</string>
 
     <!-- Age group selection -->
     <string name="age_group_selection_title">Choisir le groupe d\'age du sujet</string>
@@ -497,9 +509,11 @@
     <string name="mfid_type_nhis_card">Carte NHIS</string>
     <string name="mfid_type_ghana_id_card">Carte d\'Identité Ghana</string>
     <string name="mfid_type_qr_code">QR Code</string>
+    <string name="mfid_type_fayda_card">Carte Fayda</string>
     <string name="mfid_nhis_card_credential_field">Numéro de membre</string>
     <string name="mfid_ghana_id_credential_field">Identité Personnelle</string>
     <string name="mfid_qr_credential_field">Valeur du QR Code</string>
+    <string name="mfid_fayda_card_credential_field">Fayda Alias Number (FAN)</string>
     <string name="mfid_type_any_document">un document</string>
 
     <string name="mfid_skip_scan_dialog_title">ignorer le scan?</string>
@@ -508,6 +522,8 @@
 
     <string name="mfid_qr_scan_no_qr_detected">QR Code non detecté</string>
     <string name="mfid_scan_instructions">Placer %1$s dans la fenêtre</string>
+    <string name="mfid_scan_hint_lighting_too_dim">Pas assez de lumière</string>
+    <string name="mfid_scan_hint_lighting_too_bright">Lumière trop vive</string>
     <string name="mfid_continue">Continuer</string>
     <string name="mfid_dialog_wrong_qr_title">Type de QR Code non valide</string>
     <string name="mfid_dialog_wrong_qr_body_top">Mauvais format de QR Code scanné</string>
@@ -531,6 +547,7 @@
 
     <string name="mfid_add_document_title">Ajouter ce %1$s?</string>
     <string name="mfid_skip_title">Pourquoi avez-vous passé le scan de %1$s ?</string>
+    <string name="mfid_skip_reason_has_number_no_id">A un numéro, pas de %1$s (livret)</string>
     <string name="mfid_skip_reason_does_not_have">N\'a pas %1$s</string>
     <string name="mfid_skip_reason_did_not_bring">N\'a pas apporter %1$s</string>
     <string name="mfid_skip_reason_incorrect">A apporté le mauvais %1$s</string>
@@ -540,8 +557,23 @@
     <string name="mfid_skip_reason_other">Autre</string>
     <string name="mfid_skip_reason_hint">Raison</string>
     <string name="mfid_skip_reason_helper_text">Détaillé la raison pour ignorer </string>
+    <string name="mfid_skip_title_generic"> Pourquoi avez-vous passé le scan de document ?</string>
+    <string name="mfid_skip_reason_generic_has_number_no_id">A un numéro, pas de document (livret)</string>
+    <string name="mfid_skip_reason_generic_does_not_have">N\'a pas de document</string>
+    <string name="mfid_skip_reason_generic_did_not_bring">N\'a pas apporté de document</string>
+    <string name="mfid_skip_reason_generic_incorrect">Document incorrect apporté</string>
+    <string name="mfid_skip_reason_generic_does_not_want_to_provide">Ne souhaite pas fournir de document</string>
+    <string name="mfid_skip_reason_generic_damaged">Document endommagé ou illisible</string>
+    <string name="mfid_skip_reason_generic_unable_to_scan">Impossible de scanner le document</string>
+    <string name="mfid_skip_reason_generic_other">Autre</string>
+    <string name="mfid_skip_reason_generic_hint">Raison</string>
     <string name="mfid_skip_confirm">Ignorer le scan</string>
     <string name="mfid_skip_go_back">Retour</string>
 
+    <!-- Low storage warning -->
+    <string name="storage_alert_channel_name">Alerte d\'espace disque bas</string>
+    <string name="storage_alert_title"> L’espace de stockage devient faible</string>
+    <string name="storage_alert_description"> Simprints nécessite suffisamment d\'espace de stockage libre pour fonctionner correctement. Veuillez libérer de l\'espace pour garantir le bon fonctionnement de l\'application.</string>
+    <string name="storage_alert_settings_action"> Libérer de l\'espace disque</string>
 
 </resources>
