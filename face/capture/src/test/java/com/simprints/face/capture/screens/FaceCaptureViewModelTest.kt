@@ -67,6 +67,7 @@ class FaceCaptureViewModelTest {
     private lateinit var shouldShowInstructionsScreen: ShouldShowInstructionsScreenUseCase
 
     private lateinit var viewModel: FaceCaptureViewModel
+    private lateinit var captureAttemptTracker: CaptureAttemptTracker
 
     private val faceDetections = listOf<FaceDetection>(
         mockk(relaxed = true) {
@@ -81,6 +82,7 @@ class FaceCaptureViewModelTest {
         coEvery { faceImageUseCase.invoke(any(), any()) } returns null
         every { bitmapToByteArrayUseCase.invoke(any()) } returns byteArrayOf()
         every { authStore.signedInProjectId } returns "projectId"
+        captureAttemptTracker = CaptureAttemptTracker()
 
         viewModel = FaceCaptureViewModel(
             authStore,
@@ -95,6 +97,7 @@ class FaceCaptureViewModelTest {
             saveLicenseCheckEvent,
             shouldShowInstructionsScreen,
             "deviceId",
+            captureAttemptTracker,
         )
     }
 
@@ -155,6 +158,76 @@ class FaceCaptureViewModelTest {
 
         assertThat(viewModel.recaptureEvent.getOrAwaitValue()).isNotNull()
         assertThat(viewModel.getSampleDetection()).isNull()
+    }
+
+    @Test
+    fun `Recapture does not increment attempt number, since it is incremented when the next capture starts`() {
+        assertThat(viewModel.attemptNumber).isEqualTo(0)
+
+        viewModel.recapture()
+        assertThat(viewModel.attemptNumber).isEqualTo(0)
+
+        viewModel.recapture()
+        assertThat(viewModel.attemptNumber).isEqualTo(0)
+    }
+
+    @Test
+    fun `onNewCaptureAttemptStarted increments the attempt counter from the second call onwards`() {
+        assertThat(viewModel.attemptNumber).isEqualTo(0)
+
+        captureAttemptTracker.onNewCaptureAttemptStarted()
+        assertThat(viewModel.attemptNumber).isEqualTo(0)
+
+        captureAttemptTracker.onNewCaptureAttemptStarted()
+        assertThat(viewModel.attemptNumber).isEqualTo(1)
+    }
+
+    @Test
+    fun `Attempt number survives ViewModel recreation when the same CaptureAttemptTracker is retained`() {
+        captureAttemptTracker.onNewCaptureAttemptStarted()
+        captureAttemptTracker.onNewCaptureAttemptStarted()
+        captureAttemptTracker.onNewCaptureAttemptStarted()
+        assertThat(viewModel.attemptNumber).isEqualTo(2)
+
+        val restoredViewModel = FaceCaptureViewModel(
+            authStore,
+            configRepository,
+            faceImageUseCase,
+            eventReporter,
+            bitmapToByteArrayUseCase,
+            licenseRepository,
+            mockk {
+                coEvery { this@mockk(any()).initializer } returns faceBioSdkInitializer
+            },
+            saveLicenseCheckEvent,
+            shouldShowInstructionsScreen,
+            "deviceId",
+            captureAttemptTracker,
+        )
+
+        assertThat(restoredViewModel.attemptNumber).isEqualTo(2)
+    }
+
+    @Test
+    fun `Attempt number and init flag reset when a capture step starts for a different SDK`() {
+        val license = "license"
+        coEvery {
+            licenseRepository.getCachedLicense(Vendor.RankOne)
+        } returns License("2133-12-30T17:32:28Z", license, LicenseVersion("1.0"))
+        every { faceBioSdkInitializer.tryInitWithLicense(any(), license) } returns true
+        coJustRun { saveLicenseCheckEvent(any(), any()) }
+
+        viewModel.initFaceBioSdk(mockk(), ModalitySdkType.RANK_ONE)
+        captureAttemptTracker.onNewCaptureAttemptStarted()
+        captureAttemptTracker.onNewCaptureAttemptStarted()
+        captureAttemptTracker.onNewCaptureAttemptStarted()
+        assertThat(viewModel.attemptNumber).isEqualTo(2)
+        assertThat(viewModel.initialised).isTrue()
+
+        // A new capture step is started for a different SDK within the same (Activity-scoped) ViewModel
+        viewModel.initFaceBioSdk(mockk(), ModalitySdkType.SIM_FACE)
+
+        assertThat(viewModel.attemptNumber).isEqualTo(0)
     }
 
     @Test

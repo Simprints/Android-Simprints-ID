@@ -118,7 +118,10 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         // Wait till the views gets its final size then init frame processor and setup the camera
         binding.faceCaptureCamera.post {
             if (view != null) {
-                vm.initCapture(mainVm.bioSDK, mainVm.samplesToCapture, mainVm.attemptNumber)
+                vm.initCapture(
+                    bioSdk = mainVm.bioSDK,
+                    samplesToCapture = mainVm.samplesToCapture,
+                )
             }
         }
 
