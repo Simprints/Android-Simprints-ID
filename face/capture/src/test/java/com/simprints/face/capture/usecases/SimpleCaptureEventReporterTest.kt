@@ -306,7 +306,10 @@ class SimpleCaptureEventReporterTest {
         Timestamp(1L),
     )
 
-    private fun getFace() = Face(
+    private fun getFace(
+        age: Float? = null,
+        gender: Face.Gender? = null,
+    ) = Face(
         100,
         100,
         Rect(0, 0, 0, 0),
@@ -315,5 +318,41 @@ class SimpleCaptureEventReporterTest {
         0f,
         byteArrayOf(),
         "",
+        age,
+        gender,
     )
+
+    @Test
+    fun `Adds capture event with age and gender when available`() = runTest {
+        val detection = getDetection(FaceDetection.Status.VALID).copy(
+            face = getFace(age = 25f, gender = Face.Gender(maleProbability = 0.7f, femaleProbability = 0.3f)),
+        )
+
+        reporter.addCaptureEvents(detection, 1, 0.5f, SpoofCheckConfiguration.DISABLED)
+
+        coVerify {
+            eventRepository.addOrUpdateEvent(
+                match<FaceCaptureEvent> {
+                    it.payload.face?.age == 25f &&
+                        it.payload.face?.gender?.male == 0.7f &&
+                        it.payload.face?.gender?.female == 0.3f
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `Adds capture event with null age and gender when not available`() = runTest {
+        val detection = getDetection(FaceDetection.Status.VALID).copy(face = getFace(age = null, gender = null))
+
+        reporter.addCaptureEvents(detection, 1, 0.5f, SpoofCheckConfiguration.DISABLED)
+
+        coVerify {
+            eventRepository.addOrUpdateEvent(
+                match<FaceCaptureEvent> {
+                    it.payload.face?.age == null && it.payload.face?.gender == null
+                },
+            )
+        }
+    }
 }

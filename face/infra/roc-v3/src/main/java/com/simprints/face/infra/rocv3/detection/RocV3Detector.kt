@@ -3,6 +3,7 @@ package com.simprints.face.infra.rocv3.detection
 import ai.roc.rocsdk.embedded.SWIGTYPE_p_float
 import ai.roc.rocsdk.embedded.SWIGTYPE_p_unsigned_char
 import ai.roc.rocsdk.embedded.roc_detection
+import ai.roc.rocsdk.embedded.roc_embedded_gender
 import ai.roc.rocsdk.embedded.roc_image
 import ai.roc.rocsdk.embedded.roc_landmark
 import android.graphics.Bitmap
@@ -23,7 +24,10 @@ import ai.roc.rocsdk.embedded.roc as roc3
 )
 @Singleton
 class RocV3Detector @Inject constructor() : FaceDetector {
-    override fun analyze(bitmap: Bitmap): Face? {
+    override fun analyze(
+        bitmap: Bitmap,
+        estimateAgeAndGender: Boolean,
+    ): Face? {
         val rocColorImage = roc_image()
         val rocGrayImage = roc_image()
         val byteBuffer = bitmap.toByteBuffer()
@@ -35,7 +39,7 @@ class RocV3Detector @Inject constructor() : FaceDetector {
             rocColorImage,
         )
         roc3.roc_bgr2gray(rocColorImage, rocGrayImage)
-        return detectFace(rocColorImage, rocGrayImage, bitmap.width, bitmap.height)
+        return detectFace(rocColorImage, rocGrayImage, bitmap.width, bitmap.height, estimateAgeAndGender)
     }
 
     /*
@@ -49,11 +53,14 @@ class RocV3Detector @Inject constructor() : FaceDetector {
         grayImage: roc_image,
         width: Int,
         height: Int,
+        estimateAgeAndGender: Boolean,
     ): Face? {
         val detection = roc_detection()
         val template = roc3.new_uint8_t_array(roc3.ROC_FACE_FAST_FV_SIZE.toInt())
         val yaw = roc3.new_float()
         val quality = roc3.new_float()
+        val age = if (estimateAgeAndGender) roc3.new_float() else null
+        val gender = if (estimateAgeAndGender) roc_embedded_gender() else null
         val face = if (isFaceDetected(coloredImage, detection)) {
             generateFaceTemplateFromImage(
                 coloredImage,
@@ -62,9 +69,12 @@ class RocV3Detector @Inject constructor() : FaceDetector {
                 yaw,
                 template,
                 quality,
+                age,
+                gender,
             )
             val yawValue = roc3.float_value(yaw)
             val qualityValue = roc3.float_value(quality)
+            val ageValue = age?.let { roc3.float_value(it) }
             Face(
                 sourceWidth = width,
                 sourceHeight = height,
@@ -74,6 +84,13 @@ class RocV3Detector @Inject constructor() : FaceDetector {
                 quality = qualityValue,
                 template = roc3.cdata(roc3.roc_cast(template), roc3.ROC_FACE_FAST_FV_SIZE.toInt()),
                 format = RANK_ONE_TEMPLATE_FORMAT_3_1,
+                age = ageValue,
+                gender = gender?.let {
+                    Face.Gender(
+                        maleProbability = it.male,
+                        femaleProbability = it.female,
+                    )
+                },
             )
         } else {
             null
@@ -83,6 +100,8 @@ class RocV3Detector @Inject constructor() : FaceDetector {
         roc3.roc_free_image(coloredImage)
         roc3.delete_float(yaw)
         roc3.delete_float(quality)
+        age?.let { roc3.delete_float(it) }
+        gender?.delete()
         roc3.delete_uint8_t_array(template)
         detection.delete()
         return face
@@ -95,6 +114,8 @@ class RocV3Detector @Inject constructor() : FaceDetector {
         yaw: SWIGTYPE_p_float,
         template: SWIGTYPE_p_unsigned_char,
         quality: SWIGTYPE_p_float,
+        age: SWIGTYPE_p_float?,
+        gender: roc_embedded_gender?,
     ) {
         val landmarks = roc3.new_roc_landmark_array(roc3.roc_num_landmarks_for_pose(detection.pose))
         val rightEye = roc_landmark()
@@ -120,9 +141,9 @@ class RocV3Detector @Inject constructor() : FaceDetector {
             chin,
             template,
             quality,
+            age,
             null,
-            null,
-            null,
+            gender,
             null,
             null,
             null,

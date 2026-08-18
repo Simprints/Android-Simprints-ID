@@ -47,6 +47,15 @@ internal data class ApiFaceCapturePayload(
         val format: String,
         val spoofScore: Float? = null,
         val spoofSkipReason: ApiSpoofSkipReason? = null,
+        val age: Float? = null,
+        val gender: ApiGender? = null,
+    )
+
+    @Keep
+    @Serializable
+    data class ApiGender(
+        val male: Float,
+        val female: Float,
     )
 
     @Keep
@@ -80,6 +89,13 @@ internal fun FaceCapturePayload.Face.fromDomainToApi() = ApiFace(
     format = format,
     spoofScore = spoofScore,
     spoofSkipReason = spoofSkipReason?.fromDomainToApi(),
+    age = age,
+    gender = gender?.fromDomainToApi(),
+)
+
+internal fun FaceCapturePayload.Gender.fromDomainToApi() = ApiFaceCapturePayload.ApiGender(
+    male = male,
+    female = female,
 )
 
 internal fun FaceCapturePayload.Result.fromDomainToApi() = when (this) {

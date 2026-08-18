@@ -14,6 +14,8 @@ import android.graphics.RectF
  * @property quality image quality
  * @property template
  * @property format
+ * @property age estimated age of the person, if available from the template extraction
+ * @property gender estimated gender probabilities of the person, if available from the template extraction
  *
  */
 data class Face(
@@ -25,6 +27,8 @@ data class Face(
     val quality: Float,
     val template: ByteArray,
     val format: String,
+    val age: Float? = null,
+    val gender: Gender? = null,
 ) {
     // Relative = coordinates are fractions of the source image dimensions
     val relativeBoundingBox
@@ -34,4 +38,9 @@ data class Face(
             absoluteBoundingBox.right.toFloat() / sourceWidth,
             absoluteBoundingBox.bottom.toFloat() / sourceHeight,
         )
+
+    data class Gender(
+        val maleProbability: Float,
+        val femaleProbability: Float,
+    )
 }

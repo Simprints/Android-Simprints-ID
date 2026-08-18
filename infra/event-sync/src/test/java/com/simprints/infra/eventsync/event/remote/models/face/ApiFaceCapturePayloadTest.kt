@@ -73,6 +73,8 @@ class ApiFaceCapturePayloadTest {
                 format = FACE_TEMPLATE_FORMAT,
                 spoofScore = 0.5f,
                 spoofSkipReason = FaceCaptureEvent.FaceCapturePayload.SpoofSkipReason.IOD_TOO_SMALL,
+                age = 25f,
+                gender = FaceCaptureEvent.FaceCapturePayload.Gender(male = 0.6f, female = 0.4f),
             ).fromDomainToApi()
         assertThat(face).isInstanceOf(ApiFaceCapturePayload.ApiFace::class.java)
         assertThat(face.format).isEqualTo(FACE_TEMPLATE_FORMAT)
@@ -81,5 +83,7 @@ class ApiFaceCapturePayloadTest {
         assertThat(face.quality).isEqualTo(3.0f)
         assertThat(face.spoofScore).isEqualTo(0.5f)
         assertThat(face.spoofSkipReason).isEqualTo(ApiFaceCapturePayload.ApiSpoofSkipReason.IOD_TOO_SMALL)
+        assertThat(face.age).isEqualTo(25f)
+        assertThat(face.gender).isEqualTo(ApiFaceCapturePayload.ApiGender(male = 0.6f, female = 0.4f))
     }
 }

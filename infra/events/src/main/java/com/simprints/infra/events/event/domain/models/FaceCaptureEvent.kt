@@ -75,6 +75,15 @@ data class FaceCaptureEvent(
             val format: String,
             val spoofScore: Float? = null,
             val spoofSkipReason: SpoofSkipReason? = null,
+            val age: Float? = null,
+            val gender: Gender? = null,
+        )
+
+        @Keep
+        @Serializable
+        data class Gender(
+            val male: Float,
+            val female: Float,
         )
 
         @Keep

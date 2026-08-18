@@ -10,6 +10,7 @@ import io.rankone.rocsdk.embedded.SWIGTYPE_p_float
 import io.rankone.rocsdk.embedded.SWIGTYPE_p_unsigned_char
 import io.rankone.rocsdk.embedded.roc
 import io.rankone.rocsdk.embedded.roc_detection
+import io.rankone.rocsdk.embedded.roc_embedded_gender
 import io.rankone.rocsdk.embedded.roc_embedded_landmark
 import io.rankone.rocsdk.embedded.roc_image
 import java.nio.ByteBuffer
@@ -38,12 +39,16 @@ class RocV1Detector @Inject constructor() : FaceDetector {
         var template: SWIGTYPE_p_unsigned_char,
         var yaw: SWIGTYPE_p_float,
         var quality: SWIGTYPE_p_float,
+        var age: SWIGTYPE_p_float?,
+        var gender: roc_embedded_gender?,
     ) {
         fun cleanup() {
             face.delete()
             roc.delete_uint8_t_array(template)
             roc.delete_float(yaw)
             roc.delete_float(quality)
+            age?.let { roc.delete_float(it) }
+            gender?.delete()
         }
     }
 
@@ -52,7 +57,10 @@ class RocV1Detector @Inject constructor() : FaceDetector {
         configuredMaxSize: Int,
     ) = SpoofCheckResult(0f, SpoofCheckResult.SkipReason.NOT_AVAILABLE)
 
-    override fun analyze(bitmap: Bitmap): Face? {
+    override fun analyze(
+        bitmap: Bitmap,
+        estimateAgeAndGender: Boolean,
+    ): Face? {
         val rocColorImage = roc_image()
         val rocGrayImage = roc_image()
 
@@ -70,7 +78,7 @@ class RocV1Detector @Inject constructor() : FaceDetector {
 
         roc.roc_free_image(rocColorImage)
 
-        return analyze(rocGrayImage, bitmap.width, bitmap.height)
+        return analyze(rocGrayImage, bitmap.width, bitmap.height, estimateAgeAndGender)
     }
 
     /**
@@ -80,12 +88,15 @@ class RocV1Detector @Inject constructor() : FaceDetector {
         rocImage: roc_image,
         imageWidth: Int,
         imageHeight: Int,
+        estimateAgeAndGender: Boolean,
     ): Face? {
         val rocFace = ROCFace(
             roc_detection(),
             roc.new_uint8_t_array(roc.ROC_FAST_FV_SIZE.toInt()),
             roc.new_float(),
             roc.new_float(),
+            if (estimateAgeAndGender) roc.new_float() else null,
+            if (estimateAgeAndGender) roc_embedded_gender() else null,
         )
 
         val faceDetected = getRocTemplateFromImage(rocImage, rocFace)
@@ -99,6 +110,8 @@ class RocV1Detector @Inject constructor() : FaceDetector {
         val yawValue = roc.float_value(rocFace.yaw)
 
         val qualityValue = roc.float_value(rocFace.quality)
+
+        val ageValue = rocFace.age?.let { roc.float_value(it) }
 
         val face = Face(
             imageWidth,
@@ -114,6 +127,13 @@ class RocV1Detector @Inject constructor() : FaceDetector {
             qualityValue,
             roc.cdata(roc.roc_cast(rocFace.template), roc.ROC_FAST_FV_SIZE.toInt()),
             RANK_ONE_TEMPLATE_FORMAT_1_23,
+            age = ageValue,
+            gender = rocFace.gender?.let {
+                Face.Gender(
+                    maleProbability = it.male,
+                    femaleProbability = it.female,
+                )
+            },
         )
 
         // Free all resources after getting the face
@@ -188,9 +208,9 @@ class RocV1Detector @Inject constructor() : FaceDetector {
                     chin,
                     rocFace.template,
                     rocFace.quality,
+                    rocFace.age,
                     null,
-                    null,
-                    null,
+                    rocFace.gender,
                     null,
                     null,
                     null,

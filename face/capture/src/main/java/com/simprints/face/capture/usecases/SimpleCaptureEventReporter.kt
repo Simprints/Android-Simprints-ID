@@ -118,6 +118,13 @@ internal class SimpleCaptureEventReporter @Inject constructor(
             format = it.format,
             spoofScore = faceDetection.spoofCheckResult?.score,
             spoofSkipReason = mapSpoofReason(faceDetection.spoofCheckResult?.skipReason),
+            age = it.age,
+            gender = it.gender?.let { gender ->
+                FaceCapturePayload.Gender(
+                    male = gender.maleProbability,
+                    female = gender.femaleProbability,
+                )
+            },
         )
     }
 

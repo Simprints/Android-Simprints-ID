@@ -11,7 +11,14 @@ import javax.inject.Inject
 class SimFaceDetector @Inject constructor(
     private val simFace: SimFace,
 ) : FaceDetector {
-    override fun analyze(bitmap: Bitmap): Face? = runBlocking {
+    // Overload preserving source compatibility with the previous 1-arg API for direct callers
+    // of this concrete type (the interface already defaults `estimateAgeAndGender` to false).
+    fun analyze(bitmap: Bitmap): Face? = analyze(bitmap, estimateAgeAndGender = false)
+
+    override fun analyze(
+        bitmap: Bitmap,
+        estimateAgeAndGender: Boolean,
+    ): Face? = runBlocking {
         // Load a bitmap image for processing
         val faces = simFace.detectFaceBlocking(bitmap)
         val face = faces.getOrNull(0) ?: return@runBlocking null
