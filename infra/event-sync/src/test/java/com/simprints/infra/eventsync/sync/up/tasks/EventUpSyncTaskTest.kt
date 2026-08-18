@@ -45,6 +45,7 @@ import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.SerializationException
@@ -435,6 +436,83 @@ internal class EventUpSyncTaskTest {
         eventUpSyncTask.upSync(operation, eventScope).toList()
 
         coVerify(exactly = 0) { eventRepo.deleteEventScope(any()) }
+    }
+
+    @Test
+    fun `when upload fails due to network issue should stop retrying instead of looping indefinitely`() = runTest {
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+
+        // Scopes remain closed forever since the failed upload is never deleted,
+        // simulating a device that stays offline.
+        coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.SESSION) } returns 1
+        coEvery { eventRepo.getClosedEventScopes(any(), any()) } returns emptyList()
+        coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION, any()) } returns listOf(
+            createSessionScope(GUID1),
+        )
+        coEvery {
+            eventRepo.getEventsFromScope(GUID1)
+        } returns listOf(createEventWithSessionId(GUID1, GUID1))
+
+        coEvery {
+            eventRemoteDataSource.post(any(), any(), any())
+        } throws NetworkConnectionException(
+            cause = Exception(),
+        )
+
+        eventUpSyncTask.upSync(operation, eventScope).toList()
+
+        // Only a single attempt (and a single failure event) should be recorded per sync run,
+        // instead of spinning in a tight loop and logging duplicate events while offline.
+        coVerify(exactly = 1) { eventRemoteDataSource.post(any(), any(), any()) }
+        coVerify(exactly = 1) { eventRepo.addOrUpdateEvent(eventScope, any<EventUpSyncRequestEvent>()) }
+    }
+
+    @Test
+    fun `when upload is cancelled it should rethrow instead of treating it as a failed request`() = runTest {
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+
+        coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.SESSION) } returns 1
+        coEvery { eventRepo.getClosedEventScopes(any(), any()) } returns emptyList()
+        coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION, any()) } returns listOf(
+            createSessionScope(GUID1),
+        )
+        coEvery {
+            eventRepo.getEventsFromScope(GUID1)
+        } returns listOf(createEventWithSessionId(GUID1, GUID1))
+
+        coEvery {
+            eventRemoteDataSource.post(any(), any(), any())
+        } throws CancellationException("Upload was cancelled")
+
+        eventUpSyncTask.upSync(operation, eventScope).toList()
+
+        // The exception should propagate straight out of the request try/catch
+        coVerify(exactly = 0) { eventRepo.deleteEventScopes(any()) }
+        coVerify(exactly = 0) { eventRepo.addOrUpdateEvent(eventScope, any<EventUpSyncRequestEvent>()) }
+    }
+
+    @Test
+    fun `when upload is cancelled it should stop uploading remaining scope types`() = runTest {
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+
+        coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.SESSION) } returns 1
+        coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.UP_SYNC) } returns 1
+        coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.DOWN_SYNC) } returns 1
+        coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.SAMPLE_UP_SYNC) } returns 1
+        coEvery { eventRepo.getClosedEventScopes(any(), any()) } returns listOf(createSessionScope(GUID1))
+        coEvery {
+            eventRepo.getEventsFromScope(GUID1)
+        } returns listOf(createEventWithSessionId(GUID1, GUID1))
+
+        coEvery {
+            eventRemoteDataSource.post(any(), any(), any())
+        } throws CancellationException("Upload was cancelled")
+
+        eventUpSyncTask.upSync(operation, eventScope).toList()
+
+        // Cancellation aborts the whole upSync flow immediately, so only the first
+        // scope type attempted its (single) request before the rest were abandoned.
+        coVerify(exactly = 1) { eventRemoteDataSource.post(any(), any(), any()) }
     }
 
     @Test
