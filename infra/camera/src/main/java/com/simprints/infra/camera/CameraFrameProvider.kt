@@ -22,6 +22,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.simprints.core.DispatcherBG
 import com.simprints.core.DispatcherMain
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.tools.extensions.clone
 import com.simprints.infra.camera.helpers.CameraFocusHelper
 import com.simprints.infra.camera.helpers.FrameEmissionHelper
 import com.simprints.infra.camera.usecase.FramePreProcessUseCase
@@ -221,7 +222,12 @@ class CameraFrameProvider @Inject internal constructor(
             targetRect = targetRect,
         )
         displayInjectedImage(frame)
-        frames.tryEmit(frame)
+        if (frame.isInjected) {
+            // Clone injected frames so callers can recycle the bitmap without affecting the preview overlay.
+            frames.tryEmit(frame.copy(bitmap = frame.bitmap.clone()))
+        } else {
+            frames.tryEmit(frame)
+        }
     }
 
     private fun displayInjectedImage(frame: Frame) {
