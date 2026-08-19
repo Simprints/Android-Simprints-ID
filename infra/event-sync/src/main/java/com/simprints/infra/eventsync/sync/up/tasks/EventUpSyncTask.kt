@@ -42,6 +42,7 @@ import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.infra.serialization.SimJson
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -226,6 +227,7 @@ internal class EventUpSyncTask @Inject constructor(
                 .let(eventFilter)
                 .map { (scope, events) -> mapDomainEventScopeToApiUseCase(scope, events.orEmpty(), project) }
             val uploadedScopes = mutableListOf<String>()
+            var isNetworkUnavailable = false
 
             scopesToUpload.takeIf { it.isNotEmpty() }?.apply {
                 val requestId = UUID.randomUUID().toString()
@@ -245,13 +247,23 @@ internal class EventUpSyncTask @Inject constructor(
                         content = createUpSyncContent(this.size),
                     )
                     uploadedScopes.addAll(this.map { it.id })
+                } catch (ex: CancellationException) {
+                    throw ex
                 } catch (ex: Exception) {
+                    isNetworkUnavailable = ex is NetworkConnectionException
                     handleFailedRequest(requestId, ex, eventScope, requestStartTime)
                 }
             }
 
-            Simber.d("Deleting ${uploadedScopes.size} session scopes", tag = SYNC)
+            Simber.d("Deleting ${uploadedScopes.size} $eventScopeTypeToUpload scopes", tag = SYNC)
             eventRepository.deleteEventScopes(uploadedScopes)
+
+            // Without connectivity the upload will keep failing immediately on every iteration,
+            // spinning the loop indefinitely and logging a new failure event each time. Stop
+            // retrying this scope type until the next scheduled sync attempt instead.
+            if (isNetworkUnavailable) {
+                break
+            }
         }
     }
 
