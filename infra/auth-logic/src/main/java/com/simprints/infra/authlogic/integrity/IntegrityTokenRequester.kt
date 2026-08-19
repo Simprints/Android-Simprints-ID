@@ -23,6 +23,8 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 
 internal class IntegrityTokenRequester @Inject constructor(
@@ -47,13 +49,23 @@ internal class IntegrityTokenRequester @Inject constructor(
                             .setCloudProjectNumber(BuildConfig.CLOUD_PROJECT_ID.toLong())
                             .build(),
                     ),
+                    TOKEN_TIMEOUT_SECONDS,
+                    TimeUnit.SECONDS,
                 ).token()
+        } catch (e: TimeoutException) {
+            Simber.e("Integrity token request timed out after ${TOKEN_TIMEOUT_SECONDS}s", e, tag = LOGIN)
+            throw IntegrityServiceTemporaryDown(TOKEN_TIMEOUT_ERROR_CODE)
         } catch (integrityServiceException: IntegrityServiceException) {
             Simber.e("Integrity token request failed", integrityServiceException, tag = LOGIN)
             throw mapException(
                 integrityServiceException,
             )
         }
+    }
+
+    companion object {
+        private const val TOKEN_TIMEOUT_SECONDS = 10L
+        internal const val TOKEN_TIMEOUT_ERROR_CODE = -1
     }
 
     private fun mapException(integrityServiceException: IntegrityServiceException): Throwable =
