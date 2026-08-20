@@ -13,6 +13,7 @@ import com.google.android.play.core.integrity.model.IntegrityErrorCode.NETWORK_E
 import com.google.android.play.core.integrity.model.IntegrityErrorCode.PLAY_STORE_NOT_FOUND
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.authlogic.BuildConfig
+import com.simprints.infra.authlogic.integrity.IntegrityTokenRequester.Companion.TOKEN_TIMEOUT_ERROR_CODE
 import com.simprints.infra.authlogic.integrity.exceptions.IntegrityServiceTemporaryDown
 import com.simprints.infra.authlogic.integrity.exceptions.MissingOrOutdatedGooglePlayStoreApp
 import com.simprints.infra.authlogic.integrity.exceptions.RequestingIntegrityTokenException
@@ -28,6 +29,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.TimeoutException
 
 @RunWith(AndroidJUnit4::class)
 class IntegrityTokenRequesterTest {
@@ -48,7 +50,7 @@ class IntegrityTokenRequesterTest {
     @Before
     fun setup() {
         mockkStatic(Tasks::class)
-        every { Tasks.await(integrityTokenResponseTask) } returns integrityTokenResponse
+        every { Tasks.await(integrityTokenResponseTask, any<Long>(), any()) } returns integrityTokenResponse
     }
 
     @Test
@@ -145,5 +147,24 @@ class IntegrityTokenRequesterTest {
         val exception = assertThrows<NetworkConnectionException> {
             integrityTokenRequester.getToken(NONCE)
         }
+    }
+
+    @Test
+    fun `should throw IntegrityServiceTemporaryDown when token delivery times out`() = runTest {
+        every {
+            integrityManager.requestIntegrityToken(
+                IntegrityTokenRequest
+                    .builder()
+                    .setNonce(NONCE)
+                    .setCloudProjectNumber(BuildConfig.CLOUD_PROJECT_ID.toLong())
+                    .build(),
+            )
+        } returns integrityTokenResponseTask
+        every { Tasks.await(integrityTokenResponseTask, any<Long>(), any()) } throws TimeoutException()
+
+        val exception = assertThrows<IntegrityServiceTemporaryDown> {
+            integrityTokenRequester.getToken(NONCE)
+        }
+        assertThat(exception.errorCode).isEqualTo(TOKEN_TIMEOUT_ERROR_CODE)
     }
 }
