@@ -27,6 +27,7 @@ dependencies {
     api(libs.testing.truth)
     api(libs.testing.robolectric.core)
     api(libs.testing.coroutines)
+    api(libs.testing.turbine)
 
     api(libs.testing.espresso.core)
     api(libs.testing.espresso.intents)

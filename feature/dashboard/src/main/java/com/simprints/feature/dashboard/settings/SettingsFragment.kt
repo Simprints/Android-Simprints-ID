@@ -19,8 +19,8 @@ import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.dashboard.DashboardActivity
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsBinding
-import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
 import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.password.SettingsPasswordDialogFragment
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
