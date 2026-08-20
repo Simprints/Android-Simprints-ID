@@ -246,6 +246,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                         }
                     } catch (e: CancellationException) {
                         Simber.e("Image analysis cancelled", e, tag = FACE_CAPTURE)
+                        throw e
                     } catch (t: Throwable) {
                         Simber.e("Image analysis crashed", t, tag = FACE_CAPTURE)
                         // submitError updates LiveData, so ensure it happens on the main thread
