@@ -41,6 +41,7 @@ import com.simprints.infra.uibase.view.awaitLayout
 import com.simprints.infra.uibase.view.setCheckedWithLeftDrawable
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -243,6 +244,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                             val cropped = frameCropToTargetUseCase(frame)
                             vm.process(originalBitmap = frame.bitmap, croppedBitmap = cropped)
                         }
+                    } catch (e: CancellationException) {
+                        Simber.e("Image analysis cancelled", e, tag = FACE_CAPTURE)
+                        throw e
                     } catch (t: Throwable) {
                         Simber.e("Image analysis crashed", t, tag = FACE_CAPTURE)
                         // submitError updates LiveData, so ensure it happens on the main thread
