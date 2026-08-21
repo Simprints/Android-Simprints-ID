@@ -8,6 +8,7 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.face.capture.screens.CaptureAttemptTracker
 import com.simprints.face.capture.usecases.GetSpoofCheckConfigurationUseCase
 import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
@@ -77,6 +78,8 @@ internal class LiveFeedbackViewModelTest {
 
     private lateinit var viewModel: LiveFeedbackViewModel
 
+    private val testCaptureAttemptTracker = CaptureAttemptTracker()
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
@@ -103,6 +106,7 @@ internal class LiveFeedbackViewModelTest {
             timeHelper,
             isUsingAutoCapture,
             getSpoofCheckConfiguration,
+            testCaptureAttemptTracker,
             testCoroutineRule.testCoroutineDispatcher,
         )
     }
@@ -162,7 +166,7 @@ internal class LiveFeedbackViewModelTest {
         every { faceDetector.analyze(frame) } returns getFace()
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
         viewModel.process(frame, frame)
 
         with(viewModel.state.value) {
@@ -178,7 +182,7 @@ internal class LiveFeedbackViewModelTest {
         every { faceDetector.analyze(frame) } returns getFace()
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2)
         viewModel.process(frame, frame)
         viewModel.startCapture()
         viewModel.process(frame, frame)
@@ -204,7 +208,7 @@ internal class LiveFeedbackViewModelTest {
         val states = collectStates()
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2)
         repeat(6) { viewModel.process(frame, frame) }
 
         val feedbacks = states.map { it.feedback }
@@ -230,7 +234,7 @@ internal class LiveFeedbackViewModelTest {
         val states = collectStates()
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2)
         repeat(5) { viewModel.process(frame, frame) }
 
         val feedbacks = states.map { it.feedback }
@@ -248,7 +252,7 @@ internal class LiveFeedbackViewModelTest {
         every { faceDetector.analyze(frame) } returns getFace()
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2)
         viewModel.startCapture()
         viewModel.process(frame, frame)
 
@@ -262,7 +266,7 @@ internal class LiveFeedbackViewModelTest {
         val states = collectStates()
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2)
         viewModel.process(frame, frame)
         viewModel.startCapture()
         viewModel.process(frame, frame)
@@ -288,7 +292,7 @@ internal class LiveFeedbackViewModelTest {
         every { faceDetector.analyze(frame) } returns getFace()
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
         viewModel.process(frame, frame)
 
         assertThat(viewModel.state.value.phase).isEqualTo(LiveFeedbackState.Phase.NOT_STARTED)
@@ -302,7 +306,7 @@ internal class LiveFeedbackViewModelTest {
         every { faceDetector.analyze(frame) } returns getFace()
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
         viewModel.startCapture()
         viewModel.holdOffAutoCapture()
         viewModel.process(frame, frame)
@@ -317,7 +321,7 @@ internal class LiveFeedbackViewModelTest {
         val states = collectStates()
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
         viewModel.startCapture()
         viewModel.process(frame, frame)
 
@@ -347,7 +351,7 @@ internal class LiveFeedbackViewModelTest {
         val states = collectStates()
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
         viewModel.startCapture()
         repeat(6) {
             viewModel.process(frame, frame)
@@ -380,7 +384,7 @@ internal class LiveFeedbackViewModelTest {
         val states = collectStates()
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2)
         viewModel.startCapture()
         repeat(7) {
             viewModel.process(frame, frame)
@@ -400,7 +404,7 @@ internal class LiveFeedbackViewModelTest {
         val states = collectStates()
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
         viewModel.process(frame, frame)
         viewModel.startCapture()
         viewModel.process(frame, frame)
@@ -418,7 +422,7 @@ internal class LiveFeedbackViewModelTest {
         coEvery { faceDetector.spoofCheck(any(), any()) } returns SpoofCheckResult(score = 0.1f)
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
         viewModel.process(frame, frame)
         viewModel.startCapture()
         viewModel.process(frame, frame)
@@ -435,7 +439,7 @@ internal class LiveFeedbackViewModelTest {
         val states = collectStates()
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
         viewModel.process(frame, frame)
         viewModel.startCapture()
         viewModel.process(frame, frame)
@@ -454,7 +458,7 @@ internal class LiveFeedbackViewModelTest {
         coEvery { faceDetector.spoofCheck(any(), any()) } returns SpoofCheckResult(score = 0.9f)
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
 
         // Attempt 1
         viewModel.process(frame, frame)
@@ -472,6 +476,34 @@ internal class LiveFeedbackViewModelTest {
     }
 
     @Test
+    fun `spoof ENFORCED failing retry reports an incrementing attempt number`() = runTest {
+        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns spoofConfig(FaceConfiguration.SpoofCheckMode.ENFORCED)
+        every { faceDetector.analyze(frame) } returns getFace()
+        coEvery { faceDetector.spoofCheck(any(), any()) } returns SpoofCheckResult(score = 0.9f)
+        val attemptNumbers = mutableListOf<Int>()
+        coEvery {
+            eventReporter.addCaptureEvents(any(), capture(attemptNumbers), any(), any(), any())
+        } just runs
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+
+        // Attempt 0 fails spoof check
+        viewModel.process(frame, frame)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+        advanceUntilIdle()
+
+        // Attempt 1 (retry) reaches maxAttempts and finishes
+        viewModel.process(frame, frame)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+        advanceUntilIdle()
+
+        assertThat(attemptNumbers).containsAtLeast(0, 1)
+    }
+
+    @Test
     fun `frames are skipped while validating and progress uses the validation tint`() = runTest {
         every { getSpoofCheckConfiguration.invoke(any(), any()) } returns spoofConfig()
         every { faceDetector.analyze(frame) } returns getFace()
@@ -484,7 +516,7 @@ internal class LiveFeedbackViewModelTest {
         }
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
         viewModel.startCapture()
         viewModel.process(frame, frame)
         advanceUntilIdle()
@@ -497,7 +529,7 @@ internal class LiveFeedbackViewModelTest {
         every { faceDetector.analyze(frame) } returns getFace()
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
         viewModel.process(frame, frame)
         viewModel.process(frame, frame)
         viewModel.process(frame, frame)
@@ -512,7 +544,7 @@ internal class LiveFeedbackViewModelTest {
         every { faceDetector.analyze(frame) } returns getFace()
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
         viewModel.process(frame, frame) // fallback frame before start
         viewModel.startCapture()
         viewModel.process(frame, frame) // captured sample
@@ -529,7 +561,7 @@ internal class LiveFeedbackViewModelTest {
         every { faceDetector.analyze(any(), estimateAgeAndGender = true) } returns null
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2)
         viewModel.process(frame, frame) // fallback frame before start
         viewModel.startCapture()
         viewModel.process(frame, frame)
@@ -555,7 +587,7 @@ internal class LiveFeedbackViewModelTest {
         every { faceDetector.analyze(any(), estimateAgeAndGender = true) } returns enrichedFace
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.RANK_ONE, 1, 0)
+        viewModel.initCapture(ModalitySdkType.RANK_ONE, 1)
         viewModel.process(frame, frame) // fallback frame before start
         viewModel.startCapture()
         viewModel.process(frame, frame) // captured sample -> finishes
@@ -577,7 +609,7 @@ internal class LiveFeedbackViewModelTest {
         coEvery { faceDetector.spoofCheck(any(), any()) } returns SpoofCheckResult(score = 0.9f) // always fails
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
 
         // Attempt 1 fails and gets discarded.
         viewModel.process(frame, frame)
@@ -607,7 +639,7 @@ internal class LiveFeedbackViewModelTest {
         )
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
         viewModel.process(frame, frame) // fallback frame
         viewModel.startCapture()
         viewModel.process(frame, frame) // invalid capture -> finishes
@@ -627,7 +659,7 @@ internal class LiveFeedbackViewModelTest {
         every { faceDetector.analyze(frame) } returns getFace()
 
         viewModel.initAutoCapture()
-        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1, 0)
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
         viewModel.process(frame, frame) // pre-start fallback frame (held off)
         viewModel.startCapture()
         viewModel.process(frame, frame) // begins imaging

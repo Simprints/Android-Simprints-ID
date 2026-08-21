@@ -10,6 +10,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.models.FaceTarget
 import com.simprints.face.capture.models.SymmetricTarget
+import com.simprints.face.capture.screens.CaptureAttemptTracker
 import com.simprints.face.capture.usecases.GetSpoofCheckConfigurationUseCase
 import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
@@ -50,9 +51,9 @@ internal class LiveFeedbackViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     private val isUsingAutoCaptureUseCase: IsUsingAutoCaptureUseCase,
     private val getSpoofCheckConfiguration: GetSpoofCheckConfigurationUseCase,
+    private val captureAttemptTracker: CaptureAttemptTracker,
     @param:DispatcherBG private val bgDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
-    private var attemptNumber: Int = 1
     private var samplesToCapture: Int = 1
     private var qualityThreshold: Float = 0f
 
@@ -153,11 +154,9 @@ internal class LiveFeedbackViewModel @Inject constructor(
     fun initCapture(
         bioSdk: ModalitySdkType,
         samplesToCapture: Int,
-        attemptNumber: Int,
     ) {
         Simber.i("Initialise face detection", tag = FACE_CAPTURE)
         this.samplesToCapture = samplesToCapture
-        this.attemptNumber = attemptNumber
         viewModelScope.launch {
             faceDetector = resolveFaceBioSdk(bioSdk).detector
 
@@ -179,6 +178,8 @@ internal class LiveFeedbackViewModel @Inject constructor(
     }
 
     fun startCapture() {
+        // Single path for every new capture attempt
+        captureAttemptTracker.onNewCaptureAttemptStarted()
         if (isAutoCapture) {
             isAutoCaptureHeldOff = false
         } else {
@@ -223,7 +224,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
                     captureImagingStartTime = captureStartTime.ms
                     autoCaptureImagingTimeoutJob = viewModelScope.launch {
                         delay(autoCaptureImagingDurationMillis)
-                        finishCapture(attemptNumber)
+                        finishCapture(captureAttemptTracker.attemptNumber)
                     }
                 }
             }
@@ -248,7 +249,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
                 } else {
                     userCaptures.add(faceDetection)
                     if (userCaptures.size == samplesToCapture) {
-                        finishCapture(attemptNumber)
+                        finishCapture(captureAttemptTracker.attemptNumber)
                     }
                 }
             }
@@ -382,7 +383,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
         emit(phase = LiveFeedbackState.Phase.VALIDATION_FAILED)
         val duration = measureTimedValue {
             // Still track the capture attempt events for analytics and troubleshooting
-            sendCaptureEvents(attemptNumber)
+            sendCaptureEvents(captureAttemptTracker.attemptNumber)
 
             userCaptures.forEach {
                 it.original.recycle()

@@ -55,9 +55,10 @@ internal class FaceCaptureViewModel @Inject constructor(
     private val saveLicenseCheckEvent: SaveLicenseCheckEventUseCase,
     private val shouldShowInstructions: ShouldShowInstructionsScreenUseCase,
     @param:DeviceID private val deviceID: String,
+    private val captureAttemptTracker: CaptureAttemptTracker,
 ) : ViewModel() {
-    // Updated in live feedback screen
-    var attemptNumber: Int = 0
+    val attemptNumber: Int
+        get() = captureAttemptTracker.attemptNumber
     var samplesToCapture = 1
     var initialised = false
     lateinit var bioSDK: ModalitySdkType
@@ -92,6 +93,10 @@ internal class FaceCaptureViewModel @Inject constructor(
         activity: Activity,
         sdk: ModalitySdkType,
     ) = viewModelScope.launch {
+        if (::bioSDK.isInitialized && bioSDK != sdk) {
+            resetForNewCaptureStep()
+        }
+
         if (initialised) {
             Simber.i("Face bio SDK already initialised", tag = FACE_CAPTURE)
             return@launch
@@ -209,6 +214,16 @@ internal class FaceCaptureViewModel @Inject constructor(
         Simber.i("Starting face recapture flow", tag = FACE_CAPTURE)
         faceDetections = listOf()
         _recaptureEvent.send()
+    }
+
+    /**
+     * Resets the state that is scoped to a single capture step
+     **/
+    private fun resetForNewCaptureStep() {
+        Simber.i("Resetting face capture state for a new capture step", tag = FACE_CAPTURE)
+        captureAttemptTracker.reset()
+        initialised = false
+        faceDetections = emptyList()
     }
 
     private fun saveFaceDetections() {
