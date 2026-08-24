@@ -176,6 +176,11 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         Simber.i("Camera setup finished", tag = FACE_CAPTURE)
     }
 
+    override fun onPause() {
+        vm.holdOffAutoCapture()
+        super.onPause()
+    }
+
     override fun onResume() {
         super.onResume()
         vm.onScreenResumed(requireActivity().getCurrentPermissionStatus(Manifest.permission.CAMERA))
