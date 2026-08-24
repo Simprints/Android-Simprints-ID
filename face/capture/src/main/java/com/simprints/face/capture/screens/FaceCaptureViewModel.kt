@@ -57,8 +57,6 @@ internal class FaceCaptureViewModel @Inject constructor(
     @param:DeviceID private val deviceID: String,
     private val captureAttemptTracker: CaptureAttemptTracker,
 ) : ViewModel() {
-    val attemptNumber: Int
-        get() = captureAttemptTracker.attemptNumber
     var samplesToCapture = 1
     var initialised = false
     lateinit var bioSDK: ModalitySdkType

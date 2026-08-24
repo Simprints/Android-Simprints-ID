@@ -162,24 +162,24 @@ class FaceCaptureViewModelTest {
 
     @Test
     fun `Recapture does not increment attempt number, since it is incremented when the next capture starts`() {
-        assertThat(viewModel.attemptNumber).isEqualTo(0)
+        assertThat(captureAttemptTracker.attemptNumber).isEqualTo(0)
 
         viewModel.recapture()
-        assertThat(viewModel.attemptNumber).isEqualTo(0)
+        assertThat(captureAttemptTracker.attemptNumber).isEqualTo(0)
 
         viewModel.recapture()
-        assertThat(viewModel.attemptNumber).isEqualTo(0)
+        assertThat(captureAttemptTracker.attemptNumber).isEqualTo(0)
     }
 
     @Test
     fun `onNewCaptureAttemptStarted increments the attempt counter from the second call onwards`() {
-        assertThat(viewModel.attemptNumber).isEqualTo(0)
+        assertThat(captureAttemptTracker.attemptNumber).isEqualTo(0)
 
         captureAttemptTracker.onNewCaptureAttemptStarted()
-        assertThat(viewModel.attemptNumber).isEqualTo(0)
+        assertThat(captureAttemptTracker.attemptNumber).isEqualTo(0)
 
         captureAttemptTracker.onNewCaptureAttemptStarted()
-        assertThat(viewModel.attemptNumber).isEqualTo(1)
+        assertThat(captureAttemptTracker.attemptNumber).isEqualTo(1)
     }
 
     @Test
@@ -187,7 +187,7 @@ class FaceCaptureViewModelTest {
         captureAttemptTracker.onNewCaptureAttemptStarted()
         captureAttemptTracker.onNewCaptureAttemptStarted()
         captureAttemptTracker.onNewCaptureAttemptStarted()
-        assertThat(viewModel.attemptNumber).isEqualTo(2)
+        assertThat(captureAttemptTracker.attemptNumber).isEqualTo(2)
 
         val restoredViewModel = FaceCaptureViewModel(
             authStore,
@@ -205,7 +205,7 @@ class FaceCaptureViewModelTest {
             captureAttemptTracker,
         )
 
-        assertThat(restoredViewModel.attemptNumber).isEqualTo(2)
+        assertThat(captureAttemptTracker.attemptNumber).isEqualTo(2)
     }
 
     @Test
@@ -221,13 +221,13 @@ class FaceCaptureViewModelTest {
         captureAttemptTracker.onNewCaptureAttemptStarted()
         captureAttemptTracker.onNewCaptureAttemptStarted()
         captureAttemptTracker.onNewCaptureAttemptStarted()
-        assertThat(viewModel.attemptNumber).isEqualTo(2)
+        assertThat(captureAttemptTracker.attemptNumber).isEqualTo(2)
         assertThat(viewModel.initialised).isTrue()
 
         // A new capture step is started for a different SDK within the same (Activity-scoped) ViewModel
         viewModel.initFaceBioSdk(mockk(), ModalitySdkType.SIM_FACE)
 
-        assertThat(viewModel.attemptNumber).isEqualTo(0)
+        assertThat(captureAttemptTracker.attemptNumber).isEqualTo(0)
     }
 
     @Test
