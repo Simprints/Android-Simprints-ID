@@ -226,8 +226,8 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         binding.buttonSyncRecordsNow.isEnabled = records.isSyncButtonEnabled
         binding.buttonSyncRecordsNow.text = getString(
             when {
-                records.isSyncButtonForRetry -> IDR.string.sync_info_button_try_again
                 records.isProgressVisible -> IDR.string.sync_info_button_records_syncing
+                records.isSyncButtonForRetry -> IDR.string.sync_info_button_try_again
                 else -> IDR.string.sync_info_button_sync_records
             },
         )
