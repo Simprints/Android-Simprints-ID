@@ -188,12 +188,33 @@ internal class LiveFeedbackViewModel @Inject constructor(
     }
 
     /**
+     * Evaluates existing state to determine if the capture session is logically finished
+     */
+    private fun isCaptureComplete(): Boolean {
+        if (phase != LiveFeedbackState.Phase.CAPTURING) return false
+
+        return if (isAutoCapture) {
+            // Auto mode finishes when the imaging duration expires
+            (timeHelper.now().ms - captureImagingStartTime) >= autoCaptureImagingDurationMillis
+        } else {
+            // Manual mode finishes when the requested sample count is met
+            userCaptures.size >= samplesToCapture
+        }
+    }
+
+    /**
      * Processes the image. Called on the CameraX analyzer executor (off the main thread).
      */
     fun process(
         originalBitmap: Bitmap,
         croppedBitmap: Bitmap,
     ) {
+        // Drop frames if capture is complete to avoid race conditions.
+        if (isCaptureComplete()) {
+            originalBitmap.recycle()
+            croppedBitmap.recycle()
+            return
+        }
         // Skip processing and only update progress bar while spoof check is running
         if (phase == LiveFeedbackState.Phase.VALIDATING) {
             emit(phase = LiveFeedbackState.Phase.VALIDATING)
@@ -317,6 +338,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
     private fun finishCapture(attemptNumber: Int) {
         Simber.i("Finish capture", tag = FACE_CAPTURE)
         viewModelScope.launch {
+            enrichCapturesWithAgeAndGender()
             if (spoofCheckConfig.mode == SpoofCheckMode.DISABLED) {
                 sendEventsAndFinish(attemptNumber)
             } else {
@@ -343,14 +365,6 @@ internal class LiveFeedbackViewModel @Inject constructor(
     }
 
     private suspend fun sendEventsAndFinish(attemptNumber: Int) {
-        // Freeze frame processing so `process()` can't concurrently mutate `userCaptures`/
-        // `fallbackCapture` while we enrich captures and write events below.
-        emit(phase = LiveFeedbackState.Phase.VALIDATING)
-
-        // Age/gender estimation is extra native processing, so it's only run here on the final,
-        // accepted set of captures.
-        enrichCapturesWithAgeAndGender()
-
         sortedQualifyingCaptures = userCaptures
             .filter { isAutoCapture || it.hasValidStatus() } // Auto-capture images are pre-qualified
             .sortedByDescending { it.face?.quality }
