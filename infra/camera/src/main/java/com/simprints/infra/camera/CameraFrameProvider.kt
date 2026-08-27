@@ -59,6 +59,7 @@ class CameraFrameProvider @Inject internal constructor(
     private var cameraProvider: ProcessCameraProvider? = null
     private var imageCapture: ImageCapture? = null
     private var imageAnalysis: ImageAnalysis? = null
+    private var preview: Preview? = null
     private var camera: Camera? = null
 
     private lateinit var previewRect: Rect
@@ -139,11 +140,16 @@ class CameraFrameProvider @Inject internal constructor(
         imageCapture = capture
 
         withContext(mainDispatcher) {
-            val preview = Preview
+            // Clear any previously bound preview's surface provider to avoid CameraX's internal
+            // cache retaining a reference to the old PreviewView after unbinding.
+            preview?.surfaceProvider = null
+
+            val newPreview = Preview
                 .Builder()
                 .setResolutionSelector(resolutionSelector)
                 .build()
                 .also { it.surfaceProvider = previewView.surfaceProvider }
+            preview = newPreview
 
             val provider = ProcessCameraProvider.awaitInstance(context).also {
                 cameraProvider = it
@@ -157,7 +163,7 @@ class CameraFrameProvider @Inject internal constructor(
                         cameraSelector,
                         imageAnalysis,
                         capture,
-                        preview,
+                        newPreview,
                     ).also { boundCamera ->
                         with(cameraFocusManagerFactory.create(CrashReportTag.CAMERA)) {
                             setUpFocusOnTap(previewView, boundCamera)
@@ -195,6 +201,10 @@ class CameraFrameProvider @Inject internal constructor(
 
         cameraProvider?.unbindAll()
         cameraProvider = null
+
+        // Explicitly detach the surface provider
+        preview?.surfaceProvider = null
+        preview = null
 
         previewSurface = null
         injectionOverlay = null
