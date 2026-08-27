@@ -31,23 +31,6 @@ class CaptureTargetView @JvmOverloads constructor(
     val shapePath = Path()
 
     /**
-     * XY position of this view's top-left corner in window coordinates
-     */
-    private val locationInWindow = IntArray(2)
-
-    /**
-     * X coordinate representing how far this view is shifted from the window’s origin
-     */
-    val windowOffsetX: Float
-        get() = locationInWindow[0].toFloat()
-
-    /**
-     * Y coordinate representing how far this view is shifted from the window’s origin
-     */
-    val windowOffsetY: Float
-        get() = locationInWindow[1].toFloat()
-
-    /**
      * Outer edge of the stroke so that everything can be drawn accurately around it.
      * Android draws strokes centered on the path, so outward edge is half of the [strokeWidth]
      */
@@ -118,17 +101,6 @@ class CaptureTargetView @JvmOverloads constructor(
     ) {
         super.onSizeChanged(w, h, oldw, oldh)
         rebuildPath(w, h)
-    }
-
-    override fun onLayout(
-        changed: Boolean,
-        left: Int,
-        top: Int,
-        right: Int,
-        bottom: Int,
-    ) {
-        super.onLayout(changed, left, top, right, bottom)
-        getLocationInWindow(locationInWindow)
     }
 
     override fun onDraw(canvas: Canvas) {

@@ -87,6 +87,7 @@ class CaptureProgressView @JvmOverloads constructor(
     private val perimeterMeasure = PathMeasure() // length of drawing perimeter
     private val tempMeasures = PathMeasure() // intermediate paths measures. Used during perimeter construction
     private val selfWindowLocation = IntArray(2) // This view's top-left corner in screen coordinates
+    private val targetWindowLocation = IntArray(2) // Target view's top-left corner in screen coordinates
     private val startPositionXY = FloatArray(2) // Buffer for the 12 o'clock pixel coordinate
 
     // Draw Path cache. Only rebuilt when the target's geometry actually changes
@@ -134,6 +135,9 @@ class CaptureProgressView @JvmOverloads constructor(
             invalidate()
             return
         }
+
+        getLocationInWindow(selfWindowLocation)
+        target.getLocationInWindow(targetWindowLocation)
 
         // Drawing path only if the target view attributes changed since last draw
         if (isTargetGeometryChanged(target)) {
@@ -218,8 +222,8 @@ class CaptureProgressView @JvmOverloads constructor(
     }
 
     private fun cacheTargetGeometry(target: CaptureTargetView) {
-        cachedTargetOffsetX = target.windowOffsetX
-        cachedTargetOffsetY = target.windowOffsetY
+        cachedTargetOffsetX = targetWindowLocation[0].toFloat()
+        cachedTargetOffsetY = targetWindowLocation[1].toFloat()
         cachedTargetWidth = target.width
         cachedTargetHeight = target.height
         cachedOuterStrokeEdge = target.outerStrokeEdge
@@ -229,8 +233,8 @@ class CaptureProgressView @JvmOverloads constructor(
      * Compares the geometry attributes of the target view with the cached values. If no changes, it indicates that the target view
      * hasn't changed since last pass.
      */
-    private fun isTargetGeometryChanged(target: CaptureTargetView): Boolean = target.windowOffsetX != cachedTargetOffsetX ||
-        target.windowOffsetY != cachedTargetOffsetY ||
+    private fun isTargetGeometryChanged(target: CaptureTargetView): Boolean = targetWindowLocation[0].toFloat() != cachedTargetOffsetX ||
+        targetWindowLocation[1].toFloat() != cachedTargetOffsetY ||
         target.width != cachedTargetWidth ||
         target.height != cachedTargetHeight ||
         target.outerStrokeEdge != cachedOuterStrokeEdge
@@ -247,12 +251,8 @@ class CaptureProgressView @JvmOverloads constructor(
         val cornerCorrection = 1f.dpToPx(context)
         val outset = chipHeight / 2f - cornerCorrection // correction is required to properly align with corner arcs
 
-        // Saving view's position on the screen
-        getLocationInWindow(selfWindowLocation)
-
-        // converting target's screen coordinates into coordinates relative to this view
-        val localLeft = target.windowOffsetX - selfWindowLocation[0]
-        val localTop = target.windowOffsetY - selfWindowLocation[1]
+        val localLeft = (targetWindowLocation[0] - selfWindowLocation[0]).toFloat()
+        val localTop = (targetWindowLocation[1] - selfWindowLocation[1]).toFloat()
         val localRight = localLeft + target.width
         val localBottom = localTop + target.height
 
