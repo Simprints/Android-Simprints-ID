@@ -83,18 +83,24 @@ class CaptureProgressView @JvmOverloads constructor(
     // Reusable objects for drawing
     private val singleChipPath = Path()
     private val perimeterPath = Path() // the full outline chips are drawn along
-    private val expandedPath = Path() // path of the target's shape pushed outwards
     private val perimeterMeasure = PathMeasure() // length of drawing perimeter
-    private val tempMeasures = PathMeasure() // intermediate paths measures. Used during perimeter construction
-    private val selfWindowLocation = IntArray(2) // This view's top-left corner in screen coordinates
-    private val startPositionXY = FloatArray(2) // Buffer for the 12 o'clock pixel coordinate
-
     // Draw Path cache. Only rebuilt when the target's geometry actually changes
     private var cachedTargetOffsetX = Float.NaN
     private var cachedTargetOffsetY = Float.NaN
     private var cachedTargetWidth = -1
     private var cachedTargetHeight = -1
     private var cachedOuterStrokeEdge = Float.NaN
+    private var cachedTargetShape: CaptureTargetView.Shape? = null
+    private var cachedTargetCornerRadius = Float.NaN
+    private var observedTarget: CaptureTargetView? = null
+    private val targetLayoutChangeListener = View.OnLayoutChangeListener { _, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+        if (left != oldLeft || top != oldTop || right != oldRight || bottom != oldBottom) {
+            invalidate()
+        }
+    }
+    private val targetGeometryChangeListener = CaptureTargetView.OnGeometryChangeListener {
+        invalidate()
+    }
 
     init {
         setWillNotDraw(false)
@@ -126,14 +132,9 @@ class CaptureProgressView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val target = resolveTarget()
-
-        // In edit mode, retry every frame until the hierarchy is ready
-        // Without this check the XML preview is laggy and impossible to work with
-        if (target == null) {
-            if (!isInEditMode) return
-            invalidate()
-            return
-        }
+        bindTarget(target)
+        // A target cannot define a perimeter until both dimensions have been laid out.
+        if (target == null || target.width <= 0 || target.height <= 0) return
 
         // Drawing path only if the target view attributes changed since last draw
         if (isTargetGeometryChanged(target)) {
@@ -144,6 +145,19 @@ class CaptureProgressView @JvmOverloads constructor(
         if (perimeterLength == 0f) return
 
         drawCompletedChips(canvas)
+    }
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+        // Reset cache so the next draw picks up the sibling's updated left/top after layout
+        cachedTargetOffsetX = Float.NaN
+        cachedTargetOffsetY = Float.NaN
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        bindTarget(resolveTarget())
+        invalidate()
     }
 
     override fun onSaveInstanceState(): Parcelable = Bundle().apply {
@@ -163,6 +177,7 @@ class CaptureProgressView @JvmOverloads constructor(
     }
 
     override fun onDetachedFromWindow() {
+        bindTarget(null)
         super.onDetachedFromWindow()
         progressAnimator?.cancel()
         progressAnimator = null
@@ -218,28 +233,33 @@ class CaptureProgressView @JvmOverloads constructor(
     }
 
     private fun cacheTargetGeometry(target: CaptureTargetView) {
-        cachedTargetOffsetX = target.windowOffsetX
-        cachedTargetOffsetY = target.windowOffsetY
+        cachedTargetOffsetX = (target.left - left).toFloat()
+        cachedTargetOffsetY = (target.top - top).toFloat()
         cachedTargetWidth = target.width
         cachedTargetHeight = target.height
         cachedOuterStrokeEdge = target.outerStrokeEdge
+        cachedTargetShape = target.shape
+        cachedTargetCornerRadius = target.cornerRadius
     }
 
     /**
      * Compares the geometry attributes of the target view with the cached values. If no changes, it indicates that the target view
      * hasn't changed since last pass.
      */
-    private fun isTargetGeometryChanged(target: CaptureTargetView): Boolean = target.windowOffsetX != cachedTargetOffsetX ||
-        target.windowOffsetY != cachedTargetOffsetY ||
+    private fun isTargetGeometryChanged(target: CaptureTargetView): Boolean = (target.left - left).toFloat() != cachedTargetOffsetX ||
+        (target.top - top).toFloat() != cachedTargetOffsetY ||
         target.width != cachedTargetWidth ||
         target.height != cachedTargetHeight ||
-        target.outerStrokeEdge != cachedOuterStrokeEdge
+        target.outerStrokeEdge != cachedOuterStrokeEdge ||
+        target.shape != cachedTargetShape ||
+        target.cornerRadius != cachedTargetCornerRadius
 
     /**
      * Creates a path for loading chips. It has an enlarged copy of the target view's shape: it is pushed outward so that chips are drawn
      * just outside the target's border rather than on top of it.
      *
-     * The shape is then adjusted to start at 12 o'clock, and then progress draws chips clockwise from the top middle.
+     * The path starts at 12 o'clock and goes clockwise, built with direct geometry so it works
+     * in both runtime and Android Studio's LayoutLib preview (where PathMeasure position lookups are broken).
      */
     private fun rebuildDrawPath(target: CaptureTargetView) {
         cacheTargetGeometry(target)
@@ -247,12 +267,8 @@ class CaptureProgressView @JvmOverloads constructor(
         val cornerCorrection = 1f.dpToPx(context)
         val outset = chipHeight / 2f - cornerCorrection // correction is required to properly align with corner arcs
 
-        // Saving view's position on the screen
-        getLocationInWindow(selfWindowLocation)
-
-        // converting target's screen coordinates into coordinates relative to this view
-        val localLeft = target.windowOffsetX - selfWindowLocation[0]
-        val localTop = target.windowOffsetY - selfWindowLocation[1]
+        val localLeft = (target.left - left).toFloat()
+        val localTop = (target.top - top).toFloat()
         val localRight = localLeft + target.width
         val localBottom = localTop + target.height
 
@@ -265,7 +281,6 @@ class CaptureProgressView @JvmOverloads constructor(
             localBottom + outset,
         )
 
-        expandedPath.rewind()
         val expandedRadius = when (target.shape) {
             CaptureTargetView.Shape.OVAL -> 0f // unused for oval
             CaptureTargetView.Shape.RECT -> {
@@ -273,59 +288,64 @@ class CaptureProgressView @JvmOverloads constructor(
                 (target.cornerRadius + outset).coerceAtMost(maxRadius)
             }
         }
-        when (target.shape) {
-            CaptureTargetView.Shape.OVAL -> expandedPath.addOval(expandedBounds, Path.Direction.CW)
-            CaptureTargetView.Shape.RECT -> expandedPath.addRoundRect(expandedBounds, expandedRadius, expandedRadius, Path.Direction.CW)
-        }
 
-        buildSingleContourStartingAtTopCentre(expandedPath, target.shape, expandedBounds, expandedRadius)
+        buildPerimeterPath(target.shape, expandedBounds, expandedRadius)
         perimeterMeasure.setPath(perimeterPath, false)
         perimeterLength = perimeterMeasure.length
     }
 
     /**
-     * Rewrites [sourcePath] into [perimeterPath] with the start point shifted to the top centre,
-     * so that chips draw clockwise from 12 o'clock.
+     * Builds [perimeterPath] starting at 12 o'clock and going clockwise using direct geometry,
+     * avoiding PathMeasure position lookups which are broken in Android Studio's LayoutLib.
      */
-    private fun buildSingleContourStartingAtTopCentre(
-        sourcePath: Path,
+    private fun buildPerimeterPath(
         shape: CaptureTargetView.Shape,
         expandedBounds: RectF,
         expandedRadius: Float,
     ) {
         perimeterPath.rewind()
-        tempMeasures.setPath(sourcePath, false)
-        val totalLength = tempMeasures.length
-        if (totalLength == 0f) {
-            perimeterLength = 0f
-            return
-        }
-
-        val topCentreOffset = when (shape) {
-            // Android draws ovals from 3 o'clock clockwise, so 12 o'clock is always 25% along
-            CaptureTargetView.Shape.OVAL -> totalLength * 0.75f
+        val topCentreX = expandedBounds.centerX()
+        val topCentreY = expandedBounds.top
+        when (shape) {
+            CaptureTargetView.Shape.OVAL -> {
+                perimeterPath.moveTo(topCentreX, topCentreY)
+                // Do not combine these into a 360° arc: Android converts that to addOval(),
+                // whose length LayoutLib's PathMeasure incorrectly reports as zero.
+                perimeterPath.arcTo(expandedBounds, -90f, 90f)  // 12 → 3
+                perimeterPath.arcTo(expandedBounds, 0f, 90f)    // 3 → 6
+                perimeterPath.arcTo(expandedBounds, 90f, 90f)   // 6 → 9
+                perimeterPath.arcTo(expandedBounds, 180f, 90f)  // 9 → 12
+            }
             CaptureTargetView.Shape.RECT -> {
-                // Drawing start at the top left end of the corner arc.
-                // We need to move 1 vertical line up, 1 top left corner arc, and 1/2 of horizontal line
-                val arcLength = (Math.PI / 2.0 * expandedRadius).toFloat()
-                val straightWidth = expandedBounds.width() - 2f * expandedRadius
-                val straightHeight = expandedBounds.height() - 2f * expandedRadius
-                straightHeight + arcLength + straightWidth / 2f
+                perimeterPath.moveTo(topCentreX, topCentreY)
+                if (expandedRadius > 0f) {
+                    val r2 = 2f * expandedRadius
+                    // Top edge: top-center → top-right corner arc start
+                    perimeterPath.lineTo(expandedBounds.right - expandedRadius, topCentreY)
+                    // Top-right corner
+                    perimeterPath.arcTo(RectF(expandedBounds.right - r2, expandedBounds.top, expandedBounds.right, expandedBounds.top + r2), -90f, 90f)
+                    // Right edge
+                    perimeterPath.lineTo(expandedBounds.right, expandedBounds.bottom - expandedRadius)
+                    // Bottom-right corner
+                    perimeterPath.arcTo(RectF(expandedBounds.right - r2, expandedBounds.bottom - r2, expandedBounds.right, expandedBounds.bottom), 0f, 90f)
+                    // Bottom edge
+                    perimeterPath.lineTo(expandedBounds.left + expandedRadius, expandedBounds.bottom)
+                    // Bottom-left corner
+                    perimeterPath.arcTo(RectF(expandedBounds.left, expandedBounds.bottom - r2, expandedBounds.left + r2, expandedBounds.bottom), 90f, 90f)
+                    // Left edge
+                    perimeterPath.lineTo(expandedBounds.left, expandedBounds.top + expandedRadius)
+                    // Top-left corner
+                    perimeterPath.arcTo(RectF(expandedBounds.left, expandedBounds.top, expandedBounds.left + r2, expandedBounds.top + r2), 180f, 90f)
+                } else {
+                    perimeterPath.lineTo(expandedBounds.right, expandedBounds.top)
+                    perimeterPath.lineTo(expandedBounds.right, expandedBounds.bottom)
+                    perimeterPath.lineTo(expandedBounds.left, expandedBounds.bottom)
+                    perimeterPath.lineTo(expandedBounds.left, expandedBounds.top)
+                }
+                // Close back to top-center
+                perimeterPath.lineTo(topCentreX, topCentreY)
             }
         }
-
-        // Getting XY coordinates at the 12 o'clock position. Saving into positionScratch.
-        tempMeasures.getPosTan(topCentreOffset, startPositionXY, null)
-        // Moving to 12 o'clock coordinate for the first chip
-        perimeterPath.moveTo(startPositionXY[0], startPositionXY[1])
-        // Going from 12 o'clock all the way to the path's end point
-        tempMeasures.getSegment(topCentreOffset, totalLength, perimeterPath, false)
-
-        // Continuing drawing from the path's end point all the way to 12 o'clock
-        tempMeasures.setPath(sourcePath, false)
-        tempMeasures.getSegment(0f, topCentreOffset, perimeterPath, false)
-
-        perimeterPath.close()
     }
 
     /**
@@ -356,11 +376,21 @@ class CaptureProgressView @JvmOverloads constructor(
     private fun resolveTarget(): CaptureTargetView? {
         if (targetViewId == NO_ID) return null
         val current = resolvedTarget
-        // Making sure we're not referencing a detached view
-        if (current != null && current.isAttachedToWindow) return current
-        return rootView?.findViewById<CaptureTargetView>(targetViewId)?.also {
-            resolvedTarget = it
-        }
+        if (current != null && current.parent === parent) return current
+
+        val target = rootView?.findViewById<CaptureTargetView>(targetViewId)
+        // Layout-relative offsets are valid only for direct siblings with the same parent.
+        return target?.takeIf { it.parent === parent }?.also { resolvedTarget = it }
+    }
+
+    private fun bindTarget(target: CaptureTargetView?) {
+        if (observedTarget === target) return
+
+        observedTarget?.removeOnLayoutChangeListener(targetLayoutChangeListener)
+        observedTarget?.removeOnGeometryChangeListener(targetGeometryChangeListener)
+        observedTarget = target
+        target?.addOnLayoutChangeListener(targetLayoutChangeListener)
+        target?.addOnGeometryChangeListener(targetGeometryChangeListener)
     }
 
     /**
