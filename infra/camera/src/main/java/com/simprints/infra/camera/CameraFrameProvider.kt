@@ -59,6 +59,7 @@ class CameraFrameProvider @Inject internal constructor(
     private var cameraProvider: ProcessCameraProvider? = null
     private var imageCapture: ImageCapture? = null
     private var imageAnalysis: ImageAnalysis? = null
+    private var preview: Preview? = null
     private var camera: Camera? = null
 
     private lateinit var previewRect: Rect
@@ -139,11 +140,16 @@ class CameraFrameProvider @Inject internal constructor(
         imageCapture = capture
 
         withContext(mainDispatcher) {
-            val preview = Preview
+            // Clear any previously bound preview's surface provider to avoid CameraX's internal
+            // cache retaining a reference to the old PreviewView after unbinding.
+            preview?.surfaceProvider = null
+
+            val newPreview = Preview
                 .Builder()
                 .setResolutionSelector(resolutionSelector)
                 .build()
                 .also { it.surfaceProvider = previewView.surfaceProvider }
+            preview = newPreview
 
             val provider = ProcessCameraProvider.awaitInstance(context).also {
                 cameraProvider = it
@@ -157,7 +163,7 @@ class CameraFrameProvider @Inject internal constructor(
                         cameraSelector,
                         imageAnalysis,
                         capture,
-                        preview,
+                        newPreview,
                     ).also { boundCamera ->
                         with(cameraFocusManagerFactory.create(CrashReportTag.CAMERA)) {
                             setUpFocusOnTap(previewView, boundCamera)
@@ -165,6 +171,8 @@ class CameraFrameProvider @Inject internal constructor(
                         }
                     }
             } catch (e: Exception) {
+                preview?.surfaceProvider = null
+                preview = null
                 Simber.e("Camera binding failed", e, tag = CrashReportTag.CAMERA)
                 onError(e)
             }
@@ -193,8 +201,15 @@ class CameraFrameProvider @Inject internal constructor(
         imageAnalysis?.clearAnalyzer()
         imageAnalysis = null
 
-        cameraProvider?.unbindAll()
-        cameraProvider = null
+        try {
+            cameraProvider?.unbindAll()
+        } finally {
+            // Always detach the surface provider, even if unbindAll() throws,
+            // so the Preview never keeps retaining the PreviewView.
+            cameraProvider = null
+            preview?.surfaceProvider = null
+            preview = null
+        }
 
         previewSurface = null
         injectionOverlay = null
