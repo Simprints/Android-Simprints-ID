@@ -25,6 +25,12 @@ class CaptureTargetView @JvmOverloads constructor(
     @ExcludedFromGeneratedTestCoverageReports("Data struct")
     enum class Shape { OVAL, RECT }
 
+    fun interface OnGeometryChangeListener {
+        fun onGeometryChanged()
+    }
+
+    private val geometryChangeListeners = mutableSetOf<OnGeometryChangeListener>()
+
     /**
      * Path of the view's shape in local view coordinates
      */
@@ -44,6 +50,7 @@ class CaptureTargetView @JvmOverloads constructor(
             field = value
             rebuildPath(width, height)
             invalidate()
+            notifyGeometryChanged()
         }
 
     /**
@@ -54,6 +61,7 @@ class CaptureTargetView @JvmOverloads constructor(
             field = value
             rebuildPath(width, height)
             invalidate()
+            notifyGeometryChanged()
         }
 
     @ColorInt
@@ -70,6 +78,7 @@ class CaptureTargetView @JvmOverloads constructor(
             strokePaint.strokeWidth = value
             rebuildPath(width, height)
             invalidate()
+            notifyGeometryChanged()
         }
 
     private val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -101,6 +110,16 @@ class CaptureTargetView @JvmOverloads constructor(
     ) {
         super.onSizeChanged(w, h, oldw, oldh)
         rebuildPath(w, h)
+    }
+
+    /** Registers a listener for changes that alter this view's perimeter geometry. */
+    fun addOnGeometryChangeListener(listener: OnGeometryChangeListener) {
+        geometryChangeListeners += listener
+    }
+
+    /** Removes a listener registered with [addOnGeometryChangeListener]. */
+    fun removeOnGeometryChangeListener(listener: OnGeometryChangeListener) {
+        geometryChangeListeners -= listener
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -144,6 +163,10 @@ class CaptureTargetView @JvmOverloads constructor(
                 shapePath.addRoundRect(bounds, r, r, Path.Direction.CW)
             }
         }
+    }
+
+    private fun notifyGeometryChanged() {
+        geometryChangeListeners.forEach(OnGeometryChangeListener::onGeometryChanged)
     }
 
     companion object {

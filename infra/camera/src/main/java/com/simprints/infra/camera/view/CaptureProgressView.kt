@@ -90,6 +90,17 @@ class CaptureProgressView @JvmOverloads constructor(
     private var cachedTargetWidth = -1
     private var cachedTargetHeight = -1
     private var cachedOuterStrokeEdge = Float.NaN
+    private var cachedTargetShape: CaptureTargetView.Shape? = null
+    private var cachedTargetCornerRadius = Float.NaN
+    private var observedTarget: CaptureTargetView? = null
+    private val targetLayoutChangeListener = View.OnLayoutChangeListener { _, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+        if (left != oldLeft || top != oldTop || right != oldRight || bottom != oldBottom) {
+            invalidate()
+        }
+    }
+    private val targetGeometryChangeListener = CaptureTargetView.OnGeometryChangeListener {
+        invalidate()
+    }
 
     init {
         setWillNotDraw(false)
@@ -121,17 +132,9 @@ class CaptureProgressView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val target = resolveTarget()
-
-        if (isInEditMode) {
-            // In edit mode: keep retrying until the target is found and has been laid out.
-            // layout() sets left/top/width/height; a zero-size target means layout isn't done yet.
-            if (target == null || target.width == 0) {
-                invalidate()
-                return
-            }
-        } else {
-            if (target == null) return
-        }
+        bindTarget(target)
+        // A target cannot define a perimeter until both dimensions have been laid out.
+        if (target == null || target.width <= 0 || target.height <= 0) return
 
         // Drawing path only if the target view attributes changed since last draw
         if (isTargetGeometryChanged(target)) {
@@ -148,6 +151,13 @@ class CaptureProgressView @JvmOverloads constructor(
         super.onLayout(changed, left, top, right, bottom)
         // Reset cache so the next draw picks up the sibling's updated left/top after layout
         cachedTargetOffsetX = Float.NaN
+        cachedTargetOffsetY = Float.NaN
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        bindTarget(resolveTarget())
+        invalidate()
     }
 
     override fun onSaveInstanceState(): Parcelable = Bundle().apply {
@@ -167,6 +177,7 @@ class CaptureProgressView @JvmOverloads constructor(
     }
 
     override fun onDetachedFromWindow() {
+        bindTarget(null)
         super.onDetachedFromWindow()
         progressAnimator?.cancel()
         progressAnimator = null
@@ -227,6 +238,8 @@ class CaptureProgressView @JvmOverloads constructor(
         cachedTargetWidth = target.width
         cachedTargetHeight = target.height
         cachedOuterStrokeEdge = target.outerStrokeEdge
+        cachedTargetShape = target.shape
+        cachedTargetCornerRadius = target.cornerRadius
     }
 
     /**
@@ -237,7 +250,9 @@ class CaptureProgressView @JvmOverloads constructor(
         (target.top - top).toFloat() != cachedTargetOffsetY ||
         target.width != cachedTargetWidth ||
         target.height != cachedTargetHeight ||
-        target.outerStrokeEdge != cachedOuterStrokeEdge
+        target.outerStrokeEdge != cachedOuterStrokeEdge ||
+        target.shape != cachedTargetShape ||
+        target.cornerRadius != cachedTargetCornerRadius
 
     /**
      * Creates a path for loading chips. It has an enlarged copy of the target view's shape: it is pushed outward so that chips are drawn
@@ -294,6 +309,8 @@ class CaptureProgressView @JvmOverloads constructor(
         when (shape) {
             CaptureTargetView.Shape.OVAL -> {
                 perimeterPath.moveTo(topCentreX, topCentreY)
+                // Do not combine these into a 360° arc: Android converts that to addOval(),
+                // whose length LayoutLib's PathMeasure incorrectly reports as zero.
                 perimeterPath.arcTo(expandedBounds, -90f, 90f)  // 12 → 3
                 perimeterPath.arcTo(expandedBounds, 0f, 90f)    // 3 → 6
                 perimeterPath.arcTo(expandedBounds, 90f, 90f)   // 6 → 9
@@ -329,7 +346,6 @@ class CaptureProgressView @JvmOverloads constructor(
                 perimeterPath.lineTo(topCentreX, topCentreY)
             }
         }
-        perimeterPath.close()
     }
 
     /**
@@ -360,11 +376,21 @@ class CaptureProgressView @JvmOverloads constructor(
     private fun resolveTarget(): CaptureTargetView? {
         if (targetViewId == NO_ID) return null
         val current = resolvedTarget
-        // Making sure we're not referencing a detached view
-        if (current != null && current.isAttachedToWindow) return current
-        return rootView?.findViewById<CaptureTargetView>(targetViewId)?.also {
-            resolvedTarget = it
-        }
+        if (current != null && current.parent === parent) return current
+
+        val target = rootView?.findViewById<CaptureTargetView>(targetViewId)
+        // Layout-relative offsets are valid only for direct siblings with the same parent.
+        return target?.takeIf { it.parent === parent }?.also { resolvedTarget = it }
+    }
+
+    private fun bindTarget(target: CaptureTargetView?) {
+        if (observedTarget === target) return
+
+        observedTarget?.removeOnLayoutChangeListener(targetLayoutChangeListener)
+        observedTarget?.removeOnGeometryChangeListener(targetGeometryChangeListener)
+        observedTarget = target
+        target?.addOnLayoutChangeListener(targetLayoutChangeListener)
+        target?.addOnGeometryChangeListener(targetGeometryChangeListener)
     }
 
     /**
