@@ -171,6 +171,8 @@ class CameraFrameProvider @Inject internal constructor(
                         }
                     }
             } catch (e: Exception) {
+                preview?.surfaceProvider = null
+                preview = null
                 Simber.e("Camera binding failed", e, tag = CrashReportTag.CAMERA)
                 onError(e)
             }
@@ -199,12 +201,15 @@ class CameraFrameProvider @Inject internal constructor(
         imageAnalysis?.clearAnalyzer()
         imageAnalysis = null
 
-        cameraProvider?.unbindAll()
-        cameraProvider = null
-
-        // Explicitly detach the surface provider
-        preview?.surfaceProvider = null
-        preview = null
+        try {
+            cameraProvider?.unbindAll()
+        } finally {
+            // Always detach the surface provider, even if unbindAll() throws,
+            // so the Preview never keeps retaining the PreviewView.
+            cameraProvider = null
+            preview?.surfaceProvider = null
+            preview = null
+        }
 
         previewSurface = null
         injectionOverlay = null
