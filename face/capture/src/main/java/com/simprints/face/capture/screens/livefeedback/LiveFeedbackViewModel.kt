@@ -89,6 +89,19 @@ internal class LiveFeedbackViewModel @Inject constructor(
         private set
     private var autoCaptureImagingTimeoutJob: Job? = null
     private var autoCaptureImagingDurationMillis: Long = FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
+
+    // Debugging telemetry for rejected auto-capture frame statuses (see design-doc-face-capture-rejection-status-tracking.md)
+    private var bioSdkType: ModalitySdkType = ModalitySdkType.RANK_ONE
+    internal val statusTally = mutableMapOf<FaceDetection.Status, Int>()
+    internal var totalFramesProcessed: Int = 0
+        private set
+    private var firstValidFrameElapsedMs: Long? = null
+    private var frameWidth: Int = 0
+    private var frameHeight: Int = 0
+    private var cameraWidth: Int = 0
+    private var cameraHeight: Int = 0
+    private var faceWidth: Int = 0
+    private var faceHeight: Int = 0
     private lateinit var faceDetector: FaceDetector
     private var hasAutoRequestedPermission = false
 
@@ -206,6 +219,11 @@ internal class LiveFeedbackViewModel @Inject constructor(
             return
         }
 
+        frameWidth = croppedBitmap.width
+        frameHeight = croppedBitmap.height
+        cameraWidth = originalBitmap.width
+        cameraHeight = originalBitmap.height
+
         val captureStartTime = timeHelper.now()
         val potentialFace = faceDetector.analyze(croppedBitmap)
 
@@ -243,6 +261,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
             LiveFeedbackState.Phase.NOT_STARTED -> updateFallbackCaptureIfValid(faceDetection)
             LiveFeedbackState.Phase.CAPTURING -> {
                 if (isAutoCapture) {
+                    trackStatusTally(faceDetection)
                     if (isQualifying(faceDetection)) {
                         updateUserCapturesWith(faceDetection)
                     }
@@ -297,6 +316,49 @@ internal class LiveFeedbackViewModel @Inject constructor(
         return betterPreviousCaptureCount < samplesToCapture
     }
 
+    /**
+     * Maintains an in-memory tally of every frame status (valid and rejected) encountered during
+     * an auto-capture attempt, along with lightweight debugging context, for logging in
+     * [logRejectionTally]. No raw image/biometric data is tracked, only counts and dimensions.
+     */
+    private fun trackStatusTally(faceDetection: FaceDetection) {
+        totalFramesProcessed++
+        if (firstValidFrameElapsedMs == null && faceDetection.hasValidStatus()) {
+            firstValidFrameElapsedMs = timeHelper.now().ms - captureImagingStartTime
+        }
+        statusTally[faceDetection.status] = (statusTally[faceDetection.status] ?: 0) + 1
+
+        faceDetection.face?.relativeBoundingBox?.let { box ->
+            faceWidth = (box.width() * frameWidth).toInt()
+            faceHeight = (box.height() * frameHeight).toInt()
+        }
+    }
+
+    private fun resetRejectionTally() {
+        statusTally.clear()
+        totalFramesProcessed = 0
+        firstValidFrameElapsedMs = null
+        faceWidth = 0
+        faceHeight = 0
+    }
+
+    private fun logRejectionTally(attemptNumber: Int) {
+        val durationMs = timeHelper.now().ms - captureImagingStartTime
+        val statuses = statusTally.entries.joinToString(",") { (status, count) -> "$status=$count" }
+
+        Simber.i(
+            "auto=$isAutoCapture sdk=$bioSdkType samples=$samplesToCapture " +
+                "threshold=$qualityThreshold  resolution=${frameWidth}x$frameHeight " +
+                "cameraResolution=${cameraWidth}x$cameraHeight faceDimensions=${faceWidth}x$faceHeight",
+            tag = FACE_CAPTURE,
+        )
+        Simber.i(
+            "attempt=$attemptNumber durationMs=$durationMs firstValidMs=${firstValidFrameElapsedMs ?: -1} " +
+                "totalFrames=$totalFramesProcessed statuses: $statuses",
+            tag = FACE_CAPTURE,
+        )
+    }
+
     private fun updateUserCapturesWith(faceDetection: FaceDetection) {
         if (userCaptures.count() == samplesToCapture) {
             userCaptures.indices
@@ -315,6 +377,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
      * If any of the user captures are good, use them. If not, use the fallback capture.
      */
     private fun finishCapture(attemptNumber: Int) {
+        logRejectionTally(attemptNumber)
         Simber.i("Finish capture", tag = FACE_CAPTURE)
         viewModelScope.launch {
             if (spoofCheckConfig.mode == SpoofCheckMode.DISABLED) {
@@ -438,6 +501,20 @@ internal class LiveFeedbackViewModel @Inject constructor(
             potentialFace.quality < qualityThreshold -> FaceDetection.Status.BAD_QUALITY
             phase == LiveFeedbackState.Phase.CAPTURING -> FaceDetection.Status.VALID_CAPTURING
             else -> FaceDetection.Status.VALID
+        }
+
+        if (status == FaceDetection.Status.TOOFAR) {
+            val relativeBox = potentialFace.relativeBoundingBox
+            val faceSizePx = "${(relativeBox.width() * bitmap.width).toInt()}x${(relativeBox.height() * bitmap.height).toInt()}"
+            Simber.i(
+                "TOO_FAR detected: " +
+                    "areaOccupied=$areaOccupied, requiredAreaRange=${faceTarget.areaRange}, " +
+                    "faceSizePx=$faceSizePx, frameSizePx=${bitmap.width}x${bitmap.height}, " +
+                    "relativeBoundingBox=$relativeBox, " +
+                    "yaw=${potentialFace.yaw}, roll=${potentialFace.roll}, quality=${potentialFace.quality}, " +
+                    "phase=$phase",
+                tag = FACE_CAPTURE,
+            )
         }
 
         return FaceDetection(

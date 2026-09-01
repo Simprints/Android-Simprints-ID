@@ -8,6 +8,7 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.screens.CaptureAttemptTracker
 import com.simprints.face.capture.usecases.GetSpoofCheckConfigurationUseCase
 import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
@@ -394,6 +395,62 @@ internal class LiveFeedbackViewModelTest {
         assertThat(viewModel.sortedQualifyingCaptures).hasSize(2)
         assertThat(viewModel.sortedQualifyingCaptures.map { it.face?.quality }).containsExactly(0.97f, 0.95f)
         coVerify(exactly = 2) { eventReporter.addCaptureEvents(any(), any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `auto - tracks status tally and total frames processed for debugging telemetry`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        every { faceDetector.analyze(frame) } returnsMany listOf(
+            getFace(quality = 0.95f), // good - begins imaging
+            getFace(Rect(0, 0, 30, 30)), // too far - rejected
+            getFace(Rect(0, 0, 30, 30)), // too far - rejected
+            getFace(quality = 0f), // bad quality - rejected
+            null, // no face - rejected
+        )
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.RANK_ONE, 1, 0)
+        viewModel.startCapture()
+        repeat(5) {
+            viewModel.process(frame, frame)
+        }
+        advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS + 1)
+        advanceUntilIdle()
+
+        assertThat(viewModel.totalFramesProcessed).isEqualTo(5)
+        assertThat(viewModel.statusTally).containsExactly(
+            FaceDetection.Status.VALID,
+            1,
+            FaceDetection.Status.TOOFAR,
+            2,
+            FaceDetection.Status.BAD_QUALITY,
+            1,
+            FaceDetection.Status.NOFACE,
+            1,
+        )
+    }
+
+    @Test
+    fun `initCapture resets the rejection status tally for the new attempt`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        every { faceDetector.analyze(frame) } returnsMany listOf(
+            getFace(quality = 0.95f), // good - begins imaging
+            getFace(Rect(0, 0, 30, 30)), // too far - rejected
+        )
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.RANK_ONE, 1, 0)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
+
+        assertThat(viewModel.totalFramesProcessed).isEqualTo(2)
+        assertThat(viewModel.statusTally).containsEntry(FaceDetection.Status.TOOFAR, 1)
+
+        viewModel.initCapture(ModalitySdkType.RANK_ONE, 2, 0)
+
+        assertThat(viewModel.totalFramesProcessed).isEqualTo(0)
+        assertThat(viewModel.statusTally).isEmpty()
     }
 
     @Test
