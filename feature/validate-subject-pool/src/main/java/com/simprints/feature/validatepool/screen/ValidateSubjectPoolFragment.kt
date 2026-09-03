@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
+import com.simprints.feature.moduleselector.ModuleSelectorResult
 import com.simprints.feature.validatepool.R
 import com.simprints.feature.validatepool.ValidateSubjectPoolFragmentParams
 import com.simprints.feature.validatepool.ValidateSubjectPoolResult
@@ -15,6 +16,8 @@ import com.simprints.feature.validatepool.databinding.FragmentValidateSubjectPoo
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
+import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.navigation.navigationParams
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
@@ -35,6 +38,16 @@ internal class ValidateSubjectPoolFragment : Fragment(R.layout.fragment_validate
         applySystemBarInsets(view)
         Simber.i("ValidateSubjectPoolFragment started", tag = ORCHESTRATION)
 
+        findNavController().handleResult<ModuleSelectorResult>(
+            viewLifecycleOwner,
+            R.id.validateSubjectPoolFragment,
+            R.id.moduleSelectionFragment,
+        ) {
+            if (it.isConfirmed) {
+                viewModel.startSync(params.enrolmentRecordQuery, params.mode)
+            }
+        }
+
         viewModel.state.observe(viewLifecycleOwner, LiveDataEventWithContentObserver(::renderState))
 
         viewModel.lastSyncLabel.observe(
@@ -47,7 +60,9 @@ internal class ValidateSubjectPoolFragment : Fragment(R.layout.fragment_validate
         binding.validationActionsClose.setOnClickListener { finishWithResult(false) }
         binding.validationActionsContinue.setOnClickListener { finishWithResult(true) }
         binding.validationActionsSync.setOnClickListener { viewModel.startSync(params.enrolmentRecordQuery, params.mode) }
-
+        binding.validationActionsSelectModules.setOnClickListener {
+            findNavController().navigateSafely(this, R.id.action_validateSubjectPoolFragment_to_moduleSelectionFragment)
+        }
         viewModel.checkIdentificationPool(params.enrolmentRecordQuery, params.mode)
     }
 
@@ -64,6 +79,7 @@ internal class ValidateSubjectPoolFragment : Fragment(R.layout.fragment_validate
 
         ValidateSubjectPoolState.ModuleMismatch -> setViews(
             descriptionRes = IDR.string.id_pool_validation_module_mismatch_message,
+            showSelectModules = true,
         )
 
         ValidateSubjectPoolState.RequiresSync -> setViews(
@@ -87,6 +103,7 @@ internal class ValidateSubjectPoolFragment : Fragment(R.layout.fragment_validate
         showValidating: Boolean = false,
         showProgress: Boolean = false,
         showSyncBlock: Boolean = false,
+        showSelectModules: Boolean = false,
     ) = with(binding) {
         validationValidating.isVisible = showValidating
         validationMainCard.isVisible = !showValidating
@@ -98,7 +115,8 @@ internal class ValidateSubjectPoolFragment : Fragment(R.layout.fragment_validate
         validationIssueLastSynced.isVisible = showSyncBlock
 
         // Loading
-        validationLoadingBlock.isVisible = showSyncBlock
+        validationLoadingBlock.isVisible = showSyncBlock || showSelectModules
+        validationActionsSelectModules.isVisible = showSelectModules
         validationActionsSync.isVisible = showSyncBlock && !showProgress
         validationLoadingIndicator.isVisible = showProgress && showSyncBlock
         validationLoadingIndicatorText.isVisible = showProgress && showSyncBlock

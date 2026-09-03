@@ -490,6 +490,7 @@
     <string name="id_pool_validation_last_sync">Last sync: %1$s</string>
     <string name="id_pool_validation_syncing_message">Sync in progress…</string>
     <string name="id_pool_validation_action_sync">Sync and retry</string>
+    <string name="id_pool_validation_action_select_modules">Select modules</string>
     <string name="id_pool_validation_action_close">Close</string>
     <string name="id_pool_validation_action_continue">Continue</string>
 
