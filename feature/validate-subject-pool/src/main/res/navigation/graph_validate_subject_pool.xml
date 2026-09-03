@@ -15,6 +15,15 @@
             android:name="params"
             app:argType="com.simprints.core.domain.step.StepParams" />
 
+        <action
+            android:id="@+id/action_validateSubjectPoolFragment_to_moduleSelectionFragment"
+            app:destination="@id/moduleSelectionFragment" />
+
     </fragment>
+
+    <fragment
+        android:id="@+id/moduleSelectionFragment"
+        android:name="com.simprints.feature.moduleselector.ModuleSelectorFragment"
+        android:label="ModuleSelectionFragment" />
 
 </navigation>
