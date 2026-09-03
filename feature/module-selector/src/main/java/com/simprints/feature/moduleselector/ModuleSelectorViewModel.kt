@@ -125,8 +125,8 @@ internal class ModuleSelectorViewModel @Inject constructor(
         externalScope.launch {
             moduleRepository.saveModules(allModules.map { module -> SelectableModule(module.tokenizedName, module.isSelected) })
             syncOrchestrator.execute(OneTime.Events.restart())
+            emitEffect(ModuleSelectorEffects.Confirmed)
         }
-        emitEffect(ModuleSelectorEffects.Dismiss)
     }
 
     private fun updateState(block: (currentState: ModuleSelectorState) -> ModuleSelectorState) {
