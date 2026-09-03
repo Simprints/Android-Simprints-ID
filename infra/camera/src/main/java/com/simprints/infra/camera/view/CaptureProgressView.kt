@@ -179,8 +179,7 @@ class CaptureProgressView @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         bindTarget(null)
         super.onDetachedFromWindow()
-        progressAnimator?.cancel()
-        progressAnimator = null
+        cancelAnimator()
     }
 
     fun setProgressAnimated(
@@ -189,7 +188,7 @@ class CaptureProgressView @JvmOverloads constructor(
         interpolator: TimeInterpolator = LinearInterpolator(),
         onComplete: (() -> Unit)? = null,
     ) {
-        progressAnimator?.cancel()
+        cancelAnimator()
         progressAnimator = ValueAnimator.ofInt(progress, value).apply {
             duration = durationMs
             this.interpolator = interpolator
@@ -201,6 +200,18 @@ class CaptureProgressView @JvmOverloads constructor(
             })
             start()
         }
+    }
+
+    private fun cancelAnimator() {
+        // Removing listeners prevents unintended onComplete triggering on cancellation
+        progressAnimator?.removeAllListeners()
+        progressAnimator?.cancel()
+        progressAnimator = null
+    }
+
+    fun resetAnimation() {
+        cancelAnimator()
+        progress = 0
     }
 
     /**

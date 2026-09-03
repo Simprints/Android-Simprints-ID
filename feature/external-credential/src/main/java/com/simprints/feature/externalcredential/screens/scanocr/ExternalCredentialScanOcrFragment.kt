@@ -159,9 +159,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
                         binding.captureProgress.setProgressAnimated(
                             100,
                             durationMs = PROGRESS_FINISH_REMAINING_MS,
-                            onComplete = {
-                                viewModel.processOcrResultsAndFinish()
-                            },
+                            onComplete = { viewModel.processOcrResultsAndFinish() },
                             interpolator = AccelerateInterpolator(),
                         )
                     }
@@ -224,6 +222,8 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
 
     private fun renderInitialState() = with(binding) {
         val documentTypeText = viewModel.getDocumentTypeRes().run(::getString)
+        captureProgress.resetAnimation()
+        captureProgress.isVisible = false
         permissionRequestView.isVisible = false
         instructionsText.isVisible = true
         instructionsText.text = getString(IDR.string.mfid_scan_instructions, documentTypeText)
@@ -232,6 +232,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         progressContainer.isInvisible = true
         buttonScan.isVisible = true
         buttonScan.setOnClickListener {
+            captureProgress.resetAnimation()
             viewModel.startScanning()
         }
         viewfinderMask.maskColor = ContextCompat.getColor(requireContext(), IDR.color.simprints_black)
