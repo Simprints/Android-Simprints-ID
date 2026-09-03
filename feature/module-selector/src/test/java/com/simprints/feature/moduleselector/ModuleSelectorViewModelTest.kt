@@ -231,7 +231,7 @@ internal class ModuleSelectorViewModelTest {
 
         viewModel.effects.test {
             viewModel.onAction(ModuleSelectorAction.SaveClicked)
-            assertThat(awaitItem()).isEqualTo(ModuleSelectorEffects.Dismiss)
+            assertThat(awaitItem()).isEqualTo(ModuleSelectorEffects.Confirmed)
             cancelAndIgnoreRemainingEvents()
         }
         advanceUntilIdle()
