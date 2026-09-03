@@ -121,6 +121,18 @@
                 app:layout_constraintTop_toBottomOf="@id/validationIssueDescriptionBlock">
 
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/validationActionsSelectModules"
+                    style="@style/Widget.Simprints.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/id_pool_validation_action_select_modules"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="gone" />
+
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/validationActionsSync"
                     style="@style/Widget.Simprints.Button.Green"
                     android:layout_width="0dp"

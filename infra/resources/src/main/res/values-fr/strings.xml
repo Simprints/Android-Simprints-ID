@@ -495,6 +495,7 @@
     <string name="id_pool_validation_last_sync">Dernière synchro: %1$s</string>
     <string name="id_pool_validation_syncing_message">Synchronisation en cours...</string>
     <string name="id_pool_validation_action_sync">Synchroniser et réessayer</string>
+    <string name="id_pool_validation_action_select_modules">Sélectionner les modules</string>
     <string name="id_pool_validation_action_close">Fermer</string>
     <string name="id_pool_validation_action_continue">Continuer</string>
 

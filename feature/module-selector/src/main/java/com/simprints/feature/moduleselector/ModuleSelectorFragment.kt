@@ -15,6 +15,7 @@ import com.simprints.feature.module.selector.R
 import com.simprints.feature.module.selector.databinding.DialogModuleSelectorBinding
 import com.simprints.feature.moduleselector.ModuleSelectorState.SelectionError
 import com.simprints.feature.moduleselector.adapter.ModuleSelectorAdapter
+import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.password.SettingsPasswordDialogFragment
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
@@ -67,7 +68,7 @@ internal class ModuleSelectorFragment : Fragment(R.layout.dialog_module_selector
             onSuccess = { viewModel.onAction(ModuleSelectorAction.UnlockScreen) },
         )
         moduleSelectionToolbar.setNavigationOnClickListener {
-            findNavController().popBackStack()
+            finishWithResult(false)
         }
         moduleSelectionCancelButton.setOnClickListener {
             viewModel.onAction(ModuleSelectorAction.CancelClicked)
@@ -108,11 +109,15 @@ internal class ModuleSelectorFragment : Fragment(R.layout.dialog_module_selector
     }
 
     private fun handleEffect(effect: ModuleSelectorEffects) = when (effect) {
-        ModuleSelectorEffects.Dismiss -> findNavController().popBackStack()
+        ModuleSelectorEffects.Confirmed -> finishWithResult(true)
+        ModuleSelectorEffects.Dismiss -> finishWithResult(false)
         is ModuleSelectorEffects.ShowPassword -> {
             SettingsPasswordDialogFragment
                 .newInstance(passwordToMatch = effect.password)
                 .show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
         }
     }
+
+    private fun finishWithResult(isConfirmed: Boolean): Boolean = findNavController()
+        .finishWithResult(this, ModuleSelectorResult(isConfirmed))
 }

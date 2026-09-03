@@ -20,6 +20,8 @@ internal data class ModuleSelectorState(
 }
 
 internal sealed interface ModuleSelectorEffects {
+    data object Confirmed : ModuleSelectorEffects
+
     data object Dismiss : ModuleSelectorEffects
 
     data class ShowPassword(
