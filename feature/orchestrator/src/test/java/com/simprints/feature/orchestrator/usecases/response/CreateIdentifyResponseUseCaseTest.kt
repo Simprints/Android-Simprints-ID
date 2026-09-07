@@ -486,6 +486,138 @@ class CreateIdentifyResponseUseCaseTest {
     }
 
     @Test
+    fun `Marks credential match as linked and verified when confidence meets the SDK verification threshold`() = runTest {
+        val credentialGuid = "credentialGuid"
+        val credentialConfidence = 90f
+        val verificationMatchThreshold = 80f
+
+        val credentialFaceMatches = listOf<CredentialMatch>(
+            mockk {
+                every { comparisonResult } returns ComparisonResult(
+                    subjectId = credentialGuid,
+                    comparisonScore = credentialConfidence,
+                )
+                every { bioSdk } returns ModalitySdkType.RANK_ONE
+            },
+        )
+
+        val result = useCase(
+            mockk {
+                every { multifactorId?.allowedExternalCredentials } returns null
+                every { identification.maxNbOfReturnedCandidates } returns 5
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { face?.rankOne?.verificationMatchThreshold } returns verificationMatchThreshold
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns null
+            },
+            results = listOf(
+                mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
+                    every { matchResults } returns credentialFaceMatches
+                },
+            ),
+            project = project,
+        )
+
+        val identification = (result as AppIdentifyResponse).identifications.single()
+        assertThat(identification.guid).isEqualTo(credentialGuid)
+        assertThat(identification.isLinkedToScannedCredential).isTrue()
+        assertThat(identification.isCredentialVerified).isTrue()
+    }
+
+    @Test
+    fun `Marks credential match as linked but not verified when confidence is below the SDK verification threshold`() = runTest {
+        val credentialGuid = "credentialGuid"
+        val credentialConfidence = 70f
+        val verificationMatchThreshold = 80f
+
+        val credentialFaceMatches = listOf<CredentialMatch>(
+            mockk {
+                every { comparisonResult } returns ComparisonResult(
+                    subjectId = credentialGuid,
+                    comparisonScore = credentialConfidence,
+                )
+                every { bioSdk } returns ModalitySdkType.RANK_ONE
+            },
+        )
+
+        val result = useCase(
+            mockk {
+                every { multifactorId?.allowedExternalCredentials } returns null
+                every { identification.maxNbOfReturnedCandidates } returns 5
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { face?.rankOne?.verificationMatchThreshold } returns verificationMatchThreshold
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns null
+            },
+            results = listOf(
+                mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
+                    every { matchResults } returns credentialFaceMatches
+                },
+            ),
+            project = project,
+        )
+
+        val identification = (result as AppIdentifyResponse).identifications.single()
+        assertThat(identification.guid).isEqualTo(credentialGuid)
+        assertThat(identification.isLinkedToScannedCredential).isTrue()
+        assertThat(identification.isCredentialVerified).isFalse()
+    }
+
+    @Test
+    fun `Marks credential match as linked with null verification status when SDK has no verification threshold configured`() = runTest {
+        val credentialGuid = "credentialGuid"
+        val credentialConfidence = 90f
+
+        val credentialFaceMatches = listOf<CredentialMatch>(
+            mockk {
+                every { comparisonResult } returns ComparisonResult(
+                    subjectId = credentialGuid,
+                    comparisonScore = credentialConfidence,
+                )
+                every { bioSdk } returns ModalitySdkType.RANK_ONE
+            },
+        )
+
+        val result = useCase(
+            mockk {
+                every { multifactorId?.allowedExternalCredentials } returns null
+                every { identification.maxNbOfReturnedCandidates } returns 5
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { face?.rankOne?.verificationMatchThreshold } returns null
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns null
+            },
+            results = listOf(
+                mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
+                    every { matchResults } returns credentialFaceMatches
+                },
+            ),
+            project = project,
+        )
+
+        val identification = (result as AppIdentifyResponse).identifications.single()
+        assertThat(identification.guid).isEqualTo(credentialGuid)
+        assertThat(identification.isLinkedToScannedCredential).isTrue()
+        assertThat(identification.isCredentialVerified).isNull()
+    }
+
+    @Test
+    fun `Regular match results are not linked to a scanned credential and have no verification status`() = runTest {
+        val result = useCase(
+            mockk {
+                every { multifactorId?.allowedExternalCredentials } returns null
+                every { identification.maxNbOfReturnedCandidates } returns 2
+                every { face?.rankOne?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
+                every { face?.rankOne?.verificationMatchThreshold } returns 80f
+                every { fingerprint?.secugenSimMatcher?.decisionPolicy } returns null
+            },
+            results = listOf(createFaceMatchResult(90f)),
+            project = project,
+        )
+
+        val identification = (result as AppIdentifyResponse).identifications.single()
+        assertThat(identification.isLinkedToScannedCredential).isFalse()
+        assertThat(identification.isCredentialVerified).isNull()
+    }
+
+    @Test
     fun `Returns scanned credential when credential search result is present`() = runTest {
         val id = "id"
         val type = ExternalCredentialType.NHISCard
