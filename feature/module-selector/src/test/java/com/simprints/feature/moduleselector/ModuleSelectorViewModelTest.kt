@@ -14,8 +14,6 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.eventsync.module.ModuleSelectionRepository
 import com.simprints.infra.eventsync.module.SelectableModule
-import com.simprints.infra.sync.OneTime
-import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -35,9 +33,6 @@ internal class ModuleSelectorViewModelTest {
 
     @MockK
     private lateinit var moduleRepository: ModuleSelectionRepository
-
-    @MockK
-    private lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
     private lateinit var configRepository: ConfigRepository
@@ -218,7 +213,7 @@ internal class ModuleSelectorViewModelTest {
     }
 
     @Test
-    fun `save action persists modules and triggers sync then emits dismiss effect`() = runTest {
+    fun `save action persists modules then emits dismiss effect`() = runTest {
         coEvery { moduleRepository.getMaxNumberOfModules() } returns 2
         coEvery { moduleRepository.getModules() } returns listOf(
             SelectableModule(name = "Alpha".asTokenizableRaw(), isSelected = true),
@@ -238,7 +233,6 @@ internal class ModuleSelectorViewModelTest {
 
         val saveSlot = slot<List<SelectableModule>>()
         coVerify(exactly = 1) { moduleRepository.saveModules(capture(saveSlot)) }
-        coVerify(exactly = 1) { syncOrchestrator.execute(OneTime.Events.restart()) }
         assertThat(saveSlot.captured)
             .containsExactly(
                 SelectableModule(name = "Alpha".asTokenizableRaw(), isSelected = true),
@@ -287,7 +281,6 @@ internal class ModuleSelectorViewModelTest {
 
     private fun createViewModel() = ModuleSelectorViewModel(
         moduleRepository = moduleRepository,
-        syncOrchestrator = syncOrchestrator,
         configRepository = configRepository,
         tokenizationProcessor = tokenizationProcessor,
         externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
