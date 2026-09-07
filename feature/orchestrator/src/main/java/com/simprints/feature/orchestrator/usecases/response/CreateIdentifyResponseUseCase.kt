@@ -99,10 +99,16 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
         .flatMap { credentialSearchResult ->
             credentialSearchResult.matchResults.mapNotNull { credentialMatchResult ->
                 val sdk = credentialMatchResult.bioSdk
-                val policy = projectConfiguration.getModalitySdkConfig(sdk)?.decisionPolicy ?: return@mapNotNull null
+                val sdkConfiguration = projectConfiguration.getModalitySdkConfig(sdk) ?: return@mapNotNull null
                 val matchResult = credentialMatchResult.comparisonResult
 
-                sdk to AppMatchResult(matchResult.subjectId, matchResult.comparisonScore, policy, true)
+                sdk to AppMatchResult(
+                    guid = matchResult.subjectId,
+                    confidenceScore = matchResult.comparisonScore,
+                    decisionPolicy = sdkConfiguration.decisionPolicy,
+                    isCredentialMatch = true,
+                    verificationMatchThreshold = sdkConfiguration.verificationMatchThreshold,
+                )
             }
         }.groupDescendingResultsBySdk()
 
