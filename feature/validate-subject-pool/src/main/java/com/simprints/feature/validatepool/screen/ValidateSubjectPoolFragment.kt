@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
+import com.simprints.feature.moduleselector.ModuleSelectorContract
 import com.simprints.feature.moduleselector.ModuleSelectorResult
 import com.simprints.feature.validatepool.R
 import com.simprints.feature.validatepool.ValidateSubjectPoolFragmentParams
@@ -41,7 +42,7 @@ internal class ValidateSubjectPoolFragment : Fragment(R.layout.fragment_validate
         findNavController().handleResult<ModuleSelectorResult>(
             viewLifecycleOwner,
             R.id.validateSubjectPoolFragment,
-            R.id.moduleSelectionFragment,
+            ModuleSelectorContract.DESTINATION,
         ) {
             if (it.isConfirmed) {
                 viewModel.startSync(params.enrolmentRecordQuery, params.mode)
@@ -61,7 +62,10 @@ internal class ValidateSubjectPoolFragment : Fragment(R.layout.fragment_validate
         binding.validationActionsContinue.setOnClickListener { finishWithResult(true) }
         binding.validationActionsSync.setOnClickListener { viewModel.startSync(params.enrolmentRecordQuery, params.mode) }
         binding.validationActionsSelectModules.setOnClickListener {
-            findNavController().navigateSafely(this, R.id.action_validateSubjectPoolFragment_to_moduleSelectionFragment)
+            findNavController().navigateSafely(
+                this,
+                ValidateSubjectPoolFragmentDirections.actionValidateSubjectPoolFragmentToModuleSelection(),
+            )
         }
         viewModel.checkIdentificationPool(params.enrolmentRecordQuery, params.mode)
     }

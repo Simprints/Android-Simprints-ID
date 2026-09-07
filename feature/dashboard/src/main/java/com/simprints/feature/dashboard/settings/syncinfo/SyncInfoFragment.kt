@@ -22,6 +22,8 @@ import com.simprints.feature.dashboard.databinding.FragmentSyncInfoBinding
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCountAdapter
 import com.simprints.feature.dashboard.view.ConfigurableSyncInfoFragmentContainer
 import com.simprints.feature.login.LoginContract
+import com.simprints.feature.moduleselector.ModuleSelectorContract
+import com.simprints.feature.moduleselector.ModuleSelectorResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.toBundle
 import com.simprints.infra.uibase.view.applySystemBarInsets
@@ -62,6 +64,14 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         setupClickListeners()
         observeUI()
 
+        findNavController().handleResult<ModuleSelectorResult>(
+            viewLifecycleOwner,
+            getCurrentDestinationId(),
+            ModuleSelectorContract.DESTINATION,
+        ) {
+            if (it.isConfirmed) viewModel.forceEventSync(false)
+        }
+
         findNavController().handleResult(
             viewLifecycleOwner,
             getCurrentDestinationId(),
@@ -79,10 +89,10 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
     private fun setupClickListeners() {
         binding.buttonSelectModules.setOnClickListener {
-            findNavController().navigate(R.id.moduleSelectionFragment)
+            findNavController().navigate(R.id.action_syncInfoFragment_to_moduleSelection)
         }
         binding.textEventSyncInstructionsNoModules.setOnClickListener {
-            findNavController().navigate(R.id.moduleSelectionFragment)
+            findNavController().navigate(R.id.action_syncInfoFragment_to_moduleSelection)
         }
         binding.syncSettingsButton.setOnClickListener {
             findNavController().navigate(R.id.syncInfoFragment)
@@ -347,9 +357,13 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         textView.text = progressText
     }
 
-    private fun getCurrentDestinationId() =
-        parentFragment?.takeIf { !syncInfoConfig.isSyncInfoToolbarVisible }?.id // parent if this isn't standalone
-            ?: id
+    // Being run withing a nested NavFragment sometimes messes up the "parent" resolution and breaks the navigation result handling,
+    // so we have to find the correct destination manually using the UI clues.
+    private fun getCurrentDestinationId(): Int = when {
+        syncInfoConfig.isSyncInfoLogoutOnComplete -> R.id.logOutSyncFragment // if logging out on complete, we are at logout screen
+        syncInfoConfig.isSyncInfoToolbarVisible -> R.id.syncInfoFragment // if shown toolbar, we are in standalone sync info fragment
+        else -> R.id.mainFragment // otherwise we are in main fragment
+    }
 
     private companion object {
         private const val MAX_MODULE_LIST_HEIGHT_ITEMS = 5
