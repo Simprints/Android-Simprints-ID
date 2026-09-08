@@ -36,11 +36,13 @@ jobs:
                     echo "Checking for merges to $TARGET_BRANCH in the last $DAYS_AGO days."
 
                     cutoff_date_seconds=$(date --date "$DAYS_AGO days ago" +%s)
-                    recent_merge_commit=$(git log $TARGET_BRANCH --merges --since="$DAYS_AGO days ago" --pretty=format:"%ct" -n 1)
+                    recent_merge_timestamp=$(git log "$TARGET_BRANCH" --merges --since="$DAYS_AGO days ago" --pretty=format:"%ct" -n 1)
 
-                    if [[ -n "$recent_merge_commit" ]]; then
-                        if (( $recent_merge_commit > cutoff_date_seconds )); then
-                            echo "Found recent merge commit on $TARGET_BRANCH: $commit_hash at $(date -d @$commit_timestamp)"
+                    if [[ -n "$recent_merge_timestamp" ]]; then
+                        if (( recent_merge_timestamp > cutoff_date_seconds )); then
+                            commit_hash=$(git log "$TARGET_BRANCH" --merges --since="$DAYS_AGO days ago" --pretty=format:"%H" -n 1)
+                    
+                            echo "Found recent merge commit on $TARGET_BRANCH: $commit_hash at $(date -d "@$recent_merge_timestamp")"
                             echo "has-recent-merges=true" >> $GITHUB_OUTPUT
                         else
                             echo "No *recent* merge commits found on $TARGET_BRANCH in the last $DAYS_AGO days."
