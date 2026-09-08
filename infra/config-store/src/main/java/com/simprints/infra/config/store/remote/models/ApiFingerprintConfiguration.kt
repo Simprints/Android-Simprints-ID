@@ -11,14 +11,14 @@ import kotlinx.serialization.Serializable
 @Serializable
 internal data class ApiFingerprintConfiguration(
     val allowedScanners: List<VeroGeneration>,
-    val allowedSDKs: List<BioSdk>,
+    val allowedSDKs: List<String>,
     val displayHandIcons: Boolean,
     val secugenSimMatcher: ApiFingerprintSdkConfiguration? = null,
     val nec: ApiFingerprintSdkConfiguration? = null,
 ) {
     fun toDomain() = FingerprintConfiguration(
         allowedScanners.map { it.toDomain() },
-        allowedSDKs.map { it.toDomain() },
+        allowedSDKs.mapNotNull { ApiBioSdk.fromString(it) },
         displayHandIcons,
         secugenSimMatcher?.toDomain(),
         nec?.toDomain(),
@@ -89,14 +89,11 @@ internal data class ApiFingerprintConfiguration(
     }
 
     @Keep
-    enum class BioSdk {
-        SECUGEN_SIM_MATCHER,
-        NEC,
-        ;
-
-        fun toDomain() = when (this) {
-            SECUGEN_SIM_MATCHER -> ModalitySdkType.SECUGEN_SIM_MATCHER
-            NEC -> ModalitySdkType.NEC
+    object ApiBioSdk {
+        fun fromString(value: String?): ModalitySdkType? = when (value?.uppercase()) {
+            "SECUGEN_SIM_MATCHER" -> ModalitySdkType.SECUGEN_SIM_MATCHER
+            "NEC" -> ModalitySdkType.NEC
+            else -> null
         }
     }
 

@@ -55,7 +55,6 @@ import com.simprints.infra.config.store.remote.models.ApiAllowedAgeRange
 import com.simprints.infra.config.store.remote.models.ApiConsentConfiguration
 import com.simprints.infra.config.store.remote.models.ApiDecisionPolicy
 import com.simprints.infra.config.store.remote.models.ApiDeviceState
-import com.simprints.infra.config.store.remote.models.ApiExternalCredentialType
 import com.simprints.infra.config.store.remote.models.ApiFaceConfiguration
 import com.simprints.infra.config.store.remote.models.ApiFaceConfiguration.ApiFaceSdkConfiguration
 import com.simprints.infra.config.store.remote.models.ApiFingerprintConfiguration
@@ -171,7 +170,7 @@ internal val faceSdkConfiguration = FaceSdkConfiguration(
 )
 
 internal val apiFaceConfiguration = ApiFaceConfiguration(
-    allowedSDKs = listOf(ApiFaceConfiguration.BioSdk.RANK_ONE),
+    allowedSDKs = listOf("RANK_ONE"),
     isAutoCapture = true,
     rankOne = ApiFaceSdkConfiguration(
         nbOfImagesToCapture = 2,
@@ -259,7 +258,7 @@ internal val protoVero2Configuration = ProtoVero2Configuration
 
 internal val apiFingerprintConfiguration = ApiFingerprintConfiguration(
     allowedScanners = listOf(ApiFingerprintConfiguration.VeroGeneration.VERO_2),
-    allowedSDKs = listOf(ApiFingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
+    allowedSDKs = listOf("SECUGEN_SIM_MATCHER"),
     displayHandIcons = true,
     secugenSimMatcher = ApiFingerprintConfiguration.ApiFingerprintSdkConfiguration(
         fingersToCapture = listOf(ApiFingerprintConfiguration.ApiFinger.LEFT_3RD_FINGER),
@@ -313,8 +312,8 @@ internal val protoFingerprintConfiguration = ProtoFingerprintConfiguration
     ).build()
 
 internal val apiGeneralConfiguration = ApiGeneralConfiguration(
-    listOf(ApiGeneralConfiguration.ApiModality.FACE),
-    listOf(ApiGeneralConfiguration.ApiModality.FACE),
+    listOf("FACE"),
+    listOf("FACE"),
     listOf("en"),
     "en",
     collectLocation = true,
@@ -485,7 +484,8 @@ internal val protoSynchronizationConfiguration = ProtoSynchronizationConfigurati
             .build(),
     ).build()
 
-internal val apiAllowedExternalCredential = ApiExternalCredentialType.NHIS_CARD
+@Suppress("ktlint:standard:property-naming")
+internal const val apiAllowedExternalCredential = "NHIS_CARD"
 
 internal val apiMultiFactorIdConfiguration = ApiMultiFactorIdConfiguration(
     allowedExternalCredentials = listOf(apiAllowedExternalCredential),

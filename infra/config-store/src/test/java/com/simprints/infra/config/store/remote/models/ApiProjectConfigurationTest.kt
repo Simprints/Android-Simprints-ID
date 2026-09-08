@@ -1,11 +1,11 @@
 package com.simprints.infra.config.store.remote.models
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.testtools.apiConsentConfiguration
 import com.simprints.infra.config.store.testtools.apiGeneralConfiguration
 import com.simprints.infra.config.store.testtools.apiIdentificationConfiguration
-import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.infra.config.store.testtools.apiMultiFactorIdConfiguration
 import com.simprints.infra.config.store.testtools.apiProjectConfiguration
 import com.simprints.infra.config.store.testtools.apiSynchronizationConfiguration
@@ -27,12 +27,25 @@ class ApiProjectConfigurationTest {
     @Test
     fun `should correctly map fayda card configuration`() {
         val apiConfig = ApiMultiFactorIdConfiguration(
-            allowedExternalCredentials = listOf(ApiExternalCredentialType.FAYDA_CARD),
+            allowedExternalCredentials = listOf("FAYDA_CARD"),
             faydaCard = ApiFaydaCardConfig(isCapturingAllFields = true),
         )
         val domain = apiConfig.toDomain()
         assertThat(domain.allowedExternalCredentials).containsExactly(ExternalCredentialType.FaydaCard)
         assertThat(domain.faydaCardConfig?.isCapturingAllFields).isTrue()
+    }
+
+    @Test
+    fun `should map ExternalCredentialType strings to domain types`() {
+        val cases = mapOf(
+            "NHIS_CARD" to ExternalCredentialType.NHISCard,
+            "GHANA_CARD" to ExternalCredentialType.GhanaIdCard,
+            "QR_CODE" to ExternalCredentialType.QRCode,
+            "FAYDA_CARD" to ExternalCredentialType.FaydaCard,
+            "UNKNOWN" to null,
+        )
+
+        cases.forEach { (value, expectedType) -> assertThat(ApiExternalCredentialType.fromString(value)).isEqualTo(expectedType) }
     }
 
     @Test

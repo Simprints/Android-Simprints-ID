@@ -39,7 +39,7 @@ class ApiFingerprintConfigurationTest {
     fun `should map correctly the model when the vero1 is missing`() {
         val apiFingerprintConfiguration = ApiFingerprintConfiguration(
             listOf(ApiFingerprintConfiguration.VeroGeneration.VERO_2),
-            listOf(ApiFingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
+            listOf("SECUGEN_SIM_MATCHER"),
             true,
             ApiFingerprintConfiguration.ApiFingerprintSdkConfiguration(
                 fingersToCapture = listOf(ApiFingerprintConfiguration.ApiFinger.LEFT_3RD_FINGER),
@@ -76,7 +76,7 @@ class ApiFingerprintConfigurationTest {
     fun `should map correctly the model when the vero2 is missing`() {
         val apiFingerprintConfiguration = ApiFingerprintConfiguration(
             listOf(ApiFingerprintConfiguration.VeroGeneration.VERO_1),
-            listOf(ApiFingerprintConfiguration.BioSdk.NEC),
+            listOf("NEC"),
             true,
             null,
             ApiFingerprintConfiguration.ApiFingerprintSdkConfiguration(
@@ -107,6 +107,18 @@ class ApiFingerprintConfigurationTest {
         )
 
         assertThat(apiFingerprintConfiguration.toDomain()).isEqualTo(fingerprintConfiguration)
+    }
+
+    @Test
+    fun `should map correctly the BioSdk fingerprint enums`() {
+        val mapping = mapOf(
+            "SECUGEN_SIM_MATCHER" to ModalitySdkType.SECUGEN_SIM_MATCHER,
+            "NEC" to ModalitySdkType.NEC,
+            "RANK_ONE" to null,
+            "UNKNOWN" to null,
+        )
+
+        mapping.forEach { assertThat(ApiFingerprintConfiguration.ApiBioSdk.fromString(it.key)).isEqualTo(it.value) }
     }
 
     @Test

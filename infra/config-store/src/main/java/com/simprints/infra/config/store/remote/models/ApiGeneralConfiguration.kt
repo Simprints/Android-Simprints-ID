@@ -9,8 +9,8 @@ import kotlinx.serialization.Serializable
 @Keep
 @Serializable
 internal data class ApiGeneralConfiguration(
-    val modalities: List<ApiModality>,
-    val matchingModalities: List<ApiModality>,
+    val modalities: List<String>,
+    val matchingModalities: List<String>,
     val languageOptions: List<String>,
     val defaultLanguage: String,
     val collectLocation: Boolean,
@@ -18,8 +18,8 @@ internal data class ApiGeneralConfiguration(
     val settingsPassword: String? = null,
 ) {
     fun toDomain(): GeneralConfiguration = GeneralConfiguration(
-        modalities.map { it.toDomain() },
-        matchingModalities.map { it.toDomain() },
+        modalities.mapNotNull { ApiModality.fromString(it) },
+        matchingModalities.mapNotNull { ApiModality.fromString(it) },
         languageOptions,
         defaultLanguage,
         collectLocation,
@@ -30,14 +30,11 @@ internal data class ApiGeneralConfiguration(
     )
 
     @Keep
-    enum class ApiModality {
-        FACE,
-        FINGERPRINT,
-        ;
-
-        fun toDomain(): Modality = when (this) {
-            FACE -> Modality.FACE
-            FINGERPRINT -> Modality.FINGERPRINT
+    object ApiModality {
+        fun fromString(value: String?): Modality? = when (value?.uppercase()) {
+            "FACE" -> Modality.FACE
+            "FINGERPRINT" -> Modality.FINGERPRINT
+            else -> null
         }
     }
 }
