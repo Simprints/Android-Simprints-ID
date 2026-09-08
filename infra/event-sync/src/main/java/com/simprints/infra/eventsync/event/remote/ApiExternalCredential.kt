@@ -3,8 +3,6 @@ package com.simprints.infra.eventsync.event.remote
 import androidx.annotation.Keep
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
-import com.simprints.infra.config.store.remote.models.ApiExternalCredentialType
-import com.simprints.infra.config.store.remote.models.fromDomainToApi
 import kotlinx.serialization.Serializable
 
 @Keep

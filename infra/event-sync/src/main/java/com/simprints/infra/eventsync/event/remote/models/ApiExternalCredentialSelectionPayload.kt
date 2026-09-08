@@ -2,10 +2,10 @@ package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.remote.models.ApiExternalCredentialType
-import com.simprints.infra.config.store.remote.models.fromDomainToApi
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent.SkipReason
+import com.simprints.infra.eventsync.event.remote.ApiExternalCredentialType
+import com.simprints.infra.eventsync.event.remote.fromDomainToApi
 import com.simprints.infra.eventsync.event.remote.models.ApiExternalCredentialSelectionPayload.ApiExternalCredentialSkipReason
 import kotlinx.serialization.Serializable
 
