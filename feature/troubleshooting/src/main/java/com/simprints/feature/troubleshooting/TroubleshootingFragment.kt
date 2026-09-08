@@ -40,7 +40,7 @@ internal class TroubleshootingFragment : Fragment(R.layout.fragment_troubleshoot
             },
         )
 
-        val adapter = TroubleshootingPagerAdapter(requireActivity())
+        val adapter = TroubleshootingPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
         binding.troubleshootingPager.adapter = adapter
 
         TabLayoutMediator(binding.troubleshootingTabs, binding.troubleshootingPager) { tab, position ->

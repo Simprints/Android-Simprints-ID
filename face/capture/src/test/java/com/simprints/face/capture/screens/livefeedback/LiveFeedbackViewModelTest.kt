@@ -35,6 +35,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Behaviour-pinning tests for the refactored [LiveFeedbackViewModel], written from
@@ -287,6 +288,26 @@ internal class LiveFeedbackViewModelTest {
     }
 
     @Test
+    fun `manual - frames arriving while finishing is still in progress are dropped, not appended`() = runTest {
+        val validFace = getFace()
+        every { faceDetector.analyze(frame) } returns validFace
+        // Simulate the camera delivering another frame while finishCapture()
+        every { faceDetector.analyze(frame, estimateAgeAndGender = true) } answers {
+            assertThat(viewModel.state.value.phase).isEqualTo(LiveFeedbackState.Phase.CAPTURING)
+            viewModel.process(frame, frame)
+            validFace
+        }
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.startCapture()
+        viewModel.process(frame, frame) // reaches the requested sample count and triggers finishCapture()
+
+        assertThat(viewModel.userCaptures).hasSize(1)
+        verify(exactly = 1) { faceDetector.analyze(frame) }
+    }
+
+    @Test
     fun `auto - does not start until start capture is pressed`() = runTest {
         every { isUsingAutoCapture.invoke(any()) } returns true
         every { faceDetector.analyze(frame) } returns getFace()
@@ -335,6 +356,35 @@ internal class LiveFeedbackViewModelTest {
                 LiveFeedbackState.Phase.FINISHED,
             ).inOrder()
         coVerify { eventReporter.addCaptureEvents(any(), any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `auto - frames arriving while finishing is still in progress are dropped, not appended`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        val validFace = getFace()
+        every { faceDetector.analyze(frame) } returns validFace
+
+        var elapsedMs = 0L
+        every { timeHelper.now() } answers { Timestamp(elapsedMs) }
+
+        // Simulate a frame arriving while finishCapture() is still running
+        every { faceDetector.analyze(frame, estimateAgeAndGender = true) } answers {
+            assertThat(viewModel.state.value.phase).isEqualTo(LiveFeedbackState.Phase.CAPTURING)
+            viewModel.process(frame, frame)
+            validFace
+        }
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.startCapture()
+        viewModel.process(frame, frame) // begins CAPTURING at t=0
+
+        elapsedMs = AUTO_CAPTURE_IMAGING_DURATION_MS + 1
+        advanceTimeBy((AUTO_CAPTURE_IMAGING_DURATION_MS + 1).milliseconds) // fires the timeout job -> finishCapture()
+
+        // Only the original sample was ever captured - the frame injected mid-finish was dropped.
+        assertThat(viewModel.userCaptures).hasSize(1)
+        verify(exactly = 1) { faceDetector.analyze(frame) }
     }
 
     @Test
@@ -602,7 +652,7 @@ internal class LiveFeedbackViewModelTest {
     }
 
     @Test
-    fun `event saving - age and gender estimation is not repeated on every failed spoof-check retry`() = runTest {
+    fun `event saving - age and gender estimation runs during CAPTURING for every spoof-check retry`() = runTest {
         every { getSpoofCheckConfiguration.invoke(any(), any()) } returns spoofConfig(FaceConfiguration.SpoofCheckMode.ENFORCED)
         every { faceDetector.analyze(frame) } returns getFace()
         every { faceDetector.analyze(any(), estimateAgeAndGender = true) } returns getFace()
@@ -611,13 +661,14 @@ internal class LiveFeedbackViewModelTest {
         viewModel.initAutoCapture()
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
 
-        // Attempt 1 fails and gets discarded.
+        // Attempt 1 fails and gets discarded, but enrichment already ran while still CAPTURING,
         viewModel.process(frame, frame)
         viewModel.startCapture()
         viewModel.process(frame, frame)
         advanceUntilIdle()
         assertThat(viewModel.state.value.phase).isEqualTo(LiveFeedbackState.Phase.NOT_STARTED)
-        verify(exactly = 0) { faceDetector.analyze(any(), estimateAgeAndGender = true) }
+        // Once for the captured sample and once for the fallback capture.
+        verify(exactly = 2) { faceDetector.analyze(any(), estimateAgeAndGender = true) }
 
         // Attempt 2 reaches maxAttempts and finishes despite still failing spoof check.
         viewModel.process(frame, frame)
@@ -626,9 +677,30 @@ internal class LiveFeedbackViewModelTest {
         advanceUntilIdle()
         assertThat(viewModel.state.value.phase).isEqualTo(LiveFeedbackState.Phase.FINISHED)
 
-        // Enrichment only runs once, for the final (accepted) attempt's captures + fallback -
-        // never for the discarded first attempt.
-        verify(exactly = 2) { faceDetector.analyze(any(), estimateAgeAndGender = true) }
+        // Enrichment runs again for the second attempt's captures + fallback.
+        verify(exactly = 4) { faceDetector.analyze(any(), estimateAgeAndGender = true) }
+    }
+
+    @Test
+    fun `event saving - disabled spoof check never shows VALIDATING phase or the orange validation tint`() = runTest {
+        // Default configuration from setUp() is SpoofCheckConfiguration.DISABLED.
+        val validFace = getFace()
+        every { faceDetector.analyze(frame) } returns validFace
+        every { faceDetector.analyze(any(), estimateAgeAndGender = true) } returns validFace
+        val states = collectStates()
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.process(frame, frame) // fallback frame before start
+        viewModel.startCapture()
+        viewModel.process(frame, frame) // captured sample -> finishes
+        advanceUntilIdle()
+
+        assertThat(states.map { it.phase }).contains(LiveFeedbackState.Phase.FINISHED)
+        // Age/gender enrichment must never trigger
+        assertThat(states.map { it.phase }).doesNotContain(LiveFeedbackState.Phase.VALIDATING)
+        assertThat(states.map { it.progress.tint }).doesNotContain(Progress.Tint.VALIDATION)
+        coVerify(exactly = 0) { faceDetector.spoofCheck(any(), any()) }
     }
 
     @Test

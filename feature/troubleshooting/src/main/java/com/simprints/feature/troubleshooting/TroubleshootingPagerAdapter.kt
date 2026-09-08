@@ -1,7 +1,8 @@
 package com.simprints.feature.troubleshooting
 
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.simprints.feature.troubleshooting.intents.IntentLogFragment
 import com.simprints.feature.troubleshooting.networking.NetworkingLogFragment
@@ -12,8 +13,9 @@ import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageR
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 internal class TroubleshootingPagerAdapter(
-    fragmentActivity: FragmentActivity,
-) : FragmentStateAdapter(fragmentActivity) {
+    fragmentManager: FragmentManager,
+    lifecycle: Lifecycle,
+) : FragmentStateAdapter(fragmentManager, lifecycle) {
     override fun getItemCount(): Int = Tabs.entries.size
 
     override fun createFragment(position: Int): Fragment = Tabs.entries[position].factory()
