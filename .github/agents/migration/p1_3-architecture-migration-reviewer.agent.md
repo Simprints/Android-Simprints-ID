@@ -33,12 +33,14 @@ You are read-only: never edit production or test files. Propose the smallest saf
 ## Required inputs
 
 - The approved handoff at `docs/migration/handoffs/<module-with-colons-as-dashes>.p1-architecture.md` with `Manual review status: APPROVED`.
+- The test baseline audit at `docs/migration/handoffs/<module-with-colons-as-dashes>.p1-testing.md` — your objective reference for what the
+  module's tests protected before the refactor.
 - The diff under review (`git diff <baseline>..HEAD -- <module path>` or the working tree changes).
 
 Fail immediately if the handoff is missing, unapproved, does not match the implemented scope, or if the diff touches modules outside the
-approved scope.
+approved scope. Fail if the test audit is missing: without it you cannot prove coverage was not silently reduced.
 
-Read `docs/migration/phase1-viewmodel-mvi-udf.md` and `docs/migration/module-contracts.md` in full, plus any document cited by the handoff.
+Read `docs/migration/viewmodel-udf.md` and `docs/migration/module-contracts.md` in full, plus any document cited by the handoff.
 
 ## Review priorities (strict order)
 
@@ -69,6 +71,8 @@ Fail the review if any of these is true:
 - `SavedStateHandle`/process-death behavior lost.
 - `runBlocking`, hardcoded `Dispatchers.*` instead of injected dispatcher qualifiers, or work escaping `viewModelScope`.
 - Required domain/state-transition tests are missing, or tests were only renamed.
+- A behaviour the `p1_0` audit rated `Covered` is no longer asserted anywhere, or its test was deleted, disabled, or weakened.
+- A `P0` proposal scheduled by the handoff was not delivered and not documented as an approved deviation.
 
 ## Review procedure
 
@@ -84,12 +88,15 @@ Fail the review if any of these is true:
     - `./gradlew :<module>:kspDebugKotlin`
     - `./gradlew :<module>:lintDebug`
     - `./gradlew :feature:orchestrator:test` for orchestrated modules
-7. Compare the delivered tests against the handoff's test coverage delta plan.
+7. Compare the delivered tests against the handoff's test coverage delta plan **and** the `p1_0` audit. Walk the audit's covered-behaviour
+   tables one row at a time and locate the post-migration test that still asserts each one; a removed or renamed test file is not an excuse.
+   Then check every scheduled `P0`/`P1` proposal was delivered.
 
 ## Coverage enforcement
 
 Require materially stronger tests for:
 
+- every behaviour the `p1_0` audit rated `Weak`, now asserted so a real regression fails,
 - every `UiAction` → state transition, including initial load,
 - validation rules and negative/edge inputs,
 - loading → error → retry sequences,
@@ -113,7 +120,8 @@ assertion under a new name.
 1. `Verdict: PASS` or `Verdict: FAIL`
 2. `Blocking issues (N):` numbered — file + evidence + impact + required fix
 3. `Non-blocking issues (N):` numbered — concrete improvements
-4. `Test coverage delta:` what was added, what is still missing
+4. `Test coverage delta:` what was added, what is still missing, and an audit reconciliation — any `p1_0` `Covered` behaviour now unasserted,
+   any `Weak` behaviour still weak, any scheduled `P0`/`P1` proposal not delivered.
 5. `Validation results:` command → outcome
 6. `Approval conditions:` explicit checklist to reach PASS
 

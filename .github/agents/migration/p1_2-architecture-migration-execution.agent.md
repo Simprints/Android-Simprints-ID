@@ -41,6 +41,8 @@ You do not plan the migration, expand scope, or start Compose work.
 1. Target Gradle module path.
 2. Approved handoff at `docs/migration/handoffs/<module-with-colons-as-dashes>.p1-architecture.md` containing
    `Manual review status: APPROVED`.
+3. The test baseline audit at `docs/migration/handoffs/<module-with-colons-as-dashes>.p1-testing.md`, which the handoff's
+   `Test coverage delta plan` is built on.
 
 If the handoff is missing, unapproved, or stale relative to the current code (baseline SHA no longer matches the module's state in a way
 that invalidates the plan), stop and request a refreshed brief.
@@ -53,6 +55,8 @@ Read these two documents in full before editing code; they are the only referenc
 - `docs/migration/viewmodel-udf.md` — the MVI contract you must implement, including the `LiveData` migration map, Fragment collection
   rules, and the ViewModel test checklist.
 - `docs/migration/module-contracts.md` — the guardrails and per-module contract checklist.
+- `docs/migration/handoffs/<module-with-colons-as-dashes>.p1-testing.md` — the pre-migration test baseline. Treat its `Covered` behaviours
+  as the regression contract you must not break, and its scheduled `P0`/`P1` proposals as work you must deliver.
 
 Plus any additional document explicitly cited by the handoff.
 
@@ -101,14 +105,17 @@ except an explicitly approved shared file).
 ## Execution workflow
 
 1. Convert the handoff into an ordered checklist; work one step at a time.
-2. Introduce the screen contracts (`UiState`/`UiAction`/`UiEffect`).
-3. Migrate the ViewModel, mapping every old LiveData/event per §2d.
-4. Make the Fragment state-driven and effect-driven.
-5. Move validation/decision logic into the domain layer where the handoff requires it.
-6. Migrate and extend tests (see below).
-7. Delete now-dead LiveData plumbing and unused helpers.
-8. Run the quality gates; fix every failure before continuing.
-9. Append implementation evidence, validation output, and any deviations to the handoff.
+2. Establish the regression net first: before changing ViewModel or Fragment code, make sure the behaviours the `p1_0` audit rated `Weak` or
+   `Uncovered` and that the handoff scheduled as `P0` are pinned by tests against the **current** implementation, and confirm they pass. A
+   `P0` test that can only be written after the refactor must be flagged in the handoff as a parity risk.
+3. Introduce the screen contracts (`UiState`/`UiAction`/`UiEffect`).
+4. Migrate the ViewModel, mapping every old LiveData/event per §2d.
+5. Make the Fragment state-driven and effect-driven.
+6. Move validation/decision logic into the domain layer where the handoff requires it.
+7. Migrate and extend tests, closing the remaining scheduled audit items (see below).
+8. Delete now-dead LiveData plumbing and unused helpers.
+9. Run the quality gates; fix every failure before continuing.
+10. Append implementation evidence, validation output, and any deviations to the handoff.
 
 ## Testing requirements
 
@@ -117,6 +124,10 @@ Use the project stack: JUnit 4, MockK, Truth, Turbine, Robolectric where needed,
 
 Cover, per migrated screen:
 
+- every behaviour the `p1_0` audit rated `Covered` — it must still be asserted after the migration, even if the test had to be rewritten
+  against `UiState`/`UiEffect`,
+- every behaviour the audit rated `Weak`, now with an assertion that fails on a real regression,
+- every `P0` and scheduled `P1` proposal from the audit,
 - state transitions for each `UiAction` (including initial load),
 - validation rules and negative/edge inputs,
 - loading → success and loading → error → retry sequences,
@@ -124,7 +135,9 @@ Cover, per migrated screen:
 - domain use cases and mappers introduced or changed,
 - `SavedStateHandle` restoration where behavior depends on it.
 
-Renaming existing tests does not count as coverage. Each migrated behavior needs an assertion that would fail if the behavior regressed.
+Deleting or weakening a test that pinned an audited behaviour is a failure, not cleanup. If a baseline test must be rewritten, the
+replacement must assert the same behaviour. Renaming existing tests does not count as coverage. Each migrated behavior needs an assertion
+that would fail if the behavior regressed.
 
 Quality gates (must pass):
 
@@ -140,7 +153,8 @@ Return:
 1. Files changed (grouped: contracts, ViewModel, Fragment, domain, tests, cleanup).
 2. Per-screen MVI implementation summary and how each old LiveData/event was mapped.
 3. Behavior parity evidence against the handoff checklist.
-4. Tests added/strengthened and what each proves.
+4. Tests added/strengthened and what each proves, plus an audit disposition table: every `p1_0` proposal marked `delivered`, `deferred with
+   reason`, and every previously `Covered` behaviour marked as still asserted, naming the test.
 5. Validation command results.
 6. Deviations from the handoff, remaining risks, and follow-ups.
 

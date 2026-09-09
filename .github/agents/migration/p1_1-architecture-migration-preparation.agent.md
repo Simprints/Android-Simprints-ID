@@ -40,8 +40,11 @@ You produce a handoff document. You do not implement production changes.
 
 1. Target Gradle module path (for example `:feature:consent`).
 2. Scope constraints: screens in/out of scope, flows that must not be touched.
+3. The approved test baseline audit at `docs/migration/handoffs/<module-with-colons-as-dashes>.p1-testing.md` produced by the test
+   audit agent (`p1_0`), with `Manual review status: APPROVED`.
 
-If either is missing or ambiguous, stop and ask. Never guess the module.
+If any of these is missing or ambiguous, stop and ask. Never guess the module. If the audit is missing or unapproved, route the module back
+to `p1_0` before planning: the test baseline is what makes behaviour parity verifiable.
 
 ## Source-of-truth documents
 
@@ -51,6 +54,8 @@ Read these two documents in full before planning; they are the only references y
   Fragments, complex Flow and shared ViewModels, and the ViewModel/domain testing patterns and checklist.
 - `docs/migration/module-contracts.md` — orchestrator, navigation, serialization, and result guardrails (all modules except
   `:feature:dashboard`).
+- `docs/migration/handoffs/<module-with-colons-as-dashes>.p1-testing.md` — the pre-migration test baseline: covered happy paths, covered
+  edge cases, weakly tested and untested behaviour, and the prioritised `P0`/`P1`/`P2` test proposals.
 
 Also consult `.github/copilot-instructions.md` and `.github/event-system.md` for project conventions and event semantics. Do not pull in the
 Phase 2 Compose documents.
@@ -83,9 +88,11 @@ Explicitly out of scope in Phase 1: Compose UI, Compose dependencies/BOM, `SimTh
    `handleResult` wiring. All must be unchanged by Phase 1.
 6. **Event and logging audit** — every `SessionEventRepository.addOrUpdateEvent(...)` call site and `Simber` usage that must survive the
    refactor, including ordering relative to state changes.
-7. **Test baseline and delta** — list current tests and coverage gaps. Specify concrete new tests for state transitions, validation,
-   error/retry/loading, effect emission, and domain use cases. Note if `turbine` must be added to `gradle/libs.versions.toml` (it is not
-   present yet) and whether `InstantTaskExecutorRule` can be dropped for each test class.
+7. **Test baseline and delta** — start from the `p1_0` audit rather than re-deriving coverage. Carry every `Covered` behaviour forward as a
+   parity assertion that must still hold, upgrade every `Weak` rating to a real assertion, and schedule all `P0` proposals inside this
+   migration (`P1` where the refactor touches the code, `P2` recorded as follow-up). Add anything the audit could not foresee: state
+   transitions, validation, error/retry/loading, effect emission, and domain use cases. Justify in writing any audit proposal you decide not
+   to schedule. Note if `InstantTaskExecutorRule` can be dropped for each test class.
 8. **Sequencing and rollback** — order the work so each step compiles, tests green, and is revertable on its own (typically: contracts →
    ViewModel → Fragment → tests → cleanup).
 
@@ -105,9 +112,11 @@ Required sections:
 3. `Current-state inventory` — ViewModels, Fragments, use cases, domain logic, tests.
 4. `Per-screen MVI contract` — target `UiState`/`UiAction`/`UiEffect` and effect transport rationale.
 5. `Behavior parity checklist` — validation rules, loading/error/retry, back handling, process-death/`SavedStateHandle` behavior, event
-   logging order.
+   logging order. Every behaviour rated `Covered` in the `p1_0` audit must appear here as a must-not-regress item.
 6. `Contract stability map` — destination IDs, params/results, serializer registration, result wiring.
-7. `Test coverage delta plan` — file-by-file tests to add or strengthen, with the behavior each proves.
+7. `Test coverage delta plan` — file-by-file tests to add or strengthen, with the behavior each proves. Include an explicit
+   `Audit disposition` table mapping every `p1_0` proposal (`P0`/`P1`/`P2`) to `scheduled in this migration` or `deferred, with reason`, and
+   every `Weak`/`Uncovered` behaviour to the test that will close it.
 8. `Ordered execution plan` — numbered steps with stop conditions.
 9. `Blocking risks` and `Rollback plan`.
 10. `Acceptance criteria` and `Required validation commands` (`./gradlew :<module>:test`, `:<module>:kspDebugKotlin`, `:<module>:lintDebug`,
@@ -133,7 +142,7 @@ Fail preparation and report blockers if you cannot produce all of:
 
 - a per-screen `UiState`/`UiAction`/`UiEffect` target contract,
 - a full behavior parity checklist including error/retry and process-death behavior,
-- a concrete, file-level test coverage delta,
+- a concrete, file-level test coverage delta with an `Audit disposition` for every `p1_0` proposal,
 - a contract stability map,
 - an ordered, revertable execution plan with validation commands.
 
@@ -144,7 +153,7 @@ Return:
 1. Target module and scope.
 2. Architecture problems found (with file references).
 3. Proposed MVI/UDF target per screen.
-4. Required test additions.
+4. Required test additions, including which `p1_0` audit proposals are scheduled and which are deferred.
 5. Handoff file path and `Manual review status`.
 6. Open questions or blocking risks.
 
