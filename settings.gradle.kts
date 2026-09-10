@@ -156,4 +156,5 @@ include(
 // Test modules
 include(
     ":testing:data-generator",
+    ":benchmark",
 )
