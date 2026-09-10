@@ -11,8 +11,6 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.eventsync.module.ModuleSelectionRepository
 import com.simprints.infra.eventsync.module.SelectableModule
-import com.simprints.infra.sync.OneTime
-import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,7 +23,6 @@ import javax.inject.Inject
 @HiltViewModel
 internal class ModuleSelectorViewModel @Inject constructor(
     private val moduleRepository: ModuleSelectionRepository,
-    private val syncOrchestrator: SyncOrchestrator,
     private val configRepository: ConfigRepository,
     private val tokenizationProcessor: TokenizationProcessor,
     @param:ExternalScope private val externalScope: CoroutineScope,
@@ -124,9 +121,8 @@ internal class ModuleSelectorViewModel @Inject constructor(
     private fun saveModules() {
         externalScope.launch {
             moduleRepository.saveModules(allModules.map { module -> SelectableModule(module.tokenizedName, module.isSelected) })
-            syncOrchestrator.execute(OneTime.Events.restart())
+            emitEffect(ModuleSelectorEffects.Confirmed)
         }
-        emitEffect(ModuleSelectorEffects.Dismiss)
     }
 
     private fun updateState(block: (currentState: ModuleSelectorState) -> ModuleSelectorState) {

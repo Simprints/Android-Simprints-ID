@@ -9,6 +9,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":feature:module-selector"))
 
     implementation(project(":infra:enrolment-records:repository"))
     implementation(project(":infra:config-store"))

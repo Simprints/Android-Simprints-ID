@@ -8,6 +8,7 @@
     <include app:graph="@navigation/graph_privacy" />
     <include app:graph="@navigation/graph_login" />
     <include app:graph="@navigation/graph_troubleshooting" />
+    <include app:graph="@navigation/graph_module_selection" />
 
     <fragment
         android:id="@+id/requestLoginFragment"
@@ -54,8 +55,8 @@
             android:id="@+id/action_mainFragment_to_syncInfoFragment"
             app:destination="@id/syncInfoFragment" />
         <action
-            android:id="@+id/action_mainFragment_to_moduleSelectionFragment"
-            app:destination="@id/moduleSelectionFragment" />
+            android:id="@+id/action_syncInfoFragment_to_moduleSelection"
+            app:destination="@id/graph_module_selection" />
         <action
             android:id="@+id/action_mainFragment_to_privacyNoticesFragment"
             app:destination="@id/graph_privacy" />
@@ -102,16 +103,13 @@
         android:label="fragment_sync_info"
         tools:layout="@layout/fragment_sync_info">
         <action
-            android:id="@+id/action_syncInfoFragment_to_moduleSelectionFragment"
-            app:destination="@id/moduleSelectionFragment" />
+            android:id="@+id/action_syncInfoFragment_to_moduleSelection"
+            app:destination="@id/graph_module_selection" />
         <action
             android:id="@+id/action_syncInfoFragment_to_login"
             app:destination="@id/graph_login" />
     </fragment>
-    <fragment
-        android:id="@+id/moduleSelectionFragment"
-        android:name="com.simprints.feature.moduleselector.ModuleSelectorFragment"
-        android:label="ModuleSelectionFragment" />
+
     <fragment
         android:id="@+id/fingerSelectionFragment"
         android:name="com.simprints.feature.dashboard.settings.fingerselection.FingerSelectionFragment"
@@ -131,8 +129,8 @@
                 android:id="@+id/action_logoutSyncFragment_to_logoutSyncDeclineFragment"
                 app:destination="@id/logOutSyncDeclineFragment" />
             <action
-                android:id="@+id/action_logoutSyncFragment_to_moduleSelectionFragment"
-                app:destination="@id/moduleSelectionFragment" />
+                android:id="@+id/action_syncInfoFragment_to_moduleSelection"
+                app:destination="@id/graph_module_selection" />
             <action
                 android:id="@+id/action_logOutSyncFragment_to_login"
                 app:destination="@id/graph_login" />
