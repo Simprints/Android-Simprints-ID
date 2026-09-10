@@ -9,13 +9,13 @@ import kotlinx.serialization.Serializable
 @Keep
 @Serializable
 internal data class ApiFaceConfiguration(
-    val allowedSDKs: List<BioSdk>,
+    val allowedSDKs: List<String>,
     val isAutoCapture: Boolean = false,
     val rankOne: ApiFaceSdkConfiguration? = null,
     val simFace: ApiFaceSdkConfiguration? = null,
 ) {
     fun toDomain(): FaceConfiguration = FaceConfiguration(
-        allowedSDKs = allowedSDKs.map { it.toDomain() },
+        allowedSDKs = allowedSDKs.mapNotNull { ApiBioSdk.fromString(it) },
         isAutoCapture = isAutoCapture,
         rankOne = rankOne?.toDomain(),
         simFace = simFace?.toDomain(),
@@ -44,14 +44,11 @@ internal data class ApiFaceConfiguration(
     }
 
     @Keep
-    enum class BioSdk {
-        RANK_ONE,
-        SIM_FACE,
-        ;
-
-        fun toDomain() = when (this) {
-            RANK_ONE -> ModalitySdkType.RANK_ONE
-            SIM_FACE -> ModalitySdkType.SIM_FACE
+    object ApiBioSdk {
+        fun fromString(value: String?): ModalitySdkType? = when (value?.uppercase()) {
+            "RANK_ONE" -> ModalitySdkType.RANK_ONE
+            "SIM_FACE" -> ModalitySdkType.SIM_FACE
+            else -> null
         }
     }
 

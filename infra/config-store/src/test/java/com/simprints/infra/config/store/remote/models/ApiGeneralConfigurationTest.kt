@@ -1,6 +1,6 @@
 package com.simprints.infra.config.store.remote.models
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.testtools.apiGeneralConfiguration
@@ -16,25 +16,22 @@ class ApiGeneralConfigurationTest {
     @Test
     fun `should map correctly the Modality enums`() {
         val mapping = mapOf(
-            ApiGeneralConfiguration.ApiModality.FACE to Modality.FACE,
-            ApiGeneralConfiguration.ApiModality.FINGERPRINT to Modality.FINGERPRINT,
+            "FACE" to Modality.FACE,
+            "FINGERPRINT" to Modality.FINGERPRINT,
+            "UNKNOWN" to null,
         )
 
-        mapping.forEach {
-            assertThat(it.key.toDomain()).isEqualTo(it.value)
-        }
+        mapping.forEach { assertThat(ApiGeneralConfiguration.ApiModality.fromString(it.key)).isEqualTo(it.value) }
     }
 
     @Test
     fun `should map correctly the settings passwords`() {
-        assertThat(SettingsPasswordConfig.toDomain(null)).isEqualTo(
-            SettingsPasswordConfig.NotSet,
+        val mapping = mapOf(
+            null to SettingsPasswordConfig.NotSet,
+            "" to SettingsPasswordConfig.NotSet,
+            "123" to SettingsPasswordConfig.Locked("123"),
         )
-        assertThat(SettingsPasswordConfig.toDomain("")).isEqualTo(
-            SettingsPasswordConfig.NotSet,
-        )
-        assertThat(SettingsPasswordConfig.toDomain("123")).isEqualTo(
-            SettingsPasswordConfig.Locked("123"),
-        )
+
+        mapping.forEach { assertThat(SettingsPasswordConfig.toDomain(it.key)).isEqualTo(it.value) }
     }
 }

@@ -1,8 +1,9 @@
 package com.simprints.infra.config.store.remote.models
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.testtools.apiFaceConfiguration
 import com.simprints.infra.config.store.testtools.faceConfiguration
 import org.junit.Test
@@ -32,6 +33,18 @@ class ApiFaceConfigurationTest {
             ),
         )
         assertThat(apiFaceConfigurationWithAgeRange.toDomain()).isEqualTo(faceConfigurationWithAgeRange)
+    }
+
+    @Test
+    fun `should map correctly the BioSdk face enums`() {
+        val mapping = mapOf(
+            "RANK_ONE" to ModalitySdkType.RANK_ONE,
+            "SIM_FACE" to ModalitySdkType.SIM_FACE,
+            "NEC" to null,
+            "UNKNOWN" to null,
+        )
+
+        mapping.forEach { assertThat(ApiFaceConfiguration.ApiBioSdk.fromString(it.key)).isEqualTo(it.value) }
     }
 
     @Test

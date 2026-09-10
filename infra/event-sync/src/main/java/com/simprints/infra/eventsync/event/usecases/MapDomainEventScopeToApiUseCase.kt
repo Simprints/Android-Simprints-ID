@@ -11,7 +11,6 @@ import javax.inject.Inject
 internal class MapDomainEventScopeToApiUseCase @Inject constructor(
     private val mapDomainEventToApiUseCase: MapDomainEventToApiUseCase,
 ) {
-
     operator fun invoke(
         scope: EventScope,
         events: List<Event>,
