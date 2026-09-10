@@ -353,6 +353,17 @@
     <string name="dashboard_logout_confirmation_message">Keessa bahuu barbaadda?</string>
     <string name="dashboard_logout_confirmation_cancel_button">Haquu</string>
 
+    <!-- Module selection -->
+    <string name="select_modules_title">Moojuliiwwan filadhu</string>
+    <string name="select_modules_error_no_modules">Maaloo, yoo xiqqaate moodula tokko filadhu.</string>
+    <string name="select_modules_error_too_many_modules">Maaloo, %1$d moojulii ol hin filatiin.</string>
+    <string name="select_modules_no_modules_selected">Moojuula hin filatamne</string>
+    <string name="select_modules_search_hint">Mojuula barbaadi</string>
+    <string name="select_modules_no_results">Firiin hin jiruu</string>
+    <string name="select_modules_confirm">Mirkaneessi</string>
+    <string name="select_modules_cancel">Haquu</string>
+    <string name="select_modules_lock_overlay_title">Qulfii banuuf tuqi</string>
+
     <!-- Maintenance mode errors -->
     <string name="error_backend_maintenance_message">Sirnichi yeroo ammaa suphaadhaaf sarara ala ta\'ee jira. Mee booda irra deebi\'ii yaalaa.</string>
     <string name="error_backend_maintenance_with_time_message">Sirnichi yeroo ammaa suphaadhaaf sarara ala ta\'ee jira. Mee %s booda irra deebi\'ii yaali</string>

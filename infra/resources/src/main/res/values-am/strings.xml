@@ -462,6 +462,17 @@
     <string name="dashboard_logout_confirmation_log_out_button">ዘግተህ ዉጣ</string>
     <string name="dashboard_logout_confirmation_cancel_button">አቋርጥ</string>
 
+    <!-- Module selection -->
+    <string name="select_modules_title">ሞጅውሎችን ይምረጡ</string>
+    <string name="select_modules_error_no_modules">እባክዎት ካለው የምዕራፍ አማራጭ ውስጥ ቢያንስ አንድ ይምረጡ</string>
+    <string name="select_modules_error_too_many_modules">ካሉት ምዕራፎች ውስጥ ከ %1$d በላይ መምረጥ አይችሉም</string>
+    <string name="select_modules_no_modules_selected">የተመረጠ ሞጁል የለም</string>
+    <string name="select_modules_search_hint">ሞጁሎችን መፈለግ</string>
+    <string name="select_modules_no_results">ምንም ውጤት የለም</string>
+    <string name="select_modules_confirm">ማረጋገጥ</string>
+    <string name="select_modules_cancel">ሰርዝ</string>
+    <string name="select_modules_lock_overlay_title">ለመክፈት መታ ያድርጉ</string>
+
     <!-- Maintenance mode errors -->
     <string name="error_backend_maintenance_message">ስርዓቱ በአሁኑ ጊዜ ለጥገና ከመስመር ውጭ ነው። እባክዎ ቆየት ብለው ይሞክሩ.</string>
     <string name="error_backend_maintenance_with_time_message">ስርዓቱ በአሁኑ ጊዜ ለጥገና ከመስመር ውጭ ነው። እባክዎ ከ%s በኋላ እንደገና ይሞክሩ</string>
