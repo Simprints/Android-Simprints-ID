@@ -15,6 +15,10 @@ on:
                 description: "Android version code for the build (used to download the universal APK from Play)"
                 type: string
                 required: true
+            build-number:
+                description: "CI build number to append to the released APK filename (e.g. 173)"
+                type: string
+                required: true
             mapping-file:
                 description: "Optional artifact name of the ProGuard mapping file"
                 type: string
@@ -62,9 +66,10 @@ jobs:
                     GOOGLE_API_KEY_JSON: ${{ secrets.GOOGLE_API_KEY_JSON }}
                     VERSION_CODE: ${{ inputs.version-code }}
                     VERSION_NAME: ${{ inputs.version-name }}
+                    BUILD_NUMBER: ${{ inputs.build-number }}
                     PACKAGE_NAME: com.simprints.id
                 run: |
-                    APK_NAME="simprints-id-${VERSION_NAME}-universal.apk"
+                    APK_NAME="simprints-id-${VERSION_NAME}+${BUILD_NUMBER}-universal.apk"
                     OUTPUT_APK="$APK_NAME" python3 .github/scripts/download-universal-apk.py
                     echo "apk-name=$APK_NAME" >> "$GITHUB_OUTPUT"
 
