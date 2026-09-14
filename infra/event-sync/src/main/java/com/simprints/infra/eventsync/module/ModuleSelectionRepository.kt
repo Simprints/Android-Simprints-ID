@@ -11,6 +11,7 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SETTINGS
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
+import kotlin.collections.take
 
 class ModuleSelectionRepository @Inject internal constructor(
     private val configRepository: ConfigRepository,
@@ -85,7 +86,8 @@ class ModuleSelectionRepository @Inject internal constructor(
     }
 
     private fun setCrashlyticsKeyForModules(modules: List<String>) {
-        Simber.setUserProperty(MODULE_IDS, modules.toString())
+        // Ensure that user property is within the allowed string limit to avoid crashing in debug
+        Simber.setUserProperty(MODULE_IDS, modules.toString().take(99))
     }
 
     private fun logMessageForCrashReport(message: String) {
