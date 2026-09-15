@@ -1,0 +1,9 @@
+{
+  "startup_time.git_branch": "spike/ms-1440-compose-migration",
+  "startup_time.git_commit": "b54f017c694b874dbc8292c49c00870c5bcc2d32",
+  "startup_time.timetoinitialdisplayms_avg": 633.4855,
+  "startup_time.timetoinitialdisplayms_max": 852.8743,
+  "startup_time.timetoinitialdisplayms_median": 586.0686,
+  "startup_time.timetoinitialdisplayms_min": 419.9393,
+  "startup_time.timetoinitialdisplayms_sample_count": 5.0
+}
