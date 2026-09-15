@@ -5,6 +5,8 @@
     android:id="@+id/graph_validate_subject_pool"
     app:startDestination="@id/validateSubjectPoolFragment">
 
+    <include app:graph="@navigation/graph_module_selection" />
+
     <fragment
         android:id="@+id/validateSubjectPoolFragment"
         android:name="com.simprints.feature.validatepool.screen.ValidateSubjectPoolFragment"
@@ -14,6 +16,10 @@
         <argument
             android:name="params"
             app:argType="com.simprints.core.domain.step.StepParams" />
+
+        <action
+            android:id="@+id/action_validateSubjectPoolFragment_to_moduleSelection"
+            app:destination="@id/graph_module_selection" />
 
     </fragment>
 
