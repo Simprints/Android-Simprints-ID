@@ -459,6 +459,18 @@
     <string name="dashboard_logout_confirmation_log_out_button">Logout</string>
     <string name="dashboard_logout_confirmation_cancel_button">Cancel</string>
 
+    <!-- Module selection -->
+    <string name="select_modules_title">Select modules</string>
+    <string name="select_modules_error_no_modules">Please select at least one module.</string>
+    <string name="select_modules_error_too_many_modules">Please select no more than %1$d modules.</string>
+    <string name="select_modules_no_modules_selected">No modules selected</string>
+    <string name="select_modules_search_hint">Search modules</string>
+    <string name="select_modules_no_results">No results</string>
+    <string name="select_modules_confirm">Confirm</string>
+    <string name="select_modules_cancel">Cancel</string>
+    <string name="select_modules_lock_overlay_title">Tap to unlock</string>
+    <string name="select_modules_selected_only">Only selected</string>
+
     <!-- Maintenance mode errors -->
     <string name="error_backend_maintenance_message">The system is currently offline for maintenance. Please try again later.</string>
     <string name="error_backend_maintenance_with_time_message">The system is currently offline for maintenance. Please try again after %s</string>
