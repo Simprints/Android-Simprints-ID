@@ -9,10 +9,10 @@ import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 
 internal class ModuleSelectorUiModelMapper(
     private val tokenizationProcessor: TokenizationProcessor,
-) : StateToModelMapper<ModuleSelectorDataState, ModuleSelectorUiModel> {
+) : StateToModelMapper<ModuleSelectorState, ModuleSelectorUiModel> {
     private val untokenizedModulesCache = mutableMapOf<TokenizableString, String>()
 
-    override fun mapStateToModel(state: ModuleSelectorDataState): ModuleSelectorUiModel {
+    override fun mapStateToModel(state: ModuleSelectorState): ModuleSelectorUiModel {
         val filteredModules = state.allModules
             .filter { !state.onlySelected || it.isSelected }
             .filter { state.query.isBlank() || resolveDisplayName(it.name, state).contains(state.query, ignoreCase = true) }
@@ -43,7 +43,7 @@ internal class ModuleSelectorUiModelMapper(
 
     private fun resolveDisplayName(
         tokenized: TokenizableString,
-        state: ModuleSelectorDataState,
+        state: ModuleSelectorState,
     ): String = untokenizedModulesCache.getOrPut(tokenized) {
         state.project
             ?.let { project ->

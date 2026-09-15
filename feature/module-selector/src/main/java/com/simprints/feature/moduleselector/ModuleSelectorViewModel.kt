@@ -3,7 +3,7 @@ package com.simprints.feature.moduleselector
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
 import com.simprints.feature.moduleselector.arch.MviViewModel
-import com.simprints.feature.moduleselector.model.ModuleSelectorDataState
+import com.simprints.feature.moduleselector.model.ModuleSelectorState
 import com.simprints.feature.moduleselector.model.ModuleSelectorUiModel
 import com.simprints.feature.moduleselector.model.ModuleSelectorUiModelMapper
 import com.simprints.infra.config.store.ConfigRepository
@@ -25,8 +25,8 @@ internal class ModuleSelectorViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
     tokenizationProcessor: TokenizationProcessor,
     @param:ExternalScope private val externalScope: CoroutineScope,
-) : MviViewModel<ModuleSelectorAction, ModuleSelectorDataState, ModuleSelectorUiModel, ModuleSelectorEffects>(
-        initialDataState = ModuleSelectorDataState(),
+) : MviViewModel<ModuleSelectorAction, ModuleSelectorState, ModuleSelectorUiModel, ModuleSelectorEffects>(
+        initialDataState = ModuleSelectorState(),
         mapper = ModuleSelectorUiModelMapper(tokenizationProcessor),
     ) {
     init {
