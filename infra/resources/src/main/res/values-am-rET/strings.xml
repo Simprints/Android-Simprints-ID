@@ -485,6 +485,7 @@
     <string name="id_pool_validation_pool_empty_message">ስልኩ ላይ ምንም መረጃ የለም</string>
     <string name="id_pool_validation_action_close">ዝጋ</string>
     <string name="id_pool_validation_action_sync">ሲንከ አድርግና እና እንደገና ሞክር</string>
+    <string name="id_pool_validation_action_select_modules">ሞጁሎችን ይምረጡ</string>
 
     <!-- Age group selection -->
     <string name="age_group_selection_title">የተጠቃሚውን የእድሜ ክልል ምረጥ</string>
