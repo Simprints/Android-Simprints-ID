@@ -1,6 +1,8 @@
 package com.simprints.feature.moduleselector
 
 import com.simprints.feature.moduleselector.adapter.ModuleSelectorItem
+import com.simprints.feature.moduleselector.arch.UiAction
+import com.simprints.feature.moduleselector.arch.UiEffect
 
 internal data class ModuleSelectorState(
     val modules: List<ModuleSelectorItem> = emptyList(),
@@ -19,7 +21,7 @@ internal data class ModuleSelectorState(
     }
 }
 
-internal sealed interface ModuleSelectorEffects {
+internal sealed interface ModuleSelectorEffects : UiEffect {
     data object Dismiss : ModuleSelectorEffects
 
     data class ShowPassword(
@@ -27,7 +29,7 @@ internal sealed interface ModuleSelectorEffects {
     ) : ModuleSelectorEffects
 }
 
-internal sealed interface ModuleSelectorAction {
+internal sealed interface ModuleSelectorAction : UiAction {
     data object LockOverlayClicked : ModuleSelectorAction
 
     data object UnlockScreen : ModuleSelectorAction

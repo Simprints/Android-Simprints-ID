@@ -15,6 +15,7 @@ import com.simprints.feature.module.selector.R
 import com.simprints.feature.module.selector.databinding.FragmentModuleSelectorBinding
 import com.simprints.feature.moduleselector.ModuleSelectorState.SelectionError
 import com.simprints.feature.moduleselector.adapter.ModuleSelectorAdapter
+import com.simprints.feature.moduleselector.model.ModuleSelectorUiModel
 import com.simprints.infra.uibase.password.SettingsPasswordDialogFragment
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
@@ -54,7 +55,7 @@ internal class ModuleSelectorFragment : Fragment(R.layout.fragment_module_select
     private fun observeUi() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch { viewModel.state.collect(::renderState) }
+                launch { viewModel.uiModel.collect(::renderState) }
                 launch { viewModel.effects.collect(::handleEffect) }
             }
         }
@@ -86,23 +87,23 @@ internal class ModuleSelectorFragment : Fragment(R.layout.fragment_module_select
         }
     }
 
-    private fun renderState(state: ModuleSelectorState) = with(binding) {
-        if (moduleSelectionToggleSwitch.isChecked != state.onlySelected) {
+    private fun renderState(model: ModuleSelectorUiModel) = with(binding) {
+        if (moduleSelectionToggleSwitch.isChecked != model.onlySelected) {
             // Avoids unnecessary selection listener update loops
-            moduleSelectionToggleSwitch.isChecked = state.onlySelected
+            moduleSelectionToggleSwitch.isChecked = model.onlySelected
         }
 
-        adapter.submitList(state.modules)
-        moduleSelectionConfirmButton.isEnabled = state.isConfirmEnabled
-        modulesLockOverlay.isVisible = state.isScreenLocked
+        adapter.submitList(model.modules)
+        moduleSelectionConfirmButton.isEnabled = model.isConfirmEnabled
+        modulesLockOverlay.isVisible = model.isScreenLocked
 
-        moduleSelectionErrorText.isVisible = state.selectionError != null
-        moduleSelectionErrorText.text = when (state.selectionError) {
+        moduleSelectionErrorText.isVisible = model.selectionError != null
+        moduleSelectionErrorText.text = when (model.selectionError) {
             null -> null
             SelectionError.NoModuleSelected -> getString(IDR.string.select_modules_no_modules_selected)
             is SelectionError.TooManyModulesSelected -> getString(
                 IDR.string.select_modules_error_too_many_modules,
-                state.selectionError.maxCount,
+                model.selectionError.maxCount,
             )
         }
     }
