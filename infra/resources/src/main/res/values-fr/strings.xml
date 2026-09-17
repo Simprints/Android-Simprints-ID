@@ -465,6 +465,17 @@
     <string name="dashboard_logout_confirmation_log_out_button">Déconnexion</string>
     <string name="dashboard_logout_confirmation_cancel_button">Annuler</string>
 
+    <!-- Module selection -->
+    <string name="select_modules_title">Sélectionner les modules</string>
+    <string name="select_modules_error_no_modules">Veuillez sélectionner au moins un module.</string>
+    <string name="select_modules_error_too_many_modules">Veuillez ne pas sélectionner plus de %1$d modules.</string>
+    <string name="select_modules_no_modules_selected">Aucun module sélectionné</string>
+    <string name="select_modules_search_hint">Recherche de modules</string>
+    <string name="select_modules_no_results">Aucun résultat</string>
+    <string name="select_modules_confirm">Valider</string>
+    <string name="select_modules_cancel">Annuler</string>
+    <string name="select_modules_lock_overlay_title">Tapez pour déverrouiller</string>
+
     <!-- Maintenance mode errors -->
     <string name="error_backend_maintenance_message">Le système est hors ligne pour maintenance. Réessayez plus tard.</string>
     <string name="error_backend_maintenance_with_time_message">Le système est hors ligne pour maintenance. Réessayez dans %s</string>
