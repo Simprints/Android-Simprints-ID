@@ -127,6 +127,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
                 feedback = feedback,
                 isAutoCapture = isAutoCapture,
                 isFaceTrackingEnabled = faceTracking.enabled,
+                isProgressAroundCaptureButton = faceTracking.progressAroundCaptureButton,
                 permissionStatus = permissionStatus,
                 progress = computeProgress(phase, detectionForTint),
                 targetBox = targetBox,

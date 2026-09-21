@@ -1108,6 +1108,34 @@ internal class LiveFeedbackViewModelTest {
         verify { cropToFaceSquare.invoke(any(), any(), 512) }
     }
 
+    @Test
+    fun `tracking - progress follows the tracked face unless the placement flag is set`() = runTest {
+        enableFaceTracking()
+        viewModel.initAutoCapture()
+
+        // The screen picks where to draw progress off the state, so the default has to travel too
+        assertThat(viewModel.state.value.isProgressAroundCaptureButton).isFalse()
+    }
+
+    @Test
+    fun `tracking - the progress placement flag is published in the state`() = runTest {
+        enableFaceTracking(progressAroundCaptureButton = true)
+        viewModel.initAutoCapture()
+
+        assertThat(viewModel.state.value.isProgressAroundCaptureButton).isTrue()
+    }
+
+    @Test
+    fun `tracking - the progress placement is known by the first state the screen acts on`() = runTest {
+        enableFaceTracking(progressAroundCaptureButton = true)
+        val states = collectStates()
+
+        viewModel.initAutoCapture()
+
+        // Otherwise progress would be drawn on the face first and jump to the button
+        assertThat(states.map { it.isProgressAroundCaptureButton }.distinct()).containsExactly(true)
+    }
+
     /** A mocked frame of [size] square pixels, for the rules that count pixels rather than ratios. */
     private fun previewFrame(size: Int) = mockk<Bitmap>(relaxed = true) {
         every { width } returns size
@@ -1118,9 +1146,14 @@ internal class LiveFeedbackViewModelTest {
     private fun enableFaceTracking(
         minFaceSizePx: Int = FaceTrackingConfiguration.DISABLED.minFaceSizePx,
         maxImageSizePx: Int = FaceTrackingConfiguration.DISABLED.maxImageSizePx,
+        progressAroundCaptureButton: Boolean = false,
     ) {
-        every { getFaceTrackingConfiguration.invoke(any()) } returns
-            FaceTrackingConfiguration(enabled = true, minFaceSizePx = minFaceSizePx, maxImageSizePx = maxImageSizePx)
+        every { getFaceTrackingConfiguration.invoke(any()) } returns FaceTrackingConfiguration(
+            enabled = true,
+            minFaceSizePx = minFaceSizePx,
+            maxImageSizePx = maxImageSizePx,
+            progressAroundCaptureButton = progressAroundCaptureButton,
+        )
     }
 
     private fun detectorSees(vararg faces: Rect) {

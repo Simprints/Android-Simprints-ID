@@ -23,7 +23,8 @@ import com.simprints.infra.resources.R as IDR
 /**
  * Draws the live face-tracking feedback over the whole camera preview: a colour-coded square
  * around the detected face, plus the capture progress traced along that square's contour so it
- * follows the face instead of a fixed screen cutout.
+ * follows the face instead of a fixed screen cutout. Progress can instead be pinned to a fixed
+ * rect - see the `progressAnchor` of [update].
  *
  * Nothing is dimmed - the preview stays fully visible and the square colour carries the state.
  *
@@ -48,6 +49,9 @@ internal class FaceTrackingOverlay @JvmOverloads constructor(
     private val boxStrokeWidth = 3f.dpToPx(context)
     private val boxCornerRadius = 8f.dpToPx(context)
     private val progressStrokeWidth = 8f.dpToPx(context)
+
+    /** Matches the corners of `feedback_chip_white`, so the ring follows the button's outline. */
+    private val captureButtonCornerRadius = 20f.dpToPx(context)
 
     /** Clears the box outline so the two strokes sit side by side instead of overlapping. */
     private val progressOutset = (boxStrokeWidth + progressStrokeWidth) / 2f + 4f.dpToPx(context)
@@ -108,6 +112,9 @@ internal class FaceTrackingOverlay @JvmOverloads constructor(
     private var progress: Progress = Progress.HIDDEN
     private var showAimGuide: Boolean = false
 
+    /** Where the progress is drawn when it is not following the face. See [update]. */
+    private var progressAnchor: RectF? = null
+
     init {
         setBackgroundColor(Color.TRANSPARENT)
     }
@@ -116,14 +123,25 @@ internal class FaceTrackingOverlay @JvmOverloads constructor(
      * Renders one frame of feedback. A null [target] means no face is currently tracked.
      *
      * [showAimGuide] draws the corner brackets that tell the operator where to put the subject.
+     *
+     * [progressAnchor] pins the progress to a fixed rect in this view's coordinates - the capture
+     * button - instead of tracing the square that follows the face. Null keeps it on the face.
      */
     fun update(
         target: FaceTargetBox?,
         progress: Progress,
         showAimGuide: Boolean,
+        progressAnchor: RectF? = null,
     ) {
-        if (this.target == target && this.progress == progress && this.showAimGuide == showAimGuide) return
+        if (this.target == target &&
+            this.progress == progress &&
+            this.showAimGuide == showAimGuide &&
+            this.progressAnchor == progressAnchor
+        ) {
+            return
+        }
         this.showAimGuide = showAimGuide
+        this.progressAnchor = progressAnchor?.let { RectF(it) }
 
         if (target == null) {
             // Nothing to glide from once the face is gone; the next one appears where it is
@@ -169,11 +187,12 @@ internal class FaceTrackingOverlay @JvmOverloads constructor(
         }
 
         if (progress.visible) {
+            val anchor = progressAnchor
             progressPainter.progressColor = colorFor(progress.tint)
             progressPainter.setValue(progress.value)
             progressPainter.setContour(
-                progressContourAround(displayedRect.takeIf { box != null }),
-                boxCornerRadius + progressOutset,
+                progressContourAround(anchor ?: displayedRect.takeIf { box != null }),
+                (if (anchor != null) captureButtonCornerRadius else boxCornerRadius) + progressOutset,
             )
             progressPainter.draw(canvas)
         }
@@ -283,8 +302,9 @@ internal class FaceTrackingOverlay @JvmOverloads constructor(
     ) = from + (to - from) * fraction
 
     /**
-     * The progress traces the square itself, just outside its outline. Without a tracked face it
-     * falls back to a centred square so progress stays visible between detections.
+     * The progress traces [box] just outside its outline, whether that is the tracked square or a
+     * fixed anchor. With neither it falls back to a centred square, so progress stays visible
+     * between detections rather than disappearing with the face.
      */
     private fun progressContourAround(box: RectF?): RectF {
         if (box == null) {

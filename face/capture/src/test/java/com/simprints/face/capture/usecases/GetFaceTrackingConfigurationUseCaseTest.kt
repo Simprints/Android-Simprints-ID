@@ -37,6 +37,7 @@ internal class GetFaceTrackingConfigurationUseCaseTest {
             assertThat(enabled).isFalse()
             assertThat(minFaceSizePx).isEqualTo(150)
             assertThat(maxImageSizePx).isEqualTo(300)
+            assertThat(progressAroundCaptureButton).isFalse()
         }
     }
 
@@ -53,6 +54,23 @@ internal class GetFaceTrackingConfigurationUseCaseTest {
             assertThat(minFaceSizePx).isEqualTo(200)
             assertThat(maxImageSizePx).isEqualTo(600)
         }
+    }
+
+    @Test
+    fun `progress follows the tracked face unless the placement flag is set`() {
+        customConfig("faceTrackingCaptureEnabled" to JsonPrimitive(true))
+
+        assertThat(useCase(projectConfiguration).progressAroundCaptureButton).isFalse()
+    }
+
+    @Test
+    fun `the progress placement flag is carried through`() {
+        customConfig(
+            "faceTrackingCaptureEnabled" to JsonPrimitive(true),
+            "faceTrackingProgressAroundCaptureButton" to JsonPrimitive(true),
+        )
+
+        assertThat(useCase(projectConfiguration).progressAroundCaptureButton).isTrue()
     }
 
     @Test
