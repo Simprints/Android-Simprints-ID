@@ -1,5 +1,6 @@
 package com.simprints.face.capture.usecases
 
+import android.graphics.Bitmap
 import android.graphics.Rect
 import android.graphics.RectF
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -68,4 +69,64 @@ internal class CropToFaceSquareUseCaseTest {
     fun `unmeasured frame yields an empty square`() {
         assertThat(useCase.squareFor(RectF(0f, 0f, 200f, 200f), 0, 0).isEmpty).isTrue()
     }
+
+    @Test
+    fun `an oversized crop is scaled down to the cap before it is kept`() {
+        val crop = useCase(frame(1000, 1000), Rect(100, 100, 700, 700))
+
+        // 600px of face is more than any template needs, and it is stored and uploaded as-is
+        assertThat(crop.width).isEqualTo(CropToFaceSquareUseCase.MAX_CROP_SIZE_PX)
+        assertThat(crop.height).isEqualTo(CropToFaceSquareUseCase.MAX_CROP_SIZE_PX)
+    }
+
+    @Test
+    fun `a crop within the cap is kept at its own size`() {
+        val crop = useCase(frame(1000, 1000), Rect(0, 0, 250, 250))
+
+        assertThat(crop.width).isEqualTo(250)
+        assertThat(crop.height).isEqualTo(250)
+    }
+
+    @Test
+    fun `a crop exactly at the cap is left alone`() {
+        val size = CropToFaceSquareUseCase.MAX_CROP_SIZE_PX
+        val crop = useCase(frame(1000, 1000), Rect(0, 0, size, size))
+
+        assertThat(crop.width).isEqualTo(size)
+        assertThat(crop.height).isEqualTo(size)
+    }
+
+    @Test
+    fun `a square that fits but hangs off the edge is refused rather than cropped`() {
+        val source = frame(1000, 1000)
+
+        // 300px wide and so small enough for the frame, but its right edge is past it
+        val crop = useCase(source, Rect(800, 100, 1100, 400))
+
+        assertThat(crop).isSameInstanceAs(source)
+    }
+
+    @Test
+    fun `a square flush against the far edge is still cropped`() {
+        val crop = useCase(frame(1000, 1000), Rect(700, 700, 1000, 1000))
+
+        assertThat(crop.width).isEqualTo(300)
+        assertThat(crop.height).isEqualTo(300)
+    }
+
+    @Test
+    fun `scaling down leaves the caller's frame and the returned crop usable`() {
+        val source = frame(1000, 1000)
+
+        val crop = useCase(source, Rect(0, 0, 800, 800))
+
+        // Only the intermediate full-size crop is the use case's to release
+        assertThat(source.isRecycled).isFalse()
+        assertThat(crop.isRecycled).isFalse()
+    }
+
+    private fun frame(
+        width: Int,
+        height: Int,
+    ) = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
 }
