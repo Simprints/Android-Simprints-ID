@@ -8,10 +8,11 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.face.capture.models.FaceTrackingConfiguration
 import com.simprints.face.capture.screens.CaptureAttemptTracker
 import com.simprints.face.capture.usecases.CropToFaceSquareUseCase
+import com.simprints.face.capture.usecases.GetFaceTrackingConfigurationUseCase
 import com.simprints.face.capture.usecases.GetSpoofCheckConfigurationUseCase
-import com.simprints.face.capture.usecases.IsFaceTrackingEnabledUseCase
 import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
 import com.simprints.face.capture.usecases.SelectDominantFaceUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
@@ -83,7 +84,7 @@ internal class LiveFeedbackViewModelTest {
     private lateinit var getSpoofCheckConfiguration: GetSpoofCheckConfigurationUseCase
 
     @MockK
-    private lateinit var isFaceTrackingEnabled: IsFaceTrackingEnabledUseCase
+    private lateinit var getFaceTrackingConfiguration: GetFaceTrackingConfigurationUseCase
 
     private lateinit var viewModel: LiveFeedbackViewModel
 
@@ -100,7 +101,7 @@ internal class LiveFeedbackViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
         every { frame.width } returns FRAME_SIZE_PX
         every { frame.height } returns FRAME_SIZE_PX
-        every { cropToFaceSquare.invoke(any(), any()) } returns frame
+        every { cropToFaceSquare.invoke(any(), any(), any()) } returns frame
         coEvery { resolveFaceBioSdkUseCase.invoke(any()) } returns mockk {
             every { detector } returns faceDetector
         }
@@ -113,7 +114,7 @@ internal class LiveFeedbackViewModelTest {
         } returns QUALITY_THRESHOLD
         every { isUsingAutoCapture.invoke(any()) } returns false
         // The flag is off by default, so the bulk of the suite covers the standard cutout capture
-        every { isFaceTrackingEnabled.invoke(any()) } returns false
+        every { getFaceTrackingConfiguration.invoke(any()) } returns FaceTrackingConfiguration.DISABLED
         every { getSpoofCheckConfiguration.invoke(any(), any()) } returns SpoofCheckConfiguration.DISABLED
 
         every { timeHelper.now() } returnsMany (0..1000L).map { Timestamp(it) }
@@ -125,7 +126,7 @@ internal class LiveFeedbackViewModelTest {
             eventReporter,
             timeHelper,
             isUsingAutoCapture,
-            isFaceTrackingEnabled,
+            getFaceTrackingConfiguration,
             getSpoofCheckConfiguration,
             testCaptureAttemptTracker,
             cropToFaceSquare,
@@ -842,7 +843,7 @@ internal class LiveFeedbackViewModelTest {
     @Test
     fun `the square crop, not the full frame, is stored as the capture bitmap`() = runTest {
         val squareCrop = mockk<Bitmap>(relaxed = true)
-        every { cropToFaceSquare.invoke(any(), any()) } returns squareCrop
+        every { cropToFaceSquare.invoke(any(), any(), any()) } returns squareCrop
         every { faceDetector.analyze(frame, any(), any()) } returns trackedFace()
 
         enableFaceTracking()
@@ -902,7 +903,7 @@ internal class LiveFeedbackViewModelTest {
 
         assertThat(viewModel.state.value.feedback).isEqualTo(LiveFeedbackState.Feedback.TOO_FAR)
         // The square is still measured, for the overlay - only the pixel work is skipped
-        verify(exactly = 0) { cropToFaceSquare.invoke(any(), any()) }
+        verify(exactly = 0) { cropToFaceSquare.invoke(any(), any(), any()) }
     }
 
     @Test
@@ -912,7 +913,7 @@ internal class LiveFeedbackViewModelTest {
             every { height } returns FRAME_SIZE_PX
         }
         val squareCrop = mockk<Bitmap>(relaxed = true)
-        every { cropToFaceSquare.invoke(analysed, any()) } returns squareCrop
+        every { cropToFaceSquare.invoke(analysed, any(), any()) } returns squareCrop
         every { faceDetector.analyze(analysed, any(), any()) } returns trackedFace()
 
         enableFaceTracking()
@@ -929,7 +930,7 @@ internal class LiveFeedbackViewModelTest {
     @Test
     fun `the analysed frame survives when the square turns out to be unusable`() = runTest {
         // The use case hands the frame straight back rather than cropping
-        every { cropToFaceSquare.invoke(any(), any()) } returns frame
+        every { cropToFaceSquare.invoke(any(), any(), any()) } returns frame
         every { faceDetector.analyze(frame, any(), any()) } returns trackedFace()
 
         enableFaceTracking()
@@ -1079,6 +1080,34 @@ internal class LiveFeedbackViewModelTest {
         return seen
     }
 
+    @Test
+    fun `tracking - the configured minimum face size decides what is too far`() = runTest {
+        // 160px of face, which the built-in 150px floor would have accepted
+        val smallFrame = previewFrame(300)
+        every { faceDetector.analyze(smallFrame, any(), any()) } returns
+            Face(300, 300, Rect(70, 70, 230, 230), 0f, 0f, 1f, Random.nextBytes(20), "format")
+
+        enableFaceTracking(minFaceSizePx = 200)
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.process(smallFrame, smallFrame)
+
+        assertThat(viewModel.state.value.feedback).isEqualTo(LiveFeedbackState.Feedback.TOO_FAR)
+    }
+
+    @Test
+    fun `tracking - the configured image cap is the one the crop is taken with`() = runTest {
+        every { faceDetector.analyze(frame, any(), any()) } returns trackedFace()
+
+        enableFaceTracking(maxImageSizePx = 512)
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+
+        verify { cropToFaceSquare.invoke(any(), any(), 512) }
+    }
+
     /** A mocked frame of [size] square pixels, for the rules that count pixels rather than ratios. */
     private fun previewFrame(size: Int) = mockk<Bitmap>(relaxed = true) {
         every { width } returns size
@@ -1086,8 +1115,12 @@ internal class LiveFeedbackViewModelTest {
     }
 
     /** Turns on the experimental whole-preview tracking behaviour for a single test. */
-    private suspend fun enableFaceTracking() {
-        every { isFaceTrackingEnabled.invoke(any()) } returns true
+    private fun enableFaceTracking(
+        minFaceSizePx: Int = FaceTrackingConfiguration.DISABLED.minFaceSizePx,
+        maxImageSizePx: Int = FaceTrackingConfiguration.DISABLED.maxImageSizePx,
+    ) {
+        every { getFaceTrackingConfiguration.invoke(any()) } returns
+            FaceTrackingConfiguration(enabled = true, minFaceSizePx = minFaceSizePx, maxImageSizePx = maxImageSizePx)
     }
 
     private fun detectorSees(vararg faces: Rect) {

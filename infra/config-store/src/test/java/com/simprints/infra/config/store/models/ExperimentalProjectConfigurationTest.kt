@@ -8,6 +8,10 @@ import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MAX
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MIN
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_TRACKING_CAPTURE_ENABLED
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_TRACKING_MAX_IMAGE_SIZE_PX
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_TRACKING_MAX_IMAGE_SIZE_PX_DEFAULT
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_TRACKING_MIN_FACE_SIZE_PX
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_TRACKING_MIN_FACE_SIZE_PX_DEFAULT
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FALLBACK_TO_COMMCARE_THRESHOLD_DAYS
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FALLBACK_TO_COMMCARE_THRESHOLD_DAYS_DEFAULT
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED
@@ -73,6 +77,39 @@ internal class ExperimentalProjectConfigurationTest {
             mapOf(FACE_TRACKING_CAPTURE_ENABLED to JsonPrimitive(true)) to true,
         ).forEach { (config, result) ->
             assertThat(ExperimentalProjectConfiguration(config).faceTrackingCaptureEnabled).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `check face tracking minimum face size correctly`() {
+        mapOf(
+            // Value not present
+            emptyMap<String, JsonElement>() to FACE_TRACKING_MIN_FACE_SIZE_PX_DEFAULT,
+            // Value not int
+            mapOf(FACE_TRACKING_MIN_FACE_SIZE_PX to JsonPrimitive(true)) to FACE_TRACKING_MIN_FACE_SIZE_PX_DEFAULT,
+            // Value present but not a usable size
+            mapOf(FACE_TRACKING_MIN_FACE_SIZE_PX to JsonPrimitive(0)) to 112,
+            mapOf(FACE_TRACKING_MIN_FACE_SIZE_PX to JsonPrimitive(-100)) to 112,
+            // Value present
+            mapOf(FACE_TRACKING_MIN_FACE_SIZE_PX to JsonPrimitive(200)) to 200,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).faceTrackingMinFaceSizePx).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `check face tracking maximum image size correctly`() {
+        mapOf(
+            // Value not present
+            emptyMap<String, JsonElement>() to FACE_TRACKING_MAX_IMAGE_SIZE_PX_DEFAULT,
+            // Value not int
+            mapOf(FACE_TRACKING_MAX_IMAGE_SIZE_PX to JsonPrimitive("300")) to FACE_TRACKING_MAX_IMAGE_SIZE_PX_DEFAULT,
+            // Value present but not a usable size
+            mapOf(FACE_TRACKING_MAX_IMAGE_SIZE_PX to JsonPrimitive(0)) to 112,
+            // Value present
+            mapOf(FACE_TRACKING_MAX_IMAGE_SIZE_PX to JsonPrimitive(512)) to 512,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).faceTrackingMaxImageSizePx).isEqualTo(result)
         }
     }
 
