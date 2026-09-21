@@ -807,7 +807,7 @@ internal class LiveFeedbackViewModelTest {
             trackedFace(yaw = 45f), // pose is off
             trackedFace(quality = 0f), // quality is off
             trackedFace(Rect(0, 0, 100, 100)), // below the minimum size
-            trackedFace(Rect(0, 0, 800, 800)), // above the maximum size
+            trackedFace(Rect(0, 0, 950, 950)), // above the maximum size
         )
         val states = collectStates()
 
@@ -979,7 +979,7 @@ internal class LiveFeedbackViewModelTest {
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
         viewModel.process(frame, frame)
 
-        // 45% by 75% is 34% of the area, which the cutout accepts
+        // 45% by 95% is 43% of the area, which the cutout accepts
         assertThat(viewModel.state.value.feedback).isEqualTo(LiveFeedbackState.Feedback.VALID)
     }
 
@@ -992,8 +992,23 @@ internal class LiveFeedbackViewModelTest {
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
         viewModel.process(frame, frame)
 
-        // The square is built from the longest side, and 75% of the frame is past the limit
+        // The square is built from the longest side, and 95% of the frame is past the limit
         assertThat(viewModel.state.value.feedback).isEqualTo(LiveFeedbackState.Feedback.TOO_CLOSE)
+    }
+
+    @Test
+    fun `tracking - a face filling most of the preview is still accepted`() = runTest {
+        // 88% of the frame: close enough that the cutout would have called it too close
+        every { faceDetector.analyze(frame, any(), any()) } returns trackedFace(Rect(60, 60, 940, 940))
+
+        enableFaceTracking()
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.process(frame, frame)
+
+        // Tracking follows the face across the preview, so it only objects once the square
+        // stops fitting rather than as soon as the face grows past the cutout's target
+        assertThat(viewModel.state.value.feedback).isEqualTo(LiveFeedbackState.Feedback.VALID)
     }
 
     @Test
@@ -1023,6 +1038,37 @@ internal class LiveFeedbackViewModelTest {
         verify(exactly = 0) { cropToFaceSquare.squareFor(any(), any(), any()) }
     }
 
+    @Test
+    fun `tracking - a face below the pixel floor is too far even when it fills the preview`() = runTest {
+        // 140px of face on a 300px preview is 47% of it, which the proportional rule would accept
+        val smallFrame = previewFrame(300)
+        every { faceDetector.analyze(smallFrame, any(), any()) } returns
+            Face(300, 300, Rect(80, 80, 220, 220), 0f, 0f, 1f, Random.nextBytes(20), "format")
+
+        enableFaceTracking()
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.process(smallFrame, smallFrame)
+
+        // Too few pixels of face for any SDK to extract a template from, whatever it looks like
+        assertThat(viewModel.state.value.feedback).isEqualTo(LiveFeedbackState.Feedback.TOO_FAR)
+    }
+
+    @Test
+    fun `tracking - a face above the pixel floor on the same preview is accepted`() = runTest {
+        val smallFrame = previewFrame(300)
+        every { faceDetector.analyze(smallFrame, any(), any()) } returns
+            Face(300, 300, Rect(70, 70, 230, 230), 0f, 0f, 1f, Random.nextBytes(20), "format")
+
+        enableFaceTracking()
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.process(smallFrame, smallFrame)
+
+        // 160px clears the floor, so only the proportional rules have a say
+        assertThat(viewModel.state.value.feedback).isEqualTo(LiveFeedbackState.Feedback.VALID)
+    }
+
     /** Records the selector handed to each spoof check, so the caller can assert on it. */
     private fun recordSpoofCheckSelector(): List<FaceSelector?> {
         val seen = mutableListOf<FaceSelector?>()
@@ -1031,6 +1077,12 @@ internal class LiveFeedbackViewModelTest {
             SpoofCheckResult(score = 0.9f)
         }
         return seen
+    }
+
+    /** A mocked frame of [size] square pixels, for the rules that count pixels rather than ratios. */
+    private fun previewFrame(size: Int) = mockk<Bitmap>(relaxed = true) {
+        every { width } returns size
+        every { height } returns size
     }
 
     /** Turns on the experimental whole-preview tracking behaviour for a single test. */
@@ -1106,17 +1158,17 @@ internal class LiveFeedbackViewModelTest {
     ) = Face(100, 100, rect, yaw, roll, quality, Random.nextBytes(20), "format")
 
     /**
+     * A face taller than it is wide: 45% by 95% of the frame. The two capture modes disagree about
+     * it, because the cutout measures the area it fills while face tracking measures its longest
+     * side, and only the latter is over its limit.
+     */
+    private fun tallFace() = trackedFace(Rect(275, 25, 725, 975))
+
+    /**
      * A face sized for the face tracking rules, which judge the face against the whole preview.
      * Its source matches the mocked frame, so [rect] is read directly as frame pixels rather than
      * being rescaled. The default fills half the frame, comfortably inside the valid band.
      */
-    /**
-     * A face taller than it is wide: 45% by 75% of the frame. The two capture modes disagree about
-     * it, because the cutout measures the area it fills while face tracking measures its longest
-     * side, and only the latter is over its limit.
-     */
-    private fun tallFace() = trackedFace(Rect(275, 125, 725, 875))
-
     private fun trackedFace(
         rect: Rect = Rect(0, 0, 500, 500),
         quality: Float = 1f,

@@ -562,8 +562,10 @@ internal class LiveFeedbackViewModel @Inject constructor(
         val faceBox = potentialFace.relativeBoundingBox.scaledTo(frame.width, frame.height)
         val detectedSide = max(faceBox.width(), faceBox.height())
         val frameSide = min(frame.width, frame.height)
+        // The square is the detection's longer side, so this is the size the stored crop would have
+        val smallestUsableSide = max(MIN_FACE_SIDE_PX.toFloat(), frameSide * MIN_FACE_FRAME_RATIO)
         return when {
-            detectedSide < frameSide * MIN_FACE_FRAME_RATIO -> FaceDetection.Status.TOOFAR
+            detectedSide < smallestUsableSide -> FaceDetection.Status.TOOFAR
             detectedSide > frameSide * MAX_FACE_FRAME_RATIO -> FaceDetection.Status.TOOCLOSE
             else -> poseAndQualityStatus(potentialFace)
         }
@@ -648,17 +650,25 @@ internal class LiveFeedbackViewModel @Inject constructor(
 
         /**
          * How big the face has to be for face tracking, as a fraction of the preview's shorter
-         * edge. Chosen so both capture modes ask for a face of roughly the same size.
-         *
-         * The cutout wants the face to fill 20-50% of its target's area, which is 45-71% of that
-         * target's side; the target is in turn 90% of the preview's shorter edge, so the same face
-         * measures about 40-64% of the whole preview.
+         * edge. The lower bound asks for about as much face as the cutout does; the upper one is
+         * deliberately loose, since a square that follows the face only stops working once it no
+         * longer fits the preview.
          *
          * Expressed as proportions rather than pixels because the analyser resolution follows the
          * preview size - a fixed pixel band would mean a different thing on every device.
          */
-        private const val MIN_FACE_FRAME_RATIO = 0.40f
-        private const val MAX_FACE_FRAME_RATIO = 0.65f
+        private const val MIN_FACE_FRAME_RATIO = 0.4f
+        private const val MAX_FACE_FRAME_RATIO = 0.9f
+
+        /**
+         * Smallest face tracking will accept, in pixels of the square that gets cropped. Below this
+         * the face SDKs cannot be relied on to extract a template, so such a face is reported as
+         * too far however large it looks next to a low resolution preview.
+         *
+         * The upper bound belongs to [CropToFaceSquareUseCase.MAX_CROP_SIZE_PX], which shrinks the
+         * crop rather than rejecting it.
+         */
+        private const val MIN_FACE_SIDE_PX = 150
     }
 
     enum class PermissionAction {
