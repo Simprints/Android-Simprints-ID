@@ -1,21 +1,28 @@
 package com.simprints.face.capture.screens.livefeedback
 
 import android.graphics.Bitmap
+import android.graphics.Rect
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.tools.extensions.area
+import com.simprints.core.tools.extensions.normalisedIn
+import com.simprints.core.tools.extensions.scaledTo
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.models.FaceTarget
 import com.simprints.face.capture.models.SymmetricTarget
 import com.simprints.face.capture.screens.CaptureAttemptTracker
+import com.simprints.face.capture.usecases.CropToFaceSquareUseCase
 import com.simprints.face.capture.usecases.GetSpoofCheckConfigurationUseCase
+import com.simprints.face.capture.usecases.IsFaceTrackingEnabledUseCase
 import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
+import com.simprints.face.capture.usecases.SelectDominantFaceUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
+import com.simprints.face.infra.basebiosdk.detection.FaceSelector
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
@@ -40,6 +47,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.measureTimedValue
 
@@ -50,8 +59,11 @@ internal class LiveFeedbackViewModel @Inject constructor(
     private val eventReporter: SimpleCaptureEventReporter,
     private val timeHelper: TimeHelper,
     private val isUsingAutoCaptureUseCase: IsUsingAutoCaptureUseCase,
+    private val isFaceTrackingEnabledUseCase: IsFaceTrackingEnabledUseCase,
     private val getSpoofCheckConfiguration: GetSpoofCheckConfigurationUseCase,
     private val captureAttemptTracker: CaptureAttemptTracker,
+    private val cropToFaceSquare: CropToFaceSquareUseCase,
+    private val selectDominantFace: SelectDominantFaceUseCase,
     @param:DispatcherBG private val bgDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private var samplesToCapture: Int = 1
@@ -87,6 +99,9 @@ internal class LiveFeedbackViewModel @Inject constructor(
     private var validationStartTime: Long = 0
     var isAutoCaptureHeldOff = true
         private set
+
+    private var isFaceTrackingEnabled = false
+
     private var autoCaptureImagingTimeoutJob: Job? = null
     private var autoCaptureImagingDurationMillis: Long = FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
     private lateinit var faceDetector: FaceDetector
@@ -100,15 +115,20 @@ internal class LiveFeedbackViewModel @Inject constructor(
         feedback: LiveFeedbackState.Feedback = state.value.feedback,
         permissionStatus: PermissionStatus = state.value.permissionStatus,
         detectionForTint: FaceDetection? = null,
+        targetBox: FaceTargetBox? = state.value.targetBox,
         result: List<FaceDetection> = state.value.result,
+        stateInitialised: Boolean? = null,
     ) {
         state.update { currentState ->
             currentState.copy(
+                stateInitialised = stateInitialised ?: currentState.stateInitialised,
                 phase = phase,
                 feedback = feedback,
                 isAutoCapture = isAutoCapture,
+                isFaceTrackingEnabled = isFaceTrackingEnabled,
                 permissionStatus = permissionStatus,
                 progress = computeProgress(phase, detectionForTint),
+                targetBox = targetBox,
                 result = result,
             )
         }
@@ -116,12 +136,13 @@ internal class LiveFeedbackViewModel @Inject constructor(
 
     suspend fun initAutoCapture() {
         val config = configRepository.getProjectConfiguration()
+        isFaceTrackingEnabled = isFaceTrackingEnabledUseCase(config)
         isAutoCapture = isUsingAutoCaptureUseCase(config)
         if (isAutoCapture) {
             // Await until capture button is pressed
             holdOffAutoCapture()
         }
-        emit() // Reset UI state with correct auto-capture value
+        emit(stateInitialised = true) // Reset UI state with correct auto-capture value
     }
 
     fun onScreenResumed(permissionStatus: PermissionStatus) {
@@ -173,7 +194,12 @@ internal class LiveFeedbackViewModel @Inject constructor(
                 return // too late - imaging has already started
             }
             isAutoCaptureHeldOff = true
-            emit(phase = LiveFeedbackState.Phase.NOT_STARTED, feedback = LiveFeedbackState.Feedback.NONE) // reset view
+            // reset view
+            emit(
+                phase = LiveFeedbackState.Phase.NOT_STARTED,
+                feedback = LiveFeedbackState.Feedback.NONE,
+                targetBox = null,
+            )
         }
     }
 
@@ -204,6 +230,9 @@ internal class LiveFeedbackViewModel @Inject constructor(
 
     /**
      * Processes the image. Called on the CameraX analyzer executor (off the main thread).
+     *
+     * [frame] covers the whole visible preview: the face is detected anywhere within it, and the
+     * square around the detection is what gets cropped for the rest of the pipeline.
      */
     fun process(
         originalBitmap: Bitmap,
@@ -228,7 +257,18 @@ internal class LiveFeedbackViewModel @Inject constructor(
         }
 
         val captureStartTime = timeHelper.now()
-        val potentialFace = faceDetector.analyze(croppedBitmap)
+        val potentialFace = if (isFaceTrackingEnabled) {
+            // Detection covers the whole preview, so the subject is picked out of whatever is in
+            // frame and only that face has a template extracted for it
+            faceDetector.analyze(croppedBitmap) { faces ->
+                selectDominantFace(faces, croppedBitmap.width, croppedBitmap.height)
+            }
+        } else {
+            faceDetector.analyze(croppedBitmap)
+        }
+        val trackedSquare = trackedSquareFor(potentialFace, croppedBitmap)
+        val frameWidth = croppedBitmap.width
+        val frameHeight = croppedBitmap.height
 
         val faceDetection = getFaceDetectionFromPotentialFace(originalBitmap, croppedBitmap, potentialFace)
         faceDetection.detectionStartTime = captureStartTime
@@ -261,14 +301,14 @@ internal class LiveFeedbackViewModel @Inject constructor(
         }
 
         when (newPhase) {
-            LiveFeedbackState.Phase.NOT_STARTED -> updateFallbackCaptureIfValid(faceDetection)
+            LiveFeedbackState.Phase.NOT_STARTED -> updateFallbackCaptureIfValid(faceDetection, trackedSquare)
             LiveFeedbackState.Phase.CAPTURING -> {
                 if (isAutoCapture) {
                     if (isQualifying(faceDetection)) {
-                        updateUserCapturesWith(faceDetection)
+                        updateUserCapturesWith(cropBitmapToTrackedSquare(faceDetection, trackedSquare))
                     }
                 } else {
-                    userCaptures.add(faceDetection)
+                    userCaptures.add(cropBitmapToTrackedSquare(faceDetection, trackedSquare))
                     if (userCaptures.size == samplesToCapture) {
                         finishCapture(captureAttemptTracker.attemptNumber)
                     }
@@ -279,7 +319,14 @@ internal class LiveFeedbackViewModel @Inject constructor(
             }
         }
 
-        emit(phase = newPhase, feedback = feedback, detectionForTint = faceDetection)
+        emit(
+            phase = newPhase,
+            feedback = feedback,
+            detectionForTint = faceDetection,
+            targetBox = trackedSquare?.let {
+                FaceTargetBox(it.normalisedIn(frameWidth, frameHeight), faceDetection.status.toTargetTint())
+            },
+        )
     }
 
     private fun computeProgress(
@@ -381,7 +428,14 @@ internal class LiveFeedbackViewModel @Inject constructor(
 
         val duration = measureTimedValue {
             for ((index, bitmap) in userCaptures.map { it.original }.withIndex()) {
-                val result = faceDetector.spoofCheck(bitmap, spoofCheckConfig.maxBitmapSize)
+                // Only face tracking allows more than one person in frame, so only it needs a
+                // policy for picking between them - cutout capture stays on the SDK's own choice
+                val selectFace: FaceSelector? = if (isFaceTrackingEnabled) {
+                    { faces -> selectDominantFace(faces, bitmap.width, bitmap.height) }
+                } else {
+                    null
+                }
+                val result = faceDetector.spoofCheck(bitmap, spoofCheckConfig.maxBitmapSize, selectFace)
                 Simber.i("Spoof result: $result", tag = FACE_CAPTURE)
                 userCaptures[index].spoofCheckResult = result
             }
@@ -416,7 +470,25 @@ internal class LiveFeedbackViewModel @Inject constructor(
         Simber.i("Captures tracked in ${duration.duration}, waiting for ${delay}ms", tag = FACE_CAPTURE)
         if (delay > 0) delay(delay.milliseconds)
 
-        emit(phase = LiveFeedbackState.Phase.NOT_STARTED, feedback = LiveFeedbackState.Feedback.NONE, result = emptyList())
+        emit(
+            phase = LiveFeedbackState.Phase.NOT_STARTED,
+            feedback = LiveFeedbackState.Feedback.NONE,
+            targetBox = null,
+            result = emptyList(),
+        )
+    }
+
+    /**
+     * Face tracking only: the square to crop and draw around the subject, in frame pixels. Null
+     * for cutout capture, where the frame handed in is already cropped to the on-screen target.
+     */
+    private fun trackedSquareFor(
+        potentialFace: Face?,
+        frame: Bitmap,
+    ): Rect? {
+        if (!isFaceTrackingEnabled || potentialFace == null) return null
+        val faceBox = potentialFace.relativeBoundingBox.scaledTo(frame.width, frame.height)
+        return cropToFaceSquare.squareFor(faceBox, frame.width, frame.height).takeUnless { it.isEmpty }
     }
 
     private fun getFaceDetectionFromPotentialFace(
@@ -442,40 +514,86 @@ internal class LiveFeedbackViewModel @Inject constructor(
         original: Bitmap,
         bitmap: Bitmap,
         potentialFace: Face,
+    ): FaceDetection = FaceDetection(
+        original = original,
+        bitmap = bitmap,
+        face = potentialFace,
+        status = if (isFaceTrackingEnabled) trackedFaceStatus(potentialFace, bitmap) else cutoutFaceStatus(potentialFace),
+        detectionStartTime = timeHelper.now(),
+        detectionEndTime = timeHelper.now(),
+    )
+
+    /**
+     * Cropping costs an allocation and a rescale on the analyzer thread, so it is
+     * done here rather than for every analysed frame - the overwhelming majority are discarded
+     * straight after their status is read.
+     */
+    private fun cropBitmapToTrackedSquare(
+        faceDetection: FaceDetection,
+        trackedSquare: Rect?,
     ): FaceDetection {
+        if (trackedSquare == null) return faceDetection
+        val crop = cropToFaceSquare(faceDetection.bitmap, trackedSquare)
+        // The use case hands the frame straight back when the square is unusable
+        if (crop === faceDetection.bitmap) return faceDetection
+        faceDetection.bitmap.recycle()
+        return faceDetection.copy(bitmap = crop)
+    }
+
+    /** Cutout capture judges distance by how much of the fixed on-screen target the face fills. */
+    private fun cutoutFaceStatus(potentialFace: Face): FaceDetection.Status {
         val areaOccupied = potentialFace.relativeBoundingBox.area()
-        val status = when {
+        return when {
             areaOccupied < faceTarget.areaRange.start -> FaceDetection.Status.TOOFAR
             areaOccupied > faceTarget.areaRange.endInclusive -> FaceDetection.Status.TOOCLOSE
-            potentialFace.yaw !in faceTarget.yawTarget -> FaceDetection.Status.OFFYAW
-            potentialFace.roll !in faceTarget.rollTarget -> FaceDetection.Status.OFFROLL
-            potentialFace.quality < qualityThreshold -> FaceDetection.Status.BAD_QUALITY
-            phase == LiveFeedbackState.Phase.CAPTURING -> FaceDetection.Status.VALID_CAPTURING
-            else -> FaceDetection.Status.VALID
+            else -> poseAndQualityStatus(potentialFace)
         }
+    }
 
-        return FaceDetection(
-            original = original,
-            bitmap = bitmap,
-            face = potentialFace,
-            status = status,
-            detectionStartTime = timeHelper.now(),
-            detectionEndTime = timeHelper.now(),
-        )
+    /**
+     * Face tracking judges distance by the face's own pixel size, since it can sit anywhere in the
+     * preview. Those are the pixels the SDK actually saw, which is what governs whether a usable
+     * template can be extracted from it.
+     */
+    private fun trackedFaceStatus(
+        potentialFace: Face,
+        frame: Bitmap,
+    ): FaceDetection.Status {
+        val faceBox = potentialFace.relativeBoundingBox.scaledTo(frame.width, frame.height)
+        val detectedSide = max(faceBox.width(), faceBox.height())
+        val frameSide = min(frame.width, frame.height)
+        return when {
+            detectedSide < frameSide * MIN_FACE_FRAME_RATIO -> FaceDetection.Status.TOOFAR
+            detectedSide > frameSide * MAX_FACE_FRAME_RATIO -> FaceDetection.Status.TOOCLOSE
+            else -> poseAndQualityStatus(potentialFace)
+        }
+    }
+
+    /** Everything the two capture modes judge the same way, once distance is settled. */
+    private fun poseAndQualityStatus(potentialFace: Face): FaceDetection.Status = when {
+        potentialFace.yaw !in faceTarget.yawTarget -> FaceDetection.Status.OFFYAW
+        potentialFace.roll !in faceTarget.rollTarget -> FaceDetection.Status.OFFROLL
+        potentialFace.quality < qualityThreshold -> FaceDetection.Status.BAD_QUALITY
+        phase == LiveFeedbackState.Phase.CAPTURING -> FaceDetection.Status.VALID_CAPTURING
+        else -> FaceDetection.Status.VALID
     }
 
     /**
      * While the user has not started the capture flow, we save fallback images. If the capture doesn't
      * get any good images, at least one good image will be saved
      */
-    private fun updateFallbackCaptureIfValid(faceDetection: FaceDetection) {
+    private fun updateFallbackCaptureIfValid(
+        faceDetection: FaceDetection,
+        trackedSquare: Rect?,
+    ) {
         val fallbackQuality = fallbackCapture?.face?.quality ?: -1f // To ensure that detection is better with defaults
         val detectionQuality = faceDetection.face?.quality ?: 0f
 
         if (faceDetection.hasValidStatus() && detectionQuality >= fallbackQuality) {
             Simber.i("Fallback capture updated", tag = FACE_CAPTURE)
-            fallbackCapture = faceDetection.apply { isFallback = true }
-            createFirstFallbackCaptureEvent(faceDetection)
+            val kept = cropBitmapToTrackedSquare(faceDetection, trackedSquare).apply { isFallback = true }
+            fallbackCapture = kept
+            createFirstFallbackCaptureEvent(kept)
         }
     }
 
@@ -527,6 +645,20 @@ internal class LiveFeedbackViewModel @Inject constructor(
     companion object {
         private const val VALID_ROLL_DELTA = 15f
         private const val VALID_YAW_DELTA = 30f
+
+        /**
+         * How big the face has to be for face tracking, as a fraction of the preview's shorter
+         * edge. Chosen so both capture modes ask for a face of roughly the same size.
+         *
+         * The cutout wants the face to fill 20-50% of its target's area, which is 45-71% of that
+         * target's side; the target is in turn 90% of the preview's shorter edge, so the same face
+         * measures about 40-64% of the whole preview.
+         *
+         * Expressed as proportions rather than pixels because the analyser resolution follows the
+         * preview size - a fixed pixel band would mean a different thing on every device.
+         */
+        private const val MIN_FACE_FRAME_RATIO = 0.40f
+        private const val MAX_FACE_FRAME_RATIO = 0.65f
     }
 
     enum class PermissionAction {
