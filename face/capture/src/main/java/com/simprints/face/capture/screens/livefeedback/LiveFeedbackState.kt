@@ -12,6 +12,8 @@ internal data class LiveFeedbackState(
     val feedback: Feedback,
     val isAutoCapture: Boolean,
     val isFaceTrackingEnabled: Boolean,
+    // Tracking mode only: keeps the progress on the capture button instead of on the tracked face
+    val isProgressAroundCaptureButton: Boolean,
     val permissionStatus: PermissionStatus,
     val progress: Progress,
     val targetBox: FaceTargetBox? = null, // Tracking mode only: the square drawn around the subject. Always null for the cutout.
@@ -33,6 +35,7 @@ internal data class LiveFeedbackState(
             feedback = Feedback.NONE,
             isAutoCapture = isAutoCapture,
             isFaceTrackingEnabled = false,
+            isProgressAroundCaptureButton = false,
             permissionStatus = PermissionStatus.Denied,
             progress = Progress.HIDDEN,
         )

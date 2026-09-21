@@ -2,6 +2,7 @@ package com.simprints.face.capture.screens.livefeedback
 
 import android.Manifest
 import android.content.Intent
+import android.graphics.RectF
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
@@ -324,6 +325,26 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                     state.phase == LiveFeedbackState.Phase.NOT_STARTED ||
                         state.phase == LiveFeedbackState.Phase.CAPTURING
                 ),
+            progressAnchor = if (state.isProgressAroundCaptureButton) captureButtonBoundsInOverlay() else null,
+        )
+    }
+
+    /**
+     * The capture button's outline in the overlay's own coordinates, so progress can be drawn
+     * around it. Null until both views are laid out, which leaves the progress on the tracked face
+     * for the frame or two before that happens.
+     *
+     * A [com.google.android.material.button.MaterialButton] draws its background inset from its
+     * own bounds, so those insets are taken off here - otherwise the ring would sit further from
+     * the chip vertically than horizontally.
+     */
+    private fun captureButtonBoundsInOverlay(): RectF? = with(binding) {
+        if (captureFeedbackBtn.width == 0 || captureFeedbackBtn.height == 0) return null
+        RectF(
+            (captureFeedbackBtn.left - faceTrackingOverlay.left).toFloat(),
+            (captureFeedbackBtn.top - faceTrackingOverlay.top + captureFeedbackBtn.insetTop).toFloat(),
+            (captureFeedbackBtn.right - faceTrackingOverlay.left).toFloat(),
+            (captureFeedbackBtn.bottom - faceTrackingOverlay.top - captureFeedbackBtn.insetBottom).toFloat(),
         )
     }
 

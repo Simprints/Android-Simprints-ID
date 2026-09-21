@@ -15,6 +15,7 @@ internal class GetFaceTrackingConfigurationUseCase @Inject constructor() {
                 // A cap under the floor would scale every accepted face back below it, leaving
                 // nothing capturable at all, so the two are kept in order however they are configured
                 maxImageSizePx = experimental.faceTrackingMaxImageSizePx.coerceAtLeast(minFaceSizePx),
+                progressAroundCaptureButton = experimental.faceTrackingProgressAroundCaptureButton,
             )
         }
 }

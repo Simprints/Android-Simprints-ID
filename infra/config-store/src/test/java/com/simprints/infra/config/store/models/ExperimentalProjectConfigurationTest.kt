@@ -12,6 +12,7 @@ import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_TRACKING_MAX_IMAGE_SIZE_PX_DEFAULT
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_TRACKING_MIN_FACE_SIZE_PX
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_TRACKING_MIN_FACE_SIZE_PX_DEFAULT
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_TRACKING_PROGRESS_AROUND_CAPTURE_BUTTON
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FALLBACK_TO_COMMCARE_THRESHOLD_DAYS
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FALLBACK_TO_COMMCARE_THRESHOLD_DAYS_DEFAULT
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED
@@ -110,6 +111,24 @@ internal class ExperimentalProjectConfigurationTest {
             mapOf(FACE_TRACKING_MAX_IMAGE_SIZE_PX to JsonPrimitive(512)) to 512,
         ).forEach { (config, result) ->
             assertThat(ExperimentalProjectConfiguration(config).faceTrackingMaxImageSizePx).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `check face tracking progress placement flag correctly`() {
+        mapOf(
+            // Value not present - progress keeps following the tracked face
+            emptyMap<String, JsonElement>() to false,
+            // Value not boolean
+            mapOf(FACE_TRACKING_PROGRESS_AROUND_CAPTURE_BUTTON to JsonPrimitive(1)) to false,
+            // Value quoted, which the JSON primitive still reads as a boolean
+            mapOf(FACE_TRACKING_PROGRESS_AROUND_CAPTURE_BUTTON to JsonPrimitive("true")) to true,
+            // Value present and FALSE
+            mapOf(FACE_TRACKING_PROGRESS_AROUND_CAPTURE_BUTTON to JsonPrimitive(false)) to false,
+            // Value present and TRUE
+            mapOf(FACE_TRACKING_PROGRESS_AROUND_CAPTURE_BUTTON to JsonPrimitive(true)) to true,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).faceTrackingProgressAroundCaptureButton).isEqualTo(result)
         }
     }
 

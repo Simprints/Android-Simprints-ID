@@ -66,6 +66,17 @@ data class ExperimentalProjectConfiguration(
             ?.coerceAtLeast(FACE_TRACKING_FACE_SIZE_PX_MIN)
             ?: FACE_TRACKING_MAX_IMAGE_SIZE_PX_DEFAULT
 
+    /**
+     * Draws the face tracking capture progress around the capture button rather than around the
+     * square that follows the subject's face. Has no effect unless [faceTrackingCaptureEnabled].
+     */
+    val faceTrackingProgressAroundCaptureButton: Boolean
+        get() = customConfig
+            ?.get(FACE_TRACKING_PROGRESS_AROUND_CAPTURE_BUTTON)
+            ?.jsonPrimitive
+            ?.booleanOrNull
+            .let { it == true }
+
     val recordsDbMigrationFromRealmEnabled: Boolean
         get() = customConfig
             ?.get(RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_ENABLED)
@@ -281,6 +292,7 @@ data class ExperimentalProjectConfiguration(
         const val FACE_TRACKING_MIN_FACE_SIZE_PX_DEFAULT = 150
         internal const val FACE_TRACKING_MAX_IMAGE_SIZE_PX = "faceTrackingMaxImageSizePx"
         const val FACE_TRACKING_MAX_IMAGE_SIZE_PX_DEFAULT = 300
+        internal const val FACE_TRACKING_PROGRESS_AROUND_CAPTURE_BUTTON = "faceTrackingProgressAroundCaptureButton"
 
         internal const val RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_ENABLED = "recordsDbMigrationFromRealmEnabled"
         const val RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES = "recordsDbMigrationFromRealmMaxRetries"
