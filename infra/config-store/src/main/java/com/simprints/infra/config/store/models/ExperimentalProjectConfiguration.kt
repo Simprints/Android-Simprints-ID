@@ -31,6 +31,17 @@ data class ExperimentalProjectConfiguration(
             ?.coerceIn(FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MIN, FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MAX)
             ?: FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
 
+    /**
+     * Tracks the face anywhere in the preview instead of asking the subject to fill a fixed
+     * on-screen cutout, and picks the dominant face when several people are visible.
+     */
+    val faceTrackingCaptureEnabled: Boolean
+        get() = customConfig
+            ?.get(FACE_TRACKING_CAPTURE_ENABLED)
+            ?.jsonPrimitive
+            ?.booleanOrNull
+            .let { it == true }
+
     val recordsDbMigrationFromRealmEnabled: Boolean
         get() = customConfig
             ?.get(RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_ENABLED)
@@ -239,6 +250,7 @@ data class ExperimentalProjectConfiguration(
     companion object {
         internal const val DISABLE_SUBJECT_POOL_VALIDATION = "disableSubjectPoolValidation"
         internal const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS = "faceAutoCaptureImagingDurationMillis"
+        internal const val FACE_TRACKING_CAPTURE_ENABLED = "faceTrackingCaptureEnabled"
 
         internal const val RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_ENABLED = "recordsDbMigrationFromRealmEnabled"
         const val RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES = "recordsDbMigrationFromRealmMaxRetries"
