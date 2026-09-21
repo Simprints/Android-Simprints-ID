@@ -7,6 +7,7 @@ import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MAX
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MIN
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_TRACKING_CAPTURE_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FALLBACK_TO_COMMCARE_THRESHOLD_DAYS
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FALLBACK_TO_COMMCARE_THRESHOLD_DAYS_DEFAULT
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED
@@ -56,6 +57,22 @@ internal class ExperimentalProjectConfigurationTest {
             mapOf(DISABLE_SUBJECT_POOL_VALIDATION to JsonPrimitive(true)) to true,
         ).forEach { (config, result) ->
             assertThat(ExperimentalProjectConfiguration(config).disableSubjectPoolValidation).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `check face tracking capture flag correctly`() {
+        mapOf(
+            // Value not present - the fixed cutout behaviour stays the default
+            emptyMap<String, JsonElement>() to false,
+            // Value not boolean
+            mapOf(FACE_TRACKING_CAPTURE_ENABLED to JsonPrimitive(1)) to false,
+            // Value present and FALSE
+            mapOf(FACE_TRACKING_CAPTURE_ENABLED to JsonPrimitive(false)) to false,
+            // Value present and TRUE
+            mapOf(FACE_TRACKING_CAPTURE_ENABLED to JsonPrimitive(true)) to true,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).faceTrackingCaptureEnabled).isEqualTo(result)
         }
     }
 
