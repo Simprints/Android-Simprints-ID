@@ -35,7 +35,9 @@
     <com.simprints.face.capture.screens.livefeedback.views.CameraTargetOverlay
         android:id="@+id/capture_overlay"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        tools:visibility="visible" />
 
     <com.simprints.face.capture.screens.livefeedback.views.DashedCircularProgress
         android:id="@+id/capture_progress"
@@ -52,6 +54,27 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
+
+    <!--
+      Face tracking views. Hidden unless the faceTrackingCaptureEnabled experimental flag is on,
+      in which case the cutout overlay and ring above are hidden instead.
+    -->
+    <View
+        android:id="@+id/capture_controls_scrim"
+        android:layout_width="0dp"
+        android:layout_height="160dp"
+        android:background="@drawable/feedback_scrim_bottom"
+        android:importantForAccessibility="no"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.simprints.face.capture.screens.livefeedback.views.FaceTrackingOverlay
+        android:id="@+id/face_tracking_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/capture_feedback_btn"

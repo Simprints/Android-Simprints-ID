@@ -12,11 +12,13 @@ import androidx.core.graphics.scale
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
+import com.simprints.face.infra.basebiosdk.detection.FaceSelector
 import com.simprints.face.infra.basebiosdk.detection.SpoofCheckResult
 import java.nio.ByteBuffer
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.abs
+import kotlin.math.roundToInt
 import ai.roc.rocsdk.embedded.roc as roc3
 
 @ExcludedFromGeneratedTestCoverageReports(
@@ -27,6 +29,7 @@ class RocV3Detector @Inject constructor() : FaceDetector {
     override fun analyze(
         bitmap: Bitmap,
         estimateAgeAndGender: Boolean,
+        selectFace: FaceSelector?,
     ): Face? {
         val rocColorImage = roc_image()
         val rocGrayImage = roc_image()
@@ -39,7 +42,7 @@ class RocV3Detector @Inject constructor() : FaceDetector {
             rocColorImage,
         )
         roc3.roc_bgr2gray(rocColorImage, rocGrayImage)
-        return detectFace(rocColorImage, rocGrayImage, bitmap.width, bitmap.height, estimateAgeAndGender)
+        return detectFace(rocColorImage, rocGrayImage, bitmap.width, bitmap.height, estimateAgeAndGender, selectFace)
     }
 
     /*
@@ -54,14 +57,28 @@ class RocV3Detector @Inject constructor() : FaceDetector {
         width: Int,
         height: Int,
         estimateAgeAndGender: Boolean,
+        selectFace: FaceSelector?,
     ): Face? {
-        val detection = roc_detection()
+        val maxFaces = maxFacesFor(selectFace)
+        val detections = roc3.new_roc_detection_array(maxFaces)
         val template = roc3.new_uint8_t_array(roc3.ROC_FACE_FAST_FV_SIZE.toInt())
         val yaw = roc3.new_float()
         val quality = roc3.new_float()
         val age = if (estimateAgeAndGender) roc3.new_float() else null
         val gender = if (estimateAgeAndGender) roc_embedded_gender() else null
-        val face = if (isFaceDetected(coloredImage, detection)) {
+
+        val numFaces = detectFaces(coloredImage, detections, maxFaces).toInt().coerceIn(0, maxFaces)
+        // SWIG copies each element out of the array, so all of these are owned by Java and are
+        // deleted below whether they end up being used or not.
+        val candidates = (0 until numFaces).map { roc3.roc_detection_array_getitem(detections, it) }
+        val selectedIndex = when {
+            candidates.isEmpty() -> null
+            selectFace == null -> 0
+            else -> selectFace(candidates.map { it.boundingRect() })
+        }
+        val detection = selectedIndex?.let { candidates.getOrNull(it) }
+
+        val face = if (detection != null) {
             generateFaceTemplateFromImage(
                 coloredImage,
                 grayImage,
@@ -103,7 +120,8 @@ class RocV3Detector @Inject constructor() : FaceDetector {
         age?.let { roc3.delete_float(it) }
         gender?.delete()
         roc3.delete_uint8_t_array(template)
-        detection.delete()
+        candidates.forEach { it.delete() }
+        roc3.delete_roc_detection_array(detections)
         return face
     }
 
@@ -153,10 +171,17 @@ class RocV3Detector @Inject constructor() : FaceDetector {
         )
     }
 
-    private fun isFaceDetected(
+    /**
+     * Fills [detections] with up to [maxFaces] faces and returns how many were found.
+     *
+     * [detections] must be an array of at least [maxFaces] elements - the native call writes
+     * straight into it.
+     */
+    private fun detectFaces(
         image: roc_image,
-        detection: roc_detection,
-    ): Boolean {
+        detections: roc_detection,
+        maxFaces: Int,
+    ): Long {
         val adaptiveMinimumSize = roc3.new_size_t()
 
         roc3.roc_adaptive_minimum_size(
@@ -171,17 +196,24 @@ class RocV3Detector @Inject constructor() : FaceDetector {
         roc3.roc_embedded_detect_faces_accurate(
             image,
             roc3.size_t_value(adaptiveMinimumSize),
-            MAX_FACE_DETECTION,
+            maxFaces,
             FALSE_DETECTION_RATE,
             n,
-            detection,
+            detections,
         )
         val numFaces = roc3.size_t_value(n)
         roc3.delete_size_t(n)
         roc3.delete_size_t(adaptiveMinimumSize)
 
-        return numFaces == 1L
+        return numFaces
     }
+
+    private fun Rect.scaledBy(factor: Float) = Rect(
+        (left * factor).roundToInt(),
+        (top * factor).roundToInt(),
+        (right * factor).roundToInt(),
+        (bottom * factor).roundToInt(),
+    )
 
     private fun roc_detection.boundingRect() = Rect(
         (x - width / 2).toInt(),
@@ -199,6 +231,7 @@ class RocV3Detector @Inject constructor() : FaceDetector {
     override fun spoofCheck(
         bitmap: Bitmap,
         configuredMaxSize: Int,
+        selectFace: FaceSelector?,
     ): SpoofCheckResult {
         if (minOf(bitmap.width, bitmap.height) < SPOOF_MIN_SIZE) {
             // As per documentation - smallest dimension must be at least 720px
@@ -206,8 +239,12 @@ class RocV3Detector @Inject constructor() : FaceDetector {
         }
 
         // Scaling image down to lower the chance that IOD is outside of requirements. The check also runs faster on smaller images.
-        val scaledBitmap = if (maxOf(bitmap.width, bitmap.height) > configuredMaxSize) {
-            val scale = configuredMaxSize.toFloat() / maxOf(bitmap.width, bitmap.height).toFloat()
+        val scale = if (maxOf(bitmap.width, bitmap.height) > configuredMaxSize) {
+            configuredMaxSize.toFloat() / maxOf(bitmap.width, bitmap.height).toFloat()
+        } else {
+            1f
+        }
+        val scaledBitmap = if (scale < 1f) {
             bitmap.scale((bitmap.width * scale).toInt(), (bitmap.height * scale).toInt(), false)
         } else {
             bitmap
@@ -225,13 +262,28 @@ class RocV3Detector @Inject constructor() : FaceDetector {
         )
         roc3.roc_bgr2gray(rocColorImage, rocGrayImage)
 
-        val detection = roc_detection()
-        val faceDetected = isFaceDetected(rocColorImage, detection)
+        val maxFaces = maxFacesFor(selectFace)
+        val detections = roc3.new_roc_detection_array(maxFaces)
+        val numFaces = detectFaces(rocColorImage, detections, maxFaces).toInt().coerceIn(0, maxFaces)
+
+        // The score has to describe the same person the template was taken from, so the caller's
+        // selector picks the face to measure here too.
+        // SWIG copies each element out of the array, so all of these are owned by Java and are
+        // deleted below whether they end up being used or not.
+        val candidates = (0 until numFaces).map { roc3.roc_detection_array_getitem(detections, it) }
+        val selectedIndex = when {
+            candidates.isEmpty() -> null
+            selectFace == null -> 0
+            else -> selectFace(candidates.map { it.boundingRect().scaledBy(1f / scale) })
+        }
+        val detection = selectedIndex?.let { candidates.getOrNull(it) }
+
+        val faceDetected = detection != null
 
         var iod = 0f
         var finalScore = 0f
 
-        if (faceDetected) {
+        if (detection != null) {
             val rightEye = roc_landmark()
             val leftEye = roc_landmark()
             val chin = roc_landmark()
@@ -296,8 +348,11 @@ class RocV3Detector @Inject constructor() : FaceDetector {
         }
         roc3.roc_free_image(rocGrayImage)
         roc3.roc_free_image(rocColorImage)
-        detection.delete()
+        candidates.forEach { it.delete() }
+        roc3.delete_roc_detection_array(detections)
         byteBuffer.clear()
+        // The scaled copy is this method's own; the bitmap the caller passed in is not
+        if (scaledBitmap !== bitmap) scaledBitmap.recycle()
 
         return when {
             !faceDetected -> SpoofCheckResult(finalScore, SpoofCheckResult.SkipReason.NOT_AVAILABLE)
@@ -307,9 +362,12 @@ class RocV3Detector @Inject constructor() : FaceDetector {
         }
     }
 
+    // Detecting several faces is only useful when the caller can choose between them.
+    private fun maxFacesFor(selectFace: FaceSelector?) = if (selectFace == null) 1 else MAX_FACE_DETECTION
+
     companion object {
         const val RANK_ONE_TEMPLATE_FORMAT_3_1 = "RANK_ONE_3_1"
-        const val MAX_FACE_DETECTION = 1
+        const val MAX_FACE_DETECTION = 3
         const val FALSE_DETECTION_RATE = 0.1f
         const val RELATIVE_MIN_SIZE = 0.2f
         const val ABSOLUTE_MIN_SIZE = 36L

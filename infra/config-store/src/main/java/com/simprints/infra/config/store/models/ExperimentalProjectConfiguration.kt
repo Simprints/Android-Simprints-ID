@@ -31,6 +31,52 @@ data class ExperimentalProjectConfiguration(
             ?.coerceIn(FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MIN, FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MAX)
             ?: FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
 
+    /**
+     * Tracks the face anywhere in the preview instead of asking the subject to fill a fixed
+     * on-screen cutout, and picks the dominant face when several people are visible.
+     */
+    val faceTrackingCaptureEnabled: Boolean
+        get() = customConfig
+            ?.get(FACE_TRACKING_CAPTURE_ENABLED)
+            ?.jsonPrimitive
+            ?.booleanOrNull
+            .let { it == true }
+
+    /**
+     * Smallest face, measured on the square that gets cropped around it, that face tracking will
+     * accept. Below this the face SDKs cannot be relied on to extract a template.
+     */
+    val faceTrackingMinFaceSizePx: Int
+        get() = customConfig
+            ?.get(FACE_TRACKING_MIN_FACE_SIZE_PX)
+            ?.jsonPrimitive
+            ?.intOrNull
+            ?.coerceAtLeast(FACE_TRACKING_FACE_SIZE_PX_MIN)
+            ?: FACE_TRACKING_MIN_FACE_SIZE_PX_DEFAULT
+
+    /**
+     * Largest the cropped face is kept at before it is stored and uploaded. Anything bigger is
+     * scaled down, since the extra pixels cost storage and bandwidth without helping the template.
+     */
+    val faceTrackingMaxImageSizePx: Int
+        get() = customConfig
+            ?.get(FACE_TRACKING_MAX_IMAGE_SIZE_PX)
+            ?.jsonPrimitive
+            ?.intOrNull
+            ?.coerceAtLeast(FACE_TRACKING_FACE_SIZE_PX_MIN)
+            ?: FACE_TRACKING_MAX_IMAGE_SIZE_PX_DEFAULT
+
+    /**
+     * Draws the face tracking capture progress around the capture button rather than around the
+     * square that follows the subject's face. Has no effect unless [faceTrackingCaptureEnabled].
+     */
+    val faceTrackingProgressAroundCaptureButton: Boolean
+        get() = customConfig
+            ?.get(FACE_TRACKING_PROGRESS_AROUND_CAPTURE_BUTTON)
+            ?.jsonPrimitive
+            ?.booleanOrNull
+            .let { it == true }
+
     val recordsDbMigrationFromRealmEnabled: Boolean
         get() = customConfig
             ?.get(RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_ENABLED)
@@ -239,6 +285,14 @@ data class ExperimentalProjectConfiguration(
     companion object {
         internal const val DISABLE_SUBJECT_POOL_VALIDATION = "disableSubjectPoolValidation"
         internal const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS = "faceAutoCaptureImagingDurationMillis"
+        internal const val FACE_TRACKING_CAPTURE_ENABLED = "faceTrackingCaptureEnabled"
+
+        internal const val FACE_TRACKING_MIN_FACE_SIZE_PX = "faceTrackingMinFaceSizePx"
+        const val FACE_TRACKING_FACE_SIZE_PX_MIN = 112 // Should at least be viable for SimFace
+        const val FACE_TRACKING_MIN_FACE_SIZE_PX_DEFAULT = 150
+        internal const val FACE_TRACKING_MAX_IMAGE_SIZE_PX = "faceTrackingMaxImageSizePx"
+        const val FACE_TRACKING_MAX_IMAGE_SIZE_PX_DEFAULT = 300
+        internal const val FACE_TRACKING_PROGRESS_AROUND_CAPTURE_BUTTON = "faceTrackingProgressAroundCaptureButton"
 
         internal const val RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_ENABLED = "recordsDbMigrationFromRealmEnabled"
         const val RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_MAX_RETRIES = "recordsDbMigrationFromRealmMaxRetries"
