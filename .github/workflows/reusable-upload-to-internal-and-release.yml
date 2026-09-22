@@ -12,7 +12,7 @@ on:
                 type: string
                 required: true
             version-code:
-                description: "Android version code for the build (used to download the universal APK from Play)"
+                description: "Android version code for the build (used to download the universal APK from Play and to suffix the released APK filename)"
                 type: string
                 required: true
             mapping-file:
@@ -64,7 +64,7 @@ jobs:
                     VERSION_NAME: ${{ inputs.version-name }}
                     PACKAGE_NAME: com.simprints.id
                 run: |
-                    APK_NAME="simprints-id-${VERSION_NAME}-universal.apk"
+                    APK_NAME="simprints-id-${VERSION_NAME}-${VERSION_CODE}-universal.apk"
                     OUTPUT_APK="$APK_NAME" python3 .github/scripts/download-universal-apk.py
                     echo "apk-name=$APK_NAME" >> "$GITHUB_OUTPUT"
 
