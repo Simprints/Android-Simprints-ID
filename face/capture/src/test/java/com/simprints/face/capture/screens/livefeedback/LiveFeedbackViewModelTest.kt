@@ -892,6 +892,80 @@ internal class LiveFeedbackViewModelTest {
     }
 
     @Test
+    fun `auto - a frame that does not qualify hands its own frames back`() = runTest {
+        val analysed = trackedPreviewFrame()
+        // Valid, so it reaches the qualifying check, but a better capture already fills the quota
+        every { faceDetector.analyze(analysed, any(), any()) } returns trackedFace(quality = 0.5f)
+        every { isUsingAutoCapture.invoke(any()) } returns true
+
+        enableFaceTracking()
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.startCapture()
+        // First frame takes the only slot with a better face
+        every { faceDetector.analyze(frame, any(), any()) } returns trackedFace(quality = 0.9f)
+        viewModel.process(frame, frame)
+        viewModel.process(analysed, analysed)
+
+        assertThat(viewModel.userCaptures.single().face?.quality).isEqualTo(0.9f)
+        verify(atLeast = 1) { analysed.recycle() }
+    }
+
+    @Test
+    fun `auto - a qualifying frame keeps its frames`() = runTest {
+        val analysed = trackedPreviewFrame()
+        every { faceDetector.analyze(analysed, any(), any()) } returns trackedFace()
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        every { cropToFaceSquare.invoke(analysed, any(), any()) } returns analysed
+
+        enableFaceTracking()
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.startCapture()
+        viewModel.process(analysed, analysed)
+
+        assertThat(viewModel.userCaptures).hasSize(1)
+        verify(exactly = 0) { analysed.recycle() }
+    }
+
+    @Test
+    fun `a frame too poor to become the fallback hands its frames back`() = runTest {
+        val analysed = trackedPreviewFrame()
+        // Too far to be a fallback, so nothing keeps it
+        every { faceDetector.analyze(analysed, any(), any()) } returns trackedFace(Rect(0, 0, 40, 40))
+
+        enableFaceTracking()
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.process(analysed, analysed)
+
+        assertThat(viewModel.state.value.feedback).isEqualTo(LiveFeedbackState.Feedback.TOO_FAR)
+        verify(atLeast = 1) { analysed.recycle() }
+    }
+
+    @Test
+    fun `a superseded fallback hands its frames back`() = runTest {
+        val first = trackedPreviewFrame()
+        every { faceDetector.analyze(first, any(), any()) } returns trackedFace(quality = 0.5f)
+        every { cropToFaceSquare.invoke(first, any(), any()) } returns first
+
+        enableFaceTracking()
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.process(first, first)
+        verify(exactly = 0) { first.recycle() }
+
+        // A better face takes over as the fallback, so the one it displaces is no longer needed
+        val better = trackedPreviewFrame()
+        every { faceDetector.analyze(better, any(), any()) } returns trackedFace(quality = 0.9f)
+        every { cropToFaceSquare.invoke(better, any(), any()) } returns better
+        viewModel.process(better, better)
+
+        verify(atLeast = 1) { first.recycle() }
+        verify(exactly = 0) { better.recycle() }
+    }
+
+    @Test
     fun `frames that are only looked at are never cropped`() = runTest {
         // Too far to be kept, so its only job is to produce feedback
         every { faceDetector.analyze(frame, any(), any()) } returns trackedFace(Rect(0, 0, 40, 40))
@@ -925,6 +999,27 @@ internal class LiveFeedbackViewModelTest {
         verify(exactly = 1) { analysed.recycle() }
         verify(exactly = 0) { squareCrop.recycle() }
         assertThat(viewModel.userCaptures.single().bitmap).isSameInstanceAs(squareCrop)
+    }
+
+    @Test
+    fun `the stored frame survives when it is also the frame that was analysed`() = runTest {
+        // Nothing cropped the frame on the way in, so the capture holds one bitmap under both names
+        val squareCrop = mockk<Bitmap>(relaxed = true)
+        every { cropToFaceSquare.invoke(frame, any(), any()) } returns squareCrop
+        every { faceDetector.analyze(frame, any(), any()) } returns trackedFace()
+
+        enableFaceTracking()
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+
+        with(viewModel.userCaptures.single()) {
+            assertThat(bitmap).isSameInstanceAs(squareCrop)
+            assertThat(original).isSameInstanceAs(frame)
+        }
+        // An enabled spoof check reads original back off the capture, so it has to still be usable
+        verify(exactly = 0) { frame.recycle() }
     }
 
     @Test
@@ -1137,6 +1232,9 @@ internal class LiveFeedbackViewModelTest {
     }
 
     /** A mocked frame of [size] square pixels, for the rules that count pixels rather than ratios. */
+    /** A frame mock the size of the tracked preview, distinct per call so recycling can be traced. */
+    private fun trackedPreviewFrame() = previewFrame(FRAME_SIZE_PX)
+
     private fun previewFrame(size: Int) = mockk<Bitmap>(relaxed = true) {
         every { width } returns size
         every { height } returns size

@@ -308,6 +308,8 @@ internal class LiveFeedbackViewModel @Inject constructor(
                 if (isAutoCapture) {
                     if (isQualifying(faceDetection)) {
                         updateUserCapturesWith(cropBitmapToTrackedSquare(faceDetection, trackedSquare))
+                    } else {
+                        releaseFrames(faceDetection)
                     }
                 } else {
                     userCaptures.add(cropBitmapToTrackedSquare(faceDetection, trackedSquare))
@@ -374,6 +376,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
                     userCaptures[index].face?.quality ?: -1f
                 }?.takeIf { it >= 0 }
                 ?.let { worseQualityCaptureIndex ->
+                    releaseFrames(userCaptures[worseQualityCaptureIndex])
                     userCaptures[worseQualityCaptureIndex] = faceDetection
                 }
         } else {
@@ -538,7 +541,8 @@ internal class LiveFeedbackViewModel @Inject constructor(
         val crop = cropToFaceSquare(faceDetection.bitmap, trackedSquare, faceTracking.maxImageSizePx)
         // The use case hands the frame straight back when the square is unusable
         if (crop === faceDetection.bitmap) return faceDetection
-        faceDetection.bitmap.recycle()
+        // Only a copy made for this screen is ours to release.
+        if (faceDetection.bitmap !== faceDetection.original) faceDetection.bitmap.recycle()
         return faceDetection.copy(bitmap = crop)
     }
 
@@ -596,9 +600,17 @@ internal class LiveFeedbackViewModel @Inject constructor(
         if (faceDetection.hasValidStatus() && detectionQuality >= fallbackQuality) {
             Simber.i("Fallback capture updated", tag = FACE_CAPTURE)
             val kept = cropBitmapToTrackedSquare(faceDetection, trackedSquare).apply { isFallback = true }
+            fallbackCapture?.let { releaseFrames(it) }
             fallbackCapture = kept
             createFirstFallbackCaptureEvent(kept)
+        } else {
+            releaseFrames(faceDetection)
         }
+    }
+
+    private fun releaseFrames(faceDetection: FaceDetection) {
+        faceDetection.original.recycle()
+        faceDetection.bitmap.recycle()
     }
 
     /**
