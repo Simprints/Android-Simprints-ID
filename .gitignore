@@ -20,6 +20,7 @@ build/
 projectFilesBackup/
 .kotlin/
 !.idea/ktlint-plugin.xml
+gradle-user-home
 
 # PyCharm
 testing/__pycache__/
