@@ -3,5 +3,7 @@
 
     <uses-permission android:name="org.commcare.dalvik.provider.cases.read" />
     <uses-permission android:name="org.commcare.dalvik.debug.provider.cases.read" />
+    <uses-permission android:name="org.commcare.dalvik.echisethiopia.provider.cases.read" />
+    <uses-permission android:name="org.commcare.dalvik.echisethiopia.debug.provider.cases.read" />
 
 </manifest>
