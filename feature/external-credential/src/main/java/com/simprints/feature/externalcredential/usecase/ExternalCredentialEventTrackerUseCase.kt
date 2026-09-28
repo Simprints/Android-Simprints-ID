@@ -2,12 +2,13 @@ package com.simprints.feature.externalcredential.usecase
 
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.ExternalCredentialMapper
-import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.CalculateLevenshteinDistanceUseCase
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
@@ -64,36 +65,76 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
         )
     }
 
-    suspend fun saveCaptureEvents(
-        credentialSearchResult: ExternalCredentialSearchResult.Complete,
+    suspend fun buildCaptureAttempt(
+        scannedCredentialResult: ScannedCredentialResult,
         subjectId: String,
         startTime: Timestamp,
         selectionEventId: String,
+    ): ExternalCredentialCaptureAttempt {
+        Simber.d("Building External Credential capture attempt for $scannedCredentialResult")
+        val externalCredential = externalCredentialMapper.mapExternalCredential(
+            scannedCredentialResult = scannedCredentialResult,
+            subjectId = subjectId,
+        )
+        return ExternalCredentialCaptureAttempt(
+            scannedCredentialResult = scannedCredentialResult,
+            externalCredential = externalCredential,
+            startTime = startTime,
+            endTime = timeHelper.now(),
+            selectionEventId = selectionEventId,
+        )
+    }
+
+    fun hasConfirmedValueChanged(
+        attempt: ExternalCredentialCaptureAttempt,
+        confirmedCredential: TokenizableString.Raw,
+    ): Boolean = attempt.scannedCredentialResult.credential != confirmedCredential
+
+    suspend fun persistCaptureAttempt(attempt: ExternalCredentialCaptureAttempt) {
+        val scannedValue = attempt.scannedCredentialResult.credential.value
+        persistCaptureEvents(
+            attempt = attempt,
+            ocrErrorCount = 0,
+            capturedTextLength = scannedValue.length,
+        )
+    }
+
+    suspend fun persistCaptureAttemptWithConfirmedValue(
+        attempt: ExternalCredentialCaptureAttempt,
+        confirmedCredential: TokenizableString.Raw,
     ) {
-        Simber.d("Saving External Credential Events for $credentialSearchResult")
-        val confirmedCredential = credentialSearchResult.confirmedCredential
-        val scannedCredentialResult = credentialSearchResult.scannedCredentialResult
-        val type = scannedCredentialResult.credentialType
-        val externalCredential = externalCredentialMapper.mapExternalCredential(credentialSearchResult, subjectId)
+        val scannedValue = attempt.scannedCredentialResult.credential.value
+        persistCaptureEvents(
+            attempt = attempt,
+            ocrErrorCount = calculateDistance(scannedValue, confirmedCredential.value),
+            capturedTextLength = confirmedCredential.value.length,
+        )
+    }
+
+    private suspend fun persistCaptureEvents(
+        attempt: ExternalCredentialCaptureAttempt,
+        ocrErrorCount: Int,
+        capturedTextLength: Int,
+    ) {
         eventRepository.addOrUpdateEvent(
             ExternalCredentialCaptureValueEvent(
-                createdAt = startTime,
-                payloadId = externalCredential.id,
-                credential = externalCredential,
+                createdAt = attempt.startTime,
+                payloadId = attempt.externalCredential.id,
+                credential = attempt.externalCredential,
             ),
         )
 
         eventRepository.addOrUpdateEvent(
             ExternalCredentialCaptureEvent(
-                startTime = startTime,
-                endTime = timeHelper.now(),
-                payloadId = externalCredential.id,
-                autoCaptureStartTime = scannedCredentialResult.scanStartTime,
-                autoCaptureEndTime = scannedCredentialResult.scanEndTime,
-                ocrErrorCount = calculateDistance(scannedCredentialResult.credential.value, confirmedCredential.value),
-                capturedTextLength = confirmedCredential.value.length,
-                credentialTextLength = getExpectedCredentialValueLength(type),
-                selectionId = selectionEventId,
+                startTime = attempt.startTime,
+                endTime = attempt.endTime,
+                payloadId = attempt.externalCredential.id,
+                autoCaptureStartTime = attempt.scannedCredentialResult.scanStartTime,
+                autoCaptureEndTime = attempt.scannedCredentialResult.scanEndTime,
+                ocrErrorCount = ocrErrorCount,
+                capturedTextLength = capturedTextLength,
+                credentialTextLength = getExpectedCredentialValueLength(attempt.scannedCredentialResult.credentialType),
+                selectionId = attempt.selectionEventId,
             ),
         )
     }

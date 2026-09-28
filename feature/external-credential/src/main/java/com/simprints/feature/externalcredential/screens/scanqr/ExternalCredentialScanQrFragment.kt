@@ -159,6 +159,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
                     scanStartTime = state.scanStartTime,
                     scanEndTime = state.scanEndTime,
                 )
+                mainViewModel.addCaptureAttempt(args)
                 findNavController().navigateSafely(
                     this@ExternalCredentialScanQrFragment,
                     ExternalCredentialScanQrFragmentDirections.actionExternalCredentialSelectScanQrToExternalCredentialSearch(args),
