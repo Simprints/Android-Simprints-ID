@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -217,6 +218,47 @@ class DeviceStateDataTrackerImplTest {
             val state = awaitItem()
             assertThat(state.pendingSamples).isNull()
             assertThat(state.recordCount).isEqualTo(RECORDS)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `refresh re-subscribes a source that a failure left null`() = runTest {
+        var firstCollection = true
+        every { observeSamplesToUploadCount() } returns flow {
+            if (firstCollection) {
+                firstCollection = false
+                throw RuntimeException()
+            }
+            emit(SAMPLES)
+        }
+        val tracker = tracker(backgroundScope)
+
+        tracker.observeDeviceDataState().test {
+            assertThat(awaitItem().pendingSamples).isNull()
+
+            tracker.refresh()
+            // Every source is re-subscribed, so settle before reading rather than racing the
+            // order in which the five slots re-emit.
+            runCurrent()
+
+            // The source is rebuilt rather than left dark for the lifetime of the shared upstream.
+            assertThat(expectMostRecentItem().pendingSamples).isEqualTo(SAMPLES)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `refresh leaves healthy sources alone`() = runTest {
+        val tracker = tracker(backgroundScope)
+
+        tracker.observeDeviceDataState().test {
+            assertThat(awaitItem().recordCount).isEqualTo(RECORDS)
+
+            tracker.refresh()
+            runCurrent()
+
+            assertThat(expectMostRecentItem().recordCount).isEqualTo(RECORDS)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -441,6 +483,7 @@ class DeviceStateDataTrackerImplTest {
         observeEnrolmentRecordsCount = observeEnrolmentRecordsCount,
         observeSamplesToUploadCount = observeSamplesToUploadCount,
         appScope = scope,
+        dispatcherIO = UnconfinedTestDispatcher(),
     )
 
     companion object {

@@ -33,4 +33,11 @@ interface DeviceStateDataTracker {
      * Whether any events are still stored on the device.
      */
     suspend fun hasPendingEvents(): Boolean
+
+    /**
+     * Re-subscribes every source of [observeDeviceDataState].
+     * A source that fails reads as `null` and stays that way, because the local reads behind it rarely recover on their own.
+     * Call this when the user asks for fresh data - otherwise recovery only happens when the screen is left and reopened.
+     */
+    fun refresh()
 }

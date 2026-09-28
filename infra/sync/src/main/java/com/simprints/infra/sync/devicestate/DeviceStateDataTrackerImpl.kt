@@ -1,8 +1,10 @@
 package com.simprints.infra.sync.devicestate
 
 import com.simprints.core.AppScope
+import com.simprints.core.DispatcherIO
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
@@ -13,22 +15,25 @@ import com.simprints.infra.sync.ImageSyncTimestampProvider
 import com.simprints.infra.sync.devicestate.internal.ObserveEnrolmentRecordsCountUseCase
 import com.simprints.infra.sync.devicestate.internal.ObserveSamplesToUploadCountUseCase
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.time.Duration.Companion.milliseconds
 
 @Singleton
 internal class DeviceStateDataTrackerImpl @Inject constructor(
@@ -41,21 +46,30 @@ internal class DeviceStateDataTrackerImpl @Inject constructor(
     private val observeEnrolmentRecordsCount: ObserveEnrolmentRecordsCountUseCase,
     private val observeSamplesToUploadCount: ObserveSamplesToUploadCountUseCase,
     @param:AppScope private val appScope: CoroutineScope,
+    @param:DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) : DeviceStateDataTracker {
+    /** Bumped by [refresh] to re-subscribe every source; see [deferred]. */
+    private val refreshes = MutableStateFlow(0)
+
     private val sharedState: SharedFlow<DeviceDataState> by lazy {
         combine(
             deferred(PROJECT_ID) { observeProjectId() },
             deferred(RECORD_COUNT) { observeEnrolmentRecordsCount() },
             deferred(PENDING_SAMPLES) { observeSamplesToUploadCount() },
             deferred(PENDING_SCOPES) { eventRepository.observeClosedEventScopeCounts() },
-            deferred(PENDING_EVENTS) { observePendingEventCounts() },
-        ) { projectId, records, samples, scopes, events ->
+            // Combined only after each is made null-safe, so a failure in the enrolment counts
+            // cannot also blank the total, and each failure is logged against its own source.
+            combine(
+                deferred(PENDING_EVENTS) { observeTotalEventCount() },
+                deferred(PENDING_ENROLMENTS) { observePendingEnrolmentCount() },
+            ) { events, enrolments -> events to enrolments },
+        ) { projectId, records, samples, scopes, (events, enrolments) ->
             DeviceDataState(
                 projectId = projectId,
                 recordCount = records,
                 pendingScopes = scopes,
-                pendingEvents = events?.first,
-                pendingEnrolments = events?.second,
+                pendingEvents = events,
+                pendingEnrolments = enrolments,
                 pendingSamples = samples,
                 // Encrypted preferences have no change notification, so they are re-read per emission.
                 lastEventSyncAt = readLastEventSyncAt(),
@@ -70,6 +84,10 @@ internal class DeviceStateDataTrackerImpl @Inject constructor(
 
     override fun observeDeviceDataState(): Flow<DeviceDataState> = sharedState
 
+    override fun refresh() {
+        refreshes.update { it + 1 }
+    }
+
     /**
      * Evaluates every source directly. Deliberately NOT [observeDeviceDataState] `.first()`, which
      * on a `shareIn(replay = 1)` flow would hand back the last cached emission.
@@ -83,7 +101,7 @@ internal class DeviceStateDataTrackerImpl @Inject constructor(
             recordCount = when {
                 config == null -> null // could not read
                 projectId == null -> 0 // signed out / nothing yet
-                else -> readOrNull(RECORD_COUNT) { countRecords() }
+                else -> readOrNull(RECORD_COUNT) { countRecordsInProject(projectId) }
             },
             pendingScopes = readOrNull(PENDING_SCOPES) { eventRepository.observeClosedEventScopeCounts().first() },
             pendingEvents = readOrNull(PENDING_EVENTS) { countEvents() },
@@ -102,23 +120,27 @@ internal class DeviceStateDataTrackerImpl @Inject constructor(
 
     override suspend fun hasPendingEvents(): Boolean = countEvents() > 0
 
-    private suspend fun currentProjectId(): String? = configRepository
-        .getProjectConfiguration()
-        .projectId
-        .takeIf { it.isNotBlank() }
-
     private fun observeProjectId(): Flow<String?> = configRepository
         .observeProjectConfiguration()
         .map { it.projectId.takeIf { id -> id.isNotBlank() } }
         .distinctUntilChanged()
 
-    private fun observePendingEventCounts(): Flow<Pair<Int, Int>> = combine(
-        eventRepository.observeEventCount(type = null),
+    // distinctUntilChanged because Room invalidates the events table on every insert, and each
+    // emission re-runs the combine transform - including the encrypted timestamp reads.
+    private fun observeTotalEventCount(): Flow<Int> = eventRepository
+        .observeEventCount(type = null)
+        .distinctUntilChanged()
+
+    private fun observePendingEnrolmentCount(): Flow<Int> = combine(
         eventRepository.observeEventCount(EventType.ENROLMENT_V2),
         eventRepository.observeEventCount(EventType.ENROLMENT_V4),
-    ) { events, enrolmentsV2, enrolmentsV4 -> events to (enrolmentsV2 + enrolmentsV4) }
+    ) { enrolmentsV2, enrolmentsV4 -> enrolmentsV2 + enrolmentsV4 }.distinctUntilChanged()
 
+    /** Every record on the device, whatever project it belongs to - see [getRecordCount]. */
     private suspend fun countRecords(): Int = enrolmentRecordRepository.count()
+
+    private suspend fun countRecordsInProject(projectId: String): Int =
+        enrolmentRecordRepository.count(EnrolmentRecordQuery(projectId = projectId))
 
     private suspend fun countEvents(): Int = eventRepository.observeEventCount(type = null).first()
 
@@ -129,8 +151,12 @@ internal class DeviceStateDataTrackerImpl @Inject constructor(
         eventSyncCache.readLastSuccessfulSyncTime()?.ms
     }
 
-    private fun readLastSampleSyncAt(): Long? = readOrNull(LAST_SAMPLE_SYNC) {
-        imageSyncTimestampProvider.getLastImageSyncTimestamp()
+    /**
+     * `withContext` because this decrypts an EncryptedSharedPreferences entry and the combine
+     * transform runs on [appScope], which is the main dispatcher.
+     */
+    private suspend fun readLastSampleSyncAt(): Long? = withContext(dispatcherIO) {
+        readOrNull(LAST_SAMPLE_SYNC) { imageSyncTimestampProvider.getLastImageSyncTimestamp() }
     }
 
     /**
@@ -141,7 +167,7 @@ internal class DeviceStateDataTrackerImpl @Inject constructor(
     private fun <T> deferred(
         source: String,
         block: () -> Flow<T>,
-    ): Flow<T?> = flow { emitAll(block()) }.nullOnFailure(source)
+    ): Flow<T?> = refreshes.flatMapLatest { flow { emitAll(block()) }.nullOnFailure(source) }
 
     /**
      * Records a source failure as `null` rather than letting it abort the whole snapshot, or
@@ -160,16 +186,11 @@ internal class DeviceStateDataTrackerImpl @Inject constructor(
     }
 
     private fun <T> Flow<T>.nullOnFailure(source: String): Flow<T?> {
-        // Flow is covariant, so widening before retryWhen{} is what lets the failure be emitted as null.
+        // Flow is covariant, so widening before catch{} is what lets the failure be emitted as null.
         val nullable: Flow<T?> = this
-        return nullable.retryWhen { cause, _ ->
-            if (cause is CancellationException) return@retryWhen false
+        return nullable.catch { cause ->
             Simber.i("Could not observe $source for device data state", cause, tag = SYNC)
-            // Report the gap as null, then re-subscribe: catch{} would end the flow, leaving this
-            // source dark for as long as anything keeps collecting the shared state.
             emit(null)
-            delay(SOURCE_RETRY_DELAY_MS.milliseconds)
-            true
         }
     }
 
@@ -182,7 +203,5 @@ internal class DeviceStateDataTrackerImpl @Inject constructor(
         private const val PENDING_SAMPLES = "pending samples"
         private const val LAST_EVENT_SYNC = "last event sync time"
         private const val LAST_SAMPLE_SYNC = "last sample sync time"
-
-        private const val SOURCE_RETRY_DELAY_MS = 2_000L
     }
 }
