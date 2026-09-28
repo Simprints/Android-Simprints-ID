@@ -72,8 +72,9 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
 
         coEvery {
             externalCredentialMapper.mapExternalCredential(
-                searchResult = credentialSearchResult,
+                scannedCredentialResult = credentialSearchResult.scannedCredentialResult,
                 subjectId = SUBJECT_ID,
+                credentialValue = credentialSearchResult.confirmedCredential,
             )
         } returns mappedCredential
 
@@ -129,8 +130,9 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
             .containsExactly(mappedCredential)
         coVerify(exactly = 1) {
             externalCredentialMapper.mapExternalCredential(
-                searchResult = credentialSearchResult,
+                scannedCredentialResult = credentialSearchResult.scannedCredentialResult,
                 subjectId = SUBJECT_ID,
+                credentialValue = credentialSearchResult.confirmedCredential,
             )
         }
     }
@@ -205,7 +207,7 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
         val actions = captureActions()
         assertThat(actions).isEmpty()
         coVerify(exactly = 0) {
-            externalCredentialMapper.mapExternalCredential(any(), any())
+            externalCredentialMapper.mapExternalCredential(any(), any(), any())
         }
     }
 
@@ -239,7 +241,7 @@ internal class ResetExternalCredentialsInSessionUseCaseTest {
         assertThat(removeAction.externalCredentialIdsToRemove)
             .containsExactly(PREVIOUS_CREDENTIAL_ID)
         coVerify(exactly = 0) {
-            externalCredentialMapper.mapExternalCredential(any(), any())
+            externalCredentialMapper.mapExternalCredential(any(), any(), any())
         }
     }
 

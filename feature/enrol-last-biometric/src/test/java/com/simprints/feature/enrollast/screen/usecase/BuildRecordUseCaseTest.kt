@@ -196,7 +196,13 @@ class BuildRecordUseCaseTest {
             every { type } returns mockCredentialType
         }
 
-        coEvery { credentialMapper.mapExternalCredential(credentialSearchResult, any()) } returns mockExternalCredential
+        coEvery {
+            credentialMapper.mapExternalCredential(
+                scannedCredentialResult = credentialSearchResult.scannedCredentialResult,
+                subjectId = any(),
+                credentialValue = credentialSearchResult.confirmedCredential,
+            )
+        } returns mockExternalCredential
 
         val result =
             useCase(

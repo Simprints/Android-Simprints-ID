@@ -5,13 +5,18 @@ import androidx.lifecycle.SavedStateHandle
 import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.BoundingBox
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
+import com.simprints.feature.externalcredential.usecase.ExternalCredentialCaptureAttempt
 import com.simprints.feature.externalcredential.usecase.ExternalCredentialEventTrackerUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration
@@ -85,7 +90,31 @@ internal class ExternalCredentialViewModelTest {
     }
 
     @Test
-    fun `finish complete uses restored selection event state from savedStateHandle`() = runTest {
+    fun `addCaptureAttempt uses current capture start time and selection event id`() = runTest {
+        val selectionStartTime = Timestamp(10L)
+        val selectionEndTime = Timestamp(20L)
+        val captureStartTime = Timestamp(30L)
+        coEvery { eventsTracker.saveSelectionEvent(any(), any(), any()) } returns "selection-id"
+        every { timeHelper.now() } returnsMany listOf(selectionStartTime, selectionEndTime, captureStartTime)
+        val scannedCredentialResult = createScannedCredential()
+
+        viewModel.init(createParams(subjectId = "subjectId", flowType = FlowType.IDENTIFY))
+        viewModel.selectionStarted()
+        viewModel.setSelectedExternalCredentialType(ExternalCredentialType.QRCode)
+        viewModel.addCaptureAttempt(scannedCredentialResult)
+
+        coVerify {
+            eventsTracker.buildCaptureAttempt(
+                scannedCredentialResult = scannedCredentialResult,
+                subjectId = "subjectId",
+                startTime = captureStartTime,
+                selectionEventId = "selection-id",
+            )
+        }
+    }
+
+    @Test
+    fun `addCaptureAttempt uses restored capture start time and selection event id from savedStateHandle`() = runTest {
         val restoredCaptureStartTime = Timestamp(123L)
         val restoredSelectionEventId = "restored-selection-id"
         val restoredStateHandle = SavedStateHandle(
@@ -100,16 +129,14 @@ internal class ExternalCredentialViewModelTest {
             eventsTracker = eventsTracker,
             savedStateHandle = restoredStateHandle,
         )
-        val result = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
-            every { scannedCredentialResult } returns mockk(relaxed = true)
-        }
+        val scannedCredentialResult = createScannedCredential()
 
         restoredViewModel.init(createParams(subjectId = "subjectId", flowType = FlowType.IDENTIFY))
-        restoredViewModel.finish(result)
+        restoredViewModel.addCaptureAttempt(scannedCredentialResult)
 
         coVerify {
-            eventsTracker.saveCaptureEvents(
-                credentialSearchResult = result,
+            eventsTracker.buildCaptureAttempt(
+                scannedCredentialResult = scannedCredentialResult,
                 subjectId = "subjectId",
                 startTime = restoredCaptureStartTime,
                 selectionEventId = restoredSelectionEventId,
@@ -195,9 +222,7 @@ internal class ExternalCredentialViewModelTest {
 
     @Test
     fun `finish sends result to finishEvent`() = runTest {
-        val mockResult = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
-            every { scannedCredentialResult } returns mockk()
-        }
+        val mockResult = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true)
         viewModel.init(createParams(subjectId = "subjectId", FlowType.IDENTIFY))
         viewModel.selectionStarted()
         viewModel.setSelectedExternalCredentialType(ExternalCredentialType.QRCode)
@@ -212,40 +237,84 @@ internal class ExternalCredentialViewModelTest {
     }
 
     @Test
-    fun `finish handles non-null scannedCredential in result`() = runTest {
-        val subjectId = "subjectId"
-        val flowType = FlowType.IDENTIFY
-        val params = createParams(subjectId, flowType)
-        val credentialSearchResult = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
-            every { scannedCredentialResult } returns createScannedCredential()
-        }
-        viewModel.init(params)
+    fun `finish complete persists single attempt unmodified when confirmed value matches scanned value`() = runTest {
+        val attempt = makeAttempt()
+        coEvery { eventsTracker.buildCaptureAttempt(any(), any(), any(), any()) } returns attempt
+        every { eventsTracker.hasConfirmedValueChanged(attempt, any()) } returns false
+
+        viewModel.init(createParams(subjectId = "subjectId", FlowType.IDENTIFY))
         viewModel.selectionStarted()
-        viewModel.setSelectedExternalCredentialType(ExternalCredentialType.QRCode) // init capture timer
-        viewModel.finish(credentialSearchResult)
+        viewModel.setSelectedExternalCredentialType(ExternalCredentialType.QRCode)
+        viewModel.addCaptureAttempt(createScannedCredential())
+        viewModel.finish(makeCompleteResult(attempt.scannedCredentialResult.credential))
 
-        val observer = viewModel.finishEvent
-            .test()
-            .value()
-            .getContentIfNotHandled()
-
-        assertThat(observer).isEqualTo(credentialSearchResult)
+        coVerify(exactly = 1) { eventsTracker.persistCaptureAttempt(attempt) }
+        coVerify(exactly = 0) { eventsTracker.persistCaptureAttemptWithConfirmedValue(any(), any()) }
     }
 
     @Test
-    fun `finish saves success flow events`() = runTest {
-        val mockResult = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
-            every { scannedCredentialResult } returns mockk(relaxed = true)
-        }
-        coEvery { eventsTracker.saveSelectionEvent(any(), any(), any()) } returns "selectionId"
+    fun `finish complete persists single attempt with recalculated values when confirmed value differs`() = runTest {
+        val attempt = makeAttempt()
+        val confirmedCredential = "edited".asTokenizableRaw()
+        coEvery { eventsTracker.buildCaptureAttempt(any(), any(), any(), any()) } returns attempt
+        every { eventsTracker.hasConfirmedValueChanged(attempt, confirmedCredential) } returns true
 
-        viewModel.selectionStarted()
         viewModel.init(createParams(subjectId = "subjectId", FlowType.IDENTIFY))
-        viewModel.setSelectedExternalCredentialType(ExternalCredentialType.QRCode) // init capture timer
-        viewModel.finish(mockResult)
+        viewModel.selectionStarted()
+        viewModel.setSelectedExternalCredentialType(ExternalCredentialType.QRCode)
+        viewModel.addCaptureAttempt(createScannedCredential())
+        viewModel.finish(makeCompleteResult(confirmedCredential))
 
-        coVerify { eventsTracker.saveSelectionEvent(any(), any(), any()) }
-        coVerify { eventsTracker.saveCaptureEvents(any(), any(), any(), any()) }
+        coVerify(exactly = 1) { eventsTracker.persistCaptureAttemptWithConfirmedValue(attempt, confirmedCredential) }
+        coVerify(exactly = 0) { eventsTracker.persistCaptureAttempt(any()) }
+    }
+
+    @Test
+    fun `finish complete persists earlier recaptured attempts unmodified and only recalculates the last one`() = runTest {
+        val firstAttempt = makeAttempt(scanId = "scan-1")
+        val secondAttempt = makeAttempt(scanId = "scan-2")
+        val confirmedCredential = "edited".asTokenizableRaw()
+        coEvery {
+            eventsTracker.buildCaptureAttempt(any(), any(), any(), any())
+        } returnsMany listOf(firstAttempt, secondAttempt)
+        every { eventsTracker.hasConfirmedValueChanged(secondAttempt, confirmedCredential) } returns true
+
+        viewModel.init(createParams(subjectId = "subjectId", FlowType.IDENTIFY))
+        viewModel.selectionStarted()
+        viewModel.setSelectedExternalCredentialType(ExternalCredentialType.QRCode)
+        viewModel.addCaptureAttempt(createScannedCredential()) // first scan, later discarded via recapture
+        viewModel.addCaptureAttempt(createScannedCredential()) // second (last) scan, later confirmed with edits
+        viewModel.finish(makeCompleteResult(confirmedCredential))
+
+        coVerify(exactly = 1) { eventsTracker.persistCaptureAttempt(firstAttempt) }
+        coVerify(exactly = 0) { eventsTracker.persistCaptureAttemptWithConfirmedValue(firstAttempt, any()) }
+        coVerify(exactly = 1) { eventsTracker.persistCaptureAttemptWithConfirmedValue(secondAttempt, confirmedCredential) }
+        coVerify(exactly = 0) { eventsTracker.persistCaptureAttempt(secondAttempt) }
+    }
+
+    @Test
+    fun `finish complete with no accumulated attempts persists nothing`() = runTest {
+        viewModel.init(createParams(subjectId = "subjectId", FlowType.IDENTIFY))
+
+        viewModel.finish(makeCompleteResult("value".asTokenizableRaw()))
+
+        coVerify(exactly = 0) { eventsTracker.persistCaptureAttempt(any()) }
+        coVerify(exactly = 0) { eventsTracker.persistCaptureAttemptWithConfirmedValue(any(), any()) }
+    }
+
+    @Test
+    fun `finish skipped does not persist any accumulated capture attempts`() = runTest {
+        val attempt = makeAttempt()
+        coEvery { eventsTracker.buildCaptureAttempt(any(), any(), any(), any()) } returns attempt
+
+        viewModel.init(createParams(subjectId = "subjectId", FlowType.IDENTIFY))
+        viewModel.selectionStarted()
+        viewModel.setSelectedExternalCredentialType(ExternalCredentialType.QRCode)
+        viewModel.addCaptureAttempt(createScannedCredential())
+        viewModel.finish(mockk<ExternalCredentialSearchResult.Skipped>(relaxed = true))
+
+        coVerify(exactly = 0) { eventsTracker.persistCaptureAttempt(any()) }
+        coVerify(exactly = 0) { eventsTracker.persistCaptureAttemptWithConfirmedValue(any(), any()) }
     }
 
     @Test
@@ -350,13 +419,30 @@ internal class ExternalCredentialViewModelTest {
         zoomedCredentialImagePath: String? = "zoomedCredentialImagePath",
         credentialBoundingBox: BoundingBox? = BoundingBox(0, 0, 100, 100),
     ) = ScannedCredentialResult(
-        document = mockk(),
+        document = mockk(relaxed = true) { every { credential } returns "scanned".asTokenizableRaw() },
         documentImagePath = documentImagePath,
         zoomedCredentialImagePath = zoomedCredentialImagePath,
         credentialBoundingBox = credentialBoundingBox,
         scanStartTime = Timestamp(1L),
         scanEndTime = Timestamp(2L),
     )
+
+    private fun makeAttempt(scanId: String = "scan-id") = ExternalCredentialCaptureAttempt(
+        scannedCredentialResult = createScannedCredential(),
+        externalCredential = ExternalCredential(
+            id = scanId,
+            value = "encrypted".asTokenizableEncrypted(),
+            subjectId = "subjectId",
+            type = ExternalCredentialType.QRCode,
+        ),
+        startTime = Timestamp(1L),
+        endTime = Timestamp(2L),
+        selectionEventId = "selectionId",
+    )
+
+    private fun makeCompleteResult(confirmed: TokenizableString.Raw) = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
+        every { confirmedCredential } returns confirmed
+    }
 
     private fun createParams(
         subjectId: String,
