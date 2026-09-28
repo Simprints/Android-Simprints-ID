@@ -17,6 +17,7 @@ import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.sync.devicestate.DeviceStateDataTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -44,6 +45,7 @@ internal class SyncInfoViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     observeSyncInfo: ObserveSyncInfoUseCase,
     private val syncOrchestrator: SyncOrchestrator,
+    private val deviceStateDataTracker: DeviceStateDataTracker,
     @param:DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     var isPreLogoutUpSync = false
@@ -134,6 +136,8 @@ internal class SyncInfoViewModel @Inject constructor(
     }
 
     fun forceEventSync(canEmitSyncButtonClick: Boolean = true) {
+        // Sync is the user's "give me fresh data" gesture, so it also recovers any failed device state source
+        deviceStateDataTracker.refresh()
         viewModelScope.launch {
             if (canEmitSyncButtonClick) {
                 val isEventSyncing = eventSyncStateFlow.firstOrNull()?.isSyncInProgress() == true

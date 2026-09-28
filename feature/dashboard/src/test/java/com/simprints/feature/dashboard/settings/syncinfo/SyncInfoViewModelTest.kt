@@ -25,6 +25,7 @@ import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.SyncStatus
+import com.simprints.infra.sync.devicestate.DeviceStateDataTracker
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import com.simprints.testtools.common.livedata.getOrAwaitValues
@@ -66,6 +67,9 @@ class SyncInfoViewModelTest {
 
     @MockK
     private lateinit var syncOrchestrator: SyncOrchestrator
+
+    @MockK
+    private lateinit var deviceStateDataTracker: DeviceStateDataTracker
 
     @MockK
     private lateinit var mockProjectConfiguration: ProjectConfiguration
@@ -162,6 +166,7 @@ class SyncInfoViewModelTest {
             timeHelper = timeHelper,
             observeSyncInfo = observeSyncInfo,
             syncOrchestrator = syncOrchestrator,
+            deviceStateDataTracker = deviceStateDataTracker,
             ioDispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
     }
@@ -388,6 +393,15 @@ class SyncInfoViewModelTest {
         viewModel.forceEventSync()
 
         verify { syncOrchestrator.execute(OneTime.Events.restart(isDownSyncAllowed = false)) }
+    }
+
+    @Test
+    fun `should refresh device data state when forcing event sync`() = runTest {
+        createViewModel()
+
+        viewModel.forceEventSync()
+
+        verify(exactly = 1) { deviceStateDataTracker.refresh() }
     }
 
     @Test
