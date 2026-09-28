@@ -6,6 +6,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.event.local.models.DbEventScope
+import com.simprints.infra.events.event.local.models.DbScopeTypeCount
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 internal interface SessionScopeRoomDao {
@@ -29,6 +31,9 @@ internal interface SessionScopeRoomDao {
 
     @Query("select count(*) from DbEventScope where type = :type AND end_unixMs IS NOT NULL")
     suspend fun countClosed(type: EventScopeType): Int
+
+    @Query("select type, count(*) as count from DbEventScope where end_unixMs IS NOT NULL group by type")
+    fun observeClosedCountsByType(): Flow<List<DbScopeTypeCount>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdate(dbEvent: DbEventScope)
