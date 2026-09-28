@@ -147,6 +147,8 @@ internal open class EventRepositoryImpl @Inject constructor(
 
     override suspend fun getClosedEventScopesCount(type: EventScopeType): Int = eventLocalDataSource.countClosedEventScopes(type)
 
+    override fun observeClosedEventScopeCounts(): Flow<Map<EventScopeType, Int>> = eventLocalDataSource.observeClosedEventScopeCounts()
+
     override suspend fun deleteEventScope(scopeId: String) = reportException {
         eventLocalDataSource.deleteEventScope(scopeId = scopeId)
         eventLocalDataSource.deleteEventsInScope(scopeId = scopeId)

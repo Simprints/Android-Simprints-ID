@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -104,6 +105,17 @@ internal open class EventLocalDataSource @Inject constructor(
 
     suspend fun countClosedEventScopes(type: EventScopeType): Int = useRoom(readingDispatcher) {
         scopeDao.countClosed(type)
+    }
+
+    /**
+     * Emits a count of *closed* scopes for every [EventScopeType], zero-filled, so that consumers
+     * never have to distinguish "no rows" from "zero". Open scopes are excluded, as in [countClosedEventScopes].
+     */
+    fun observeClosedEventScopeCounts(): Flow<Map<EventScopeType, Int>> = useRoomFlow(readingDispatcher) {
+        scopeDao.observeClosedCountsByType().map { rows ->
+            val counts = rows.associate { it.type to it.count }
+            EventScopeType.entries.associateWith { counts[it] ?: 0 }
+        }
     }
 
     suspend fun loadAllScopes(): List<EventScope> = useRoom(readingDispatcher) {
