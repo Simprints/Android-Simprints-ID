@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":infra:license"))
     implementation(project(":infra:network"))
     implementation(project(":infra:logging-persistent"))
+    implementation(project(":infra:sync"))
     implementation(project(":infra:enrolment-records:repository"))
 
     implementation(project(":fingerprint:infra:scanner"))
