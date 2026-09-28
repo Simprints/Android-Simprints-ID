@@ -24,13 +24,15 @@ import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSampleUploadEnabledInProject
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
+import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.infra.eventsync.sync.down.EventDownSyncPeriodicCountUseCase
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.SyncStatus
-import com.simprints.infra.sync.SyncableCounts
-import com.simprints.infra.sync.usecase.ObserveSyncableCountsUseCase
+import com.simprints.infra.sync.devicestate.DeviceDataState
+import com.simprints.infra.sync.devicestate.DeviceStateDataTracker
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -56,7 +58,8 @@ internal class ObserveSyncInfoUseCaseTest {
 
     private val connectivityTracker = mockk<ConnectivityTracker>()
     private val authStore = mockk<AuthStore>()
-    private val observeSyncableCounts = mockk<ObserveSyncableCountsUseCase>()
+    private val deviceStateDataTracker = mockk<DeviceStateDataTracker>()
+    private val eventDownSyncCount = mockk<EventDownSyncPeriodicCountUseCase>()
     private val syncOrchestrator = mockk<SyncOrchestrator>()
     private val ticker = mockk<Ticker>()
     private val appForegroundStateTracker = mockk<AppForegroundStateTracker>()
@@ -67,20 +70,23 @@ internal class ObserveSyncInfoUseCaseTest {
     private val syncStatusFlow = MutableStateFlow(
         SyncStatus(eventSyncState = mockk(relaxed = true), imageSyncStatus = mockk(relaxed = true)),
     )
-    private val syncableCountsFlow = MutableStateFlow(
-        SyncableCounts(
-            totalRecords = 0,
-            recordEventsToDownload = 0,
-            isRecordEventsToDownloadLowerBound = false,
-            eventsToUpload = 0,
-            enrolmentsToUpload = 0,
-            samplesToUpload = 0,
-        ),
-    )
+    private val deviceDataStateFlow = MutableStateFlow(createDeviceDataState())
+    private val downSyncCountsFlow = MutableStateFlow(DownSyncCounts(count = 0, isLowerBound = false))
 
     private lateinit var useCase: ObserveSyncInfoUseCase
 
     private companion object {
+        fun createDeviceDataState(): DeviceDataState = DeviceDataState(
+            projectId = TEST_PROJECT_ID,
+            recordCount = 0,
+            pendingScopes = emptyMap(),
+            pendingEvents = 0,
+            pendingEnrolments = 0,
+            pendingSamples = 0,
+            lastEventSyncAt = null,
+            lastSampleSyncAt = null,
+        )
+
         const val TEST_PROJECT_ID = "test_project_id"
         const val TEST_MODULE_NAME = "test_module"
         val TEST_TIMESTAMP = Timestamp(1000L)
@@ -143,15 +149,10 @@ internal class ObserveSyncInfoUseCaseTest {
         every { syncOrchestrator.observeSyncState() } returns syncStatusFlow
 
         every { mockEventSyncState.lastSyncTime } returns TEST_TIMESTAMP
-        syncableCountsFlow.value = SyncableCounts(
-            totalRecords = 0,
-            recordEventsToDownload = 0,
-            isRecordEventsToDownloadLowerBound = false,
-            eventsToUpload = 0,
-            enrolmentsToUpload = 0,
-            samplesToUpload = 0,
-        )
-        every { observeSyncableCounts.invoke() } returns syncableCountsFlow
+        deviceDataStateFlow.value = createDeviceDataState()
+        downSyncCountsFlow.value = DownSyncCounts(count = 0, isLowerBound = false)
+        every { deviceStateDataTracker.observeDeviceDataState() } returns deviceDataStateFlow
+        every { eventDownSyncCount.invoke() } returns downSyncCountsFlow
 
         every { ticker.observeTicks(any()) } returns MutableStateFlow(Unit)
 
@@ -165,7 +166,7 @@ internal class ObserveSyncInfoUseCaseTest {
         every { any<ProjectConfiguration>().isSampleUploadEnabledInProject() } returns true
 
         every {
-            getSyncInfoSectionRecords(any(), any(), any(), any(), any(), any(), any(), any(), any())
+            getSyncInfoSectionRecords(any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
         } returns SyncInfoSectionRecords()
 
         every {
@@ -182,7 +183,8 @@ internal class ObserveSyncInfoUseCaseTest {
             getSyncInfoSectionImages = getSyncInfoSectionImages,
             getSyncInfoSectionRecords = getSyncInfoSectionRecords,
             observeConfigurationFlow = observeConfigurationFlow,
-            observeSyncableCounts = observeSyncableCounts,
+            deviceStateDataTracker = deviceStateDataTracker,
+            eventDownSyncCount = eventDownSyncCount,
             syncOrchestrator = syncOrchestrator,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
@@ -342,14 +344,14 @@ internal class ObserveSyncInfoUseCaseTest {
 
         useCase().first()
 
-        verify { getSyncInfoSectionRecords(any(), isOnline = false, any(), any(), any(), any(), any(), any(), any()) }
+        verify { getSyncInfoSectionRecords(any(), isOnline = false, any(), any(), any(), any(), any(), any(), any(), any()) }
         verify { getSyncInfoSectionImages(isOnline = false, any(), any(), any()) }
 
         connectivityFlow.value = true
 
         useCase().first()
 
-        verify { getSyncInfoSectionRecords(any(), isOnline = true, any(), any(), any(), any(), any(), any(), any()) }
+        verify { getSyncInfoSectionRecords(any(), isOnline = true, any(), any(), any(), any(), any(), any(), any(), any()) }
         verify { getSyncInfoSectionImages(isOnline = true, any(), any(), any()) }
     }
 
@@ -363,14 +365,14 @@ internal class ObserveSyncInfoUseCaseTest {
 
         useCase().first()
 
-        verify { getSyncInfoSectionRecords(any(), isOnline = false, any(), any(), any(), any(), any(), any(), any()) }
+        verify { getSyncInfoSectionRecords(any(), isOnline = false, any(), any(), any(), any(), any(), any(), any(), any()) }
         verify { getSyncInfoSectionImages(isOnline = false, any(), any(), any()) }
 
         connectivityFlow.value = true // changed to online
 
         useCase().first()
 
-        verify { getSyncInfoSectionRecords(any(), isOnline = true, any(), any(), any(), any(), any(), any(), any()) }
+        verify { getSyncInfoSectionRecords(any(), isOnline = true, any(), any(), any(), any(), any(), any(), any(), any()) }
         verify { getSyncInfoSectionImages(isOnline = true, any(), any(), any()) }
     }
 
@@ -418,7 +420,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
         useCase().first()
 
-        verify { getSyncInfoSectionRecords(any(), any(), any(), mockIdleState, any(), any(), any(), any(), any()) }
+        verify { getSyncInfoSectionRecords(any(), any(), any(), mockIdleState, any(), any(), any(), any(), any(), any()) }
 
         val mockSyncingState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncInProgress() } returns true
@@ -429,7 +431,7 @@ internal class ObserveSyncInfoUseCaseTest {
 
         useCase().first()
 
-        verify { getSyncInfoSectionRecords(any(), any(), any(), mockSyncingState, any(), any(), any(), any(), any()) }
+        verify { getSyncInfoSectionRecords(any(), any(), any(), mockSyncingState, any(), any(), any(), any(), any(), any()) }
     }
 
     @Test
@@ -553,7 +555,8 @@ internal class ObserveSyncInfoUseCaseTest {
             getSyncInfoSectionImages = getSyncInfoSectionImagesUseCase,
             getSyncInfoSectionRecords = getSyncInfoSectionRecordsUseCase,
             observeConfigurationFlow = observeConfigurationFlow,
-            observeSyncableCounts = observeSyncableCounts,
+            deviceStateDataTracker = deviceStateDataTracker,
+            eventDownSyncCount = eventDownSyncCount,
             syncOrchestrator = syncOrchestrator,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
