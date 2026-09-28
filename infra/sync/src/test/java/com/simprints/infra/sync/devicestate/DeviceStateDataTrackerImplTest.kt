@@ -13,9 +13,13 @@ import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.sync.ImageSyncTimestampProvider
-import com.simprints.infra.sync.usecase.internal.ObserveEnrolmentRecordsCountUseCase
-import com.simprints.infra.sync.usecase.internal.ObserveSamplesToUploadCountUseCase
+import com.simprints.infra.sync.devicestate.internal.ObserveEnrolmentRecordsCountUseCase
+import com.simprints.infra.sync.devicestate.internal.ObserveSamplesToUploadCountUseCase
 import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi

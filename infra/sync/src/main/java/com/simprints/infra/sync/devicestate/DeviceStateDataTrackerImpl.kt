@@ -10,8 +10,8 @@ import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.sync.ImageSyncTimestampProvider
-import com.simprints.infra.sync.usecase.internal.ObserveEnrolmentRecordsCountUseCase
-import com.simprints.infra.sync.usecase.internal.ObserveSamplesToUploadCountUseCase
+import com.simprints.infra.sync.devicestate.internal.ObserveEnrolmentRecordsCountUseCase
+import com.simprints.infra.sync.devicestate.internal.ObserveSamplesToUploadCountUseCase
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
