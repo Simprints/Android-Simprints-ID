@@ -12,20 +12,21 @@ import com.simprints.feature.troubleshooting.AutoResettingClickCounter
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
-import com.simprints.infra.sync.usecase.ObserveSyncableCountsUseCase
+import com.simprints.infra.sync.devicestate.DeviceStateDataTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 internal class AboutViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
-    private val observeSyncableCounts: ObserveSyncableCountsUseCase,
+    private val deviceStateDataTracker: DeviceStateDataTracker,
     private val syncOrchestrator: SyncOrchestrator,
     private val recentUserActivityManager: RecentUserActivityManager,
 ) : ViewModel() {
@@ -79,7 +80,12 @@ internal class AboutViewModel @Inject constructor(
         }
     }
 
-    private suspend fun hasEventsToUpload(): Boolean = observeSyncableCounts().first().eventsToUpload > 0
+    private suspend fun hasEventsToUpload(): Boolean = try {
+        deviceStateDataTracker.hasPendingEvents()
+    } catch (t: Throwable) {
+        Simber.i("Could not check pending events before logout", t, tag = SYNC)
+        true
+    }
 
     private suspend fun canSyncDataToSimprints(): Boolean = configRepository.getProjectConfiguration().canSyncDataToSimprints()
 

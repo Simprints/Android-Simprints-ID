@@ -20,7 +20,9 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.flow.shareIn
@@ -42,11 +44,11 @@ internal class DeviceStateDataTrackerImpl @Inject constructor(
 ) : DeviceStateDataTracker {
     private val sharedState: SharedFlow<DeviceDataState> by lazy {
         combine(
-            observeProjectId().nullOnFailure(PROJECT_ID),
-            observeEnrolmentRecordsCount().nullOnFailure(RECORD_COUNT),
-            observeSamplesToUploadCount().nullOnFailure(PENDING_SAMPLES),
-            eventRepository.observeClosedEventScopeCounts().nullOnFailure(PENDING_SCOPES),
-            observePendingEventCounts().nullOnFailure(PENDING_EVENTS),
+            deferred(PROJECT_ID) { observeProjectId() },
+            deferred(RECORD_COUNT) { observeEnrolmentRecordsCount() },
+            deferred(PENDING_SAMPLES) { observeSamplesToUploadCount() },
+            deferred(PENDING_SCOPES) { eventRepository.observeClosedEventScopeCounts() },
+            deferred(PENDING_EVENTS) { observePendingEventCounts() },
         ) { projectId, records, samples, scopes, events ->
             DeviceDataState(
                 projectId = projectId,
@@ -130,6 +132,16 @@ internal class DeviceStateDataTrackerImpl @Inject constructor(
     private fun readLastSampleSyncAt(): Long? = readOrNull(LAST_SAMPLE_SYNC) {
         imageSyncTimestampProvider.getLastImageSyncTimestamp()
     }
+
+    /**
+     * Builds the source flow only once something collects, so that merely holding the tracker
+     * touches no repository, and reports a failure - in construction or in the stream - as `null`
+     * rather than killing the whole state flow.
+     */
+    private fun <T> deferred(
+        source: String,
+        block: () -> Flow<T>,
+    ): Flow<T?> = flow { emitAll(block()) }.nullOnFailure(source)
 
     /**
      * Records a source failure as `null` rather than letting it abort the whole snapshot, or
