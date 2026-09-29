@@ -1,13 +1,13 @@
 package com.simprints.feature.troubleshooting.overview.usecase
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.sync.SyncFailureReason
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.sync.devicestate.DeviceDataState
 import com.simprints.infra.sync.devicestate.DeviceStateDataTracker
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -92,6 +92,30 @@ class CollectDeviceDataStateUseCaseTest {
     }
 
     @Test
+    fun `a failed sync renders its reason alongside the time it failed`() = runTest {
+        coEvery { deviceStateDataTracker.getCurrentDeviceDataState() } returns deviceDataState(
+            lastEventSyncFailure = SyncFailureReason.BACKEND_MAINTENANCE,
+            lastSampleSyncFailure = SyncFailureReason.UNKNOWN,
+        )
+
+        val details = useCase()
+
+        // The time has to stay: a device still trying and failing reads very differently from one
+        // that stopped syncing.
+        assertThat(details).contains("Last event sync: $READABLE_TIME (failed: BACKEND_MAINTENANCE)")
+        assertThat(details).contains("Last sample sync: $READABLE_TIME (failed: UNKNOWN)")
+    }
+
+    @Test
+    fun `a succeeded sync renders no reason`() = runTest {
+        coEvery { deviceStateDataTracker.getCurrentDeviceDataState() } returns deviceDataState()
+
+        val details = useCase()
+
+        assertThat(details).doesNotContain("failed:")
+    }
+
+    @Test
     fun `signed out snapshot renders without throwing`() = runTest {
         coEvery { deviceStateDataTracker.getCurrentDeviceDataState() } returns deviceDataState(projectId = null)
 
@@ -107,8 +131,10 @@ class CollectDeviceDataStateUseCaseTest {
         pendingEvents: Int? = 22,
         pendingEnrolments: Int? = 33,
         pendingSamples: Int? = 44,
-        lastEventSyncAt: Long? = 1000L,
-        lastSampleSyncAt: Long? = 2000L,
+        lastEventSyncAt: Timestamp? = Timestamp(1000L),
+        lastEventSyncFailure: SyncFailureReason? = null,
+        lastSampleSyncAt: Timestamp? = Timestamp(2000L),
+        lastSampleSyncFailure: SyncFailureReason? = null,
     ) = DeviceDataState(
         projectId = projectId,
         recordCount = recordCount,
@@ -117,7 +143,9 @@ class CollectDeviceDataStateUseCaseTest {
         pendingEnrolments = pendingEnrolments,
         pendingSamples = pendingSamples,
         lastEventSyncAt = lastEventSyncAt,
+        lastEventSyncFailure = lastEventSyncFailure,
         lastSampleSyncAt = lastSampleSyncAt,
+        lastSampleSyncFailure = lastSampleSyncFailure,
     )
 
     companion object {

@@ -3,6 +3,7 @@ package com.simprints.infra.sync.files
 import android.os.PowerManager
 import androidx.work.ListenableWorker.Result
 import com.google.common.truth.*
+import com.simprints.core.domain.sync.SyncFailureReason
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.sync.ImageSyncTimestampProvider
@@ -64,7 +65,7 @@ class FileUpSyncWorkerTest {
         // Then
         Truth.assertThat(Result.success()).isEqualTo(result)
         coVerify(exactly = 1) { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID, any()) }
-        coVerify(exactly = 1) { imageSyncTimestampProvider.saveImageSyncCompletionTimestampNow() }
+        coVerify(exactly = 1) { imageSyncTimestampProvider.saveImageSyncOutcomeNow(failure = null) }
     }
 
     @Test
@@ -78,7 +79,8 @@ class FileUpSyncWorkerTest {
         // Then
         Truth.assertThat(Result.retry()).isEqualTo(result)
         coVerify(exactly = 1) { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID, any()) }
-        coVerify(exactly = 0) { imageSyncTimestampProvider.saveImageSyncCompletionTimestampNow() }
+        // A retry is still an attempt that ended without uploading anything.
+        coVerify(exactly = 1) { imageSyncTimestampProvider.saveImageSyncOutcomeNow(SyncFailureReason.UNKNOWN) }
     }
 
     @Test
@@ -92,7 +94,7 @@ class FileUpSyncWorkerTest {
         // Then
         Truth.assertThat(Result.retry()).isEqualTo(result)
         coVerify(exactly = 1) { imageRepository.uploadStoredImagesAndDelete(any(), any()) }
-        coVerify(exactly = 0) { imageSyncTimestampProvider.saveImageSyncCompletionTimestampNow() }
+        coVerify(exactly = 1) { imageSyncTimestampProvider.saveImageSyncOutcomeNow(SyncFailureReason.UNKNOWN) }
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.sync.common
 
 import androidx.work.WorkInfo
+import com.simprints.core.domain.sync.SyncFailureReason
 
 internal const val OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED = "OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED"
 internal const val OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS = "OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS"
@@ -32,3 +33,12 @@ internal fun WorkInfo.hasAnyFailureReason(): Boolean =
         didFailBecauseBackendMaintenance() ||
         didFailBecauseTooManyRequests() ||
         didFailBecauseCommCarePermissionMissing()
+
+internal fun List<WorkInfo>.firstFailureReason(): SyncFailureReason? = when {
+    any { it.didFailBecauseReloginRequired() } -> SyncFailureReason.RELOGIN_REQUIRED
+    any { it.didFailBecauseCloudIntegration() } -> SyncFailureReason.CLOUD_INTEGRATION
+    any { it.didFailBecauseBackendMaintenance() } -> SyncFailureReason.BACKEND_MAINTENANCE
+    any { it.didFailBecauseTooManyRequests() } -> SyncFailureReason.TOO_MANY_REQUESTS
+    any { it.didFailBecauseCommCarePermissionMissing() } -> SyncFailureReason.COMM_CARE_PERMISSION_MISSING
+    else -> null
+}

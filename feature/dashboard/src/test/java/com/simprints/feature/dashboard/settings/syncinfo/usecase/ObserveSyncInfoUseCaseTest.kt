@@ -84,7 +84,9 @@ internal class ObserveSyncInfoUseCaseTest {
             pendingEnrolments = 0,
             pendingSamples = 0,
             lastEventSyncAt = null,
+            lastEventSyncFailure = null,
             lastSampleSyncAt = null,
+            lastSampleSyncFailure = null,
         )
 
         const val TEST_PROJECT_ID = "test_project_id"

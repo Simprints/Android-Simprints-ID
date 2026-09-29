@@ -1,12 +1,13 @@
 package com.simprints.infra.sync.devicestate
 
 import com.simprints.core.AppScope
-import com.simprints.core.DispatcherIO
+import com.simprints.core.domain.sync.SyncOutcome
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EventType
+import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
@@ -15,7 +16,6 @@ import com.simprints.infra.sync.ImageSyncTimestampProvider
 import com.simprints.infra.sync.devicestate.internal.ObserveEnrolmentRecordsCountUseCase
 import com.simprints.infra.sync.devicestate.internal.ObserveSamplesToUploadCountUseCase
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -46,7 +45,6 @@ internal class DeviceStateDataTrackerImpl @Inject constructor(
     private val observeEnrolmentRecordsCount: ObserveEnrolmentRecordsCountUseCase,
     private val observeSamplesToUploadCount: ObserveSamplesToUploadCountUseCase,
     @param:AppScope private val appScope: CoroutineScope,
-    @param:DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) : DeviceStateDataTracker {
     /** Bumped by [refresh] to re-subscribe every source; see [deferred]. */
     private val refreshes = MutableStateFlow(0)
@@ -56,24 +54,20 @@ internal class DeviceStateDataTrackerImpl @Inject constructor(
             deferred(PROJECT_ID) { observeProjectId() },
             deferred(RECORD_COUNT) { observeEnrolmentRecordsCount() },
             deferred(PENDING_SAMPLES) { observeSamplesToUploadCount() },
-            deferred(PENDING_SCOPES) { eventRepository.observeClosedEventScopeCounts() },
-            // Combined only after each is made null-safe, so a failure in the enrolment counts
-            // cannot also blank the total, and each failure is logged against its own source.
-            combine(
-                deferred(PENDING_EVENTS) { observeTotalEventCount() },
-                deferred(PENDING_ENROLMENTS) { observePendingEnrolmentCount() },
-            ) { events, enrolments -> events to enrolments },
-        ) { projectId, records, samples, scopes, (events, enrolments) ->
+            observeEventCounts(),
+            observeLastSyncs(),
+        ) { projectId, records, samples, eventCounts, (lastEventSync, lastSampleSync) ->
             DeviceDataState(
                 projectId = projectId,
                 recordCount = records,
-                pendingScopes = scopes,
-                pendingEvents = events,
-                pendingEnrolments = enrolments,
+                pendingScopes = eventCounts.pendingScopes,
+                pendingEvents = eventCounts.pendingEvents,
+                pendingEnrolments = eventCounts.pendingEnrolments,
                 pendingSamples = samples,
-                // Encrypted preferences have no change notification, so they are re-read per emission.
-                lastEventSyncAt = readLastEventSyncAt(),
-                lastSampleSyncAt = readLastSampleSyncAt(),
+                lastEventSyncAt = lastEventSync?.timestamp,
+                lastEventSyncFailure = lastEventSync?.failure,
+                lastSampleSyncAt = lastSampleSync?.timestamp,
+                lastSampleSyncFailure = lastSampleSync?.failure,
             )
         }.shareIn(
             appScope,
@@ -95,6 +89,8 @@ internal class DeviceStateDataTrackerImpl @Inject constructor(
     override suspend fun getCurrentDeviceDataState(): DeviceDataState {
         val config = readOrNull(PROJECT_ID) { configRepository.getProjectConfiguration() }
         val projectId = config?.projectId?.takeIf { it.isNotBlank() }
+        val lastEventSync = readOrNull(LAST_EVENT_SYNC) { eventSyncCache.readLastSyncOutcome() }
+        val lastSampleSync = readOrNull(LAST_SAMPLE_SYNC) { imageSyncTimestampProvider.getLastSyncOutcome() }
 
         return DeviceDataState(
             projectId = projectId,
@@ -111,8 +107,10 @@ internal class DeviceStateDataTrackerImpl @Inject constructor(
                 projectId == null -> 0 // signed out / nothing yet
                 else -> readOrNull(PENDING_SAMPLES) { imageRepository.getNumberOfImagesToUpload(projectId) }
             },
-            lastEventSyncAt = readLastEventSyncAt(),
-            lastSampleSyncAt = readLastSampleSyncAt(),
+            lastEventSyncAt = lastEventSync?.timestamp,
+            lastEventSyncFailure = lastEventSync?.failure,
+            lastSampleSyncAt = lastSampleSync?.timestamp,
+            lastSampleSyncFailure = lastSampleSync?.failure,
         )
     }
 
@@ -120,16 +118,12 @@ internal class DeviceStateDataTrackerImpl @Inject constructor(
 
     override suspend fun hasPendingEvents(): Boolean = countEvents() > 0
 
-    private fun observeProjectId(): Flow<String?> = configRepository
-        .observeProjectConfiguration()
-        .map { it.projectId.takeIf { id -> id.isNotBlank() } }
-        .distinctUntilChanged()
+    private fun observeProjectId(): Flow<String?> =
+        configRepository.observeProjectConfiguration().map { it.projectId.takeIf { id -> id.isNotBlank() } }.distinctUntilChanged()
 
     // distinctUntilChanged because Room invalidates the events table on every insert, and each
     // emission re-runs the combine transform - including the encrypted timestamp reads.
-    private fun observeTotalEventCount(): Flow<Int> = eventRepository
-        .observeEventCount(type = null)
-        .distinctUntilChanged()
+    private fun observeTotalEventCount(): Flow<Int> = eventRepository.observeEventCount(type = null).distinctUntilChanged()
 
     private fun observePendingEnrolmentCount(): Flow<Int> = combine(
         eventRepository.observeEventCount(EventType.ENROLMENT_V2),
@@ -144,20 +138,20 @@ internal class DeviceStateDataTrackerImpl @Inject constructor(
 
     private suspend fun countEvents(): Int = eventRepository.observeEventCount(type = null).first()
 
-    private suspend fun countEnrolmentEvents(): Int = eventRepository.observeEventCount(EventType.ENROLMENT_V2).first() +
-        eventRepository.observeEventCount(EventType.ENROLMENT_V4).first()
+    private suspend fun countEnrolmentEvents(): Int = eventRepository.observeEventCount(EventType.ENROLMENT_V2).first() + eventRepository
+        .observeEventCount(EventType.ENROLMENT_V4)
+        .first()
 
-    private suspend fun readLastEventSyncAt(): Long? = readOrNull(LAST_EVENT_SYNC) {
-        eventSyncCache.readLastSuccessfulSyncTime()?.ms
-    }
+    private fun observeEventCounts(): Flow<EventCounts> = combine(
+        deferred(PENDING_SCOPES) { eventRepository.observeClosedEventScopeCounts() },
+        deferred(PENDING_EVENTS) { observeTotalEventCount() },
+        deferred(PENDING_ENROLMENTS) { observePendingEnrolmentCount() },
+    ) { scopes, events, enrolments -> EventCounts(scopes, events, enrolments) }
 
-    /**
-     * `withContext` because this decrypts an EncryptedSharedPreferences entry and the combine
-     * transform runs on [appScope], which is the main dispatcher.
-     */
-    private suspend fun readLastSampleSyncAt(): Long? = withContext(dispatcherIO) {
-        readOrNull(LAST_SAMPLE_SYNC) { imageSyncTimestampProvider.getLastImageSyncTimestamp() }
-    }
+    private fun observeLastSyncs(): Flow<Pair<SyncOutcome?, SyncOutcome?>> = combine(
+        deferred(LAST_EVENT_SYNC) { eventSyncCache.observeLastSyncOutcome() },
+        deferred(LAST_SAMPLE_SYNC) { imageSyncTimestampProvider.observeLastSyncOutcome() },
+    ) { event, sample -> event to sample }
 
     /**
      * Builds the source flow only once something collects, so that merely holding the tracker
@@ -194,6 +188,12 @@ internal class DeviceStateDataTrackerImpl @Inject constructor(
         }
     }
 
+    private data class EventCounts(
+        val pendingScopes: Map<EventScopeType, Int>?,
+        val pendingEvents: Int?,
+        val pendingEnrolments: Int?,
+    )
+
     companion object {
         private const val PROJECT_ID = "project id"
         private const val RECORD_COUNT = "record count"
@@ -201,7 +201,7 @@ internal class DeviceStateDataTrackerImpl @Inject constructor(
         private const val PENDING_EVENTS = "pending events"
         private const val PENDING_ENROLMENTS = "pending enrolments"
         private const val PENDING_SAMPLES = "pending samples"
-        private const val LAST_EVENT_SYNC = "last event sync time"
-        private const val LAST_SAMPLE_SYNC = "last sample sync time"
+        private const val LAST_EVENT_SYNC = "last event sync outcome"
+        private const val LAST_SAMPLE_SYNC = "last sample sync outcome"
     }
 }
