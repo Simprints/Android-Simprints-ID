@@ -303,7 +303,7 @@ internal class ExternalCredentialViewModelTest {
     }
 
     @Test
-    fun `finish skipped does not persist any accumulated capture attempts`() = runTest {
+    fun `finish skipped persists accumulated capture attempts unmodified`() = runTest {
         val attempt = makeAttempt()
         coEvery { eventsTracker.buildCaptureAttempt(any(), any(), any(), any()) } returns attempt
 
@@ -311,6 +311,37 @@ internal class ExternalCredentialViewModelTest {
         viewModel.selectionStarted()
         viewModel.setSelectedExternalCredentialType(ExternalCredentialType.QRCode)
         viewModel.addCaptureAttempt(createScannedCredential())
+        viewModel.finish(mockk<ExternalCredentialSearchResult.Skipped>(relaxed = true))
+
+        coVerify(exactly = 1) { eventsTracker.persistCaptureAttempt(attempt) }
+        coVerify(exactly = 0) { eventsTracker.persistCaptureAttemptWithConfirmedValue(any(), any()) }
+    }
+
+    @Test
+    fun `finish skipped persists every accumulated capture attempt when there were multiple recaptures`() = runTest {
+        val firstAttempt = makeAttempt(scanId = "scan-1")
+        val secondAttempt = makeAttempt(scanId = "scan-2")
+        coEvery {
+            eventsTracker.buildCaptureAttempt(any(), any(), any(), any())
+        } returnsMany listOf(firstAttempt, secondAttempt)
+
+        viewModel.init(createParams(subjectId = "subjectId", FlowType.IDENTIFY))
+        viewModel.selectionStarted()
+        viewModel.setSelectedExternalCredentialType(ExternalCredentialType.QRCode)
+        viewModel.addCaptureAttempt(createScannedCredential())
+        viewModel.addCaptureAttempt(createScannedCredential())
+        viewModel.finish(mockk<ExternalCredentialSearchResult.Skipped>(relaxed = true))
+
+        coVerify(exactly = 1) { eventsTracker.persistCaptureAttempt(firstAttempt) }
+        coVerify(exactly = 1) { eventsTracker.persistCaptureAttempt(secondAttempt) }
+        coVerify(exactly = 0) { eventsTracker.persistCaptureAttemptWithConfirmedValue(any(), any()) }
+        coVerify(exactly = 0) { eventsTracker.hasConfirmedValueChanged(any(), any()) }
+    }
+
+    @Test
+    fun `finish skipped with no accumulated attempts persists nothing`() = runTest {
+        viewModel.selectionStarted()
+
         viewModel.finish(mockk<ExternalCredentialSearchResult.Skipped>(relaxed = true))
 
         coVerify(exactly = 0) { eventsTracker.persistCaptureAttempt(any()) }

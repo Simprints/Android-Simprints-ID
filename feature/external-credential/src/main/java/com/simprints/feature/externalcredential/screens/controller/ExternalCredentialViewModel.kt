@@ -148,6 +148,7 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
             when (result) {
                 is ExternalCredentialSearchResult.Complete -> persistCaptureAttempts(result.confirmedCredential)
                 is ExternalCredentialSearchResult.Skipped -> {
+                    persistCaptureAttempts(confirmedCredential = null)
                     eventsTracker.saveSkippedEvent(
                         startTime = selectionStartTime,
                         skipReason = result.skipReason,
@@ -161,10 +162,13 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
 
     // All attempts except the last one were discarded via Recapture and never went through a confirm step, so they are
     // persisted unmodified. The last attempt is the one the user confirmed, so its OCR-accuracy/length metrics are
-    // recalculated against the confirmed value only if it differs from what was originally scanned.
-    private suspend fun persistCaptureAttempts(confirmedCredential: TokenizableString.Raw) {
+    // recalculated against the confirmed value only if it differs from what was originally scanned. When the flow was
+    // skipped instead of confirmed, there is no confirmed value at all, so every accumulated attempt is persisted
+    // unmodified - nothing is lost just because the user backed out instead of confirming.
+    private suspend fun persistCaptureAttempts(confirmedCredential: TokenizableString.Raw?) {
         captureAttempts.forEachIndexed { index, attempt ->
-            if (index == captureAttempts.lastIndex && eventsTracker.hasConfirmedValueChanged(attempt, confirmedCredential)) {
+            val isLastAttempt = index == captureAttempts.lastIndex
+            if (confirmedCredential != null && isLastAttempt && eventsTracker.hasConfirmedValueChanged(attempt, confirmedCredential)) {
                 eventsTracker.persistCaptureAttemptWithConfirmedValue(attempt, confirmedCredential)
             } else {
                 eventsTracker.persistCaptureAttempt(attempt)
