@@ -17,6 +17,6 @@ class DeleteSyncInfoUseCase @Inject internal constructor(
         commCareSyncCache.clearAllSyncedCases()
         upSyncScopeRepo.deleteAll()
         eventSyncCache.clearProgresses()
-        eventSyncCache.storeLastSuccessfulSyncTime(null)
+        eventSyncCache.clearLastSyncOutcome()
     }
 }

@@ -4,11 +4,17 @@ import android.annotation.SuppressLint
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import com.simprints.core.DispatcherIO
+import com.simprints.core.domain.sync.SyncFailureReason
+import com.simprints.core.domain.sync.SyncOutcome
+import com.simprints.core.domain.sync.toSyncFailureReason
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,6 +31,24 @@ class EventSyncCache @Inject constructor(
         securityManager.buildEncryptedSharedPreferences(FILENAME_FOR_PROGRESSES_SHARED_PREFS)
     private val sharedForLastSyncTime =
         securityManager.buildEncryptedSharedPreferences(FILENAME_FOR_LAST_SYNC_TIME_SHARED_PREFS)
+    private val lastSyncOutcome = MutableStateFlow<SyncOutcome?>(null)
+
+    /** The last attempt and how it turned out, then every later one. */
+    fun observeLastSyncOutcome(): Flow<SyncOutcome?> =
+        lastSyncOutcome.onStart { lastSyncOutcome.compareAndSet(null, readLastSyncOutcome()) }
+
+    /** When event sync was last attempted and how it turned out; null when it never has been. */
+    suspend fun readLastSyncOutcome(): SyncOutcome? = withContext(dispatcher) {
+        sharedForLastSyncTime
+            .getLong(LAST_ATTEMPT_TIME_KEY, -1)
+            .takeIf { it >= 0 }
+            ?.let { timestamp ->
+                SyncOutcome(
+                    timestamp = Timestamp(timestamp),
+                    failure = sharedForLastSyncTime.getString(LAST_ATTEMPT_FAILURE_KEY, null)?.toSyncFailureReason(),
+                )
+            }
+    }
 
     suspend fun readLastSuccessfulSyncTime(): Timestamp? = withContext(dispatcher) {
         sharedForLastSyncTime
@@ -33,10 +57,30 @@ class EventSyncCache @Inject constructor(
             ?.let { Timestamp(it) }
     }
 
-    suspend fun storeLastSuccessfulSyncTime(lastSyncTime: Timestamp?): Unit = withContext(dispatcher) {
+    /** Records an attempt: when it ended, and why it failed when it did. */
+    suspend fun storeLastSyncOutcome(
+        timestamp: Timestamp,
+        failure: SyncFailureReason?,
+    ): Unit = withContext(dispatcher) {
         sharedForLastSyncTime.edit {
-            putLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, lastSyncTime?.ms ?: -1)
+            putLong(LAST_ATTEMPT_TIME_KEY, timestamp.ms)
+            if (failure == null) {
+                remove(LAST_ATTEMPT_FAILURE_KEY)
+                putLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, timestamp.ms)
+            } else {
+                putString(LAST_ATTEMPT_FAILURE_KEY, failure.name)
+            }
         }
+        lastSyncOutcome.value = SyncOutcome(timestamp, failure)
+    }
+
+    suspend fun clearLastSyncOutcome(): Unit = withContext(dispatcher) {
+        sharedForLastSyncTime.edit {
+            remove(LAST_ATTEMPT_TIME_KEY)
+            remove(LAST_ATTEMPT_FAILURE_KEY)
+            remove(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY)
+        }
+        lastSyncOutcome.value = null
     }
 
     suspend fun readProgress(workerId: String): Int = withContext(dispatcher) {
@@ -87,6 +131,12 @@ class EventSyncCache @Inject constructor(
     companion object {
         @VisibleForTesting
         const val PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY = "PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY"
+
+        @VisibleForTesting
+        const val LAST_ATTEMPT_TIME_KEY = "LAST_SYNC_ATTEMPT_TIME_KEY"
+
+        @VisibleForTesting
+        const val LAST_ATTEMPT_FAILURE_KEY = "LAST_SYNC_ATTEMPT_FAILURE_KEY"
 
         const val KEY_IGNORE_MAX = "IGNORE_MAX_VALUES"
 

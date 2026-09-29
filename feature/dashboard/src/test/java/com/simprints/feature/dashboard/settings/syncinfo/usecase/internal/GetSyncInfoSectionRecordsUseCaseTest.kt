@@ -772,7 +772,9 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
         pendingEnrolments = pendingEnrolments,
         pendingSamples = pendingSamples,
         lastEventSyncAt = null,
+        lastEventSyncFailure = null,
         lastSampleSyncAt = null,
+        lastSampleSyncFailure = null,
     )
 
     private companion object {

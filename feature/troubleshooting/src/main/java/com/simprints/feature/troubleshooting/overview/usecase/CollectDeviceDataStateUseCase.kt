@@ -1,5 +1,6 @@
 package com.simprints.feature.troubleshooting.overview.usecase
 
+import com.simprints.core.domain.sync.SyncFailureReason
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
@@ -20,8 +21,8 @@ internal class CollectDeviceDataStateUseCase @Inject constructor(
             Pending enrolments: ${state.pendingEnrolments.render()}
             Pending samples: ${state.pendingSamples.render()}
             Pending scopes: ${state.pendingScopes.render()}
-            Last event sync: ${state.lastEventSyncAt.renderTime()}
-            Last sample sync: ${state.lastSampleSyncAt.renderTime()}
+            Last event sync: ${state.lastEventSyncAt.renderTime()} ${state.lastEventSyncFailure.renderFailure()}
+            Last sample sync: ${state.lastSampleSyncAt.renderTime()} ${state.lastSampleSyncFailure.renderFailure()}
             """.trimIndent()
     }
 
@@ -36,13 +37,15 @@ internal class CollectDeviceDataStateUseCase @Inject constructor(
         ?.joinToString { "${it.key}: ${it.value}" }
         ?: UNKNOWN
 
-    /** Null covers both "never synced on this install" and "the store could not be read". */
-    private fun Long?.renderTime(): String = this
-        ?.let { timeHelper.readableBetweenNowAndTime(Timestamp(it)) }
+    private fun Timestamp?.renderTime(): String = this
+        ?.let { timeHelper.readableBetweenNowAndTime(it) }
         ?: NEVER
+
+    private fun SyncFailureReason?.renderFailure(): String = this?.let { "($FAILED $it)" }.orEmpty()
 
     companion object {
         private const val UNKNOWN = "unknown"
+        private const val FAILED = "failed:"
         private const val NEVER = "never"
         private const val SIGNED_OUT = "signed out"
     }

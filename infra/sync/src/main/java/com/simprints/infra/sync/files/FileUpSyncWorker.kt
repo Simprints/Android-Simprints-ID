@@ -5,6 +5,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.core.DispatcherBG
+import com.simprints.core.domain.sync.SyncFailureReason
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.images.ImageRepository
@@ -42,12 +43,14 @@ internal class FileUpSyncWorker @AssistedInject constructor(
                 )
             }
             if (uploadSuccessful) {
-                imageSyncTimestampProvider.saveImageSyncCompletionTimestampNow()
+                imageSyncTimestampProvider.saveImageSyncOutcomeNow(failure = null)
                 success()
             } else {
+                imageSyncTimestampProvider.saveImageSyncOutcomeNow(SyncFailureReason.UNKNOWN)
                 retry()
             }
         } catch (ex: Exception) {
+            imageSyncTimestampProvider.saveImageSyncOutcomeNow(SyncFailureReason.UNKNOWN)
             retry(ex)
         }
     }

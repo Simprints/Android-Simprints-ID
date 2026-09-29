@@ -2,6 +2,8 @@ package com.simprints.infra.sync.devicestate
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.sync.SyncFailureReason
+import com.simprints.core.domain.sync.SyncOutcome
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
@@ -16,10 +18,6 @@ import com.simprints.infra.sync.ImageSyncTimestampProvider
 import com.simprints.infra.sync.devicestate.internal.ObserveEnrolmentRecordsCountUseCase
 import com.simprints.infra.sync.devicestate.internal.ObserveSamplesToUploadCountUseCase
 import io.mockk.*
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -28,7 +26,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -82,8 +79,11 @@ class DeviceStateDataTrackerImplTest {
         coEvery { imageRepository.getNumberOfImagesToUpload(any()) } returns SAMPLES
         every { observeSamplesToUploadCount() } returns flowOf(SAMPLES)
 
-        coEvery { eventSyncCache.readLastSuccessfulSyncTime() } returns Timestamp(EVENT_SYNC_AT)
-        every { imageSyncTimestampProvider.getLastImageSyncTimestamp() } returns SAMPLE_SYNC_AT
+        every { eventSyncCache.observeLastSyncOutcome() } returns flowOf(EVENT_SYNC_OUTCOME)
+        coEvery { eventSyncCache.readLastSyncOutcome() } returns EVENT_SYNC_OUTCOME
+
+        every { imageSyncTimestampProvider.observeLastSyncOutcome() } returns flowOf(SAMPLE_SYNC_OUTCOME)
+        coEvery { imageSyncTimestampProvider.getLastSyncOutcome() } returns SAMPLE_SYNC_OUTCOME
     }
 
     // --- aggregation ---
@@ -101,7 +101,9 @@ class DeviceStateDataTrackerImplTest {
                 pendingEnrolments = ENROLMENTS_V2 + ENROLMENTS_V4,
                 pendingSamples = SAMPLES,
                 lastEventSyncAt = EVENT_SYNC_AT,
+                lastEventSyncFailure = null,
                 lastSampleSyncAt = SAMPLE_SYNC_AT,
+                lastSampleSyncFailure = null,
             ),
         )
     }
@@ -118,7 +120,9 @@ class DeviceStateDataTrackerImplTest {
                     pendingEnrolments = ENROLMENTS_V2 + ENROLMENTS_V4,
                     pendingSamples = SAMPLES,
                     lastEventSyncAt = EVENT_SYNC_AT,
+                    lastEventSyncFailure = null,
                     lastSampleSyncAt = SAMPLE_SYNC_AT,
+                    lastSampleSyncFailure = null,
                 ),
             )
             cancelAndIgnoreRemainingEvents()
@@ -189,14 +193,16 @@ class DeviceStateDataTrackerImplTest {
     }
 
     @Test
-    fun `snapshot reports failing sync timestamps as null and keeps the other fields`() = runTest {
-        coEvery { eventSyncCache.readLastSuccessfulSyncTime() } throws RuntimeException()
-        every { imageSyncTimestampProvider.getLastImageSyncTimestamp() } throws RuntimeException()
+    fun `snapshot reports failing sync outcomes as null and keeps the other fields`() = runTest {
+        coEvery { eventSyncCache.readLastSyncOutcome() } throws RuntimeException()
+        coEvery { imageSyncTimestampProvider.getLastSyncOutcome() } throws RuntimeException()
 
         val state = tracker(backgroundScope).getCurrentDeviceDataState()
 
         assertThat(state.lastEventSyncAt).isNull()
+        assertThat(state.lastEventSyncFailure).isNull()
         assertThat(state.lastSampleSyncAt).isNull()
+        assertThat(state.lastSampleSyncFailure).isNull()
         assertThat(state.recordCount).isEqualTo(RECORDS)
     }
 
@@ -454,8 +460,8 @@ class DeviceStateDataTrackerImplTest {
 
     @Test
     fun `never-synced timestamps stay null rather than becoming zero`() = runTest {
-        coEvery { eventSyncCache.readLastSuccessfulSyncTime() } returns null
-        every { imageSyncTimestampProvider.getLastImageSyncTimestamp() } returns null
+        coEvery { eventSyncCache.readLastSyncOutcome() } returns null
+        coEvery { imageSyncTimestampProvider.getLastSyncOutcome() } returns null
 
         val state = tracker(backgroundScope).getCurrentDeviceDataState()
 
@@ -469,8 +475,62 @@ class DeviceStateDataTrackerImplTest {
         tracker.getCurrentDeviceDataState()
         tracker.getCurrentDeviceDataState()
 
-        coVerify(exactly = 2) { eventSyncCache.readLastSuccessfulSyncTime() }
-        verify(exactly = 2) { imageSyncTimestampProvider.getLastImageSyncTimestamp() }
+        coVerify(exactly = 2) { eventSyncCache.readLastSyncOutcome() }
+        coVerify(exactly = 2) { imageSyncTimestampProvider.getLastSyncOutcome() }
+    }
+
+    // --- last sync outcome ---
+
+    @Test
+    fun `snapshot carries the failure reason of each channel`() = runTest {
+        coEvery { eventSyncCache.readLastSyncOutcome() } returns
+            SyncOutcome(EVENT_SYNC_AT, SyncFailureReason.BACKEND_MAINTENANCE)
+        coEvery { imageSyncTimestampProvider.getLastSyncOutcome() } returns
+            SyncOutcome(SAMPLE_SYNC_AT, SyncFailureReason.UNKNOWN)
+
+        val state = tracker(backgroundScope).getCurrentDeviceDataState()
+
+        assertThat(state.lastEventSyncFailure).isEqualTo(SyncFailureReason.BACKEND_MAINTENANCE)
+        assertThat(state.lastSampleSyncFailure).isEqualTo(SyncFailureReason.UNKNOWN)
+    }
+
+    @Test
+    fun `a failure keeps the timestamp of the run that failed`() = runTest {
+        coEvery { eventSyncCache.readLastSyncOutcome() } returns
+            SyncOutcome(EVENT_SYNC_AT, SyncFailureReason.CLOUD_INTEGRATION)
+
+        val state = tracker(backgroundScope).getCurrentDeviceDataState()
+
+        // A device that keeps failing must not read as one that stopped syncing.
+        assertThat(state.lastEventSyncAt).isEqualTo(EVENT_SYNC_AT)
+    }
+
+    @Test
+    fun `observed state re-emits when a sync fails and moves no count`() = runTest {
+        val outcomes = MutableStateFlow<SyncOutcome?>(EVENT_SYNC_OUTCOME)
+        every { eventSyncCache.observeLastSyncOutcome() } returns outcomes
+
+        tracker(backgroundScope).observeDeviceDataState().test {
+            assertThat(awaitItem().lastEventSyncFailure).isNull()
+
+            outcomes.value = SyncOutcome(EVENT_SYNC_AT, SyncFailureReason.RELOGIN_REQUIRED)
+
+            assertThat(awaitItem().lastEventSyncFailure).isEqualTo(SyncFailureReason.RELOGIN_REQUIRED)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `observed state reports a failing outcome store as null rather than failing the stream`() = runTest {
+        every { imageSyncTimestampProvider.observeLastSyncOutcome() } returns flow { throw RuntimeException() }
+
+        tracker(backgroundScope).observeDeviceDataState().test {
+            val state = awaitItem()
+            assertThat(state.lastSampleSyncAt).isNull()
+            assertThat(state.lastSampleSyncFailure).isNull()
+            assertThat(state.lastEventSyncAt).isEqualTo(EVENT_SYNC_AT)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private fun tracker(scope: CoroutineScope) = DeviceStateDataTrackerImpl(
@@ -483,7 +543,6 @@ class DeviceStateDataTrackerImplTest {
         observeEnrolmentRecordsCount = observeEnrolmentRecordsCount,
         observeSamplesToUploadCount = observeSamplesToUploadCount,
         appScope = scope,
-        dispatcherIO = UnconfinedTestDispatcher(),
     )
 
     companion object {
@@ -493,8 +552,10 @@ class DeviceStateDataTrackerImplTest {
         private const val ENROLMENTS_V2 = 2
         private const val ENROLMENTS_V4 = 3
         private const val SAMPLES = 4
-        private const val EVENT_SYNC_AT = 1000L
-        private const val SAMPLE_SYNC_AT = 2000L
+        private val EVENT_SYNC_AT = Timestamp(1000L)
+        private val SAMPLE_SYNC_AT = Timestamp(2000L)
+        private val EVENT_SYNC_OUTCOME = SyncOutcome(EVENT_SYNC_AT, failure = null)
+        private val SAMPLE_SYNC_OUTCOME = SyncOutcome(SAMPLE_SYNC_AT, failure = null)
         private val SCOPE_COUNTS = EventScopeType.entries.associateWith { 1 }
     }
 }

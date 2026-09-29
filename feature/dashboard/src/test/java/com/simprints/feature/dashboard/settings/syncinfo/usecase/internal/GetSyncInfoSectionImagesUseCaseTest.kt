@@ -227,7 +227,9 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
         pendingEnrolments = 0,
         pendingSamples = pendingSamples,
         lastEventSyncAt = null,
+        lastEventSyncFailure = null,
         lastSampleSyncAt = null,
+        lastSampleSyncFailure = null,
     )
 
     @Test
