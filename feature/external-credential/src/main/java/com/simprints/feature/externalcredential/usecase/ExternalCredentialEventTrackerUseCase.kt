@@ -71,7 +71,6 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
         startTime: Timestamp,
         selectionEventId: String,
     ): ExternalCredentialCaptureAttempt {
-        Simber.d("Building External Credential capture attempt for $scannedCredentialResult")
         val externalCredential = externalCredentialMapper.mapExternalCredential(
             scannedCredentialResult = scannedCredentialResult,
             subjectId = subjectId,
