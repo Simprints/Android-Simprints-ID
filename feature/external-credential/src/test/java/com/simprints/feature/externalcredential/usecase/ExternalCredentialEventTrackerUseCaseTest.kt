@@ -1,7 +1,6 @@
 package com.simprints.feature.externalcredential.usecase
 
 import com.google.common.truth.Truth.*
-import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.comparison.ComparisonResult
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
@@ -10,7 +9,6 @@ import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.ExternalCredentialMapper
-import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.CredentialMatch
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.CalculateLevenshteinDistanceUseCase
 import com.simprints.feature.externalcredential.screens.search.model.MfidDocument
@@ -67,7 +65,7 @@ class ExternalCredentialEventTrackerUseCaseTest {
 
         coEvery { configRepository.getProject() } returns mockk()
         coEvery {
-            externalCredentialMapper.mapExternalCredential(any(), any())
+            externalCredentialMapper.mapExternalCredential(any(), any(), any())
         } returns ExternalCredential(
             id = SCAN_ID,
             value = ENCRYPTED_CREDENTIAL,
@@ -79,34 +77,114 @@ class ExternalCredentialEventTrackerUseCaseTest {
     }
 
     @Test
-    fun `saveCaptureEvents should save external credential capture value event`() = runTest {
-        val searchResult = makeCredentialSearchResult(ExternalCredentialType.QRCode)
-        useCase.saveCaptureEvents(searchResult, SUBJECT_ID, START_TIME, SELECTION_ID)
+    fun `buildCaptureAttempt maps scanned credential result via mapper`() = runTest {
+        val scannedResult = makeScannedCredentialResult(ExternalCredentialType.QRCode)
 
-        coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(any<ExternalCredentialCaptureValueEvent>()) }
-    }
+        useCase.buildCaptureAttempt(scannedResult, SUBJECT_ID, START_TIME, SELECTION_ID)
 
-    @Test
-    fun `saveCaptureEvents should save external credential capture event`() = runTest {
-        val searchResult = makeCredentialSearchResult(ExternalCredentialType.QRCode)
-        useCase.saveCaptureEvents(searchResult, SUBJECT_ID, START_TIME, SELECTION_ID)
-
-        val captureEventSlot = slot<ExternalCredentialCaptureEvent>()
-        coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
-        with(captureEventSlot.captured) {
-            assertThat(payload.createdAt).isEqualTo(START_TIME)
-            assertThat(payload.endedAt).isEqualTo(END_TIME)
-            assertThat(payload.autoCaptureStartTime).isEqualTo(SCAN_START_TIME)
-            assertThat(payload.autoCaptureEndTime).isEqualTo(SCAN_END_TIME)
-            assertThat(payload.ocrErrorCount).isEqualTo(DEFAULT_DISTANCE)
-            assertThat(payload.capturedTextLength).isEqualTo(RAW_SCANNED_VALUE.length)
+        coVerify(exactly = 1) {
+            externalCredentialMapper.mapExternalCredential(
+                scannedCredentialResult = scannedResult,
+                subjectId = SUBJECT_ID,
+            )
         }
     }
 
     @Test
-    fun `saveCaptureEvents should correctly calculate length for NHISCard`() = runTest {
-        val searchResult = makeCredentialSearchResult(ExternalCredentialType.NHISCard)
-        useCase.saveCaptureEvents(searchResult, SUBJECT_ID, START_TIME, SELECTION_ID)
+    fun `buildCaptureAttempt returns attempt without persisting anything`() = runTest {
+        val scannedResult = makeScannedCredentialResult(ExternalCredentialType.QRCode)
+
+        val attempt = useCase.buildCaptureAttempt(scannedResult, SUBJECT_ID, START_TIME, SELECTION_ID)
+
+        assertThat(attempt.scannedCredentialResult).isEqualTo(scannedResult)
+        assertThat(attempt.startTime).isEqualTo(START_TIME)
+        assertThat(attempt.endTime).isEqualTo(END_TIME)
+        assertThat(attempt.selectionEventId).isEqualTo(SELECTION_ID)
+        coVerify(exactly = 0) { eventRepository.addOrUpdateEvent(any()) }
+    }
+
+    @Test
+    fun `hasConfirmedValueChanged returns false when confirmed value matches scanned value`() {
+        val attempt = makeAttempt(ExternalCredentialType.QRCode, scannedValue = RAW_SCANNED_VALUE)
+
+        val result = useCase.hasConfirmedValueChanged(attempt, RAW_SCANNED_VALUE.asTokenizableRaw())
+
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun `hasConfirmedValueChanged returns true when confirmed value differs from scanned value`() {
+        val attempt = makeAttempt(ExternalCredentialType.QRCode, scannedValue = RAW_SCANNED_VALUE)
+
+        val result = useCase.hasConfirmedValueChanged(attempt, "edited".asTokenizableRaw())
+
+        assertThat(result).isTrue()
+    }
+
+    @Test
+    fun `persistCaptureAttempt should save external credential capture value event`() = runTest {
+        val attempt = makeAttempt(ExternalCredentialType.QRCode)
+        useCase.persistCaptureAttempt(attempt)
+
+        val valueEventSlot = slot<ExternalCredentialCaptureValueEvent>()
+        coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(valueEventSlot)) }
+        with(valueEventSlot.captured) {
+            assertThat(payload.createdAt).isEqualTo(attempt.startTime)
+            assertThat(payload.credential).isEqualTo(attempt.externalCredential)
+        }
+    }
+
+    @Test
+    fun `persistCaptureAttempt should save capture event unmodified with zero ocr error count`() = runTest {
+        val attempt = makeAttempt(ExternalCredentialType.QRCode, scannedValue = RAW_SCANNED_VALUE)
+        useCase.persistCaptureAttempt(attempt)
+
+        val captureEventSlot = slot<ExternalCredentialCaptureEvent>()
+        coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
+        with(captureEventSlot.captured) {
+            assertThat(payload.createdAt).isEqualTo(attempt.startTime)
+            assertThat(payload.endedAt).isEqualTo(attempt.endTime)
+            assertThat(payload.autoCaptureStartTime).isEqualTo(SCAN_START_TIME)
+            assertThat(payload.autoCaptureEndTime).isEqualTo(SCAN_END_TIME)
+            assertThat(payload.ocrErrorCount).isEqualTo(0)
+            assertThat(payload.capturedTextLength).isEqualTo(RAW_SCANNED_VALUE.length)
+            assertThat(payload.selectionId).isEqualTo(SELECTION_ID)
+        }
+        coVerify(exactly = 0) { calculateDistance(any(), any()) }
+    }
+
+    @Test
+    fun `persistCaptureAttemptWithConfirmedValue recalculates ocr error count and captured text length`() = runTest {
+        val attempt = makeAttempt(ExternalCredentialType.QRCode, scannedValue = RAW_SCANNED_VALUE)
+        val confirmedValue = "confirmed value".asTokenizableRaw()
+
+        useCase.persistCaptureAttemptWithConfirmedValue(attempt, confirmedValue)
+
+        val captureEventSlot = slot<ExternalCredentialCaptureEvent>()
+        coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
+        coVerify(exactly = 1) { calculateDistance(RAW_SCANNED_VALUE, confirmedValue.value) }
+        with(captureEventSlot.captured) {
+            assertThat(payload.ocrErrorCount).isEqualTo(DEFAULT_DISTANCE)
+            assertThat(payload.capturedTextLength).isEqualTo(confirmedValue.value.length)
+        }
+    }
+
+    @Test
+    fun `persistCaptureAttemptWithConfirmedValue still saves the raw scanned value in the value event`() = runTest {
+        val attempt = makeAttempt(ExternalCredentialType.QRCode, scannedValue = RAW_SCANNED_VALUE)
+        val confirmedValue = "confirmed value".asTokenizableRaw()
+
+        useCase.persistCaptureAttemptWithConfirmedValue(attempt, confirmedValue)
+
+        val valueEventSlot = slot<ExternalCredentialCaptureValueEvent>()
+        coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(valueEventSlot)) }
+        assertThat(valueEventSlot.captured.payload.credential).isEqualTo(attempt.externalCredential)
+    }
+
+    @Test
+    fun `persistCaptureAttempt should correctly calculate expected length for NHISCard`() = runTest {
+        val attempt = makeAttempt(ExternalCredentialType.NHISCard)
+        useCase.persistCaptureAttempt(attempt)
 
         val captureEventSlot = slot<ExternalCredentialCaptureEvent>()
         coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
@@ -114,9 +192,9 @@ class ExternalCredentialEventTrackerUseCaseTest {
     }
 
     @Test
-    fun `saveCaptureEvents should correctly calculate length for GhanaIdCard`() = runTest {
-        val searchResult = makeCredentialSearchResult(ExternalCredentialType.GhanaIdCard)
-        useCase.saveCaptureEvents(searchResult, SUBJECT_ID, START_TIME, SELECTION_ID)
+    fun `persistCaptureAttempt should correctly calculate expected length for GhanaIdCard`() = runTest {
+        val attempt = makeAttempt(ExternalCredentialType.GhanaIdCard)
+        useCase.persistCaptureAttempt(attempt)
 
         val captureEventSlot = slot<ExternalCredentialCaptureEvent>()
         coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
@@ -124,9 +202,9 @@ class ExternalCredentialEventTrackerUseCaseTest {
     }
 
     @Test
-    fun `saveCaptureEvents should correctly calculate length for FaydaCard`() = runTest {
-        val searchResult = makeCredentialSearchResult(ExternalCredentialType.FaydaCard)
-        useCase.saveCaptureEvents(searchResult, SUBJECT_ID, START_TIME, SELECTION_ID)
+    fun `persistCaptureAttempt should correctly calculate expected length for FaydaCard`() = runTest {
+        val attempt = makeAttempt(ExternalCredentialType.FaydaCard)
+        useCase.persistCaptureAttempt(attempt)
 
         val captureEventSlot = slot<ExternalCredentialCaptureEvent>()
         coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
@@ -134,9 +212,9 @@ class ExternalCredentialEventTrackerUseCaseTest {
     }
 
     @Test
-    fun `saveCaptureEvents should correctly calculate length for QRCode`() = runTest {
-        val searchResult = makeCredentialSearchResult(ExternalCredentialType.QRCode)
-        useCase.saveCaptureEvents(searchResult, SUBJECT_ID, START_TIME, SELECTION_ID)
+    fun `persistCaptureAttempt should correctly calculate expected length for QRCode`() = runTest {
+        val attempt = makeAttempt(ExternalCredentialType.QRCode)
+        useCase.persistCaptureAttempt(attempt)
 
         val captureEventSlot = slot<ExternalCredentialCaptureEvent>()
         coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(captureEventSlot)) }
@@ -229,29 +307,44 @@ class ExternalCredentialEventTrackerUseCaseTest {
         )
     }
 
-    private fun makeCredentialSearchResult(type: ExternalCredentialType): ExternalCredentialSearchResult.Complete {
-        val document: MfidDocument = when (type) {
-            ExternalCredentialType.NHISCard -> MfidDocument.GhanaNhisCard(credential = RAW_SCANNED_VALUE.asTokenizableRaw())
-            ExternalCredentialType.GhanaIdCard -> MfidDocument.GhanaIdCard(credential = RAW_SCANNED_VALUE.asTokenizableRaw())
-            ExternalCredentialType.QRCode -> MfidDocument.GhanaQrCode(credential = RAW_SCANNED_VALUE.asTokenizableRaw())
-            ExternalCredentialType.FaydaCard -> MfidDocument.FaydaCard(credential = RAW_SCANNED_VALUE.asTokenizableRaw())
-        }
-        val scannedResult = ScannedCredentialResult(
-            credentialScanId = SCAN_ID,
-            document = document,
-            documentImagePath = null,
-            zoomedCredentialImagePath = null,
-            credentialBoundingBox = null,
-            scanStartTime = SCAN_START_TIME,
-            scanEndTime = SCAN_END_TIME,
-        )
-        return ExternalCredentialSearchResult.Complete(
-            flowType = FlowType.ENROL,
-            scannedCredentialResult = scannedResult,
-            confirmedCredential = RAW_SCANNED_VALUE.asTokenizableRaw(),
-            matchResults = emptyList(),
-        )
+    private fun makeDocument(
+        type: ExternalCredentialType,
+        value: String,
+    ): MfidDocument = when (type) {
+        ExternalCredentialType.NHISCard -> MfidDocument.GhanaNhisCard(credential = value.asTokenizableRaw())
+        ExternalCredentialType.GhanaIdCard -> MfidDocument.GhanaIdCard(credential = value.asTokenizableRaw())
+        ExternalCredentialType.QRCode -> MfidDocument.GhanaQrCode(credential = value.asTokenizableRaw())
+        ExternalCredentialType.FaydaCard -> MfidDocument.FaydaCard(credential = value.asTokenizableRaw())
     }
+
+    private fun makeScannedCredentialResult(
+        type: ExternalCredentialType,
+        value: String = RAW_SCANNED_VALUE,
+    ) = ScannedCredentialResult(
+        credentialScanId = SCAN_ID,
+        document = makeDocument(type, value),
+        documentImagePath = null,
+        zoomedCredentialImagePath = null,
+        credentialBoundingBox = null,
+        scanStartTime = SCAN_START_TIME,
+        scanEndTime = SCAN_END_TIME,
+    )
+
+    private fun makeAttempt(
+        type: ExternalCredentialType,
+        scannedValue: String = RAW_SCANNED_VALUE,
+    ) = ExternalCredentialCaptureAttempt(
+        scannedCredentialResult = makeScannedCredentialResult(type, scannedValue),
+        externalCredential = ExternalCredential(
+            id = SCAN_ID,
+            value = ENCRYPTED_CREDENTIAL,
+            subjectId = SUBJECT_ID,
+            type = type,
+        ),
+        startTime = START_TIME,
+        endTime = END_TIME,
+        selectionEventId = SELECTION_ID,
+    )
 
     private fun makeCredentialMatch(
         faceSdk: ModalitySdkType?,

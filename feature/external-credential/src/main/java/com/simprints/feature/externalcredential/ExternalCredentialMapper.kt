@@ -2,6 +2,7 @@ package com.simprints.feature.externalcredential
 
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
@@ -12,13 +13,12 @@ class ExternalCredentialMapper @Inject constructor(
     private val configRepository: ConfigRepository,
 ) {
     suspend fun mapExternalCredential(
-        searchResult: ExternalCredentialSearchResult.Complete,
+        scannedCredentialResult: ScannedCredentialResult,
         subjectId: String,
+        credentialValue: TokenizableString.Raw = scannedCredentialResult.credential,
     ): ExternalCredential {
-        val scannedCredentialResult = searchResult.scannedCredentialResult
-        val confirmedCredential = searchResult.confirmedCredential
         val encrypted = tokenizationProcessor.encrypt(
-            decrypted = confirmedCredential,
+            decrypted = credentialValue,
             tokenKeyType = TokenKeyType.ExternalCredential,
             project = configRepository.getProject()!!,
         ) as TokenizableString.Tokenized

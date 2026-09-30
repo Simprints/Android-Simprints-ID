@@ -42,8 +42,9 @@ class ResetExternalCredentialsInSessionUseCase @Inject constructor(
         val validSubjectId = subjectId.takeIf { it.isValidGuid() }
         val credentialsToAdd = if (validSubjectId != null && credentialSearchResult != null) {
             val externalCredential = credentialMapper.mapExternalCredential(
-                searchResult = credentialSearchResult,
+                scannedCredentialResult = credentialSearchResult.scannedCredentialResult,
                 subjectId = validSubjectId,
+                credentialValue = credentialSearchResult.confirmedCredential,
             )
             listOf(
                 EnrolmentRecordAction.Update(
