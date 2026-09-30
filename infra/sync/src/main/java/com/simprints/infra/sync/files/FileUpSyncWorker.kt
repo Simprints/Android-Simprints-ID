@@ -13,6 +13,7 @@ import com.simprints.infra.sync.ImageSyncTimestampProvider
 import com.simprints.infra.sync.SyncConstants
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
@@ -49,6 +50,10 @@ internal class FileUpSyncWorker @AssistedInject constructor(
                 imageSyncTimestampProvider.saveImageSyncOutcomeNow(SyncFailureReason.UNKNOWN)
                 retry()
             }
+        } catch (cancellation: CancellationException) {
+            // WorkManager cancelling the worker is not an upload attempt, and recording one here
+            // would both publish a failure that never happened and swallow the cancellation.
+            throw cancellation
         } catch (ex: Exception) {
             imageSyncTimestampProvider.saveImageSyncOutcomeNow(SyncFailureReason.UNKNOWN)
             retry(ex)

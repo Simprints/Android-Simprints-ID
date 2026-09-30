@@ -39,7 +39,7 @@ class EventSyncCache @Inject constructor(
 
     /** When event sync was last attempted and how it turned out; null when it never has been. */
     suspend fun readLastSyncOutcome(): SyncOutcome? = withContext(dispatcher) {
-        sharedForLastSyncTime
+        val lastAttempt = sharedForLastSyncTime
             .getLong(LAST_ATTEMPT_TIME_KEY, -1)
             .takeIf { it >= 0 }
             ?.let { timestamp ->
@@ -48,14 +48,15 @@ class EventSyncCache @Inject constructor(
                     failure = sharedForLastSyncTime.getString(LAST_ATTEMPT_FAILURE_KEY, null)?.toSyncFailureReason(),
                 )
             }
+        lastAttempt ?: readLastSuccessfulSyncTimeBlocking()?.let { SyncOutcome(timestamp = it, failure = null) }
     }
 
-    suspend fun readLastSuccessfulSyncTime(): Timestamp? = withContext(dispatcher) {
-        sharedForLastSyncTime
-            .getLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, -1)
-            .takeIf { it >= 0 }
-            ?.let { Timestamp(it) }
-    }
+    suspend fun readLastSuccessfulSyncTime(): Timestamp? = withContext(dispatcher) { readLastSuccessfulSyncTimeBlocking() }
+
+    private fun readLastSuccessfulSyncTimeBlocking(): Timestamp? = sharedForLastSyncTime
+        .getLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, -1)
+        .takeIf { it >= 0 }
+        ?.let { Timestamp(it) }
 
     /** Records an attempt: when it ended, and why it failed when it did. */
     suspend fun storeLastSyncOutcome(

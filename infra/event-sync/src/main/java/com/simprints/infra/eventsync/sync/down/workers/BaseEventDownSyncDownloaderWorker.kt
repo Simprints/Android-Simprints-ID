@@ -16,6 +16,7 @@ import com.simprints.infra.eventsync.sync.common.WorkerProgressCountReporter
 import com.simprints.infra.eventsync.sync.down.tasks.BaseEventDownSyncTask
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.serialization.SimJson
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
@@ -97,6 +98,18 @@ internal abstract class BaseEventDownSyncDownloaderWorker(
                     "Total downloaded: $count / $max",
                 )
             }
+        } catch (cancellation: CancellationException) {
+            // Cancellation is not a sync failure, so it must not reach handleSyncException and be
+            // flagged as one. It must not propagate either: a worker that throws breaks the chain
+            // and the end reporter would never run to record the attempt.
+            Simber.i("Down-sync cancelled", cancellation, tag = tag)
+            success(
+                workDataOf(
+                    OUTPUT_DOWN_SYNC to count,
+                    OUTPUT_DOWN_MAX_SYNC to max,
+                ),
+                "Cancelled after: $count / $max",
+            )
         } catch (t: Throwable) {
             handleSyncException(t, count, max)
         }

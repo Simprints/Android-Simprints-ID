@@ -20,6 +20,7 @@ import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.devicestate.DeviceStateDataTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -82,6 +83,8 @@ internal class AboutViewModel @Inject constructor(
 
     private suspend fun hasEventsToUpload(): Boolean = try {
         deviceStateDataTracker.hasPendingEvents()
+    } catch (cancellation: CancellationException) {
+        throw cancellation
     } catch (t: Throwable) {
         Simber.i("Could not check pending events before logout", t, tag = SYNC)
         true
