@@ -1,12 +1,14 @@
 package com.simprints.infra.eventsync.sync.common
 
 import androidx.work.WorkInfo
+import com.simprints.core.domain.sync.SyncFailureReason
 
 internal const val OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED = "OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED"
 internal const val OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS = "OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS"
 internal const val OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION = "OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION"
 internal const val OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE = "OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE"
 internal const val OUTPUT_FAILED_BECAUSE_COMMCARE_PERMISSION_MISSING = "OUTPUT_FAILED_BECAUSE_COMMCARE_PERMISSION_MISSING"
+internal const val OUTPUT_FAILED_UNEXPECTEDLY = "OUTPUT_FAILED_UNEXPECTEDLY"
 internal const val OUTPUT_ESTIMATED_MAINTENANCE_TIME = "OUTPUT_ESTIMATED_MAINTENANCE_TIME"
 
 internal fun WorkInfo.didFailBecauseReloginRequired(): Boolean =
@@ -24,6 +26,8 @@ internal fun WorkInfo.didFailBecauseTooManyRequests(): Boolean =
 internal fun WorkInfo.didFailBecauseCommCarePermissionMissing(): Boolean =
     this.outputData.getBoolean(OUTPUT_FAILED_BECAUSE_COMMCARE_PERMISSION_MISSING, false)
 
+internal fun WorkInfo.didFailUnexpectedly(): Boolean = this.outputData.getBoolean(OUTPUT_FAILED_UNEXPECTEDLY, false)
+
 internal fun WorkInfo.getEstimatedOutageTime(): Long = this.outputData.getLong(OUTPUT_ESTIMATED_MAINTENANCE_TIME, 0L)
 
 internal fun WorkInfo.hasAnyFailureReason(): Boolean =
@@ -31,4 +35,16 @@ internal fun WorkInfo.hasAnyFailureReason(): Boolean =
         didFailBecauseCloudIntegration() ||
         didFailBecauseBackendMaintenance() ||
         didFailBecauseTooManyRequests() ||
-        didFailBecauseCommCarePermissionMissing()
+        didFailBecauseCommCarePermissionMissing() ||
+        didFailUnexpectedly()
+
+internal fun List<WorkInfo>.firstFailureReason(): SyncFailureReason? = when {
+    any { it.didFailBecauseReloginRequired() } -> SyncFailureReason.RELOGIN_REQUIRED
+    any { it.didFailBecauseCloudIntegration() } -> SyncFailureReason.CLOUD_INTEGRATION
+    any { it.didFailBecauseBackendMaintenance() } -> SyncFailureReason.BACKEND_MAINTENANCE
+    any { it.didFailBecauseTooManyRequests() } -> SyncFailureReason.TOO_MANY_REQUESTS
+    any { it.didFailBecauseCommCarePermissionMissing() } -> SyncFailureReason.COMM_CARE_PERMISSION_MISSING
+    any { it.didFailUnexpectedly() } -> SyncFailureReason.UNKNOWN
+    any { it.state == WorkInfo.State.FAILED } -> SyncFailureReason.UNKNOWN
+    else -> null
+}

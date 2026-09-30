@@ -1,4 +1,4 @@
-package com.simprints.infra.sync.usecase.internal
+package com.simprints.infra.sync.devicestate.internal
 
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.images.ImageRepository

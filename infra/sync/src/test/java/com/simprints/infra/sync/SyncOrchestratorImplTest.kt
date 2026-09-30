@@ -135,7 +135,7 @@ class SyncOrchestratorImplTest {
         syncOrchestrator.deleteEventSyncInfo()
         coVerify { deleteSyncInfo() }
         verify { workManager.pruneWork() }
-        verify { imageSyncTimestampProvider.clearTimestamp() }
+        coVerify { imageSyncTimestampProvider.clearLastSyncOutcome() }
     }
 
     @Test

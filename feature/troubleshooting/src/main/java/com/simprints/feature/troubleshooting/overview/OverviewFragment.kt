@@ -33,6 +33,9 @@ internal class OverviewFragment : Fragment(R.layout.fragment_troubleshooting_ove
         viewModel.configurationDetails.observe(viewLifecycleOwner) {
             binding.troubleshootOverviewConfiguration.text = it.orEmpty()
         }
+        viewModel.deviceDataState.observe(viewLifecycleOwner) {
+            binding.troubleshootOverviewDataState.text = it.orEmpty()
+        }
         viewModel.licenseStates.observe(viewLifecycleOwner) {
             binding.troubleshootOverviewLicences.text = it.ifBlank { "No licenses found" }
         }
