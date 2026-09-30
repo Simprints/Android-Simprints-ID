@@ -20,6 +20,7 @@ import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_BACKEND_M
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_UNEXPECTEDLY
 import com.simprints.infra.eventsync.sync.common.WorkerProgressCountReporter
 import com.simprints.infra.eventsync.sync.up.tasks.EventUpSyncTask
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_MAX_SYNC
@@ -32,6 +33,7 @@ import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.infra.serialization.SimJson
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
@@ -92,6 +94,15 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
                 createOutputData(count, max),
                 "Total uploaded: $count / $max",
             )
+        } catch (cancellation: CancellationException) {
+            // Cancellation is not a sync failure, so no failure flag is written. It must not
+            // propagate either: a worker that throws breaks the chain and the end reporter would
+            // never run to record the attempt.
+            Simber.i("Up-sync cancelled", cancellation, tag = tag)
+            success(
+                createOutputData(count, max),
+                "Cancelled after: $count / $max",
+            )
         } catch (t: Throwable) {
             Simber.i("Up-sync completed with issue", t, tag = tag)
             success(
@@ -119,6 +130,9 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
                 outputDataBuilder
                     .putBoolean(OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE, true)
                     .putLong(OUTPUT_ESTIMATED_MAINTENANCE_TIME, t.estimatedOutage ?: 0L)
+
+            null -> Unit
+            else -> outputDataBuilder.putBoolean(OUTPUT_FAILED_UNEXPECTEDLY, true)
         }
 
         return outputDataBuilder.build()

@@ -83,8 +83,29 @@ class EventSyncCacheTest {
     @Test
     fun `readLastSyncOutcome returns null until a sync has been attempted`() = runTest {
         every { sharedPrefsForLastSyncTime.getLong(LAST_ATTEMPT_TIME_KEY, -1) } returns -1
+        every { sharedPrefsForLastSyncTime.getLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, -1) } returns -1
 
         assertThat(eventSyncCache.readLastSyncOutcome()).isNull()
+    }
+
+    @Test
+    fun `readLastSyncOutcome falls back to a success stored before attempts were recorded`() = runTest {
+        // Upgrading from a version that only wrote the success key: without the fallback the
+        // device would report never having synced until the next attempt.
+        every { sharedPrefsForLastSyncTime.getLong(LAST_ATTEMPT_TIME_KEY, -1) } returns -1
+        every { sharedPrefsForLastSyncTime.getLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, -1) } returns 30
+
+        assertThat(eventSyncCache.readLastSyncOutcome()).isEqualTo(SyncOutcome(Timestamp(30), failure = null))
+    }
+
+    @Test
+    fun `readLastSyncOutcome prefers a recorded attempt over the legacy success`() = runTest {
+        every { sharedPrefsForLastSyncTime.getLong(LAST_ATTEMPT_TIME_KEY, -1) } returns 90
+        every { sharedPrefsForLastSyncTime.getLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, -1) } returns 30
+        every { sharedPrefsForLastSyncTime.getString(LAST_ATTEMPT_FAILURE_KEY, null) } returns SyncFailureReason.CLOUD_INTEGRATION.name
+
+        assertThat(eventSyncCache.readLastSyncOutcome())
+            .isEqualTo(SyncOutcome(Timestamp(90), failure = SyncFailureReason.CLOUD_INTEGRATION))
     }
 
     @Test
@@ -171,6 +192,7 @@ class EventSyncCacheTest {
     fun `observeLastSyncOutcome publishes every write`() = runTest {
         every { sharedPrefsForLastSyncTime.edit() } returns mockk(relaxed = true)
         every { sharedPrefsForLastSyncTime.getLong(LAST_ATTEMPT_TIME_KEY, -1) } returns -1
+        every { sharedPrefsForLastSyncTime.getLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, -1) } returns -1
 
         eventSyncCache.observeLastSyncOutcome().test {
             assertThat(awaitItem()).isNull()

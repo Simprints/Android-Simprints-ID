@@ -36,7 +36,7 @@ class ImageSyncTimestampProvider @Inject constructor(
 
     /** When the upload worker last ran and how it turned out; null when it never has. */
     suspend fun getLastSyncOutcome(): SyncOutcome? = withContext(dispatcher) {
-        securePrefs
+        val lastAttempt = securePrefs
             .getLong(IMAGE_SYNC_ATTEMPT_TIME_MILLIS, 0)
             .takeIf { securePrefs.contains(IMAGE_SYNC_ATTEMPT_TIME_MILLIS) }
             ?.let { at ->
@@ -45,17 +45,18 @@ class ImageSyncTimestampProvider @Inject constructor(
                     failure = securePrefs.getString(IMAGE_SYNC_FAILURE_REASON, null)?.toSyncFailureReason(),
                 )
             }
+        lastAttempt ?: readCompletionTimestamp()?.let { SyncOutcome(timestamp = Timestamp(it), failure = null) }
     }
 
     /**
      * When the last upload actually *completed*, which is what says how stale this device's
      * samples are. The last attempt cannot answer it - it moves even when nothing uploaded.
      */
-    suspend fun getLastSuccessfulSyncTimestamp(): Long? = withContext(dispatcher) {
-        securePrefs
-            .getLong(IMAGE_SYNC_COMPLETION_TIME_MILLIS, 0)
-            .takeIf { securePrefs.contains(IMAGE_SYNC_COMPLETION_TIME_MILLIS) }
-    }
+    suspend fun getLastSuccessfulSyncTimestamp(): Long? = withContext(dispatcher) { readCompletionTimestamp() }
+
+    private fun readCompletionTimestamp(): Long? = securePrefs
+        .getLong(IMAGE_SYNC_COMPLETION_TIME_MILLIS, 0)
+        .takeIf { securePrefs.contains(IMAGE_SYNC_COMPLETION_TIME_MILLIS) }
 
     suspend fun getMillisSinceLastImageSync(): Long? = getLastSuccessfulSyncTimestamp()?.let { timeHelper.now().ms - it }
 

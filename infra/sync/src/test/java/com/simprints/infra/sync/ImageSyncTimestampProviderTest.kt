@@ -64,6 +64,26 @@ class ImageSyncTimestampProviderTest {
     }
 
     @Test
+    fun `getLastSyncOutcome falls back to a completion stored before attempts were recorded`() = runTest {
+        // Upgrading from a version that only wrote the completion key: without the fallback the
+        // device would report never having synced until the next attempt.
+        storedSuccessTimestamp(1234567890L)
+
+        assertThat(imageSyncTimestampProvider.getLastSyncOutcome())
+            .isEqualTo(SyncOutcome(Timestamp(1234567890L), failure = null))
+    }
+
+    @Test
+    fun `getLastSyncOutcome prefers a recorded attempt over the legacy completion`() = runTest {
+        storedTimestamp(200L)
+        storedSuccessTimestamp(100L)
+        every { sharedPreferences.getString(FAILURE_KEY, null) } returns SyncFailureReason.CLOUD_INTEGRATION.name
+
+        assertThat(imageSyncTimestampProvider.getLastSyncOutcome())
+            .isEqualTo(SyncOutcome(Timestamp(200L), failure = SyncFailureReason.CLOUD_INTEGRATION))
+    }
+
+    @Test
     fun `getLastSyncOutcome returns the time of an attempt that succeeded`() = runTest {
         storedTimestamp(1234567890L)
 

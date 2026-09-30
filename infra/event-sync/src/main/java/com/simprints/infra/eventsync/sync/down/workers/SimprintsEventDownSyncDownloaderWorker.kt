@@ -17,6 +17,7 @@ import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_BACKEND_M
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_UNEXPECTEDLY
 import com.simprints.infra.eventsync.sync.down.tasks.BaseEventDownSyncTask
 import com.simprints.infra.eventsync.sync.down.tasks.SimprintsEventDownSyncTask
 import com.simprints.infra.logging.Simber
@@ -86,6 +87,7 @@ internal class SimprintsEventDownSyncDownloaderWorker @AssistedInject constructo
             }
 
             else -> {
+                outputData.putBoolean(OUTPUT_FAILED_UNEXPECTEDLY, true)
                 Simber.e("Down-sync completed with unexpected issue", t, tag = tag)
             }
         }
