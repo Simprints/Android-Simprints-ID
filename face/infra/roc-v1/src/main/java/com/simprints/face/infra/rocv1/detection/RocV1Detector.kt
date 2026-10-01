@@ -5,6 +5,7 @@ import android.graphics.Rect
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
+import com.simprints.face.infra.basebiosdk.detection.FaceSelector
 import com.simprints.face.infra.basebiosdk.detection.SpoofCheckResult
 import io.rankone.rocsdk.embedded.SWIGTYPE_p_float
 import io.rankone.rocsdk.embedded.SWIGTYPE_p_unsigned_char
@@ -20,11 +21,6 @@ import javax.inject.Inject
     reason = "This class uses roc class that has native functions and can't be mocked",
 )
 class RocV1Detector @Inject constructor() : FaceDetector {
-    companion object {
-        const val RANK_ONE_TEMPLATE_FORMAT_1_23 = "RANK_ONE_1_23"
-    }
-
-    private val maxFaces = 1
     private val falseDetectionRate = 0.1f
     private val relativeMinSize = 0.2f
     private val absoluteMinSize = 36L
@@ -35,7 +31,7 @@ class RocV1Detector @Inject constructor() : FaceDetector {
         reason = "This class uses roc class that has native functions and can't be mocked",
     )
     data class ROCFace(
-        var face: roc_detection,
+        var face: roc_detection?,
         var template: SWIGTYPE_p_unsigned_char,
         var yaw: SWIGTYPE_p_float,
         var quality: SWIGTYPE_p_float,
@@ -43,7 +39,7 @@ class RocV1Detector @Inject constructor() : FaceDetector {
         var gender: roc_embedded_gender?,
     ) {
         fun cleanup() {
-            face.delete()
+            face?.delete()
             roc.delete_uint8_t_array(template)
             roc.delete_float(yaw)
             roc.delete_float(quality)
@@ -55,11 +51,13 @@ class RocV1Detector @Inject constructor() : FaceDetector {
     override fun spoofCheck(
         bitmap: Bitmap,
         configuredMaxSize: Int,
+        selectFace: FaceSelector?,
     ) = SpoofCheckResult(0f, SpoofCheckResult.SkipReason.NOT_AVAILABLE)
 
     override fun analyze(
         bitmap: Bitmap,
         estimateAgeAndGender: Boolean,
+        selectFace: FaceSelector?,
     ): Face? {
         val rocColorImage = roc_image()
         val rocGrayImage = roc_image()
@@ -78,7 +76,7 @@ class RocV1Detector @Inject constructor() : FaceDetector {
 
         roc.roc_free_image(rocColorImage)
 
-        return analyze(rocGrayImage, bitmap.width, bitmap.height, estimateAgeAndGender)
+        return analyze(rocGrayImage, bitmap.width, bitmap.height, estimateAgeAndGender, selectFace)
     }
 
     /**
@@ -89,9 +87,10 @@ class RocV1Detector @Inject constructor() : FaceDetector {
         imageWidth: Int,
         imageHeight: Int,
         estimateAgeAndGender: Boolean,
+        selectFace: FaceSelector?,
     ): Face? {
         val rocFace = ROCFace(
-            roc_detection(),
+            null,
             roc.new_uint8_t_array(roc.ROC_FAST_FV_SIZE.toInt()),
             roc.new_float(),
             roc.new_float(),
@@ -99,9 +98,10 @@ class RocV1Detector @Inject constructor() : FaceDetector {
             if (estimateAgeAndGender) roc_embedded_gender() else null,
         )
 
-        val faceDetected = getRocTemplateFromImage(rocImage, rocFace)
+        getRocTemplateFromImage(rocImage, rocFace, selectFace)
+        val detection = rocFace.face
 
-        if (!faceDetected) {
+        if (detection == null) {
             roc.roc_free_image(rocImage)
             rocFace.cleanup()
             return null
@@ -116,14 +116,9 @@ class RocV1Detector @Inject constructor() : FaceDetector {
         val face = Face(
             imageWidth,
             imageHeight,
-            Rect(
-                (rocFace.face.x - rocFace.face.width / 2).toInt(),
-                (rocFace.face.y - rocFace.face.height / 2).toInt(),
-                (rocFace.face.x + rocFace.face.width / 2).toInt(),
-                (rocFace.face.y + rocFace.face.height / 2).toInt(),
-            ),
+            detection.boundingRect(),
             yawValue,
-            rocFace.face.rotation,
+            detection.rotation,
             qualityValue,
             roc.cdata(roc.roc_cast(rocFace.template), roc.ROC_FAST_FV_SIZE.toInt()),
             RANK_ONE_TEMPLATE_FORMAT_1_23,
@@ -146,7 +141,8 @@ class RocV1Detector @Inject constructor() : FaceDetector {
     private fun getRocTemplateFromImage(
         image: roc_image,
         rocFace: ROCFace,
-    ): Boolean {
+        selectFace: FaceSelector?,
+    ) {
         val adaptiveMinimumSize = roc.new_size_t()
         roc.roc_ensure(
             roc.roc_adaptive_minimum_size(
@@ -158,7 +154,9 @@ class RocV1Detector @Inject constructor() : FaceDetector {
             ),
         )
 
+        val maxFaces = maxFacesFor(selectFace)
         val n = roc.new_size_t()
+        val detections = roc.new_roc_detection_array(maxFaces)
 
         roc.roc_ensure(
             roc.roc_embedded_error_to_string(
@@ -168,16 +166,29 @@ class RocV1Detector @Inject constructor() : FaceDetector {
                     maxFaces,
                     falseDetectionRate,
                     n,
-                    rocFace.face,
+                    detections,
                 ),
             ),
         )
 
-        if (roc.size_t_value(n) != 1L) {
+        val numFaces = roc.size_t_value(n).toInt().coerceIn(0, maxFaces)
+        val candidates = (0 until numFaces).map { roc.roc_detection_array_getitem(detections, it) }
+        val selectedIndex = when {
+            candidates.isEmpty() -> null
+            selectFace == null -> 0
+            else -> selectFace(candidates.map { it.boundingRect() })
+        }
+
+        val detection = selectedIndex?.let { candidates.getOrNull(it) }
+        candidates.forEach { if (it !== detection) it.delete() }
+        roc.delete_roc_detection_array(detections)
+
+        if (detection == null) {
             roc.delete_size_t(adaptiveMinimumSize)
             roc.delete_size_t(n)
-            return false
+            return
         }
+        rocFace.face = detection
 
         val landmarks = roc.new_roc_embedded_landmark_array(68)
         val rightEye = roc_embedded_landmark()
@@ -187,7 +198,7 @@ class RocV1Detector @Inject constructor() : FaceDetector {
             roc.roc_embedded_error_to_string(
                 roc.roc_embedded_landmark_face(
                     image,
-                    rocFace.face,
+                    detection,
                     landmarks,
                     rightEye,
                     leftEye,
@@ -202,7 +213,7 @@ class RocV1Detector @Inject constructor() : FaceDetector {
             roc.roc_embedded_error_to_string(
                 roc.roc_embedded_represent_face(
                     image,
-                    rocFace.face,
+                    detection,
                     rightEye,
                     leftEye,
                     chin,
@@ -224,7 +235,20 @@ class RocV1Detector @Inject constructor() : FaceDetector {
         roc.delete_size_t(adaptiveMinimumSize)
         roc.delete_size_t(n)
         roc.delete_roc_embedded_landmark_array(landmarks)
+    }
 
-        return true
+    private fun roc_detection.boundingRect() = Rect(
+        (x - width / 2).toInt(),
+        (y - height / 2).toInt(),
+        (x + width / 2).toInt(),
+        (y + height / 2).toInt(),
+    )
+
+    // Detecting several faces is only useful when the caller can choose between them.
+    private fun maxFacesFor(selectFace: FaceSelector?) = if (selectFace == null) 1 else MAX_FACES
+
+    companion object {
+        const val RANK_ONE_TEMPLATE_FORMAT_1_23 = "RANK_ONE_1_23"
+        const val MAX_FACES = 3
     }
 }
