@@ -31,6 +31,53 @@ data class ExperimentalProjectConfiguration(
             ?.coerceIn(FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MIN, FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MAX)
             ?: FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
 
+    /**
+     * Maximum absolute face yaw (in degrees) accepted during face capture. Applies to all face SDKs.
+     */
+    val faceCaptureMaxYawDegrees: Float
+        get() = customConfig
+            ?.get(FACE_CAPTURE_MAX_YAW_DEGREES)
+            ?.jsonPrimitive
+            ?.floatOrNull
+            ?.takeIf { it.isFinite() }
+            ?.coerceIn(FACE_CAPTURE_MAX_ANGLE_DEGREES_MIN, FACE_CAPTURE_MAX_ANGLE_DEGREES_MAX)
+            ?: FACE_CAPTURE_MAX_YAW_DEGREES_DEFAULT
+
+    /**
+     * Maximum absolute face roll (in degrees) accepted during face capture. Applies to all face SDKs.
+     */
+    val faceCaptureMaxRollDegrees: Float
+        get() = customConfig
+            ?.get(FACE_CAPTURE_MAX_ROLL_DEGREES)
+            ?.jsonPrimitive
+            ?.floatOrNull
+            ?.takeIf { it.isFinite() }
+            ?.coerceIn(FACE_CAPTURE_MAX_ANGLE_DEGREES_MIN, FACE_CAPTURE_MAX_ANGLE_DEGREES_MAX)
+            ?: FACE_CAPTURE_MAX_ROLL_DEGREES_DEFAULT
+
+    /**
+     * Range of the relative frame area the face bounding box must occupy during face capture.
+     * Applies to all face SDKs. Falls back to the default range if the configured range is empty.
+     */
+    val faceCaptureAcceptedAreaRange: ClosedFloatingPointRange<Float>
+        get() {
+            val min = customConfig
+                ?.get(FACE_CAPTURE_MIN_AREA)
+                ?.jsonPrimitive
+                ?.floatOrNull
+                ?.takeIf { it.isFinite() }
+                ?.coerceIn(0f, 1f)
+                ?: FACE_CAPTURE_MIN_AREA_DEFAULT
+            val max = customConfig
+                ?.get(FACE_CAPTURE_MAX_AREA)
+                ?.jsonPrimitive
+                ?.floatOrNull
+                ?.takeIf { it.isFinite() }
+                ?.coerceIn(0f, 1f)
+                ?: FACE_CAPTURE_MAX_AREA_DEFAULT
+            return if (min < max) min..max else FACE_CAPTURE_MIN_AREA_DEFAULT..FACE_CAPTURE_MAX_AREA_DEFAULT
+        }
+
     val recordsDbMigrationFromRealmEnabled: Boolean
         get() = customConfig
             ?.get(RECORDS_DB_MIGRATION_FROM_REALM_TO_ROOM_ENABLED)
@@ -246,6 +293,17 @@ data class ExperimentalProjectConfiguration(
         internal const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MIN = 1L
         const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT = 3_000L
         internal const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MAX = 60_000L
+
+        const val FACE_CAPTURE_MAX_YAW_DEGREES = "faceCaptureMaxYawDegrees"
+        const val FACE_CAPTURE_MAX_YAW_DEGREES_DEFAULT = 30f
+        const val FACE_CAPTURE_MAX_ROLL_DEGREES = "faceCaptureMaxRollDegrees"
+        const val FACE_CAPTURE_MAX_ROLL_DEGREES_DEFAULT = 15f
+        internal const val FACE_CAPTURE_MAX_ANGLE_DEGREES_MIN = 1f
+        internal const val FACE_CAPTURE_MAX_ANGLE_DEGREES_MAX = 90f
+        const val FACE_CAPTURE_MIN_AREA = "faceCaptureMinArea"
+        const val FACE_CAPTURE_MIN_AREA_DEFAULT = 0.2f
+        const val FACE_CAPTURE_MAX_AREA = "faceCaptureMaxArea"
+        const val FACE_CAPTURE_MAX_AREA_DEFAULT = 0.5f
 
         internal const val FALLBACK_TO_COMMCARE_THRESHOLD_DAYS = "fallbackToCommCareThresholdDays"
         internal const val FALLBACK_TO_COMMCARE_THRESHOLD_DAYS_DEFAULT = 5L

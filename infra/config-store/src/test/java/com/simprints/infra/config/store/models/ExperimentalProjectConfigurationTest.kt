@@ -450,4 +450,57 @@ internal class ExperimentalProjectConfigurationTest {
             assertThat(ExperimentalProjectConfiguration(config).useParentalConsentAsDefault).isEqualTo(result)
         }
     }
+
+    @Test
+    fun `face capture max yaw parsed correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to 30f,
+            mapOf(ExperimentalProjectConfiguration.FACE_CAPTURE_MAX_YAW_DEGREES to JsonPrimitive(null)) to 30f,
+            mapOf(ExperimentalProjectConfiguration.FACE_CAPTURE_MAX_YAW_DEGREES to JsonPrimitive("string")) to 30f,
+            mapOf(ExperimentalProjectConfiguration.FACE_CAPTURE_MAX_YAW_DEGREES to JsonPrimitive("NaN")) to 30f,
+            mapOf(ExperimentalProjectConfiguration.FACE_CAPTURE_MAX_YAW_DEGREES to JsonPrimitive("Infinity")) to 30f,
+            mapOf(ExperimentalProjectConfiguration.FACE_CAPTURE_MAX_YAW_DEGREES to JsonPrimitive(20)) to 20f,
+            mapOf(ExperimentalProjectConfiguration.FACE_CAPTURE_MAX_YAW_DEGREES to JsonPrimitive(22.5f)) to 22.5f,
+            mapOf(ExperimentalProjectConfiguration.FACE_CAPTURE_MAX_YAW_DEGREES to JsonPrimitive(0)) to 1f,
+            mapOf(ExperimentalProjectConfiguration.FACE_CAPTURE_MAX_YAW_DEGREES to JsonPrimitive(120)) to 90f,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).faceCaptureMaxYawDegrees).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `face capture max roll parsed correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to 15f,
+            mapOf(ExperimentalProjectConfiguration.FACE_CAPTURE_MAX_ROLL_DEGREES to JsonPrimitive(null)) to 15f,
+            mapOf(ExperimentalProjectConfiguration.FACE_CAPTURE_MAX_ROLL_DEGREES to JsonPrimitive("string")) to 15f,
+            mapOf(ExperimentalProjectConfiguration.FACE_CAPTURE_MAX_ROLL_DEGREES to JsonPrimitive("NaN")) to 15f,
+            mapOf(ExperimentalProjectConfiguration.FACE_CAPTURE_MAX_ROLL_DEGREES to JsonPrimitive("Infinity")) to 15f,
+            mapOf(ExperimentalProjectConfiguration.FACE_CAPTURE_MAX_ROLL_DEGREES to JsonPrimitive(10)) to 10f,
+            mapOf(ExperimentalProjectConfiguration.FACE_CAPTURE_MAX_ROLL_DEGREES to JsonPrimitive(-5)) to 1f,
+            mapOf(ExperimentalProjectConfiguration.FACE_CAPTURE_MAX_ROLL_DEGREES to JsonPrimitive(100)) to 90f,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).faceCaptureMaxRollDegrees).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `face capture accepted area range parsed correctly`() {
+        val min = ExperimentalProjectConfiguration.FACE_CAPTURE_MIN_AREA
+        val max = ExperimentalProjectConfiguration.FACE_CAPTURE_MAX_AREA
+        mapOf(
+            emptyMap<String, JsonElement>() to 0.2f..0.5f,
+            mapOf(min to JsonPrimitive("string"), max to JsonPrimitive(null)) to 0.2f..0.5f,
+            mapOf(min to JsonPrimitive("NaN"), max to JsonPrimitive("Infinity")) to 0.2f..0.5f,
+            mapOf(min to JsonPrimitive(0.1f)) to 0.1f..0.5f,
+            mapOf(max to JsonPrimitive(0.7f)) to 0.2f..0.7f,
+            mapOf(min to JsonPrimitive(0.15f), max to JsonPrimitive(0.6f)) to 0.15f..0.6f,
+            mapOf(min to JsonPrimitive(-1), max to JsonPrimitive(2)) to 0f..1f,
+            // Empty or inverted range falls back to defaults
+            mapOf(min to JsonPrimitive(0.6f)) to 0.2f..0.5f,
+            mapOf(min to JsonPrimitive(0.4f), max to JsonPrimitive(0.4f)) to 0.2f..0.5f,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).faceCaptureAcceptedAreaRange).isEqualTo(result)
+        }
+    }
 }
