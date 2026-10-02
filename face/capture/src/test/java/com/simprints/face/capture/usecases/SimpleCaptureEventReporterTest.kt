@@ -13,6 +13,7 @@ import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckConfiguration
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent.BiometricReferenceCreationPayload
+import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent
 import com.simprints.infra.events.event.domain.models.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.FaceCaptureConfirmationEvent
 import com.simprints.infra.events.event.domain.models.FaceCaptureEvent
@@ -97,6 +98,29 @@ class SimpleCaptureEventReporterTest {
                 },
             )
         }
+    }
+
+    @Test
+    fun `Adds capture attempt event`() = runTest {
+        val event = FaceCaptureAttemptEvent(
+            startTime = Timestamp(1L),
+            endTime = Timestamp(2L),
+            attemptNb = 0,
+            bioSdk = FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.BioSdk.RANK_ONE,
+            targetFrameWidth = 556,
+            targetFrameHeight = 556,
+            totalFramesAnalysed = 0,
+            validFrameCount = 0,
+            timeToFirstValidMs = null,
+            rejectionStats = FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.RejectionStats(),
+            qualityAllFrames = null,
+            statusRuns = emptyList(),
+            statusRunsTruncated = false,
+        )
+
+        reporter.addCaptureAttemptEvent(event)
+
+        coVerify { eventRepository.addOrUpdateEvent(event) }
     }
 
     @Test

@@ -1,0 +1,51 @@
+{
+  "id": "3b5e9a14-77cd-49f1-8a2e-6c0b4d9f1e23",
+  "type": "FACE_CAPTURE_ATTEMPT",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "FACE_CAPTURE_ATTEMPT",
+    "eventVersion": 0,
+    "createdAt": 6781345670,
+    "endedAt": 6781348270,
+    "attemptNb": 0,
+    "bioSdk": "RANK_ONE",
+    "targetFrameWidth": 556,
+    "targetFrameHeight": 556,
+    "totalFramesAnalysed": 47,
+    "validFrameCount": 15,
+    "timeToFirstValidMs": 950,
+    "rejectionStats": {
+      "tooFar": {
+        "count": 12,
+        "firstSeenMs": 0,
+        "longestRunMs": 400,
+        "minValue": 0.12,
+        "maxValue": 0.18,
+        "medianValue": 0.15
+      },
+      "offYaw": {
+        "count": 20,
+        "firstSeenMs": 400,
+        "longestRunMs": 550,
+        "minValue": -41.0,
+        "maxValue": 36.5,
+        "medianValue": -34.0
+      }
+    },
+    "qualityAllFrames": {
+      "minValue": 0.41,
+      "maxValue": 0.97,
+      "medianValue": 0.83
+    },
+    "statusRuns": [
+      { "status": "TOO_FAR", "frameCount": 12, "durationMs": 400 },
+      { "status": "OFF_YAW", "frameCount": 20, "durationMs": 550 },
+      { "status": "VALID", "frameCount": 15, "durationMs": 1650 }
+    ],
+    "statusRunsTruncated": false
+  }
+}

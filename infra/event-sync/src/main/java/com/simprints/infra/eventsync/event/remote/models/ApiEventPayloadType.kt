@@ -39,6 +39,7 @@ import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENT
 import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_SEARCH
 import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_SELECTION
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE
+import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_ATTEMPT
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_BIOMETRICS
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
 import com.simprints.infra.events.event.domain.models.EventType.FACE_FALLBACK_CAPTURE
@@ -89,6 +90,7 @@ internal enum class ApiEventPayloadType {
     FaceOnboardingComplete,
     FaceFallbackCapture,
     FaceCapture,
+    FaceCaptureAttempt,
     FaceCaptureBiometrics,
     FaceCaptureConfirmation,
     EventDownSyncRequest,
@@ -177,6 +179,8 @@ internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
 
     FINGERPRINT_CAPTURE_BIOMETRICS -> ApiEventPayloadType.FingerprintCaptureBiometrics
 
+    FACE_CAPTURE_ATTEMPT -> ApiEventPayloadType.FaceCaptureAttempt
+
     FACE_CAPTURE_BIOMETRICS -> ApiEventPayloadType.FaceCaptureBiometrics
 
     EVENT_DOWN_SYNC_REQUEST -> ApiEventPayloadType.EventDownSyncRequest
@@ -231,6 +235,7 @@ internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.FaceCapture -> FACE_CAPTURE
     ApiEventPayloadType.FaceCaptureConfirmation -> FACE_CAPTURE_CONFIRMATION
     ApiEventPayloadType.FingerprintCaptureBiometrics -> FINGERPRINT_CAPTURE_BIOMETRICS
+    ApiEventPayloadType.FaceCaptureAttempt -> FACE_CAPTURE_ATTEMPT
     ApiEventPayloadType.FaceCaptureBiometrics -> FACE_CAPTURE_BIOMETRICS
     ApiEventPayloadType.EventDownSyncRequest -> EVENT_DOWN_SYNC_REQUEST
     ApiEventPayloadType.EventUpSyncRequest -> EVENT_UP_SYNC_REQUEST

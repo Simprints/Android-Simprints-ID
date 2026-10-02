@@ -1,12 +1,14 @@
 package com.simprints.face.capture.screens.livefeedback
 
 import android.graphics.Bitmap
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.tools.extensions.area
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.models.FaceTarget
 import com.simprints.face.capture.models.SymmetricTarget
@@ -23,6 +25,7 @@ import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckConfi
 import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckMode
 import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.experimental
+import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.BioSdk
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -53,6 +56,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
     private val getSpoofCheckConfiguration: GetSpoofCheckConfigurationUseCase,
     private val captureAttemptTracker: CaptureAttemptTracker,
     @param:DispatcherBG private val bgDispatcher: CoroutineDispatcher,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private var samplesToCapture: Int = 1
     private var qualityThreshold: Float = 0f
@@ -91,6 +95,19 @@ internal class LiveFeedbackViewModel @Inject constructor(
     private var autoCaptureImagingDurationMillis: Long = FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
     private lateinit var faceDetector: FaceDetector
     private var hasAutoRequestedPermission = false
+
+    /** Which face SDK runs this screen, in the vocabulary of [FaceCaptureAttemptEvent]; null when unknown. */
+    private var attemptBioSdk: BioSdk? = null
+
+    /**
+     * Diagnostics for the auto-capture attempt in progress (MS-1605). Null in manual mode and
+     * between attempts. Written to only from [process] on the analyser thread.
+     */
+    private var attemptStats: AutoCaptureAttemptStats? = null
+
+    init {
+        flushAttemptPersistedBeforeProcessDeath()
+    }
 
     private val phase: LiveFeedbackState.Phase
         get() = state.value.phase
@@ -157,6 +174,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
     ) {
         Simber.i("Initialise face detection", tag = FACE_CAPTURE)
         this.samplesToCapture = samplesToCapture
+        attemptBioSdk = bioSdk.toAttemptBioSdk()
         viewModelScope.launch {
             faceDetector = resolveFaceBioSdk(bioSdk).detector
 
@@ -181,6 +199,16 @@ internal class LiveFeedbackViewModel @Inject constructor(
         // Single path for every new capture attempt
         captureAttemptTracker.onNewCaptureAttemptStarted()
         if (isAutoCapture) {
+            // A previous attempt still open here was never finished (e.g. the screen was paused
+            // while aiming); report it as abandoned before starting the next one.
+            flushAttemptStats()
+            attemptStats = attemptBioSdk?.let { sdk ->
+                AutoCaptureAttemptStats(
+                    attemptNb = captureAttemptTracker.attemptNumber,
+                    bioSdk = sdk,
+                    startTime = timeHelper.now(),
+                )
+            }
             isAutoCaptureHeldOff = false
         } else {
             emit(phase = LiveFeedbackState.Phase.CAPTURING)
@@ -228,11 +256,15 @@ internal class LiveFeedbackViewModel @Inject constructor(
         }
 
         val captureStartTime = timeHelper.now()
+        val targetFrameWidth = croppedBitmap.width
+        val targetFrameHeight = croppedBitmap.height
         val potentialFace = faceDetector.analyze(croppedBitmap)
 
         val faceDetection = getFaceDetectionFromPotentialFace(originalBitmap, croppedBitmap, potentialFace)
         faceDetection.detectionStartTime = captureStartTime
         faceDetection.detectionEndTime = timeHelper.now()
+
+        recordAttemptFrame(faceDetection, captureStartTime, targetFrameWidth, targetFrameHeight)
 
         var newPhase = phase
         var feedback = state.value.feedback
@@ -371,6 +403,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
             .ifEmpty { listOfNotNull(fallbackCapture) }
 
         sendCaptureEvents(attemptNumber)
+        flushAttemptStats()
         emit(phase = LiveFeedbackState.Phase.FINISHED, result = sortedQualifyingCaptures)
     }
 
@@ -398,6 +431,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
         val duration = measureTimedValue {
             // Still track the capture attempt events for analytics and troubleshooting
             sendCaptureEvents(captureAttemptTracker.attemptNumber)
+            flushAttemptStats()
 
             userCaptures.forEach {
                 it.original.recycle()
@@ -524,7 +558,83 @@ internal class LiveFeedbackViewModel @Inject constructor(
         eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold, spoofCheckConfig, isAutoCapture = isAutoCapture)
     }
 
+    // region MS-1605 auto-capture attempt diagnostics
+
+    /**
+     * Feeds the current frame into the attempt diagnostics. Only frames that belong to an
+     * auto-capture attempt count: after the capture button was pressed and before the attempt
+     * finished. Frames analysed while auto-capture is held off are not part of any attempt.
+     */
+    private fun recordAttemptFrame(
+        faceDetection: FaceDetection,
+        frameTime: Timestamp,
+        frameWidth: Int,
+        frameHeight: Int,
+    ) {
+        val stats = attemptStats ?: return
+        if (!isAutoCapture || isAutoCaptureHeldOff) return
+
+        stats.recordFrame(
+            detection = faceDetection,
+            areaOccupied = faceDetection.face?.relativeBoundingBox?.area(),
+            frameTime = frameTime,
+            frameWidth = frameWidth,
+            frameHeight = frameHeight,
+        )
+        if (stats.hasUnsavedRunChange) {
+            // Persist on run boundaries only (bounded by MAX_STATUS_RUNS), so the attempt survives
+            // process death without serialising on every frame.
+            val snapshot = stats.snapshot()
+            viewModelScope.launch { savedStateHandle[KEY_ATTEMPT_STATS] = snapshot }
+        }
+    }
+
+    /**
+     * Emits the open attempt as a [FaceCaptureAttemptEvent] and clears it. Safe to call when no
+     * attempt is open. Exactly one of the finish paths or an abandonment path calls this per attempt.
+     *
+     * Every caller runs on the main thread (finish coroutines on viewModelScope, the start button,
+     * onCleared), so the saved-state key is removed synchronously - onCleared in particular runs
+     * after viewModelScope has been cancelled, where a launch would silently do nothing.
+     */
+    private fun flushAttemptStats(endTime: Timestamp? = null) {
+        val stats = attemptStats ?: return
+        attemptStats = null
+        eventReporter.addCaptureAttemptEvent(stats.build(endTime ?: timeHelper.now()))
+        savedStateHandle.remove<String>(KEY_ATTEMPT_STATS)
+    }
+
+    /**
+     * After process death the ViewModel is recreated with its SavedStateHandle but the camera
+     * session and the attempt are gone. Whatever was persisted is the record of an abandoned
+     * attempt; emit it, ending at the last frame we saw.
+     */
+    private fun flushAttemptPersistedBeforeProcessDeath() {
+        val snapshot = savedStateHandle.get<String>(KEY_ATTEMPT_STATS) ?: return
+        savedStateHandle.remove<String>(KEY_ATTEMPT_STATS)
+        val restored = AutoCaptureAttemptStats.restore(snapshot) ?: return
+        eventReporter.addCaptureAttemptEvent(restored.build(endTime = restored.lastFrameTime))
+    }
+
+    override fun onCleared() {
+        // Leaving the screen with an attempt still open - the user gave up before a valid frame,
+        // or backed out mid-imaging. This is the failure case the event exists to capture.
+        flushAttemptStats()
+        super.onCleared()
+    }
+
+    private fun ModalitySdkType.toAttemptBioSdk(): BioSdk? = when (this) {
+        ModalitySdkType.RANK_ONE -> BioSdk.RANK_ONE
+        ModalitySdkType.SIM_FACE -> BioSdk.SIM_FACE
+        ModalitySdkType.SECUGEN_SIM_MATCHER,
+        ModalitySdkType.NEC,
+        -> null
+    }
+
+    // endregion
+
     companion object {
+        internal const val KEY_ATTEMPT_STATS = "face_auto_capture_attempt_stats"
         private const val VALID_ROLL_DELTA = 15f
         private const val VALID_YAW_DELTA = 30f
     }

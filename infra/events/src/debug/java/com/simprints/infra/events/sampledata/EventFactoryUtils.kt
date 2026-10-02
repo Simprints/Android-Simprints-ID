@@ -50,6 +50,7 @@ import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirma
 import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirmationEvent.ExternalCredentialConfirmationResult
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSearchEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
+import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent
 import com.simprints.infra.events.event.domain.models.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.FaceCaptureConfirmationEvent
 import com.simprints.infra.events.event.domain.models.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.CONTINUE
@@ -326,6 +327,59 @@ fun createFaceCaptureEvent() = FaceCaptureEvent(
 fun createFaceFallbackCaptureEvent() = FaceFallbackCaptureEvent(
     CREATED_AT,
     ENDED_AT,
+)
+
+fun createFaceCaptureAttemptEvent() = FaceCaptureAttemptEvent(
+    startTime = CREATED_AT,
+    endTime = ENDED_AT,
+    attemptNb = 0,
+    bioSdk = FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.BioSdk.RANK_ONE,
+    targetFrameWidth = 556,
+    targetFrameHeight = 556,
+    totalFramesAnalysed = 47,
+    validFrameCount = 15,
+    timeToFirstValidMs = 950L,
+    rejectionStats = FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.RejectionStats(
+        tooFar = FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.RejectionMetric(
+            count = 12,
+            firstSeenMs = 0L,
+            longestRunMs = 400L,
+            minValue = 0.12f,
+            maxValue = 0.18f,
+            medianValue = 0.15f,
+        ),
+        offYaw = FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.RejectionMetric(
+            count = 20,
+            firstSeenMs = 400L,
+            longestRunMs = 550L,
+            minValue = -41.0f,
+            maxValue = 36.5f,
+            medianValue = -34.0f,
+        ),
+    ),
+    qualityAllFrames = FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.ValueStats(
+        minValue = 0.41f,
+        maxValue = 0.97f,
+        medianValue = 0.83f,
+    ),
+    statusRuns = listOf(
+        FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.StatusRun(
+            FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.RunStatus.TOO_FAR,
+            12,
+            400L,
+        ),
+        FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.StatusRun(
+            FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.RunStatus.OFF_YAW,
+            20,
+            550L,
+        ),
+        FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.StatusRun(
+            FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.RunStatus.VALID,
+            15,
+            1650L,
+        ),
+    ),
+    statusRunsTruncated = false,
 )
 
 fun createFaceOnboardingCompleteEvent() = FaceOnboardingCompleteEvent(

@@ -5,6 +5,7 @@ package com.simprints.infra.events.event.local.models
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload
+import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent
 import com.simprints.infra.events.sampledata.*
 import org.junit.Test
 
@@ -110,6 +111,15 @@ class DbEventTest {
         val transformed = original.fromDomainToDb().fromDbToDomain()
 
         assertThat(original).isEqualTo(transformed)
+    }
+
+    @Test
+    fun convert_FaceCaptureAttemptEvent() {
+        val original = createFaceCaptureAttemptEvent()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
+
+        assertThat(original).isEqualTo(transformed)
+        assertThat((transformed as FaceCaptureAttemptEvent).payload).isEqualTo(original.payload)
     }
 
     @Test
