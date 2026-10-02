@@ -114,6 +114,7 @@ sealed class Event {
                 ExternalCredentialConfirmationEvent.serializer()
             is ExternalCredentialSearchEvent -> ExternalCredentialSearchEvent.serializer()
             is ExternalCredentialSelectionEvent -> ExternalCredentialSelectionEvent.serializer()
+            is FaceCaptureAttemptEvent -> FaceCaptureAttemptEvent.serializer()
             is FaceCaptureBiometricsEvent -> FaceCaptureBiometricsEvent.serializer()
             is FaceCaptureConfirmationEvent -> FaceCaptureConfirmationEvent.serializer()
             is FaceCaptureEvent -> FaceCaptureEvent.serializer()

@@ -3,6 +3,8 @@ package com.simprints.face.capture.screens.livefeedback
 import android.graphics.Bitmap
 import android.graphics.Rect
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModelStore
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.permission.PermissionStatus
@@ -20,6 +22,7 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckConfiguration
 import com.simprints.infra.config.store.models.ModalitySdkType
+import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -81,6 +84,8 @@ internal class LiveFeedbackViewModelTest {
 
     private val testCaptureAttemptTracker = CaptureAttemptTracker()
 
+    private lateinit var savedStateHandle: SavedStateHandle
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
@@ -99,6 +104,7 @@ internal class LiveFeedbackViewModelTest {
 
         every { timeHelper.now() } returnsMany (0..1000L).map { Timestamp(it) }
         justRun { frame.recycle() }
+        savedStateHandle = SavedStateHandle()
 
         viewModel = LiveFeedbackViewModel(
             resolveFaceBioSdkUseCase,
@@ -109,6 +115,7 @@ internal class LiveFeedbackViewModelTest {
             getSpoofCheckConfiguration,
             testCaptureAttemptTracker,
             testCoroutineRule.testCoroutineDispatcher,
+            savedStateHandle,
         )
     }
 
@@ -734,12 +741,322 @@ internal class LiveFeedbackViewModelTest {
         viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
         viewModel.process(frame, frame) // pre-start fallback frame (held off)
         viewModel.startCapture()
-        viewModel.process(frame, frame) // begins imaging
+        viewModel.process(frame, frame)
         advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS + 1)
 
         // 1 stored sample + 1 fallback.
         coVerify(exactly = 2) { eventReporter.addCaptureEvents(any(), any(), any(), any(), any()) }
         coVerify(exactly = 1) { eventReporter.addFallbackCaptureEvent(any(), any()) }
+    }
+
+    @Test
+    fun `attempt event - auto capture emits one attempt event on finish with per-reason counts`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        every { faceDetector.analyze(frame) } returnsMany listOf(
+            getFace(Rect(0, 0, 30, 30)),
+            getFace(yaw = 45f),
+            getFace(),
+        )
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.startCapture()
+        repeat(3) { viewModel.process(frame, frame) }
+        advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS + 1)
+
+        val slot = slot<FaceCaptureAttemptEvent>()
+        verify(exactly = 1) { eventReporter.addCaptureAttemptEvent(capture(slot)) }
+        with(slot.captured.payload) {
+            assertThat(attemptNb).isEqualTo(0)
+            assertThat(bioSdk).isEqualTo("SIM_FACE")
+            assertThat(totalFramesAnalysed).isEqualTo(3)
+            assertThat(validFrameCount).isEqualTo(1)
+            assertThat(timeToFirstValidMs).isNotNull()
+            assertThat(rejectionStats.tooFar?.count).isEqualTo(1)
+            assertThat(rejectionStats.offYaw?.count).isEqualTo(1)
+            assertThat(rejectionStats.tooFar?.minValue).isWithin(0.001f).of(0.09f)
+            assertThat(rejectionStats.offYaw?.minValue).isEqualTo(45f)
+            assertThat(statusRuns.map { it.status })
+                .containsExactly(
+                    FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.RunStatus.TOO_FAR,
+                    FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.RunStatus.OFF_YAW,
+                    FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.RunStatus.VALID,
+                ).inOrder()
+            assertThat(qualityAllFrames).isNotNull()
+        }
+    }
+
+    @Test
+    fun `attempt event - frames analysed before the capture button are not part of the attempt`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        every { faceDetector.analyze(frame) } returns getFace()
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.RANK_ONE, 1)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+        advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS + 1)
+
+        val slot = slot<FaceCaptureAttemptEvent>()
+        verify(exactly = 1) { eventReporter.addCaptureAttemptEvent(capture(slot)) }
+        assertThat(slot.captured.payload.totalFramesAnalysed).isEqualTo(1)
+        assertThat(slot.captured.payload.bioSdk).isEqualTo("RANK_ONE")
+    }
+
+    @Test
+    fun `attempt event - manual capture emits no attempt event`() = runTest {
+        every { faceDetector.analyze(frame) } returns getFace()
+        val states = collectStates()
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+        advanceUntilIdle()
+
+        // process() emits CAPTURING after finishCapture(), so check collected phases
+        assertThat(states.map { it.phase }).contains(LiveFeedbackState.Phase.FINISHED)
+        coVerify(atLeast = 1) { eventReporter.addCaptureEvents(any(), any(), any(), any(), any()) }
+        verify(exactly = 0) { eventReporter.addCaptureAttemptEvent(any()) }
+    }
+
+    @Test
+    fun `attempt event - leaving the screen with an attempt that never reached a valid frame emits it as abandoned`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        every { faceDetector.analyze(frame) } returns getFace(Rect(0, 0, 30, 30))
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.startCapture()
+        repeat(4) { viewModel.process(frame, frame) }
+        advanceUntilIdle()
+        verify(exactly = 0) { eventReporter.addCaptureAttemptEvent(any()) }
+
+        ViewModelStore().apply {
+            put("vm", viewModel)
+            clear()
+        }
+
+        val slot = slot<FaceCaptureAttemptEvent>()
+        verify(exactly = 1) { eventReporter.addCaptureAttemptEvent(capture(slot)) }
+        with(slot.captured.payload) {
+            assertThat(totalFramesAnalysed).isEqualTo(4)
+            assertThat(validFrameCount).isEqualTo(0)
+            assertThat(timeToFirstValidMs).isNull()
+            assertThat(rejectionStats.tooFar?.count).isEqualTo(4)
+        }
+    }
+
+    @Test
+    fun `attempt event - starting a new attempt flushes an unfinished one as abandoned`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        every { faceDetector.analyze(frame) } returns getFace(Rect(0, 0, 30, 30))
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+        viewModel.holdOffAutoCapture()
+        viewModel.startCapture()
+
+        val slot = slot<FaceCaptureAttemptEvent>()
+        verify(exactly = 1) { eventReporter.addCaptureAttemptEvent(capture(slot)) }
+        assertThat(slot.captured.payload.attemptNb).isEqualTo(0)
+        assertThat(slot.captured.payload.totalFramesAnalysed).isEqualTo(1)
+    }
+
+    @Test
+    fun `attempt event - a frame whose analysis started before the capture button is not part of the attempt`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        var calls = 0
+        every { faceDetector.analyze(frame) } answers {
+            if (calls++ == 0) viewModel.startCapture()
+            getFace(Rect(0, 0, 30, 30))
+        }
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
+        ViewModelStore().apply {
+            put("vm", viewModel)
+            clear()
+        }
+
+        val slot = slot<FaceCaptureAttemptEvent>()
+        verify(exactly = 1) { eventReporter.addCaptureAttemptEvent(capture(slot)) }
+        assertThat(slot.captured.payload.totalFramesAnalysed).isEqualTo(1)
+    }
+
+    @Test
+    fun `attempt event - a frame in flight when a new attempt starts is attributed to neither attempt`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        var calls = 0
+        every { faceDetector.analyze(frame) } answers {
+            if (calls++ == 1) {
+                viewModel.holdOffAutoCapture()
+                viewModel.startCapture()
+            }
+            getFace(Rect(0, 0, 30, 30))
+        }
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
+
+        val slot = slot<FaceCaptureAttemptEvent>()
+        verify(exactly = 1) { eventReporter.addCaptureAttemptEvent(capture(slot)) }
+        assertThat(slot.captured.payload.attemptNb).isEqualTo(0)
+        assertThat(slot.captured.payload.totalFramesAnalysed).isEqualTo(1)
+
+        val persisted = AutoCaptureAttemptStats.restore(savedStateHandle[AutoCaptureAttemptRecorder.KEY_ATTEMPT_STATS]!!)!!
+        assertThat(persisted.attemptNb).isEqualTo(1)
+        assertThat(persisted.toEvent(Timestamp(0L)).payload.totalFramesAnalysed).isEqualTo(0)
+    }
+
+    @Test
+    fun `attempt event - starting an attempt persists it before any frame is analysed`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.startCapture()
+
+        val persisted = AutoCaptureAttemptStats.restore(savedStateHandle[AutoCaptureAttemptRecorder.KEY_ATTEMPT_STATS]!!)
+        assertThat(persisted?.attemptNb).isEqualTo(0)
+    }
+
+    @Test
+    fun `attempt event - ends when imaging ends, not after spoof validation`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns spoofConfig()
+        every { faceDetector.analyze(frame) } returns getFace()
+        coEvery { faceDetector.spoofCheck(any(), any()) } returns SpoofCheckResult(score = 0.1f)
+        every { timeHelper.now() } answers { Timestamp(testScheduler.currentTime) }
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+        advanceUntilIdle()
+
+        val slot = slot<FaceCaptureAttemptEvent>()
+        verify(exactly = 1) { eventReporter.addCaptureAttemptEvent(capture(slot)) }
+        with(slot.captured.payload) {
+            assertThat(endedAt).isEqualTo(Timestamp(AUTO_CAPTURE_IMAGING_DURATION_MS))
+            assertThat(statusRuns.sumOf { it.durationMs }).isEqualTo(AUTO_CAPTURE_IMAGING_DURATION_MS)
+        }
+    }
+
+    @Test
+    fun `attempt event - a valid frame whose analysis started before the capture button does not start imaging`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        var calls = 0
+        every { faceDetector.analyze(frame) } answers {
+            if (calls++ == 0) viewModel.startCapture()
+            getFace()
+        }
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.process(frame, frame)
+        assertThat(viewModel.state.value.phase).isEqualTo(LiveFeedbackState.Phase.NOT_STARTED)
+
+        viewModel.process(frame, frame)
+        assertThat(viewModel.state.value.phase).isEqualTo(LiveFeedbackState.Phase.CAPTURING)
+        advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS + 1)
+
+        val slot = slot<FaceCaptureAttemptEvent>()
+        verify(exactly = 1) { eventReporter.addCaptureAttemptEvent(capture(slot)) }
+        assertThat(slot.captured.payload.totalFramesAnalysed).isEqualTo(1)
+        assertThat(slot.captured.payload.validFrameCount).isEqualTo(1)
+    }
+
+    @Test
+    fun `attempt event - leaving the screen during validation keeps the imaging end time`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns spoofConfig()
+        every { faceDetector.analyze(frame) } returns getFace()
+        coEvery { faceDetector.spoofCheck(any(), any()) } returns SpoofCheckResult(score = 0.1f)
+        every { timeHelper.now() } answers { Timestamp(testScheduler.currentTime) }
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+        advanceTimeBy((AUTO_CAPTURE_IMAGING_DURATION_MS + 500).milliseconds)
+        assertThat(viewModel.state.value.phase).isEqualTo(LiveFeedbackState.Phase.VALIDATING)
+        ViewModelStore().apply {
+            put("vm", viewModel)
+            clear()
+        }
+
+        val slot = slot<FaceCaptureAttemptEvent>()
+        verify(exactly = 1) { eventReporter.addCaptureAttemptEvent(capture(slot)) }
+        assertThat(slot.captured.payload.endedAt).isEqualTo(Timestamp(AUTO_CAPTURE_IMAGING_DURATION_MS))
+    }
+
+    @Test
+    fun `attempt event - pausing before imaging ends the attempt at the pause`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        every { faceDetector.analyze(frame) } returns getFace(Rect(0, 0, 30, 30))
+        var nowMs = 0L
+        every { timeHelper.now() } answers { Timestamp(nowMs) }
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.startCapture()
+        nowMs = 100
+        viewModel.process(frame, frame)
+        nowMs = 200
+        viewModel.holdOffAutoCapture()
+
+        val slot = slot<FaceCaptureAttemptEvent>()
+        verify(exactly = 1) { eventReporter.addCaptureAttemptEvent(capture(slot)) }
+        assertThat(slot.captured.payload.endedAt).isEqualTo(Timestamp(200))
+        assertThat(
+            slot.captured.payload.rejectionStats.tooFar
+                ?.longestRunMs,
+        ).isEqualTo(100)
+        assertThat(savedStateHandle.contains(AutoCaptureAttemptRecorder.KEY_ATTEMPT_STATS)).isFalse()
+
+        nowMs = 5_000
+        viewModel.startCapture()
+        verify(exactly = 1) { eventReporter.addCaptureAttemptEvent(any()) }
+    }
+
+    @Test
+    fun `attempt event - an attempt persisted before process death is emitted when the view model is recreated`() = runTest {
+        val persisted = AutoCaptureAttemptStats(
+            attemptNb = 3,
+            bioSdk = "RANK_ONE",
+            startTime = Timestamp(10L),
+        )
+        val handle = SavedStateHandle(mapOf(AutoCaptureAttemptRecorder.KEY_ATTEMPT_STATS to persisted.snapshot()))
+
+        LiveFeedbackViewModel(
+            resolveFaceBioSdkUseCase,
+            configRepository,
+            eventReporter,
+            timeHelper,
+            isUsingAutoCapture,
+            getSpoofCheckConfiguration,
+            testCaptureAttemptTracker,
+            testCoroutineRule.testCoroutineDispatcher,
+            handle,
+        )
+
+        val slot = slot<FaceCaptureAttemptEvent>()
+        verify(exactly = 1) { eventReporter.addRecoveredCaptureAttemptEvent(capture(slot)) }
+        verify(exactly = 0) { eventReporter.addCaptureAttemptEvent(any()) }
+        assertThat(slot.captured.id).isEqualTo(persisted.toEvent(Timestamp(10L)).id)
+        assertThat(slot.captured.payload.attemptNb).isEqualTo(3)
+        assertThat(slot.captured.payload.createdAt).isEqualTo(Timestamp(10L))
+        assertThat(handle.contains(AutoCaptureAttemptRecorder.KEY_ATTEMPT_STATS)).isFalse()
     }
 
     private fun TestScope.collectStates(): List<LiveFeedbackState> {

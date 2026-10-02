@@ -63,6 +63,7 @@ import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENT
 import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_SEARCH
 import com.simprints.infra.events.event.domain.models.EventType.EXTERNAL_CREDENTIAL_SELECTION
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE
+import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_ATTEMPT
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_BIOMETRICS
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
 import com.simprints.infra.events.event.domain.models.EventType.FACE_FALLBACK_CAPTURE
@@ -88,6 +89,7 @@ import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureV
 import com.simprints.infra.events.event.domain.models.ExternalCredentialConfirmationEvent.ExternalCredentialConfirmationPayload
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSearchEvent.ExternalCredentialSearchPayload
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent.ExternalCredentialSelectionPayload
+import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent
 import com.simprints.infra.events.event.domain.models.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
 import com.simprints.infra.events.event.domain.models.FaceCaptureEvent
@@ -153,6 +155,7 @@ internal fun EventPayload.fromDomainToApi(): ApiEventPayload = when (this.type) 
     FACE_ONBOARDING_COMPLETE -> ApiFaceOnboardingCompletePayload(this as FaceOnboardingCompletePayload)
     FACE_FALLBACK_CAPTURE -> ApiFaceFallbackCapturePayload(this as FaceFallbackCapturePayload)
     FACE_CAPTURE -> ApiFaceCapturePayload(this as FaceCaptureEvent.FaceCapturePayload)
+    FACE_CAPTURE_ATTEMPT -> ApiFaceCaptureAttemptPayload(this as FaceCaptureAttemptEvent.FaceCaptureAttemptPayload)
     FACE_CAPTURE_CONFIRMATION -> ApiFaceCaptureConfirmationPayload(this as FaceCaptureConfirmationPayload)
     SCANNER_FIRMWARE_UPDATE -> ApiScannerFirmwareUpdatePayload(this as ScannerFirmwareUpdatePayload)
     CALLOUT_CONFIRMATION -> ApiCalloutPayloadV2(this as ConfirmationCalloutEventV2.ConfirmationCalloutPayload)
@@ -299,6 +302,10 @@ internal object ApiEventPayloadSerializer : KSerializer<ApiEventPayload> {
 
             is ApiExternalCredentialSelectionPayload -> {
                 encoder.encodeSerializableValue(ApiExternalCredentialSelectionPayload.serializer(), value)
+            }
+
+            is ApiFaceCaptureAttemptPayload -> {
+                encoder.encodeSerializableValue(ApiFaceCaptureAttemptPayload.serializer(), value)
             }
 
             is ApiFaceCaptureBiometricsPayload -> {
