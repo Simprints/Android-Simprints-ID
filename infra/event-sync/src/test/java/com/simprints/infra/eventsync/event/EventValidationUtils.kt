@@ -628,6 +628,62 @@ fun validateFaceFallbackCaptureEventApiModel(json: JSONObject) {
     }
 }
 
+fun validateFaceCaptureAttemptEventApiModel(json: JSONObject) {
+    validateCommonParams(json, "FaceCaptureAttempt", 1)
+    with(json.getJSONObject("payload")) {
+        validateTimestamp(getJSONObject("startTime"))
+        validateTimestamp(getJSONObject("endTime"))
+        assertThat(getInt("attemptNb")).isEqualTo(0)
+        assertThat(getString("bioSdk")).isIn(listOf("RANK_ONE", "SIM_FACE"))
+        assertThat(getInt("targetFrameWidth")).isEqualTo(556)
+        assertThat(getInt("targetFrameHeight")).isEqualTo(556)
+        assertThat(getInt("totalFramesAnalysed")).isEqualTo(47)
+        assertThat(getInt("validFrameCount")).isEqualTo(15)
+        assertThat(getLong("timeToFirstValidMs")).isEqualTo(950L)
+
+        with(getJSONObject("rejectionStats")) {
+            with(getJSONObject("tooFar")) {
+                assertThat(getInt("count")).isEqualTo(12)
+                assertThat(getLong("firstSeenMs")).isEqualTo(0L)
+                assertThat(getLong("longestRunMs")).isEqualTo(400L)
+                assertThat(getDouble("minValue")).isWithin(0.001).of(0.12)
+                assertThat(getDouble("maxValue")).isWithin(0.001).of(0.18)
+                assertThat(getDouble("medianValue")).isWithin(0.001).of(0.15)
+                assertThat(length()).isEqualTo(6)
+            }
+            assertThat(has("offYaw")).isTrue()
+            // Reasons that did not occur are absent, not null
+            assertThat(has("invalid")).isFalse()
+            assertThat(has("badQuality")).isFalse()
+            assertThat(length()).isEqualTo(2)
+        }
+
+        with(getJSONObject("qualityAllFrames")) {
+            assertThat(getDouble("minValue")).isWithin(0.001).of(0.41)
+            assertThat(getDouble("maxValue")).isWithin(0.001).of(0.97)
+            assertThat(getDouble("medianValue")).isWithin(0.001).of(0.83)
+            assertThat(length()).isEqualTo(3)
+        }
+
+        // Status runs are encoded as [status, frameCount, durationMs] tuples
+        with(getJSONArray("statusRuns")) {
+            assertThat(length()).isEqualTo(3)
+            with(getJSONArray(0)) {
+                assertThat(getString(0)).isEqualTo("tooFar")
+                assertThat(getInt(1)).isEqualTo(12)
+                assertThat(getLong(2)).isEqualTo(400L)
+            }
+            assertThat(getJSONArray(1).getString(0)).isEqualTo("offYaw")
+            assertThat(getJSONArray(2).getString(0)).isEqualTo("valid")
+        }
+
+        // Absent means false
+        assertThat(has("statusRunsTruncated")).isFalse()
+        // 13 payload fields minus the absent statusRunsTruncated
+        assertThat(length()).isEqualTo(12)
+    }
+}
+
 fun validateFaceCaptureEventApiModel(json: JSONObject) {
     validateCommonParams(json, "FaceCapture", 4)
     with(json.getJSONObject("payload")) {
