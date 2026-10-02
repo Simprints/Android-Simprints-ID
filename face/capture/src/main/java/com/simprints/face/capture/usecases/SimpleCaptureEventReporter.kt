@@ -8,6 +8,7 @@ import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.infra.basebiosdk.detection.SpoofCheckResult
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
+import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent
 import com.simprints.infra.events.event.domain.models.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.FaceCaptureConfirmationEvent
 import com.simprints.infra.events.event.domain.models.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result
@@ -48,6 +49,17 @@ internal class SimpleCaptureEventReporter @Inject constructor(
         endTime: Timestamp,
     ) = sessionCoroutineScope.launch {
         eventRepository.addOrUpdateEvent(FaceFallbackCaptureEvent(startTime, endTime))
+    }
+
+    fun addCaptureAttemptEvent(event: FaceCaptureAttemptEvent) = sessionCoroutineScope.launch {
+        eventRepository.addOrUpdateEvent(event)
+    }
+
+    // Saved state can predate the attempt's completion, so never overwrite an already saved attempt
+    fun addRecoveredCaptureAttemptEvent(event: FaceCaptureAttemptEvent) = sessionCoroutineScope.launch {
+        if (eventRepository.getEventsInCurrentSession().none { it.id == event.id }) {
+            eventRepository.addOrUpdateEvent(event)
+        }
     }
 
     suspend fun addCaptureEvents(

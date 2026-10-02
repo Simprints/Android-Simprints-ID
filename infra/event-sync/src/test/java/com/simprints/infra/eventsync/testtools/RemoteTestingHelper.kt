@@ -16,6 +16,7 @@ internal class RemoteTestingHelper {
             ApiEventPayloadType.IntentParsing, ApiEventPayloadType.CompletionCheck, ApiEventPayloadType.FaceOnboardingComplete,
             ApiEventPayloadType.FaceFallbackCapture, ApiEventPayloadType.FaceCapture, ApiEventPayloadType.FaceCaptureConfirmation,
             ApiEventPayloadType.FingerprintCaptureBiometrics, ApiEventPayloadType.FaceCaptureBiometrics,
+            ApiEventPayloadType.FaceCaptureAttempt,
             ApiEventPayloadType.EventDownSyncRequest, ApiEventPayloadType.EventUpSyncRequest, ApiEventPayloadType.LicenseCheck,
             ApiEventPayloadType.AgeGroupSelection, ApiEventPayloadType.BiometricReferenceCreation, ApiEventPayloadType.SampleUpSyncRequest,
             ApiEventPayloadType.EnrolmentUpdate, ApiEventPayloadType.ExternalCredentialSelection,

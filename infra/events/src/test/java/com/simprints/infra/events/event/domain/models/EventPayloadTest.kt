@@ -22,6 +22,7 @@ import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayloa
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerInfo
 import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
+import com.simprints.infra.events.sampledata.createFaceCaptureAttemptEvent
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.CREDENTIAL_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_BIOMETRIC_DATA_SOURCE
@@ -137,6 +138,7 @@ class EventPayloadTest {
             face = FaceCaptureEvent.FaceCapturePayload.Face(0F, 1F, 2F, FACE_TEMPLATE_FORMAT),
         ),
         FaceFallbackCaptureEvent(CREATED_AT, ENDED_AT),
+        createFaceCaptureAttemptEvent(),
         FaceOnboardingCompleteEvent(CREATED_AT, ENDED_AT),
         FingerprintCaptureBiometricsEvent(
             createdAt = CREATED_AT,
