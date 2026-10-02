@@ -17,6 +17,7 @@ import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.basebiosdk.detection.SpoofCheckResult
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckConfiguration
 import com.simprints.infra.config.store.models.ModalitySdkType
@@ -26,6 +27,7 @@ import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -194,6 +196,35 @@ internal class LiveFeedbackViewModelTest {
             assertThat(progress.visible).isTrue()
             assertThat(progress.tint).isEqualTo(Progress.Tint.VALID)
         }
+    }
+
+    @Test
+    fun `manual - face acceptance thresholds are read from experimental config`() = runTest {
+        coEvery { configRepository.getProjectConfiguration().custom } returns mapOf(
+            ExperimentalProjectConfiguration.FACE_CAPTURE_MAX_YAW_DEGREES to JsonPrimitive(10),
+            ExperimentalProjectConfiguration.FACE_CAPTURE_MAX_ROLL_DEGREES to JsonPrimitive(25),
+            ExperimentalProjectConfiguration.FACE_CAPTURE_MIN_AREA to JsonPrimitive(0.1f),
+            ExperimentalProjectConfiguration.FACE_CAPTURE_MAX_AREA to JsonPrimitive(0.4f),
+        )
+        every { faceDetector.analyze(frame) } returnsMany listOf(
+            getFace(yaw = 20f), // off yaw with config, valid with defaults
+            getFace(roll = 20f), // valid with config, off roll with defaults
+            getFace(Rect(0, 0, 35, 35)), // valid with config, too far with defaults
+            getFace(Rect(0, 0, 70, 70)), // too close with config, valid with defaults
+        )
+        val states = collectStates()
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2)
+        repeat(4) { viewModel.process(frame, frame) }
+
+        val feedbacks = states.map { it.feedback }
+        assertThat(feedbacks).containsExactly(
+            LiveFeedbackState.Feedback.NONE,
+            LiveFeedbackState.Feedback.LOOK_STRAIGHT,
+            LiveFeedbackState.Feedback.VALID,
+            LiveFeedbackState.Feedback.TOO_CLOSE,
+        )
     }
 
     @Test
