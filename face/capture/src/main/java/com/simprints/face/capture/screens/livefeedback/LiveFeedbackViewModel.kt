@@ -19,6 +19,10 @@ import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_CAPTURE_MAX_AREA_DEFAULT
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_CAPTURE_MAX_ROLL_DEGREES_DEFAULT
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_CAPTURE_MAX_YAW_DEGREES_DEFAULT
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_CAPTURE_MIN_AREA_DEFAULT
 import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckConfiguration
 import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckMode
 import com.simprints.infra.config.store.models.ModalitySdkType
@@ -57,10 +61,10 @@ internal class LiveFeedbackViewModel @Inject constructor(
     private var samplesToCapture: Int = 1
     private var qualityThreshold: Float = 0f
 
-    private val faceTarget = FaceTarget(
-        SymmetricTarget(VALID_YAW_DELTA),
-        SymmetricTarget(VALID_ROLL_DELTA),
-        0.20f..0.5f,
+    private var faceTarget = FaceTarget(
+        SymmetricTarget(FACE_CAPTURE_MAX_YAW_DEGREES_DEFAULT),
+        SymmetricTarget(FACE_CAPTURE_MAX_ROLL_DEGREES_DEFAULT),
+        FACE_CAPTURE_MIN_AREA_DEFAULT..FACE_CAPTURE_MAX_AREA_DEFAULT,
     )
     private val fallbackCaptureEventStartTime = timeHelper.now()
     private var shouldSendFallbackCaptureEvent: AtomicBoolean = AtomicBoolean(true)
@@ -163,7 +167,13 @@ internal class LiveFeedbackViewModel @Inject constructor(
             val config = configRepository.getProjectConfiguration()
             spoofCheckConfig = getSpoofCheckConfiguration(config, bioSdk)
             qualityThreshold = config.face?.getSdkConfiguration(bioSdk)?.qualityThreshold ?: 0f
-            autoCaptureImagingDurationMillis = config.experimental().faceAutoCaptureImagingDurationMillis
+            val experimentalConfig = config.experimental()
+            autoCaptureImagingDurationMillis = experimentalConfig.faceAutoCaptureImagingDurationMillis
+            faceTarget = FaceTarget(
+                SymmetricTarget(experimentalConfig.faceCaptureMaxYawDegrees),
+                SymmetricTarget(experimentalConfig.faceCaptureMaxRollDegrees),
+                experimentalConfig.faceCaptureAcceptedAreaRange,
+            )
         }
     }
 
@@ -522,11 +532,6 @@ internal class LiveFeedbackViewModel @Inject constructor(
     ) {
         if (faceDetection == null) return
         eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold, spoofCheckConfig, isAutoCapture = isAutoCapture)
-    }
-
-    companion object {
-        private const val VALID_ROLL_DELTA = 15f
-        private const val VALID_YAW_DELTA = 30f
     }
 
     enum class PermissionAction {
