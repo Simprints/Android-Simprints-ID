@@ -22,6 +22,7 @@ import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_BACKEND_M
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_UNEXPECTEDLY
 import com.simprints.infra.eventsync.sync.down.tasks.SimprintsEventDownSyncTask
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.INPUT_EVENT_DOWN_SYNC_SCOPE_ID
@@ -38,6 +39,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -249,11 +251,35 @@ internal class SimprintsEventDownSyncDownloaderWorkerTest {
     }
 
     @Test
-    fun worker_failForNetworkIssue_shouldSucceedWithoutFailureFlags() = runTest {
+    fun worker_failForUncategorisedIssue_shouldFlagUnexpectedFailure() = runTest {
+        // Nothing downloaded, so the run must not be indistinguishable from a clean one - the end
+        // reporter reads these flags to decide what outcome to store.
         coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
             downSyncTask.downSync(any(), any(), any(), any())
         } throws Throwable("Network Exception")
+
+        val result = eventDownSyncDownloaderWorker.doWork()
+
+        assertThat(result).isEqualTo(
+            ListenableWorker.Result.success(
+                workDataOf(
+                    OUTPUT_DOWN_SYNC to 0,
+                    OUTPUT_DOWN_MAX_SYNC to 0,
+                    OUTPUT_FAILED_UNEXPECTEDLY to true,
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun worker_cancelled_shouldSucceedWithoutFailureFlag() = runTest {
+        // Flagging cancellation would make the end reporter store an UNKNOWN failed attempt for a
+        // sync that was simply stopped, and throwing would break the chain before it ever runs.
+        coEvery { eventRepository.getEventScope(any()) } returns eventScope
+        coEvery {
+            downSyncTask.downSync(any(), any(), any(), any())
+        } throws CancellationException("Cancelled")
 
         val result = eventDownSyncDownloaderWorker.doWork()
 

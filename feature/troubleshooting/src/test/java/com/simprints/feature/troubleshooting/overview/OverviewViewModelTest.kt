@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.feature.troubleshooting.overview.usecase.CollectConfigurationDetailsUseCase
+import com.simprints.feature.troubleshooting.overview.usecase.CollectDeviceDataStateUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.CollectIdsUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.CollectLicenceStatesUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.CollectNetworkInformationUseCase
@@ -39,6 +40,9 @@ class OverviewViewModelTest {
     private lateinit var collectConfigurationDetails: CollectConfigurationDetailsUseCase
 
     @MockK
+    private lateinit var collectDeviceDataState: CollectDeviceDataStateUseCase
+
+    @MockK
     private lateinit var collectLicencesUseCase: CollectLicenceStatesUseCase
 
     @MockK
@@ -62,6 +66,7 @@ class OverviewViewModelTest {
         viewModel = OverviewViewModel(
             collectIds = collectIdsUseCase,
             collectConfigurationDetails = collectConfigurationDetails,
+            collectDeviceDataState = collectDeviceDataState,
             collectLicenseStates = collectLicencesUseCase,
             collectNetworkInformation = collectNetworkInformationUseCase,
             doServerPing = pingServerUseCase,
@@ -74,11 +79,13 @@ class OverviewViewModelTest {
     fun `sets when data collected`() = runTest {
         every { collectIdsUseCase() } returns "ids"
         coEvery { collectConfigurationDetails() } returns "details"
+        coEvery { collectDeviceDataState() } returns "device data"
         coEvery { collectLicencesUseCase() } returns "licences"
         every { collectNetworkInformationUseCase() } returns "network"
 
         val idsText = viewModel.projectIds.test()
         val configText = viewModel.configurationDetails.test()
+        val deviceDataText = viewModel.deviceDataState.test()
         val licenceText = viewModel.licenseStates.test()
         val networkText = viewModel.networkStates.test()
         val pingResult = viewModel.pingResult.test()
@@ -87,6 +94,7 @@ class OverviewViewModelTest {
 
         assertThat(idsText.value()).isNotEmpty()
         assertThat(configText.value()).isNotEmpty()
+        assertThat(deviceDataText.value()).isNotEmpty()
         assertThat(licenceText.value()).isNotEmpty()
         assertThat(networkText.value()).isNotEmpty()
         assertThat(pingResult.value()).isInstanceOf(PingResult.NotDone::class.java)

@@ -12,6 +12,7 @@ import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLME
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.event.local.models.DbEvent
 import com.simprints.infra.events.event.local.models.DbEventScope
+import com.simprints.infra.events.event.local.models.DbScopeTypeCount
 import com.simprints.infra.events.event.local.models.fromDbToDomain
 import com.simprints.infra.events.event.local.models.fromDomainToDb
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
@@ -23,6 +24,7 @@ import io.mockk.*
 import io.mockk.impl.annotations.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -457,6 +459,42 @@ internal class EventLocalDataSourceTest {
         }
     }
 
+    @Test
+    fun `observeClosedEventScopeCounts zero-fills every scope type`() = runTest {
+        every { scopeDao.observeClosedCountsByType() } returns flowOf(
+            listOf(DbScopeTypeCount(EventScopeType.SESSION, 3)),
+        )
+
+        val counts = eventLocalDataSource.observeClosedEventScopeCounts().first()
+
+        assertThat(counts).containsExactlyEntriesIn(
+            EventScopeType.entries.associateWith { if (it == EventScopeType.SESSION) 3 else 0 },
+        )
+    }
+
+    @Test
+    fun `observeClosedEventScopeCounts zero-fills when there are no rows at all`() = runTest {
+        every { scopeDao.observeClosedCountsByType() } returns flowOf(emptyList())
+
+        val counts = eventLocalDataSource.observeClosedEventScopeCounts().first()
+
+        assertThat(counts.keys).containsExactlyElementsIn(EventScopeType.entries)
+        assertThat(counts.values.toSet()).containsExactly(0)
+    }
+
+    @Test
+    fun `observeClosedEventScopeCounts recovers from database corruption`() = runTest {
+        every { scopeDao.observeClosedCountsByType() }
+            .throws(SQLiteDatabaseCorruptException())
+            .andThen(flowOf(listOf(DbScopeTypeCount(EventScopeType.SESSION, 1))))
+
+        val counts = eventLocalDataSource.observeClosedEventScopeCounts().toList()
+
+        verify { eventDatabaseFactory.recreateDatabase() }
+        verify(exactly = 2) { scopeDao.observeClosedCountsByType() }
+        assertThat(counts.single()[EventScopeType.SESSION]).isEqualTo(1)
+    }
+
     private fun mockDaoLoadToMakeNothing() {
         db = mockk(relaxed = true)
         eventDao = mockk(relaxed = true)
@@ -467,6 +505,7 @@ internal class EventLocalDataSourceTest {
         coEvery { scopeDao.loadOpen(any()) } returns emptyList()
         coEvery { scopeDao.loadClosed(any(), any()) } returns emptyList()
         coEvery { scopeDao.count(any()) } returns 0
+        every { scopeDao.observeClosedCountsByType() } returns flowOf(emptyList())
         every { db.eventDao } returns eventDao
         every { db.scopeDao } returns scopeDao
         every { eventDatabaseFactory.get() } returns db

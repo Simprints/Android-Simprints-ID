@@ -184,7 +184,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
     override suspend fun deleteEventSyncInfo() {
         deleteSyncInfo()
         workManager.pruneWork()
-        imageSyncTimestampProvider.clearTimestamp()
+        imageSyncTimestampProvider.clearLastSyncOutcome()
     }
 
     override fun cleanupWorkers() {

@@ -3,13 +3,14 @@ package com.simprints.feature.logincheck.usecases
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.scope.Device
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.session.SessionEventRepository
+import com.simprints.infra.sync.devicestate.DeviceStateDataTracker
+import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -23,7 +24,7 @@ internal class UpdateSessionScopePayloadUseCaseTest {
     lateinit var eventRepository: SessionEventRepository
 
     @MockK
-    lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
+    lateinit var deviceStateDataTracker: DeviceStateDataTracker
 
     @MockK
     lateinit var configRepository: ConfigRepository
@@ -36,14 +37,14 @@ internal class UpdateSessionScopePayloadUseCaseTest {
 
         useCase = UpdateSessionScopePayloadUseCase(
             eventRepository,
-            enrolmentRecordRepository,
+            deviceStateDataTracker,
             configRepository,
         )
     }
 
     @Test
     fun `Updates current scope with data from enrolments`() = runTest {
-        coEvery { enrolmentRecordRepository.count() } returns 42
+        coEvery { deviceStateDataTracker.getRecordCount() } returns 42
         coEvery { configRepository.getProjectConfiguration().updatedAt } returns "configUpdatedAt"
 
         coEvery { eventRepository.getCurrentSessionScope() } returns createBlankSessionScope()
@@ -58,6 +59,17 @@ internal class UpdateSessionScopePayloadUseCaseTest {
                 },
             )
         }
+    }
+
+    @Test
+    fun `Propagates a record count failure rather than writing a wrong count`() = runTest {
+        coEvery { deviceStateDataTracker.getRecordCount() } throws RuntimeException()
+        coEvery { configRepository.getProjectConfiguration().updatedAt } returns "configUpdatedAt"
+        coEvery { eventRepository.getCurrentSessionScope() } returns createBlankSessionScope()
+
+        assertThrows<RuntimeException> { useCase() }
+
+        coVerify(exactly = 0) { eventRepository.saveSessionScope(any()) }
     }
 
     private fun createBlankSessionScope() = EventScope(

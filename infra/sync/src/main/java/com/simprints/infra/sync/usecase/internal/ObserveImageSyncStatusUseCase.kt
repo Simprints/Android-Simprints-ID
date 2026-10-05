@@ -20,7 +20,7 @@ internal class ObserveImageSyncStatusUseCase @Inject constructor(
         .getWorkInfosFlow(WorkQuery.fromUniqueWorkNames(SyncConstants.FILE_UP_SYNC_WORK_NAME))
         .associateWithIfSyncing()
         .map { (workInfos, isSyncing) ->
-            val lastUpdateTimestamp = imageSyncTimestampProvider.getLastImageSyncTimestamp()
+            val lastUpdateTimestamp = imageSyncTimestampProvider.getLastSuccessfulSyncTimestamp()
             val currentIndex = workInfos
                 .firstOrNull()
                 ?.progress
