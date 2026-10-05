@@ -173,6 +173,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         viewModel.finishOcrEvent.observe(
             viewLifecycleOwner,
             LiveDataEventWithContentObserver { scannedCredential ->
+                mainViewModel.addCaptureAttempt(scannedCredential)
                 scheduleFinish(scannedCredential)
             },
         )

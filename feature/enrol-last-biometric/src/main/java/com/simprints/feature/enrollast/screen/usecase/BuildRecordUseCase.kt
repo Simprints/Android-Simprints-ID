@@ -23,8 +23,13 @@ internal class BuildRecordUseCase @Inject constructor(
         isAddingCredential: Boolean,
     ): EnrolmentRecord {
         val subjectId = UUID.randomUUID().toString()
-        val externalCredentials = if (isAddingCredential && params.credentialSearchResult != null) {
-            credentialMapper.mapExternalCredential(params.credentialSearchResult, subjectId).let(::listOf)
+        val credentialSearchResult = params.credentialSearchResult
+        val externalCredentials = if (isAddingCredential && credentialSearchResult != null) {
+            credentialMapper.mapExternalCredential(
+                scannedCredentialResult = credentialSearchResult.scannedCredentialResult,
+                subjectId = subjectId,
+                credentialValue = credentialSearchResult.confirmedCredential,
+            ).let(::listOf)
         } else {
             emptyList()
         }

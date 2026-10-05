@@ -3,6 +3,7 @@ package com.simprints.feature.externalcredential
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
@@ -33,13 +34,7 @@ internal class ExternalCredentialMapperTest {
     lateinit var project: Project
 
     @MockK
-    lateinit var searchResult: ExternalCredentialSearchResult.Complete
-
-    @MockK
     lateinit var scannedCredentialResult: ScannedCredentialResult
-
-    @MockK
-    lateinit var confirmedCredential: TokenizableString.Raw
 
     @MockK
     lateinit var encryptedCredential: TokenizableString.Tokenized
@@ -51,11 +46,10 @@ internal class ExternalCredentialMapperTest {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
         coEvery { configRepository.getProject() } returns project
-        every { searchResult.scannedCredentialResult } returns scannedCredentialResult
-        every { searchResult.confirmedCredential } returns confirmedCredential
         every { scannedCredentialResult.credentialScanId } returns SCAN_ID
         every { scannedCredentialResult.credentialType } returns ExternalCredentialType.NHISCard
-        every { tokenizationProcessor.encrypt(confirmedCredential, TokenKeyType.ExternalCredential, project) } returns encryptedCredential
+        every { scannedCredentialResult.credential } returns SCANNED_VALUE
+        every { tokenizationProcessor.encrypt(any(), TokenKeyType.ExternalCredential, project) } returns encryptedCredential
 
         mapper = ExternalCredentialMapper(tokenizationProcessor, configRepository)
     }
@@ -67,7 +61,7 @@ internal class ExternalCredentialMapperTest {
     }
 
     @Test
-    fun `maps encrypted confirmed credential to external credential value`() = runTest {
+    fun `maps encrypted credential to external credential value`() = runTest {
         val result = mapCredential()
         assertThat(result.value).isEqualTo(encryptedCredential)
     }
@@ -86,11 +80,38 @@ internal class ExternalCredentialMapperTest {
     }
 
     @Test
-    fun `encrypts confirmed credential using external credential key type`() = runTest {
-        mapCredential()
+    fun `defaults to the raw scanned value when no credential value is provided`() = runTest {
+        mapper.mapExternalCredential(scannedCredentialResult = scannedCredentialResult, subjectId = SUBJECT_ID)
+
         coVerify {
             tokenizationProcessor.encrypt(
-                decrypted = confirmedCredential,
+                decrypted = SCANNED_VALUE,
+                tokenKeyType = TokenKeyType.ExternalCredential,
+                project = project,
+            )
+        }
+    }
+
+    @Test
+    fun `encrypts the explicitly provided credential value instead of the scanned one`() = runTest {
+        val confirmedValue = "confirmed".asTokenizableRaw()
+
+        mapper.mapExternalCredential(
+            scannedCredentialResult = scannedCredentialResult,
+            subjectId = SUBJECT_ID,
+            credentialValue = confirmedValue,
+        )
+
+        coVerify {
+            tokenizationProcessor.encrypt(
+                decrypted = confirmedValue,
+                tokenKeyType = TokenKeyType.ExternalCredential,
+                project = project,
+            )
+        }
+        coVerify(exactly = 0) {
+            tokenizationProcessor.encrypt(
+                decrypted = SCANNED_VALUE,
                 tokenKeyType = TokenKeyType.ExternalCredential,
                 project = project,
             )
@@ -104,10 +125,11 @@ internal class ExternalCredentialMapperTest {
     }
 
     private suspend fun mapCredential(subjectId: String = SUBJECT_ID) =
-        mapper.mapExternalCredential(searchResult = searchResult, subjectId = subjectId)
+        mapper.mapExternalCredential(scannedCredentialResult = scannedCredentialResult, subjectId = subjectId)
 
     companion object {
         private const val SCAN_ID = "SCAN_ID"
         private const val SUBJECT_ID = "SUBJECT_ID"
+        private val SCANNED_VALUE = "scanned".asTokenizableRaw()
     }
 }

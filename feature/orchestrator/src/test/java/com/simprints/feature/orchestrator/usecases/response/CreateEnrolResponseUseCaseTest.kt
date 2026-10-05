@@ -108,7 +108,13 @@ internal class CreateEnrolResponseUseCaseTest {
             subjectId = enrolmentSubjectId,
             type = externalCredentialType,
         )
-        coEvery { credentialMapper.mapExternalCredential(credentialSearchResult, enrolmentSubjectId) } returns mappedCredential
+        coEvery {
+            credentialMapper.mapExternalCredential(
+                scannedCredentialResult = credentialSearchResult.scannedCredentialResult,
+                subjectId = enrolmentSubjectId,
+                credentialValue = credentialSearchResult.confirmedCredential,
+            )
+        } returns mappedCredential
 
         every {
             enrolmentRecordFactory.buildFromCaptureResults(

@@ -27,7 +27,13 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
         enrolmentSubjectId: String,
     ): AppResponse {
         val credentialSearchResult = results.filterIsInstance<ExternalCredentialSearchResult.Complete>().lastOrNull()
-        val externalCredential = credentialSearchResult?.let { credentialMapper.mapExternalCredential(it, enrolmentSubjectId) }
+        val externalCredential = credentialSearchResult?.let {
+            credentialMapper.mapExternalCredential(
+                scannedCredentialResult = it.scannedCredentialResult,
+                subjectId = enrolmentSubjectId,
+                credentialValue = it.confirmedCredential,
+            )
+        }
 
         return try {
             val record = enrolmentRecordFactory.buildFromCaptureResults(

@@ -6,12 +6,15 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
+import com.simprints.feature.externalcredential.usecase.ExternalCredentialCaptureAttempt
 import com.simprints.feature.externalcredential.usecase.ExternalCredentialEventTrackerUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.experimental
@@ -55,6 +58,7 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
     var selectedSkipReason: ExternalCredentialSelectionEvent.SkipReason? = null
         private set
     private var selectedSkipOtherText: String? = null
+    private val captureAttempts = mutableListOf<ExternalCredentialCaptureAttempt>()
 
     init {
         savedStateHandle.get<Timestamp>(KEY_SELECTION_START_TIME)?.let { selectionStartTime = it }
@@ -128,18 +132,23 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
         }
     }
 
+    fun addCaptureAttempt(scannedCredentialResult: ScannedCredentialResult) {
+        viewModelScope.launch {
+            captureAttempts += eventsTracker.buildCaptureAttempt(
+                scannedCredentialResult = scannedCredentialResult,
+                subjectId = params.subjectId.orEmpty(),
+                startTime = captureStartTime,
+                selectionEventId = selectionEventId,
+            )
+        }
+    }
+
     fun finish(result: ExternalCredentialSearchResult) {
         viewModelScope.launch {
             when (result) {
-                is ExternalCredentialSearchResult.Complete -> {
-                    eventsTracker.saveCaptureEvents(
-                        credentialSearchResult = result,
-                        subjectId = params.subjectId.orEmpty(),
-                        startTime = captureStartTime,
-                        selectionEventId = selectionEventId,
-                    )
-                }
+                is ExternalCredentialSearchResult.Complete -> persistCaptureAttempts(result.confirmedCredential)
                 is ExternalCredentialSearchResult.Skipped -> {
+                    persistCaptureAttempts(confirmedCredential = null)
                     eventsTracker.saveSkippedEvent(
                         startTime = selectionStartTime,
                         skipReason = result.skipReason,
@@ -148,6 +157,22 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
                 }
             }
             _finishEvent.send(result)
+        }
+    }
+
+    // All attempts except the last one were discarded via Recapture and never went through a confirm step, so they are
+    // persisted unmodified. The last attempt is the one the user confirmed, so its OCR-accuracy/length metrics are
+    // recalculated against the confirmed value only if it differs from what was originally scanned. When the flow was
+    // skipped instead of confirmed, there is no confirmed value at all, so every accumulated attempt is persisted
+    // unmodified - nothing is lost just because the user backed out instead of confirming.
+    private suspend fun persistCaptureAttempts(confirmedCredential: TokenizableString.Raw?) {
+        captureAttempts.forEachIndexed { index, attempt ->
+            val isLastAttempt = index == captureAttempts.lastIndex
+            if (confirmedCredential != null && isLastAttempt && eventsTracker.hasConfirmedValueChanged(attempt, confirmedCredential)) {
+                eventsTracker.persistCaptureAttemptWithConfirmedValue(attempt, confirmedCredential)
+            } else {
+                eventsTracker.persistCaptureAttempt(attempt)
+            }
         }
     }
 
