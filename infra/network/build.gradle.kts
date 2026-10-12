@@ -23,9 +23,7 @@ dependencies {
     implementation(project(":infra:logging-persistent"))
     implementation(project(":infra:security"))
 
-    debugImplementation(libs.chuck.debug) {
-        exclude("androidx.lifecycle", "lifecycle-viewmodel-ktx")
-    }
+    debugImplementation(libs.chuck.debug)
     implementation(libs.chuck.release)
 
     runtimeOnly(libs.kotlin.coroutinesAndroid)
