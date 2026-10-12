@@ -9,11 +9,9 @@ internal fun Project.configureKotlinCompiler() {
     tasks.withType(KotlinCompile::class.java).configureEach {
         compilerOptions {
             freeCompilerArgs.addAll(
-                "-Xnew-inference",
                 "-opt-in=kotlin.RequiresOptIn",
                 "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
                 "-opt-in=kotlinx.coroutines.FlowPreview",
-                "-opt-in=kotlin.Experimental",
             )
         }
     }
