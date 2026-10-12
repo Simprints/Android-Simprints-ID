@@ -27,7 +27,6 @@ dependencies {
     implementation(project(":fingerprint:infra:bio-sdk"))
 
     // Kotlin
-    runtimeOnly(libs.kotlin.reflect)
     runtimeOnly(libs.kotlin.serialization)
 
     // Android X
