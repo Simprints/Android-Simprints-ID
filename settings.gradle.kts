@@ -2,7 +2,6 @@ pluginManagement {
     includeBuild("build-logic")
 
     repositories {
-        maven(url = "https://repo1.maven.org/maven2/")
         google()
         mavenCentral()
         gradlePluginPortal()
@@ -21,8 +20,6 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
-        maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
-        maven(url = "https://s3.amazonaws.com/repo.commonsware.com")
 
         maven {
             name = "SimMatcherGitHubPackages"
@@ -37,26 +34,6 @@ dependencyResolutionManagement {
         maven {
             name = "RocWrapperGitHubPackages"
             url = uri("https://maven.pkg.github.com/simprints/lib-roc-wrapper")
-            credentials {
-                username =
-                    properties.getProperty("GITHUB_USERNAME", System.getenv("GITHUB_USERNAME"))
-                password = properties.getProperty("GITHUB_TOKEN", System.getenv("GITHUB_TOKEN"))
-            }
-        }
-
-        maven {
-            name = "NECWrapperGitHubPackages"
-            url = uri("https://maven.pkg.github.com/simprints/NEC-wrapper")
-            credentials {
-                username =
-                    properties.getProperty("GITHUB_USERNAME", System.getenv("GITHUB_USERNAME"))
-                password = properties.getProperty("GITHUB_TOKEN", System.getenv("GITHUB_TOKEN"))
-            }
-        }
-
-        maven {
-            name = "SecugenWrapperGitHubPackages"
-            url = uri("https://maven.pkg.github.com/simprints/secugen-wrapper")
             credentials {
                 username =
                     properties.getProperty("GITHUB_USERNAME", System.getenv("GITHUB_USERNAME"))
