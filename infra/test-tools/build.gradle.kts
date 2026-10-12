@@ -11,7 +11,6 @@ dependencies {
     api(project(":infra:core"))
 
     api(libs.testing.androidX.core)
-    api(libs.androidX.multidex)
     api(libs.androidX.appcompat)
     api(libs.testing.fragment)
     api(libs.testing.androidX.ext.junit)

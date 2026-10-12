@@ -17,7 +17,6 @@ import com.simprints.infra.events.event.local.models.fromDomainToDb
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.testtools.common.syntax.assertThrows
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.*
 import io.mockk.impl.annotations.*
@@ -35,7 +34,7 @@ import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = HiltTestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
+@Config(application = HiltTestApplication::class)
 internal class EventLocalDataSourceTest {
     private lateinit var db: EventRoomDatabase
     private lateinit var eventDao: EventRoomDao

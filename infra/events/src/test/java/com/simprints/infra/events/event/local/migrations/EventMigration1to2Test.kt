@@ -11,7 +11,6 @@ import com.simprints.core.tools.extensions.getStringWithColumnName
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.events.event.local.EventRoomDatabase
 import com.simprints.infra.events.event.local.migrations.MigrationTestingTools.retrieveCursorWithEventById
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import dagger.hilt.android.testing.HiltTestApplication
 import org.json.JSONObject
 import org.junit.Rule
@@ -21,7 +20,7 @@ import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = HiltTestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
+@Config(application = HiltTestApplication::class)
 class EventMigration1to2Test {
     @get:Rule
     val helper = MigrationTestHelper(
