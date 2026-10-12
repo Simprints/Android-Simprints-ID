@@ -64,7 +64,6 @@ libsimprints_version = "2026.1.0"
 simmatcher_version = "1.3.0"
 roc_wrapper_version = "1.23.0"
 roc_wrapper-v3_version = "3.1.0"
-secugen_version = "1.1.0"
 simface = "2026.2.0"
 
 junit_version = "4.13.2"
@@ -76,7 +75,6 @@ turbine_version = "1.2.1"
 robolectric_version = "4.17"
 espresso_version = "3.7.0"
 espresso_accessibility_version = "4.1.1"
-barista_version = "4.3.0"
 uiAutomator_version = "2.4.0"
 jacoco_version = "0.8.15"
 
@@ -98,7 +96,6 @@ kotlin-serialization = {module="org.jetbrains.kotlinx:kotlinx-serialization-json
 androidX-core = { module = "androidx.core:core-ktx", version.ref = "androidx_core_version" }
 androidX-multidex = { module = "androidx.multidex:multidex", version.ref = "androidx_dex_version" }
 androidX-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx_app_compat_version" }
-androidX-appcompat-resource = { module = "androidx.appcompat:appcompat-resources", version.ref = "androidx_app_compat_version" }
 androidX-Room-core = { module = "androidx.room:room-runtime", version.ref = "androidx_room_version" }
 androidX-Room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidx_room_version" }
 androidX-Room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx_room_version" }
@@ -126,7 +123,6 @@ androidX-cameraX-view = { module = "androidx.camera:camera-view", version.ref = 
 
 #Navigation
 androidX-navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidx_navigation_version" }
-androidX-navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidx_navigation_version" }
 
 #Annotation
 androidX-annotation-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx_annotation_version" }
@@ -199,8 +195,6 @@ simmatcher = { module = "com.simprints:libsimmatcher", version.ref = "simmatcher
 roc-v1 = { module = "com.simprints:rocwrapper", version.ref = "roc_wrapper_version" }
 # roc v3 sdk hosted in https://github.com/Simprints/lib-roc-wrapper-v3
 roc-v3 = { module = "com.simprints:roc-v3", version.ref = "roc_wrapper-v3_version" }
-# secugen sdk hosted in https://github.com/Simprints/secugen-wrapper
-secugen = { module = "com.simprints:secugenwrapper", version.ref = "secugen_version" }
 simface = { module = "com.simprints.biometrics:simface", version.ref = "simface" }
 
 #hilt
@@ -224,7 +218,6 @@ tink-core = { module = "com.google.crypto.tink:tink-android", version.ref = "tin
 testing-junit = { module = "junit:junit", version.ref = "junit_version" }
 testing-truth = { module = "com.google.truth:truth", version.ref = "truth_version" }
 testing-work = { module = "androidx.work:work-testing", version.ref = "androidx_work_version" }
-testing-retrofit = { module = "com.squareup.retrofit2:retrofit-mock", version.ref = "retrofit_version" }
 testing-mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okttp_version" }
 testing-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin_coroutine_version" }
 testing-live-data = { module = "com.jraska.livedata:testing-ktx", version.ref = "livedata_testing_version" }
@@ -233,7 +226,6 @@ testing-fragment = { module = "androidx.fragment:fragment-testing", version.ref 
 testing-navigation = { module = "androidx.navigation:navigation-testing", version.ref = "androidx_navigation_version" }
 #Testing-Robolectric
 testing-Robolectric-core = { module = "org.robolectric:robolectric", version.ref = "robolectric_version" }
-testing-Robolectric-annotation = { module = "org.robolectric:annotations", version.ref = "robolectric_version" }
 #Testing-Mockk
 testing-Mockk-core = { module = "io.mockk:mockk", version.ref = "mockk_version" }
 testing-Mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk_version" }
@@ -242,7 +234,6 @@ testing-Espresso-core = { module = "androidx.test.espresso:espresso-core", versi
 testing-Espresso-contrib = { module = "androidx.test.espresso:espresso-contrib", version.ref = "espresso_version" }
 testing-Espresso-accessibility = { module = "com.google.android.apps.common.testing.accessibility.framework:accessibility-test-framework", version.ref = "espresso_accessibility_version" }
 testing-Espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espresso_version" }
-testing-Espresso-barista = { module = "com.adevinta.android:barista", version.ref = "barista_version" } #Used to grant permissions in AndroidTests
 #Testing-AndroidX
 testing-AndroidX-ext-junit = { module = "androidx.test.ext:junit", version.ref = "junit_ext_version" }
 testing-AndroidX-core = { module = "androidx.arch.core:core-testing", version.ref = "androidx_arch_core_version" }
