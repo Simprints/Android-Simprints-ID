@@ -20,6 +20,13 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        // Sonatype Central Portal snapshots, used to test unreleased LibSimprints builds in SID
+        maven {
+            name = "CentralPortalSnapshots"
+            url = uri("https://central.sonatype.com/repository/maven-snapshots/")
+            mavenContent { snapshotsOnly() }
+            content { includeModule("com.simprints", "libsimprints") }
+        }
 
         maven {
             name = "SimMatcherGitHubPackages"
