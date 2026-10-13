@@ -30,6 +30,8 @@ internal data class SearchCredentialState(
             val isOcrReadout = when (scannedCredentialResult.credentialType) {
                 ExternalCredentialType.NHISCard, ExternalCredentialType.GhanaIdCard, ExternalCredentialType.FaydaCard -> true
                 ExternalCredentialType.QRCode -> false
+                // Document number is read from the chip over secure messaging, so there is nothing to confirm or correct
+                ExternalCredentialType.IcaoDocument -> false
             }
             return SearchCredentialState(
                 scannedCredentialResult = scannedCredentialResult,

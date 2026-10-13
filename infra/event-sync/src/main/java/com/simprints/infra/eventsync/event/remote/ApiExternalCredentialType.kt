@@ -18,6 +18,7 @@ enum class ApiExternalCredentialType {
         GHANA_CARD -> ExternalCredentialType.GhanaIdCard
         QR_CODE -> ExternalCredentialType.QRCode
         FAYDA_CARD -> ExternalCredentialType.FaydaCard
+        // ICAO_DOCUMENT -> ExternalCredentialType.IcaoDocument
     }
 }
 
@@ -26,4 +27,6 @@ fun ExternalCredentialType.fromDomainToApi(): ApiExternalCredentialType = when (
     ExternalCredentialType.GhanaIdCard -> ApiExternalCredentialType.GHANA_CARD
     ExternalCredentialType.QRCode -> ApiExternalCredentialType.QR_CODE
     ExternalCredentialType.FaydaCard -> ApiExternalCredentialType.FAYDA_CARD
+    ExternalCredentialType.IcaoDocument -> ApiExternalCredentialType.GHANA_CARD // TODO, PoC - masking ICAO as Ghana card for now
+    // ExternalCredentialType.IcaoDocument -> ApiExternalCredentialType.ICAO_DOCUMENT
 }

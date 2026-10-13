@@ -64,6 +64,7 @@ object ApiExternalCredentialType {
         "GHANA_CARD" -> ExternalCredentialType.GhanaIdCard
         "QR_CODE" -> ExternalCredentialType.QRCode
         "FAYDA_CARD" -> ExternalCredentialType.FaydaCard
+        // "ICAO_DOCUMENT" -> ExternalCredentialType.IcaoDocument
         else -> null
     }
 }

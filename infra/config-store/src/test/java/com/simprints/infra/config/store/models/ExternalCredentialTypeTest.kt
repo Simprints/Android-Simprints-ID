@@ -17,7 +17,8 @@ class ExternalCredentialTypeMapperTest {
             ExternalCredentialType.NHISCard to ProtoExternalCredentialType.NHIS_CARD,
             ExternalCredentialType.GhanaIdCard to ProtoExternalCredentialType.GHANA_ID_CARD,
             ExternalCredentialType.QRCode to ProtoExternalCredentialType.QR_CODE,
-            ExternalCredentialType.FaydaCard to ProtoExternalCredentialType.FAYDA_CARD
+            ExternalCredentialType.FaydaCard to ProtoExternalCredentialType.FAYDA_CARD,
+            ExternalCredentialType.IcaoDocument to ProtoExternalCredentialType.ICAO_DOCUMENT,
         )
 
         pairs.forEach { (domain, proto) ->
@@ -31,7 +32,8 @@ class ExternalCredentialTypeMapperTest {
             ProtoExternalCredentialType.NHIS_CARD to ExternalCredentialType.NHISCard,
             ProtoExternalCredentialType.GHANA_ID_CARD to ExternalCredentialType.GhanaIdCard,
             ProtoExternalCredentialType.QR_CODE to ExternalCredentialType.QRCode,
-            ProtoExternalCredentialType.FAYDA_CARD to ExternalCredentialType.FaydaCard
+            ProtoExternalCredentialType.FAYDA_CARD to ExternalCredentialType.FaydaCard,
+            ProtoExternalCredentialType.ICAO_DOCUMENT to ExternalCredentialType.IcaoDocument,
         )
 
         pairs.forEach { (proto, domain) ->

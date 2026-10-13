@@ -20,4 +20,8 @@ dependencies {
     implementation(project(":infra:camera"))
 
     implementation(libs.mlkit.text.recognition)
+
+    // ICAO 9303 document chip reading (BAC/PACE, secure messaging, LDS parsing). Brings BouncyCastle transitively.
+    implementation(libs.jmrtd)
+    implementation(libs.scuba.sc.android)
 }

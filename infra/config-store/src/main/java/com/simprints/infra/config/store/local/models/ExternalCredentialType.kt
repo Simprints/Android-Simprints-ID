@@ -8,6 +8,7 @@ internal fun ExternalCredentialType.toProto(): ProtoExternalCredentialType = whe
     ExternalCredentialType.GhanaIdCard -> ProtoExternalCredentialType.GHANA_ID_CARD
     ExternalCredentialType.QRCode -> ProtoExternalCredentialType.QR_CODE
     ExternalCredentialType.FaydaCard -> ProtoExternalCredentialType.FAYDA_CARD
+    ExternalCredentialType.IcaoDocument -> ProtoExternalCredentialType.ICAO_DOCUMENT
 }
 
 internal fun ProtoExternalCredentialType.toDomain(): ExternalCredentialType = when(this){
@@ -17,4 +18,5 @@ internal fun ProtoExternalCredentialType.toDomain(): ExternalCredentialType = wh
     ProtoExternalCredentialType.GHANA_ID_CARD -> ExternalCredentialType.GhanaIdCard
     ProtoExternalCredentialType.QR_CODE -> ExternalCredentialType.QRCode
     ProtoExternalCredentialType.FAYDA_CARD -> ExternalCredentialType.FaydaCard
+    ProtoExternalCredentialType.ICAO_DOCUMENT -> ExternalCredentialType.IcaoDocument
 }

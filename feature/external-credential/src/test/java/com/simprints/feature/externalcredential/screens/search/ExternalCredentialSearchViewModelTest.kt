@@ -348,6 +348,21 @@ internal class ExternalCredentialSearchViewModelTest {
     }
 
     @Test
+    fun `isCredentialFormatValid validates ICAO document number format`() = runTest {
+        every { mockScannedCredentialResult.credentialType } returns ExternalCredentialType.IcaoDocument
+
+        viewModel = createViewModel()
+
+        assertThat(viewModel.isCredentialFormatValid("L898902C3")).isTrue()
+        assertThat(viewModel.isCredentialFormatValid(" L898 902C3 ")).isTrue()
+        assertThat(viewModel.isCredentialFormatValid("D23145890AB11223")).isTrue()
+        assertThat(viewModel.isCredentialFormatValid("l898902c3")).isFalse()
+        assertThat(viewModel.isCredentialFormatValid("L898-902C3")).isFalse()
+        assertThat(viewModel.isCredentialFormatValid("")).isFalse()
+        assertThat(viewModel.isCredentialFormatValid(null)).isFalse()
+    }
+
+    @Test
     fun `isCredentialFormatValid validates Fayda card format`() = runTest {
         every { mockScannedCredentialResult.credentialType } returns ExternalCredentialType.FaydaCard
 

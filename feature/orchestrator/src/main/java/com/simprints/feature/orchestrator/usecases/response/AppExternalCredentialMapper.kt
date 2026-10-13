@@ -12,6 +12,7 @@ internal fun ExternalCredentialSearchResult.Complete?.toAppExternalCredential():
         is MfidDocument.GhanaNhisCard -> document.toNonCredentialFields()
         is MfidDocument.GhanaQrCode -> emptyMap()
         is MfidDocument.FaydaCard -> emptyMap()
+        is MfidDocument.IcaoDocument -> emptyMap()
     }
     return AppExternalCredential(
         id = scannedCredentialResult.credentialScanId,

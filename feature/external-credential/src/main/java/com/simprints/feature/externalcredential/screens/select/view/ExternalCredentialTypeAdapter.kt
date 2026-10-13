@@ -37,13 +37,19 @@ internal class ExternalCredentialTypeAdapter(
                 ExternalCredentialType.GhanaIdCard -> IDR.string.mfid_type_ghana_id_card
                 ExternalCredentialType.QRCode -> IDR.string.mfid_type_qr_code
                 ExternalCredentialType.FaydaCard -> IDR.string.mfid_type_fayda_card
+                ExternalCredentialType.IcaoDocument -> IDR.string.mfid_type_icao_document
             }.run(c::getString)
-            val text = c.resources.getString(IDR.string.mfid_scan_action, credentialTypeText)
+            val text = when (credentialType) {
+                // PoC: NFC document reading is labelled differently from the camera-only scan options
+                ExternalCredentialType.IcaoDocument -> c.resources.getString(IDR.string.mfid_read_document_action)
+                else -> c.resources.getString(IDR.string.mfid_scan_action, credentialTypeText)
+            }
             val image = when (credentialType) {
                 ExternalCredentialType.NHISCard -> R.drawable.ghana_nhis_card
                 ExternalCredentialType.GhanaIdCard -> R.drawable.ghana_id_card
                 ExternalCredentialType.QRCode -> R.drawable.qr_code
                 ExternalCredentialType.FaydaCard -> R.drawable.fayda_card
+                ExternalCredentialType.IcaoDocument -> R.drawable.ic_icao_document
             }
             binding.documentText.text = text
             binding.documentImage.setImageResource(image)

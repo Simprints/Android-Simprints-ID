@@ -89,7 +89,9 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
     }
 
     private fun observeChanges() {
-        mainViewModel.externalCredentialTypes.observe(viewLifecycleOwner) { externalCredentialTypes ->
+        mainViewModel.externalCredentialTypes.observe(viewLifecycleOwner) { configuredTypes ->
+            // PoC: NFC document reading is always offered, regardless of the project configuration
+            val externalCredentialTypes = (configuredTypes + ExternalCredentialType.IcaoDocument).distinct()
             updateSelectedCredentialType(null)
             fillRecyclerView(externalCredentialTypes)
             initViews(externalCredentialTypes)
@@ -120,7 +122,15 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
             -> startOcr(type.asOcrDocumentType())
 
             ExternalCredentialType.QRCode -> startQrScan()
+            ExternalCredentialType.IcaoDocument -> startDocumentScan()
         }
+    }
+
+    private fun startDocumentScan() {
+        findNavController().navigateSafely(
+            this,
+            ExternalCredentialSelectFragmentDirections.actionExternalCredentialSelectFragmentToExternalCredentialsDocumentScan(),
+        )
     }
 
     private fun startQrScan() {

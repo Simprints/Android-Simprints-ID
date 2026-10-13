@@ -23,6 +23,7 @@ enum ProtoExternalCredentialType {
     GHANA_ID_CARD = 2;
     QR_CODE = 3;
     FAYDA_CARD = 4;
+    ICAO_DOCUMENT = 5;
 }
 
 message ProtoMultiFactorIdConfiguration {

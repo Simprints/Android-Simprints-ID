@@ -183,6 +183,7 @@ internal class InsertEnrollmentRecordsUseCase @Inject constructor(
             ExternalCredentialType.NHISCard -> "12345678"
             ExternalCredentialType.QRCode -> "123456"
             ExternalCredentialType.FaydaCard -> "1234567812345678"
+            ExternalCredentialType.IcaoDocument -> "A12345678"
         }.asTokenizableRaw()
 
         return tokenizationProcessor.encrypt(

@@ -314,6 +314,7 @@ internal class ExternalCredentialSearchFragment : Fragment(R.layout.fragment_ext
         ExternalCredentialType.NHISCard,
         ExternalCredentialType.GhanaIdCard,
         ExternalCredentialType.QRCode,
+        ExternalCredentialType.IcaoDocument,
         -> this
         ExternalCredentialType.FaydaCard -> chunked(4).joinToString(" ")
     }

@@ -61,3 +61,11 @@
 -keep class io.realm.** { *; }
 -keepnames class io.realm.** { *; }
 -dontwarn lombok.Generated
+
+# JMRTD / scuba / BouncyCastle (ICAO document chip reading PoC).
+# BouncyCastle registers algorithm implementations by class name and resolves them reflectively.
+-keep class org.bouncycastle.** { *; }
+-keep class org.jmrtd.** { *; }
+-keep class net.sf.scuba.** { *; }
+-dontwarn org.bouncycastle.**
+-dontwarn javax.naming.**
