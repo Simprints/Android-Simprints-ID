@@ -49,4 +49,14 @@ sealed class MfidDocument : StepResult {
     data class FaydaCard(
         override val credential: TokenizableString.Raw,
     ) : MfidDocument()
+
+    /**
+     * ICAO 9303 compliant document (passport, ID card) read via NFC chip. Only the document number leaves the scanning
+     * screen, all other data read from the chip is intentionally dropped.
+     */
+    @Serializable
+    @SerialName("MfidDocument.IcaoDocument")
+    data class IcaoDocument(
+        override val credential: TokenizableString.Raw,
+    ) : MfidDocument()
 }

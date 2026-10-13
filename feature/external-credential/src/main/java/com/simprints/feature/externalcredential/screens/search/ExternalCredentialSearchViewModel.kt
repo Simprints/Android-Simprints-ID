@@ -14,6 +14,7 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.feature.externalcredential.screens.scandocument.mrz.MrzParser
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.FaydaCardOcrReaderUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GhanaIdCardOcrReaderUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GhanaNhisCardOcrReaderUseCase
@@ -169,6 +170,7 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
         ExternalCredentialType.FaydaCard -> InputType.TYPE_CLASS_NUMBER
         ExternalCredentialType.GhanaIdCard -> InputType.TYPE_CLASS_TEXT
         ExternalCredentialType.QRCode -> InputType.TYPE_CLASS_TEXT
+        ExternalCredentialType.IcaoDocument -> InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
     }
 
     fun trackRecapture() {
@@ -223,6 +225,10 @@ internal class ExternalCredentialSearchViewModel @AssistedInject constructor(
             ExternalCredentialType.QRCode -> {
                 // No QR code validation as of 2025.4.1
                 true
+            }
+            ExternalCredentialType.IcaoDocument -> {
+                // ICAO 9303 document number: alphanumeric, up to 9 characters (longer in TD1 extended format)
+                MrzParser.DOCUMENT_NUMBER_PATTERN.matches(credentialNormalized)
             }
         }
     }

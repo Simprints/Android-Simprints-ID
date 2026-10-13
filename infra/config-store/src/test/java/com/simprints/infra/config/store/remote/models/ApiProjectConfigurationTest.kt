@@ -42,6 +42,7 @@ class ApiProjectConfigurationTest {
             "GHANA_CARD" to ExternalCredentialType.GhanaIdCard,
             "QR_CODE" to ExternalCredentialType.QRCode,
             "FAYDA_CARD" to ExternalCredentialType.FaydaCard,
+            "ICAO_DOCUMENT" to ExternalCredentialType.IcaoDocument,
             "UNKNOWN" to null,
         )
 

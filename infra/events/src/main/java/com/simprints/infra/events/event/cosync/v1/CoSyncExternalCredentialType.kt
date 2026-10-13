@@ -17,6 +17,7 @@ enum class CoSyncExternalCredentialType {
     GhanaIdCard,
     QRCode,
     FaydaCard,
+    // IcaoDocument,
 }
 
 @ExcludedFromGeneratedTestCoverageReports("Mapper")
@@ -25,6 +26,7 @@ fun ExternalCredentialType.toCoSync(): CoSyncExternalCredentialType = when (this
     ExternalCredentialType.GhanaIdCard -> CoSyncExternalCredentialType.GhanaIdCard
     ExternalCredentialType.QRCode -> CoSyncExternalCredentialType.QRCode
     ExternalCredentialType.FaydaCard -> CoSyncExternalCredentialType.FaydaCard
+    ExternalCredentialType.IcaoDocument -> CoSyncExternalCredentialType.GhanaIdCard // TODO PoC - masking as Ghana Card
 }
 
 @ExcludedFromGeneratedTestCoverageReports("Mapper")
@@ -33,4 +35,5 @@ fun CoSyncExternalCredentialType.toDomain(): ExternalCredentialType = when (this
     CoSyncExternalCredentialType.GhanaIdCard -> ExternalCredentialType.GhanaIdCard
     CoSyncExternalCredentialType.QRCode -> ExternalCredentialType.QRCode
     CoSyncExternalCredentialType.FaydaCard -> ExternalCredentialType.FaydaCard
+    // CoSyncExternalCredentialType.IcaoDocument -> ExternalCredentialType.IcaoDocument
 }

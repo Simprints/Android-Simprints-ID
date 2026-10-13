@@ -38,6 +38,8 @@ play_publisher_version = "4.1.1"
 play_barcode_version = "18.3.1"
 
 ml_entity_extraction_version = "16.0.1"
+jmrtd_version = "0.8.9"
+scuba_android_version = "0.0.27"
 
 firebase_auth_version = "25.0.0"
 firebase_crashlytics_version = "21.0.0"
@@ -146,6 +148,10 @@ desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref 
 
 #OCR
 mlkit-text-recognition = { module = "com.google.mlkit:text-recognition", version.ref = "ml_entity_extraction_version" }
+
+#ICAO eMRTD (NFC document chip) reading
+jmrtd = { module = "org.jmrtd:jmrtd", version.ref = "jmrtd_version" }
+scuba-sc-android = { module = "net.sf.scuba:scuba-sc-android", version.ref = "scuba_android_version" }
 
 #Firebase
 firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebase_auth_version" }

@@ -315,6 +315,7 @@ class ExternalCredentialEventTrackerUseCaseTest {
         ExternalCredentialType.GhanaIdCard -> MfidDocument.GhanaIdCard(credential = value.asTokenizableRaw())
         ExternalCredentialType.QRCode -> MfidDocument.GhanaQrCode(credential = value.asTokenizableRaw())
         ExternalCredentialType.FaydaCard -> MfidDocument.FaydaCard(credential = value.asTokenizableRaw())
+        ExternalCredentialType.IcaoDocument -> MfidDocument.IcaoDocument(credential = value.asTokenizableRaw())
     }
 
     private fun makeScannedCredentialResult(

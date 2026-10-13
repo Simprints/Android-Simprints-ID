@@ -31,5 +31,6 @@ data class ScannedCredentialResult(
             is MfidDocument.GhanaNhisCard -> ExternalCredentialType.NHISCard
             is MfidDocument.GhanaQrCode -> ExternalCredentialType.QRCode
             is MfidDocument.FaydaCard -> ExternalCredentialType.FaydaCard
+            is MfidDocument.IcaoDocument -> ExternalCredentialType.IcaoDocument
         }
 }

@@ -12,6 +12,7 @@ class ApiExternalCredentialTypeTest {
             ApiExternalCredentialType.GHANA_CARD to ExternalCredentialType.GhanaIdCard,
             ApiExternalCredentialType.QR_CODE to ExternalCredentialType.QRCode,
             ApiExternalCredentialType.FAYDA_CARD to ExternalCredentialType.FaydaCard,
+            // ApiExternalCredentialType.ICAO_DOCUMENT to ExternalCredentialType.IcaoDocument,
         )
 
         cases.forEach { (apiType, expectedDomainType) ->
@@ -26,6 +27,7 @@ class ApiExternalCredentialTypeTest {
             ExternalCredentialType.GhanaIdCard to ApiExternalCredentialType.GHANA_CARD,
             ExternalCredentialType.QRCode to ApiExternalCredentialType.QR_CODE,
             ExternalCredentialType.FaydaCard to ApiExternalCredentialType.FAYDA_CARD,
+            ExternalCredentialType.IcaoDocument to ApiExternalCredentialType.GHANA_CARD, // TODO PoC - should be ICAO_DOCUMENT
         )
 
         cases.forEach { (domainType, expectedApiType) ->

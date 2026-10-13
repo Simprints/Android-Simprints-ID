@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- PoC placeholder: generic ID card with an NFC chip and MRZ lines -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="160dp"
+    android:height="100dp"
+    android:viewportWidth="160"
+    android:viewportHeight="100">
+    <path
+        android:fillColor="#FFE3EAF2"
+        android:pathData="M8,0h144a8,8 0,0 1,8 8v84a8,8 0,0 1,-8 8h-144a8,8 0,0 1,-8 -8v-84a8,8 0,0 1,8 -8z" />
+    <path
+        android:fillColor="#FFB0BEC5"
+        android:pathData="M14,14h36v44h-36z" />
+    <path
+        android:fillColor="#FFD4A537"
+        android:pathData="M62,18h22a3,3 0,0 1,3 3v16a3,3 0,0 1,-3 3h-22a3,3 0,0 1,-3 -3v-16a3,3 0,0 1,3 -3z" />
+    <path
+        android:fillColor="#FF90A4AE"
+        android:pathData="M98,18h48v5h-48zM98,30h40v5h-40zM98,42h44v5h-44z" />
+    <path
+        android:fillColor="#FF546E7A"
+        android:pathData="M14,68h132v5h-132zM14,78h132v5h-132zM14,88h132v5h-132z" />
+</vector>

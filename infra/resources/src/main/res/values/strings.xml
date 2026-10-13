@@ -519,6 +519,9 @@
     <string name="mfid_ghana_id_credential_field">Personal ID</string>
     <string name="mfid_qr_credential_field">QR Code value</string>
     <string name="mfid_fayda_card_credential_field">Fayda Alias Number (FAN)</string>
+    <string name="mfid_type_icao_document">ID document</string>
+    <string name="mfid_icao_document_credential_field">Document number</string>
+    <string name="mfid_read_document_action">Read document</string>
     <string name="mfid_type_any_document">a document</string>
 
     <string name="mfid_skip_scan_dialog_title">Skip scanning?</string>

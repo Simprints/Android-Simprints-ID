@@ -12,7 +12,9 @@ fun ExternalCredentialType.asOcrDocumentType() = when (this) {
     ExternalCredentialType.NHISCard -> OcrDocumentType.NhisCard
     ExternalCredentialType.GhanaIdCard -> OcrDocumentType.GhanaIdCard
     ExternalCredentialType.FaydaCard -> OcrDocumentType.FaydaCard
-    ExternalCredentialType.QRCode -> throw IllegalArgumentException("Cannot create Ocr Document Type from $this")
+    ExternalCredentialType.QRCode,
+    ExternalCredentialType.IcaoDocument,
+    -> throw IllegalArgumentException("Cannot create Ocr Document Type from $this")
 }
 
 fun OcrDocumentType.asExternalCredentialType() = when (this) {
