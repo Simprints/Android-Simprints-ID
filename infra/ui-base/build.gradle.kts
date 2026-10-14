@@ -31,7 +31,6 @@ dependencies {
 
     api(libs.androidX.ui.fragment)
     api(libs.androidX.ui.constraintlayout)
-    api(libs.androidX.ui.coordinatorlayout)
     api(libs.androidX.ui.cardview)
 
     api(libs.androidX.navigation.fragment)

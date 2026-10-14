@@ -11,7 +11,5 @@ dependencies {
     implementation(libs.androidX.appcompat)
     implementation(libs.androidX.ui.constraintlayout)
 
-    implementation(libs.androidX.ui.preference) {
-        exclude("androidx.lifecycle", "lifecycle-viewmodel-ktx")
-    }
+    implementation(libs.androidX.ui.preference)
 }

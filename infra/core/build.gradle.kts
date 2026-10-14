@@ -17,7 +17,6 @@ dependencies {
     api(project(":infra:security"))
 
     api(libs.androidX.appcompat)
-    api(libs.androidX.multidex)
     api(libs.androidX.annotation.annotation)
     api(libs.androidX.lifecycle.process)
 
