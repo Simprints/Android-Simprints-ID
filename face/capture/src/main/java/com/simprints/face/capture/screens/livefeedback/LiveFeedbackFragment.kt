@@ -2,9 +2,9 @@ package com.simprints.face.capture.screens.livefeedback
 
 import android.Manifest
 import android.content.Intent
+import android.graphics.RectF
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Size
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
@@ -43,8 +43,8 @@ import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -63,8 +63,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private val vm: LiveFeedbackViewModel by viewModels()
     private val binding by viewBinding(FragmentLiveFeedbackBinding::bind)
 
-    private lateinit var screenSize: Size
-
     @Inject
     lateinit var cameraFrameProvider: CameraFrameProvider
 
@@ -81,7 +79,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         get() = ContextCompat.getColor(requireContext(), IDR.color.simprints_green_light)
     private val defaultCaptureProgressColor: Int
         get() = ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey_light)
-
     private val validationProgressColor: Int
         get() = ContextCompat.getColor(requireContext(), IDR.color.simprints_orange)
 
@@ -103,7 +100,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     private fun initFragment() {
-        screenSize = with(resources.displayMetrics) { Size(widthPixels, widthPixels) }
         bindViewModel()
         bindPermissionActions()
         setUpFrameProcessing()
@@ -159,19 +155,22 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     /** Initialize CameraX, and prepare to bind the camera use cases  */
-    private fun setUpCamera() = viewLifecycleOwner.lifecycleScope.launch {
+    private fun setUpCamera(state: LiveFeedbackState) = viewLifecycleOwner.lifecycleScope.launch {
         if (cameraFrameProvider.isInitialised()) {
             return@launch
         }
 
+        val isTracking = state.isFaceTrackingEnabled
+
         // Wait for the views to be properly laid out
         binding.faceCaptureCamera.awaitLayout()
-        binding.captureOverlay.awaitLayout()
+        if (!isTracking) binding.captureOverlay.awaitLayout()
 
         cameraFrameProvider.initialiseCamera(
             lifecycleOwner = viewLifecycleOwner,
             cameraPreviewView = binding.faceCaptureCamera,
-            target = binding.captureOverlay.circleRect.toRect(),
+            // Tracking analyses the whole preview; otherwise only the fixed cutout is analysed
+            target = if (isTracking) null else binding.captureOverlay.circleRect.toRect(),
         )
         Simber.i("Camera setup finished", tag = FACE_CAPTURE)
     }
@@ -208,11 +207,11 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 launch { vm.state.collect(::render) }
                 launch {
                     vm.state
-                        .map { it.permissionStatus }
-                        .distinctUntilChanged()
-                        .collect { permissionStatus ->
-                            if (permissionStatus == PermissionStatus.Granted) {
-                                setUpCamera()
+                        .filter { it.stateInitialised }
+                        .distinctUntilChangedBy { it.permissionStatus }
+                        .collect { state ->
+                            if (state.permissionStatus == PermissionStatus.Granted) {
+                                setUpCamera(state)
                                 toggleCaptureButtonIfAutoCapture(true)
                             }
                         }
@@ -268,48 +267,90 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     private fun render(state: LiveFeedbackState) {
+        // Which mode's views exist at all is only known once the configuration has been read, so
+        // both sets stay hidden until then rather than one being drawn and swapped for the other.
+        // Everything below is mode-independent and renders from the first state, so a slow config
+        // read still leaves a screen that can explain itself.
+        if (state.stateInitialised) {
+            applyCaptureMode(state.isFaceTrackingEnabled)
+            // The two modes own entirely separate views, so this is the only place they are told apart
+            if (state.isFaceTrackingEnabled) renderTrackingOverlay(state) else renderCutoutOverlay(state)
+        }
+
         if (state.permissionStatus != PermissionStatus.Granted) {
             renderNoPermission()
             return
         }
 
-        renderProgress(state.progress)
         when (state.phase) {
             LiveFeedbackState.Phase.NOT_STARTED -> {
-                renderOverlay(overlayWhite = false, explanationVisible = false)
+                renderControls(explanationVisible = false)
                 renderFeedbackOnButton(state)
             }
             LiveFeedbackState.Phase.CAPTURING -> {
-                renderOverlay(overlayWhite = true, explanationVisible = true)
+                renderControls(explanationVisible = true)
                 renderFeedbackOnButton(state)
             }
             LiveFeedbackState.Phase.VALIDATING -> {
-                renderOverlay(overlayWhite = true, explanationVisible = true)
+                renderControls(explanationVisible = true)
                 renderValidating()
             }
             LiveFeedbackState.Phase.VALIDATION_FAILED -> {
-                renderOverlay(overlayWhite = true, explanationVisible = true)
+                renderControls(explanationVisible = true)
                 renderValidationFailed()
             }
             LiveFeedbackState.Phase.FINISHED -> onCaptureFinished(state.result)
         }
     }
 
-    private fun renderProgress(progress: Progress) = with(binding.captureProgress) {
-        value = progress.value
-        progressColor = when (progress.tint) {
-            Progress.Tint.DEFAULT -> defaultCaptureProgressColor
-            Progress.Tint.VALID -> validCaptureProgressColor
-            Progress.Tint.VALIDATION -> validationProgressColor
-        }
-        isInvisible = !progress.visible
+    /**
+     * Shows the views belonging to the active mode and hides the other mode's entirely, so nothing
+     * from the experimental path can be drawn while the flag is off.
+     */
+    private fun applyCaptureMode(isFaceTrackingEnabled: Boolean) = with(binding) {
+        captureOverlay.isVisible = !isFaceTrackingEnabled
+        captureProgress.isVisible = !isFaceTrackingEnabled
+        faceTrackingOverlay.isVisible = isFaceTrackingEnabled
+        captureControlsScrim.isVisible = isFaceTrackingEnabled
     }
 
-    private fun renderOverlay(
-        overlayWhite: Boolean,
-        explanationVisible: Boolean,
-    ) = with(binding) {
-        if (overlayWhite) {
+    private fun renderTrackingOverlay(state: LiveFeedbackState) = with(binding) {
+        val hasPermission = state.permissionStatus == PermissionStatus.Granted
+        faceTrackingOverlay.update(
+            target = state.targetBox.takeIf { hasPermission },
+            progress = if (hasPermission) state.progress else Progress.HIDDEN,
+            // Only useful while the operator is still framing the subject
+            showAimGuide = hasPermission &&
+                (
+                    state.phase == LiveFeedbackState.Phase.NOT_STARTED ||
+                        state.phase == LiveFeedbackState.Phase.CAPTURING
+                ),
+            progressAnchor = if (state.isProgressAroundCaptureButton) captureButtonBoundsInOverlay() else null,
+        )
+    }
+
+    /**
+     * The capture button's outline in the overlay's own coordinates, so progress can be drawn
+     * around it. Null until both views are laid out, which leaves the progress on the tracked face
+     * for the frame or two before that happens.
+     *
+     * A [com.google.android.material.button.MaterialButton] draws its background inset from its
+     * own bounds, so those insets are taken off here - otherwise the ring would sit further from
+     * the chip vertically than horizontally.
+     */
+    private fun captureButtonBoundsInOverlay(): RectF? = with(binding) {
+        if (captureFeedbackBtn.width == 0 || captureFeedbackBtn.height == 0) return null
+        RectF(
+            (captureFeedbackBtn.left - faceTrackingOverlay.left).toFloat(),
+            (captureFeedbackBtn.top - faceTrackingOverlay.top + captureFeedbackBtn.insetTop).toFloat(),
+            (captureFeedbackBtn.right - faceTrackingOverlay.left).toFloat(),
+            (captureFeedbackBtn.bottom - faceTrackingOverlay.top - captureFeedbackBtn.insetBottom).toFloat(),
+        )
+    }
+
+    private fun renderCutoutOverlay(state: LiveFeedbackState) = with(binding) {
+        val dimPreview = state.permissionStatus == PermissionStatus.Granted && state.phase != LiveFeedbackState.Phase.NOT_STARTED
+        if (dimPreview) {
             captureOverlay.drawWhiteTarget()
             captureFeedbackTxtExplanation.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey))
         } else {
@@ -317,6 +358,16 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             captureFeedbackTxtExplanation.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_white))
         }
 
+        captureProgress.value = state.progress.value
+        captureProgress.progressColor = when (state.progress.tint) {
+            Progress.Tint.DEFAULT -> defaultCaptureProgressColor
+            Progress.Tint.VALID -> validCaptureProgressColor
+            Progress.Tint.VALIDATION -> validationProgressColor
+        }
+        captureProgress.isInvisible = !state.progress.visible
+    }
+
+    private fun renderControls(explanationVisible: Boolean) = with(binding) {
         captureFeedbackTxtExplanation.isVisible = explanationVisible
         captureFeedbackBtn.isVisible = true
         captureFeedbackPermissionButton.isGone = true
@@ -394,7 +445,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     private fun renderValidating() = with(binding) {
-        captureOverlay.drawWhiteTarget()
         captureFeedbackBtn.setText(IDR.string.face_capture_title_validating)
         captureFeedbackBtn.setCheckedWithLeftDrawable(false)
         setManualCaptureButtonClickable(false)
@@ -428,7 +478,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderNoPermission() {
         binding.apply {
-            renderOverlay(overlayWhite = false, explanationVisible = true)
+            renderControls(explanationVisible = true)
             captureFeedbackTxtExplanation.setText(IDR.string.face_capture_permission_denied)
             captureFeedbackBtn.isGone = true
             captureFeedbackPermissionButton.isVisible = true
