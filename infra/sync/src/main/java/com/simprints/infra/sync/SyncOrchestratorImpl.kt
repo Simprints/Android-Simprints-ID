@@ -12,6 +12,7 @@ import com.simprints.core.AppScope
 import com.simprints.core.DispatcherIO
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.store.models.imagesUploadRequiresUnmeteredConnection
 import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.eventsync.DeleteSyncInfoUseCase
@@ -21,6 +22,7 @@ import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.eventsync.sync.master.EventSyncMasterWorker
 import com.simprints.infra.sync.config.worker.DeviceConfigDownSyncWorker
 import com.simprints.infra.sync.config.worker.ProjectConfigDownSyncWorker
+import com.simprints.infra.sync.devicestate.worker.DeviceStatusReportWorker
 import com.simprints.infra.sync.enrolments.EnrolmentRecordWorker
 import com.simprints.infra.sync.extensions.anyRunning
 import com.simprints.infra.sync.extensions.cancelWorkers
@@ -45,6 +47,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -147,6 +150,12 @@ internal class SyncOrchestratorImpl @Inject constructor(
             action = command.action,
             unschedule = ::stopImageSync,
             reschedule = { rescheduleImageUpSync() },
+        )
+
+        is ScheduleCommand.DeviceStatusCommand -> executeSchedulingAction(
+            action = command.action,
+            unschedule = ::cancelDeviceStatusReport,
+            reschedule = { rescheduleDeviceStatusReport() },
         )
     }
 
@@ -255,6 +264,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
                 constraints = getImageUploadConstraints(),
             )
             rescheduleEventSync(withDelay = withDelay)
+            rescheduleDeviceStatusReport()
             if (shouldScheduleFirmwareUpdate()) {
                 workManager.schedulePeriodicWorker<FirmwareFileUpdateWorker>(
                     SyncConstants.FIRMWARE_UPDATE_WORK_NAME,
@@ -273,6 +283,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
             SyncConstants.FILE_UP_SYNC_WORK_NAME,
             SyncConstants.EVENT_SYNC_WORK_NAME,
             SyncConstants.FIRMWARE_UPDATE_WORK_NAME,
+            SyncConstants.DEVICE_STATUS_REPORT_WORK_NAME,
         )
         stopEventSync()
     }
@@ -328,6 +339,30 @@ internal class SyncOrchestratorImpl @Inject constructor(
             existingWorkPolicy = ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
             constraints = getImageUploadConstraints(),
         )
+    }
+
+    /**
+     * The interval comes from project configuration, so it is re-applied in place (UPDATE policy)
+     * rather than re-enqueued, to keep the existing schedule when nothing has changed.
+     */
+    private suspend fun rescheduleDeviceStatusReport() {
+        val intervalHours = configRepository
+            .getProjectConfiguration()
+            .experimental()
+            .deviceStatusRepeatIntervalHours
+        if (intervalHours <= 0) {
+            cancelDeviceStatusReport()
+            return
+        }
+        workManager.schedulePeriodicWorker<DeviceStatusReportWorker>(
+            workName = SyncConstants.DEVICE_STATUS_REPORT_WORK_NAME,
+            repeatInterval = TimeUnit.HOURS.toMinutes(intervalHours),
+            initialDelay = SyncConstants.DEVICE_STATUS_REPORT_INITIAL_DELAY_MINUTES,
+        )
+    }
+
+    private fun cancelDeviceStatusReport() {
+        workManager.cancelWorkers(SyncConstants.DEVICE_STATUS_REPORT_WORK_NAME)
     }
 
     private suspend fun getImageUploadConstraints(): Constraints {
