@@ -13,6 +13,7 @@ import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckConfiguration
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent.BiometricReferenceCreationPayload
+import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent
 import com.simprints.infra.events.event.domain.models.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.FaceCaptureConfirmationEvent
 import com.simprints.infra.events.event.domain.models.FaceCaptureEvent
@@ -97,6 +98,35 @@ class SimpleCaptureEventReporterTest {
                 },
             )
         }
+    }
+
+    @Test
+    fun `Adds capture attempt event`() = runTest {
+        val event = attemptEvent()
+
+        reporter.addCaptureAttemptEvent(event)
+
+        coVerify { eventRepository.addOrUpdateEvent(event) }
+    }
+
+    @Test
+    fun `Adds recovered capture attempt event when the session does not have it`() = runTest {
+        val event = attemptEvent()
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(attemptEvent(id = "other"))
+
+        reporter.addRecoveredCaptureAttemptEvent(event)
+
+        coVerify { eventRepository.addOrUpdateEvent(event) }
+    }
+
+    @Test
+    fun `Skips recovered capture attempt event already saved in the session`() = runTest {
+        val event = attemptEvent()
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(attemptEvent())
+
+        reporter.addRecoveredCaptureAttemptEvent(event)
+
+        coVerify(exactly = 0) { eventRepository.addOrUpdateEvent(any()) }
     }
 
     @Test
@@ -355,4 +385,21 @@ class SimpleCaptureEventReporterTest {
             )
         }
     }
+
+    private fun attemptEvent(id: String = "attempt-id") = FaceCaptureAttemptEvent(
+        startTime = Timestamp(1L),
+        endTime = Timestamp(2L),
+        attemptNb = 0,
+        bioSdk = "RANK_ONE",
+        targetFrameWidth = 556,
+        targetFrameHeight = 556,
+        totalFramesAnalysed = 0,
+        validFrameCount = 0,
+        timeToFirstValidMs = null,
+        rejectionStats = FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.RejectionStats(),
+        qualityAllFrames = null,
+        statusRuns = emptyList(),
+        statusRunsTruncated = false,
+        id = id,
+    )
 }
