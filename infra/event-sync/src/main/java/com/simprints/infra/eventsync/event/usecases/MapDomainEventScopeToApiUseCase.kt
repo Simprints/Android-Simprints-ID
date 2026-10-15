@@ -1,5 +1,6 @@
 package com.simprints.infra.eventsync.event.usecases
 
+import com.simprints.core.api.fromDomainToApi
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.scope.EventScope

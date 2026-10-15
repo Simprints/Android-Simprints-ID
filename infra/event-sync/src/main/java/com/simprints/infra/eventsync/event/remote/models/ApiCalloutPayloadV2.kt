@@ -2,6 +2,8 @@ package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.api.ApiTimestamp
+import com.simprints.core.api.fromDomainToApi
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.ConfirmationCalloutEventV2
 import com.simprints.infra.events.event.domain.models.EnrolmentCalloutEventV2
