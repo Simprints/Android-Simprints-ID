@@ -25,6 +25,10 @@ sealed class ScheduleCommand {
         val action: Action,
     ) : ScheduleCommand()
 
+    internal data class DeviceStatusCommand(
+        val action: Action,
+    ) : ScheduleCommand()
+
     object Everything {
         fun reschedule(withDelay: Boolean = false): ScheduleCommand = EverythingCommand(action = Action.RESCHEDULE, withDelay = withDelay)
 
@@ -41,5 +45,11 @@ sealed class ScheduleCommand {
         fun reschedule(): ScheduleCommand = ImagesCommand(action = Action.RESCHEDULE)
 
         fun unschedule(): ScheduleCommand = ImagesCommand(action = Action.UNSCHEDULE)
+    }
+
+    object DeviceStatus {
+        fun reschedule(): ScheduleCommand = DeviceStatusCommand(action = Action.RESCHEDULE)
+
+        fun unschedule(): ScheduleCommand = DeviceStatusCommand(action = Action.UNSCHEDULE)
     }
 }

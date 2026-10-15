@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models.session
 
 import com.google.common.truth.Truth
-import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
+import com.simprints.core.api.ApiTimestamp
 import com.simprints.infra.serialization.SimJson
 import org.junit.Test
 

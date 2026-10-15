@@ -1,6 +1,7 @@
 package com.simprints.infra.sync.config.usecase
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.DEVICE_STATUS_REPEAT_INTERVAL_HOURS
 import com.simprints.infra.sync.ScheduleCommand
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.config.testtools.projectConfiguration
@@ -15,6 +16,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Before
 import org.junit.Test
 
@@ -96,5 +98,36 @@ class RescheduleWorkersIfConfigChangedUseCaseTest {
 
         verify { syncOrchestrator.execute(ScheduleCommand.Images.reschedule()) }
         assertThat(useCaseJob.isCompleted).isTrue()
+    }
+
+    @Test
+    fun `should not reschedule device status report when interval does not change`() = runTest {
+        useCase(
+            projectConfiguration.copy(custom = null),
+            projectConfiguration.copy(custom = mapOf(DEVICE_STATUS_REPEAT_INTERVAL_HOURS to JsonPrimitive(8))),
+        )
+
+        verify(exactly = 0) { syncOrchestrator.execute(ScheduleCommand.DeviceStatus.reschedule()) }
+    }
+
+    @Test
+    fun `should reschedule device status report when interval changes`() = runTest {
+        useCase(
+            projectConfiguration.copy(custom = null),
+            projectConfiguration.copy(custom = mapOf(DEVICE_STATUS_REPEAT_INTERVAL_HOURS to JsonPrimitive(24))),
+        )
+
+        verify(exactly = 1) { syncOrchestrator.execute(ScheduleCommand.DeviceStatus.reschedule()) }
+        verify(exactly = 0) { syncOrchestrator.execute(ScheduleCommand.Images.reschedule()) }
+    }
+
+    @Test
+    fun `should reschedule device status report when reporting is disabled`() = runTest {
+        useCase(
+            projectConfiguration.copy(custom = mapOf(DEVICE_STATUS_REPEAT_INTERVAL_HOURS to JsonPrimitive(8))),
+            projectConfiguration.copy(custom = mapOf(DEVICE_STATUS_REPEAT_INTERVAL_HOURS to JsonPrimitive(0))),
+        )
+
+        verify(exactly = 1) { syncOrchestrator.execute(ScheduleCommand.DeviceStatus.reschedule()) }
     }
 }

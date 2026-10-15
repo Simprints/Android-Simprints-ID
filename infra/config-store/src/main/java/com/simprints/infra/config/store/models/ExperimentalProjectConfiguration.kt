@@ -283,6 +283,15 @@ data class ExperimentalProjectConfiguration(
             ?.booleanOrNull
             .let { it == true }
 
+    /** How often the device data state is reported to the backend, `0` disables the reporting. */
+    val deviceStatusRepeatIntervalHours: Long
+        get() = customConfig
+            ?.get(DEVICE_STATUS_REPEAT_INTERVAL_HOURS)
+            ?.jsonPrimitive
+            ?.longOrNull
+            ?.coerceAtLeast(0)
+            ?: DEVICE_STATUS_REPEAT_INTERVAL_HOURS_DEFAULT
+
     companion object {
         internal const val DISABLE_SUBJECT_POOL_VALIDATION = "disableSubjectPoolValidation"
         internal const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS = "faceAutoCaptureImagingDurationMillis"
@@ -373,5 +382,8 @@ data class ExperimentalProjectConfiguration(
         const val SPOOF_CHECK_MIN_VALIDATION_ERROR_UI_DURATION_MS_DEFAULT = 2000
 
         const val USE_PARENTAL_CONSENT_AS_DEFAULT = "useParentalConsentAsDefault"
+
+        const val DEVICE_STATUS_REPEAT_INTERVAL_HOURS = "deviceStatusRepeatIntervalHours"
+        const val DEVICE_STATUS_REPEAT_INTERVAL_HOURS_DEFAULT = 8L
     }
 }

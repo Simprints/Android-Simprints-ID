@@ -1,9 +1,9 @@
 package com.simprints.infra.eventsync.event.remote.models.session
 
 import androidx.annotation.Keep
+import com.simprints.core.api.ApiTimestamp
 import com.simprints.infra.eventsync.event.remote.models.ApiEvent
 import com.simprints.infra.eventsync.event.remote.models.ApiModality
-import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable

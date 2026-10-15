@@ -36,4 +36,13 @@ class ScheduleSyncCommandTest {
         assertThat(ScheduleCommand.Images.unschedule())
             .isEqualTo(ScheduleCommand.ImagesCommand(action = ScheduleCommand.Action.UNSCHEDULE))
     }
+
+    @Test
+    fun `device status commands build expected command`() {
+        assertThat(ScheduleCommand.DeviceStatus.reschedule())
+            .isEqualTo(ScheduleCommand.DeviceStatusCommand(action = ScheduleCommand.Action.RESCHEDULE))
+
+        assertThat(ScheduleCommand.DeviceStatus.unschedule())
+            .isEqualTo(ScheduleCommand.DeviceStatusCommand(action = ScheduleCommand.Action.UNSCHEDULE))
+    }
 }

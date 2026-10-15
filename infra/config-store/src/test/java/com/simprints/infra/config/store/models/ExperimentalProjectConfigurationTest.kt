@@ -503,4 +503,18 @@ internal class ExperimentalProjectConfigurationTest {
             assertThat(ExperimentalProjectConfiguration(config).faceCaptureAcceptedAreaRange).isEqualTo(result)
         }
     }
+
+    @Test
+    fun `check device status repeat interval parsed correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to ExperimentalProjectConfiguration.DEVICE_STATUS_REPEAT_INTERVAL_HOURS_DEFAULT,
+            mapOf(ExperimentalProjectConfiguration.DEVICE_STATUS_REPEAT_INTERVAL_HOURS to JsonPrimitive(true))
+                to ExperimentalProjectConfiguration.DEVICE_STATUS_REPEAT_INTERVAL_HOURS_DEFAULT,
+            mapOf(ExperimentalProjectConfiguration.DEVICE_STATUS_REPEAT_INTERVAL_HOURS to JsonPrimitive(24)) to 24L,
+            mapOf(ExperimentalProjectConfiguration.DEVICE_STATUS_REPEAT_INTERVAL_HOURS to JsonPrimitive(0)) to 0L,
+            mapOf(ExperimentalProjectConfiguration.DEVICE_STATUS_REPEAT_INTERVAL_HOURS to JsonPrimitive(-5)) to 0L,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).deviceStatusRepeatIntervalHours).isEqualTo(result)
+        }
+    }
 }

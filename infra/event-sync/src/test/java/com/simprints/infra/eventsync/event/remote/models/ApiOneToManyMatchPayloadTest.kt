@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.api.ApiTimestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import io.mockk.mockk
 import org.junit.Test

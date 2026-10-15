@@ -1,6 +1,7 @@
 package com.simprints.infra.sync.config.usecase
 
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.store.models.imagesUploadRequiresUnmeteredConnection
 import com.simprints.infra.sync.ScheduleCommand
 import com.simprints.infra.sync.SyncOrchestrator
@@ -17,10 +18,18 @@ internal class RescheduleWorkersIfConfigChangedUseCase @Inject constructor(
         if (shouldRescheduleImageUpload(oldConfig, newConfig)) {
             syncOrchestrator.execute(ScheduleCommand.Images.reschedule()).await()
         }
+        if (shouldRescheduleDeviceStatusReport(oldConfig, newConfig)) {
+            syncOrchestrator.execute(ScheduleCommand.DeviceStatus.reschedule()).await()
+        }
     }
 
     private fun shouldRescheduleImageUpload(
         oldConfig: ProjectConfiguration,
         newConfig: ProjectConfiguration,
     ) = oldConfig.imagesUploadRequiresUnmeteredConnection() != newConfig.imagesUploadRequiresUnmeteredConnection()
+
+    private fun shouldRescheduleDeviceStatusReport(
+        oldConfig: ProjectConfiguration,
+        newConfig: ProjectConfiguration,
+    ) = oldConfig.experimental().deviceStatusRepeatIntervalHours != newConfig.experimental().deviceStatusRepeatIntervalHours
 }
