@@ -36,6 +36,7 @@ import com.simprints.infra.events.sampledata.createExternalCredentialCaptureValu
 import com.simprints.infra.events.sampledata.createExternalCredentialConfirmationEvent
 import com.simprints.infra.events.sampledata.createExternalCredentialSearchEvent
 import com.simprints.infra.events.sampledata.createExternalCredentialSelectionEvent
+import com.simprints.infra.events.sampledata.createFaceCaptureAttemptEvent
 import com.simprints.infra.events.sampledata.createFaceCaptureBiometricsEvent
 import com.simprints.infra.events.sampledata.createFaceCaptureConfirmationEvent
 import com.simprints.infra.events.sampledata.createFaceCaptureEvent
@@ -92,6 +93,7 @@ import com.simprints.infra.eventsync.event.validateExternalCredentialCaptureValu
 import com.simprints.infra.eventsync.event.validateExternalCredentialConfirmationApiModel
 import com.simprints.infra.eventsync.event.validateExternalCredentialSearchApiModel
 import com.simprints.infra.eventsync.event.validateExternalCredentialSelectionEventApiModel
+import com.simprints.infra.eventsync.event.validateFaceCaptureAttemptEventApiModel
 import com.simprints.infra.eventsync.event.validateFaceCaptureBiometricsEventApiModel
 import com.simprints.infra.eventsync.event.validateFaceCaptureConfirmationEventApiModel
 import com.simprints.infra.eventsync.event.validateFaceCaptureEventApiModel
@@ -487,6 +489,15 @@ internal class MapDomainEventToApiUseCaseTest {
     }
 
     @Test
+    fun validate_FaceCaptureAttemptEventApiModel() {
+        val event = createFaceCaptureAttemptEvent()
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(SimJson.encodeToString(apiEvent))
+
+        validateFaceCaptureAttemptEventApiModel(json)
+    }
+
+    @Test
     fun validate_FaceFallbackCaptureEventApiModel() {
         val event = createFaceFallbackCaptureEvent()
         val apiEvent = useCase(event, project)
@@ -753,6 +764,7 @@ internal class MapDomainEventToApiUseCaseTest {
             FaceCaptureConfirmation -> validate_FaceCaptureConfirmationEventApiModel()
             FingerprintCaptureBiometrics -> validate_FingerprintCaptureBiometricsEventApiModel()
             FaceCaptureBiometrics -> validate_FaceCaptureBiometricsEventApiModel()
+            FaceCaptureAttempt -> validate_FaceCaptureAttemptEventApiModel()
             EventDownSyncRequest -> validate_DownSyncRequestEventApiModel()
             EventUpSyncRequest -> validate_UpSyncRequestEventApiModel()
             SampleUpSyncRequest -> validate_SampleUpSyncRequestEventApiModel()
