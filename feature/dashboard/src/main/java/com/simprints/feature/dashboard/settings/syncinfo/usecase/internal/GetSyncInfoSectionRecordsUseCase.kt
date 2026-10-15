@@ -17,7 +17,7 @@ import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.sync.ImageSyncStatus
-import com.simprints.infra.sync.SyncableCounts
+import com.simprints.infra.sync.devicestate.DeviceDataState
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -31,7 +31,8 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
         projectId: String,
         eventSyncState: EventSyncState,
         imageSyncStatus: ImageSyncStatus,
-        syncableCounts: SyncableCounts,
+        deviceDataState: DeviceDataState,
+        downSyncCounts: DownSyncCounts,
         isProjectRunning: Boolean,
         moduleCounts: List<ModuleCount>,
         projectConfig: ProjectConfiguration,
@@ -39,12 +40,12 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
         val isSyncInProgress = eventSyncState.isSyncInProgress() ||
             (isPreLogoutUpSync && imageSyncStatus.isSyncing) // also in progress if combined with image sync
 
-        val counterTotalRecords = getRecordsTotal(isSyncInProgress, projectId, syncableCounts)
-        val counterRecordsToDownload = getRecordsToDownload(isSyncInProgress, isPreLogoutUpSync, projectConfig, syncableCounts)
-        val counterRecordsToUpload = getRecordsToUpload(isSyncInProgress, syncableCounts)
-        val counterImagesToUpload = getImagesToUpload(imageSyncStatus, syncableCounts)
+        val counterTotalRecords = getRecordsTotal(isSyncInProgress, projectId, deviceDataState)
+        val counterRecordsToDownload = getRecordsToDownload(isSyncInProgress, isPreLogoutUpSync, projectConfig, downSyncCounts)
+        val counterRecordsToUpload = getRecordsToUpload(isSyncInProgress, deviceDataState)
+        val counterImagesToUpload = getImagesToUpload(imageSyncStatus, deviceDataState)
 
-        val progress = getSyncProgressInfo(isSyncInProgress, isPreLogoutUpSync, eventSyncState, imageSyncStatus, syncableCounts)
+        val progress = getSyncProgressInfo(isSyncInProgress, isPreLogoutUpSync, eventSyncState, imageSyncStatus, deviceDataState)
 
         val recordSyncVisibleState =
             getSyncVisibleState(isSyncInProgress, isOnline, isPreLogoutUpSync, projectConfig, moduleCounts, eventSyncState)
@@ -82,41 +83,39 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
         isSyncInProgress: Boolean,
         isPreLogoutUpSync: Boolean,
         projectConfig: ProjectConfiguration,
-        syncableCounts: SyncableCounts,
+        downSyncCounts: DownSyncCounts,
     ): String = when {
         isSyncInProgress || isPreLogoutUpSync -> null
-        projectConfig.isSimprintsEventDownSyncAllowed() -> with(syncableCounts) {
-            DownSyncCounts(recordEventsToDownload, isRecordEventsToDownloadLowerBound)
-        }
+        projectConfig.isSimprintsEventDownSyncAllowed() -> downSyncCounts
         else -> DownSyncCounts(0, isLowerBound = false)
     }?.let { "${it.count}${if (it.isLowerBound) "+" else ""}" }.orEmpty()
 
     private fun getRecordsTotal(
         isSyncInProgress: Boolean,
         projectId: String,
-        syncableCounts: SyncableCounts,
+        deviceDataState: DeviceDataState,
     ): String = if (isSyncInProgress || projectId.isBlank()) {
         ""
     } else {
-        syncableCounts.totalRecords.toString()
+        deviceDataState.recordCount?.toString().orEmpty()
     }
 
     private fun getRecordsToUpload(
         isSyncInProgress: Boolean,
-        syncableCounts: SyncableCounts,
+        deviceDataState: DeviceDataState,
     ): String = if (isSyncInProgress) {
         ""
     } else {
-        syncableCounts.enrolmentsToUpload.toString()
+        deviceDataState.pendingEnrolments?.toString().orEmpty()
     }
 
     private fun getImagesToUpload(
         imageSyncStatus: ImageSyncStatus,
-        syncableCounts: SyncableCounts,
+        deviceDataState: DeviceDataState,
     ): String = if (imageSyncStatus.isSyncing) {
         ""
     } else {
-        syncableCounts.samplesToUpload.toString()
+        deviceDataState.pendingSamples?.toString().orEmpty()
     }
 
     private fun getSyncProgressInfo(
@@ -124,7 +123,7 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
         isPreLogoutUpSync: Boolean,
         eventSyncState: EventSyncState,
         imageSyncStatus: ImageSyncStatus,
-        syncableCounts: SyncableCounts,
+        deviceDataState: DeviceDataState,
     ): SyncProgressInfo {
         if (!isSyncInProgress) {
             return SyncProgressInfo()
@@ -142,7 +141,8 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
         )
         val imageSyncProgressPart = SyncProgressInfoPart(
             isPending = eventSyncState.isSyncInProgress() && !imageSyncStatus.isSyncing,
-            isDone = !eventSyncState.isSyncInProgress() && !imageSyncStatus.isSyncing && syncableCounts.samplesToUpload == 0,
+            // An unreadable sample count (null) is deliberately not "done".
+            isDone = !eventSyncState.isSyncInProgress() && !imageSyncStatus.isSyncing && deviceDataState.pendingSamples == 0,
             areNumbersVisible = imageSyncStatus.isSyncing && totalImages > 0,
             currentNumber = currentImages,
             totalNumber = totalImages,

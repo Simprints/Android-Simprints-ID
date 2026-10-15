@@ -2,13 +2,16 @@ package com.simprints.infra.eventsync.sync.master
 
 import android.os.PowerManager
 import androidx.work.ListenableWorker
+import androidx.work.WorkInfo
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.sync.SyncFailureReason
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_UNEXPECTEDLY
 import com.simprints.infra.eventsync.sync.common.SyncWorkersInfoProvider
 import com.simprints.infra.eventsync.sync.master.EventEndSyncReporterWorker.Companion.EVENT_DOWN_SYNC_SCOPE_TO_CLOSE
 import com.simprints.infra.eventsync.sync.master.EventEndSyncReporterWorker.Companion.EVENT_UP_SYNC_SCOPE_TO_CLOSE
@@ -51,7 +54,7 @@ internal class EventEndSyncReporterWorkerTest {
         val result = endSyncReportWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
-        coVerify(exactly = 0) { syncCache.storeLastSuccessfulSyncTime(any()) }
+        coVerify(exactly = 0) { syncCache.storeLastSyncOutcome(any(), any()) }
     }
 
     @Test
@@ -60,16 +63,16 @@ internal class EventEndSyncReporterWorkerTest {
         val result = endSyncReportWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
-        coVerify(exactly = 0) { syncCache.storeLastSuccessfulSyncTime(any()) }
+        coVerify(exactly = 0) { syncCache.storeLastSyncOutcome(any(), any()) }
     }
 
     @Test
-    fun `doWork should succeed otherwise and save the last success time`() = runTest {
+    fun `doWork should succeed otherwise and record the attempt`() = runTest {
         val endSyncReportWorker = createWorker("sync id", null, null)
         val result = endSyncReportWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
-        coVerify(exactly = 1) { syncCache.storeLastSuccessfulSyncTime(any()) }
+        coVerify(exactly = 1) { syncCache.storeLastSyncOutcome(any(), any()) }
     }
 
     @Test
@@ -91,7 +94,7 @@ internal class EventEndSyncReporterWorkerTest {
     }
 
     @Test
-    fun `doWork should not save last success time when workers contain failure flags`() = runTest {
+    fun `doWork still records the attempt when workers contain failure flags`() = runTest {
         every { syncWorkersInfoProvider.getSyncWorkerInfos(any()) } returns flowOf(
             listOf(
                 mockk(relaxed = true) {
@@ -104,7 +107,75 @@ internal class EventEndSyncReporterWorkerTest {
         val result = endSyncReportWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
-        coVerify(exactly = 0) { syncCache.storeLastSuccessfulSyncTime(any()) }
+        // The one timestamp moves whatever the outcome, so a device whose syncs keep failing
+        // cannot be mistaken for one that simply stopped syncing.
+        coVerify(exactly = 1) { syncCache.storeLastSyncOutcome(Timestamp(1), SyncFailureReason.CLOUD_INTEGRATION) }
+    }
+
+    @Test
+    fun `doWork stores a succeeded outcome when no worker failed`() = runTest {
+        every { syncWorkersInfoProvider.getSyncWorkerInfos(any()) } returns flowOf(
+            listOf(
+                mockk(relaxed = true) {
+                    every { outputData } returns workDataOf()
+                    every { state } returns WorkInfo.State.SUCCEEDED
+                },
+            ),
+        )
+
+        createWorker("sync id", null, null).doWork()
+
+        coVerify(exactly = 1) { syncCache.storeLastSyncOutcome(Timestamp(1), null) }
+    }
+
+    @Test
+    fun `doWork records an uncategorised worker error as a failure, not a success`() = runTest {
+        // Sync workers succeed with the reason in their output, so an error they could not
+        // categorise would otherwise be stored as a clean run.
+        every { syncWorkersInfoProvider.getSyncWorkerInfos(any()) } returns flowOf(
+            listOf(
+                mockk(relaxed = true) {
+                    every { outputData } returns workDataOf(OUTPUT_FAILED_UNEXPECTEDLY to true)
+                    every { state } returns WorkInfo.State.SUCCEEDED
+                },
+            ),
+        )
+
+        createWorker("sync id", null, null).doWork()
+
+        coVerify(exactly = 1) { syncCache.storeLastSyncOutcome(Timestamp(1), SyncFailureReason.UNKNOWN) }
+    }
+
+    @Test
+    fun `doWork records a worker left in the failed state as a failure`() = runTest {
+        every { syncWorkersInfoProvider.getSyncWorkerInfos(any()) } returns flowOf(
+            listOf(
+                mockk(relaxed = true) {
+                    every { outputData } returns workDataOf()
+                    every { state } returns WorkInfo.State.FAILED
+                },
+            ),
+        )
+
+        createWorker("sync id", null, null).doWork()
+
+        coVerify(exactly = 1) { syncCache.storeLastSyncOutcome(Timestamp(1), SyncFailureReason.UNKNOWN) }
+    }
+
+    @Test
+    fun `doWork keeps a categorised reason over the uncategorised fallback`() = runTest {
+        every { syncWorkersInfoProvider.getSyncWorkerInfos(any()) } returns flowOf(
+            listOf(
+                mockk(relaxed = true) {
+                    every { outputData } returns workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true)
+                    every { state } returns WorkInfo.State.FAILED
+                },
+            ),
+        )
+
+        createWorker("sync id", null, null).doWork()
+
+        coVerify(exactly = 1) { syncCache.storeLastSyncOutcome(Timestamp(1), SyncFailureReason.CLOUD_INTEGRATION) }
     }
 
     private fun createWorker(

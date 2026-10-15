@@ -45,6 +45,14 @@ interface EventRepository {
 
     suspend fun getClosedEventScopesCount(type: EventScopeType): Int
 
+    /**
+     * Reactive count of *closed* event scopes per type, zero-filled for every [EventScopeType].
+     *
+     * An open scope - the session currently being recorded, or an in-flight sync scope - is not
+     * counted, matching [getClosedEventScopesCount].
+     */
+    fun observeClosedEventScopeCounts(): Flow<Map<EventScopeType, Int>>
+
     suspend fun deleteEventScope(scopeId: String)
 
     suspend fun deleteEventScopes(scopeIds: List<String>)

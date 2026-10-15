@@ -5,7 +5,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.sync.ImageSyncStatus
-import com.simprints.infra.sync.SyncableCounts
+import com.simprints.infra.sync.devicestate.DeviceDataState
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.mockk
@@ -24,14 +24,7 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
         every { progress } returns null
         every { lastUpdateTimeMillis } returns null
     }
-    private val mockSyncableCounts = SyncableCounts(
-        totalRecords = 0,
-        recordEventsToDownload = 0,
-        isRecordEventsToDownloadLowerBound = false,
-        eventsToUpload = 0,
-        enrolmentsToUpload = 0,
-        samplesToUpload = 0,
-    )
+    private val mockDeviceDataState = createDeviceDataState()
 
     private lateinit var useCase: GetSyncInfoSectionImagesUseCase
 
@@ -54,7 +47,7 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
             isOnline = false,
             eventSyncState = mockEventSyncState,
             imageSyncStatus = mockNotSyncingImageStatus,
-            syncableCounts = mockSyncableCounts,
+            deviceDataState = mockDeviceDataState,
         )
 
         assertThat(result.isInstructionOfflineVisible).isTrue()
@@ -71,7 +64,7 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
             isOnline = true,
             eventSyncState = mockNormalEventSyncState,
             imageSyncStatus = mockImageSyncStatus,
-            syncableCounts = mockSyncableCounts,
+            deviceDataState = mockDeviceDataState,
         )
 
         assertThat(result.isSyncButtonEnabled).isTrue()
@@ -90,7 +83,7 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
             isOnline = true,
             eventSyncState = mockEventSyncState,
             imageSyncStatus = mockImageStatusWithLastSync,
-            syncableCounts = mockSyncableCounts,
+            deviceDataState = mockDeviceDataState,
         )
 
         assertThat(result.isFooterLastSyncTimeVisible).isTrue()
@@ -109,7 +102,7 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
             isOnline = true,
             eventSyncState = mockEventSyncState,
             imageSyncStatus = imageSyncStatus,
-            syncableCounts = mockSyncableCounts,
+            deviceDataState = mockDeviceDataState,
         )
 
         assertThat(result.isProgressVisible).isTrue()
@@ -127,7 +120,7 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
             isOnline = true,
             eventSyncState = mockEventSyncState,
             imageSyncStatus = mockNotSyncingImageStatus,
-            syncableCounts = mockSyncableCounts,
+            deviceDataState = mockDeviceDataState,
         )
 
         assertThat(result.isProgressVisible).isFalse()
@@ -140,13 +133,13 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
             every { isSyncing } returns false
             every { progress } returns null
         }
-        val syncableCounts = mockSyncableCounts.copy(samplesToUpload = 15)
+        val deviceDataState = createDeviceDataState(pendingSamples = 15)
 
         val result = useCase(
             isOnline = true,
             eventSyncState = mockEventSyncState,
             imageSyncStatus = mockNotSyncingImageStatus,
-            syncableCounts = syncableCounts,
+            deviceDataState = deviceDataState,
         )
 
         assertThat(result.counterImagesToUpload).isEqualTo("15")
@@ -164,7 +157,7 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
             isOnline = true,
             eventSyncState = mockEventSyncState,
             imageSyncStatus = imageSyncStatus,
-            syncableCounts = mockSyncableCounts,
+            deviceDataState = mockDeviceDataState,
         )
 
         assertThat(result.counterImagesToUpload).isEmpty()
@@ -183,7 +176,7 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
             isOnline = true,
             eventSyncState = mockEventSyncState,
             imageSyncStatus = mockImageStatusWithLastSync,
-            syncableCounts = mockSyncableCounts,
+            deviceDataState = mockDeviceDataState,
         )
 
         assertThat(result.isFooterLastSyncTimeVisible).isTrue()
@@ -202,7 +195,7 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
             isOnline = true,
             eventSyncState = mockEventSyncState,
             imageSyncStatus = mockImageStatusWithoutLastSync,
-            syncableCounts = mockSyncableCounts,
+            deviceDataState = mockDeviceDataState,
         )
 
         assertThat(result.isFooterLastSyncTimeVisible).isFalse()
@@ -220,9 +213,34 @@ internal class GetSyncInfoSectionImagesUseCaseTest {
             isOnline = true,
             eventSyncState = mockEventSyncState,
             imageSyncStatus = mockImageStatusWithNegativeTimestamp,
-            syncableCounts = mockSyncableCounts,
+            deviceDataState = mockDeviceDataState,
         )
 
         assertThat(result.isFooterLastSyncTimeVisible).isFalse()
+    }
+
+    private fun createDeviceDataState(pendingSamples: Int? = 0): DeviceDataState = DeviceDataState(
+        projectId = "projectId",
+        recordCount = 0,
+        pendingScopes = emptyMap(),
+        pendingEvents = 0,
+        pendingEnrolments = 0,
+        pendingSamples = pendingSamples,
+        lastEventSyncAt = null,
+        lastEventSyncFailure = null,
+        lastSampleSyncAt = null,
+        lastSampleSyncFailure = null,
+    )
+
+    @Test
+    fun `should render an unreadable sample count as unknown rather than zero`() = runTest {
+        val result = useCase(
+            isOnline = true,
+            eventSyncState = mockEventSyncState,
+            imageSyncStatus = mockImageSyncStatus,
+            deviceDataState = createDeviceDataState(pendingSamples = null),
+        )
+
+        assertThat(result.counterImagesToUpload).isEqualTo("")
     }
 }

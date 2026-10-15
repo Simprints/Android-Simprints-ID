@@ -45,6 +45,6 @@ internal class DeleteSyncInfoUseCaseTest {
         coVerify(exactly = 1) { commCareSyncCache.clearAllSyncedCases() }
         coVerify(exactly = 1) { upSyncScopeRepository.deleteAll() }
         coVerify(exactly = 1) { eventSyncCache.clearProgresses() }
-        coVerify(exactly = 1) { eventSyncCache.storeLastSuccessfulSyncTime(null) }
+        coVerify(exactly = 1) { eventSyncCache.clearLastSyncOutcome() }
     }
 }

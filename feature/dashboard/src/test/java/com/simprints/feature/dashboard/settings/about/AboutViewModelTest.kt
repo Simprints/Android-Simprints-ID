@@ -15,14 +15,12 @@ import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
-import com.simprints.infra.sync.SyncableCounts
-import com.simprints.infra.sync.usecase.ObserveSyncableCountsUseCase
+import com.simprints.infra.sync.devicestate.DeviceStateDataTracker
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -56,7 +54,7 @@ class AboutViewModelTest {
     )
 
     @MockK
-    lateinit var observeSyncableCounts: ObserveSyncableCountsUseCase
+    lateinit var deviceStateDataTracker: DeviceStateDataTracker
 
     @MockK
     lateinit var configRepository: ConfigRepository
@@ -79,7 +77,7 @@ class AboutViewModelTest {
     fun `should initialize the live data correctly`() = runTest(testDispatcher) {
         val viewModel = AboutViewModel(
             configRepository = configRepository,
-            observeSyncableCounts = observeSyncableCounts,
+            deviceStateDataTracker = deviceStateDataTracker,
             recentUserActivityManager = recentUserActivityManager,
             syncOrchestrator = syncOrchestrator,
         )
@@ -196,6 +194,20 @@ class AboutViewModelTest {
         }
     }
 
+    @Test
+    fun `should read pending events freshly rather than reusing an earlier value`() = runTest(testDispatcher) {
+        val viewModel = buildAboutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = false)
+        viewModel.processLogoutRequest()
+        assertThat(viewModel.logoutDestinationEvent.getOrAwaitValue().peekContent())
+            .isEqualTo(LogoutDestination.LoginScreen)
+
+        coEvery { deviceStateDataTracker.hasPendingEvents() } returns true
+        viewModel.processLogoutRequest()
+
+        assertThat(viewModel.logoutDestinationEvent.getOrAwaitValue().peekContent())
+            .isEqualTo(LogoutDestination.LogoutDataSyncScreen)
+    }
+
     private fun buildAboutViewModel(
         canSyncDataToSimprints: Boolean,
         hasEventsToUpload: Boolean,
@@ -204,26 +216,13 @@ class AboutViewModelTest {
             true -> UpSynchronizationConfiguration.UpSynchronizationKind.ALL
             false -> UpSynchronizationConfiguration.UpSynchronizationKind.NONE
         }
-        val countEventsToUpload = when (hasEventsToUpload) {
-            true -> 1
-            false -> 0
-        }
-        every { observeSyncableCounts.invoke() } returns flowOf(
-            SyncableCounts(
-                totalRecords = 0,
-                recordEventsToDownload = 0,
-                isRecordEventsToDownloadLowerBound = false,
-                eventsToUpload = countEventsToUpload,
-                enrolmentsToUpload = 0,
-                samplesToUpload = 0,
-            ),
-        )
+        coEvery { deviceStateDataTracker.hasPendingEvents() } returns hasEventsToUpload
         coEvery { configRepository.getProjectConfiguration() } returns buildProjectConfigurationMock(
             upSyncKind,
         )
         return AboutViewModel(
             configRepository = configRepository,
-            observeSyncableCounts = observeSyncableCounts,
+            deviceStateDataTracker = deviceStateDataTracker,
             recentUserActivityManager = recentUserActivityManager,
             syncOrchestrator = syncOrchestrator,
         )

@@ -3,6 +3,7 @@ package com.simprints.infra.sync.files
 import android.os.PowerManager
 import androidx.work.ListenableWorker.Result
 import com.google.common.truth.*
+import com.simprints.core.domain.sync.SyncFailureReason
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.sync.ImageSyncTimestampProvider
@@ -10,7 +11,9 @@ import com.simprints.infra.sync.SyncConstants
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -64,7 +67,7 @@ class FileUpSyncWorkerTest {
         // Then
         Truth.assertThat(Result.success()).isEqualTo(result)
         coVerify(exactly = 1) { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID, any()) }
-        coVerify(exactly = 1) { imageSyncTimestampProvider.saveImageSyncCompletionTimestampNow() }
+        coVerify(exactly = 1) { imageSyncTimestampProvider.saveImageSyncOutcomeNow(failure = null) }
     }
 
     @Test
@@ -78,7 +81,8 @@ class FileUpSyncWorkerTest {
         // Then
         Truth.assertThat(Result.retry()).isEqualTo(result)
         coVerify(exactly = 1) { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID, any()) }
-        coVerify(exactly = 0) { imageSyncTimestampProvider.saveImageSyncCompletionTimestampNow() }
+        // A retry is still an attempt that ended without uploading anything.
+        coVerify(exactly = 1) { imageSyncTimestampProvider.saveImageSyncOutcomeNow(SyncFailureReason.UNKNOWN) }
     }
 
     @Test
@@ -92,7 +96,20 @@ class FileUpSyncWorkerTest {
         // Then
         Truth.assertThat(Result.retry()).isEqualTo(result)
         coVerify(exactly = 1) { imageRepository.uploadStoredImagesAndDelete(any(), any()) }
-        coVerify(exactly = 0) { imageSyncTimestampProvider.saveImageSyncCompletionTimestampNow() }
+        coVerify(exactly = 1) { imageSyncTimestampProvider.saveImageSyncOutcomeNow(SyncFailureReason.UNKNOWN) }
+    }
+
+    @Test
+    fun `doWork lets cancellation through without recording an attempt`() = runBlocking {
+        // Cancelling the worker is not an upload attempt, and catching it here would also swallow
+        // cooperative cancellation.
+        coEvery { imageRepository.uploadStoredImagesAndDelete(any(), any()) } throws CancellationException("cancelled")
+
+        assertThrows(CancellationException::class.java) {
+            runBlocking { fileUpSyncWorker.doWork() }
+        }
+
+        coVerify(exactly = 0) { imageSyncTimestampProvider.saveImageSyncOutcomeNow(any()) }
     }
 
     @Test

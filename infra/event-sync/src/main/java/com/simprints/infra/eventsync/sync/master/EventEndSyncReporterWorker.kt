@@ -10,7 +10,7 @@ import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.SyncWorkersInfoProvider
-import com.simprints.infra.eventsync.sync.common.hasAnyFailureReason
+import com.simprints.infra.eventsync.sync.common.firstFailureReason
 import com.simprints.infra.logging.Simber
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -20,7 +20,7 @@ import kotlinx.coroutines.withContext
 
 /**
  * It's executed at the end of the sync, when all workers succeed (downloaders and uploaders).
- * It stores the "last successful timestamp"
+ * It stores when the sync was attempted, and how it turned out.
  */
 @HiltWorker
 internal class EventEndSyncReporterWorker @AssistedInject constructor(
@@ -50,15 +50,16 @@ internal class EventEndSyncReporterWorker @AssistedInject constructor(
             }
 
             if (!syncId.isNullOrEmpty()) {
-                val hasWorkerFailures = syncWorkersInfoProvider
+                val failure = syncWorkersInfoProvider
                     .getSyncWorkerInfos(syncId)
                     .firstOrNull()
                     .orEmpty()
-                    .any { it.hasAnyFailureReason() }
+                    .firstFailureReason()
 
-                if (!hasWorkerFailures) {
-                    syncCache.storeLastSuccessfulSyncTime(timeHelper.now())
-                }
+                // Stored whatever the outcome, so that a device whose syncs keep failing cannot be
+                // mistaken for one that simply stopped syncing. Only a success moves the success
+                // time, which is what says how stale the data is.
+                syncCache.storeLastSyncOutcome(timeHelper.now(), failure)
                 success()
             } else {
                 throw IllegalArgumentException("SyncId missed")

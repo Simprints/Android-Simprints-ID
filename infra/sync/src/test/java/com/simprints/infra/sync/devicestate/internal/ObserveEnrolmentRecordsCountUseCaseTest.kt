@@ -1,9 +1,10 @@
-package com.simprints.infra.sync.usecase.internal
+package com.simprints.infra.sync.devicestate.internal
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.images.ImageRepository
+import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.sync.config.testtools.projectConfiguration
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -22,27 +23,27 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ObserveSamplesToUploadCountUseCaseTest {
+class ObserveEnrolmentRecordsCountUseCaseTest {
     @MockK
     private lateinit var configRepository: ConfigRepository
 
     @MockK
-    private lateinit var imageRepository: ImageRepository
+    private lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
-    private lateinit var useCase: ObserveSamplesToUploadCountUseCase
+    private lateinit var useCase: ObserveEnrolmentRecordsCountUseCase
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        useCase = ObserveSamplesToUploadCountUseCase(configRepository, imageRepository)
+        useCase = ObserveEnrolmentRecordsCountUseCase(configRepository, enrolmentRecordRepository)
     }
 
     @Test
-    fun `maps project id to observed sample upload count`() = runTest {
+    fun `maps project id to observed enrolment record count`() = runTest {
         val configFlow = MutableSharedFlow<ProjectConfiguration>()
-        val sampleCountFlow = MutableSharedFlow<Int>()
+        val recordCountFlow = MutableSharedFlow<Int>()
         every { configRepository.observeProjectConfiguration() } returns configFlow
-        coEvery { imageRepository.observeNumberOfImagesToUpload(PROJECT_ID) } returns sampleCountFlow
+        coEvery { enrolmentRecordRepository.observeCount(EnrolmentRecordQuery(PROJECT_ID)) } returns recordCountFlow
         val emitted = mutableListOf<Int>()
 
         val collectJob = launch { useCase().take(2).toList(emitted) }
@@ -50,23 +51,23 @@ class ObserveSamplesToUploadCountUseCaseTest {
         runCurrent()
         configFlow.emit(projectConfiguration.copy(projectId = PROJECT_ID))
         runCurrent()
-        sampleCountFlow.emit(0)
-        sampleCountFlow.emit(5)
+        recordCountFlow.emit(0)
+        recordCountFlow.emit(5)
         runCurrent()
         collectJob.join()
         assertThat(emitted).containsExactly(0, 5).inOrder()
         verify(exactly = 1) { configRepository.observeProjectConfiguration() }
-        coVerify(exactly = 1) { imageRepository.observeNumberOfImagesToUpload(PROJECT_ID) }
+        coVerify(exactly = 1) { enrolmentRecordRepository.observeCount(EnrolmentRecordQuery(PROJECT_ID)) }
     }
 
     @Test
-    fun `switches to latest project sample count flow when project id changes`() = runTest {
+    fun `switches to latest project enrolment record count flow when project id changes`() = runTest {
         val configFlow = MutableSharedFlow<ProjectConfiguration>()
-        val sampleCountFlow1 = MutableSharedFlow<Int>()
-        val sampleCountFlow2 = MutableSharedFlow<Int>()
+        val recordCountFlow1 = MutableSharedFlow<Int>()
+        val recordCountFlow2 = MutableSharedFlow<Int>()
         every { configRepository.observeProjectConfiguration() } returns configFlow
-        coEvery { imageRepository.observeNumberOfImagesToUpload(PROJECT_ID_1) } returns sampleCountFlow1
-        coEvery { imageRepository.observeNumberOfImagesToUpload(PROJECT_ID_2) } returns sampleCountFlow2
+        coEvery { enrolmentRecordRepository.observeCount(EnrolmentRecordQuery(PROJECT_ID_1)) } returns recordCountFlow1
+        coEvery { enrolmentRecordRepository.observeCount(EnrolmentRecordQuery(PROJECT_ID_2)) } returns recordCountFlow2
         val emitted = mutableListOf<Int>()
 
         val collectJob = launch { useCase().take(2).toList(emitted) }
@@ -75,20 +76,20 @@ class ObserveSamplesToUploadCountUseCaseTest {
         configFlow.emit(projectConfiguration.copy(projectId = PROJECT_ID_1))
         runCurrent()
 
-        sampleCountFlow1.emit(1)
+        recordCountFlow1.emit(1)
         runCurrent()
 
         configFlow.emit(projectConfiguration.copy(projectId = PROJECT_ID_2))
         runCurrent()
 
-        sampleCountFlow1.emit(2) // should be ignored due to flatMapLatest
-        sampleCountFlow2.emit(3)
+        recordCountFlow1.emit(2) // should be ignored due to flatMapLatest
+        recordCountFlow2.emit(3)
         runCurrent()
 
         collectJob.join()
         assertThat(emitted).containsExactly(1, 3).inOrder()
-        coVerify(exactly = 1) { imageRepository.observeNumberOfImagesToUpload(PROJECT_ID_1) }
-        coVerify(exactly = 1) { imageRepository.observeNumberOfImagesToUpload(PROJECT_ID_2) }
+        coVerify(exactly = 1) { enrolmentRecordRepository.observeCount(EnrolmentRecordQuery(PROJECT_ID_1)) }
+        coVerify(exactly = 1) { enrolmentRecordRepository.observeCount(EnrolmentRecordQuery(PROJECT_ID_2)) }
     }
 
     companion object {
