@@ -33,3 +33,15 @@ project(":infra:resources") {
         skipProject = true
     }
 }
+
+/**
+ * The benchmark module only has the "benchmark" variant (no "debug") and contains no production
+ * code, so it is excluded from analysis. The variant still has to point at an existing one,
+ * otherwise the sonarResolver task fails to configure.
+ */
+project(":benchmark") {
+    sonar {
+        androidVariant = "benchmark"
+        skipProject = true
+    }
+}
