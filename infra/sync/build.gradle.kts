@@ -1,5 +1,7 @@
 plugins {
     id("simprints.infra")
+    id("simprints.library.kotlinSerialization")
+    id("simprints.library.backendApi")
 }
 
 android {
@@ -42,5 +44,4 @@ dependencies {
     implementation(project(":fingerprint:infra:scanner"))
 
     implementation(libs.workManager.work)
-    implementation(libs.kotlin.serialization)
 }
