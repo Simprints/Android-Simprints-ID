@@ -12,6 +12,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
+import net.lingala.zip4j.ZipFile
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -93,6 +94,7 @@ class ExportLogsUseCaseTest {
         )
 
         coVerify(exactly = 0) { projectConfiguration.projectId }
+        assertArchivePassword("1234")
     }
 
     @Test
@@ -137,5 +139,33 @@ class ExportLogsUseCaseTest {
         )
 
         coVerify(exactly = 1) { projectConfiguration.projectId }
+        assertArchivePassword("projectId")
+    }
+
+    @Test
+    fun `if there is no password and project id, zip is created with device id`() = runTest {
+        every { logDirectoryProvider.invoke(any()) } returns logFilesRoot.also {
+            it.mkdirs()
+            File(it, "file1").createNewFile()
+        }
+        coEvery {
+            projectConfiguration.general.settingsPassword.getNullablePassword()
+        } returns null
+        coEvery { projectConfiguration.projectId } returns ""
+
+        val results = exportLogsUseCase.invoke().toList()
+        assertThat(results).containsExactly(
+            ExportLogsUseCase.LogsExportResult.InProgress,
+            ExportLogsUseCase.LogsExportResult.Success("deviceId", File("cache/log_archives/fileName_deviceId.zip")),
+        )
+
+        assertArchivePassword("deviceId")
+    }
+
+    private fun assertArchivePassword(password: String) {
+        val archive = File("cache/log_archives/fileName_deviceId.zip")
+        val extractDir = File(cacheFileRoot, "extracted")
+        ZipFile(archive, password.toCharArray()).extractAll(extractDir.path)
+        assertThat(File(extractDir, "file1").exists()).isTrue()
     }
 }
