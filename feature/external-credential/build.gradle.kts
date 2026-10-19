@@ -20,4 +20,5 @@ dependencies {
     implementation(project(":infra:camera"))
 
     implementation(libs.mlkit.text.recognition)
+    implementation(libs.playServices.barcode)
 }

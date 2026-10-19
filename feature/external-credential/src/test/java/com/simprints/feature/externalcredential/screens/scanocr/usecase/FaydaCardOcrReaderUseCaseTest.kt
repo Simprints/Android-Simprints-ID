@@ -5,6 +5,7 @@ import com.simprints.feature.externalcredential.model.BoundingBox
 import com.simprints.feature.externalcredential.screens.scanocr.reader.OcrLine
 import com.simprints.feature.externalcredential.screens.scanocr.reader.OcrReader
 import com.simprints.feature.externalcredential.screens.scanocr.reader.OcrText
+import com.simprints.feature.externalcredential.screens.scanocr.reader.ScannedBarcode
 import io.mockk.MockKAnnotations
 import org.junit.Before
 import org.junit.Test
@@ -104,6 +105,52 @@ internal class FaydaCardOcrReaderUseCaseTest {
         assertThat(result?.credential?.id).isEqualTo(2)
         assertThat(result?.credential?.text).isEqualTo("8642370540168134")
     }
+
+    @Test
+    fun `returns FAN from barcode`() {
+        val barcodes = listOf(barcode("2580945924815610", top = 100, bottom = 140))
+
+        val result = useCase.fromBarcodes(barcodes)
+
+        assertThat(result?.credential?.text).isEqualTo("2580945924815610")
+        assertThat(result?.credential?.confidence).isEqualTo(1f)
+        assertThat(result?.isFromBarcode).isTrue()
+    }
+
+    @Test
+    fun `uses barcode box as credential box`() {
+        val result = useCase.fromBarcodes(listOf(barcode("2580945924815610", top = 100, bottom = 140)))
+
+        assertThat(result?.credential?.boundingBox).isEqualTo(BoundingBox(left = 10, top = 100, right = 200, bottom = 140))
+        assertThat(result?.credential?.blockBoundingBox).isEqualTo(result?.credential?.boundingBox)
+    }
+
+    @Test
+    fun `skips barcodes that are not a FAN`() {
+        val barcodes = listOf(
+            barcode("ABC123", top = 0, bottom = 10),
+            barcode("123456781234567", top = 0, bottom = 10), // 15 digits
+            barcode("1234 5678 1234 5678", top = 0, bottom = 10), // separators are not expected in barcodes
+            barcode("2580945924815610", top = 100, bottom = 140),
+        )
+
+        assertThat(useCase.fromBarcodes(barcodes)?.credential?.text).isEqualTo("2580945924815610")
+    }
+
+    @Test
+    fun `returns null when no barcode is a FAN`() {
+        assertThat(useCase.fromBarcodes(emptyList())).isNull()
+        assertThat(useCase.fromBarcodes(listOf(barcode("12345678123456789", top = 0, bottom = 10)))).isNull()
+    }
+
+    private fun barcode(
+        value: String,
+        top: Int,
+        bottom: Int,
+    ) = ScannedBarcode(
+        value = value,
+        boundingBox = BoundingBox(left = 10, top = top, right = 200, bottom = bottom),
+    )
 
     private fun buildReader(vararg lines: OcrLine) = OcrReader(
         OcrText(allLines = lines.toList()),

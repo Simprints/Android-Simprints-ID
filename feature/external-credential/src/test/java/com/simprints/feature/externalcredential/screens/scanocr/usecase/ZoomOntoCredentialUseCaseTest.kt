@@ -77,6 +77,24 @@ class ZoomOntoCredentialUseCaseTest {
     }
 
     @Test
+    fun `uses a wider margin for barcode bounding boxes`() {
+        val boundingBox = BoundingBox(left = 600, top = 450, right = 1000, bottom = 550)
+        val capturedWidths = mutableListOf<Int>()
+        mockkStatic(Bitmap::class)
+        every {
+            Bitmap.createBitmap(any<Bitmap>(), any(), any(), capture(capturedWidths), any())
+        } returns mockk()
+
+        useCase(imagePath, boundingBox)
+        useCase(imagePath, boundingBox, isBarcode = true)
+
+        val (defaultWidth, barcodeWidth) = capturedWidths
+        assertThat(barcodeWidth).isGreaterThan(defaultWidth)
+        // Barcode margin covers a printed number up to ~30% wider than the barcode
+        assertThat(barcodeWidth).isAtLeast((boundingBox.right - boundingBox.left) * 129 / 100)
+    }
+
+    @Test
     fun `handles bounding box in center of image correctly`() {
         val boundingBox = BoundingBox(left = 400, top = 400, right = 600, bottom = 500)
         val croppedBitmap = mockk<Bitmap>()

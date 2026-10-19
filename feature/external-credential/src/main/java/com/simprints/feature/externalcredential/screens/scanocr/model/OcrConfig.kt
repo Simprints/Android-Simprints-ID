@@ -7,4 +7,5 @@ internal data class OcrConfig(
     val useHighRes: Boolean,
     val keepHighResDetail: Boolean,
     val capturesRequired: Int,
+    val readFaydaBarcode: Boolean,
 )

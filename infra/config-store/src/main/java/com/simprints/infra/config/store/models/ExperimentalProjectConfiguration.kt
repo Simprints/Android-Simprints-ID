@@ -73,6 +73,13 @@ data class ExperimentalProjectConfiguration(
             ?.intOrNull
             ?: OCR_CAPTURES_DEFAULT
 
+    val ocrReadFaydaBarcode: Boolean
+        get() = customConfig
+            ?.get(OCR_READ_FAYDA_BARCODE)
+            ?.jsonPrimitive
+            ?.booleanOrNull
+            ?: OCR_READ_FAYDA_BARCODE_DEFAULT
+
     val allowConfirmingGuidsNotInCallback: Boolean
         get() = customConfig
             ?.get(ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK)
@@ -263,6 +270,8 @@ data class ExperimentalProjectConfiguration(
         internal const val OCR_KEEP_HIGH_RES_DETAIL_DEFAULT = true
         internal const val OCR_CAPTURES = "ocrCaptures"
         internal const val OCR_CAPTURES_DEFAULT = 3
+        const val OCR_READ_FAYDA_BARCODE = "ocrReadFaydaBarcode"
+        internal const val OCR_READ_FAYDA_BARCODE_DEFAULT = false
 
         const val ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK = "allowConfirmingGuidsNotInCallback"
 

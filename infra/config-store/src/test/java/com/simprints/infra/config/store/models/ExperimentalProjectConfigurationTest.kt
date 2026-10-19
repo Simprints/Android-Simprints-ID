@@ -163,6 +163,18 @@ internal class ExperimentalProjectConfigurationTest {
     }
 
     @Test
+    fun `check ocr read fayda barcode flag correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to false,
+            mapOf(ExperimentalProjectConfiguration.OCR_READ_FAYDA_BARCODE to JsonPrimitive(1)) to false,
+            mapOf(ExperimentalProjectConfiguration.OCR_READ_FAYDA_BARCODE to JsonPrimitive(false)) to false,
+            mapOf(ExperimentalProjectConfiguration.OCR_READ_FAYDA_BARCODE to JsonPrimitive(true)) to true,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).ocrReadFaydaBarcode).isEqualTo(result)
+        }
+    }
+
+    @Test
     fun `check allow confirming GUIDs not in callback flag correctly`() {
         mapOf(
             // Value not present
