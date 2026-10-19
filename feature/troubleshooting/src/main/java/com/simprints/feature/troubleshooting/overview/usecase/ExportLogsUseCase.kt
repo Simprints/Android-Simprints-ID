@@ -49,10 +49,15 @@ internal class ExportLogsUseCase @Inject constructor(
             it.mkdirs()
         }.let { File(it, "$name.zip") }
 
-    private suspend fun getPassword() = configRepository
-        .getProjectConfiguration()
-        .let { it.general.settingsPassword.getNullablePassword() ?: it.projectId }
-        .toCharArray()
+    private suspend fun getPassword(): CharArray {
+        val config = configRepository.getProjectConfiguration()
+        val password = config.general.settingsPassword
+            .getNullablePassword()
+            ?.takeIf { it.isNotBlank() }
+            ?: config.projectId.takeIf { it.isNotBlank() }
+            ?: deviceId
+        return password.toCharArray()
+    }
 
     fun createZipArchiveWithPassword(
         archiveFile: File,
