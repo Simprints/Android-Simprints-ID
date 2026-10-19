@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
+import com.simprints.core.api.ApiTimestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.AgeGroupSelectionEvent
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload

@@ -28,6 +28,11 @@ internal object SyncConstants {
     const val EVENT_SYNC_WORK_NAME_ONE_TIME = "event-sync-work-one-time"
     const val EVENT_SYNC_WORKER_INTERVAL = BuildConfig.EVENT_SYNC_WORKER_INTERVAL_MINUTES
 
+    const val DEVICE_STATUS_REPORT_WORK_NAME = "device-status-report-work"
+
+    // Offset from the other workers that are scheduled at the same time to avoid running in parallel
+    const val DEVICE_STATUS_REPORT_INITIAL_DELAY_MINUTES = 20L
+
     const val PROGRESS_CURRENT = "progress_current"
     const val PROGRESS_MAX = "progress_max"
 

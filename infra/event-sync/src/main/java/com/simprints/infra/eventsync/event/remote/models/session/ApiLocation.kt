@@ -1,9 +1,9 @@
 package com.simprints.infra.eventsync.event.remote.models.session
 
 import androidx.annotation.Keep
+import com.simprints.core.api.ApiTimestamp
+import com.simprints.core.api.fromDomainToApi
 import com.simprints.infra.events.event.domain.models.scope.Location
-import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
-import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 import kotlinx.serialization.Serializable
 
 @Keep

@@ -7,7 +7,7 @@ import com.simprints.feature.dashboard.settings.syncinfo.SyncProgressInfo
 import com.simprints.feature.dashboard.settings.syncinfo.SyncProgressInfoPart
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.sync.ImageSyncStatus
-import com.simprints.infra.sync.SyncableCounts
+import com.simprints.infra.sync.devicestate.DeviceDataState
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -18,12 +18,12 @@ internal class GetSyncInfoSectionImagesUseCase @Inject constructor(
         isOnline: Boolean,
         eventSyncState: EventSyncState,
         imageSyncStatus: ImageSyncStatus,
-        syncableCounts: SyncableCounts,
+        deviceDataState: DeviceDataState,
     ): SyncInfoSectionImages {
         val imagesToUploadOrNull = if (imageSyncStatus.isSyncing) {
             null
         } else {
-            syncableCounts.samplesToUpload // internal term is sample, user-facing (within sync info) term is image
+            deviceDataState.pendingSamples
         }
         val progress = getImageSyncProgress(imageSyncStatus)
         val imageLastSyncTimestamp = Timestamp(imageSyncStatus.lastUpdateTimeMillis ?: -1)

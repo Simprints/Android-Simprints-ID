@@ -7,6 +7,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.sync.ImageSyncTimestampProvider
 import com.simprints.infra.sync.SyncConstants
 import io.mockk.MockKAnnotations
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
@@ -30,6 +31,7 @@ class ObserveImageSyncStatusUseCaseTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
+        coEvery { imageSyncTimestampProvider.getLastSuccessfulSyncTimestamp() } returns null
         useCase = ObserveImageSyncStatusUseCase(
             workManager = workManager,
             imageSyncTimestampProvider = imageSyncTimestampProvider,
@@ -40,8 +42,8 @@ class ObserveImageSyncStatusUseCaseTest {
     fun `image sync status returns syncing when worker is running`() = runTest {
         val workInfoFlow = flowOf(createWorkInfos(WorkInfo.State.RUNNING))
         every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
-        every { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns 30_000L
-        every { imageSyncTimestampProvider.getLastImageSyncTimestamp() } returns 1_234_567_890L
+        coEvery { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns 30_000L
+        coEvery { imageSyncTimestampProvider.getLastSuccessfulSyncTimestamp() } returns 1_234_567_890L
 
         val status = useCase().first()
 
@@ -53,8 +55,8 @@ class ObserveImageSyncStatusUseCaseTest {
     fun `image sync status returns not syncing when worker is cancelled`() = runTest {
         val workInfoFlow = flowOf(createWorkInfos(WorkInfo.State.CANCELLED))
         every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
-        every { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns 120_000L
-        every { imageSyncTimestampProvider.getLastImageSyncTimestamp() } returns 1_234_567_890L
+        coEvery { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns 120_000L
+        coEvery { imageSyncTimestampProvider.getLastSuccessfulSyncTimestamp() } returns 1_234_567_890L
 
         val status = useCase().first()
 
@@ -66,8 +68,8 @@ class ObserveImageSyncStatusUseCaseTest {
     fun `image sync status returns null timestamp when no sync has occurred`() = runTest {
         val workInfoFlow = flowOf(createWorkInfos(WorkInfo.State.CANCELLED))
         every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
-        every { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns null
-        every { imageSyncTimestampProvider.getLastImageSyncTimestamp() } returns null
+        coEvery { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns null
+        coEvery { imageSyncTimestampProvider.getLastSuccessfulSyncTimestamp() } returns null
 
         val status = useCase().first()
 
@@ -81,7 +83,7 @@ class ObserveImageSyncStatusUseCaseTest {
         val workInfo2 = createWorkInfosWithProgress(WorkInfo.State.RUNNING)
         val workInfoFlow = flowOf(workInfo1, workInfo2)
         every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
-        every { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns 0L
+        coEvery { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns 0L
 
         val status1 = useCase().first()
         assertThat(status1.progress).isEqualTo(5 to 10)
@@ -94,13 +96,22 @@ class ObserveImageSyncStatusUseCaseTest {
     fun `image sync status returns syncing momentarily when worker succeeds quickly`() = runTest {
         val workInfoFlow = flowOf(createWorkInfos(WorkInfo.State.SUCCEEDED))
         every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
-        every { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns 0L
+        coEvery { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns 0L
 
         val status1 = useCase().first()
         assertThat(status1.isSyncing).isTrue()
 
         val status2 = useCase().drop(1).first()
         assertThat(status2.isSyncing).isFalse()
+    }
+
+    @Test
+    fun `image sync status does not pulse when the quick run uploaded nothing`() = runTest {
+        every { workManager.getWorkInfosFlow(any()) } returns flowOf(createWorkInfos(WorkInfo.State.SUCCEEDED))
+        // A failed attempt leaves the completion time where it was, so it cannot read as "just now".
+        coEvery { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns 120_000L
+
+        assertThat(useCase().first().isSyncing).isFalse()
     }
 
     private fun createWorkInfos(state: WorkInfo.State): List<WorkInfo> = listOf(

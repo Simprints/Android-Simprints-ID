@@ -11,9 +11,10 @@ import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
+import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.sync.ImageSyncStatus
-import com.simprints.infra.sync.SyncableCounts
+import com.simprints.infra.sync.devicestate.DeviceDataState
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.mockk
@@ -224,18 +225,15 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
             syncInProgress = false,
             syncRunning = false,
         )
-        val syncableCounts = createSyncableCounts(
-            totalRecords = 25,
-            recordEventsToDownload = 8,
-            isRecordEventsToDownloadLowerBound = false,
-            eventsToUpload = 0,
-            enrolmentsToUpload = 5,
-            samplesToUpload = 0,
+        val deviceDataState = createDeviceDataState(
+            recordCount = 25,
+            pendingEnrolments = 5,
         )
 
         val result = invokeUseCase(
             eventSyncState = mockIdleEventSyncState,
-            syncableCounts = syncableCounts,
+            deviceDataState = deviceDataState,
+            downSyncCounts = DownSyncCounts(count = 8, isLowerBound = false),
         )
 
         assertThat(result.counterTotalRecords).isEqualTo("25")
@@ -279,13 +277,13 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
             isSyncing = false,
             progress = null,
         )
-        val syncableCounts = createSyncableCounts(
-            samplesToUpload = 15,
+        val deviceDataState = createDeviceDataState(
+            pendingSamples = 15,
         )
 
         val result = invokeUseCase(
             imageSyncStatus = mockNotSyncingImageStatus,
-            syncableCounts = syncableCounts,
+            deviceDataState = deviceDataState,
         )
 
         assertThat(result.counterImagesToUpload).isEqualTo("15")
@@ -311,21 +309,13 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
         val mockIdleEventSyncState = createEventSyncState(
             syncInProgress = false,
         )
-        val syncableCounts = createSyncableCounts(
-            totalRecords = 0,
-            recordEventsToDownload = 42,
-            isRecordEventsToDownloadLowerBound = false,
-            eventsToUpload = 0,
-            enrolmentsToUpload = 0,
-            samplesToUpload = 0,
-        )
         every { mockProjectConfigWithDownSync.isSimprintsEventDownSyncAllowed() } returns true
         every { mockProjectConfigWithDownSync.isModuleSelectionAvailable() } returns false
 
         val result = invokeUseCase(
             projectConfig = mockProjectConfigWithDownSync,
             eventSyncState = mockIdleEventSyncState,
-            syncableCounts = syncableCounts,
+            downSyncCounts = DownSyncCounts(count = 42, isLowerBound = false),
         )
 
         assertThat(result.isCounterRecordsToDownloadVisible).isTrue()
@@ -659,13 +649,50 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
         assertThat(result.recordSyncVisibleState).isEqualTo(RecordSyncVisibleState.ON_STANDBY)
     }
 
+    @Test
+    fun `should render unreadable counters as unknown rather than zero`() = runTest {
+        val mockIdleEventSyncState = createEventSyncState(syncInProgress = false)
+        val deviceDataState = createDeviceDataState(
+            recordCount = null,
+            pendingEnrolments = null,
+            pendingSamples = null,
+        )
+
+        val result = invokeUseCase(
+            eventSyncState = mockIdleEventSyncState,
+            deviceDataState = deviceDataState,
+        )
+
+        assertThat(result.counterTotalRecords).isEqualTo("")
+        assertThat(result.counterRecordsToUpload).isEqualTo("")
+        assertThat(result.counterImagesToUpload).isEqualTo("")
+    }
+
+    @Test
+    fun `should not report image sync done when the sample count is unreadable`() = runTest {
+        val deviceDataState = createDeviceDataState(pendingSamples = null)
+
+        val result = invokeUseCase(
+            isPreLogoutUpSync = true,
+            eventSyncState = createEventSyncState(syncInProgress = true),
+            deviceDataState = deviceDataState,
+        )
+
+        assertThat(
+            result.progress.progressParts
+                .last()
+                .isDone,
+        ).isFalse()
+    }
+
     private fun invokeUseCase(
         isPreLogoutUpSync: Boolean = false,
         isOnline: Boolean = true,
         projectId: String = TEST_PROJECT_ID,
         eventSyncState: EventSyncState = createEventSyncState(),
         imageSyncStatus: ImageSyncStatus = createImageSyncStatus(),
-        syncableCounts: SyncableCounts = createSyncableCounts(),
+        deviceDataState: DeviceDataState = createDeviceDataState(),
+        downSyncCounts: DownSyncCounts = DownSyncCounts(count = 0, isLowerBound = false),
         isProjectRunning: Boolean = true,
         moduleCounts: List<ModuleCount> = emptyList(),
         projectConfig: ProjectConfiguration = mockProjectConfiguration,
@@ -675,7 +702,8 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
         projectId = projectId,
         eventSyncState = eventSyncState,
         imageSyncStatus = imageSyncStatus,
-        syncableCounts = syncableCounts,
+        deviceDataState = deviceDataState,
+        downSyncCounts = downSyncCounts,
         isProjectRunning = isProjectRunning,
         moduleCounts = moduleCounts,
         projectConfig = projectConfig,
@@ -732,20 +760,21 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
         lastUpdateTimeMillis = lastUpdateTimeMillis,
     )
 
-    private fun createSyncableCounts(
-        totalRecords: Int = 0,
-        recordEventsToDownload: Int = 0,
-        isRecordEventsToDownloadLowerBound: Boolean = false,
-        eventsToUpload: Int = 0,
-        enrolmentsToUpload: Int = 0,
-        samplesToUpload: Int = 0,
-    ): SyncableCounts = SyncableCounts(
-        totalRecords = totalRecords,
-        recordEventsToDownload = recordEventsToDownload,
-        isRecordEventsToDownloadLowerBound = isRecordEventsToDownloadLowerBound,
-        eventsToUpload = eventsToUpload,
-        enrolmentsToUpload = enrolmentsToUpload,
-        samplesToUpload = samplesToUpload,
+    private fun createDeviceDataState(
+        recordCount: Int? = 0,
+        pendingEnrolments: Int? = 0,
+        pendingSamples: Int? = 0,
+    ): DeviceDataState = DeviceDataState(
+        projectId = TEST_PROJECT_ID,
+        recordCount = recordCount,
+        pendingScopes = emptyMap(),
+        pendingEvents = 0,
+        pendingEnrolments = pendingEnrolments,
+        pendingSamples = pendingSamples,
+        lastEventSyncAt = null,
+        lastEventSyncFailure = null,
+        lastSampleSyncAt = null,
+        lastSampleSyncFailure = null,
     )
 
     private companion object {

@@ -8,10 +8,12 @@ import androidx.work.WorkManager
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.DEVICE_STATUS_REPEAT_INTERVAL_HOURS
 import com.simprints.infra.eventsync.DeleteSyncInfoUseCase
 import com.simprints.infra.eventsync.EventSyncWorkerTagRepository
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.eventsync.sync.master.EventSyncMasterWorker
+import com.simprints.infra.sync.SyncConstants.DEVICE_STATUS_REPORT_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.EVENT_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.EVENT_SYNC_WORK_NAME_ONE_TIME
@@ -31,10 +33,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 class SyncOrchestratorCommandExecutionTest {
     @get:Rule
@@ -76,6 +80,7 @@ class SyncOrchestratorCommandExecutionTest {
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
         every { workManager.getWorkInfosFlow(any()) } returns flowOf(emptyList())
+        coEvery { configRepository.getProjectConfiguration().custom } returns null
         orchestrator = createOrchestrator()
     }
 
@@ -102,6 +107,7 @@ class SyncOrchestratorCommandExecutionTest {
             workManager.enqueueUniquePeriodicWork(FILE_UP_SYNC_WORK_NAME, any(), any())
             workManager.enqueueUniquePeriodicWork(EVENT_SYNC_WORK_NAME, any(), any())
             workManager.enqueueUniquePeriodicWork(FIRMWARE_UPDATE_WORK_NAME, any(), any())
+            workManager.enqueueUniquePeriodicWork(DEVICE_STATUS_REPORT_WORK_NAME, any(), any())
         }
     }
 
@@ -169,8 +175,63 @@ class SyncOrchestratorCommandExecutionTest {
             workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME)
             workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME_ONE_TIME)
             workManager.cancelUniqueWork(FIRMWARE_UPDATE_WORK_NAME)
+            workManager.cancelUniqueWork(DEVICE_STATUS_REPORT_WORK_NAME)
             workManager.cancelAllWorkByTag("syncWorkers")
         }
+    }
+
+    @Test
+    fun `schedules device status report with default interval and offset`() = runTest {
+        orchestrator.execute(ScheduleCommand.DeviceStatus.reschedule()).join()
+
+        verify {
+            workManager.enqueueUniquePeriodicWork(
+                DEVICE_STATUS_REPORT_WORK_NAME,
+                ExistingPeriodicWorkPolicy.UPDATE,
+                match {
+                    it.workSpec.intervalDuration == TimeUnit.HOURS.toMillis(8) &&
+                        it.workSpec.initialDelay == TimeUnit.MINUTES.toMillis(20) &&
+                        it.workSpec.constraints.requiredNetworkType == NetworkType.CONNECTED
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `schedules device status report with configured interval`() = runTest {
+        coEvery { configRepository.getProjectConfiguration().custom } returns mapOf(
+            DEVICE_STATUS_REPEAT_INTERVAL_HOURS to JsonPrimitive(24),
+        )
+
+        orchestrator.execute(ScheduleCommand.DeviceStatus.reschedule()).join()
+
+        verify {
+            workManager.enqueueUniquePeriodicWork(
+                DEVICE_STATUS_REPORT_WORK_NAME,
+                any(),
+                match { it.workSpec.intervalDuration == TimeUnit.HOURS.toMillis(24) },
+            )
+        }
+    }
+
+    @Test
+    fun `cancels device status report when configured interval is zero`() = runTest {
+        coEvery { configRepository.getProjectConfiguration().custom } returns mapOf(
+            DEVICE_STATUS_REPEAT_INTERVAL_HOURS to JsonPrimitive(0),
+        )
+
+        orchestrator.execute(ScheduleCommand.DeviceStatus.reschedule()).join()
+
+        verify(exactly = 0) { workManager.enqueueUniquePeriodicWork(DEVICE_STATUS_REPORT_WORK_NAME, any(), any()) }
+        verify { workManager.cancelUniqueWork(DEVICE_STATUS_REPORT_WORK_NAME) }
+    }
+
+    @Test
+    fun `unschedule device status report cancels the worker`() = runTest {
+        val job = orchestrator.execute(ScheduleCommand.DeviceStatus.unschedule())
+
+        assertThat(job.isCompleted).isTrue()
+        verify { workManager.cancelUniqueWork(DEVICE_STATUS_REPORT_WORK_NAME) }
     }
 
     @Test

@@ -12,9 +12,12 @@ import com.simprints.feature.dashboard.settings.syncinfo.usecase.internal.GetSyn
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSampleUploadEnabledInProject
+import com.simprints.infra.eventsync.status.models.DownSyncCounts
+import com.simprints.infra.eventsync.sync.down.EventDownSyncPeriodicCountUseCase
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.sync.SyncOrchestrator
-import com.simprints.infra.sync.usecase.ObserveSyncableCountsUseCase
+import com.simprints.infra.sync.devicestate.DeviceDataState
+import com.simprints.infra.sync.devicestate.DeviceStateDataTracker
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -32,7 +35,8 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     private val getSyncInfoSectionImages: GetSyncInfoSectionImagesUseCase,
     private val getSyncInfoSectionRecords: GetSyncInfoSectionRecordsUseCase,
     private val observeConfigurationFlow: ObserveConfigurationChangesUseCase,
-    private val observeSyncableCounts: ObserveSyncableCountsUseCase,
+    private val deviceStateDataTracker: DeviceStateDataTracker,
+    private val eventDownSyncCount: EventDownSyncPeriodicCountUseCase,
     private val syncOrchestrator: SyncOrchestrator,
     @param:DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) {
@@ -43,17 +47,22 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         ticker.observeTicks(1.minutes),
     ) { isOnline, _, _ -> isOnline }
 
+    private fun combinedDataState(): Flow<Pair<DeviceDataState, DownSyncCounts>> = combine(
+        deviceStateDataTracker.observeDeviceDataState(),
+        eventDownSyncCount(),
+    ) { deviceDataState, downSyncCounts -> deviceDataState to downSyncCounts }
+
     operator fun invoke(isPreLogoutUpSync: Boolean = false): Flow<SyncInfo> = combine(
         combinedRefreshSignals(),
         authStore.observeSignedInProjectId(),
         syncOrchestrator.observeSyncState(),
-        observeSyncableCounts(),
+        combinedDataState(),
         observeConfigurationFlow(),
     ) {
         isOnline,
         projectId,
         (eventSyncState, imageSyncStatus),
-        syncableCounts,
+        (deviceDataState, downSyncCounts),
         (isRefreshing, isProjectRunning, moduleCounts, projectConfig),
         ->
         val isReLoginRequired = eventSyncState.isSyncFailedBecauseReloginRequired()
@@ -67,7 +76,8 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             projectId,
             eventSyncState,
             imageSyncStatus,
-            syncableCounts,
+            deviceDataState,
+            downSyncCounts,
             isProjectRunning,
             moduleCounts,
             projectConfig,
@@ -76,7 +86,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             isOnline,
             eventSyncState,
             imageSyncStatus,
-            syncableCounts,
+            deviceDataState,
         )
         return@combine SyncInfo(
             isLoggedIn = projectId.isNotEmpty(),

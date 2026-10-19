@@ -5,6 +5,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.core.DispatcherBG
+import com.simprints.core.domain.sync.SyncFailureReason
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.images.ImageRepository
@@ -12,6 +13,7 @@ import com.simprints.infra.sync.ImageSyncTimestampProvider
 import com.simprints.infra.sync.SyncConstants
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
@@ -42,12 +44,18 @@ internal class FileUpSyncWorker @AssistedInject constructor(
                 )
             }
             if (uploadSuccessful) {
-                imageSyncTimestampProvider.saveImageSyncCompletionTimestampNow()
+                imageSyncTimestampProvider.saveImageSyncOutcomeNow(failure = null)
                 success()
             } else {
+                imageSyncTimestampProvider.saveImageSyncOutcomeNow(SyncFailureReason.UNKNOWN)
                 retry()
             }
+        } catch (cancellation: CancellationException) {
+            // WorkManager cancelling the worker is not an upload attempt, and recording one here
+            // would both publish a failure that never happened and swallow the cancellation.
+            throw cancellation
         } catch (ex: Exception) {
+            imageSyncTimestampProvider.saveImageSyncOutcomeNow(SyncFailureReason.UNKNOWN)
             retry(ex)
         }
     }

@@ -23,6 +23,7 @@ import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_BACKEND_M
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_UNEXPECTEDLY
 import com.simprints.infra.eventsync.sync.up.EventUpSyncProgress
 import com.simprints.infra.eventsync.sync.up.tasks.EventUpSyncTask
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_EVENT_UP_SYNC_SCOPE_ID
@@ -33,6 +34,7 @@ import com.simprints.infra.serialization.SimJson
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -103,7 +105,7 @@ internal class EventUpSyncUploaderWorkerTest {
     }
 
     @Test
-    fun worker_shouldSucceedWithoutFlagsIfNoEventScope() = runTest {
+    fun worker_shouldFlagUnexpectedFailureIfNoEventScope() = runTest {
         coEvery { eventRepository.getEventScope(any()) } returns null
 
         val result = init(projectScope).doWork()
@@ -113,6 +115,7 @@ internal class EventUpSyncUploaderWorkerTest {
                 workDataOf(
                     EventUpSyncUploaderWorker.OUTPUT_UP_SYNC to 0,
                     EventUpSyncUploaderWorker.OUTPUT_UP_MAX_SYNC to 12,
+                    OUTPUT_FAILED_UNEXPECTEDLY to true,
                 ),
             ),
         )
@@ -222,11 +225,35 @@ internal class EventUpSyncUploaderWorkerTest {
     }
 
     @Test
-    fun worker_shouldSucceedWithoutFlagsIfUnexpectedIssue() = runTest {
+    fun worker_shouldFlagUnexpectedFailureIfUnexpectedIssue() = runTest {
+        // Nothing uploaded, so the run must not be indistinguishable from a clean one - the end
+        // reporter reads these flags to decide what outcome to store.
         coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
             upSyncTask.upSync(any(), eventScope)
         } throws Throwable()
+
+        val result = init(projectScope).doWork()
+
+        assertThat(result).isEqualTo(
+            ListenableWorker.Result.success(
+                workDataOf(
+                    EventUpSyncUploaderWorker.OUTPUT_UP_SYNC to 0,
+                    EventUpSyncUploaderWorker.OUTPUT_UP_MAX_SYNC to 12,
+                    OUTPUT_FAILED_UNEXPECTEDLY to true,
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun `worker should succeed without a failure flag when cancelled`() = runTest {
+        // Flagging cancellation would make the end reporter store an UNKNOWN failed attempt for a
+        // sync that was simply stopped, and throwing would break the chain before it ever runs.
+        coEvery { eventRepository.getEventScope(any()) } returns eventScope
+        coEvery {
+            upSyncTask.upSync(any(), eventScope)
+        } throws CancellationException("cancelled")
 
         val result = init(projectScope).doWork()
 
@@ -282,7 +309,7 @@ internal class EventUpSyncUploaderWorkerTest {
     }
 
     @Test
-    fun `should succeed when input is null`() = runTest {
+    fun `should flag an unexpected failure when input is null`() = runTest {
         val eventUpSyncUploaderWorker = init(null)
 
         val result = eventUpSyncUploaderWorker.doWork()
@@ -292,6 +319,7 @@ internal class EventUpSyncUploaderWorkerTest {
                 workDataOf(
                     EventUpSyncUploaderWorker.OUTPUT_UP_SYNC to 0,
                     EventUpSyncUploaderWorker.OUTPUT_UP_MAX_SYNC to 12,
+                    OUTPUT_FAILED_UNEXPECTEDLY to true,
                 ),
             ),
         )
