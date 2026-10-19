@@ -59,6 +59,13 @@ data class ExperimentalProjectConfiguration(
             ?.booleanOrNull
             ?: OCR_USE_HIGH_RES_DEFAULT
 
+    val ocrKeepHighResDetail: Boolean
+        get() = customConfig
+            ?.get(OCR_KEEP_HIGH_RES_DETAIL)
+            ?.jsonPrimitive
+            ?.booleanOrNull
+            ?: OCR_KEEP_HIGH_RES_DETAIL_DEFAULT
+
     val ocrCaptures: Int
         get() = customConfig
             ?.get(OCR_CAPTURES)
@@ -252,6 +259,8 @@ data class ExperimentalProjectConfiguration(
 
         internal const val OCR_USE_HIGH_RES = "ocrHighRes"
         internal const val OCR_USE_HIGH_RES_DEFAULT = true
+        internal const val OCR_KEEP_HIGH_RES_DETAIL = "ocrKeepHighResDetail"
+        internal const val OCR_KEEP_HIGH_RES_DETAIL_DEFAULT = true
         internal const val OCR_CAPTURES = "ocrCaptures"
         internal const val OCR_CAPTURES_DEFAULT = 3
 

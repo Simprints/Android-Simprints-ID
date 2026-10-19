@@ -87,6 +87,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
             with(configRepository.getProjectConfiguration().experimental()) {
                 ocrConfigFlow.value = OcrConfig(
                     useHighRes = ocrUseHighRes,
+                    keepHighResDetail = ocrKeepHighResDetail,
                     capturesRequired = ocrCaptures.coerceIn(OCR_CAPTURE_MIN, OCR_CAPTURE_MAX),
                 )
             }

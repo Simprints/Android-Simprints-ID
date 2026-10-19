@@ -97,4 +97,22 @@ internal class NormalizeHighResBitmapToPreviewUseCaseTest {
         verify { Bitmap.createBitmap(inputBitmap, 0, 0, inputWidth, inputHeight, any(), true) }
         verify { croppedBitmap.scale(previewWidth, previewHeight) }
     }
+
+    @Test
+    fun `keeps native resolution when scaling to preview is disabled`() = runTest {
+        every {
+            Bitmap.createBitmap(inputBitmap, 0, 0, inputWidth, inputHeight, any(), true)
+        } returns rotatedBitmap
+
+        every {
+            Bitmap.createBitmap(rotatedBitmap, any(), any(), any(), any())
+        } returns croppedBitmap
+
+        val result = useCase(inputBitmap, rotationDegrees, previewWidth, previewHeight, scaleToPreview = false)
+
+        Truth.assertThat(result).isEqualTo(croppedBitmap)
+        // Rotated 1080x1920 cropped to 4:3 at native resolution: 1080x810, centered vertically
+        verify { Bitmap.createBitmap(rotatedBitmap, 0, 555, 1080, 810) }
+        verify(exactly = 0) { croppedBitmap.scale(any(), any()) }
+    }
 }
