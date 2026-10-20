@@ -6,4 +6,5 @@ import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 internal data class OcrConfig(
     val useHighRes: Boolean,
     val capturesRequired: Int,
+    val scanTimeCutoffSeconds: Int,
 )

@@ -151,6 +151,20 @@ internal class ExperimentalProjectConfigurationTest {
     }
 
     @Test
+    fun `check ocr scan time cutoff value correctly`() {
+        val expectedOcrScanTimeCutoffSeconds = 10
+        mapOf(
+            emptyMap<String, JsonElement>() to ExperimentalProjectConfiguration.OCR_SCAN_TIME_CUTOFF_DEFAULT,
+            mapOf(ExperimentalProjectConfiguration.OCR_SCAN_TIME_CUTOFF to JsonPrimitive(true))
+                to ExperimentalProjectConfiguration.OCR_SCAN_TIME_CUTOFF_DEFAULT,
+            mapOf(ExperimentalProjectConfiguration.OCR_SCAN_TIME_CUTOFF to JsonPrimitive(expectedOcrScanTimeCutoffSeconds))
+                to expectedOcrScanTimeCutoffSeconds,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).ocrScanTimeCutoffSeconds).isEqualTo(result)
+        }
+    }
+
+    @Test
     fun `check allow confirming GUIDs not in callback flag correctly`() {
         mapOf(
             // Value not present

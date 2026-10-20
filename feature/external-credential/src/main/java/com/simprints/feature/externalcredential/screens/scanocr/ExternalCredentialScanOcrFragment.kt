@@ -153,15 +153,21 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         viewModel.scanOcrStateLiveData.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is ScanOcrState.ScanningInProgress -> {
-                    renderProgress(state)
-                    if (state.successfulCaptures >= state.scansRequired) {
-                        // Animate progress bar to go to 100%, and then finish the flow
-                        binding.captureProgress.setProgressAnimated(
-                            100,
-                            durationMs = PROGRESS_FINISH_REMAINING_MS,
-                            onComplete = { viewModel.processOcrResultsAndFinish() },
-                            interpolator = AccelerateInterpolator(),
-                        )
+                    applyScanningVisualTheme()
+                    if (state.successfulCaptures == 0) {
+                        // Don't show the progress indicator until the first frame has been successfully captured
+                        binding.buttonScan.isVisible = false
+                    } else {
+                        renderProgress(state)
+                        if (state.successfulCaptures >= state.scansRequired) {
+                            // Animate progress bar to go to 100%, and then finish the flow
+                            binding.captureProgress.setProgressAnimated(
+                                100,
+                                durationMs = PROGRESS_FINISH_REMAINING_MS,
+                                onComplete = { viewModel.processOcrResultsAndFinish() },
+                                interpolator = AccelerateInterpolator(),
+                            )
+                        }
                     }
                 }
 
@@ -213,6 +219,9 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         captureProgress.isVisible = true
         documentScannerArea.isVisible = true
         iconScanComplete.alpha = 0f
+    }
+
+    private fun applyScanningVisualTheme() = with(binding) {
         instructionsText.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_black))
         viewfinderMask.maskColor = ContextCompat.getColor(requireContext(), IDR.color.simprints_white)
         viewfinderMask.alpha = VIEW_FINDER_ALPHA_SCAN_ACTIVE

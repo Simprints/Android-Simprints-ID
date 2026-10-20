@@ -66,6 +66,13 @@ data class ExperimentalProjectConfiguration(
             ?.intOrNull
             ?: OCR_CAPTURES_DEFAULT
 
+    val ocrScanTimeCutoffSeconds: Int
+        get() = customConfig
+            ?.get(OCR_SCAN_TIME_CUTOFF)
+            ?.jsonPrimitive
+            ?.intOrNull
+            ?: OCR_SCAN_TIME_CUTOFF_DEFAULT
+
     val allowConfirmingGuidsNotInCallback: Boolean
         get() = customConfig
             ?.get(ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK)
@@ -254,6 +261,8 @@ data class ExperimentalProjectConfiguration(
         internal const val OCR_USE_HIGH_RES_DEFAULT = true
         internal const val OCR_CAPTURES = "ocrCaptures"
         internal const val OCR_CAPTURES_DEFAULT = 3
+        internal const val OCR_SCAN_TIME_CUTOFF = "ocrScanTimeCutoff"
+        internal const val OCR_SCAN_TIME_CUTOFF_DEFAULT = 5
 
         const val ALLOW_CONFIRMING_GUIDS_NOT_IN_CALLBACK = "allowConfirmingGuidsNotInCallback"
 

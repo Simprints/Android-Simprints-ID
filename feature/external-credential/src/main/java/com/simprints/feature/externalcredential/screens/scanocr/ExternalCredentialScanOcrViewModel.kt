@@ -30,6 +30,8 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
@@ -79,6 +81,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
 
     private lateinit var startTime: Timestamp
     private val ocrConfigFlow = MutableStateFlow<OcrConfig?>(null)
+    private var scanTimeoutJob: Job? = null
 
     private var lightingConditionsAssessmentConfig: LightingConditionsAssessmentConfig? = null
 
@@ -88,6 +91,7 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
                 ocrConfigFlow.value = OcrConfig(
                     useHighRes = ocrUseHighRes,
                     capturesRequired = ocrCaptures.coerceIn(OCR_CAPTURE_MIN, OCR_CAPTURE_MAX),
+                    scanTimeCutoffSeconds = ocrScanTimeCutoffSeconds,
                 )
             }
             lightingConditionsAssessmentConfig = getLightingConditionsAssessmentConfig()
@@ -108,6 +112,8 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
 
     fun startScanning() {
         val captureConfig = ocrConfigFlow.value ?: return
+        scanTimeoutJob?.cancel()
+        scanTimeoutJob = null
         startTime = timeHelper.now()
         updateState {
             ScanOcrState.ScanningInProgress(
@@ -154,9 +160,21 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
                             scansRequired = captureConfig.capturesRequired,
                         )
                     }
+                    if (scannedMfidDocuments.size == 1) {
+                        startScanTimeoutJob(captureConfig.scanTimeCutoffSeconds)
+                    }
                 }
             } finally {
                 imageProcessingStopped()
+            }
+        }
+    }
+
+    private fun startScanTimeoutJob(cutoffSeconds: Int) {
+        scanTimeoutJob = viewModelScope.launch {
+            delay((cutoffSeconds * 1000L).milliseconds)
+            if (isScanningInProgress) {
+                processOcrResultsAndFinish()
             }
         }
     }

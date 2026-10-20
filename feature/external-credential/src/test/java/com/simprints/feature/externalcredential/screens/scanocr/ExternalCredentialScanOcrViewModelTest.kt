@@ -32,6 +32,7 @@ import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class ExternalCredentialScanOcrViewModelTest {
@@ -378,5 +379,106 @@ internal class ExternalCredentialScanOcrViewModelTest {
         assertThat(stateObserver.value()).isEqualTo(ScanOcrState.Complete)
         assertThat(viewModel.isOcrActive).isFalse()
         coVerify(exactly = 0) { scanMfidDocumentUseCase.invoke(any(), any(), any()) }
+    }
+
+    @Test
+    fun `processImage finishes scan with partial captures after default cutoff elapses`() = runTest {
+        val mockScannedDocument = mockk<ScannedMfidDocument>()
+        val mockCroppedBitmap = mockk<Bitmap>()
+        val mockScannedCredentialResult = mockk<ScannedCredentialResult>()
+
+        coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
+        coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
+        coEvery { buildScannedCredentialResultUseCase(any(), documentType, any()) } returns mockScannedCredentialResult
+
+        val stateObserver = viewModel.scanOcrStateLiveData.test()
+        viewModel.startScanning()
+        viewModel.processImage(frame)
+        runCurrent()
+
+        assertThat((stateObserver.value() as ScanOcrState.ScanningInProgress).successfulCaptures).isEqualTo(1)
+
+        advanceTimeBy(4_999L.milliseconds)
+        runCurrent()
+        assertThat(stateObserver.value()).isInstanceOf(ScanOcrState.ScanningInProgress::class.java)
+
+        advanceTimeBy(1L.milliseconds) // 5s default cutoff now elapsed
+        runCurrent()
+
+        assertThat(stateObserver.value()).isEqualTo(ScanOcrState.Complete)
+        coVerify { buildScannedCredentialResultUseCase(listOf(mockScannedDocument), documentType, any()) }
+    }
+
+    @Test
+    fun `processImage uses ocrScanTimeCutoff from custom config to schedule early finish`() = runTest {
+        val mockScannedDocument = mockk<ScannedMfidDocument>()
+        val mockCroppedBitmap = mockk<Bitmap>()
+        val mockScannedCredentialResult = mockk<ScannedCredentialResult>()
+        viewModel = initViewModel(
+            documentType = documentType,
+            customConfig = mapOf("ocrScanTimeCutoff" to JsonPrimitive(1)),
+        )
+        runCurrent()
+
+        coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
+        coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
+        coEvery { buildScannedCredentialResultUseCase(any(), documentType, any()) } returns mockScannedCredentialResult
+
+        val stateObserver = viewModel.scanOcrStateLiveData.test()
+        viewModel.startScanning()
+        viewModel.processImage(frame)
+        runCurrent()
+
+        advanceTimeBy(1_000L) // 1s custom cutoff now elapsed
+        runCurrent()
+
+        assertThat(stateObserver.value()).isEqualTo(ScanOcrState.Complete)
+    }
+
+    @Test
+    fun `processImage does not re-trigger finish from a stale timeout once scan already completed`() = runTest {
+        val mockScannedDocument = mockk<ScannedMfidDocument>()
+        val mockCroppedBitmap = mockk<Bitmap>()
+
+        coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
+        coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
+        coEvery { buildScannedCredentialResultUseCase(any(), documentType, any()) } returns mockk()
+
+        viewModel.startScanning()
+        repeat(3) { viewModel.processImage(frame) } // reaches the 3 required captures
+        runCurrent()
+        viewModel.processOcrResultsAndFinish() // as triggered by the fragment once captures are complete
+
+        advanceTimeBy(5_000L) // let the pending timeout job from the first capture elapse
+        runCurrent()
+
+        coVerify(exactly = 1) { buildScannedCredentialResultUseCase(any(), documentType, any()) }
+    }
+
+    @Test
+    fun `startScanning cancels a pending timeout job left over from a previous scan`() = runTest {
+        val mockScannedDocument = mockk<ScannedMfidDocument>()
+        val mockCroppedBitmap = mockk<Bitmap>()
+
+        coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
+        coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
+        coEvery { buildScannedCredentialResultUseCase(any(), documentType, any()) } returns mockk()
+
+        val stateObserver = viewModel.scanOcrStateLiveData.test()
+
+        viewModel.startScanning()
+        viewModel.processImage(frame) // schedules the 5s default timeout
+        runCurrent()
+
+        advanceTimeBy(2_000L)
+        runCurrent()
+
+        viewModel.startScanning() // restart before the stale timeout elapses
+
+        advanceTimeBy(5_000L)
+        runCurrent()
+
+        val state = stateObserver.value() as ScanOcrState.ScanningInProgress
+        assertThat(state.successfulCaptures).isEqualTo(0)
     }
 }
