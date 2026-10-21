@@ -6,6 +6,7 @@ import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_ATTEMPT
 import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent
 import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent.Companion.EVENT_VERSION
+import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.LightingCheckMode
 import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.RunStatus
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
@@ -34,7 +35,18 @@ class FaceCaptureAttemptEventTest {
             assertThat(rejectionStats.badQuality).isNull()
             assertThat(statusRuns.map { it.status }).containsExactly(RunStatus.TOO_FAR, RunStatus.OFF_YAW, RunStatus.VALID).inOrder()
             assertThat(statusRunsTruncated).isFalse()
+            assertThat(lightingStats?.mode).isEqualTo(LightingCheckMode.HINT)
+            assertThat(lightingStats?.tooDarkFrameCount).isEqualTo(3)
         }
+    }
+
+    @Test
+    fun `decodes payload without lighting stats`() {
+        val original = createFaceCaptureAttemptEvent().let { it.copy(payload = it.payload.copy(lightingStats = null)) }
+
+        val decoded: Event = SimJson.decodeFromString(original.toJson())
+
+        assertThat((decoded as FaceCaptureAttemptEvent).payload.lightingStats).isNull()
     }
 
     @Test
@@ -53,7 +65,7 @@ class FaceCaptureAttemptEventTest {
         val safe = createFaceCaptureAttemptEvent().payload.toSafeString()
 
         assertThat(safe).isEqualTo(
-            "attempt nr: 0, sdk: RANK_ONE, frames: 47, valid: 15, first valid ms: 950, runs: 3, truncated: false",
+            "attempt nr: 0, sdk: RANK_ONE, frames: 47, valid: 15, first valid ms: 950, runs: 3, truncated: false, lighting: HINT",
         )
     }
 }

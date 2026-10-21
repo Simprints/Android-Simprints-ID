@@ -33,6 +33,7 @@ data class FaceCaptureAttemptEvent(
         qualityAllFrames: FaceCaptureAttemptPayload.ValueStats?,
         statusRuns: List<FaceCaptureAttemptPayload.StatusRun>,
         statusRunsTruncated: Boolean,
+        lightingStats: FaceCaptureAttemptPayload.LightingStats? = null,
         id: String = randomUUID(),
     ) : this(
         id,
@@ -51,6 +52,7 @@ data class FaceCaptureAttemptEvent(
             qualityAllFrames = qualityAllFrames,
             statusRuns = statusRuns,
             statusRunsTruncated = statusRunsTruncated,
+            lightingStats = lightingStats,
         ),
         FACE_CAPTURE_ATTEMPT,
     )
@@ -73,11 +75,14 @@ data class FaceCaptureAttemptEvent(
         val qualityAllFrames: ValueStats? = null,
         val statusRuns: List<StatusRun>,
         val statusRunsTruncated: Boolean = false,
+        /** Present only when the lighting check runs. */
+        val lightingStats: LightingStats? = null,
         override val type: EventType = FACE_CAPTURE_ATTEMPT,
     ) : EventPayload() {
         override fun toSafeString(): String =
             "attempt nr: $attemptNb, sdk: $bioSdk, frames: $totalFramesAnalysed, valid: $validFrameCount, " +
-                "first valid ms: $timeToFirstValidMs, runs: ${statusRuns.size}, truncated: $statusRunsTruncated"
+                "first valid ms: $timeToFirstValidMs, runs: ${statusRuns.size}, truncated: $statusRunsTruncated, " +
+                "lighting: ${lightingStats?.mode}"
 
         /** Null entries mean the reason did not occur. */
         @Keep
@@ -118,6 +123,33 @@ data class FaceCaptureAttemptEvent(
             val frameCount: Int,
             val durationMs: Long,
         )
+
+        /** Brightness and contrast are luminance values, 0..255. */
+        @Keep
+        @Serializable
+        data class LightingStats(
+            val mode: LightingCheckMode,
+            /** Frames the check ran on (sampled about every 250 ms). */
+            val framesMeasured: Int,
+            val tooDarkFrameCount: Int,
+            /** Frames rejected as no face while too dark. */
+            val noFaceWhileTooDarkCount: Int? = null,
+            /** Lowest per-frame median brightness of the face region (the capture circle when no face is found). */
+            val brightnessMin: Int? = null,
+            val brightnessMedian: Int? = null,
+            val brightnessMax: Int? = null,
+            /** Median of P95 minus P5 brightness. */
+            val contrastMedian: Int? = null,
+            /** Total time the too-dark hint was visible; 0 in log mode. */
+            val hintShownMs: Long? = null,
+        )
+
+        @Keep
+        @Serializable
+        enum class LightingCheckMode {
+            LOG,
+            HINT,
+        }
 
         @Keep
         @Serializable
