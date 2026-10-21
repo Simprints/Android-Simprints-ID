@@ -1,6 +1,7 @@
 package com.simprints.infra.camera.helpers
 
 import android.annotation.SuppressLint
+import android.graphics.Rect
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewTreeObserver
@@ -32,18 +33,26 @@ internal class CameraFocusHelper @AssistedInject constructor(
     }
 
     @SuppressLint("ClickableViewAccessibility")
+    /**
+     * @param exposureTarget when set, exposure and white balance stay metered on this area (in preview coordinates)
+     *        rather than following the tapped point
+     */
     fun setUpFocusOnTap(
         cameraPreview: PreviewView,
         camera: Camera,
+        exposureTarget: Rect? = null,
     ) {
         cameraPreview.afterMeasured {
-            it.setOnTouchListener(touchListener(camera.cameraControl))
+            it.setOnTouchListener(touchListener(camera.cameraControl, exposureTarget))
         }
     }
 
     @SuppressLint("ClickableViewAccessibility")
     @ExcludedFromGeneratedTestCoverageReports("Generates inner class of excluded file")
-    private fun touchListener(cameraControl: CameraControl) = View.OnTouchListener { view, event ->
+    private fun touchListener(
+        cameraControl: CameraControl,
+        exposureTarget: Rect?,
+    ) = View.OnTouchListener { view, event ->
         when (event.action) {
             MotionEvent.ACTION_DOWN -> true
 
@@ -54,7 +63,10 @@ internal class CameraFocusHelper @AssistedInject constructor(
                     .Builder(
                         focusPoint,
                         FocusMeteringAction.FLAG_AF,
-                    ).disableAutoCancel()
+                    ).apply {
+                        // A new action replaces the previous one, so keep metering exposure on the target
+                        exposureTarget?.let { addPoint(getTargetPoint(view, it), FLAGS_AE_AWB) }
+                    }.disableAutoCancel()
                     .build()
 
                 try {
@@ -85,6 +97,30 @@ internal class CameraFocusHelper @AssistedInject constructor(
 
             try {
                 camera.cameraControl.startFocusAndMetering(focusAction)
+            } catch (e: CameraInfoUnavailableException) {
+                Simber.e("Cannot access camera", e, tag = crashReportTag)
+            }
+        }
+    }
+
+    /**
+     * Meters auto-exposure and auto-white-balance on [target] (in preview coordinates) instead of the whole frame,
+     * so a subject in the target is exposed correctly against a bright or dark background.
+     * Autofocus is not part of the action, so it stays continuous.
+     */
+    fun setUpExposureOnTarget(
+        cameraPreview: PreviewView,
+        camera: Camera,
+        target: Rect,
+    ) {
+        cameraPreview.afterMeasured {
+            val meteringAction = FocusMeteringAction
+                .Builder(getTargetPoint(it, target), FLAGS_AE_AWB)
+                .disableAutoCancel()
+                .build()
+
+            try {
+                camera.cameraControl.startFocusAndMetering(meteringAction)
             } catch (e: CameraInfoUnavailableException) {
                 Simber.e("Cannot access camera", e, tag = crashReportTag)
             }
@@ -122,5 +158,20 @@ internal class CameraFocusHelper @AssistedInject constructor(
         val centreHeight = height / 2
 
         return factory.createPoint(centreWidth, centreHeight)
+    }
+
+    private fun getTargetPoint(
+        view: View,
+        target: Rect,
+    ): MeteringPoint {
+        val width = view.width.toFloat()
+        val height = view.height.toFloat()
+        // Point size is relative to the surface, so a size matching the target covers the target
+        val size = (target.width() / width).coerceIn(0f, 1f)
+        return SurfaceOrientedMeteringPointFactory(width, height).createPoint(target.exactCenterX(), target.exactCenterY(), size)
+    }
+
+    private companion object {
+        private const val FLAGS_AE_AWB = FocusMeteringAction.FLAG_AE or FocusMeteringAction.FLAG_AWB
     }
 }
