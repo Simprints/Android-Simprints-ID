@@ -7,6 +7,8 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent
+import com.simprints.infra.camera.lighting.LightingStats
+import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.LightingCheckMode
 import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.RunStatus
 import io.mockk.mockk
 import org.junit.Before
@@ -267,6 +269,77 @@ class AutoCaptureAttemptStatsTest {
         assertThat(stats.snapshotIfDue()).isNull()
     }
 
+    @Test
+    fun `no lighting stats when the lighting check is off`() {
+        record(FaceDetection.Status.NOFACE, atMs = 0, lighting = darkMeasurement(), isLightingHintShown = true)
+
+        assertThat(stats.toEvent(Timestamp(START_MS + 100)).payload.lightingStats).isNull()
+    }
+
+    @Test
+    fun `lighting stats aggregate measured frames and hint time`() {
+        stats = lightingStats(LightingCheckMode.HINT)
+
+        record(FaceDetection.Status.NOFACE, atMs = 0, lighting = darkMeasurement(median = 10, contrast = 20))
+        record(FaceDetection.Status.NOFACE, atMs = 100, isLightingHintShown = true) // not measured, reused
+        record(FaceDetection.Status.NOFACE, atMs = 250, lighting = darkMeasurement(median = 30, contrast = 40), isLightingHintShown = true)
+        record(FaceDetection.Status.TOOFAR, area = 0.1f, atMs = 400, lighting = darkMeasurement(median = 20, contrast = 30))
+        record(FaceDetection.Status.VALID, atMs = 500, lighting = brightMeasurement(median = 120, contrast = 90))
+
+        with(stats.toEvent(Timestamp(START_MS + 600)).payload.lightingStats!!) {
+            assertThat(mode).isEqualTo(LightingCheckMode.HINT)
+            assertThat(framesMeasured).isEqualTo(4)
+            assertThat(tooDarkFrameCount).isEqualTo(3)
+            assertThat(noFaceWhileTooDarkCount).isEqualTo(2)
+            assertThat(brightnessMin).isEqualTo(10)
+            assertThat(brightnessMedian).isEqualTo(25)
+            assertThat(brightnessMax).isEqualTo(120)
+            assertThat(contrastMedian).isEqualTo(35)
+            assertThat(hintShownMs).isEqualTo(300L) // shown from 100 to 400
+        }
+    }
+
+    @Test
+    fun `hint still visible at the end of the attempt is counted until the end`() {
+        stats = lightingStats(LightingCheckMode.HINT)
+
+        record(FaceDetection.Status.NOFACE, atMs = 100, lighting = darkMeasurement(), isLightingHintShown = true)
+
+        assertThat(stats.toEvent(Timestamp(START_MS + 600)).payload.lightingStats?.hintShownMs).isEqualTo(500L)
+    }
+
+    @Test
+    fun `log mode reports zero hint time and survives a snapshot`() {
+        stats = lightingStats(LightingCheckMode.LOG)
+        record(FaceDetection.Status.NOFACE, atMs = 0, lighting = darkMeasurement())
+
+        val restored = AutoCaptureAttemptStats.restore(stats.snapshot())!!
+
+        with(restored.toEvent(Timestamp(START_MS + 100)).payload.lightingStats!!) {
+            assertThat(mode).isEqualTo(LightingCheckMode.LOG)
+            assertThat(framesMeasured).isEqualTo(1)
+            assertThat(hintShownMs).isEqualTo(0L)
+        }
+    }
+
+    private fun lightingStats(mode: LightingCheckMode) = AutoCaptureAttemptStats(
+        attemptNb = 2,
+        bioSdk = "RANK_ONE",
+        startTime = Timestamp(START_MS),
+        random = Random(SEED),
+        lightingMode = mode,
+    )
+
+    private fun darkMeasurement(
+        median: Int = 10,
+        contrast: Int = 20,
+    ) = FaceLightingCheck.Measurement(LightingStats(p5 = 0, median = median, p95 = contrast), isTooDark = true)
+
+    private fun brightMeasurement(
+        median: Int,
+        contrast: Int,
+    ) = FaceLightingCheck.Measurement(LightingStats(p5 = 0, median = median, p95 = contrast), isTooDark = false)
+
     private fun record(
         status: FaceDetection.Status,
         area: Float? = null,
@@ -274,6 +347,8 @@ class AutoCaptureAttemptStatsTest {
         roll: Float = 0f,
         quality: Float = 1f,
         atMs: Long,
+        lighting: FaceLightingCheck.Measurement? = null,
+        isLightingHintShown: Boolean = false,
     ) {
         val face = if (status == FaceDetection.Status.NOFACE) {
             null
@@ -294,6 +369,8 @@ class AutoCaptureAttemptStatsTest {
             frameTime = Timestamp(START_MS + atMs),
             frameWidth = FRAME_W,
             frameHeight = FRAME_H,
+            lighting = lighting,
+            isLightingHintShown = isLightingHintShown,
         )
     }
 
