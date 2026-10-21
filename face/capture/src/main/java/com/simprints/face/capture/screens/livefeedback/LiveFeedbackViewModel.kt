@@ -57,6 +57,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
     private val isUsingAutoCaptureUseCase: IsUsingAutoCaptureUseCase,
     private val getSpoofCheckConfiguration: GetSpoofCheckConfigurationUseCase,
     private val captureAttemptTracker: CaptureAttemptTracker,
+    private val faceLightingCheck: FaceLightingCheck,
     @param:DispatcherBG private val bgDispatcher: CoroutineDispatcher,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -180,6 +181,8 @@ internal class LiveFeedbackViewModel @Inject constructor(
                 SymmetricTarget(experimentalConfig.faceCaptureMaxRollDegrees),
                 experimentalConfig.faceCaptureAcceptedAreaRange,
             )
+            faceLightingCheck.configure(experimentalConfig)
+            attemptRecorder.setLightingMode(faceLightingCheck.mode)
         }
     }
 
@@ -251,6 +254,8 @@ internal class LiveFeedbackViewModel @Inject constructor(
         val targetFrameWidth = croppedBitmap.width
         val targetFrameHeight = croppedBitmap.height
         val potentialFace = faceDetector.analyze(croppedBitmap)
+        // Measure before getFaceDetectionFromPotentialFace, which recycles the frame when there is no face
+        val lighting = measureLightingIfDue(croppedBitmap, potentialFace, captureStartTime.ms)
 
         val faceDetection = getFaceDetectionFromPotentialFace(originalBitmap, croppedBitmap, potentialFace)
         faceDetection.detectionStartTime = captureStartTime
@@ -259,8 +264,17 @@ internal class LiveFeedbackViewModel @Inject constructor(
         // Read once so frame recording and the imaging-start decision agree
         val isHeldOff = isAutoCaptureHeldOff
         val isCurrentAttempt = attempt === attemptRecorder.activeAttempt
+        val isLightingHintShown = updateLightingHint(faceDetection, isHeldOff, captureStartTime.ms)
         if (isAutoCapture && !isHeldOff && isCurrentAttempt && attempt != null) {
-            attemptRecorder.record(attempt, faceDetection, captureStartTime, targetFrameWidth, targetFrameHeight)
+            attemptRecorder.record(
+                attempt = attempt,
+                faceDetection = faceDetection,
+                frameTime = captureStartTime,
+                frameWidth = targetFrameWidth,
+                frameHeight = targetFrameHeight,
+                lighting = lighting,
+                isLightingHintShown = isLightingHintShown,
+            )
         }
 
         var newPhase = phase
@@ -268,7 +282,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
 
         if (isAutoCapture) {
             if (!isHeldOff) {
-                feedback = faceDetection.status.toFeedback()
+                feedback = faceDetection.status.toFeedback(isLightingHintShown)
                 if (
                     faceDetection.status == FaceDetection.Status.VALID &&
                     phase == LiveFeedbackState.Phase.NOT_STARTED &&
@@ -289,7 +303,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
                 // and proceed with capture as long as the face is in the correct position.
                 LiveFeedbackState.Feedback.VALID
             } else {
-                faceDetection.status.toFeedback()
+                faceDetection.status.toFeedback(isLightingHintShown)
             }
         }
 
@@ -313,6 +327,30 @@ internal class LiveFeedbackViewModel @Inject constructor(
         }
 
         emit(phase = newPhase, feedback = feedback, detectionForTint = faceDetection)
+    }
+
+    /**
+     * Skipped while capturing or validating, and while auto-capture is held off, to keep frame processing fast.
+     */
+    private fun measureLightingIfDue(
+        croppedBitmap: Bitmap,
+        potentialFace: Face?,
+        nowMs: Long,
+    ): FaceLightingCheck.Measurement? {
+        if (phase != LiveFeedbackState.Phase.NOT_STARTED || (isAutoCapture && isAutoCaptureHeldOff)) return null
+        return faceLightingCheck.measureIfDue(croppedBitmap, potentialFace?.relativeBoundingBox, nowMs)
+    }
+
+    private fun updateLightingHint(
+        faceDetection: FaceDetection,
+        isHeldOff: Boolean,
+        nowMs: Long,
+    ): Boolean {
+        if (isAutoCapture && isHeldOff) {
+            faceLightingCheck.reset()
+            return false
+        }
+        return faceLightingCheck.updateHint(isNoFace = faceDetection.status == FaceDetection.Status.NOFACE, nowMs = nowMs)
     }
 
     private fun computeProgress(

@@ -80,6 +80,8 @@ class CameraFrameProvider @Inject internal constructor(
      *   binding.preview.awaitLayout()
      *   binding.targerOverlay.awaitLayout()
      * ```
+     *
+     * @param meterExposureOnTarget meter exposure and white balance on [target] rather than the whole frame
      */
 
     @ExcludedFromGeneratedTestCoverageReports(reason = "Camera API wrapper")
@@ -88,6 +90,7 @@ class CameraFrameProvider @Inject internal constructor(
         cameraPreviewView: CameraPreviewView,
         target: Rect? = null,
         highResolution: Boolean = false,
+        meterExposureOnTarget: Boolean = false,
         onError: (Throwable) -> Unit = {},
     ) = withContext(bgDispatcher) {
         val previewView = cameraPreviewView.previewView
@@ -166,8 +169,13 @@ class CameraFrameProvider @Inject internal constructor(
                         newPreview,
                     ).also { boundCamera ->
                         with(cameraFocusManagerFactory.create(CrashReportTag.CAMERA)) {
-                            setUpFocusOnTap(previewView, boundCamera)
-                            setUpAutoFocus(previewView, boundCamera)
+                            val exposureTarget = targetRect.takeIf { meterExposureOnTarget }
+                            setUpFocusOnTap(previewView, boundCamera, exposureTarget)
+                            if (exposureTarget != null) {
+                                setUpExposureOnTarget(previewView, boundCamera, exposureTarget)
+                            } else {
+                                setUpAutoFocus(previewView, boundCamera)
+                            }
                         }
                     }
             } catch (e: Exception) {

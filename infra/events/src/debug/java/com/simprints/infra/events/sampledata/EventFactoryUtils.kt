@@ -380,6 +380,17 @@ fun createFaceCaptureAttemptEvent() = FaceCaptureAttemptEvent(
         ),
     ),
     statusRunsTruncated = false,
+    lightingStats = FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.LightingStats(
+        mode = FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.LightingCheckMode.HINT,
+        framesMeasured = 11,
+        tooDarkFrameCount = 3,
+        noFaceWhileTooDarkCount = 2,
+        brightnessMin = 21,
+        brightnessMedian = 96,
+        brightnessMax = 141,
+        contrastMedian = 88,
+        hintShownMs = 600L,
+    ),
 )
 
 fun createFaceOnboardingCompleteEvent() = FaceOnboardingCompleteEvent(
