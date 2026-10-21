@@ -11,4 +11,6 @@ data class LightingConditionsAssessmentConfig(
     val highMedianLuminanceThresholdPercent: Int,
     val highGlareLuminanceThresholdPercent: Int,
     val glareDetectionGridMinDimension: Int,
+    /** Glare detection suits flat reflective surfaces like cards; it gives false alarms on faces. */
+    val isGlareDetectionEnabled: Boolean = true,
 )

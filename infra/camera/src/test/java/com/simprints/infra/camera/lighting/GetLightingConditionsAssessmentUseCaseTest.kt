@@ -33,7 +33,7 @@ internal class GetLightingConditionsAssessmentUseCaseTest {
 
     @Before
     fun setUp() {
-        useCase = GetLightingConditionsAssessmentUseCase()
+        useCase = GetLightingConditionsAssessmentUseCase(ClassifyLightingConditionsUseCase())
     }
 
     @Test
@@ -170,6 +170,15 @@ internal class GetLightingConditionsAssessmentUseCaseTest {
     }
 
     @Test
+    fun `returns NORMAL when card is glare illuminated but glare detection is disabled`() {
+        assertAssessment(
+            expected = LightingConditionsAssessment.NORMAL,
+            bitmap = glareCardBitmap,
+            config = getLightingConditionsAssessmentConfig(isGlareDetectionEnabled = false),
+        )
+    }
+
+    @Test
     fun `does not recycle bitmap`() {
         useCase(normalCardBitmap, getLightingConditionsAssessmentConfig())
         val otherSizeCardBitmap = createCardBitmap(widthPx = 100, heightPx = 500)
@@ -196,6 +205,7 @@ internal class GetLightingConditionsAssessmentUseCaseTest {
         highMedianLuminanceThresholdPercent: Int = 95,
         highGlareLuminanceThresholdPercent: Int = 99,
         glareDetectionGridMinDimension: Int = 6,
+        isGlareDetectionEnabled: Boolean = true,
     ) = LightingConditionsAssessmentConfig(
         isEnabled = isEnabled,
         borderWidthPercent = borderWidthPercent,
@@ -204,6 +214,7 @@ internal class GetLightingConditionsAssessmentUseCaseTest {
         highMedianLuminanceThresholdPercent = highMedianLuminanceThresholdPercent,
         highGlareLuminanceThresholdPercent = highGlareLuminanceThresholdPercent,
         glareDetectionGridMinDimension = glareDetectionGridMinDimension,
+        isGlareDetectionEnabled = isGlareDetectionEnabled,
     )
 
     /**

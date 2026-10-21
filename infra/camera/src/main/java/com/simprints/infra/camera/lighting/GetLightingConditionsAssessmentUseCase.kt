@@ -1,11 +1,17 @@
 package com.simprints.infra.camera.lighting
 
 import android.graphics.Bitmap
+import com.simprints.infra.camera.lighting.ClassifyLightingConditionsUseCase.Companion.isAbovePercent
+import com.simprints.infra.camera.lighting.ClassifyLightingConditionsUseCase.Companion.isBelowPercent
+import com.simprints.infra.camera.lighting.LuminanceHistogram.Companion.PERCENTILE_10
+import com.simprints.infra.camera.lighting.LuminanceHistogram.Companion.PERCENTILE_90
+import com.simprints.infra.camera.lighting.LuminanceHistogram.Companion.PERCENTILE_95
 import javax.inject.Inject
-import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-class GetLightingConditionsAssessmentUseCase @Inject constructor() {
+class GetLightingConditionsAssessmentUseCase @Inject constructor(
+    private val classifyLightingConditions: ClassifyLightingConditionsUseCase,
+) {
     /**
      * Detects normal, too dim or too bright lighting in a bitmap of an image of a card that approximately fits the image.
      *
@@ -40,7 +46,7 @@ class GetLightingConditionsAssessmentUseCase @Inject constructor() {
      * - median P50 luminance is high, >95%
      * - contrast is too low: difference between P95 and P5 luminance <30%
      *
-     * Otherwise, the image is still considered too bright when it has reflection glare areas:
+     * Otherwise, if glare detection is enabled, the image is still considered too bright when it has reflection glare areas:
      * - the 5% border width along the edges is ignored to reduce influence of possible dim background behind the card
      * - the remaining image is divided into a 6x6 (or larger in longer dimension) grid of ~square tiles to look for glare
      * - at least 1 tile has near-maximum P95 luminance very high, >99% (clamped to nearly pure white)
@@ -72,25 +78,17 @@ class GetLightingConditionsAssessmentUseCase @Inject constructor() {
         val bottom = height - borderWidth
         val stride = width
 
-        val imageHistogram = buildLuminanceHistogram(pixels, stride, left, top, right, bottom)
-        val p5 = imageHistogram.percentile(PERCENTILE_5)
-        val p50 = imageHistogram.percentile(PERCENTILE_50)
-        val p95 = imageHistogram.percentile(PERCENTILE_95)
-        val globalContrast = p95 - p5
+        val imageStats = LuminanceHistogram()
+            .apply { addRegion(pixels, stride, left, top, right, bottom) }
+            .toLightingStats()
+            ?: return LightingConditionsAssessment.NORMAL
 
-        if (p50.isBelowPercent(lowMedianLuminanceThresholdPercent) &&
-            globalContrast.isBelowPercent(lowContrastThresholdPercent)
+        val exposureAssessment = classifyLightingConditions(imageStats, lightingConditionsAssessmentConfig)
+        if (exposureAssessment != LightingConditionsAssessment.NORMAL) return exposureAssessment
+
+        if (isGlareDetectionEnabled &&
+            hasReflectionGlare(pixels, stride, left, top, right, bottom, lightingConditionsAssessmentConfig)
         ) {
-            return LightingConditionsAssessment.TOO_DIM
-        }
-
-        if (p50.isAbovePercent(highMedianLuminanceThresholdPercent) &&
-            globalContrast.isBelowPercent(lowContrastThresholdPercent)
-        ) {
-            return LightingConditionsAssessment.TOO_BRIGHT
-        }
-
-        if (hasReflectionGlare(pixels, stride, left, top, right, bottom, lightingConditionsAssessmentConfig)) {
             return LightingConditionsAssessment.TOO_BRIGHT
         }
 
@@ -120,6 +118,7 @@ class GetLightingConditionsAssessmentUseCase @Inject constructor() {
             glareDetectionGridMinDimension
         }
 
+        val tileHistogram = LuminanceHistogram()
         for (row in 0 until gridRows) {
             val tileTop = top + row * innerHeight / gridRows
             val tileBottom = top + (row + 1) * innerHeight / gridRows
@@ -128,7 +127,8 @@ class GetLightingConditionsAssessmentUseCase @Inject constructor() {
                 val tileLeft = left + column * innerWidth / gridColumns
                 val tileRight = left + (column + 1) * innerWidth / gridColumns
 
-                val tileHistogram = buildLuminanceHistogram(pixels, stride, tileLeft, tileTop, tileRight, tileBottom)
+                tileHistogram.reset()
+                tileHistogram.addRegion(pixels, stride, tileLeft, tileTop, tileRight, tileBottom)
 
                 val p10 = tileHistogram.percentile(PERCENTILE_10)
                 val p90 = tileHistogram.percentile(PERCENTILE_90)
@@ -146,56 +146,6 @@ class GetLightingConditionsAssessmentUseCase @Inject constructor() {
         return false
     }
 
-    private fun Int.isBelowPercent(percent: Int): Boolean = this * 100 < percent * MAX_LUMINANCE
-
-    private fun Int.isAbovePercent(percent: Int): Boolean = this * 100 > percent * MAX_LUMINANCE
-
-    private fun buildLuminanceHistogram(
-        pixels: IntArray,
-        stride: Int,
-        left: Int,
-        top: Int,
-        right: Int,
-        bottom: Int,
-    ): LuminanceHistogram {
-        val histogram = IntArray(LUMINANCE_BUCKETS)
-        var totalCount = 0
-
-        for (y in top until bottom) {
-            val rowOffset = y * stride
-            for (x in left until right) {
-                val color = pixels[rowOffset + x]
-                val red = (color ushr 16) and CHANNEL_MASK
-                val green = (color ushr 8) and CHANNEL_MASK
-                val blue = color and CHANNEL_MASK
-                val luminance = (RED_WEIGHT * red + GREEN_WEIGHT * green + BLUE_WEIGHT * blue) ushr 8 // int approximation
-                histogram[luminance]++
-                totalCount++
-            }
-        }
-
-        return LuminanceHistogram(counts = histogram, totalCount = totalCount)
-    }
-
-    private class LuminanceHistogram(
-        val counts: IntArray,
-        val totalCount: Int,
-    ) {
-        fun percentile(percentile: Double): Int {
-            if (totalCount <= 0) return 0
-
-            val targetRank = ceil(percentile.coerceIn(0.0, 1.0) * totalCount).toInt().coerceAtLeast(1)
-            var cumulativeCount = 0
-
-            for (luminance in counts.indices) {
-                cumulativeCount += counts[luminance]
-                if (cumulativeCount >= targetRank) return luminance
-            }
-
-            return counts.lastIndex
-        }
-    }
-
     private fun Bitmap.scaledTo(targetMinDimensionPx: Int): Bitmap {
         val minDimension = minOf(width, height)
         val scaleFactor = targetMinDimensionPx.toFloat() / minDimension.toFloat().coerceAtLeast(1f)
@@ -206,20 +156,5 @@ class GetLightingConditionsAssessmentUseCase @Inject constructor() {
 
     private companion object {
         private const val TARGET_MIN_DIMENSION_PX = 100
-
-        // percentiles
-        private const val PERCENTILE_5 = 0.05
-        private const val PERCENTILE_10 = 0.10
-        private const val PERCENTILE_50 = 0.50
-        private const val PERCENTILE_90 = 0.90
-        private const val PERCENTILE_95 = 0.95
-
-        // color math
-        private const val LUMINANCE_BUCKETS = 256
-        private const val MAX_LUMINANCE = LUMINANCE_BUCKETS - 1
-        private const val CHANNEL_MASK = 0xFF
-        private const val RED_WEIGHT = 77
-        private const val GREEN_WEIGHT = 150
-        private const val BLUE_WEIGHT = 29
     }
 }
