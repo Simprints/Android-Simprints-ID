@@ -517,4 +517,77 @@ internal class ExperimentalProjectConfigurationTest {
             assertThat(ExperimentalProjectConfiguration(config).deviceStatusRepeatIntervalHours).isEqualTo(result)
         }
     }
+
+    @Test
+    fun `face lighting conditions assessment mode parsed correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to FaceLightingConditionsAssessmentMode.OFF,
+            mapOf(ExperimentalProjectConfiguration.FACE_LIGHTING_CONDITIONS_ASSESSMENT_MODE to JsonPrimitive(1)) to
+                FaceLightingConditionsAssessmentMode.OFF,
+            mapOf(ExperimentalProjectConfiguration.FACE_LIGHTING_CONDITIONS_ASSESSMENT_MODE to JsonPrimitive("unknown")) to
+                FaceLightingConditionsAssessmentMode.OFF,
+            mapOf(ExperimentalProjectConfiguration.FACE_LIGHTING_CONDITIONS_ASSESSMENT_MODE to JsonPrimitive("log")) to
+                FaceLightingConditionsAssessmentMode.LOG,
+            mapOf(ExperimentalProjectConfiguration.FACE_LIGHTING_CONDITIONS_ASSESSMENT_MODE to JsonPrimitive("HINT")) to
+                FaceLightingConditionsAssessmentMode.HINT,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).faceLightingConditionsAssessmentMode).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `face lighting conditions assessment low brightness parsed correctly`() {
+        val key = ExperimentalProjectConfiguration.FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS
+        mapOf(
+            emptyMap<String, JsonElement>() to 14,
+            mapOf(key to JsonPrimitive(true)) to 14,
+            mapOf(key to JsonPrimitive(-1)) to 0,
+            mapOf(key to JsonPrimitive(51)) to 50,
+            mapOf(key to JsonPrimitive(20)) to 20,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).faceLightingConditionsAssessmentLowBrightness).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `face lighting conditions assessment low contrast parsed correctly`() {
+        val key = ExperimentalProjectConfiguration.FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST
+        mapOf(
+            emptyMap<String, JsonElement>() to 100,
+            mapOf(key to JsonPrimitive(true)) to 100,
+            mapOf(key to JsonPrimitive(-1)) to 0,
+            mapOf(key to JsonPrimitive(101)) to 100,
+            mapOf(key to JsonPrimitive(30)) to 30,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).faceLightingConditionsAssessmentLowContrast).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `face lighting conditions assessment hint debounce parsed correctly`() {
+        val key = ExperimentalProjectConfiguration.FACE_LIGHTING_CONDITIONS_ASSESSMENT_HINT_DEBOUNCE_MILLIS
+        mapOf(
+            emptyMap<String, JsonElement>() to 500L,
+            mapOf(key to JsonPrimitive("string")) to 500L,
+            mapOf(key to JsonPrimitive(-1)) to 0L,
+            mapOf(key to JsonPrimitive(10_000)) to 5_000L,
+            mapOf(key to JsonPrimitive(800)) to 800L,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).faceLightingConditionsAssessmentHintDebounceMillis).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `face lighting conditions assessment interval parsed correctly`() {
+        val key = ExperimentalProjectConfiguration.FACE_LIGHTING_CONDITIONS_ASSESSMENT_INTERVAL_MILLIS
+        mapOf(
+            emptyMap<String, JsonElement>() to 250L,
+            mapOf(key to JsonPrimitive("string")) to 250L,
+            mapOf(key to JsonPrimitive(-1)) to 0L,
+            mapOf(key to JsonPrimitive(10_000)) to 5_000L,
+            mapOf(key to JsonPrimitive(100)) to 100L,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).faceLightingConditionsAssessmentIntervalMillis).isEqualTo(result)
+        }
+    }
 }
