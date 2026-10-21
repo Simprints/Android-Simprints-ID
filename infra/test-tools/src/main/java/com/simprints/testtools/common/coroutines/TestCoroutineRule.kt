@@ -17,10 +17,12 @@ class TestCoroutineRule : TestRule {
     ) = object : Statement() {
         override fun evaluate() {
             Dispatchers.setMain(testCoroutineDispatcher)
-
-            base.evaluate()
-
-            Dispatchers.resetMain()
+            try {
+                base.evaluate()
+            } finally {
+                // Otherwise a failed test leaks its scheduler (and virtual time) into the next test's dispatcher
+                Dispatchers.resetMain()
+            }
         }
     }
 }
