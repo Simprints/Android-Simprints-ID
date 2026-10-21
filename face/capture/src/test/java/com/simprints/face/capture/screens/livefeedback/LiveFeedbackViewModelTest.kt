@@ -18,10 +18,12 @@ import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.basebiosdk.detection.SpoofCheckResult
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
+import com.simprints.infra.camera.lighting.LightingStats
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckConfiguration
+import com.simprints.infra.config.store.models.FaceLightingConditionsAssessmentMode
 import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -82,6 +84,9 @@ internal class LiveFeedbackViewModelTest {
     @MockK
     private lateinit var getSpoofCheckConfiguration: GetSpoofCheckConfigurationUseCase
 
+    @MockK
+    private lateinit var faceLightingCheck: FaceLightingCheck
+
     private lateinit var viewModel: LiveFeedbackViewModel
 
     private val testCaptureAttemptTracker = CaptureAttemptTracker()
@@ -103,6 +108,9 @@ internal class LiveFeedbackViewModelTest {
         } returns QUALITY_THRESHOLD
         every { isUsingAutoCapture.invoke(any()) } returns false
         every { getSpoofCheckConfiguration.invoke(any(), any()) } returns SpoofCheckConfiguration.DISABLED
+        every { faceLightingCheck.mode } returns FaceLightingConditionsAssessmentMode.OFF
+        every { faceLightingCheck.measureIfDue(any(), any(), any()) } returns null
+        every { faceLightingCheck.updateHint(any(), any()) } returns false
 
         every { timeHelper.now() } returnsMany (0..1000L).map { Timestamp(it) }
         justRun { frame.recycle() }
@@ -116,6 +124,7 @@ internal class LiveFeedbackViewModelTest {
             isUsingAutoCapture,
             getSpoofCheckConfiguration,
             testCaptureAttemptTracker,
+            faceLightingCheck,
             testCoroutineRule.testCoroutineDispatcher,
             savedStateHandle,
         )
@@ -1077,6 +1086,7 @@ internal class LiveFeedbackViewModelTest {
             isUsingAutoCapture,
             getSpoofCheckConfiguration,
             testCaptureAttemptTracker,
+            faceLightingCheck,
             testCoroutineRule.testCoroutineDispatcher,
             handle,
         )
@@ -1088,6 +1098,106 @@ internal class LiveFeedbackViewModelTest {
         assertThat(slot.captured.payload.attemptNb).isEqualTo(3)
         assertThat(slot.captured.payload.createdAt).isEqualTo(Timestamp(10L))
         assertThat(handle.contains(AutoCaptureAttemptRecorder.KEY_ATTEMPT_STATS)).isFalse()
+    }
+
+    @Test
+    fun `manual - too-dark hint replaces only the no-face feedback`() = runTest {
+        every { faceLightingCheck.updateHint(any(), any()) } returns true
+        every { faceDetector.analyze(frame) } returnsMany listOf(null, getFace(Rect(0, 0, 30, 30)), getFace())
+        val states = collectStates()
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2)
+        repeat(3) { viewModel.process(frame, frame) }
+
+        assertThat(states.map { it.feedback }).containsExactly(
+            LiveFeedbackState.Feedback.NONE,
+            LiveFeedbackState.Feedback.TOO_DARK,
+            LiveFeedbackState.Feedback.TOO_FAR,
+            LiveFeedbackState.Feedback.VALID,
+        )
+    }
+
+    @Test
+    fun `lighting - measured on the face box before the frame is recycled`() = runTest {
+        val face = getFace()
+        every { faceDetector.analyze(frame) } returns face
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2)
+        viewModel.process(frame, frame)
+
+        verify { faceLightingCheck.measureIfDue(frame, face.relativeBoundingBox, any()) }
+        verify { faceLightingCheck.updateHint(isNoFace = false, nowMs = any()) }
+    }
+
+    @Test
+    fun `lighting - not measured while capturing`() = runTest {
+        every { faceDetector.analyze(frame) } returns getFace()
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+
+        verify(exactly = 0) { faceLightingCheck.measureIfDue(any(), any(), any()) }
+    }
+
+    @Test
+    fun `lighting - auto-capture held off resets the check and shows no hint`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        every { faceDetector.analyze(frame) } returns null
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.process(frame, frame)
+
+        verify(exactly = 0) { faceLightingCheck.measureIfDue(any(), any(), any()) }
+        verify(exactly = 0) { faceLightingCheck.updateHint(any(), any()) }
+        verify { faceLightingCheck.reset() }
+    }
+
+    @Test
+    fun `attempt event - carries lighting stats when the lighting check runs`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        every { faceLightingCheck.mode } returns FaceLightingConditionsAssessmentMode.HINT
+        every { faceLightingCheck.measureIfDue(any(), any(), any()) } returns
+            FaceLightingCheck.Measurement(LightingStats(p5 = 2, median = 20, p95 = 40), isTooDark = true)
+        every { faceLightingCheck.updateHint(any(), any()) } returns true
+        every { faceDetector.analyze(frame) } returnsMany listOf(null, null, getFace())
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.startCapture()
+        repeat(3) { viewModel.process(frame, frame) }
+        advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS + 1)
+
+        val slot = slot<FaceCaptureAttemptEvent>()
+        verify(exactly = 1) { eventReporter.addCaptureAttemptEvent(capture(slot)) }
+        with(slot.captured.payload.lightingStats!!) {
+            assertThat(mode).isEqualTo(FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.LightingCheckMode.HINT)
+            assertThat(framesMeasured).isEqualTo(3)
+            assertThat(tooDarkFrameCount).isEqualTo(3)
+            assertThat(noFaceWhileTooDarkCount).isEqualTo(2)
+            assertThat(brightnessMedian).isEqualTo(20)
+            assertThat(contrastMedian).isEqualTo(38)
+        }
+    }
+
+    @Test
+    fun `attempt event - no lighting stats when the lighting check is off`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        every { faceDetector.analyze(frame) } returns getFace()
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+        advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS + 1)
+
+        val slot = slot<FaceCaptureAttemptEvent>()
+        verify(exactly = 1) { eventReporter.addCaptureAttemptEvent(capture(slot)) }
+        assertThat(slot.captured.payload.lightingStats).isNull()
     }
 
     private fun TestScope.collectStates(): List<LiveFeedbackState> {
