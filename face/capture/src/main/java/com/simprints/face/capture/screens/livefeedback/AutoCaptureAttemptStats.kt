@@ -4,6 +4,8 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent
+import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.LightingCheckMode
+import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.LightingStats
 import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.RejectionMetric
 import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.RejectionStats
 import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.RunStatus
@@ -11,6 +13,7 @@ import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent.Fa
 import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.ValueStats
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlin.math.roundToInt
 import kotlin.random.Random
 
 /**
@@ -26,7 +29,8 @@ internal class AutoCaptureAttemptStats private constructor(
         bioSdk: String,
         startTime: Timestamp,
         random: Random = Random.Default,
-    ) : this(State(attemptNb = attemptNb, bioSdk = bioSdk, startTime = startTime), random)
+        lightingMode: LightingCheckMode? = null,
+    ) : this(State(attemptNb = attemptNb, bioSdk = bioSdk, startTime = startTime, lightingMode = lightingMode), random)
 
     val attemptNb: Int get() = state.attemptNb
     val startTime: Timestamp get() = state.startTime
@@ -44,6 +48,8 @@ internal class AutoCaptureAttemptStats private constructor(
         frameTime: Timestamp,
         frameWidth: Int,
         frameHeight: Int,
+        lighting: FaceLightingCheck.Measurement? = null,
+        isLightingHintShown: Boolean = false,
     ) {
         val offsetMs = (frameTime.ms - state.startTime.ms).coerceAtLeast(0L)
         val runStatus = detection.status.toRunStatus()
@@ -67,6 +73,7 @@ internal class AutoCaptureAttemptStats private constructor(
         }
 
         advanceRuns(runStatus, offsetMs)
+        if (state.lightingMode != null) recordLighting(lighting, runStatus, isLightingHintShown, offsetMs)
         hasFramesSinceSnapshot = true
     }
 
@@ -74,6 +81,7 @@ internal class AutoCaptureAttemptStats private constructor(
     fun toEvent(endTime: Timestamp): FaceCaptureAttemptEvent {
         val endOffsetMs = (endTime.ms - state.startTime.ms).coerceAtLeast(0L)
         closeOpenRun(endOffsetMs)
+        closeHintShown(endOffsetMs)
 
         return FaceCaptureAttemptEvent(
             startTime = state.startTime,
@@ -96,6 +104,7 @@ internal class AutoCaptureAttemptStats private constructor(
             qualityAllFrames = state.qualityAllFrames.toValueStats(),
             statusRuns = state.closedRuns.map { StatusRun(it.status, it.frameCount, it.durationMs) },
             statusRunsTruncated = state.statusRunsTruncated,
+            lightingStats = toLightingStats(),
             id = state.eventId,
         )
     }
@@ -115,6 +124,52 @@ internal class AutoCaptureAttemptStats private constructor(
         val last = lastSnapshotMs
         if (last != null && nowMs - last < SNAPSHOT_INTERVAL_MS) return null
         return snapshot()
+    }
+
+    private fun recordLighting(
+        lighting: FaceLightingCheck.Measurement?,
+        runStatus: RunStatus,
+        isHintShown: Boolean,
+        offsetMs: Long,
+    ) {
+        if (lighting != null) {
+            state.lightingFramesMeasured++
+            state.brightness.add(lighting.stats.median.toFloat(), random)
+            state.contrast.add(lighting.stats.contrast.toFloat(), random)
+            if (lighting.isTooDark) {
+                state.tooDarkFrameCount++
+                if (runStatus == RunStatus.INVALID) state.noFaceWhileTooDarkCount++
+            }
+        }
+
+        val shownSinceMs = state.hintShownSinceMs
+        if (isHintShown && shownSinceMs == null) {
+            state.hintShownSinceMs = offsetMs
+        } else if (!isHintShown && shownSinceMs != null) {
+            state.hintShownMs += (offsetMs - shownSinceMs).coerceAtLeast(0L)
+            state.hintShownSinceMs = null
+        }
+    }
+
+    private fun closeHintShown(endOffsetMs: Long) {
+        state.hintShownSinceMs?.let { state.hintShownMs += (endOffsetMs - it).coerceAtLeast(0L) }
+        state.hintShownSinceMs = null
+    }
+
+    private fun toLightingStats(): LightingStats? {
+        val mode = state.lightingMode ?: return null
+        val brightness = state.brightness.toValueStats()
+        return LightingStats(
+            mode = mode,
+            framesMeasured = state.lightingFramesMeasured,
+            tooDarkFrameCount = state.tooDarkFrameCount,
+            noFaceWhileTooDarkCount = state.noFaceWhileTooDarkCount,
+            brightnessMin = brightness?.minValue?.roundToInt(),
+            brightnessMedian = brightness?.medianValue?.roundToInt(),
+            brightnessMax = brightness?.maxValue?.roundToInt(),
+            contrastMedian = state.contrast.toValueStats()?.medianValue?.roundToInt(),
+            hintShownMs = state.hintShownMs,
+        )
     }
 
     private fun advanceRuns(
@@ -199,6 +254,15 @@ internal class AutoCaptureAttemptStats private constructor(
         val closedRuns: MutableList<ClosedRun> = mutableListOf(),
         var openRun: OpenRun? = null,
         var statusRunsTruncated: Boolean = false,
+        // Lighting check, only when it runs
+        val lightingMode: LightingCheckMode? = null,
+        var lightingFramesMeasured: Int = 0,
+        var tooDarkFrameCount: Int = 0,
+        var noFaceWhileTooDarkCount: Int = 0,
+        val brightness: BoundedSamples = BoundedSamples(),
+        val contrast: BoundedSamples = BoundedSamples(),
+        var hintShownMs: Long = 0L,
+        var hintShownSinceMs: Long? = null,
     )
 
     @Serializable

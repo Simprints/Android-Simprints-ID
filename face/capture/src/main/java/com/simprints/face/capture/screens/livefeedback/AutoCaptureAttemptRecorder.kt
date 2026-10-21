@@ -6,7 +6,9 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
+import com.simprints.infra.config.store.models.FaceLightingConditionsAssessmentMode
 import com.simprints.infra.config.store.models.ModalitySdkType
+import com.simprints.infra.events.event.domain.models.FaceCaptureAttemptEvent.FaceCaptureAttemptPayload.LightingCheckMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -21,6 +23,7 @@ internal class AutoCaptureAttemptRecorder(
     private val scope: CoroutineScope,
 ) {
     private var bioSdk: String? = null
+    private var lightingMode: LightingCheckMode? = null
 
     @Volatile
     var activeAttempt: AutoCaptureAttemptStats? = null
@@ -34,11 +37,26 @@ internal class AutoCaptureAttemptRecorder(
         bioSdk = sdk.name
     }
 
+    fun setLightingMode(mode: FaceLightingConditionsAssessmentMode) {
+        lightingMode = when (mode) {
+            FaceLightingConditionsAssessmentMode.OFF -> null
+            FaceLightingConditionsAssessmentMode.LOG -> LightingCheckMode.LOG
+            FaceLightingConditionsAssessmentMode.HINT -> LightingCheckMode.HINT
+        }
+    }
+
     fun start(attemptNb: Int) {
         // Report any unfinished previous attempt as abandoned
         finish()
         activeAttempt = bioSdk
-            ?.let { AutoCaptureAttemptStats(attemptNb = attemptNb, bioSdk = it, startTime = timeHelper.now()) }
+            ?.let {
+                AutoCaptureAttemptStats(
+                    attemptNb = attemptNb,
+                    bioSdk = it,
+                    startTime = timeHelper.now(),
+                    lightingMode = lightingMode,
+                )
+            }
             .also { savedStateHandle[KEY_ATTEMPT_STATS] = it?.snapshot() }
     }
 
@@ -48,6 +66,8 @@ internal class AutoCaptureAttemptRecorder(
         frameTime: Timestamp,
         frameWidth: Int,
         frameHeight: Int,
+        lighting: FaceLightingCheck.Measurement? = null,
+        isLightingHintShown: Boolean = false,
     ) {
         attempt.recordFrame(
             detection = faceDetection,
@@ -55,6 +75,8 @@ internal class AutoCaptureAttemptRecorder(
             frameTime = frameTime,
             frameWidth = frameWidth,
             frameHeight = frameHeight,
+            lighting = lighting,
+            isLightingHintShown = isLightingHintShown,
         )
         attempt.snapshotIfDue()?.let { snapshot ->
             scope.launch {
