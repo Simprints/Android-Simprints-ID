@@ -394,7 +394,7 @@
         <item quantity="other">ወደ ሲስተሙ ማስገባት</item>
     </plurals>
     <plurals name="dashboard_activity_card_identifications">
-        <item quantity="one">%d መለየት</item>
+        <item quantity="one">መለየት</item>
         <item quantity="other">መለየት</item>
     </plurals>
     <plurals name="dashboard_activity_card_verifications">
