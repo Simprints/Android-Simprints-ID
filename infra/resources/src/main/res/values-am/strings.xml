@@ -390,7 +390,7 @@
     <!-- Dashboard - Daily activity card -->
     <string name="dashboard_activity_card_activity">የየዕለት ተግባር: %1$s</string>
     <plurals name="dashboard_activity_card_enrolments">
-        <item quantity="one">%d ወደ ሲስተሙ ማስገባት</item>
+        <item quantity="one">ወደ ሲስተሙ ማስገባት</item>
         <item quantity="other">ወደ ሲስተሙ ማስገባት</item>
     </plurals>
     <plurals name="dashboard_activity_card_identifications">
