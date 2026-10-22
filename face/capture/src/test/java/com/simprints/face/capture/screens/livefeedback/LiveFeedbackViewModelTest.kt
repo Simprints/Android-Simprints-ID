@@ -30,6 +30,7 @@ import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -342,7 +343,39 @@ internal class LiveFeedbackViewModelTest {
         viewModel.process(frame, frame) // reaches the requested sample count and triggers finishCapture()
 
         assertThat(viewModel.userCaptures).hasSize(1)
+        assertThat(viewModel.sortedQualifyingCaptures).hasSize(1)
         verify(exactly = 1) { faceDetector.analyze(frame) }
+        coVerify(exactly = 1) { eventReporter.addCaptureEvents(any(), any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `manual - frame analysed while another frame finishes the capture is not added`() = runTest {
+        // Queued background work keeps the finishing coroutine suspended while the phase is still CAPTURING
+        viewModel = LiveFeedbackViewModel(
+            resolveFaceBioSdkUseCase,
+            configRepository,
+            eventReporter,
+            timeHelper,
+            isUsingAutoCapture,
+            getSpoofCheckConfiguration,
+            testCaptureAttemptTracker,
+            StandardTestDispatcher(testScheduler),
+            savedStateHandle,
+        )
+        // The second frame is still being analysed when the third one completes the capture
+        every { faceDetector.analyze(frame) } returns getFace() andThenAnswer {
+            viewModel.process(frame, frame)
+            getFace()
+        } andThen getFace()
+
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
+        advanceUntilIdle()
+
+        assertThat(viewModel.sortedQualifyingCaptures).hasSize(2)
+        coVerify(exactly = 2) { eventReporter.addCaptureEvents(any(), any(), any(), any(), any()) }
     }
 
     @Test
@@ -485,6 +518,33 @@ internal class LiveFeedbackViewModelTest {
     }
 
     @Test
+    fun `auto - frame analysed while the capture is finishing is not added`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        every { faceDetector.analyze(frame) } returnsMany listOf(
+            getFace(quality = 0.8f),
+            getFace(quality = 0.7f),
+            getFace(quality = 0.99f), // would replace the worst capture if it was not dropped
+        )
+        // Reported from within finishCapture(), while the timeout job is still active and the phase is still CAPTURING
+        every { eventReporter.addCaptureAttemptEvent(any()) } answers {
+            viewModel.process(frame, frame)
+            mockk()
+        }
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+        viewModel.process(frame, frame)
+        advanceTimeBy((AUTO_CAPTURE_IMAGING_DURATION_MS + 1).milliseconds) // fires the timeout job -> finishCapture()
+        advanceUntilIdle()
+
+        verify(exactly = 3) { faceDetector.analyze(frame) }
+        assertThat(viewModel.sortedQualifyingCaptures.map { it.face?.quality }).containsExactly(0.8f, 0.7f)
+        coVerify(exactly = 2) { eventReporter.addCaptureEvents(any(), any(), any(), any(), any()) }
+    }
+
+    @Test
     fun `spoof RECORDED finishes regardless of score`() = runTest {
         every { getSpoofCheckConfiguration.invoke(any(), any()) } returns spoofConfig()
         every { faceDetector.analyze(frame) } returns getFace()
@@ -561,6 +621,31 @@ internal class LiveFeedbackViewModelTest {
         viewModel.process(frame, frame)
         advanceUntilIdle()
         assertThat(viewModel.state.value.phase).isEqualTo(LiveFeedbackState.Phase.FINISHED)
+    }
+
+    @Test
+    fun `auto - spoof ENFORCED failing resets finishing so the retry can capture and finish`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        every { getSpoofCheckConfiguration.invoke(any(), any()) } returns spoofConfig(FaceConfiguration.SpoofCheckMode.ENFORCED)
+        every { faceDetector.analyze(frame) } returns getFace()
+        coEvery { faceDetector.spoofCheck(any(), any()) } returns SpoofCheckResult(score = 0.9f)
+        every { timeHelper.now() } answers { Timestamp(testScheduler.currentTime) }
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+
+        // Attempt 1 fails the spoof check and resets
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+        advanceUntilIdle()
+        assertThat(viewModel.state.value.phase).isEqualTo(LiveFeedbackState.Phase.NOT_STARTED)
+
+        // Attempt 2 reaches maxAttempts, so it must be captured and finish
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+        advanceUntilIdle()
+        assertThat(viewModel.state.value.phase).isEqualTo(LiveFeedbackState.Phase.FINISHED)
+        assertThat(viewModel.sortedQualifyingCaptures).hasSize(1)
     }
 
     @Test

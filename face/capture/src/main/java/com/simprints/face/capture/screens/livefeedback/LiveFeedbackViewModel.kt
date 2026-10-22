@@ -76,6 +76,10 @@ internal class LiveFeedbackViewModel @Inject constructor(
     val userCaptures = mutableListOf<FaceDetection>()
     var sortedQualifyingCaptures = listOf<FaceDetection>()
 
+    // Once set (under [capturesLock]) frames no longer touch the captures, so finishing can safely read them
+    private val capturesLock = Any()
+    private val isFinishing = AtomicBoolean(false)
+
     /**
      * The single source of truth for the whole screen.
      * The fragment renders this deterministically; all transitions funnel through [emit].
@@ -293,22 +297,26 @@ internal class LiveFeedbackViewModel @Inject constructor(
             }
         }
 
-        when (newPhase) {
-            LiveFeedbackState.Phase.NOT_STARTED -> updateFallbackCaptureIfValid(faceDetection)
-            LiveFeedbackState.Phase.CAPTURING -> {
-                if (isAutoCapture) {
-                    if (isQualifying(faceDetection)) {
-                        updateUserCapturesWith(faceDetection)
-                    }
-                } else {
-                    userCaptures.add(faceDetection)
-                    if (userCaptures.size == samplesToCapture) {
-                        finishCapture(captureAttemptTracker.attemptNumber)
+        synchronized(capturesLock) {
+            // Capture finished while this frame was analysed
+            if (isFinishing.get()) return
+            when (newPhase) {
+                LiveFeedbackState.Phase.NOT_STARTED -> updateFallbackCaptureIfValid(faceDetection)
+                LiveFeedbackState.Phase.CAPTURING -> {
+                    if (isAutoCapture) {
+                        if (isQualifying(faceDetection)) {
+                            updateUserCapturesWith(faceDetection)
+                        }
+                    } else {
+                        userCaptures.add(faceDetection)
+                        if (userCaptures.size == samplesToCapture) {
+                            finishCapture(captureAttemptTracker.attemptNumber)
+                        }
                     }
                 }
-            }
 
-            else -> { // no-op
+                else -> { // no-op
+                }
             }
         }
 
@@ -369,6 +377,9 @@ internal class LiveFeedbackViewModel @Inject constructor(
      * If any of the user captures are good, use them. If not, use the fallback capture.
      */
     private fun finishCapture(attemptNumber: Int) {
+        synchronized(capturesLock) {
+            if (!isFinishing.compareAndSet(false, true)) return
+        }
         Simber.i("Finish capture", tag = FACE_CAPTURE)
         attemptRecorder.finish()
         viewModelScope.launch {
@@ -450,6 +461,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
         Simber.i("Captures tracked in ${duration.duration}, waiting for ${delay}ms", tag = FACE_CAPTURE)
         if (delay > 0) delay(delay.milliseconds)
 
+        isFinishing.set(false)
         emit(phase = LiveFeedbackState.Phase.NOT_STARTED, feedback = LiveFeedbackState.Feedback.NONE, result = emptyList())
     }
 
