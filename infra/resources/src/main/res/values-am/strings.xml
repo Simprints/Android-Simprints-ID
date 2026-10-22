@@ -398,7 +398,7 @@
         <item quantity="other">መለየት</item>
     </plurals>
     <plurals name="dashboard_activity_card_verifications">
-        <item quantity="one">%d ማመሳከር</item>
+        <item quantity="one">ማመሳከር</item>
         <item quantity="other">ማመሳከር</item>
     </plurals>
 
