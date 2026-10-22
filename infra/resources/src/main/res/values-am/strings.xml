@@ -108,7 +108,7 @@
     <!-- Matcher -->
     <string name="matcher_please_wait">የመለየት ሰራውን እስኪጠናቀቅ እባክዎት ትንሽ ይጠብቁ</string>
     <string name="matcher_loading_candidates">ዕጩዎችን በመጫን ላይ ነው</string>
-    <string name="matcher_matching_candidates">ካሉት %s ማህደር ዉስጥ እየለየ</string>
+    <string name="matcher_matching_candidates">ካሉት ማህደር ዉስጥ እየለየ</string>
     <plurals name="matcher_matched_candidates">
         <item quantity="one">እያወዳደረ %d ተመራጭ</item>
         <item quantity="other">እያወዳደረ %d ተመራጮችን</item>
