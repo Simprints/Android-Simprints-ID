@@ -465,18 +465,6 @@
     <string name="dashboard_logout_confirmation_log_out_button">ዘግተህ ዉጣ</string>
     <string name="dashboard_logout_confirmation_cancel_button">አቋርጥ</string>
 
-    <!-- Module selection -->
-    <string name="select_modules_title">ሞጁሎችን ይምረጡ</string>
-    <string name="select_modules_error_no_modules">እባክዎ ቢያንስ አንድ ሞጁል ይምረጡ።</string>
-    <string name="select_modules_error_too_many_modules">እባክዎ ከ %1$d በላይ ሞጁሎችን ይምረጡ።</string>
-    <string name="select_modules_no_modules_selected">ምንም ሞጁሎች አልተመረጡም</string>
-    <string name="select_modules_search_hint">ሞጁሎችን ይፈልጉ</string>
-    <string name="select_modules_no_results">ምንም ውጤት አልተገኘም</string>
-    <string name="select_modules_confirm">አረጋግጥ</string>
-    <string name="select_modules_cancel">ሰርዝ</string>
-    <string name="select_modules_lock_overlay_title">ለመክፈት ይህን ይንኩ</string>
-    <string name="select_modules_selected_only">የተመረጡ ብቻ</string>
-
     <!-- Maintenance mode errors -->
     <string name="error_backend_maintenance_message">ስርዓቱ በአሁኑ ጊዜ ለጥገና ከመስመር ውጭ ነው። እባክዎ ቆየት ብለው ይሞክሩ.</string>
     <string name="error_backend_maintenance_with_time_message">ስርዓቱ በአሁኑ ጊዜ ለጥገና ከመስመር ውጭ ነው። እባክዎ ከ%s በኋላ እንደገና ይሞክሩ</string>
@@ -496,7 +484,6 @@
     <string name="id_pool_validation_last_sync">የመጨረሻው የSync ጊዜ %1$s</string>
     <string name="id_pool_validation_syncing_message">በማመሳሰል ላይ…</string>
     <string name="id_pool_validation_action_sync">ሲንከ አድርግና እና እንደገና ሞክር</string>
-    <string name="id_pool_validation_action_select_modules">ሞጁሎችን ይምረጡ</string>
     <string name="id_pool_validation_action_close">ዝጋ</string>
     <string name="id_pool_validation_action_continue">ቀጥል</string>
 
