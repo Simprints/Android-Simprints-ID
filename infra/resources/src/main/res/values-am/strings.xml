@@ -494,7 +494,7 @@
     <string name="id_pool_validation_module_mismatch_message">በጥያቄው ላይ ያለው የሞጁል መለያ (Module ID) በሲምፕሪንትስ (Simprints ID) ላይ ከተመረጡት ሞጁሎች መካከል ከአንዳቸውም ጋር አይዛመድም።</string>
     <string name="id_pool_validation_sync_required_message">የሲምፕሪንትስ መረጃዎ ከሰርቨር ጋር ሳይመሳሰል ረጅም ጊዜ ቆይቷል።</string>
     <string name="id_pool_validation_pool_empty_message">ለዚህ ጥያቄ የሚሆን ምንም ዓይነት መዝገብ/መረጃ በዚህ መሣሪያ (ስልክ) ላይ አልተገኘም።</string>
-    <string name="id_pool_validation_last_sync">የመጨረሻው የSync ጊዜ 1%1$s</string>
+    <string name="id_pool_validation_last_sync">የመጨረሻው የSync ጊዜ %1$s</string>
     <string name="id_pool_validation_syncing_message">በማመሳሰል ላይ…</string>
     <string name="id_pool_validation_action_sync">ሲንከ አድርግና እና እንደገና ሞክር</string>
     <string name="id_pool_validation_action_select_modules">ሞጁሎችን ይምረጡ</string>
