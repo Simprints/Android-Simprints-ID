@@ -70,6 +70,11 @@ class CameraFrameProvider @Inject internal constructor(
 
     private val frameEmissionHelper = FrameEmissionHelper()
 
+    // When true, high-resolution captures are not scaled down to the preview size.
+    // Set on the background dispatcher during initialisation and read on the camera executor.
+    @Volatile
+    private var keepHighResolutionDetail = false
+
     fun isInitialised() = camera != null
 
     /**
@@ -88,8 +93,10 @@ class CameraFrameProvider @Inject internal constructor(
         cameraPreviewView: CameraPreviewView,
         target: Rect? = null,
         highResolution: Boolean = false,
+        keepHighResolutionDetail: Boolean = false,
         onError: (Throwable) -> Unit = {},
     ) = withContext(bgDispatcher) {
+        this@CameraFrameProvider.keepHighResolutionDetail = keepHighResolutionDetail
         val previewView = cameraPreviewView.previewView
         try {
             previewRect = fullPreviewSizeRect(previewView)
@@ -216,6 +223,7 @@ class CameraFrameProvider @Inject internal constructor(
         imageCapture = null
         camera = null
         frameEmissionHelper.reset()
+        keepHighResolutionDetail = false
 
         if (!executor.isShutdown) executor.shutdown()
     }
@@ -279,6 +287,7 @@ class CameraFrameProvider @Inject internal constructor(
                                         rotationDegrees,
                                         previewViewWidth,
                                         previewViewHeight,
+                                        scaleToPreview = !keepHighResolutionDetail,
                                     ),
                                     rotationDegrees,
                                 )

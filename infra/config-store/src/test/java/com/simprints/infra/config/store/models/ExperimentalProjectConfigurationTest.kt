@@ -138,6 +138,18 @@ internal class ExperimentalProjectConfigurationTest {
     }
 
     @Test
+    fun `check ocr keep high res detail flag correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to true,
+            mapOf(ExperimentalProjectConfiguration.OCR_KEEP_HIGH_RES_DETAIL to JsonPrimitive(1)) to true,
+            mapOf(ExperimentalProjectConfiguration.OCR_KEEP_HIGH_RES_DETAIL to JsonPrimitive(false)) to false,
+            mapOf(ExperimentalProjectConfiguration.OCR_KEEP_HIGH_RES_DETAIL to JsonPrimitive(true)) to true,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).ocrKeepHighResDetail).isEqualTo(result)
+        }
+    }
+
+    @Test
     fun `check ocr captures value correctly`() {
         val expectedOcrCaptures = 10
         mapOf(
@@ -147,6 +159,18 @@ internal class ExperimentalProjectConfigurationTest {
             mapOf(ExperimentalProjectConfiguration.OCR_CAPTURES to JsonPrimitive(expectedOcrCaptures)) to expectedOcrCaptures,
         ).forEach { (config, result) ->
             assertThat(ExperimentalProjectConfiguration(config).ocrCaptures).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `check ocr read fayda barcode flag correctly`() {
+        mapOf(
+            emptyMap<String, JsonElement>() to false,
+            mapOf(ExperimentalProjectConfiguration.OCR_READ_FAYDA_BARCODE to JsonPrimitive(1)) to false,
+            mapOf(ExperimentalProjectConfiguration.OCR_READ_FAYDA_BARCODE to JsonPrimitive(false)) to false,
+            mapOf(ExperimentalProjectConfiguration.OCR_READ_FAYDA_BARCODE to JsonPrimitive(true)) to true,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).ocrReadFaydaBarcode).isEqualTo(result)
         }
     }
 
