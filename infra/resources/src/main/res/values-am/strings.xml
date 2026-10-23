@@ -195,7 +195,7 @@
     <string name="face_capture_error_look_straight">ሰዉየዉ ቀጥታ ካሜራዉን እንዲያይ አድርግ</string>
     <string name="face_capture_title_validating">የፊት ምዝገባ ትክክለኛነት በማረጋገጥ ላይ</string>
     <string name="face_capture_title_validating_failed">ማረጋገጥ አልተቻለም</string>
-    <string name="face_capture_error_validating_failed">እባክዎ ትከከለኛ ሰው ፊለፊትዎ መኖሩን አረጋግጡ በድጋሚ ፎቶውን ያንሱ</string>
+    <string name="face_capture_error_validating_failed">እባክዎ ፊለፊትዎ ሰዉ መኖሩን ያረጋግጡና በድጋሚ ፎቶውን ያንሱ ::</string>
     <string name="face_capture_begin_button">ለማንሳት ተጫን</string>
     <string name="face_capture_prep_begin_button_capturing">በማንሳት ላይ....</string>
     <string name="face_capture_permission_denied">የካሜራ ፍቃድ ስጥ</string>
