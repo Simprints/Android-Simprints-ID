@@ -176,6 +176,8 @@ internal class EventUpSyncTask @Inject constructor(
             )
 
             emitProgress(lastOperation, 0)
+        } catch (ex: CancellationException) {
+            throw ex
         } catch (t: Throwable) {
             Simber.e("Failed to upload event scopes", t, tag = SYNC)
             lastOperation = lastOperation.copy(
