@@ -19,11 +19,16 @@ import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.concurrent.thread
 
 @RunWith(AndroidJUnit4::class)
 class FirebaseAuthManagerTest {
@@ -153,6 +158,41 @@ class FirebaseAuthManagerTest {
 
         val result = firebaseAuthManager.getCurrentToken()
         assertThat(result).isEqualTo("Token")
+    }
+
+    @Test
+    fun `getCurrentToken should not use the core app while signOut is deleting it`() {
+        val workerThreadName = "sync-worker"
+        val coreAppFetched = CountDownLatch(1)
+        val coreAppDeleted = CountDownLatch(1)
+        val isDeleted = AtomicBoolean(false)
+        every { FirebaseApp.getInstance(any()) } answers {
+            if (Thread.currentThread().name.startsWith(workerThreadName)) {
+                coreAppFetched.countDown()
+                coreAppDeleted.await(1, TimeUnit.SECONDS)
+            }
+            firebaseApp
+        }
+        every { firebaseApp.delete() } answers {
+            isDeleted.set(true)
+            coreAppDeleted.countDown()
+        }
+        every { FirebaseAuth.getInstance(firebaseApp) } answers {
+            check(!isDeleted.get()) { "FirebaseApp was deleted" }
+            firebaseAuth
+        }
+        every { firebaseAuth.currentUser } returns firebaseUser
+        every { firebaseUser.getIdToken(any()) } returns Tasks.forResult(GetTokenResult("Token", HashMap()))
+
+        var result: Result<String>? = null
+        val worker = thread(name = workerThreadName) {
+            result = runCatching { runBlocking { firebaseAuthManager.getCurrentToken() } }
+        }
+        coreAppFetched.await(1, TimeUnit.SECONDS)
+        firebaseAuthManager.signOut()
+        worker.join()
+
+        assertThat(result?.getOrThrow()).isEqualTo("Token")
     }
 
     @Test
