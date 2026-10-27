@@ -5,6 +5,7 @@ import com.google.firebase.FirebaseNetworkException
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import java.util.concurrent.CancellationException
 import javax.net.ssl.SSLHandshakeException
 import javax.net.ssl.SSLProtocolException
 
@@ -177,14 +178,15 @@ object Simber {
     }
 
     // Some exception do not provide any value when logged into crashlytics,
-    // e.g. issues due to bad network
+    // e.g. issues due to bad network or coroutine cancellation
     private fun shouldSkipThrowableReporting(t: Throwable) = isSkippableException(t) || isSkippableException(t.cause)
 
     private fun isSkippableException(it: Throwable?) = it is SocketTimeoutException ||
         it is UnknownHostException ||
         it is SSLProtocolException ||
         it is SSLHandshakeException ||
-        it is FirebaseNetworkException
+        it is FirebaseNetworkException ||
+        it is CancellationException
 
     // companion object {
     const val DEFAULT_TAG = "Simber"
