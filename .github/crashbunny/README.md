@@ -18,6 +18,8 @@ the next night.
 
 ## Setup
 
+All secrets and variables below go in the `CrashBunny` environment (Settings → Environments), restricted to the `main` branch.
+
 | Kind | Name | Value |
 | --- | --- | --- |
 | Secret | `CLAUDE_CODE_OAUTH_TOKEN` | Output of `claude setup-token` (Enterprise seat, valid 1 year) |

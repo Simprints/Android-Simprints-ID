@@ -31,6 +31,8 @@ jobs:
     crashbunny:
         runs-on: ubuntu-latest
         timeout-minutes: 330
+        # Holds the CrashBunny secrets, restricted to main so other branches' workflows can't read them
+        environment: CrashBunny
 
         env:
             # Shadow mode until the repo variable CRASHBUNNY_DRY_RUN is set to 'false'
