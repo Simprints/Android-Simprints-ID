@@ -3,6 +3,13 @@
   "items": [
     {
       "attempts": 1,
+      "fix": {
+        "branch": "crashbunny/sync-worker-cancellation-logged-as-error",
+        "pr_url": "https://github.com/Simprints/Android-Simprints-ID/pull/1886",
+        "reason": null,
+        "status": "pr_opened",
+        "summary": "Simber skips CancellationException (direct or as cause) from Crashlytics reporting, and EventUpSyncTask rethrows cancellation instead of recording the operation as FAILED"
+      },
       "impact": "medium",
       "issue_ids": [
         "9d98adfcb32c5f9f91ead1e93f12e219",
@@ -11,9 +18,10 @@
         "0552d941bebf05f77676957643d1ad90",
         "181be15b78d7c239c7c9a912554f9649"
       ],
+      "pr_url": "https://github.com/Simprints/Android-Simprints-ID/pull/1886",
       "root_cause": "Broad catch blocks in sync paths log WorkManager cancellations via Simber.e, which records them as non-fatals: FirebaseAuthManager.getCurrentToken (\"Failed to get access token\"), EventRepositoryImpl.reportException (\"Failed to save the event\") and EventUpSyncTask (\"Failed to upload event scopes\"). EventUpSyncTask also swallows the CancellationException (not in isTerminalException) and records the scope as FAILED. Unchanged on main; Simber.shouldSkipThrowableReporting could skip CancellationException, and EventUpSyncTask should rethrow it. No open PR.",
       "root_cause_id": "sync-worker-cancellation-logged-as-error",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "attempts": 0,
