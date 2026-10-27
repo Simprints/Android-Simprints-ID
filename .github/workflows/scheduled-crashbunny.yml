@@ -51,7 +51,8 @@ jobs:
             RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
             # Seat token from `claude setup-token`. Don't add ANTHROPIC_API_KEY here: it would take precedence
             CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-            # A PAT or app token lets the draft PRs trigger the PR checks; GITHUB_TOKEN-created PRs don't
+            # Used by `gh` to open PRs: a PAT or app token makes the draft PRs trigger the PR checks, GITHUB_TOKEN-created
+            # PRs don't. Git pushes (state branch, fix branches) use the checkout's GITHUB_TOKEN
             GH_TOKEN: ${{ secrets.CRASHBUNNY_GH_TOKEN || github.token }}
             SIMPHONY_WEBHOOK_URL: ${{ secrets.SIMPHONY_CRASHBUNNY_WEBHOOK_URL }}
             SIMPHONY_WEBHOOK_SECRET: ${{ secrets.SIMPHONY_CRASHBUNNY_WEBHOOK_SECRET }}
@@ -61,7 +62,6 @@ jobs:
                 uses: actions/checkout@v7
                 with:
                     fetch-depth: 0
-                    token: ${{ secrets.CRASHBUNNY_GH_TOKEN || github.token }}
 
             -   name: Set up JDK 21
                 uses: actions/setup-java@v5
