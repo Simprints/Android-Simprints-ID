@@ -61,7 +61,7 @@
     }
   ],
   "night_id": "2026-10-27",
-  "reported": false,
+  "reported": true,
   "triage": {
     "issues": [
       {
