@@ -113,6 +113,12 @@ if [ "$phase" = "triage" ]; then
     [ -n "$night" ] || night="$(date -u -d '+6 hours' +%F)"
     [ -n "$start" ] || start="$(date -u -d '-24 hours' +%FT%TZ)"
     [ -n "$end" ] || end="$(date -u +%FT%TZ)"
+    if [ "$(echo "$phase_out" | out unreported_previous)" = "true" ]; then
+        "${QUEUE[@]}" report --run-url "$RUN_URL" --out "$WORK/previous-report.json"
+        send_report "$WORK/previous-report.json"
+        "${QUEUE[@]}" mark-reported
+        save_state "Reported previous night"
+    fi
     reset_repo
     git -C "$REPO" fetch -q --tags
     render "$HERE/triage-prompt.md" "$WORK/triage-prompt.md" \

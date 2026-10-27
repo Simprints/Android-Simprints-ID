@@ -61,7 +61,9 @@ def cmd_phase(args):
     current = night_id(now())
     if queue.get("night_id") != current:
         start = state.get("last_window_end") or iso(now() - DEFAULT_LOOKBACK)
-        gh_output(phase="triage", night_id=current, window_start=start, window_end=iso(now()))
+        # A previous night that never got its report out (e.g. the webhook failed) is reported before it's replaced
+        unreported = "true" if queue and not queue.get("reported") else "false"
+        gh_output(phase="triage", night_id=current, window_start=start, window_end=iso(now()), unreported_previous=unreported)
         return
     pending = [i for i in queue["items"] if i["status"] in ("pending", "in_progress")]
     if queue.get("weekly_limit_hit") and not args.ignore_weekly_limit:
