@@ -1,0 +1,137 @@
+{
+  "issues": {
+    "02ca2632210c8f37647cffa1a9b52347": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "sync-worker-cancellation-logged-as-error",
+      "title": "hg.q1 (Job was cancelled)",
+      "verdict": "app_bug"
+    },
+    "0552d941bebf05f77676957643d1ad90": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "sync-worker-cancellation-logged-as-error",
+      "title": "S6.t0 (Job was cancelled)",
+      "verdict": "app_bug"
+    },
+    "05ae5e1d98686e7494af8e5dd8342c03": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "old-build-error-level-debug-logging",
+      "title": "com.simprints.infra.logging.Simber.w",
+      "verdict": "noise"
+    },
+    "0e20e143562ba7fca72664df73515809": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "legacy-firebase-storage-upload-network-failure",
+      "title": "com.google.firebase.storage.UploadTask.recoverStatus",
+      "verdict": "noise"
+    },
+    "181be15b78d7c239c7c9a912554f9649": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "sync-worker-cancellation-logged-as-error",
+      "title": "cf.r1 (j2 was cancelled)",
+      "verdict": "app_bug"
+    },
+    "2845a07a2b8a5f7f6b32fc6d505b74d0": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "firebase-auth-token-refresh-network-error-unclassified",
+      "title": "com.google.firebase.concurrent.CustomThreadFactory.lambda$newThread$0",
+      "verdict": "noise"
+    },
+    "3036d989a965fd16488e1217e61fa1c7": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "calling-app-invalid-confirm-request",
+      "title": "com.simprints.feature.clientapi.mappers.request.validators.ConfirmIdentityValidator.validateSelectedGuid",
+      "verdict": "external"
+    },
+    "315d257c4dc34255d99032683d4f862c": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "firebase-auth-token-refresh-network-error-unclassified",
+      "title": "com.google.firebase.concurrent.CustomThreadFactory.lambda$newThread$0",
+      "verdict": "noise"
+    },
+    "3cb2ed1c2712239c16aa6e46eb483093": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "legacy-firebase-storage-upload-auth-expired",
+      "title": "com.google.firebase.storage.network.NetworkRequest.parseResponse",
+      "verdict": "noise"
+    },
+    "4cddb74671504f936037c6481d4d08d2": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "firebase-core-app-deleted-race",
+      "title": "com.simprints.infra.authstore.db.FirebaseAuthManager$getCurrentToken$2.invokeSuspend",
+      "verdict": "app_bug"
+    },
+    "581e35401a6ec2e46e7608e6fbb0f053": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "old-build-missing-commcare-session-id-injection",
+      "title": "com.simprints.feature.clientapi.mappers.request.validators.ConfirmIdentityValidator.validateSessionId",
+      "verdict": "external"
+    },
+    "6060d9ae8ab2f817a6c3775ca82f1137": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "camerax-capture-aborted-on-lifecycle-stop",
+      "title": "androidx.camera.core.ImageCaptureException.<init>",
+      "verdict": "noise"
+    },
+    "97d5fc613b1b573a93d15b941152c678": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "firebase-auth-token-refresh-network-error-unclassified",
+      "title": "com.google.firebase.concurrent.CustomThreadFactory.lambda$newThread$0",
+      "verdict": "noise"
+    },
+    "9cf671682a5dec83266ee9ff26fd44d8": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "sync-worker-cancellation-logged-as-error",
+      "title": "a22 (Job was cancelled)",
+      "verdict": "app_bug"
+    },
+    "9d98adfcb32c5f9f91ead1e93f12e219": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "sync-worker-cancellation-logged-as-error",
+      "title": "b22 (Job was cancelled)",
+      "verdict": "app_bug"
+    },
+    "a50da44960bd13762948632b986d56d8": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "face-image-analysis-cancellation-logged-as-error",
+      "title": "b22 (bp3 was cancelled)",
+      "verdict": "noise"
+    },
+    "af7ee95841284372e27d3522979f6960": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "calling-app-invalid-confirm-request",
+      "title": "com.simprints.feature.clientapi.mappers.request.validators.ConfirmIdentityValidator.validateSessionEvents",
+      "verdict": "external"
+    },
+    "c8ba2a28b8a84b7d4b27f862cdc814bc": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "calling-app-duplicate-enrol-last-request",
+      "title": "com.simprints.feature.clientapi.mappers.request.validators.EnrolLastBiometricsValidator.validateSessionId",
+      "verdict": "external"
+    },
+    "c8fb8d920f6f95a4b4cfa70fc66e8a41": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "commcare-fallback-visibility-warning",
+      "title": "com.simprints.feature.orchestrator.usecases.steps.FallbackToCommCareDataSourceIfNeededUseCase.shouldFallbackToCommCareDataSource",
+      "verdict": "noise"
+    },
+    "cb0a48a89916e642b574a3dc26365cf4": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "realm-unsupported-legacy-file-format-not-recovered",
+      "title": "com.simprints.infra.enrolment.records.realm.store.RealmWrapperImpl.createRealm",
+      "verdict": "app_bug"
+    },
+    "da618680ebf6d7d980fa306bed959ee8": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "legacy-firebase-storage-upload-network-failure",
+      "title": "com.google.firebase.storage.UploadTask.shouldContinue",
+      "verdict": "noise"
+    },
+    "e36a354f7f859092470e039455d10e7f": {
+      "last_seen": "2026-10-27T12:48:55Z",
+      "root_cause_id": "worker-runs-while-signed-out",
+      "title": "com.simprints.infra.authstore.db.FirebaseAuthManager$getCurrentToken$2.invokeSuspend",
+      "verdict": "noise"
+    }
+  },
+  "last_window_end": "2026-10-27T12:48:55Z"
+}
