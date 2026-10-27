@@ -2,7 +2,7 @@
   "dry_run": true,
   "items": [
     {
-      "attempts": 0,
+      "attempts": 1,
       "impact": "medium",
       "issue_ids": [
         "9d98adfcb32c5f9f91ead1e93f12e219",
@@ -13,7 +13,7 @@
       ],
       "root_cause": "Broad catch blocks in sync paths log WorkManager cancellations via Simber.e, which records them as non-fatals: FirebaseAuthManager.getCurrentToken (\"Failed to get access token\"), EventRepositoryImpl.reportException (\"Failed to save the event\") and EventUpSyncTask (\"Failed to upload event scopes\"). EventUpSyncTask also swallows the CancellationException (not in isTerminalException) and records the scope as FAILED. Unchanged on main; Simber.shouldSkipThrowableReporting could skip CancellationException, and EventUpSyncTask should rethrow it. No open PR.",
       "root_cause_id": "sync-worker-cancellation-logged-as-error",
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "attempts": 0,
