@@ -31,7 +31,7 @@ internal class FirebaseAuthManager @Inject constructor(
         cacheTokenClaims(token.value)
         cacheFirebaseOptions(token)
         val result = try {
-            FirebaseAuth.getInstance(getCoreApp()).signInWithCustomToken(token.value).await()
+            getCoreAuth().signInWithCustomToken(token.value).await()
         } catch (e: Exception) {
             throw transformFirebaseExceptionIfNeeded(e)
         }
@@ -43,7 +43,7 @@ internal class FirebaseAuthManager @Inject constructor(
         // On legacy projects they may not have a separate Core Firebase Project, so we try to
         // log out on both just in case.
         try {
-            FirebaseAuth.getInstance(getCoreApp()).signOut()
+            getCoreAuth().signOut()
         } catch (e: Exception) {
             throw transformFirebaseExceptionIfNeeded(e)
         }
@@ -66,8 +66,7 @@ internal class FirebaseAuthManager @Inject constructor(
         // Projects that were signed in and then updated to 2021.2.0 need to check the
         // previous Firebase project until they login again.
         val result = try {
-            FirebaseAuth
-                .getInstance(getCoreApp())
+            getCoreAuth()
                 .currentUser
                 ?.getIdToken(false)
                 ?.await()
@@ -125,6 +124,7 @@ internal class FirebaseAuthManager @Inject constructor(
         }
     }
 
+    @Synchronized
     private fun tryToDeleteCoreApp() {
         try {
             getCoreApp().delete()
@@ -149,6 +149,10 @@ internal class FirebaseAuthManager @Inject constructor(
     } catch (ex: IllegalStateException) {
         getCoreAppOrAttemptInit()
     }
+
+    // Synchronized with tryToDeleteCoreApp so the core app can't be deleted between being fetched and used
+    @Synchronized
+    private fun getCoreAuth() = FirebaseAuth.getInstance(getCoreApp())
 
     private fun getCoreFirebaseApp() = FirebaseApp.getInstance(CORE_BACKEND_PROJECT)
 
