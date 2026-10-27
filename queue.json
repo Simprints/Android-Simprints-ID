@@ -43,13 +43,21 @@
     },
     {
       "attempts": 1,
+      "fix": {
+        "branch": "crashbunny/firebase-core-app-deleted-race",
+        "pr_url": "https://github.com/Simprints/Android-Simprints-ID/pull/1888",
+        "reason": null,
+        "status": "pr_opened",
+        "summary": "Synchronize core FirebaseAuth lookup and core FirebaseApp deletion in FirebaseAuthManager so getCurrentToken can't use an app being deleted by signOut/re-init"
+      },
       "impact": "low",
       "issue_ids": [
         "4cddb74671504f936037c6481d4d08d2"
       ],
+      "pr_url": "https://github.com/Simprints/Android-Simprints-ID/pull/1888",
       "root_cause": "There is a race in FirebaseAuthManager: signOut/initializeCoreProject delete the core FirebaseApp (tryToDeleteCoreApp) while a sync worker calls FirebaseAuth.getInstance(getCoreApp()) in getCurrentToken, which throws \"FirebaseApp was deleted\". The worker fails gracefully. getCoreApp is still unsynchronised against delete on main.",
       "root_cause_id": "firebase-core-app-deleted-race",
-      "status": "in_progress"
+      "status": "done"
     }
   ],
   "night_id": "2026-10-27",
