@@ -5,6 +5,13 @@
 name: "[Manual][Scheduled] CrashBunny"
 
 on:
+    # TEMPORARY: lets the feature branch be tested before the workflow exists on main. Remove before merging
+    push:
+        branches:
+            - feature/crashbunny-automation
+        paths:
+            - .github/workflows/scheduled-crashbunny.yml
+            - .github/crashbunny/**
     workflow_dispatch:
         inputs:
             force-triage:
