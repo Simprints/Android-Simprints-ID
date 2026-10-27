@@ -25,13 +25,21 @@
     },
     {
       "attempts": 1,
+      "fix": {
+        "branch": "crashbunny/realm-unsupported-legacy-file-format-not-recovered",
+        "pr_url": "https://github.com/Simprints/Android-Simprints-ID/pull/1887",
+        "reason": null,
+        "status": "pr_opened",
+        "summary": "Treat RLM_ERR_UNSUPPORTED_FILE_FORMAT_VERSION like DB corruption so RealmWrapperImpl deletes and recreates the unupgradable legacy Realm file"
+      },
       "impact": "low",
       "issue_ids": [
         "cb0a48a89916e642b574a3dc26365cf4"
       ],
+      "pr_url": "https://github.com/Simprints/Android-Simprints-ID/pull/1887",
       "root_cause": "A single device has a legacy Realm file in format 9 that realm-kotlin cannot upgrade. RealmWrapperImpl.createRealm only deletes and recreates the DB on RLM_ERR_INVALID_DATABASE, not RLM_ERR_UNSUPPORTED_FILE_FORMAT_VERSION, so every background worker fails. Main is unchanged.",
       "root_cause_id": "realm-unsupported-legacy-file-format-not-recovered",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "attempts": 0,
