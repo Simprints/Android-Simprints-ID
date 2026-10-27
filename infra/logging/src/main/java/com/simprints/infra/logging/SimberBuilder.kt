@@ -22,7 +22,12 @@ object SimberBuilder {
      */
     fun initialize(context: Context) {
         when {
-            BuildConfig.DEBUG -> Logger.setLogWriters(LogcatWriter())
+            // TEMP (MS-1612): also write file logs in debug builds so the App logs tab has data. Revert before merging.
+            BuildConfig.DEBUG -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                Logger.setLogWriters(LogcatWriter(), FileLogWriter(context))
+            } else {
+                Logger.setLogWriters(LogcatWriter())
+            }
 
             Build.VERSION.SDK_INT < Build.VERSION_CODES.O -> Logger.setLogWriters(
                 AnalyticsPropertyLogWriter(FirebaseAnalytics.getInstance(context)),

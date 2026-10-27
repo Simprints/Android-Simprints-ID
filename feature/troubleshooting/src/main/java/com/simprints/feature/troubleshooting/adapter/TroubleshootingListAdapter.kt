@@ -1,5 +1,6 @@
 package com.simprints.feature.troubleshooting.adapter
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -11,7 +12,7 @@ import com.simprints.infra.uibase.system.Clipboard
 
 @ExcludedFromGeneratedTestCoverageReports("UI classes are not unit tested")
 internal class TroubleshootingListAdapter(
-    private val items: List<TroubleshootingItemViewData>,
+    private var items: List<TroubleshootingItemViewData>,
     private val onMoreClick: (String) -> Unit = {},
 ) : RecyclerView.Adapter<TroubleshootingListAdapter.ViewHolder>() {
     override fun onCreateViewHolder(
@@ -32,6 +33,11 @@ internal class TroubleshootingListAdapter(
 
     override fun getItemCount(): Int = items.size
 
+    fun submit(newItems: List<TroubleshootingItemViewData>) {
+        items = newItems
+        notifyDataSetChanged()
+    }
+
     @ExcludedFromGeneratedTestCoverageReports("UI classes are not unit tested")
     inner class ViewHolder(
         private val binding: ItemTroubleshootingListBinding,
@@ -40,6 +46,7 @@ internal class TroubleshootingListAdapter(
             binding.troubleshootingItemTitle.text = item.title
             binding.troubleshootingItemSubtitle.text = item.subtitle
             binding.troubleshootingItemBody.text = item.body
+            binding.troubleshootingItemCard.setCardBackgroundColor(item.backgroundColor ?: Color.WHITE)
 
             binding.troubleshootingItemButton.isVisible = item.navigationId != null
             binding.troubleshootingItemButton.setOnClickListener {

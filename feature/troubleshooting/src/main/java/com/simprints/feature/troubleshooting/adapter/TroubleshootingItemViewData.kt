@@ -5,4 +5,5 @@ internal data class TroubleshootingItemViewData(
     val subtitle: String = "",
     val body: String = "",
     val navigationId: String? = null,
+    val backgroundColor: Int? = null,
 )

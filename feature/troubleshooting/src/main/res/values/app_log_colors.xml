@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="app_log_error_background">#FDE7E7</color>
+    <color name="app_log_warn_background">#FFF3DC</color>
+</resources>

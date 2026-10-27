@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="4dp">
+
+    <TextView
+        android:id="@+id/appLogsDeviceInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:paddingHorizontal="8dp"
+        android:textColor="@color/simprints_text_grey"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/appLogsSummary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:paddingHorizontal="8dp"
+        android:textColor="@color/simprints_text_black"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginTop="8dp"
+        android:hint="Search logs">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/appLogsSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/appLogsGroupChips"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="8dp"
+        app:singleSelection="false">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/appLogsChipProblems"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:checked="true"
+            android:tag="Problems"
+            android:text="Problems"
+            app:chipBackgroundColor="@color/app_log_chip_background"
+            app:chipStrokeColor="@color/simprints_blue"
+            app:chipStrokeWidth="1dp"
+            android:textColor="@color/app_log_chip_text" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/appLogsChipSteps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:tag="Steps"
+            android:text="Normal steps"
+            app:chipBackgroundColor="@color/app_log_chip_background"
+            app:chipStrokeColor="@color/simprints_blue"
+            app:chipStrokeWidth="1dp"
+            android:textColor="@color/app_log_chip_text" />
+
+    </com.google.android.material.chip.ChipGroup>
+
+</LinearLayout>
