@@ -791,6 +791,19 @@ internal class EventUpSyncTaskTest {
         eventUpSyncTask.upSync(operation, eventScope).toList()
     }
 
+    @Test(expected = CancellationException::class)
+    fun `upSync should rethrow CancellationException without marking the operation as failed`() = runTest {
+        coEvery { eventRepo.getClosedEventScopesCount(any()) } throws CancellationException("Job was cancelled")
+
+        try {
+            eventUpSyncTask.upSync(operation, eventScope).toList()
+        } finally {
+            coVerify(exactly = 0) {
+                eventUpSyncScopeRepository.insertOrUpdate(match { it.lastState == UpSyncState.FAILED })
+            }
+        }
+    }
+
     private fun setUpSyncKind(kind: UpSynchronizationConfiguration.UpSynchronizationKind) {
         every { synchronizationConfiguration.up.simprints.kind } returns kind
     }
