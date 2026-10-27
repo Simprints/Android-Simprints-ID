@@ -5,10 +5,14 @@
 # this one stopped.
 set -euo pipefail
 
-HERE="$(cd "$(dirname "$0")" && pwd)"
-REPO="$(git -C "$HERE" rev-parse --show-toplevel)"
+SOURCE="$(cd "$(dirname "$0")" && pwd)"
+REPO="$(git -C "$SOURCE" rev-parse --show-toplevel)"
 WORK="$RUNNER_TEMP/crashbunny"
 STATE_DIR="$WORK/state"
+# Fixes run on a fresh checkout of main, so keep this run's scripts and prompts outside the repository
+HERE="$WORK/scripts"
+mkdir -p "$HERE"
+cp "$SOURCE"/* "$HERE/"
 QUEUE=(python3 "$HERE/queue.py" --state-dir "$STATE_DIR")
 MAX_PRS="${CRASHBUNNY_MAX_PRS:-15}"
 FINAL_HOUR_UTC="${CRASHBUNNY_FINAL_HOUR_UTC:-05}"
