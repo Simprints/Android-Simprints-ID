@@ -3,6 +3,7 @@ package com.simprints.core.domain.tokenization.serialization
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.serialization.SimJson
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Test
@@ -84,7 +85,7 @@ class TokenizationSerializerTest {
         assertThat(result).isEqualTo(TokenizableString.Raw("no class"))
     }
 
-    @Test(expected = IllegalStateException::class)
+    @Test(expected = SerializationException::class)
     fun `deserialize missing value throws`() {
         val jsonInput =
             """{"className":"TokenizableString.Raw"}"""
