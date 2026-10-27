@@ -1,0 +1,108 @@
+# Nightly automated Crash Bunny: triages Crashlytics issues since the previous night, opens draft PRs for app bugs
+# and regressions, and sends a report to the Simphony "Nightly CrashBunny report" job, which files Jira tickets and
+# posts the morning summary in Slack. Runs hourly through the night so it can resume after Claude usage limits.
+# See .github/crashbunny/ for the prompts and the queue state machine.
+name: "[Manual][Scheduled] CrashBunny"
+
+on:
+    workflow_dispatch:
+        inputs:
+            force-triage:
+                type: boolean
+                default: false
+                description: "Run triage even if tonight's triage is already done"
+            force-report:
+                type: boolean
+                default: false
+                description: "Send the report at the end of this run even if the queue isn't empty"
+    schedule:
+        -   cron: '0 22,23 * * *'
+        -   cron: '0 0-5 * * *'
+
+concurrency:
+    group: crashbunny
+    cancel-in-progress: false
+
+permissions:
+    contents: write
+    pull-requests: write
+
+jobs:
+    crashbunny:
+        runs-on: ubuntu-latest
+        timeout-minutes: 330
+
+        env:
+            # Shadow mode until the repo variable CRASHBUNNY_DRY_RUN is set to 'false'
+            DRY_RUN: ${{ vars.CRASHBUNNY_DRY_RUN == 'false' && 'false' || 'true' }}
+            CRASHBUNNY_MODEL: ${{ vars.CRASHBUNNY_MODEL || 'opus' }}
+            CRASHBUNNY_MAX_PRS: ${{ vars.CRASHBUNNY_MAX_PRS || '15' }}
+            FORCE_TRIAGE: ${{ inputs.force-triage || 'false' }}
+            FORCE_REPORT: ${{ inputs.force-report || 'false' }}
+            RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            # Seat token from `claude setup-token`. Don't add ANTHROPIC_API_KEY here: it would take precedence
+            CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+            # A PAT or app token lets the draft PRs trigger the PR checks; GITHUB_TOKEN-created PRs don't
+            GH_TOKEN: ${{ secrets.CRASHBUNNY_GH_TOKEN || github.token }}
+            SIMPHONY_WEBHOOK_URL: ${{ secrets.SIMPHONY_CRASHBUNNY_WEBHOOK_URL }}
+            SIMPHONY_WEBHOOK_SECRET: ${{ secrets.SIMPHONY_CRASHBUNNY_WEBHOOK_SECRET }}
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v7
+                with:
+                    fetch-depth: 0
+                    token: ${{ secrets.CRASHBUNNY_GH_TOKEN || github.token }}
+
+            -   name: Set up JDK 21
+                uses: actions/setup-java@v5
+                with:
+                    java-version: 21
+                    distribution: 'temurin'
+
+            -   name: Restore gradle global directory
+                uses: actions/cache/restore@v6
+                with:
+                    path: |
+                        ~/.gradle/
+                        .gradle/
+                    key: global-gradle-
+                    restore-keys: global-gradle-
+
+            -   name: Set up build files
+                uses: ./.github/actions/setup-gradle-build-files
+                with:
+                    gh-package-name: ${{ secrets.GH_PACKAGE_NAME }}
+                    gh-package-token: ${{ secrets.GH_PACKAGE_TOKEN }}
+                    google-services-file: ${{ secrets.GOOGLE_SERVICES_FILE }}
+
+            -   name: Install Claude Code and Firebase CLI
+                run: npm install -g @anthropic-ai/claude-code firebase-tools
+
+            -   name: Set up Firebase credentials
+                env:
+                    FIREBASE_SA_JSON: ${{ secrets.CRASHBUNNY_FIREBASE_SA_JSON }}
+                run: |
+                    echo "$FIREBASE_SA_JSON" > "$RUNNER_TEMP/firebase-sa.json"
+                    echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/firebase-sa.json" >> "$GITHUB_ENV"
+
+            -   name: Set up git identity
+                run: |
+                    git config --global user.name "crashbunny-bot"
+                    git config --global user.email "crashbunny-bot@users.noreply.github.com"
+
+            -   name: Run CrashBunny
+                run: bash .github/crashbunny/run.sh
+
+            -   name: Upload logs and dry-run patches
+                if: always()
+                uses: actions/upload-artifact@v7
+                with:
+                    name: crashbunny-${{ github.run_id }}
+                    path: |
+                        ${{ runner.temp }}/crashbunny/logs
+                        ${{ runner.temp }}/crashbunny/patches
+                        ${{ runner.temp }}/crashbunny/triage.json
+                        ${{ runner.temp }}/crashbunny/report.json
+                    if-no-files-found: ignore
+                    retention-days: 14
