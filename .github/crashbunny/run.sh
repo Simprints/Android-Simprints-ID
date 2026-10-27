@@ -84,10 +84,13 @@ send_report() { # report-file
         echo "SIMPHONY_WEBHOOK_URL is not set; report only written to the job summary"
         return
     fi
-    curl -fsS -X POST "$SIMPHONY_WEBHOOK_URL" \
+    local status
+    status="$(curl -sS -o "$WORK/webhook-response.txt" -w '%{http_code}' -X POST "$SIMPHONY_WEBHOOK_URL" \
         -H "X-Simphony-Secret: $SIMPHONY_WEBHOOK_SECRET" \
         -H "Content-Type: application/json" \
-        --data-binary "@$1"
+        --data-binary "@$1")"
+    echo "Simphony webhook answered $status: $(cat "$WORK/webhook-response.txt")"
+    [[ "$status" == 2* ]]
 }
 
 is_final_run() {
