@@ -25,7 +25,7 @@ All secrets and variables below go in the `CrashBunny` environment (Settings →
 | Secret | `CLAUDE_CODE_OAUTH_TOKEN` | Output of `claude setup-token` (Enterprise seat, valid 1 year) |
 | Secret | `CRASHBUNNY_FIREBASE_SA_JSON` | Service account key JSON with Crashlytics read access on `simprints-152315` |
 | Secret | `CRASHBUNNY_GH_TOKEN` | Optional. A token that can push branches and open PRs, so the PR checks run on bot PRs |
-| Secret | `SIMPHONY_CRASHBUNNY_WEBHOOK_URL` / `SIMPHONY_CRASHBUNNY_WEBHOOK_SECRET` | The Simphony job's webhook URL and secret |
+| Secret | `SIMPHONY_CRASHBUNNY_WEBHOOK_URL` / `SIMPHONY_CRASHBUNNY_WEBHOOK_SECRET` | The Simphony job's webhook URL and secret (sent in the `X-Simphony-Secret` header) |
 | Variable | `CRASHBUNNY_DRY_RUN` | Anything except `false` keeps shadow mode: no pushes or PRs, and patches are uploaded as artifacts |
 | Variable | `CRASHBUNNY_MODEL` | Optional, default `opus` |
 | Variable | `CRASHBUNNY_MAX_PRS` | Optional, default `15`. A runaway guard, not a quota |
