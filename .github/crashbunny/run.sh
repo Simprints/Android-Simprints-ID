@@ -85,7 +85,7 @@ send_report() { # report-file
         return
     fi
     curl -fsS -X POST "$SIMPHONY_WEBHOOK_URL" \
-        -H "Authorization: Bearer $SIMPHONY_WEBHOOK_SECRET" \
+        -H "X-Simphony-Secret: $SIMPHONY_WEBHOOK_SECRET" \
         -H "Content-Type: application/json" \
         --data-binary "@$1"
 }
