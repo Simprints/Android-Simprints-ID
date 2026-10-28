@@ -18,6 +18,8 @@ internal class NormalizeHighResBitmapToPreviewUseCase @Inject constructor() {
      * sees in the camera preview, making the target bounds spatially consistent with the preview overlay.
      *
      * @param originalBitmap the original camera capture bitmap
+     * @param scaleToPreview when false, step 3 is skipped and the bitmap keeps the capture's native resolution (only the aspect
+     * ratio matches the PreviewView). Target bounds are still mapped correctly by FrameCropToTargetUseCase.
      *
      * @return a new bitmap with normalized dimensions and aspect ratio
      */
@@ -26,6 +28,7 @@ internal class NormalizeHighResBitmapToPreviewUseCase @Inject constructor() {
         rotationDegrees: Int,
         previewWidth: Int,
         previewHeight: Int,
+        scaleToPreview: Boolean = true,
     ): Bitmap {
         // Rotate if necessary
         val rotated = if (rotationDegrees != 0) {
@@ -57,6 +60,7 @@ internal class NormalizeHighResBitmapToPreviewUseCase @Inject constructor() {
         }
 
         val cropped = Bitmap.createBitmap(rotated, offsetX, offsetY, cropWidth, cropHeight)
+        if (!scaleToPreview) return cropped
 
         // Scale to PreviewView size
         return cropped.scale(previewWidth, previewHeight)

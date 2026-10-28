@@ -196,6 +196,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             cameraPreviewView = binding.preview,
             target = targetRect,
             highResolution = ocrConfig.useHighRes,
+            keepHighResolutionDetail = ocrConfig.keepHighResDetail,
         ) {
             Simber.e("Camera binding failed in OCR", it, MULTI_FACTOR_ID)
         }
