@@ -30,11 +30,11 @@ import com.simprints.core.tools.extensions.permissionFromResult
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialScanOcrBinding
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
-import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessment
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrConfig
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetBoundsRelativeToParentUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.infra.camera.CameraFrameProvider
+import com.simprints.infra.camera.lighting.LightingConditionsAssessment
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MULTI_FACTOR_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.navigateSafely

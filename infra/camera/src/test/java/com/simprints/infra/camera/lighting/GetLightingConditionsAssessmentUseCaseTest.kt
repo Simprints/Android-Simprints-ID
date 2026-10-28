@@ -1,11 +1,9 @@
-package com.simprints.feature.externalcredential.screens.scanocr.usecase
+package com.simprints.infra.camera.lighting
 
 import android.graphics.Bitmap
 import android.graphics.Color
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessment
-import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessmentConfig
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Before

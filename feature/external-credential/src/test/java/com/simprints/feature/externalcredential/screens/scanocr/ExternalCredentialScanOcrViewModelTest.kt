@@ -6,15 +6,15 @@ import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessment
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import com.simprints.feature.externalcredential.screens.scanocr.model.ScannedMfidDocument
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.BuildScannedCredentialResultUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetLightingConditionsAssessmentConfigUseCase
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetLightingConditionsAssessmentUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ScanMfidDocumentUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.infra.camera.Frame
+import com.simprints.infra.camera.lighting.GetLightingConditionsAssessmentUseCase
+import com.simprints.infra.camera.lighting.LightingConditionsAssessment
 import com.simprints.infra.camera.postprocess.FrameCropToTargetUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED
