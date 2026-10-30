@@ -6,7 +6,14 @@ import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
 import com.simprints.feature.clientapi.models.CommCareConstants
 import com.simprints.infra.orchestration.data.ActionResponse
+import com.simprints.infra.orchestration.data.responses.AppExternalCredential
 import com.simprints.libsimprints.Constants
+import com.simprints.libsimprints.contracts.VersionsList
+import com.simprints.libsimprints.contracts.data.ConfidenceBand
+import com.simprints.libsimprints.contracts.data.Identification
+import com.simprints.libsimprints.contracts.data.Identification.Companion.toJson
+import com.simprints.libsimprints.contracts.data.ScannedCredential
+import org.json.JSONObject
 import javax.inject.Inject
 import com.simprints.libsimprints.Identification as LegacyIdentification
 import com.simprints.libsimprints.Tier as LegacyTier
@@ -25,20 +32,49 @@ internal class CommCareResponseMapper @Inject constructor(
         ).appendCoSyncData(response.subjectActions).toCommCareBundle()
 
         /**
-         * CommCare expects Identification result as ParcelableArrayList containing Identification
+         * Legacy CommCare builds expect Identification result as ParcelableArrayList containing Identification
          * objects in LibSimprints 1.0.12 format. That's why it is being returned in a different way
          * from others (not inside [CommCareConstants.COMMCARE_BUNDLE_KEY]).
+         *
+         * CommCare builds that declare [VersionsList.ADDED_EXTERNAL_CREDENTIALS] get the identifications
+         * as JSON in the same key, along with the multi-factor ID data.
          */
-        is ActionResponse.IdentifyActionResponse -> bundleOf(
-            CommCareConstants.COMMCARE_DEVICE_ID to deviceId,
-            CommCareConstants.COMMCARE_SID_VERSION to appVersionName,
-            Constants.SIMPRINTS_SESSION_ID to response.sessionId,
-            Constants.SIMPRINTS_IDENTIFICATIONS to ArrayList<LegacyIdentification>(
-                response.identifications.map {
-                    LegacyIdentification(it.guid, it.confidenceScore, LegacyTier.valueOf(it.tier.name))
-                },
-            ),
-        )
+        is ActionResponse.IdentifyActionResponse ->
+            if (response.actionIdentifier.contractVersion <
+                VersionsList.ADDED_EXTERNAL_CREDENTIALS
+            ) {
+                bundleOf(
+                    CommCareConstants.COMMCARE_DEVICE_ID to deviceId,
+                    CommCareConstants.COMMCARE_SID_VERSION to appVersionName,
+                    Constants.SIMPRINTS_SESSION_ID to response.sessionId,
+                    Constants.SIMPRINTS_IDENTIFICATIONS to ArrayList<LegacyIdentification>(
+                        response.identifications.map {
+                            LegacyIdentification(it.guid, it.confidenceScore, LegacyTier.valueOf(it.tier.name))
+                        },
+                    ),
+                )
+            } else {
+                bundleOf(
+                    CommCareConstants.COMMCARE_DEVICE_ID to deviceId,
+                    CommCareConstants.COMMCARE_SID_VERSION to appVersionName,
+                    Constants.SIMPRINTS_SESSION_ID to response.sessionId,
+                    Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to "true",
+                    Constants.SIMPRINTS_IDENTIFICATIONS to response.identifications
+                        .map {
+                            Identification(
+                                guid = it.guid,
+                                confidence = it.confidenceScore.toFloat(),
+                                confidenceBand = ConfidenceBand.valueOf(it.matchConfidence.name),
+                                isLinkedToCredential = if (response.isMultiFactorIdEnabled) {
+                                    it.isLinkedToScannedCredential ?: false
+                                } else {
+                                    null
+                                },
+                                isCredentialVerified = it.isCredentialVerified,
+                            )
+                        }.toJson(),
+                ).appendScannedCredential(response.scannedCredential.takeIf { response.isMultiFactorIdEnabled })
+            }
 
         is ActionResponse.ConfirmActionResponse -> bundleOf(
             CommCareConstants.COMMCARE_DEVICE_ID to deviceId,
@@ -82,6 +118,19 @@ internal class CommCareResponseMapper @Inject constructor(
         actions?.let { putString(Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS, it) }
     }
 
+    private fun Bundle.appendScannedCredential(credential: AppExternalCredential?) = apply {
+        credential?.let {
+            val credentialJson = JSONObject(ScannedCredential(it.type.name, it.value.value).toJson())
+                .apply {
+                    val documentFields = JSONObject().apply {
+                        it.nonCredentialFields.forEach { (key, value) -> put(key, value) }
+                    }
+                    put(SCANNED_CREDENTIAL_DOCUMENT_FIELDS, documentFields)
+                }.toString()
+            putString(Constants.SIMPRINTS_SCANNED_CREDENTIAL, credentialJson)
+        }
+    }
+
     // Based on the documentation, we are supposed to send either [CommCareConstants.COMMCARE_BUNDLE_KEY] (for key-values result)
     // or [CommCareConstants.COMMCARE_DATA_KEY] (for a single integer or string), but apparently due to a bug in commcare
     // if we send [CommCareConstants.COMMCARE_BUNDLE_KEY] only, the result is processed correctly, but a toast shows an
@@ -90,4 +139,8 @@ internal class CommCareResponseMapper @Inject constructor(
         CommCareConstants.COMMCARE_DATA_KEY to "",
         CommCareConstants.COMMCARE_BUNDLE_KEY to this,
     )
+
+    companion object {
+        internal const val SCANNED_CREDENTIAL_DOCUMENT_FIELDS = "documentFields"
+    }
 }
