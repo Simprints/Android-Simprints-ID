@@ -226,6 +226,119 @@ class CommCareResponseMapperTest {
     }
 
     @Test
+    fun `maps enrol response without credential data for versions before external credentials`() {
+        val extras = mapper(
+            ActionResponse.EnrolActionResponse(
+                actionIdentifier = EnrolActionFactory.getIdentifier(),
+                sessionId = "sessionId",
+                enrolledGuid = "guid",
+                subjectActions = null,
+                externalCredential = credential,
+            ),
+        ).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
+
+        assertThat(extras.containsKey(Constants.SIMPRINTS_HAS_CREDENTIAL)).isFalse()
+        assertThat(extras.containsKey(Constants.SIMPRINTS_SCANNED_CREDENTIAL)).isFalse()
+    }
+
+    @Test
+    fun `maps enrol response with credential for external credentials version`() {
+        val extras = mapper(
+            ActionResponse.EnrolActionResponse(
+                actionIdentifier = EnrolLastBiometricsActionFactory
+                    .getIdentifier()
+                    .copy(contractVersion = VersionsList.ADDED_EXTERNAL_CREDENTIALS),
+                sessionId = "sessionId",
+                enrolledGuid = "guid",
+                subjectActions = null,
+                externalCredential = credential,
+            ),
+        ).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
+
+        assertThat(extras.getString(CommCareConstants.REGISTRATION_GUID_KEY)).isEqualTo("guid")
+        assertThat(extras.getString(Constants.SIMPRINTS_HAS_CREDENTIAL)).isEqualTo("true")
+        assertThat(extras.getString(Constants.SIMPRINTS_SCANNED_CREDENTIAL)).isEqualTo(
+            """{"type":"NHISCard","value":"credential-value","$SCANNED_CREDENTIAL_DOCUMENT_FIELDS":{"name":"John"}}""",
+        )
+    }
+
+    @Test
+    fun `maps enrol response without scanned credential for external credentials version`() {
+        val extras = mapper(
+            ActionResponse.EnrolActionResponse(
+                actionIdentifier = EnrolActionFactory
+                    .getIdentifier()
+                    .copy(contractVersion = VersionsList.ADDED_EXTERNAL_CREDENTIALS),
+                sessionId = "sessionId",
+                enrolledGuid = "guid",
+                subjectActions = null,
+                externalCredential = null,
+            ),
+        ).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
+
+        assertThat(extras.getString(Constants.SIMPRINTS_HAS_CREDENTIAL)).isEqualTo("false")
+        assertThat(extras.containsKey(Constants.SIMPRINTS_SCANNED_CREDENTIAL)).isFalse()
+    }
+
+    @Test
+    fun `maps confirm response without credential data for versions before external credentials`() {
+        val extras = mapper(
+            ActionResponse.ConfirmActionResponse(
+                actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
+                sessionId = "sessionId",
+                confirmed = true,
+                subjectActions = null,
+                externalCredential = credential,
+            ),
+        ).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
+
+        assertThat(extras.containsKey(Constants.SIMPRINTS_HAS_CREDENTIAL)).isFalse()
+        assertThat(extras.containsKey(Constants.SIMPRINTS_SCANNED_CREDENTIAL)).isFalse()
+    }
+
+    @Test
+    fun `maps confirm response with credential for external credentials version`() {
+        val extras = mapper(
+            ActionResponse.ConfirmActionResponse(
+                actionIdentifier = ConfirmIdentityActionFactory
+                    .getIdentifier()
+                    .copy(contractVersion = VersionsList.ADDED_EXTERNAL_CREDENTIALS),
+                sessionId = "sessionId",
+                confirmed = true,
+                subjectActions = "cosyncJson",
+                externalCredential = credential,
+            ),
+        ).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
+
+        assertThat(extras.getString(Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS)).isEqualTo("cosyncJson")
+        assertThat(extras.getString(Constants.SIMPRINTS_HAS_CREDENTIAL)).isEqualTo("true")
+        assertThat(extras.getString(Constants.SIMPRINTS_SCANNED_CREDENTIAL)).isEqualTo(
+            """{"type":"NHISCard","value":"credential-value","$SCANNED_CREDENTIAL_DOCUMENT_FIELDS":{"name":"John"}}""",
+        )
+    }
+
+    @Test
+    fun `maps verify response with confidence band for external credentials version`() {
+        val extras = mapper(
+            ActionResponse.VerifyActionResponse(
+                actionIdentifier = VerifyActionFactory
+                    .getIdentifier()
+                    .copy(contractVersion = VersionsList.ADDED_EXTERNAL_CREDENTIALS),
+                sessionId = "sessionId",
+                matchResult = AppMatchResult(
+                    guid = "guid",
+                    confidenceScore = 50,
+                    matchConfidence = AppMatchConfidence.MEDIUM,
+                    verificationSuccess = true,
+                ),
+            ),
+        ).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
+
+        assertThat(extras.getString(CommCareConstants.VERIFICATION_TIER_KEY)).isEqualTo("TIER_2")
+        assertThat(extras.getString(CommCareConstants.VERIFICATION_CONFIDENCE_BAND_KEY)).isEqualTo("MEDIUM")
+    }
+
+    @Test
     fun `correctly maps verify response with null verificationSuccess`() {
         val extras = mapper(
             ActionResponse.VerifyActionResponse(
@@ -248,6 +361,7 @@ class CommCareResponseMapperTest {
         assertThat(extras.getString(CommCareConstants.VERIFICATION_TIER_KEY)).isEqualTo("TIER_1")
         assertThat(extras.getString(CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY)).isEqualTo("true")
         assertThat(extras.getString(CommCareConstants.VERIFICATION_SUCCESS_KEY)).isNull()
+        assertThat(extras.containsKey(CommCareConstants.VERIFICATION_CONFIDENCE_BAND_KEY)).isFalse()
     }
 
     @Test
