@@ -45,7 +45,7 @@ firebase_crashlyticsPlugin_version = "3.0.8"
 firebase_perfPlugin_version = "2.0.2"
 
 retrofit_version = "3.0.0"
-okttp_version = "5.5.0"
+okttp_version = "5.5.1"
 chuck_version = "4.3.1"
 
 sqlCipher_version = "4.19.1"
