@@ -104,6 +104,19 @@ internal class BuildScannedCredentialResultUseCaseTest {
     }
 
     @Test
+    fun `zoomed image uses barcode margin when last document was read from a barcode`() = runTest {
+        val lastFile = "last.jpg"
+        val barcodeDocument = ScannedMfidDocument(
+            imagePath = lastFile,
+            ocrScanResult = OcrScanResult.FaydaCard(credential = ocrLine("1234567812345678", null), isFromBarcode = true),
+        )
+
+        useCase(listOf(nhisScannedDocument(imagePath = "first.jpg"), barcodeDocument), OcrDocumentType.FaydaCard, startTime)
+
+        coVerify { createAndSaveZoomedImageUseCase(barcodeDocument.ocrScanResult.credential, lastFile, isBarcode = true) }
+    }
+
+    @Test
     fun `result zoomed image path comes from createAndSaveZoomedImageUseCase`() = runTest {
         val documents = listOf(nhisScannedDocument())
         val result = useCase(documents, OcrDocumentType.NhisCard, startTime)

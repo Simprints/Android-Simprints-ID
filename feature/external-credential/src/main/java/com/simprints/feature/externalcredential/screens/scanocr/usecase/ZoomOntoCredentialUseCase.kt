@@ -13,14 +13,17 @@ internal class ZoomOntoCredentialUseCase @Inject constructor() {
      *
      * @param imagePath path to image containing the document to zoom into
      * @param boundingBox bounding box that defines the zoom area
+     * @param isBarcode whether [boundingBox] is a barcode. Barcode boxes only cover the bars, so a wider margin is used to include
+     * the human-readable number printed next to them, which can be wider than the barcode.
      * @return zoomed-in bitmap
      */
     operator fun invoke(
         imagePath: String,
         boundingBox: BoundingBox,
+        isBarcode: Boolean = false,
     ): Bitmap {
         val bitmap = BitmapFactory.decodeFile(imagePath)
-        val expandedBox = scaleBoundingBox(boundingBox, BOX_SCALE_FACTOR)
+        val expandedBox = scaleBoundingBox(boundingBox, if (isBarcode) BARCODE_BOX_SCALE_FACTOR else BOX_SCALE_FACTOR)
 
         val left = expandedBox.left.coerceIn(0, bitmap.width)
         val top = expandedBox.top.coerceIn(0, bitmap.height)
@@ -83,5 +86,6 @@ internal class ZoomOntoCredentialUseCase @Inject constructor() {
     companion object {
         private const val TARGET_ASPECT_RATIO = 16f / 10f
         private const val BOX_SCALE_FACTOR = 1.15f
+        private const val BARCODE_BOX_SCALE_FACTOR = 1.3f
     }
 }

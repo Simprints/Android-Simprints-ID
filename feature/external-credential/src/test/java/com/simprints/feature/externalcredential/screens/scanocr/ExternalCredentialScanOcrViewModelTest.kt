@@ -8,6 +8,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessment
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
+import com.simprints.feature.externalcredential.screens.scanocr.model.OcrScanResult
 import com.simprints.feature.externalcredential.screens.scanocr.model.ScannedMfidDocument
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.BuildScannedCredentialResultUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetLightingConditionsAssessmentConfigUseCase
@@ -18,6 +19,7 @@ import com.simprints.infra.camera.Frame
 import com.simprints.infra.camera.postprocess.FrameCropToTargetUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.OCR_READ_FAYDA_BARCODE
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.resources.R
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -135,6 +137,33 @@ internal class ExternalCredentialScanOcrViewModelTest {
     }
 
     @Test
+    fun `processImage passes Fayda barcode flag from config to scan use case`() = runTest {
+        val mockCroppedBitmap = mockk<Bitmap>()
+        coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
+        viewModel = initViewModel(
+            documentType = OcrDocumentType.FaydaCard,
+            customConfig = mapOf(OCR_READ_FAYDA_BARCODE to JsonPrimitive(true)),
+        )
+
+        viewModel.startScanning()
+        viewModel.processImage(frame)
+
+        coVerify { scanMfidDocumentUseCase(mockCroppedBitmap, OcrDocumentType.FaydaCard, any(), readFaydaBarcode = true) }
+    }
+
+    @Test
+    fun `processImage does not read Fayda barcode by default`() = runTest {
+        val mockCroppedBitmap = mockk<Bitmap>()
+        coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
+        viewModel = initViewModel(documentType = OcrDocumentType.FaydaCard)
+
+        viewModel.startScanning()
+        viewModel.processImage(frame)
+
+        coVerify { scanMfidDocumentUseCase(mockCroppedBitmap, OcrDocumentType.FaydaCard, any(), readFaydaBarcode = false) }
+    }
+
+    @Test
     fun `processImage updates lighting conditions after debounce`() = runTest {
         val mockCroppedBitmap = mockk<Bitmap>()
         val lightingConditionsAssessment = LightingConditionsAssessment.TOO_DIM
@@ -171,7 +200,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
 
         assertThat(observer.value()).isInstanceOf(ScanOcrState.NotScanning::class.java)
         coVerify(exactly = 0) { frameCropToTargetUseCase(frame) }
-        coVerify(exactly = 0) { scanMfidDocumentUseCase.invoke(any(), any(), any()) }
+        coVerify(exactly = 0) { scanMfidDocumentUseCase.invoke(any(), any(), any(), any()) }
         coVerify(exactly = 0) { getLightingConditionsAssessment.invoke(any(), any()) }
         assertThat(viewModel.isOcrActive).isFalse()
     }
@@ -200,7 +229,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
 
         assertThat(observer.value()).isEqualTo(lightingConditionsAssessment)
         coVerify(exactly = 1) { getLightingConditionsAssessment(mockCroppedBitmap, any()) }
-        coVerify(exactly = 0) { scanMfidDocumentUseCase.invoke(any(), any(), any()) }
+        coVerify(exactly = 0) { scanMfidDocumentUseCase.invoke(any(), any(), any(), any()) }
     }
 
     @Test
@@ -356,6 +385,58 @@ internal class ExternalCredentialScanOcrViewModelTest {
     }
 
     @Test
+    fun `processImage completes capture after a single Fayda barcode readout`() = runTest {
+        val barcodeDocument = ScannedMfidDocument(
+            imagePath = "path",
+            ocrScanResult = OcrScanResult.FaydaCard(credential = mockk(), isFromBarcode = true),
+        )
+        val mockCroppedBitmap = mockk<Bitmap>()
+        coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
+        viewModel = initViewModel(
+            documentType = OcrDocumentType.FaydaCard,
+            customConfig = mapOf(OCR_READ_FAYDA_BARCODE to JsonPrimitive(true)),
+        )
+        coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, OcrDocumentType.FaydaCard, any(), any()) } returns barcodeDocument
+
+        val observer = viewModel.scanOcrStateLiveData.test()
+        viewModel.startScanning()
+        viewModel.processImage(frame)
+
+        val state = observer.value() as ScanOcrState.ScanningInProgress
+        assertThat(state.successfulCaptures).isEqualTo(state.scansRequired)
+
+        repeat(2) { viewModel.processImage(frame) }
+        val completionTriggers = observer
+            .valueHistory()
+            .filterIsInstance<ScanOcrState.ScanningInProgress>()
+            .count { it.successfulCaptures >= it.scansRequired }
+        assertThat(completionTriggers).isEqualTo(1)
+    }
+
+    @Test
+    fun `processImage requires all captures for Fayda OCR readouts when barcode reading is enabled`() = runTest {
+        val ocrDocument = ScannedMfidDocument(
+            imagePath = "path",
+            ocrScanResult = OcrScanResult.FaydaCard(credential = mockk(), isFromBarcode = false),
+        )
+        val mockCroppedBitmap = mockk<Bitmap>()
+        coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
+        viewModel = initViewModel(
+            documentType = OcrDocumentType.FaydaCard,
+            customConfig = mapOf(OCR_READ_FAYDA_BARCODE to JsonPrimitive(true)),
+        )
+        coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, OcrDocumentType.FaydaCard, any(), any()) } returns ocrDocument
+
+        val observer = viewModel.scanOcrStateLiveData.test()
+        viewModel.startScanning()
+        viewModel.processImage(frame)
+
+        val state = observer.value() as ScanOcrState.ScanningInProgress
+        assertThat(state.successfulCaptures).isEqualTo(1)
+        assertThat(state.successfulCaptures).isLessThan(state.scansRequired)
+    }
+
+    @Test
     fun `processImage does not append documents or update state after scanning is complete`() = runTest {
         val mockScannedDocument = mockk<ScannedMfidDocument>()
         val mockScannedCredentialResult = mockk<ScannedCredentialResult>()
@@ -377,6 +458,6 @@ internal class ExternalCredentialScanOcrViewModelTest {
 
         assertThat(stateObserver.value()).isEqualTo(ScanOcrState.Complete)
         assertThat(viewModel.isOcrActive).isFalse()
-        coVerify(exactly = 0) { scanMfidDocumentUseCase.invoke(any(), any(), any()) }
+        coVerify(exactly = 0) { scanMfidDocumentUseCase.invoke(any(), any(), any(), any()) }
     }
 }
