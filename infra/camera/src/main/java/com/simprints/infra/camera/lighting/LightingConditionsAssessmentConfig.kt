@@ -1,9 +1,9 @@
-package com.simprints.feature.externalcredential.screens.scanocr.model
+package com.simprints.infra.camera.lighting
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 
 @ExcludedFromGeneratedTestCoverageReports("Data struct")
-internal data class LightingConditionsAssessmentConfig(
+data class LightingConditionsAssessmentConfig(
     val isEnabled: Boolean,
     val borderWidthPercent: Int,
     val lowContrastThresholdPercent: Int,

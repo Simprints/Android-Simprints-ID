@@ -1,6 +1,6 @@
 package com.simprints.feature.externalcredential.screens.scanocr.usecase
 
-import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessmentConfig
+import com.simprints.infra.camera.lighting.LightingConditionsAssessmentConfig
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration
 import com.simprints.infra.config.store.models.experimental
