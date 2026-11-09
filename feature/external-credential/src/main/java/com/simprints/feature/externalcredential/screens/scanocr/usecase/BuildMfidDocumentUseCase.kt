@@ -70,6 +70,11 @@ internal class BuildMfidDocumentUseCase @Inject constructor(
     }
 
     private fun buildFaydaCard(scannedDocuments: List<ScannedMfidDocument>): MfidDocument.FaydaCard {
+        // Barcode readouts are checksummed, so one is used as-is instead of voting with OCR readouts that may contain misread digits
+        scannedDocuments
+            .find { (it.ocrScanResult as? OcrScanResult.FaydaCard)?.isFromBarcode == true }
+            ?.let { return MfidDocument.FaydaCard(credential = it.ocrScanResult.credential.text.asTokenizableRaw()) }
+
         val credential = scannedDocuments
             .map { it.ocrScanResult.credential.text }
             .let { credentials -> getBestReadoutBasedOnConfidenceUseCase(credentials, targetLength = CREDENTIAL_LENGTH_FAYDA_CARD) }

@@ -15,6 +15,7 @@ import javax.inject.Singleton
 @Singleton
 internal class ScanMfidDocumentUseCase @Inject constructor(
     private val readTextFromImage: ReadTextFromImageUseCase,
+    private val readBarcodesFromImage: ReadBarcodesFromImageUseCase,
     private val ghanaNhisCardOcrReaderUseCase: GhanaNhisCardOcrReaderUseCase,
     private val ghanaIdCardOcrReaderUseCase: GhanaIdCardOcrReaderUseCase,
     private val faydaCardOcrReaderUseCase: FaydaCardOcrReaderUseCase,
@@ -24,6 +25,7 @@ internal class ScanMfidDocumentUseCase @Inject constructor(
         bitmap: Bitmap,
         documentType: OcrDocumentType,
         config: MultiFactorIdConfiguration,
+        readFaydaBarcode: Boolean = false,
     ): ScannedMfidDocument? {
         val isCapturingAllFields = when (documentType) {
             OcrDocumentType.NhisCard -> config.nhisCardConfig?.isCapturingAllFields
@@ -31,6 +33,13 @@ internal class ScanMfidDocumentUseCase @Inject constructor(
             OcrDocumentType.FaydaCard -> config.faydaCardConfig?.isCapturingAllFields
         } ?: false
         return try {
+            if (readFaydaBarcode && documentType == OcrDocumentType.FaydaCard) {
+                // Fayda cards carry the FAN in a barcode, which reads faster and more reliably than the printed number
+                faydaCardOcrReaderUseCase.fromBarcodes(readBarcodesFromImage(bitmap))?.let { scanResult ->
+                    val savedImagePath = credentialImageRepository.saveCredentialScan(bitmap, imageType = FullDocument)
+                    return ScannedMfidDocument(savedImagePath, scanResult)
+                }
+            }
             val ocrText = readTextFromImage(bitmap) ?: return null
             val ocrReader = OcrReader(ocrText)
             val scanResult = when (documentType) {
