@@ -93,9 +93,11 @@ jobs:
                     echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/firebase-sa.json" >> "$GITHUB_ENV"
 
             -   name: Set up git identity
+                # Commit as the GitHub Actions bot: its noreply email maps to a real GitHub account
+                # (github-actions[bot]), so cla-bot can resolve it. "crashbunny-bot" has no account behind it.
                 run: |
-                    git config --global user.name "crashbunny-bot"
-                    git config --global user.email "crashbunny-bot@users.noreply.github.com"
+                    git config --global user.name "github-actions[bot]"
+                    git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
             -   name: Run CrashBunny
                 run: bash .github/crashbunny/run.sh
