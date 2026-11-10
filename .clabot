@@ -22,7 +22,9 @@
     "bastien-micheau-simprints",
     "simprints-cloud-ci-bot", 
     "dependabot[bot]",
-    "transifex-integration[bot]"
+    "transifex-integration[bot]",
+    "claude",
+    "crashbunny-bot"
   ],
   "message": "We require contributors to sign our Contributor License Agreement. For us to review and merge your code, don't hesitate to get in touch with @chrisjroyce, @TristramN or @mharvey83 to get yourself added.",
   "label": "...",
