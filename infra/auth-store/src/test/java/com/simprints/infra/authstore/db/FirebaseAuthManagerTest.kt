@@ -25,9 +25,11 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.lang.management.ManagementFactory
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Singleton
 import kotlin.concurrent.thread
 
@@ -165,19 +167,21 @@ class FirebaseAuthManagerTest {
     fun `getCurrentToken should not use the core app while signOut is deleting it`() {
         val workerThreadName = "sync-worker"
         val coreAppFetched = CountDownLatch(1)
-        val coreAppDeleted = CountDownLatch(1)
         val isDeleted = AtomicBoolean(false)
+        val signOutThread = AtomicReference<Thread>()
         every { FirebaseApp.getInstance(any()) } answers {
             if (Thread.currentThread().name.startsWith(workerThreadName)) {
                 coreAppFetched.countDown()
-                coreAppDeleted.await(1, TimeUnit.SECONDS)
+                // Hold the fetched app until sign-out has either deleted it (no lock) or is waiting on the lock
+                val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
+                while (!isDeleted.get() && !isBlockedOnAuthManagerLock(signOutThread.get())) {
+                    check(System.nanoTime() < deadline) { "Sign-out never attempted to delete the core app" }
+                    Thread.sleep(1)
+                }
             }
             firebaseApp
         }
-        every { firebaseApp.delete() } answers {
-            isDeleted.set(true)
-            coreAppDeleted.countDown()
-        }
+        every { firebaseApp.delete() } answers { isDeleted.set(true) }
         every { FirebaseAuth.getInstance(firebaseApp) } answers {
             check(!isDeleted.get()) { "FirebaseApp was deleted" }
             firebaseAuth
@@ -185,16 +189,24 @@ class FirebaseAuthManagerTest {
         every { firebaseAuth.currentUser } returns firebaseUser
         every { firebaseUser.getIdToken(any()) } returns Tasks.forResult(GetTokenResult("Token", HashMap()))
 
-        var result: Result<String>? = null
+        var tokenResult: Result<String>? = null
+        var signOutResult: Result<Unit>? = null
         val worker = thread(name = workerThreadName) {
-            result = runCatching { runBlocking { firebaseAuthManager.getCurrentToken() } }
+            tokenResult = runCatching { runBlocking { firebaseAuthManager.getCurrentToken() } }
         }
-        coreAppFetched.await(1, TimeUnit.SECONDS)
-        firebaseAuthManager.signOut()
-        worker.join()
+        assertThat(coreAppFetched.await(5, TimeUnit.SECONDS)).isTrue()
+        signOutThread.set(thread(name = "sign-out") { signOutResult = runCatching { firebaseAuthManager.signOut() } })
+        worker.join(10_000)
+        signOutThread.get().join(10_000)
 
-        assertThat(result?.getOrThrow()).isEqualTo("Token")
+        assertThat(tokenResult?.getOrThrow()).isEqualTo("Token")
+        assertThat(signOutResult?.isSuccess).isTrue()
+        assertThat(isDeleted.get()).isTrue()
     }
+
+    private fun isBlockedOnAuthManagerLock(thread: Thread?): Boolean = thread != null &&
+        thread.state == Thread.State.BLOCKED &&
+        ManagementFactory.getThreadMXBean().getThreadInfo(thread.id)?.lockInfo?.className == FirebaseAuthManager::class.java.name
 
     @Test
     fun `FirebaseAuthManager is a singleton so all injected consumers share the core app lock`() {
