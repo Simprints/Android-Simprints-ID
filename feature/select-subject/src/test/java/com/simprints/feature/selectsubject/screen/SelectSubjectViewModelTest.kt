@@ -239,6 +239,7 @@ internal class SelectSubjectViewModelTest {
             .value()
             .getContentIfNotHandled()
         assertThat(result?.isSubjectIdSaved).isTrue()
+        coVerify(exactly = 0) { enrolmentRecordRepository.load(any()) }
     }
 
     @Test
