@@ -96,6 +96,17 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
     ): SelectSubjectState.CredentialDialogDisplayed? {
         if (credentialSearchResult == null) return null
         val project = configRepository.getProject() ?: return null
+
+        if (!subjectId.isValidGuid()) {
+            // Confirmation of "none_selected" (or any non UUID value) should not display the dialog,
+            // but still remove update event from session and reset previously linked external credentials
+            resetExternalCredentialsUseCase(
+                credentialSearchResult = credentialSearchResult,
+                subjectId = params.subjectId,
+            )
+            return null
+        }
+
         val scannedCredentialResult = credentialSearchResult.scannedCredentialResult
         val credential = credentialSearchResult.confirmedCredential
         val encryptedCredential = tokenizationProcessor.encrypt(
@@ -111,16 +122,6 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
                     externalCredential = encryptedCredential,
                 ),
             ).firstOrNull()
-
-        if (!subjectId.isValidGuid()) {
-            // Confirmation of "none_selected" (or any non UUID value) should not display the dialog,
-            // but still remove update event from session and reset previously linked external credentials
-            resetExternalCredentialsUseCase(
-                credentialSearchResult = credentialSearchResult,
-                subjectId = params.subjectId,
-            )
-            return null
-        }
 
         // Credentials already linked to the correct subject, so no need to re-link
         if (alreadyLinkedSubject != null && alreadyLinkedSubject.subjectId == subjectId) return null
