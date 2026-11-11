@@ -69,10 +69,12 @@ internal class FirebaseAuthManager @Inject constructor(
         // Projects that were signed in and then updated to 2021.2.0 need to check the
         // previous Firebase project until they login again.
         val result = try {
-            getCoreAuth()
-                .currentUser
-                ?.getIdToken(false)
-                ?.await()
+            // getIdToken() resolves the core app again, so create the task under the same lock as
+            // tryToDeleteCoreApp and only await it once the lock is released
+            val tokenTask = synchronized(this@FirebaseAuthManager) {
+                getCoreAuth().currentUser?.getIdToken(false)
+            }
+            tokenTask?.await()
         } catch (ex: Exception) {
             Simber.e("Failed to get access token", ex, tag = LOGIN)
             throw transformFirebaseExceptionIfNeeded(ex)

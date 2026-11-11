@@ -165,20 +165,52 @@ class FirebaseAuthManagerTest {
 
     @Test
     fun `getCurrentToken should not use the core app while signOut is deleting it`() {
-        val workerThreadName = "sync-worker"
-        val coreAppFetched = CountDownLatch(1)
+        assertGetCurrentTokenSurvivesSignOutRace(RacePoint.FETCHING_CORE_APP)
+    }
+
+    @Test
+    fun `getCurrentToken should not request the token while signOut is deleting the core app`() {
+        assertGetCurrentTokenSurvivesSignOutRace(RacePoint.READING_CURRENT_USER)
+    }
+
+    @Test
+    fun `signOut should not delete the core app while getCurrentToken is using it`() {
+        assertGetCurrentTokenSurvivesSignOutRace(RacePoint.SIGN_OUT_BEFORE_DELETE)
+    }
+
+    private enum class RacePoint {
+        // Token thread pauses after fetching the core app, before creating FirebaseAuth
+        FETCHING_CORE_APP,
+
+        // Token thread pauses after creating FirebaseAuth, before requesting the token
+        READING_CURRENT_USER,
+
+        // Sign-out starts first and only tries to delete the core app once the token thread is using it
+        SIGN_OUT_BEFORE_DELETE,
+    }
+
+    /**
+     * Pauses the token thread at [racePoint] until sign-out has either deleted the core app (no locking)
+     * or is blocked on the [FirebaseAuthManager] monitor (correct locking), then checks the token was
+     * retrieved without touching a deleted app and that sign-out still completed.
+     */
+    private fun assertGetCurrentTokenSurvivesSignOutRace(racePoint: RacePoint) {
+        val tokenThreadName = "sync-worker"
         val isDeleted = AtomicBoolean(false)
+        val tokenThreadInRace = CountDownLatch(1)
         val signOutThread = AtomicReference<Thread>()
-        every { FirebaseApp.getInstance(any()) } answers {
-            if (Thread.currentThread().name.startsWith(workerThreadName)) {
-                coreAppFetched.countDown()
-                // Hold the fetched app until sign-out has either deleted it (no lock) or is waiting on the lock
+        val holdUntilSignOutBlockedOrDeleted = {
+            if (Thread.currentThread().name.startsWith(tokenThreadName)) {
+                tokenThreadInRace.countDown()
                 val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
                 while (!isDeleted.get() && !isBlockedOnAuthManagerLock(signOutThread.get())) {
                     check(System.nanoTime() < deadline) { "Sign-out never attempted to delete the core app" }
                     Thread.sleep(1)
                 }
             }
+        }
+        every { FirebaseApp.getInstance(any()) } answers {
+            if (racePoint != RacePoint.READING_CURRENT_USER) holdUntilSignOutBlockedOrDeleted()
             firebaseApp
         }
         every { firebaseApp.delete() } answers { isDeleted.set(true) }
@@ -186,21 +218,34 @@ class FirebaseAuthManagerTest {
             check(!isDeleted.get()) { "FirebaseApp was deleted" }
             firebaseAuth
         }
-        every { firebaseAuth.currentUser } returns firebaseUser
-        every { firebaseUser.getIdToken(any()) } returns Tasks.forResult(GetTokenResult("Token", HashMap()))
+        every { firebaseAuth.currentUser } answers {
+            if (racePoint == RacePoint.READING_CURRENT_USER) holdUntilSignOutBlockedOrDeleted()
+            firebaseUser
+        }
+        every { firebaseAuth.signOut() } answers {
+            if (racePoint == RacePoint.SIGN_OUT_BEFORE_DELETE) check(tokenThreadInRace.await(5, TimeUnit.SECONDS))
+        }
+        every { firebaseUser.getIdToken(any()) } answers {
+            check(!isDeleted.get()) { "FirebaseApp was deleted" }
+            Tasks.forResult(GetTokenResult("Token", HashMap()))
+        }
 
         var tokenResult: Result<String>? = null
         var signOutResult: Result<Unit>? = null
-        val worker = thread(name = workerThreadName) {
+        val startSignOut = {
+            signOutThread.set(thread(name = "sign-out") { signOutResult = runCatching { firebaseAuthManager.signOut() } })
+        }
+        if (racePoint == RacePoint.SIGN_OUT_BEFORE_DELETE) startSignOut()
+        val tokenThread = thread(name = tokenThreadName) {
             tokenResult = runCatching { runBlocking { firebaseAuthManager.getCurrentToken() } }
         }
-        assertThat(coreAppFetched.await(5, TimeUnit.SECONDS)).isTrue()
-        signOutThread.set(thread(name = "sign-out") { signOutResult = runCatching { firebaseAuthManager.signOut() } })
-        worker.join(10_000)
+        assertThat(tokenThreadInRace.await(5, TimeUnit.SECONDS)).isTrue()
+        if (racePoint != RacePoint.SIGN_OUT_BEFORE_DELETE) startSignOut()
+        tokenThread.join(10_000)
         signOutThread.get().join(10_000)
 
         assertThat(tokenResult?.getOrThrow()).isEqualTo("Token")
-        assertThat(signOutResult?.isSuccess).isTrue()
+        assertThat(signOutResult?.getOrThrow()).isEqualTo(Unit)
         assertThat(isDeleted.get()).isTrue()
     }
 
