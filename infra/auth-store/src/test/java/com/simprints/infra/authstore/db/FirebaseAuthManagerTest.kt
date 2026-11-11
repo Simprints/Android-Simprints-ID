@@ -28,6 +28,7 @@ import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Singleton
 import kotlin.concurrent.thread
 
 @RunWith(AndroidJUnit4::class)
@@ -193,6 +194,11 @@ class FirebaseAuthManagerTest {
         worker.join()
 
         assertThat(result?.getOrThrow()).isEqualTo("Token")
+    }
+
+    @Test
+    fun `FirebaseAuthManager is a singleton so all injected consumers share the core app lock`() {
+        assertThat(FirebaseAuthManager::class.java.isAnnotationPresent(Singleton::class.java)).isTrue()
     }
 
     @Test

@@ -21,7 +21,10 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import javax.inject.Singleton
 
+// Singleton so all consumers share the same lock guarding the process-wide core FirebaseApp
+@Singleton
 internal class FirebaseAuthManager @Inject constructor(
     private val loginInfoStore: LoginInfoStore,
     @param:ApplicationContext private val context: Context,
