@@ -11,6 +11,7 @@ import org.junit.Before
 import org.junit.Test
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import java.util.concurrent.CancellationException
 import javax.net.ssl.SSLHandshakeException
 import javax.net.ssl.SSLProtocolException
 
@@ -116,5 +117,6 @@ class SimberTest {
         SSLProtocolException("Stub"),
         SSLHandshakeException("Stub"),
         FirebaseNetworkException("Stub"),
+        CancellationException("Stub"),
     )
 }

@@ -467,7 +467,7 @@ internal class EventUpSyncTaskTest {
         coVerify(exactly = 1) { eventRepo.addOrUpdateEvent(eventScope, any<EventUpSyncRequestEvent>()) }
     }
 
-    @Test
+    @Test(expected = CancellationException::class)
     fun `when upload is cancelled it should rethrow instead of treating it as a failed request`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
 
@@ -484,14 +484,16 @@ internal class EventUpSyncTaskTest {
             eventRemoteDataSource.post(any(), any(), any())
         } throws CancellationException("Upload was cancelled")
 
-        eventUpSyncTask.upSync(operation, eventScope).toList()
-
-        // The exception should propagate straight out of the request try/catch
-        coVerify(exactly = 0) { eventRepo.deleteEventScopes(any()) }
-        coVerify(exactly = 0) { eventRepo.addOrUpdateEvent(eventScope, any<EventUpSyncRequestEvent>()) }
+        try {
+            eventUpSyncTask.upSync(operation, eventScope).toList()
+        } finally {
+            // The exception should propagate straight out of the request try/catch
+            coVerify(exactly = 0) { eventRepo.deleteEventScopes(any()) }
+            coVerify(exactly = 0) { eventRepo.addOrUpdateEvent(eventScope, any<EventUpSyncRequestEvent>()) }
+        }
     }
 
-    @Test
+    @Test(expected = CancellationException::class)
     fun `when upload is cancelled it should stop uploading remaining scope types`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
 
@@ -508,11 +510,13 @@ internal class EventUpSyncTaskTest {
             eventRemoteDataSource.post(any(), any(), any())
         } throws CancellationException("Upload was cancelled")
 
-        eventUpSyncTask.upSync(operation, eventScope).toList()
-
-        // Cancellation aborts the whole upSync flow immediately, so only the first
-        // scope type attempted its (single) request before the rest were abandoned.
-        coVerify(exactly = 1) { eventRemoteDataSource.post(any(), any(), any()) }
+        try {
+            eventUpSyncTask.upSync(operation, eventScope).toList()
+        } finally {
+            // Cancellation aborts the whole upSync flow immediately, so only the first
+            // scope type attempted its (single) request before the rest were abandoned.
+            coVerify(exactly = 1) { eventRemoteDataSource.post(any(), any(), any()) }
+        }
     }
 
     @Test
@@ -789,6 +793,19 @@ internal class EventUpSyncTaskTest {
         coEvery { eventRepo.getClosedEventScopesCount(any()) } throws TooManyRequestsException()
 
         eventUpSyncTask.upSync(operation, eventScope).toList()
+    }
+
+    @Test(expected = CancellationException::class)
+    fun `upSync should rethrow CancellationException without marking the operation as failed`() = runTest {
+        coEvery { eventRepo.getClosedEventScopesCount(any()) } throws CancellationException("Job was cancelled")
+
+        try {
+            eventUpSyncTask.upSync(operation, eventScope).toList()
+        } finally {
+            coVerify(exactly = 0) {
+                eventUpSyncScopeRepository.insertOrUpdate(match { it.lastState == UpSyncState.FAILED })
+            }
+        }
     }
 
     private fun setUpSyncKind(kind: UpSynchronizationConfiguration.UpSynchronizationKind) {
