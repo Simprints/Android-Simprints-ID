@@ -23,6 +23,7 @@ import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepositor
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.events.event.domain.models.EnrolmentUpdateEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureEvent
+import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
 import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectionEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -343,6 +344,50 @@ internal class SelectSubjectViewModelTest {
             )
         }
         coVerify { eventRepository.addOrUpdateEvent(match { it is EnrolmentUpdateEvent }) }
+    }
+
+    @Test
+    fun `saveCredential only references the confirmed credential capture when there were recaptures`() = runTest {
+        val credentialSearchResult = mockk<ExternalCredentialSearchResult.Complete>(relaxed = true) {
+            every { scannedCredentialResult.credentialScanId } returns "finalScanId"
+        }
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
+            captureValueEvent("discardedScanId1"),
+            captureValueEvent("discardedScanId2"),
+            captureValueEvent("finalScanId"),
+        )
+        coJustRun { resetScannedCredentialsInSession(any(), any()) }
+
+        val viewModel = createViewModel(params = selectSubjectParams.copy(credentialSearchResult = credentialSearchResult))
+        viewModel.saveCredential()
+
+        coVerify {
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat((it as EnrolmentUpdateEvent).payload.externalCredentialIdsToAdd).containsExactly("finalScanId")
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `saveCredential does not reference any credential when there is no confirmed credential`() = runTest {
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(captureValueEvent("scanId"))
+        coJustRun { resetScannedCredentialsInSession(any(), any()) }
+
+        viewModel.saveCredential()
+
+        coVerify {
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat((it as EnrolmentUpdateEvent).payload.externalCredentialIdsToAdd).isEmpty()
+                },
+            )
+        }
+    }
+
+    private fun captureValueEvent(payloadId: String) = mockk<ExternalCredentialCaptureValueEvent> {
+        every { payload.id } returns payloadId
     }
 
     @Test
