@@ -562,10 +562,12 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         _vibrate.send()
         tracker.setImageQualityCheckingResult(false)
         updateCaptureState(CaptureState::toNotDetected)
-        addCaptureAndBiometricEventsInSession()
-        tracker.resetToIdle()
         if (isNoFingerDetectedLimitReachedUseCase(state.currentCaptureState(), bioSdkConfiguration)) {
+            // handleCaptureFinished() saves the capture events itself
             handleCaptureFinished()
+        } else {
+            addCaptureAndBiometricEventsInSession()
+            tracker.resetToIdle()
         }
     }
 
