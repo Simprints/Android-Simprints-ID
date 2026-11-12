@@ -11,13 +11,14 @@ internal class UpdateSessionScopePayloadUseCase @Inject constructor(
     private val configRepository: ConfigRepository,
 ) {
     suspend operator fun invoke() {
-        val configUpdatedAt = configRepository.getProjectConfiguration().updatedAt
+        val projectConfiguration = configRepository.getProjectConfiguration()
         val recordCount = deviceStateDataTracker.getRecordCount()
         val sessionScope = eventRepository.getCurrentSessionScope()
 
         val updatedScope = sessionScope.copy(
             payload = sessionScope.payload.copy(
-                projectConfigurationUpdatedAt = configUpdatedAt,
+                projectConfigurationUpdatedAt = projectConfiguration.updatedAt,
+                projectConfigurationId = projectConfiguration.id,
                 databaseInfo = sessionScope.payload.databaseInfo.copy(
                     recordCount = recordCount,
                 ),
