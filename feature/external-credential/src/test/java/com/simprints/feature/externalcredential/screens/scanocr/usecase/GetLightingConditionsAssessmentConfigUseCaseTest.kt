@@ -1,7 +1,7 @@
 package com.simprints.feature.externalcredential.screens.scanocr.usecase
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessmentConfig
+import com.simprints.infra.camera.lighting.LightingConditionsAssessmentConfig
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_BRIGHTNESS
