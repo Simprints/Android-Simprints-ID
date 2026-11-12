@@ -115,6 +115,22 @@ internal class FrameCropToTargetUseCaseTest {
     }
 
     @Test
+    fun `Crops at native resolution when high-res bitmap has preview aspect ratio`() {
+        val cropped = useCase(
+            Frame(
+                bitmap = Bitmap.createBitmap(2160, 4062, Bitmap.Config.ARGB_8888), // 3x preview size
+                rotation = 0,
+                previewBounds = Rect(0, 0, 720, 1354),
+                targetBounds = Rect(28, 470, 692, 885), // 664x415
+            ),
+        )
+
+        // Cropped should keep the 3x detail of the high-res capture
+        assertThat(cropped.width).isEqualTo(1992)
+        assertThat(cropped.height).isEqualTo(1245)
+    }
+
+    @Test
     fun `Correctly crops bitmap with valid cutout rectangle`() {
         val cropped = useCase(
             Frame(

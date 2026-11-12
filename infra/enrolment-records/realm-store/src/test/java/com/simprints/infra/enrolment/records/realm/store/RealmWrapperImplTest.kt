@@ -118,6 +118,29 @@ class RealmWrapperImplTest {
         verify(exactly = 2) { Realm.open(configuration) }
     }
 
+    @Test
+    fun `test recreate db if it has unsupported file format`() = runTest {
+        // Given
+        every {
+            Realm.open(
+                configuration,
+            )
+        } throws IllegalStateException(
+            "[RLM_ERR_UNSUPPORTED_FILE_FORMAT_VERSION]: Database has an unsupported version (9) and cannot be upgraded",
+        ) andThen
+            mockk<Realm>(relaxed = true)
+        every { Realm.deleteRealm(configuration) } just Runs
+
+        // When
+        realmWrapper.writeRealm { }
+        // Then
+        verify {
+            Realm.deleteRealm(configuration)
+            context.startForegroundService(any()) // Start ResetDownSyncService service
+        }
+        verify(exactly = 2) { Realm.open(configuration) }
+    }
+
     // test close realm instance
     @Test
     fun `test close realm instance`(): Unit = runTest {
