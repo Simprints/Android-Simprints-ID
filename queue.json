@@ -75,6 +75,13 @@
     },
     {
       "attempts": 1,
+      "fix": {
+        "branch": "crashbunny/sync-worker-cancellation-logged-as-error",
+        "pr_url": null,
+        "reason": "origin/main already contains PR #1886 (merge 17815420f5, 2026-11-12): Simber.isSkippableException now skips java.util.concurrent.CancellationException (covers JobCancellationException and TimeoutCancellationException from FirebaseAuthManager.getCurrentToken and EventRepositoryImpl.reportException), and EventUpSyncTask rethrows CancellationException before the generic catch. The remaining Crashlytics events come from released versions (<= 2026.3.2) that predate the fix; it will take effect once a release built from main ships.",
+        "status": "failed",
+        "summary": "Already fixed on main by PR #1886; no new change needed"
+      },
       "impact": "medium",
       "issue_ids": [
         "9d98adfcb32c5f9f91ead1e93f12e219",
@@ -83,9 +90,10 @@
         "0e77edd7d946c5332d1101b9aee1d710",
         "0552d941bebf05f77676957643d1ad90"
       ],
+      "pr_url": null,
       "root_cause": "Broad catch blocks in sync paths log WorkManager cancellations via Simber.e, which records them as non-fatals: FirebaseAuthManager.getCurrentToken (\"Failed to get access token\"), EventRepositoryImpl.reportException (\"Failed to save the event\") and EventUpSyncTask (\"Failed to upload event scopes\"). EventUpSyncTask also swallows the CancellationException (not in isTerminalException) and records the scope as FAILED. Unchanged on main; Simber.shouldSkipThrowableReporting could skip CancellationException, and EventUpSyncTask should rethrow it. Fix merged to main in PR #1886 (2026-11-12, makes Simber skip CancellationException and EventUpSyncTask rethrow it) but not in any release yet (v2026.3.2 predates it); no open PR.",
       "root_cause_id": "sync-worker-cancellation-logged-as-error",
-      "status": "in_progress"
+      "status": "failed"
     },
     {
       "attempts": 0,
