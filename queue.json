@@ -3,13 +3,21 @@
   "items": [
     {
       "attempts": 1,
+      "fix": {
+        "branch": "crashbunny/select-subject-non-guid-realm-uuid",
+        "pr_url": null,
+        "reason": "Already fixed on main by 97aea7d307 (MS-1753), which is an ancestor of origin/main. In SelectSubjectViewModel.getDisplayDialogStateIfRequired, the isValidGuid() check now returns before enrolmentRecordRepository.load(), so RealmUUID.from() is never called with non-GUID IDs. The fix still needs to ship in a release (v2026.3.2 does not have it), so consider cherry-picking 97aea7d307 to the release branch.",
+        "status": "failed",
+        "summary": "No change needed: main already skips the enrolment record lookup for non-GUID selected IDs."
+      },
       "impact": "medium",
       "issue_ids": [
         "e1ebe2ed9b6ca0f0451a3a34ba6360d5"
       ],
+      "pr_url": null,
       "root_cause": "In an MFID CONFIRM_IDENTITY callout the caller sends a selected ID that is not a GUID ('BIOMETRICS_SEARCH_...'); SelectSubjectViewModel.getDisplayDialogStateIfRequired calls enrolmentRecordRepository.load() before its isValidGuid() check, so RealmUUID.from() in RealmEnrolmentRecordLocalDataSource.buildRealmQueryForSubject throws and the app crashes. Fixed on main by commit 97aea7d307 (MS-1753, 2026-11-11) but not in any release yet (v2026.3.2 still has it); no open PR.",
       "root_cause_id": "select-subject-non-guid-realm-uuid",
-      "status": "in_progress"
+      "status": "failed"
     },
     {
       "attempts": 0,
