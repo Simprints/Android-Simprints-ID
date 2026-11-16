@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import com.simprints.infra.events.device.DeviceEventTracker
 import com.simprints.infra.sync.SyncOrchestrator
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 /**
@@ -12,6 +13,7 @@ import javax.inject.Inject
  * that has not been saved in older versions (e.g. tokenization keys).
  * Therefore it makes sense to refresh the configuration ASAP.
  */
+@AndroidEntryPoint
 class SyncConfigScheduleReceiver : BroadcastReceiver() {
     @Inject
     lateinit var syncOrchestrator: SyncOrchestrator
