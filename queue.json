@@ -39,13 +39,21 @@
     },
     {
       "attempts": 1,
+      "fix": {
+        "branch": "crashbunny/fingerprint-capture-null-config-after-restore",
+        "pr_url": null,
+        "reason": null,
+        "status": "would_fix",
+        "summary": "FingerprintCaptureViewModel.start no longer force-unwraps a null fingerprint config; it logs via Simber, shows the unexpected-error alert, and the fragment skips capture UI setup."
+      },
       "impact": "medium",
       "issue_ids": [
         "b323b0646455bdfa0cb301ac3455dc5c"
       ],
+      "pr_url": null,
       "root_cause": "FingerprintCaptureViewModel.start dereferences configRepository.getProjectConfiguration().fingerprint!!, which was null when the orchestrator restored a fingerprint step after process death right after a config sync, so fingerprint capture crashed. Main still has the unguarded `!!`; no open PR.",
       "root_cause_id": "fingerprint-capture-null-config-after-restore",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "attempts": 0,
