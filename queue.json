@@ -133,13 +133,21 @@
     },
     {
       "attempts": 1,
+      "fix": {
+        "branch": "crashbunny/firebase-core-app-deleted-race",
+        "pr_url": null,
+        "reason": "main already fixes this root cause. FirebaseAuthManager is now a @Singleton, getCoreAuth() and tryToDeleteCoreApp() are both @Synchronized on the same instance, and getCurrentToken() creates the getIdToken task inside synchronized(this) (commits 60b994e4c6, e77e04ca53, 0da9f42831, merged in #1888). The crash stack (FirebaseAuthManager$getCurrentToken$2) can no longer hit a deleted app between fetching it and using it. The public getCoreApp() is still unsynchronised, but its only external caller is AuthStore.getCoreApp(), which is a different call path from this Crashlytics issue. All events in the window come from pre-2026 builds that don't have the fix, so they should stop once a release includes #1888.",
+        "status": "failed",
+        "summary": "No change needed: the getCurrentToken / core FirebaseApp delete race is already fixed on main (PR #1888)."
+      },
       "impact": "low",
       "issue_ids": [
         "4cddb74671504f936037c6481d4d08d2"
       ],
+      "pr_url": null,
       "root_cause": "There is a race in FirebaseAuthManager: signOut/initializeCoreProject delete the core FirebaseApp (tryToDeleteCoreApp) while a sync worker calls FirebaseAuth.getInstance(getCoreApp()) in getCurrentToken, which throws \"FirebaseApp was deleted\". The worker fails gracefully. getCoreApp is still unsynchronised against delete on main. Fix merged to main in PR #1888 (2026-11-12) but not yet released; window events are all on pre-2026 builds.",
       "root_cause_id": "firebase-core-app-deleted-race",
-      "status": "in_progress"
+      "status": "failed"
     },
     {
       "attempts": 0,
