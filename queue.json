@@ -56,14 +56,14 @@
       "status": "done"
     },
     {
-      "attempts": 0,
+      "attempts": 1,
       "impact": "medium",
       "issue_ids": [
         "d91457cd4808446bda8e43f1b1342181"
       ],
       "root_cause": "FaceCaptureViewModel.saveImage uses runBlocking on the main thread (called from flowFinished in viewModelScope) to compress the bitmap and write it to disk, blocking the UI long enough to ANR during face capture. Main still has the runBlocking; no open PR.",
       "root_cause_id": "face-capture-saveimage-runblocking-main",
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "attempts": 0,
