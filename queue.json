@@ -132,14 +132,14 @@
       "status": "done"
     },
     {
-      "attempts": 0,
+      "attempts": 1,
       "impact": "low",
       "issue_ids": [
         "4cddb74671504f936037c6481d4d08d2"
       ],
       "root_cause": "There is a race in FirebaseAuthManager: signOut/initializeCoreProject delete the core FirebaseApp (tryToDeleteCoreApp) while a sync worker calls FirebaseAuth.getInstance(getCoreApp()) in getCurrentToken, which throws \"FirebaseApp was deleted\". The worker fails gracefully. getCoreApp is still unsynchronised against delete on main. Fix merged to main in PR #1888 (2026-11-12) but not yet released; window events are all on pre-2026 builds.",
       "root_cause_id": "firebase-core-app-deleted-race",
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "attempts": 0,
