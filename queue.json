@@ -20,14 +20,14 @@
       "status": "failed"
     },
     {
-      "attempts": 0,
+      "attempts": 1,
       "impact": "medium",
       "issue_ids": [
         "a3bc7c8db94c4357fec5a2f320fb030e"
       ],
       "root_cause": "ConsentFragment calls finishWithResult twice (e.g. double tap); the second ConsentResult is delivered under the root result key while the current destination is already the orchestrator root, and OrchestratorActivity's handleResult<AppResult> listener throws ClassCastException (NavigationResultExt / OrchestratorActivity). Fixed on main by commit 9f8fd51f9a (MS-1752, 2026-11-10), not in any release yet; no open PR.",
       "root_cause_id": "double-finish-result-orchestrator-cast",
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "attempts": 0,
