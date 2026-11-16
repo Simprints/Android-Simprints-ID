@@ -57,13 +57,21 @@
     },
     {
       "attempts": 1,
+      "fix": {
+        "branch": "crashbunny/face-capture-saveimage-runblocking-main",
+        "pr_url": null,
+        "reason": null,
+        "status": "would_fix",
+        "summary": "Replace runBlocking in FaceCaptureViewModel.saveImage with a suspending withContext on the injected @DispatcherBG dispatcher so bitmap compression and image saving no longer block the main thread during face capture."
+      },
       "impact": "medium",
       "issue_ids": [
         "d91457cd4808446bda8e43f1b1342181"
       ],
+      "pr_url": null,
       "root_cause": "FaceCaptureViewModel.saveImage uses runBlocking on the main thread (called from flowFinished in viewModelScope) to compress the bitmap and write it to disk, blocking the UI long enough to ANR during face capture. Main still has the runBlocking; no open PR.",
       "root_cause_id": "face-capture-saveimage-runblocking-main",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "attempts": 0,
