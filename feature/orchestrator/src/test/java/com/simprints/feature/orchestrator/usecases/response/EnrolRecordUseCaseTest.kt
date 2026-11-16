@@ -1,6 +1,9 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
@@ -11,6 +14,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentR
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent.BiometricReferenceCreationPayload
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
+import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import io.mockk.MockKAnnotations
@@ -145,4 +149,58 @@ class EnrolRecordUseCaseTest {
             )
         }
     }
+
+    @Test
+    fun `Only references the external credential linked to the record when there were recaptures`() = runTest {
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
+            captureValueEvent("discardedScanId"),
+            captureValueEvent("finalScanId"),
+        )
+
+        useCase.invoke(enrolmentRecord(listOf(externalCredential("finalScanId"))), project)
+
+        coVerify {
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat((it as EnrolmentEventV4).payload.externalCredentialIds).containsExactly("finalScanId")
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `Does not reference external credentials when none are linked to the record`() = runTest {
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
+            captureValueEvent("scanId"),
+        )
+
+        useCase.invoke(enrolmentRecord(emptyList()), project)
+
+        coVerify {
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat((it as EnrolmentEventV4).payload.externalCredentialIds).isEmpty()
+                },
+            )
+        }
+    }
+
+    private fun captureValueEvent(payloadId: String) = mockk<ExternalCredentialCaptureValueEvent> {
+        every { payload.id } returns payloadId
+    }
+
+    private fun externalCredential(id: String) = ExternalCredential(
+        id = id,
+        value = "credential".asTokenizableEncrypted(),
+        subjectId = "subjectId",
+        type = ExternalCredentialType.NHISCard,
+    )
+
+    private fun enrolmentRecord(credentials: List<ExternalCredential>) = EnrolmentRecord(
+        subjectId = "subjectId",
+        projectId = "projectId",
+        attendantId = "attendantId".asTokenizableRaw(),
+        moduleId = "moduleId".asTokenizableRaw(),
+        externalCredentials = credentials,
+    )
 }

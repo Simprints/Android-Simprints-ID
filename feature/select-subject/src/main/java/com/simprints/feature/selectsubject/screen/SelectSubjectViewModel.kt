@@ -11,6 +11,7 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.isValidGuid
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.feature.externalcredential.ext.getLinkedExternalCredentialIds
 import com.simprints.feature.externalcredential.usecase.ResetExternalCredentialsInSessionUseCase
 import com.simprints.feature.selectsubject.SelectSubjectParams
 import com.simprints.feature.selectsubject.SelectSubjectResult
@@ -22,7 +23,6 @@ import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.event.domain.models.EnrolmentUpdateEvent
-import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SESSION
@@ -144,7 +144,7 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
 
                 // Confirmation of "none_selected" (or any non UUID value) should not produce an EnrolmentUpdateEvent
                 if (params.subjectId.isValidGuid()) {
-                    saveCredentialSelectionEvent(params.subjectId)
+                    saveCredentialSelectionEvent(params.subjectId, credentialSearchResult)
                 }
             } catch (e: Exception) {
                 Simber.e("Failed to attach scanned credential", e, tag = SESSION)
@@ -162,12 +162,17 @@ internal class SelectSubjectViewModel @AssistedInject constructor(
         _finish.send(SelectSubjectResult(isSubjectIdSaved = true, credentialSearchResult = null))
     }
 
-    private suspend fun saveCredentialSelectionEvent(subjectId: String) = with(sessionCoroutineScope) {
+    private suspend fun saveCredentialSelectionEvent(
+        subjectId: String,
+        credentialSearchResult: ExternalCredentialSearchResult.Complete?,
+    ) = with(sessionCoroutineScope) {
         try {
+            // Only the confirmed scan is linked to the subject (see ResetExternalCredentialsInSessionUseCase),
+            // so capture value events of discarded recaptures must not be referenced.
+            val linkedCredentialIds = setOfNotNull(credentialSearchResult?.scannedCredentialResult?.credentialScanId)
             val externalCredentialIdsToAdd = eventRepository
                 .getEventsInCurrentSession()
-                .filterIsInstance<ExternalCredentialCaptureValueEvent>()
-                .map { it.payload.id }
+                .getLinkedExternalCredentialIds(linkedCredentialIds)
 
             Simber.d("Adding credentials $externalCredentialIdsToAdd to subject $subjectId", tag = SESSION)
 
