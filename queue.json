@@ -114,14 +114,14 @@
       "status": "done"
     },
     {
-      "attempts": 0,
+      "attempts": 1,
       "impact": "medium",
       "issue_ids": [
         "178de8246c0eb6f255cd914c2c962763"
       ],
       "root_cause": "Two EventSyncMasterWorker runs start concurrently; the second calls closeAllOpenScopes(DOWN_SYNC) and EventRepositoryImpl.closeEventScope deletes the first chain's empty down-sync scope, so BaseEventDownSyncDownloaderWorker.getEventScope finds none and throws IllegalArgumentException('input required'), failing that down-sync run. Still on main; no open PR.",
       "root_cause_id": "down-sync-scope-closed-by-concurrent-master-worker",
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "attempts": 0,
