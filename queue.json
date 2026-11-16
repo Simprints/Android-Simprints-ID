@@ -97,13 +97,21 @@
     },
     {
       "attempts": 1,
+      "fix": {
+        "branch": "crashbunny/mlkit-barcode-module-not-preinstalled",
+        "pr_url": null,
+        "reason": null,
+        "status": "would_fix",
+        "summary": "Replace legacy com.google.firebase.ml.vision.DEPENDENCIES meta-data in feature:login with com.google.mlkit.vision.DEPENDENCIES=barcode in infra:camera so Play Services pre-downloads the unbundled barcode module for login and MFID QR scanning"
+      },
       "impact": "medium",
       "issue_ids": [
         "3a78dfd40948631584e361acaa82640e"
       ],
+      "pr_url": null,
       "root_cause": "The unbundled Play Services ML Kit barcode module is not on the device when QR scanning starts (login / MFID QR), so every frame fails with 'Waiting for the barcode module to be downloaded' and DetectQrCodeUseCase logs each failure via Simber.e. feature/login AndroidManifest.xml declares the legacy meta-data key com.google.firebase.ml.vision.DEPENDENCIES instead of com.google.mlkit.vision.DEPENDENCIES, so the module is likely never pre-downloaded; unchanged on main, no open PR.",
       "root_cause_id": "mlkit-barcode-module-not-preinstalled",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "attempts": 0,
