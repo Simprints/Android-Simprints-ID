@@ -1,13 +1,11 @@
-package com.simprints.feature.externalcredential.screens.scanocr.usecase
+package com.simprints.infra.camera.lighting
 
 import android.graphics.Bitmap
-import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessment
-import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessmentConfig
 import javax.inject.Inject
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-internal class GetLightingConditionsAssessmentUseCase @Inject constructor() {
+class GetLightingConditionsAssessmentUseCase @Inject constructor() {
     /**
      * Detects normal, too dim or too bright lighting in a bitmap of an image of a card that approximately fits the image.
      *
