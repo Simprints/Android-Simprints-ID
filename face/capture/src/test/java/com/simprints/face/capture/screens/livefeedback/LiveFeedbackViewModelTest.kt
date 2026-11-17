@@ -1158,6 +1158,45 @@ internal class LiveFeedbackViewModelTest {
     }
 
     @Test
+    fun `lighting - no hint while capturing`() = runTest {
+        every { faceLightingCheck.updateHint(any(), any()) } returns true
+        every { faceDetector.analyze(frame) } returns null
+        val states = collectStates()
+
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2)
+        viewModel.startCapture()
+        viewModel.process(frame, frame)
+
+        assertThat(states.last().feedback).isEqualTo(LiveFeedbackState.Feedback.NO_FACE)
+        verify(exactly = 0) { faceLightingCheck.updateHint(any(), any()) }
+        verify { faceLightingCheck.reset() }
+    }
+
+    @Test
+    fun `attempt event - hint time stops when a face is found even while the hint is still debounced`() = runTest {
+        every { isUsingAutoCapture.invoke(any()) } returns true
+        every { faceLightingCheck.mode } returns FaceLightingConditionsAssessmentMode.HINT
+        every { faceLightingCheck.updateHint(any(), any()) } returns true
+        every { faceDetector.analyze(frame) } returnsMany listOf(null, getFace(Rect(0, 0, 30, 30)))
+        var nowMs = 0L
+        every { timeHelper.now() } answers { Timestamp(nowMs) }
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 1)
+        viewModel.startCapture()
+        nowMs = 100
+        viewModel.process(frame, frame)
+        nowMs = 300
+        viewModel.process(frame, frame)
+        nowMs = 400
+        viewModel.holdOffAutoCapture()
+
+        val slot = slot<FaceCaptureAttemptEvent>()
+        verify(exactly = 1) { eventReporter.addCaptureAttemptEvent(capture(slot)) }
+        assertThat(slot.captured.payload.lightingStats?.hintShownMs).isEqualTo(200)
+    }
+
+    @Test
     fun `attempt event - carries lighting stats when the lighting check runs`() = runTest {
         every { isUsingAutoCapture.invoke(any()) } returns true
         every { faceLightingCheck.mode } returns FaceLightingConditionsAssessmentMode.HINT

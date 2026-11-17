@@ -159,6 +159,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private fun toggleTorch(enabled: Boolean) {
         cameraFrameProvider.setTorchEnabled(enabled)
         binding.captureFlashButton.isSelected = enabled
+        // A repeated state is not rendered again, so update the highlight here
+        renderFlashHighlight(displayedFeedback(vm.state.value) == LiveFeedbackState.Feedback.TOO_DARK)
     }
 
     /** Initialize CameraX, and prepare to bind the camera use cases  */
@@ -327,11 +329,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     private fun renderFeedbackOnButton(state: LiveFeedbackState) = with(binding) {
-        val feedback = if (state.isAutoCapture && vm.isAutoCaptureHeldOff) {
-            LiveFeedbackState.Feedback.NONE
-        } else {
-            state.feedback
-        }
+        val feedback = displayedFeedback(state)
         renderFlashHighlight(feedback == LiveFeedbackState.Feedback.TOO_DARK)
 
         when (feedback) {
@@ -390,6 +388,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             }
         }
     }
+
+    private fun displayedFeedback(state: LiveFeedbackState): LiveFeedbackState.Feedback =
+        if (state.isAutoCapture && vm.isAutoCaptureHeldOff) LiveFeedbackState.Feedback.NONE else state.feedback
 
     /** Draws attention to the flash button while the too-dark hint is shown and the flash is off. */
     private fun renderFlashHighlight(isTooDark: Boolean) = with(binding.captureFlashButton) {

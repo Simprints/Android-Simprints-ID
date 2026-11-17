@@ -13,6 +13,7 @@ import androidx.camera.core.MeteringPoint
 import androidx.camera.core.MeteringPointFactory
 import androidx.camera.core.SurfaceOrientedMeteringPointFactory
 import androidx.camera.view.PreviewView
+import androidx.lifecycle.Observer
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
@@ -43,13 +44,14 @@ internal class CameraFocusHelper @AssistedInject constructor(
         exposureTarget: Rect? = null,
     ) {
         cameraPreview.afterMeasured {
-            it.setOnTouchListener(touchListener(camera.cameraControl, exposureTarget))
+            it.setOnTouchListener(touchListener(it, camera.cameraControl, exposureTarget))
         }
     }
 
     @SuppressLint("ClickableViewAccessibility")
     @ExcludedFromGeneratedTestCoverageReports("Generates inner class of excluded file")
     private fun touchListener(
+        previewView: PreviewView,
         cameraControl: CameraControl,
         exposureTarget: Rect?,
     ) = View.OnTouchListener { view, event ->
@@ -65,7 +67,7 @@ internal class CameraFocusHelper @AssistedInject constructor(
                         FocusMeteringAction.FLAG_AF,
                     ).apply {
                         // A new action replaces the previous one, so keep metering exposure on the target
-                        exposureTarget?.let { addPoint(getTargetPoint(view, it), FLAGS_AE_AWB) }
+                        exposureTarget?.let { addPoint(getTargetPoint(previewView, it), FLAGS_AE_AWB) }
                     }.disableAutoCancel()
                     .build()
 
@@ -113,7 +115,9 @@ internal class CameraFocusHelper @AssistedInject constructor(
         camera: Camera,
         target: Rect,
     ) {
-        cameraPreview.afterMeasured {
+        // The preview's metering point factory maps view coordinates through the preview's rotation and crop,
+        // which are only known once the preview is streaming
+        cameraPreview.afterStreaming {
             val meteringAction = FocusMeteringAction
                 .Builder(getTargetPoint(it, target), FLAGS_AE_AWB)
                 .disableAutoCancel()
@@ -125,6 +129,20 @@ internal class CameraFocusHelper @AssistedInject constructor(
                 Simber.e("Cannot access camera", e, tag = crashReportTag)
             }
         }
+    }
+
+    private inline fun PreviewView.afterStreaming(crossinline block: (previewView: PreviewView) -> Unit) {
+        previewStreamState.observeForever(
+            @ExcludedFromGeneratedTestCoverageReports("Inner class of excluded file")
+            object : Observer<PreviewView.StreamState> {
+                override fun onChanged(value: PreviewView.StreamState) {
+                    if (value == PreviewView.StreamState.STREAMING) {
+                        previewStreamState.removeObserver(this)
+                        block(this@afterStreaming)
+                    }
+                }
+            },
+        )
     }
 
     private inline fun PreviewView.afterMeasured(crossinline block: (previewView: PreviewView) -> Unit) {
@@ -160,15 +178,19 @@ internal class CameraFocusHelper @AssistedInject constructor(
         return factory.createPoint(centreWidth, centreHeight)
     }
 
+    /**
+     * The point size applies to both sensor dimensions, so it is taken from the target's smaller share of the preview
+     * to keep the metering region inside the target.
+     */
     private fun getTargetPoint(
-        view: View,
+        previewView: PreviewView,
         target: Rect,
     ): MeteringPoint {
-        val width = view.width.toFloat()
-        val height = view.height.toFloat()
-        // Point size is relative to the surface, so a size matching the target covers the target
-        val size = (target.width() / width).coerceIn(0f, 1f)
-        return SurfaceOrientedMeteringPointFactory(width, height).createPoint(target.exactCenterX(), target.exactCenterY(), size)
+        val size = minOf(
+            target.width() / previewView.width.toFloat(),
+            target.height() / previewView.height.toFloat(),
+        ).coerceIn(0f, 1f)
+        return previewView.meteringPointFactory.createPoint(target.exactCenterX(), target.exactCenterY(), size)
     }
 
     private companion object {

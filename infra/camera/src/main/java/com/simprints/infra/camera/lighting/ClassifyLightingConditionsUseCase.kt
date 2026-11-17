@@ -9,6 +9,8 @@ import javax.inject.Inject
  * - too dim (underexposed): median luminance below the low threshold and contrast below the contrast threshold
  * - too bright (overexposed): median luminance above the high threshold and contrast below the contrast threshold
  * - otherwise normal
+ *
+ * A contrast threshold of 100% or more turns the contrast condition off, so only the median is checked.
  */
 class ClassifyLightingConditionsUseCase @Inject constructor() {
     operator fun invoke(
@@ -18,19 +20,22 @@ class ClassifyLightingConditionsUseCase @Inject constructor() {
         if (!isEnabled) return LightingConditionsAssessment.NORMAL
 
         if (stats.median.isBelowPercent(lowMedianLuminanceThresholdPercent) &&
-            stats.contrast.isBelowPercent(lowContrastThresholdPercent)
+            isLowContrast(stats.contrast)
         ) {
             return LightingConditionsAssessment.TOO_DIM
         }
 
         if (stats.median.isAbovePercent(highMedianLuminanceThresholdPercent) &&
-            stats.contrast.isBelowPercent(lowContrastThresholdPercent)
+            isLowContrast(stats.contrast)
         ) {
             return LightingConditionsAssessment.TOO_BRIGHT
         }
 
         return LightingConditionsAssessment.NORMAL
     }
+
+    private fun LightingConditionsAssessmentConfig.isLowContrast(contrast: Int): Boolean =
+        lowContrastThresholdPercent >= 100 || contrast.isBelowPercent(lowContrastThresholdPercent)
 
     internal companion object {
         fun Int.isBelowPercent(percent: Int): Boolean = this * 100 < percent * MAX_LUMINANCE
