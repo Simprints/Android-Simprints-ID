@@ -66,11 +66,12 @@ internal class SyncInfoViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             syncStatusFlow
-                .filter { (eventSyncState, imageSyncStatus) ->
+                .map { (eventSyncState, imageSyncStatus) ->
                     isPreLogoutUpSync && eventSyncState.isSyncCompleted() &&
                         !imageSyncStatus.isSyncing
-                }.map { Unit }
+                }
                 .debounce(LOGOUT_DELAY_MILLIS)
+                .filter { isReadyToLogOut -> isReadyToLogOut }
                 .onEach { performLogout() }
                 .flowOn(ioDispatcher)
                 .collect { }

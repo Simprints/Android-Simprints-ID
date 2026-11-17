@@ -334,6 +334,32 @@ class SyncInfoViewModelTest {
         verify(exactly = 0) { syncOrchestrator.execute(any<OneTime>()) }
     }
 
+    @Test
+    fun `should not trigger logout if images started syncing after pause between events and images`() = runTest {
+        val mockCompletedEventSyncState = mockk<EventSyncState>(relaxed = true) {
+            every { isSyncCompleted() } returns true
+        }
+        val mockNotSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
+            every { isSyncing } returns false
+            every { progress } returns null
+            every { lastUpdateTimeMillis } returns 0
+        }
+        val mockSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
+            every { isSyncing } returns true
+            every { progress } returns Pair(1, 2)
+            every { lastUpdateTimeMillis } returns null
+        }
+        createViewModel()
+        viewModel.isPreLogoutUpSync = true
+        syncStatusFlow.value = SyncStatus(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockNotSyncingImageStatus)
+
+        advanceTimeBy(1000L)
+        syncStatusFlow.value = SyncStatus(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockSyncingImageStatus)
+
+        advanceTimeBy(3100L)
+        verify(exactly = 0) { syncOrchestrator.execute(any<OneTime>()) }
+    }
+
     // forceEventSync() tests
 
     @Test
