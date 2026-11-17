@@ -25,6 +25,20 @@ internal class ClassifyLightingConditionsUseCaseTest {
     }
 
     @Test
+    fun `contrast threshold of 100 percent reports too dim even at full contrast`() {
+        val config = config(lowContrastThresholdPercent = 100, lowMedianLuminanceThresholdPercent = 14)
+
+        assertThat(useCase(stats(median = 0, contrast = 255), config)).isEqualTo(LightingConditionsAssessment.TOO_DIM)
+    }
+
+    @Test
+    fun `contrast threshold of 100 percent reports too bright even at full contrast`() {
+        val config = config(lowContrastThresholdPercent = 100, highMedianLuminanceThresholdPercent = 90)
+
+        assertThat(useCase(stats(median = 255, contrast = 255), config)).isEqualTo(LightingConditionsAssessment.TOO_BRIGHT)
+    }
+
+    @Test
     fun `too bright when median is high and contrast is low`() {
         assertThat(useCase(stats(median = 250, contrast = 5), config())).isEqualTo(LightingConditionsAssessment.TOO_BRIGHT)
     }

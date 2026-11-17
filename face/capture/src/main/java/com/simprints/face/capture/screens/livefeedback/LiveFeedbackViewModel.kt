@@ -354,11 +354,14 @@ internal class LiveFeedbackViewModel @Inject constructor(
         isHeldOff: Boolean,
         nowMs: Long,
     ): Boolean {
-        if (isAutoCapture && isHeldOff) {
+        // Measurements stop outside NOT_STARTED, so a cached result must not drive the hint there
+        if (phase != LiveFeedbackState.Phase.NOT_STARTED || (isAutoCapture && isHeldOff)) {
             faceLightingCheck.reset()
             return false
         }
-        return faceLightingCheck.updateHint(isNoFace = faceDetection.status == FaceDetection.Status.NOFACE, nowMs = nowMs)
+        val isNoFace = faceDetection.status == FaceDetection.Status.NOFACE
+        // Keep the debouncer updated on every frame, but the hint is only visible in place of the no-face message
+        return faceLightingCheck.updateHint(isNoFace = isNoFace, nowMs = nowMs) && isNoFace
     }
 
     private fun computeProgress(
