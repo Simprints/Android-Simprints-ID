@@ -31,6 +31,10 @@ internal class CommCareEventDataSource @Inject constructor(
 ) {
     private val pendingSyncedCases = CopyOnWriteArrayList<SyncedCaseEntity>()
 
+    // Case IDs no longer in CommCare to drop from the cache without deleting their subject.
+    // Applied in onEventsProcessed so the cache only changes once the emitted events are processed.
+    private val pendingCaseIdsToDrop = CopyOnWriteArrayList<String>()
+
     // Pre-created date formatters to avoid repeated instantiation during sync
     private val commCareDateFormats = listOf(
         SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US), // Standard Date.toString() format
@@ -38,7 +42,9 @@ internal class CommCareEventDataSource @Inject constructor(
     )
 
     fun getEvents(queryEvent: RemoteEventQuery): CommCareEventSyncResult {
-        pendingSyncedCases.clear() // Clear any leftover state from previous syncs
+        // Clear any leftover state from previous syncs
+        pendingSyncedCases.clear()
+        pendingCaseIdsToDrop.clear()
 
         return if (queryEvent.externalIds.isNullOrEmpty()) {
             CommCareEventSyncResult(
@@ -119,9 +125,7 @@ internal class CommCareEventDataSource @Inject constructor(
                                     "Skipping caseId $caseId: CommCare lastModified ($commCareLastModifiedTime) is not newer than lastSyncedTimestamp (${cachedCase.lastSyncedTimestamp})",
                                     tag = COMMCARE_SYNC,
                                 )
-                                cachedCase.simprintsId
-                                    .takeIf { it.isNotEmpty() }
-                                    ?.let(subjectIdsReferencedInCommCare::add)
+                                subjectIdsReferencedInCommCare.add(cachedCase.simprintsId)
                                 continue // Skip cases not modified since last sync
                             }
                         }
@@ -146,16 +150,15 @@ internal class CommCareEventDataSource @Inject constructor(
             // If no cases were found in CommCare, it's most likely that CommCare is logged out.
             if (caseIdsPresentInCommCare.isNotEmpty()) {
                 val casesNoLongerInCommCare = previouslySyncedCasesMap.values.filterNot { (it.caseId in caseIdsPresentInCommCare) }
-                val (casesWithSubjectStillReferenced, casesToRemove) = casesNoLongerInCommCare.partition {
-                    it.simprintsId in subjectIdsReferencedInCommCare
+                // Cases without a subject, or whose subject is still referenced by another case, are only dropped from the cache
+                val (casesToDrop, casesToRemove) = casesNoLongerInCommCare.partition {
+                    it.simprintsId.isEmpty() || it.simprintsId in subjectIdsReferencedInCommCare
                 }
-                if (casesWithSubjectStillReferenced.isNotEmpty()) {
-                    Simber.i(
-                        "Keeping subjects of ${casesWithSubjectStillReferenced.size} cases no longer in CommCare as other cases still reference them.",
-                        tag = COMMCARE_SYNC,
-                    )
-                    casesWithSubjectStillReferenced.forEach { case -> commCareSyncCache.removeSyncedCase(case.caseId) }
-                }
+                Simber.i(
+                    "Dropping ${casesToDrop.size} cases no longer in CommCare whose subject is absent or still referenced by other cases.",
+                    tag = COMMCARE_SYNC,
+                )
+                pendingCaseIdsToDrop.addAll(casesToDrop.map { it.caseId })
                 Simber.i("Generating deletion events for ${casesToRemove.size} cases no longer in CommCare.", tag = COMMCARE_SYNC)
                 casesToRemove.forEach { case ->
                     generateEnrolmentRecordDeletionEvent(case).collect {
@@ -173,13 +176,6 @@ internal class CommCareEventDataSource @Inject constructor(
      * This is called when a case is not found in the latest sync.
      */
     private fun generateEnrolmentRecordDeletionEvent(case: SyncedCaseEntity): Flow<EnrolmentRecordDeletionEvent> = flow {
-        if (case.simprintsId.isEmpty()) {
-            Simber.d("Skipping deletion event for caseId ${case.caseId} with empty simprintsId", tag = COMMCARE_SYNC)
-            // Directly remove the case from the cache if it has no simprintsId
-            commCareSyncCache.removeSyncedCase(case.caseId)
-            return@flow
-        }
-
         Simber.d("Generating deletion event for caseId ${case.caseId} with simprintsId ${case.simprintsId}", tag = COMMCARE_SYNC)
         pendingSyncedCases.add(case)
         emit(
@@ -314,6 +310,14 @@ internal class CommCareEventDataSource @Inject constructor(
 
         // Remove processed cases from pendingSyncedCases
         pendingSyncedCases.removeAll(pendingCasesToRemove)
+
+        // Events emitted before these cases were queued have been processed by now, so they can be dropped safely
+        val caseIdsToDrop = pendingCaseIdsToDrop.toList()
+        caseIdsToDrop.forEach { caseId ->
+            commCareSyncCache.removeSyncedCase(caseId)
+            Simber.d("Dropped case $caseId from CommCareSyncCache without deleting its subject", tag = COMMCARE_SYNC)
+        }
+        pendingCaseIdsToDrop.removeAll(caseIdsToDrop)
     }
 
     companion object {

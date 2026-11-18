@@ -264,7 +264,12 @@ class CommCareEventDataSourceTest {
         val events = dataSource.getEvents(emptyEventQuery).eventFlow.toList()
 
         assertTrue(events.isEmpty())
-        coVerify { mockCommCareSyncCache.removeSyncedCase(caseIdMissing) }
+        // The cache only changes once the emitted events have been processed
+        coVerify(exactly = 0) { mockCommCareSyncCache.removeSyncedCase(any()) }
+
+        dataSource.onEventsProcessed(events)
+
+        coVerify(exactly = 1) { mockCommCareSyncCache.removeSyncedCase(caseIdMissing) }
         coVerify(exactly = 0) { mockCommCareSyncCache.removeSyncedCase(caseIdPresent) }
     }
 
@@ -289,7 +294,16 @@ class CommCareEventDataSourceTest {
 
         assertEquals(1, events.size)
         assertEquals(SUBJECT_ACTIONS_EVENT_1_SUBJECT_ID, (events.single() as EnrolmentRecordCreationEvent).payload.subjectId)
-        coVerify { mockCommCareSyncCache.removeSyncedCase(caseIdMissing) }
+        coVerify(exactly = 0) { mockCommCareSyncCache.removeSyncedCase(any()) }
+
+        dataSource.onEventsProcessed(events)
+
+        coVerifyOrder {
+            mockCommCareSyncCache.addSyncedCase(
+                match<SyncedCaseEntity> { it.caseId == caseIdPresent && it.simprintsId == SUBJECT_ACTIONS_EVENT_1_SUBJECT_ID },
+            )
+            mockCommCareSyncCache.removeSyncedCase(caseIdMissing)
+        }
     }
 
     @Test
@@ -316,6 +330,43 @@ class CommCareEventDataSourceTest {
         assertEquals(2, events.size)
         val deletionEvent = events.filterIsInstance<EnrolmentRecordDeletionEvent>().single()
         assertEquals(SUBJECT_ACTIONS_EVENT_1_SUBJECT_ID, deletionEvent.payload.subjectId)
+
+        dataSource.onEventsProcessed(events)
+
+        coVerify {
+            mockCommCareSyncCache.addSyncedCase(
+                match<SyncedCaseEntity> { it.caseId == caseIdPresent && it.simprintsId == SUBJECT_ACTIONS_EVENT_2_SUBJECT_ID },
+            )
+        }
+        coVerify(exactly = 1) { mockCommCareSyncCache.removeSyncedCase(caseIdMissing) }
+    }
+
+    @Test
+    fun `getEvents does not drop cases from cache when events are not processed`() = runTest {
+        val caseIdPresent = "client_case"
+        val caseIdMissing = "purged_form_case"
+
+        every { mockMetadataCursor.count } returns 1
+        every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, false)
+        every { mockMetadataCursor.getString(COLUMN_INDEX_CASE_ID) } returns caseIdPresent
+
+        every { mockDataCursor.moveToNext() } returnsMany listOf(true, false)
+        every { mockDataCursor.getString(COLUMN_INDEX_DATUM_ID) } returns SIMPRINTS_COSYNC_SUBJECT_ACTIONS
+        every { mockDataCursor.getString(COLUMN_INDEX_VALUE) } returns SUBJECT_ACTIONS_EVENT_1
+
+        coEvery { mockCommCareSyncCache.getAllSyncedCases() } returns listOf(
+            SyncedCaseEntity(caseIdMissing, SUBJECT_ACTIONS_EVENT_1_SUBJECT_ID, 5000L),
+        )
+
+        dataSource.getEvents(emptyEventQuery).eventFlow.toList()
+        // A new sync starts without the previous one processing its events
+        coEvery { mockCommCareSyncCache.getAllSyncedCases() } returns emptyList()
+        every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, false)
+        every { mockDataCursor.moveToNext() } returnsMany listOf(true, false)
+        val events = dataSource.getEvents(emptyEventQuery).eventFlow.toList()
+        dataSource.onEventsProcessed(events)
+
+        coVerify(exactly = 0) { mockCommCareSyncCache.removeSyncedCase(any()) }
     }
 
     @Test
@@ -729,7 +780,7 @@ class CommCareEventDataSourceTest {
     }
 
     @Test
-    fun `generateEnrolmentRecordDeletionEvent skips deletion event and removes cache for empty simprintsId`() = runTest {
+    fun `getEvents skips deletion event and drops cache entry for empty simprintsId`() = runTest {
         val caseIdPresent = "case_present"
         val caseIdMissingWithEmptySimprints = "case_missing_empty_simprints"
 
@@ -763,7 +814,9 @@ class CommCareEventDataSourceTest {
         val deletionEvents = events.filterIsInstance<EnrolmentRecordDeletionEvent>()
         assertEquals(0, deletionEvents.size)
 
-        // Verify that the case with empty simprintsId was removed from cache directly
+        // Verify that the case with empty simprintsId is removed from cache once events are processed
+        coVerify(exactly = 0) { mockCommCareSyncCache.removeSyncedCase(any()) }
+        dataSource.onEventsProcessed(events)
         coVerify { mockCommCareSyncCache.removeSyncedCase(caseIdMissingWithEmptySimprints) }
     }
 
