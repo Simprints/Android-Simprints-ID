@@ -1,0 +1,37 @@
+# Build time scenarios for the Compose migration metrics.
+#
+# Target files are chosen to stay stable for the whole migration: the core `Timestamp` model and
+# the alert configuration builder are not UI code and are not replaced by Phase 1 or Phase 2.
+# Do not point scenarios at layouts, Fragments or ViewModels: they get rewritten or deleted.
+# Changing a scenario breaks comparability with earlier history rows; record it in the runbook.
+
+default-scenarios = ["clean_build", "incremental_core_abi_change", "incremental_feature_non_abi_change"]
+
+clean_build {
+  title = "Clean build"
+  tasks = ["id:assembleDebug"]
+  cleanup-tasks = ["clean"]
+  daemon = warm
+  warm-ups = 1
+  iterations = 3
+}
+
+incremental_core_abi_change {
+  title = "Incremental core ABI change"
+  tasks = ["id:assembleDebug"]
+  daemon = warm
+  warm-ups = 2
+  iterations = 5
+
+  apply-abi-change-to = "infra/core/src/main/java/com/simprints/core/tools/time/Timestamp.kt"
+}
+
+incremental_feature_non_abi_change {
+  title = "Incremental feature non-ABI change"
+  tasks = ["id:assembleDebug"]
+  daemon = warm
+  warm-ups = 2
+  iterations = 5
+
+  apply-non-abi-change-to = "feature/alert/src/main/java/com/simprints/feature/alert/AlertConfigurationBuilder.kt"
+}
