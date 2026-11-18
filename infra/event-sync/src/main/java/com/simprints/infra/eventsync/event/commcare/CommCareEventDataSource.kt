@@ -89,6 +89,10 @@ internal class CommCareEventDataSource @Inject constructor(
 
             val casesToParse = mutableListOf<SyncedCaseEntity>()
             val caseIdsPresentInCommCare = mutableSetOf<String>()
+            // Subjects referenced by at least one case still present in CommCare. The same subject can be
+            // referenced by several cases (e.g. a closed form case and the client case), so a subject must
+            // be kept as long as any of them remains, even if CommCare purged the others from the device.
+            val subjectIdsReferencedInCommCare = mutableSetOf<String>()
             // Fetch all previously synced cases with their details (including lastSyncedTimestamp)
             val previouslySyncedCasesMap = commCareSyncCache
                 .getAllSyncedCases()
@@ -115,6 +119,9 @@ internal class CommCareEventDataSource @Inject constructor(
                                     "Skipping caseId $caseId: CommCare lastModified ($commCareLastModifiedTime) is not newer than lastSyncedTimestamp (${cachedCase.lastSyncedTimestamp})",
                                     tag = COMMCARE_SYNC,
                                 )
+                                cachedCase.simprintsId
+                                    .takeIf { it.isNotEmpty() }
+                                    ?.let(subjectIdsReferencedInCommCare::add)
                                 continue // Skip cases not modified since last sync
                             }
                         }
@@ -129,13 +136,26 @@ internal class CommCareEventDataSource @Inject constructor(
             val batchSize = BATCH_SIZE // Adjust based on performance testing
             casesToParse.chunked(batchSize).forEach { batch ->
                 batch.forEach { case ->
-                    loadEnrolmentRecordCreationEvents(case).collect { emit(it) }
+                    loadEnrolmentRecordCreationEvents(case).collect { event ->
+                        subjectIdsReferencedInCommCare.add(event.payload.subjectId)
+                        emit(event)
+                    }
                 }
             }
 
             // If no cases were found in CommCare, it's most likely that CommCare is logged out.
             if (caseIdsPresentInCommCare.isNotEmpty()) {
-                val casesToRemove = previouslySyncedCasesMap.values.filterNot { (it.caseId in caseIdsPresentInCommCare) }
+                val casesNoLongerInCommCare = previouslySyncedCasesMap.values.filterNot { (it.caseId in caseIdsPresentInCommCare) }
+                val (casesWithSubjectStillReferenced, casesToRemove) = casesNoLongerInCommCare.partition {
+                    it.simprintsId in subjectIdsReferencedInCommCare
+                }
+                if (casesWithSubjectStillReferenced.isNotEmpty()) {
+                    Simber.i(
+                        "Keeping subjects of ${casesWithSubjectStillReferenced.size} cases no longer in CommCare as other cases still reference them.",
+                        tag = COMMCARE_SYNC,
+                    )
+                    casesWithSubjectStillReferenced.forEach { case -> commCareSyncCache.removeSyncedCase(case.caseId) }
+                }
                 Simber.i("Generating deletion events for ${casesToRemove.size} cases no longer in CommCare.", tag = COMMCARE_SYNC)
                 casesToRemove.forEach { case ->
                     generateEnrolmentRecordDeletionEvent(case).collect {

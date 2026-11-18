@@ -246,6 +246,79 @@ class CommCareEventDataSourceTest {
     }
 
     @Test
+    fun `getEvents keeps subject of missing case when an unmodified present case still references it`() = runTest {
+        val caseIdPresent = "client_case"
+        val caseIdMissing = "purged_form_case"
+        val sharedSimprintsId = "shared_simprints_id"
+
+        every { mockMetadataCursor.count } returns 1
+        every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, false)
+        every { mockMetadataCursor.getString(COLUMN_INDEX_CASE_ID) } returns caseIdPresent
+
+        // Present case not modified since last sync (lastModified 10000 <= 15000), so it is not parsed again
+        coEvery { mockCommCareSyncCache.getAllSyncedCases() } returns listOf(
+            SyncedCaseEntity(caseIdPresent, sharedSimprintsId, 15000L),
+            SyncedCaseEntity(caseIdMissing, sharedSimprintsId, 15000L),
+        )
+
+        val events = dataSource.getEvents(emptyEventQuery).eventFlow.toList()
+
+        assertTrue(events.isEmpty())
+        coVerify { mockCommCareSyncCache.removeSyncedCase(caseIdMissing) }
+        coVerify(exactly = 0) { mockCommCareSyncCache.removeSyncedCase(caseIdPresent) }
+    }
+
+    @Test
+    fun `getEvents keeps subject of missing case when a case parsed in the same sync references it`() = runTest {
+        val caseIdPresent = "client_case"
+        val caseIdMissing = "purged_form_case"
+
+        every { mockMetadataCursor.count } returns 1
+        every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, false)
+        every { mockMetadataCursor.getString(COLUMN_INDEX_CASE_ID) } returns caseIdPresent
+
+        every { mockDataCursor.moveToNext() } returnsMany listOf(true, false)
+        every { mockDataCursor.getString(COLUMN_INDEX_DATUM_ID) } returns SIMPRINTS_COSYNC_SUBJECT_ACTIONS
+        every { mockDataCursor.getString(COLUMN_INDEX_VALUE) } returns SUBJECT_ACTIONS_EVENT_1
+
+        coEvery { mockCommCareSyncCache.getAllSyncedCases() } returns listOf(
+            SyncedCaseEntity(caseIdMissing, SUBJECT_ACTIONS_EVENT_1_SUBJECT_ID, 5000L),
+        )
+
+        val events = dataSource.getEvents(emptyEventQuery).eventFlow.toList()
+
+        assertEquals(1, events.size)
+        assertEquals(SUBJECT_ACTIONS_EVENT_1_SUBJECT_ID, (events.single() as EnrolmentRecordCreationEvent).payload.subjectId)
+        coVerify { mockCommCareSyncCache.removeSyncedCase(caseIdMissing) }
+    }
+
+    @Test
+    fun `getEvents deletes subject of missing case when the present case no longer references it`() = runTest {
+        val caseIdPresent = "client_case"
+        val caseIdMissing = "purged_form_case"
+
+        every { mockMetadataCursor.count } returns 1
+        every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, false)
+        every { mockMetadataCursor.getString(COLUMN_INDEX_CASE_ID) } returns caseIdPresent
+
+        // Present case was modified and now references a different subject
+        every { mockDataCursor.moveToNext() } returnsMany listOf(true, false)
+        every { mockDataCursor.getString(COLUMN_INDEX_DATUM_ID) } returns SIMPRINTS_COSYNC_SUBJECT_ACTIONS
+        every { mockDataCursor.getString(COLUMN_INDEX_VALUE) } returns SUBJECT_ACTIONS_EVENT_2
+
+        coEvery { mockCommCareSyncCache.getAllSyncedCases() } returns listOf(
+            SyncedCaseEntity(caseIdPresent, SUBJECT_ACTIONS_EVENT_1_SUBJECT_ID, 5000L),
+            SyncedCaseEntity(caseIdMissing, SUBJECT_ACTIONS_EVENT_1_SUBJECT_ID, 5000L),
+        )
+
+        val events = dataSource.getEvents(emptyEventQuery).eventFlow.toList()
+
+        assertEquals(2, events.size)
+        val deletionEvent = events.filterIsInstance<EnrolmentRecordDeletionEvent>().single()
+        assertEquals(SUBJECT_ACTIONS_EVENT_1_SUBJECT_ID, deletionEvent.payload.subjectId)
+    }
+
+    @Test
     fun `getEvents does not generate deletion events when CommCare response is empty`() = runTest {
         val caseIdMissing = "case_missing_but_commcare_empty"
         val simprintsIdForMissingCase = "simprints_id_for_missing_empty"
