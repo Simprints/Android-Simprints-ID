@@ -41,6 +41,12 @@ internal class AutoCaptureAttemptStats private constructor(
 
     private var lastSnapshotMs: Long? = null
 
+    /** For an attempt started before the configuration was loaded. */
+    @Synchronized
+    fun setLightingMode(mode: LightingCheckMode?) {
+        state.lightingMode = mode
+    }
+
     @Synchronized
     fun recordFrame(
         detection: FaceDetection,
@@ -255,7 +261,7 @@ internal class AutoCaptureAttemptStats private constructor(
         var openRun: OpenRun? = null,
         var statusRunsTruncated: Boolean = false,
         // Lighting check, only when it runs
-        val lightingMode: LightingCheckMode? = null,
+        var lightingMode: LightingCheckMode? = null,
         var lightingFramesMeasured: Int = 0,
         var tooDarkFrameCount: Int = 0,
         var noFaceWhileTooDarkCount: Int = 0,

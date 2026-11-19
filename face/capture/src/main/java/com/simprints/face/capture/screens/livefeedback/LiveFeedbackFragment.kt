@@ -349,8 +349,11 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             LiveFeedbackState.Feedback.NO_FACE ->
                 renderInvalidFace(IDR.string.face_capture_title_no_face, IDR.string.face_capture_error_no_face)
 
-            LiveFeedbackState.Feedback.TOO_DARK ->
+            LiveFeedbackState.Feedback.TOO_DARK -> {
                 renderInvalidFace(IDR.string.face_capture_title_too_dark, IDR.string.face_capture_error_too_dark)
+                // The explanation is hidden before capture starts, but here it tells the user what to do
+                captureFeedbackTxtExplanation.isVisible = true
+            }
 
             LiveFeedbackState.Feedback.LOOK_STRAIGHT ->
                 renderInvalidFace(IDR.string.face_capture_title_look_straight, IDR.string.face_capture_error_look_straight)

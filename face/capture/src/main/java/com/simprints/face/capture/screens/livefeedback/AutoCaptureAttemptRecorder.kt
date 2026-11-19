@@ -43,6 +43,8 @@ internal class AutoCaptureAttemptRecorder(
             FaceLightingConditionsAssessmentMode.LOG -> LightingCheckMode.LOG
             FaceLightingConditionsAssessmentMode.HINT -> LightingCheckMode.HINT
         }
+        // The attempt may have started before the configuration was loaded
+        activeAttempt?.setLightingMode(lightingMode)
     }
 
     fun start(attemptNb: Int) {

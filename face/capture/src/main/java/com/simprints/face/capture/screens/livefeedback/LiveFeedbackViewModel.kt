@@ -26,6 +26,7 @@ import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_CAPTURE_MIN_AREA_DEFAULT
 import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckConfiguration
 import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckMode
+import com.simprints.infra.config.store.models.FaceLightingConditionsAssessmentMode
 import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
@@ -259,7 +260,9 @@ internal class LiveFeedbackViewModel @Inject constructor(
         val targetFrameHeight = croppedBitmap.height
         val potentialFace = faceDetector.analyze(croppedBitmap)
         // Measure before getFaceDetectionFromPotentialFace, which recycles the frame when there is no face
-        val lighting = measureLightingIfDue(croppedBitmap, potentialFace, captureStartTime.ms)
+        // Monotonic time, so a wall clock correction cannot stall the sampling interval or the hint debounce
+        val lightingNowMs = captureStartTime.msSinceBoot ?: captureStartTime.ms
+        val lighting = measureLightingIfDue(croppedBitmap, potentialFace, lightingNowMs)
 
         val faceDetection = getFaceDetectionFromPotentialFace(originalBitmap, croppedBitmap, potentialFace)
         faceDetection.detectionStartTime = captureStartTime
@@ -268,7 +271,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
         // Read once so frame recording and the imaging-start decision agree
         val isHeldOff = isAutoCaptureHeldOff
         val isCurrentAttempt = attempt === attemptRecorder.activeAttempt
-        val isLightingHintShown = updateLightingHint(faceDetection, isHeldOff, captureStartTime.ms)
+        val isLightingHintShown = updateLightingHint(faceDetection, isHeldOff, lightingNowMs)
         if (isAutoCapture && !isHeldOff && isCurrentAttempt && attempt != null) {
             attemptRecorder.record(
                 attempt = attempt,
@@ -346,6 +349,8 @@ internal class LiveFeedbackViewModel @Inject constructor(
         nowMs: Long,
     ): FaceLightingCheck.Measurement? {
         if (phase != LiveFeedbackState.Phase.NOT_STARTED || (isAutoCapture && isAutoCaptureHeldOff)) return null
+        // Lighting stats are only recorded for auto-capture attempts, so log mode has nothing to do in manual capture
+        if (!isAutoCapture && faceLightingCheck.mode == FaceLightingConditionsAssessmentMode.LOG) return null
         return faceLightingCheck.measureIfDue(croppedBitmap, potentialFace?.relativeBoundingBox, nowMs)
     }
 

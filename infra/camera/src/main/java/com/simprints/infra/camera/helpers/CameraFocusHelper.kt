@@ -33,11 +33,11 @@ internal class CameraFocusHelper @AssistedInject constructor(
         fun create(crashReportTag: LoggingConstants.CrashReportTag): CameraFocusHelper
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     /**
      * @param exposureTarget when set, exposure and white balance stay metered on this area (in preview coordinates)
      *        rather than following the tapped point
      */
+    @SuppressLint("ClickableViewAccessibility")
     fun setUpFocusOnTap(
         cameraPreview: PreviewView,
         camera: Camera,
