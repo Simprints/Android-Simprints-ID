@@ -22,6 +22,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.dropWhile
@@ -65,10 +66,11 @@ internal class SyncInfoViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            // TODO MS-1761: move this into a pre-logout sync use case
             syncStatusFlow
-                .map { (eventSyncState, imageSyncStatus) ->
+                .combine(deviceStateDataTracker.observeDeviceDataState()) { (eventSyncState, imageSyncStatus), deviceDataState ->
                     isPreLogoutUpSync && eventSyncState.isSyncCompleted() &&
-                        !imageSyncStatus.isSyncing
+                        !imageSyncStatus.isSyncing && !deviceDataState.hasDataToUpload
                 }
                 .debounce(LOGOUT_DELAY_MILLIS)
                 .filter { isReadyToLogOut -> isReadyToLogOut }

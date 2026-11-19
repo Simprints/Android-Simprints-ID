@@ -70,8 +70,10 @@ internal class GetSyncInfoSectionRecordsUseCase @Inject constructor(
             isSyncButtonVisible = !isPreLogoutUpSync || eventSyncState.isSyncFailed(),
             isSyncButtonEnabled = isSyncButtonEnabled,
             isSyncButtonForRetry = eventSyncState.isSyncFailed(),
-            isFooterSyncInProgressVisible = isPreLogoutUpSync && isSyncInProgress,
-            isFooterReadyToLogOutVisible = isPreLogoutUpSync && eventSyncState.isSyncCompleted() && !imageSyncStatus.isSyncing,
+            isFooterSyncInProgressVisible = isPreLogoutUpSync &&
+                (isSyncInProgress || (deviceDataState.hasDataToUpload && !eventSyncState.isSyncFailed())),
+            isFooterReadyToLogOutVisible = isPreLogoutUpSync && eventSyncState.isSyncCompleted() && !imageSyncStatus.isSyncing &&
+                !deviceDataState.hasDataToUpload,
             isFooterSyncIncompleteVisible = isPreLogoutUpSync && eventSyncState.isSyncFailed(),
             isFooterLastSyncTimeVisible =
                 !isPreLogoutUpSync && !eventSyncState.isSyncInProgress() && eventSyncState.lastSyncTimestamp.ms >= 0,

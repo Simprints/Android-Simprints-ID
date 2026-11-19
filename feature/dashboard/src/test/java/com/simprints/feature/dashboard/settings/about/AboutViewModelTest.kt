@@ -122,6 +122,29 @@ class AboutViewModelTest {
     }
 
     @Test
+    fun `should not enqueue logout worker when can sync data to simprints and there are only samples to upload`() =
+        runTest(testDispatcher) {
+            val viewModel =
+                buildAboutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = false, hasSamplesToUpload = true)
+            advanceUntilIdle()
+            viewModel.processLogoutRequest()
+            advanceUntilIdle()
+            verify(exactly = 0) { syncOrchestrator.execute(any<OneTime>()) }
+        }
+
+    @Test
+    fun `should emit LogoutDestination_LogoutDataSyncScreen when can sync data to simprints and there are only samples to upload`() =
+        runTest(testDispatcher) {
+            val viewModel =
+                buildAboutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = false, hasSamplesToUpload = true)
+            advanceUntilIdle()
+            viewModel.processLogoutRequest()
+            assertThat(viewModel.logoutDestinationEvent.getOrAwaitValue().peekContent()).isEqualTo(
+                LogoutDestination.LogoutDataSyncScreen,
+            )
+        }
+
+    @Test
     fun `should emit LogoutDestination_LogoutDataSyncScreen when can sync data to simprints and there are events to upload`() =
         runTest(testDispatcher) {
             val viewModel =
@@ -211,12 +234,16 @@ class AboutViewModelTest {
     private fun buildAboutViewModel(
         canSyncDataToSimprints: Boolean,
         hasEventsToUpload: Boolean,
+        hasSamplesToUpload: Boolean = false,
     ): AboutViewModel {
         val upSyncKind = when (canSyncDataToSimprints) {
             true -> UpSynchronizationConfiguration.UpSynchronizationKind.ALL
             false -> UpSynchronizationConfiguration.UpSynchronizationKind.NONE
         }
         coEvery { deviceStateDataTracker.hasPendingEvents() } returns hasEventsToUpload
+        coEvery { deviceStateDataTracker.getCurrentDeviceDataState() } returns mockk {
+            every { pendingSamples } returns if (hasSamplesToUpload) 1 else 0
+        }
         coEvery { configRepository.getProjectConfiguration() } returns buildProjectConfigurationMock(
             upSyncKind,
         )

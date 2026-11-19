@@ -70,7 +70,7 @@ internal class AboutViewModel @Inject constructor(
     fun processLogoutRequest() {
         viewModelScope.launch {
             val logoutDestination =
-                when (canSyncDataToSimprints() && hasEventsToUpload()) {
+                when (canSyncDataToSimprints() && (hasEventsToUpload() || hasSamplesToUpload())) {
                     true -> LogoutDestination.LogoutDataSyncScreen
                     false -> {
                         syncOrchestrator.execute(OneTime.Logout.start())
@@ -89,6 +89,8 @@ internal class AboutViewModel @Inject constructor(
         Simber.i("Could not check pending events before logout", t, tag = SYNC)
         true
     }
+
+    private suspend fun hasSamplesToUpload(): Boolean = deviceStateDataTracker.getCurrentDeviceDataState().pendingSamples != 0
 
     private suspend fun canSyncDataToSimprints(): Boolean = configRepository.getProjectConfiguration().canSyncDataToSimprints()
 

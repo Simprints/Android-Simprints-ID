@@ -10,6 +10,8 @@ import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.SyncStatus
+import com.simprints.infra.sync.devicestate.DeviceDataState
+import com.simprints.infra.sync.devicestate.DeviceStateDataTracker
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.*
@@ -32,6 +34,9 @@ internal class LogoutSyncViewModelTest {
 
     @MockK
     lateinit var authStore: AuthStore
+
+    @MockK
+    lateinit var deviceStateDataTracker: DeviceStateDataTracker
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
@@ -119,6 +124,21 @@ internal class LogoutSyncViewModelTest {
     }
 
     @Test
+    fun `isLogoutWithoutSyncVisibleLiveData should return true when sync completed but there is still data to upload`() = runTest {
+        val eventSyncState = mockk<EventSyncState> {
+            every { isSyncCompleted() } returns true
+        }
+        val imageSyncStatus = ImageSyncStatus(isSyncing = false, progress = null, lastUpdateTimeMillis = null)
+
+        setupSyncMocks(eventSyncState, imageSyncStatus, hasDataToUpload = true)
+
+        val viewModel = createViewModel()
+
+        val result = viewModel.isLogoutWithoutSyncVisibleLiveData.getOrAwaitValue(afterObserve = ::advanceUntilIdle)
+        assertThat(result).isTrue()
+    }
+
+    @Test
     fun `isLogoutWithoutSyncVisibleLiveData should return false when conditions for logout are met`() = runTest {
         val eventSyncState = mockk<EventSyncState> {
             every { isSyncCompleted() } returns true
@@ -136,14 +156,20 @@ internal class LogoutSyncViewModelTest {
     private fun setupSyncMocks(
         eventSyncState: EventSyncState,
         imageSyncStatus: ImageSyncStatus,
+        hasDataToUpload: Boolean = false,
     ) {
         val statusFlow = MutableStateFlow(SyncStatus(eventSyncState = eventSyncState, imageSyncStatus = imageSyncStatus))
         every { syncOrchestrator.observeSyncState() } returns statusFlow
+        val deviceDataState = mockk<DeviceDataState> {
+            every { this@mockk.hasDataToUpload } returns hasDataToUpload
+        }
+        every { deviceStateDataTracker.observeDeviceDataState() } returns MutableStateFlow(deviceDataState)
     }
 
     private fun createViewModel() = LogoutSyncViewModel(
         configRepository = configRepository,
         syncOrchestrator = syncOrchestrator,
         authStore = authStore,
+        deviceStateDataTracker = deviceStateDataTracker,
     )
 }
