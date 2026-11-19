@@ -25,6 +25,7 @@ import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.SyncStatus
+import com.simprints.infra.sync.devicestate.DeviceDataState
 import com.simprints.infra.sync.devicestate.DeviceStateDataTracker
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
@@ -86,6 +87,9 @@ class SyncInfoViewModelTest {
     @MockK
     private lateinit var mockImageSyncStatus: ImageSyncStatus
 
+    @MockK
+    private lateinit var mockDeviceDataState: DeviceDataState
+
     private lateinit var syncStatusFlow: MutableStateFlow<SyncStatus>
 
     private lateinit var viewModel: SyncInfoViewModel
@@ -118,6 +122,8 @@ class SyncInfoViewModelTest {
         every { mockImageSyncStatus.progress } returns null
         every { mockImageSyncStatus.lastUpdateTimeMillis } returns null
 
+        every { mockDeviceDataState.hasDataToUpload } returns false
+
         mockkStatic("androidx.lifecycle.FlowLiveDataConversions")
         mockkStatic("com.simprints.infra.config.store.models.ProjectConfigurationKt")
         mockkStatic("com.simprints.core.tools.extensions.Flow_extKt")
@@ -143,6 +149,7 @@ class SyncInfoViewModelTest {
             SyncStatus(eventSyncState = mockEventSyncState, imageSyncStatus = mockImageSyncStatus),
         )
         every { syncOrchestrator.observeSyncState() } returns syncStatusFlow
+        every { deviceStateDataTracker.observeDeviceDataState() } returns MutableStateFlow(mockDeviceDataState)
         every { syncOrchestrator.execute(any<OneTime>()) } returns Job().apply { complete() }
 
         every { timeHelper.now() } returns TEST_TIMESTAMP
@@ -329,6 +336,25 @@ class SyncInfoViewModelTest {
         createViewModel()
         viewModel.isPreLogoutUpSync = true
         syncStatusFlow.value = SyncStatus(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockSyncingImageStatus)
+
+        advanceTimeBy(3100L) // after the logout delay (3000ms)
+        verify(exactly = 0) { syncOrchestrator.execute(any<OneTime>()) }
+    }
+
+    @Test
+    fun `should not trigger logout when sync completed but there is still data to upload`() = runTest {
+        val mockCompletedEventSyncState = mockk<EventSyncState>(relaxed = true) {
+            every { isSyncCompleted() } returns true
+        }
+        val mockNotSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
+            every { isSyncing } returns false
+            every { progress } returns null
+            every { lastUpdateTimeMillis } returns 0
+        }
+        every { mockDeviceDataState.hasDataToUpload } returns true
+        createViewModel()
+        viewModel.isPreLogoutUpSync = true
+        syncStatusFlow.value = SyncStatus(eventSyncState = mockCompletedEventSyncState, imageSyncStatus = mockNotSyncingImageStatus)
 
         advanceTimeBy(3100L) // after the logout delay (3000ms)
         verify(exactly = 0) { syncOrchestrator.execute(any<OneTime>()) }

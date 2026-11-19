@@ -10,6 +10,7 @@ import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
+import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.eventsync.permission.CommCarePermissionChecker
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.models.EventSyncState
@@ -113,6 +114,49 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
 
         assertThat(result.isFooterLastSyncTimeVisible).isTrue()
         assertThat(result.footerLastSyncMinutesAgo).isEqualTo("0 minutes ago")
+        assertThat(result.isFooterSyncInProgressVisible).isFalse()
+    }
+
+    @Test
+    fun `should show ready to log out footer when pre-logout sync completed and nothing is pending`() = runTest {
+        val result = invokeUseCase(
+            isPreLogoutUpSync = true,
+            eventSyncState = createEventSyncState(syncCompleted = true),
+        )
+
+        assertThat(result.isFooterReadyToLogOutVisible).isTrue()
+    }
+
+    @Test
+    fun `should hide ready to log out footer when pre-logout sync completed but samples are still pending`() = runTest {
+        val result = invokeUseCase(
+            isPreLogoutUpSync = true,
+            eventSyncState = createEventSyncState(syncCompleted = true),
+            deviceDataState = createDeviceDataState(pendingSamples = 15),
+        )
+
+        assertThat(result.isFooterReadyToLogOutVisible).isFalse()
+    }
+
+    @Test
+    fun `should show sync in progress footer when pre-logout sync completed but samples are still pending`() = runTest {
+        val result = invokeUseCase(
+            isPreLogoutUpSync = true,
+            eventSyncState = createEventSyncState(syncCompleted = true),
+            deviceDataState = createDeviceDataState(pendingSamples = 15),
+        )
+
+        assertThat(result.isFooterSyncInProgressVisible).isTrue()
+    }
+
+    @Test
+    fun `should hide sync in progress footer when pre-logout sync failed with samples still pending`() = runTest {
+        val result = invokeUseCase(
+            isPreLogoutUpSync = true,
+            eventSyncState = createEventSyncState(syncFailed = true),
+            deviceDataState = createDeviceDataState(pendingSamples = 15),
+        )
+
         assertThat(result.isFooterSyncInProgressVisible).isFalse()
     }
 
@@ -767,7 +811,7 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
     ): DeviceDataState = DeviceDataState(
         projectId = TEST_PROJECT_ID,
         recordCount = recordCount,
-        pendingScopes = emptyMap(),
+        pendingScopes = mapOf(EventScopeType.SESSION to 0),
         pendingEvents = 0,
         pendingEnrolments = pendingEnrolments,
         pendingSamples = pendingSamples,
