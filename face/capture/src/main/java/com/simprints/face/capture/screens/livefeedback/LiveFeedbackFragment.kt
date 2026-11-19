@@ -2,6 +2,7 @@ package com.simprints.face.capture.screens.livefeedback
 
 import android.Manifest
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Size
@@ -76,6 +77,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     lateinit var bgDispatcher: CoroutineDispatcher
 
     private var finishedHandled = false
+    private var defaultFlashButtonTint: ColorStateList? = null
 
     private val validCaptureProgressColor: Int
         get() = ContextCompat.getColor(requireContext(), IDR.color.simprints_green_light)
@@ -138,6 +140,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         with(binding.captureFlashButton) {
             isVisible = requireContext().hasCameraFlash
             isSelected = false
+            defaultFlashButtonTint = backgroundTintList
             setOnClickListener {
                 val torchEnabled = !binding.captureFlashButton.isSelected
                 toggleTorch(torchEnabled)
@@ -156,6 +159,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private fun toggleTorch(enabled: Boolean) {
         cameraFrameProvider.setTorchEnabled(enabled)
         binding.captureFlashButton.isSelected = enabled
+        // A repeated state is not rendered again, so update the highlight here
+        renderFlashHighlight(displayedFeedback(vm.state.value) == LiveFeedbackState.Feedback.TOO_DARK)
     }
 
     /** Initialize CameraX, and prepare to bind the camera use cases  */
@@ -172,6 +177,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             lifecycleOwner = viewLifecycleOwner,
             cameraPreviewView = binding.faceCaptureCamera,
             target = binding.captureOverlay.circleRect.toRect(),
+            meterExposureOnTarget = true,
         )
         Simber.i("Camera setup finished", tag = FACE_CAPTURE)
     }
@@ -323,11 +329,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     private fun renderFeedbackOnButton(state: LiveFeedbackState) = with(binding) {
-        val feedback = if (state.isAutoCapture && vm.isAutoCaptureHeldOff) {
-            LiveFeedbackState.Feedback.NONE
-        } else {
-            state.feedback
-        }
+        val feedback = displayedFeedback(state)
+        renderFlashHighlight(feedback == LiveFeedbackState.Feedback.TOO_DARK)
 
         when (feedback) {
             LiveFeedbackState.Feedback.NONE -> when {
@@ -345,6 +348,12 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
             LiveFeedbackState.Feedback.NO_FACE ->
                 renderInvalidFace(IDR.string.face_capture_title_no_face, IDR.string.face_capture_error_no_face)
+
+            LiveFeedbackState.Feedback.TOO_DARK -> {
+                renderInvalidFace(IDR.string.face_capture_title_too_dark, IDR.string.face_capture_error_too_dark)
+                // The explanation is hidden before capture starts, but here it tells the user what to do
+                captureFeedbackTxtExplanation.isVisible = true
+            }
 
             LiveFeedbackState.Feedback.LOOK_STRAIGHT ->
                 renderInvalidFace(IDR.string.face_capture_title_look_straight, IDR.string.face_capture_error_look_straight)
@@ -380,6 +389,19 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                     ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp),
                 )
             }
+        }
+    }
+
+    private fun displayedFeedback(state: LiveFeedbackState): LiveFeedbackState.Feedback =
+        if (state.isAutoCapture && vm.isAutoCaptureHeldOff) LiveFeedbackState.Feedback.NONE else state.feedback
+
+    /** Draws attention to the flash button while the too-dark hint is shown and the flash is off. */
+    private fun renderFlashHighlight(isTooDark: Boolean) = with(binding.captureFlashButton) {
+        val highlighted = isTooDark && isVisible && !isSelected
+        backgroundTintList = if (highlighted) {
+            ColorStateList.valueOf(ContextCompat.getColor(requireContext(), IDR.color.simprints_orange))
+        } else {
+            defaultFlashButtonTint
         }
     }
 

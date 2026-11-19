@@ -1,6 +1,7 @@
 package com.simprints.infra.camera.helpers
 
 import android.annotation.SuppressLint
+import android.graphics.Rect
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewTreeObserver
@@ -12,6 +13,7 @@ import androidx.camera.core.MeteringPoint
 import androidx.camera.core.MeteringPointFactory
 import androidx.camera.core.SurfaceOrientedMeteringPointFactory
 import androidx.camera.view.PreviewView
+import androidx.lifecycle.Observer
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
@@ -31,19 +33,28 @@ internal class CameraFocusHelper @AssistedInject constructor(
         fun create(crashReportTag: LoggingConstants.CrashReportTag): CameraFocusHelper
     }
 
+    /**
+     * @param exposureTarget when set, exposure and white balance stay metered on this area (in preview coordinates)
+     *        rather than following the tapped point
+     */
     @SuppressLint("ClickableViewAccessibility")
     fun setUpFocusOnTap(
         cameraPreview: PreviewView,
         camera: Camera,
+        exposureTarget: Rect? = null,
     ) {
         cameraPreview.afterMeasured {
-            it.setOnTouchListener(touchListener(camera.cameraControl))
+            it.setOnTouchListener(touchListener(it, camera.cameraControl, exposureTarget))
         }
     }
 
     @SuppressLint("ClickableViewAccessibility")
     @ExcludedFromGeneratedTestCoverageReports("Generates inner class of excluded file")
-    private fun touchListener(cameraControl: CameraControl) = View.OnTouchListener { view, event ->
+    private fun touchListener(
+        previewView: PreviewView,
+        cameraControl: CameraControl,
+        exposureTarget: Rect?,
+    ) = View.OnTouchListener { view, event ->
         when (event.action) {
             MotionEvent.ACTION_DOWN -> true
 
@@ -54,7 +65,10 @@ internal class CameraFocusHelper @AssistedInject constructor(
                     .Builder(
                         focusPoint,
                         FocusMeteringAction.FLAG_AF,
-                    ).disableAutoCancel()
+                    ).apply {
+                        // A new action replaces the previous one, so keep metering exposure on the target
+                        exposureTarget?.let { addPoint(getTargetPoint(previewView, it), FLAGS_AE_AWB) }
+                    }.disableAutoCancel()
                     .build()
 
                 try {
@@ -91,6 +105,46 @@ internal class CameraFocusHelper @AssistedInject constructor(
         }
     }
 
+    /**
+     * Meters auto-exposure and auto-white-balance on [target] (in preview coordinates) instead of the whole frame,
+     * so a subject in the target is exposed correctly against a bright or dark background.
+     * Autofocus is not part of the action, so it stays continuous.
+     */
+    fun setUpExposureOnTarget(
+        cameraPreview: PreviewView,
+        camera: Camera,
+        target: Rect,
+    ) {
+        // The preview's metering point factory maps view coordinates through the preview's rotation and crop,
+        // which are only known once the preview is streaming
+        cameraPreview.afterStreaming {
+            val meteringAction = FocusMeteringAction
+                .Builder(getTargetPoint(it, target), FLAGS_AE_AWB)
+                .disableAutoCancel()
+                .build()
+
+            try {
+                camera.cameraControl.startFocusAndMetering(meteringAction)
+            } catch (e: CameraInfoUnavailableException) {
+                Simber.e("Cannot access camera", e, tag = crashReportTag)
+            }
+        }
+    }
+
+    private inline fun PreviewView.afterStreaming(crossinline block: (previewView: PreviewView) -> Unit) {
+        previewStreamState.observeForever(
+            @ExcludedFromGeneratedTestCoverageReports("Inner class of excluded file")
+            object : Observer<PreviewView.StreamState> {
+                override fun onChanged(value: PreviewView.StreamState) {
+                    if (value == PreviewView.StreamState.STREAMING) {
+                        previewStreamState.removeObserver(this)
+                        block(this@afterStreaming)
+                    }
+                }
+            },
+        )
+    }
+
     private inline fun PreviewView.afterMeasured(crossinline block: (previewView: PreviewView) -> Unit) {
         viewTreeObserver.addOnGlobalLayoutListener(
             @ExcludedFromGeneratedTestCoverageReports("Inner class of excluded file")
@@ -122,5 +176,24 @@ internal class CameraFocusHelper @AssistedInject constructor(
         val centreHeight = height / 2
 
         return factory.createPoint(centreWidth, centreHeight)
+    }
+
+    /**
+     * The point size applies to both sensor dimensions, so it is taken from the target's smaller share of the preview
+     * to keep the metering region inside the target.
+     */
+    private fun getTargetPoint(
+        previewView: PreviewView,
+        target: Rect,
+    ): MeteringPoint {
+        val size = minOf(
+            target.width() / previewView.width.toFloat(),
+            target.height() / previewView.height.toFloat(),
+        ).coerceIn(0f, 1f)
+        return previewView.meteringPointFactory.createPoint(target.exactCenterX(), target.exactCenterY(), size)
+    }
+
+    private companion object {
+        private const val FLAGS_AE_AWB = FocusMeteringAction.FLAG_AE or FocusMeteringAction.FLAG_AWB
     }
 }

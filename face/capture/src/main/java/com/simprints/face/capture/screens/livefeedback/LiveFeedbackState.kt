@@ -21,7 +21,7 @@ internal data class LiveFeedbackState(
      * UI-facing guidance derived from the latest [FaceDetection].
      * Decoupled from the biometric [FaceDetection.Status] so the fragment maps it to text/visuals via a simple lookup.
      */
-    enum class Feedback { NONE, NO_FACE, LOOK_STRAIGHT, TOO_CLOSE, TOO_FAR, BAD_QUALITY, VALID, VALID_CAPTURING }
+    enum class Feedback { NONE, NO_FACE, TOO_DARK, LOOK_STRAIGHT, TOO_CLOSE, TOO_FAR, BAD_QUALITY, VALID, VALID_CAPTURING }
 
     companion object {
         fun initial(isAutoCapture: Boolean = false) = LiveFeedbackState(
@@ -46,10 +46,14 @@ internal data class Progress(
     }
 }
 
-internal fun FaceDetection.Status.toFeedback(): LiveFeedbackState.Feedback = when (this) {
+/**
+ * @param isLightingHintShown the too-dark hint replaces only the no-face message; when a face is found,
+ *        the distance, pose and quality messages keep their priority
+ */
+internal fun FaceDetection.Status.toFeedback(isLightingHintShown: Boolean = false): LiveFeedbackState.Feedback = when (this) {
     FaceDetection.Status.VALID -> LiveFeedbackState.Feedback.VALID
     FaceDetection.Status.VALID_CAPTURING -> LiveFeedbackState.Feedback.VALID_CAPTURING
-    FaceDetection.Status.NOFACE -> LiveFeedbackState.Feedback.NO_FACE
+    FaceDetection.Status.NOFACE -> if (isLightingHintShown) LiveFeedbackState.Feedback.TOO_DARK else LiveFeedbackState.Feedback.NO_FACE
     FaceDetection.Status.OFFYAW -> LiveFeedbackState.Feedback.LOOK_STRAIGHT
     FaceDetection.Status.OFFROLL -> LiveFeedbackState.Feedback.LOOK_STRAIGHT
     FaceDetection.Status.TOOCLOSE -> LiveFeedbackState.Feedback.TOO_CLOSE

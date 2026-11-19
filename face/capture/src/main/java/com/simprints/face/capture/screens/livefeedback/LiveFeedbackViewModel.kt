@@ -26,6 +26,7 @@ import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_CAPTURE_MIN_AREA_DEFAULT
 import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckConfiguration
 import com.simprints.infra.config.store.models.FaceConfiguration.SpoofCheckMode
+import com.simprints.infra.config.store.models.FaceLightingConditionsAssessmentMode
 import com.simprints.infra.config.store.models.ModalitySdkType
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
@@ -57,6 +58,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
     private val isUsingAutoCaptureUseCase: IsUsingAutoCaptureUseCase,
     private val getSpoofCheckConfiguration: GetSpoofCheckConfigurationUseCase,
     private val captureAttemptTracker: CaptureAttemptTracker,
+    private val faceLightingCheck: FaceLightingCheck,
     @param:DispatcherBG private val bgDispatcher: CoroutineDispatcher,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -180,6 +182,8 @@ internal class LiveFeedbackViewModel @Inject constructor(
                 SymmetricTarget(experimentalConfig.faceCaptureMaxRollDegrees),
                 experimentalConfig.faceCaptureAcceptedAreaRange,
             )
+            faceLightingCheck.configure(experimentalConfig)
+            attemptRecorder.setLightingMode(faceLightingCheck.mode)
         }
     }
 
@@ -251,6 +255,10 @@ internal class LiveFeedbackViewModel @Inject constructor(
         val targetFrameWidth = croppedBitmap.width
         val targetFrameHeight = croppedBitmap.height
         val potentialFace = faceDetector.analyze(croppedBitmap)
+        // Measure before getFaceDetectionFromPotentialFace, which recycles the frame when there is no face
+        // Monotonic time, so a wall clock correction cannot stall the sampling interval or the hint debounce
+        val lightingNowMs = captureStartTime.msSinceBoot ?: captureStartTime.ms
+        val lighting = measureLightingIfDue(croppedBitmap, potentialFace, lightingNowMs)
 
         val faceDetection = getFaceDetectionFromPotentialFace(originalBitmap, croppedBitmap, potentialFace)
         faceDetection.detectionStartTime = captureStartTime
@@ -259,8 +267,17 @@ internal class LiveFeedbackViewModel @Inject constructor(
         // Read once so frame recording and the imaging-start decision agree
         val isHeldOff = isAutoCaptureHeldOff
         val isCurrentAttempt = attempt === attemptRecorder.activeAttempt
+        val isLightingHintShown = updateLightingHint(faceDetection, isHeldOff, lightingNowMs)
         if (isAutoCapture && !isHeldOff && isCurrentAttempt && attempt != null) {
-            attemptRecorder.record(attempt, faceDetection, captureStartTime, targetFrameWidth, targetFrameHeight)
+            attemptRecorder.record(
+                attempt = attempt,
+                faceDetection = faceDetection,
+                frameTime = captureStartTime,
+                frameWidth = targetFrameWidth,
+                frameHeight = targetFrameHeight,
+                lighting = lighting,
+                isLightingHintShown = isLightingHintShown,
+            )
         }
 
         var newPhase = phase
@@ -268,7 +285,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
 
         if (isAutoCapture) {
             if (!isHeldOff) {
-                feedback = faceDetection.status.toFeedback()
+                feedback = faceDetection.status.toFeedback(isLightingHintShown)
                 if (
                     faceDetection.status == FaceDetection.Status.VALID &&
                     phase == LiveFeedbackState.Phase.NOT_STARTED &&
@@ -289,7 +306,7 @@ internal class LiveFeedbackViewModel @Inject constructor(
                 // and proceed with capture as long as the face is in the correct position.
                 LiveFeedbackState.Feedback.VALID
             } else {
-                faceDetection.status.toFeedback()
+                faceDetection.status.toFeedback(isLightingHintShown)
             }
         }
 
@@ -313,6 +330,35 @@ internal class LiveFeedbackViewModel @Inject constructor(
         }
 
         emit(phase = newPhase, feedback = feedback, detectionForTint = faceDetection)
+    }
+
+    /**
+     * Skipped while capturing or validating, and while auto-capture is held off, to keep frame processing fast.
+     */
+    private fun measureLightingIfDue(
+        croppedBitmap: Bitmap,
+        potentialFace: Face?,
+        nowMs: Long,
+    ): FaceLightingCheck.Measurement? {
+        if (phase != LiveFeedbackState.Phase.NOT_STARTED || (isAutoCapture && isAutoCaptureHeldOff)) return null
+        // Lighting stats are only recorded for auto-capture attempts, so log mode has nothing to do in manual capture
+        if (!isAutoCapture && faceLightingCheck.mode == FaceLightingConditionsAssessmentMode.LOG) return null
+        return faceLightingCheck.measureIfDue(croppedBitmap, potentialFace?.relativeBoundingBox, nowMs)
+    }
+
+    private fun updateLightingHint(
+        faceDetection: FaceDetection,
+        isHeldOff: Boolean,
+        nowMs: Long,
+    ): Boolean {
+        // Measurements stop outside NOT_STARTED, so a cached result must not drive the hint there
+        if (phase != LiveFeedbackState.Phase.NOT_STARTED || (isAutoCapture && isHeldOff)) {
+            faceLightingCheck.reset()
+            return false
+        }
+        val isNoFace = faceDetection.status == FaceDetection.Status.NOFACE
+        // Keep the debouncer updated on every frame, but the hint is only visible in place of the no-face message
+        return faceLightingCheck.updateHint(isNoFace = isNoFace, nowMs = nowMs) && isNoFace
     }
 
     private fun computeProgress(

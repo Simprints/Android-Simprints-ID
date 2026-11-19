@@ -193,6 +193,63 @@ data class ExperimentalProjectConfiguration(
             )
             ?: MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_DEFAULT
 
+    /** Lighting check during face capture: off, log only (telemetry) or hint (telemetry plus too-dark hint). */
+    val faceLightingConditionsAssessmentMode: FaceLightingConditionsAssessmentMode
+        get() = customConfig
+            ?.get(FACE_LIGHTING_CONDITIONS_ASSESSMENT_MODE)
+            ?.jsonPrimitive
+            ?.contentOrNull
+            ?.let { FaceLightingConditionsAssessmentMode.fromString(it) }
+            ?: FaceLightingConditionsAssessmentMode.OFF
+
+    /** Median brightness of the face region, in percent of maximum, below which the frame is too dark. */
+    val faceLightingConditionsAssessmentLowBrightness: Int
+        get() = customConfig
+            ?.get(FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS)
+            ?.jsonPrimitive
+            ?.intOrNull
+            ?.coerceIn(
+                FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_MIN,
+                FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_MAX,
+            )
+            ?: FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_DEFAULT
+
+    /** Contrast (P95 minus P5), in percent of maximum, that a too-dark frame must also be below. 100 disables the contrast condition. */
+    val faceLightingConditionsAssessmentLowContrast: Int
+        get() = customConfig
+            ?.get(FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST)
+            ?.jsonPrimitive
+            ?.intOrNull
+            ?.coerceIn(
+                FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST_MIN,
+                FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST_MAX,
+            )
+            ?: FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST_DEFAULT
+
+    /** How long the too-dark condition must hold, or stop holding, before the hint is shown or hidden. */
+    val faceLightingConditionsAssessmentHintDebounceMillis: Long
+        get() = customConfig
+            ?.get(FACE_LIGHTING_CONDITIONS_ASSESSMENT_HINT_DEBOUNCE_MILLIS)
+            ?.jsonPrimitive
+            ?.longOrNull
+            ?.coerceIn(
+                FACE_LIGHTING_CONDITIONS_ASSESSMENT_HINT_DEBOUNCE_MILLIS_MIN,
+                FACE_LIGHTING_CONDITIONS_ASSESSMENT_HINT_DEBOUNCE_MILLIS_MAX,
+            )
+            ?: FACE_LIGHTING_CONDITIONS_ASSESSMENT_HINT_DEBOUNCE_MILLIS_DEFAULT
+
+    /** Minimum time between two lighting measurements; the last result is reused in between. */
+    val faceLightingConditionsAssessmentIntervalMillis: Long
+        get() = customConfig
+            ?.get(FACE_LIGHTING_CONDITIONS_ASSESSMENT_INTERVAL_MILLIS)
+            ?.jsonPrimitive
+            ?.longOrNull
+            ?.coerceIn(
+                FACE_LIGHTING_CONDITIONS_ASSESSMENT_INTERVAL_MILLIS_MIN,
+                FACE_LIGHTING_CONDITIONS_ASSESSMENT_INTERVAL_MILLIS_MAX,
+            )
+            ?: FACE_LIGHTING_CONDITIONS_ASSESSMENT_INTERVAL_MILLIS_DEFAULT
+
     val minimumFreeSpaceMb: Int
         get() = customConfig
             ?.get(MINIMUM_FREE_SPACE_MB)
@@ -355,6 +412,28 @@ data class ExperimentalProjectConfiguration(
         internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_DEFAULT = 6
         internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_MIN = 1
         internal const val MFID_LIGHTING_CONDITIONS_ASSESSMENT_GLARE_SENSITIVITY_MAX = 20
+
+        const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_MODE = "faceLightingConditionsAssessmentMode"
+
+        const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS = "faceLightingConditionsAssessmentLowBrightness"
+        const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_DEFAULT = 14 // about 35 of 255, from the ROC lighting test
+        internal const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_MIN = 0
+        internal const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_MAX = 50
+
+        const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST = "faceLightingConditionsAssessmentLowContrast"
+        const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST_DEFAULT = 100
+        internal const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST_MIN = 0
+        internal const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_CONTRAST_MAX = 100
+
+        const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_HINT_DEBOUNCE_MILLIS = "faceLightingConditionsAssessmentHintDebounceMillis"
+        const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_HINT_DEBOUNCE_MILLIS_DEFAULT = 500L
+        internal const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_HINT_DEBOUNCE_MILLIS_MIN = 0L
+        internal const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_HINT_DEBOUNCE_MILLIS_MAX = 5_000L
+
+        const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_INTERVAL_MILLIS = "faceLightingConditionsAssessmentIntervalMillis"
+        const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_INTERVAL_MILLIS_DEFAULT = 250L
+        internal const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_INTERVAL_MILLIS_MIN = 0L
+        internal const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_INTERVAL_MILLIS_MAX = 5_000L
 
         const val MINIMUM_FREE_SPACE_MB = "minimumFreeSpaceMb"
         const val MINIMUM_FREE_SPACE_MB_DEFAULT = 1024 // 1GB
