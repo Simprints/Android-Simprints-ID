@@ -322,6 +322,18 @@ class AutoCaptureAttemptStatsTest {
         }
     }
 
+    @Test
+    fun `lighting mode set after the attempt started is used for later frames`() {
+        record(FaceDetection.Status.NOFACE, atMs = 0, lighting = darkMeasurement())
+        stats.setLightingMode(LightingCheckMode.LOG)
+        record(FaceDetection.Status.NOFACE, atMs = 250, lighting = darkMeasurement())
+
+        with(stats.toEvent(Timestamp(START_MS + 300)).payload.lightingStats!!) {
+            assertThat(mode).isEqualTo(LightingCheckMode.LOG)
+            assertThat(framesMeasured).isEqualTo(1)
+        }
+    }
+
     private fun lightingStats(mode: LightingCheckMode) = AutoCaptureAttemptStats(
         attemptNb = 2,
         bioSdk = "RANK_ONE",

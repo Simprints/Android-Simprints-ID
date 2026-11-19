@@ -1132,6 +1132,31 @@ internal class LiveFeedbackViewModelTest {
     }
 
     @Test
+    fun `lighting - not measured in log mode with manual capture`() = runTest {
+        every { faceLightingCheck.mode } returns FaceLightingConditionsAssessmentMode.LOG
+        every { faceDetector.analyze(frame) } returns getFace()
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2)
+        viewModel.process(frame, frame)
+
+        verify(exactly = 0) { faceLightingCheck.measureIfDue(any(), any(), any()) }
+    }
+
+    @Test
+    fun `lighting - uses time since boot when available`() = runTest {
+        every { timeHelper.now() } returns Timestamp(ms = 5_000L, msSinceBoot = 70L)
+        every { faceDetector.analyze(frame) } returns getFace()
+
+        viewModel.initAutoCapture()
+        viewModel.initCapture(ModalitySdkType.SIM_FACE, 2)
+        viewModel.process(frame, frame)
+
+        verify { faceLightingCheck.measureIfDue(any(), any(), 70L) }
+        verify { faceLightingCheck.updateHint(any(), 70L) }
+    }
+
+    @Test
     fun `lighting - not measured while capturing`() = runTest {
         every { faceDetector.analyze(frame) } returns getFace()
 
