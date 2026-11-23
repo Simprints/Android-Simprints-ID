@@ -49,7 +49,7 @@ internal class ConnectivityManagerWrapperImplTest {
 
         every { connectivityManager.getNetworkCapabilities(any()) } returns networkCapabilities
         every { connectivityManager.activeNetwork } returns mockk()
-        every { connectivityManager.registerNetworkCallback(any(), capture(networkCallback)) } returns Unit
+        every { connectivityManager.registerDefaultNetworkCallback(capture(networkCallback)) } returns Unit
 
         connectivityManagerWrapper = ConnectivityManagerWrapper(context)
     }
@@ -100,7 +100,7 @@ internal class ConnectivityManagerWrapperImplTest {
 
         connectivityManagerWrapper.observeIsConnected().first()
 
-        verify { connectivityManager.registerNetworkCallback(any(), any<NetworkCallback>()) }
+        verify { connectivityManager.registerDefaultNetworkCallback(any<NetworkCallback>()) }
         verify { connectivityManager.unregisterNetworkCallback(any<NetworkCallback>()) }
     }
 
