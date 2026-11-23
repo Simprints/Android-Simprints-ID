@@ -46,7 +46,7 @@ firebase_perfPlugin_version = "2.0.2"
 
 retrofit_version = "3.0.0"
 okttp_version = "5.5.1"
-chuck_version = "4.3.1"
+chuck_version = "4.4.0"
 
 sqlCipher_version = "4.20.0"
 fuzzywuzzy_version = "1.4.0"
