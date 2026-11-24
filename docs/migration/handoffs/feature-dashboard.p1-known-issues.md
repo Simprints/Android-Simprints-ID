@@ -12,6 +12,14 @@ reproduced on a device.
 |------|-----------------------------------------------------------------|-------------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------|
 | KI-1 | `SyncInfoFragment` (main card, standalone screen, logout panel) | Re-login navigation is replayed to every newly created view | Keep; deliberate deviation from `viewmodel-udf.md` §5 | Make it a one-time `UiEffect`                   |
 | KI-2 | `SettingsFragment`                                              | "Last updated" summary is lost when the view is re-created  | Keep; the standard §5 mapping already preserves it    | Move it into `UiState`, formatted when rendered |
+| KI-3 | `SettingsFragment`                                              | App relaunch after a language change does not wait for the language to be saved | Keep the Fragment sequence; refresh runs in `launchWork` | Relaunch on an effect sent after the save |
+| KI-4 | `SyncInfoFragment` (all hosts; duplicates only on the logout panel) | Each stream restart re-runs the initial-sync decision and adds another image auto-start collector | Keep; same 5 s stop timeout and `onStart` hooks | Start the image collector once; decide whether the re-check is intended |
+| KI-5 | `RequestLoginFragment` (**unconfirmed**)                        | Logout-reason dialog may re-appear after returning from troubleshooting | No change (Fragment not refactored) | Confirm on a device, then decide "once per logout" |
+| KI-6 | `MainFragment`                                                  | A failing configuration read crashes the app and skips the root check | Keep; the base-class guard catches only cancellation | Run the root check independently; log the config failure |
+| KI-7 | `FingerSelectionFragment`                                       | An unknown finger type in the configuration crashes the list | Keep; unknown entries still reach the adapter | Skip unknown entries and log them |
+
+KI-3 to KI-7 were found while planning the Phase 1 refactor (`feature-dashboard.p1-architecture.md`, and audit proposals M-5 and FS-4)
+and added by human decision on 2026-11-24. All five are kept as they are in Phase 1, like KI-1 and KI-2.
 
 ---
 
@@ -157,3 +165,181 @@ Audit references: R-4 (c), §6.6, proposal ST-9.
 - **Tests:** change the parity test to "after re-creating the view, the last-updated text is still shown and reflects the current time".
 - **Phase 2:** the Compose Settings screen will need this value as state anyway, so the fix can also land as part of Phase 2 for
   Settings.
+
+---
+
+## KI-3: the app relaunches before the new language is saved
+
+Handoff references: AP-11, DV-3; audit R-5, proposals ST-3 and ST-6.
+
+### Current behaviour
+
+- `SettingsFragment.handleLanguageChange` calls `viewModel.updateLanguagePreference(code)`, writes the language summary, then relaunches
+  (`settings/SettingsFragment.kt:192-196`). The relaunch is `finishAffinity()`, `startActivity(DashboardActivity)` and
+  `overridePendingTransition(0, 0)` (`:198-202`).
+- `updateLanguagePreference` only launches a coroutine on `viewModelScope` (`settings/SettingsViewModel.kt:58-73`): it writes the device
+  configuration and tracks `DeviceConfigurationUpdatedEvent` inside the transform, then posts the language and logs.
+- Nothing makes the relaunch wait. Finishing the activity clears the Fragment's ViewModel, which cancels `viewModelScope`.
+
+### Risk
+
+- **Today (from reading the code, not reproduced):** if the write is slower than the activity teardown, the language change and its event
+  can be lost, or the new activity can start in the old language.
+- **During the refactor:** the save must still start immediately. If `LanguageSelected` were queued behind a long action (the
+  configuration refresh), it might never run before the ViewModel is cleared. Moving the relaunch behind the save would change timing
+  without a decision.
+
+### Phase 1 approach (keep as-is)
+
+- **Fragment:** same sequence: `onAction(LanguageSelected(code))`, write the summary for the selected code, relaunch.
+- **ViewModel:** `LanguageSelected` is handled in `handleAction` in today's order (write + event, then `languageCode` state, then
+  `Simber.i`). The configuration refresh runs in `launchWork`, so the queue is idle when the language is selected.
+- **Mark it:** `// Parity with legacy relaunch timing, see feature-dashboard.p1-known-issues.md KI-3` in the Fragment.
+- **Tests that pin it:** ST-3 (relaunch and summary), ST-6 (event tracked before the language output changes), N-4 (selection is not
+  blocked by an in-flight refresh).
+
+### Fix after Phase 1 (separate change)
+
+- **Relaunch after the save:** the ViewModel emits `RelaunchApp` once the write has finished; the Fragment relaunches on that effect.
+  Remove the immediate summary write.
+- **Failure:** decide what happens if the write fails (no relaunch plus an error, or relaunch anyway).
+- **Tests:** "relaunch happens only after the configuration write completes"; check on a device that the new language is applied.
+
+---
+
+## KI-4: each sync-info stream restart repeats the start-up checks
+
+Handoff references: AP-3, DV-6, test N-3; audit §6.5.
+
+### Current behaviour
+
+- `syncInfoLiveData` (`settings/syncinfo/SyncInfoViewModel.kt:83-139`) wraps the data-layer flow in
+  `onStart { startInitialSyncIfRequired(); syncImagesAfterEventsWhenRequired() }` (`:85-88`), shares it with `WhileSubscribed()`
+  (`:88-92`) and exposes it with `asLiveData(viewModelScope.coroutineContext)` (`:138`), whose default stop timeout is 5 s.
+- After 5 s or more without an active observer (app in background, host view stopped), the upstream stops; the next observer restarts it
+  and both `onStart` hooks run again.
+- `startInitialSyncIfRequired` (`:192-212`) re-decides the initial sync; in pre-logout mode it always restarts event sync.
+- `syncImagesAfterEventsWhenRequired` (`:214-227`) launches a new, never-ending collector each time. In pre-logout mode every collector
+  issues `OneTime.Images.start()` on its first value if events are already complete, and on every later completion transition.
+
+### Risk
+
+- **Today (not reproduced):** on the logout screen, every return from the background after 5 s restarts event sync and adds one more image
+  auto-start collector, so `Images.start()` is issued several times per completion. On the main card the initial-sync check simply runs
+  again on return, which may be intended.
+- **During the refactor:** changing the stop timeout, or moving the hooks to `init`, changes when the checks run.
+
+### Phase 1 approach (keep as-is)
+
+- **ViewModel:** two-stage `stateIn` (outer `WhileSubscribed(5_000)`, inner `WhileSubscribed()`), so the total stop delay stays 5 s. The
+  `onStart` hooks start through `launchWork` on each restart, as today.
+- **Mark it:** `// Parity with legacy restart behaviour, see feature-dashboard.p1-known-issues.md KI-4` at the hooks.
+- **Tests that pin it:** N-3 (a collector gap of 5 s or more re-runs the initial-sync decision and re-delivers the last state), S-1,
+  S-16 and the existing initial-sync tests.
+
+### Fix after Phase 1 (separate change)
+
+- **Image auto-start:** start the pre-logout image collector once per ViewModel (or keep its `Job` and skip if active).
+- **Initial sync:** decide whether re-checking on return is intended per host, and pin the decision.
+- **Tests:** "repeated restarts issue `Images.start()` once per completion transition".
+
+---
+
+## KI-5: the logout-reason dialog may re-appear after returning from troubleshooting (unconfirmed)
+
+Handoff references: D-9, BR-9, parity item PC-7; audit §6.9.
+
+### Current behaviour
+
+- `RequestLoginFragment.onViewCreated` sets `wasLogoutReasonDisplayed = savedInstanceState?.getBoolean(KEY_WAS_LOGOUT_REASON_DISPLAYED)
+  ?: false` (`requestlogin/RequestLoginFragment.kt:48`) and shows the dialog when a reason exists and the flag is false (`:52`). The flag
+  is saved in `onSaveInstanceState` (`:61-64`).
+- Ten logo taps open troubleshooting (`:54-58`). Coming back re-creates the view from the back stack. If `onViewCreated` then receives
+  `savedInstanceState == null`, the flag resets and the dialog is shown again.
+- **Unconfirmed:** whether saved state is passed on back-stack view re-creation depends on the AndroidX Fragment version. Not reproduced.
+
+### Risk
+
+- **Today:** cosmetic; the project-ending message may be shown twice.
+- **During the refactor:** none in Phase 1 (the Fragment is not changed). A later move of the flag into a ViewModel or `SavedStateHandle`
+  would change this behaviour either way without anyone noticing.
+
+### Phase 1 approach (keep as-is)
+
+- **No production change.** RL-1, RL-2 and RL-4 pin the dialog on first show and across `recreate()`.
+- **No unit test for the back-stack case:** the `TestNavHostController` setup does not re-create Fragment views. Confirm it on a device
+  (audit §9 flow 18) before Phase 2 planning.
+
+### Fix after Phase 1 (separate change)
+
+- **Confirm first**, then decide the intended rule (most likely "once per logout").
+- **Implement it** with the flag in a ViewModel `SavedStateHandle`, and add a test that navigates to troubleshooting and back.
+
+---
+
+## KI-6: a failing configuration read crashes the dashboard and skips the root check
+
+Audit references: §6.2, proposal M-5. Handoff references: PC-13, D-1.
+
+### Current behaviour
+
+- `MainViewModel.load()` launches on `viewModelScope` and calls `configRepository.getProjectConfiguration()` first, then
+  `checkIfDeviceIsSafe()` (`main/MainViewModel.kt:34-37`). There is no error handling around the configuration read.
+- `checkIfDeviceIsSafe()` catches only `RootedDeviceException` (`:39-44`).
+- If the configuration read throws (realistically a corrupt or undecryptable local DataStore; `ConfigRepositoryImpl` already catches
+  failures to refresh from the network), the exception escapes `viewModelScope.launch`, the app crashes, and the root check never runs.
+
+### Risk
+
+- **Today:** the security gate depends on the configuration load succeeding. A crash instead of a rooted-device overlay.
+- **During the refactor:** catching the exception, reordering the two calls, or running them in parallel would change behaviour without a
+  decision. The base-class guard (`mvi-base-classes.md` §3.3) catches only `CancellationException`, so it does not change this.
+
+### Phase 1 approach (keep as-is)
+
+- **ViewModel:** `MainUiAction.Load` keeps the order (consent read, then root check) and adds no error handling. The exception propagates
+  out of the action loop to `viewModelScope`, as it escapes `launch` today.
+- **Tests that pin it (M-5):** when `getProjectConfiguration()` throws, `checkIfDeviceIsRooted()` is never called,
+  `isRootedDeviceDetected` stays `false`, and the exception is not swallowed (it surfaces as an uncaught coroutine exception from the
+  ViewModel's creation in the test). Written before the refactor and kept after it.
+
+### Fix after Phase 1 (separate change)
+
+- **Decouple:** run the root check independently of the configuration load, so a configuration failure can never skip it.
+- **Log:** catch the configuration failure, log it through `Simber`, and decide what the privacy-notice item shows without a configuration.
+- **Tests:** flip M-5 to "configuration read throws → root check still runs and no crash".
+
+---
+
+## KI-7: an unknown finger type in the configuration crashes Finger selection
+
+Audit references: §6.8, proposal FS-4. Handoff references: PC-73.
+
+### Current behaviour
+
+- An unrecognised proto finger maps to `TemplateIdentifier.NONE`
+  (`infra/config-store/src/main/java/com/simprints/infra/config/store/local/models/Finger.kt:20`).
+- `FingerSelectionViewModel` copies the configured fingers into sections without filtering (`settings/fingerselection/
+  FingerSelectionViewModel.kt:21-48`).
+- `TemplateIdentifier.toString(context)` throws `IllegalArgumentException("Incorrect sample identifier")` for `NONE`
+  (`settings/fingerselection/FingerSelectionItemAdapter.kt:104`), called from the item view holder's `bind` (`:85-88`).
+- Result: Finger selection crashes while drawing its list if the configuration contains a finger type this app version does not know.
+
+### Risk
+
+- **Today:** a crash on a settings screen after a backend adds a new finger type.
+- **During the refactor:** the immutable aggregation could start filtering `NONE` "by accident", which would hide the crash without a
+  decision.
+
+### Phase 1 approach (keep as-is)
+
+- **ViewModel:** the aggregation keeps every configured entry, including `NONE`.
+- **Adapter:** `toString(context)` unchanged.
+- **Tests that pin it (FS-4):** the ViewModel keeps a `NONE` entry in its section; `TemplateIdentifier.NONE.toString(context)` throws
+  `IllegalArgumentException`.
+
+### Fix after Phase 1 (separate change)
+
+- **Skip and log:** drop unknown entries when building the sections and log them through `Simber`; make `toString` total or unreachable for
+  `NONE`.
+- **Tests:** flip FS-4 to "unknown entries are skipped and the list renders".
