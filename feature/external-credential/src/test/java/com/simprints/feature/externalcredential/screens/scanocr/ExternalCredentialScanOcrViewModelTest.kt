@@ -108,15 +108,6 @@ internal class ExternalCredentialScanOcrViewModelTest {
     }
 
     @Test
-    fun `imageProcessingStopped resets the flag for image processing`() = runTest {
-        viewModel.imageProcessingStarted()
-        assertThat(viewModel.isProcessingImage.value).isTrue()
-
-        viewModel.imageProcessingStopped()
-        assertThat(viewModel.isProcessingImage.value).isFalse()
-    }
-
-    @Test
     fun `processImage keeps ScanningInProgress before captures complete`() = runTest {
         val mockScannedDocument = mockk<ScannedMfidDocument> { every { source } returns ReadoutSource.TEXT_OCR }
         val mockCroppedBitmap = mockk<Bitmap>()
@@ -124,7 +115,6 @@ internal class ExternalCredentialScanOcrViewModelTest {
         coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
 
         val observer = viewModel.scanOcrStateLiveData.test()
-        viewModel.imageProcessingStarted()
         viewModel.startScanning()
         viewModel.processImage(frame)
 
@@ -394,28 +384,25 @@ internal class ExternalCredentialScanOcrViewModelTest {
     }
 
     @Test
-    fun `processImage ignores a frame whose scan returns after captures completed`() = runTest {
+    fun `processImage drops frames that arrive while a frame is being processed`() = runTest {
         val document = stubOcrDocument()
         val bitmap = mockk<Bitmap>()
         coEvery { frameCropToTargetUseCase(frame) } returns bitmap
         val gate = CompletableDeferred<Unit>()
-        var calls = 0
         coEvery { scanMfidDocumentUseCase(bitmap, documentType, any(), any()) } coAnswers {
-            // The first frame stays "inside" the scan until three other frames have completed the capture
-            if (calls++ == 0) gate.await()
+            gate.await()
             document
         }
 
-        val observer = viewModel.scanOcrStateLiveData.test()
         viewModel.startScanning()
         viewModel.processImage(frame)
-        repeat(3) { viewModel.processImage(frame) }
-        runCurrent()
+        assertThat(viewModel.isProcessingImage.value).isTrue()
+        repeat(2) { viewModel.processImage(frame) }
         gate.complete(Unit)
         runCurrent()
 
-        assertThat(observer.valueHistory().count { it == ScanOcrState.ScansProcessing }).isEqualTo(1)
-        coVerify(exactly = 1) { buildScannedCredentialResultUseCase(any(), any(), any()) }
+        coVerify(exactly = 1) { scanMfidDocumentUseCase(any(), any(), any(), any()) }
+        assertThat(viewModel.isProcessingImage.value).isFalse()
     }
 
     @Test

@@ -315,7 +315,6 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
 
                 launch {
                     cameraFrameProvider.frames.collect { frame ->
-                        viewModel.imageProcessingStarted()
                         viewModel.processImage(frame)
                     }
                 }

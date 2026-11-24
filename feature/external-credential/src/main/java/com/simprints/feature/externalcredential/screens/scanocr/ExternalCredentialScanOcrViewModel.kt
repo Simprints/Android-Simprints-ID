@@ -105,8 +105,9 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     }
 
     fun processImage(frame: Frame) {
+        if (isProcessingImage.value) return
+        imageProcessingStarted()
         viewModelScope.launch(bgDispatcher) {
-            imageProcessingStarted()
             try {
                 val isOcrAllowed = ocrState is ScanOcrState.ScanningInProgress
                 val isLightningAssessmentEnabled = lightingConditionsAssessmentConfig != null
@@ -131,7 +132,6 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
                     readFaydaBarcode = captureConfig.readFaydaBarcode,
                 ) ?: return@launch
                 Simber.d("Detected OCR")
-                // A frame already in flight may return after the capture has completed
                 if (ocrState !is ScanOcrState.ScanningInProgress) return@launch
                 captureState.add(scannedMfidDocument)
                 if (captureState.isComplete) onScansComplete()
@@ -144,16 +144,17 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
     private fun onScansComplete() {
         ocrState = ScanOcrState.ScansProcessing
         viewModelScope.launch {
-            ocrState = ScanOcrState.ScansReady(buildScannedCredentialResultUseCase(captureState.documents, ocrDocumentType, startTime))
+            val scanResults = buildScannedCredentialResultUseCase(captureState.documents, ocrDocumentType, startTime)
+            ocrState = ScanOcrState.ScansReady(scanResults)
         }
     }
 
-    suspend fun imageProcessingStarted() {
-        isProcessingImage.emit(true)
+    private fun imageProcessingStarted() {
+        isProcessingImage.value = true
     }
 
-    suspend fun imageProcessingStopped() {
-        isProcessingImage.emit(false)
+    private fun imageProcessingStopped() {
+        isProcessingImage.value = false
     }
 
     companion object {
