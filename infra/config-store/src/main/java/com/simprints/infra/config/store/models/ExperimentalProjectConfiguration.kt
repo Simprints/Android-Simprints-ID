@@ -434,7 +434,7 @@ data class ExperimentalProjectConfiguration(
         const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_MODE = "faceLightingConditionsAssessmentMode"
 
         const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS = "faceLightingConditionsAssessmentLowBrightness"
-        const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_DEFAULT = 14 // about 35 of 255, from the ROC lighting test
+        const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_DEFAULT = 18 // about 45 of 255: GG2 matching accuracy drops below this
         internal const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_MIN = 0
         internal const val FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS_MAX = 50
 

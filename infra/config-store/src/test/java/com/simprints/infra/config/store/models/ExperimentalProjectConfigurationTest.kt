@@ -563,8 +563,8 @@ internal class ExperimentalProjectConfigurationTest {
     fun `face lighting conditions assessment low brightness parsed correctly`() {
         val key = ExperimentalProjectConfiguration.FACE_LIGHTING_CONDITIONS_ASSESSMENT_LOW_BRIGHTNESS
         mapOf(
-            emptyMap<String, JsonElement>() to 14,
-            mapOf(key to JsonPrimitive(true)) to 14,
+            emptyMap<String, JsonElement>() to 18,
+            mapOf(key to JsonPrimitive(true)) to 18,
             mapOf(key to JsonPrimitive(-1)) to 0,
             mapOf(key to JsonPrimitive(51)) to 50,
             mapOf(key to JsonPrimitive(20)) to 20,

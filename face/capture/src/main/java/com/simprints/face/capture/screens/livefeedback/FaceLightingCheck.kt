@@ -16,8 +16,8 @@ import javax.inject.Inject
  *
  * Measures the face box, or the whole capture circle when no face is found, about every
  * [Settings.intervalMs] and reuses the last result in between, to keep the per-frame cost low.
- * Only a too-dark frame is reported: glare and too-bright checks give false alarms on faces,
- * and the face SDK copes with moderate darkness, failing only by not finding a very dark face.
+ * Only a too-dark frame is reported: glare and too-bright checks give false alarms on faces.
+ * Darkness is what hurts: the face SDK stops finding very dark faces, and darker captures match worse.
  *
  * Not thread-safe apart from [configure]: confine the other calls to the analyser executor.
  */

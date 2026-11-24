@@ -59,13 +59,13 @@ class FaceLightingCheckTest {
     }
 
     @Test
-    fun `too dark below the default 14 percent median brightness`() {
+    fun `too dark below the default 18 percent median brightness`() {
         check.configure(config(mode = "LOG", intervalMs = 0))
 
-        every { measureLightingStats(any(), any(), any()) } returns LightingStats(p5 = 0, median = 35, p95 = 200)
+        every { measureLightingStats(any(), any(), any()) } returns LightingStats(p5 = 0, median = 45, p95 = 200)
         assertThat(check.measureIfDue(bitmap, null, 0)?.isTooDark).isTrue()
 
-        every { measureLightingStats(any(), any(), any()) } returns LightingStats(p5 = 0, median = 36, p95 = 200)
+        every { measureLightingStats(any(), any(), any()) } returns LightingStats(p5 = 0, median = 46, p95 = 200)
         assertThat(check.measureIfDue(bitmap, null, 1)?.isTooDark).isFalse()
     }
 
