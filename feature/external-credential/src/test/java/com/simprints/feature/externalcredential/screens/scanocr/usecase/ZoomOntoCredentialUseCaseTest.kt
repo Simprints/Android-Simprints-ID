@@ -1,7 +1,6 @@
 package com.simprints.feature.externalcredential.screens.scanocr.usecase
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import com.google.common.truth.Truth.*
 import com.simprints.feature.externalcredential.model.BoundingBox
 import io.mockk.*
@@ -13,30 +12,27 @@ class ZoomOntoCredentialUseCaseTest {
     private lateinit var mockBitmap: Bitmap
     private val bitmapWidth = 1600
     private val bitmapHeight = 1000 // 16:10
-    private val imagePath = "path"
 
     @Before
     fun setUp() {
         useCase = ZoomOntoCredentialUseCase()
-        mockkStatic(BitmapFactory::class)
         mockBitmap = mockk {
             every { width } returns bitmapWidth
             every { height } returns bitmapHeight
         }
-        every { BitmapFactory.decodeFile(any()) } returns mockBitmap
     }
 
     @Test
     fun `returns original bitmap when bounding box has zero width`() {
         val boundingBox = BoundingBox(left = 100, top = 100, right = 100, bottom = 200)
-        val result = useCase(imagePath, boundingBox)
+        val result = useCase(mockBitmap, boundingBox)
         assertThat(result).isEqualTo(mockBitmap)
     }
 
     @Test
     fun `returns original bitmap when bounding box has zero height`() {
         val boundingBox = BoundingBox(left = 100, top = 100, right = 200, bottom = 100)
-        val result = useCase(imagePath, boundingBox)
+        val result = useCase(mockBitmap, boundingBox)
         assertThat(result).isEqualTo(mockBitmap)
     }
 
@@ -85,8 +81,8 @@ class ZoomOntoCredentialUseCaseTest {
             Bitmap.createBitmap(any<Bitmap>(), any(), any(), capture(capturedWidths), any())
         } returns mockk()
 
-        useCase(imagePath, boundingBox)
-        useCase(imagePath, boundingBox, isBarcode = true)
+        useCase(mockBitmap, boundingBox)
+        useCase(mockBitmap, boundingBox, isBarcode = true)
 
         val (defaultWidth, barcodeWidth) = capturedWidths
         assertThat(barcodeWidth).isGreaterThan(defaultWidth)
@@ -112,7 +108,7 @@ class ZoomOntoCredentialUseCaseTest {
                 capture(capturedHeight),
             )
         } returns croppedBitmap
-        useCase(imagePath, boundingBox)
+        useCase(mockBitmap, boundingBox)
 
         // Double checking that aspect ratio remains 16:10
         val aspectRatio = capturedWidth.captured.toFloat() / capturedHeight.captured.toFloat()
@@ -133,7 +129,7 @@ class ZoomOntoCredentialUseCaseTest {
             Bitmap.createBitmap(any<Bitmap>(), any(), any(), capture(capturedWidth), capture(capturedHeight))
         } returns croppedBitmap
 
-        useCase(imagePath, boundingBox)
+        useCase(mockBitmap, boundingBox)
         val aspectRatio = capturedWidth.captured.toFloat() / capturedHeight.captured.toFloat()
         assertThat(aspectRatio).isWithin(0.01f).of(1.6f)
     }
@@ -155,7 +151,7 @@ class ZoomOntoCredentialUseCaseTest {
             )
         } returns croppedBitmap
 
-        useCase(imagePath, boundingBox)
+        useCase(mockBitmap, boundingBox)
 
         // Crop area should stay within the bitmap boundaries
         assertThat(capturedLeft.captured).isAtLeast(0)

@@ -12,6 +12,7 @@ import com.simprints.infra.config.store.models.GhanaIdCardConfig
 import com.simprints.infra.config.store.models.MultiFactorIdConfiguration
 import com.simprints.infra.config.store.models.NhisCardConfig
 import com.simprints.infra.credential.store.CredentialImageRepository
+import com.simprints.infra.credential.store.model.CredentialScanImageType.FullDocument
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -42,10 +43,14 @@ internal class ScanMfidDocumentUseCaseTest {
     @MockK
     private lateinit var credentialImageRepository: CredentialImageRepository
 
+    @MockK
+    private lateinit var createAndSaveZoomedImageUseCase: CreateAndSaveZoomedImageUseCase
+
     private lateinit var useCase: ScanMfidDocumentUseCase
 
     private val bitmap = mockk<Bitmap>(relaxed = true)
     private val savedImagePath = "path/to/image.jpg"
+    private val zoomedImagePath = "path/to/zoomed.jpg"
     private val nhisConfig = MultiFactorIdConfiguration(
         allowedExternalCredentials = emptyList(),
         ghanaIdCardConfig = null,
@@ -85,8 +90,10 @@ internal class ScanMfidDocumentUseCaseTest {
             ghanaIdCardOcrReaderUseCase = ghanaIdCardOcrReaderUseCase,
             faydaCardOcrReaderUseCase = faydaCardOcrReaderUseCase,
             credentialImageRepository = credentialImageRepository,
+            createAndSaveZoomedImageUseCase = createAndSaveZoomedImageUseCase,
         )
         coEvery { credentialImageRepository.saveCredentialScan(any(), any()) } returns savedImagePath
+        coEvery { createAndSaveZoomedImageUseCase(any(), any(), any()) } returns zoomedImagePath
         every { readBarcodesFromImage(any()) } returns emptyList()
         every { faydaCardOcrReaderUseCase.fromBarcodes(any()) } returns null
     }
@@ -246,6 +253,42 @@ internal class ScanMfidDocumentUseCaseTest {
         val result = useCase(bitmap, OcrDocumentType.NhisCard, nhisConfig)
 
         assertThat(result?.imagePath).isEqualTo(savedImagePath)
+    }
+
+    @Test
+    fun `saves zoomed credential from the scanned bitmap`() = runTest {
+        val result = OcrScanResult.GhanaNhisCard(credential = ocrLine())
+        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
+        every { ghanaNhisCardOcrReaderUseCase(any(), any()) } returns result
+
+        val document = useCase(bitmap, OcrDocumentType.NhisCard, nhisConfig)
+
+        coVerify(exactly = 1) { createAndSaveZoomedImageUseCase(result.credential, bitmap, false) }
+        assertThat(document?.zoomedImagePath).isEqualTo(zoomedImagePath)
+    }
+
+    @Test
+    fun `passes barcode flag to zoom for barcode readouts`() = runTest {
+        val barcodes = listOf(ScannedBarcode(value = "1234567812345678", boundingBox = BoundingBox(0, 0, 10, 10)))
+        val barcodeResult = OcrScanResult.FaydaCard(credential = ocrLine(text = "1234567812345678"), isFromBarcode = true)
+        every { readBarcodesFromImage(bitmap) } returns barcodes
+        every { faydaCardOcrReaderUseCase.fromBarcodes(barcodes) } returns barcodeResult
+
+        useCase(bitmap, OcrDocumentType.FaydaCard, faydaConfig, readFaydaBarcode = true)
+
+        coVerify(exactly = 1) { createAndSaveZoomedImageUseCase(barcodeResult.credential, bitmap, true) }
+    }
+
+    @Test
+    fun `saves document when zoom fails`() = runTest {
+        coEvery { createAndSaveZoomedImageUseCase(any(), any(), any()) } returns null
+        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
+        every { ghanaNhisCardOcrReaderUseCase(any(), any()) } returns OcrScanResult.GhanaNhisCard(credential = ocrLine())
+
+        val document = useCase(bitmap, OcrDocumentType.NhisCard, nhisConfig)
+
+        assertThat(document?.imagePath).isEqualTo(savedImagePath)
+        assertThat(document?.zoomedImagePath).isNull()
     }
 
     @Test

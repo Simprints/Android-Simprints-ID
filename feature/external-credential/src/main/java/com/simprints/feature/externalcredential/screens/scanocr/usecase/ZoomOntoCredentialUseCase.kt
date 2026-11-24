@@ -1,7 +1,6 @@
 package com.simprints.feature.externalcredential.screens.scanocr.usecase
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import com.simprints.feature.externalcredential.model.BoundingBox
 import javax.inject.Inject
 import kotlin.math.max
@@ -11,18 +10,17 @@ internal class ZoomOntoCredentialUseCase @Inject constructor() {
     /**
      * Zooms into given image. Zoom area defined by the [boundingBox]
      *
-     * @param imagePath path to image containing the document to zoom into
+     * @param bitmap image containing the document to zoom into
      * @param boundingBox bounding box that defines the zoom area
      * @param isBarcode whether [boundingBox] is a barcode. Barcode boxes only cover the bars, so a wider margin is used to include
      * the human-readable number printed next to them, which can be wider than the barcode.
      * @return zoomed-in bitmap
      */
     operator fun invoke(
-        imagePath: String,
+        bitmap: Bitmap,
         boundingBox: BoundingBox,
         isBarcode: Boolean = false,
     ): Bitmap {
-        val bitmap = BitmapFactory.decodeFile(imagePath)
         val expandedBox = scaleBoundingBox(boundingBox, if (isBarcode) BARCODE_BOX_SCALE_FACTOR else BOX_SCALE_FACTOR)
 
         val left = expandedBox.left.coerceIn(0, bitmap.width)

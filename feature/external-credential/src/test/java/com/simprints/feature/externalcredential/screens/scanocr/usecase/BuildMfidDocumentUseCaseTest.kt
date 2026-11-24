@@ -258,6 +258,7 @@ internal class BuildMfidDocumentUseCaseTest {
         isFromBarcode: Boolean = false,
     ) = ScannedMfidDocument(
         imagePath = "path/to/image.jpg",
+        zoomedImagePath = null,
         ocrScanResult = OcrScanResult.FaydaCard(
             credential = ocrLine(credential),
             isFromBarcode = isFromBarcode,
@@ -280,6 +281,7 @@ internal class BuildMfidDocumentUseCaseTest {
         dateOfIssue: String? = null,
     ) = ScannedMfidDocument(
         imagePath = "path/to/image.jpg",
+        zoomedImagePath = null,
         ocrScanResult = OcrScanResult.GhanaNhisCard(
             credential = ocrLine(credential),
             name = name?.let { ocrLine(it) },
@@ -302,6 +304,7 @@ internal class BuildMfidDocumentUseCaseTest {
         dateOfExpiry: String? = null,
     ) = ScannedMfidDocument(
         imagePath = "path/to/image.jpg",
+        zoomedImagePath = null,
         ocrScanResult = OcrScanResult.GhanaIdCard(
             credential = ocrLine(credential),
             surname = surname?.let { ocrLine(it) },

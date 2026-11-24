@@ -138,18 +138,6 @@ internal class ExperimentalProjectConfigurationTest {
     }
 
     @Test
-    fun `check ocr keep high res detail flag correctly`() {
-        mapOf(
-            emptyMap<String, JsonElement>() to true,
-            mapOf(ExperimentalProjectConfiguration.OCR_KEEP_HIGH_RES_DETAIL to JsonPrimitive(1)) to true,
-            mapOf(ExperimentalProjectConfiguration.OCR_KEEP_HIGH_RES_DETAIL to JsonPrimitive(false)) to false,
-            mapOf(ExperimentalProjectConfiguration.OCR_KEEP_HIGH_RES_DETAIL to JsonPrimitive(true)) to true,
-        ).forEach { (config, result) ->
-            assertThat(ExperimentalProjectConfiguration(config).ocrKeepHighResDetail).isEqualTo(result)
-        }
-    }
-
-    @Test
     fun `check ocr captures value correctly`() {
         val expectedOcrCaptures = 10
         mapOf(

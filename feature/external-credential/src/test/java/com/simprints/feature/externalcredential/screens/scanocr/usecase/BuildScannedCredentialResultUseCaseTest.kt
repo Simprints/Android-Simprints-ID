@@ -10,7 +10,6 @@ import com.simprints.feature.externalcredential.screens.scanocr.model.ScannedMfi
 import com.simprints.feature.externalcredential.screens.scanocr.reader.OcrLine
 import com.simprints.feature.externalcredential.screens.search.model.MfidDocument
 import io.mockk.MockKAnnotations
-import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -22,9 +21,6 @@ import org.junit.Test
 internal class BuildScannedCredentialResultUseCaseTest {
     @MockK
     private lateinit var buildMfidDocumentUseCase: BuildMfidDocumentUseCase
-
-    @MockK
-    private lateinit var createAndSaveZoomedImageUseCase: CreateAndSaveZoomedImageUseCase
 
     @MockK
     private lateinit var timeHelper: TimeHelper
@@ -41,11 +37,9 @@ internal class BuildScannedCredentialResultUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
         useCase = BuildScannedCredentialResultUseCase(
             buildMfidDocumentUseCase = buildMfidDocumentUseCase,
-            createAndSaveZoomedImageUseCase = createAndSaveZoomedImageUseCase,
             timeHelper = timeHelper,
         )
         every { timeHelper.now() } returns endTime
-        coEvery { createAndSaveZoomedImageUseCase(any(), any()) } returns zoomedImagePath
         every { buildMfidDocumentUseCase(any(), any()) } returns mockk<MfidDocument.GhanaNhisCard>(relaxed = true)
     }
 
@@ -93,33 +87,12 @@ internal class BuildScannedCredentialResultUseCaseTest {
     }
 
     @Test
-    fun `zoomed image is created using last document credential and image path`() = runTest {
-        val lastFile = "last.jpg"
-        val firstDocument = nhisScannedDocument(imagePath = "first.jpg")
-        val lastDocument = nhisScannedDocument(imagePath = lastFile)
+    fun `result zoomed image path is taken from last scanned document`() = runTest {
+        val firstDocument = nhisScannedDocument(zoomedImagePath = "first_zoom.jpg")
+        val lastDocument = nhisScannedDocument(zoomedImagePath = zoomedImagePath)
 
-        useCase(listOf(firstDocument, lastDocument), OcrDocumentType.NhisCard, startTime)
+        val result = useCase(listOf(firstDocument, lastDocument), OcrDocumentType.NhisCard, startTime)
 
-        coVerify { createAndSaveZoomedImageUseCase(lastDocument.ocrScanResult.credential, lastFile) }
-    }
-
-    @Test
-    fun `zoomed image uses barcode margin when last document was read from a barcode`() = runTest {
-        val lastFile = "last.jpg"
-        val barcodeDocument = ScannedMfidDocument(
-            imagePath = lastFile,
-            ocrScanResult = OcrScanResult.FaydaCard(credential = ocrLine("1234567812345678", null), isFromBarcode = true),
-        )
-
-        useCase(listOf(nhisScannedDocument(imagePath = "first.jpg"), barcodeDocument), OcrDocumentType.FaydaCard, startTime)
-
-        coVerify { createAndSaveZoomedImageUseCase(barcodeDocument.ocrScanResult.credential, lastFile, isBarcode = true) }
-    }
-
-    @Test
-    fun `result zoomed image path comes from createAndSaveZoomedImageUseCase`() = runTest {
-        val documents = listOf(nhisScannedDocument())
-        val result = useCase(documents, OcrDocumentType.NhisCard, startTime)
         assertThat(result.zoomedCredentialImagePath).isEqualTo(zoomedImagePath)
     }
 
@@ -134,9 +107,8 @@ internal class BuildScannedCredentialResultUseCaseTest {
     }
 
     @Test
-    fun `result zoomed image path is null when createAndSaveZoomedImageUseCase returns null`() = runTest {
-        coEvery { createAndSaveZoomedImageUseCase(any(), any()) } returns null
-        val documents = listOf(nhisScannedDocument())
+    fun `result zoomed image path is null when last scanned document has none`() = runTest {
+        val documents = listOf(nhisScannedDocument(zoomedImagePath = null))
 
         val result = useCase(documents, OcrDocumentType.NhisCard, startTime)
 
@@ -156,10 +128,12 @@ internal class BuildScannedCredentialResultUseCaseTest {
 
     private fun nhisScannedDocument(
         imagePath: String = documentImagePath,
+        zoomedImagePath: String? = this.zoomedImagePath,
         credential: String = "12345678",
         credentialBlockBoundingBox: BoundingBox? = null,
     ) = ScannedMfidDocument(
         imagePath = imagePath,
+        zoomedImagePath = zoomedImagePath,
         ocrScanResult = OcrScanResult.GhanaNhisCard(
             credential = ocrLine(credential, credentialBlockBoundingBox),
         ),

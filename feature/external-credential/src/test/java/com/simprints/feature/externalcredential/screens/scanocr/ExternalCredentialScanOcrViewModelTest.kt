@@ -388,6 +388,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
     fun `processImage completes capture after a single Fayda barcode readout`() = runTest {
         val barcodeDocument = ScannedMfidDocument(
             imagePath = "path",
+            zoomedImagePath = null,
             ocrScanResult = OcrScanResult.FaydaCard(credential = mockk(), isFromBarcode = true),
         )
         val mockCroppedBitmap = mockk<Bitmap>()
@@ -417,6 +418,7 @@ internal class ExternalCredentialScanOcrViewModelTest {
     fun `processImage requires all captures for Fayda OCR readouts when barcode reading is enabled`() = runTest {
         val ocrDocument = ScannedMfidDocument(
             imagePath = "path",
+            zoomedImagePath = null,
             ocrScanResult = OcrScanResult.FaydaCard(credential = mockk(), isFromBarcode = false),
         )
         val mockCroppedBitmap = mockk<Bitmap>()

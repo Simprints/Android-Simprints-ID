@@ -9,7 +9,8 @@ import kotlinx.serialization.Serializable
  * Result of the OCR scan for the supported credential document. Its subclasses define the currently-supported document types with their
  * respective non-credential fields.
  *
- * @param imagePath path to full-res bitmap that was used for the OCR
+ * @param imagePath path to the document image, the same full-res bitmap that was used for the OCR
+ * @param zoomedImagePath path to the credential crop taken from the full-res OCR bitmap, null if the crop failed
  * @param ocrScanResult detected blocks for the external credential
  */
 
@@ -19,6 +20,7 @@ import kotlinx.serialization.Serializable
 @ExcludedFromGeneratedTestCoverageReports("Data class")
 internal data class ScannedMfidDocument(
     val imagePath: String,
+    val zoomedImagePath: String?,
     val ocrScanResult: OcrScanResult,
 ) {
     val type: OcrDocumentType

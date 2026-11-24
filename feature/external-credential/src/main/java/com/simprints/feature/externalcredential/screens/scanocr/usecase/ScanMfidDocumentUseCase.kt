@@ -2,6 +2,7 @@ package com.simprints.feature.externalcredential.screens.scanocr.usecase
 
 import android.graphics.Bitmap
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
+import com.simprints.feature.externalcredential.screens.scanocr.model.OcrScanResult
 import com.simprints.feature.externalcredential.screens.scanocr.model.ScannedMfidDocument
 import com.simprints.feature.externalcredential.screens.scanocr.reader.OcrReader
 import com.simprints.infra.config.store.models.MultiFactorIdConfiguration
@@ -20,6 +21,7 @@ internal class ScanMfidDocumentUseCase @Inject constructor(
     private val ghanaIdCardOcrReaderUseCase: GhanaIdCardOcrReaderUseCase,
     private val faydaCardOcrReaderUseCase: FaydaCardOcrReaderUseCase,
     private val credentialImageRepository: CredentialImageRepository,
+    private val createAndSaveZoomedImageUseCase: CreateAndSaveZoomedImageUseCase,
 ) {
     suspend operator fun invoke(
         bitmap: Bitmap,
@@ -36,8 +38,7 @@ internal class ScanMfidDocumentUseCase @Inject constructor(
             if (readFaydaBarcode && documentType == OcrDocumentType.FaydaCard) {
                 // Fayda cards carry the FAN in a barcode, which reads faster and more reliably than the printed number
                 faydaCardOcrReaderUseCase.fromBarcodes(readBarcodesFromImage(bitmap))?.let { scanResult ->
-                    val savedImagePath = credentialImageRepository.saveCredentialScan(bitmap, imageType = FullDocument)
-                    return ScannedMfidDocument(savedImagePath, scanResult)
+                    return save(bitmap, scanResult, isBarcode = true)
                 }
             }
             val ocrText = readTextFromImage(bitmap) ?: return null
@@ -47,15 +48,20 @@ internal class ScanMfidDocumentUseCase @Inject constructor(
                 OcrDocumentType.GhanaIdCard -> ghanaIdCardOcrReaderUseCase(ocrReader, isCapturingAllFields)
                 OcrDocumentType.FaydaCard -> faydaCardOcrReaderUseCase(ocrReader)
             }
-            if (scanResult != null) {
-                val savedImagePath = credentialImageRepository.saveCredentialScan(bitmap, imageType = FullDocument)
-                ScannedMfidDocument(savedImagePath, scanResult)
-            } else {
-                null
-            }
+            scanResult?.let { save(bitmap, it, isBarcode = false) }
         } catch (e: Exception) {
             Simber.e("OCR failed for $documentType", e, tag = MULTI_FACTOR_ID)
             null
         }
+    }
+
+    private suspend fun save(
+        bitmap: Bitmap,
+        scanResult: OcrScanResult,
+        isBarcode: Boolean,
+    ): ScannedMfidDocument {
+        val zoomedImagePath = createAndSaveZoomedImageUseCase(scanResult.credential, bitmap, isBarcode)
+        val imagePath = credentialImageRepository.saveCredentialScan(bitmap, imageType = FullDocument)
+        return ScannedMfidDocument(imagePath, zoomedImagePath, scanResult)
     }
 }

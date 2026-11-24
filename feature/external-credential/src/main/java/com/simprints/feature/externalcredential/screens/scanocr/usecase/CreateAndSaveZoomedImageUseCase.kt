@@ -1,5 +1,6 @@
 package com.simprints.feature.externalcredential.screens.scanocr.usecase
 
+import android.graphics.Bitmap
 import com.simprints.feature.externalcredential.screens.scanocr.reader.OcrLine
 import com.simprints.infra.credential.store.CredentialImageRepository
 import com.simprints.infra.credential.store.model.CredentialScanImageType.ZoomedInCredential
@@ -13,16 +14,16 @@ internal class CreateAndSaveZoomedImageUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         ocrLine: OcrLine,
-        fullSizeImagePath: String,
+        bitmap: Bitmap,
         isBarcode: Boolean = false,
     ) = try {
         credentialImageRepository.saveCredentialScan(
-            bitmap = zoomOntoCredentialUseCase(fullSizeImagePath, ocrLine.blockBoundingBox, isBarcode),
+            bitmap = zoomOntoCredentialUseCase(bitmap, ocrLine.blockBoundingBox, isBarcode),
             imageType = ZoomedInCredential,
         )
     } catch (e: Exception) {
         Simber.e(
-            "Unable to zoom into bounding box [${ocrLine.blockBoundingBox}] image $fullSizeImagePath",
+            "Unable to zoom into bounding box [${ocrLine.blockBoundingBox}]",
             e,
             MULTI_FACTOR_ID,
         )

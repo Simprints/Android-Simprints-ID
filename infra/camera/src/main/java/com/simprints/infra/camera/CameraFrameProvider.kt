@@ -26,7 +26,7 @@ import com.simprints.core.tools.extensions.clone
 import com.simprints.infra.camera.helpers.CameraFocusHelper
 import com.simprints.infra.camera.helpers.FrameEmissionHelper
 import com.simprints.infra.camera.usecase.FramePreProcessUseCase
-import com.simprints.infra.camera.usecase.NormalizeHighResBitmapToPreviewUseCase
+import com.simprints.infra.camera.usecase.DecodeTargetFromPhotoUseCase
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -45,7 +45,7 @@ class CameraFrameProvider @Inject internal constructor(
     @DispatcherBG private val bgDispatcher: CoroutineDispatcher,
     @DispatcherMain private val mainDispatcher: CoroutineDispatcher,
     private val cameraFocusManagerFactory: CameraFocusHelper.Factory,
-    private val normalizeHighResBitmapToPreviewUseCase: NormalizeHighResBitmapToPreviewUseCase,
+    private val decodeTargetFromPhotoUseCase: DecodeTargetFromPhotoUseCase,
     private val framePreProcessUseCase: FramePreProcessUseCase,
 ) {
     private var executor: ExecutorService = Executors.newSingleThreadExecutor()
@@ -70,11 +70,6 @@ class CameraFrameProvider @Inject internal constructor(
 
     private val frameEmissionHelper = FrameEmissionHelper()
 
-    // When true, high-resolution captures are not scaled down to the preview size.
-    // Set on the background dispatcher during initialisation and read on the camera executor.
-    @Volatile
-    private var keepHighResolutionDetail = false
-
     fun isInitialised() = camera != null
 
     /**
@@ -93,10 +88,8 @@ class CameraFrameProvider @Inject internal constructor(
         cameraPreviewView: CameraPreviewView,
         target: Rect? = null,
         highResolution: Boolean = false,
-        keepHighResolutionDetail: Boolean = false,
         onError: (Throwable) -> Unit = {},
     ) = withContext(bgDispatcher) {
-        this@CameraFrameProvider.keepHighResolutionDetail = keepHighResolutionDetail
         val previewView = cameraPreviewView.previewView
         try {
             previewRect = fullPreviewSizeRect(previewView)
@@ -223,7 +216,6 @@ class CameraFrameProvider @Inject internal constructor(
         imageCapture = null
         camera = null
         frameEmissionHelper.reset()
-        keepHighResolutionDetail = false
 
         if (!executor.isShutdown) executor.shutdown()
     }
@@ -237,6 +229,8 @@ class CameraFrameProvider @Inject internal constructor(
     private fun emitFrame(
         bitmap: Bitmap,
         rotation: Int,
+        previewRect: Rect = this.previewRect,
+        targetRect: Rect = this.targetRect,
     ) {
         val frame = framePreProcessUseCase(
             bitmap = bitmap,
@@ -275,23 +269,13 @@ class CameraFrameProvider @Inject internal constructor(
                 object : ImageCapture.OnImageCapturedCallback() {
                     override fun onCaptureSuccess(imageProxy: ImageProxy) {
                         val shouldEmitFrame = frameEmissionHelper.completeHighResolutionCapture()
-                        imageProxy.use { capturedFrame ->
-                            val rotationDegrees = capturedFrame.imageInfo.rotationDegrees
-                            val previewViewWidth = previewRect.width()
-                            val previewViewHeight = previewRect.height()
-
-                            if (shouldEmitFrame) {
-                                emitFrame(
-                                    normalizeHighResBitmapToPreviewUseCase(
-                                        capturedFrame.toBitmap(),
-                                        rotationDegrees,
-                                        previewViewWidth,
-                                        previewViewHeight,
-                                        scaleToPreview = !keepHighResolutionDetail,
-                                    ),
-                                    rotationDegrees,
-                                )
-                            }
+                        imageProxy.use { photo ->
+                            if (!shouldEmitFrame) return
+                            val jpeg = photo.planes[0].buffer.let { buffer -> ByteArray(buffer.remaining()).also(buffer::get) }
+                            val window = decodeTargetFromPhotoUseCase(jpeg, photo.imageInfo.rotationDegrees, previewRect, targetRect)
+                            // The window is already upright and is the whole frame, so a consumer's crop to target is a no-op
+                            val windowRect = Rect(0, 0, window.width, window.height)
+                            emitFrame(window, rotation = 0, previewRect = windowRect, targetRect = windowRect)
                         }
                     }
 
