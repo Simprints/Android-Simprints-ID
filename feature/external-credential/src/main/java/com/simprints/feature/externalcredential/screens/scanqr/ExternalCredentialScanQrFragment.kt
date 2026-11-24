@@ -23,6 +23,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.extensions.getCurrentPermissionStatus
+import com.simprints.core.tools.extensions.hasCameraFlash
 import com.simprints.core.tools.extensions.hasPermission
 import com.simprints.core.tools.extensions.permissionFromResult
 import com.simprints.feature.externalcredential.R
@@ -57,6 +58,9 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
 
     private val cameraInitLock = Mutex()
 
+    private val hasCameraFlash: Boolean
+        get() = requireContext().hasCameraFlash
+
     @Inject
     lateinit var cameraFrameProvider: CameraFrameProvider
 
@@ -85,6 +89,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
         Simber.i("ExternalCredentialScanQrFragment started", tag = MULTI_FACTOR_ID)
 
         initObservers()
+        setUpTorchButton()
         startAnalyzer()
 
         if (!requireActivity().hasPermission(CAMERA)) {
@@ -98,10 +103,26 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
         viewModel.updateCameraPermissionStatus(cameraPermissionStatus)
     }
 
+    override fun onPause() {
+        toggleTorch(false)
+        super.onPause()
+    }
+
     override fun onDestroyView() {
         dismissDialog()
         cameraFrameProvider.release()
         super.onDestroyView()
+    }
+
+    private fun setUpTorchButton() = with(binding.torchButton) {
+        isVisible = hasCameraFlash
+        isSelected = false
+        setOnClickListener { toggleTorch(!isSelected) }
+    }
+
+    private fun toggleTorch(enabled: Boolean) {
+        cameraFrameProvider.setTorchEnabled(enabled)
+        binding.torchButton.isSelected = enabled
     }
 
     private fun dismissDialog() {
@@ -136,6 +157,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
         qrInstructionsText.isVisible = true
         qrInstructionsText.text = getString(IDR.string.mfid_scan_instructions, getString(IDR.string.mfid_type_qr_code))
         qrPreviewCard.isVisible = false
+        torchButton.isVisible = hasCameraFlash
         buttonScan.setText(IDR.string.mfid_qr_scan_no_qr_detected)
         buttonScan.isVisible = true
         buttonScan.isEnabled = false
@@ -231,6 +253,7 @@ internal class ExternalCredentialScanQrFragment : Fragment(R.layout.fragment_ext
     private fun renderNoPermission(shouldOpenPhoneSettings: Boolean) = with(binding) {
         qrInstructionsText.isVisible = false
         buttonScan.isVisible = false
+        torchButton.isVisible = false
         val bodyText = getString(IDR.string.mfid_scan_camera_permission_body, getString(IDR.string.mfid_type_qr_code))
         if (shouldOpenPhoneSettings) {
             permissionRequestView.init(

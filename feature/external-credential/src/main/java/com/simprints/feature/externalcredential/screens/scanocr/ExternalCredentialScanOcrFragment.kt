@@ -26,6 +26,7 @@ import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.extensions.getCurrentPermissionStatus
+import com.simprints.core.tools.extensions.hasCameraFlash
 import com.simprints.core.tools.extensions.permissionFromResult
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialScanOcrBinding
@@ -82,6 +83,8 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     private var pendingFinishAction: (() -> Unit)? = null
 
     private val cameraInitLock = Mutex()
+    private val hasCameraFlash: Boolean
+        get() = requireContext().hasCameraFlash
 
     @Inject
     lateinit var cameraFrameProvider: CameraFrameProvider
@@ -104,6 +107,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         applySystemBarInsets(view)
 
         initObservers()
+        setUpTorchButton()
         setUpFrameProcessing()
         Simber.i("ExternalCredentialScanOcrFragment started", tag = MULTI_FACTOR_ID)
     }
@@ -120,10 +124,26 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         }
     }
 
+    override fun onPause() {
+        toggleTorch(false)
+        super.onPause()
+    }
+
     override fun onDestroyView() {
         stopCamera()
         clearAnimations()
         super.onDestroyView()
+    }
+
+    private fun setUpTorchButton() = with(binding.torchButton) {
+        isVisible = hasCameraFlash
+        isSelected = false
+        setOnClickListener { toggleTorch(!isSelected) }
+    }
+
+    private fun toggleTorch(enabled: Boolean) {
+        cameraFrameProvider.setTorchEnabled(enabled)
+        binding.torchButton.isSelected = enabled
     }
 
     private fun clearAnimations() {
@@ -214,6 +234,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         progressContainer.isVisible = true
         captureProgress.isVisible = true
         documentScannerArea.isVisible = true
+        torchButton.isVisible = hasCameraFlash
         iconScanComplete.alpha = 0f
         instructionsText.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_black))
         viewfinderMask.maskColor = ContextCompat.getColor(requireContext(), IDR.color.simprints_white)
@@ -231,6 +252,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         instructionsText.text = getString(IDR.string.mfid_scan_instructions, documentTypeText)
         instructionsText.setTextColor(ContextCompat.getColor(requireContext(), IDR.color.simprints_text_white))
         documentScannerArea.isVisible = true
+        torchButton.isVisible = hasCameraFlash
         progressContainer.isInvisible = true
         buttonScan.isVisible = true
         buttonScan.setOnClickListener {
@@ -271,6 +293,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
             instructionsText.isVisible = false
             progressContainer.isInvisible = true
             documentScannerArea.isInvisible = true
+            torchButton.isVisible = false
             scanHint.isInvisible = true
             buttonScan.isVisible = false
             val documentTypeText = viewModel.getDocumentTypeRes().run(::getString)
