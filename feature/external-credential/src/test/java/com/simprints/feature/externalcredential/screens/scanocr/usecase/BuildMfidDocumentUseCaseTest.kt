@@ -5,6 +5,7 @@ import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.externalcredential.model.BoundingBox
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrScanResult
+import com.simprints.feature.externalcredential.screens.scanocr.model.ReadoutSource
 import com.simprints.feature.externalcredential.screens.scanocr.model.ScannedMfidDocument
 import com.simprints.feature.externalcredential.screens.scanocr.reader.OcrLine
 import com.simprints.feature.externalcredential.screens.search.model.MfidDocument
@@ -191,7 +192,7 @@ internal class BuildMfidDocumentUseCaseTest {
     fun `uses only barcode readouts for FaydaCard when available`() {
         val documents = listOf(
             faydaScannedDocument(credential = "8642370540168184"),
-            faydaScannedDocument(credential = "8642370540168134", isFromBarcode = true),
+            faydaScannedDocument(credential = "8642370540168134", source = ReadoutSource.BARCODE),
             faydaScannedDocument(credential = "8642370540168184"),
         )
         val result = useCase(documents, OcrDocumentType.FaydaCard) as MfidDocument.FaydaCard
@@ -201,7 +202,7 @@ internal class BuildMfidDocumentUseCaseTest {
 
     @Test
     fun `uses barcode readout as-is for FaydaCard`() {
-        val documents = listOf(faydaScannedDocument(credential = "2580945924815610", isFromBarcode = true))
+        val documents = listOf(faydaScannedDocument(credential = "2580945924815610", source = ReadoutSource.BARCODE))
         val result = useCase(documents, OcrDocumentType.FaydaCard) as MfidDocument.FaydaCard
         assertThat(result.credential).isEqualTo("2580945924815610".asTokenizableRaw())
         verify(exactly = 0) { getBestReadout(any(), any()) }
@@ -255,13 +256,11 @@ internal class BuildMfidDocumentUseCaseTest {
 
     private fun faydaScannedDocument(
         credential: String = "1234567812345678",
-        isFromBarcode: Boolean = false,
+        source: ReadoutSource = ReadoutSource.TEXT_OCR,
     ) = ScannedMfidDocument(
         imagePath = "path/to/image.jpg",
-        ocrScanResult = OcrScanResult.FaydaCard(
-            credential = ocrLine(credential),
-            isFromBarcode = isFromBarcode,
-        ),
+        ocrScanResult = OcrScanResult.FaydaCard(credential = ocrLine(credential)),
+        source = source,
     )
 
     private fun ocrLine(text: String) = OcrLine(
@@ -287,6 +286,7 @@ internal class BuildMfidDocumentUseCaseTest {
             sex = sex?.let { ocrLine(it) },
             dateOfIssue = dateOfIssue?.let { ocrLine(it) },
         ),
+        source = ReadoutSource.TEXT_OCR,
     )
 
     private fun ghanaIdScannedDocument(
@@ -314,6 +314,7 @@ internal class BuildMfidDocumentUseCaseTest {
             dateOfIssue = dateOfIssue?.let { ocrLine(it) },
             dateOfExpiry = dateOfExpiry?.let { ocrLine(it) },
         ),
+        source = ReadoutSource.TEXT_OCR,
     )
 
     companion object {

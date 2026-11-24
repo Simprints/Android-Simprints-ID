@@ -20,11 +20,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.withStarted
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.permission.PermissionStatus
-import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.extensions.getCurrentPermissionStatus
 import com.simprints.core.tools.extensions.permissionFromResult
 import com.simprints.feature.externalcredential.R
@@ -152,31 +152,15 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
 
         viewModel.scanOcrStateLiveData.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is ScanOcrState.ScanningInProgress -> {
-                    renderProgress(state)
-                    if (state.successfulCaptures >= state.scansRequired) {
-                        // Animate progress bar to go to 100%, and then finish the flow
-                        binding.captureProgress.setProgressAnimated(
-                            100,
-                            durationMs = PROGRESS_FINISH_REMAINING_MS,
-                            onComplete = { viewModel.processOcrResultsAndFinish() },
-                            interpolator = AccelerateInterpolator(),
-                        )
-                    }
-                }
-
                 ScanOcrState.NotScanning -> renderInitialState()
-                ScanOcrState.Complete -> animateCompletionState()
+                is ScanOcrState.ScanningInProgress -> renderProgress(state)
+                ScanOcrState.ScansProcessing -> animateCompletionState()
+                is ScanOcrState.ScansReady -> {
+                    mainViewModel.addCaptureAttempt(state.result)
+                    scheduleFinish(state.result)
+                }
             }
         }
-
-        viewModel.finishOcrEvent.observe(
-            viewLifecycleOwner,
-            LiveDataEventWithContentObserver { scannedCredential ->
-                mainViewModel.addCaptureAttempt(scannedCredential)
-                scheduleFinish(scannedCredential)
-            },
-        )
     }
 
     private suspend fun initCamera(ocrConfig: OcrConfig) {
@@ -206,7 +190,7 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
         if (!captureProgress.isAnimating) {
             captureProgress.setProgressAnimated(
                 95,
-                durationMs = PROGRESS_ONE_SEGMENT_MS * state.scansRequired,
+                durationMs = PROGRESS_ONE_SEGMENT_MS * state.maxScansRequired,
                 interpolator = DecelerateInterpolator(),
             )
         }
@@ -245,24 +229,36 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
 
     private fun animateCompletionState() = with(binding) {
         isAnimatingCompletion = true
-        val finalVisibility = View.INVISIBLE
-        captureProgress.fadeOut(
-            FINISH_ANIMATION_DURATION,
-            fragment = this@ExternalCredentialScanOcrFragment,
-            finalVisibility = finalVisibility,
+        // Animate progress bar to go to 100%, then fade to the completion icon
+        captureProgress.setProgressAnimated(
+            100,
+            durationMs = PROGRESS_FINISH_REMAINING_MS,
+            interpolator = AccelerateInterpolator(),
+            onComplete = {
+                val finalVisibility = View.INVISIBLE
+                captureProgress.fadeOut(
+                    FINISH_ANIMATION_DURATION,
+                    fragment = this@ExternalCredentialScanOcrFragment,
+                    finalVisibility = finalVisibility,
+                )
+                scanInstructions.fadeOut(
+                    FINISH_ANIMATION_DURATION,
+                    fragment = this@ExternalCredentialScanOcrFragment,
+                    finalVisibility = finalVisibility,
+                )
+                iconScanComplete.fadeIn(FINISH_ANIMATION_DURATION, fragment = this@ExternalCredentialScanOcrFragment, onComplete = {
+                    isAnimatingCompletion = false
+                    // Execute any pending action after the animation. Currently used is for next fragment navigation
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        viewLifecycleOwner.withStarted {
+                            pendingFinishAction?.invoke()
+                            pendingFinishAction = null
+                        }
+                    }
+                })
+                scanHint.isInvisible = true
+            },
         )
-        scanInstructions.fadeOut(
-            FINISH_ANIMATION_DURATION,
-            fragment = this@ExternalCredentialScanOcrFragment,
-            finalVisibility = finalVisibility,
-        )
-        iconScanComplete.fadeIn(FINISH_ANIMATION_DURATION, fragment = this@ExternalCredentialScanOcrFragment, onComplete = {
-            isAnimatingCompletion = false
-            // Execute any pending action after the animation. Currently used is for next fragment navigation
-            pendingFinishAction?.invoke()
-            pendingFinishAction = null
-        })
-        scanHint.isInvisible = true
     }
 
     private fun renderNoPermission(shouldOpenPhoneSettings: Boolean) {
@@ -334,9 +330,8 @@ internal class ExternalCredentialScanOcrFragment : Fragment(R.layout.fragment_ex
     }
 
     /**
-     * Waits until all animations are complete before navigating away. Completion animations are in place because the execution of
-     * [ExternalCredentialScanOcrViewModel.processOcrResultsAndFinish] is not immediate, and it makes the transition to the next fragment
-     * smoother for user.
+     * Waits until all animations are complete before navigating away. Completion animations are in place because building the
+     * scan result is not immediate, and it makes the transition to the next fragment smoother for user.
      *
      * The animation state is stored in the [isAnimatingCompletion]. If it is set to true, the navigation action is set to
      * [pendingFinishAction] which will be executed once animations are complete. If false, the navigation will proceed immediately.

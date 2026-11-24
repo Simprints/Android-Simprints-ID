@@ -8,6 +8,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrScanResult
+import com.simprints.feature.externalcredential.screens.scanocr.model.ReadoutSource
 import com.simprints.feature.externalcredential.screens.scanocr.model.ScannedMfidDocument
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.BuildScannedCredentialResultUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetLightingConditionsAssessmentConfigUseCase
@@ -99,14 +100,11 @@ internal class ExternalCredentialScanOcrViewModelTest {
     }
 
     @Test
-    fun `startScanning updates state to ScanningInProgress`() {
+    fun `startScanning emits ScanningInProgress with max scans required`() {
         val observer = viewModel.scanOcrStateLiveData.test()
         viewModel.startScanning()
 
-        val state = observer.value() as ScanOcrState.ScanningInProgress
-        assertThat(state.ocrDocumentType).isEqualTo(documentType)
-        assertThat(state.successfulCaptures).isEqualTo(0)
-        assertThat(state.scansRequired).isEqualTo(3)
+        assertThat(observer.value()).isEqualTo(ScanOcrState.ScanningInProgress(maxScansRequired = 3))
     }
 
     @Test
@@ -119,8 +117,8 @@ internal class ExternalCredentialScanOcrViewModelTest {
     }
 
     @Test
-    fun `processImage updates detected blocks and state when OCR successful`() = runTest {
-        val mockScannedDocument = mockk<ScannedMfidDocument>()
+    fun `processImage keeps ScanningInProgress before captures complete`() = runTest {
+        val mockScannedDocument = mockk<ScannedMfidDocument> { every { source } returns ReadoutSource.TEXT_OCR }
         val mockCroppedBitmap = mockk<Bitmap>()
         coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
         coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
@@ -130,10 +128,8 @@ internal class ExternalCredentialScanOcrViewModelTest {
         viewModel.startScanning()
         viewModel.processImage(frame)
 
-        val state = observer.value() as ScanOcrState.ScanningInProgress
-        assertThat(state.successfulCaptures).isEqualTo(1)
+        assertThat(observer.value()).isEqualTo(ScanOcrState.ScanningInProgress(maxScansRequired = 3))
         assertThat(viewModel.isProcessingImage.value).isFalse()
-        assertThat(viewModel.isOcrActive).isTrue()
     }
 
     @Test
@@ -202,7 +198,6 @@ internal class ExternalCredentialScanOcrViewModelTest {
         coVerify(exactly = 0) { frameCropToTargetUseCase(frame) }
         coVerify(exactly = 0) { scanMfidDocumentUseCase.invoke(any(), any(), any(), any()) }
         coVerify(exactly = 0) { getLightingConditionsAssessment.invoke(any(), any()) }
-        assertThat(viewModel.isOcrActive).isFalse()
     }
 
     @Test
@@ -288,39 +283,6 @@ internal class ExternalCredentialScanOcrViewModelTest {
     }
 
     @Test
-    fun `processOcrResultsAndFinish sends finish event with scanned credential`() = runTest {
-        val mockScannedCredentialResult = mockk<ScannedCredentialResult>()
-        coEvery { buildScannedCredentialResultUseCase(any(), documentType, any()) } returns mockScannedCredentialResult
-
-        val finishObserver = viewModel.finishOcrEvent.test()
-        val stateObserver = viewModel.scanOcrStateLiveData.test()
-
-        viewModel.startScanning()
-        viewModel.processOcrResultsAndFinish()
-
-        assertThat(finishObserver.value()?.peekContent()).isEqualTo(mockScannedCredentialResult)
-        assertThat(stateObserver.value()).isEqualTo(ScanOcrState.Complete)
-        assertThat(viewModel.isOcrActive).isFalse()
-    }
-
-    @Test
-    fun `processOcrResultsAndFinish passes accumulated documents to build use case`() = runTest {
-        val mockScannedDocument = mockk<ScannedMfidDocument>()
-        val mockScannedCredentialResult = mockk<ScannedCredentialResult>()
-        val mockCroppedBitmap = mockk<Bitmap>()
-
-        coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
-        coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
-        coEvery { buildScannedCredentialResultUseCase(any(), documentType, any()) } returns mockScannedCredentialResult
-
-        viewModel.startScanning()
-        viewModel.processImage(frame)
-        viewModel.processOcrResultsAndFinish()
-
-        coVerify { buildScannedCredentialResultUseCase(listOf(mockScannedDocument), documentType, any()) }
-    }
-
-    @Test
     fun `getDocumentTypeRes returns correct resource for NHIS card`() {
         viewModel = initViewModel(OcrDocumentType.NhisCard)
         val result = viewModel.getDocumentTypeRes()
@@ -341,54 +303,66 @@ internal class ExternalCredentialScanOcrViewModelTest {
         assertThat(result).isEqualTo(R.string.mfid_type_fayda_card)
     }
 
-    @Test
-    fun `processImage does not add documents or update state once required captures are reached`() = runTest {
-        val mockScannedDocument = mockk<ScannedMfidDocument>()
+    private fun stubOcrDocument(): ScannedMfidDocument {
+        val document = ScannedMfidDocument(
+            imagePath = "path",
+            ocrScanResult = OcrScanResult.FaydaCard(credential = mockk()),
+            source = ReadoutSource.TEXT_OCR,
+        )
         val mockCroppedBitmap = mockk<Bitmap>()
-
         coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
-        coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
-
-        val observer = viewModel.scanOcrStateLiveData.test()
-        viewModel.startScanning()
-
-        val capturesRequired = (observer.value() as ScanOcrState.ScanningInProgress).scansRequired
-        repeat(capturesRequired) { viewModel.processImage(frame) }
-
-        val stateAtCapacity = observer.value() as ScanOcrState.ScanningInProgress
-        assertThat(stateAtCapacity.successfulCaptures).isEqualTo(capturesRequired)
-
-        viewModel.processImage(frame)
-
-        assertThat(observer.value()).isEqualTo(stateAtCapacity)
+        coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any(), any()) } returns document
+        return document
     }
 
     @Test
-    fun `processImage emits ScanningInProgress with enough captures exactly once`() = runTest {
-        val mockScannedDocument = mockk<ScannedMfidDocument>()
-        val mockCroppedBitmap = mockk<Bitmap>()
-
-        coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
-        coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
+    fun `startScanning emits ScanningInProgress once regardless of captures`() = runTest {
+        stubOcrDocument()
 
         val observer = viewModel.scanOcrStateLiveData.test()
         viewModel.startScanning()
+        repeat(2) { viewModel.processImage(frame) }
 
-        val capturesRequired = (observer.value() as ScanOcrState.ScanningInProgress).scansRequired
-        repeat(capturesRequired + 2) { viewModel.processImage(frame) }
+        val inProgress = observer.valueHistory().filterIsInstance<ScanOcrState.ScanningInProgress>()
+        assertThat(inProgress).hasSize(1)
+    }
 
-        val completionTriggers = observer
-            .valueHistory()
-            .filterIsInstance<ScanOcrState.ScanningInProgress>()
-            .count { it.successfulCaptures >= it.scansRequired }
-        assertThat(completionTriggers).isEqualTo(1)
+    @Test
+    fun `processImage emits ScansProcessing then ScansReady when captures complete`() = runTest {
+        stubOcrDocument()
+        val result = mockk<ScannedCredentialResult>()
+        coEvery { buildScannedCredentialResultUseCase(any(), documentType, any()) } returns result
+
+        val observer = viewModel.scanOcrStateLiveData.test()
+        viewModel.startScanning()
+        repeat(3) { viewModel.processImage(frame) }
+
+        assertThat(observer.valueHistory().takeLast(2)).containsExactly(
+            ScanOcrState.ScansProcessing,
+            ScanOcrState.ScansReady(result),
+        ).inOrder()
+    }
+
+    @Test
+    fun `ScansReady carries result built from accumulated documents`() = runTest {
+        val document = stubOcrDocument()
+        val result = mockk<ScannedCredentialResult>()
+        coEvery { buildScannedCredentialResultUseCase(any(), documentType, any()) } returns result
+
+        val observer = viewModel.scanOcrStateLiveData.test()
+        viewModel.startScanning()
+        repeat(3) { viewModel.processImage(frame) }
+
+        coVerify { buildScannedCredentialResultUseCase(listOf(document, document, document), documentType, any()) }
+        assertThat((observer.value() as ScanOcrState.ScansReady).result).isEqualTo(result)
     }
 
     @Test
     fun `processImage completes capture after a single Fayda barcode readout`() = runTest {
         val barcodeDocument = ScannedMfidDocument(
             imagePath = "path",
-            ocrScanResult = OcrScanResult.FaydaCard(credential = mockk(), isFromBarcode = true),
+            ocrScanResult = OcrScanResult.FaydaCard(credential = mockk()),
+            source = ReadoutSource.BARCODE,
         )
         val mockCroppedBitmap = mockk<Bitmap>()
         coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
@@ -400,64 +374,78 @@ internal class ExternalCredentialScanOcrViewModelTest {
 
         val observer = viewModel.scanOcrStateLiveData.test()
         viewModel.startScanning()
+        assertThat(observer.value()).isEqualTo(ScanOcrState.ScanningInProgress(maxScansRequired = 3))
+
         viewModel.processImage(frame)
 
-        val state = observer.value() as ScanOcrState.ScanningInProgress
-        assertThat(state.successfulCaptures).isEqualTo(state.scansRequired)
-
-        repeat(2) { viewModel.processImage(frame) }
-        val completionTriggers = observer
-            .valueHistory()
-            .filterIsInstance<ScanOcrState.ScanningInProgress>()
-            .count { it.successfulCaptures >= it.scansRequired }
-        assertThat(completionTriggers).isEqualTo(1)
+        assertThat(observer.valueHistory()).contains(ScanOcrState.ScansProcessing)
     }
 
     @Test
-    fun `processImage requires all captures for Fayda OCR readouts when barcode reading is enabled`() = runTest {
-        val ocrDocument = ScannedMfidDocument(
-            imagePath = "path",
-            ocrScanResult = OcrScanResult.FaydaCard(credential = mockk(), isFromBarcode = false),
-        )
-        val mockCroppedBitmap = mockk<Bitmap>()
-        coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
-        viewModel = initViewModel(
-            documentType = OcrDocumentType.FaydaCard,
-            customConfig = mapOf(OCR_READ_FAYDA_BARCODE to JsonPrimitive(true)),
-        )
-        coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, OcrDocumentType.FaydaCard, any(), any()) } returns ocrDocument
+    fun `processImage ignores documents after captures are complete`() = runTest {
+        stubOcrDocument()
+
+        val observer = viewModel.scanOcrStateLiveData.test()
+        viewModel.startScanning()
+        repeat(5) { viewModel.processImage(frame) }
+
+        assertThat(observer.valueHistory().count { it == ScanOcrState.ScansProcessing }).isEqualTo(1)
+        coVerify(exactly = 1) { buildScannedCredentialResultUseCase(any(), any(), any()) }
+    }
+
+    @Test
+    fun `processImage ignores a frame whose scan returns after captures completed`() = runTest {
+        val document = stubOcrDocument()
+        val bitmap = mockk<Bitmap>()
+        coEvery { frameCropToTargetUseCase(frame) } returns bitmap
+        val gate = CompletableDeferred<Unit>()
+        var calls = 0
+        coEvery { scanMfidDocumentUseCase(bitmap, documentType, any(), any()) } coAnswers {
+            // The first frame stays "inside" the scan until three other frames have completed the capture
+            if (calls++ == 0) gate.await()
+            document
+        }
 
         val observer = viewModel.scanOcrStateLiveData.test()
         viewModel.startScanning()
         viewModel.processImage(frame)
+        repeat(3) { viewModel.processImage(frame) }
+        runCurrent()
+        gate.complete(Unit)
+        runCurrent()
 
-        val state = observer.value() as ScanOcrState.ScanningInProgress
-        assertThat(state.successfulCaptures).isEqualTo(1)
-        assertThat(state.successfulCaptures).isLessThan(state.scansRequired)
+        assertThat(observer.valueHistory().count { it == ScanOcrState.ScansProcessing }).isEqualTo(1)
+        coVerify(exactly = 1) { buildScannedCredentialResultUseCase(any(), any(), any()) }
     }
 
     @Test
-    fun `processImage does not append documents or update state after scanning is complete`() = runTest {
-        val mockScannedDocument = mockk<ScannedMfidDocument>()
-        val mockScannedCredentialResult = mockk<ScannedCredentialResult>()
-        val mockCroppedBitmap = mockk<Bitmap>()
-
-        coEvery { frameCropToTargetUseCase(frame) } returns mockCroppedBitmap
-        coEvery { scanMfidDocumentUseCase(mockCroppedBitmap, documentType, any()) } returns mockScannedDocument
-        coEvery { buildScannedCredentialResultUseCase(any(), documentType, any()) } returns mockScannedCredentialResult
-
-        val stateObserver = viewModel.scanOcrStateLiveData.test()
+    fun `processImage runs lighting assessment but not OCR after ScansProcessing`() = runTest {
+        viewModel = initViewModel(
+            documentType = documentType,
+            customConfig = mapOf(MFID_LIGHTING_CONDITIONS_ASSESSMENT_ENABLED to JsonPrimitive(true)),
+        )
+        runCurrent()
+        stubOcrDocument()
 
         viewModel.startScanning()
-        // transitioning to Complete
-        viewModel.processOcrResultsAndFinish()
+        repeat(3) { viewModel.processImage(frame) }
+        clearMocks(scanMfidDocumentUseCase, getLightingConditionsAssessment, answers = false)
 
-        // Frame from camera arrives after Complete
-        viewModel.imageProcessingStarted()
         viewModel.processImage(frame)
 
-        assertThat(stateObserver.value()).isEqualTo(ScanOcrState.Complete)
-        assertThat(viewModel.isOcrActive).isFalse()
+        coVerify(exactly = 1) { getLightingConditionsAssessment(any(), any()) }
         coVerify(exactly = 0) { scanMfidDocumentUseCase.invoke(any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `startScanning again drops previous documents`() = runTest {
+        val document = stubOcrDocument()
+
+        viewModel.startScanning()
+        repeat(2) { viewModel.processImage(frame) }
+        viewModel.startScanning()
+        repeat(3) { viewModel.processImage(frame) }
+
+        coVerify(exactly = 1) { buildScannedCredentialResultUseCase(listOf(document, document, document), documentType, any()) }
     }
 }

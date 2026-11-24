@@ -66,7 +66,7 @@ internal class FaydaCardOcrReaderUseCaseTest {
     fun `returns matching line for valid FAN formats`() {
         validFans.forEachIndexed { id, fan ->
             val reader = buildReader(line(id = id, text = fan, top = 100))
-            assertThat(useCase(reader)?.credential?.text).isEqualTo(fan)
+            assertThat(useCase.fromText(reader)?.credential?.text).isEqualTo(fan)
         }
     }
 
@@ -74,7 +74,7 @@ internal class FaydaCardOcrReaderUseCaseTest {
     fun `returns matching line and strips whitespace from FAN`() {
         validFansWithWhitespace.forEachIndexed { id, fan ->
             val reader = buildReader(line(id = id, text = fan, top = 100))
-            assertThat(useCase(reader)?.credential?.text).isEqualTo(fan.filter(Char::isDigit))
+            assertThat(useCase.fromText(reader)?.credential?.text).isEqualTo(fan.filter(Char::isDigit))
         }
     }
 
@@ -82,7 +82,7 @@ internal class FaydaCardOcrReaderUseCaseTest {
     fun `extracts FAN from line containing other text`() {
         linesContainingFan.entries.forEachIndexed { id, (text, fan) ->
             val reader = buildReader(line(id = id, text = text, top = 100))
-            assertThat(useCase(reader)?.credential?.text).isEqualTo(fan)
+            assertThat(useCase.fromText(reader)?.credential?.text).isEqualTo(fan)
         }
     }
 
@@ -90,7 +90,7 @@ internal class FaydaCardOcrReaderUseCaseTest {
     fun `returns null for invalid FAN formats`() {
         invalidFans.forEachIndexed { id, fan ->
             val reader = buildReader(line(id = id, text = fan, top = 100))
-            assertThat(useCase(reader)).isNull()
+            assertThat(useCase.fromText(reader)).isNull()
         }
     }
 
@@ -101,7 +101,7 @@ internal class FaydaCardOcrReaderUseCaseTest {
             line(id = 1, text = "30/07/2026 | 08/04/2034", top = 150),
             line(id = 2, text = "8642370540168134", top = 200),
         )
-        val result = useCase(reader)
+        val result = useCase.fromText(reader)
         assertThat(result?.credential?.id).isEqualTo(2)
         assertThat(result?.credential?.text).isEqualTo("8642370540168134")
     }
@@ -110,16 +110,15 @@ internal class FaydaCardOcrReaderUseCaseTest {
     fun `returns FAN from barcode`() {
         val barcodes = listOf(barcode("2580945924815610", top = 100, bottom = 140))
 
-        val result = useCase.fromBarcodes(barcodes)
+        val result = useCase.fromBarcode(barcodes)
 
         assertThat(result?.credential?.text).isEqualTo("2580945924815610")
         assertThat(result?.credential?.confidence).isEqualTo(1f)
-        assertThat(result?.isFromBarcode).isTrue()
     }
 
     @Test
     fun `uses barcode box as credential box`() {
-        val result = useCase.fromBarcodes(listOf(barcode("2580945924815610", top = 100, bottom = 140)))
+        val result = useCase.fromBarcode(listOf(barcode("2580945924815610", top = 100, bottom = 140)))
 
         assertThat(result?.credential?.boundingBox).isEqualTo(BoundingBox(left = 10, top = 100, right = 200, bottom = 140))
         assertThat(result?.credential?.blockBoundingBox).isEqualTo(result?.credential?.boundingBox)
@@ -134,13 +133,13 @@ internal class FaydaCardOcrReaderUseCaseTest {
             barcode("2580945924815610", top = 100, bottom = 140),
         )
 
-        assertThat(useCase.fromBarcodes(barcodes)?.credential?.text).isEqualTo("2580945924815610")
+        assertThat(useCase.fromBarcode(barcodes)?.credential?.text).isEqualTo("2580945924815610")
     }
 
     @Test
     fun `returns null when no barcode is a FAN`() {
-        assertThat(useCase.fromBarcodes(emptyList())).isNull()
-        assertThat(useCase.fromBarcodes(listOf(barcode("12345678123456789", top = 0, bottom = 10)))).isNull()
+        assertThat(useCase.fromBarcode(emptyList())).isNull()
+        assertThat(useCase.fromBarcode(listOf(barcode("12345678123456789", top = 0, bottom = 10)))).isNull()
     }
 
     private fun barcode(

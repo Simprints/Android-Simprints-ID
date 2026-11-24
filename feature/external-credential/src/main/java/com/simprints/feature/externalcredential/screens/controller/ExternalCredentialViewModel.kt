@@ -133,6 +133,9 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
     }
 
     fun addCaptureAttempt(scannedCredentialResult: ScannedCredentialResult) {
+        // Capture attempt comes from the fragment, it might send the same one due configuration change.
+        // Adding extra check to avoid duplicates
+        if (captureAttempts.lastOrNull()?.scannedCredentialResult == scannedCredentialResult) return
         viewModelScope.launch {
             captureAttempts += eventsTracker.buildCaptureAttempt(
                 scannedCredentialResult = scannedCredentialResult,

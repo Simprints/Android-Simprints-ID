@@ -114,6 +114,22 @@ internal class ExternalCredentialViewModelTest {
     }
 
     @Test
+    fun `addCaptureAttempt ignores the same result reported twice`() = runTest {
+        coEvery { eventsTracker.saveSelectionEvent(any(), any(), any()) } returns "selection-id"
+        val scannedCredentialResult = createScannedCredential()
+        coEvery { eventsTracker.buildCaptureAttempt(any(), any(), any(), any()) } returns
+            makeAttempt().copy(scannedCredentialResult = scannedCredentialResult)
+
+        viewModel.init(createParams(subjectId = "subjectId", flowType = FlowType.IDENTIFY))
+        viewModel.selectionStarted()
+        viewModel.setSelectedExternalCredentialType(ExternalCredentialType.QRCode)
+        viewModel.addCaptureAttempt(scannedCredentialResult)
+        viewModel.addCaptureAttempt(scannedCredentialResult)
+
+        coVerify(exactly = 1) { eventsTracker.buildCaptureAttempt(any(), any(), any(), any()) }
+    }
+
+    @Test
     fun `addCaptureAttempt uses restored capture start time and selection event id from savedStateHandle`() = runTest {
         val restoredCaptureStartTime = Timestamp(123L)
         val restoredSelectionEventId = "restored-selection-id"

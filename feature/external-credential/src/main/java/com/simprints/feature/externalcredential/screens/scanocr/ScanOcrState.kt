@@ -1,21 +1,19 @@
 package com.simprints.feature.externalcredential.screens.scanocr
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
+import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 
 @ExcludedFromGeneratedTestCoverageReports("Data struct")
 internal sealed class ScanOcrState {
     data object NotScanning : ScanOcrState()
 
     data class ScanningInProgress(
-        val ocrDocumentType: OcrDocumentType,
-        val successfulCaptures: Int,
-        val scansRequired: Int,
+        val maxScansRequired: Int,
     ) : ScanOcrState()
 
-    data object Complete : ScanOcrState()
+    data object ScansProcessing : ScanOcrState()
 
-    companion object {
-        val EMPTY = ScanOcrState.NotScanning
-    }
+    data class ScansReady(
+        val result: ScannedCredentialResult,
+    ) : ScanOcrState()
 }
