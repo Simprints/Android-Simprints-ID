@@ -1,33 +1,31 @@
 package com.simprints.feature.dashboard.main.projectdetails
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import com.simprints.infra.uibase.viewmodel.BaseMviViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 @HiltViewModel
 internal class ProjectDetailsViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
     private val recentUserActivityManager: RecentUserActivityManager,
     private val tokenizationProcessor: TokenizationProcessor,
-) : ViewModel() {
-    val projectCardStateLiveData: LiveData<DashboardProjectState>
-        get() = _projectCardStateLiveData
-    private val _projectCardStateLiveData = MutableLiveData<DashboardProjectState>()
-
-    init {
-        load()
+) : BaseMviViewModel<ProjectDetailsUiState, ProjectDetailsUiAction, ProjectDetailsUiEffect>(ProjectDetailsUiState()) {
+    override suspend fun handleAction(action: ProjectDetailsUiAction) {
+        when (action) {
+            ProjectDetailsUiAction.Load -> load()
+        }
     }
 
-    fun load() = viewModelScope.launch {
+    private suspend fun load() {
         val state = try {
             configRepository.getProject()?.let { cachedProject ->
                 val recentUserActivity = recentUserActivityManager.getRecentUserActivity()
@@ -40,16 +38,25 @@ internal class ProjectDetailsViewModel @Inject constructor(
                         project = cachedProject,
                     )
                 }
-                DashboardProjectState(
+                ProjectDetailsUiState(
+                    isLoaded = true,
                     title = cachedProject.name,
                     lastUser = decryptedUserId.value,
                     lastScanner = recentUserActivity.lastScannerUsed,
-                    isLoaded = true,
                 )
-            } ?: DashboardProjectState(isLoaded = false)
-        } catch (_: Throwable) {
-            DashboardProjectState(isLoaded = false)
+            } ?: ProjectDetailsUiState(isLoaded = false)
+        } catch (_: CancellationException) {
+            // A real cancellation (the ViewModel is cleared) stops here; a stray one from a collaborator hides the card, as before.
+            currentCoroutineContext().ensureActive()
+            ProjectDetailsUiState(isLoaded = false)
+        } catch (e: Exception) {
+            Simber.e("Failed to load project details on dashboard", e)
+            ProjectDetailsUiState(isLoaded = false)
         }
-        _projectCardStateLiveData.postValue(state)
+        reduce { state }
+    }
+
+    init {
+        onAction(ProjectDetailsUiAction.Load)
     }
 }

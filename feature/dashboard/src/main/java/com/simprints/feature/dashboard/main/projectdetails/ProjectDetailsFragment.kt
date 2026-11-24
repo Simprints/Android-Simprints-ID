@@ -5,10 +5,14 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentDashboardCardProjectDetailsBinding
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
@@ -21,29 +25,46 @@ internal class ProjectDetailsFragment : Fragment(R.layout.fragment_dashboard_car
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.projectCardStateLiveData.observe(viewLifecycleOwner) {
-            binding.dashboardProjectDetailsCard.isVisible = it.isLoaded
-            binding.dashboardProjectDetailsCardTitle.text = it.title
-            binding.dashboardProjectDetailsCardCurrentUser.text = String.format(
-                getString(IDR.string.dashboard_project_card_current_user),
-                it.lastUser,
-            )
-            with(binding.dashboardProjectDetailsCardScannerUsed) {
-                if (it.lastScanner.isEmpty()) {
-                    visibility = View.GONE
-                } else {
-                    visibility = View.VISIBLE
-                    text = String.format(
-                        context.getString(IDR.string.dashboard_project_card_scanner_used),
-                        it.lastScanner,
-                    )
-                }
-            }
-        }
+        observeState()
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.load()
+        viewModel.onAction(ProjectDetailsUiAction.Load)
+    }
+
+    private fun observeState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { viewModel.uiState.collect(::render) }
+                launch { viewModel.uiEffect.collect(::handleEffect) }
+            }
+        }
+    }
+
+    // ProjectDetailsUiEffect has no effects; collected anyway so every screen has wiring
+    @Suppress("UNUSED_PARAMETER")
+    private fun handleEffect(effect: ProjectDetailsUiEffect) = Unit
+
+    private fun render(state: ProjectDetailsUiState) {
+        // null: not loaded yet, the card keeps its XML default (visible, empty).
+        val isLoaded = state.isLoaded ?: return
+        binding.dashboardProjectDetailsCard.isVisible = isLoaded
+        binding.dashboardProjectDetailsCardTitle.text = state.title
+        binding.dashboardProjectDetailsCardCurrentUser.text = String.format(
+            getString(IDR.string.dashboard_project_card_current_user),
+            state.lastUser,
+        )
+        with(binding.dashboardProjectDetailsCardScannerUsed) {
+            if (state.lastScanner.isEmpty()) {
+                visibility = View.GONE
+            } else {
+                visibility = View.VISIBLE
+                text = String.format(
+                    context.getString(IDR.string.dashboard_project_card_scanner_used),
+                    state.lastScanner,
+                )
+            }
+        }
     }
 }

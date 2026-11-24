@@ -16,7 +16,9 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.main.dailyactivity.DailyActivityViewModel
+import com.simprints.feature.dashboard.main.projectdetails.ProjectDetailsUiState
 import com.simprints.feature.dashboard.main.projectdetails.ProjectDetailsViewModel
+import com.simprints.feature.dashboard.tools.stubMvi
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.testtools.hilt.testNavController
 import dagger.hilt.android.testing.BindValue
@@ -57,6 +59,7 @@ class MainFragmentTest {
     @Before
     fun setUp() {
         hiltRule.inject()
+        projectDetailsViewModel.stubMvi(ProjectDetailsUiState())
         val ctx: Context = getApplicationContext()
         WorkManagerTestInitHelper.initializeTestWorkManager(ctx, Configuration.Builder().build())
     }
