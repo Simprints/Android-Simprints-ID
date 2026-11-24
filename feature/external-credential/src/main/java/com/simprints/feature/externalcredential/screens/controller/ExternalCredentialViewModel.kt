@@ -59,6 +59,7 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
         private set
     private var selectedSkipOtherText: String? = null
     private val captureAttempts = mutableListOf<ExternalCredentialCaptureAttempt>()
+    private var lastReportedScan: ScannedCredentialResult? = null
 
     init {
         savedStateHandle.get<Timestamp>(KEY_SELECTION_START_TIME)?.let { selectionStartTime = it }
@@ -133,6 +134,10 @@ internal class ExternalCredentialViewModel @Inject internal constructor(
     }
 
     fun addCaptureAttempt(scannedCredentialResult: ScannedCredentialResult) {
+        // Capture attempt comes from the fragment, it might send the same one due configuration change, possibly while
+        // the first attempt is still being built. Remembering the result before launching keeps the replay out.
+        if (scannedCredentialResult == lastReportedScan) return
+        lastReportedScan = scannedCredentialResult
         viewModelScope.launch {
             captureAttempts += eventsTracker.buildCaptureAttempt(
                 scannedCredentialResult = scannedCredentialResult,

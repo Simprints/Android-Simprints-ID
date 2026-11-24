@@ -7,7 +7,7 @@ import com.simprints.feature.externalcredential.screens.scanocr.reader.ScannedBa
 import javax.inject.Inject
 
 internal class FaydaCardOcrReaderUseCase @Inject constructor() {
-    operator fun invoke(ocrReader: OcrReader): OcrScanResult.FaydaCard? = ocrReader.ocrText.allLines.firstNotNullOfOrNull { line ->
+    fun fromText(ocrReader: OcrReader): OcrScanResult.FaydaCard? = ocrReader.ocrText.allLines.firstNotNullOfOrNull { line ->
         FAN_OCR_PATTERN.find(line.text)?.let { match ->
             OcrScanResult.FaydaCard(line.copy(text = match.value.filter(Char::isDigit)))
         }
@@ -17,7 +17,7 @@ internal class FaydaCardOcrReaderUseCase @Inject constructor() {
      * Reads the FAN from the barcode printed next to it on the card. Barcode decoding is checksummed, so unlike OCR it does not
      * misread individual digits, and it works at distances where the printed FAN is too small for OCR.
      */
-    fun fromBarcodes(barcodes: List<ScannedBarcode>): OcrScanResult.FaydaCard? {
+    fun fromBarcode(barcodes: List<ScannedBarcode>): OcrScanResult.FaydaCard? {
         val barcode = barcodes.firstOrNull { FAN_PATTERN.matches(it.value) } ?: return null
         val credential = OcrLine(
             id = BARCODE_LINE_ID,
@@ -26,7 +26,7 @@ internal class FaydaCardOcrReaderUseCase @Inject constructor() {
             blockBoundingBox = barcode.boundingBox,
             confidence = 1f,
         )
-        return OcrScanResult.FaydaCard(credential, isFromBarcode = true)
+        return OcrScanResult.FaydaCard(credential)
     }
 
     companion object {

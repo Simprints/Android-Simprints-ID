@@ -3,6 +3,7 @@ package com.simprints.feature.externalcredential.screens.scanocr.usecase
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrScanResult
+import com.simprints.feature.externalcredential.screens.scanocr.model.ReadoutSource
 import com.simprints.feature.externalcredential.screens.scanocr.model.ScannedMfidDocument
 import com.simprints.feature.externalcredential.screens.scanocr.reader.OcrLine
 import com.simprints.feature.externalcredential.screens.search.model.MfidDocument
@@ -72,7 +73,7 @@ internal class BuildMfidDocumentUseCase @Inject constructor(
     private fun buildFaydaCard(scannedDocuments: List<ScannedMfidDocument>): MfidDocument.FaydaCard {
         // Barcode readouts are checksummed, so one is used as-is instead of voting with OCR readouts that may contain misread digits
         scannedDocuments
-            .find { (it.ocrScanResult as? OcrScanResult.FaydaCard)?.isFromBarcode == true }
+            .find { it.source == ReadoutSource.BARCODE }
             ?.let { return MfidDocument.FaydaCard(credential = it.ocrScanResult.credential.text.asTokenizableRaw()) }
 
         val credential = scannedDocuments

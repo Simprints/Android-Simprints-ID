@@ -41,6 +41,5 @@ internal sealed class OcrScanResult {
     @SerialName("OcrScanResult.FaydaCard")
     data class FaydaCard(
         override val credential: OcrLine,
-        val isFromBarcode: Boolean = false,
     ) : OcrScanResult()
 }

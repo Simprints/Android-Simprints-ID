@@ -6,18 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DispatcherBG
-import com.simprints.core.livedata.LiveDataEventWithContent
-import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.feature.externalcredential.screens.scanocr.model.MfidCaptureState
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
-import com.simprints.feature.externalcredential.screens.scanocr.model.OcrScanResult
-import com.simprints.feature.externalcredential.screens.scanocr.model.ScannedMfidDocument
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.BuildScannedCredentialResultUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetLightingConditionsAssessmentConfigUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ScanMfidDocumentUseCase
-import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.infra.camera.Frame
 import com.simprints.infra.camera.lighting.GetLightingConditionsAssessmentUseCase
 import com.simprints.infra.camera.lighting.LightingConditionsAssessment
@@ -55,22 +51,18 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
         fun create(ocrDocumentType: OcrDocumentType): ExternalCredentialScanOcrViewModel
     }
 
-    private var scannedMfidDocuments: List<ScannedMfidDocument> = emptyList()
+    private lateinit var captureState: MfidCaptureState
 
     val isProcessingImage: StateFlow<Boolean>
         field = MutableStateFlow(false)
 
-    val isOcrActive: Boolean
-        get() = scannedMfidDocuments.isNotEmpty()
-    private var ocrState: ScanOcrState = ScanOcrState.EMPTY
+    private var ocrState: ScanOcrState = ScanOcrState.NotScanning
         set(value) {
             field = value
             _scanOcrStateLiveData.postValue(value)
         }
     private val _scanOcrStateLiveData = MutableLiveData(ocrState)
     val scanOcrStateLiveData: LiveData<ScanOcrState> = _scanOcrStateLiveData
-    val finishOcrEvent: LiveData<LiveDataEventWithContent<ScannedCredentialResult>>
-        field = MutableLiveData<LiveDataEventWithContent<ScannedCredentialResult>>()
     private val lightingConditionsAssessmentFlow = MutableStateFlow<LightingConditionsAssessment?>(null)
     val lightingConditionsAssessment: LiveData<LightingConditionsAssessment> =
         lightingConditionsAssessmentFlow
@@ -99,10 +91,6 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
 
     suspend fun awaitOcrConfig(): OcrConfig = ocrConfigFlow.filterNotNull().first()
 
-    private fun updateState(state: (ScanOcrState) -> ScanOcrState) {
-        this.ocrState = state(this.ocrState)
-    }
-
     fun getDocumentTypeRes(): Int = when (ocrDocumentType) {
         OcrDocumentType.NhisCard -> R.string.mfid_type_nhis_card
         OcrDocumentType.GhanaIdCard -> R.string.mfid_type_ghana_id_card
@@ -111,24 +99,17 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
 
     fun startScanning() {
         val captureConfig = ocrConfigFlow.value ?: return
+        captureState = MfidCaptureState(ocrDocumentType, captureConfig)
         startTime = timeHelper.now()
-        updateState {
-            ScanOcrState.ScanningInProgress(
-                ocrDocumentType = ocrDocumentType,
-                successfulCaptures = 0,
-                scansRequired = captureConfig.capturesRequired,
-            )
-        }
+        ocrState = ScanOcrState.ScanningInProgress(captureState.maxScansRequired)
     }
 
-    val isScanningInProgress: Boolean
-        get() = ocrState is ScanOcrState.ScanningInProgress
-
     fun processImage(frame: Frame) {
+        if (isProcessingImage.value) return
+        imageProcessingStarted()
         viewModelScope.launch(bgDispatcher) {
-            imageProcessingStarted()
             try {
-                val isOcrAllowed = isScanningInProgress
+                val isOcrAllowed = ocrState is ScanOcrState.ScanningInProgress
                 val isLightningAssessmentEnabled = lightingConditionsAssessmentConfig != null
 
                 if (!isOcrAllowed && !isLightningAssessmentEnabled) return@launch // no-op
@@ -151,46 +132,29 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
                     readFaydaBarcode = captureConfig.readFaydaBarcode,
                 ) ?: return@launch
                 Simber.d("Detected OCR")
-                if (isScanningInProgress && !isCaptureComplete(captureConfig)) {
-                    scannedMfidDocuments += scannedMfidDocument
-                    updateState {
-                        ScanOcrState.ScanningInProgress(
-                            ocrDocumentType = ocrDocumentType,
-                            successfulCaptures = if (isCaptureComplete(captureConfig)) {
-                                captureConfig.capturesRequired
-                            } else {
-                                scannedMfidDocuments.size
-                            },
-                            scansRequired = captureConfig.capturesRequired,
-                        )
-                    }
-                }
+                if (ocrState !is ScanOcrState.ScanningInProgress) return@launch
+                captureState.add(scannedMfidDocument)
+                if (captureState.isComplete) onScansComplete()
             } finally {
                 imageProcessingStopped()
             }
         }
     }
 
-    private fun isCaptureComplete(captureConfig: OcrConfig) = scannedMfidDocuments.size >= captureConfig.capturesRequired ||
-        // Barcode readouts are checksummed, so a single one completes the capture
-        captureConfig.readFaydaBarcode &&
-        scannedMfidDocuments.any { (it.ocrScanResult as? OcrScanResult.FaydaCard)?.isFromBarcode == true }
-
-    fun processOcrResultsAndFinish() {
-        updateState { ScanOcrState.Complete }
+    private fun onScansComplete() {
+        ocrState = ScanOcrState.ScansProcessing
         viewModelScope.launch {
-            val scannedCredentialResult = buildScannedCredentialResultUseCase(scannedMfidDocuments, ocrDocumentType, startTime)
-            finishOcrEvent.send(scannedCredentialResult)
-            scannedMfidDocuments = emptyList()
+            val scanResults = buildScannedCredentialResultUseCase(captureState.documents, ocrDocumentType, startTime)
+            ocrState = ScanOcrState.ScansReady(scanResults)
         }
     }
 
-    suspend fun imageProcessingStarted() {
-        isProcessingImage.emit(true)
+    private fun imageProcessingStarted() {
+        isProcessingImage.value = true
     }
 
-    suspend fun imageProcessingStopped() {
-        isProcessingImage.emit(false)
+    private fun imageProcessingStopped() {
+        isProcessingImage.value = false
     }
 
     companion object {

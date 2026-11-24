@@ -3,7 +3,7 @@ package com.simprints.feature.externalcredential.screens.scanocr.usecase
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
-import com.simprints.feature.externalcredential.screens.scanocr.model.OcrScanResult
+import com.simprints.feature.externalcredential.screens.scanocr.model.ReadoutSource
 import com.simprints.feature.externalcredential.screens.scanocr.model.ScannedMfidDocument
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import javax.inject.Inject
@@ -24,7 +24,7 @@ internal class BuildScannedCredentialResultUseCase @Inject constructor(
         // transitioning to the next screen, as the image looks closest to the last frame the user saw
         val (latestImagePath, latestCredentialOcrBlock) = scannedDocuments.last().imagePath to
             scannedDocuments.last().ocrScanResult.credential
-        val isBarcode = (scannedDocuments.last().ocrScanResult as? OcrScanResult.FaydaCard)?.isFromBarcode == true
+        val isBarcode = scannedDocuments.last().source == ReadoutSource.BARCODE
         val zoomedCredentialImagePath = createAndSaveZoomedImageUseCase(latestCredentialOcrBlock, latestImagePath, isBarcode)
 
         return ScannedCredentialResult(

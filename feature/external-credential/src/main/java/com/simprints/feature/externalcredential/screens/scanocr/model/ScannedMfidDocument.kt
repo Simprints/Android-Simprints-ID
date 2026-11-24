@@ -11,6 +11,7 @@ import kotlinx.serialization.Serializable
  *
  * @param imagePath path to full-res bitmap that was used for the OCR
  * @param ocrScanResult detected blocks for the external credential
+ * @param source scanner type that produced the readout
  */
 
 @Keep
@@ -20,6 +21,7 @@ import kotlinx.serialization.Serializable
 internal data class ScannedMfidDocument(
     val imagePath: String,
     val ocrScanResult: OcrScanResult,
+    val source: ReadoutSource,
 ) {
     val type: OcrDocumentType
         get() = when (ocrScanResult) {

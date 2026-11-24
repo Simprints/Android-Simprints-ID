@@ -6,6 +6,7 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.externalcredential.model.BoundingBox
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrScanResult
+import com.simprints.feature.externalcredential.screens.scanocr.model.ReadoutSource
 import com.simprints.feature.externalcredential.screens.scanocr.model.ScannedMfidDocument
 import com.simprints.feature.externalcredential.screens.scanocr.reader.OcrLine
 import com.simprints.feature.externalcredential.screens.search.model.MfidDocument
@@ -108,7 +109,8 @@ internal class BuildScannedCredentialResultUseCaseTest {
         val lastFile = "last.jpg"
         val barcodeDocument = ScannedMfidDocument(
             imagePath = lastFile,
-            ocrScanResult = OcrScanResult.FaydaCard(credential = ocrLine("1234567812345678", null), isFromBarcode = true),
+            ocrScanResult = OcrScanResult.FaydaCard(credential = ocrLine("1234567812345678", null)),
+            source = ReadoutSource.BARCODE,
         )
 
         useCase(listOf(nhisScannedDocument(imagePath = "first.jpg"), barcodeDocument), OcrDocumentType.FaydaCard, startTime)
@@ -163,5 +165,6 @@ internal class BuildScannedCredentialResultUseCaseTest {
         ocrScanResult = OcrScanResult.GhanaNhisCard(
             credential = ocrLine(credential, credentialBlockBoundingBox),
         ),
+        source = ReadoutSource.TEXT_OCR,
     )
 }

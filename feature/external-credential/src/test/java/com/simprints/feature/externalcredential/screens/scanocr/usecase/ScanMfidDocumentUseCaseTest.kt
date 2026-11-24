@@ -5,8 +5,9 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.externalcredential.model.BoundingBox
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrScanResult
+import com.simprints.feature.externalcredential.screens.scanocr.model.ReadoutResult
+import com.simprints.feature.externalcredential.screens.scanocr.model.ReadoutSource
 import com.simprints.feature.externalcredential.screens.scanocr.reader.OcrLine
-import com.simprints.feature.externalcredential.screens.scanocr.reader.ScannedBarcode
 import com.simprints.infra.config.store.models.FaydaCardConfig
 import com.simprints.infra.config.store.models.GhanaIdCardConfig
 import com.simprints.infra.config.store.models.MultiFactorIdConfiguration
@@ -25,19 +26,10 @@ import org.junit.Test
 
 internal class ScanMfidDocumentUseCaseTest {
     @MockK
-    private lateinit var readTextFromImage: ReadTextFromImageUseCase
+    private lateinit var readBarcode: ReadBarcodeUseCase
 
     @MockK
-    private lateinit var readBarcodesFromImage: ReadBarcodesFromImageUseCase
-
-    @MockK
-    private lateinit var ghanaNhisCardOcrReaderUseCase: GhanaNhisCardOcrReaderUseCase
-
-    @MockK
-    private lateinit var ghanaIdCardOcrReaderUseCase: GhanaIdCardOcrReaderUseCase
-
-    @MockK
-    private lateinit var faydaCardOcrReaderUseCase: FaydaCardOcrReaderUseCase
+    private lateinit var readOcrText: ReadOcrTextUseCase
 
     @MockK
     private lateinit var credentialImageRepository: CredentialImageRepository
@@ -74,235 +66,107 @@ internal class ScanMfidDocumentUseCaseTest {
         qrCodeConfig = null,
         faydaCardConfig = FaydaCardConfig(isCapturingAllFields = true),
     )
+    private val nhisReadout = ReadoutResult(ReadoutSource.TEXT_OCR, OcrScanResult.GhanaNhisCard(credential = ocrLine()))
+    private val faydaOcrReadout = ReadoutResult(ReadoutSource.TEXT_OCR, OcrScanResult.FaydaCard(credential = ocrLine("1234567812345678")))
+    private val faydaBarcodeReadout = ReadoutResult(ReadoutSource.BARCODE, OcrScanResult.FaydaCard(credential = ocrLine("1234567812345678")))
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         useCase = ScanMfidDocumentUseCase(
-            readTextFromImage = readTextFromImage,
-            readBarcodesFromImage = readBarcodesFromImage,
-            ghanaNhisCardOcrReaderUseCase = ghanaNhisCardOcrReaderUseCase,
-            ghanaIdCardOcrReaderUseCase = ghanaIdCardOcrReaderUseCase,
-            faydaCardOcrReaderUseCase = faydaCardOcrReaderUseCase,
+            readBarcode = readBarcode,
+            readOcrText = readOcrText,
             credentialImageRepository = credentialImageRepository,
         )
         coEvery { credentialImageRepository.saveCredentialScan(any(), any()) } returns savedImagePath
-        every { readBarcodesFromImage(any()) } returns emptyList()
-        every { faydaCardOcrReaderUseCase.fromBarcodes(any()) } returns null
+        every { readBarcode(any(), any()) } returns null
+        every { readOcrText(any(), any(), any()) } returns null
     }
 
     @Test
-    fun `returns null when readTextFromImage returns null`() = runTest {
-        every { readTextFromImage(bitmap) } returns null
-        val result = useCase(bitmap, OcrDocumentType.NhisCard, nhisConfig)
-        assertThat(result).isNull()
-    }
-
-    @Test
-    fun `returns null when selector finds no matching line for NhisCard`() = runTest {
-        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
-        every { ghanaNhisCardOcrReaderUseCase(any(), any()) } returns null
-        val result = useCase(bitmap, OcrDocumentType.NhisCard, nhisConfig)
-        assertThat(result).isNull()
-    }
-
-    @Test
-    fun `returns null when selector finds no matching line for GhanaIdCard`() = runTest {
-        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
-        every { ghanaIdCardOcrReaderUseCase(any(), any()) } returns null
-
-        val result = useCase(bitmap, OcrDocumentType.GhanaIdCard, ghanaIdConfig)
-
-        assertThat(result).isNull()
-    }
-
-    @Test
-    fun `returns ScannedMfidDocument for NhisCard when line is found`() = runTest {
-        val credentialLine = ocrLine(text = "12345678")
-        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
-        every { ghanaNhisCardOcrReaderUseCase(any(), any()) } returns OcrScanResult.GhanaNhisCard(credential = credentialLine)
-
+    fun `returns null when nothing is read`() = runTest {
         val result = useCase(bitmap, OcrDocumentType.NhisCard, nhisConfig)
 
-        assertThat(result).isNotNull()
-        assertThat(result?.ocrScanResult?.credential?.text).isEqualTo(credentialLine.text)
-        assertThat(result?.ocrScanResult?.credential?.boundingBox).isEqualTo(credentialLine.boundingBox)
-        assertThat(result?.ocrScanResult).isInstanceOf(OcrScanResult.GhanaNhisCard::class.java)
-    }
-
-    @Test
-    fun `returns ScannedMfidDocument for GhanaIdCard when line is found`() = runTest {
-        val credentialLine = ocrLine(text = "GHA-123456789-0")
-        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
-        every { ghanaIdCardOcrReaderUseCase(any(), any()) } returns OcrScanResult.GhanaIdCard(credential = credentialLine)
-
-        val result = useCase(bitmap, OcrDocumentType.GhanaIdCard, ghanaIdConfig)
-
-        assertThat(result).isNotNull()
-        assertThat(result?.ocrScanResult?.credential?.text).isEqualTo(credentialLine.text)
-        assertThat(result?.ocrScanResult).isInstanceOf(OcrScanResult.GhanaIdCard::class.java)
-    }
-
-    @Test
-    fun `returns null when selector finds no matching line for FaydaCard`() = runTest {
-        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
-        every { faydaCardOcrReaderUseCase(any()) } returns null
-        val result = useCase(bitmap, OcrDocumentType.FaydaCard, faydaConfig)
         assertThat(result).isNull()
-    }
-
-    @Test
-    fun `returns ScannedMfidDocument for FaydaCard when line is found`() = runTest {
-        val credentialLine = ocrLine(text = "1234567812345678")
-        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
-        every { faydaCardOcrReaderUseCase(any()) } returns OcrScanResult.FaydaCard(credential = credentialLine)
-        val result = useCase(bitmap, OcrDocumentType.FaydaCard, faydaConfig)
-        assertThat(result).isNotNull()
-        assertThat(result?.ocrScanResult?.credential?.text).isEqualTo(credentialLine.text)
-        assertThat(result?.ocrScanResult).isInstanceOf(OcrScanResult.FaydaCard::class.java)
-    }
-
-    @Test
-    fun `delegates FaydaCard to fayda selector`() = runTest {
-        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
-        useCase(bitmap, OcrDocumentType.FaydaCard, faydaConfig)
-        verify(exactly = 1) { faydaCardOcrReaderUseCase(any()) }
-        verify(exactly = 0) { ghanaNhisCardOcrReaderUseCase(any(), any()) }
-        verify(exactly = 0) { ghanaIdCardOcrReaderUseCase(any(), any()) }
-    }
-
-    @Test
-    fun `returns FaydaCard from barcode without running OCR`() = runTest {
-        val barcodes = listOf(ScannedBarcode(value = "1234567812345678", boundingBox = BoundingBox(0, 0, 10, 10)))
-        val barcodeResult = OcrScanResult.FaydaCard(credential = ocrLine(text = "1234567812345678"))
-        every { readBarcodesFromImage(bitmap) } returns barcodes
-        every { faydaCardOcrReaderUseCase.fromBarcodes(barcodes) } returns barcodeResult
-
-        val result = useCase(bitmap, OcrDocumentType.FaydaCard, faydaConfig, readFaydaBarcode = true)
-
-        assertThat(result?.ocrScanResult).isEqualTo(barcodeResult)
-        verify(exactly = 0) { readTextFromImage(any()) }
-        verify(exactly = 0) { faydaCardOcrReaderUseCase(any()) }
-    }
-
-    @Test
-    fun `falls back to OCR for FaydaCard when barcode is not read`() = runTest {
-        val ocrResult = OcrScanResult.FaydaCard(credential = ocrLine(text = "1234567812345678"))
-        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
-        every { faydaCardOcrReaderUseCase(any()) } returns ocrResult
-
-        val result = useCase(bitmap, OcrDocumentType.FaydaCard, faydaConfig, readFaydaBarcode = true)
-
-        assertThat(result?.ocrScanResult).isEqualTo(ocrResult)
-        verify(exactly = 1) { readBarcodesFromImage(bitmap) }
-        verify(exactly = 1) { readTextFromImage(bitmap) }
-    }
-
-    @Test
-    fun `does not read barcodes for Ghana cards`() = runTest {
-        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
-
-        useCase(bitmap, OcrDocumentType.NhisCard, nhisConfig, readFaydaBarcode = true)
-        useCase(bitmap, OcrDocumentType.GhanaIdCard, ghanaIdConfig, readFaydaBarcode = true)
-
-        verify(exactly = 0) { readBarcodesFromImage(any()) }
-    }
-
-    @Test
-    fun `does not read barcodes for FaydaCard when disabled`() = runTest {
-        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
-
-        useCase(bitmap, OcrDocumentType.FaydaCard, faydaConfig, readFaydaBarcode = false)
-
-        verify(exactly = 0) { readBarcodesFromImage(any()) }
-        verify(exactly = 1) { faydaCardOcrReaderUseCase(any()) }
-    }
-
-    @Test
-    fun `saves image when line is found`() = runTest {
-        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
-        every { ghanaNhisCardOcrReaderUseCase(any(), any()) } returns OcrScanResult.GhanaNhisCard(credential = ocrLine())
-
-        useCase(bitmap, OcrDocumentType.NhisCard, nhisConfig)
-
-        coVerify(exactly = 1) { credentialImageRepository.saveCredentialScan(bitmap, any()) }
-    }
-
-    @Test
-    fun `does not save image when no line is found`() = runTest {
-        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
-        every { ghanaNhisCardOcrReaderUseCase(any(), any()) } returns null
-
-        useCase(bitmap, OcrDocumentType.NhisCard, nhisConfig)
-
         coVerify(exactly = 0) { credentialImageRepository.saveCredentialScan(any(), any()) }
     }
 
     @Test
-    fun `saved image path is set in result`() = runTest {
-        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
-        every { ghanaNhisCardOcrReaderUseCase(any(), any()) } returns OcrScanResult.GhanaNhisCard(credential = ocrLine())
+    fun `returns saved document with readout source when text is read`() = runTest {
+        every { readOcrText(bitmap, OcrDocumentType.NhisCard, false) } returns nhisReadout
 
         val result = useCase(bitmap, OcrDocumentType.NhisCard, nhisConfig)
 
         assertThat(result?.imagePath).isEqualTo(savedImagePath)
+        assertThat(result?.ocrScanResult).isEqualTo(nhisReadout.scanResult)
+        assertThat(result?.source).isEqualTo(ReadoutSource.TEXT_OCR)
+        coVerify(exactly = 1) { credentialImageRepository.saveCredentialScan(bitmap, any()) }
+    }
+
+    @Test
+    fun `returns FaydaCard from barcode without reading text`() = runTest {
+        every { readBarcode(bitmap, OcrDocumentType.FaydaCard) } returns faydaBarcodeReadout
+
+        val result = useCase(bitmap, OcrDocumentType.FaydaCard, faydaConfig, readFaydaBarcode = true)
+
+        assertThat(result?.ocrScanResult).isEqualTo(faydaBarcodeReadout.scanResult)
+        assertThat(result?.source).isEqualTo(ReadoutSource.BARCODE)
+        verify(exactly = 0) { readOcrText(any(), any(), any()) }
+    }
+
+    @Test
+    fun `falls back to text for FaydaCard when barcode is not read`() = runTest {
+        every { readOcrText(bitmap, OcrDocumentType.FaydaCard, false) } returns faydaOcrReadout
+
+        val result = useCase(bitmap, OcrDocumentType.FaydaCard, faydaConfig, readFaydaBarcode = true)
+
+        assertThat(result?.ocrScanResult).isEqualTo(faydaOcrReadout.scanResult)
+        assertThat(result?.source).isEqualTo(ReadoutSource.TEXT_OCR)
+        verify(exactly = 1) { readBarcode(bitmap, OcrDocumentType.FaydaCard) }
+    }
+
+    @Test
+    fun `passes the document type to the barcode reader`() = runTest {
+        useCase(bitmap, OcrDocumentType.NhisCard, nhisConfig, readFaydaBarcode = true)
+        useCase(bitmap, OcrDocumentType.GhanaIdCard, ghanaIdConfig, readFaydaBarcode = true)
+
+        verify(exactly = 1) { readBarcode(bitmap, OcrDocumentType.NhisCard) }
+        verify(exactly = 1) { readBarcode(bitmap, OcrDocumentType.GhanaIdCard) }
+    }
+
+    @Test
+    fun `does not read barcodes for FaydaCard when disabled`() = runTest {
+        useCase(bitmap, OcrDocumentType.FaydaCard, faydaConfig, readFaydaBarcode = false)
+
+        verify(exactly = 0) { readBarcode(any(), any()) }
+        verify(exactly = 1) { readOcrText(bitmap, OcrDocumentType.FaydaCard, false) }
+    }
+
+    @Test
+    fun `passes isCapturingAllFields from the matching card config`() = runTest {
+        useCase(bitmap, OcrDocumentType.NhisCard, allFieldsConfig)
+        useCase(bitmap, OcrDocumentType.GhanaIdCard, allFieldsConfig)
+        useCase(bitmap, OcrDocumentType.FaydaCard, allFieldsConfig)
+
+        verify { readOcrText(bitmap, OcrDocumentType.NhisCard, true) }
+        verify { readOcrText(bitmap, OcrDocumentType.GhanaIdCard, true) }
+        verify { readOcrText(bitmap, OcrDocumentType.FaydaCard, true) }
+    }
+
+    @Test
+    fun `passes false for isCapturingAllFields when card config is absent`() = runTest {
+        useCase(bitmap, OcrDocumentType.NhisCard, ghanaIdConfig)
+
+        verify { readOcrText(bitmap, OcrDocumentType.NhisCard, false) }
     }
 
     @Test
     fun `returns null when exception is thrown`() = runTest {
-        every { readTextFromImage(bitmap) } throws RuntimeException("OCR failed")
+        every { readOcrText(any(), any(), any()) } throws RuntimeException("OCR failed")
+
         val result = useCase(bitmap, OcrDocumentType.NhisCard, nhisConfig)
+
         assertThat(result).isNull()
-    }
-
-    @Test
-    fun `delegates NhisCard to nhis selector`() = runTest {
-        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
-
-        useCase(bitmap, OcrDocumentType.NhisCard, nhisConfig)
-
-        verify(exactly = 1) { ghanaNhisCardOcrReaderUseCase(any(), any()) }
-        verify(exactly = 0) { ghanaIdCardOcrReaderUseCase(any(), any()) }
-    }
-
-    @Test
-    fun `delegates GhanaIdCard to ghana id selector`() = runTest {
-        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
-
-        useCase(bitmap, OcrDocumentType.GhanaIdCard, ghanaIdConfig)
-
-        verify(exactly = 1) { ghanaIdCardOcrReaderUseCase(any(), any()) }
-        verify(exactly = 0) { ghanaNhisCardOcrReaderUseCase(any(), any()) }
-    }
-
-    @Test
-    fun `passes isCapturingAllFields from nhis config to selector`() = runTest {
-        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
-        useCase(bitmap, OcrDocumentType.NhisCard, allFieldsConfig)
-        verify { ghanaNhisCardOcrReaderUseCase(any(), isCapturingAllFields = true) }
-    }
-
-    @Test
-    fun `passes isCapturingAllFields from ghana id config to selector`() = runTest {
-        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
-        useCase(bitmap, OcrDocumentType.GhanaIdCard, allFieldsConfig)
-        verify { ghanaIdCardOcrReaderUseCase(any(), isCapturingAllFields = true) }
-    }
-
-    @Test
-    fun `passes false for isCapturingAllFields when config is absent for nhis`() = runTest {
-        val configWithoutNhis = MultiFactorIdConfiguration(
-            allowedExternalCredentials = emptyList(),
-            ghanaIdCardConfig = null,
-            nhisCardConfig = null,
-            qrCodeConfig = null,
-            faydaCardConfig = null,
-        )
-        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
-
-        useCase(bitmap, OcrDocumentType.NhisCard, configWithoutNhis)
-
-        verify { ghanaNhisCardOcrReaderUseCase(any(), isCapturingAllFields = false) }
     }
 
     private fun ocrLine(text: String = "12345678") = OcrLine(
