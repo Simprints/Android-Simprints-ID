@@ -24,6 +24,8 @@ import com.simprints.infra.events.event.domain.models.ExternalCredentialSelectio
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Before
@@ -125,6 +127,27 @@ internal class ExternalCredentialViewModelTest {
         viewModel.setSelectedExternalCredentialType(ExternalCredentialType.QRCode)
         viewModel.addCaptureAttempt(scannedCredentialResult)
         viewModel.addCaptureAttempt(scannedCredentialResult)
+
+        coVerify(exactly = 1) { eventsTracker.buildCaptureAttempt(any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `addCaptureAttempt ignores a replay while the first attempt is still being built`() = runTest {
+        coEvery { eventsTracker.saveSelectionEvent(any(), any(), any()) } returns "selection-id"
+        val scannedCredentialResult = createScannedCredential()
+        val gate = CompletableDeferred<Unit>()
+        coEvery { eventsTracker.buildCaptureAttempt(any(), any(), any(), any()) } coAnswers {
+            gate.await()
+            makeAttempt().copy(scannedCredentialResult = scannedCredentialResult)
+        }
+
+        viewModel.init(createParams(subjectId = "subjectId", flowType = FlowType.IDENTIFY))
+        viewModel.selectionStarted()
+        viewModel.setSelectedExternalCredentialType(ExternalCredentialType.QRCode)
+        viewModel.addCaptureAttempt(scannedCredentialResult)
+        viewModel.addCaptureAttempt(scannedCredentialResult) // replay after a configuration change
+        gate.complete(Unit)
+        runCurrent()
 
         coVerify(exactly = 1) { eventsTracker.buildCaptureAttempt(any(), any(), any(), any()) }
     }
