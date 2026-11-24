@@ -100,7 +100,7 @@ Metrics mapping: Phase 2 `not-started`/`planned` = legacy UI, `in-progress`/`val
 
 | Module                              | Wave | Phase 1     | Phase 2     | Updated    | Notes                                 |
 |-------------------------------------|------|-------------|-------------|------------|---------------------------------------|
-| `:feature:dashboard`                | 0    | not-started | not-started | 2026-10-14 | Pilot                                 |
+| `:feature:dashboard`                | 0    | audit       | not-started | 2026-11-24 | Pilot                                 |
 | `:feature:troubleshooting`          | 1    | not-started | not-started | 2026-10-14 | Extension of dashboard                |
 | `:infra:ui-base`                    | 1    | n/a         | not-started | 2026-10-14 | Shared dialog only                    |
 | `:feature:alert`                    | 2    | not-started | not-started | 2026-10-14 |                                       |
