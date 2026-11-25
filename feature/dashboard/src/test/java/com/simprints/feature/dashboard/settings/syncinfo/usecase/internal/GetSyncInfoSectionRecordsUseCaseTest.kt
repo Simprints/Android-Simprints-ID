@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.dashboard.settings.syncinfo.RecordSyncVisibleState
+import com.simprints.feature.dashboard.settings.syncinfo.SyncInfoError
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
@@ -727,6 +728,61 @@ internal class GetSyncInfoSectionRecordsUseCaseTest {
                 .last()
                 .isDone,
         ).isFalse()
+    }
+
+    // S-14
+    @Test
+    fun `error popup info mirrors maintenance, its estimated outage and too many requests`() = runTest {
+        val result = invokeUseCase(
+            eventSyncState = createEventSyncState(
+                syncFailed = true,
+                syncFailedBecauseBackendMaintenance = true,
+                estimatedBackendMaintenanceOutage = 600L,
+                syncFailedBecauseTooManyRequests = true,
+            ),
+        )
+
+        assertThat(result.instructionPopupErrorInfo).isEqualTo(
+            SyncInfoError(isBackendMaintenance = true, backendMaintenanceEstimatedOutage = 600L, isTooManyRequests = true),
+        )
+    }
+
+    // S-14
+    @Test
+    fun `error popup info uses -1 when the maintenance outage is unknown`() = runTest {
+        val result = invokeUseCase(
+            eventSyncState = createEventSyncState(
+                syncFailed = true,
+                syncFailedBecauseBackendMaintenance = true,
+                estimatedBackendMaintenanceOutage = null,
+            ),
+        )
+
+        assertThat(result.instructionPopupErrorInfo).isEqualTo(
+            SyncInfoError(isBackendMaintenance = true, backendMaintenanceEstimatedOutage = -1L, isTooManyRequests = false),
+        )
+    }
+
+    // S-14
+    @Test
+    fun `sync incomplete footer is shown only in pre-logout mode with a failed sync`() = runTest {
+        val preLogoutFailed = invokeUseCase(isPreLogoutUpSync = true, eventSyncState = createEventSyncState(syncFailed = true))
+        val normalFailed = invokeUseCase(isPreLogoutUpSync = false, eventSyncState = createEventSyncState(syncFailed = true))
+        val preLogoutNotFailed = invokeUseCase(isPreLogoutUpSync = true, eventSyncState = createEventSyncState(syncFailed = false))
+
+        assertThat(preLogoutFailed.isFooterSyncIncompleteVisible).isTrue()
+        assertThat(normalFailed.isFooterSyncIncompleteVisible).isFalse()
+        assertThat(preLogoutNotFailed.isFooterSyncIncompleteVisible).isFalse()
+    }
+
+    // S-14
+    @Test
+    fun `combined images counter visibility follows pre-logout mode`() = runTest {
+        val preLogout = invokeUseCase(isPreLogoutUpSync = true)
+        val normal = invokeUseCase(isPreLogoutUpSync = false)
+
+        assertThat(preLogout.isCounterImagesToUploadVisible).isTrue()
+        assertThat(normal.isCounterImagesToUploadVisible).isFalse()
     }
 
     private fun invokeUseCase(

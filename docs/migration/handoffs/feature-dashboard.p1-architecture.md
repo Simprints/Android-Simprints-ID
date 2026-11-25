@@ -1091,4 +1091,23 @@ Step 1 additionally:
       the hidden entry easier to reach, and the password gate still applies. An unknown password-dialog key sends nothing (before: it
       unlocked); only About's own keys can reach it. `Load` writes state once after both reads. Logout requests run one after another, so
       a slow logout decision holds up later actions. AB-3 and AB-5 are split between the ViewModel and Fragment tests, as ST-7 was.
+    - **Step 10 as implemented (2026-11-25), accepted by the reviewer:**
+        - KI-1 test mechanics differ from the §8 Step 10 test note: stop/start keeps an `ActivityScenario` and moves it CREATED →
+          RESUMED, because `HiltExt.moveToState` caps the Fragment's own lifecycle and destroys its view; view re-creation uses
+          Fragment detach/attach (Fragment and ViewModel kept, as on a back-stack return), because activity recreation makes a new
+          Fragment that the test `NavController` is not attached to.
+        - `observeSyncInfo(mode)` is called once per stream restart (the flow is cold and keeps its operator state per collection).
+        - The `SyncInfo()` pre-render in `onViewCreated` is gone; the first render at STARTED comes from the initial state (S-13).
+        - The view re-renders on every STARTED and on re-login presses, which restarts the progress pulse animation (cosmetic).
+        - Without `HostAttached`, actions treat the host as normal mode, the old `var` default; `HostAttached` is always sent first.
+        - Clicks and results are queued, so a slow `getProject()` network fallback holds up later SyncInfo actions.
+        - The module-selection `isConfirmed` check moved into the ViewModel; S-6 is split between the Fragment (result forwarded) and
+          ViewModel (confirmed vs not) tests. `performLogout` is private; S-2 is met through the auto-logout tests.
+        - KI-4's extra pre-logout image collector on each restart is pinned by
+          `after a stream restart in pre-logout mode one events completion starts images once per stream start` (current behaviour).
+        - Step 12's `LiveData` grep will match `viewLifecycleOwnerLiveData` in `SyncInfoFragmentTest`; exclude it.
+    - **Decided 2026-11-25 — KI-1 fixed in step 10:** DV-1 is withdrawn for SyncInfo. Re-login navigation is a one-time
+      `SyncInfoUiEffect.NavigateToLogin(params)`; `loginRequest`/`LoginRequest`/`seq` and the dedicated collector are removed, so the
+      step 12 `LiveData` grep no longer needs to exclude KI-1 comments (only `viewLifecycleOwnerLiveData` in `SyncInfoFragmentTest`).
+      Details in `feature-dashboard.p1-known-issues.md` (KI-1).
     - _(reviewer)_

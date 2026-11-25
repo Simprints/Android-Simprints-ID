@@ -14,6 +14,9 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.simprints.core.tools.utils.TimeUtils
@@ -22,6 +25,7 @@ import com.simprints.feature.dashboard.databinding.FragmentSyncInfoBinding
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCountAdapter
 import com.simprints.feature.dashboard.view.ConfigurableSyncInfoFragmentContainer
 import com.simprints.feature.login.LoginContract
+import com.simprints.feature.login.LoginResult
 import com.simprints.feature.moduleselector.ModuleSelectorContract
 import com.simprints.feature.moduleselector.ModuleSelectorResult
 import com.simprints.infra.uibase.navigation.handleResult
@@ -30,6 +34,8 @@ import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.view.setPulseAnimation
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import com.simprints.feature.login.R as LoginR
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
@@ -48,7 +54,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         syncInfoConfig =
             (container?.parent as? ConfigurableSyncInfoFragmentContainer)?.syncInfoFragmentConfig
                 ?: SyncInfoFragmentConfig()
-        viewModel.isPreLogoutUpSync = syncInfoConfig.isSyncInfoLogoutOnComplete
+        viewModel.onAction(SyncInfoUiAction.HostAttached(isPreLogoutUpSync = syncInfoConfig.isSyncInfoLogoutOnComplete))
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
@@ -62,22 +68,20 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         binding.selectedModulesView.adapter = moduleCountAdapter
 
         setupClickListeners()
-        observeUI()
+        observeState()
 
+        val currentDestinationId = SyncInfoRenderRules.currentDestinationId(syncInfoConfig)
         findNavController().handleResult<ModuleSelectorResult>(
             viewLifecycleOwner,
-            getCurrentDestinationId(),
+            currentDestinationId,
             ModuleSelectorContract.DESTINATION,
-        ) {
-            if (it.isConfirmed) viewModel.forceEventSync(false)
-        }
+        ) { result -> viewModel.onAction(SyncInfoUiAction.ModuleSelectionResultReceived(result)) }
 
-        findNavController().handleResult(
+        findNavController().handleResult<LoginResult>(
             viewLifecycleOwner,
-            getCurrentDestinationId(),
+            currentDestinationId,
             LoginContract.DESTINATION,
-            viewModel::handleLoginResult,
-        )
+        ) { result -> viewModel.onAction(SyncInfoUiAction.LoginResultReceived(result)) }
     }
 
     override fun onDestroyView() {
@@ -101,13 +105,13 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
             findNavController().popBackStack()
         }
         binding.syncReloginRequiredLoginButton.setOnClickListener {
-            viewModel.requestNavigationToLogin()
+            viewModel.onAction(SyncInfoUiAction.RequestLogin)
         }
         binding.buttonSyncRecordsNow.setOnClickListener {
-            viewModel.forceEventSync()
+            viewModel.onAction(SyncInfoUiAction.SyncRecordsClicked)
         }
         binding.buttonSyncImagesNow.setOnClickListener {
-            viewModel.toggleImageSync()
+            viewModel.onAction(SyncInfoUiAction.SyncImagesClicked)
         }
         binding.textEventSyncInstructionsCommCarePermission.setOnClickListener {
             startActivity(
@@ -138,13 +142,22 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         }
     }
 
-    private fun observeUI() {
-        renderSyncInfo(SyncInfo(), syncInfoConfig)
-        viewModel.syncInfoLiveData.observe(viewLifecycleOwner) { syncInfo ->
-            renderSyncInfo(syncInfo, syncInfoConfig)
+    private fun observeState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { viewModel.uiState.collect(::render) }
+                launch { viewModel.uiEffect.collect(::handleEffect) }
+            }
         }
-        viewModel.loginNavigationEventLiveData.observe(viewLifecycleOwner) { loginParams ->
-            findNavController().navigate(com.simprints.feature.login.R.id.graph_login, loginParams.toBundle())
+    }
+
+    private fun render(state: SyncInfoUiState) {
+        renderSyncInfo(state.syncInfo, syncInfoConfig)
+    }
+
+    private fun handleEffect(effect: SyncInfoUiEffect) {
+        when (effect) {
+            is SyncInfoUiEffect.NavigateToLogin -> findNavController().navigate(LoginR.id.graph_login, effect.params.toBundle())
         }
     }
 
@@ -177,7 +190,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         renderRecordsSection(syncInfo.syncInfoSectionRecords, config)
 
         // Images section
-        binding.layoutImagesSync.isVisible = config.isSyncInfoImageSyncVisible && syncInfo.isImageSyncSectionVisible
+        binding.layoutImagesSync.isVisible = SyncInfoRenderRules.isImageSectionVisible(config, syncInfo)
         renderImagesSection(syncInfo.syncInfoSectionImages)
 
         // Modules section
@@ -217,7 +230,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         binding.textEventSyncInstructionsOffline.isVisible = records.recordSyncVisibleState == RecordSyncVisibleState.OFFLINE_ERROR
         binding.textEventSyncInstructionsNoModules.isVisible = records.recordSyncVisibleState == RecordSyncVisibleState.NO_MODULES_ERROR
         binding.textEventSyncInstructionsError.isVisible = records.recordSyncVisibleState == RecordSyncVisibleState.ERROR
-        records.instructionPopupErrorInfo.configureErrorPopup()
+        binding.textEventSyncInstructionsError.showInfoPopupOnClick(errorPopupMessage(records.instructionPopupErrorInfo))
 
         // Progress: using `isInvisible` because the empty space should still be there if no progress bar
         binding.layoutEventSyncProgress.isInvisible = !records.isProgressVisible
@@ -231,20 +244,12 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         binding.eventSyncProgressBar.setPulseAnimation(isEnabled = records.isProgressVisible)
 
         // Sync button
-        val isSyncButtonVisible = !config.isSyncInfoLogoutOnComplete || records.isSyncButtonVisible
-        binding.buttonSyncRecordsNow.isVisible = isSyncButtonVisible
+        binding.buttonSyncRecordsNow.isVisible = SyncInfoRenderRules.isSyncButtonVisible(config, records)
         binding.buttonSyncRecordsNow.isEnabled = records.isSyncButtonEnabled
-        binding.buttonSyncRecordsNow.text = getString(
-            when {
-                records.isProgressVisible -> IDR.string.sync_info_button_records_syncing
-                records.isSyncButtonForRetry -> IDR.string.sync_info_button_try_again
-                else -> IDR.string.sync_info_button_sync_records
-            },
-        )
+        binding.buttonSyncRecordsNow.text = getString(SyncInfoRenderRules.syncButtonText(records))
 
         // Footer
-        val isFooterSyncInProgressVisible = config.isSyncInfoLogoutOnComplete && records.isFooterSyncInProgressVisible
-        binding.textFooterRecordSyncInProgress.isVisible = isFooterSyncInProgressVisible
+        binding.textFooterRecordSyncInProgress.isVisible = SyncInfoRenderRules.isFooterSyncInProgressVisible(config, records)
         binding.layoutFooterRecordLoggingOut.isVisible = records.isFooterReadyToLogOutVisible
         binding.textFooterRecordSyncIncomplete.isVisible = records.isFooterSyncIncompleteVisible
         binding.textFooterRecordLastSyncedWhen.isVisible = records.isFooterLastSyncTimeVisible
@@ -252,27 +257,17 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
             String.format(getString(IDR.string.sync_info_last_sync), records.footerLastSyncMinutesAgo)
     }
 
-    private fun SyncInfoError.configureErrorPopup() {
-        binding.textEventSyncInstructionsError.showInfoPopupOnClick(
-            when {
-                isTooManyRequests -> getString(
-                    IDR.string.sync_info_details_too_many_modules,
-                )
+    private fun errorPopupMessage(error: SyncInfoError): String = when (val message = SyncInfoRenderRules.errorPopupMessage(error)) {
+        SyncInfoRenderRules.ErrorPopupMessage.TooManyRequests -> getString(IDR.string.sync_info_details_too_many_modules)
 
-                isBackendMaintenance && backendMaintenanceEstimatedOutage > 0 -> getString(
-                    IDR.string.error_backend_maintenance_with_time_message,
-                    TimeUtils.getFormattedEstimatedOutage(backendMaintenanceEstimatedOutage),
-                )
-
-                isBackendMaintenance -> getString(
-                    IDR.string.error_backend_maintenance_message,
-                )
-
-                else -> getString(
-                    IDR.string.sync_info_details_error,
-                )
-            },
+        is SyncInfoRenderRules.ErrorPopupMessage.MaintenanceWithOutage -> getString(
+            IDR.string.error_backend_maintenance_with_time_message,
+            TimeUtils.getFormattedEstimatedOutage(message.estimatedOutage),
         )
+
+        SyncInfoRenderRules.ErrorPopupMessage.Maintenance -> getString(IDR.string.error_backend_maintenance_message)
+
+        SyncInfoRenderRules.ErrorPopupMessage.Generic -> getString(IDR.string.sync_info_details_error)
     }
 
     private fun renderImagesSection(images: SyncInfoSectionImages) {
@@ -292,19 +287,10 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
         // Sync button
         binding.buttonSyncImagesNow.isEnabled = images.isSyncButtonEnabled
-        binding.buttonSyncImagesNow.text = getString(
-            when {
-                images.isProgressVisible -> IDR.string.sync_info_button_images_sync_stop
-                else -> IDR.string.sync_info_button_sync_images
-            },
-        )
+        binding.buttonSyncImagesNow.text = getString(SyncInfoRenderRules.imageSyncButtonText(images))
         binding.buttonSyncImagesNow.backgroundTintList = ContextCompat.getColorStateList(
             requireContext(),
-            if (images.isProgressVisible) {
-                IDR.color.button_sync_images_background_red
-            } else {
-                IDR.color.button_sync_images_background_default
-            },
+            SyncInfoRenderRules.imageSyncButtonColor(images),
         )
 
         // Footer: using `isInvisible` because the empty space should still be there if no visible footer
@@ -317,9 +303,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         modules: SyncInfoSectionModules,
         config: SyncInfoFragmentConfig,
     ) {
-        val isModuleSectionVisible =
-            modules.isSectionAvailable && (config.isSyncInfoModuleListVisible || modules.moduleCounts.isEmpty())
-        binding.layoutModuleSelection.isVisible = isModuleSectionVisible
+        binding.layoutModuleSelection.isVisible = SyncInfoRenderRules.isModuleSectionVisible(config, modules)
         binding.selectedModulesView.isVisible = config.isSyncInfoModuleListVisible
 
         moduleCountAdapter.submitList(modules.moduleCounts)
@@ -344,25 +328,26 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
     ) {
         progressBar.progress = progress.progressBarPercentage
         val progressText = progress.progressParts
-            .mapIndexed { index, (isPending, isDone, areNumbersVisible, currentNumber, totalNumber) ->
+            .mapIndexed { index, part ->
                 val itemName = getString(itemNameResIDs.getOrNull(index) ?: IDR.string.sync_info_item_default)
-                when {
-                    isPending -> getString(IDR.string.sync_info_progress_pending, itemName)
-                    isDone -> getString(IDR.string.sync_info_progress_complete, itemName)
-                    !areNumbersVisible -> getString(IDR.string.sync_info_progress_ongoing_no_counters, itemName)
-                    else -> getString(IDR.string.sync_info_progress_ongoing, itemName, currentNumber, totalNumber)
+                when (val line = SyncInfoRenderRules.progressLine(part)) {
+                    SyncInfoRenderRules.ProgressLine.Pending -> getString(IDR.string.sync_info_progress_pending, itemName)
+                    SyncInfoRenderRules.ProgressLine.Done -> getString(IDR.string.sync_info_progress_complete, itemName)
+                    SyncInfoRenderRules.ProgressLine.OngoingWithoutCounters -> getString(
+                        IDR.string.sync_info_progress_ongoing_no_counters,
+                        itemName,
+                    )
+
+                    is SyncInfoRenderRules.ProgressLine.Ongoing -> getString(
+                        IDR.string.sync_info_progress_ongoing,
+                        itemName,
+                        line.current,
+                        line.total,
+                    )
                 }
             }.joinToString(separator = "\n")
 
         textView.text = progressText
-    }
-
-    // Being run withing a nested NavFragment sometimes messes up the "parent" resolution and breaks the navigation result handling,
-    // so we have to find the correct destination manually using the UI clues.
-    private fun getCurrentDestinationId(): Int = when {
-        syncInfoConfig.isSyncInfoLogoutOnComplete -> R.id.logOutSyncFragment // if logging out on complete, we are at logout screen
-        syncInfoConfig.isSyncInfoToolbarVisible -> R.id.syncInfoFragment // if shown toolbar, we are in standalone sync info fragment
-        else -> R.id.mainFragment // otherwise we are in main fragment
     }
 
     private companion object {

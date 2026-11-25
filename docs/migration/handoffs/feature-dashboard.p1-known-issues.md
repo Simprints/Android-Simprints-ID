@@ -10,7 +10,7 @@ reproduced on a device.
 
 | ID   | Screen(s)                                                       | Today                                                       | Phase 1                                               | After Phase 1                                   |
 |------|-----------------------------------------------------------------|-------------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------|
-| KI-1 | `SyncInfoFragment` (main card, standalone screen, logout panel) | Re-login navigation is replayed to every newly created view | Keep; deliberate deviation from `viewmodel-udf.md` §5 | Make it a one-time `UiEffect`                   |
+| KI-1 | `SyncInfoFragment` (main card, standalone screen, logout panel) | Re-login navigation is replayed to every newly created view | **Fixed in step 10** (decided 2026-11-25) | n/a |
 | KI-2 | `SettingsFragment`                                              | "Last updated" summary is stale after a sub-screen round trip and lost after an activity re-creation | **Fixed in step 8** (decided 2026-11-25) | n/a |
 | KI-3 | `SettingsFragment`                                              | App relaunch after a language change does not wait for the language to be saved | **Fixed in step 8** (decided 2026-11-25) | n/a |
 | KI-4 | `SyncInfoFragment` (all hosts; duplicates only on the logout panel) | Each stream restart re-runs the initial-sync decision and adds another image auto-start collector | Keep; same 5 s stop timeout and `onStart` hooks | Start the image collector once; decide whether the re-check is intended |
@@ -26,6 +26,14 @@ and added by human decision on 2026-11-24. All five are kept as they are in Phas
 ## KI-1: re-login navigation is replayed when the sync-info view is re-created
 
 Audit references: R-4 (b), §6.5, proposals S-5 and S-12.
+
+> **Decided 2026-11-25: fixed in Phase 1 step 10.** The "Fix after Phase 1" below is applied: `loginRequest`, `LoginRequest` and its
+> `seq` are gone, and a re-login press sends `SyncInfoUiEffect.NavigateToLogin(params)` through `emitEffect`. The dedicated collector is
+> deleted; the Fragment navigates from `handleEffect` (still `navigate(graph_login, params.toBundle())`; `navigateSafely` was not adopted
+> because the target is a graph ID, not `NavDirections`). Tests: each press sends one effect and navigates once; a delivered request is not
+> replayed to a later collector; re-creating the view does not navigate again; a request sent while the view is stopped navigates once on
+> start; stop/start does not navigate again. The "Phase 1 approach" section below is superseded. Still to do: check on a device that
+> returning from login no longer reopens it, and run the related E2E cases from the audit §9.
 
 ### Current behaviour
 
