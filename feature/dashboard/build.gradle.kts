@@ -26,10 +26,8 @@ dependencies {
     // Data Generator is a test-only feature, only included in debug builds
     debugImplementation(project(":testing:data-generator"))
 
-    implementation(libs.fuzzywuzzy.core)
     implementation(libs.kotlin.serialization)
 
     // UI
     implementation(libs.androidX.ui.preference)
-    implementation(libs.workManager.work)
 }
