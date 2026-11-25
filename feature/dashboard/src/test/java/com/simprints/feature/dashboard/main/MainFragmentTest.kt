@@ -15,6 +15,7 @@ import androidx.work.Configuration
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.dashboard.R
+import com.simprints.feature.dashboard.main.dailyactivity.DailyActivityUiState
 import com.simprints.feature.dashboard.main.dailyactivity.DailyActivityViewModel
 import com.simprints.feature.dashboard.main.projectdetails.ProjectDetailsUiState
 import com.simprints.feature.dashboard.main.projectdetails.ProjectDetailsViewModel
@@ -60,6 +61,7 @@ class MainFragmentTest {
     fun setUp() {
         hiltRule.inject()
         projectDetailsViewModel.stubMvi(ProjectDetailsUiState())
+        dailyActivityViewModel.stubMvi(DailyActivityUiState())
         val ctx: Context = getApplicationContext()
         WorkManagerTestInitHelper.initializeTestWorkManager(ctx, Configuration.Builder().build())
     }
