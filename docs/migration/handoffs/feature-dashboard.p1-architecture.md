@@ -1067,4 +1067,18 @@ Step 1 additionally:
       parity item PC-7).
     - **Decided 2026-11-24 — M-5 and FS-4:** keep current behaviour in Phase 1, recorded as KI-6 and KI-7; pinned by M-5 (step 5) and
       FS-4 (step 2), parity items PC-13 and PC-73.
+    - **Decided 2026-11-25 — KI-2 fixed in step 8:** DV-2 is withdrawn. The Settings "last updated" value moves into `SettingsUiState`
+      and is rendered from state; `ShowConfigLastUpdated` is removed; ST-9 and PC-56 follow the fix in `feature-dashboard.p1-known-issues.md`
+      (KI-2). Reason: the KI-2 "current behaviour" was wrong (stale after a back-stack round trip, lost only on activity re-creation).
+    - **Decided 2026-11-25 — init load as an action:** Settings (§4.7) and About (§4.8) get `data object Load` (init only) with
+      `init { onAction(Load) }`, as Main does. Every action sent before the load finishes now waits for it; for a language click this
+      means the password check applies.
+    - **Step 8 as implemented (2026-11-25):** besides the KI-2 changes recorded in the known-issues file, ST-7 is pinned in
+      `SettingsViewModelTest` (the unlock now lives in the ViewModel, so a Fragment test would only test the mock); N-5 is superseded (the
+      value is state, so a late collector reads it from the `StateFlow`) and replaced by "language dialog requested before anyone collects
+      is still delivered"; the summary choice is a pure property tested in the new `SettingsUiStateTest`. Accepted: a `ScreenStarted` read
+      in flight during a refresh emission can write back the older relative text (milliseconds window).
+    - **Decided 2026-11-25 — KI-3 fixed in step 8:** DV-3 is withdrawn. The relaunch after a language change is a `RelaunchApp` effect
+      sent after the save; the Fragment no longer writes the summary or relaunches by itself, and dismisses the language dialog on
+      selection. A failed save does not relaunch. Details in `feature-dashboard.p1-known-issues.md` (KI-3).
     - _(reviewer)_

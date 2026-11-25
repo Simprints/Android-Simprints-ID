@@ -11,8 +11,8 @@ reproduced on a device.
 | ID   | Screen(s)                                                       | Today                                                       | Phase 1                                               | After Phase 1                                   |
 |------|-----------------------------------------------------------------|-------------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------|
 | KI-1 | `SyncInfoFragment` (main card, standalone screen, logout panel) | Re-login navigation is replayed to every newly created view | Keep; deliberate deviation from `viewmodel-udf.md` §5 | Make it a one-time `UiEffect`                   |
-| KI-2 | `SettingsFragment`                                              | "Last updated" summary is lost when the view is re-created  | Keep; the standard §5 mapping already preserves it    | Move it into `UiState`, formatted when rendered |
-| KI-3 | `SettingsFragment`                                              | App relaunch after a language change does not wait for the language to be saved | Keep the Fragment sequence; refresh runs in `launchWork` | Relaunch on an effect sent after the save |
+| KI-2 | `SettingsFragment`                                              | "Last updated" summary is stale after a sub-screen round trip and lost after an activity re-creation | **Fixed in step 8** (decided 2026-11-25) | n/a |
+| KI-3 | `SettingsFragment`                                              | App relaunch after a language change does not wait for the language to be saved | **Fixed in step 8** (decided 2026-11-25) | n/a |
 | KI-4 | `SyncInfoFragment` (all hosts; duplicates only on the logout panel) | Each stream restart re-runs the initial-sync decision and adds another image auto-start collector | Keep; same 5 s stop timeout and `onStart` hooks | Start the image collector once; decide whether the re-check is intended |
 | KI-5 | `RequestLoginFragment` (**unconfirmed**)                        | Logout-reason dialog may re-appear after returning from troubleshooting | No change (Fragment not refactored) | Confirm on a device, then decide "once per logout" |
 | KI-6 | `MainFragment`                                                  | A failing configuration read crashes the app and skips the root check | Keep; the base-class guard catches only cancellation | Run the root check independently; log the config failure |
@@ -117,6 +117,21 @@ This looks like a latent bug, but it is kept by decision. Confirm it on a device
 
 Audit references: R-4 (c), §6.6, proposal ST-9.
 
+> **Decided 2026-11-25: fixed in Phase 1 step 8.** While writing the "before" tests the step-8 executor found that the "Current
+> behaviour" below is wrong in one respect. `PreferenceFragmentCompat` builds its preferences once per Fragment instance, not per view, so
+> after a round trip through a sub-screen (back stack) the summary is **kept but stale** ("x minutes ago" frozen at the time it was
+> computed). It falls back to the XML default only when the Fragment itself is re-created while the ViewModel survives (activity
+> re-creation). Instead of pinning that, the human decided to apply the "Fix after Phase 1" approach below in step 8: the value moves into
+> `UiState`, the Fragment renders the summary from state, and `ShowConfigLastUpdated` is removed. The "Phase 1 approach" section and the
+> ST-9 wording in it are superseded; ST-9 follows the "Tests" bullet of the fix.
+>
+> **As implemented in step 8:** `ConfigSyncCache` only exposes `sinceLastUpdateTime()` as a pre-formatted relative string (no raw
+> timestamp), so the value is refreshed on a `ScreenStarted` action each time the view reaches STARTED instead of being formatted at render
+> time. The text still does not tick while the screen stays open, as before. Because the summary is now rendered from state, the
+> "Configuration update started" summary also moved to state (`isConfigUpdateScheduled`, cleared by the next refresh emission); its only
+> visible change is that it is still shown after an activity re-creation during a refresh. The toast stays an effect, sent before the state
+> update.
+
 ### Current behaviour
 
 - `SettingsViewModel` sends the "since last updated" text as a `LiveDataEventWithContent<String>`. It sends it once from `load()`, which
@@ -171,6 +186,16 @@ Audit references: R-4 (c), §6.6, proposal ST-9.
 ## KI-3: the app relaunches before the new language is saved
 
 Handoff references: AP-11, DV-3; audit R-5, proposals ST-3 and ST-6.
+
+> **Decided 2026-11-25: fixed in Phase 1 step 8.** The "Fix after Phase 1" below is applied in step 8 instead of keeping the behaviour:
+> the ViewModel emits `RelaunchApp` after the write, the event, the `languageCode` state update and the log; the Fragment relaunches only on
+> that effect and renders the summary from state (the immediate summary write is removed). **Failure:** if the write throws, no relaunch
+> is requested and the exception escapes through `viewModelScope`, as an escaped save exception did before. **Double pick:** the language
+> dialog is dismissed on selection, so a second pick during the save cannot relaunch the app twice. Tests: "relaunch is requested only
+> after the language is saved", "a failed language save does not ask for a relaunch" (ViewModel); ST-3 now pins "selection sends
+> `LanguageSelected`, dismisses the dialog and does not relaunch", plus "saved language is shown and the app relaunches only on the
+> relaunch effect" (Fragment). The "Phase 1 approach" section below is superseded. Still to do: check on a device that the new language
+> is applied after the relaunch.
 
 ### Current behaviour
 
