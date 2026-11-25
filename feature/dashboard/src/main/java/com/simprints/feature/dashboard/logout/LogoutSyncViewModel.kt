@@ -3,13 +3,8 @@ package com.simprints.feature.dashboard.logout
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.SettingsPasswordConfig
-import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.devicestate.DeviceStateDataTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,8 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class LogoutSyncViewModel @Inject constructor(
-    private val configRepository: ConfigRepository,
-    private val syncOrchestrator: SyncOrchestrator,
+    syncOrchestrator: SyncOrchestrator,
     authStore: AuthStore,
     deviceStateDataTracker: DeviceStateDataTracker,
 ) : ViewModel() {
@@ -42,15 +36,6 @@ internal class LogoutSyncViewModel @Inject constructor(
                 !syncStatus.eventSyncState.isSyncCompleted() || syncStatus.imageSyncStatus.isSyncing || deviceDataState.hasDataToUpload
             }.debounce(timeoutMillis = ANTI_JITTER_DELAY_MILLIS)
             .asLiveData(viewModelScope.coroutineContext)
-
-    val settingsLocked: LiveData<LiveDataEventWithContent<SettingsPasswordConfig>>
-        get() = liveData(context = viewModelScope.coroutineContext) {
-            emit(LiveDataEventWithContent(configRepository.getProjectConfiguration().general.settingsPassword))
-        }
-
-    fun logout() {
-        syncOrchestrator.execute(OneTime.Logout.start())
-    }
 
     private companion object {
         private const val ANTI_JITTER_DELAY_MILLIS = 1000L

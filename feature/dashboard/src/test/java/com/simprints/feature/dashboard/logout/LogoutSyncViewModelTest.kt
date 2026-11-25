@@ -3,11 +3,8 @@ package com.simprints.feature.dashboard.logout
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.sync.ImageSyncStatus
-import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.SyncStatus
 import com.simprints.infra.sync.devicestate.DeviceDataState
@@ -27,9 +24,6 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class LogoutSyncViewModelTest {
     @MockK
-    lateinit var configRepository: ConfigRepository
-
-    @MockK
     lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
@@ -47,31 +41,6 @@ internal class LogoutSyncViewModelTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
-    }
-
-    @Test
-    fun `should enqueue logout worker when logout invoked`() = runTest {
-        val viewModel = createViewModel()
-
-        viewModel.logout()
-        advanceUntilIdle()
-
-        verify(exactly = 1) {
-            syncOrchestrator.execute(any<OneTime>())
-        }
-    }
-
-    @Test
-    fun `password config should be fetched after initialization`() {
-        val config = SettingsPasswordConfig.Locked(password = "123")
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
-            every { general } returns mockk {
-                every { settingsPassword } returns config
-            }
-        }
-        val viewModel = createViewModel()
-        val resultConfig = viewModel.settingsLocked.getOrAwaitValue()
-        assertThat(resultConfig.peekContent()).isEqualTo(config)
     }
 
     @Test
@@ -167,7 +136,6 @@ internal class LogoutSyncViewModelTest {
     }
 
     private fun createViewModel() = LogoutSyncViewModel(
-        configRepository = configRepository,
         syncOrchestrator = syncOrchestrator,
         authStore = authStore,
         deviceStateDataTracker = deviceStateDataTracker,
