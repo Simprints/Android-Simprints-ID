@@ -1,45 +1,54 @@
 package com.simprints.feature.dashboard.main
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.simprints.core.livedata.LiveDataEvent
-import com.simprints.core.livedata.send
+import com.simprints.core.DispatcherIO
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
+import com.simprints.infra.uibase.viewmodel.BaseMviViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 internal class MainViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
     private val securityManager: SecurityManager,
-) : ViewModel() {
-    val consentRequired: LiveData<Boolean>
-        get() = _consentRequired
-    private val _consentRequired = MutableLiveData<Boolean>()
+    @param:DispatcherIO private val ioDispatcher: CoroutineDispatcher,
+) : BaseMviViewModel<MainUiState, MainUiAction, MainUiEffect>(MainUiState()) {
+    override suspend fun handleAction(action: MainUiAction) {
+        when (action) {
+            MainUiAction.Load -> load()
+        }
+    }
 
-    val rootedDeviceDetected: LiveData<LiveDataEvent>
-        get() = _rootedDeviceDetected
-    private val _rootedDeviceDetected = MutableLiveData<LiveDataEvent>()
+    // The root check runs first and does not depend on the configuration. A failing configuration read is logged and leaves the
+    // consent requirement unknown (null: the privacy menu item keeps its XML default).
+    private suspend fun load() {
+        checkIfDeviceIsSafe()
+        val isConsentRequired = try {
+            configRepository.getProjectConfiguration().consent.collectConsent
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Simber.e("Failed to load project configuration on dashboard", e)
+            return
+        }
+        reduce { it.copy(isConsentRequired = isConsentRequired) }
+    }
+
+    private suspend fun checkIfDeviceIsSafe() {
+        try {
+            withContext(ioDispatcher) { securityManager.checkIfDeviceIsRooted() }
+        } catch (ex: RootedDeviceException) {
+            Simber.e("Rooted device detected", ex)
+            reduce { it.copy(isRootedDeviceDetected = true) }
+        }
+    }
 
     init {
-        load()
-    }
-
-    private fun load() = viewModelScope.launch {
-        _consentRequired.postValue(configRepository.getProjectConfiguration().consent.collectConsent)
-        checkIfDeviceIsSafe()
-    }
-
-    private fun checkIfDeviceIsSafe() = try {
-        securityManager.checkIfDeviceIsRooted()
-    } catch (ex: RootedDeviceException) {
-        Simber.e("Rooted device detected", ex)
-        _rootedDeviceDetected.send()
+        onAction(MainUiAction.Load)
     }
 }

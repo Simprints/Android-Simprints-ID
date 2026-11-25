@@ -3,8 +3,12 @@ package com.simprints.feature.dashboard.main
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.simprints.feature.dashboard.BuildConfig
 import com.simprints.feature.dashboard.R
@@ -13,6 +17,7 @@ import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 internal class MainFragment : Fragment(R.layout.fragment_main) {
@@ -31,14 +36,30 @@ internal class MainFragment : Fragment(R.layout.fragment_main) {
         if (!BuildConfig.DEBUG) {
             binding.dashboardToolbar.menu.removeItem(R.id.debug)
         }
-        viewModel.consentRequired.observe(viewLifecycleOwner) {
+        observeState()
+    }
+
+    private fun observeState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { viewModel.uiState.collect(::render) }
+                launch { viewModel.uiEffect.collect(::handleEffect) }
+            }
+        }
+    }
+
+    // MainUiEffect has no effects; collected anyway so every screen has wiring
+    @Suppress("UNUSED_PARAMETER")
+    private fun handleEffect(effect: MainUiEffect) = Unit
+
+    private fun render(state: MainUiState) {
+        // null: not loaded yet, the privacy notice menu item keeps its XML default (visible).
+        state.isConsentRequired?.let { isConsentRequired ->
             binding.dashboardToolbar.menu
                 .findItem(R.id.menuPrivacyNotice)
-                .isVisible = it
+                .isVisible = isConsentRequired
         }
-        viewModel.rootedDeviceDetected.observe(viewLifecycleOwner) {
-            binding.rootedDeviceError.visibility = View.VISIBLE
-        }
+        binding.rootedDeviceError.isVisible = state.isRootedDeviceDetected
     }
 
     private fun menuItemClicked(item: MenuItem): Boolean = with(findNavController()) {
