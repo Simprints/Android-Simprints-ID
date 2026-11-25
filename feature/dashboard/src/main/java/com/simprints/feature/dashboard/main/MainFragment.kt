@@ -10,7 +10,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.simprints.feature.dashboard.BuildConfig
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentMainBinding
 import com.simprints.infra.uibase.view.applySystemBarInsets
@@ -32,9 +31,6 @@ internal class MainFragment : Fragment(R.layout.fragment_main) {
         applySystemBarInsets(view)
         binding.dashboardToolbar.setOnMenuItemClickListener {
             menuItemClicked(it)
-        }
-        if (!BuildConfig.DEBUG) {
-            binding.dashboardToolbar.menu.removeItem(R.id.debug)
         }
         observeState()
     }
@@ -65,7 +61,6 @@ internal class MainFragment : Fragment(R.layout.fragment_main) {
     private fun menuItemClicked(item: MenuItem): Boolean = with(findNavController()) {
         when (item.itemId) {
             R.id.menuSettings -> navigateSafely(this@MainFragment, MainFragmentDirections.actionMainFragmentToSettingsFragment())
-            R.id.debug -> navigateSafely(this@MainFragment, MainFragmentDirections.actionMainFragmentToDebugFragment())
             R.id.menuPrivacyNotice -> navigateSafely(this@MainFragment, MainFragmentDirections.actionMainFragmentToPrivacyNoticesFragment())
         }
         true

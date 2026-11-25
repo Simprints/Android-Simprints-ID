@@ -4,6 +4,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.simprints.feature.troubleshooting.debug.DebugFragment
 import com.simprints.feature.troubleshooting.intents.IntentLogFragment
 import com.simprints.feature.troubleshooting.networking.NetworkingLogFragment
 import com.simprints.feature.troubleshooting.overview.OverviewFragment
@@ -16,9 +17,13 @@ internal class TroubleshootingPagerAdapter(
     fragmentManager: FragmentManager,
     lifecycle: Lifecycle,
 ) : FragmentStateAdapter(fragmentManager, lifecycle) {
-    override fun getItemCount(): Int = Tabs.entries.size
+    private val tabs = Tabs.visibleEntries()
 
-    override fun createFragment(position: Int): Fragment = Tabs.entries[position].factory()
+    override fun getItemCount(): Int = tabs.size
+
+    override fun createFragment(position: Int): Fragment = tabs[position].factory()
+
+    fun getTabTitle(position: Int): String = tabs[position].title
 
     internal enum class Tabs(
         val title: String,
@@ -29,5 +34,12 @@ internal class TroubleshootingPagerAdapter(
         Network("Network", { NetworkingLogFragment() }),
         Workers("Workers", { WorkerLogFragment() }),
         RealmToRoom("Migration", { RealmToRoomRecordsMigrationFragment() }),
+        Debug("DEBUG", { DebugFragment() }),
+        ;
+
+        companion object {
+            /** Tabs shown in this build: [Debug] only exists in debug builds. */
+            fun visibleEntries(): List<Tabs> = entries.filter { it != Debug || BuildConfig.DEBUG }
+        }
     }
 }

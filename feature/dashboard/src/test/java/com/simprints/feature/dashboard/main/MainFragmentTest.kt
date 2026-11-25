@@ -114,17 +114,6 @@ class MainFragmentTest {
     }
 
     @Test
-    fun `should redirect to the debug fragment when clicking on debug`() {
-        mockConsentRequired(true)
-
-        launchFragmentInHiltContainer<MainFragment>(navController = navController)
-
-        openContextualActionModeOverflowMenu()
-        onView(withText("Debug")).perform(click())
-        assertThat(navController.currentDestination?.id).isEqualTo(R.id.debugFragment)
-    }
-
-    @Test
     fun `no consent state yet keeps the privacy notice menu xml default`() {
         launchFragmentInHiltContainer<MainFragment>(navController = navController)
 

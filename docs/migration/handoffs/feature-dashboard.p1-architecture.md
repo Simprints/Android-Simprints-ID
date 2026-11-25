@@ -16,9 +16,9 @@ Path abbreviations used in sections 3 to 7 (section 8 lists every file with its 
 | Item                    | Value                                                                                                                                                                                                                                                                                                                                                                                                         |
 |-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Module                  | `:feature:dashboard` (Compose migration pilot, wave 0)                                                                                                                                                                                                                                                                                                                                                        |
-| Scope                   | Every screen in the module: `DashboardActivity`, `BaseFragment`, `MainFragment` + cards `ProjectDetailsFragment`, `DailyActivityFragment`, `SyncInfoFragment` (3 hosts), `SettingsFragment`, `AboutFragment`, `FingerSelectionFragment`, `RequestLoginFragment`, `LogoutSyncFragment`, `LogoutSyncDeclineFragment`. `DebugFragment` is **removed from the application** (human decision 2026-11-24, step 11). |
+| Scope                   | Every screen in the module: `DashboardActivity`, `BaseFragment`, `MainFragment` + cards `ProjectDetailsFragment`, `DailyActivityFragment`, `SyncInfoFragment` (3 hosts), `SettingsFragment`, `AboutFragment`, `FingerSelectionFragment`, `RequestLoginFragment`, `LogoutSyncFragment`, `LogoutSyncDeclineFragment`. `DebugFragment` **moves to `:feature:troubleshooting`** as a debug-only tab (decided 2026-11-25, step 11). |
 | Out of scope            | The included graphs owned by other modules (`graph_login`, `graph_privacy`, `graph_troubleshooting`, `graph_module_selection`); only the navigation into them and the results coming back (`LoginResult`, `ModuleSelectorResult`) are in scope. No Compose, no Phase 2 planning. `SettingsPasswordDialogFragment` (`:infra:ui-base`) is used unchanged.                                                       |
-| Approved shared change  | `BaseMviViewModel` (+ tests) in `:infra:ui-base`, package `com.simprints.infra.uibase.viewmodel` (step 1), implemented from `docs/migration/mvi-base-classes.md`. The only other file outside `:feature:dashboard` that changes is the dashboard row of `docs/migration/migration-catalog.md` §2 (step 11).                                                                                                   |
+| Approved shared change  | `BaseMviViewModel` (+ tests) in `:infra:ui-base`, package `com.simprints.infra.uibase.viewmodel` (step 1), implemented from `docs/migration/mvi-base-classes.md`. Outside `:feature:dashboard`, step 11 also changes `:feature:troubleshooting` (debug tab, decided 2026-11-25) and the dashboard row of `docs/migration/migration-catalog.md` §2.                                                                                                   |
 | Preparation date        | 2026-11-24                                                                                                                                                                                                                                                                                                                                                                                                    |
 | Baseline commit         | `4aa6180b2a99a1c732060c34074b782d948cc449` (HEAD of `migration/ms-1440-pilot-phase-1`). `git diff b18e513451 HEAD -- feature/dashboard infra/ui-base infra/test-tools build-logic gradle` is empty, so the audit baseline `b18e513451` describes the same code.                                                                                                                                               |
 | Test audit              | `docs/migration/handoffs/feature-dashboard.p1-testing.md`, `Manual review status: APPROVED` (2026-11-24), §11 reviewer notes applied                                                                                                                                                                                                                                                                          |
@@ -104,7 +104,7 @@ No ViewModel uses `SavedStateHandle`. No ViewModel injects another ViewModel.
 | `P/settings/fingerselection/FingerSelectionFragment.kt` | internal | `start()` per view (`:32`), adapter pulls `viewModel.fingerSelections.value` (`:39-41`)                                                                                                                                                                                   |
 | `P/logout/sync/LogoutSyncFragment.kt`                   | public   | `observe` registered inside `repeatOnLifecycle(RESUMED)` (adds an observer on every resume, `:47-56`)                                                                                                                                                                     |
 | `P/logout/syncdecline/LogoutSyncDeclineFragment.kt`     | public   | Observes a new LiveData on every confirm click and decides password vs confirmation (`:56-72`)                                                                                                                                                                            |
-| `P/debug/DebugFragment.kt`                              | internal | Five injected collaborators, `asLiveData().observe` (`:67-88`), `runBlocking` on main (`:107-120`), `cleanAll` on `lifecycleScope` + IO (`:122-132`), private sync-state mapping (`:151-157`). No ViewModel. **Removed from the application in Phase 1** (D-11, step 11). |
+| `P/debug/DebugFragment.kt`                              | internal | Five injected collaborators, `asLiveData().observe` (`:67-88`), `runBlocking` on main (`:107-120`), `cleanAll` on `lifecycleScope` + IO (`:122-132`), private sync-state mapping (`:151-157`). No ViewModel. **Moved to `:feature:troubleshooting` as a reduced debug-only tab in Phase 1** (D-11 revised 2026-11-25, step 11). |
 
 ### 3.3 Domain logic, models, adapters
 
@@ -151,7 +151,7 @@ The audit inventory (§2: 22 classes, 200 tests, all green at the baseline) is t
 | AP-14 | Dead code: `logoutEventLiveData`, `LogoutActionReason`, `fuzzySearch` (+ dependency), `fragment_settings_password_input.xml`, `typeSearchViewText`/`clickCloseChipIcon`.                                         | section 3.3, `T/tools/Espresso.kt`                                                                        |
 
 AP-3 (KI-4), AP-11 (KI-3) and AP-13 are **kept as-is** for parity (recorded in section 4.0 and the known-issues document); AP-1, AP-2,
-AP-4 to AP-8, AP-10, AP-12 and AP-14 are resolved by the refactor; AP-9 disappears with the removal of `DebugFragment` (D-11). AP-1 is
+AP-4 to AP-8, AP-10, AP-12 and AP-14 are resolved by the refactor; AP-9 disappears with the move of a reduced `DebugFragment` to `:feature:troubleshooting` (D-11, revised 2026-11-25). AP-1 is
 resolved without changing behaviour (decision D-7).
 
 ---
@@ -172,7 +172,7 @@ resolved without changing behaviour (decision D-7).
 | D-8  | **SyncInfo render rules (AP-4, R-3).** The host config (`SyncInfoFragmentConfig`) stays a Fragment value resolved in `onCreateView` (static per Fragment instance, also needed for result routing). Every decision that combines config and state, or chooses between alternatives, moves to pure functions in `P/settings/syncinfo/SyncInfoRenderRules.kt`, unit-tested without Robolectric. The Fragment only applies their results and formats strings.                                                   | `viewmodel-udf.md` §6; audit R-3                             |
 | D-9  | **No ViewModel for `DashboardActivity`, `BaseFragment`, `RequestLoginFragment`.** They hold no LiveData and no ViewModel; their logic is the logout terminal step and a one-line auth redirect. Moving `RequestLoginFragment`'s dialog-once flag into a ViewModel would change when the dialog re-appears (a Fragment field reset in `onViewCreated` vs. ViewModel-lifetime state), so Phase 1 only pins them with P0 tests. Revisit at Phase 2 planning.                                                    | Phase 1 objectives (ViewModel/LiveData scope); parity        |
 | D-10 | **`LogoutSyncViewModel` split.** The two screens use disjoint members, and §3 requires exactly one effect collector per ViewModel. `LogoutSyncDeclineViewModel` (new) takes password + logout; `LogoutSyncViewModel` keeps visibility and moves next to its screen.                                                                                                                                                                                                                                          | `viewmodel-udf.md` §3, §8; AP-8                              |
-| D-11 | **`DebugFragment` is removed from the application** (human decision 2026-11-24): the Fragment, its layout, nav destination and action, the debug menu item and its `BuildConfig.DEBUG` wiring, and its test. No `DebugViewModel`. Removing the nav destination is an **approved exception** to "nav IDs unchanged": `:feature:dashboard` is exempt from `module-contracts.md`, nothing outside the module references `debugFragment`, and the human ordered it.                                              | Human decision 2026-11-24                                    |
+| D-11 | **`DebugFragment` leaves the dashboard** (human decision 2026-11-24, revised 2026-11-25): its layout, nav destination and action, the debug menu item and its `BuildConfig.DEBUG` wiring, and its test are removed; a reduced version (clean all, clear Firebase token) moves to `:feature:troubleshooting` as a debug-only "DEBUG" tab (step 11). Removing the nav destination is an **approved exception** to "nav IDs unchanged": `:feature:dashboard` is exempt from `module-contracts.md`, nothing outside the module references `debugFragment`, and the human ordered it.                                              | Human decision 2026-11-24                                    |
 | D-12 | **Fragment tests stub the MVI streams explicitly** with the shared helper from `mvi-base-classes.md` §6 (`T/tools/MviTestExt.kt`, step 1): a `MutableStateFlow` for `uiState` and a `Channel` for `uiEffect`. Relaxed mocks of `StateFlow` do not emit, and `StateFlow.collect` returns `Nothing`, so an unstubbed relaxed mock is never acceptable (audit structural note).                                                                                                                                 | audit §2 structural note, R-7                                |
 | D-13 | **Visibility.** All new types are `internal`. Existing public types (`DashboardActivity`, `LogoutSyncFragment`, `LogoutSyncDeclineFragment`, `SyncInfoFragmentConfig`, `ConfigurableSyncInfoFragmentContainer`, `FingerSelectionSection`, `FingerSelectionItem`, `TemplateIdentifier.toString`, `LogoutReason`) keep their visibility. `FingerSelectionItem` fields change from `var` to `val` (module-internal users only).                                                                                 | copilot-instructions §1                                      |
 
@@ -445,14 +445,15 @@ per D-4 or `onAction`. `SyncInfoRenderRules.kt` (pure) holds: `isSyncButtonVisib
 Deleted: `loginNavigationEventLiveData`, `syncInfoLiveData`, `var isPreLogoutUpSync`, public `forceEventSync`/`toggleImageSync`/
 `requestNavigationToLogin`/`handleLoginResult`, `LogoutActionReason`.
 
-### 4.10 Debug — removed (human decision 2026-11-24)
+### 4.10 Debug — moved to Troubleshooting (decided 2026-11-24, revised 2026-11-25)
 
-No contract. `DebugFragment` and everything that exists only for it are deleted in step 11 (D-11): the Fragment, `fragment_debug.xml`,
-the `debugFragment` destination and `action_mainFragment_to_debugFragment`, the `debug` menu item, `MainFragment`'s
-`!BuildConfig.DEBUG` removal block and `R.id.debug` branch, and the `MainFragmentTest` debug-navigation test. The screen had no
-string, drawable or dimension resources (hard-coded labels) and no Hilt module of its own: every binding it injected (`SyncOrchestrator`,
-`ResetDownSyncInfoUseCase`, `AuthStore`, `EventRepository`, `EnrolmentRecordRepository`, `@DispatcherIO`) is
-provided by another module and still used elsewhere, so no DI code changes.
+No dashboard contract. Step 11 removes the dashboard `DebugFragment`, `fragment_debug.xml`, the `debugFragment` destination and
+`action_mainFragment_to_debugFragment`, the `debug` menu item, `MainFragment`'s `!BuildConfig.DEBUG` removal block and `R.id.debug`
+branch, and the `MainFragmentTest` debug-navigation test. A reduced screen (clean all, clear Firebase token) moves to
+`:feature:troubleshooting` as the last, debug-only "DEBUG" tab, with its own `DebugViewModel` following that module's tab pattern
+(LiveData, not Phase 1 MVI). Its bindings (`SyncOrchestrator`, `ResetDownSyncInfoUseCase`, `AuthStore`, `EventRepository`,
+`EnrolmentRecordRepository`, `WorkManager`, `@DispatcherIO`) are all provided in `SingletonComponent`; troubleshooting gains a
+`:infra:event-sync` dependency. Accepted gap: the tab Fragment's button wiring is not tested (audit DB-1…DB-3 are met at ViewModel level).
 
 ### 4.11 Unchanged screens
 
@@ -487,7 +488,7 @@ Every row is a must-not-regress item. "Audit" names the audit row; "Pinned by" n
 | PC-11 | Rooted (`RootedDeviceException`) → overlay visible, logged with `Simber.e`; non-rooted → no overlay                                     | 3.2 (C), 6.2 (U)    | `MainViewModelTest`, M-1, M-3, M-4                             |
 | PC-12 | Overlay is **sticky**: still visible after view re-creation                                                                             | 6.2 (U), R-4 a      | M-2                                                            |
 | PC-13 | **KI-6:** root check runs after the consent load; a failing config read skips it and the exception escapes (crash)                      | 6.2 (U)             | M-5 (pins current behaviour, step 5 before/after)              |
-| PC-14 | Menu → settings / privacy (`graph_privacy`); menu → debug until step 11, after which the item and destination no longer exist (D-11)    | 3.2 (C)             | `MainFragmentTest` (debug test deleted in step 11 by decision) |
+| PC-14 | Menu → settings / privacy (`graph_privacy`); menu → debug until step 11, after which the item and destination no longer exist (D-11; the screen moves to troubleshooting)    | 3.2 (C)             | `MainFragmentTest` (debug test deleted in step 11 by decision) |
 | PC-15 | Project card: loaded state with exact `decrypt(AttendantId, project)`; `Raw` passes through; null project or any throwable → not loaded | 3.3, 4 (C), 6.3 (U) | `ProjectDetailsViewModelTest` (rewritten), P-5, P-6            |
 | PC-16 | Project card render: card visible iff loaded, title, formatted user, scanner row visible iff non-empty with formatted text              | 3.3 (W), 4 (W)      | P-1, P-2, P-3                                                  |
 | PC-17 | Cards reload on every resume as well as on creation (R-10)                                                                              | 6.3, 6.4 (U)        | P-4, D-2                                                       |
@@ -566,10 +567,11 @@ Every row is a must-not-regress item. "Audit" names the audit row; "Pinned by" n
 | PC-84 | Password config read at confirm time                                                                                                            | 3.10 (C), 6.10          | `LogoutSyncDeclineViewModelTest`, LV-8            |
 | PC-85 | Pre-logout panel runs SyncInfo in pre-logout mode                                                                                               | 6.10 (U)                | S-3, S-7 (LV-9)                                   |
 
-### 5.8 Debug — not applicable
+### 5.8 Debug — moved to Troubleshooting
 
-The Debug screen is removed by human decision (2026-11-24, D-11). Former PC-90…PC-93 (debug commands, sync-state line, clean-all order,
-print DB) have no successor. Parity item after step 11: the main menu shows only Privacy Notice (when consent is required) and Settings,
+The Debug screen leaves the dashboard (D-11, revised 2026-11-25). Former PC-92 (clean-all order) and the Firebase-token part of PC-90
+continue in the troubleshooting DEBUG tab, pinned by `DebugViewModelTest`; PC-91 (sync-state line), PC-93 (print DB) and the sync
+commands of PC-90 are dropped by decision. Parity item after step 11: the main menu shows only Privacy Notice (when consent is required) and Settings,
 in every build type, and `debugFragment` no longer exists in `graph_dashboard`.
 
 ### 5.9 Cross-cutting
@@ -929,35 +931,51 @@ their final MVI form and are written once. No host production file changes.
   `SyncInfoViewModelTest` debounce timings (2900/200/3100/4100 ms) need different values (that would mean the 3 s delay or 5 s stop
   timeout changed).
 
-### Step 11 — `MS-1440 Dashboard P1: remove Debug screen`
+### Step 11 — `MS-1440 Dashboard P1: move Debug screen to Troubleshooting`
 
-Human decision (2026-11-24, D-11): remove `DebugFragment` from the application. Placed after `Main` (step 5) so `MainFragment` and
-`MainFragmentTest` are edited in their final MVI form; the debug item is plain static navigation until then.
+Human decision (2026-11-24, D-11), revised 2026-11-25: instead of deleting `DebugFragment`, move a reduced version of it into
+`:feature:troubleshooting` as the last tab of the troubleshooting view pager, titled "DEBUG" and present only in debug builds. Placed after
+`Main` (step 5) so `MainFragment` and `MainFragmentTest` are edited in their final MVI form.
 
-- **Delete**
-    - `feature/dashboard/src/main/java/com/simprints/feature/dashboard/debug/DebugFragment.kt` (the `debug/` package becomes empty)
-    - `feature/dashboard/src/main/res/layout/fragment_debug.xml`
-- **Modify**
+- **Debug tab (`:feature:troubleshooting`, approved cross-module change)**
+    - **Create** `feature/troubleshooting/src/main/java/com/simprints/feature/troubleshooting/debug/DebugFragment.kt` and
+      `feature/troubleshooting/src/main/res/layout/fragment_troubleshooting_debug.xml`. Keep only the two actions:
+        - **Clear Firebase token:** `authStore.clearFirebaseToken()`, then append "Firebase token deleted" to the log text, as today.
+        - **Clean all:** in order, `execute(OneTime.Events.stop())`, `execute(ScheduleCommand.Events.unschedule())`,
+          `eventRepository.deleteAll()`, `resetDownSyncInfo()`, `enrolmentRecordRepository.deleteAll()`, `WorkManager.pruneWork()`, off
+          the main thread, as today.
+    - **Drop** the sync-state log stream, the sync start/stop/schedule buttons, the Room DB print (and its `runBlocking`), the
+      random-colour helpers and `DebugActivitySyncState`.
+    - **Architecture:** follow the troubleshooting module's existing tab pattern (Fragment + `@HiltViewModel` ViewModel, as the other
+      tabs). Phase 1 MVI rules do not apply to `:feature:troubleshooting`; do not refactor the other tabs.
+    - **Tab:** add `Debug("DEBUG", { DebugFragment() })` as the **last** entry of `TroubleshootingPagerAdapter.Tabs`, shown only when
+      `BuildConfig.DEBUG` (the module's own `BuildConfig`, enabled for all libraries by the convention plugin). The adapter's item count
+      and the `TabLayoutMediator` titles must use the same filtered list.
+    - **Build file:** add `implementation(project(":infra:event-sync"))` to `feature/troubleshooting/build.gradle.kts` for
+      `ResetDownSyncInfoUseCase`. Every other dependency is already there.
+    - **Tests (troubleshooting module):** ViewModel test pinning the clean-all order and the Firebase-token call; a test that the tab list
+      ends with DEBUG in debug builds (unit tests run on the debug variant). Release-build absence is pinned by reading
+      `BuildConfig.DEBUG` in the same filter; note it in the report rather than adding a release-variant test.
+- **Remove from `:feature:dashboard`**
+    - **Delete** `feature/dashboard/src/main/java/com/simprints/feature/dashboard/debug/DebugFragment.kt` (the `debug/` package becomes
+      empty) and `feature/dashboard/src/main/res/layout/fragment_debug.xml`.
     - `feature/dashboard/src/main/res/navigation/graph_dashboard.xml`: remove the `debugFragment` destination and the
-      `action_mainFragment_to_debugFragment` action (approved exception to "nav IDs unchanged", section 6)
-    - `feature/dashboard/src/main/res/menu/app_menu.xml`: remove the `debug` item
+      `action_mainFragment_to_debugFragment` action (approved exception to "nav IDs unchanged", section 6).
+    - `feature/dashboard/src/main/res/menu/app_menu.xml`: remove the `debug` item.
     - `feature/dashboard/src/main/java/com/simprints/feature/dashboard/main/MainFragment.kt`: remove the `!BuildConfig.DEBUG` block, the
-      `R.id.debug` branch and the now-unused `BuildConfig` import
+      `R.id.debug` branch and the now-unused `BuildConfig` import.
     - `feature/dashboard/src/test/java/com/simprints/feature/dashboard/main/MainFragmentTest.kt`: delete
-      `should redirect to the debug fragment when clicking on debug`
+      `should redirect to the debug fragment when clicking on debug`.
     - `docs/migration/migration-catalog.md` §2, dashboard row: remove `DebugFragment` from the screen list and change
-      `graph_dashboard.xml (10 destinations)` to `graph_dashboard.xml (9 destinations)`
-- **Nothing else references it** (repository-wide grep for `DebugFragment`, `debugFragment`, `fragment_debug`, `FragmentDebugBinding`,
-  `R.id.debug`, `DebugActivitySyncState` at the baseline): no strings, drawables or dimensions (labels are hard-coded), no Hilt module or
-  binding of its own, no other module.
-- **Debug-only dependency left unused (follow-up, do not remove here):** `implementation(libs.workManager.work)` in
-  `feature/dashboard/build.gradle.kts` — `DebugFragment` is the only `src/main` file importing `androidx.work`. Every other dependency
-  it used (`:infra:events`, `:infra:event-sync`, `:infra:enrolment-records:repository`, `:infra:sync`, `:infra:auth-store`) is still
-  used by other dashboard code. `debugImplementation(project(":testing:data-generator"))` is unrelated to this screen and unchanged.
-- **Stop if**: any reference to the removed IDs, layout or class remains after the edits; lint reports a newly unused resource that
-  belongs to another module.
-- **Validate**: the common commands, plus `grep -rn "debugFragment\|DebugFragment\|fragment_debug\|R.id.debug\b" feature/dashboard`
-  returns nothing.
+      `graph_dashboard.xml (10 destinations)` to `graph_dashboard.xml (9 destinations)` (main session, not the executor).
+- **Debug-only dependency left unused in dashboard (follow-up, do not remove here):** `implementation(libs.workManager.work)` in
+  `feature/dashboard/build.gradle.kts`. `debugImplementation(project(":testing:data-generator"))` is unrelated and unchanged.
+- **Reaching the tab:** the debug tab is reached through the existing About → troubleshooting entry (5 quick clicks, password gate);
+  there is no separate debug menu any more.
+- **Stop if**: any reference to the removed dashboard IDs, layout or class remains; lint reports a newly unused resource in another
+  module; adding `:infra:event-sync` to troubleshooting creates a dependency cycle.
+- **Validate**: the common commands, plus `./gradlew :feature:troubleshooting:test :feature:troubleshooting:lintDebug` and
+  `grep -rn "debugFragment\|DebugFragment\|fragment_debug\|R.id.debug\b" feature/dashboard` returning nothing.
 
 ### Step 12 — `MS-1440 Dashboard P1: dead-code cleanup`
 
@@ -1002,8 +1020,8 @@ Nothing blocks planning. Items that need a human answer are in section 11.
 - **Ordered pairs**: revert 7 before 6 (step 7 moves the class step 6 trimmed). Revert 12 before anything it follows if a deleted file must
   come back.
 - **Tests-only parts** (step 1 parts b and c) never need reverting for a production rollback.
-- **Step 11** (Debug removal) can be reverted alone if step 5 is in place; it restores the Fragment, layout, nav entries, menu item and test
-  (and the catalog row).
+- **Step 11** (Debug move) can be reverted alone if step 5 is in place; it restores the dashboard Fragment, layout, nav entries, menu item
+  and test, removes the troubleshooting DEBUG tab and its `:infra:event-sync` dependency (and restores the catalog rows).
 - **Step 1** has consumers from step 2 on; reverting it requires reverting every converted screen first. Reverting step 1 alone is not
   supported.
 - **Before release**: if a regression is found after merge, revert the screen's step commit (the previous LiveData implementation comes
@@ -1110,4 +1128,7 @@ Step 1 additionally:
       `SyncInfoUiEffect.NavigateToLogin(params)`; `loginRequest`/`LoginRequest`/`seq` and the dedicated collector are removed, so the
       step 12 `LiveData` grep no longer needs to exclude KI-1 comments (only `viewLifecycleOwnerLiveData` in `SyncInfoFragmentTest`).
       Details in `feature-dashboard.p1-known-issues.md` (KI-1).
+    - **Decided 2026-11-25 — Debug screen moved, not deleted:** replaces the 2026-11-24 removal. Step 11 moves a reduced `DebugFragment`
+      (clean all and clear Firebase token only) into `:feature:troubleshooting` as the last tab, "DEBUG", debug builds only, and removes
+      the dashboard debug menu item, destination and action as planned.
     - _(reviewer)_
