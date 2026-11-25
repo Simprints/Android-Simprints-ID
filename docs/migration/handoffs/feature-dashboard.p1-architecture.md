@@ -364,6 +364,7 @@ internal data class AboutUiState(
     val passwordConfig: SettingsPasswordConfig = SettingsPasswordConfig.NotSet,
 )
 internal sealed interface AboutUiAction {
+    data object Load : AboutUiAction                   // init only (decided 2026-11-25)
     data object LogoutClicked : AboutUiAction
     data object LogoutConfirmed : AboutUiAction        // confirmation dialog positive button
     data object TroubleshootingClicked : AboutUiAction // sync & search preference click
@@ -375,7 +376,11 @@ internal sealed interface AboutUiEffect {
     data object NavigateToLogoutSync : AboutUiEffect
     data object NavigateToTroubleshooting : AboutUiEffect
 }
+internal enum class AboutGatedAction(val key: String) { LOGOUT("logout"), TROUBLESHOOTING("troubleshooting") } // + fromKey(key)
 ```
+
+- `Load` (sent once from `init { onAction(Load) }`): reads the configuration, then recent activity, then one `reduce`. Actions sent
+  before it finishes wait for it.
 
 - `LogoutClicked`: password set → `ShowPasswordDialog(LOGOUT)`, else `ShowLogoutConfirmation`.
 - `LogoutConfirmed` and `PasswordUnlocked(LOGOUT)` (the latter after `reduce { Unlocked }`) run the unchanged decision:
@@ -1081,4 +1086,9 @@ Step 1 additionally:
     - **Decided 2026-11-25 — KI-3 fixed in step 8:** DV-3 is withdrawn. The relaunch after a language change is a `RelaunchApp` effect
       sent after the save; the Fragment no longer writes the summary or relaunches by itself, and dismisses the language dialog on
       selection. A failed save does not relaunch. Details in `feature-dashboard.p1-known-issues.md` (KI-3).
+    - **Step 9 as implemented (2026-11-25), accepted by the reviewer:** troubleshooting clicks are counted when the action queue
+      processes them, so taps queued behind a busy queue (start-up `Load`, a logout decision) can count as quick ones; this can only make
+      the hidden entry easier to reach, and the password gate still applies. An unknown password-dialog key sends nothing (before: it
+      unlocked); only About's own keys can reach it. `Load` writes state once after both reads. Logout requests run one after another, so
+      a slow logout decision holds up later actions. AB-3 and AB-5 are split between the ViewModel and Fragment tests, as ST-7 was.
     - _(reviewer)_
