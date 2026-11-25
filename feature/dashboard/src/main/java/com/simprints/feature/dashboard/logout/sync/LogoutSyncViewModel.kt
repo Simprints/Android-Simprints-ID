@@ -1,43 +1,38 @@
-package com.simprints.feature.dashboard.logout
+package com.simprints.feature.dashboard.logout.sync
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.devicestate.DeviceStateDataTracker
+import com.simprints.infra.uibase.viewmodel.BaseMviViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
 internal class LogoutSyncViewModel @Inject constructor(
     syncOrchestrator: SyncOrchestrator,
-    authStore: AuthStore,
     deviceStateDataTracker: DeviceStateDataTracker,
-) : ViewModel() {
-    val logoutEventLiveData: LiveData<Unit> =
-        authStore
-            .observeSignedInProjectId()
-            .filter { projectId -> projectId.isEmpty() }
-            .distinctUntilChanged()
-            .map { }
-            .asLiveData(viewModelScope.coroutineContext)
-
-    val isLogoutWithoutSyncVisibleLiveData: LiveData<Boolean> =
+) : BaseMviViewModel<LogoutSyncUiState, LogoutSyncUiAction, LogoutSyncUiEffect>(LogoutSyncUiState()) {
+    // Stream-composed state; sources stay observed for 5 s after the last collector leaves, as before the MVI migration.
+    override val uiState: StateFlow<LogoutSyncUiState> =
         syncOrchestrator
             .observeSyncState()
             .combine(deviceStateDataTracker.observeDeviceDataState()) { syncStatus, deviceDataState ->
                 !syncStatus.eventSyncState.isSyncCompleted() || syncStatus.imageSyncStatus.isSyncing || deviceDataState.hasDataToUpload
             }.debounce(timeoutMillis = ANTI_JITTER_DELAY_MILLIS)
-            .asLiveData(viewModelScope.coroutineContext)
+            .map { isLogoutWithoutSyncVisible -> LogoutSyncUiState(isLogoutWithoutSyncVisible = isLogoutWithoutSyncVisible) }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), LogoutSyncUiState())
+
+    // LogoutSyncUiAction has no actions; the queue is never used by this screen
+    override suspend fun handleAction(action: LogoutSyncUiAction) = Unit
 
     private companion object {
         private const val ANTI_JITTER_DELAY_MILLIS = 1000L
+        private const val STOP_TIMEOUT_MILLIS = 5_000L
     }
 }
