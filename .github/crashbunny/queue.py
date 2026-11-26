@@ -14,6 +14,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 FIX_VERDICTS = {"app_bug", "regression"}
+DONE_STATUSES = {"pr_opened", "would_fix", "skipped_existing"}
 IMPACT_ORDER = {"high": 0, "medium": 1, "low": 2}
 DEFAULT_LOOKBACK = timedelta(hours=24)
 # A "night" is keyed by the morning it is reported on, so runs from 22:00 UTC onwards count towards the next day
@@ -151,6 +152,7 @@ def cmd_next(args):
             else:
                 item["status"] = "failed"
                 item["fix"] = {"status": "failed", "reason": "Fix run was cut off by a job timeout or cancellation"}
+                queue["reported"] = False
     # Only PRs opened tonight count towards the runaway guard, not ones that already existed
     opened = sum(1 for i in queue.get("items", []) if (i.get("fix") or {}).get("status") == "pr_opened")
     if opened >= args.max_prs:
@@ -195,26 +197,36 @@ def cmd_limit(args):
     gh_output(limit=classify_log(log_text))
 
 
+def read_result(path):
+    """The fix run's result, or None when it didn't write a usable one."""
+    try:
+        result = json.loads(path.read_text())
+    except (OSError, ValueError):
+        return None
+    if not isinstance(result, dict) or result.get("status") not in DONE_STATUSES | {"failed"}:
+        return None
+    return result
+
+
 def cmd_complete(args):
     """Record the outcome of one fix attempt."""
     _, queue_path = paths(args.state_dir)
     queue = load(queue_path, {})
     item = next(i for i in queue["items"] if i["root_cause_id"] == args.id)
-    if args.limit in ("session", "weekly"):
+    result = read_result(Path(args.result))
+    queue["weekly_limit_hit"] = queue.get("weekly_limit_hit") or args.limit == "weekly"
+    if args.limit in ("session", "weekly") and not result:
         # The attempt never finished, so it does not count against the item
         item["status"] = "pending"
         item["attempts"] -= 1
-        queue["weekly_limit_hit"] = queue.get("weekly_limit_hit") or args.limit == "weekly"
     else:
-        result_path = Path(args.result)
-        result = json.loads(result_path.read_text()) if result_path.exists() else {
-            "status": "failed", "reason": "Fix run ended without writing a result",
-        }
+        # A limit hit after the result was written doesn't undo it (e.g. a PR that is already open)
+        result = result or {"status": "failed", "reason": "Fix run ended without writing a result"}
         item["fix"] = result
         item["pr_url"] = result.get("pr_url")
-        item["status"] = "done" if result.get("status") in ("pr_opened", "would_fix", "skipped_existing") else "failed"
-        # A report already sent (e.g. on the last run of the night) doesn't include this outcome yet
-        queue["reported"] = False
+        item["status"] = "done" if result["status"] in DONE_STATUSES else "failed"
+    # A report already sent (e.g. on the last run of the night) doesn't include this outcome or pause yet
+    queue["reported"] = False
     save(queue_path, queue)
 
 

@@ -90,7 +90,7 @@ send_report() { # report-file
         return
     fi
     local status
-    status="$(curl -sS -o "$WORK/webhook-response.txt" -w '%{http_code}' -X POST "$SIMPHONY_WEBHOOK_URL" \
+    status="$(curl -sS --connect-timeout 15 --max-time 120 -o "$WORK/webhook-response.txt" -w '%{http_code}' -X POST "$SIMPHONY_WEBHOOK_URL" \
         -H "X-Simphony-Secret: $SIMPHONY_WEBHOOK_SECRET" \
         -H "Content-Type: application/json" \
         --data-binary "@$1")"
