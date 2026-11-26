@@ -67,7 +67,7 @@ internal enum class AlertError(
         message = IDR.string.fingerprint_connect_bluetooth_not_enabled_error_message,
         mainDrawable = IDR.drawable.ic_alert_bt,
         hintDrawable = IDR.drawable.ic_alert_hint_bt_disabled,
-        eventType = AlertScreenEventType.BLUETOOTH_NOT_SUPPORTED,
+        eventType = AlertScreenEventType.BLUETOOTH_NOT_ENABLED,
         appErrorReason = AppErrorReason.BLUETOOTH_NOT_SUPPORTED,
         leftButton = Buttons.tryAgainButton(),
         rightButton = Buttons.bluetoothSettingsButton(),

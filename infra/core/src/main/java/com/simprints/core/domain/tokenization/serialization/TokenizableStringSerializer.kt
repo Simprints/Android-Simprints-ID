@@ -2,6 +2,7 @@ package com.simprints.core.domain.tokenization.serialization
 
 import com.simprints.core.domain.tokenization.TokenizableString
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -56,7 +57,7 @@ object TokenizableStringSerializer : KSerializer<TokenizableString> {
             is JsonObject -> {
                 val className = element[FIELD_CLASS_NAME]?.jsonPrimitive?.content.orEmpty()
                 val value = element[FIELD_VALUE]?.jsonPrimitive?.content
-                    ?: throw IllegalStateException("Missing 'value' field in TokenizableString")
+                    ?: throw SerializationException("Missing 'value' field in TokenizableString")
 
                 if (className == TOKENIZED) {
                     TokenizableString.Tokenized(value)
@@ -66,7 +67,7 @@ object TokenizableStringSerializer : KSerializer<TokenizableString> {
             }
 
             else -> {
-                error("Unexpected JSON element for TokenizableString")
+                throw SerializationException("Unexpected JSON element for TokenizableString")
             }
         }
     }

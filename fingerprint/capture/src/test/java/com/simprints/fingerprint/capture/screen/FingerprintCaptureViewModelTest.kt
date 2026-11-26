@@ -375,6 +375,26 @@ class FingerprintCaptureViewModelTest {
     }
 
     @Test
+    @ExperimentalTime
+    fun scanPressed_noFingerDetectedLimitReached_createsSingleEvent() = runTest {
+        mockScannerTurnSmileLedsOff()
+        setupCaptureFingerprintResponses(NO_FINGER_DETECTED)
+        noImageTransfer()
+        coEvery { isNoFingerDetectedLimitReachedUseCase.invoke(any(), any()) } returns true
+
+        vm.handleOnViewCreated(TWO_FINGERS_IDS, SECUGEN_SIM_MATCHER)
+        vm.handleScanButtonPressed()
+
+        assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
+            CaptureState.ScanProcess.NotDetected(
+                numberOfBadScans = 0,
+                numberOfNoFingerDetectedScans = 1,
+            ),
+        )
+        coVerify(exactly = 1) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
+    }
+
+    @Test
     fun scanPressed_scannerDisconnectedDuringScan_updatesStateCorrectlyAndReconnects() = runTest {
         mockScannerTurnSmileLedsOff()
         coEvery {

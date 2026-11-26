@@ -166,10 +166,15 @@ private fun NavController.navigateIfPossible(
     if (canNavigate(currentFragment)) {
         navigation()
     } else {
-        val fragmentName = currentFragment.toString().takeWhile { it != ' ' }
-        val target = (currentDestination as? FragmentNavigator.Destination)?.className
-        Simber.w("Cannot navigate from $fragmentName to $target", t = IllegalStateException("Navigation not possible"))
+        logNavigationNotPossible(currentFragment)
     }
+}
+
+@ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
+private fun NavController.logNavigationNotPossible(currentFragment: Fragment?) {
+    val fragmentName = currentFragment.toString().takeWhile { it != ' ' }
+    val target = (currentDestination as? FragmentNavigator.Destination)?.className
+    Simber.w("Cannot navigate from $fragmentName to $target", t = IllegalStateException("Navigation not possible"))
 }
 
 /**
@@ -217,7 +222,8 @@ fun <T : Serializable> NavController.setResult(
 }
 
 /**
- * Same as `setResult()` but also pops current fragment from backstack
+ * Same as `setResult()` but also pops current fragment from backstack.
+ * The result is ignored if fragment is no longer the current destination, see `canNavigate`.
  *
  * @return true if the stack was popped at least once
  */
@@ -226,6 +232,12 @@ fun <T : Serializable> NavController.finishWithResult(
     fragment: Fragment,
     result: T,
 ): Boolean {
+    // Fragment is no longer the current destination (like in a 2nd call of a double tap)
+    if (!canNavigate(fragment)) {
+        logNavigationNotPossible(fragment)
+        return false
+    }
+
     val currentDestinationId = currentDestination?.id
     val saveHandle = previousBackStackEntry?.savedStateHandle
 

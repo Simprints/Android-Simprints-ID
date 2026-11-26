@@ -56,6 +56,7 @@ internal object CommCareConstants {
     const val REGISTRATION_GUID_KEY = "guid"
     const val VERIFICATION_CONFIDENCE_KEY = "confidence"
     const val VERIFICATION_TIER_KEY = "tier"
+    const val VERIFICATION_CONFIDENCE_BAND_KEY = "confidenceBand"
     const val VERIFICATION_GUID_KEY = "guid"
     const val VERIFICATION_SUCCESS_KEY = "verificationSuccess"
     const val EXIT_REASON = "exitReason"

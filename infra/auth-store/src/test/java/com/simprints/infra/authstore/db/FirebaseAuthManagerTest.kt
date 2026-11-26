@@ -19,11 +19,19 @@ import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.lang.management.ManagementFactory
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
+import javax.inject.Singleton
+import kotlin.concurrent.thread
 
 @RunWith(AndroidJUnit4::class)
 class FirebaseAuthManagerTest {
@@ -153,6 +161,101 @@ class FirebaseAuthManagerTest {
 
         val result = firebaseAuthManager.getCurrentToken()
         assertThat(result).isEqualTo("Token")
+    }
+
+    @Test
+    fun `getCurrentToken should not use the core app while signOut is deleting it`() {
+        assertGetCurrentTokenSurvivesSignOutRace(RacePoint.FETCHING_CORE_APP)
+    }
+
+    @Test
+    fun `getCurrentToken should not request the token while signOut is deleting the core app`() {
+        assertGetCurrentTokenSurvivesSignOutRace(RacePoint.READING_CURRENT_USER)
+    }
+
+    @Test
+    fun `signOut should not delete the core app while getCurrentToken is using it`() {
+        assertGetCurrentTokenSurvivesSignOutRace(RacePoint.SIGN_OUT_BEFORE_DELETE)
+    }
+
+    private enum class RacePoint {
+        // Token thread pauses after fetching the core app, before creating FirebaseAuth
+        FETCHING_CORE_APP,
+
+        // Token thread pauses after creating FirebaseAuth, before requesting the token
+        READING_CURRENT_USER,
+
+        // Sign-out starts first and only tries to delete the core app once the token thread is using it
+        SIGN_OUT_BEFORE_DELETE,
+    }
+
+    /**
+     * Pauses the token thread at [racePoint] until sign-out has either deleted the core app (no locking)
+     * or is blocked on the [FirebaseAuthManager] monitor (correct locking), then checks the token was
+     * retrieved without touching a deleted app and that sign-out still completed.
+     */
+    private fun assertGetCurrentTokenSurvivesSignOutRace(racePoint: RacePoint) {
+        val tokenThreadName = "sync-worker"
+        val isDeleted = AtomicBoolean(false)
+        val tokenThreadInRace = CountDownLatch(1)
+        val signOutThread = AtomicReference<Thread>()
+        val holdUntilSignOutBlockedOrDeleted = {
+            if (Thread.currentThread().name.startsWith(tokenThreadName)) {
+                tokenThreadInRace.countDown()
+                val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
+                while (!isDeleted.get() && !isBlockedOnAuthManagerLock(signOutThread.get())) {
+                    check(System.nanoTime() < deadline) { "Sign-out never attempted to delete the core app" }
+                    Thread.sleep(1)
+                }
+            }
+        }
+        every { FirebaseApp.getInstance(any()) } answers {
+            if (racePoint != RacePoint.READING_CURRENT_USER) holdUntilSignOutBlockedOrDeleted()
+            firebaseApp
+        }
+        every { firebaseApp.delete() } answers { isDeleted.set(true) }
+        every { FirebaseAuth.getInstance(firebaseApp) } answers {
+            check(!isDeleted.get()) { "FirebaseApp was deleted" }
+            firebaseAuth
+        }
+        every { firebaseAuth.currentUser } answers {
+            if (racePoint == RacePoint.READING_CURRENT_USER) holdUntilSignOutBlockedOrDeleted()
+            firebaseUser
+        }
+        every { firebaseAuth.signOut() } answers {
+            if (racePoint == RacePoint.SIGN_OUT_BEFORE_DELETE) check(tokenThreadInRace.await(5, TimeUnit.SECONDS))
+        }
+        every { firebaseUser.getIdToken(any()) } answers {
+            check(!isDeleted.get()) { "FirebaseApp was deleted" }
+            Tasks.forResult(GetTokenResult("Token", HashMap()))
+        }
+
+        var tokenResult: Result<String>? = null
+        var signOutResult: Result<Unit>? = null
+        val startSignOut = {
+            signOutThread.set(thread(name = "sign-out") { signOutResult = runCatching { firebaseAuthManager.signOut() } })
+        }
+        if (racePoint == RacePoint.SIGN_OUT_BEFORE_DELETE) startSignOut()
+        val tokenThread = thread(name = tokenThreadName) {
+            tokenResult = runCatching { runBlocking { firebaseAuthManager.getCurrentToken() } }
+        }
+        assertThat(tokenThreadInRace.await(5, TimeUnit.SECONDS)).isTrue()
+        if (racePoint != RacePoint.SIGN_OUT_BEFORE_DELETE) startSignOut()
+        tokenThread.join(10_000)
+        signOutThread.get().join(10_000)
+
+        assertThat(tokenResult?.getOrThrow()).isEqualTo("Token")
+        assertThat(signOutResult?.getOrThrow()).isEqualTo(Unit)
+        assertThat(isDeleted.get()).isTrue()
+    }
+
+    private fun isBlockedOnAuthManagerLock(thread: Thread?): Boolean = thread != null &&
+        thread.state == Thread.State.BLOCKED &&
+        ManagementFactory.getThreadMXBean().getThreadInfo(thread.id)?.lockInfo?.className == FirebaseAuthManager::class.java.name
+
+    @Test
+    fun `FirebaseAuthManager is a singleton so all injected consumers share the core app lock`() {
+        assertThat(FirebaseAuthManager::class.java.isAnnotationPresent(Singleton::class.java)).isTrue()
     }
 
     @Test

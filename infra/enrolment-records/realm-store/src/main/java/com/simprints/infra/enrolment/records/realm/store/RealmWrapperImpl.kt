@@ -83,8 +83,9 @@ class RealmWrapperImpl @Inject constructor(
         }
     }
 
+    // Legacy DB files in a format realm-kotlin cannot upgrade are as unusable as corrupt ones
     private fun isFileCorruptException(ex: Exception) = ex is IllegalStateException &&
-        ex.message?.contains("RLM_ERR_INVALID_DATABASE") == true
+        ex.message?.let { it.contains("RLM_ERR_INVALID_DATABASE") || it.contains("RLM_ERR_UNSUPPORTED_FILE_FORMAT_VERSION") } == true
 
     /**
      * Executes provided block ensuring a valid Realm instance is used and closed.

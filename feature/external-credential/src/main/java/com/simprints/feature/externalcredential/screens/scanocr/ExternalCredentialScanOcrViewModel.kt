@@ -10,17 +10,18 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessment
-import com.simprints.feature.externalcredential.screens.scanocr.model.LightingConditionsAssessmentConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrConfig
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
+import com.simprints.feature.externalcredential.screens.scanocr.model.OcrScanResult
 import com.simprints.feature.externalcredential.screens.scanocr.model.ScannedMfidDocument
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.BuildScannedCredentialResultUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetLightingConditionsAssessmentConfigUseCase
-import com.simprints.feature.externalcredential.screens.scanocr.usecase.GetLightingConditionsAssessmentUseCase
 import com.simprints.feature.externalcredential.screens.scanocr.usecase.ScanMfidDocumentUseCase
 import com.simprints.feature.externalcredential.screens.search.model.ScannedCredentialResult
 import com.simprints.infra.camera.Frame
+import com.simprints.infra.camera.lighting.GetLightingConditionsAssessmentUseCase
+import com.simprints.infra.camera.lighting.LightingConditionsAssessment
+import com.simprints.infra.camera.lighting.LightingConditionsAssessmentConfig
 import com.simprints.infra.camera.postprocess.FrameCropToTargetUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.experimental
@@ -87,7 +88,9 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
             with(configRepository.getProjectConfiguration().experimental()) {
                 ocrConfigFlow.value = OcrConfig(
                     useHighRes = ocrUseHighRes,
+                    keepHighResDetail = ocrKeepHighResDetail,
                     capturesRequired = ocrCaptures.coerceIn(OCR_CAPTURE_MIN, OCR_CAPTURE_MAX),
+                    readFaydaBarcode = ocrReadFaydaBarcode,
                 )
             }
             lightingConditionsAssessmentConfig = getLightingConditionsAssessmentConfig()
@@ -141,16 +144,23 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
                 if (!isOcrAllowed) return@launch
                 val mfidConfig = configRepository.getProjectConfiguration().multifactorId ?: return@launch
                 val captureConfig = ocrConfigFlow.value ?: return@launch
-                val scannedMfidDocument =
-                    scanMfidDocumentUseCase(bitmap = cropped, documentType = ocrDocumentType, config = mfidConfig) ?: return@launch
+                val scannedMfidDocument = scanMfidDocumentUseCase(
+                    bitmap = cropped,
+                    documentType = ocrDocumentType,
+                    config = mfidConfig,
+                    readFaydaBarcode = captureConfig.readFaydaBarcode,
+                ) ?: return@launch
                 Simber.d("Detected OCR")
-                val notEnoughCaptures = scannedMfidDocuments.size < captureConfig.capturesRequired
-                if (isScanningInProgress && notEnoughCaptures) {
+                if (isScanningInProgress && !isCaptureComplete(captureConfig)) {
                     scannedMfidDocuments += scannedMfidDocument
                     updateState {
                         ScanOcrState.ScanningInProgress(
                             ocrDocumentType = ocrDocumentType,
-                            successfulCaptures = scannedMfidDocuments.size,
+                            successfulCaptures = if (isCaptureComplete(captureConfig)) {
+                                captureConfig.capturesRequired
+                            } else {
+                                scannedMfidDocuments.size
+                            },
                             scansRequired = captureConfig.capturesRequired,
                         )
                     }
@@ -160,6 +170,11 @@ internal class ExternalCredentialScanOcrViewModel @AssistedInject constructor(
             }
         }
     }
+
+    private fun isCaptureComplete(captureConfig: OcrConfig) = scannedMfidDocuments.size >= captureConfig.capturesRequired ||
+        // Barcode readouts are checksummed, so a single one completes the capture
+        captureConfig.readFaydaBarcode &&
+        scannedMfidDocuments.any { (it.ocrScanResult as? OcrScanResult.FaydaCard)?.isFromBarcode == true }
 
     fun processOcrResultsAndFinish() {
         updateState { ScanOcrState.Complete }

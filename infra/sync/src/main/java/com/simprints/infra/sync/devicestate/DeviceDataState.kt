@@ -21,4 +21,10 @@ data class DeviceDataState(
     val lastEventSyncFailure: SyncFailureReason?,
     val lastSampleSyncAt: Timestamp?,
     val lastSampleSyncFailure: SyncFailureReason?,
-)
+) {
+    /**
+     * Closed sessions, enrolments or samples waiting to be uploaded; sync reports not counted
+     */
+    val hasDataToUpload: Boolean
+        get() = pendingScopes?.get(EventScopeType.SESSION) != 0 || pendingEnrolments != 0 || pendingSamples != 0
+}

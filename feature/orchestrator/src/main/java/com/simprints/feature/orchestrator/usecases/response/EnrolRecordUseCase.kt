@@ -1,13 +1,13 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.feature.externalcredential.ext.getLinkedExternalCredentialIds
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecord
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordAction
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
-import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import javax.inject.Inject
 
@@ -28,9 +28,7 @@ internal class EnrolRecordUseCase @Inject constructor(
             .sortedByDescending { it.payload.createdAt }
             .map { it.payload.id }
 
-        val externalCredentialIds = events
-            .filterIsInstance<ExternalCredentialCaptureValueEvent>()
-            .map { it.payload.id }
+        val externalCredentialIds = events.getLinkedExternalCredentialIds(enrolmentRecord)
 
         eventRepository.addOrUpdateEvent(
             EnrolmentEventV4(

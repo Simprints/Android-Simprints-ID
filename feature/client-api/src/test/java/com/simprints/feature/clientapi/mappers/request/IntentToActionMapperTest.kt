@@ -18,6 +18,7 @@ import com.simprints.libsimprints.Constants.SIMPRINTS_SELECTED_GUID
 import com.simprints.libsimprints.Constants.SIMPRINTS_SESSION_ID
 import com.simprints.libsimprints.Constants.SIMPRINTS_USER_ID
 import com.simprints.libsimprints.Constants.SIMPRINTS_VERIFY_GUID
+import com.simprints.libsimprints.contracts.VersionsList
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
@@ -130,6 +131,14 @@ class IntentToActionMapperTest {
         ).forEach { (action, expectedClass) ->
             assertThat(mapper(action, blankSessionExtras, any())).isInstanceOf(expectedClass.java)
         }
+    }
+
+    @Test
+    fun `parses contract version from CommCare intent`() = runTest {
+        val extras = defaultExtras + (SIMPRINTS_LIB_VERSION to VersionsList.ADDED_EXTERNAL_CREDENTIALS)
+
+        val action = mapper("com.simprints.commcare.IDENTIFY", extras, any())
+        assertThat(action.actionIdentifier.contractVersion).isEqualTo(VersionsList.ADDED_EXTERNAL_CREDENTIALS)
     }
 
     @Test

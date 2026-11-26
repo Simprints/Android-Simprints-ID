@@ -170,15 +170,27 @@ class ExternalCredentialEventTrackerUseCaseTest {
     }
 
     @Test
-    fun `persistCaptureAttemptWithConfirmedValue still saves the raw scanned value in the value event`() = runTest {
+    fun `persistCaptureAttemptWithConfirmedValue saves the confirmed value in the value event`() = runTest {
         val attempt = makeAttempt(ExternalCredentialType.QRCode, scannedValue = RAW_SCANNED_VALUE)
         val confirmedValue = "confirmed value".asTokenizableRaw()
+        val confirmedExternalCredential = attempt.externalCredential.copy(value = ENCRYPTED_CONFIRMED_CREDENTIAL)
+        coEvery {
+            externalCredentialMapper.mapExternalCredential(
+                scannedCredentialResult = attempt.scannedCredentialResult,
+                subjectId = SUBJECT_ID,
+                credentialValue = confirmedValue,
+            )
+        } returns confirmedExternalCredential
 
         useCase.persistCaptureAttemptWithConfirmedValue(attempt, confirmedValue)
 
         val valueEventSlot = slot<ExternalCredentialCaptureValueEvent>()
         coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(capture(valueEventSlot)) }
-        assertThat(valueEventSlot.captured.payload.credential).isEqualTo(attempt.externalCredential)
+        with(valueEventSlot.captured.payload) {
+            assertThat(credential).isEqualTo(confirmedExternalCredential)
+            assertThat(credential).isNotEqualTo(attempt.externalCredential)
+            assertThat(id).isEqualTo(SCAN_ID)
+        }
     }
 
     @Test
@@ -393,6 +405,7 @@ class ExternalCredentialEventTrackerUseCaseTest {
         private const val SUBJECT_ID = "test-subject-id"
         private const val RAW_SCANNED_VALUE = "scanned"
         private val ENCRYPTED_CREDENTIAL = "encrypted_credential".asTokenizableEncrypted()
+        private val ENCRYPTED_CONFIRMED_CREDENTIAL = "encrypted_confirmed_credential".asTokenizableEncrypted()
         private const val DEFAULT_DISTANCE = 7
         private const val SELECTION_ID = "selection_id"
         private const val CONFIDENCE = 0.9f

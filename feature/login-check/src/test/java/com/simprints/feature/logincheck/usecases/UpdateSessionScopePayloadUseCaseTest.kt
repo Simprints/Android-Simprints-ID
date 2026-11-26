@@ -46,6 +46,7 @@ internal class UpdateSessionScopePayloadUseCaseTest {
     fun `Updates current scope with data from enrolments`() = runTest {
         coEvery { deviceStateDataTracker.getRecordCount() } returns 42
         coEvery { configRepository.getProjectConfiguration().updatedAt } returns "configUpdatedAt"
+        coEvery { configRepository.getProjectConfiguration().id } returns "configId"
 
         coEvery { eventRepository.getCurrentSessionScope() } returns createBlankSessionScope()
 
@@ -56,6 +57,7 @@ internal class UpdateSessionScopePayloadUseCaseTest {
                 withArg {
                     assertThat(it.payload.databaseInfo.recordCount).isEqualTo(42)
                     assertThat(it.payload.projectConfigurationUpdatedAt).isEqualTo("configUpdatedAt")
+                    assertThat(it.payload.projectConfigurationId).isEqualTo("configId")
                 },
             )
         }

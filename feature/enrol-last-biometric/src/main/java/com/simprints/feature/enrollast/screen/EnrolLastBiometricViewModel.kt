@@ -15,6 +15,7 @@ import com.simprints.feature.enrollast.screen.model.CredentialDialogItem
 import com.simprints.feature.enrollast.screen.usecase.BuildRecordUseCase
 import com.simprints.feature.enrollast.screen.usecase.CheckForDuplicateEnrolmentsUseCase
 import com.simprints.feature.externalcredential.ExternalCredentialSearchResult
+import com.simprints.feature.externalcredential.ext.getLinkedExternalCredentialIds
 import com.simprints.feature.externalcredential.usecase.ResetExternalCredentialsInSessionUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -25,7 +26,6 @@ import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentR
 import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentRecordQuery
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
-import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ENROLMENT
 import com.simprints.infra.logging.Simber
@@ -160,9 +160,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
             .sortedByDescending { it.payload.createdAt }
             .map { it.payload.id }
 
-        val externalCredentialIds = events
-            .filterIsInstance<ExternalCredentialCaptureValueEvent>()
-            .map { it.payload.id }
+        val externalCredentialIds = events.getLinkedExternalCredentialIds(enrolmentRecord)
 
         eventRepository.addOrUpdateEvent(
             EnrolmentEventV4(

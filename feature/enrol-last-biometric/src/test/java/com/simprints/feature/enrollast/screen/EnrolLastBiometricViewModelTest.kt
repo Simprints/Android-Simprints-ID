@@ -3,7 +3,10 @@ package com.simprints.feature.enrollast.screen
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
+import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
@@ -23,6 +26,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.EnrolmentR
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent.BiometricReferenceCreationPayload
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
+import com.simprints.infra.events.event.domain.models.ExternalCredentialCaptureValueEvent
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -299,6 +303,48 @@ internal class EnrolLastBiometricViewModelTest {
     }
 
     @Test
+    fun `Enrolment event only references the final credential capture when there were recaptures`() = runTest {
+        every { checkForDuplicateEnrolments.invoke(any(), any()) } returns null
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
+            captureValueEvent("discardedScanId1"),
+            captureValueEvent("discardedScanId2"),
+            captureValueEvent("finalScanId"),
+        )
+        coEvery { buildRecord.invoke(any(), isAddingCredential = true) } returns
+            enrolmentRecordWithCredentials(listOf(externalCredential("finalScanId")))
+
+        viewModel.enrolBiometric(createParams(listOf()), isAddingCredential = true)
+
+        coVerify {
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat((it.payload as EnrolmentEventV4.EnrolmentPayload).externalCredentialIds)
+                        .containsExactly("finalScanId")
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `Enrolment event does not reference any credential when attendant declines adding it`() = runTest {
+        every { checkForDuplicateEnrolments.invoke(any(), any()) } returns null
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
+            captureValueEvent("scanId"),
+        )
+        coEvery { buildRecord.invoke(any(), isAddingCredential = false) } returns enrolmentRecordWithCredentials(emptyList())
+
+        viewModel.enrolBiometric(createParams(listOf()), isAddingCredential = false)
+
+        coVerify {
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat((it.payload as EnrolmentEventV4.EnrolmentPayload).externalCredentialIds).isEmpty()
+                },
+            )
+        }
+    }
+
+    @Test
     fun `shows add credential dialog when scanned credential is linked to another subject`() = runTest {
         val confirmedCredential = "decryptedCredential".asTokenizableRaw()
         val encryptedCredential = mockk<TokenizableString.Tokenized>()
@@ -368,6 +414,25 @@ internal class EnrolLastBiometricViewModelTest {
 
         viewModel.showAddCredentialDialog.test().assertNoValue()
     }
+
+    private fun captureValueEvent(payloadId: String) = mockk<ExternalCredentialCaptureValueEvent> {
+        every { payload.id } returns payloadId
+    }
+
+    private fun externalCredential(id: String) = ExternalCredential(
+        id = id,
+        value = "credential".asTokenizableEncrypted(),
+        subjectId = guidToEnrol,
+        type = ExternalCredentialType.NHISCard,
+    )
+
+    private fun enrolmentRecordWithCredentials(credentials: List<ExternalCredential>) = EnrolmentRecord(
+        subjectId = guidToEnrol,
+        projectId = PROJECT_ID,
+        attendantId = USER_ID,
+        moduleId = MODULE_ID,
+        externalCredentials = credentials,
+    )
 
     private fun createParams(
         steps: List<EnrolLastBiometricStepResult>,

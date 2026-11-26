@@ -103,8 +103,14 @@ internal class ExternalCredentialEventTrackerUseCase @Inject constructor(
         confirmedCredential: TokenizableString.Raw,
     ) {
         val scannedValue = attempt.scannedCredentialResult.credential.value
+        // The capture value event must hold the credential the user confirmed (possibly edited), not the raw scan
+        val confirmedExternalCredential = externalCredentialMapper.mapExternalCredential(
+            scannedCredentialResult = attempt.scannedCredentialResult,
+            subjectId = attempt.externalCredential.subjectId,
+            credentialValue = confirmedCredential,
+        )
         persistCaptureEvents(
-            attempt = attempt,
+            attempt = attempt.copy(externalCredential = confirmedExternalCredential),
             ocrErrorCount = calculateDistance(scannedValue, confirmedCredential.value),
             capturedTextLength = confirmedCredential.value.length,
         )

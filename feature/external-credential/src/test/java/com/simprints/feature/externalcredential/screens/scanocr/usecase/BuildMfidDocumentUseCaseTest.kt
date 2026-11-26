@@ -188,6 +188,26 @@ internal class BuildMfidDocumentUseCaseTest {
     }
 
     @Test
+    fun `uses only barcode readouts for FaydaCard when available`() {
+        val documents = listOf(
+            faydaScannedDocument(credential = "8642370540168184"),
+            faydaScannedDocument(credential = "8642370540168134", isFromBarcode = true),
+            faydaScannedDocument(credential = "8642370540168184"),
+        )
+        val result = useCase(documents, OcrDocumentType.FaydaCard) as MfidDocument.FaydaCard
+        assertThat(result.credential).isEqualTo("8642370540168134".asTokenizableRaw())
+        verify(exactly = 0) { getBestReadout(any(), any()) }
+    }
+
+    @Test
+    fun `uses barcode readout as-is for FaydaCard`() {
+        val documents = listOf(faydaScannedDocument(credential = "2580945924815610", isFromBarcode = true))
+        val result = useCase(documents, OcrDocumentType.FaydaCard) as MfidDocument.FaydaCard
+        assertThat(result.credential).isEqualTo("2580945924815610".asTokenizableRaw())
+        verify(exactly = 0) { getBestReadout(any(), any()) }
+    }
+
+    @Test
     fun `sets credential from best readout for FaydaCard`() {
         val expectedCredential = "1234567812345678"
         every { getBestReadout(listOf(expectedCredential), targetLength = FAYDA_CREDENTIAL_LENGTH) } returns expectedCredential
@@ -233,10 +253,14 @@ internal class BuildMfidDocumentUseCaseTest {
         verify { getBestReadout(texts, targetLength = NHIS_CREDENTIAL_LENGTH) }
     }
 
-    private fun faydaScannedDocument(credential: String = "1234567812345678") = ScannedMfidDocument(
+    private fun faydaScannedDocument(
+        credential: String = "1234567812345678",
+        isFromBarcode: Boolean = false,
+    ) = ScannedMfidDocument(
         imagePath = "path/to/image.jpg",
         ocrScanResult = OcrScanResult.FaydaCard(
             credential = ocrLine(credential),
+            isFromBarcode = isFromBarcode,
         ),
     )
 

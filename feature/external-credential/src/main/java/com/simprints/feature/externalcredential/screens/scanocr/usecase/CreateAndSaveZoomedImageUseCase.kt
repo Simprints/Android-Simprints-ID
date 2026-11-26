@@ -14,9 +14,10 @@ internal class CreateAndSaveZoomedImageUseCase @Inject constructor(
     suspend operator fun invoke(
         ocrLine: OcrLine,
         fullSizeImagePath: String,
+        isBarcode: Boolean = false,
     ) = try {
         credentialImageRepository.saveCredentialScan(
-            bitmap = zoomOntoCredentialUseCase(fullSizeImagePath, ocrLine.blockBoundingBox),
+            bitmap = zoomOntoCredentialUseCase(fullSizeImagePath, ocrLine.blockBoundingBox, isBarcode),
             imageType = ZoomedInCredential,
         )
     } catch (e: Exception) {

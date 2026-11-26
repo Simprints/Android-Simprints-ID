@@ -31,7 +31,7 @@ jobs:
             -   name: Set up Node.js
                 uses: actions/setup-node@v7
                 with:
-                    node-version: 'latest'
+                    node-version: '24'
 
             -   name: Install Firebase Tools
                 run: npm install -g firebase-tools  --ignore-scripts

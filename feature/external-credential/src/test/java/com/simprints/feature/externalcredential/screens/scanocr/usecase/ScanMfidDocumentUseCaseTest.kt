@@ -6,6 +6,7 @@ import com.simprints.feature.externalcredential.model.BoundingBox
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrDocumentType
 import com.simprints.feature.externalcredential.screens.scanocr.model.OcrScanResult
 import com.simprints.feature.externalcredential.screens.scanocr.reader.OcrLine
+import com.simprints.feature.externalcredential.screens.scanocr.reader.ScannedBarcode
 import com.simprints.infra.config.store.models.FaydaCardConfig
 import com.simprints.infra.config.store.models.GhanaIdCardConfig
 import com.simprints.infra.config.store.models.MultiFactorIdConfiguration
@@ -25,6 +26,9 @@ import org.junit.Test
 internal class ScanMfidDocumentUseCaseTest {
     @MockK
     private lateinit var readTextFromImage: ReadTextFromImageUseCase
+
+    @MockK
+    private lateinit var readBarcodesFromImage: ReadBarcodesFromImageUseCase
 
     @MockK
     private lateinit var ghanaNhisCardOcrReaderUseCase: GhanaNhisCardOcrReaderUseCase
@@ -76,12 +80,15 @@ internal class ScanMfidDocumentUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
         useCase = ScanMfidDocumentUseCase(
             readTextFromImage = readTextFromImage,
+            readBarcodesFromImage = readBarcodesFromImage,
             ghanaNhisCardOcrReaderUseCase = ghanaNhisCardOcrReaderUseCase,
             ghanaIdCardOcrReaderUseCase = ghanaIdCardOcrReaderUseCase,
             faydaCardOcrReaderUseCase = faydaCardOcrReaderUseCase,
             credentialImageRepository = credentialImageRepository,
         )
         coEvery { credentialImageRepository.saveCredentialScan(any(), any()) } returns savedImagePath
+        every { readBarcodesFromImage(any()) } returns emptyList()
+        every { faydaCardOcrReaderUseCase.fromBarcodes(any()) } returns null
     }
 
     @Test
@@ -162,6 +169,53 @@ internal class ScanMfidDocumentUseCaseTest {
         verify(exactly = 1) { faydaCardOcrReaderUseCase(any()) }
         verify(exactly = 0) { ghanaNhisCardOcrReaderUseCase(any(), any()) }
         verify(exactly = 0) { ghanaIdCardOcrReaderUseCase(any(), any()) }
+    }
+
+    @Test
+    fun `returns FaydaCard from barcode without running OCR`() = runTest {
+        val barcodes = listOf(ScannedBarcode(value = "1234567812345678", boundingBox = BoundingBox(0, 0, 10, 10)))
+        val barcodeResult = OcrScanResult.FaydaCard(credential = ocrLine(text = "1234567812345678"))
+        every { readBarcodesFromImage(bitmap) } returns barcodes
+        every { faydaCardOcrReaderUseCase.fromBarcodes(barcodes) } returns barcodeResult
+
+        val result = useCase(bitmap, OcrDocumentType.FaydaCard, faydaConfig, readFaydaBarcode = true)
+
+        assertThat(result?.ocrScanResult).isEqualTo(barcodeResult)
+        verify(exactly = 0) { readTextFromImage(any()) }
+        verify(exactly = 0) { faydaCardOcrReaderUseCase(any()) }
+    }
+
+    @Test
+    fun `falls back to OCR for FaydaCard when barcode is not read`() = runTest {
+        val ocrResult = OcrScanResult.FaydaCard(credential = ocrLine(text = "1234567812345678"))
+        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
+        every { faydaCardOcrReaderUseCase(any()) } returns ocrResult
+
+        val result = useCase(bitmap, OcrDocumentType.FaydaCard, faydaConfig, readFaydaBarcode = true)
+
+        assertThat(result?.ocrScanResult).isEqualTo(ocrResult)
+        verify(exactly = 1) { readBarcodesFromImage(bitmap) }
+        verify(exactly = 1) { readTextFromImage(bitmap) }
+    }
+
+    @Test
+    fun `does not read barcodes for Ghana cards`() = runTest {
+        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
+
+        useCase(bitmap, OcrDocumentType.NhisCard, nhisConfig, readFaydaBarcode = true)
+        useCase(bitmap, OcrDocumentType.GhanaIdCard, ghanaIdConfig, readFaydaBarcode = true)
+
+        verify(exactly = 0) { readBarcodesFromImage(any()) }
+    }
+
+    @Test
+    fun `does not read barcodes for FaydaCard when disabled`() = runTest {
+        every { readTextFromImage(bitmap) } returns mockk(relaxed = true)
+
+        useCase(bitmap, OcrDocumentType.FaydaCard, faydaConfig, readFaydaBarcode = false)
+
+        verify(exactly = 0) { readBarcodesFromImage(any()) }
+        verify(exactly = 1) { faydaCardOcrReaderUseCase(any()) }
     }
 
     @Test
