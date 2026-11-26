@@ -77,7 +77,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     lateinit var bgDispatcher: CoroutineDispatcher
 
     private var finishedHandled = false
-    private var defaultFlashButtonTint: ColorStateList? = null
+    private var defaultFlashIconTint: ColorStateList? = null
 
     private val validCaptureProgressColor: Int
         get() = ContextCompat.getColor(requireContext(), IDR.color.simprints_green_light)
@@ -140,7 +140,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         with(binding.captureFlashButton) {
             isVisible = requireContext().hasCameraFlash
             isSelected = false
-            defaultFlashButtonTint = backgroundTintList
+            defaultFlashIconTint = imageTintList
             setOnClickListener {
                 val torchEnabled = !binding.captureFlashButton.isSelected
                 toggleTorch(torchEnabled)
@@ -395,13 +395,16 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private fun displayedFeedback(state: LiveFeedbackState): LiveFeedbackState.Feedback =
         if (state.isAutoCapture && vm.isAutoCaptureHeldOff) LiveFeedbackState.Feedback.NONE else state.feedback
 
-    /** Draws attention to the flash button while the too-dark hint is shown and the flash is off. */
+    /**
+     * Draws attention to the flash button while the too-dark hint is shown and the flash is off.
+     * Tints the icon: the button has no background of its own, so a background tint would not show.
+     */
     private fun renderFlashHighlight(isTooDark: Boolean) = with(binding.captureFlashButton) {
         val highlighted = isTooDark && isVisible && !isSelected
-        backgroundTintList = if (highlighted) {
+        imageTintList = if (highlighted) {
             ColorStateList.valueOf(ContextCompat.getColor(requireContext(), IDR.color.simprints_orange))
         } else {
-            defaultFlashButtonTint
+            defaultFlashIconTint
         }
     }
 
