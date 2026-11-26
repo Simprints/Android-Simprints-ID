@@ -46,9 +46,6 @@
         android:label="MainFragment"
         tools:layout="@layout/fragment_main">
         <action
-            android:id="@+id/action_mainFragment_to_debugFragment"
-            app:destination="@id/debugFragment" />
-        <action
             android:id="@+id/action_mainFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
         <action
@@ -64,12 +61,6 @@
             android:id="@+id/action_mainFragment_to_login"
             app:destination="@id/graph_login" />
     </fragment>
-    <fragment
-        android:id="@+id/debugFragment"
-        android:name="com.simprints.feature.dashboard.debug.DebugFragment"
-        android:label="DebugFragment"
-        tools:layout="@layout/fragment_debug" />
-
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.simprints.feature.dashboard.settings.SettingsFragment"

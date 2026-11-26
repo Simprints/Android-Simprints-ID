@@ -1,37 +1,34 @@
 package com.simprints.feature.dashboard.main.dailyactivity
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import com.simprints.infra.uibase.viewmodel.BaseMviViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 internal class DailyActivityViewModel @Inject constructor(
     private val recentUserActivityManager: RecentUserActivityManager,
     private val timeHelper: TimeHelper,
-) : ViewModel() {
-    val dailyActivity: LiveData<DashboardDailyActivityState>
-        get() = _dailyActivity
-    private val _dailyActivity = MutableLiveData<DashboardDailyActivityState>()
-
-    init {
-        load()
+) : BaseMviViewModel<DailyActivityUiState, DailyActivityUiAction, DailyActivityUiEffect>(DailyActivityUiState()) {
+    override suspend fun handleAction(action: DailyActivityUiAction) {
+        when (action) {
+            DailyActivityUiAction.Load -> load()
+        }
     }
 
-    fun getCurrentDateAsString(): String = timeHelper.getCurrentDateAsString()
-
-    fun load() = viewModelScope.launch {
+    private suspend fun load() {
         val userActivity = recentUserActivityManager.getRecentUserActivity()
-        val state = DashboardDailyActivityState(
-            userActivity.enrolmentsToday,
-            userActivity.identificationsToday,
-            userActivity.verificationsToday,
+        val activity = DailyActivityUiState.DailyActivityUi(
+            enrolments = userActivity.enrolmentsToday,
+            identifications = userActivity.identificationsToday,
+            verifications = userActivity.verificationsToday,
+            currentDate = timeHelper.getCurrentDateAsString(),
         )
-        _dailyActivity.postValue(state)
+        reduce { it.copy(activity = activity) }
+    }
+
+    init {
+        onAction(DailyActivityUiAction.Load)
     }
 }

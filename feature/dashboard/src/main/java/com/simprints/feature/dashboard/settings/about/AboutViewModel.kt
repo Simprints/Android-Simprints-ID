@@ -1,13 +1,7 @@
 package com.simprints.feature.dashboard.settings.about
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.common.Modality
-import com.simprints.core.livedata.LiveDataEvent
-import com.simprints.core.livedata.LiveDataEventWithContent
-import com.simprints.core.livedata.send
 import com.simprints.feature.troubleshooting.AutoResettingClickCounter
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
@@ -15,13 +9,12 @@ import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
-import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.infra.sync.OneTime
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.devicestate.DeviceStateDataTracker
+import com.simprints.infra.uibase.viewmodel.BaseMviViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,54 +23,68 @@ internal class AboutViewModel @Inject constructor(
     private val deviceStateDataTracker: DeviceStateDataTracker,
     private val syncOrchestrator: SyncOrchestrator,
     private val recentUserActivityManager: RecentUserActivityManager,
-) : ViewModel() {
-    val syncAndSearchConfig: LiveData<SyncAndSearchConfig>
-        get() = _syncAndSearchConfig
-    private val _syncAndSearchConfig = MutableLiveData<SyncAndSearchConfig>()
+) : BaseMviViewModel<AboutUiState, AboutUiAction, AboutUiEffect>(AboutUiState()) {
+    private val troubleshootingClickCounter = AutoResettingClickCounter()
 
-    val modalities: LiveData<List<Modality>>
-        get() = _modalities
-    private val _modalities = MutableLiveData<List<Modality>>()
-
-    val recentUserActivity: LiveData<RecentUserActivity>
-        get() = _recentUserActivity
-    private val _recentUserActivity = MutableLiveData<RecentUserActivity>()
-
-    val settingsLocked: LiveData<SettingsPasswordConfig>
-        get() = _settingsLocked
-    private val _settingsLocked =
-        MutableLiveData<SettingsPasswordConfig>(SettingsPasswordConfig.NotSet)
-
-    val logoutDestinationEvent: LiveData<LiveDataEventWithContent<LogoutDestination>>
-        get() = _logoutDestinationEvent
-    private val _logoutDestinationEvent =
-        MutableLiveData<LiveDataEventWithContent<LogoutDestination>>()
-
-    val openTroubleshooting: LiveData<LiveDataEvent>
-        get() = _openTroubleshooting
-    private val _openTroubleshooting = MutableLiveData<LiveDataEvent>()
-
-    private var troubleshootingClickCounter = AutoResettingClickCounter()
-
-    init {
-        load()
+    override suspend fun handleAction(action: AboutUiAction) {
+        when (action) {
+            AboutUiAction.Load -> load()
+            AboutUiAction.LogoutClicked -> requestLogoutConfirmation()
+            AboutUiAction.LogoutConfirmed -> confirmLogout()
+            AboutUiAction.LogoutConfirmationDismissed -> reduce { it.copy(isLogoutConfirmationVisible = false) }
+            AboutUiAction.TroubleshootingClicked -> countTroubleshootingClick()
+            is AboutUiAction.PasswordUnlocked -> unlock(action.action)
+        }
     }
 
-    fun unlockSettings() {
-        _settingsLocked.postValue(SettingsPasswordConfig.Unlocked)
+    private suspend fun load() {
+        val configuration = configRepository.getProjectConfiguration()
+        val syncAndSearchConfig = SyncAndSearchConfig(
+            configuration.synchronization.down.simprints
+                ?.partitionType
+                ?.name ?: "CommCare",
+            configuration.identification.poolType.name,
+        )
+        val recentUserActivity = recentUserActivityManager.getRecentUserActivity()
+        reduce {
+            it.copy(
+                syncAndSearchConfig = syncAndSearchConfig,
+                isScannerVersionVisible = configuration.general.modalities.contains(Modality.FINGERPRINT),
+                lastScannerVersion = recentUserActivity.lastScannerVersion,
+                passwordConfig = configuration.general.settingsPassword,
+            )
+        }
     }
 
-    fun processLogoutRequest() {
-        viewModelScope.launch {
-            val logoutDestination =
-                when (canSyncDataToSimprints() && (hasEventsToUpload() || hasSamplesToUpload())) {
-                    true -> LogoutDestination.LogoutDataSyncScreen
-                    false -> {
-                        syncOrchestrator.execute(OneTime.Logout.start())
-                        LogoutDestination.LoginScreen
-                    }
-                }
-            _logoutDestinationEvent.send(logoutDestination)
+    private suspend fun requestLogoutConfirmation() {
+        val password = uiState.value.passwordConfig.getNullablePassword()
+        if (password != null) {
+            emitEffect(AboutUiEffect.ShowPasswordDialog(password, AboutGatedAction.LOGOUT))
+        } else {
+            reduce { it.copy(isLogoutConfirmationVisible = true) }
+        }
+    }
+
+    private suspend fun confirmLogout() {
+        reduce { it.copy(isLogoutConfirmationVisible = false) }
+        processLogoutRequest()
+    }
+
+    private suspend fun unlock(action: AboutGatedAction) {
+        reduce { it.copy(passwordConfig = SettingsPasswordConfig.Unlocked) }
+        when (action) {
+            AboutGatedAction.LOGOUT -> processLogoutRequest()
+            AboutGatedAction.TROUBLESHOOTING -> emitEffect(AboutUiEffect.NavigateToTroubleshooting)
+        }
+    }
+
+    // Pending data is read freshly on every request. Without pending data the logout command is enough: navigation to request
+    // login comes from the DashboardActivity logout broadcast, so no effect is sent.
+    private suspend fun processLogoutRequest() {
+        if (canSyncDataToSimprints() && (hasEventsToUpload() || hasSamplesToUpload())) {
+            emitEffect(AboutUiEffect.NavigateToLogoutSync)
+        } else {
+            syncOrchestrator.execute(OneTime.Logout.start())
         }
     }
 
@@ -94,23 +101,18 @@ internal class AboutViewModel @Inject constructor(
 
     private suspend fun canSyncDataToSimprints(): Boolean = configRepository.getProjectConfiguration().canSyncDataToSimprints()
 
-    private fun load() = viewModelScope.launch {
-        val configuration = configRepository.getProjectConfiguration()
-        val syncAndSearchConfig = SyncAndSearchConfig(
-            configuration.synchronization.down.simprints
-                ?.partitionType
-                ?.name ?: "CommCare",
-            configuration.identification.poolType.name,
-        )
-        _syncAndSearchConfig.postValue(syncAndSearchConfig)
-        _modalities.postValue(configuration.general.modalities)
-        _recentUserActivity.postValue(recentUserActivityManager.getRecentUserActivity())
-        _settingsLocked.postValue(configuration.general.settingsPassword)
+    private suspend fun countTroubleshootingClick() {
+        if (troubleshootingClickCounter.handleClick(viewModelScope)) {
+            val password = uiState.value.passwordConfig.getNullablePassword()
+            if (password != null) {
+                emitEffect(AboutUiEffect.ShowPasswordDialog(password, AboutGatedAction.TROUBLESHOOTING))
+            } else {
+                emitEffect(AboutUiEffect.NavigateToTroubleshooting)
+            }
+        }
     }
 
-    fun troubleshootingClick() {
-        if (troubleshootingClickCounter.handleClick(viewModelScope)) {
-            _openTroubleshooting.send()
-        }
+    init {
+        onAction(AboutUiAction.Load)
     }
 }

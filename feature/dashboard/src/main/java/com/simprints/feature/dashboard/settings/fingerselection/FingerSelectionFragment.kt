@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.simprints.feature.dashboard.R
@@ -12,6 +15,7 @@ import com.simprints.feature.dashboard.databinding.FragmentFingerSelectionBindin
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 internal class FingerSelectionFragment : Fragment(R.layout.fragment_finger_selection) {
@@ -28,25 +32,37 @@ internal class FingerSelectionFragment : Fragment(R.layout.fragment_finger_selec
         applySystemBarInsets(view)
 
         initRecyclerView()
-        listenForItemChanges()
-        viewModel.start()
+        observeState()
+        viewModel.onAction(FingerSelectionUiAction.Load)
         binding.settingsToolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
         }
     }
 
     private fun initRecyclerView() {
-        fingerSelectionAdapter = FingerSelectionItemAdapter {
-            viewModel.fingerSelections.value ?: emptyList()
-        }
+        fingerSelectionAdapter = FingerSelectionItemAdapter()
         binding.fingerSelectionRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.fingerSelectionRecyclerView.adapter = fingerSelectionAdapter
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private fun listenForItemChanges() {
-        viewModel.fingerSelections.observe(viewLifecycleOwner) {
-            fingerSelectionAdapter.notifyDataSetChanged()
+    private fun observeState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { viewModel.uiState.collect(::render) }
+                launch { viewModel.uiEffect.collect(::handleEffect) }
+            }
         }
+    }
+
+    // FingerSelectionUiEffect has no effects; collected anyway so every screen has wiring
+    @Suppress("UNUSED_PARAMETER")
+    private fun handleEffect(effect: FingerSelectionUiEffect) = Unit
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun render(state: FingerSelectionUiState) {
+        // null: not loaded yet, the list stays empty.
+        val sections = state.sections ?: return
+        fingerSelectionAdapter.submit(sections)
+        fingerSelectionAdapter.notifyDataSetChanged()
     }
 }

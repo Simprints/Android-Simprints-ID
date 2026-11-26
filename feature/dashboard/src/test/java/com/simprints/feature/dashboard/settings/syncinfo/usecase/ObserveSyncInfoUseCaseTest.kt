@@ -1,6 +1,5 @@
 package com.simprints.feature.dashboard.settings.syncinfo.usecase
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.Modality
 import com.simprints.core.lifecycle.AppForegroundStateTracker
@@ -43,6 +42,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -50,9 +51,6 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class ObserveSyncInfoUseCaseTest {
-    @get:Rule
-    val rule = InstantTaskExecutorRule()
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -252,6 +250,50 @@ internal class ObserveSyncInfoUseCaseTest {
         val result = useCase().first()
 
         assertThat(result.isLoggedIn).isFalse()
+    }
+
+    // S-15
+    @Test
+    fun `image sync section is visible when sample upload is enabled in the project`() = runTest {
+        every { any<ProjectConfiguration>().isSampleUploadEnabledInProject() } returns true
+
+        val result = useCase().first()
+
+        assertThat(result.isImageSyncSectionVisible).isTrue()
+    }
+
+    // S-15
+    @Test
+    fun `image sync section is hidden when sample upload is not enabled in the project`() = runTest {
+        every { any<ProjectConfiguration>().isSampleUploadEnabledInProject() } returns false
+
+        val result = useCase().first()
+
+        assertThat(result.isImageSyncSectionVisible).isFalse()
+    }
+
+    // S-15
+    @Test
+    fun `when records progress ends the next emission is held for one second`() = runTest {
+        val syncingState = mockk<EventSyncState>(relaxed = true)
+        val idleState = mockk<EventSyncState>(relaxed = true)
+        every {
+            getSyncInfoSectionRecords(any(), any(), any(), syncingState, any(), any(), any(), any(), any(), any())
+        } returns SyncInfoSectionRecords(isProgressVisible = true)
+        every {
+            getSyncInfoSectionRecords(any(), any(), any(), idleState, any(), any(), any(), any(), any(), any())
+        } returns SyncInfoSectionRecords(isProgressVisible = false)
+        syncStatusFlow.value = SyncStatus(eventSyncState = syncingState, imageSyncStatus = mockImageSyncStatus)
+        val values = mutableListOf<SyncInfo>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { useCase().collect { values += it } }
+        assertThat(values.map { it.syncInfoSectionRecords.isProgressVisible }).containsExactly(true)
+
+        syncStatusFlow.value = SyncStatus(eventSyncState = idleState, imageSyncStatus = mockImageSyncStatus)
+        advanceTimeBy(999)
+        assertThat(values.map { it.syncInfoSectionRecords.isProgressVisible }).containsExactly(true)
+
+        advanceTimeBy(2)
+        assertThat(values.map { it.syncInfoSectionRecords.isProgressVisible }).containsExactly(true, false).inOrder()
     }
 
     // Section-specific tests

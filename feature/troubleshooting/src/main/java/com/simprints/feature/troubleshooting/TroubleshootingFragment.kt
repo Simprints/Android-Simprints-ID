@@ -8,8 +8,8 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.tabs.TabLayoutMediator
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.troubleshooting.databinding.FragmentTroubleshootingBinding
-import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -44,7 +44,7 @@ internal class TroubleshootingFragment : Fragment(R.layout.fragment_troubleshoot
         binding.troubleshootingPager.adapter = adapter
 
         TabLayoutMediator(binding.troubleshootingTabs, binding.troubleshootingPager) { tab, position ->
-            tab.text = TroubleshootingPagerAdapter.Tabs.entries[position].title
+            tab.text = adapter.getTabTitle(position)
         }.attach()
     }
 }

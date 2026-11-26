@@ -5,25 +5,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
-import com.simprints.core.domain.common.Modality
-import com.simprints.core.livedata.LiveDataEventObserver
-import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsAboutBinding
+import com.simprints.feature.dashboard.view.StateDrivenDialog
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.password.SettingsPasswordDialogFragment
 import com.simprints.infra.uibase.system.Clipboard
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
@@ -41,16 +42,9 @@ internal class AboutFragment : PreferenceFragmentCompat() {
     private val viewModel by viewModels<AboutViewModel>()
     private val binding by viewBinding(FragmentSettingsAboutBinding::bind)
 
-    private val confirmationDialogForLogout: AlertDialog by lazy {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(IDR.string.dashboard_logout_confirmation_title))
-            .setMessage(getString(IDR.string.dashboard_logout_confirmation_message))
-            .setPositiveButton(
-                getString(IDR.string.dashboard_logout_confirmation_log_out_button),
-            ) { _, _ -> viewModel.processLogoutRequest() }
-            .setNegativeButton(getString(IDR.string.dashboard_logout_confirmation_cancel_button), null)
-            .create()
-    }
+    private val logoutConfirmationDialog = StateDrivenDialog(
+        onCancelledByUser = { viewModel.onAction(AboutUiAction.LogoutConfirmationDismissed) },
+    )
 
     override fun onCreatePreferences(
         savedInstanceState: Bundle?,
@@ -80,49 +74,72 @@ internal class AboutFragment : PreferenceFragmentCompat() {
             findNavController().popBackStack()
         }
         initLayout()
-
-        viewModel.syncAndSearchConfig.observe(viewLifecycleOwner) {
-            getSyncAndSearchConfigurationPreference()?.summary =
-                "${it.sync.lowerCaseCapitalized()} Sync - ${it.search.lowerCaseCapitalized()} Search"
-        }
-        viewModel.modalities.observe(viewLifecycleOwner) {
-            getScannerVersionPreference()?.isVisible = it.contains(Modality.FINGERPRINT)
-        }
-        viewModel.recentUserActivity.observe(viewLifecycleOwner) {
-            getScannerVersionPreference()?.summary = it.lastScannerVersion
-        }
-        viewModel.logoutDestinationEvent.observe(
-            viewLifecycleOwner,
-            LiveDataEventWithContentObserver {
-                when (it) {
-                    LogoutDestination.LogoutDataSyncScreen -> {
-                        val destination = AboutFragmentDirections.actionAboutFragmentToLogoutNavigation()
-                        findNavController().navigateSafely(this, destination)
-                    }
-                    LogoutDestination.LoginScreen -> {
-                        // Logout navigation is handled by DashboardActivity
-                    }
-                }
-            },
-        )
-        viewModel.openTroubleshooting.observe(
-            viewLifecycleOwner,
-            LiveDataEventObserver {
-                showPasswordIfRequired(ACTION_TROUBLESHOOTING) { openTroubleshooting() }
-            },
-        )
+        observeState()
 
         SettingsPasswordDialogFragment.registerForResult(
             fragmentManager = childFragmentManager,
             lifecycleOwner = this,
             onSuccess = { action ->
-                viewModel.unlockSettings()
-                when (action) {
-                    ACTION_LOGOUT -> viewModel.processLogoutRequest()
-                    ACTION_TROUBLESHOOTING -> openTroubleshooting()
-                }
+                AboutGatedAction.fromKey(action)?.let { viewModel.onAction(AboutUiAction.PasswordUnlocked(it)) }
             },
         )
+    }
+
+    override fun onDestroyView() {
+        logoutConfirmationDialog.release()
+        super.onDestroyView()
+    }
+
+    private fun observeState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { viewModel.uiState.collect(::render) }
+                launch { viewModel.uiEffect.collect(::handleEffect) }
+            }
+        }
+    }
+
+    private fun render(state: AboutUiState) {
+        state.syncAndSearchConfig?.let {
+            getSyncAndSearchConfigurationPreference()?.summary =
+                "${it.sync.lowerCaseCapitalized()} Sync - ${it.search.lowerCaseCapitalized()} Search"
+        }
+        state.isScannerVersionVisible?.let { isVisible ->
+            getScannerVersionPreference()?.isVisible = isVisible
+        }
+        state.lastScannerVersion?.let { lastScannerVersion ->
+            getScannerVersionPreference()?.summary = lastScannerVersion
+        }
+        logoutConfirmationDialog.render(state.isLogoutConfirmationVisible, ::createLogoutConfirmationDialog)
+    }
+
+    private fun createLogoutConfirmationDialog() = MaterialAlertDialogBuilder(requireContext())
+        .setTitle(getString(IDR.string.dashboard_logout_confirmation_title))
+        .setMessage(getString(IDR.string.dashboard_logout_confirmation_message))
+        .setPositiveButton(
+            getString(IDR.string.dashboard_logout_confirmation_log_out_button),
+        ) { _, _ -> viewModel.onAction(AboutUiAction.LogoutConfirmed) }
+        .setNegativeButton(getString(IDR.string.dashboard_logout_confirmation_cancel_button)) { dialog, _ -> dialog.cancel() }
+        .create()
+
+    private fun handleEffect(effect: AboutUiEffect) {
+        when (effect) {
+            is AboutUiEffect.ShowPasswordDialog -> SettingsPasswordDialogFragment
+                .newInstance(
+                    passwordToMatch = effect.password,
+                    action = effect.action.key,
+                ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
+
+            AboutUiEffect.NavigateToLogoutSync -> findNavController().navigateSafely(
+                this,
+                AboutFragmentDirections.actionAboutFragmentToLogoutNavigation(),
+            )
+
+            AboutUiEffect.NavigateToTroubleshooting -> findNavController().navigateSafely(
+                this,
+                AboutFragmentDirections.actionAboutFragmentToTroubleshooting(),
+            )
+        }
     }
 
     private fun initLayout() {
@@ -141,25 +158,14 @@ internal class AboutFragment : PreferenceFragmentCompat() {
             }
         }
         getSyncAndSearchConfigurationPreference()?.setOnPreferenceClickListener {
-            viewModel.troubleshootingClick()
+            viewModel.onAction(AboutUiAction.TroubleshootingClicked)
             true
         }
 
         getLogoutPreference()?.setOnPreferenceClickListener {
-            activity?.runOnUiThread {
-                val password = viewModel.settingsLocked.value?.getNullablePassword()
-                if (password != null) {
-                    showPasswordIfRequired(ACTION_LOGOUT) { viewModel.processLogoutRequest() }
-                } else {
-                    confirmationDialogForLogout.show()
-                }
-            }
+            viewModel.onAction(AboutUiAction.LogoutClicked)
             true
         }
-    }
-
-    private fun openTroubleshooting() {
-        findNavController().navigateSafely(this, AboutFragmentDirections.actionAboutFragmentToTroubleshooting())
     }
 
     private fun getAppVersionPreference(): Preference? = findPreference(getString(R.string.preference_app_version_key))
@@ -174,25 +180,4 @@ internal class AboutFragment : PreferenceFragmentCompat() {
 
     private fun String.lowerCaseCapitalized() =
         lowercase(Locale.getDefault()).replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-
-    private fun showPasswordIfRequired(
-        action: String,
-        cb: () -> Unit,
-    ) {
-        val password = viewModel.settingsLocked.value?.getNullablePassword()
-        if (password != null) {
-            SettingsPasswordDialogFragment
-                .newInstance(
-                    passwordToMatch = password,
-                    action = action,
-                ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
-        } else {
-            cb()
-        }
-    }
-
-    companion object {
-        private const val ACTION_LOGOUT = "logout"
-        private const val ACTION_TROUBLESHOOTING = "troubleshooting"
-    }
 }

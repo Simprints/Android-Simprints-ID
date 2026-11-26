@@ -49,7 +49,6 @@ okttp_version = "5.5.1"
 chuck_version = "4.4.0"
 
 sqlCipher_version = "4.20.0"
-fuzzywuzzy_version = "1.4.0"
 rootbeer_version = "0.1.2"
 commons_io_version = "2.22.0"
 kronos_version = "0.0.1-alpha11"
@@ -163,10 +162,6 @@ retrofit_kotlin_serialization = { group = "com.squareup.retrofit2", name = "conv
 #Chuck
 chuck-debug = { module = "com.github.chuckerteam.chucker:library", version.ref = "chuck_version" }
 chuck-release = { module = "com.github.chuckerteam.chucker:library-no-op", version.ref = "chuck_version" }
-
-
-#Fuzzywuzzy
-fuzzywuzzy-core = { module = "me.xdrop:fuzzywuzzy", version.ref = "fuzzywuzzy_version" }
 
 #Rootbeer
 rootbeer-core = { module = "com.scottyab:rootbeer-lib", version.ref = "rootbeer_version" }

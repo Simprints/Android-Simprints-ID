@@ -9,27 +9,33 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.simprints.core.domain.common.Modality
-import com.simprints.core.livedata.LiveDataEventObserver
-import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.dashboard.DashboardActivity
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsBinding
+import com.simprints.feature.dashboard.settings.SettingsUiState.UpdateConfigSummary
+import com.simprints.feature.dashboard.view.StateDrivenDialog
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.password.SettingsPasswordDialogFragment
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class SettingsFragment : PreferenceFragmentCompat() {
     private val viewModel by viewModels<SettingsViewModel>()
     private val binding by viewBinding(FragmentSettingsBinding::bind)
+    private val languageDialog = StateDrivenDialog(
+        onCancelledByUser = { viewModel.onAction(SettingsUiAction.LanguageDialogDismissed) },
+    )
 
     override fun onCreatePreferences(
         savedInstanceState: Bundle?,
@@ -59,41 +65,68 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         binding.settingsToolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
         }
-        viewModel.generalConfiguration.observe(viewLifecycleOwner) {
-            enableFingerprintSettings(it.modalities.contains(Modality.FINGERPRINT))
+        bindClickListeners()
+        observeState()
+    }
+
+    override fun onDestroyView() {
+        languageDialog.release()
+        super.onDestroyView()
+    }
+
+    private fun observeState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.onAction(SettingsUiAction.ScreenStarted)
+                launch { viewModel.uiState.collect(::render) }
+                launch { viewModel.uiEffect.collect(::handleEffect) }
+            }
         }
-        viewModel.faceConfiguration.observe(viewLifecycleOwner) {
-            showFaceAutoCaptureSetting(it?.isAutoCapture == true)
+    }
+
+    private fun render(state: SettingsUiState) {
+        state.isFingerprintSettingsVisible?.let { isVisible ->
+            getFingerSelectionPreference()?.isVisible = isVisible
+            getAudioAlertPreference()?.isVisible = isVisible
         }
-        viewModel.languagePreference.observe(viewLifecycleOwner) {
-            loadSelectedLanguage(it)
+        state.isFaceAutoCaptureVisible?.let { isVisible ->
+            getFaceAutoCapturePreference()?.isVisible = isVisible
         }
-        viewModel.configUpdated.observe(
-            viewLifecycleOwner,
-            LiveDataEventObserver {
+        state.languageCode?.let(::loadSelectedLanguage)
+        when (val summary = state.updateConfigSummary) {
+            UpdateConfigSummary.Empty -> Unit
+
+            UpdateConfigSummary.Scheduled -> getUpdateConfig()?.setSummary(IDR.string.dashboard_preference_update_config_scheduled)
+
+            is UpdateConfigSummary.LastUpdated -> getUpdateConfig()?.summary = getString(
+                IDR.string.dashboard_preference_summary_update_config_last_updated,
+                summary.sinceLastUpdate,
+            )
+        }
+        languageDialog.render(state.isLanguageDialogVisible) {
+            createLanguageSelectionDialog(state.languageOptions, state.languageCode)
+        }
+    }
+
+    private fun handleEffect(effect: SettingsUiEffect) {
+        when (effect) {
+            is SettingsUiEffect.ShowPasswordDialog ->
+                SettingsPasswordDialogFragment
+                    .newInstance(
+                        passwordToMatch = effect.password,
+                        action = effect.action.key,
+                    ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
+
+            SettingsUiEffect.ConfigUpdated ->
                 Toast
                     .makeText(
                         requireContext(),
                         IDR.string.dashboard_preference_update_config_finished,
                         Toast.LENGTH_SHORT,
                     ).show()
-            },
-        )
-        viewModel.sinceConfigLastUpdated.observe(
-            viewLifecycleOwner,
-            LiveDataEventWithContentObserver { lastUpdated ->
-                getUpdateConfig()?.summary = getString(
-                    IDR.string.dashboard_preference_summary_update_config_last_updated,
-                    lastUpdated,
-                )
-            },
-        )
-        bindClickListeners()
-    }
 
-    private fun enableFingerprintSettings(enabled: Boolean) {
-        getFingerSelectionPreference()?.isVisible = enabled
-        getAudioAlertPreference()?.isVisible = enabled
+            SettingsUiEffect.RelaunchApp -> clearActivityStackAndRelaunchApp()
+        }
     }
 
     private fun bindClickListeners() {
@@ -101,14 +134,11 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
             fragmentManager = childFragmentManager,
             lifecycleOwner = this,
             onSuccess = { action ->
-                viewModel.unlockSettings()
-                when (action) {
-                    ACTION_LANGUAGE -> createLanguageSelectionDialog().show()
-                }
+                SettingsGatedAction.fromKey(action)?.let { viewModel.onAction(SettingsUiAction.PasswordUnlocked(it)) }
             },
         )
         getLanguagePreference()?.setOnPreferenceClickListener {
-            showPasswordIfRequired(ACTION_LANGUAGE) { createLanguageSelectionDialog().show() }
+            viewModel.onAction(SettingsUiAction.LanguageClicked)
             true
         }
 
@@ -129,7 +159,7 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         getUpdateConfig()?.setOnPreferenceClickListener {
-            updateConfiguration()
+            viewModel.onAction(SettingsUiAction.UpdateConfigClicked)
             true
         }
 
@@ -142,36 +172,23 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    private fun showPasswordIfRequired(
-        action: String,
-        cb: () -> Unit,
-    ) {
-        val password = viewModel.settingsLocked.value?.getNullablePassword()
-        if (password != null) {
-            SettingsPasswordDialogFragment
-                .newInstance(
-                    passwordToMatch = password,
-                    action = action,
-                ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
-        } else {
-            cb()
-        }
-    }
-
-    private fun createLanguageSelectionDialog(): AlertDialog {
-        val languagesOptions = viewModel.generalConfiguration.value
-            ?.languageOptions
-            .orEmpty()
-        val languagesCodeToName = computeAvailableLanguageCodeAndName(languagesOptions)
+    private fun createLanguageSelectionDialog(
+        languageOptions: List<String>,
+        selectedCode: String?,
+    ): AlertDialog {
+        val languagesCodeToName = computeAvailableLanguageCodeAndName(languageOptions)
         val languageNames = languagesCodeToName.map { it.second }.toTypedArray()
 
-        val selectedLanguage = viewModel.languagePreference.value
-            ?.let { selectedCode -> languagesCodeToName.indexOfFirst { selectedCode == it.first } }
+        val selectedLanguage = selectedCode
+            ?.let { code -> languagesCodeToName.indexOfFirst { code == it.first } }
             ?: ArrayAdapter.NO_SELECTION
 
         return MaterialAlertDialogBuilder(requireContext())
-            .setSingleChoiceItems(languageNames, selectedLanguage) { _, which -> handleLanguageChange(languagesCodeToName[which].first) }
-            .create()
+            .setSingleChoiceItems(languageNames, selectedLanguage) { dialog, which ->
+                // Dismissed straight away: a second pick during the save would otherwise relaunch the app twice.
+                dialog.dismiss()
+                handleLanguageChange(languagesCodeToName[which].first)
+            }.create()
     }
 
     private fun computeAvailableLanguageCodeAndName(availableLanguages: List<String>): List<Pair<String, String>> {
@@ -189,21 +206,15 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         getLanguagePreference()?.summary = newLanguageName
     }
 
+    // The summary is rendered from state and the relaunch comes as an effect, both after the save (KI-3 fix).
     private fun handleLanguageChange(newLanguageCode: String) {
-        viewModel.updateLanguagePreference(newLanguageCode)
-        loadSelectedLanguage(newLanguageCode)
-        clearActivityStackAndRelaunchApp()
+        viewModel.onAction(SettingsUiAction.LanguageSelected(newLanguageCode))
     }
 
     private fun clearActivityStackAndRelaunchApp() {
         activity?.finishAffinity()
         activity?.startActivity(Intent(context, DashboardActivity::class.java))
         activity?.overridePendingTransition(0, 0)
-    }
-
-    private fun updateConfiguration() {
-        viewModel.scheduleConfigUpdate()
-        getUpdateConfig()?.setSummary(IDR.string.dashboard_preference_update_config_scheduled)
     }
 
     private fun getLanguagePreference(): Preference? = findPreference(getString(R.string.preference_select_language_key))
@@ -219,12 +230,4 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
     private fun getAudioAlertPreference(): Preference? = findPreference(getString(R.string.preference_enable_audio_on_scan_complete_key))
 
     private fun getFaceAutoCapturePreference(): Preference? = findPreference(getString(R.string.preference_enable_face_auto_capture))
-
-    private fun showFaceAutoCaptureSetting(isVisible: Boolean) {
-        getFaceAutoCapturePreference()?.isVisible = isVisible
-    }
-
-    companion object {
-        private const val ACTION_LANGUAGE = "language"
-    }
 }

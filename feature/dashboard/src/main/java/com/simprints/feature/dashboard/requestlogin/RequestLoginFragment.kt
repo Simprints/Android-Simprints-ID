@@ -40,12 +40,18 @@ internal class RequestLoginFragment : Fragment(R.layout.fragment_request_login) 
     // Requires so many clicks in short window to make it less likely to open on accident
     private val clickCounter = AutoResettingClickCounter(requiredClicks = 10)
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Restored once per Fragment instance, not per view: a view re-created from the back stack (for example after
+        // troubleshooting) keeps the flag, so the dialog shows once per logout.
+        wasLogoutReasonDisplayed = savedInstanceState?.getBoolean(KEY_WAS_LOGOUT_REASON_DISPLAYED) ?: false
+    }
+
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        wasLogoutReasonDisplayed = savedInstanceState?.getBoolean(KEY_WAS_LOGOUT_REASON_DISPLAYED) ?: false
         binding.tvDeviceId.text = getString(IDR.string.dashboard_request_login_device_id, deviceId)
         binding.simprintsIdVersionTextView.text =
             String.format(getString(IDR.string.dashboard_request_login_simprints_version), packageVersionName)

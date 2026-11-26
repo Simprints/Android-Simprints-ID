@@ -9,23 +9,28 @@ import com.simprints.feature.dashboard.databinding.HeaderSdkNameBinding
 import com.simprints.feature.dashboard.databinding.ItemFingerSelectionBinding
 import com.simprints.infra.resources.R as IDR
 
-internal class FingerSelectionItemAdapter(
-    private val getItems: () -> List<FingerSelectionSection>,
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+internal class FingerSelectionItemAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     companion object {
         private const val TYPE_HEADER = 0
         private const val TYPE_ITEM = 1
     }
 
-    override fun getItemCount(): Int = getItems().sumOf { it.items.size + 1 }
+    private var sections: List<FingerSelectionSection> = emptyList()
+
+    /** Replaces the displayed sections. The caller notifies the adapter afterwards. */
+    fun submit(sections: List<FingerSelectionSection>) {
+        this.sections = sections
+    }
+
+    override fun getItemCount(): Int = sections.sumOf { it.items.size + 1 }
 
     override fun getItemViewType(position: Int): Int {
         var pos = 0
-        for (section in getItems()) {
+        for ((_, items) in sections) {
             if (position == pos) {
                 return TYPE_HEADER
             }
-            pos += section.items.size + 1
+            pos += items.size + 1
             if (position < pos) {
                 return TYPE_ITEM
             }
@@ -52,15 +57,15 @@ internal class FingerSelectionItemAdapter(
         position: Int,
     ) {
         var totalItems = 0
-        for (section in getItems()) {
+        for ((sdkName, items) in sections) {
             if (position == totalItems && holder is HeaderViewHolder) {
-                holder.bind(section.sdkName)
+                holder.bind(sdkName)
                 return
-            } else if (position < totalItems + section.items.size + 1 && holder is FingerSelectionItemViewHolder) {
-                holder.bind(section.items[position - totalItems - 1])
+            } else if (position < totalItems + items.size + 1 && holder is FingerSelectionItemViewHolder) {
+                holder.bind(items[position - totalItems - 1])
                 return
             }
-            totalItems += section.items.size + 1
+            totalItems += items.size + 1
         }
     }
 
