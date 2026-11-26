@@ -1,361 +1,96 @@
 {
-  "dry_run": true,
+  "dry_run": false,
   "items": [
     {
       "attempts": 1,
       "fix": {
-        "branch": "crashbunny/select-subject-non-guid-realm-uuid",
-        "pr_url": null,
-        "reason": "Already fixed on main by 97aea7d307 (MS-1753), which is an ancestor of origin/main. In SelectSubjectViewModel.getDisplayDialogStateIfRequired, the isValidGuid() check now returns before enrolmentRecordRepository.load(), so RealmUUID.from() is never called with non-GUID IDs. The fix still needs to ship in a release (v2026.3.2 does not have it), so consider cherry-picking 97aea7d307 to the release branch.",
-        "status": "failed",
-        "summary": "No change needed: main already skips the enrolment record lookup for non-GUID selected IDs."
-      },
-      "impact": "medium",
-      "issue_ids": [
-        "e1ebe2ed9b6ca0f0451a3a34ba6360d5"
-      ],
-      "pr_url": null,
-      "root_cause": "In an MFID CONFIRM_IDENTITY callout the caller sends a selected ID that is not a GUID ('BIOMETRICS_SEARCH_...'); SelectSubjectViewModel.getDisplayDialogStateIfRequired calls enrolmentRecordRepository.load() before its isValidGuid() check, so RealmUUID.from() in RealmEnrolmentRecordLocalDataSource.buildRealmQueryForSubject throws and the app crashes. Fixed on main by commit 97aea7d307 (MS-1753, 2026-11-11) but not in any release yet (v2026.3.2 still has it); no open PR.",
-      "root_cause_id": "select-subject-non-guid-realm-uuid",
-      "status": "failed"
-    },
-    {
-      "attempts": 1,
-      "fix": {
-        "branch": "crashbunny/double-finish-result-orchestrator-cast",
-        "pr_url": null,
-        "reason": "Root cause already fixed on origin/main by commit 9f8fd51f9a (MS-1752, 'Ignore finishWithResult from fragment that already was popped from backstack'). In infra/ui-base NavigationResultExt.kt, finishWithResult now returns early when canNavigate(fragment) is false. So a second ConsentFragment finishWithResult (double tap) never sets a ConsentResult under the root result key, and OrchestratorActivity's handleResult<AppResult> cast is never reached. The only crash is on 2024.1.5, which predates the fix. No extra change needed; the fix only has to ship in the next release.",
-        "status": "failed",
-        "summary": "Already fixed on main: NavController.finishWithResult now ignores calls from a fragment that is no longer the current destination (canNavigate guard)."
-      },
-      "impact": "medium",
-      "issue_ids": [
-        "a3bc7c8db94c4357fec5a2f320fb030e"
-      ],
-      "pr_url": null,
-      "root_cause": "ConsentFragment calls finishWithResult twice (e.g. double tap); the second ConsentResult is delivered under the root result key while the current destination is already the orchestrator root, and OrchestratorActivity's handleResult<AppResult> listener throws ClassCastException (NavigationResultExt / OrchestratorActivity). Fixed on main by commit 9f8fd51f9a (MS-1752, 2026-11-10), not in any release yet; no open PR.",
-      "root_cause_id": "double-finish-result-orchestrator-cast",
-      "status": "failed"
-    },
-    {
-      "attempts": 1,
-      "fix": {
-        "branch": "crashbunny/fingerprint-capture-null-config-after-restore",
-        "pr_url": null,
-        "reason": null,
-        "status": "would_fix",
-        "summary": "FingerprintCaptureViewModel.start no longer force-unwraps a null fingerprint config; it logs via Simber, shows the unexpected-error alert, and the fragment skips capture UI setup."
-      },
-      "impact": "medium",
-      "issue_ids": [
-        "b323b0646455bdfa0cb301ac3455dc5c"
-      ],
-      "pr_url": null,
-      "root_cause": "FingerprintCaptureViewModel.start dereferences configRepository.getProjectConfiguration().fingerprint!!, which was null when the orchestrator restored a fingerprint step after process death right after a config sync, so fingerprint capture crashed. Main still has the unguarded `!!`; no open PR.",
-      "root_cause_id": "fingerprint-capture-null-config-after-restore",
-      "status": "done"
-    },
-    {
-      "attempts": 1,
-      "fix": {
-        "branch": "crashbunny/face-capture-saveimage-runblocking-main",
-        "pr_url": null,
-        "reason": null,
-        "status": "would_fix",
-        "summary": "Replace runBlocking in FaceCaptureViewModel.saveImage with a suspending withContext on the injected @DispatcherBG dispatcher so bitmap compression and image saving no longer block the main thread during face capture."
-      },
-      "impact": "medium",
-      "issue_ids": [
-        "d91457cd4808446bda8e43f1b1342181"
-      ],
-      "pr_url": null,
-      "root_cause": "FaceCaptureViewModel.saveImage uses runBlocking on the main thread (called from flowFinished in viewModelScope) to compress the bitmap and write it to disk, blocking the UI long enough to ANR during face capture. Main still has the runBlocking; no open PR.",
-      "root_cause_id": "face-capture-saveimage-runblocking-main",
-      "status": "done"
-    },
-    {
-      "attempts": 1,
-      "fix": {
         "branch": "crashbunny/sync-worker-cancellation-logged-as-error",
-        "pr_url": null,
-        "reason": "origin/main already contains PR #1886 (merge 17815420f5, 2026-11-12): Simber.isSkippableException now skips java.util.concurrent.CancellationException (covers JobCancellationException and TimeoutCancellationException from FirebaseAuthManager.getCurrentToken and EventRepositoryImpl.reportException), and EventUpSyncTask rethrows CancellationException before the generic catch. The remaining Crashlytics events come from released versions (<= 2026.3.2) that predate the fix; it will take effect once a release built from main ships.",
-        "status": "failed",
-        "summary": "Already fixed on main by PR #1886; no new change needed"
+        "pr_url": "https://github.com/Simprints/Android-Simprints-ID/pull/1886",
+        "reason": null,
+        "status": "pr_opened",
+        "summary": "Simber skips CancellationException (direct or as cause) from Crashlytics reporting, and EventUpSyncTask rethrows cancellation instead of recording the operation as FAILED"
       },
       "impact": "medium",
       "issue_ids": [
         "9d98adfcb32c5f9f91ead1e93f12e219",
         "02ca2632210c8f37647cffa1a9b52347",
         "9cf671682a5dec83266ee9ff26fd44d8",
-        "0e77edd7d946c5332d1101b9aee1d710",
-        "0552d941bebf05f77676957643d1ad90"
+        "0552d941bebf05f77676957643d1ad90",
+        "181be15b78d7c239c7c9a912554f9649"
       ],
-      "pr_url": null,
-      "root_cause": "Broad catch blocks in sync paths log WorkManager cancellations via Simber.e, which records them as non-fatals: FirebaseAuthManager.getCurrentToken (\"Failed to get access token\"), EventRepositoryImpl.reportException (\"Failed to save the event\") and EventUpSyncTask (\"Failed to upload event scopes\"). EventUpSyncTask also swallows the CancellationException (not in isTerminalException) and records the scope as FAILED. Unchanged on main; Simber.shouldSkipThrowableReporting could skip CancellationException, and EventUpSyncTask should rethrow it. Fix merged to main in PR #1886 (2026-11-12, makes Simber skip CancellationException and EventUpSyncTask rethrow it) but not in any release yet (v2026.3.2 predates it); no open PR.",
+      "pr_url": "https://github.com/Simprints/Android-Simprints-ID/pull/1886",
+      "root_cause": "Broad catch blocks in sync paths log WorkManager cancellations via Simber.e, which records them as non-fatals: FirebaseAuthManager.getCurrentToken (\"Failed to get access token\"), EventRepositoryImpl.reportException (\"Failed to save the event\") and EventUpSyncTask (\"Failed to upload event scopes\"). EventUpSyncTask also swallows the CancellationException (not in isTerminalException) and records the scope as FAILED. Unchanged on main; Simber.shouldSkipThrowableReporting could skip CancellationException, and EventUpSyncTask should rethrow it. No open PR.",
       "root_cause_id": "sync-worker-cancellation-logged-as-error",
-      "status": "failed"
-    },
-    {
-      "attempts": 1,
-      "fix": {
-        "branch": "crashbunny/mlkit-barcode-module-not-preinstalled",
-        "pr_url": null,
-        "reason": null,
-        "status": "would_fix",
-        "summary": "Replace legacy com.google.firebase.ml.vision.DEPENDENCIES meta-data in feature:login with com.google.mlkit.vision.DEPENDENCIES=barcode in infra:camera so Play Services pre-downloads the unbundled barcode module for login and MFID QR scanning"
-      },
-      "impact": "medium",
-      "issue_ids": [
-        "3a78dfd40948631584e361acaa82640e"
-      ],
-      "pr_url": null,
-      "root_cause": "The unbundled Play Services ML Kit barcode module is not on the device when QR scanning starts (login / MFID QR), so every frame fails with 'Waiting for the barcode module to be downloaded' and DetectQrCodeUseCase logs each failure via Simber.e. feature/login AndroidManifest.xml declares the legacy meta-data key com.google.firebase.ml.vision.DEPENDENCIES instead of com.google.mlkit.vision.DEPENDENCIES, so the module is likely never pre-downloaded; unchanged on main, no open PR.",
-      "root_cause_id": "mlkit-barcode-module-not-preinstalled",
       "status": "done"
     },
     {
       "attempts": 1,
       "fix": {
-        "branch": "crashbunny/down-sync-scope-closed-by-concurrent-master-worker",
-        "pr_url": null,
+        "branch": "crashbunny/realm-unsupported-legacy-file-format-not-recovered",
+        "pr_url": "https://github.com/Simprints/Android-Simprints-ID/pull/1887",
         "reason": null,
-        "status": "would_fix",
-        "summary": "Serialise EventSyncMasterWorker's is-sync-running check, scope cleanup/creation and chain enqueue with a shared Mutex so a concurrent periodic/one-time master can no longer close the down-sync scope of a chain being scheduled."
+        "status": "pr_opened",
+        "summary": "Treat RLM_ERR_UNSUPPORTED_FILE_FORMAT_VERSION like DB corruption so RealmWrapperImpl deletes and recreates the unupgradable legacy Realm file"
       },
-      "impact": "medium",
+      "impact": "low",
       "issue_ids": [
-        "178de8246c0eb6f255cd914c2c962763"
+        "cb0a48a89916e642b574a3dc26365cf4"
       ],
-      "pr_url": null,
-      "root_cause": "Two EventSyncMasterWorker runs start concurrently; the second calls closeAllOpenScopes(DOWN_SYNC) and EventRepositoryImpl.closeEventScope deletes the first chain's empty down-sync scope, so BaseEventDownSyncDownloaderWorker.getEventScope finds none and throws IllegalArgumentException('input required'), failing that down-sync run. Still on main; no open PR.",
-      "root_cause_id": "down-sync-scope-closed-by-concurrent-master-worker",
+      "pr_url": "https://github.com/Simprints/Android-Simprints-ID/pull/1887",
+      "root_cause": "A single device has a legacy Realm file in format 9 that realm-kotlin cannot upgrade. RealmWrapperImpl.createRealm only deletes and recreates the DB on RLM_ERR_INVALID_DATABASE, not RLM_ERR_UNSUPPORTED_FILE_FORMAT_VERSION, so every background worker fails. Main is unchanged.",
+      "root_cause_id": "realm-unsupported-legacy-file-format-not-recovered",
       "status": "done"
     },
     {
       "attempts": 1,
       "fix": {
         "branch": "crashbunny/firebase-core-app-deleted-race",
-        "pr_url": null,
-        "reason": "main already fixes this root cause. FirebaseAuthManager is now a @Singleton, getCoreAuth() and tryToDeleteCoreApp() are both @Synchronized on the same instance, and getCurrentToken() creates the getIdToken task inside synchronized(this) (commits 60b994e4c6, e77e04ca53, 0da9f42831, merged in #1888). The crash stack (FirebaseAuthManager$getCurrentToken$2) can no longer hit a deleted app between fetching it and using it. The public getCoreApp() is still unsynchronised, but its only external caller is AuthStore.getCoreApp(), which is a different call path from this Crashlytics issue. All events in the window come from pre-2026 builds that don't have the fix, so they should stop once a release includes #1888.",
-        "status": "failed",
-        "summary": "No change needed: the getCurrentToken / core FirebaseApp delete race is already fixed on main (PR #1888)."
+        "pr_url": "https://github.com/Simprints/Android-Simprints-ID/pull/1888",
+        "reason": null,
+        "status": "pr_opened",
+        "summary": "Synchronize core FirebaseAuth lookup and core FirebaseApp deletion in FirebaseAuthManager so getCurrentToken can't use an app being deleted by signOut/re-init"
       },
       "impact": "low",
       "issue_ids": [
         "4cddb74671504f936037c6481d4d08d2"
       ],
-      "pr_url": null,
-      "root_cause": "There is a race in FirebaseAuthManager: signOut/initializeCoreProject delete the core FirebaseApp (tryToDeleteCoreApp) while a sync worker calls FirebaseAuth.getInstance(getCoreApp()) in getCurrentToken, which throws \"FirebaseApp was deleted\". The worker fails gracefully. getCoreApp is still unsynchronised against delete on main. Fix merged to main in PR #1888 (2026-11-12) but not yet released; window events are all on pre-2026 builds.",
+      "pr_url": "https://github.com/Simprints/Android-Simprints-ID/pull/1888",
+      "root_cause": "There is a race in FirebaseAuthManager: signOut/initializeCoreProject delete the core FirebaseApp (tryToDeleteCoreApp) while a sync worker calls FirebaseAuth.getInstance(getCoreApp()) in getCurrentToken, which throws \"FirebaseApp was deleted\". The worker fails gracefully. getCoreApp is still unsynchronised against delete on main.",
       "root_cause_id": "firebase-core-app-deleted-race",
-      "status": "failed"
-    },
-    {
-      "attempts": 1,
-      "fix": {
-        "branch": "crashbunny/realm-unsupported-legacy-file-format-not-recovered",
-        "pr_url": null,
-        "reason": "Already fixed on main by PR #1887 (commits 74d16e8518 test, d9144cee59 fix): RealmWrapperImpl.isFileCorruptException now matches RLM_ERR_UNSUPPORTED_FILE_FORMAT_VERSION as well as RLM_ERR_INVALID_DATABASE. The remaining events come from a single device on 2025.2.0, which predates the fix; they will stop once that device updates to a release that includes #1887.",
-        "status": "failed",
-        "summary": "No change needed: main already recovers from RLM_ERR_UNSUPPORTED_FILE_FORMAT_VERSION by deleting and recreating the Realm DB"
-      },
-      "impact": "low",
-      "issue_ids": [
-        "cb0a48a89916e642b574a3dc26365cf4"
-      ],
-      "pr_url": null,
-      "root_cause": "A single device has a legacy Realm file in format 9 that realm-kotlin cannot upgrade. RealmWrapperImpl.createRealm only deletes and recreates the DB on RLM_ERR_INVALID_DATABASE, not RLM_ERR_UNSUPPORTED_FILE_FORMAT_VERSION, so every background worker fails. Main is unchanged. Fix merged to main in PR #1887 (2026-11-12), not yet released; the affected single device is on 2025.2.0.",
-      "root_cause_id": "realm-unsupported-legacy-file-format-not-recovered",
-      "status": "failed"
+      "status": "done"
     }
   ],
-  "night_id": "2026-11-16",
+  "night_id": "2026-10-27",
   "reported": true,
   "triage": {
     "issues": [
       {
-        "crashlytics_issue_id": "e1ebe2ed9b6ca0f0451a3a34ba6360d5",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/e1ebe2ed9b6ca0f0451a3a34ba6360d5",
-        "events_90d": 5,
-        "events_window": 4,
+        "crashlytics_issue_id": "a50da44960bd13762948632b986d56d8",
+        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/a50da44960bd13762948632b986d56d8",
+        "events_90d": 3690,
+        "events_window": 46,
         "external_owner": null,
         "files": [
-          "feature/select-subject/src/main/java/com/simprints/feature/selectsubject/screen/SelectSubjectViewModel.kt",
-          "infra/enrolment-records/repository/src/main/java/com/simprints/infra/enrolment/records/repository/local/RealmEnrolmentRecordLocalDataSource.kt"
-        ],
-        "impact": "medium",
-        "module": "feature:select-subject",
-        "root_cause": "In an MFID CONFIRM_IDENTITY callout the caller sends a selected ID that is not a GUID ('BIOMETRICS_SEARCH_...'); SelectSubjectViewModel.getDisplayDialogStateIfRequired calls enrolmentRecordRepository.load() before its isValidGuid() check, so RealmUUID.from() in RealmEnrolmentRecordLocalDataSource.buildRealmQueryForSubject throws and the app crashes. Fixed on main by commit 97aea7d307 (MS-1753, 2026-11-11) but not in any release yet (v2026.3.2 still has it); no open PR.",
-        "root_cause_id": "select-subject-non-guid-realm-uuid",
-        "tier": "open_crash",
-        "title": "com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource.buildRealmQueryForSubject",
-        "users_window": 2,
-        "verdict": "app_bug",
-        "versions": [
-          "2025.4.2"
-        ],
-        "warning": null
-      },
-      {
-        "crashlytics_issue_id": "0055b5565d49825afb5c19d78ab58fd4",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/0055b5565d49825afb5c19d78ab58fd4",
-        "events_90d": 8,
-        "events_window": 2,
-        "external_owner": "delivery",
-        "files": [
-          "infra/core/src/main/java/com/simprints/core/workers/SimCoroutineWorker.kt"
+          "face/capture/src/main/java/com/simprints/face/capture/screens/livefeedback/LiveFeedbackFragment.kt"
         ],
         "impact": "low",
-        "module": "infra:core",
-        "root_cause": "WorkManager's SystemForegroundService did not call startForeground in time during background sync on one Android 9 Samsung device running 2024.1.4 (WorkManager 2.9.0), so the OS raised RemoteServiceException. Main uses WorkManager 2.12.0 and SimCoroutineWorker wraps setForeground in try/catch (MS-1112); no open PR.",
-        "root_cause_id": "workmanager-foreground-service-timeout-legacy",
-        "tier": "open_crash",
-        "title": "android.app.ActivityThread$H.handleMessage",
-        "users_window": 1,
-        "verdict": "external",
-        "versions": [
-          "2024.1.4"
-        ],
-        "warning": "One device is still on SID 2024.1.4 and should be updated to a current release."
-      },
-      {
-        "crashlytics_issue_id": "3c1a249032fd24540920dde7ea90dc6b",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/3c1a249032fd24540920dde7ea90dc6b",
-        "events_90d": 7,
-        "events_window": 1,
-        "external_owner": "delivery",
-        "files": [
-          "infra/logging/src/main/java/com/simprints/infra/logging/Simber.kt",
-          "id/build.gradle.kts"
-        ],
-        "impact": "low",
-        "module": "infra:logging",
-        "root_cause": "On an Android 7.0 (API 24) Samsung SM-T585, Kermit's file log writer needs java.time.Instant, which is missing before API 26; build 2025.1.0 had no core library desugaring, so the app crashes at startup through Simber.setUserProperty. Fixed from v2025.2.0 by commit dc62bb3e66 (desugar_jdk_libs); no open PR.",
-        "root_cause_id": "java-time-missing-pre-api26-no-desugaring",
-        "tier": "open_crash",
-        "title": "com.simprints.infra.logging.Simber.setUserProperty",
-        "users_window": 1,
-        "verdict": "external",
-        "versions": [
-          "2025.1.0"
-        ],
-        "warning": "One Android 7 device still on SID 2025.1.0 crashes on every launch and should be updated to 2025.2.0 or later."
-      },
-      {
-        "crashlytics_issue_id": "a3bc7c8db94c4357fec5a2f320fb030e",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/a3bc7c8db94c4357fec5a2f320fb030e",
-        "events_90d": 1,
-        "events_window": 1,
-        "external_owner": null,
-        "files": [
-          "infra/ui-base/src/main/java/com/simprints/infra/uibase/navigation/NavigationResultExt.kt",
-          "feature/orchestrator/src/main/java/com/simprints/feature/orchestrator/OrchestratorActivity.kt"
-        ],
-        "impact": "medium",
-        "module": "infra:ui-base",
-        "root_cause": "ConsentFragment calls finishWithResult twice (e.g. double tap); the second ConsentResult is delivered under the root result key while the current destination is already the orchestrator root, and OrchestratorActivity's handleResult<AppResult> listener throws ClassCastException (NavigationResultExt / OrchestratorActivity). Fixed on main by commit 9f8fd51f9a (MS-1752, 2026-11-10), not in any release yet; no open PR.",
-        "root_cause_id": "double-finish-result-orchestrator-cast",
-        "tier": "open_crash",
-        "title": "com.simprints.feature.orchestrator.OrchestratorActivity$onCreate$1.invoke",
-        "users_window": 1,
-        "verdict": "app_bug",
-        "versions": [
-          "2024.1.5"
-        ],
-        "warning": null
-      },
-      {
-        "crashlytics_issue_id": "b323b0646455bdfa0cb301ac3455dc5c",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/b323b0646455bdfa0cb301ac3455dc5c",
-        "events_90d": 1,
-        "events_window": 1,
-        "external_owner": null,
-        "files": [
-          "fingerprint/capture/src/main/java/com/simprints/fingerprint/capture/screen/FingerprintCaptureViewModel.kt"
-        ],
-        "impact": "medium",
-        "module": "fingerprint:capture",
-        "root_cause": "FingerprintCaptureViewModel.start dereferences configRepository.getProjectConfiguration().fingerprint!!, which was null when the orchestrator restored a fingerprint step after process death right after a config sync, so fingerprint capture crashed. Main still has the unguarded `!!`; no open PR.",
-        "root_cause_id": "fingerprint-capture-null-config-after-restore",
-        "tier": "open_crash",
-        "title": "com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModel$start$1.invokeSuspend",
-        "users_window": 1,
-        "verdict": "app_bug",
-        "versions": [
-          "2026.3.1"
-        ],
-        "warning": null
-      },
-      {
-        "crashlytics_issue_id": "4d05f9e74e77520b418eac3a355108f1",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/4d05f9e74e77520b418eac3a355108f1",
-        "events_90d": 30,
-        "events_window": 2,
-        "external_owner": null,
-        "files": [],
-        "impact": "low",
-        "module": null,
-        "root_cause": "Background ANR with the main thread idle in nativePollOnce and no app frames, on one Lenovo tablet on old 2024.1.5 during periodic sync workers; nothing traceable to SID code. No open PR.",
-        "root_cause_id": "anr-idle-main-thread-unknown",
-        "tier": "open_anr",
-        "title": "android.os.MessageQueue.nativePollOnce",
-        "users_window": 1,
+        "module": "face:capture",
+        "root_cause": "Last log line is \"[FACE_CAPTURE] Image analysis cancelled\": LiveFeedbackFragment.setUpFrameProcessing catches the expected CancellationException when the capture screen is left after Finish capture, logs it with Simber.e (so it is recorded as a non-fatal) and rethrows it correctly. Harmless, but downgrading that log to Simber.i would remove the noise. Same code on main; no open PR.",
+        "root_cause_id": "face-image-analysis-cancellation-logged-as-error",
+        "tier": "open_non_fatal",
+        "title": "b22 (bp3 was cancelled)",
+        "users_window": 5,
         "verdict": "noise",
         "versions": [
-          "2024.1.5"
+          "2026.3.0"
         ],
         "warning": null
-      },
-      {
-        "crashlytics_issue_id": "d91457cd4808446bda8e43f1b1342181",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/d91457cd4808446bda8e43f1b1342181",
-        "events_90d": 2,
-        "events_window": 2,
-        "external_owner": null,
-        "files": [
-          "face/capture/src/main/java/com/simprints/face/capture/screens/FaceCaptureViewModel.kt",
-          "face/capture/src/main/java/com/simprints/face/capture/usecases/BitmapToByteArrayUseCase.kt"
-        ],
-        "impact": "medium",
-        "module": "face:capture",
-        "root_cause": "FaceCaptureViewModel.saveImage uses runBlocking on the main thread (called from flowFinished in viewModelScope) to compress the bitmap and write it to disk, blocking the UI long enough to ANR during face capture. Main still has the runBlocking; no open PR.",
-        "root_cause_id": "face-capture-saveimage-runblocking-main",
-        "tier": "open_anr",
-        "title": "com.simprints.face.capture.screens.FaceCaptureViewModel.saveImage",
-        "users_window": 1,
-        "verdict": "app_bug",
-        "versions": [
-          "2026.2.1"
-        ],
-        "warning": null
-      },
-      {
-        "crashlytics_issue_id": "9cfbc16097aa6476d6a9748052239772",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/9cfbc16097aa6476d6a9748052239772",
-        "events_90d": 1,
-        "events_window": 1,
-        "external_owner": "delivery",
-        "files": [
-          "infra/config-store/src/main/java/com/simprints/infra/config/store/local/models/ProjectConfiguration.kt",
-          "infra/core/src/main/java/com/simprints/core/tools/json/JsonHelper.kt"
-        ],
-        "impact": "low",
-        "module": "infra:config-store",
-        "root_cause": "On a cold background start the main thread parsed the stored project config with Jackson (ProjectConfiguration.toDomain -> JsonHelper.fromJson) and slow Jackson class init caused the ANR. Jackson was replaced by kotlinx.serialization (SimJson) from v2026.1.0 (MS-1305); no open PR.",
-        "root_cause_id": "jackson-config-parse-main-thread",
-        "tier": "open_anr",
-        "title": "com.simprints.core.tools.json.JsonHelper.fromJson",
-        "users_window": 1,
-        "verdict": "external",
-        "versions": [
-          "2025.2.1"
-        ],
-        "warning": "Fixed from 2026.1.0 but 2025.2.1 is still the production track; devices should move to a current release."
       },
       {
         "crashlytics_issue_id": "9d98adfcb32c5f9f91ead1e93f12e219",
         "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/9d98adfcb32c5f9f91ead1e93f12e219",
-        "events_90d": 7644,
-        "events_window": 3672,
+        "events_90d": 3829,
+        "events_window": 38,
         "external_owner": null,
         "files": [
           "infra/event-sync/src/main/java/com/simprints/infra/eventsync/sync/up/tasks/EventUpSyncTask.kt",
@@ -365,11 +100,11 @@
         ],
         "impact": "medium",
         "module": "infra:event-sync",
-        "root_cause": "Broad catch blocks in sync paths log WorkManager cancellations via Simber.e, which records them as non-fatals: FirebaseAuthManager.getCurrentToken (\"Failed to get access token\"), EventRepositoryImpl.reportException (\"Failed to save the event\") and EventUpSyncTask (\"Failed to upload event scopes\"). EventUpSyncTask also swallows the CancellationException (not in isTerminalException) and records the scope as FAILED. Unchanged on main; Simber.shouldSkipThrowableReporting could skip CancellationException, and EventUpSyncTask should rethrow it. Fix merged to main in PR #1886 (2026-11-12, makes Simber skip CancellationException and EventUpSyncTask rethrow it) but not in any release yet (v2026.3.2 predates it); no open PR.",
+        "root_cause": "Broad catch blocks in sync paths log WorkManager cancellations via Simber.e, which records them as non-fatals: FirebaseAuthManager.getCurrentToken (\"Failed to get access token\"), EventRepositoryImpl.reportException (\"Failed to save the event\") and EventUpSyncTask (\"Failed to upload event scopes\"). EventUpSyncTask also swallows the CancellationException (not in isTerminalException) and records the scope as FAILED. Unchanged on main; Simber.shouldSkipThrowableReporting could skip CancellationException, and EventUpSyncTask should rethrow it. No open PR.",
         "root_cause_id": "sync-worker-cancellation-logged-as-error",
         "tier": "open_non_fatal",
         "title": "b22 (Job was cancelled)",
-        "users_window": 248,
+        "users_window": 9,
         "verdict": "app_bug",
         "versions": [
           "2026.3.0"
@@ -377,32 +112,58 @@
         "warning": null
       },
       {
-        "crashlytics_issue_id": "a50da44960bd13762948632b986d56d8",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/a50da44960bd13762948632b986d56d8",
-        "events_90d": 5929,
-        "events_window": 1948,
+        "crashlytics_issue_id": "05ae5e1d98686e7494af8e5dd8342c03",
+        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/05ae5e1d98686e7494af8e5dd8342c03",
+        "events_90d": 4385,
+        "events_window": 28,
         "external_owner": null,
         "files": [
-          "face/capture/src/main/java/com/simprints/face/capture/screens/livefeedback/LiveFeedbackFragment.kt"
+          "infra/network/src/main/java/com/simprints/infra/network/url/BaseUrlProviderImpl.kt"
         ],
         "impact": "low",
-        "module": "face:capture",
-        "root_cause": "Last log line is \"[FACE_CAPTURE] Image analysis cancelled\": LiveFeedbackFragment.setUpFrameProcessing catches the expected CancellationException when the capture screen is left after Finish capture, logs it with Simber.e (so it is recorded as a non-fatal) and rethrows it correctly. Harmless, but downgrading that log to Simber.i would remove the noise. Same code on main; no open PR. PR #1886 (merged to main 2026-11-12, unreleased) makes Simber skip CancellationException, which will silence this.",
-        "root_cause_id": "face-image-analysis-cancellation-logged-as-error",
+        "module": "infra:network",
+        "root_cause": "A catch-all Simber bucket. The window events are BaseUrlProviderImpl.setApiBaseUrl logging \"Setting API base URL\" at error level on old 2024.1.x builds from a single device. It was downgraded to Simber.d by v2024.2.0, so it is already fixed on main.",
+        "root_cause_id": "old-build-error-level-debug-logging",
         "tier": "open_non_fatal",
-        "title": "b22 (bp3 was cancelled)",
-        "users_window": 146,
+        "title": "com.simprints.infra.logging.Simber.w",
+        "users_window": 1,
         "verdict": "noise",
         "versions": [
-          "2026.3.0"
+          "2024.1.5",
+          "2024.1.4"
+        ],
+        "warning": null
+      },
+      {
+        "crashlytics_issue_id": "e36a354f7f859092470e039455d10e7f",
+        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/e36a354f7f859092470e039455d10e7f",
+        "events_90d": 3897,
+        "events_window": 25,
+        "external_owner": null,
+        "files": [
+          "infra/auth-store/src/main/java/com/simprints/infra/authstore/db/FirebaseAuthManager.kt",
+          "infra/core/src/main/java/com/simprints/core/workers/SimCoroutineWorker.kt"
+        ],
+        "impact": "low",
+        "module": "infra:core",
+        "root_cause": "FirebaseAuthManager.getCurrentToken throws RemoteDbNotSignedInException when there is no Firebase user, and background sync workers keep running and logging \"Unexpected worker error\" in SimCoroutineWorker. Two signed-out devices on old builds; one 2025.2.0 device also shows a Realm downgrade error. No events on 2026.3.x.",
+        "root_cause_id": "worker-runs-while-signed-out",
+        "tier": "open_non_fatal",
+        "title": "com.simprints.infra.authstore.db.FirebaseAuthManager$getCurrentToken$2.invokeSuspend",
+        "users_window": 2,
+        "verdict": "noise",
+        "versions": [
+          "2025.2.1",
+          "2025.4.2",
+          "2025.2.0"
         ],
         "warning": null
       },
       {
         "crashlytics_issue_id": "02ca2632210c8f37647cffa1a9b52347",
         "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/02ca2632210c8f37647cffa1a9b52347",
-        "events_90d": 5139,
-        "events_window": 1118,
+        "events_90d": 5445,
+        "events_window": 17,
         "external_owner": null,
         "files": [
           "infra/auth-store/src/main/java/com/simprints/infra/authstore/db/FirebaseAuthManager.kt",
@@ -411,11 +172,11 @@
         ],
         "impact": "medium",
         "module": "infra:auth-store",
-        "root_cause": "Broad catch blocks in sync paths log WorkManager cancellations via Simber.e, which records them as non-fatals: FirebaseAuthManager.getCurrentToken (\"Failed to get access token\"), EventRepositoryImpl.reportException (\"Failed to save the event\") and EventUpSyncTask (\"Failed to upload event scopes\"). EventUpSyncTask also swallows the CancellationException (not in isTerminalException) and records the scope as FAILED. Unchanged on main; Simber.shouldSkipThrowableReporting could skip CancellationException, and EventUpSyncTask should rethrow it. Fix merged to main in PR #1886 (2026-11-12, makes Simber skip CancellationException and EventUpSyncTask rethrow it) but not in any release yet (v2026.3.2 predates it); no open PR.",
+        "root_cause": "Broad catch blocks in sync paths log WorkManager cancellations via Simber.e, which records them as non-fatals: FirebaseAuthManager.getCurrentToken (\"Failed to get access token\"), EventRepositoryImpl.reportException (\"Failed to save the event\") and EventUpSyncTask (\"Failed to upload event scopes\"). EventUpSyncTask also swallows the CancellationException (not in isTerminalException) and records the scope as FAILED. Unchanged on main; Simber.shouldSkipThrowableReporting could skip CancellationException, and EventUpSyncTask should rethrow it. No open PR.",
         "root_cause_id": "sync-worker-cancellation-logged-as-error",
         "tier": "open_non_fatal",
         "title": "hg.q1 (Job was cancelled)",
-        "users_window": 86,
+        "users_window": 6,
         "verdict": "app_bug",
         "versions": [
           "2026.2.1",
@@ -424,63 +185,10 @@
         "warning": null
       },
       {
-        "crashlytics_issue_id": "05ae5e1d98686e7494af8e5dd8342c03",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/05ae5e1d98686e7494af8e5dd8342c03",
-        "events_90d": 4000,
-        "events_window": 912,
-        "external_owner": null,
-        "files": [
-          "infra/network/src/main/java/com/simprints/infra/network/url/BaseUrlProviderImpl.kt"
-        ],
-        "impact": "low",
-        "module": "infra:network",
-        "root_cause": "A catch-all Simber bucket. The window events are BaseUrlProviderImpl.setApiBaseUrl logging \"Setting API base URL\" at error level on old 2024.1.x builds from a single device. It was downgraded to Simber.d by v2024.2.0, so it is already fixed on main. Re-check: 2024.2.2 now also shows events from the same BaseUrlProviderImpl call site, still an old build.",
-        "root_cause_id": "old-build-error-level-debug-logging",
-        "tier": "open_non_fatal",
-        "title": "com.simprints.infra.logging.Simber.w",
-        "users_window": 16,
-        "verdict": "noise",
-        "versions": [
-          "2024.1.5",
-          "2024.1.4",
-          "2024.2.2"
-        ],
-        "warning": null
-      },
-      {
-        "crashlytics_issue_id": "e36a354f7f859092470e039455d10e7f",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/e36a354f7f859092470e039455d10e7f",
-        "events_90d": 3930,
-        "events_window": 779,
-        "external_owner": null,
-        "files": [
-          "infra/auth-store/src/main/java/com/simprints/infra/authstore/db/FirebaseAuthManager.kt",
-          "infra/core/src/main/java/com/simprints/core/workers/SimCoroutineWorker.kt"
-        ],
-        "impact": "low",
-        "module": "infra:core",
-        "root_cause": "FirebaseAuthManager.getCurrentToken throws RemoteDbNotSignedInException when there is no Firebase user, and background sync workers keep running and logging \"Unexpected worker error\" in SimCoroutineWorker. Two signed-out devices on old builds; one 2025.2.0 device also shows a Realm downgrade error. No events on 2026.3.x. Re-check: now spread across more old builds (2024.1.5 the largest) plus one 2026.3.0 device; same signed-out worker signature (ProjectConfigWorker failing at getCurrentToken).",
-        "root_cause_id": "worker-runs-while-signed-out",
-        "tier": "open_non_fatal",
-        "title": "com.simprints.infra.authstore.db.FirebaseAuthManager$getCurrentToken$2.invokeSuspend",
-        "users_window": 23,
-        "verdict": "noise",
-        "versions": [
-          "2025.4.2",
-          "2025.2.1",
-          "2024.1.5",
-          "2025.2.0",
-          "2026.3.0",
-          "2024.1.4",
-          "2024.2.2"
-        ],
-        "warning": null
-      },
-      {
         "crashlytics_issue_id": "315d257c4dc34255d99032683d4f862c",
         "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/315d257c4dc34255d99032683d4f862c",
-        "events_90d": 5342,
-        "events_window": 507,
+        "events_90d": 6024,
+        "events_window": 17,
         "external_owner": null,
         "files": [
           "infra/auth-store/src/main/java/com/simprints/infra/authstore/db/FirebaseAuthManager.kt",
@@ -492,7 +200,7 @@
         "root_cause_id": "firebase-auth-token-refresh-network-error-unclassified",
         "tier": "open_non_fatal",
         "title": "com.google.firebase.concurrent.CustomThreadFactory.lambda$newThread$0",
-        "users_window": 156,
+        "users_window": 6,
         "verdict": "noise",
         "versions": [
           "2025.4.2"
@@ -502,8 +210,8 @@
       {
         "crashlytics_issue_id": "af7ee95841284372e27d3522979f6960",
         "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/af7ee95841284372e27d3522979f6960",
-        "events_90d": 1973,
-        "events_window": 313,
+        "events_90d": 1957,
+        "events_window": 11,
         "external_owner": "config",
         "files": [
           "feature/client-api/src/main/java/com/simprints/feature/clientapi/mappers/request/validators/ConfirmIdentityValidator.kt",
@@ -511,50 +219,24 @@
         ],
         "impact": "low",
         "module": "feature:client-api",
-        "root_cause": "CommCare (eCHIS) sends CONFIRM_IDENTITY when there is no open session with an identification callback (e.g. after a failed login, an exit form or a reboot closed it), so SID creates an empty session and ConfirmIdentityValidator correctly rejects the request. The non-fatal is deliberate (MS-1214). Same logic on main; no open PR. Re-check: now also seen on 2026.3.2 and 2024.1.5, same validateSessionEvents rejection.",
+        "root_cause": "CommCare (eCHIS) sends CONFIRM_IDENTITY when there is no open session with an identification callback (e.g. after a failed login, an exit form or a reboot closed it), so SID creates an empty session and ConfirmIdentityValidator correctly rejects the request. The non-fatal is deliberate (MS-1214). Same logic on main; no open PR.",
         "root_cause_id": "calling-app-invalid-confirm-request",
         "tier": "open_non_fatal",
         "title": "com.simprints.feature.clientapi.mappers.request.validators.ConfirmIdentityValidator.validateSessionEvents",
-        "users_window": 77,
+        "users_window": 4,
         "verdict": "external",
         "versions": [
           "2025.2.1",
-          "2026.3.0",
           "2025.2.0",
-          "2026.3.2",
-          "2024.1.5"
+          "2026.3.0"
         ],
         "warning": "eCHIS CommCare form maintainers should only send Confirm Identity after a successful Simprints Identify in the same session."
       },
       {
-        "crashlytics_issue_id": "9cf671682a5dec83266ee9ff26fd44d8",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/9cf671682a5dec83266ee9ff26fd44d8",
-        "events_90d": 380,
-        "events_window": 303,
-        "external_owner": null,
-        "files": [
-          "infra/events/src/main/java/com/simprints/infra/events/EventRepositoryImpl.kt",
-          "infra/logging/src/main/java/com/simprints/infra/logging/Simber.kt"
-        ],
-        "impact": "medium",
-        "module": "infra:events",
-        "root_cause": "Broad catch blocks in sync paths log WorkManager cancellations via Simber.e, which records them as non-fatals: FirebaseAuthManager.getCurrentToken (\"Failed to get access token\"), EventRepositoryImpl.reportException (\"Failed to save the event\") and EventUpSyncTask (\"Failed to upload event scopes\"). EventUpSyncTask also swallows the CancellationException (not in isTerminalException) and records the scope as FAILED. Unchanged on main; Simber.shouldSkipThrowableReporting could skip CancellationException, and EventUpSyncTask should rethrow it. Fix merged to main in PR #1886 (2026-11-12, makes Simber skip CancellationException and EventUpSyncTask rethrow it) but not in any release yet (v2026.3.2 predates it); no open PR. Re-check: now also on the newest release 2026.3.2 (last log 'Failed to save the event').",
-        "root_cause_id": "sync-worker-cancellation-logged-as-error",
-        "tier": "open_non_fatal",
-        "title": "a22 (Job was cancelled)",
-        "users_window": 14,
-        "verdict": "app_bug",
-        "versions": [
-          "2026.3.1",
-          "2026.3.2"
-        ],
-        "warning": null
-      },
-      {
         "crashlytics_issue_id": "97d5fc613b1b573a93d15b941152c678",
         "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/97d5fc613b1b573a93d15b941152c678",
-        "events_90d": 1893,
-        "events_window": 278,
+        "events_90d": 2304,
+        "events_window": 10,
         "external_owner": null,
         "files": [
           "infra/auth-store/src/main/java/com/simprints/infra/authstore/db/FirebaseAuthManager.kt"
@@ -565,104 +247,30 @@
         "root_cause_id": "firebase-auth-token-refresh-network-error-unclassified",
         "tier": "open_non_fatal",
         "title": "com.google.firebase.concurrent.CustomThreadFactory.lambda$newThread$0",
-        "users_window": 9,
+        "users_window": 5,
         "verdict": "noise",
         "versions": [
           "2025.2.1",
           "2025.2.0"
-        ],
-        "warning": null
-      },
-      {
-        "crashlytics_issue_id": "4cddb74671504f936037c6481d4d08d2",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/4cddb74671504f936037c6481d4d08d2",
-        "events_90d": 1343,
-        "events_window": 203,
-        "external_owner": null,
-        "files": [
-          "infra/auth-store/src/main/java/com/simprints/infra/authstore/db/FirebaseAuthManager.kt",
-          "infra/auth-store/src/main/java/com/simprints/infra/authstore/AuthStoreImpl.kt"
-        ],
-        "impact": "low",
-        "module": "infra:auth-store",
-        "root_cause": "There is a race in FirebaseAuthManager: signOut/initializeCoreProject delete the core FirebaseApp (tryToDeleteCoreApp) while a sync worker calls FirebaseAuth.getInstance(getCoreApp()) in getCurrentToken, which throws \"FirebaseApp was deleted\". The worker fails gracefully. getCoreApp is still unsynchronised against delete on main. Fix merged to main in PR #1888 (2026-11-12) but not yet released; window events are all on pre-2026 builds.",
-        "root_cause_id": "firebase-core-app-deleted-race",
-        "tier": "open_non_fatal",
-        "title": "com.simprints.infra.authstore.db.FirebaseAuthManager$getCurrentToken$2.invokeSuspend",
-        "users_window": 51,
-        "verdict": "app_bug",
-        "versions": [
-          "2025.4.2",
-          "2024.1.5",
-          "2025.2.1",
-          "2024.2.2",
-          "2024.1.4",
-          "2025.2.0",
-          "2024.1.2"
-        ],
-        "warning": null
-      },
-      {
-        "crashlytics_issue_id": "da618680ebf6d7d980fa306bed959ee8",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/da618680ebf6d7d980fa306bed959ee8",
-        "events_90d": 2065,
-        "events_window": 199,
-        "external_owner": null,
-        "files": [
-          "infra/images/src/main/java/com/simprints/infra/images/remote/firebase/FirebaseSampleUploader.kt"
-        ],
-        "impact": "low",
-        "module": "infra:images",
-        "root_cause": "Firebase Storage image upload exceeds its retry limit while the device is offline; FirebaseSampleUploader logs \"Failed to upload images\" and FileUpSyncWorker retries. This uploader was removed in 2026.2.0 in favour of SignedUrlSampleUploader.",
-        "root_cause_id": "legacy-firebase-storage-upload-network-failure",
-        "tier": "open_non_fatal",
-        "title": "com.google.firebase.storage.UploadTask.shouldContinue",
-        "users_window": 60,
-        "verdict": "noise",
-        "versions": [
-          "2025.4.2"
         ],
         "warning": null
       },
       {
         "crashlytics_issue_id": "2845a07a2b8a5f7f6b32fc6d505b74d0",
         "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/2845a07a2b8a5f7f6b32fc6d505b74d0",
-        "events_90d": 487,
-        "events_window": 191,
+        "events_90d": 275,
+        "events_window": 7,
         "external_owner": null,
         "files": [
           "infra/auth-store/src/main/java/com/simprints/infra/authstore/db/FirebaseAuthManager.kt"
         ],
         "impact": "low",
         "module": "infra:auth-store",
-        "root_cause": "Connection reset during Firebase token refresh in FirebaseAuthManager.getCurrentToken. The generic FirebaseException is not mapped to NetworkConnectionException, so it is logged via Simber.e; the worker retries and later syncs succeed. The same code is on main. Re-check: a few events on 2026.3.1 too; unchanged signature.",
+        "root_cause": "Connection reset during Firebase token refresh in FirebaseAuthManager.getCurrentToken. The generic FirebaseException is not mapped to NetworkConnectionException, so it is logged via Simber.e; the worker retries and later syncs succeed. The same code is on main.",
         "root_cause_id": "firebase-auth-token-refresh-network-error-unclassified",
         "tier": "open_non_fatal",
         "title": "com.google.firebase.concurrent.CustomThreadFactory.lambda$newThread$0",
-        "users_window": 65,
-        "verdict": "noise",
-        "versions": [
-          "2026.3.0",
-          "2026.3.1"
-        ],
-        "warning": null
-      },
-      {
-        "crashlytics_issue_id": "a2394bd2ba2548001d130928b4b1cd74",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/a2394bd2ba2548001d130928b4b1cd74",
-        "events_90d": 237,
-        "events_window": 106,
-        "external_owner": null,
-        "files": [
-          "infra/camera/src/main/java/com/simprints/infra/camera/CameraFrameProvider.kt"
-        ],
-        "impact": "low",
-        "module": "infra:camera",
-        "root_cause": "Same as 6060d9ae: when ExternalCredentialScanOcrFragment's lifecycle stops, CameraX aborts the pending takePicture ('Camera is closed.') and infra/camera CameraFrameProvider logs the error callback via Simber.e ('[CAMERA] High-res frame capture failed'); the new grouping comes from different CameraX stack frames. Main still logs it at error level; no open PR.",
-        "root_cause_id": "camerax-capture-aborted-on-lifecycle-stop",
-        "tier": "open_non_fatal",
-        "title": "androidx.camera.core.imagecapture.TakePictureManagerImpl.abortRequests",
-        "users_window": 25,
+        "users_window": 2,
         "verdict": "noise",
         "versions": [
           "2026.3.0"
@@ -670,186 +278,40 @@
         "warning": null
       },
       {
-        "crashlytics_issue_id": "c8fb8d920f6f95a4b4cfa70fc66e8a41",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/c8fb8d920f6f95a4b4cfa70fc66e8a41",
-        "events_90d": 346,
-        "events_window": 93,
-        "external_owner": null,
+        "crashlytics_issue_id": "581e35401a6ec2e46e7608e6fbb0f053",
+        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/581e35401a6ec2e46e7608e6fbb0f053",
+        "events_90d": 317,
+        "events_window": 7,
+        "external_owner": "delivery",
         "files": [
-          "feature/orchestrator/src/main/java/com/simprints/feature/orchestrator/usecases/steps/FallbackToCommCareDataSourceIfNeededUseCase.kt"
-        ],
-        "impact": "low",
-        "module": "feature:orchestrator",
-        "root_cause": "A deliberate Simber.w visibility signal (MS-1251) when the device has not synced within the threshold, so identification reads from CommCare. Here it fired right after a fresh login. This is expected behaviour. Re-check: also on 2026.3.1/2026.3.2, same call site.",
-        "root_cause_id": "commcare-fallback-visibility-warning",
-        "tier": "open_non_fatal",
-        "title": "com.simprints.feature.orchestrator.usecases.steps.FallbackToCommCareDataSourceIfNeededUseCase.shouldFallbackToCommCareDataSource",
-        "users_window": 25,
-        "verdict": "noise",
-        "versions": [
-          "2026.3.0",
-          "2026.3.2",
-          "2026.3.1"
-        ],
-        "warning": null
-      },
-      {
-        "crashlytics_issue_id": "3a78dfd40948631584e361acaa82640e",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/3a78dfd40948631584e361acaa82640e",
-        "events_90d": 108,
-        "events_window": 90,
-        "external_owner": null,
-        "files": [
-          "feature/login/src/main/AndroidManifest.xml",
-          "infra/camera/src/main/java/com/simprints/infra/camera/postprocess/DetectQrCodeUseCase.kt"
-        ],
-        "impact": "medium",
-        "module": "feature:login",
-        "root_cause": "The unbundled Play Services ML Kit barcode module is not on the device when QR scanning starts (login / MFID QR), so every frame fails with 'Waiting for the barcode module to be downloaded' and DetectQrCodeUseCase logs each failure via Simber.e. feature/login AndroidManifest.xml declares the legacy meta-data key com.google.firebase.ml.vision.DEPENDENCIES instead of com.google.mlkit.vision.DEPENDENCIES, so the module is likely never pre-downloaded; unchanged on main, no open PR.",
-        "root_cause_id": "mlkit-barcode-module-not-preinstalled",
-        "tier": "open_non_fatal",
-        "title": "com.google.android.gms:play-services-mlkit-barcode-scanning@@18.3.1 - com.google.mlkit.vision.barcode.internal.zzo.zzc",
-        "users_window": 12,
-        "verdict": "app_bug",
-        "versions": [
-          "2026.3.0"
-        ],
-        "warning": null
-      },
-      {
-        "crashlytics_issue_id": "6c769d7aebf3190ac83979e563e17219",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/6c769d7aebf3190ac83979e563e17219",
-        "events_90d": 111,
-        "events_window": 80,
-        "external_owner": null,
-        "files": [
-          "face/capture/src/main/java/com/simprints/face/capture/screens/livefeedback/LiveFeedbackFragment.kt",
-          "infra/logging/src/main/java/com/simprints/infra/logging/Simber.kt"
-        ],
-        "impact": "low",
-        "module": "face:capture",
-        "root_cause": "Last log line is '[FACE_CAPTURE] Image analysis cancelled': LiveFeedbackFragment.setUpFrameProcessing logs the expected JobCancellationException via Simber.e when the fragment is left. PR #1886 (merged to main 2026-11-12, unreleased) makes Simber skip CancellationException; no open PR.",
-        "root_cause_id": "face-image-analysis-cancellation-logged-as-error",
-        "tier": "open_non_fatal",
-        "title": "a22 (ap3 was cancelled)",
-        "users_window": 15,
-        "verdict": "noise",
-        "versions": [
-          "2026.3.1",
-          "2026.3.2"
-        ],
-        "warning": null
-      },
-      {
-        "crashlytics_issue_id": "0e77edd7d946c5332d1101b9aee1d710",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/0e77edd7d946c5332d1101b9aee1d710",
-        "events_90d": 89,
-        "events_window": 74,
-        "external_owner": null,
-        "files": [
-          "infra/auth-store/src/main/java/com/simprints/infra/authstore/db/FirebaseAuthManager.kt",
-          "infra/event-sync/src/main/java/com/simprints/infra/eventsync/sync/down/EventDownSyncPeriodicCountUseCase.kt",
-          "infra/logging/src/main/java/com/simprints/infra/logging/Simber.kt"
-        ],
-        "impact": "low",
-        "module": "infra:auth-store",
-        "root_cause": "Last log line is '[LOGIN] Failed to get access token': EventDownSyncPeriodicCountUseCase wraps the count in withTimeoutOrNull(10_000) and the resulting TimeoutCancellationException is caught by FirebaseAuthManager.getCurrentToken's generic catch and logged via Simber.e (the count falls back to 0). Fixed on main by PR #1886 (merged 2026-11-12, unreleased); older issues d1a67422/5f6d5f9f are likely the same.",
-        "root_cause_id": "sync-worker-cancellation-logged-as-error",
-        "tier": "open_non_fatal",
-        "title": "kotlinx.coroutines.TimeoutKt.TimeoutCancellationException",
-        "users_window": 38,
-        "verdict": "app_bug",
-        "versions": [
-          "2026.3.0",
-          "2026.3.2",
-          "2026.3.1"
-        ],
-        "warning": null
-      },
-      {
-        "crashlytics_issue_id": "6060d9ae8ab2f817a6c3775ca82f1137",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/6060d9ae8ab2f817a6c3775ca82f1137",
-        "events_90d": 721,
-        "events_window": 57,
-        "external_owner": null,
-        "files": [
-          "feature/external-credential/src/main/java/com/simprints/feature/externalcredential/screens/scanocr/ExternalCredentialScanOcrFragment.kt",
-          "infra/camera/src/main/java/com/simprints/infra/camera/CameraFrameProvider.kt"
-        ],
-        "impact": "low",
-        "module": "infra:camera",
-        "root_cause": "CameraX cancels a pending OCR takePicture when the ExternalCredentialScanOcrFragment lifecycle stops (\"Camera is closed.\"), and the error callback logs it with Simber.e. This is expected; main's CameraFrameProvider still logs this cancel at error level.",
-        "root_cause_id": "camerax-capture-aborted-on-lifecycle-stop",
-        "tier": "open_non_fatal",
-        "title": "androidx.camera.core.ImageCaptureException.<init>",
-        "users_window": 32,
-        "verdict": "noise",
-        "versions": [
-          "2025.4.2"
-        ],
-        "warning": null
-      },
-      {
-        "crashlytics_issue_id": "3036d989a965fd16488e1217e61fa1c7",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/3036d989a965fd16488e1217e61fa1c7",
-        "events_90d": 526,
-        "events_window": 42,
-        "external_owner": "config",
-        "files": [
-          "feature/client-api/src/main/java/com/simprints/feature/clientapi/mappers/request/validators/ConfirmIdentityValidator.kt"
+          "feature/client-api/src/main/java/com/simprints/feature/clientapi/mappers/request/validators/ConfirmIdentityValidator.kt",
+          "feature/client-api/src/main/java/com/simprints/feature/clientapi/mappers/request/IntentToActionMapper.kt"
         ],
         "impact": "low",
         "module": "feature:client-api",
-        "root_cause": "A CommCare CONFIRM_IDENTITY arrived with a blank selected GUID, and ConfirmIdentityValidator correctly rejected it (main also accepts NONE_SELECTED). Re-check: no longer only 2024.1.5; seen across 2025.x and 2026.3.0 with the same 'Missing Selected GUID' rejection.",
-        "root_cause_id": "calling-app-invalid-confirm-request",
+        "root_cause": "One eCHIS device on 2024.1.4 sends CommCare CONFIRM_IDENTITY without a session ID. That build predates the session ID injection in IntentToActionMapper.ensureExtrasHaveSessionId (MS-617, in 2024.1.5+), so the confirms always fail validation.",
+        "root_cause_id": "old-build-missing-commcare-session-id-injection",
         "tier": "open_non_fatal",
-        "title": "com.simprints.feature.clientapi.mappers.request.validators.ConfirmIdentityValidator.validateSelectedGuid",
-        "users_window": 33,
+        "title": "com.simprints.feature.clientapi.mappers.request.validators.ConfirmIdentityValidator.validateSessionId",
+        "users_window": 1,
         "verdict": "external",
         "versions": [
-          "2025.4.2",
-          "2024.1.5",
-          "2026.3.0",
-          "2025.2.1",
-          "2025.2.0"
+          "2024.1.4"
         ],
-        "warning": "Calling-app (CommCare) form maintainers should always pass the selected GUID (or NONE_SELECTED) in Confirm Identity."
-      },
-      {
-        "crashlytics_issue_id": "0552d941bebf05f77676957643d1ad90",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/0552d941bebf05f77676957643d1ad90",
-        "events_90d": 439,
-        "events_window": 40,
-        "external_owner": null,
-        "files": [
-          "infra/auth-store/src/main/java/com/simprints/infra/authstore/db/FirebaseAuthManager.kt",
-          "infra/logging/src/main/java/com/simprints/infra/logging/Simber.kt"
-        ],
-        "impact": "low",
-        "module": "infra:auth-store",
-        "root_cause": "Broad catch blocks in sync paths log WorkManager cancellations via Simber.e, which records them as non-fatals: FirebaseAuthManager.getCurrentToken (\"Failed to get access token\"), EventRepositoryImpl.reportException (\"Failed to save the event\") and EventUpSyncTask (\"Failed to upload event scopes\"). EventUpSyncTask also swallows the CancellationException (not in isTerminalException) and records the scope as FAILED. Unchanged on main; Simber.shouldSkipThrowableReporting could skip CancellationException, and EventUpSyncTask should rethrow it. Fix merged to main in PR #1886 (2026-11-12, makes Simber skip CancellationException and EventUpSyncTask rethrow it) but not in any release yet (v2026.3.2 predates it); no open PR.",
-        "root_cause_id": "sync-worker-cancellation-logged-as-error",
-        "tier": "open_non_fatal",
-        "title": "S6.t0 (Job was cancelled)",
-        "users_window": 8,
-        "verdict": "app_bug",
-        "versions": [
-          "2025.1.0"
-        ],
-        "warning": null
+        "warning": "The eCHIS device still on SID 2024.1.4 should be updated to a current release, because CommCare confirms cannot work on that build."
       },
       {
         "crashlytics_issue_id": "cb0a48a89916e642b574a3dc26365cf4",
         "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/cb0a48a89916e642b574a3dc26365cf4",
-        "events_90d": 220,
-        "events_window": 39,
+        "events_90d": 240,
+        "events_window": 7,
         "external_owner": null,
         "files": [
           "infra/enrolment-records/realm-store/src/main/java/com/simprints/infra/enrolment/records/realm/store/RealmWrapperImpl.kt"
         ],
         "impact": "low",
         "module": "infra:enrolment-records:realm-store",
-        "root_cause": "A single device has a legacy Realm file in format 9 that realm-kotlin cannot upgrade. RealmWrapperImpl.createRealm only deletes and recreates the DB on RLM_ERR_INVALID_DATABASE, not RLM_ERR_UNSUPPORTED_FILE_FORMAT_VERSION, so every background worker fails. Main is unchanged. Fix merged to main in PR #1887 (2026-11-12), not yet released; the affected single device is on 2025.2.0.",
+        "root_cause": "A single device has a legacy Realm file in format 9 that realm-kotlin cannot upgrade. RealmWrapperImpl.createRealm only deletes and recreates the DB on RLM_ERR_INVALID_DATABASE, not RLM_ERR_UNSUPPORTED_FILE_FORMAT_VERSION, so every background worker fails. Main is unchanged.",
         "root_cause_id": "realm-unsupported-legacy-file-format-not-recovered",
         "tier": "open_non_fatal",
         "title": "com.simprints.infra.enrolment.records.realm.store.RealmWrapperImpl.createRealm",
@@ -861,10 +323,169 @@
         "warning": null
       },
       {
+        "crashlytics_issue_id": "9cf671682a5dec83266ee9ff26fd44d8",
+        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/9cf671682a5dec83266ee9ff26fd44d8",
+        "events_90d": 68,
+        "events_window": 6,
+        "external_owner": null,
+        "files": [
+          "infra/events/src/main/java/com/simprints/infra/events/EventRepositoryImpl.kt",
+          "infra/logging/src/main/java/com/simprints/infra/logging/Simber.kt"
+        ],
+        "impact": "low",
+        "module": "infra:events",
+        "root_cause": "Broad catch blocks in sync paths log WorkManager cancellations via Simber.e, which records them as non-fatals: FirebaseAuthManager.getCurrentToken (\"Failed to get access token\"), EventRepositoryImpl.reportException (\"Failed to save the event\") and EventUpSyncTask (\"Failed to upload event scopes\"). EventUpSyncTask also swallows the CancellationException (not in isTerminalException) and records the scope as FAILED. Unchanged on main; Simber.shouldSkipThrowableReporting could skip CancellationException, and EventUpSyncTask should rethrow it. No open PR.",
+        "root_cause_id": "sync-worker-cancellation-logged-as-error",
+        "tier": "open_non_fatal",
+        "title": "a22 (Job was cancelled)",
+        "users_window": 1,
+        "verdict": "app_bug",
+        "versions": [
+          "2026.3.1"
+        ],
+        "warning": null
+      },
+      {
+        "crashlytics_issue_id": "da618680ebf6d7d980fa306bed959ee8",
+        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/da618680ebf6d7d980fa306bed959ee8",
+        "events_90d": 2317,
+        "events_window": 6,
+        "external_owner": null,
+        "files": [
+          "infra/images/src/main/java/com/simprints/infra/images/remote/firebase/FirebaseSampleUploader.kt"
+        ],
+        "impact": "low",
+        "module": "infra:images",
+        "root_cause": "Firebase Storage image upload exceeds its retry limit while the device is offline; FirebaseSampleUploader logs \"Failed to upload images\" and FileUpSyncWorker retries. This uploader was removed in 2026.2.0 in favour of SignedUrlSampleUploader.",
+        "root_cause_id": "legacy-firebase-storage-upload-network-failure",
+        "tier": "open_non_fatal",
+        "title": "com.google.firebase.storage.UploadTask.shouldContinue",
+        "users_window": 2,
+        "verdict": "noise",
+        "versions": [
+          "2025.4.2"
+        ],
+        "warning": null
+      },
+      {
+        "crashlytics_issue_id": "0552d941bebf05f77676957643d1ad90",
+        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/0552d941bebf05f77676957643d1ad90",
+        "events_90d": 462,
+        "events_window": 5,
+        "external_owner": null,
+        "files": [
+          "infra/auth-store/src/main/java/com/simprints/infra/authstore/db/FirebaseAuthManager.kt",
+          "infra/logging/src/main/java/com/simprints/infra/logging/Simber.kt"
+        ],
+        "impact": "low",
+        "module": "infra:auth-store",
+        "root_cause": "Broad catch blocks in sync paths log WorkManager cancellations via Simber.e, which records them as non-fatals: FirebaseAuthManager.getCurrentToken (\"Failed to get access token\"), EventRepositoryImpl.reportException (\"Failed to save the event\") and EventUpSyncTask (\"Failed to upload event scopes\"). EventUpSyncTask also swallows the CancellationException (not in isTerminalException) and records the scope as FAILED. Unchanged on main; Simber.shouldSkipThrowableReporting could skip CancellationException, and EventUpSyncTask should rethrow it. No open PR.",
+        "root_cause_id": "sync-worker-cancellation-logged-as-error",
+        "tier": "open_non_fatal",
+        "title": "S6.t0 (Job was cancelled)",
+        "users_window": 1,
+        "verdict": "app_bug",
+        "versions": [
+          "2025.1.0"
+        ],
+        "warning": null
+      },
+      {
+        "crashlytics_issue_id": "4cddb74671504f936037c6481d4d08d2",
+        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/4cddb74671504f936037c6481d4d08d2",
+        "events_90d": 1480,
+        "events_window": 4,
+        "external_owner": null,
+        "files": [
+          "infra/auth-store/src/main/java/com/simprints/infra/authstore/db/FirebaseAuthManager.kt",
+          "infra/auth-store/src/main/java/com/simprints/infra/authstore/AuthStoreImpl.kt"
+        ],
+        "impact": "low",
+        "module": "infra:auth-store",
+        "root_cause": "There is a race in FirebaseAuthManager: signOut/initializeCoreProject delete the core FirebaseApp (tryToDeleteCoreApp) while a sync worker calls FirebaseAuth.getInstance(getCoreApp()) in getCurrentToken, which throws \"FirebaseApp was deleted\". The worker fails gracefully. getCoreApp is still unsynchronised against delete on main.",
+        "root_cause_id": "firebase-core-app-deleted-race",
+        "tier": "open_non_fatal",
+        "title": "com.simprints.infra.authstore.db.FirebaseAuthManager$getCurrentToken$2.invokeSuspend",
+        "users_window": 1,
+        "verdict": "app_bug",
+        "versions": [
+          "2024.1.5",
+          "2025.4.2"
+        ],
+        "warning": null
+      },
+      {
+        "crashlytics_issue_id": "0e20e143562ba7fca72664df73515809",
+        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/0e20e143562ba7fca72664df73515809",
+        "events_90d": 94,
+        "events_window": 2,
+        "external_owner": null,
+        "files": [
+          "infra/images/src/main/java/com/simprints/infra/images/remote/firebase/FirebaseSampleUploader.kt"
+        ],
+        "impact": "low",
+        "module": "infra:images",
+        "root_cause": "A resumable Firebase Storage upload session is dropped when FileUpSyncWorker is cancelled or the network drops; FirebaseSampleUploader logs it and the worker retries. This code path was removed in 2026.2.0.",
+        "root_cause_id": "legacy-firebase-storage-upload-network-failure",
+        "tier": "open_non_fatal",
+        "title": "com.google.firebase.storage.UploadTask.recoverStatus",
+        "users_window": 2,
+        "verdict": "noise",
+        "versions": [
+          "2025.4.2"
+        ],
+        "warning": null
+      },
+      {
+        "crashlytics_issue_id": "181be15b78d7c239c7c9a912554f9649",
+        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/181be15b78d7c239c7c9a912554f9649",
+        "events_90d": 73,
+        "events_window": 1,
+        "external_owner": null,
+        "files": [
+          "infra/auth-store/src/main/java/com/simprints/infra/authstore/db/FirebaseAuthManager.kt",
+          "infra/logging/src/main/java/com/simprints/infra/logging/Simber.kt"
+        ],
+        "impact": "low",
+        "module": "infra:auth-store",
+        "root_cause": "Broad catch blocks in sync paths log WorkManager cancellations via Simber.e, which records them as non-fatals: FirebaseAuthManager.getCurrentToken (\"Failed to get access token\"), EventRepositoryImpl.reportException (\"Failed to save the event\") and EventUpSyncTask (\"Failed to upload event scopes\"). EventUpSyncTask also swallows the CancellationException (not in isTerminalException) and records the scope as FAILED. Unchanged on main; Simber.shouldSkipThrowableReporting could skip CancellationException, and EventUpSyncTask should rethrow it. No open PR.",
+        "root_cause_id": "sync-worker-cancellation-logged-as-error",
+        "tier": "open_non_fatal",
+        "title": "cf.r1 (j2 was cancelled)",
+        "users_window": 1,
+        "verdict": "app_bug",
+        "versions": [
+          "2025.4.2"
+        ],
+        "warning": null
+      },
+      {
+        "crashlytics_issue_id": "3036d989a965fd16488e1217e61fa1c7",
+        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/3036d989a965fd16488e1217e61fa1c7",
+        "events_90d": 635,
+        "events_window": 1,
+        "external_owner": "config",
+        "files": [
+          "feature/client-api/src/main/java/com/simprints/feature/clientapi/mappers/request/validators/ConfirmIdentityValidator.kt"
+        ],
+        "impact": "low",
+        "module": "feature:client-api",
+        "root_cause": "A CommCare CONFIRM_IDENTITY arrived with a blank selected GUID, and ConfirmIdentityValidator correctly rejected it (main also accepts NONE_SELECTED).",
+        "root_cause_id": "calling-app-invalid-confirm-request",
+        "tier": "open_non_fatal",
+        "title": "com.simprints.feature.clientapi.mappers.request.validators.ConfirmIdentityValidator.validateSelectedGuid",
+        "users_window": 1,
+        "verdict": "external",
+        "versions": [
+          "2024.1.5"
+        ],
+        "warning": "The CommCare app config should pass the selected GUID (or NONE_SELECTED on current SID), and the device on 2024.1.5 should be updated."
+      },
+      {
         "crashlytics_issue_id": "3cb2ed1c2712239c16aa6e46eb483093",
         "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/3cb2ed1c2712239c16aa6e46eb483093",
-        "events_90d": 556,
-        "events_window": 36,
+        "events_90d": 831,
+        "events_window": 1,
         "external_owner": null,
         "files": [
           "infra/images/src/main/java/com/simprints/infra/images/remote/firebase/FirebaseSampleUploader.kt"
@@ -875,7 +496,7 @@
         "root_cause_id": "legacy-firebase-storage-upload-auth-expired",
         "tier": "open_non_fatal",
         "title": "com.google.firebase.storage.network.NetworkRequest.parseResponse",
-        "users_window": 18,
+        "users_window": 1,
         "verdict": "noise",
         "versions": [
           "2025.4.2"
@@ -883,89 +504,84 @@
         "warning": null
       },
       {
-        "crashlytics_issue_id": "581e35401a6ec2e46e7608e6fbb0f053",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/581e35401a6ec2e46e7608e6fbb0f053",
-        "events_90d": 324,
-        "events_window": 32,
-        "external_owner": "delivery",
-        "files": [
-          "feature/client-api/src/main/java/com/simprints/feature/clientapi/mappers/request/validators/ConfirmIdentityValidator.kt",
-          "feature/client-api/src/main/java/com/simprints/feature/clientapi/mappers/request/IntentToActionMapper.kt"
-        ],
-        "impact": "low",
-        "module": "feature:client-api",
-        "root_cause": "One eCHIS device on 2024.1.4 sends CommCare CONFIRM_IDENTITY without a session ID. That build predates the session ID injection in IntentToActionMapper.ensureExtrasHaveSessionId (MS-617, in 2024.1.5+), so the confirms always fail validation. Re-check: one 'Missing Session ID' event on 2026.2.1 from a caller that does not get session ID injection; the bulk is still the 2024.1.4 device.",
-        "root_cause_id": "old-build-missing-commcare-session-id-injection",
-        "tier": "open_non_fatal",
-        "title": "com.simprints.feature.clientapi.mappers.request.validators.ConfirmIdentityValidator.validateSessionId",
-        "users_window": 6,
-        "verdict": "external",
-        "versions": [
-          "2024.1.4",
-          "2026.2.1"
-        ],
-        "warning": "The eCHIS device still on SID 2024.1.4 should be updated to a current release, because CommCare confirms cannot work on that build."
-      },
-      {
-        "crashlytics_issue_id": "bfbb96184d9e207c18940f3b30b54baa",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/bfbb96184d9e207c18940f3b30b54baa",
-        "events_90d": 176,
-        "events_window": 24,
+        "crashlytics_issue_id": "6060d9ae8ab2f817a6c3775ca82f1137",
+        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/6060d9ae8ab2f817a6c3775ca82f1137",
+        "events_90d": 777,
+        "events_window": 1,
         "external_owner": null,
         "files": [
-          "infra/auth-store/src/main/java/com/simprints/infra/authstore/db/FirebaseAuthManager.kt"
+          "feature/external-credential/src/main/java/com/simprints/feature/externalcredential/screens/scanocr/ExternalCredentialScanOcrFragment.kt",
+          "infra/camera/src/main/java/com/simprints/infra/camera/CameraFrameProvider.kt"
         ],
         "impact": "low",
-        "module": "infra:auth-store",
-        "root_cause": "Firebase Auth token refresh fails with a generic FirebaseException wrapping a connection abort; FirebaseAuthManager.transformFirebaseExceptionIfNeeded only maps FirebaseNetworkException/ApiException to NetworkConnectionException, so getCurrentToken logs it via Simber.e and the worker retries. Handled network blip; unchanged on main, no open PR.",
-        "root_cause_id": "firebase-auth-token-refresh-network-error-unclassified",
+        "module": "infra:camera",
+        "root_cause": "CameraX cancels a pending OCR takePicture when the ExternalCredentialScanOcrFragment lifecycle stops (\"Camera is closed.\"), and the error callback logs it with Simber.e. This is expected; main's CameraFrameProvider still logs this cancel at error level.",
+        "root_cause_id": "camerax-capture-aborted-on-lifecycle-stop",
         "tier": "open_non_fatal",
-        "title": "com.google.firebase.concurrent.CustomThreadFactory.lambda$newThread$0",
-        "users_window": 12,
+        "title": "androidx.camera.core.ImageCaptureException.<init>",
+        "users_window": 1,
         "verdict": "noise",
         "versions": [
-          "2026.2.1",
-          "2026.2.0"
+          "2025.4.2"
         ],
         "warning": null
       },
       {
-        "crashlytics_issue_id": "178de8246c0eb6f255cd914c2c962763",
-        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/178de8246c0eb6f255cd914c2c962763",
-        "events_90d": 171,
-        "events_window": 23,
+        "crashlytics_issue_id": "c8ba2a28b8a84b7d4b27f862cdc814bc",
+        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/c8ba2a28b8a84b7d4b27f862cdc814bc",
+        "events_90d": 421,
+        "events_window": 1,
+        "external_owner": "config",
+        "files": [
+          "feature/client-api/src/main/java/com/simprints/feature/clientapi/mappers/request/validators/EnrolLastBiometricsValidator.kt"
+        ],
+        "impact": "low",
+        "module": "feature:client-api",
+        "root_cause": "The DHIS2 app sent the same REGISTER_LAST_BIOMETRICS twice. The first one succeeded and closed the session, so EnrolLastBiometricsValidator rejected the duplicate with a session ID mismatch, as it should.",
+        "root_cause_id": "calling-app-duplicate-enrol-last-request",
+        "tier": "open_non_fatal",
+        "title": "com.simprints.feature.clientapi.mappers.request.validators.EnrolLastBiometricsValidator.validateSessionId",
+        "users_window": 1,
+        "verdict": "external",
+        "versions": [
+          "2025.4.2"
+        ],
+        "warning": "The DHIS2 Simprints integration owners should check why Register Last Biometrics is sent twice for one session (project q3g2oCFr45hdfflPwF4M)."
+      },
+      {
+        "crashlytics_issue_id": "c8fb8d920f6f95a4b4cfa70fc66e8a41",
+        "crashlytics_url": "https://console.firebase.google.com/project/simprints-152315/crashlytics/app/android:com.simprints.id/issues/c8fb8d920f6f95a4b4cfa70fc66e8a41",
+        "events_90d": 257,
+        "events_window": 1,
         "external_owner": null,
         "files": [
-          "infra/event-sync/src/main/java/com/simprints/infra/eventsync/sync/master/EventSyncMasterWorker.kt",
-          "infra/event-sync/src/main/java/com/simprints/infra/eventsync/sync/down/workers/BaseEventDownSyncDownloaderWorker.kt",
-          "infra/events/src/main/java/com/simprints/infra/events/EventRepositoryImpl.kt"
+          "feature/orchestrator/src/main/java/com/simprints/feature/orchestrator/usecases/steps/FallbackToCommCareDataSourceIfNeededUseCase.kt"
         ],
-        "impact": "medium",
-        "module": "infra:event-sync",
-        "root_cause": "Two EventSyncMasterWorker runs start concurrently; the second calls closeAllOpenScopes(DOWN_SYNC) and EventRepositoryImpl.closeEventScope deletes the first chain's empty down-sync scope, so BaseEventDownSyncDownloaderWorker.getEventScope finds none and throws IllegalArgumentException('input required'), failing that down-sync run. Still on main; no open PR.",
-        "root_cause_id": "down-sync-scope-closed-by-concurrent-master-worker",
+        "impact": "low",
+        "module": "feature:orchestrator",
+        "root_cause": "A deliberate Simber.w visibility signal (MS-1251) when the device has not synced within the threshold, so identification reads from CommCare. Here it fired right after a fresh login. This is expected behaviour.",
+        "root_cause_id": "commcare-fallback-visibility-warning",
         "tier": "open_non_fatal",
-        "title": "com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.getEventScope",
-        "users_window": 18,
-        "verdict": "app_bug",
+        "title": "com.simprints.feature.orchestrator.usecases.steps.FallbackToCommCareDataSourceIfNeededUseCase.shouldFallbackToCommCareDataSource",
+        "users_window": 1,
+        "verdict": "noise",
         "versions": [
-          "2025.4.2",
-          "2026.2.1"
+          "2026.3.0"
         ],
         "warning": null
       }
     ],
     "tiers": [
       {
-        "scanned": 5,
+        "scanned": 0,
         "tier": "open_crash"
       },
       {
-        "scanned": 3,
+        "scanned": 0,
         "tier": "open_anr"
       },
       {
-        "scanned": 25,
+        "scanned": 22,
         "tier": "open_non_fatal"
       },
       {
@@ -983,6 +599,6 @@
     ]
   },
   "weekly_limit_hit": false,
-  "window_end": "2026-11-16T16:33:58Z",
-  "window_start": "2026-10-27T12:48:55Z"
+  "window_end": "2026-10-27T12:48:55Z",
+  "window_start": "2026-10-26T12:48:55Z"
 }
