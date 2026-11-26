@@ -16,6 +16,8 @@ cp "$SOURCE"/* "$HERE/"
 QUEUE=(python3 "$HERE/queue.py" --state-dir "$STATE_DIR")
 MAX_PRS="${CRASHBUNNY_MAX_PRS:-15}"
 FINAL_HOUR_UTC="${CRASHBUNNY_FINAL_HOUR_UTC:-05}"
+# Taken when the run starts, so a long or delayed last run of the night still counts as the last one
+START_HOUR_UTC="$(date -u +%H)"
 mkdir -p "$WORK/patches" "$WORK/logs" "$WORK/setup-files"
 
 out() { sed -n "s/^$1=//p"; }
@@ -93,8 +95,9 @@ send_report() { # report-file
     [[ "$status" == 2* ]]
 }
 
-is_final_run() {
-    [ "$(date -u +%H)" = "$FINAL_HOUR_UTC" ] || [ "${FORCE_REPORT:-false}" = "true" ]
+is_final_run() { # any run that starts after the night window (22:00 to the final hour) has ended
+    { [ "$((10#$START_HOUR_UTC))" -ge "$((10#$FINAL_HOUR_UTC))" ] && [ "$((10#$START_HOUR_UTC))" -lt 22 ]; } ||
+        [ "${FORCE_REPORT:-false}" = "true" ]
 }
 
 cat > "$WORK/mcp.json" <<EOF
@@ -150,7 +153,7 @@ fi
 
 if [ "$phase" = "fix" ]; then
     while true; do
-        item="$("${QUEUE[@]}" next --out "$WORK/item.json" --max-prs "$MAX_PRS" | out item)"
+        item="$("${QUEUE[@]}" next --out "$WORK/item.json" --max-prs "$MAX_PRS" --dry-run "$DRY_RUN" | out item)"
         [ -n "$item" ] || break
         save_state "Start $item"
         echo "::group::Fix $item"

@@ -107,9 +107,13 @@ def cmd_init(args):
             "root_cause": issue.get("root_cause"),
             "impact": issue.get("impact"),
             "issue_ids": [],
+            "issues": [],
             "status": "pending",
             "attempts": 0,
         })
+        # Keep the issue details on the item, so a carried-over item still has them after the next triage
+        item.setdefault("issues", [])
+        item["issues"] = [i for i in item["issues"] if i["crashlytics_issue_id"] != issue["crashlytics_issue_id"]] + [issue]
         if issue["crashlytics_issue_id"] not in item["issue_ids"]:
             item["issue_ids"].append(issue["crashlytics_issue_id"])
         if IMPACT_ORDER.get(issue.get("impact"), 3) < IMPACT_ORDER.get(item.get("impact"), 3):
@@ -135,6 +139,18 @@ def cmd_next(args):
     """Claim the next pending item and write it for the fix prompt."""
     _, queue_path = paths(args.state_dir)
     queue = load(queue_path, {})
+    # The current workflow setting wins over the one the queue was triaged with, so shadow mode can be switched on
+    # for a queue that is already running
+    queue["dry_run"] = args.dry_run == "true"
+    # Runs never overlap, so an item still in progress here was cut off by a job timeout or cancellation. The
+    # attempt still counts, so an item that keeps getting cut off can't loop forever
+    for item in queue.get("items", []):
+        if item["status"] == "in_progress":
+            if item["attempts"] < args.max_attempts:
+                item["status"] = "pending"
+            else:
+                item["status"] = "failed"
+                item["fix"] = {"status": "failed", "reason": "Fix run was cut off by a job timeout or cancellation"}
     done = sum(1 for i in queue.get("items", []) if i["status"] == "done" and i.get("pr_url"))
     if done >= args.max_prs:
         gh_output(item="")
@@ -143,11 +159,11 @@ def cmd_next(args):
         if item["status"] == "pending" and item["attempts"] < args.max_attempts:
             item["status"] = "in_progress"
             item["attempts"] += 1
-            issues = [i for i in queue["triage"]["issues"] if i["crashlytics_issue_id"] in item["issue_ids"]]
-            Path(args.out).write_text(json.dumps({**item, "issues": issues, "dry_run": queue["dry_run"]}, indent=2))
+            Path(args.out).write_text(json.dumps({**item, "dry_run": queue["dry_run"]}, indent=2))
             save(queue_path, queue)
             gh_output(item=item["root_cause_id"])
             return
+    save(queue_path, queue)
     gh_output(item="")
 
 
@@ -208,6 +224,14 @@ def cmd_report(args):
         for issue_id in item["issue_ids"]:
             fixes[issue_id] = fix
     pending = sum(1 for i in queue.get("items", []) if i["status"] in ("pending", "in_progress"))
+    issues = list(queue.get("triage", {}).get("issues", []))
+    # Items carried over from an earlier night keep their issues even when tonight's triage didn't see them again
+    seen = {i["crashlytics_issue_id"] for i in issues}
+    for item in queue.get("items", []):
+        for issue in item.get("issues", []):
+            if issue["crashlytics_issue_id"] not in seen:
+                issues.append({**issue, "carried_over": True})
+                seen.add(issue["crashlytics_issue_id"])
     if queue.get("weekly_limit_hit"):
         status = "paused_weekly_limit"
     else:
@@ -224,7 +248,7 @@ def cmd_report(args):
         "tiers": queue.get("triage", {}).get("tiers", []),
         "issues": [
             {**issue, "fix": fixes.get(issue["crashlytics_issue_id"])}
-            for issue in queue.get("triage", {}).get("issues", [])
+            for issue in issues
         ],
     }
     Path(args.out).write_text(json.dumps(report, indent=2))
@@ -258,6 +282,7 @@ def main():
     nxt.add_argument("--out", required=True)
     nxt.add_argument("--max-prs", type=int, default=15)
     nxt.add_argument("--max-attempts", type=int, default=2)
+    nxt.add_argument("--dry-run", choices=["true", "false"], required=True)
     nxt.set_defaults(func=cmd_next)
 
     limit = sub.add_parser("limit")
