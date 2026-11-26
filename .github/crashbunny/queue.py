@@ -145,14 +145,16 @@ def cmd_next(args):
     # Runs never overlap, so an item still in progress here was cut off by a job timeout or cancellation. The
     # attempt still counts, so an item that keeps getting cut off can't loop forever
     for item in queue.get("items", []):
-        if item["status"] == "in_progress":
+        if item["status"] in ("pending", "in_progress"):
             if item["attempts"] < args.max_attempts:
                 item["status"] = "pending"
             else:
                 item["status"] = "failed"
                 item["fix"] = {"status": "failed", "reason": "Fix run was cut off by a job timeout or cancellation"}
-    done = sum(1 for i in queue.get("items", []) if i["status"] == "done" and i.get("pr_url"))
-    if done >= args.max_prs:
+    # Only PRs opened tonight count towards the runaway guard, not ones that already existed
+    opened = sum(1 for i in queue.get("items", []) if (i.get("fix") or {}).get("status") == "pr_opened")
+    if opened >= args.max_prs:
+        save(queue_path, queue)
         gh_output(item="")
         return
     for item in queue.get("items", []):
@@ -211,6 +213,8 @@ def cmd_complete(args):
         item["fix"] = result
         item["pr_url"] = result.get("pr_url")
         item["status"] = "done" if result.get("status") in ("pr_opened", "would_fix", "skipped_existing") else "failed"
+        # A report already sent (e.g. on the last run of the night) doesn't include this outcome yet
+        queue["reported"] = False
     save(queue_path, queue)
 
 
@@ -240,7 +244,8 @@ def cmd_report(args):
         "run": {
             "window_start": queue.get("window_start"),
             "window_end": queue.get("window_end"),
-            "dry_run": queue.get("dry_run", True),
+            # The current setting, so switching on shadow mode also stops a pending report from writing to Jira
+            "dry_run": args.dry_run == "true",
             "workflow_run_url": args.run_url,
             "queue_status": status,
             "pending": pending,
@@ -298,6 +303,7 @@ def main():
     report = sub.add_parser("report")
     report.add_argument("--run-url", required=True)
     report.add_argument("--out", required=True)
+    report.add_argument("--dry-run", choices=["true", "false"], required=True)
     report.set_defaults(func=cmd_report)
 
     mark = sub.add_parser("mark-reported")

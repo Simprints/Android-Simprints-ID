@@ -18,6 +18,9 @@ MAX_PRS="${CRASHBUNNY_MAX_PRS:-15}"
 FINAL_HOUR_UTC="${CRASHBUNNY_FINAL_HOUR_UTC:-05}"
 # Taken when the run starts, so a long or delayed last run of the night still counts as the last one
 START_HOUR_UTC="$(date -u +%H)"
+# The job is cancelled at 330 minutes; stop starting fixes in time to save state and send the report
+DEADLINE=$(( $(date +%s) + ${CRASHBUNNY_BUDGET_MINUTES:-300} * 60 ))
+FIX_MINUTES=60
 mkdir -p "$WORK/patches" "$WORK/logs" "$WORK/setup-files"
 
 out() { sed -n "s/^$1=//p"; }
@@ -120,7 +123,7 @@ if [ "$phase" = "triage" ]; then
     [ -n "$start" ] || start="$(date -u -d '-24 hours' +%FT%TZ)"
     [ -n "$end" ] || end="$(date -u +%FT%TZ)"
     if [ "$(echo "$phase_out" | out unreported_previous)" = "true" ]; then
-        "${QUEUE[@]}" report --run-url "$RUN_URL" --out "$WORK/previous-report.json"
+        "${QUEUE[@]}" report --run-url "$RUN_URL" --dry-run "$DRY_RUN" --out "$WORK/previous-report.json"
         send_report "$WORK/previous-report.json"
         "${QUEUE[@]}" mark-reported
         save_state "Reported previous night"
@@ -153,6 +156,10 @@ fi
 
 if [ "$phase" = "fix" ]; then
     while true; do
+        if [ $(( DEADLINE - $(date +%s) )) -lt $(( FIX_MINUTES * 60 )) ]; then
+            echo "Not enough time left in this job for another fix; the next hourly run continues the queue"
+            break
+        fi
         item="$("${QUEUE[@]}" next --out "$WORK/item.json" --max-prs "$MAX_PRS" --dry-run "$DRY_RUN" | out item)"
         [ -n "$item" ] || break
         save_state "Start $item"
@@ -161,7 +168,7 @@ if [ "$phase" = "fix" ]; then
         rm -f "$WORK/result.json"
         render "$HERE/fix-prompt.md" "$WORK/fix-prompt.md" \
             ITEM_FILE="$WORK/item.json" RESULT_FILE="$WORK/result.json" PATCH_FILE="$WORK/patches/$item.patch"
-        run_claude "$WORK/fix-prompt.md" "$WORK/logs/fix-$item.jsonl" 60
+        run_claude "$WORK/fix-prompt.md" "$WORK/logs/fix-$item.jsonl" "$FIX_MINUTES"
         limit="$("${QUEUE[@]}" limit --log "$WORK/logs/fix-$item.jsonl" | out limit)"
         "${QUEUE[@]}" complete --id "$item" --result "$WORK/result.json" --limit "$limit"
         save_state "Finish $item ($limit)"
@@ -176,7 +183,7 @@ fi
 # Report once the queue is drained (or on the last run of the night), then go idle until the next night
 phase="$("${QUEUE[@]}" phase | out phase)"
 if [ "$phase" = "report" ] || { [ "$phase" = "fix" ] && is_final_run; }; then
-    "${QUEUE[@]}" report --run-url "$RUN_URL" --out "$WORK/report.json"
+    "${QUEUE[@]}" report --run-url "$RUN_URL" --dry-run "$DRY_RUN" --out "$WORK/report.json"
     send_report "$WORK/report.json"
     "${QUEUE[@]}" mark-reported
     save_state "Reported"
