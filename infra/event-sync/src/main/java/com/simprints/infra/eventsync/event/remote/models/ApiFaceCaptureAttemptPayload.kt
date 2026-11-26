@@ -23,6 +23,7 @@ internal data class ApiFaceCaptureAttemptPayload(
     val qualityAllFrames: ApiValueStats?,
     val statusRuns: List<ApiStatusRun>,
     val statusRunsTruncated: Boolean?,
+    val lightingStats: ApiLightingStats? = null,
 ) : ApiEventPayload() {
     constructor(domainPayload: FaceCaptureAttemptPayload) : this(
         startTime = domainPayload.createdAt.fromDomainToApi(),
@@ -39,6 +40,7 @@ internal data class ApiFaceCaptureAttemptPayload(
         statusRuns = domainPayload.statusRuns.map { it.fromDomainToApi() },
         // Absent means false
         statusRunsTruncated = domainPayload.statusRunsTruncated.takeIf { it },
+        lightingStats = domainPayload.lightingStats?.fromDomainToApi(),
     )
 
     @Keep
@@ -78,6 +80,26 @@ internal data class ApiFaceCaptureAttemptPayload(
         val frameCount: Int,
         val durationMs: Long,
     )
+
+    @Keep
+    @Serializable
+    data class ApiLightingStats(
+        val mode: ApiLightingCheckMode,
+        val framesMeasured: Int,
+        val tooDarkFrameCount: Int,
+        val noFaceWhileTooDarkCount: Int? = null,
+        val brightnessMin: Int? = null,
+        val brightnessMedian: Int? = null,
+        val brightnessMax: Int? = null,
+        val contrastMedian: Int? = null,
+        val hintShownMs: Long? = null,
+    )
+
+    @Keep
+    enum class ApiLightingCheckMode {
+        LOG,
+        HINT,
+    }
 
     /** Same names as [ApiFaceCapturePayload.ApiResult], so the two events read alike. */
     @Keep
@@ -133,3 +155,18 @@ internal fun FaceCaptureAttemptPayload.RunStatus.fromDomainToApi() = when (this)
     FaceCaptureAttemptPayload.RunStatus.TOO_CLOSE -> ApiFaceCaptureAttemptPayload.ApiRunStatus.TOO_CLOSE
     FaceCaptureAttemptPayload.RunStatus.TOO_FAR -> ApiFaceCaptureAttemptPayload.ApiRunStatus.TOO_FAR
 }
+
+internal fun FaceCaptureAttemptPayload.LightingStats.fromDomainToApi() = ApiFaceCaptureAttemptPayload.ApiLightingStats(
+    mode = when (mode) {
+        FaceCaptureAttemptPayload.LightingCheckMode.LOG -> ApiFaceCaptureAttemptPayload.ApiLightingCheckMode.LOG
+        FaceCaptureAttemptPayload.LightingCheckMode.HINT -> ApiFaceCaptureAttemptPayload.ApiLightingCheckMode.HINT
+    },
+    framesMeasured = framesMeasured,
+    tooDarkFrameCount = tooDarkFrameCount,
+    noFaceWhileTooDarkCount = noFaceWhileTooDarkCount,
+    brightnessMin = brightnessMin,
+    brightnessMedian = brightnessMedian,
+    brightnessMax = brightnessMax,
+    contrastMedian = contrastMedian,
+    hintShownMs = hintShownMs,
+)

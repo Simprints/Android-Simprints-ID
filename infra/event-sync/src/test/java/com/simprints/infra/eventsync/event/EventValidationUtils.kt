@@ -677,7 +677,20 @@ fun validateFaceCaptureAttemptEventApiModel(json: JSONObject) {
         }
 
         assertThat(has("statusRunsTruncated")).isFalse()
-        assertThat(length()).isEqualTo(12)
+
+        with(getJSONObject("lightingStats")) {
+            assertThat(getString("mode")).isEqualTo("HINT")
+            assertThat(getInt("framesMeasured")).isEqualTo(11)
+            assertThat(getInt("tooDarkFrameCount")).isEqualTo(3)
+            assertThat(getInt("noFaceWhileTooDarkCount")).isEqualTo(2)
+            assertThat(getInt("brightnessMin")).isEqualTo(21)
+            assertThat(getInt("brightnessMedian")).isEqualTo(96)
+            assertThat(getInt("brightnessMax")).isEqualTo(141)
+            assertThat(getInt("contrastMedian")).isEqualTo(88)
+            assertThat(getLong("hintShownMs")).isEqualTo(600L)
+            assertThat(length()).isEqualTo(9)
+        }
+        assertThat(length()).isEqualTo(13)
     }
 }
 

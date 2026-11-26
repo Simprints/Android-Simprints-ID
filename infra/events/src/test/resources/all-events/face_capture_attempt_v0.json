@@ -46,6 +46,17 @@
       { "status": "OFF_YAW", "frameCount": 20, "durationMs": 550 },
       { "status": "VALID", "frameCount": 15, "durationMs": 1650 }
     ],
-    "statusRunsTruncated": false
+    "statusRunsTruncated": false,
+    "lightingStats": {
+      "mode": "HINT",
+      "framesMeasured": 11,
+      "tooDarkFrameCount": 3,
+      "noFaceWhileTooDarkCount": 2,
+      "brightnessMin": 21,
+      "brightnessMedian": 96,
+      "brightnessMax": 141,
+      "contrastMedian": 88,
+      "hintShownMs": 600
+    }
   }
 }
