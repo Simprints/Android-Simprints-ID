@@ -5,10 +5,6 @@
 name: "[Manual][Scheduled] CrashBunny"
 
 on:
-    # TEMPORARY: lets the feature branch be tested before the workflow exists on main. Remove before merging
-    push:
-        branches:
-            - feature/crashbunny-automation
     workflow_dispatch:
         inputs:
             force-triage:
@@ -39,8 +35,8 @@ jobs:
         environment: CrashBunny
 
         env:
-            # Shadow mode until the repo variable CRASHBUNNY_DRY_RUN is set to 'false'
-            DRY_RUN: ${{ vars.CRASHBUNNY_DRY_RUN == 'false' && 'false' || 'true' }}
+            # Live by default; set the CRASHBUNNY_DRY_RUN variable to 'true' to go back to shadow mode
+            DRY_RUN: ${{ vars.CRASHBUNNY_DRY_RUN == 'true' && 'true' || 'false' }}
             CRASHBUNNY_MODEL: ${{ vars.CRASHBUNNY_MODEL || 'opus' }}
             CRASHBUNNY_MAX_PRS: ${{ vars.CRASHBUNNY_MAX_PRS || '15' }}
             FORCE_TRIAGE: ${{ inputs.force-triage || 'false' }}
