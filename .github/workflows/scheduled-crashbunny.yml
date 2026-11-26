@@ -79,7 +79,13 @@ jobs:
                     google-services-file: ${{ secrets.GOOGLE_SERVICES_FILE }}
 
             -   name: Install Claude Code and Firebase CLI
-                run: npm install -g @anthropic-ai/claude-code firebase-tools
+                # Pinned versions and no lifecycle scripts. Claude Code's only postinstall copies its native binary
+                # out of the platform package, so it's run explicitly (firebase-tools needs none)
+                run: |
+                    npm install -g --ignore-scripts @anthropic-ai/claude-code@2.1.332 firebase-tools@15.37.0
+                    node "$(npm root -g)/@anthropic-ai/claude-code/install.cjs"
+                    claude --version
+                    firebase --version
 
             -   name: Set up Firebase credentials
                 env:

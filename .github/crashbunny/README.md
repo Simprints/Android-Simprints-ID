@@ -31,3 +31,5 @@ All secrets and variables below go in the `CrashBunny` environment (Settings →
 | Variable | `CRASHBUNNY_MAX_PRS` | Optional, default `15`. A runaway guard, not a quota |
 
 Use `workflow_dispatch` with `force-triage` and `force-report` to test outside the night window.
+
+Claude Code and the Firebase CLI are pinned in the workflow and installed with `--ignore-scripts`; bump the versions there to update them.
